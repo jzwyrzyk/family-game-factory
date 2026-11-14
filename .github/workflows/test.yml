@@ -2,7 +2,8 @@ name: Arcade journeys
 on: [push, pull_request]
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest can move to unsupported OS versions.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
