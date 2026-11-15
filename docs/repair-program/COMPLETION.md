@@ -49,3 +49,9 @@ Issue #7 remains PARTIAL. The residual construction, shared learning, private st
 - IMPLEMENTED-UNVERIFIED overall: pictured rocket/submarine/robot constraint guides, seeded household-kit variation with mandatory solvable core and optional substitute, proportional colored parts, visible launch/dive/dance and reduced-motion behavior.
 - VERIFIED-LOCAL: 500 seeded kits include a solution within ten joints; touch drag/rotate via Chromium touch events, keyboard assembly, undo restoring gum, and actual rocket → submarine → robot progression pass. Screenshots capture the assembled structures, not only the result panel.
 - Full combined CI is pending; this follow-up is not part of the approved/deployed restoration SHA above.
+
+## Private on-device drawing batch
+
+- IMPLEMENTED-UNVERIFIED overall: private IndexedDB image library scoped to local profiles, magic-byte/decode/size checks, 5 MiB per-file and 20 MiB device quota, original SHA-256 provenance, explicit separate centre-cutout derivatives, original export, explicit deletion and drawing decoration for newly created construction bodies. Existing constructions retain their selected asset reference.
+- VERIFIED-LOCAL targeted browser: upload, cutout preserving original, actual build decoration, profile switching, reload, export/delete, malformed bytes rejection and no network uploads. Full CI pending.
+- This is local private storage, not authenticated cloud sync. Existing progress JSON does not embed image bytes; originals have separate exports. Custom rigging, generated-game image/audio capability and private object-storage wiring remain incomplete; no public uploads or cloud calls were added.
