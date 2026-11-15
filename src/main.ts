@@ -11,3 +11,6 @@ void initBuilder();
 
 import {installOffline} from './offline';
 installOffline();
+
+import {installDrawings} from './assets/ui';
+installDrawings();

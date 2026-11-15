@@ -13,3 +13,10 @@ fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-size:25px;font-weig
 
 .revision-tools summary{cursor:pointer;font-weight:800;color:var(--aqua);min-height:44px;padding:10px 0}
 #builderPanel{margin:18px 0;border:2px solid var(--yellow)}#generatedPreview{width:100%;height:520px;border:2px solid var(--blue);border-radius:18px;background:#211942}#builtGames{margin-bottom:20px}#builderGames{display:flex;flex-wrap:wrap;gap:12px}#createTry{margin:12px 0}#builderPanel input{display:block;width:100%;background:#101732;border:1px solid #505e88;border-radius:11px;color:white;padding:12px}#builderPanel label{display:block;margin-top:18px}#builderPreview{margin-top:18px}
+
+/* Original construction: move the connected assembly visibly, respect reduced motion. */
+.construction-stage.launch[data-kind="rocket"] [data-part],.construction-stage.launch[data-kind="rocket"] svg{translate:0 -450px;transition:translate 1s ease-in}
+.construction-stage.launch[data-kind="submarine"] [data-part],.construction-stage.launch[data-kind="submarine"] svg{translate:600px 0;transition:translate 1s ease-in}
+.construction-stage.launch[data-kind="robot"] [data-part]{animation:wobble .18s 5 alternate}
+.construction-stage [data-part]{min-height:44px;min-width:44px;color:#26304f;padding:3px;line-height:1.1}
+@media(prefers-reduced-motion:reduce){.construction-stage.launch [data-part],.construction-stage.launch svg{animation:none!important;transition:none!important;translate:none!important}}
