@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {generateKeyPair,SignJWT} from 'jose';
+import {paidExecutionAllowed} from '../server/gateway';
 import {GitHubDispatcher,workerTag} from '../server/actions/dispatcher';
 import {GitHubOIDCVerifier} from '../server/actions/identity';
 
@@ -38,4 +39,12 @@ test('private callbacks are signed and reject public repo, wrong private SHA, PR
  for(const bad of [{repository:'jzwyrzyk/family-game-factory'},{repository_id:'1458033181'},{sha:'a'.repeat(40)},{ref:'refs/heads/main'},{workflow_ref:PRIVATE+'/.github/workflows/evil.yml@'+tag},{event_name:'pull_request'},{run_attempt:'2'},{environment:'untrusted'}]){
   await assert.rejects(verifier.verify(await sign(bad)),/WORKER_FORBIDDEN/);
  }
+});
+
+test('paid execution requires active private config AND explicit runtime approval (default off)',()=>{
+ assert.equal(paidExecutionAllowed(false,undefined),false);
+ assert.equal(paidExecutionAllowed(true,undefined),false);
+ assert.equal(paidExecutionAllowed(true,'false'),false);
+ assert.equal(paidExecutionAllowed(false,'true'),false);
+ assert.equal(paidExecutionAllowed(true,'true'),true);
 });
