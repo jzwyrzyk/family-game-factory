@@ -1,0 +1,1 @@
+PASS live service-worker update: prior reviewed cache → new exact SHA, explicit update, saved profile retained, obsolete cache removed

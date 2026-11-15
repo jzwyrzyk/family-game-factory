@@ -1,0 +1,1 @@
+PASS private drawings: upload, separate cutout, build decoration, scoped reload, export/delete, bad bytes rejected, no network uploads
