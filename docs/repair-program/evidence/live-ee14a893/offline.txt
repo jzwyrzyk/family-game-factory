@@ -1,0 +1,1 @@
+PASS offline: cached shell and original art, offline native game, private endpoints excluded, build identity

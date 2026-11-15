@@ -1,0 +1,109 @@
+
+> family-game-factory@2.0.0-foundation test
+> npm run build && npm run test:unit && npm run test:browser && npm run test:real-agent
+
+
+> family-game-factory@2.0.0-foundation build
+> npm run typecheck && vite build
+
+
+> family-game-factory@2.0.0-foundation typecheck
+> tsc --noEmit
+
+vite v6.4.1 building for production...
+transforming...
+✓ 28 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  13.31 kB │ gzip:  4.71 kB
+dist/assets/index-CRdLEPUG.css   16.16 kB │ gzip:  4.66 kB
+dist/assets/index-RzuAoPI2.js   145.98 kB │ gzip: 54.00 kB
+✓ built in 374ms
+
+> family-game-factory@2.0.0-foundation test:unit
+> node --import tsx tests/unit.ts
+
+✔ manifest types, ranges, steps and unknown keys fail closed; presets preserve originals (1.14768ms)
+✔ honest interpreter accepts bounded child language, rejects mixed/novel instructions and out-of-range edits (1.000061ms)
+✔ revision DAG preserves alternate futures; undo, compare, fork and reload never overwrite source (1.414098ms)
+✔ failed writes and invalid restore retain the last working revision and in-memory state (0.416892ms)
+✔ v1 workspace migration is durable on next save; unrelated original math/progress key is untouched (0.198866ms)
+✔ invalid DAG, unknown versions, private executable fields and corrupt storage are not silently reset (0.227589ms)
+✔ play evidence must match the revision, coach uses real outcome and supports skip and a testable hypothesis (0.606915ms)
+✔ plugin lifecycle starts once, disposes idempotently, retries and ignores stale/duplicate finishes (1.165477ms)
+✔ redo follows a selected child without deleting alternate futures and rejects other profiles (0.444592ms)
+✔ private resources require verified unexpired family scope, publishing additionally requires parent approval and tests (0.277894ms)
+✔ generation rejects client-selected security fields and oversized requests (0.720384ms)
+✔ job lifecycle requires validation before ready; cancellation is terminal (0.184605ms)
+✔ unconfigured AI adapter does not pretend to generate a game (0.163975ms)
+✔ session verification rejects tampering, expiration and missing authentication (0.483862ms)
+✔ job submissions are idempotent, family-scoped and reject private/unknown inputs (0.940392ms)
+✔ spending is disabled by default, reserved atomically, cut off under concurrent jobs and parent-controlled (1.063996ms)
+✔ cancellation is terminal, failed validation never replaces kept content, retry policy is bounded (243.449988ms)
+✔ durable queue survives reopening; immutable revisions and kept pointers survive restart (84.987015ms)
+✔ unknown executable artifacts fail validation; compiled preview uses strict CSP and no credential or network access (0.403632ms)
+✔ timeouts fail closed and record an audit event instead of replacing active revision (20.619812ms)
+✔ real adapter uses fixed OpenAI endpoint, strict source schema, no provider storage, bounded output and measured pricing (12.637755ms)
+✔ disabled approval, refusal, oversized source and missing usage fail closed without inventing a success (0.44951ms)
+✔ repair sends the last source and bounded test feedback, never compiled runtime or credentials (0.338023ms)
+✔ compiled artifact binds source, output hash and all required tests (0.358003ms)
+✔ GitHub dispatch exposes opaque job IDs only and refuses reviewed-tag drift (0.816016ms)
+✔ Actions OIDC verifies issuer/audience, repository ID, approved SHA, environment stage and rejects forks/reruns (20.272835ms)
+✔ durable Actions coordinator repairs failed tests automatically, binds stages and rejects stale reports (1.38236ms)
+✔ sandbox cannot weaken gVisor, network, filesystem, PID or output controls (0.307147ms)
+✔ one-use owner invitation yields only a scoped HttpOnly partitioned session, never a provider credential (21.27649ms)
+✔ queue dispatch failure survives coordinator restart and expires instead of remaining stuck forever (0.591441ms)
+✔ owner kill switch blocks previously queued Actions generation, not only new submissions (0.266798ms)
+✔ structural construction supports substitute bodies, different geometry and solvable progression (3.966682ms)
+✔ disconnected structures, gum budgets and invalid attachments are enforced (0.235291ms)
+✔ rotation changes support geometry and stretched joints need repair (0.247549ms)
+✔ seeded household kits always include a construction within ten gum sticks (4.068193ms)
+✔ gum joints store attachment points on each piece, not just a connectivity flag (0.108842ms)
+✔ parent fact targets and due reviews persist with deterministic clock and avoid immediate repeats (2.185187ms)
+✔ assisted answers do not count as independent retrieval and evidence retains attempts (0.611702ms)
+✔ large revision payloads leave Firestore metadata while round-trip authorization and games remain intact (31.225228ms)
+✔ artifact tampering and unsafe references fail closed; legacy inline workspaces still load (0.335099ms)
+✔ GCS adapter uses private workspace-scoped immutable writes, bounded reads and digest verification (0.654145ms)
+ℹ tests 41
+ℹ suites 0
+ℹ pass 41
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 660.942416
+
+> family-game-factory@2.0.0-foundation test:browser
+> node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs
+
+PASS: creation, remix, all games, math, parents, persistence, profiles, failed saves, mobile
+PASS desktop: five real mutations, outcomes/coach, compare, undo/DAG, fork/reload, profile/math isolation, rejected edits, quota safety
+PASS mobile: five real mutations, outcomes/coach, compare, undo/DAG, fork/reload, profile/math isolation, rejected edits, quota safety
+Builder test browser: 141.0.7390.37 explicit executable: /tmp/assignment-002-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+Artifact gate passed: 5 stars
+Artifact gate passed: 6 stars
+PASS builder desktop: real mocked novel mechanic, browser-gated artifact, sandbox isolation, failure preservation, retry, keep/undo, cancellation, reload and authorization
+Artifact gate passed: 5 stars
+Artifact gate passed: 6 stars
+PASS builder mobile: real mocked novel mechanic, browser-gated artifact, sandbox isolation, failure preservation, retry, keep/undo, cancellation, reload and authorization
+PASS Assignment 002 desktop: website → authenticated gateway → mocked Actions → real adapter transport fixture → source compile/test/repair → private worker preview → five playable revisions/keep/undo/fork/reload/cancel
+PASS Assignment 002 mobile: website → authenticated gateway → mocked Actions → real adapter transport fixture → source compile/test/repair → private worker preview → five playable revisions/keep/undo/fork/reload/cancel
+PASS generated-worker boundary: infinite module stopped without network, parent access or UI freeze
+PASS generated-worker boundary: blocked network stopped without network, parent access or UI freeze
+PASS generated-worker boundary: blocked DOM stopped without network, parent access or UI freeze
+PASS restored native games desktop
+PASS restored native games mobile
+PASS learning: fact override, hints, both Splash consequences, independent evidence, reload and backup
+PASS offline: cached shell and original art, offline native game, private endpoints excluded, build identity
+PASS construction touch drag/rotate, gum undo, keyboard assembly and rocket/submarine/robot progression
+PASS private drawings: upload, separate cutout, build decoration, scoped reload, export/delete, bad bytes rejected, no network uploads
+
+> family-game-factory@2.0.0-foundation test:real-agent
+> node tests/real-agent-status.cjs
+
+SKIP real-agent smoke: no verified, funded production integration. No credentials read and no external agent request made.
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
