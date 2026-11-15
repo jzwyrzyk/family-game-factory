@@ -8,3 +8,6 @@ initLiveRemix();
 
 import { initBuilder } from './builder/ui';
 void initBuilder();
+
+import {installOffline} from './offline';
+installOffline();

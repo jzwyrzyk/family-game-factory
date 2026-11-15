@@ -1,0 +1,13 @@
+import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';import type {Plugin} from 'vite';
+export function offlineBuild():Plugin{return {name:'reviewed-offline-shell',closeBundle(){
+ const dir='dist';const files=(base:string):string[]=>fs.readdirSync(path.join(dir,base),{withFileTypes:true}).flatMap(f=>f.isDirectory()?files(path.join(base,f.name)):[path.join(base,f.name)]);
+ const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const dirty=!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim();fs.writeFileSync(path.join(dir,'build-info.json'),JSON.stringify({sha,dirty}));
+ const list=files('').filter(f=>!['sw.js','factory-config.json'].includes(f)).sort();const hash=createHash('sha256');for(const f of list)hash.update(f).update(fs.readFileSync(path.join(dir,f)));const version=hash.digest('hex');
+ fs.writeFileSync(path.join(dir,'sw.js'),`const paths=${JSON.stringify(list)},version=${JSON.stringify(version)};
+const prefix='family-arcade:'+new URL(self.registration.scope).pathname+':',key=prefix+version;
+const urls=paths.map(p=>new URL(p,self.registration.scope).href);
+self.addEventListener('install',event=>event.waitUntil(caches.open(key).then(c=>c.addAll(urls))));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(prefix)&&k!==key).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('message',e=>{if(e.data?.type==='ACTIVATE_REVIEWED_UPDATE')self.skipWaiting()});
+self.addEventListener('fetch',event=>{const r=event.request;if(r.method!=='GET')return;const u=new URL(r.url);if(u.origin!==self.location.origin)return;const target=r.mode==='navigate'&&u.href.startsWith(self.registration.scope)?new URL('index.html',self.registration.scope).href:r.url;if(!urls.includes(target))return;event.respondWith(caches.open(key).then(async c=>(await c.match(target))||fetch(r)));});`);
+}}}

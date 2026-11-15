@@ -29,3 +29,17 @@ Local evidence: `npm test` baseline with the revised journeys and five-change su
 - VERIFIED-LOCAL unit fixtures: a 4+ MiB revision workspace round-trips through <20 KiB metadata; tampered/unsafe/missing-storage references fail closed; a fake GCS transport checks private immutable options and workspace paths. No real cloud or emulator calls are claimed.
 - Owner action when configuration resumes: select/verify a private bucket in the existing project, enforce public-access prevention/uniform access, grant the gateway scoped object create/read and preview object read, and set the same bucket/workspace in both private configs. Do not enable a generic age-based deletion policy on referenced live artifacts. Review retention/export/orphan cleanup before activation. No bucket has been created and no deployment or paid request was made.
 - Limits remain explicit: 3 MiB metadata, 8 MiB per payload, 100 MiB referenced payloads and 512 references per workspace. This is bounded POC storage, not unlimited storage. Authenticated drawing upload/sync, generated image/audio capabilities and complete deletion/retention APIs are still incomplete.
+
+## Shared-learning batch (stacked on restoration)
+
+- IMPLEMENTED-UNVERIFIED overall: explicit parent multiplication-fact targets, bounded validation, injected-clock due scheduling, avoidance of immediate repeats when alternatives exist, independent/assisted evidence with attempts and timestamps, and game-specific outcome text in the optional coach.
+- VERIFIED-LOCAL: 35 unit tests; targeted browser flow for parent fact override, Practice hint/recovery, Original Challenge ending a run, reload and backup restoration. Full combined regressions/CI pending.
+- Additive profile fields: `factTargets`, `learningEvidence` (latest 500 records), `dueAt`, `lastAttempts`, `lastIndependent`, `lastFact`. Existing cumulative skill counts and legacy backups remain readable. These are provisional practice estimates, not certified mastery.
+- Still incomplete: prerequisite catalog beyond worked arithmetic hints, general fact targets outside multiplication, a configured real-model coach, real-device accessibility and all cloud/live-generation acceptance.
+
+
+## Offline/revision usability batch (stacked)
+
+- IMPLEMENTED-UNVERIFIED: explicit redo of the latest child, preserving alternate futures and profile authorization; installable manifest; content-hashed static-shell cache; user-triggered update activation; build SHA/dirty-state marker.
+- VERIFIED-LOCAL: offline browser test loaded the original Dragon art and started native gameplay after network disconnection. Cache keys exclude `factory-config.json`, authenticated APIs and private previews. This adds no cloud storage or public upload endpoint.
+- NOT STARTED: private upload/cutout/rigging UI, authenticated sync/object-storage implementation, standalone game export and deletion/retention UX. Those remain real implementation gaps, not owner-action blockers. Real AI activation and deployed-service verification remain blocked by paused configuration and the full isolated-runner gate.
