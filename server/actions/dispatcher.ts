@@ -13,17 +13,17 @@ export class GitHubDispatcher implements DispatchPort {
   const headers={Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
   const prefix=`https://api.github.com/repos/${this.config.repository}`;
   const tag=workerTag(this.config);
-  async function fetchCommitRef(transport:typeof fetch,url:string){
+  async function fetchCommitRef(transport:typeof fetch,url:string,strictType:boolean){
    const r=await transport(url,{headers,redirect:'error'});
    if(!r.ok)return null;
    const data=await r.json();
-   return data?.object?.type==='commit'?data.object.sha:null;
+   return data?.object?.sha&&(strictType?data.object.type==='commit':!data.object.type||data.object.type==='commit')?data.object.sha:null;
   }
   // The code identity remains independently pinned even though selected workflows must use main.
-  const tagged=await fetchCommitRef(this.transport,`${prefix}/git/ref/tags/${tag}`);
+  const tagged=await fetchCommitRef(this.transport,`${prefix}/git/ref/tags/${tag}`,Boolean(this.config.privateWorker));
   if(tagged!==this.config.approvedSha)throw Error('APPROVED_WORKER_TAG_CHANGED');
   if(this.config.privateWorker){
-   const head=await fetchCommitRef(this.transport,`${prefix}/git/ref/heads/main`);
+   const head=await fetchCommitRef(this.transport,`${prefix}/git/ref/heads/main`,true);
    if(head!==this.config.approvedSha)throw Error('APPROVED_WORKER_BRANCH_DRIFT');
   }
   // Dispatch inputs are opaque. The workflow itself repeats SHA checks; a race fails closed.
