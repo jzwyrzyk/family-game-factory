@@ -9,6 +9,7 @@ export class DesignCoach {
     this.playId=play.id;this.phase='reflection';this.hypothesis='';
     const outcome=play.outcome;
     this.summary=`You ${outcome.won?'won':'got splashed or lost'} level ${outcome.level} after ${(outcome.durationMs/1000).toFixed(1)} seconds of play.`;
+    this.summary+=' '+outcome.description;
     if (revision.hypothesis) this.summary+=` You predicted: “${revision.hypothesis}”. This is one play, not proof.`;
   }
   question():string {return this.phase==='reflection'?'What did you notice in that play?':this.phase==='hypothesis'?'What do you think your next change will do?':'';}
