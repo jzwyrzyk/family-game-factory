@@ -39,7 +39,7 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-Strict TypeScript check, Vite production build, unit/contract tests, original v0.3 browser journeys and desktop/mobile five-iteration remix journeys run in CI on pinned Ubuntu 24.04. System Chromium is used when installed; otherwise Playwright's Chromium is used. `CHROMIUM_PATH` overrides it. Tests serve built assets under a repository-style `/arcade/` path and create synthetic screenshots in `test-results/`.
+Strict TypeScript check, Vite production build, unit/contract tests, original v0.3 browser journeys and desktop/mobile five-iteration remix journeys run in CI on pinned Ubuntu 24.04. CI always uses the Playwright-pinned Chromium installed by the workflow. Local runs may use system Chromium when installed; otherwise Playwright's Chromium is used. `CHROMIUM_PATH` overrides it. Tests serve built assets under a repository-style `/arcade/` path and create synthetic screenshots in `test-results/`.
 
 ## GitHub Pages and cloud limits
 

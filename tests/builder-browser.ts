@@ -13,8 +13,8 @@ import type { AgentAdapter,AgentInput } from '../server/pipeline/types';
 import { resolve,extname } from 'node:path';
 const listen=(server:Server,host?:string)=>new Promise<number>(r=>{server.listen(0,host,()=>r((server.address() as {port:number}).port));});
 async function main(){
- const browser:Browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
- console.log('Builder test browser:',browser.version(),'explicit executable:',process.env.CHROMIUM_PATH||'auto');
+ const browser:Browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
+ console.log('Builder test browser:',browser.version(),'explicit executable:',process.env.CHROMIUM_PATH||(process.env.CI?'Playwright pinned browser':'local auto'));
  let failNext=false,slowNext=false;const mock=new MockAgent();
  const agent:AgentAdapter={available:true,kind:'mock',async generate(input:AgentInput){if(failNext){failNext=false;throw Error('TEST_BUILD_FAILURE');}if(slowNext){slowNext=false;await new Promise<void>((_,reject)=>input.signal.addEventListener('abort',()=>reject(Error('CANCELLED')),{once:true}));}return mock.generate(input);}};
  const repository=new MemoryRepository(),service=new JobService(repository,agent,{async test(game){

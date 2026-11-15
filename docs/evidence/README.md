@@ -30,3 +30,5 @@ The browser tests also verify combined parent JSON export/restore, old progress-
 CI reproduces the same commands on Node 22 / Ubuntu 24.04 and uploads `test-results/` as `browser-evidence`. This evidence is for the implemented local configuration system. It does not claim arbitrary AI generation, production cloud security, full original-game fidelity, physical mobile-device/Safari validation or deployment.
 
 The mocked builder tests also exercise compare and save-as-new, then verify private family authorization and scan the production JavaScript assets for server secrets and mock-agent implementation. The mock is explicitly labeled in the parent UI, including when reopening saved versions.
+
+CI diagnosis: the runner had unpinned Chromium 157 installed at the system path, while Playwright 1.56.1 downloaded Chromium 141. The mocked browser gate timed out on that system engine. CI now explicitly uses Playwright’s pinned engine; a complete local Node 22 + Chromium 141 run passed without changing assertions.
