@@ -1,0 +1,52 @@
+name: Factory isolated runner smoke (owner-only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: factory-isolated-smoke
+  cancel-in-progress: false
+jobs:
+  sandbox:
+    # This workflow is intentionally inert until an owner separately enables the smoke gate.
+    # It does NOT enable paid generation or change FACTORY_ACTIONS_APPROVED.
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/tags/factory-worker-dcb887e6a51ba000fda1ccc42b9d198f8b9895f9' && vars.FACTORY_RUNNER_SMOKE_APPROVED == 'true' && vars.FACTORY_ACTIONS_APPROVED != 'true'
+    runs-on: [self-hosted, factory-isolated]
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Refuse worker drift and unsafe host
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$(git rev-parse HEAD)" = dcb887e6a51ba000fda1ccc42b9d198f8b9895f9
+          test "$(df -BG /var/lib/docker | awk 'NR==2 {gsub(/G/,"",$4);print $4}')" -ge 20
+          test "$(docker info --format '{{.Driver}}')" = overlay2
+          docker info --format '{{json .Runtimes}}' | grep -q runsc
+          test -z "${FACTORY_OPENAI_API_KEY:-}"
+          test -z "${GOOGLE_APPLICATION_CREDENTIALS:-}"
+          test -z "${GITHUB_TOKEN:-}"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - name: Build immutable reviewed sandbox image (no credentials)
+        shell: bash
+        run: |
+          docker build --pull -f server/sandbox/Dockerfile -t factory-sandbox:smoke .
+          echo "FACTORY_TEST_SANDBOX_IMAGE=$(docker image inspect factory-sandbox:smoke --format '{{.Id}}')" >> "$GITHUB_ENV"
+      - name: Full gVisor browser, hostile source, and no-egress probes
+        run: npm run test:sandbox
+      - name: Browser parent isolation and normal regressions
+        run: npm test
+      - name: No egress from sandbox namespace
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # An explicit command in the same enforced network namespace. No host fallback.
+          ! docker run --rm --pull=never --runtime=runsc --network=none --read-only --cap-drop=ALL --security-opt=no-new-privileges --user=1000:1000 --entrypoint=node "$FACTORY_TEST_SANDBOX_IMAGE" -e "require('node:net').connect(443,'1.1.1.1').on('error',()=>process.exit(7))"
+          echo "PASS: connection did not succeed (review failure reason in job log)"
