@@ -76,6 +76,7 @@ export class RevisionStore {
   keep(projectId:string,owner:string):void {const p=this.project(projectId,owner);this.transaction(d=>{d.projects.find(x=>x.id===p.id)!.keptId=p.headId;return true;});}
   checkout(projectId:string,owner:string,revisionId:string):void {this.revision(projectId,owner,revisionId);this.transaction(d=>{d.projects.find(p=>p.id===projectId)!.headId=revisionId;return true;});}
   undo(projectId:string,owner:string):void {const r=this.revision(projectId,owner);if(!r.parentId)throw Error('You are at the starting version.');this.checkout(projectId,owner,r.parentId);}
+  redo(projectId:string,owner:string,childId?:string):void {const current=this.revision(projectId,owner);const children=this.history(projectId,owner).filter(r=>r.parentId===current.id);const next=childId?children.find(r=>r.id===childId):children.at(-1);if(!next)throw Error('No later change on this branch. Choose another version in Compare.');this.checkout(projectId,owner,next.id);}
   fork(projectId:string,owner:string,name:string):Project {
     const p=this.project(projectId,owner),r=this.revision(projectId,owner);
     return this.transaction(d=>{const project={id:id(),owner,game:p.game,name:name.trim().slice(0,60)||'My new remix',headId:id()};d.projects.push(project);d.revisions.push({...r,id:project.headId,projectId:project.id,parentId:null,sourceRevisionId:r.id,label:'Saved as a new game'});return project;});
