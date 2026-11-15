@@ -1,0 +1,18 @@
+
+> family-game-factory@2.0.0-foundation test:deployment
+> python3 -m unittest discover -s scripts/deployment -p "test_*.py" -v
+
+test_sandbox_skip_or_partial_output_is_never_success (test_deploy.ActivationGateTests.test_sandbox_skip_or_partial_output_is_never_success) ... ok
+test_build_defaults_to_no_commands (test_deploy.BuildSafetyTests.test_build_defaults_to_no_commands) ... ok
+test_build_stages_only_committed_allowed_files_and_resolves_registry_digest (test_deploy.BuildSafetyTests.test_build_stages_only_committed_allowed_files_and_resolves_registry_digest) ... ok
+test_distinct_configuration_without_pem_and_repeatable_signing_keys (test_deploy.DeploymentTests.test_distinct_configuration_without_pem_and_repeatable_signing_keys) ... ok
+test_drift_rejected (test_deploy.DeploymentTests.test_drift_rejected) ... ok
+test_full_mocked_deploy_pins_secrets_isolates_identities_and_never_reads_pem (test_deploy.DeploymentTests.test_full_mocked_deploy_pins_secrets_isolates_identities_and_never_reads_pem) ... ok
+test_iam_rejects_preview_writes_foreign_secret_and_public_access (test_deploy.DeploymentTests.test_iam_rejects_preview_writes_foreign_secret_and_public_access) ... ok
+test_offline_default_and_explicit_mutation_boundary (test_deploy.DeploymentTests.test_offline_default_and_explicit_mutation_boundary) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.006s
+
+OK
+Metadata IAM preflight passed. Group membership, impersonation and Firestore client rules still require owner security review.

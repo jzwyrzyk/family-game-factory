@@ -1,6 +1,7 @@
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {createServer} from 'node:http';
-import {readFile} from 'node:fs/promises';
+import {loadGatewayConfig} from './private-config';
+import {startBootstrap} from './bootstrap';
 import {Firestore} from '@google-cloud/firestore';
 import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {JobService} from './pipeline/service';
@@ -16,7 +17,7 @@ import {validateApproval,type AgentApproval} from './agent/openai';
 import {sessionHandler} from './sessions';
 export interface GatewayConfig {
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
- repository:string;repositoryId:string;workflow:string;approvedSha:string;githubAppId:string;githubInstallationId:string;githubPrivateKey:string;
+ repository:string;repositoryId:string;workflow:string;approvedSha:string;githubAppId:string;githubInstallationId:string;githubPrivateKey:string;githubPrivateKeyFile?:string;
  approval:AgentApproval;maxJobMicroUsd:number;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string;schedulerEmail?:string;
 }
 export async function createGateway(config:GatewayConfig){
@@ -37,7 +38,7 @@ export async function createGateway(config:GatewayConfig){
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
   const url=new URL(req.url!,config.gatewayOrigin);
-  if(url.pathname==='/health'){res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({ready:true,paidExecution:config.active}));return;}
+  if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');try{await repo.snapshot();res.end(JSON.stringify({ready:true,paidExecution:config.active}));}catch{res.statusCode=503;res.end(JSON.stringify({ready:false,paidExecution:false}));}return;}
   if(url.pathname.startsWith('/preview/')){res.writeHead(403);res.end('Separate preview origin required');return;}
   if(url.pathname.startsWith('/v1/worker/')){await worker(req,res);queueMicrotask(()=>{void coordinator.tick().catch(()=>{});});return;}
   if(url.pathname==='/v1/internal/dispatch'){
@@ -48,5 +49,5 @@ export async function createGateway(config:GatewayConfig){
  }};
 }
 // Configuration file is mounted privately from Secret Manager; never VITE_ or public/factory-config.json.
-async function main(){if(!process.env.FACTORY_PRIVATE_CONFIG)throw Error('PRIVATE_CONFIG_REQUIRED');const config=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as GatewayConfig;const gateway=await createGateway(config);createServer((req,res)=>{void gateway.handler(req,res).catch(()=>{if(!res.headersSent)res.writeHead(503);res.end('Private service unavailable');});}).listen(Number(process.env.PORT)||8080);}
+async function main(){if(process.env.FACTORY_BOOTSTRAP==='true'){startBootstrap();return;}if(!process.env.FACTORY_PRIVATE_CONFIG)throw Error('PRIVATE_CONFIG_REQUIRED');const config=await loadGatewayConfig(process.env.FACTORY_PRIVATE_CONFIG);const gateway=await createGateway(config);createServer((req,res)=>{void gateway.handler(req,res).catch(()=>{if(!res.headersSent)res.writeHead(503);res.end('Private service unavailable');});}).listen(Number(process.env.PORT)||8080);}
 if(process.argv.some(x=>/[/\\]gateway\.ts$/.test(x)))void main().catch(()=>{console.error('Gateway configuration/startup failed. No credentials are logged.');process.exitCode=1;});

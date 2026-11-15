@@ -1,0 +1,56 @@
+
+> family-game-factory@2.0.0-foundation test:unit
+> node --import tsx tests/unit.ts
+
+✔ manifest types, ranges, steps and unknown keys fail closed; presets preserve originals (1.313625ms)
+✔ honest interpreter accepts bounded child language, rejects mixed/novel instructions and out-of-range edits (0.896023ms)
+✔ revision DAG preserves alternate futures; undo, compare, fork and reload never overwrite source (1.581845ms)
+✔ failed writes and invalid restore retain the last working revision and in-memory state (0.434767ms)
+✔ v1 workspace migration is durable on next save; unrelated original math/progress key is untouched (0.265104ms)
+✔ invalid DAG, unknown versions, private executable fields and corrupt storage are not silently reset (0.331233ms)
+✔ play evidence must match the revision, coach uses real outcome and supports skip and a testable hypothesis (0.82603ms)
+✔ plugin lifecycle starts once, disposes idempotently, retries and ignores stale/duplicate finishes (0.963635ms)
+✔ redo follows a selected child without deleting alternate futures and rejects other profiles (0.688124ms)
+✔ private resources require verified unexpired family scope, publishing additionally requires parent approval and tests (0.559443ms)
+✔ generation rejects client-selected security fields and oversized requests (0.880019ms)
+✔ job lifecycle requires validation before ready; cancellation is terminal (0.259807ms)
+✔ unconfigured AI adapter does not pretend to generate a game (0.239056ms)
+✔ session verification rejects tampering, expiration and missing authentication (0.590409ms)
+✔ job submissions are idempotent, family-scoped and reject private/unknown inputs (1.216581ms)
+✔ spending is disabled by default, reserved atomically, cut off under concurrent jobs and parent-controlled (1.291222ms)
+✔ cancellation is terminal, failed validation never replaces kept content, retry policy is bounded (244.675455ms)
+✔ durable queue survives reopening; immutable revisions and kept pointers survive restart (89.656163ms)
+✔ unknown executable artifacts fail validation; compiled preview uses strict CSP and no credential or network access (0.726431ms)
+✔ timeouts fail closed and record an audit event instead of replacing active revision (21.049433ms)
+✔ real adapter uses fixed OpenAI endpoint, strict source schema, no provider storage, bounded output and measured pricing (18.852833ms)
+✔ disabled approval, refusal, oversized source and missing usage fail closed without inventing a success (0.682717ms)
+✔ repair sends the last source and bounded test feedback, never compiled runtime or credentials (0.640964ms)
+✔ compiled artifact binds source, output hash and all required tests (0.414137ms)
+✔ GitHub dispatch exposes opaque job IDs only and refuses reviewed-tag drift (1.256321ms)
+✔ Actions OIDC verifies issuer/audience, repository ID, approved SHA, environment stage and rejects forks/reruns (28.082373ms)
+✔ durable Actions coordinator repairs failed tests automatically, binds stages and rejects stale reports (1.455597ms)
+✔ sandbox cannot weaken gVisor, network, filesystem, PID or output controls (0.312926ms)
+✔ one-use owner invitation yields only a scoped HttpOnly partitioned session, never a provider credential (31.003171ms)
+✔ queue dispatch failure survives coordinator restart and expires instead of remaining stuck forever (0.636818ms)
+✔ owner kill switch blocks previously queued Actions generation, not only new submissions (0.431652ms)
+✔ structural construction supports substitute bodies, different geometry and solvable progression (3.677685ms)
+✔ disconnected structures, gum budgets and invalid attachments are enforced (0.264293ms)
+✔ rotation changes support geometry and stretched joints need repair (0.141751ms)
+✔ seeded household kits always include a construction within ten gum sticks (9.192524ms)
+✔ gum joints store attachment points on each piece, not just a connectivity flag (0.162001ms)
+✔ parent fact targets and due reviews persist with deterministic clock and avoid immediate repeats (2.813067ms)
+✔ assisted answers do not count as independent retrieval and evidence retains attempts (1.117083ms)
+✔ large revision payloads leave Firestore metadata while round-trip authorization and games remain intact (109.544022ms)
+✔ artifact tampering and unsafe references fail closed; legacy inline workspaces still load (0.401428ms)
+✔ GCS adapter uses private workspace-scoped immutable writes, bounded reads and digest verification (0.581426ms)
+✔ gateway resolves separate RSA PEM mount, preserves inline compatibility and rejects ambiguous sources (36.034701ms)
+✔ preview readiness probes persistence and exposes no private content; wrong host/capability fails closed (7.561206ms)
+✔ URL bootstrap starts with no private config and exposes status only (5.640075ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 987.642667
