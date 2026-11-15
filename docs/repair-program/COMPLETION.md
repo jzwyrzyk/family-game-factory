@@ -23,12 +23,27 @@ Original asset files are byte-identical, with no crop/rig changes; rendering use
 
 Local evidence: `npm test` baseline with the revised journeys and five-change suite passed before the final construction-rotation assertion; final complete run is in progress. Expanded `tests/restored-games.cjs` passed both desktop and mobile. Screenshots are Chromium viewport emulation, not real Android/iOS device evidence. No deployment SHA exists for this batch.
 
+## Approved restoration deployment
+
+PR #8 was explicitly approved by the owner, merged, and deployed through the existing main-only Pages workflow. Deployed merge SHA: `3e9825263da36bcb8fd24bd7def522c3ba1acd5d`. Workflow: https://github.com/jzwyrzyk/family-game-factory/actions/runs/43676271084 . Git tree matches the CI-tested PR head `c71e83953d98a37f184215094c4f78ef50881bfd`.
+
+DEPLOYED-VERIFIED for the tested restoration subset: the actual public URL passed desktop and mobile-sized Chromium gameplay tests (idle Dragon loss/player reflection win, seven Splash levels with locked choice and distinct food particles, construction assembly/win/reload). The published HTML, JS, CSS and all 23 original PNGs match the deployment artifact byte-for-byte; see evidence/live/asset-proof.json and live screenshots. This is viewport emulation, not a physical Android/iOS test. The browser trusted this workspace's inspection proxy using its pinned public key; no production TLS setting was changed. Neither learning PR #9 nor offline PR #10 is part of this deployed SHA.
+
+Issue #7 remains PARTIAL. The residual construction, shared learning, private storage/assets and real-generation requirements remain open. Funding and account creation are not blockers; cloud configuration is paused, resource/identity wiring is unverified, and the full gVisor browser gate is still outstanding.
+
+## Construction fidelity follow-up
+
+- IMPLEMENTED-UNVERIFIED overall: pictured rocket/submarine/robot constraint guides, seeded household-kit variation with mandatory solvable core and optional substitute, proportional colored parts, visible launch/dive/dance and reduced-motion behavior.
+- VERIFIED-LOCAL: 500 seeded kits include a solution within ten joints; touch drag/rotate via Chromium touch events, keyboard assembly, undo restoring gum, and actual rocket → submarine → robot progression pass. Screenshots capture the assembled structures, not only the result panel.
+- Full combined CI is pending; this follow-up is not part of the approved/deployed restoration SHA above.
+
 ## Shared-learning batch (stacked on restoration)
 
 - IMPLEMENTED-UNVERIFIED overall: explicit parent multiplication-fact targets, bounded validation, injected-clock due scheduling, avoidance of immediate repeats when alternatives exist, independent/assisted evidence with attempts and timestamps, and game-specific outcome text in the optional coach.
 - VERIFIED-LOCAL: 35 unit tests; targeted browser flow for parent fact override, Practice hint/recovery, Original Challenge ending a run, reload and backup restoration. Full combined regressions/CI pending.
 - Additive profile fields: `factTargets`, `learningEvidence` (latest 500 records), `dueAt`, `lastAttempts`, `lastIndependent`, `lastFact`. Existing cumulative skill counts and legacy backups remain readable. These are provisional practice estimates, not certified mastery.
 - Still incomplete: prerequisite catalog beyond worked arithmetic hints, general fact targets outside multiplication, a configured real-model coach, real-device accessibility and all cloud/live-generation acceptance.
+
 
 ## Offline/revision usability batch (stacked)
 
