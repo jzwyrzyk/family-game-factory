@@ -22,3 +22,9 @@ Rollback: current main `dcb887e6a51ba000fda1ccc42b9d198f8b9895f9`; original stor
 Original asset files are byte-identical, with no crop/rig changes; rendering uses the recovered hero upper/leg rig and scene scale code. The shield return trajectory removes downward acceleration after reflection so the intended return reaches the dragon. This gameplay change needs explicit behavioral evidence before acceptance.
 
 Local evidence: `npm test` baseline with the revised journeys and five-change suite passed before the final construction-rotation assertion; final complete run is in progress. Expanded `tests/restored-games.cjs` passed both desktop and mobile. Screenshots are Chromium viewport emulation, not real Android/iOS device evidence. No deployment SHA exists for this batch.
+
+## Private on-device drawing batch
+
+- IMPLEMENTED-UNVERIFIED overall: private IndexedDB image library scoped to local profiles, magic-byte/decode/size checks, 5 MiB per-file and 20 MiB device quota, original SHA-256 provenance, explicit separate centre-cutout derivatives, original export, explicit deletion and drawing decoration for newly created construction bodies. Existing constructions retain their selected asset reference.
+- VERIFIED-LOCAL targeted browser: upload, cutout preserving original, actual build decoration, profile switching, reload, export/delete, malformed bytes rejection and no network uploads. Full CI pending.
+- This is local private storage, not authenticated cloud sync. Existing progress JSON does not embed image bytes; originals have separate exports. Custom rigging, generated-game image/audio capability and private object-storage wiring remain incomplete; no public uploads or cloud calls were added.
