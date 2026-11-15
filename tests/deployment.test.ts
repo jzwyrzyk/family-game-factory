@@ -5,6 +5,7 @@ import {mkdtemp,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createServer,request as httpRequest} from 'node:http';
+import {FirestoreRepository} from '../server/pipeline/firestore';
 import {loadGatewayConfig} from '../server/private-config';
 import {startBootstrap} from '../server/bootstrap';
 import {createPreview} from '../server/preview-server';
@@ -45,4 +46,12 @@ test('URL bootstrap starts with no private config and exposes status only',async
   const health=await fetch(url+'/health');assert.equal(health.status,200);assert.deepEqual(await health.json(),{ready:false,bootstrap:true,paidExecution:false});
   for(const path of ['/v1/sessions','/v1/worker/job/claim','/preview/revision'])assert.equal((await fetch(url+path,{method:'POST'})).status,503);
  }finally{await new Promise<void>(r=>server.close(()=>r()));}
+});
+
+test('Firestore snapshot uses a read-only transaction for preview viewer IAM',async()=>{
+ let options:any,reads=0;
+ const db={doc:()=>({}),runTransaction:async(callback:any,requested:any)=>{options=requested;return callback({get:async()=>{reads++;return {exists:false}}});}};
+ const repo=new FirestoreRepository(db as any,'family-001');
+ assert.deepEqual(await repo.snapshot(),{version:1,jobs:[],revisions:[],active:{},ledgers:{},audit:[]});
+ assert.deepEqual(options,{readOnly:true});assert.equal(reads,1);
 });

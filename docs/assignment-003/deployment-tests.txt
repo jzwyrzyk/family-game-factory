@@ -12,7 +12,7 @@ test_iam_rejects_preview_writes_foreign_secret_and_public_access (test_deploy.De
 test_offline_default_and_explicit_mutation_boundary (test_deploy.DeploymentTests.test_offline_default_and_explicit_mutation_boundary) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 0.006s
+Ran 8 tests in 0.005s
 
 OK
 Metadata IAM preflight passed. Group membership, impersonation and Firestore client rules still require owner security review.
