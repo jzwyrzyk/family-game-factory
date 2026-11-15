@@ -29,3 +29,9 @@ Local evidence: `npm test` baseline with the revised journeys and five-change su
 - VERIFIED-LOCAL: 35 unit tests; targeted browser flow for parent fact override, Practice hint/recovery, Original Challenge ending a run, reload and backup restoration. Full combined regressions/CI pending.
 - Additive profile fields: `factTargets`, `learningEvidence` (latest 500 records), `dueAt`, `lastAttempts`, `lastIndependent`, `lastFact`. Existing cumulative skill counts and legacy backups remain readable. These are provisional practice estimates, not certified mastery.
 - Still incomplete: prerequisite catalog beyond worked arithmetic hints, general fact targets outside multiplication, a configured real-model coach, real-device accessibility and all cloud/live-generation acceptance.
+
+## Offline/revision usability batch (stacked)
+
+- IMPLEMENTED-UNVERIFIED: explicit redo of the latest child, preserving alternate futures and profile authorization; installable manifest; content-hashed static-shell cache; user-triggered update activation; build SHA/dirty-state marker.
+- VERIFIED-LOCAL: offline browser test loaded the original Dragon art and started native gameplay after network disconnection. Cache keys exclude `factory-config.json`, authenticated APIs and private previews. This adds no cloud storage or public upload endpoint.
+- NOT STARTED: private upload/cutout/rigging UI, authenticated sync/object-storage implementation, standalone game export and deletion/retention UX. Those remain real implementation gaps, not owner-action blockers. Real AI activation and deployed-service verification remain blocked by paused configuration and the full isolated-runner gate.

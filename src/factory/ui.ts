@@ -54,7 +54,7 @@ export function initLiveRemix() {
     renderCollection();if(!active)return;
     const p=project(),r=revision(),history=store.history(p.id,owner());$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · version ${history.findIndex(x=>x.id===r.id)+1} · Saved on this device. Math settings stay the same.`;
     $('liveMechanics').replaceChildren(...manifests[p.game].mechanics.map(m=>{const card=document.createElement('div');card.className='stat';card.textContent=`${m.label}: ${display(m.key,r.config[m.key])}`;return card;}));
-    $<HTMLButtonElement>('liveUndo').disabled=!r.parentId;$('compareVersion').replaceChildren(...history.map((rev,i)=>option(rev.id,`Version ${i+1}: ${rev.label}`)));$<HTMLSelectElement>('compareVersion').value=r.parentId||r.id;
+    $<HTMLButtonElement>('liveUndo').disabled=!r.parentId;const redo=$<HTMLButtonElement>('liveRedo');if(redo)redo.disabled=!history.some(x=>x.parentId===r.id);$('compareVersion').replaceChildren(...history.map((rev,i)=>option(rev.id,`Version ${i+1}: ${rev.label}`)));$<HTMLSelectElement>('compareVersion').value=r.parentId||r.id;
     $('liveExamples').replaceChildren(...examples[p.game].map(example=>{const button=document.createElement('button');button.type='button';button.className='text-btn';button.textContent=example;button.onclick=()=>{clearPending();$<HTMLInputElement>('livePrompt').value=example;$('livePrompt').focus()};return button;}));
     $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0];renderComparison();renderCoach();
   }
@@ -76,6 +76,7 @@ export function initLiveRemix() {
   function applyPending(){if(!pending)throw Error('Describe your change first.');const p=project();const r=store.commit(p.id,owner(),pending.config,pendingPrompt,coach.hypothesis);clearPending();render();play(r);}
   $('liveTry').onclick=()=>guarded(applyPending);
   $('saveNovelIdea').onclick=()=>guarded(()=>{if(!FG.store.addFeedback({game:project().game,type:'generation needed',idea:pendingPrompt}))throw Error('Could not save your idea. Keep it here and try again.');$('liveIntent').textContent='Idea saved in My Creations. It has not been built into a game.';$('saveNovelIdea').hidden=true;});
+  const redo=document.createElement('button');redo.id='liveRedo';redo.className='btn secondary';redo.textContent='Redo latest change';$('liveUndo').after(redo);redo.onclick=()=>guarded(()=>{store.redo(project().id,owner());clearPending();coach.reset();render();$('liveStatus').textContent='Restored the latest child of this version. Other branches remain in Compare.';});
   $('liveUndo').onclick=()=>guarded(()=>{store.undo(project().id,owner());clearPending();coach.reset();render();$('liveStatus').textContent='Undone. Your other versions are still in the history.';});
   $('compareVersion').onchange=()=>guarded(renderComparison);
   $('playCompare').onclick=()=>guarded(()=>play(store.revision(project().id,owner(),value('compareVersion'))));
