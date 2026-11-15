@@ -20,8 +20,8 @@ const http = require('node:http');
  for(const game of ['gum','buckets','dragon'])for(const difficulty of ['gentle','classic','stretch']){
  await nav('🎛️ Remix');await page.selectOption('#remixGame',game);await page.selectOption('#remixDifficulty',difficulty);await page.click('#playRemix');await page.waitForSelector('#page-game:not(.hidden)');
  if(game==='gum')assert.ok(await page.locator('.builder-piece').count()>0);
- if(game==='dragon')await page.getByRole('button',{name:/Alex/}).count()?await page.getByRole('button',{name:/Alex/}).click():await page.locator('.builder-piece').first().click();
- if(game==='buckets'){await page.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await page.waitForTimeout(2100);assert.equal(await page.locator('#stage-overlay').isVisible(),true)}
+ if(game==='dragon'){await page.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await page.locator('#startBtn').click();assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.dragonHP),2)}
+ if(game==='buckets'){for(let i=0;i<4;i++)await page.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');await page.locator('#go').click();assert.equal(await page.locator('#stage-overlay').isVisible(),true)}
  await page.click('#exitGame');
  }
  // Existing math engine: wrong answer hint, correct answer, persisted progress.
@@ -33,7 +33,7 @@ const http = require('node:http');
  // Profile-specific remixes; legacy v1 backups without new fields still load.
  await nav('🎛️ Remix');await page.selectOption('#remixGame','dragon');assert.equal(await page.inputValue('#remixDifficulty'),'stretch');await page.locator('.profile-choice').nth(1).click();assert.equal(await page.inputValue('#remixDifficulty'),'classic');
  // Complete a builder level and continue, without changing the first profile's history.
- await page.evaluate(()=>FG.store.changeProfile({rate:0}));await page.evaluate(()=>FG.app.openGame('gum'));
+ await page.evaluate(()=>FG.store.changeProfile({rate:0}));await page.evaluate(()=>FG.app.openGame('gum',{config:{highlightMatches:false,extraDecoys:0}}));
  for(const [piece,slot] of [['Traffic cone','Pointy nose'],['Big bottle','Rocket body'],['Spoon wing','Left wing'],['Paddle wing','Right wing'],['Old fan','Engine'],['Shiny CD','Window']]){await page.locator('.builder-piece').filter({hasText:piece}).click();await page.locator('.build-slot').filter({hasText:slot}).click()}
  await page.waitForSelector('#resultNext');await page.click('#resultNext');assert.match(await page.textContent('.builder-header'),/Level 2/);assert.equal(await page.evaluate(()=>FG.store.current().stats.gum.wins),1);await page.click('#exitGame');
  // Failed local writes keep a child's draft and report failure.

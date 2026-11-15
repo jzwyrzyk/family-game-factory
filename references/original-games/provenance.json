@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "originals": [
+    {
+      "file": "Dragon_Island_Rescue_SOLO_BALANCED.html",
+      "sha256": "bb34ec66824282d70b60d949d48b91332105164694e76d8819d310bc85bf3320",
+      "bytes": 5855554
+    },
+    {
+      "file": "Splash_or_Pass_Choose_or_Randomize.html",
+      "sha256": "eda572f39f60bd9ac120c76848c6a5cb4ef7b09f4a7ed24b221ff72b90b6d763",
+      "bytes": 38209
+    }
+  ],
+  "assets": [
+    {
+      "source": "dragon_island_assets/camper.png",
+      "file": "public/assets/original-dragon/camper.png",
+      "sha256": "6dcfde49f82c28f2052f3c0abaf7bd3fa5e8c368847a8d6ccd5fa04bf7c7d25f",
+      "bytes": 327086,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/castle.png",
+      "file": "public/assets/original-dragon/castle.png",
+      "sha256": "0e1b072992f643906bddbbb4a67c977a3c3cf63c8d1e406f03c196d6f093bdb0",
+      "bytes": 357451,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/dragon.png",
+      "file": "public/assets/original-dragon/dragon.png",
+      "sha256": "5f491f6a74b871ccb8a9d5dee6df44fa53f11f127b08d468187843d739026a00",
+      "bytes": 577056,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/flower_one.png",
+      "file": "public/assets/original-dragon/flower_one.png",
+      "sha256": "e6d0a41c934e4d30dcfa616e812665f6079620286ccdf19e446e9eeec6a49456",
+      "bytes": 32807,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/flower_three.png",
+      "file": "public/assets/original-dragon/flower_three.png",
+      "sha256": "4cbf0c324f238af9880e60b180827ea9a6fb7858264162309931af97e191d08c",
+      "bytes": 59919,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/flower_two.png",
+      "file": "public/assets/original-dragon/flower_two.png",
+      "sha256": "2e03c5bc3ccb1124c5bea80b4ad41b3fe179dfe8ff58aab3e9d5a8a5136749f6",
+      "bytes": 32388,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/flowers.png",
+      "file": "public/assets/original-dragon/flowers.png",
+      "sha256": "280adfebcb3c608cb819962ca6b463e30a5c403f1dcf7bd935130e414cccab51",
+      "bytes": 148895,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/king.png",
+      "file": "public/assets/original-dragon/king.png",
+      "sha256": "ccda6039f7835b5134d749ff10a392f8c2ce813a8db33360d1e8c4f9b80481eb",
+      "bytes": 296110,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/king_leg_0.png",
+      "file": "public/assets/original-dragon/king_leg_0.png",
+      "sha256": "3f30d37fad762ce98970034c6f602bb40b4f4ec4a845de176b75800e029aea01",
+      "bytes": 13351,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/king_leg_1.png",
+      "file": "public/assets/original-dragon/king_leg_1.png",
+      "sha256": "4b1e2886d19ff5c94c057d506ee8e34c76cbeef1fc124e074fa4f886021c2605",
+      "bytes": 17989,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/king_upper.png",
+      "file": "public/assets/original-dragon/king_upper.png",
+      "sha256": "df3309559d61fcaf82453ad0ff0436ddb5755ff1a38cdaea3fea160b766d93ee",
+      "bytes": 273567,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_bow.png",
+      "file": "public/assets/original-dragon/princess_bow.png",
+      "sha256": "fb4bfbf449fe4348e3653e6be586dcd7a1c28a047ca5289e8f0b8dd979c6784e",
+      "bytes": 293485,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_bow_leg_0.png",
+      "file": "public/assets/original-dragon/princess_bow_leg_0.png",
+      "sha256": "2ad92ad86401cd57b73b7f3dc981c954051cf1e724d9a10a84604934cd070194",
+      "bytes": 19878,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_bow_leg_1.png",
+      "file": "public/assets/original-dragon/princess_bow_leg_1.png",
+      "sha256": "c70661b27b17eef35ae8089e718edfba10170948b3e32796431f0b3cb5bcc92f",
+      "bytes": 19692,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_bow_upper.png",
+      "file": "public/assets/original-dragon/princess_bow_upper.png",
+      "sha256": "df458726d11e7e00358a0f45c5efde907750732134f574ffa60d1929d7e38145",
+      "bytes": 262119,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_wand.png",
+      "file": "public/assets/original-dragon/princess_wand.png",
+      "sha256": "a64863b35f4e1e43d3d466bae03ba948b4a31917f6be18df20da48cde29176fa",
+      "bytes": 252942,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_wand_leg_0.png",
+      "file": "public/assets/original-dragon/princess_wand_leg_0.png",
+      "sha256": "f9a78ec7fcd4cb896027dcdcf7b8664315cc1d41711d13c01ba8ab2e7aee2e93",
+      "bytes": 14258,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_wand_leg_1.png",
+      "file": "public/assets/original-dragon/princess_wand_leg_1.png",
+      "sha256": "d0d668dd93a93060eb8191e58024a16fa209a98a76722039fa5ed33b2bd32c42",
+      "bytes": 17635,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/princess_wand_upper.png",
+      "file": "public/assets/original-dragon/princess_wand_upper.png",
+      "sha256": "15ef581242a53d255eaa49f7cb3cc35ac7be8eab81f8557d7d80d61daee87e13",
+      "bytes": 228719,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/queen.png",
+      "file": "public/assets/original-dragon/queen.png",
+      "sha256": "53ef9e1b17e7fa0a2401f3c789cf02d55a74059ce5c86095765bc794473deec0",
+      "bytes": 556098,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/queen_leg_0.png",
+      "file": "public/assets/original-dragon/queen_leg_0.png",
+      "sha256": "60bc84b34d6dd19c551286d3b2ee218e48ff0b600f6a0badced34b50d04a2338",
+      "bytes": 19196,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/queen_leg_1.png",
+      "file": "public/assets/original-dragon/queen_leg_1.png",
+      "sha256": "a1256a3ff74a587adbef0fea0e4afc8c416ba5c6894d68563ccd3759553e6a24",
+      "bytes": 18262,
+      "transformation": "none; decoded original bytes"
+    },
+    {
+      "source": "dragon_island_assets/queen_upper.png",
+      "file": "public/assets/original-dragon/queen_upper.png",
+      "sha256": "327a9aaf59e3254a0db3391991cb423f8ef7dcc903b37fee982f192df453898d",
+      "bytes": 528785,
+      "transformation": "none; decoded original bytes"
+    }
+  ],
+  "status": "Reference recovery only; game integration and design acceptance are separate gates."
+}

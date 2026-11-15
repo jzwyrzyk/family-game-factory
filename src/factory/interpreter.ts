@@ -15,14 +15,20 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
     else if (/^(?:make it|make the splash) faster$/.test(text)) patch.splashMs = Number(current.splashMs) - 300;
     else if (/^(?:make it|make the splash) slower$/.test(text)) patch.splashMs = Number(current.splashMs) + 300;
   } else if (game === 'gum') {
-    if (/^(?:show|highlight) (?:the )?matching pieces$/.test(text)) patch.highlightMatches = true;
+    if ((match=text.match(/^give me (\d+) gum sticks$/))) patch.gumBudget=Number(match[1]);
+    else if (/^make joints stronger$/.test(text)) patch.jointStrength=Number(current.jointStrength)+.25;
+    else if (/^(?:show|highlight) (?:the )?matching pieces$/.test(text)) patch.highlightMatches = true;
     else if (/^(?:hide|stop highlighting) (?:the )?matching pieces$/.test(text)) patch.highlightMatches = false;
     else if ((match = text.match(/^(?:add|use|give me) (\d+) extra (?:silly )?pieces$/))) patch.extraDecoys = Number(match[1]);
   } else {
-    if ((match = text.match(/^(?:(?:give me|use|i want) )?(\d+) hearts$/))) patch.hearts = Number(match[1]);
+    if ((match=text.match(/^give the island (\d+) resilience$/))) patch.groundResilience=Number(match[1]);
+    else if (/^make fireballs slower$/.test(text)) patch.fireballCadence=Number(current.fireballCadence)-.25;
+    else if (/^make shield wider$/.test(text)) patch.shieldRadius=Number(current.shieldRadius)+10;
+    else if ((match = text.match(/^(?:(?:give me|use|i want) )?(\d+) hearts$/))) patch.hearts = Number(match[1]);
     else if (/^(?:make (?:the )?dragon breath|dragon breath) slower$/.test(text)) patch.breathSpeed = Math.round((Number(current.breathSpeed) - .2) * 100) / 100;
     else if (/^(?:make (?:the )?dragon breath|dragon breath) faster$/.test(text)) patch.breathSpeed = Math.round((Number(current.breathSpeed) + .2) * 100) / 100;
   }
+  if(current.originalRules && ['hearts','breathSpeed','highlightMatches','extraDecoys'].some(k=>k in patch)) return {kind:'invalid',message:'That setting belongs to a saved legacy game. Use the restored game examples below.'};
   if (!Object.keys(patch).length) return { kind: 'generation-needed', message: 'I cannot build that change with these local tools yet. No game changed. Try an example below, or save your idea for later. No AI service is connected.' };
   try {
     const config = validateConfig(game, { ...current, ...patch }), changes = diff(game, current, config);
@@ -32,6 +38,6 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
 }
 export const examples: Record<GameId, string[]> = {
   buckets: ['Give me four buckets', 'Show the safe bucket', 'Make the splash last 1 second', 'Hide the safe bucket', 'Make it slower'],
-  gum: ['Show matching pieces', 'Add two extra pieces', 'Hide matching pieces'],
-  dragon: ['Give me six hearts', 'Make dragon breath slower', 'Make dragon breath faster'],
+  gum: ['Give me ten gum sticks', 'Give me six gum sticks', 'Make joints stronger'],
+  dragon: ['Give the island 120 resilience', 'Make fireballs slower', 'Make shield wider'],
 };

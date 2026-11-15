@@ -60,7 +60,7 @@ export function initLiveRemix() {
   }
   function play(r:Revision){
     const p=project(),capturedOwner=owner();$('playedVersion').hidden=false;$('playedVersion').textContent=`Playing ${p.name}: ${manifests[p.game].mechanics.map(m=>`${m.label} ${display(m.key,r.config[m.key])}`).join(' · ')}`;$('returnLive').hidden=false;
-    FG.app.openGame(p.game,{config:r.config,onOutcome:(outcome:PlayOutcome)=>guarded(()=>{
+    FG.app.openGame(p.game,{config:r.config,stateKey:r.id,onOutcome:(outcome:PlayOutcome)=>guarded(()=>{
       const record=store.record(p.id,capturedOwner,r.id,outcome);if(owner()===capturedOwner){coach.observe(record,r);renderCoach();$('playedVersion').textContent=`${coach.summary} Tap “Back to Live Remix” to reflect or change your game.`;}
     })});
   }

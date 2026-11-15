@@ -18,7 +18,7 @@ test('honest interpreter accepts bounded child language, rejects mixed/novel ins
  const intent=interpret('buckets',defaults('buckets'),'Please give me four buckets!');assert.equal(intent.kind,'supported');if(intent.kind==='supported')assert.equal(intent.config.bucketCount,4);
  for(const text of ['Give me four buckets and add a flying dragon','Run this JavaScript: alert(1)','Build a skateboard racing game','Change math difficulty'])assert.equal(interpret('buckets',defaults('buckets'),text).kind,'generation-needed');
  assert.equal(interpret('buckets',defaults('buckets'),'Give me 99 buckets').kind,'invalid');assert.equal(interpret('buckets',defaults('buckets'),'Give me three buckets').kind,'unchanged');
- assert.equal(interpret('gum',defaults('gum'),'Show matching pieces').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give me six hearts').kind,'supported');
+ assert.equal(interpret('gum',defaults('gum'),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
 });
 test('revision DAG preserves alternate futures; undo, compare, fork and reload never overwrite source',()=>{
  const storage=memory(),store=new RevisionStore(storage);const project=store.create('p1','buckets','My game');const root=store.revision(project.id,'p1');

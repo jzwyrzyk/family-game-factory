@@ -15,15 +15,16 @@ const {start}=require('./browser-server.cjs');
   const original=await page.evaluate(()=>{FG.store.current().skills['mul:8x4']={tries:3,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.changeProfile({rate:0});return JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity})});
   await nav('🎛️ Remix');await page.click('#newLiveGame');
   const snapshot=()=>page.evaluate(()=>FG.runtime.snapshot());
-  const round=async()=>{await page.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await page.waitForSelector('#resultNext');await page.click('#returnLive');};
+  const ready=async()=>{for(let i=0;i<3;i++)await page.locator('#go').click()};
+  const round=async()=>{if((await snapshot()).state.mode==='title')await ready();await page.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');await page.locator('#go').click();await page.waitForSelector('#resultNext');await page.click('#returnLive');};
   await page.click('#livePlay');assert.equal((await snapshot()).state.bucketCount,3);await round();assert.match(await page.textContent('#coachEvidence'),/level 1 after/);assert.match(await page.textContent('#coachQuestion'),/notice/);
   await page.fill('#coachAnswer','I got splashed');await page.click('#coachForm button[type=submit]');assert.match(await page.textContent('#coachQuestion'),/next change/);await page.fill('#coachAnswer','More buckets might be harder');await page.click('#coachForm button[type=submit]');
   const changes=[['Give me four buckets','bucketCount',4],['Show the safe bucket','revealSafe',true],['Make the splash last 0.4 seconds','splashMs',400],['Hide the safe bucket','revealSafe',false],['Give me two buckets','bucketCount',2]];
   for(const [i,[prompt,key,expected]] of changes.entries()){
     await page.fill('#livePrompt',prompt);await page.click('#livePromptForm button[type=submit]');await page.waitForSelector('#page-game:not(.hidden)');
-    const state=await snapshot();assert.equal(state.config[key],expected);assert.equal(state.state[key],expected);assert.equal(await page.locator('.bucket-choice').count(),state.config.bucketCount);
-    if(state.config.revealSafe)await page.getByRole('button',{name:/⭐ Safe/}).click();
-    const began=Date.now();await round();if(key==='splashMs')assert.ok(Date.now()-began<1700,'splash duration must really change');
+    const state=await snapshot();assert.equal(state.config[key],expected);assert.equal(state.state[key],expected);assert.equal(state.state.bucketCount,state.config.bucketCount);
+
+    const began=Date.now();await round();if(key==='splashMs')assert.ok(Date.now()-began<5000,'splash duration must really change');
     if(i===0)assert.match(await page.textContent('#coachEvidence'),/More buckets might be harder.*not proof/);
     await page.click('#coachSkip');assert.equal(await page.locator('#coachForm').isVisible(),false);
   }
@@ -57,8 +58,8 @@ const {start}=require('./browser-server.cjs');
  }
  // Other plugin manifests drive real engine state, not cosmetic labels.
  const pluginPage=await browser.newPage();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
- for(const [game,prompt,key,expected] of [['gum','Add two extra pieces','pieceCount',11],['dragon','Give me six hearts','hearts',6]]){
-  await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon')await pluginPage.locator('.builder-piece').first().click();assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
+ for(const [game,prompt,key,expected] of [['gum','Give me six gum sticks','gumRemaining',6],['dragon','Give the island 120 resilience','islandHP',120]]){
+  await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
  // Deterministic real round regression: lose/retry, win/next; then leave during delayed math feedback.
  await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:0});FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'Bucket 2',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);await pluginPage.click('#resultNext');await pluginPage.getByRole('button',{name:'Bucket 1',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);

@@ -17,6 +17,7 @@ export interface GameInstance {
   snapshot?(): Record<string, unknown>;
 }
 export interface GameContext {
+  persistence?: {load():unknown;save(state:unknown):boolean};
   difficulty: Difficulty; config: Mechanics; finish(result: RoundResult): void;
 }
 export interface GamePlugin {
