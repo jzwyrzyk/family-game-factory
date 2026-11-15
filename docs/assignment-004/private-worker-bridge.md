@@ -1,58 +1,53 @@
-# Assignment 004 — public gateway to private worker bridge
+# Assignment 004 — public gateway bridge to organization-owned private worker
 
-Status: **inactive pull request; no deployed Cloud Run, Firestore, original games, child UI, existing worker tag or credentials modified.**
+**PR #16 is draft/inactive.** Private companion: `family-game-factory-lab/family-game-factory-worker#1`. Neither has been merged or deployed. The child-facing Family Game Factory, all existing games, revisions, Firestore data, Cloud Run gateway and preview services, origins and signing credentials stay unchanged.
 
-## Design
+## Immutable trust identities
 
-The public Family Game Factory remains the user-facing Vite/PWA game app. Signed session authentication, child intent capture, immutable revisions, existing Firestore workspace, budget ledger, compare/undo/fork, private preview and automatic repair continue unchanged.
+| Asset | Verified identity |
+| --- | --- |
+| Public website and trusted source | `jzwyrzyk/family-game-factory`; ID `1458033181`; frozen public worker SHA `dcb887e6a51ba000fda1ccc42b9d198f8b9895f9` |
+| Private orchestration repository | `family-game-factory-lab/family-game-factory-worker`; ID `1458899834` (unchanged by transfer) |
+| Organization | `family-game-factory-lab`; owner ID `357047835` |
+| Selected workflow dispatch ref | protected `main` (`refs/heads/main`) |
+| Independent reviewed private code | final owner-approved full private SHA `P`, protected tag `factory-execution-P` pointing to P and `main` also pointing to P |
+| Workflow | `.github/workflows/factory-private.yml@refs/heads/main` |
 
-Dispatch moves to `jzwyrzyk/family-game-factory-worker`, repository ID **1458899834**. The original public code provenance remains `jzwyrzyk/family-game-factory` ID **1458033181** and approved SHA **dcb887e6a51ba000fda1ccc42b9d198f8b9895f9**. The new private execution code has its own reviewed merge commit SHA `P` and an immutable lightweight tag `factory-execution-P`. These two SHA values must **not** be conflated.
+The gateway GitHub App dispatches **opaque job ID and bounded repair attempt only**, never child text, generated code or credentials. Before dispatch, the tag **and** main are independently read via GitHub API and must be exactly approved `P`. The workflow checks its actual `github.sha` equals `P`; a branch move during dispatch fails closed. Private generation retrieves the frozen public source SHA. Worker callbacks carry GitHub-issued signed OIDC; the gateway verifies issuer, audience, private repo and org ID, `ref=refs/heads/main`, `workflow_ref`, `workflow_sha=P`, environment, first run attempt and stage/run identity, and preserves the existing artifact and revision integrity checks.
 
-Updated gateway fields (optional only while inactive):
+## Inactive private configuration migration
+
+Do not put any private configuration into GitHub. The existing gateway config retains these frozen source fields:
+
 ```json
-{
-  "repository": "jzwyrzyk/family-game-factory",
-  "repositoryId": "1458033181",
-  "workflow": "factory-agent.yml",
-  "approvedSha": "dcb887e6a51ba000fda1ccc42b9d198f8b9895f9",
-  "workerRepository": "jzwyrzyk/family-game-factory-worker",
-  "workerRepositoryId": "1458899834",
-  "workerWorkflow": "factory-private.yml",
-  "workerApprovedSha": "REPLACE_WITH_REVIEWED_PRIVATE_MERGE_SHA"
-}
+{"repository":"jzwyrzyk/family-game-factory","repositoryId":"1458033181",
+ "workflow":"factory-agent.yml","approvedSha":"dcb887e6a51ba000fda1ccc42b9d198f8b9895f9"}
 ```
 
-No real secret or other private config field should appear in a commit. The existing `githubInstallationId` may need updating if the GitHub App private-repo installation differs. The GitHub App must have Actions write and Contents read scoped to the **private repository ID**, while the gateway must NOT gain repository runner administration privileges.
+The owner-reviewed, inactive config adds only the following private execution selectors (plus an independently reviewed new GitHub App installation ID when the App is actually installed):
 
-`GitHubDispatcher` first confirms the approved private tag points at the exact owner-pinned SHA. It then dispatches a workflow with **only an opaque job ID and bounded attempt index**; no child's text, game source, model key or preview credential is sent as workflow input. Each signed private stage claim/report is verified against issuer, gateway audience, repository name **and ID**, immutable private SHA/tag, private workflow path, environment, event and run attempt. Existing coordinator validates stage/run ID, job attempt, bounded usage, artifact hashes and replay/conflict. The private generation job does not execute model output; the test job receives no model key and executes untrusted game code only inside networkless gVisor Docker. Stage separation preserves existing source/revision and Firestore behavior.
-
-New production activation is refused if private worker configuration is missing. A separate **runtime two-key kill switch** requires BOTH `active:true` in the private gateway config AND `FACTORY_ACTIONS_APPROVED=true` as an actual gateway runtime environment variable. The private workflow independently requires its own `FACTORY_ACTIONS_APPROVED=true` repository variable. None of the three switches are enabled by this PR. With `active:false`, existing deployed inactive configurations remain compatible. Public `factory-agent.yml` jobs are explicitly disabled in reviewed main. **Owner must also ensure the legacy public workflow cannot be dispatched from the older public approved tag** by keeping the public approval variable false and disabling legacy workflow in GitHub Actions settings before any new activation.
-
-## Offline owner steps, then separately approved deployment
-
-1. Review both draft PRs. Merge only manually after security review. Record final private approved SHA `P`; owner creates/protects a lightweight tag `factory-execution-P` in the **private** repo.
-2. The private repo Actions workflow must exist on its default branch. Configure restricted `factory-generation` and `factory-sandbox` environments, no per-game approval reviewers, private worker vars and App installation as described in the private PR's `docs/assignment-004/OWNER.md`.
-3. On a trusted owner machine use the EXISTING private gateway JSON file, not a repository file:
-
-```bash
-python3 scripts/deployment/private_worker_config.py \
-  --input /secure/existing-gateway-config.json \
-  --output /secure/inactive-private-worker-config.json \
-  --reviewed-private-sha P
+```json
+{"workerRepository":"family-game-factory-lab/family-game-factory-worker",
+ "workerRepositoryId":"1458899834","workerWorkflow":"factory-private.yml",
+ "workerApprovedSha":"FINAL_REVIEWED_PRIVATE_MAIN_SHA"}
 ```
 
-The output is a separate owner-readable 0600 file, intentionally keeps `active:false` and `approval.enabled:false`, retains all family identifiers, signing keys, credentials, endpoints, existing Firestore workspace and original approved worker SHA. It does **not** update Secret Manager or Cloud Run.
-4. After a separate GCP deployment authorization, owner builds/pins an updated **gateway-only** OCI image and creates a new version of the existing private gateway config secret. Redeploys existing `factory-gateway` in **us-east5** retaining service name, origin, service account, Firestore workspace/project, HTTP auth, mounted PEM, scaling limits, active=false and approved image digest. Leave existing preview Cloud Run service, its origin, signing key and Firestore untouched. Do not use older deployment scripts that would regenerate JSON and drop the new fields.
-5. Run the private repository's **unpaid** JIT runner smoke. Only when all security controls have passed and paid usage is independently authorized could the owner later activate the private `FACTORY_ACTIONS_APPROVED` variable, gateway private `active`/approval, and gateway `FACTORY_ACTIONS_APPROVED` runtime flag. These changes are explicitly **not part of Assignment 004's PRs**.
+Owner can use `scripts/deployment/private_worker_config.py --input /secure/old.json --output /secure/new-inactive.json --reviewed-private-sha P` to produce a new 0600 copy **offline**, preserving all existing keys, workspace IDs, Firestore, URLs and family identifiers. Paid execution remains `active:false`, `approval.enabled:false`, and requires the independent gateway runtime `FACTORY_ACTIONS_APPROVED=true` and private workflow variable `FACTORY_ACTIONS_APPROVED=true` only after future owner authorization. All flags remain **false** for Assignment 004.
 
-## Acceptance and evidence
+## Github App and GCP setup (requirements, NOT executed)
 
-- `tests/private-worker-bridge.test.ts` added to `tests/unit.ts`: checks private dispatch destination and opaque inputs, tag drift rejection, legitimate synthetic signed OIDC for both stages, and rejection of incorrect repository/name ID, public repo, wrong SHA/ref/workflow, PR event, rerun and environment.
-- Existing `tests/assignment-002.test.ts` covers claim/report stage binding, replay/recovery, ledgers, tagged Actions dispatch (legacy mode), and gVisor argument policies. Existing `npm test` covers old game/revision/browser regressions.
-- Private `factory-smoke.yml` includes full `npm run test:sandbox` (previously blocked in 8 GiB environment), `npm test`, browser fixtures, infinite-loop/forbidden network tests, no-egress TCP probe, image digest printout and environment/gVisor checks.
-- **All new tests are authored, not executed on owner infrastructure.** No claim of signed *live* gateway callback, cloud permissions, runner registration, GCP deployment or actual gVisor/browser test success until owner produces CI logs. No GCP, GitHub variable, GitHub App installation or secret was mutated.
-- Rollback to the prior inactive gateway image and mounted Secret Manager version; no Firestore migration, data clearing, origin change or child UI modifications.
+- Gateway App: install on only the new organization private worker repository, with Actions write, Contents read and Metadata read. Record its **organization installation ID**, which may differ from the old personal-account installation. The existing GitHub App private key remains privately mounted on the gateway; this PR does not change it. Gateway does not receive runner administration rights.
+- Private runner-administration App: repository Administration write and organization Self-hosted runners read, installed only where needed; its private key belongs solely in `factory-infrastructure` environment, not in the browser or runner. `actions/create-github-app-token` mints a short-lived job token for provisioning/cleanup.
+- Organization selected-workflow runner group: name `factory-isolated`, Selected repositories **only** `family-game-factory-lab/family-game-factory-worker`; Selected workflows **exactly**
+  `family-game-factory-lab/family-game-factory-worker/.github/workflows/factory-private.yml@refs/heads/main`
+  and
+  `family-game-factory-lab/family-game-factory-worker/.github/workflows/factory-smoke.yml@refs/heads/main`.
+  Public repositories disabled; default group forbidden. See private PR `docs/assignment-004/OWNER.md` for complete UI and read-only API audit.
+- GCP: update Workload Identity Federation trust conditions (only when separately authorized) to organization owner ID `357047835`, repo ID `1458899834`, exact trusted `workflow_ref@refs/heads/main`, `factory-infrastructure` environment and reviewed private SHA. No new credentials or VM provisioned by PRs.
+- Future owner-authorized redeployment: update the **existing gateway only** using owner-reviewed immutable image and new private secret version, preserving Cloud Run hostname, service account, request/instance controls, current preview, Firestore workspace and signing secrets. No deployment or configuration change performed here.
 
-### Stop criteria
+## Security evidence and limits
 
-Do not enable paid generation if a private repo contributor can schedule arbitrary self-hosted jobs, if runner registration is not one-use/isolated, if tag/workflow can be moved, if OIDC identity is not verified, if cloud metadata credentials exist on the runner, if gVisor full smoke is missing, if source assets could exfiltrate secrets, or if VM cleanup/disk inventory fails.
+Public CI includes branch/tag-drift and strict organization OIDC negative tests, plus existing child's desktop/mobile mocked creation, repair, play, keep, undo and fork journeys. Private PR supplies `scripts/runner/verify_group_policy.py`: read-only query of actual organization runner-group and selected-repository access; offline tests reject extra repositories, extra workflows, public access and tag-ref substitutions.
+
+**This chat cannot verify live group settings through the exposed GitHub connection, and no registered runner can be scheduled for a real denied-workflow test without separately authorized infrastructure.** No claim of actual unauthorized workflow denial until the owner runs the policy audit and a controlled negative scheduling test. Do not set `FACTORY_ACTIONS_APPROVED=true`; do not merge or deploy automatically.
