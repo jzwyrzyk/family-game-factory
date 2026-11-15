@@ -12,3 +12,5 @@ import './artifact-storage.test';
 
 
 import './deployment.test';
+
+import './private-worker-bridge.test';
