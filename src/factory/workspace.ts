@@ -31,7 +31,7 @@ export function validateWorkspace(value: unknown): Workspace {
     const revision=d.revisions.find(r=>r.id===play.revisionId), project=d.projects.find(p=>p.id===revision?.projectId), out=play.outcome;
     if (!revision || !project || !out || out.game!==project.game || typeof out.won!=='boolean' || !Number.isInteger(out.level) || out.level<1 || !Number.isFinite(out.durationMs) || out.durationMs<0 || !text(out.title,300) || !text(out.description,1000) || !text(out.at,40) || !text(play.reflection,300)) throw Error('Invalid play evidence.');
     const playedConfig=validateConfig(out.game, out.config);
-    if (Object.entries(playedConfig).some(([key,value])=>revision.config[key]!==value)) throw Error('Play evidence does not match its revision.');
+    if (Object.entries(playedConfig).some(([key,value])=>validateConfig(project.game,revision.config)[key]!==value)) throw Error('Play evidence does not match its revision.');
   }
   return copy(d);
 }

@@ -1,9 +1,9 @@
 import { validateConfig } from './manifests';
 import type { Difficulty, GameLifecycle, GamePlugin, Mechanics, PlayOutcome, GameContext } from './types';
-export function createLifecycle(plugin: GamePlugin, target: HTMLElement, config: Mechanics, difficulty: Difficulty, onOutcome: (outcome: PlayOutcome) => void): GameLifecycle {
+export function createLifecycle(plugin: GamePlugin, target: HTMLElement, config: Mechanics, difficulty: Difficulty, onOutcome: (outcome: PlayOutcome) => void, persistence?: GameContext['persistence']): GameLifecycle {
   const checked = validateConfig(plugin.manifest.id, config);
   let instance: ReturnType<GamePlugin['mount']> | undefined, disposed = false, finished = false, began = performance.now();
-  const context: GameContext = { difficulty, config: Object.freeze({ ...checked }), finish(result) {
+  const context: GameContext = { persistence, difficulty, config: Object.freeze({ ...checked }), finish(result) {
     if (disposed || finished) return;
     finished = true;
     onOutcome({ ...result, game: plugin.manifest.id, durationMs: Math.round(performance.now() - began), config: { ...checked }, at: new Date().toISOString() });
