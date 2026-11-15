@@ -36,3 +36,17 @@ Issue #7 remains PARTIAL. The residual construction, shared learning, private st
 - IMPLEMENTED-UNVERIFIED overall: pictured rocket/submarine/robot constraint guides, seeded household-kit variation with mandatory solvable core and optional substitute, proportional colored parts, visible launch/dive/dance and reduced-motion behavior.
 - VERIFIED-LOCAL: 500 seeded kits include a solution within ten joints; touch drag/rotate via Chromium touch events, keyboard assembly, undo restoring gum, and actual rocket → submarine → robot progression pass. Screenshots capture the assembled structures, not only the result panel.
 - Full combined CI is pending; this follow-up is not part of the approved/deployed restoration SHA above.
+
+## Shared-learning batch (stacked on restoration)
+
+- IMPLEMENTED-UNVERIFIED overall: explicit parent multiplication-fact targets, bounded validation, injected-clock due scheduling, avoidance of immediate repeats when alternatives exist, independent/assisted evidence with attempts and timestamps, and game-specific outcome text in the optional coach.
+- VERIFIED-LOCAL: 35 unit tests; targeted browser flow for parent fact override, Practice hint/recovery, Original Challenge ending a run, reload and backup restoration. Full combined regressions/CI pending.
+- Additive profile fields: `factTargets`, `learningEvidence` (latest 500 records), `dueAt`, `lastAttempts`, `lastIndependent`, `lastFact`. Existing cumulative skill counts and legacy backups remain readable. These are provisional practice estimates, not certified mastery.
+- Still incomplete: prerequisite catalog beyond worked arithmetic hints, general fact targets outside multiplication, a configured real-model coach, real-device accessibility and all cloud/live-generation acceptance.
+
+
+## Offline/revision usability batch (stacked)
+
+- IMPLEMENTED-UNVERIFIED: explicit redo of the latest child, preserving alternate futures and profile authorization; installable manifest; content-hashed static-shell cache; user-triggered update activation; build SHA/dirty-state marker.
+- VERIFIED-LOCAL: offline browser test loaded the original Dragon art and started native gameplay after network disconnection. Cache keys exclude `factory-config.json`, authenticated APIs and private previews. This adds no cloud storage or public upload endpoint.
+- NOT STARTED: private upload/cutout/rigging UI, authenticated sync/object-storage implementation, standalone game export and deletion/retention UX. Those remain real implementation gaps, not owner-action blockers. Real AI activation and deployed-service verification remain blocked by paused configuration and the full isolated-runner gate.
