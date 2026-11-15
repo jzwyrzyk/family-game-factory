@@ -7,9 +7,9 @@ const {start}=require('./browser-server.cjs');
  fs.mkdirSync('test-results',{recursive:true});
  try{
  for(const [device,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:375,height:812}]]){
-  const context=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
+  const context=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors=[],jobRequests=[];page.on('request',r=>{if(r.url().includes('/v1/jobs'))jobRequests.push(r.url())});
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dialog=>dialog.accept());
-  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory);
+  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);
   const nav=async(name)=>page.getByRole('navigation').getByRole('button',{name,exact:true}).click();
   // Seed real legacy progress before remixing. New editor must not change math settings/evidence.
   const original=await page.evaluate(()=>{FG.store.current().skills['mul:8x4']={tries:3,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.changeProfile({rate:0});return JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity})});
@@ -20,26 +20,27 @@ const {start}=require('./browser-server.cjs');
   await page.fill('#coachAnswer','I got splashed');await page.click('#coachForm button[type=submit]');assert.match(await page.textContent('#coachQuestion'),/next change/);await page.fill('#coachAnswer','More buckets might be harder');await page.click('#coachForm button[type=submit]');
   const changes=[['Give me four buckets','bucketCount',4],['Show the safe bucket','revealSafe',true],['Make the splash last 0.4 seconds','splashMs',400],['Hide the safe bucket','revealSafe',false],['Give me two buckets','bucketCount',2]];
   for(const [i,[prompt,key,expected]] of changes.entries()){
-    await page.fill('#livePrompt',prompt);await page.click('#livePromptForm button[type=submit]');assert.equal(await page.locator('#liveTry').isVisible(),true);await page.click('#liveTry');
+    await page.fill('#livePrompt',prompt);await page.click('#livePromptForm button[type=submit]');await page.waitForSelector('#page-game:not(.hidden)');
     const state=await snapshot();assert.equal(state.config[key],expected);assert.equal(state.state[key],expected);assert.equal(await page.locator('.bucket-choice').count(),state.config.bucketCount);
     if(state.config.revealSafe)await page.getByRole('button',{name:/⭐ Safe/}).click();
     const began=Date.now();await round();if(key==='splashMs')assert.ok(Date.now()-began<1700,'splash duration must really change');
     if(i===0)assert.match(await page.textContent('#coachEvidence'),/More buckets might be harder.*not proof/);
     await page.click('#coachSkip');assert.equal(await page.locator('#coachForm').isVisible(),false);
   }
-  assert.equal(await page.locator('#compareVersion option').count(),6);
+  assert.equal(await page.locator('#compareVersion option').count(),6);await page.click('#liveKeep');assert.match(await page.textContent('#liveStatus'),/pinned/);
   // Compare and play an earlier version without modifying current head.
   await page.locator('#versionTools').evaluate(el=>el.open=true);
   const options=await page.locator('#compareVersion option').evaluateAll(os=>os.map(o=>o.value));await page.selectOption('#compareVersion',options[1]);assert.match(await page.textContent('#liveCompare tbody'),/Number of buckets42/);
   await page.click('#playCompare');assert.equal((await snapshot()).state.bucketCount,4);await page.click('#returnLive');
   await page.click('#liveUndo');assert.match(await page.textContent('#liveMechanics'),/Number of buckets: 4/);
   // New alternate future after undo, old fifth change retained.
-  await page.fill('#livePrompt','Give me five buckets');await page.click('#livePromptForm button[type=submit]');await page.click('#liveTry');assert.equal((await snapshot()).state.bucketCount,5);await page.click('#returnLive');assert.equal(await page.locator('#compareVersion option').count(),7);
+  await page.fill('#livePrompt','Give me five buckets');await page.click('#livePromptForm button[type=submit]');assert.equal((await snapshot()).state.bucketCount,5);await page.click('#returnLive');assert.equal(await page.locator('#compareVersion option').count(),7);
   // Unsupported text is never run, never interpreted as partial success.
   for(const prompt of ['Give me four buckets and add flying unicorns','Build a new skateboard game','<script>alert(1)</script>','Give me 99 buckets']){
     await page.fill('#livePrompt',prompt);await page.click('#livePromptForm button[type=submit]');assert.equal(await page.locator('#liveTry').isVisible(),false);assert.match(await page.textContent('#liveMechanics'),/Number of buckets: 5/);
   }
-  await page.fill('#forkName',`Donut Splash ${device}`);await page.click('#liveForkForm button[type=submit]');await page.reload();await page.waitForFunction(()=>window.FG?.factory);await nav('🎨 My Creations');await page.getByRole('button',{name:`🎮 Donut Splash ${device}`,exact:true}).click();assert.match(await page.textContent('#liveMechanics'),/Number of buckets: 5/);await page.click('#livePlay');assert.equal((await snapshot()).state.bucketCount,5);await page.click('#returnLive');
+  assert.match(await page.textContent('#builderStatus'),/Needs builder.*No job was queued/);assert.deepEqual(jobRequests,[]);
+  await page.fill('#forkName',`Donut Splash ${device}`);await page.click('#liveForkForm button[type=submit]');await page.reload();await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await nav('🎨 My Creations');await page.getByRole('button',{name:`🎮 Donut Splash ${device}`,exact:true}).click();assert.match(await page.textContent('#liveMechanics'),/Number of buckets: 5/);await page.click('#livePlay');assert.equal((await snapshot()).state.bucketCount,5);await page.click('#returnLive');
   const after=await page.evaluate(()=>JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity}));assert.equal(after,original);
   // Parent export/restore includes the new workspace, while an old backup keeps it intact.
   await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();const downloadPromise=page.waitForEvent('download');await page.click('#exportData');const download=await downloadPromise,backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.equal(backup.factoryWorkspace.version,2);const workspaceBefore=JSON.stringify(backup.factoryWorkspace);
@@ -51,13 +52,13 @@ const {start}=require('./browser-server.cjs');
   await page.locator('#liveFactory').screenshot({path:`test-results/live-remix-${device}.png`});
   // Quota failure preserves both durable and in-memory head; typed draft still visible.
   const before=await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace()));await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw Error('full')}});
-  await page.fill('#livePrompt','Give me two buckets');await page.click('#livePromptForm button[type=submit]');await page.click('#liveTry');assert.match(await page.textContent('#liveStatus'),/Could not save/);assert.equal(await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace())),before);assert.equal(await page.inputValue('#livePrompt'),'Give me two buckets');
+  await page.fill('#livePrompt','Give me two buckets');await page.click('#livePromptForm button[type=submit]');assert.match(await page.textContent('#liveStatus'),/Could not save/);assert.equal(await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace())),before);assert.equal(await page.inputValue('#livePrompt'),'Give me two buckets');
   assert.deepEqual(errors,[]);console.log(`PASS ${device}: five real mutations, outcomes/coach, compare, undo/DAG, fork/reload, profile/math isolation, rejected edits, quota safety`);await context.close();
  }
  // Other plugin manifests drive real engine state, not cosmetic labels.
- const pluginPage=await browser.newPage();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
+ const pluginPage=await browser.newPage();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
  for(const [game,prompt,key,expected] of [['gum','Add two extra pieces','pieceCount',11],['dragon','Give me six hearts','hearts',6]]){
-  await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');await pluginPage.click('#liveTry');if(game==='dragon')await pluginPage.locator('.builder-piece').first().click();assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
+  await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon')await pluginPage.locator('.builder-piece').first().click();assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
  // Deterministic real round regression: lose/retry, win/next; then leave during delayed math feedback.
  await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:0});FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'Bucket 2',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);await pluginPage.click('#resultNext');await pluginPage.getByRole('button',{name:'Bucket 1',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
@@ -65,6 +66,6 @@ const {start}=require('./browser-server.cjs');
  await pluginPage.fill('#math-answer',String(answer));await pluginPage.click('#math-submit');await pluginPage.evaluate(()=>FG.app.openGame('gum'));await pluginPage.waitForTimeout(650);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.ok(await pluginPage.locator('.builder-piece').count());
  await pluginPage.close();
  // Legacy workspace migration in browser; failed/corrupt load never replaces stored source.
- const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('family-game-factory-workspace-v2',JSON.stringify({version:1,games:[{id:'old-game',owner:'player1',game:'buckets',name:'Migrated Splash',config:{bucketCount:2,revealSafe:true,splashMs:400}}]}))});await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory);await page.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();assert.match(await page.textContent('#liveName'),/Migrated Splash/);await page.click('#livePlay');assert.equal((await page.evaluate(()=>FG.runtime.snapshot())).state.bucketCount,2);await page.close();
+ const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('family-game-factory-workspace-v2',JSON.stringify({version:1,games:[{id:'old-game',owner:'player1',game:'buckets',name:'Migrated Splash',config:{bucketCount:2,revealSafe:true,splashMs:400}}]}))});await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();assert.match(await page.textContent('#liveName'),/Migrated Splash/);await page.click('#livePlay');assert.equal((await page.evaluate(()=>FG.runtime.snapshot())).state.bucketCount,2);await page.close();
  }finally{await browser.close();server.close()}
 })().catch(err=>{console.error(err);process.exitCode=1});

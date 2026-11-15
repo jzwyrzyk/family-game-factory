@@ -7,7 +7,7 @@ const http = require('node:http');
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.app&&window.FG?.factory);
+ await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.app&&window.FG?.factory&&window.FG?.builder);
  const nav=async(name)=>page.getByRole('navigation').getByRole('button',{name,exact:true}).click();
  const original=await page.evaluate(()=>{FG.store.current().stats.gum={played:9,wins:5,bestLevel:3};FG.store.current().skills.legacy={tries:2};FG.store.save();return JSON.stringify(FG.store.current())});
  await nav('✨ Create');await page.click('#wizardNext');assert.equal(await page.locator('[data-step="0"]').isVisible(),true);

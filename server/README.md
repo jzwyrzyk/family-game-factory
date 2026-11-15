@@ -2,7 +2,7 @@
 
 `contracts/api.ts` defines versioned Cloud Run boundary types, tenant authorization and parent release gates, strict generation input validation, job transitions, private Firestore/Cloud Storage ports, atomic budget reservations, isolated-worker and server-only AI provider interfaces. The unconfigured adapter fails explicitly. These files are not imported by the browser and contain no cloud credentials, SDK initialization or mock generation success.
 
-No endpoint is served. No billable resource, account, bucket, database, queue, secret or build worker is created. Implementing the cloud service is a later phase. Type checks and contract tests are useful foundation checks; they do not prove cloud security or a production isolation boundary.
+No production endpoint is deployed. The newer Issue #4 reference HTTP/job pipeline is implemented in `pipeline/`; its canonical API is documented in `openapi.json`. The older `/v1/generations` contract types below remain proposed, not separate active endpoints. See [pipeline scope](../docs/agent-pipeline.md). No billable resource, account, bucket, database, queue, secret or build worker is created. Implementing the cloud service is a later phase. Type checks and contract tests are useful foundation checks; they do not prove cloud security or a production isolation boundary.
 
 ## Required service behavior before enabling clients
 
@@ -17,4 +17,4 @@ No endpoint is served. No billable resource, account, bucket, database, queue, s
 - Untrusted generation goes to a separately isolated worker with no cloud metadata endpoint, app credentials, arbitrary network, or access to the deployment pipeline. Enforce CPU, memory, runtime, output size, MIME/path/symlink and artifact-hash validation. Preview uses a separate untrusted origin and sandboxed iframe without `allow-same-origin`, strict `default-src 'none'` CSP and narrow typed message channels. No generated JS is executed by this implementation. Prompts are plain bounded strings, never shell or code.
 - Keep original child drawings private and immutable. Cutout/rigging requires explicit permission; transformations retain provenance. Do not send names, photos or learning records to public GitHub or telemetry. Define retention/deletion and consent before connecting production providers.
 
-Backend HTTP integration, live provider calls, cloud IAM/rules tests, abuse tests and real generated-module sandbox/publish/rollback tests remain blocked until the owner provisions the backend. There is intentionally no “deploy” script.
+Production identity/cloud integration, live provider calls, cloud IAM/rules tests, abuse tests and real generated-module sandbox/publish/rollback tests remain blocked until the owner provisions the backend. There is intentionally no “deploy” script.

@@ -2,7 +2,7 @@ import { defaults, isGameId, validateConfig } from '../runtime/manifests';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 export const WORKSPACE_KEY = 'family-game-factory-workspace-v2';
 export interface Revision { id: string; projectId: string; parentId: string | null; sourceRevisionId?: string; config: Mechanics; label: string; hypothesis: string; createdAt: string; state: 'private' }
-export interface Project { id: string; owner: string; game: GameId; name: string; headId: string }
+export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string }
 export interface PlayRecord { id: string; revisionId: string; outcome: PlayOutcome; reflection: string }
 export interface Workspace { version: 2; projects: Project[]; revisions: Revision[]; plays: PlayRecord[] }
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -17,6 +17,7 @@ export function validateWorkspace(value: unknown): Workspace {
   if (!unique(d.projects) || !unique(d.revisions) || !unique(d.plays)) throw Error('Workspace identifiers are invalid.');
   for (const p of d.projects) {
     if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || !d.revisions.some(r=>r.id===p.headId && r.projectId===p.id)) throw Error('Invalid game project.');
+    if(p.keptId&&!d.revisions.some(r=>r.id===p.keptId&&r.projectId===p.id))throw Error('Invalid kept version.');
   }
   for (const r of d.revisions) {
     const project = d.projects.find(p=>p.id===r.projectId);
@@ -72,6 +73,7 @@ export class RevisionStore {
     const p=this.project(projectId,owner),checked=validateConfig(p.game,config);
     return this.transaction(d=>{const revision={id:id(),projectId,parentId:p.headId,config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);d.projects.find(x=>x.id===p.id)!.headId=revision.id;return revision;});
   }
+  keep(projectId:string,owner:string):void {const p=this.project(projectId,owner);this.transaction(d=>{d.projects.find(x=>x.id===p.id)!.keptId=p.headId;return true;});}
   checkout(projectId:string,owner:string,revisionId:string):void {this.revision(projectId,owner,revisionId);this.transaction(d=>{d.projects.find(p=>p.id===projectId)!.headId=revisionId;return true;});}
   undo(projectId:string,owner:string):void {const r=this.revision(projectId,owner);if(!r.parentId)throw Error('You are at the starting version.');this.checkout(projectId,owner,r.parentId);}
   fork(projectId:string,owner:string,name:string):Project {

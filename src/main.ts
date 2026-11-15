@@ -5,3 +5,6 @@ import './runtime/registry';
 import './legacy/ui.js';
 import { initLiveRemix } from './factory/ui';
 initLiveRemix();
+
+import { initBuilder } from './builder/ui';
+void initBuilder();
