@@ -1,5 +1,7 @@
 # One-button builder scaffold (Issue #4)
 
+Historical Assignment 001 baseline. Assignment 002 source generation, Actions execution and current operational limits are documented in [the updated pipeline](assignment-002/README.md).
+
 The default static configuration is **unavailable**. Supported local changes run instantly with **Try It**, without a queue, model, adult approval or GitHub step. Unsupported requests say “Needs builder”; no job ID/status is fabricated. The new-game Create input also has Try It; its existing wizard can still save a private idea without claiming it is playable. Development/GitHub/copy-brief controls are restricted to the parent page.
 
 ## Implemented reference pipeline

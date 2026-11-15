@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Family Factory private build API",
-    "version": "1.0.0",
-    "description": "Reference scaffold; no deployed service. Identity provisioning, real agents and distributed cloud adapters are not configured."
+    "version": "2.0.0",
+    "description": "Authenticated family gateway and separate private preview; Actions worker stages use approved workflow OIDC. Paid activation requires owner setup."
   },
   "servers": [
     {
@@ -642,6 +642,112 @@
           }
         }
       }
+    },
+    "/v1/sessions": {
+      "post": {
+        "summary": "Redeem owner-provisioned one-time invitation for a partitioned HttpOnly session",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Invitation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connected; signed HttpOnly Secure SameSite=None Partitioned cookie"
+          },
+          "403": {
+            "description": "Invalid/expired/used invitation or Origin/CSRF mismatch"
+          }
+        }
+      }
+    },
+    "/v1/jobs/{id}/retry": {
+      "post": {
+        "summary": "Retry an authorized failed job after reload without copying its prompt",
+        "responses": {
+          "202": {
+            "description": "Idempotent bounded retry acknowledgement"
+          }
+        }
+      }
+    },
+    "/v1/worker/jobs/{id}/claim": {
+      "post": {
+        "summary": "Private Actions stage claim",
+        "security": [
+          {
+            "workerOIDC": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized job-scoped stage result"
+          },
+          "403": {
+            "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          }
+        }
+      }
+    },
+    "/v1/worker/jobs/{id}/report": {
+      "post": {
+        "summary": "Private Actions stage report",
+        "security": [
+          {
+            "workerOIDC": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized job-scoped stage result"
+          },
+          "403": {
+            "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          }
+        }
+      }
+    },
+    "/v1/worker/jobs/{id}/status": {
+      "get": {
+        "summary": "Private Actions stage status",
+        "security": [
+          {
+            "workerOIDC": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized job-scoped stage result"
+          },
+          "403": {
+            "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          }
+        }
+      }
+    },
+    "/v1/internal/dispatch": {
+      "post": {
+        "summary": "Authenticated scheduler wakeup for durable retry and job expiry",
+        "security": [
+          {
+            "schedulerOIDC": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Dispatcher tick complete"
+          },
+          "403": {
+            "description": "Untrusted scheduler rejected"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -651,6 +757,17 @@
         "in": "cookie",
         "name": "factory_session",
         "description": "Server-issued signed HttpOnly Secure SameSite cookie from trusted family identity provisioning. Never a caller-selected family ID. POST additionally requires an allowed Origin and X-Factory-Request: 1."
+      },
+      "workerOIDC": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "GitHub Actions OIDC JWT",
+        "description": "Exact repository ID, reviewed tag/SHA, workflow, environment, audience, issuer and first run attempt. Stage/run/job binding enforced."
+      },
+      "schedulerOIDC": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Google signed OIDC; exact scheduler account email, verified email and gateway audience."
       }
     },
     "schemas": {
@@ -665,7 +782,14 @@
         ],
         "properties": {
           "gameId": {
-            "type": "string"
+            "enum": [
+              "new",
+              "gum",
+              "buckets",
+              "dragon",
+              "star-catcher",
+              "generated-module"
+            ]
           },
           "baseRevisionId": {
             "type": [
@@ -721,6 +845,20 @@
           },
           "errorCode": {
             "type": "string"
+          },
+          "phase": {
+            "enum": [
+              "generating",
+              "testing",
+              "repairing",
+              "ready",
+              "failed"
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
           }
         }
       },
@@ -879,6 +1017,40 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "GeneratedMetadata": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "generated-module-v1"
+          },
+          "title": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "controls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Invitation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "invitation"
+        ],
+        "properties": {
+          "invitation": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 100
           }
         }
       }

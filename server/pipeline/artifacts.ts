@@ -1,7 +1,9 @@
+import {validateGenerated, type GeneratedGame} from '../agent/generated';
 import { createHash } from 'node:crypto';
 import type { CandidateArtifact,StarGame } from './types';
-export function validateArtifact(value:unknown):StarGame {
- const artifact=value as CandidateArtifact,g=artifact?.game;
+export function validateArtifact(value:unknown):StarGame|GeneratedGame {
+ if((value as {format?:string})?.format==='generated-source-v1'){const a=value as {format:string;game:unknown};if(Object.keys(a).some(k=>!['format','game'].includes(k)))throw Error('ARTIFACT_REJECTED');return validateGenerated(a.game);}
+ const artifact=value as {format:'declarative-v1';game:StarGame},g=artifact?.game;
  if(!artifact||artifact.format!=='declarative-v1'||Object.keys(artifact).some(k=>!['format','game'].includes(k))||!g||g.kind!=='star-catcher-v1'||Object.keys(g).some(k=>!['kind','target','seconds'].includes(k))||!Number.isInteger(g.target)||g.target<2||g.target>10||!Number.isInteger(g.seconds)||g.seconds<3||g.seconds>60)throw Error('ARTIFACT_REJECTED');
  return {kind:'star-catcher-v1',target:g.target,seconds:g.seconds};
 }

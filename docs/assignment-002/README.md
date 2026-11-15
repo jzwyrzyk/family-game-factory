@@ -1,0 +1,27 @@
+# Assignment 002 — authenticated gateway → Actions → private game
+
+This assignment implements the preferred POC, not a public standalone coding endpoint. The website submits an authenticated request to a GCP-ready gateway. A durable dispatcher sends **only an opaque job ID and attempt number** to GitHub Actions. Actions privately fetches the design, generates source, and passes it through compilation/browser tests on a different credential-free worker. Failed tests request at most two automatic repairs. A tested immutable revision is exposed through the existing short-lived private preview capability and keep/undo/fork APIs.
+
+## Delivered code
+
+- `server/agent/openai.ts`: real server-side OpenAI Responses API transport, strict generated-module JSON, `store:false`, fixed HTTPS provider endpoint, bounded input/output, abort, refusal/error handling, fresh owner-approved prices/model, measured token cost. No browser keys or subscription assumptions.
+- `server/actions/`: GitHub App installation-token dispatch, protected immutable reviewed-tag/SHA check, cryptographic Actions OIDC verification (issuer/audience/repository ID/ref/SHA/workflow/environment/run attempt), durable stage/run binding, replay-safe callbacks, queue recovery/expiry and bounded repair orchestration. Generation and testing are separate GitHub environments/jobs.
+- `.github/workflows/factory-agent.yml`: manual gateway-dispatched worker; generation receives the model key only in a trusted non-executing source-generation step. Testing runs on a dedicated `factory-isolated` runner with gVisor and an immutable approved image. No child prompts/source are inputs, run names, outputs, logs or public Actions artifacts.
+- `server/sandbox/`: offline TypeScript compilation and static checks; hard gVisor/network/filesystem/capability/PID/CPU/memory/output/wall limits; independent desktop/mobile input-driven win, visible-change and replay tests. The production gate has **no host or runc fallback**.
+- Generated code implements game logic in a **dedicated Web Worker**, not the DOM/main app. A trusted separate-origin iframe host renders bounded canvas commands and exposes touch/keyboard controls. Strict CSP denies network/import/eval; worker exceptions, floods and stalls stop the game. This permits new mechanics rather than only another star-game parameter set. External assets/packages, arbitrary DOM/HTML and network APIs are not supported.
+- `server/gateway.ts`, `server/preview-server.ts`: deployable role-separated entry points; Firestore persistence; signed scope-limited preview; existing family sessions, revisions, budgets, keep/undo/fork and local game/data paths reused.
+- One-time owner-provisioned invitation establishes an HttpOnly/Secure/partitioned session in the existing website. This is initial family setup, not approval for each child change. The UI shows actual queued/building/testing/repairing/failed/cancelled states, survives a reload during an acknowledged job, and supports retry without copying a prompt.
+
+## What is and is not activated
+
+The static site's default `factory-config.json` remains **unavailable**. No GCP resources, self-hosted runner, GitHub worker run, provider credential, paid model call or production login have been provisioned/activated by this PR. The metered adapter is fully implemented but requires the account-owner checklist. `codex-subscription` remains unavailable because current-account unattended entitlement cannot be verified here. The official Codex Action/API-key route is documented in [research](agent-research.md); the implemented supported fallback uses the metered Responses API **inside Actions**.
+
+See [owner setup](owner-setup.md), [cost estimate](cost-estimate.md), [evidence](evidence.md) and [audit](audit.md).
+
+## Operational limits
+
+- POC Firestore storage is a bounded private family-workspace document/chunk set (3 MiB application cap), using SDK transactions; it is not a high-volume multi-tenant database. Polling currently reads that workspace; retain/export/prune deliberately before capacity. No history is silently discarded. Large assets and Cloud Storage artifact indirection are future work.
+- The provider step never executes source. Untrusted compilation/play runs only in the gVisor test image; production readiness requires the actual runner smoke tests. The browser worker watchdog is a responsiveness guard, not an enforceable browser RAM quota. The separate origin and Web Worker prevent DOM/credential access; server-side resource limits are the hard execution boundary.
+- Browser gates validate runnable/input-responsive/achievable gameplay, not proof that every arbitrary design idea was faithfully understood or that a child will enjoy it. Generated games are canvas/emoji/geometry-based first levels. Drawing uploads, audio, external art, certified learning outcomes, original-game fidelity and automatic public release are not added here.
+- Cancellation aborts polling/provider/test controllers and terminalizes the job. Already incurred or unknown provider usage is conservatively charged to the reserved application allowance. Lost workers and undispatched jobs expire rather than remaining pending forever. Infrastructure cost limits are separate from the model ledger.
+- Real family enrollment is a trusted owner invitation for this POC; production multi-parent SSO, session revocation/rotation, comprehensive content moderation, deletion/retention and cloud IAM penetration testing still require owner operational work.

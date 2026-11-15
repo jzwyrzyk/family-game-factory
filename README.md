@@ -1,6 +1,6 @@
 # Family Game Factory 2.0 foundation
 
-A child-led local game-design loop built on the Family Arcade. See [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
+A child-led local game-design loop built on the Family Arcade. See [Assignment 002](docs/assignment-002/README.md), [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
 
 ## Run locally
 
@@ -48,3 +48,11 @@ The source now requires a Vite build. After review/merge, choose **GitHub Action
 `server/` contains typed managed-service ports plus an authenticated, budget-limited reference job API/worker, private preview renderer and OpenAPI spec. A durable single-process file adapter and a clearly labeled mock agent are exercised by tests. No production backend, identity provider, real coding-agent adapter or cloud resource is configured/deployed. See [pipeline](docs/agent-pipeline.md) and [Codex research](docs/codex-agent-research.md). Arbitrary generated JS is not accepted; the mock produces a genuine new star-catching mechanic through a closed declarative artifact. Arbitrary new mechanics, full original-game fidelity, offline PWA support and drawing workflows remain explicitly pending in the gap analysis.
 
 Real-agent smoke testing is explicitly skipped: no verified funded production adapter/API exists here. Before adding a live smoke test, verify the destination, identity and billing authorization; do not export personal credentials to an arbitrary endpoint. No live-agent credentials are read by the test suite.
+
+## Assignment 002: private source generation through Actions
+
+The preferred path is now implemented as **website → authenticated GCP gateway → GitHub Actions → generated TypeScript → isolated build/test/repair → private preview**. It reuses the existing jobs, revisions, signed preview, keep/undo/fork, authentication and child UI contracts. A real metered OpenAI Responses coding adapter runs only in the Actions generation job; compilation/play runs in a different gVisor job without the model key. Reviewed immutable worker tags, stage-bound OIDC and private callbacks keep prompts/source out of public workflow inputs/artifacts. Subscription-based Codex entitlement remains unverified and disabled.
+
+The default website configuration and paid activation remain **off**. No provider key, funded account, GitHub App, runner or GCP service is provisioned by this PR. Account-owner actions, current cost estimates, evidence and remaining limits are in [setup](docs/assignment-002/owner-setup.md), [costs](docs/assignment-002/cost-estimate.md) and [evidence](docs/assignment-002/evidence.md). No real inference is claimed from the mocked E2E. The full browser-container smoke is locally blocked by the 8 GiB VFS environment; it is a mandatory runner setup gate with no unsafe fallback.
+
+`npm test` includes the original games/data regressions plus five source-generation/revision requests on desktop/mobile through mocked Actions and fixture provider responses, automatic repair, private preview and worker security probes. `npm run test:sandbox` additionally requires an explicitly supplied immutable worker image and gVisor Docker socket. It never silently executes arbitrary generated source on the host. Source games currently use bounded canvas/emoji rendering and trusted input controls, not arbitrary HTML, network assets or packages.
