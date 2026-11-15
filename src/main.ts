@@ -9,5 +9,8 @@ initLiveRemix();
 import { initBuilder } from './builder/ui';
 void initBuilder();
 
+import {installDrawings} from './assets/ui';
+installDrawings();
+
 import {installOffline} from './offline';
 installOffline();
