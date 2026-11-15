@@ -42,6 +42,8 @@ jobs:
           echo "FACTORY_TEST_SANDBOX_IMAGE=$(docker image inspect factory-sandbox:smoke --format '{{.Id}}')" >> "$GITHUB_ENV"
       - name: Full gVisor browser, hostile source, and no-egress probes
         run: npm run test:sandbox
+      - name: Install pinned Chromium for host browser regressions
+        run: npx playwright install --with-deps chromium
       - name: Browser parent isolation and normal regressions
         run: npm test
       - name: No egress from sandbox namespace
