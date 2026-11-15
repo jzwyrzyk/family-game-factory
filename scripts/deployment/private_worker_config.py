@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 SOURCE_SHA = 'dcb887e6a51ba000fda1ccc42b9d198f8b9895f9'
-PRIVATE_REPO = 'jzwyrzyk/family-game-factory-worker'
+PRIVATE_REPO = 'family-game-factory-lab/family-game-factory-worker'
 PRIVATE_ID = '1458899834'
 WORKFLOW = 'factory-private.yml'
 
