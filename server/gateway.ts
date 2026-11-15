@@ -17,7 +17,9 @@ import {validateApproval,type AgentApproval} from './agent/openai';
 import {sessionHandler} from './sessions';
 export interface GatewayConfig {
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
- repository:string;repositoryId:string;workflow:string;approvedSha:string;githubAppId:string;githubInstallationId:string;githubPrivateKey:string;githubPrivateKeyFile?:string;
+ repository:string;repositoryId:string;workflow:string;approvedSha:string;
+ workerRepository?:string;workerRepositoryId?:string;workerWorkflow?:string;workerApprovedSha?:string;
+ githubAppId:string;githubInstallationId:string;githubPrivateKey:string;githubPrivateKeyFile?:string;
  approval:AgentApproval;maxJobMicroUsd:number;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string;schedulerEmail?:string;
 }
 export async function createGateway(config:GatewayConfig){
@@ -30,9 +32,13 @@ export async function createGateway(config:GatewayConfig){
  await repo.snapshot();
  const agent={kind:'metered-api' as const,available:config.active,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
  const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,timeoutMs:900000,maxRetries:2});
- const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(config.repositoryId)},()=>config.githubPrivateKey);
- const dispatcher=new GitHubDispatcher({enabled:config.active,repository:config.repository,workflow:config.workflow,approvedSha:config.approvedSha},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:config.active&&config.approval.enabled});
- const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:config.repository,repositoryId:config.repositoryId,workflow:config.workflow,approvedSha:config.approvedSha});
+ const privateWorker=Boolean(config.workerRepository||config.workerRepositoryId||config.workerWorkflow||config.workerApprovedSha);
+ if(privateWorker&&(!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.workerRepository===config.repository||!/^\\d+$/.test(config.workerRepositoryId)||!/^\\w[\\w-]*\\/[\\w.-]+$/.test(config.workerRepository)||!/^\\w[\\w.-]*\\.yml$/.test(config.workerWorkflow)||! /^[a-f0-9]{40}$/.test(config.workerApprovedSha)))throw Error('PRIVATE_WORKER_CONFIG_REQUIRED');
+ if(config.active&&!privateWorker)throw Error('PRIVATE_WORKER_REQUIRED_FOR_ACTIVATION');
+ const target={repository:config.workerRepository||config.repository,repositoryId:config.workerRepositoryId||config.repositoryId,workflow:config.workerWorkflow||config.workflow,approvedSha:config.workerApprovedSha||config.approvedSha,privateWorker};
+ const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(target.repositoryId)},()=>config.githubPrivateKey);
+ const dispatcher=new GitHubDispatcher({enabled:config.active,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:config.active&&config.approval.enabled});
+ const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker});
  const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();}};
  const api=apiHandler(service,http),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
