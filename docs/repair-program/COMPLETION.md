@@ -42,3 +42,19 @@ Local evidence: `npm test` baseline with the revised journeys and five-change su
 - IMPLEMENTED-UNVERIFIED: explicit redo of the latest child, preserving alternate futures and profile authorization; installable manifest; content-hashed static-shell cache; user-triggered update activation; build SHA/dirty-state marker.
 - VERIFIED-LOCAL: offline browser test loaded the original Dragon art and started native gameplay after network disconnection. Cache keys exclude `factory-config.json`, authenticated APIs and private previews. This adds no cloud storage or public upload endpoint.
 - NOT STARTED: private upload/cutout/rigging UI, authenticated sync/object-storage implementation, standalone game export and deletion/retention UX. Those remain real implementation gaps, not owner-action blockers. Real AI activation and deployed-service verification remain blocked by paused configuration and the full isolated-runner gate.
+
+## Approved restoration deployment
+
+PR #8 was explicitly approved by the owner, merged, and deployed through the existing main-only Pages workflow. Deployed merge SHA: `3e9825263da36bcb8fd24bd7def522c3ba1acd5d`. Workflow: https://github.com/jzwyrzyk/family-game-factory/actions/runs/43676271084 . Git tree matches the CI-tested PR head `c71e83953d98a37f184215094c4f78ef50881bfd`.
+
+DEPLOYED-VERIFIED for the tested restoration subset: the actual public URL passed desktop and mobile-sized Chromium gameplay tests (idle Dragon loss/player reflection win, seven Splash levels with locked choice and distinct food particles, construction assembly/win/reload). The published HTML, JS, CSS and all 23 original PNGs match the deployment artifact byte-for-byte; see evidence/live/asset-proof.json and live screenshots. This is viewport emulation, not a physical Android/iOS test. The browser trusted this workspace's inspection proxy using its pinned public key; no production TLS setting was changed. Neither learning PR #9 nor offline PR #10 is part of this deployed SHA.
+
+Issue #7 remains PARTIAL. The residual construction, shared learning, private storage/assets and real-generation requirements remain open. Funding and account creation are not blockers; cloud configuration is paused, resource/identity wiring is unverified, and the full gVisor browser gate is still outstanding.
+
+
+## Construction fidelity follow-up
+
+- IMPLEMENTED-UNVERIFIED overall: pictured rocket/submarine/robot constraint guides, seeded household-kit variation with mandatory solvable core and optional substitute, proportional colored parts, visible launch/dive/dance and reduced-motion behavior.
+- VERIFIED-LOCAL: 500 seeded kits include a solution within ten joints; touch drag/rotate via Chromium touch events, keyboard assembly, undo restoring gum, and actual rocket → submarine → robot progression pass. Screenshots capture the assembled structures, not only the result panel.
+- Full combined CI is pending; this follow-up is not part of the approved/deployed restoration SHA above.
+
