@@ -6,3 +6,5 @@ import './assignment-002.test';
 import './construction.test';
 
 import './learning-repair.test';
+
+import './artifact-storage.test';
