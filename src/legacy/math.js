@@ -27,18 +27,13 @@ function bank(profile){
  return list;
 }
 function estimate(skill){if(!skill||!skill.tries)return null;return Math.round((skill.right+1)/(skill.tries+2)*100)}
-function select(profile){const pool=bank(profile);const intensity=profile.intensity||'balanced';const candidate=pool.map(q=>{
- const rec=profile.skills[q.id];const score=estimate(rec);
- // Strong emphasis on unmastered facts; still mix in retrieval of known skills.
- const weakness=score===null?.8:Math.max(.12,(100-score)/100);
- const weight=Math.random() < (intensity==='gentle'?.35:intensity==='stretch'?.82:.64)?weakness*weakness+.05:.28;
- return {q,weight};
- });
- const total=candidate.reduce((sum,x)=>sum+x.weight,0);let roll=Math.random()*total;
- for(const c of candidate){roll-=c.weight;if(roll<=0)return {...c.q}}
- return {...candidate[candidate.length-1].q};
+function select(profile,now=Date.now(),random=Math.random){
+ let pool=bank(profile);const targets=(profile.factTargets||[]).map(id=>{const m=/^mul:(\d+)x(\d+)$/.exec(id);if(!m)return null;const a=+m[1],b=+m[2];if(a<1||a>12||b<1||b>12)return null;return {id,skill:'Multiplication',question:`${a} × ${b} = ?`,answer:a*b,hint:`Use ${b} groups of ${a}. Try ${a} × ${b-1}, then add ${a}.`}}).filter(Boolean);
+ if(targets.length)pool=targets;const alternate=pool.filter(q=>q.id!==profile.lastFact);if(alternate.length)pool=alternate;
+ const scored=pool.map(q=>{const r=profile.skills[q.id];return {q,priority:!r?2:(r.dueAt&&Date.parse(r.dueAt)<=now?4:0)+(1-(estimate(r)||0)/100)}}).sort((a,b)=>b.priority-a.priority);
+ const top=scored.filter(x=>x.priority>=scored[0].priority-.05);const q=top[Math.min(top.length-1,Math.floor(random()*top.length))].q;profile.lastFact=q.id;return {...q};
 }
-function record(profile,q,firstTryCorrect,helpUsed){const rec=profile.skills[q.id] ||= {tries:0,right:0,hints:0,streak:0,last:null};rec.tries++;if(firstTryCorrect){rec.right++;rec.streak++}else{rec.streak=0}if(helpUsed)rec.hints++;rec.last=new Date().toISOString();FG.store.save()}
+function record(profile,q,firstTryCorrect,helpUsed,now=Date.now(),attempts=firstTryCorrect?1:2){const rec=profile.skills[q.id] ||= {tries:0,right:0,hints:0,streak:0,last:null};const independent=firstTryCorrect&&!helpUsed;rec.tries++;if(independent){rec.right++;rec.streak++}else rec.streak=0;if(helpUsed)rec.hints++;rec.last=new Date(now).toISOString();const days=independent?Math.min(14,Math.pow(2,Math.min(rec.streak-1,4))):1;rec.dueAt=new Date(now+days*86400000).toISOString();rec.lastAttempts=attempts;rec.lastIndependent=independent;profile.learningEvidence||=[];profile.learningEvidence.push({fact:q.id,at:rec.last,attempts,independent,helpUsed:!!helpUsed});profile.learningEvidence=profile.learningEvidence.slice(-500);FG.store.save()}
 function review(profile){const entries=Object.entries(profile.skills).filter(([,v])=>v&&v.tries>0);const weak=entries.filter(([,v])=>estimate(v)<70).sort((a,b)=>estimate(a[1])-estimate(b[1]));return {attempts:entries.reduce((n,[,v])=>n+v.tries,0),practiced:entries.length,weak:weak.slice(0,6).map(([id,v])=>({id,confidence:estimate(v),tries:v.tries})),entries:entries.sort((a,b)=>a[0].localeCompare(b[0]))};}
 function canAsk(profile){const rate=Number(profile.rate)||0;if(rate<1)return false;const now=Date.now(),begin=now-600000;profile.mathWindow=(profile.mathWindow||[]).filter(t=>t>begin);if(profile.mathWindow.length>=rate)return false;const last=profile.mathWindow.at(-1)||0;return now-last>=Math.max(30000,600000/(rate*2));}
 function didAsk(profile){profile.mathWindow=(profile.mathWindow||[]).filter(t=>t>Date.now()-600000);profile.mathWindow.push(Date.now());FG.store.save()}
