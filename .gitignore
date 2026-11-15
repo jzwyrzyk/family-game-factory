@@ -2,3 +2,9 @@ node_modules/
 test-results/
 playwright-report/
 dist/
+
+# Owner deployment material must never enter source control.
+*.pem
+*.key
+.factory-deployment/
+**/__pycache__/

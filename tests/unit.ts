@@ -10,3 +10,5 @@ import './learning-repair.test';
 import './artifact-storage.test';
 
 
+
+import './deployment.test';
