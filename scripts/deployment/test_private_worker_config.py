@@ -27,7 +27,7 @@ class PrivateWorkerConfigTests(unittest.TestCase):
             'previewOrigin':'https://different.example.run.app'}
     def test_preserves_data_and_frozen_worker_source(self):
         migrated=module.make_config(self.old,'b'*40)
-        self.assertEqual(migrated['workerRepository'],'jzwyrzyk/family-game-factory-worker')
+        self.assertEqual(migrated['workerRepository'],'family-game-factory-lab/family-game-factory-worker')
         self.assertEqual(migrated['workerRepositoryId'],'1458899834')
         self.assertEqual(migrated['workerWorkflow'],'factory-private.yml')
         self.assertEqual(migrated['workerApprovedSha'],'b'*40)
