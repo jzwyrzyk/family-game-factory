@@ -2,7 +2,7 @@
 
 Audit base: `518a68b` on `feature/factory-v2-foundation` (includes v0.3 and its passing CI fix). Baseline `npm test` passed before edits. No cloud resources were found or provisioned. The repository had one HTML file containing UI, storage, adaptive math, three game constructors and a parent-mediated idea/GitHub handoff; one Playwright regression script; no runtime/plugin contract, game revisions, live interpreter, design coach or backend.
 
-## Implemented in this assignment
+## Assignment 001 baseline (historical)
 
 - Vite build with relative assets for project-path Pages hosting. Strict TypeScript runtime, mechanics manifests, local interpreter, revision store and coach. Existing store/math/bridge/orchestration and each game engine extracted into separate JavaScript modules behind typed adapters; their full internals have not been ported to TypeScript.
 - Explicit start/next/retry/dispose/snapshot lifecycle; duplicate or disposed round events ignored. Generation tokens protect against delayed math feedback appearing in a later game. Each game receives only validated mechanics and its completion callback, not a math profile or credential.
@@ -20,7 +20,7 @@ Audit base: `518a68b` on `feature/factory-v2-foundation` (includes v0.3 and its 
 
 **Three-bucket Splash or Pass original fidelity remains pending.** Classic still uses three buckets, and the original safe/random selection, slime/sauce, retry and progression behavior is preserved. The intended original game has not been independently reconstructed/validated against its source design. Changing bucket count is an explicit remix, not a claim that the original game's complete intended mechanics have been delivered.
 
-## Remaining phases and release limits
+## Assignment 001 gaps (superseded where Assignment 002 says otherwise)
 
 - Arbitrary unfamiliar ideas cannot generate new playable mechanics yet. Only the documented local grammar changes manifest parameters. Unsupported/mixed requests fail honestly with an optional saved idea. No LLM is called; no mock AI response is shown as a real generation. A CI mock can generate a distinct playable star-catching mechanic and revise it through the authenticated reference pipeline; this is not real AI. A general novel-code build/test/repair loop remains phase 5.
 - No deployed Cloud Run/Firestore/Storage, production identity enrollment, provider key, distributed queue, or externally isolated code worker. HMAC family session verification, quotas, a durable reference queue and tested declarative sandbox are implemented in `server/pipeline`; these do not prove cloud IAM, Storage rules, identity enrollment or distributed isolation. See `docs/agent-pipeline.md`.
@@ -33,3 +33,7 @@ Audit base: `518a68b` on `feature/factory-v2-foundation` (includes v0.3 and its 
 - Automated browser evidence covers Chromium desktop and a 375px touch viewport; it is not a claim of real iOS/Safari testing. Full cross-browser/device and accessibility audits remain future validation.
 
 Issue #4 additions, production setup limits, API semantics and authentication/cost research are documented in [agent pipeline](agent-pipeline.md) and [Codex research](codex-agent-research.md). Remote catalog revisions live in the configured private family service; local parent backups do not contain remote artifacts or preview capabilities. Voice dictation and general code-generation plugins remain future work.
+
+## Assignment 002 update
+
+[Assignment 002](assignment-002/README.md) adds the real metered provider transport, generated TypeScript module contract, private gateway/Actions orchestration, reviewed-tag/stage-bound OIDC, bounded build/test/repair, durable Firestore adapter, dedicated-worker canvas preview and owner setup/cost documentation. This supersedes the earlier fixed-star-only/source-unavailable statements above. All real activation remains off; no live provider or cloud/Actions run was made. Full browser-container validation is blocked by local VFS disk limits and must pass on the approved runner. Read [current evidence and limits](assignment-002/evidence.md) rather than interpreting earlier foundation tests as proof of live generation.

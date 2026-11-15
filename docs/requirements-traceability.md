@@ -53,3 +53,18 @@ Neither tests nor runtime contact an AI or cloud service. Test evidence contains
 | Real-agent smoke | Explicit SKIP: no verified/funded backend. No credential egress code enabled | Not run; production configuration and approval required |
 
 See [agent pipeline](agent-pipeline.md) for precise scaffold/production boundaries and [research](codex-agent-research.md) for sources. No paid service is deployed.
+
+## Assignment 002 update
+
+| Requirement | Current implementation/evidence | Limit/setup |
+| --- | --- | --- |
+| Preferred GCP→Actions path | Gateway, transactional dispatcher, GitHub App token minting, opaque job inputs, private OIDC callbacks | Owner must configure project/App/approved immutable worker tag |
+| Supported real agent | OpenAI Responses transport with strict generated-source schema, caps, refusal/usage accounting | Disabled; no model key/call. Codex entitlement unverified; official API-key automation documented |
+| Novel source mechanics | TypeScript createGame contract, pure-state worker logic and bounded canvas commands | No arbitrary DOM/HTML/assets/packages; model fidelity not guaranteed by smoke |
+| Autonomous build/test/repair | Credential-free gVisor gate; compiler/static checks; independent desktop/mobile win/replay gate; two repairs | Full browser container blocked here by VFS disk; mandatory owner runner smoke |
+| Persistent work/revisions | Firestore transactions, stage/run binding, callback replay checks, queue/worker expiry, existing private revision APIs | Bounded 3 MiB family POC; no deployed cloud/emulator test |
+| Child workflow | Five generated-source requests, play, repair, revision, keep/undo/fork, reload acknowledged work, cancel; mocked Actions/provider fixtures on desktop/mobile | No live inference claimed; initial parent connection/paid setup required |
+| Isolation | Dedicated worker denies DOM/network; CSP/opaque iframe; watchdog; tiny real gVisor smoke plus OCI-policy tests | Browser RAM bounds are soft; full gVisor browser test still required |
+| Privacy/cost | No public prompt/artifact inputs, generation secret separate from test, micro-USD reservation and fresh prices | Owner consent, private logs, infra quotas, retention and actual billing review required |
+
+See [Assignment 002 evidence](assignment-002/evidence.md), [cost estimate](assignment-002/cost-estimate.md) and [precise owner checklist](assignment-002/owner-setup.md). Nothing merged or deployed automatically.

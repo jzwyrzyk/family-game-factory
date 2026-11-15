@@ -1,0 +1,64 @@
+name: Private Factory build worker
+run-name: Factory job ${{ inputs.job_id }} attempt ${{ inputs.attempt }}
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: Opaque private gateway job ID; never a prompt or credential
+        required: true
+        type: string
+      attempt:
+        description: Bounded generation/repair attempt
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  generate:
+    if: github.ref == format('refs/tags/factory-worker-{0}', vars.FACTORY_WORKER_SHA) && vars.FACTORY_ACTIONS_APPROVED == 'true'
+    environment: factory-generation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      # Model output is never executed in this job. Key is scoped to this one trusted step.
+      - run: node --import tsx server/actions/worker-cli.ts generate
+        env:
+          FACTORY_JOB_ID: ${{ inputs.job_id }}
+          FACTORY_ATTEMPT: ${{ inputs.attempt }}
+          FACTORY_GATEWAY_URL: ${{ vars.FACTORY_GATEWAY_URL }}
+          FACTORY_OPENAI_API_KEY: ${{ secrets.FACTORY_OPENAI_API_KEY }}
+  test:
+    needs: generate
+    # Dedicated, ephemeral runner: approved gVisor runtime + digest-pinned worker image.
+    environment: factory-sandbox
+    runs-on: [self-hosted, factory-isolated]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      # No model key, family cookie, GitHub App key or cloud storage credential is passed to the container.
+      - run: node --import tsx server/actions/worker-cli.ts test
+        env:
+          FACTORY_JOB_ID: ${{ inputs.job_id }}
+          FACTORY_ATTEMPT: ${{ inputs.attempt }}
+          FACTORY_GATEWAY_URL: ${{ vars.FACTORY_GATEWAY_URL }}
+          FACTORY_SANDBOX_IMAGE: ${{ vars.FACTORY_SANDBOX_IMAGE }}
