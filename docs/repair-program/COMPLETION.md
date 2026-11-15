@@ -22,3 +22,10 @@ Rollback: current main `dcb887e6a51ba000fda1ccc42b9d198f8b9895f9`; original stor
 Original asset files are byte-identical, with no crop/rig changes; rendering uses the recovered hero upper/leg rig and scene scale code. The shield return trajectory removes downward acceleration after reflection so the intended return reaches the dragon. This gameplay change needs explicit behavioral evidence before acceptance.
 
 Local evidence: `npm test` baseline with the revised journeys and five-change suite passed before the final construction-rotation assertion; final complete run is in progress. Expanded `tests/restored-games.cjs` passed both desktop and mobile. Screenshots are Chromium viewport emulation, not real Android/iOS device evidence. No deployment SHA exists for this batch.
+
+## Shared-learning batch (stacked on restoration)
+
+- IMPLEMENTED-UNVERIFIED overall: explicit parent multiplication-fact targets, bounded validation, injected-clock due scheduling, avoidance of immediate repeats when alternatives exist, independent/assisted evidence with attempts and timestamps, and game-specific outcome text in the optional coach.
+- VERIFIED-LOCAL: 35 unit tests; targeted browser flow for parent fact override, Practice hint/recovery, Original Challenge ending a run, reload and backup restoration. Full combined regressions/CI pending.
+- Additive profile fields: `factTargets`, `learningEvidence` (latest 500 records), `dueAt`, `lastAttempts`, `lastIndependent`, `lastFact`. Existing cumulative skill counts and legacy backups remain readable. These are provisional practice estimates, not certified mastery.
+- Still incomplete: prerequisite catalog beyond worked arithmetic hints, general fact targets outside multiplication, a configured real-model coach, real-device accessibility and all cloud/live-generation acceptance.
