@@ -1,3 +1,4 @@
+import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -9,12 +10,14 @@ export interface StudioSession {
   projectId: string | null; remoteId: string | null; remoteKind?: string;
   candidate: Candidate | null; undone?: Candidate | null; draft: string; messages: Message[];
   job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
+  design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
+  pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
 }
 export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string> }
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
 const safeText = (x: unknown, max: number): x is string => typeof x === 'string' && x.length <= max;
-const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(x);
+const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(x) && !['__proto__','constructor','prototype'].includes(x);
 export function validateNotebook(input: unknown): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
@@ -29,11 +32,16 @@ export function validateNotebook(input: unknown): Notebook {
       if (c.remoteId && !ident(c.remoteId)) throw Error('Invalid preview reference.');
       if (c.config && (typeof c.config !== 'object' || Array.isArray(c.config) || Object.keys(c.config).length > 100 || !Object.entries(c.config).every(([k,v])=>/^[a-zA-Z][\w]*$/.test(k) && (typeof v==='boolean' || typeof v==='number' && Number.isFinite(v))))) throw Error('Invalid preview settings.');
     }
+    if(s.design!==undefined)validateDesign(s.design);
+    if(s.experiments!==undefined)validateExperiments(s.experiments);
+    if(s.selectedTest!==undefined&&s.selectedTest!==null&&!s.experiments?.some(e=>e.id===s.selectedTest))throw Error('Unknown selected test.');
+    if(s.playOnly!==undefined&&typeof s.playOnly!=='boolean')throw Error('Invalid play-only state.');
+    if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
     if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   return copy(n);
 }
@@ -50,7 +58,7 @@ export class StudioNotebook {
   get(id:string,owner:string):StudioSession {const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return s;}
   last(owner:string):StudioSession|null {const n=this.read();return n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner)||null;}
   create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
-    return this.write(n=>{const s:StudioSession={id:crypto.randomUUID(),owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const s:StudioSession={id:crypto.randomUUID(),owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
     return this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');fn(s);s.updated=new Date().toISOString();return s;});
@@ -61,7 +69,19 @@ export class StudioNotebook {
   }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
     const source=this.get(id,owner);
-    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+  }
+  saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child'):Experiment {
+    let result:Experiment;
+    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;s.playOnly=false;});return result!;
+  }
+  selectExperiment(id:string,owner:string,testId:string):Experiment {
+    const e=this.get(id,owner).experiments?.find(e=>e.id===testId);if(!e)throw Error('Choose one of this project’s tests.');
+    this.update(id,owner,s=>{s.selectedTest=e.id;s.candidate=copy(e.candidate);});return copy(e);
+  }
+  note(id:string,owner:string,testId:string,note:string){if(!safeText(note,2000))throw Error('Note is too long.');this.update(id,owner,s=>{const e=s.experiments?.find(e=>e.id===testId);if(!e)throw Error('Test not found.');e.notes=note;});}
+  observe(id:string,owner:string,text:string,source:'runtime'|'child',experimentId:string|null=null){
+    this.update(id,owner,s=>{s.design ||= freshDesign();if(experimentId&&!s.experiments?.some(e=>e.id===experimentId))throw Error('Unknown observation test.');s.design.observations.push({id:crypto.randomUUID(),experimentId,text:text.slice(0,1200),source,at:new Date().toISOString()});});
   }
   restore(data:unknown) {const checked=validateNotebook(data);this.storage.setItem(STUDIO_KEY,JSON.stringify(checked));}
 }
