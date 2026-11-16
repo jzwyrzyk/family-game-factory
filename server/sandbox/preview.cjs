@@ -4,7 +4,73 @@ function renderGenerated(game,artifactId,channel){
  if(!game.compiled||!/^[\w-]{1,100}$/.test(artifactId)||!/^[\w-]{8,100}$/.test(channel))throw Error('INVALID_GENERATED_PREVIEW');
  const worker=game.compiled.code+`\nconst game=GameModule.createGame();let state;self.onunhandledrejection=()=>{self.postMessage({failed:true})};self.onmessage=e=>{const m=e.data;if(m.type==='start')state=game.init();else if(m.type==='step')state=game.step(state,m.input,m.dt);else return;const commands=game.draw(state),outcome=game.outcome(state);self.postMessage({commands,outcome});};`;
  const data=JSON.stringify({worker,artifactId,channel,controls:game.controls}).replace(/</g,'\\u003c');
- const script=`const config=${data};const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),status=document.getElementById('status');let worker=null,timer=null,watch=null,received=0,inputs=0,frames=0,changed=0,lastFrame='',ended=false,last=0;const pressed=new Set();let tap=null;function report(event,extra={}){parent.postMessage({type:'factory-preview',channel:config.channel,artifactId:config.artifactId,event,...extra},'*')}function stop(){clearInterval(timer);clearInterval(watch);worker?.terminate();worker=null;}function fail(){stop();status.textContent='This version stopped safely. You can replay or try a change.';status.dataset.state='error';report('preview-failed');}function number(v,min,max){if(!Number.isFinite(v))throw Error();return Math.max(min,Math.min(max,v));}function color(v){if(typeof v!=='string'||!/^#[0-9a-f]{3,8}$/i.test(v))throw Error();return v;}function draw(message){if(!message||JSON.stringify(message).length>24000||!Array.isArray(message.commands)||message.commands.length>100)throw Error();const out=message.outcome;if(!out||!['playing','won','lost'].includes(out.status)||!Number.isInteger(out.score)||out.score<0||out.score>1000000)throw Error();if(!frames&&out.status!=='playing')throw Error();const signature=JSON.stringify(message.commands);if(signature!==lastFrame)changed++;lastFrame=signature;ctx.clearRect(0,0,720,400);for(const c of message.commands){ctx.fillStyle=color(c.color);const x=number(c.x,0,720),y=number(c.y,0,400);if(c.type==='rect')ctx.fillRect(x,y,number(c.width,0,720),number(c.height,0,400));else if(c.type==='circle'){ctx.beginPath();ctx.arc(x,y,number(c.radius,0,200),0,Math.PI*2);ctx.fill();}else if(c.type==='text'){if(typeof c.text!=='string'||c.text.length>100)throw Error();ctx.font=number(c.size,8,80)+'px system-ui';ctx.fillText(c.text,x,y);}else throw Error();}frames++;canvas.dataset.frames=String(frames);canvas.dataset.changed=String(changed);canvas.dataset.inputs=String(inputs);document.getElementById('score').textContent='Score: '+out.score;status.dataset.state=out.status;if(out.status!=='playing'){if(!inputs)throw Error();ended=true;status.textContent=out.status==='won'?'You did it!':'Try another way!';report('round-complete',{won:out.status==='won',score:out.score});stop();}}function start(){stop();ended=false;inputs=frames=changed=0;lastFrame='';pressed.clear();tap=null;status.textContent='Let’s play!';status.dataset.state='playing';const url=URL.createObjectURL(new Blob([config.worker],{type:'text/javascript'}));worker=new Worker(url);URL.revokeObjectURL(url);last=performance.now();let messages=0,period=last;worker.onmessage=e=>{const now=performance.now();if(now-period>1000){messages=0;period=now;}if(++messages>60){fail();return;}last=now;received++;try{draw(e.data)}catch{fail();}};worker.onerror=fail;worker.postMessage({type:'start'});timer=setInterval(()=>{if(!worker||ended)return;worker.postMessage({type:'step',input:{pressed:[...pressed],tap},dt:0.05});tap=null;},50);watch=setInterval(()=>{if(performance.now()-last>700)fail();},100);}document.getElementById('start').onclick=start;document.getElementById('replay').onclick=start;canvas.onclick=e=>{const r=canvas.getBoundingClientRect();tap={x:(e.clientX-r.left)/r.width*720,y:(e.clientY-r.top)/r.height*400};inputs++;};const mapping={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',Space:'action'};onkeydown=e=>{const key=mapping[e.code];if(key){e.preventDefault();pressed.add(key);inputs++;}};onkeyup=e=>{pressed.delete(mapping[e.code]);};for(const b of document.querySelectorAll('[data-control]')){b.onpointerdown=()=>{pressed.add(b.dataset.control);inputs++;};b.onpointerup=b.onpointercancel=b.onpointerleave=()=>pressed.delete(b.dataset.control);b.onclick=()=>{pressed.add(b.dataset.control);inputs++;setTimeout(()=>pressed.delete(b.dataset.control),120);};}document.getElementById('start').disabled=false;document.getElementById('replay').disabled=false;report('ready',{height:Math.ceil(document.body.scrollHeight)});`;
+ const script=`
+const config=${data};
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),status=document.getElementById('status');
+let worker=null,timer=null,watch=null,inputs=0,frames=0,changed=0,lastFrame='',ended=false,last=0;
+let connected=false,paused=false,roundId=0,checkpointId=0,activeSeconds=0;
+const pressed=new Set();let tap=null;
+function report(event,extra={}){parent.postMessage({type:'factory-preview',channel:config.channel,artifactId:config.artifactId,event,roundId,...extra},'*')}
+function controls(){document.getElementById('start').disabled=paused;document.getElementById('replay').disabled=paused;canvas.setAttribute('aria-disabled',String(paused));}
+function pause(){paused=true;pressed.clear();tap=null;controls();}
+addEventListener('message',event=>{
+ const d=event.data;if(event.source!==parent||!d||d.type!=='factory-learning'||d.channel!==config.channel||d.artifactId!==config.artifactId)return;
+ if(d.action==='connect'){connected=true;return;}
+ if(d.action==='pause')pause();
+ if(d.action==='resume'){paused=false;last=performance.now();controls();}
+});
+function stop(){clearInterval(timer);clearInterval(watch);worker?.terminate();worker=null;}
+function fail(){stop();status.textContent='This version stopped safely. You can replay or try a change.';status.dataset.state='error';report('preview-failed');}
+function number(v,min,max){if(!Number.isFinite(v))throw Error();return Math.max(min,Math.min(max,v));}
+function color(v){if(typeof v!=='string'||!/^#[0-9a-f]{3,8}$/i.test(v))throw Error();return v;}
+function draw(message){
+ if(!message||JSON.stringify(message).length>24000||!Array.isArray(message.commands)||message.commands.length>100)throw Error();
+ const out=message.outcome;if(!out||!['playing','won','lost'].includes(out.status)||!Number.isInteger(out.score)||out.score<0||out.score>1000000)throw Error();
+ if(!frames&&out.status!=='playing')throw Error();
+ const signature=JSON.stringify(message.commands);if(signature!==lastFrame)changed++;lastFrame=signature;
+ ctx.clearRect(0,0,720,400);
+ for(const c of message.commands){
+  ctx.fillStyle=color(c.color);const x=number(c.x,0,720),y=number(c.y,0,400);
+  if(c.type==='rect')ctx.fillRect(x,y,number(c.width,0,720),number(c.height,0,400));
+  else if(c.type==='circle'){ctx.beginPath();ctx.arc(x,y,number(c.radius,0,200),0,Math.PI*2);ctx.fill();}
+  else if(c.type==='text'){if(typeof c.text!=='string'||c.text.length>100)throw Error();ctx.font=number(c.size,8,80)+'px system-ui';ctx.fillText(c.text,x,y);}
+  else throw Error();
+ }
+ frames++;canvas.dataset.frames=String(frames);canvas.dataset.changed=String(changed);canvas.dataset.inputs=String(inputs);
+ document.getElementById('score').textContent='Score: '+out.score;status.dataset.state=out.status;
+ if(out.status!=='playing'){
+  if(!inputs)throw Error();ended=true;status.textContent=out.status==='won'?'You did it!':'Try another way!';
+  if(connected)pause();report('round-complete',{won:out.status==='won',score:out.score});stop();
+ }
+}
+function start(){
+ if(paused)return;stop();ended=false;roundId++;checkpointId=0;activeSeconds=0;inputs=frames=changed=0;lastFrame='';pressed.clear();tap=null;
+ status.textContent='Let’s play!';status.dataset.state='playing';
+ const url=URL.createObjectURL(new Blob([config.worker],{type:'text/javascript'}));worker=new Worker(url);URL.revokeObjectURL(url);
+ last=performance.now();let messages=0,period=last;
+ worker.onmessage=e=>{const now=performance.now();if(now-period>1000){messages=0;period=now;}if(++messages>60){fail();return;}last=now;try{draw(e.data)}catch{fail();}};
+ worker.onerror=fail;worker.postMessage({type:'start'});
+ timer=setInterval(()=>{
+  if(!worker||ended||paused||document.hidden)return;
+  activeSeconds+=0.05;
+  if(connected&&activeSeconds>=90){activeSeconds=0;pause();report('math-checkpoint',{checkpointId:++checkpointId});return;}
+  worker.postMessage({type:'step',input:{pressed:[...pressed],tap},dt:0.05});tap=null;
+ },50);
+ watch=setInterval(()=>{if(!paused&&!document.hidden&&performance.now()-last>700)fail();},100);
+}
+addEventListener('visibilitychange',()=>{pressed.clear();tap=null;last=performance.now();});
+document.getElementById('start').onclick=start;document.getElementById('replay').onclick=start;
+canvas.onclick=e=>{if(paused||ended)return;const r=canvas.getBoundingClientRect();tap={x:(e.clientX-r.left)/r.width*720,y:(e.clientY-r.top)/r.height*400};inputs++;};
+const mapping={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',Space:'action'};
+onkeydown=e=>{if(paused||ended)return;const key=mapping[e.code];if(key){e.preventDefault();pressed.add(key);inputs++;}};
+onkeyup=e=>{pressed.delete(mapping[e.code]);};
+for(const b of document.querySelectorAll('[data-control]')){
+ b.onpointerdown=()=>{if(paused||ended)return;pressed.add(b.dataset.control);inputs++;};
+ b.onpointerup=b.onpointercancel=b.onpointerleave=()=>pressed.delete(b.dataset.control);
+ b.onclick=()=>{if(paused||ended)return;pressed.add(b.dataset.control);inputs++;setTimeout(()=>pressed.delete(b.dataset.control),120);};
+}
+controls();report('ready',{height:Math.ceil(document.body.scrollHeight)});
+`;
  const digest=createHash('sha256').update(script).digest('base64');const csp=`default-src 'none'; script-src 'sha256-${digest}'; worker-src blob:; connect-src 'none'; style-src 'unsafe-inline'; img-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors *`;
  const labels={left:'◀ Left',right:'Right ▶',up:'▲ Up',down:'▼ Down',action:'⭐ Action'};
  const controls=game.controls.map(k=>`<button data-control="${k}">${labels[k]}</button>`).join('');

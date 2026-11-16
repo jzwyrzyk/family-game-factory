@@ -28,6 +28,6 @@ FG.games = Object.fromEntries((Object.keys(plugins) as GameId[]).map(id => [id, 
     const lifecycle = createLifecycle(plugins[id], target, ctx.config || defaults(id, ctx.difficulty), ctx.difficulty, ctx.finish, {load:()=>FG.store.current().constructionStates?.[ctx.stateKey||id],save:(state:unknown)=>{const p=FG.store.current();p.constructionStates||={};p.constructionStates[ctx.stateKey||id]=state;return FG.store.save()}});
     current = lifecycle;
     lifecycle.start();
-    return { next: () => lifecycle.next(), restart: () => lifecycle.retry(), retry: () => lifecycle.retry(), unmount: () => lifecycle.dispose() };
+    return { next: () => lifecycle.next(), restart: () => lifecycle.retry(), retry: () => lifecycle.retry(), isPlaying:()=>lifecycle.isPlaying(),pause:()=>lifecycle.pause(),resume:()=>lifecycle.resume(),unmount: () => lifecycle.dispose() };
   },
 }]));

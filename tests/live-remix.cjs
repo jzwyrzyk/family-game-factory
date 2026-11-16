@@ -11,8 +11,9 @@ const {start}=require('./browser-server.cjs');
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dialog=>dialog.accept());
   await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);
   const nav=async(name)=>page.getByRole('navigation').getByRole('button',{name,exact:true}).click();
-  // Seed real legacy progress before remixing. New editor must not change math settings/evidence.
-  const original=await page.evaluate(()=>{FG.store.current().skills['mul:8x4']={tries:3,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.changeProfile({rate:0});return JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity})});
+  // Seed real legacy progress before remixing. A recent-question budget isolates
+  // editor/history behavior while mandatory math remains enabled at rate 1.
+  const original=await page.evaluate(()=>{FG.store.current().skills['mul:8x4']={tries:3,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();return JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity})});
   await nav('🎛️ Remix');await page.click('#newLiveGame');
   const snapshot=()=>page.evaluate(()=>FG.runtime.snapshot());
   const ready=async()=>{for(let i=0;i<3;i++)await page.locator('#go').click()};
@@ -61,10 +62,19 @@ const {start}=require('./browser-server.cjs');
  for(const [game,prompt,key,expected] of [['gum','Give me six gum sticks','gumRemaining',6],['dragon','Give the island 120 resilience','islandHP',120]]){
   await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
- // Deterministic real round regression: lose/retry, win/next; then leave during delayed math feedback.
- await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:0});FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'Bucket 2',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);await pluginPage.click('#resultNext');await pluginPage.getByRole('button',{name:'Bucket 1',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
- await pluginPage.evaluate(()=>{FG.store.changeProfile({rate:8});FG.store.current().mathWindow=[];FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#math-answer');const questionText=await pluginPage.locator('#stage-overlay h2').textContent(),operands=questionText.match(/(\d+)\s*([+−×÷-])\s*(\d+)/),left=+operands[1],right=+operands[3],answer=operands[2]==='+'?left+right:operands[2]==='×'?left*right:operands[2]==='÷'?left/right:left-right;
- await pluginPage.fill('#math-answer',String(answer));await pluginPage.click('#math-submit');await pluginPage.evaluate(()=>FG.app.openGame('gum'));await pluginPage.waitForTimeout(650);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.ok(await pluginPage.locator('.builder-piece').count());
+ // Deterministic round regression uses the same recent-question budget for
+ // lose/retry and win/next. The next case clears it to exercise actual math.
+ await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'Bucket 2',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);await pluginPage.click('#resultNext');await pluginPage.getByRole('button',{name:'Bucket 1',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
+ await pluginPage.evaluate(()=>{FG.store.changeProfile({rate:8});FG.store.current().mathWindow=[];FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('.math-activity');
+ const activeItem=await pluginPage.evaluate(()=>FG.learning.activeItem);
+ assert.ok(activeItem,'math feedback regression must exercise an actual learning item');
+ if(activeItem.answerKind==='choice'){
+  const choice=activeItem.choices.find(c=>c.value===String(activeItem.answer));assert.ok(choice);
+  await pluginPage.getByRole('button',{name:choice.label,exact:true}).click();
+ }else{
+  await pluginPage.fill('#math-answer',String(activeItem.answer));await pluginPage.click('#math-submit');
+ }
+ await pluginPage.evaluate(()=>FG.app.openGame('gum'));await pluginPage.waitForTimeout(650);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.ok(await pluginPage.locator('.builder-piece').count());
  await pluginPage.close();
  // Legacy workspace migration in browser; failed/corrupt load never replaces stored source.
  const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('family-game-factory-workspace-v2',JSON.stringify({version:1,games:[{id:'old-game',owner:'player1',game:'buckets',name:'Migrated Splash',config:{bucketCount:2,revealSafe:true,splashMs:400}}]}))});await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();assert.match(await page.textContent('#liveName'),/Migrated Splash/);await page.click('#livePlay');assert.equal((await page.evaluate(()=>FG.runtime.snapshot())).state.bucketCount,2);await page.close();

@@ -14,3 +14,9 @@ import './artifact-storage.test';
 import './deployment.test';
 
 import './private-worker-bridge.test';
+
+import './learning-content.test';
+import './learning-engine.test';
+import './learning-policy.test';
+
+import './learning-builder-contract.test';

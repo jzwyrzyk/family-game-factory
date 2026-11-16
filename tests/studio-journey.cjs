@@ -12,7 +12,9 @@ const {start}=require('./browser-server.cjs');
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(r.url().includes('/v1/jobs'))jobs.push(r.url());});
   const url=`http://127.0.0.1:${server.address().port}/arcade/?studio=1`;
   await page.goto(url);await page.waitForFunction(()=>FG.studio&&FG.factory&&FG.builder);
-  const original=await page.evaluate(()=>{FG.store.changeProfile({rate:0});FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills);});
+  // This suite checks studio/history isolation. A recent question satisfies the
+  // ordinary pacing budget; math remains mandatory and is tested separately.
+  const original=await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills);});
   const notebook=()=>page.evaluate(()=>FG.studio.exportNotebook());
   const workspace=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
   const talk=async()=>{if(device==='mobile')await page.click('[data-studio-tab="talk"]');};

@@ -76,14 +76,14 @@ async function loadAssets(){
 }
 
 let selected = 'queen';
-let mode='loading';
+let mode='loading',hostPaused=false;
 let muted=false;
 const keys={};
-listen('keydown',e=>{ if(/INPUT|TEXTAREA/.test(e.target.tagName))return; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault(); keys[e.code]=true; if(e.code==='Space') keys.Space=true; if(e.code==='Escape'&&mode==='playing') pause();});
+listen('keydown',e=>{ if(hostPaused)return; if(/INPUT|TEXTAREA/.test(e.target.tagName))return; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault(); keys[e.code]=true; if(e.code==='Space') keys.Space=true; if(e.code==='Escape'&&mode==='playing') pause();});
 listen('keyup',e=>{ keys[e.code]=false; if(e.code==='Space') keys.Space=false;});
 document.querySelectorAll('#touch button').forEach(btn=>{
   const key=btn.dataset.key;
-  const down=e=>{e.preventDefault(); keys[key]=true; if(key==='Space') keys.Space=true;};
+  const down=e=>{e.preventDefault(); if(hostPaused)return; keys[key]=true; if(key==='Space') keys.Space=true;};
   const up=e=>{e.preventDefault(); keys[key]=false; if(key==='Space') keys.Space=false;};
   btn.addEventListener('pointerdown',down); btn.addEventListener('pointerup',up); btn.addEventListener('pointerleave',up); btn.addEventListener('pointercancel',up);
 });
@@ -315,7 +315,7 @@ function drawUIState(){
 function render(){
   ctx.clearRect(0,0,W,H); drawScene(); drawDragon(); game.heroes.forEach(h=>drawHero(h)); drawFireballs(); drawUIState();
 }
-let last=performance.now(); function loop(t){ const dt=Math.min(.033,(t-last)/1000); last=t; update(dt); render(); frame(loop);} 
+let last=performance.now(); function loop(t){ const dt=Math.min(.033,(t-last)/1000); last=t; if(!hostPaused)update(dt); render(); frame(loop);}
 
 (async function init(){
   renderHeroCards();
@@ -326,7 +326,7 @@ let last=performance.now(); function loop(t){ const dt=Math.min(.033,(t-last)/10
   frame(loop);
 })().catch(()=>{if(alive)root.getElementById('toast').textContent='Artwork could not load. Reopen the game to retry.'});
 
-this.next=()=>{game.level++;startLevel(game.level);setMode('playing')};this.restart=()=>{startLevel(game.level);setMode('playing')};this.snapshot=()=>({level:game.level,mode,islandHP:game.islandHP,dragonHP:game.dragonHP,player:game.leader,fireballs:game.fireballs,cracks:game.cracks.length,assets:Object.keys(processed).length});this.unmount=()=>{alive=false;cancelAnimationFrame(raf);listeners.forEach(([t,f])=>window.removeEventListener(t,f));timers.forEach(clearTimeout);playTone.ac?.close();mount.replaceChildren()};
+this.isPlaying=()=>mode==='playing'&&!hostPaused;this.pause=()=>{if(mode!=='playing'||hostPaused)return false;hostPaused=true;Object.keys(keys).forEach(k=>keys[k]=false);return true};this.resume=()=>{hostPaused=false};this.next=()=>{game.level++;startLevel(game.level);setMode('playing')};this.restart=()=>{startLevel(game.level);setMode('playing')};this.snapshot=()=>({level:game.level,mode,islandHP:game.islandHP,dragonHP:game.dragonHP,player:game.leader,fireballs:game.fireballs,cracks:game.cracks.length,assets:Object.keys(processed).length});this.unmount=()=>{alive=false;cancelAnimationFrame(raf);listeners.forEach(([t,f])=>window.removeEventListener(t,f));timers.forEach(clearTimeout);playTone.ac?.close();mount.replaceChildren()};
 }
 run.call(this,scopeDocument);
 }

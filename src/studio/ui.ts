@@ -1,3 +1,5 @@
+import { attachPreviewLearning } from '../learning/remote';
+import { interpretMathRequest, MODE_LABELS, setMode } from '../learning/policy';
 import './style.css';
 import { StudioNotebook, validateNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
 import { StudioGames } from './adapter';
@@ -28,6 +30,7 @@ export async function installStudio(){
  let remote:BuilderConfig={version:1,mode:'unavailable'};
  const clients=new Map<string,BuilderClient>();
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
+ let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
  let saving=false, reflecting=false, lastOutcome:string|null=null;
  const sending=new Set<string>();
@@ -37,7 +40,7 @@ export async function installStudio(){
  <div class="studio-topbar"><div class="studio-version"><span class="studio-dot"></span><span id="studioVersion">New idea</span></div><div class="studio-actions"><button id="studioPlay" class="studio-button studio-primary">▶ Play</button><button id="studioKeep" class="studio-button studio-keep" disabled>✓ Keep change</button><button id="studioUndo" class="studio-button" disabled>↶ Undo</button><button id="studioRedo" class="studio-button" disabled>↷ Redo</button><button id="studioCompare" class="studio-button">▤ Versions</button><button id="studioCopy" class="studio-button">＋ Save as new</button></div></div>
  <div id="studioStatus" class="studio-status" role="status" aria-live="polite"></div>
  <nav class="studio-mobile-tabs" aria-label="Studio panels"><button data-studio-tab="game" aria-pressed="true">🎮 Game</button><button data-studio-tab="talk" aria-pressed="false">💬 Talk & change</button><button data-studio-tab="versions" aria-pressed="false">▤ Versions</button></nav>
- <div class="studio-workspace" data-mobile-panel="game"><div class="studio-canvas-column"><div id="studioPreviewNotice" class="studio-preview-notice" hidden>Preview only. Your working game has not changed. <button id="studioBackWorking">Back to working game</button></div><div id="studioGameHost" class="studio-game-host"><div id="studioEmpty" class="studio-empty"><span>✦</span><h2>An idea is all you need.</h2><p>Describe a new game, or choose a game from your library to change it.</p><button class="studio-button" id="studioChooseStarter">Choose a starting game</button></div><div id="studioRemoteHost" hidden></div></div><p class="studio-footnote" id="studioPlayNote">Play and change in one place. Saving here never publishes a game.</p></div>
+ <div class="studio-workspace" data-mobile-panel="game"><div class="studio-canvas-column"><div id="studioPreviewNotice" class="studio-preview-notice" hidden>Preview only. Your working game has not changed. <button id="studioBackWorking">Back to working game</button></div><div id="studioGameHost" class="studio-game-host"><div id="studioEmpty" class="studio-empty"><span>✦</span><h2>An idea is all you need.</h2><p>Describe a new game, or choose a game from your library to change it.</p><button class="studio-button" id="studioChooseStarter">Choose a starting game</button></div><div id="studioRemoteHost" hidden></div></div><div id="studioMathMode"></div><p class="studio-footnote" id="studioPlayNote">Play and change in one place. Saving here never publishes a game.</p></div>
  <aside class="studio-conversation"><div class="studio-helper-heading"><span class="studio-helper-icon">✦</span><div><h2>Your design partner</h2><p id="studioAvailability">Checking available tools…</p></div></div><div id="studioMessages" class="studio-messages" role="log" aria-label="Project conversation" aria-live="polite"></div><div id="studioReflection" class="studio-reflection" hidden><p id="studioReflectionQuestion">What worked well? What would you change?</p><div><button id="studioReflectAnswer" class="studio-chip">Share a thought</button><button id="studioReflectSkip" class="studio-chip">Skip & keep playing</button></div></div><form id="studioPromptForm" class="studio-prompt"><label for="studioPrompt" id="studioPromptLabel">What would you like to change?</label><textarea id="studioPrompt" rows="3" maxlength="2000" placeholder="Tell me what you imagine…" required></textarea><div id="studioSuggestions" class="studio-suggestions"></div><div class="studio-send-row"><span id="studioDraftStatus">Draft saved as you type</span><button id="studioSend" class="studio-button studio-primary" type="submit">Try change →</button></div><div class="studio-build-controls"><button id="studioCancel" class="studio-button" type="button" hidden>Cancel build</button><button id="studioRetry" class="studio-button" type="button" hidden>Try build again</button></div></form></aside></div>
  <section id="studioVersions" class="studio-versions" aria-labelledby="studioVersionsTitle" hidden><div class="studio-section-heading"><div><h2 id="studioVersionsTitle">Try a version. Keep your choice.</h2><p>Playing an older version does not overwrite your working game.</p></div><button class="studio-button" id="studioCloseVersions">Close</button></div><div id="studioVersionCards" class="studio-version-cards"></div></section>
  <dialog id="studioCopyDialog" class="studio-dialog"><form id="studioCopyForm"><h2>Give this game a new name</h2><p>Your original stays exactly as it is. The conversation comes with your copy.</p><label for="studioCopyName">Game name</label><input id="studioCopyName" maxlength="60" required><div><button class="studio-button" id="studioCopyCancel" type="button">Cancel</button><button class="studio-button studio-primary" type="submit">Save new game</button></div></form></dialog>`;
@@ -66,7 +69,7 @@ export async function installStudio(){
   nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
  }
  function disposeGame(){
-  ++epoch;iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
+  ++epoch;previewLearning?.dispose();previewLearning=null;FG.learning.dispose();iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
   // The original host cleans listeners, timers, audio and pending math callbacks.
   if(mounted){FG.app.page('home');mounted=false;}
   nativeStage.classList.add('hidden');$('studioRemoteHost').replaceChildren();$('studioRemoteHost').hidden=true;
@@ -100,7 +103,7 @@ export async function installStudio(){
  }
  function render(){
   if(!activeId)return;const s=current(),working=s.projectId?games.revision(s.projectId,s.owner):null;
-  $('studioTitle').textContent=s.name;$('studioStorage').textContent=s.remoteId||s.candidate?.remoteId?'Private family game · local conversation':'Saved on this device';
+  FG.learning.modeControl($('studioMathMode'),s.id);$('studioTitle').textContent=s.name;$('studioStorage').textContent=s.remoteId||s.candidate?.remoteId?'Private family game · local conversation':'Saved on this device';
   const n=s.projectId?games.history(s.projectId,s.owner).findIndex(r=>r.id===working?.id)+1:0;
   $('studioVersion').textContent=showing==='candidate'?'Preview · not kept':showing==='history'?'Comparing an earlier version':working?`Working version ${n}`:s.remoteId?'Working game':'Idea · not a playable game yet';
   $('studioPreviewNotice').hidden=showing==='working';
@@ -123,15 +126,16 @@ export async function installStudio(){
   nativeStage.classList.remove('hidden');
  }
  function announceOutcome(s:StudioSession,description:string){
+  if(FG.learning.active){const at=epoch;const pending=()=>{if(!FG.learning.active){window.removeEventListener('factory-learning-active',pending);if(at===epoch)announceOutcome(s,description);}};window.addEventListener('factory-learning-active',pending);return;}
   if(owner()!==s.owner||activeId!==s.id)return;
   // One optional prompt per completed play; no inferred emotion or automatic change.
-  if(description===lastOutcome)return;lastOutcome=description;
-  message(s,'helper',description+' What was fun or tricky? You can share a thought, ask for a change, or keep playing.');
-  notebook.update(s.id,s.owner,x=>{x.reflection=true;});render();
+  if(description===lastOutcome)return;
+  try{message(s,'helper',description+' What was fun or tricky? You can share a thought, ask for a change, or keep playing.');
+  notebook.update(s.id,s.owner,x=>{x.reflection=true;});lastOutcome=description;render();}catch(error){status((error as Error).message,true);}
  }
  function playLocal(s:StudioSession,config:Mechanics,key:string,view:typeof showing,revisionId?:string){
   disposeGame();lastOutcome=null;const generation=epoch;showing=view;mountNative();
-  FG.app.openGame(s.game,{config,stateKey:key,onOutcome:(outcome:PlayOutcome)=>{
+  FG.app.openGame(s.game,{config,stateKey:key,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
     announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`);
@@ -145,6 +149,8 @@ export async function installStudio(){
   if(reflecting){message(s,'reflection',prompt);notebook.update(s.id,s.owner,x=>{x.draft='';x.reflection=false;});reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value='';render();return;}
   if(busy(s)||sending.has(s.id)){status('Your current build is still running. Play your working game or cancel the build first.');return;}
   message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});
+  const mathRequest=interpretMathRequest(prompt);
+  if(mathRequest){if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Math format set to ${MODE_LABELS[mathRequest.mode]}. It applies at the next safe learning moment; your game rules and learning history stay together.`);notebook.update(s.id,s.owner,x=>{x.draft='';});$<HTMLTextAreaElement>('studioPrompt').value='';}render();return;}
   if(s.projectId&&!s.remoteId&&!s.candidate?.remoteId){
     const working=games.revision(s.projectId,s.owner),config=s.candidate?.config||working.config;
     const intent=interpret(s.game as GameId,config,prompt);
@@ -186,6 +192,7 @@ export async function installStudio(){
  }
  function resume(s:StudioSession){if(!s.job)return;void clientFor(s).resume(s.job.id).catch(()=>{if(owner()===s.owner&&activeId===s.id)status('Could not refresh that build. Your saved game is still available.',true);});}
  async function showRemote(s:StudioSession,id:string){
+  if(FG.store.loadError)throw Error(FG.store.loadError);
   disposeGame();lastOutcome=null;const generation=epoch,preview=await clientFor(s).preview(id);
   if(generation!==epoch||s.owner!==owner()||s.id!==activeId||route!=='studio')return;
   notebook.update(s.id,s.owner,x=>{x.remoteKind=preview.kind||'star-catcher-v1';});
@@ -193,6 +200,7 @@ export async function installStudio(){
   iframe=document.createElement('iframe');iframe.title='Private game preview';iframe.setAttribute('sandbox','allow-scripts');iframe.referrerPolicy='no-referrer';
   previewChannel=crypto.randomUUID();previewArtifact=preview.artifactId;previewOwner=s.owner;
   const url=new URL(preview.url);url.searchParams.set('channel',previewChannel);iframe.src=url.href;host.replaceChildren(iframe);
+  previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onRound:d=>announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`)});
   $('studioPlayNote').textContent=preview.adapter==='mock'?'Test builder (mock)—not a real AI generation.':'Private preview. Your working game stays unchanged until you keep it.';
   render();setTab('game');
  }
@@ -200,7 +208,7 @@ export async function installStudio(){
   if(!iframe||event.source!==iframe.contentWindow||previewOwner!==owner()||route!=='studio')return;
   const d=event.data;if(!d||d.type!=='factory-preview'||d.channel!==previewChannel||d.artifactId!==previewArtifact)return;
   if(d.event==='ready'&&Number.isInteger(d.height)&&d.height>=300&&d.height<=1000)iframe.style.height=`${Math.max(400,d.height+12)}px`;
-  if(d.event==='round-complete'&&typeof d.won==='boolean'&&Number.isInteger(d.score))announceOutcome(current(),`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`);
+
  });
  async function keep(){
   if(saving)return;const s=current(),c=s.candidate;if(!c)return;saving=true;render();
@@ -229,11 +237,11 @@ export async function installStudio(){
   if(!box.children.length)box.append(el('p','','Your idea is saved. Versions appear when there is a playable game.'));
  }
  async function copyGame(name:string){
-  if(saving)return;saving=true;const s=current();render();
+  if(saving)return;saving=true;const s=current(),sourceMode=FG.learning.modeFor(s.id);render();
   try{let projectId:string|null=null,remoteId:string|null=null;
     if(s.candidate?.remoteId||s.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(s.candidate?.remoteId||s.remoteId!)+'/fork',{name});remoteId=r.revisionId;}
     else if(s.projectId){const p=games.fork(s.owner,s.projectId,name,s.candidate?.config,s.candidate?.prompt,s.candidate?.id);projectId=p.id;}
-    const saved=notebook.fork(s.id,s.owner,name,projectId,remoteId);$<HTMLDialogElement>('studioCopyDialog').close();
+    const saved=notebook.fork(s.id,s.owner,name,projectId,remoteId);const learner=FG.store.data.profiles.find((p:any)=>p.id===s.owner);if(learner){const before=learner.mathModes;setMode(learner,saved.id,sourceMode);if(!FG.store.save()){learner.mathModes=before;throw Error('Your separate game was saved, but its math format could not be copied.');}}$<HTMLDialogElement>('studioCopyDialog').close();
     if(s.owner===owner()){message(saved,'helper','Saved as a separate game. Your original game is unchanged.');await open(saved.id);}
   }finally{saving=false;render();}
  }
@@ -266,7 +274,7 @@ export async function installStudio(){
  window.addEventListener('beforeunload',()=>{try{flushDraft();}catch{/* preserve existing data on quota errors */}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
  // Existing progress backups gain an explicitly versioned optional notebook. Old backups remain valid.
- const exportButton=$('exportData');exportButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();act(()=>{flushDraft();const data={...FG.store.data,factoryWorkspace:games.export(),factoryStudio:notebook.read()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a') as HTMLAnchorElement;a.href=url;a.download='family-game-factory-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});},true);
+ const exportButton=$('exportData');exportButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();act(()=>{if(!FG.store.recoveryRaw)flushDraft();const data=FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:games.export(),factoryStudio:notebook.read()},null,2);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a') as HTMLAnchorElement;a.href=url;a.download='family-game-factory-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});},true);
  const importInput=$<HTMLInputElement>('importData');importInput.addEventListener('change',event=>{event.stopImmediatePropagation();const file=importInput.files?.[0];if(!file)return;act(async()=>{try{if(file.size>20_000_000)throw Error('That backup is too large.');const data=JSON.parse(await file.text());if(data.factoryStudio)validateNotebook(data.factoryStudio);if(data.factoryWorkspace)FG.factory.validateWorkspace(data.factoryWorkspace);if(!confirm('Restore this backup? Current progress will be replaced.'))return;const prior=JSON.stringify(FG.store.data),oldWorkspace=games.export(),oldNotebook=notebook.read();try{FG.store.restore(JSON.stringify(data));if(data.factoryWorkspace)FG.factory.restoreWorkspace(data.factoryWorkspace);if(data.factoryStudio)notebook.restore(data.factoryStudio);}catch(error){FG.store.restore(prior);FG.factory.restoreWorkspace(oldWorkspace);notebook.restore(oldNotebook);throw error;}location.reload();}finally{importInput.value='';}});},true);
  home();
  try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{remote={version:1,mode:'unavailable'};}configReady=true;if(activeId)render();

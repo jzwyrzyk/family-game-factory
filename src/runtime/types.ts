@@ -14,6 +14,8 @@ export interface PlayOutcome extends RoundResult {
 }
 export interface GameInstance {
   next(): void; restart(): void; retry?(): void; unmount(): void;
+  /** Optional safe checkpoint contract. Only an actively playing game may pause. */
+  isPlaying?(): boolean; pause?(): boolean; resume?(): void;
   snapshot?(): Record<string, unknown>;
 }
 export interface GameContext {
@@ -26,5 +28,6 @@ export interface GamePlugin {
 }
 export interface GameLifecycle {
   start(): void; next(): void; retry(): void; dispose(): void;
+  isPlaying(): boolean; pause(): boolean; resume(): void;
   snapshot(): { config: Mechanics; state: Record<string, unknown>; disposed: boolean };
 }
