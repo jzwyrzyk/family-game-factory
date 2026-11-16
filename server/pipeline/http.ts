@@ -5,7 +5,7 @@ import { createHmac,timingSafeEqual } from 'node:crypto';
 import { verifySession } from './auth';
 import { renderPreview } from './artifacts';
 import { JobService } from './service';
-interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>}
+interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>}
 function json(response:ServerResponse,status:number,value:unknown){response.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});response.end(JSON.stringify(value));}
 async function body(request:IncomingMessage){let text='';for await(const chunk of request){text+=chunk;if(Buffer.byteLength(text)>12000)throw Error('REQUEST_TOO_LARGE');}return JSON.parse(text||'{}');}
 const signature=(key:string,fields:string)=>createHmac('sha256',key).update(fields).digest('base64url');
@@ -26,7 +26,7 @@ export function apiHandler(service:JobService,config:HttpConfig){
     const ack=await service.submit(session,await body(request));json(response,202,ack);if(ack.status==='queued')setImmediate(()=>{void (config.dispatch?config.dispatch(ack.jobId):service.run(ack.jobId)).catch(()=>{});});return;
    }
    let match=path.match(/^\/v1\/jobs\/([\w-]+)(\/(?:cancel|retry))?$/);
-   if(match){if(match[2]==='/retry'&&request.method==='POST'){const input=await body(request),ack=await service.retry(session,match[1],input.clientRequestId);json(response,202,ack);if(config.dispatch)void config.dispatch(ack.jobId).catch(()=>{});else void service.run(ack.jobId).catch(()=>{});return;}if(match[2]==='/cancel'&&request.method==='POST')return json(response,200,await service.cancel(session,match[1]));if(!match[2]&&request.method==='GET')return json(response,200,await service.get(session,match[1]));}
+   if(match){if(match[2]==='/retry'&&request.method==='POST'){const input=await body(request),ack=await service.retry(session,match[1],input.clientRequestId);json(response,202,ack);if(config.dispatch)void config.dispatch(ack.jobId).catch(()=>{});else void service.run(ack.jobId).catch(()=>{});return;}if(match[2]==='/cancel'&&request.method==='POST')return json(response,200,await service.cancel(session,match[1]));if(!match[2]&&request.method==='GET'){await service.get(session,match[1]);await config.poll?.();return json(response,200,await service.get(session,match[1]));}}
    if(/^\/v1\/revisions\/[\w-]+$/.test(path)&&request.method==='GET'){const r=await service.revision(session,path.split('/').at(-1)!);return json(response,200,{id:r.id,projectId:r.projectId,parentId:r.parentId,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game,name:r.name});}
    if(path==='/v1/creations'&&request.method==='GET')return json(response,200,(await service.list(session)).map(r=>({...r,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game})));
    match=path.match(/^\/v1\/revisions\/([\w-]+)\/(preview|keep|undo|fork)$/);
