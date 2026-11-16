@@ -26,7 +26,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  const working=document.createElement('dialog');working.className='drawing-lab';working.setAttribute('aria-label','Bring my drawing to life');
  working.innerHTML=`<div class="dl-shell"><header class="dl-header"><div><span class="dl-kicker">MY DRAWING LAB</span><h2>Make my drawing move!</h2><p>The original stays safe. You decide what each part does.</p></div><button type="button" data-close aria-label="Close drawing designer">✕ Close</button></header>
   <div class="dl-main"><section class="dl-stage"><canvas class="dl-canvas" tabindex="0" aria-label="Drawing editor. Tap a highlighted part, drag to move it, or drag its corner to resize."></canvas>
-  <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">✏️ Fix parts</button><button type="button" data-mode="play">▶ Try it!</button><button type="button" data-retry hidden>↶ Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Jump ↑</button></div></section>
+  <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">✏️ Fix parts</button><button type="button" data-mode="play">▶ Try it!</button><button type="button" data-cutouts>✂️ Check cutouts</button><button type="button" data-retry hidden>↶ Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Jump ↑</button></div><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
   <aside class="dl-tools"><label>What did you draw?<select data-kind><option value="car">Car or vehicle</option><option value="character">Character or creature</option><option value="machine">Invention or machine</option><option value="scene">World or level</option></select></label>
   <p data-explanation class="dl-note" aria-live="polite"></p><div data-piece-list class="dl-piece-list" role="group" aria-label="Pieces in this drawing"></div>
   <div class="dl-edit-tools"><button type="button" data-add>＋ Mark another part</button><button type="button" data-undo>↶ Undo</button><button type="button" data-delete>Remove part</button>
@@ -51,6 +51,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  let drag:null|{pointer:number;type:'create'|'move'|'resize';id:string;startX:number;startY:number;before:DrawingAssembly} = null;
  const undo:DrawingAssembly[]=[];
  const partsPanel=q<HTMLElement>(working,'[data-piece-list]'),clockHolder:{clock?:ReturnType<typeof createFixedClock>}={};
+ const cutoutPreview=q<HTMLElement>(working,'[data-cutout-preview]');
+ let showCutouts=false;
  let car:ReturnType<typeof createVehicle>|null=null,other:ReturnType<typeof createDrawingPlayground>|null=null;
  let carScene:VehicleSnapshot|null=null,otherScene:PlayScene|null=null;
  let go=false,jump=false,playDistance=0,lastFrame=0;
@@ -105,6 +107,19 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    if(!layerCache.has(p.id))layerCache.set(p.id,layerCanvas(sourceCanvas,sourceCanvas.width,sourceCanvas.height,p,assembly.pieces));
   }
  }
+ function renderCutoutPreview(){
+  if(!showCutouts||mode!=='edit'){cutoutPreview.hidden=true;return;}
+  layers();cutoutPreview.hidden=false;cutoutPreview.replaceChildren();
+  for(const p of assembly.pieces){
+   const layer=layerCache.get(p.id)!;
+   const figure=document.createElement('figure'),thumbnail=document.createElement('canvas');
+   const scale=Math.min(1,140/Math.max(layer.width,layer.height));
+   thumbnail.width=Math.max(1,Math.round(layer.width*scale));thumbnail.height=Math.max(1,Math.round(layer.height*scale));
+   thumbnail.getContext('2d')!.drawImage(layer,0,0,thumbnail.width,thumbnail.height);
+   const caption=document.createElement('figcaption');caption.textContent=p.name;
+   figure.append(thumbnail,caption);cutoutPreview.append(figure);
+  }
+ }
  function drawEdit(){
   const {w,h}=fit();ctx.clearRect(0,0,w,h);ctx.fillStyle='#eef6ed';ctx.fillRect(0,0,w,h);
   const s=Math.min((w-36)/sourceCanvas.width,(h-36)/sourceCanvas.height);
@@ -152,13 +167,13 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   }
   if(!carScene&&!otherScene){ctx.fillStyle='#243b48';ctx.fillText('Preparing your moving drawing…',20,30);}
  }
- function refresh(){if(disposed)return;updatePanel();mode==='edit'?drawEdit():drawPlay();}
+ function refresh(){if(disposed)return;updatePanel();mode==='edit'?drawEdit():drawPlay();renderCutoutPreview();}
  function stopPlay(){
   clockHolder.clock?.dispose();clockHolder.clock=undefined;car?.dispose();other?.dispose();
   car=null;other=null;carScene=null;otherScene=null;go=false;jump=false;
   q<HTMLButtonElement>(working,'[data-go]').hidden=true;
   q<HTMLButtonElement>(working,'[data-jump]').hidden=true;
-  q<HTMLButtonElement>(working,'[data-retry]').hidden=true;
+  q<HTMLButtonElement>(working,'[data-retry]').hidden=true;cutoutPreview.hidden=true;
  }
  function startPlay(){
   stopPlay();
@@ -203,7 +218,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const point=position(e),before=structuredClone(assembly);
   if(pendingNew){
    const n=assembly.pieces.length+1,id='piece_'+n+'_'+Math.round(performance.now())%10000;
-   const piece:DrawingPiece={id,name:'My moving piece',role:'limb',region:{x:point.x,y:point.y,w:.026,h:.026,shape:'rect'},parentId:assembly.pieces[0]?.id||null,physical:true};
+   const piece:DrawingPiece={id,name:'My moving piece',role:'limb',region:{x:Math.min(point.x,.974),y:Math.min(point.y,.974),w:.026,h:.026,shape:'rect'},parentId:assembly.pieces[0]?.id||null,physical:true};
    assembly.pieces.push(piece);selected=id;pendingNew=false;
    drag={pointer:e.pointerId,type:'create',id,startX:point.x,startY:point.y,before};canvas.setPointerCapture(e.pointerId);drawEdit();return;
   }
@@ -272,6 +287,11 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   p.parentId=parentInput.value||null;
   try{validateAssembly(assembly);remember(before);}catch(e){assembly=before;message((e as Error).message);}
   refresh();
+ });
+ q<HTMLButtonElement>(working,'[data-cutouts]').addEventListener('click',()=>{
+  if(mode!=='edit')setMode('edit');
+  showCutouts=!showCutouts;q<HTMLButtonElement>(working,'[data-cutouts]').setAttribute('aria-pressed',String(showCutouts));
+  renderCutoutPreview();
  });
  q<HTMLButtonElement>(working,'[data-mode="edit"]').addEventListener('click',()=>setMode('edit'));
  q<HTMLButtonElement>(working,'[data-mode="play"]').addEventListener('click',()=>setMode('play'));

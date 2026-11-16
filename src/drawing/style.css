@@ -43,3 +43,8 @@
 .drawing-paint [data-colors] button[aria-pressed=true]{outline:3px solid #f1ad4c;outline-offset:2px}
 .drawing-paint [data-save]{background:#21816c;color:white}
 @media(max-width:830px){.drawing-paint .dp-work{grid-template-columns:1fr}.drawing-paint .dp-tools{display:flex;flex-flow:row wrap;align-items:center}.drawing-paint .dp-tools label{flex:1 1 150px}.drawing-paint [data-colors]{width:100%}}
+
+.dl-cutout-preview{display:flex;gap:11px;overflow-x:auto;padding:9px 10px;align-items:flex-end;background:#e9f1e7;border:1px solid #bfd6c8;border-radius:12px;margin-top:8px}
+.dl-cutout-preview figure{display:flex;flex:0 0 140px;min-width:140px;flex-direction:column;align-items:center;gap:4px;margin:0;padding:6px;background:#fff;border-radius:10px}
+.dl-cutout-preview canvas{width:auto;height:auto;max-width:120px;max-height:90px;background-color:#fff;background-image:linear-gradient(45deg,#dfe4e0 25%,transparent 25%),linear-gradient(-45deg,#dfe4e0 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#dfe4e0 75%),linear-gradient(-45deg,transparent 75%,#dfe4e0 75%);background-position:0 0,0 8px,8px -8px,-8px 0;background-size:16px 16px}
+.dl-cutout-preview figcaption{font-size:11px;font-weight:800;text-align:center}
