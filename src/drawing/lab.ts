@@ -90,8 +90,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  function fit(){
   const w=contentWidth(),h=Math.max(310,Math.min(530,w*.64));
   const dpr=Math.min(2,window.devicePixelRatio||1);
-  canvas.style.height=h+'px';canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const pixelWidth=Math.round(w*dpr),pixelHeight=Math.round(h*dpr);
+  if(canvas.width!==pixelWidth||canvas.height!==pixelHeight){canvas.style.height=h+'px';canvas.width=pixelWidth;canvas.height=pixelHeight;ctx.setTransform(dpr,0,0,dpr,0,0);}
   return {w,h};
  }
  function layers(){
