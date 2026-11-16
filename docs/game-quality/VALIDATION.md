@@ -14,17 +14,18 @@ Studio and the design coach are already in main; this feature integrates that ma
 | Studio source already merged into that main | `9bc1b71686153d1a622af23ad62940c2c5ad30f2` |
 | Native/generated parent of the integration | `16864e669d3c71f7f6b63b4eff68f1700e4f0f6c` |
 | Original combined integration | `832a705256ec28f0ce917ff40bd91bc1e826c527` |
-| Latest measured native client, including the paused scene | `d957657e8db31d5044830f070aab22c36f48ed12` |
-| Application/test revision accepted by CI | `ca9b53d70e89bb2dba86654b2face902752d4795` |
+| Original measured native client, including the paused scene | `d957657e8db31d5044830f070aab22c36f48ed12` |
+| Original application/test revision accepted by CI | `ca9b53d70e89bb2dba86654b2face902752d4795` |
+| Continuation client and review source | `562d5ba6bb008edb7509c470b316798c5af663aa` |
 | Trusted generated runtime in the current review batch | `quality-runtime-v2.0.2` |
 
-The bundle report retains each measured source independently. The latest native-client row includes v2.0.2-era routing and the bounded paused scene; generated worker archives remain outside its core-client transfer totals.
+The bundle report retains each measured source independently. The latest native-client row includes v2.0.2-era routing, the bounded paused scene and the subsequent paused-render/keyboard corrections; generated worker archives remain outside its core-client transfer totals.
 See [integration decisions](../studio-review/QUALITY_INTEGRATION_CI.md) and [compatibility notes](STUDIO_COMPATIBILITY.md).
 
-## Final CI status — passed
+## Original CI status — passed
 
-**All application and test changes passed the full suite at `ca9b53d70e89bb2dba86654b2face902752d4795`.**
-The report and retained screenshots are documentation added after that tested revision; they do not change application, runtime, test, dependency or workflow code.
+**The original application and test changes passed the full suite at `ca9b53d70e89bb2dba86654b2face902752d4795`.**
+The original report and retained screenshots were added in documentation revision `2558fb7e0c53e6c793cdaec8536c01f961825df9`. Subsequent code changes and their verification are recorded in the continuation section below.
 
 | Required evidence | Observed result |
 | --- | --- |
@@ -42,11 +43,35 @@ The report and retained screenshots are documentation added after that tested re
 The complete logs were inspected and both downloaded artifact digests were verified. Selected actual screenshots and per-image hashes are retained in [screenshots/evidence.json](screenshots/evidence.json).
 Automated acceptance establishes the tested behavior, not target-device thermals, measured end-to-end input latency, child enjoyment or learning efficacy.
 
-## Continuation review — verification pending
+## Continuation review — passed
 
-After the original validation, both full runs on documentation revision `2558fb7e0c53e6c793cdaec8536c01f961825df9` passed: [feature push](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814706176) and [PR integration](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814711922). A [separate repeated review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814706234) failed in the mocked Actions journey: the known v1 hopper fixture exhausted repair after `NO_ACHIEVABLE_WIN_IN_PLAYTEST`.
+**All continuation application and test changes passed at `562d5ba6bb008edb7509c470b316798c5af663aa`, against main `ca73ceba4ae2c79f9f669c3fcbaa66922230d601`.** The follow-up evidence commit updates only this report and bundle measurements; it does not change the accepted executable source.
 
-The continuation addresses that input-ordering failure and three native interaction issues: recurring rendering while paused, Rally consuming modified browser shortcuts, and the workshop losing canvas focus after returning to edit. Focused regressions accompany the changes. Their complete browser verification will be recorded here after CI; the earlier passed revision and its evidence remain pinned above.
+| Evidence | Result |
+| --- | --- |
+| Full exact-feature-head `npm test` | **Passed** — [run 43817401659](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43817401659) |
+| Full PR integration `npm test` | **Passed** — [run 43817410341](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43817410341) |
+| Independent generated/Studio/coach/mocked generation review | **Passed** — [run 43817401679](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43817401679) |
+| Local and CI core checks | Build/typecheck and **77 core tests passed**; existing deployment-policy, Studio, coach, HTTP and historical browser suites also passed |
+| New native browser regressions | Desktop/touch layouts verify quiescent pauses, painted resized canvases, paused drag/cancellation and paint changes without simulation advance, browser-shortcut preservation and restored keyboard editing focus |
+| New v1 input regression | The real-browser test reproduces an unsampled click and then wins the unchanged authored fixture through ordinary held input; complete desktop/mobile generation journeys pass afterward |
+| Full PR browser artifact | `14203507207`, `browser-evidence`, 5,929,482 bytes; ZIP SHA-256 `93dd8daa72860a9d8dfae3b742a165aab004f698f34a00b77b557bda949fa85b` |
+| Independent review artifact | `14202643769`, `studio-quality-review-evidence`, 2,246,265 bytes; ZIP SHA-256 `8cda94b9f6bd110f0c529da2bf614c9bc6801bda3b86a0b2d54f0674c4ef97e5`; its source-pin file records the accepted SHA above |
+
+Both downloaded artifact ZIP digests were verified, the independent source pin was checked, and the completed logs were inspected. The selected screenshots retained in this repository remain the original `ca9b53d…` captures with their original provenance; the continuation browser evidence is linked above.
+
+### Changes and why they were needed
+
+- **Paused rendering:** [the shared native clock](../../src/quality/clock.ts) paints once and becomes quiescent. Explicit invalidation handles resize, editing, paint and scene changes. The tests verify stopped scheduling, one coalesced redraw, independent pause reasons, safe resumption and disposal, and actual rendered pixels after paused edits/resizing. No simulation constants change.
+- **Keyboard continuity:** [Rally](../../src/games/quality-hill.ts) ignores Ctrl/Meta/Alt-modified keydown commands while retaining keyup cleanup. [The workshop](../../src/games/quality-builder.ts) restores canvas focus after Edit hides the activated control. Browser tests immediately select and move a restored part with the keyboard.
+- **V1 acceptance-playtest ordering:** [the gate](../../server/sandbox/worker.cjs) now holds an ordinary control across at least two existing 50 ms sampling periods and observes fresh frames before releasing, within a bounded observation. A frame increment alone cannot complete the hold because a reply may already be in flight. Releasing outside the button avoids the legacy click-cleanup timer interfering with a later press. Cleanup always attempts pointer release through `finally`; win, visible-change, replay, isolation and overall fixture-timeout requirements remain intact.
+- **Actual-device review:** [PLAY_REVIEW.md](PLAY_REVIEW.md) provides a local phone/tablet setup and concrete observation tasks. It is a blank guide and introduces no telemetry or completed child/device results.
+
+The input investigation followed a new repeat failure. Both full runs on documentation revision `2558fb7e0c53e6c793cdaec8536c01f961825df9` passed: [feature push](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814706176) and [PR integration](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814711922). Its [independent repeat](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814706234) failed in the mocked Actions journey after the known v1 hopper exhausted repair with `NO_ACHIEVABLE_WIN_IN_PLAYTEST`.
+
+The [deterministic regression](../../tests/generated-v1-playtest.test.ts) executes the unchanged trusted v1 preview and exact authored fixture: all 30 old click-then-canvas iterations can produce zero sampled hops despite recorded input events. The corrected gesture reaches a genuine win, including when stale frames are injected; separate cases retain stalled-game and loss rejection. The [browser regression](../../tests/generated-v1-input-browser.ts) confirms the input ordering with real pointer events and a real Worker. This supplies a reproducible explanation for the observed repeat failure; it does not retroactively prove the cause of every earlier unexplained stall.
+
+V1 preview bytes and immutable v2 archives remain unchanged. The measured native client adds **724 raw / 207 gzip bytes** over the preceding client. The headless physics benchmark's four source pins remain unchanged; it was not rerun. Live paid generation, provisioned gVisor execution and private-worker rollout were not performed.
 
 ## Implemented behavior
 
@@ -126,12 +151,13 @@ The scope is `dist/index.html` plus `dist/assets/*.js` and `dist/assets/*.css`, 
 | Current main with Studio | `ca73ceba4ae2c79f9f669c3fcbaa66922230d601` | 254,591 | 85,716 |
 | Original combined quality + Studio | `832a705256ec28f0ce917ff40bd91bc1e826c527` | 567,155 | 163,919 |
 | Reviewed client with paused scene | `d957657e8db31d5044830f070aab22c36f48ed12` | 569,723 | 164,651 |
+| Continuation with quiescent pauses and keyboard corrections | `562d5ba6bb008edb7509c470b316798c5af663aa` | 570,447 | 164,858 |
 
-The latest measured increment over current main is **315,132 raw bytes / 78,935 gzip bytes** (about 79 kB compressed).
-Measurements use Node v24.22.1 / Vite 6.4.1. The isolated comparison reused dependencies matched against every non-root lockfile entry. The latest build had only documentation edits outside the measured application inputs; its metadata files are excluded consistently from the core totals.
-The same **23 original Dragon PNGs total 4,367,688 bytes** in all five sources and are excluded from core totals; their manifest digest is recorded.
+The latest measured increment over current main is **315,856 raw bytes / 79,142 gzip bytes** (about 79 kB compressed).
+Measurements use Node v24.22.1 / Vite 6.4.1. The isolated comparison reused dependencies matched against every non-root lockfile entry. The continuation build completed before its commit was created; its identical app/build inputs were subsequently verified at the recorded source SHA and their Git objects are recorded. Build metadata files are excluded consistently from the core totals. The continuation adds **724 raw / 207 gzip bytes** over the preceding reviewed client.
+The same **23 original Dragon PNGs total 4,367,688 bytes** in all six sources and are excluded from core totals; their manifest digest is recorded.
 Generated-runtime archives, service-worker cache transfers and startup time are outside those core measurements. Vite's own printed gzip estimate is not this report's level-6 total.
-The reviewed JavaScript chunk is 512,145 raw bytes and triggers Vite's standard 500 kB warning; actual device loading and frame behavior remain to be measured.
+The reviewed JavaScript chunk is 512,869 raw bytes and triggers Vite's standard 500 kB warning; actual device loading and frame behavior remain to be measured.
 
 ## Generated runtime and execution boundary
 
