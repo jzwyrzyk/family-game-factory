@@ -41,17 +41,21 @@ const { chromium } = require('playwright');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'page fits the viewport');
       const initialCanvas = await canvas.boundingBox();
       assert.ok(initialCanvas.height > 240 && initialCanvas.width > 280, 'the playable canvas remains substantial');
+      await root.screenshot({ path: `test-results/quality-gum-${mobile ? 'mobile' : 'desktop'}.png` });
       const trayLabels = await root.locator('.q-part > span').evaluateAll(labels => labels.map(label => ({
+        text: label.textContent,
         font: parseFloat(getComputedStyle(label).fontSize),
+        labelWidth: label.getBoundingClientRect().width,
+        clientWidth: label.clientWidth,
+        scrollWidth: label.scrollWidth,
         line: parseFloat(getComputedStyle(label).lineHeight),
         width: label.parentElement.getBoundingClientRect().width,
         height: label.parentElement.getBoundingClientRect().height,
         fits: label.scrollWidth <= label.clientWidth + 1,
       })));
       assert.equal(trayLabels.length, 10);
-      assert.ok(trayLabels.every(label => label.font >= 10 && label.font <= 12 && label.line <= 15), 'legacy emoji font rules must not enlarge tray labels');
-      assert.ok(trayLabels.every(label => label.width >= 62 && label.width <= 80 && label.height <= 130 && label.fits), 'part cards stay compact and their labels fit');
-      await root.screenshot({ path: `test-results/quality-gum-${mobile ? 'mobile' : 'desktop'}.png` });
+      assert.ok(trayLabels.every(label => label.font >= 10 && label.font <= 12 && label.line <= 15), 'legacy emoji font rules must not enlarge tray labels: ' + JSON.stringify(trayLabels));
+      assert.ok(trayLabels.every(label => label.width >= 62 && label.width <= 80 && label.height <= 130 && label.fits), 'part cards stay compact and their labels fit: ' + JSON.stringify(trayLabels));
 
       // The provided machine is editable, and undo restores exact part identity and geometry.
       const initial = await blueprint();
@@ -196,6 +200,23 @@ const { chromium } = require('playwright');
           assert.deepEqual(await blueprint(), ready);
         }
       }
+
+      // A smaller remix budget preserves a larger saved machine and explains the shortage.
+      const bridge = await blueprint();
+      await page.evaluate(() => FG.app.openGame('gum', { config: { ...FG.runtime.snapshot().config, gumBudget: 4 } }));
+      assert.deepEqual(await blueprint(), bridge);
+      assert.match(await root.locator('.q-meter').textContent(), /1 gum short/);
+      await button('Test machine  ▶').click();
+      assert.equal((await state()).mode, 'build');
+      assert.match(await root.locator('.q-status').textContent(), /Unstick.*add more gum/);
+      assert.deepEqual(await blueprint(), bridge);
+      await canvas.focus();
+      await page.keyboard.press(']');
+      await button('Detach selected part').click();
+      assert.equal((await state()).gumRemaining, 0);
+      await undo();
+      assert.deepEqual(await blueprint(), bridge, 'undo remains available when over budget');
+      await page.evaluate(() => FG.app.openGame('gum', { config: { ...FG.runtime.snapshot().config, gumBudget: 10 } }));
 
       // Each mission has its own persisted design. Music preference survives reload too.
       await root.getByRole('combobox', { name: 'Choose construction challenge' }).selectOption('free');

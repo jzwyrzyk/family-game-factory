@@ -14,3 +14,6 @@ installOffline();
 
 import {installDrawings} from './assets/ui';
 installDrawings();
+
+import {installQualityCards} from './quality/cards';
+installQualityCards();

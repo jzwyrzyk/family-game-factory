@@ -237,6 +237,15 @@ export default class QualityBuilder implements GameInstance {
     private save() { if (this.storageBlocked)
         return; const saved = this.saved(); this.builds = saved.builds; if (this.context.persistence?.save(saved) === false)
         this.message('This device could not save. Keep this page open to protect your machine.'); }
+    private gumShortage() { return Math.max(0, this.blueprint.joints.length - budgetOf(this.context)); }
+    private gumHelp() { const short = this.gumShortage(); return `Your machine needs ${short} more piece${short === 1 ? '' : 's'} of gum. Unstick a connection, or add more gum in Remix, then test again.`; }
+    private friendlyError(error: unknown, fallback = 'That change could not be made. Your machine is safe. Try again.') {
+        const text = error instanceof Error ? error.message : '';
+        if (this.gumShortage() > 0 && (text.includes('gum') || text.includes('GUM'))) return this.gumHelp();
+        if (['Choose two different, unconnected parts.', 'Move those parts a little closer.', 'No gum left. Unstick a connection or try using fewer parts.', 'Add a few parts before testing.', 'Add the little passenger so they can try your machine.'].includes(text)) return text;
+        if (text === 'INVALID_JOINT_ANCHOR' || text === 'MISALIGNED_JOINT_ANCHORS') return 'Too far for that gum. Unstick this part before moving it farther.';
+        return fallback;
+    }
     private message(t: string) { this.lastMessage = t; this.status.textContent = t; }
     private commit(next: Blueprint, before = this.blueprint) { const valid = rebindConnections(next); this.history.push(cloneBlueprint(before)); if (this.history.length > 60)
         this.history.shift(); this.blueprint = valid; this.save(); this.refresh(); }
@@ -245,8 +254,9 @@ export default class QualityBuilder implements GameInstance {
         const m = missionById(this.mission);
         this.missionCopy.replaceChildren(el('b', '', m.title), el('span', '', m.instruction));
         this.gum.replaceChildren();
-        const remaining = Math.max(0, budgetOf(this.context) - this.blueprint.joints.length);
-        this.gum.append(el('span', '', `${remaining} gum left`));
+        const remaining = budgetOf(this.context) - this.blueprint.joints.length;
+        this.gum.dataset.short = String(remaining < 0);
+        this.gum.append(el('span', '', remaining < 0 ? `${-remaining} gum short` : `${remaining} gum left`));
         const dots = el('span', 'q-gum-dots');
         for (let i = 0; i < Math.min(10, remaining); i++)
             dots.append(el('i', 'q-gum-dot'));
@@ -288,7 +298,7 @@ export default class QualityBuilder implements GameInstance {
         this.canvas.focus({ preventScroll: true });
     }
     catch (e) {
-        this.message((e as Error).message);
+        this.message(this.friendlyError(e));
     } }
     private pointerDown(e: PointerEvent) {
         if (this.mode !== 'build' || this.storageBlocked || e.button > 0)
@@ -442,7 +452,7 @@ export default class QualityBuilder implements GameInstance {
         this.refresh();
     }
     catch (err) {
-        this.message((err as Error).message);
+        this.message(this.friendlyError(err));
     } }
     private detach() { if (!this.selected)
         return; const n = cloneBlueprint(this.blueprint); n.joints = n.joints.filter(j => j.a !== this.selected && j.b !== this.selected); if (n.joints.length === this.blueprint.joints.length) {
@@ -459,7 +469,7 @@ export default class QualityBuilder implements GameInstance {
         return;
     } this.builds[this.mission] = cloneBlueprint(this.blueprint); this.mission = missionById(id).id; this.blueprint = this.builds[this.mission] ? cloneBlueprint(this.builds[this.mission]) : this.mission === 'free' ? { version: 1, parts: [], joints: [] } : starterBlueprint(this.mission); this.selected = null; this.history = []; this.joining = false; this.missionSelect.value = this.mission; this.save(); this.refresh(); this.message('Your other builds are saved. Here is a new challenge.'); }
     private test() { if (this.storageBlocked || !this.blueprint.parts.length)
-        return; this.cancelDrag(); void this.audio.unlock(); this.save(); this.simulation?.dispose(); try {
+        return; this.cancelDrag(); if (this.gumShortage() > 0) { this.message(this.gumHelp()); this.refresh(); return; } void this.audio.unlock(); this.save(); this.simulation?.dispose(); try {
         this.simulation = createConstruction(cloneBlueprint(this.blueprint), { jointStrength: Number(this.context.config.jointStrength) || 1, gumBudget: budgetOf(this.context), gravity: Number(this.context.config.gravity) || 10, thrust: Number(this.context.config.thrust) || 1 }, this.mission);
         this.scene = this.simulation.snapshot();
         this.previous = this.scene;
@@ -480,7 +490,7 @@ export default class QualityBuilder implements GameInstance {
     }
     catch (e) {
         this.mode = 'build';
-        this.message((e as Error).message);
+        this.message(this.friendlyError(e));
         this.refresh();
     } }
     private edit() { this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.refresh(); this.message('Your original machine is ready to change.'); }
