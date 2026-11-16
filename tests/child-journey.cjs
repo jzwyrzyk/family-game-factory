@@ -27,6 +27,19 @@ async function returnToViewed(page,device){
  await page.waitForSelector('.quality-builder');
 }
 async function failureScreenshot(page,name){try{await page.screenshot({path:`test-results/child-${name}-failure.png`,fullPage:true});}catch{}}
+async function assertTouchDevice(page,device,phase){
+ const capability=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarsePointer:matchMedia('(pointer:coarse)').matches,viewportWidth:innerWidth}));
+ if(device==='mobile')assert.ok(capability.maxTouchPoints>0&&capability.coarsePointer,`${phase}: mobile touch emulation must remain active: ${JSON.stringify(capability)}`);
+ return capability;
+}
+async function journeyScreenshot(page,device,name){
+ // Chromium beyond-viewport captures reset touch emulation in this Playwright
+ // version: https://github.com/microsoft/playwright/issues/42607 . Only a
+ // terminal failure capture may use fullPage; active journeys keep real touch.
+ await assertTouchDevice(page,device,`before ${name} screenshot`);
+ await page.screenshot({path:`test-results/child-${name}-${device}.png`,fullPage:false});
+ await assertTouchDevice(page,device,`after ${name} screenshot`);
+}
 async function prepare(browser,viewport,device){
  const context=await browser.newContext({viewport,isMobile:device==='mobile',hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
  page.setDefaultTimeout(8000);page.on('pageerror',error=>errors.push(error.message));page.on('dialog',dialog=>dialog.accept());
@@ -38,11 +51,12 @@ async function localJourney(browser,url,device,viewport){
  try{
   await page.route('**/factory-config.json',unavailable);await page.clock.install();
   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
+  await assertTouchDevice(page,device,'after initial navigation');
   const first=await page.locator('#studioStarters [data-starter]').first().boundingBox();
   assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable game choice is in the first viewport');
   await assertTargets(page,['#studioNavHome','#studioNavCreate','#studioNavPowers','#studioProfileSummary','#studioNew']);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
-  await page.screenshot({path:`test-results/child-first-screen-${device}.png`,fullPage:true});
+  await journeyScreenshot(page,device,'first-screen');
 
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   await assertTargets(page,['#studioPlay','#studioChange','#studioHelp','#studioMore > summary']);
@@ -50,13 +64,13 @@ async function localJourney(browser,url,device,viewport){
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();await localTest(page);
   const candidate=(await currentSession(page)).candidate.id;
   assert.equal(await mainId(page),originalMain);
-  const touchCapabilities=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarsePointer:matchMedia('(pointer:coarse)').matches,viewportWidth:innerWidth}));
-  if(device==='mobile')assert.ok(touchCapabilities.maxTouchPoints>0||touchCapabilities.coarsePointer,`mobile Help requires an emulated touch device: ${JSON.stringify(touchCapabilities)}`);
-  await page.click('#studioHelp');await page.waitForSelector('#studioHelpPanel');
+  const touchCapabilities=await assertTouchDevice(page,device,'before Help');
+  if(device==='mobile')await page.locator('#studioHelp').tap();else await page.click('#studioHelp');
+  await page.waitForSelector('#studioHelpPanel');
   assert.equal((await runtime(page)).disposed,true,'help pauses the mounted game');
   assert.equal(await page.locator('#studioHelpTitle').evaluate(node=>document.activeElement===node),true);
   if(device==='mobile')assert.match(await page.textContent('#studioHelpControls'),/Tap a part/,`Help must describe touch controls on this device: ${JSON.stringify(touchCapabilities)}`);
-  await page.screenshot({path:`test-results/child-help-${device}.png`,fullPage:true});
+  await journeyScreenshot(page,device,'help');
   await page.click('#studioCloseHelp');await returnToViewed(page,device);await expectBudget(page,15);
   assert.equal((await currentSession(page)).candidate.id,candidate,'returning from help resumes the selected test');
   assert.equal((await runtime(page)).state.parts.filter(part=>part.kind==='bottle').length,1);
@@ -99,7 +113,7 @@ async function localJourney(browser,url,device,viewport){
   }
   const question=await page.locator('#stage-overlay .math-activity h2').evaluate(node=>{const box=node.getBoundingClientRect();return {focused:document.activeElement===node,visible:box.top>=0&&box.bottom<=innerHeight};});
   assert.deepEqual(question,{focused:true,visible:true});
-  await page.screenshot({path:`test-results/child-required-math-${device}.png`,fullPage:true});
+  await journeyScreenshot(page,device,'required-math');
   await player(page,1);assert.equal(await page.evaluate(()=>FG.learning.active),false);
   const abandoned=await page.evaluate(({owner,id})=>{
    const record=FG.store.data.profiles.find(profile=>profile.id===owner).learning.attempts.find(item=>item.id===id);
@@ -156,7 +170,7 @@ async function remoteJourney(browser,url,device,viewport){
   assert.equal(completed.experiments.length,2);assert.equal(completed.experiments.at(-1).candidate.remoteId,'journey-ready');
   assert.equal(await mainId(page),originalMain);assert.equal((await runtime(page)).disposed,false);assert.equal((await runtime(page)).config.gumBudget,15);
   assert.equal(await page.locator('#studioRemoteHost iframe').count(),0);assert.deepEqual(previewRequests,[],'no preview is requested before the child chooses it');
-  await page.screenshot({path:`test-results/child-background-ready-${device}.png`,fullPage:true});
+  await journeyScreenshot(page,device,'background-ready');
 
   // Hold the real preview endpoint after an explicit child choice. A newer
   // decision to think/type must win over that in-flight network response.
@@ -176,7 +190,7 @@ async function remoteJourney(browser,url,device,viewport){
   assert.equal((await runtime(page)).config.gumBudget,15);assert.equal((await currentSession(page)).candidate.id,originalCandidate);
   await page.waitForFunction(text=>FG.studio.exportNotebook().sessions.some(session=>session.draft===text),raceDraft);
   assert.equal(await page.locator('#studioReady').isVisible(),true,'the saved test remains available for an explicit retry');
-  await page.screenshot({path:`test-results/child-preview-race-${device}.png`,fullPage:true});
+  await journeyScreenshot(page,device,'preview-race');
   await page.click('#studioReady');await page.waitForSelector('#studioRemoteHost iframe');
   const frame=page.frameLocator('#studioRemoteHost iframe');await frame.getByRole('heading',{name:'Journey transport fixture',exact:true}).waitFor();
   await page.waitForFunction(()=>document.querySelector('#studioRemoteHost iframe').inert===false);
@@ -216,7 +230,7 @@ async function recoveryJourney(browser,url,device,viewport){
   await page.click('#studioNavHome');assert.equal(await page.locator('#page-studio').isVisible(),true,'a failed draft save does not navigate away from the typed work');
   await player(page,1);assert.equal(await page.evaluate(()=>FG.store.current().id),owner,'a failed draft save does not switch away from this child');
   assert.equal(await page.inputValue('#studioPrompt'),unsaved);
-  await page.screenshot({path:`test-results/child-save-recovery-${device}.png`,fullPage:true});
+  await journeyScreenshot(page,device,'save-recovery');
   await storageFailure(page,false);await page.click('#studioNavHome');await page.reload();await page.waitForFunction(()=>window.FG?.studio);
   await page.click('#studioContinuePlaying');assert.equal(await page.inputValue('#studioPrompt'),unsaved,'retrying persistence recovers the exact typed draft across reload');
   assert.deepEqual(errors,[]);
