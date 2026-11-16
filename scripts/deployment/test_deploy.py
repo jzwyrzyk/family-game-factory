@@ -142,6 +142,37 @@ class ActivationGateTests(unittest.TestCase):
 
 
 class BuildSafetyTests(unittest.TestCase):
+    def test_redeployment_preserves_private_worker_app_storage_and_family_configuration(self):
+        old=d.configuration(*URLS.values())['gateway']
+        old.update(workerRepository='family-game-factory-lab/family-game-factory-worker',workerRepositoryId='1458899834',
+                   workerWorkflow='factory-private.yml',workerApprovedSha='b'*40,githubInstallationId='reviewed-org-installation',
+                   artifactBucket='existing-private-artifacts',schedulerEmail='existing-scheduler@example.com')
+        old['approval'].update(model='reviewed-model',inputUsdPerMillion=.75,outputUsdPerMillion=4.5)
+        configs=d.configuration(*URLS.values(),old=old)
+        self.assertEqual(configs['gateway'],old)
+        self.assertEqual(configs['preview']['artifactBucket'],old['artifactBucket'])
+
+    def test_sandbox_build_defaults_to_offline_plan(self):
+        module=self.builder()
+        with patch.object(module,'run') as run,patch('sys.argv',['build.py','--sandbox']),redirect_stdout(io.StringIO()):module.main()
+        run.assert_not_called()
+
+    def test_sandbox_build_stages_reviewed_commit_without_publishing_or_cloud_calls(self):
+        module=self.builder();seen=[];sha='c'*40
+        def fake(args,cwd=None):
+            seen.append(args)
+            if args[:3]==['git','ls-tree','-r']:return b'.dockerignore\nserver/sandbox/Dockerfile\nserver/sandbox/worker.cjs\nserver/sandbox/key.pem\n'
+            if args[:2]==['git','show']:
+                self.assertTrue(args[2].startswith(sha+':'));return b'tracked fixture'
+            if args[0]=='env':
+                self.assertIn('DOCKER_BUILDKIT=1',args)
+                self.assertTrue((Path(cwd)/'server/sandbox/worker.cjs').exists())
+                self.assertFalse((Path(cwd)/'server/sandbox/key.pem').exists())
+            return b''
+        with patch.object(module,'run',side_effect=fake),patch('sys.argv',['build.py','--sandbox','--execute','--reviewed-source-sha',sha]),redirect_stdout(io.StringIO()) as output:module.main()
+        self.assertIn('NOT published',output.getvalue())
+        self.assertFalse(any(args[0]=='gcloud' or args[:2]==['docker','push'] for args in seen))
+
     def builder(self):
         spec=importlib.util.spec_from_file_location('build_deployment',Path(__file__).with_name('build.py'))
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)

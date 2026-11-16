@@ -1,6 +1,16 @@
 name: Build reviewed Pages site
 # Deliberately manual: PRs do not change the existing live arcade.
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      gateway_origin:
+        description: Existing gateway HTTPS origin; empty keeps AI unavailable
+        required: false
+        type: string
+      preview_origin:
+        description: Existing separate preview HTTPS origin
+        required: false
+        type: string
 permissions:
   contents: read
 jobs:
@@ -16,6 +26,11 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm test
+      - name: Configure reviewed public service URLs
+        run: node --import tsx scripts/deployment/site-config.ts
+        env:
+          FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
+          FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

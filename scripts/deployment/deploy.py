@@ -51,9 +51,11 @@ def configuration(gateway, preview, old=None):
     family = old.get('familyId', 'family-001') if old else 'family-001'
     if any(not re.fullmatch(r'[A-Za-z0-9_-]{1,100}', value) or value in ('__proto__','constructor','prototype') for value in (workspace, family)):
         raise SafeError('Existing workspace/family identifier requires review.')
-    if old and (old.get('projectId') != PROJECT or old.get('approvedSha') != WORKER or old.get('repository') != 'jzwyrzyk/family-game-factory' or old.get('artifactBucket') or old.get('schedulerEmail') or old.get('localFile')):
+    if old and (old.get('projectId') != PROJECT or old.get('approvedSha') != WORKER or old.get('repository') != 'jzwyrzyk/family-game-factory' or old.get('localFile')):
         raise SafeError('Existing gateway deployment contract differs; refuse implicit workspace/project/worker/storage migration.')
     shared = dict(projectId=PROJECT, workspace=workspace, previewOrigin=preview, previewKey=preview_key)
+    if old and old.get('artifactBucket'):
+        shared['artifactBucket'] = old['artifactBucket']
     preview_config = dict(shared)
     gateway_config = dict(shared, active=False, appOrigin='https://jzwyrzyk.github.io', gatewayOrigin=gateway,
         sessionKey=session, familyId=family, repository='jzwyrzyk/family-game-factory', repositoryId='1458033181',
@@ -61,6 +63,11 @@ def configuration(gateway, preview, old=None):
         githubPrivateKeyFile='/var/run/factory-github/key.pem', maxJobMicroUsd=120000,
         approval=dict(enabled=False, approvalId='', model='', inputUsdPerMillion=0, outputUsdPerMillion=0,
                       maxInputTokens=24000, maxOutputTokens=4000, priceReviewedOn=''))
+    if old:
+        # Redeploy the existing family, App installation, worker pins and storage.
+        # Only activation is reset; never silently revert to personal-account defaults.
+        gateway_config = dict(old, **shared, gatewayOrigin=gateway, active=False,
+                              approval=dict(old['approval'], enabled=False))
     return {'gateway': gateway_config, 'preview': preview_config}
 
 

@@ -43,7 +43,7 @@ export async function createGateway(config:GatewayConfig){
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(target.repositoryId)},()=>config.githubPrivateKey);
  const dispatcher=new GitHubDispatcher({enabled:paidEnabled,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:paidEnabled&&config.approval.enabled});
  const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker});
- const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();}};
+ const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
  const coach=coachHandler(new CoachService(repo,coachConfig(process.env)),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
  const api=apiHandler(service,http),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));

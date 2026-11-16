@@ -7,6 +7,8 @@
 !src/runtime/
 !src/runtime/types.ts
 !src/runtime/manifests.ts
+!src/studio/
+!src/studio/design.ts
 server/**/node_modules
 server/**/.env*
 server/**/*.pem
