@@ -17,7 +17,7 @@ test('Drawing rigs preserve validated child-defined components and create real s
  assert.equal(rig.bindings.length,2);assert.ok(rig.bindings.every(b=>b.kind==='suspension'));
  assert.deepEqual(validateAssembly(sample),sample);
 });
-test('Changing the child's wheel geometry changes the actual Planck world',()=>{
+test("Changing the child's wheel geometry changes the actual Planck world",()=>{
  const original=vehicleGeometry(sample),shifted=structuredClone(sample);
  shifted.pieces[1].region.x=.16;shifted.pieces[1].region.w=.20;
  const revised=vehicleGeometry(shifted);
