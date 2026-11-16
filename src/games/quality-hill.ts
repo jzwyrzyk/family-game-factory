@@ -160,9 +160,10 @@ export default class QualityHill implements GameInstance {
   private resize() {
     const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
     const normalHeight = w < 600 ? Math.max(290, w * .75) : w * .54;
-    const tabletLandscape = window.matchMedia('(any-pointer: coarse)').matches
-      && window.innerWidth > window.innerHeight && window.innerHeight >= 600 && w >= 600;
-    const h = tabletLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
+    // Geometry, not mutable pointer classification, determines whether pedals need screen room.
+    const compactLandscape = window.innerWidth > window.innerHeight
+      && window.innerHeight >= 600 && window.innerHeight <= 900 && w >= 600;
+    const h = compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
     const dpr = Math.min(2, window.devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.canvas.style.height = h + 'px';
     this.context2d.setTransform(dpr, 0, 0, dpr, 0, 0); this.view.w = w; this.view.h = h; this.view.scale = clamp(w / 17, 27, 65);
     this.clock?.invalidate();
