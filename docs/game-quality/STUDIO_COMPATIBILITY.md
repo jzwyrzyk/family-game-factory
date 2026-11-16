@@ -1,20 +1,21 @@
-# Studio compatibility patch
+# Studio compatibility integration
 
-`studio-integration.patch` contains only Studio adaptations for the native game-quality slice. It has not been applied to the main checkout, committed to PR18, or published.
+`studio-integration.patch` is the review record for the Studio adaptations applied to the game-quality feature branch. Studio and the design coach are already in `main` through `ca73ceba4ae2c79f9f669c3fcbaa66922230d601`; the quality branch integrates that main baseline without changing its coaching behavior or publishing the arcade.
 
 ## Exact review baseline
 
-- Native game-quality commit: `7f3e4fc37c65513bb95892e11cfa286b7e401d95`.
-- PR18 Studio/design-coach commit: `9bc1b71686153d1a622af23ad62940c2c5ad30f2`.
-- Integration checkout: `quality-studio-integration`, with the existing merge left uncommitted.
+- Native/generated parent: `16864e669d3c71f7f6b63b4eff68f1700e4f0f6c`.
+- Main parent: `ca73ceba4ae2c79f9f669c3fcbaa66922230d601`.
+- Studio/design-coach source already in main: `9bc1b71686153d1a622af23ad62940c2c5ad30f2`.
+- Target branch: `feature/game-quality-v1`; generated runtime: `quality-runtime-v2.0.1`.
 
-The patch compares against the staged PR18 Studio files in that integration checkout. A clean application was checked against copies of those baseline files, and every resulting file matched the tested adaptation. The patch touches six Studio source files and three Studio test files.
+The patch was originally checked against the exact Studio source above and reapplied to its identical tree in the main merge. It touches six Studio source files and three Studio test files. Current integration pins and CI scope are recorded in `docs/studio-review/quality-ci-pins.json` and `QUALITY_INTEGRATION_CI.md`.
 
 ## Prerequisites outside this patch
 
-Keep both branches' package scripts when resolving `package.json`: retain Planck 1.4.2 and the native quality tests, and add PR18's Studio and coach scripts. That merge resolution is deliberately excluded from this patch.
+The package merge retains Planck 1.4.2 and all native/generated scripts, and adds main's Studio and coach scripts. Both client initializers are retained. Those two merge resolutions are deliberately excluded from the archived compatibility patch.
 
-The native host must dispatch `factory-remix-request` with `cancelable: true` from both the Hill garage and legacy Improve button. The legacy Live Remix listener must return immediately when `event.defaultPrevented` is true. Those three native-file changes were copied into the integration checkout for validation; they belong to the native review and are excluded here.
+The native parent dispatches `factory-remix-request` with `cancelable: true` from both the Hill garage and legacy Improve button. Its legacy Live Remix listener returns immediately when `event.defaultPrevented` is true. These native prerequisites are retained from the final quality parent, rather than copied from an older integration checkout.
 
 ## Adaptation behavior
 
@@ -30,7 +31,7 @@ Studio browser fixtures now target the physical builder's public snapshots and e
 
 ## Validation and remaining gate
 
-Passed in the isolated checkout:
+The original isolated patch validation passed:
 
 - `npm run build`, including strict TypeScript checking and the production Vite bundle.
 - `node --import tsx tests/studio-unit.ts`: 22 tests.
@@ -39,6 +40,6 @@ Passed in the isolated checkout:
 - Syntax checks for both updated browser test files and `git diff --check`.
 - Clean patch application against the exact staged baseline.
 
-The combined client bundle was 506.51 kB minified / 148.37 kB gzip; Vite emitted its standard warning for a chunk over 500 kB. This is a build measurement, not a browser performance result.
+The original combined client bundle was 506.51 kB minified / 148.37 kB gzip; Vite emitted its standard warning for a chunk over 500 kB. That historical measurement predates the final native fixes and is not a browser performance result. Current build results belong to the final combined feature-branch commit.
 
-Browser journeys were **not run** in this environment. The event-routing unit fixture models capture/bubble phases because Node's EventTarget does not implement browser capture ordering. Real desktop/mobile Studio journeys, native-game pause/input behavior, visual review, and remote preview isolation remain browser-CI gates before merging this adaptation. No live inference or child enjoyment claim follows from these checks.
+Local preparation did **not run browsers**. The event-routing unit fixture models capture/bubble phases because Node's EventTarget does not implement browser capture ordering. The dedicated feature-branch workflow runs the real desktop/mobile Studio and coach journeys independently; its exact-commit results are the browser gate. No live inference or child enjoyment claim follows from unit or fixture checks.

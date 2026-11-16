@@ -1,0 +1,89 @@
+import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
+import { isGameId } from '../runtime/manifests';
+import type { GameId } from '../runtime/types';
+/** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
+export const STUDIO_KEY = 'family-game-factory-studio-v1';
+export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
+export type Message = { id: string; role: 'child' | 'helper' | 'reflection'; text: string; at: string };
+export type Candidate = { id: string; baseId: string | null; config?: Record<string, number | boolean>; remoteId?: string; prompt: string; summary: string };
+export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled' };
+export interface StudioSession {
+  id: string; owner: string; name: string; game: GameId | 'new';
+  projectId: string | null; remoteId: string | null; remoteKind?: string;
+  candidate: Candidate | null; undone?: Candidate | null; draft: string; messages: Message[];
+  job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
+  design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
+  pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
+}
+export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string> }
+const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
+const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
+const safeText = (x: unknown, max: number): x is string => typeof x === 'string' && x.length <= max;
+const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(x) && !['__proto__','constructor','prototype'].includes(x);
+export function validateNotebook(input: unknown): Notebook {
+  const n = input as Notebook;
+  if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
+  const ids = new Set<string>();
+  for (const s of n.sessions) {
+    if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
+    ids.add(s.id);
+    if (s.projectId !== null && !ident(s.projectId) || s.remoteId !== null && !ident(s.remoteId) || s.remoteKind !== undefined && !safeText(s.remoteKind,60)) throw Error('Invalid studio reference.');
+    if (!Array.isArray(s.messages) || s.messages.length > 200 || !s.messages.every(m => m && ident(m.id) && ['child','helper','reflection'].includes(m.role) && safeText(m.text,2200) && safeText(m.at,40) && Number.isFinite(Date.parse(m.at)))) throw Error('Invalid studio conversation.');
+    for (const c of [s.candidate,s.undone??null]) if (c !== null) {
+      if (!c || !ident(c.id) || c.baseId !== null && !ident(c.baseId) || !safeText(c.prompt,2000) || !safeText(c.summary,2200) || (!!c.config === !!c.remoteId)) throw Error('Invalid preview.');
+      if (c.remoteId && !ident(c.remoteId)) throw Error('Invalid preview reference.');
+      if (c.config && (typeof c.config !== 'object' || Array.isArray(c.config) || Object.keys(c.config).length > 100 || !Object.entries(c.config).every(([k,v])=>/^[a-zA-Z][\w]*$/.test(k) && (typeof v==='boolean' || typeof v==='number' && Number.isFinite(v))))) throw Error('Invalid preview settings.');
+    }
+    if(s.design!==undefined)validateDesign(s.design);
+    if(s.experiments!==undefined)validateExperiments(s.experiments);
+    if(s.selectedTest!==undefined&&s.selectedTest!==null&&!s.experiments?.some(e=>e.id===s.selectedTest))throw Error('Unknown selected test.');
+    if(s.playOnly!==undefined&&typeof s.playOnly!=='boolean')throw Error('Invalid play-only state.');
+    if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
+    if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
+  }
+  for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
+  // Reject accidental capability/secret persistence anywhere in the notebook schema.
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment'];
+  if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
+  return copy(n);
+}
+export class StudioNotebook {
+  constructor(private storage: StoragePort) { this.read(); }
+  read(): Notebook { const raw=this.storage.getItem(STUDIO_KEY); return raw===null ? fresh() : validateNotebook(JSON.parse(raw)); }
+  private write<T>(fn:(n:Notebook)=>T):T {
+    // Re-read on every synchronous transaction: don't overwrite a newer workspace snapshot.
+    const n=this.read(), result=fn(n); validateNotebook(n);
+    try { this.storage.setItem(STUDIO_KEY, JSON.stringify(n)); } catch { throw Error('Could not save this notebook. Your working game is safe. Export a backup before freeing browser space.'); }
+    return copy(result);
+  }
+  list(owner:string):StudioSession[] {return this.read().sessions.filter(s=>s.owner===owner).sort((a,b)=>b.updated.localeCompare(a.updated));}
+  get(id:string,owner:string):StudioSession {const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return s;}
+  last(owner:string):StudioSession|null {const n=this.read();return n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner)||null;}
+  create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
+    return this.write(n=>{const s:StudioSession={id:crypto.randomUUID(),owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
+  }
+  update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
+    return this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');fn(s);s.updated=new Date().toISOString();return s;});
+  }
+  select(id:string,owner:string) {this.get(id,owner);this.write(n=>{n.active[owner]=id;return true;});}
+  message(id:string,owner:string,role:Message['role'],text:string) {
+    return this.update(id,owner,s=>{if(s.messages.length>=200)throw Error('This conversation is full. Save a new copy or export your notebook to keep exploring.');s.messages.push({id:crypto.randomUUID(),role,text:text.slice(0,2200),at:new Date().toISOString()});});
+  }
+  fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
+    const source=this.get(id,owner);
+    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+  }
+  saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child'):Experiment {
+    let result:Experiment;
+    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;s.playOnly=false;});return result!;
+  }
+  selectExperiment(id:string,owner:string,testId:string):Experiment {
+    const e=this.get(id,owner).experiments?.find(e=>e.id===testId);if(!e)throw Error('Choose one of this project’s tests.');
+    this.update(id,owner,s=>{s.selectedTest=e.id;s.candidate=copy(e.candidate);});return copy(e);
+  }
+  note(id:string,owner:string,testId:string,note:string){if(!safeText(note,2000))throw Error('Note is too long.');this.update(id,owner,s=>{const e=s.experiments?.find(e=>e.id===testId);if(!e)throw Error('Test not found.');e.notes=note;});}
+  observe(id:string,owner:string,text:string,source:'runtime'|'child',experimentId:string|null=null){
+    this.update(id,owner,s=>{s.design ||= freshDesign();if(experimentId&&!s.experiments?.some(e=>e.id===experimentId))throw Error('Unknown observation test.');s.design.observations.push({id:crypto.randomUUID(),experimentId,text:text.slice(0,1200),source,at:new Date().toISOString()});});
+  }
+  restore(data:unknown) {const checked=validateNotebook(data);this.storage.setItem(STUDIO_KEY,JSON.stringify(checked));}
+}

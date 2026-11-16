@@ -8,7 +8,7 @@
     "build": "npm run typecheck && vite build",
     "test:unit": "node --import tsx tests/unit.ts",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs",
-    "test": "npm run build && npm run test:unit && npm run test:deployment && npm run test:browser && npm run test:real-agent",
+    "test": "npm run build && npm run test:unit && npm run test:deployment && npm run test:browser && npm run test:studio && npm run test:coach && npm run test:real-agent",
     "test:real-agent": "node tests/real-agent-status.cjs",
     "test:sandbox": "node --import tsx tests/generated-sandbox.ts",
     "start:gateway": "node --import tsx server/gateway.ts",
@@ -16,7 +16,9 @@
     "setup:owner": "node --import tsx server/owner-setup.ts",
     "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
     "test:quality": "node tests/quality-browser.cjs",
-    "benchmark:quality": "node --import tsx tools/quality-benchmark.ts"
+    "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
+    "test:studio": "node --import tsx tests/studio-unit.ts && node tests/studio-journey.cjs",
+    "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node tests/design-coach-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
