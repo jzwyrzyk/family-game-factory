@@ -27,6 +27,15 @@ const fs=require('node:fs');
    const originalCount=await page.locator('#drawingList article').count();
    await page.getByRole('button',{name:'✨ Bring to life',exact:true}).click();
    const lab=page.locator('dialog.drawing-lab');await lab.waitFor({state:'visible'});
+   await lab.locator('[data-cutouts]').click();
+   await page.waitForFunction(()=>document.querySelectorAll('dialog.drawing-lab [data-cutout-preview] canvas').length===3);
+   const cutout=await lab.locator('[data-cutout-preview] canvas').first().evaluate(c=>{
+     const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+     let solid=0,transparent=0;for(let i=3;i<d.length;i+=4){if(d[i]>80)solid++;else transparent++;}
+     return {solid,transparent};
+   });
+   assert.ok(cutout.solid>10&&cutout.transparent>10,'a separate part retains colored child art and transparent pixels');
+   await lab.locator('[data-cutouts]').click();
    await lab.locator('[data-mode="play"]').click();
    await page.waitForFunction(()=>document.querySelector('dialog.drawing-lab [data-retry]')&&!document.querySelector('dialog.drawing-lab [data-retry]').hidden);
    await lab.locator('[data-go]').scrollIntoViewIfNeeded();
@@ -53,7 +62,34 @@ const fs=require('node:fs');
    assert.match(await lab.locator('[data-status]').textContent(),/earlier test/i);
    await lab.locator('[data-close]').click();
    assert.equal(await page.locator('#drawingList article').count(),originalCount);
-   assert.deepEqual(sent,[],'drawing analysis does not upload child images or make paid requests');
+   // A brand-new drawing must be creatable directly on a tablet or with a mouse.
+   await page.getByRole('button',{name:'✏️ Draw here',exact:true}).click();
+   const painter=page.locator('dialog.drawing-paint'),paper=painter.locator('[data-paper]');
+   await painter.waitFor({state:'visible'});const box=await paper.boundingBox();assert.ok(box);
+   if(touch){const session=await context.newCDPSession(page);
+     await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width*.3,y:box.y+box.height*.3}]});
+     await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:box.x+box.width*.55,y:box.y+box.height*.6}]});
+     await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+   }else{
+     await page.mouse.move(box.x+box.width*.3,box.y+box.height*.3);
+     await page.mouse.down();await page.mouse.move(box.x+box.width*.55,box.y+box.height*.6);await page.mouse.up();
+   }
+   await painter.locator('[data-title]').fill('A silly paper robot');
+   await painter.locator('[data-save]').click();
+   await page.waitForFunction(count=>document.querySelectorAll('#drawingList article').length===count,originalCount+1);
+   assert.equal(await page.getByText('A silly paper robot', {exact:true}).count(),1,'draw-here painting saves as an actual private drawing');
+   await page.getByRole('button',{name:'✨ Bring to life',exact:true}).first().click();
+   await lab.waitFor({state:'visible'});
+   await page.locator('.profile-choice').nth(1).click();
+   await page.waitForFunction(()=>!document.querySelector('dialog.drawing-lab')?.open);
+   await page.waitForFunction(()=>document.querySelectorAll('#drawingList article').length===0);
+   await page.locator('.profile-choice').first().click();
+   await page.waitForFunction(count=>document.querySelectorAll('#drawingList article').length===count,originalCount+1);
+   await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/?studio=1');
+   await page.waitForSelector('#studioNavDrawings');
+   await page.locator('#studioNavDrawings').click();
+   await page.waitForFunction(count=>!document.getElementById('page-creations')?.classList.contains('hidden')&&document.querySelectorAll('#drawingList article').length===count,originalCount+1);
+   assert.deepEqual(sent,[],'drawing analysis, painting and Studio navigation do not upload child images or make paid requests');
    assert.deepEqual(errors,[]);console.log('PASS drawing '+(touch?'tablet':'desktop')+': source preserved, physical preview, private save, active component car in Rally, history and zero uploads');
    await context.close();
   }
