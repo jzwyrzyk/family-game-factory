@@ -182,6 +182,8 @@ test('corrupt saved blueprints, stale anchors and unbounded settings are rejecte
   assert.doesNotThrow(() => validateBlueprint(rebindConnections(edited)));
   assert.throws(() => createVehicle({ enginePower: Infinity }));
   assert.throws(() => createVehicle({ wheelSize: 0 }));
+  assert.throws(() => createVehicle({}, '__proto__'), /UNKNOWN_TRACK/);
+  assert.throws(() => createConstruction(valid, {}, 'constructor'), /UNKNOWN_MISSION/);
   assert.throws(() => createConstruction(valid, { gravity: -100 }));
   assert.throws(() => createConstruction(starterBlueprint('bridge'), { gumBudget: 4 }, 'bridge'), /gum/);
   assert.throws(() => createVehicle().step(NaN));

@@ -99,6 +99,7 @@ export function initLiveRemix() {
     currentPlay={game:detail.game,stateKey:detail.stateKey,config:detail.config||defaults(detail.game,FG.store.current().remixes?.[detail.game]||'classic'),owner:owner()};
     if(!detail.live){$('returnLive').hidden=true;$('playedVersion').hidden=true;}});
   window.addEventListener('factory-remix-request',event=>guarded(()=>{
+    if(event.defaultPrevented)return; // An embedded Studio can own this game's experiment loop.
     const detail=(event as CustomEvent<{game:GameId;prompt?:string}>).detail;if(!detail||!isGameId(detail.game))return;
     const source=currentPlay?.game===detail.game&&currentPlay.owner===owner()?currentPlay:null;
     FG.app.page('feedback'); // Unmount first so the last ride/build state is flushed.

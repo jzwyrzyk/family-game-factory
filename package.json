@@ -15,7 +15,8 @@
     "start:preview": "node --import tsx server/preview-server.ts",
     "setup:owner": "node --import tsx server/owner-setup.ts",
     "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
-    "test:quality": "node tests/quality-builder.cjs && node tests/quality-hill.cjs"
+    "test:quality": "node tests/quality-builder.cjs && node tests/quality-hill.cjs",
+    "benchmark:quality": "node --import tsx tools/quality-benchmark.ts"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

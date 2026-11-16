@@ -41,6 +41,16 @@ const { chromium } = require('playwright');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'page fits the viewport');
       const initialCanvas = await canvas.boundingBox();
       assert.ok(initialCanvas.height > 240 && initialCanvas.width > 280, 'the playable canvas remains substantial');
+      const trayLabels = await root.locator('.q-part > span').evaluateAll(labels => labels.map(label => ({
+        font: parseFloat(getComputedStyle(label).fontSize),
+        line: parseFloat(getComputedStyle(label).lineHeight),
+        width: label.parentElement.getBoundingClientRect().width,
+        height: label.parentElement.getBoundingClientRect().height,
+        fits: label.scrollWidth <= label.clientWidth + 1,
+      })));
+      assert.equal(trayLabels.length, 10);
+      assert.ok(trayLabels.every(label => label.font >= 10 && label.font <= 12 && label.line <= 15), 'legacy emoji font rules must not enlarge tray labels');
+      assert.ok(trayLabels.every(label => label.width >= 62 && label.width <= 80 && label.height <= 130 && label.fits), 'part cards stay compact and their labels fit');
       await root.screenshot({ path: `test-results/quality-gum-${mobile ? 'mobile' : 'desktop'}.png` });
 
       // The provided machine is editable, and undo restores exact part identity and geometry.
@@ -202,18 +212,18 @@ const { chromium } = require('playwright');
       // Unsupported future data is retained verbatim until a deliberate fresh/example choice.
       await page.evaluate(() => {
         FG.app.openGame('buckets');
-        FG.store.current().constructionStates.gum = { legacyMarker: 'retain me', qualityConstruction: { schema: 'future-version', payload: { keep: true } } };
+        FG.store.current().constructionStates['original-gum'] = { legacyMarker: 'retain me', qualityConstruction: { schema: 'future-version', payload: { keep: true } } };
         FG.store.save();
         FG.app.openGame('gum');
       });
       assert.equal((await state()).storageBlocked, true);
       assert.equal(await button('Test machine  ▶').isDisabled(), true);
       await page.evaluate(() => FG.app.openGame('buckets'));
-      assert.deepEqual(await page.evaluate(() => FG.store.current().constructionStates.gum), { legacyMarker: 'retain me', qualityConstruction: { schema: 'future-version', payload: { keep: true } } });
+      assert.deepEqual(await page.evaluate(() => FG.store.current().constructionStates['original-gum']), { legacyMarker: 'retain me', qualityConstruction: { schema: 'future-version', payload: { keep: true } } });
       await page.evaluate(() => FG.app.openGame('gum'));
       await button('Use example').click();
       assert.equal((await state()).storageBlocked, false);
-      assert.equal(await page.evaluate(() => FG.store.current().constructionStates.gum.legacyMarker), 'retain me');
+      assert.equal(await page.evaluate(() => FG.store.current().constructionStates['original-gum'].legacyMarker), 'retain me');
       assert.deepEqual(errors, []);
       await context.close();
       console.log(`PASS quality builder ${mobile ? 'touch' : 'desktop'}: editing, keyboard gum, undo, cancellation, real physics/three missions, explicit finish, pause, persistence, future-data protection`);

@@ -4,12 +4,13 @@ import { validateBlueprint, type Blueprint, type GumConnection, worldPoint } fro
 
 export const PHYSICS_VERSION = 'planck-1.4.2-quality-1';
 export const FIXED_DT = 1 / 60;
+const ownRecord = <T extends object>(value: T): Readonly<T> => Object.freeze(Object.setPrototypeOf(value, null));
 export interface Rect { x: number; y: number; width: number; height: number; angle?: number }
 export interface Mission {
   id: string; title: string; instruction: string; goal: Rect;
   terrain: Rect[]; bounds: Rect; holdSeconds: number; maxSeconds: number;
 }
-export const MISSIONS: Readonly<Record<string, Mission>> = {
+export const MISSIONS: Readonly<Record<string, Mission>> = ownRecord({
   delivery: { id: 'delivery', title: 'Special delivery', instruction: 'Carry your little passenger to the green landing mat.',
     goal: { x: 18.5, y: 6.5, width: 4, height: 5.5 }, terrain: [{ x: -2, y: 12, width: 28, height: 2 }],
     bounds: { x: 0, y: 0, width: 24, height: 13.5 }, holdSeconds: .15, maxSeconds: 30 },
@@ -22,7 +23,7 @@ export const MISSIONS: Readonly<Record<string, Mission>> = {
   free: { id: 'free', title: 'Junkyard playground', instruction: 'Try an idea. Launch it, change it, and see what happens.',
     goal: { x: 18.5, y: 6.5, width: 4, height: 5.5 }, terrain: [{ x: -2, y: 12, width: 28, height: 2 }],
     bounds: { x: 0, y: 0, width: 24, height: 13.5 }, holdSeconds: Infinity, maxSeconds: Infinity },
-};
+});
 export interface BodySnapshot {
   id: string; kind: PartKind | 'chassis'; x: number; y: number; angle: number;
   previousX: number; previousY: number; previousAngle: number;
@@ -164,14 +165,14 @@ export function createConstruction(value: Blueprint, options: ConstructionOption
 }
 
 export interface Track { id: string; title: string; description: string; points: Point[]; goalX: number; gravity: number; color: string }
-export const TRACKS: Readonly<Record<string, Track>> = {
+export const TRACKS: Readonly<Record<string, Track>> = ownRecord({
   meadow: { id: 'meadow', title: 'Meadow trail', description: 'Find your rhythm over the rolling hills.', goalX: 62, gravity: 10, color: '#83b684',
     points: [{ x: -12, y: 11 }, { x: 8, y: 11 }, { x: 14, y: 9.5 }, { x: 19, y: 8.3 }, { x: 25, y: 11 }, { x: 31, y: 10.3 }, { x: 37, y: 8.8 }, { x: 43, y: 8.8 }, { x: 49, y: 11 }, { x: 55, y: 10 }, { x: 62, y: 10 }, { x: 76, y: 10 }] },
   ridge: { id: 'ridge', title: 'Rocky ridge', description: 'Ease off before a crest and land on your wheels.', goalX: 68, gravity: 10, color: '#c39b7b',
     points: [{ x: -12, y: 11 }, { x: 7, y: 11 }, { x: 12, y: 8.5 }, { x: 17, y: 7 }, { x: 22, y: 11 }, { x: 27, y: 9.3 }, { x: 32, y: 9.3 }, { x: 36, y: 7.6 }, { x: 41, y: 11.2 }, { x: 46, y: 10 }, { x: 53, y: 7.8 }, { x: 59, y: 10.7 }, { x: 68, y: 10.7 }, { x: 82, y: 10.7 }] },
   moon: { id: 'moon', title: 'Moon bounce', description: 'Long floating jumps. Try a softer landing.', goalX: 65, gravity: 5.2, color: '#a9a5cf',
     points: [{ x: -12, y: 11 }, { x: 8, y: 11 }, { x: 14, y: 8.5 }, { x: 21, y: 10.5 }, { x: 27, y: 8.5 }, { x: 33, y: 11 }, { x: 39, y: 8 }, { x: 46, y: 10.5 }, { x: 53, y: 8.5 }, { x: 59, y: 10.5 }, { x: 65, y: 10.5 }, { x: 80, y: 10.5 }] },
-};
+});
 export interface VehicleOptions { enginePower?: number; suspension?: number; wheelSize?: number; chassisMass?: number; grip?: number }
 export interface VehicleInput { throttle?: number; brake?: boolean }
 export interface VehicleSnapshot extends SimulationSnapshot { distance: number; bestDistance: number; tilt: number; speed: number; grounded: boolean; track: string }

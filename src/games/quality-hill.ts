@@ -93,7 +93,7 @@ export default class QualityHill implements GameInstance {
     garage.append(choices, el('p', 'q-subtitle', 'Try a change in Live Remix. Your versions keep their own handling and trail.'));
     const prompts = el('div', 'q-edit-actions'); prompts.style.padding = '10px 0 2px';
     for (const prompt of ['Make the wheels bigger', 'Make the springs softer', 'Make the motor stronger', 'Make the car lighter']) {
-      prompts.append(this.button(prompt, 'q-chip', () => window.dispatchEvent(new CustomEvent('factory-remix-request', { detail: { game: 'hill', prompt } }))));
+      prompts.append(this.button(prompt, 'q-chip', () => window.dispatchEvent(new CustomEvent('factory-remix-request', { cancelable: true, detail: { game: 'hill', prompt } }))));
     }
     garage.append(prompts);
     const footer = el('div', 'q-footer'); footer.append(el('span', '', '→ / D drive · ← / A brake · R retry · P pause'), el('span', '', 'Your own best. No timer to beat.'));
