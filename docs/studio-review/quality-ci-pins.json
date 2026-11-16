@@ -1,0 +1,10 @@
+{
+  "qualityParent": "16864e669d3c71f7f6b63b4eff68f1700e4f0f6c",
+  "mainParent": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+  "studioSource": "9bc1b71686153d1a622af23ad62940c2c5ad30f2",
+  "targetBranch": "feature/game-quality-v1",
+  "localPreparationBranch": "integration/game-quality-main-20261116",
+  "generatedRuntimeVersion": "quality-runtime-v2.0.1",
+  "compatibilityPatchSha256": "313f018ffe7dac615da62d50b7d5411454ce49c309cd2299420fa901c1d29266",
+  "scope": "Feature-branch compatibility and read-only browser CI; no deployment or private worker repin"
+}

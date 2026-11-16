@@ -3,24 +3,44 @@
 'use strict';
 const FG=window.FG;
 const $=id=>document.getElementById(id);
-let activeGame=null,activeGameId=null,question=null,labStreak=0,gameSession=0,learningContext={},checkpointTimer=null;
+let activeGame=null,activeGameId=null,question=null,labStreak=0,gameSession=0,learningContext={},checkpointTimer=null,checkpointCount=0;
 function escapeHtml(str){return String(str).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function page(which){FG.learning?.dispose();dismiss();clearInterval(checkpointTimer);checkpointTimer=null;window.dispatchEvent(new CustomEvent('factory-page',{detail:which}));if(which!=='game'&&activeGame){gameSession++;activeGame.unmount();activeGame=null;activeGameId=null}document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('page-'+which).classList.remove('hidden');document.querySelectorAll('.nav').forEach(n=>{const selected=n.dataset.page===which;n.classList.toggle('active',selected);if(selected)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current')});if(which==='lab')loadLab();if(which==='creations')renderFeedback();if(which==='feedback')loadRemix();if(which==='parent')loadParent();window.scrollTo({top:0,behavior:'auto'})}
 function profiles(){const box=$('profile-choices');box.replaceChildren();FG.store.data.profiles.forEach(p=>{const b=document.createElement('button');b.className='profile-choice'+(FG.store.current().id===p.id?' active':'');b.textContent=`${p.icon||'⭐'} ${p.name}`;b.addEventListener('click',()=>{FG.store.choose(p.id);profiles();window.dispatchEvent(new Event('factory-profile'));if(!$('page-lab').classList.contains('hidden'))loadLab();if(!$('page-parent').classList.contains('hidden'))loadParent();if(!$('page-feedback').classList.contains('hidden'))loadRemix();if(activeGame)page('home')});box.append(b)})}
-function gameOpen(id,options={}){if(FG.store.loadError){page('parent');return}FG.learning?.dispose();gameSession++;learningContext={gameId:id,versionId:options.stateKey||'original-'+id,projectId:options.projectId||id};const g=FG.games[id];if(!g)return;window.dispatchEvent(new CustomEvent('factory-game',{detail:{live:!!options.onOutcome}}));if(activeGame)activeGame.unmount();activeGameId=id;page('game');$('game-title').textContent=g.name;$('game-type').textContent=g.type;$('game-instructions').textContent=g.instructions;$('game-control-hint').textContent=g.controls;$('game-status').textContent=FG.store.current().icon+' '+FG.store.current().name+(id==='buckets'?' · '+(FG.store.current().punish?'Original Challenge: wrong math ends the run':'Practice: hints and recovery'):'');$('stage-overlay').classList.add('hidden');activeGame=new g.build($('game-mount'),{difficulty:FG.store.current().remixes?.[id]||'classic',config:options.config,stateKey:options.stateKey||'original-'+id,finish:result=>{finish(id,result);options.onOutcome?.(result)}});let modeBox=$('gameMathMode');if(!modeBox){modeBox=document.createElement('div');modeBox.id='gameMathMode';$('page-game').querySelector('.game-bottom').append(modeBox);}FG.learning.modeControl(modeBox,learningContext.projectId);startCheckpointClock();}
-// Safe mid-round checkpoints keep open-ended play connected to learning.
+function gameOpen(id,options={}){if(FG.store.loadError){page('parent');return}FG.learning?.dispose();gameSession++;checkpointCount=0;learningContext={gameId:id,versionId:options.stateKey||'original-'+id,projectId:options.projectId||id};const g=FG.games[id];if(!g)return;window.dispatchEvent(new CustomEvent('factory-game',{detail:{live:!!options.onOutcome,game:id,stateKey:options.stateKey||'original-'+id,config:options.config}}));if(activeGame)activeGame.unmount();activeGameId=id;page('game');$('game-title').textContent=g.name;$('game-type').textContent=g.type;$('game-instructions').textContent=g.instructions;$('game-control-hint').textContent=g.controls;$('game-status').textContent=FG.store.current().icon+' '+FG.store.current().name+(id==='buckets'?' · '+(FG.store.current().punish?'Original Challenge: wrong math ends the run':'Practice: hints and recovery'):'');$('stage-overlay').classList.add('hidden');activeGame=new g.build($('game-mount'),{difficulty:FG.store.current().remixes?.[id]||'classic',config:options.config,stateKey:options.stateKey||'original-'+id,finish:result=>{finish(id,result);options.onOutcome?.(result)}});let modeBox=$('gameMathMode');if(!modeBox){modeBox=document.createElement('div');modeBox.id='gameMathMode';$('page-game').querySelector('.game-bottom').append(modeBox);}FG.learning.modeControl(modeBox,learningContext.projectId);startCheckpointClock();}
+// Safe event boundaries and active play share one per-child learning budget.
+function deepFocus(){let node=document.activeElement;while(node?.shadowRoot?.activeElement)node=node.shadowRoot.activeElement;return node;}
+function restorePlayFocus(prior){
+ const mount=$('game-mount');if(!mount.isConnected||!mount.getClientRects().length||mount.inert)return;
+ if(prior?.isConnected&&prior.getClientRects?.().length&&(mount.contains(prior)||prior.getRootNode?.().host&&mount.contains(prior.getRootNode().host))&&!prior.disabled){prior.focus({preventScroll:true});return;}
+ const target=mount.querySelector('canvas,button:not(:disabled)')||Array.from(mount.children).map(child=>child.shadowRoot?.querySelector('canvas,button:not(:disabled)')).find(Boolean);
+ if(target){if(target.tagName==='CANVAS'&&target.tabIndex<0)target.tabIndex=0;target.focus({preventScroll:true});}
+}
+function safeCheckpoint(kind){
+ const session=gameSession,profile=FG.store.current(),game=activeGame;
+ if(!game||FG.learning.active||document.hidden||!$('stage-overlay').classList.contains('hidden')||!FG.math.canAsk(profile))return false;
+ const prior=deepFocus();if(!game.pause?.())return false;
+ const token=`${session}:${kind}:${++checkpointCount}`;
+ const complete=()=>{if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;dismiss();game.resume?.();restorePlayFocus(prior);};
+ const open=()=>{
+  if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;
+  const overlay=overlayHtml('<div id="native-learning-activity" class="modal-card"></div>');
+  try{if(!FG.learning.checkpoint(overlay.firstElementChild,learningContext,complete,{roundId:token,legacyIds:true}))complete();}
+  catch{const box=overlay.firstElementChild;box.replaceChildren();const title=document.createElement('h2'),copy=document.createElement('p'),retry=document.createElement('button');title.textContent='Your game is paused';copy.textContent='Math could not open. Try again, or leave this game and ask a grown-up for help.';retry.className='btn primary';retry.textContent='Try math again';retry.onclick=open;box.append(title,copy,retry);retry.focus();}
+ };
+ open();return true;
+}
 function startCheckpointClock(){
- let activeSeconds=0,number=0;const session=gameSession;
+ let activeSeconds=0;const session=gameSession;
  checkpointTimer=setInterval(()=>{
   if(session!==gameSession||document.hidden||FG.learning.active||!activeGame?.isPlaying?.()||!$('stage-overlay').classList.contains('hidden'))return;
-  activeSeconds++;if(activeSeconds<90||!FG.math.canAsk(FG.store.current()))return;
-  if(!activeGame.pause())return;activeSeconds=0;
-  const el=overlayHtml('<div id="native-learning-activity" class="modal-card"></div>');
-  const complete=()=>{if(session!==gameSession)return;dismiss();activeGame?.resume();};
-  const asked=FG.learning.checkpoint(el.firstElementChild,learningContext,complete,{roundId:`${session}:mid:${++number}`,legacyIds:true});
-  if(!asked)complete();
+  activeSeconds++;if(activeSeconds>=90&&safeCheckpoint('active-play'))activeSeconds=0;
  },1000);
 }
+window.addEventListener('factory-game-event',event=>{
+ const data=event.detail;if(!data||data.type!=='checkpoint'||data.game!==activeGameId||!activeGame)return;
+ safeCheckpoint('game-event');
+});
 function overlayHtml(html){$('game-mount').inert=true;const el=$('stage-overlay');el.innerHTML=html;el.classList.remove('hidden');return el}
 function dismiss(){$('game-mount').inert=false;const el=$('stage-overlay');el.classList.add('hidden');el.replaceChildren()}
 function finish(game,result){
@@ -35,8 +55,8 @@ function finish(game,result){
  if(!asked)showResult(result,true);
 }
 function showResult(result,mathFirstTry){if(!activeGame)return;const p=FG.store.current();const penalty=!!p.punish&&!mathFirstTry&&result.won;const won=!!result.won&&!penalty;FG.store.recordGame(activeGameId,won,result.level);let txt=penalty?'Math challenge missed on the first try. Parent challenge mode means repeating this level.':result.description;
- const el=overlayHtml(`<div class="modal-card"><div class="big-icon">${won?'🏆':'💛'}</div><div class="eyebrow">${won?'LEVEL CLEARED':'TRY AGAIN'}</div><h2>${escapeHtml(penalty?'One more try!':result.title)}</h2><p>${escapeHtml(txt||'')}</p><div class="modal-actions"><button class="btn primary" id="resultNext">${won?'Next level →':'🔁 Retry level'}</button><button class="btn secondary" id="resultHome">🏠 Arcade</button></div></div>`);
- $('resultNext').addEventListener('click',()=>{dismiss();if(won)activeGame.next();else if(typeof activeGame.retry==='function')activeGame.retry();else activeGame.restart()});$('resultHome').addEventListener('click',()=>page('home'));
+ const el=overlayHtml(`<div class="modal-card"><div class="big-icon">${won?'🏆':'💛'}</div><div class="eyebrow">${won?'LEVEL CLEARED':'TRY AGAIN'}</div><h2 id="native-result-title" tabindex="-1">${escapeHtml(penalty?'One more try!':result.title)}</h2><p>${escapeHtml(txt||'')}</p><div class="modal-actions"><button class="btn primary" id="resultNext">${won?'Next level →':'🔁 Retry level'}</button><button class="btn secondary" id="resultHome">🏠 Arcade</button></div></div>`);
+ $('resultNext').addEventListener('click',()=>{dismiss();if(won)activeGame.next();else if(typeof activeGame.retry==='function')activeGame.retry();else activeGame.restart()});$('resultHome').addEventListener('click',()=>page('home'));$('native-result-title').focus();
 }
 function loadLab(){labStreak=0;question=null;renderLabReport();if(FG.store.loadError){$('lab-question').textContent=FG.store.loadError;$('lab-controls').replaceChildren();return}nextLab()}
 function renderLabReport(){FG.learning.renderReport($('skill-report'));}
@@ -73,8 +93,8 @@ let wizardStep=0;
 function designCard(){return ['My game: '+$('inventIdea').value.trim(),'Players: '+$('inventAction').value,'Win: '+($('inventWin').value.trim()||'Find a joyful goal together'),'Surprise: '+($('inventFunny').value.trim()||'Dream one up later'),'Art: '+$('inventArt').value].join('\n')}
 function showWizard(){document.querySelectorAll('[data-step]').forEach(el=>el.hidden=Number(el.dataset.step)!==wizardStep);$('wizardProgress').textContent=`Step ${wizardStep+1} of 3 · ${['Dream','Choose','Save'][wizardStep]}`;$('wizardBack').hidden=wizardStep===0;$('wizardNext').hidden=wizardStep===2;$('wizardSave').hidden=wizardStep!==2;$('ideaPreview').textContent=designCard();const legend=document.querySelector(`[data-step="${wizardStep}"] legend`);legend.tabIndex=-1;legend.focus()}
 function loadRemix(){$('remixDifficulty').value=FG.store.current().remixes?.[$('remixGame').value]||'classic';$('remixStatus').textContent='';describeRemix()}
-function describeRemix(){const descriptions={gum:{gentle:'Matching pieces glow to help you build.',classic:'Find the matching pieces yourself.',stretch:'More extra pieces in your junk pile!'},buckets:{gentle:'A star shows the safe bucket. Follow the clue!',classic:'Pick a bucket and see what happens!',stretch:'Four buckets and only one keeps you dry!'},dragon:{gentle:'More hearts and slower dragon breath.',classic:'The original dragon adventure.',stretch:'Fewer hearts and faster dragon breath!'}};$('remixDescription').textContent=descriptions[$('remixGame').value][$('remixDifficulty').value]}
-function bind(){document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>gameOpen(b.dataset.game)));$('homeBtn').onclick=()=>page('home');$('playFeatured').onclick=()=>gameOpen('gum');$('exitGame').onclick=()=>page('home');$('improveThis').onclick=()=>{if(activeGameId){$('feedbackGame').value=activeGameId;$('remixGame').value=activeGameId}page('feedback')};$('gameHelp').onclick=()=>alert(FG.games[activeGameId]?.controls||'Use the controls shown in the game');
+function describeRemix(){const descriptions={gum:{gentle:'Stronger gum and gentler gravity help your invention hold together.',classic:'Build, test and change your machine.',stretch:'Stretchier gum makes balance matter more.'},hill:{gentle:'Gentler acceleration and grippy tires.',classic:'Find your rhythm over the hills.',stretch:'More motor power and less tire grip.'},buckets:{gentle:'A star shows the safe bucket. Follow the clue!',classic:'Pick a bucket and see what happens!',stretch:'Four buckets and only one keeps you dry!'},dragon:{gentle:'More time between fireballs and a wider shield.',classic:'The original dragon adventure.',stretch:'More frequent fireballs and a smaller shield.'}};$('remixDescription').textContent=descriptions[$('remixGame').value][$('remixDifficulty').value]}
+function bind(){document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>gameOpen(b.dataset.game)));$('homeBtn').onclick=()=>page('home');$('playFeatured').onclick=()=>gameOpen('gum');$('exitGame').onclick=()=>page('home');$('improveThis').onclick=()=>{if(activeGameId)window.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:activeGameId}}))};$('gameHelp').onclick=()=>alert(FG.games[activeGameId]?.controls||'Use the controls shown in the game');
  if(FG.store.loadError){const notice=document.createElement('section');notice.id='storageRecovery';notice.className='panel learning-save-warning';notice.setAttribute('role','alert');const message=document.createElement('p');message.textContent=FG.store.loadError;const exportButton=document.createElement('button');exportButton.className='btn secondary';exportButton.textContent='Save original progress for recovery';exportButton.onclick=()=>download(FG.store.recoveryRaw,'family-game-factory-recovery.json');notice.append(message,exportButton);document.querySelector('main').prepend(notice);}
  $('parentGrade').onchange=populateSkills;$('parentRate').oninput=e=>$('parentRateValue').textContent=e.target.value;$('saveParent').onclick=saveParent;
  $('feedbackForm').onsubmit=e=>{e.preventDefault();const worked=FG.store.addFeedback({game:$('feedbackGame').value,type:$('feedbackType').value,idea:$('feedbackText').value});if(!worked)$('feedbackStatus').textContent='Could not save. Keep your idea here and try again.';if(worked){$('feedbackText').value='';$('feedbackStatus').textContent='💡 Saved! Find it in My Creations.'}};

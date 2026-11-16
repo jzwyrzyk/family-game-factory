@@ -1,11 +1,21 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
   gum: { version: 1, id: 'gum', name: 'Bubble Gum Builders', mechanics: [
+    { key: 'qualityVersion', label: 'Physical workshop', type: 'number', default: 1, min: 0, max: 1, step: 1 },
+    { key: 'gravity', label: 'Gravity', type: 'number', default: 10, min: 4, max: 16, step: 1 },
+    { key: 'thrust', label: 'Fan power', type: 'number', default: 1, min: .5, max: 1.5, step: .1 },
     { key: 'originalRules', label: 'Restored original rules', type: 'boolean', default: true },
     { key: 'gumBudget', label: 'Gum sticks', type: 'number', default: 10, min: 4, max: 20, step: 1 },
     { key: 'jointStrength', label: 'Joint strength', type: 'number', default: 1, min: .5, max: 2, step: .25 },
     { key: 'highlightMatches', label: 'Matching pieces glow', type: 'boolean', default: false },
     { key: 'extraDecoys', label: 'Extra silly pieces', type: 'number', default: 0, min: 0, max: 6, step: 1 },
+  ] },
+  hill: { version: 1, id: 'hill', name: 'Junkyard Rally', mechanics: [
+    { key: 'enginePower', label: 'Motor power', type: 'number', default: 1, min: .5, max: 2, step: .1 },
+    { key: 'suspension', label: 'Spring stiffness', type: 'number', default: 4, min: 2, max: 8, step: .5 },
+    { key: 'wheelSize', label: 'Wheel size', type: 'number', default: .52, min: .35, max: .8, step: .01 },
+    { key: 'chassisMass', label: 'Body weight', type: 'number', default: 1, min: .5, max: 2, step: .1 },
+    { key: 'grip', label: 'Tire grip', type: 'number', default: 1, min: .5, max: 1.5, step: .1 },
   ] },
   buckets: { version: 1, id: 'buckets', name: 'Splash or Pass', mechanics: [
     { key: 'originalRules', label: 'Restored original rules', type: 'boolean', default: true },
@@ -28,8 +38,9 @@ export function validateConfig(game: GameId, value: unknown): Mechanics {
   const input = value as Record<string, unknown>, result: Mechanics = {};
   if (Object.keys(input).some(key => !manifests[game].mechanics.some(m => m.key === key))) throw Error('Unknown mechanic.');
   for (const m of manifests[game].mechanics) {
-    const added=['originalRules','gumBudget','jointStrength','groundResilience','fireballCadence','shieldRadius'];
-    const v = input[m.key] ?? (added.includes(m.key) ? (m.key==='originalRules'?false:m.default) : undefined);
+    const added=['originalRules','gumBudget','jointStrength','groundResilience','fireballCadence','shieldRadius','qualityVersion','gravity','thrust'];
+    // Missing qualityVersion identifies a saved older revision; never silently replace its engine.
+    const v = input[m.key] ?? (added.includes(m.key) ? (m.key==='originalRules'?false:m.key==='qualityVersion'?0:m.default) : undefined);
     if (m.type === 'boolean') { if (typeof v !== 'boolean') throw Error(`Choose on or off for ${m.label}.`); }
     else if (typeof v !== 'number' || !Number.isFinite(v) || v < m.min! || v > m.max! || Math.abs((v - m.min!) / m.step! - Math.round((v - m.min!) / m.step!)) > 1e-6) throw Error(`${m.label} is outside its allowed range.`);
     result[m.key] = v as number | boolean;
@@ -38,11 +49,18 @@ export function validateConfig(game: GameId, value: unknown): Mechanics {
 }
 export function defaults(game: GameId, difficulty: Difficulty = 'classic'): Mechanics {
   const config = Object.fromEntries(manifests[game].mechanics.map(m => [m.key, m.default]));
-  if (difficulty === 'gentle') Object.assign(config, game === 'gum' ? { highlightMatches: true } : game === 'buckets' ? { revealSafe: true } : { hearts: 7, breathSpeed: 0.65 });
-  if (difficulty === 'stretch') Object.assign(config, game === 'gum' ? { extraDecoys: 2 } : game === 'buckets' ? { bucketCount: 4 } : { hearts: 3, breathSpeed: 1.4 });
+  if (difficulty === 'gentle') Object.assign(config, game === 'gum' ? { highlightMatches: true, jointStrength: 1.5, gravity: 8 } : game === 'buckets' ? { revealSafe: true } : game === 'hill' ? { enginePower: .8, grip: 1.2 } : { hearts: 7, breathSpeed: 0.65, fireballCadence: .75, shieldRadius: 82 });
+  if (difficulty === 'stretch') Object.assign(config, game === 'gum' ? { extraDecoys: 2, jointStrength: .75 } : game === 'buckets' ? { bucketCount: 4 } : game === 'hill' ? { enginePower: 1.3, grip: .8 } : { hearts: 3, breathSpeed: 1.4, fireballCadence: 1.25, shieldRadius: 62 });
   // Preset breath speed retains the original 0.65; editable values use steps of 0.05.
   return validateConfig(game, config);
 }
 export function diff(game: GameId, before: Mechanics, after: Mechanics) {
   return manifests[game].mechanics.filter(m => before[m.key] !== after[m.key]).map(m => ({ key: m.key, label: m.label, before: before[m.key], after: after[m.key] }));
+}
+/** Show the controls that actually affect this saved engine, never compatibility flags. */
+export function playableMechanics(game: GameId, config: Mechanics) {
+  const keys = game === 'gum' ? (config.qualityVersion === 1 ? ['gumBudget','jointStrength','gravity','thrust']
+    : config.originalRules ? ['gumBudget','jointStrength'] : ['highlightMatches','extraDecoys'])
+    : game === 'dragon' ? (config.originalRules ? ['groundResilience','fireballCadence','shieldRadius'] : ['hearts','breathSpeed']) : null;
+  return manifests[game].mechanics.filter(m => keys ? keys.includes(m.key) : m.key !== 'originalRules');
 }

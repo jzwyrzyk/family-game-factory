@@ -10,6 +10,8 @@ import type {MathItem} from '../src/learning/types';
 import {renderPreview} from '../server/pipeline/artifacts';
 import {renderGenerated} from '../server/sandbox/preview.cjs';
 import {hash, type GeneratedGame} from '../server/agent/generated';
+import {createRequire} from 'node:module';
+const runtimeBundle=createRequire(import.meta.url)('../server/sandbox/bundle-v2.cjs').runtimeBundle;
 
 const STORE='family-game-factory-state-v1';
 const devices=[['desktop',{width:1280,height:960}],['mobile',{width:390,height:844}]] as const;
@@ -96,7 +98,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     assert.equal((await profile(page)).id,owner);assert.equal(JSON.stringify((await profile(page)).learning),ownerHistory);
 
     await page.clock.install();
-    await page.evaluate(()=>{window.FG.store.current().mathWindow=[];window.FG.store.save();window.FG.app.openGame('gum');});
+    await page.evaluate(()=>{window.FG.store.current().mathWindow=[];window.FG.store.save();window.FG.app.openGame('gum',{config:{originalRules:true,qualityVersion:0,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}});});
     const mode=page.locator('#gameMathMode select');
     assert.deepEqual(await mode.locator('option').evaluateAll(nodes=>nodes.map(n=>(n as HTMLOptionElement).value)),['checkpoint','interaction','both']);
     for(const value of ['interaction','both','checkpoint']){
@@ -165,7 +167,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
   }finally{await context.close();}
 }
 
-function generatedFixture():GeneratedGame {
+function generatedFixture(v2=false,version?:string):GeneratedGame {
   const source=`export function createGame(){return {
     init:()=>({count:0}),
     step:(state,input)=>({count:Math.min(2,state.count+(input.tap?1:0))}),
@@ -175,12 +177,13 @@ function generatedFixture():GeneratedGame {
     outcome:state=>({status:state.count===2?'won':'playing',score:state.count})
   }};`;
   const code=transformSync(source,{loader:'ts',format:'iife',globalName:'GameModule'}).code;
-  return {kind:'generated-module-v1',title:'Learning integration fixture',instructions:'A local audited fixture: tap the play area twice.',source,controls:[],compiled:{code,sourceHash:hash(source),codeHash:hash(code),tests:{desktop:true,mobile:true,replay:true,isolation:true}}};
+  const trusted=v2?runtimeBundle(version):null;
+  return {kind:v2?'generated-module-v2':'generated-module-v1',title:'Learning integration fixture',instructions:'A local audited fixture: tap the play area twice.',source,controls:[],compiled:{code,sourceHash:hash(source),codeHash:hash(code),...(trusted?{runtimeVersion:trusted.version,runtimeHash:trusted.hash}:{}),tests:{desktop:true,mobile:true,replay:true,isolation:true,...(v2?{input:true,resources:true,pause:true}:{})}}};
 }
 
-async function previewJourney(browser:Browser,base:string,bridge:string,device:typeof devices[number],kind:'declarative'|'generated') {
+async function previewJourney(browser:Browser,base:string,bridge:string,device:typeof devices[number],kind:'declarative'|'generated'|'generated-v2') {
   const [name,viewport]=device,channel=`math-${kind}-channel`,artifactId=`math-${kind}-artifact`;
-  const html=kind==='declarative'?renderPreview({kind:'star-catcher-v1',target:2,seconds:60},artifactId,channel).html:renderGenerated(generatedFixture(),artifactId,channel).html;
+  const html=kind==='declarative'?renderPreview({kind:'star-catcher-v1',target:2,seconds:60},artifactId,channel).html:renderGenerated(generatedFixture(kind==='generated-v2'),artifactId,channel).html;
   const context=await browser.newContext({viewport,hasTouch:name==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors:string[]=[];
   page.on('pageerror',e=>errors.push(e.message));
   try{
@@ -197,7 +200,8 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     },{html,channel,artifactId,kind});
     const frame=page.frameLocator('#math-fixture-frame');
     await frame.locator(kind==='declarative'?'#restart':'#start').waitFor();
-    await page.waitForFunction(()=> (window as any).previewMessages.some((m:any)=>m.event==='ready'));
+    await page.waitForFunction(()=> (window as any).previewBridge.ready===true);
+    assert.equal(await page.locator('#math-fixture-frame').evaluate(el=>(el as HTMLIFrameElement).inert),false,'only the validated current protocol enables preview interaction');
     assert.equal(await frame.locator('body').evaluate(()=>{try{return !!parent.document.body;}catch{return false;}}),false,'the actual wrapper remains sandboxed away from child data');
     const packet={type:'factory-preview',channel,artifactId,event:'round-complete',roundId:1,won:true,score:2};
     await page.evaluate(packet=>window.postMessage(packet,'*'),packet); // Correct data from the wrong source.
@@ -241,7 +245,7 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     const rounds=await page.evaluate(()=>(window as any).previewMessages.filter((m:any)=>m.event==='round-complete'&&m.channel!=='incorrect-channel').map((m:any)=>m.roundId));
     assert.ok(rounds.includes(1)&&rounds.includes(2),'the real wrapper increments its round ID on replay');
     assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),2);
-    if(kind==='generated'){
+    if(kind!=='declarative'){
       // Exercise a completion already in flight when the trusted wrapper's
       // mid-round checkpoint pauses play. These are explicit protocol fixtures.
       await advanceBudget(page);await frame.locator('#replay').click();
@@ -260,6 +264,63 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     }
     assert.deepEqual(errors,[]);
     console.log(`PASS ${kind} preview ${name}: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling`);
+  }finally{await context.close();}
+}
+
+async function qualityNativeJourney(browser:Browser,base:string,device:typeof devices[number]) {
+  const [name,viewport]=device,context=await browser.newContext({viewport,hasTouch:name==='mobile',reducedMotion:'reduce'}),page=await context.newPage();
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  try{
+    await page.clock.install();await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);
+    await page.evaluate(()=>{window.FG.store.changeProfile({grade:2,focus:'adaptive',rate:1,punish:false});window.FG.app.openGame('hill');});
+    const hill=page.locator('.quality-hill'),state=()=>page.evaluate(()=>window.FG.runtime.snapshot().state);
+    await hill.getByRole('button',{name:'Let’s drive →',exact:true}).click();
+    await page.keyboard.down('ArrowRight');await page.clock.runFor(12_000);await page.keyboard.up('ArrowRight');
+    await page.waitForFunction(()=>window.FG.learning.active);const before=await state();
+    assert.equal(before.mode,'result');assert.equal(before.status,'won');assert.equal(before.hostPaused,true);
+    const hillAttempt=await page.evaluate(()=>window.FG.learning.activeAttemptId);
+    await page.keyboard.press('r');await page.clock.runFor(1500);
+    const during=await state();assert.equal(during.time,before.time);assert.equal(during.mode,'result');assert.equal(during.inputActive,0,'global retry/pedal input cannot resume a required activity');
+    assert.equal(await page.locator('#game-mount').evaluate(el=>(el as HTMLElement).inert),true);
+    await page.screenshot({path:`test-results/math-quality-hill-${name}.png`,fullPage:true});
+    await finishWithHelp(page);assert.equal((await state()).hostPaused,false);
+    assert.equal(await page.locator('#game-mount').evaluate(el=>(el as HTMLElement).inert),false);
+    await hill.getByRole('button',{name:'Finish this trip',exact:true}).click();await page.waitForSelector('#resultNext');
+    assert.equal(await page.evaluate(()=>document.activeElement?.id),'native-result-title','round completion moves focus to its labelled result');
+    await page.click('#resultNext');assert.equal((await state()).track,'ridge');
+    await advanceBudget(page);await page.evaluate(()=>window.FG.app.openGame('gum'));
+    const workshop=page.locator('.quality-builder');await workshop.getByRole('button',{name:'Add Bottle',exact:true}).click();
+    const part=await page.evaluate(()=>window.FG.runtime.snapshot().state.parts.at(-1));
+    await page.clock.runFor(91_000);await page.waitForFunction(()=>window.FG.learning.active);
+    const frozen=await state();assert.equal(frozen.hostPaused,true);await page.clock.runFor(1500);
+    assert.equal((await state()).clock.steps,frozen.clock.steps,'workshop stepping stops throughout the math interaction');
+    await page.screenshot({path:`test-results/math-quality-workshop-${name}.png`,fullPage:true});
+    await finishWithHelp(page);
+    assert.equal(await workshop.locator('canvas.q-canvas').evaluate(el=>document.activeElement===el),true,'completed mid-play math returns keyboard focus to the same canvas');
+    await page.keyboard.press('ArrowRight');assert.ok((await state()).parts.find((p:any)=>p.id===part.id).x>part.x,'the same saved construction remains editable');
+    await workshop.getByRole('button',{name:'Pause game',exact:true}).click();
+    await page.evaluate(()=>{window.FG.runtime.pause();window.FG.runtime.resume();});
+    assert.equal((await state()).paused,true,'a host resume preserves the child’s manual pause');
+    await workshop.getByRole('button',{name:'Resume game',exact:true}).click();assert.equal((await state()).paused,false);
+    const records=await attempts(page);assert.equal(records.length,2);assert.equal(records.find((a:any)=>a.id===hillAttempt).context.gameId,'hill');assert.ok(records.every((a:any)=>a.outcome==='shown'&&!a.independent));
+    assert.deepEqual(errors,[]);console.log(`PASS quality learning ${name}: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause`);
+  }finally{await context.close();}
+}
+
+async function archivedProtocolJourney(browser:Browser,base:string,bridge:string){
+  const context=await browser.newContext(),page=await context.newPage(),channel='math-archived-channel',artifactId='math-archived-artifact';
+  const html=renderGenerated(generatedFixture(true,'quality-runtime-v2.0.2'),artifactId,channel).html;
+  try{
+    await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);await page.addScriptTag({content:bridge});
+    await page.evaluate(({html,channel,artifactId})=>{
+      const w=window as any,host=document.createElement('section'),frame=document.createElement('iframe');host.style.cssText='height:760px;position:relative';frame.id='archived-learning-preview';frame.title='Archived runtime test';frame.sandbox.add('allow-scripts');frame.style.cssText='width:100%;height:760px';host.append(frame);document.getElementById('page-home')!.prepend(host);
+      w.archivedLearning=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id});frame.srcdoc=html;
+    },{html,channel,artifactId});
+    await page.getByText('This saved preview needs an updated game player to include math.',{exact:false}).waitFor();
+    assert.equal(await page.locator('#archived-learning-preview').evaluate(el=>(el as HTMLIFrameElement).inert),true);
+    assert.equal(await page.evaluate(()=>(window as any).archivedLearning.ready),false);
+    assert.equal(await page.evaluate(()=>window.FG.learning.active),false);assert.equal((await attempts(page)).length,0,'blocking an incompatible player does not invent learning evidence');
+    console.log('PASS archived v2 learning: immutable older archive remains blocked until a compatible new revision is reviewed');
   }finally{await context.close();}
 }
 
@@ -301,10 +362,12 @@ async function main(){
     };
     for(const device of devices){
       await run(`application ${device[0]}`,()=>applicationJourney(activeBrowser,base,device));
-      for(const kind of ['declarative','generated'] as const)await run(`${kind} preview ${device[0]}`,()=>previewJourney(activeBrowser,base,output.outputFiles[0].text,device,kind));
+      await run(`quality native ${device[0]}`,()=>qualityNativeJourney(activeBrowser,base,device));
+      for(const kind of ['declarative','generated','generated-v2'] as const)await run(`${kind} preview ${device[0]}`,()=>previewJourney(activeBrowser,base,output.outputFiles[0].text,device,kind));
     }
+    await run('archived protocol blocked',()=>archivedProtocolJourney(activeBrowser,base,output.outputFiles[0].text));
     await run('future-state recovery',()=>recoveryJourney(activeBrowser,base));
-    if(failures.length)throw new AggregateError(failures,`${failures.length} of 7 learning integration journeys failed`);
+    if(failures.length)throw new AggregateError(failures,`${failures.length} of 12 learning integration journeys failed`);
   }finally{await browser?.close();await new Promise<void>(resolve=>server.close(()=>resolve()));}
 }
 void main().catch(error=>{console.error(error);process.exitCode=1;});

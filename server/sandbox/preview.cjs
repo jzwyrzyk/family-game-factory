@@ -1,6 +1,7 @@
 const {createHash}=require('node:crypto');
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGenerated(game,artifactId,channel){
+ if(game.kind==='generated-module-v2')return require('./preview-v2.cjs').renderGeneratedV2(game,artifactId,channel);
  if(!game.compiled||!/^[\w-]{1,100}$/.test(artifactId)||!/^[\w-]{8,100}$/.test(channel))throw Error('INVALID_GENERATED_PREVIEW');
  const worker=game.compiled.code+`\nconst game=GameModule.createGame();let state;self.onunhandledrejection=()=>{self.postMessage({failed:true})};self.onmessage=e=>{const m=e.data;if(m.type==='start')state=game.init();else if(m.type==='step')state=game.step(state,m.input,m.dt);else return;const commands=game.draw(state),outcome=game.outcome(state);self.postMessage({commands,outcome});};`;
  const data=JSON.stringify({worker,artifactId,channel,controls:game.controls}).replace(/</g,'\\u003c');
@@ -15,7 +16,7 @@ function controls(){document.getElementById('start').disabled=paused;document.ge
 function pause(){paused=true;pressed.clear();tap=null;controls();}
 addEventListener('message',event=>{
  const d=event.data;if(event.source!==parent||!d||d.type!=='factory-learning'||d.channel!==config.channel||d.artifactId!==config.artifactId)return;
- if(d.action==='connect'){connected=true;return;}
+ if(d.action==='connect'){connected=true;report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});return;}
  if(d.action==='pause')pause();
  if(d.action==='resume'){paused=false;last=performance.now();controls();}
 });
@@ -69,7 +70,7 @@ for(const b of document.querySelectorAll('[data-control]')){
  b.onpointerup=b.onpointercancel=b.onpointerleave=()=>pressed.delete(b.dataset.control);
  b.onclick=()=>{if(paused||ended)return;pressed.add(b.dataset.control);inputs++;setTimeout(()=>pressed.delete(b.dataset.control),120);};
 }
-controls();report('ready',{height:Math.ceil(document.body.scrollHeight)});
+controls();report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});
 `;
  const digest=createHash('sha256').update(script).digest('base64');const csp=`default-src 'none'; script-src 'sha256-${digest}'; worker-src blob:; connect-src 'none'; style-src 'unsafe-inline'; img-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors *`;
  const labels={left:'◀ Left',right:'Right ▶',up:'▲ Up',down:'▼ Down',action:'⭐ Action'};

@@ -72,6 +72,6 @@ export function installLearningHost() {
   }
   window.addEventListener('factory-profile',dispose);
   window.addEventListener('pagehide',dispose);
-  FG.learning={version:2,sessionId,mount,checkpoint,dispose,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,renderReport,report:()=>report(FG.store.current()),skills:SKILLS,selectItem,
+  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,renderReport,report:()=>report(FG.store.current()),skills:SKILLS,selectItem,
     get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
 }

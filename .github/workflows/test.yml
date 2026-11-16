@@ -50,12 +50,6 @@ jobs:
       - name: Private drawings
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/private-drawings.cjs
-      - name: Studio journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:studio
-      - name: Design coach checks
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:coach
       - name: Real agent activation status
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:real-agent
@@ -91,5 +85,36 @@ jobs:
         if: always()
         with:
           name: learning-evidence
+          path: test-results/
+          if-no-files-found: ignore
+  creative:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build production
+        id: build
+        run: npm run build
+      - name: Physical and generated games
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:quality
+      - name: Studio journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:studio
+      - name: Design coach checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:coach
+      - name: Child journey and recovery
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:child-journey
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: creative-evidence
           path: test-results/
           if-no-files-found: ignore

@@ -1,3 +1,22 @@
+import { isGameId } from '../runtime/manifests';
+import type { GameId } from '../runtime/types';
+
+/** Claim the matching embedded game's request synchronously. The legacy fallback
+ * waits until dispatch completes, so ownership does not depend on listener order.
+ */
+export function installStudioRemixRouting(host: { activeGame(): GameId | null; openRequest(prompt?: string): void }, target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> = window) {
+  const listener = (event: Event) => {
+    const detail = (event as CustomEvent<{ game?: unknown; prompt?: unknown }>).detail;
+    if (event.defaultPrevented || !event.cancelable || !detail || !isGameId(detail.game) ||
+        detail.prompt !== undefined && (typeof detail.prompt !== 'string' || detail.prompt.length > 2000) ||
+        host.activeGame() !== detail.game) return;
+    event.preventDefault();
+    host.openRequest(typeof detail.prompt === 'string' ? detail.prompt : undefined);
+  };
+  target.addEventListener('factory-remix-request', listener, true);
+  return () => target.removeEventListener('factory-remix-request', listener, { capture: true });
+}
+
 /** Bridge the original round-result Home button back to the studio library. */
 export function installStudioHostNavigation() {
   const fg = (window as any).FG;

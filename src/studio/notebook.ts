@@ -1,12 +1,14 @@
 import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
+import { isGameId } from '../runtime/manifests';
+import type { GameId } from '../runtime/types';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
 export type Message = { id: string; role: 'child' | 'helper' | 'reflection'; text: string; at: string };
 export type Candidate = { id: string; baseId: string | null; config?: Record<string, number | boolean>; remoteId?: string; prompt: string; summary: string };
-export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled' };
+export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled'; revisionId?:string };
 export interface StudioSession {
-  id: string; owner: string; name: string; game: 'gum' | 'buckets' | 'dragon' | 'new';
+  id: string; owner: string; name: string; game: GameId | 'new';
   projectId: string | null; remoteId: string | null; remoteKind?: string;
   candidate: Candidate | null; undone?: Candidate | null; draft: string; messages: Message[];
   job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
@@ -23,7 +25,7 @@ export function validateNotebook(input: unknown): Notebook {
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
   const ids = new Set<string>();
   for (const s of n.sessions) {
-    if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !['gum','buckets','dragon','new'].includes(s.game) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
+    if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
     ids.add(s.id);
     if (s.projectId !== null && !ident(s.projectId) || s.remoteId !== null && !ident(s.remoteId) || s.remoteKind !== undefined && !safeText(s.remoteKind,60)) throw Error('Invalid studio reference.');
     if (!Array.isArray(s.messages) || s.messages.length > 200 || !s.messages.every(m => m && ident(m.id) && ['child','helper','reflection'].includes(m.role) && safeText(m.text,2200) && safeText(m.at,40) && Number.isFinite(Date.parse(m.at)))) throw Error('Invalid studio conversation.');
@@ -37,7 +39,7 @@ export function validateNotebook(input: unknown): Notebook {
     if(s.selectedTest!==undefined&&s.selectedTest!==null&&!s.experiments?.some(e=>e.id===s.selectedTest))throw Error('Unknown selected test.');
     if(s.playOnly!==undefined&&typeof s.playOnly!=='boolean')throw Error('Invalid play-only state.');
     if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
-    if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
+    if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
@@ -75,9 +77,9 @@ export class StudioNotebook {
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
     return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
-  saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child'):Experiment {
+  saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true):Experiment {
     let result:Experiment;
-    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;s.playOnly=false;});return result!;
+    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);if(select){s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;}s.playOnly=false;});return result!;
   }
   selectExperiment(id:string,owner:string,testId:string):Experiment {
     const e=this.get(id,owner).experiments?.find(e=>e.id===testId);if(!e)throw Error('Choose one of this project’s tests.');

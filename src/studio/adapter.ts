@@ -1,6 +1,8 @@
 /** Existing game engines, learning host and revision storage remain authoritative. */
 import { RevisionStore } from '../factory/workspace';
 import type { Mechanics, GameId } from '../runtime/types';
+/** Both generated formats use the generated revision endpoint; neither is a star catcher. */
+export function isGeneratedRemoteKind(kind: unknown): boolean { return kind === 'generated-module-v1' || kind === 'generated-module-v2'; }
 export class StudioGames {
   constructor(private storage: Storage, private fg: any) {}
   private store(){return new RevisionStore(this.storage);}

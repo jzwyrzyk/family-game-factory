@@ -785,6 +785,7 @@
             "enum": [
               "new",
               "gum",
+              "hill",
               "buckets",
               "dragon",
               "star-catcher",
@@ -885,6 +886,7 @@
           "gameId": {
             "enum": [
               "gum",
+              "hill",
               "buckets",
               "dragon"
             ]
@@ -957,7 +959,10 @@
               "type": "string"
             },
             "game": {
-              "$ref": "#/components/schemas/StarGame"
+              "oneOf": [
+                {"$ref": "#/components/schemas/StarGame"},
+                {"$ref": "#/components/schemas/GeneratedMetadata"}
+              ]
             }
           }
         }
@@ -1013,7 +1018,10 @@
             ]
           },
           "game": {
-            "$ref": "#/components/schemas/StarGame"
+            "oneOf": [
+              {"$ref": "#/components/schemas/StarGame"},
+              {"$ref": "#/components/schemas/GeneratedMetadata"}
+            ]
           },
           "name": {
             "type": "string"
@@ -1024,7 +1032,8 @@
         "type": "object",
         "properties": {
           "kind": {
-            "const": "generated-module-v1"
+            "type": "string",
+            "enum": ["generated-module-v1", "generated-module-v2"]
           },
           "title": {
             "type": "string"

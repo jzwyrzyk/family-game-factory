@@ -1,4 +1,4 @@
-export type GameId = 'gum' | 'buckets' | 'dragon';
+export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill';
 export type Difficulty = 'gentle' | 'classic' | 'stretch';
 export type Mechanics = Record<string, number | boolean>;
 export interface Mechanic {
@@ -21,6 +21,8 @@ export interface GameInstance {
 export interface GameContext {
   persistence?: {load():unknown;save(state:unknown):boolean};
   difficulty: Difficulty; config: Mechanics; finish(result: RoundResult): void;
+  /** Local gameplay events for coordinated learning/coaching; never a network request. */
+  emit?(event: { type: 'checkpoint' | 'mechanic' | 'pause' | 'resume'; name: string; value?: number }): void;
 }
 export interface GamePlugin {
   manifest: Manifest;

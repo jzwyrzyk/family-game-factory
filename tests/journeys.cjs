@@ -36,6 +36,10 @@ const fs = require('node:fs');
  // Every original game and each difficulty can launch and exit.
  for(const game of ['gum','buckets','dragon'])for(const difficulty of ['gentle','classic','stretch']){
  await nav('🎛️ Remix');await page.selectOption('#remixGame',game);await page.selectOption('#remixDifficulty',difficulty);await page.click('#playRemix');await page.waitForSelector('#page-game:not(.hidden)');
+ // This loop verifies the retained original engines. Preserve the chosen UI
+ // difficulty, then deliberately select the older construction revision. The
+ // physical workshop has its own quality and required-learning journeys.
+ if(game==='gum')await page.evaluate(()=>FG.app.openGame('gum',{config:{...FG.runtime.snapshot().config,qualityVersion:0,originalRules:true}}));
  assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),false,'Opening another game must release an earlier checkpoint’s input lock');
  if(game==='gum')assert.ok(await page.locator('.builder-piece').count()>0);
  if(game==='dragon'){await page.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await page.locator('#startBtn').click();assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.dragonHP),2)}
@@ -58,7 +62,7 @@ const fs = require('node:fs');
  // Profile-specific remixes; legacy v1 backups without new fields still load.
  await nav('🎛️ Remix');await page.selectOption('#remixGame','dragon');assert.equal(await page.inputValue('#remixDifficulty'),'stretch');await page.locator('.profile-choice').nth(1).click();assert.equal(await page.inputValue('#remixDifficulty'),'classic');
  // Complete a builder level and continue, without changing the first profile's history.
- await page.evaluate(()=>{FG.store.changeProfile({rate:8});FG.app.openGame('gum')});
+ await page.evaluate(()=>{FG.store.changeProfile({rate:8});FG.app.openGame('gum',{config:{qualityVersion:0,originalRules:true,highlightMatches:false,extraDecoys:0}})});
  await page.getByRole('button',{name:'Add Bottle',exact:true}).click();
  for(const [piece,key] of [['Cone','ArrowUp'],['Spoon','ArrowLeft'],['Paddle','ArrowRight'],['Fan','ArrowDown']]){
   await page.getByRole('button',{name:'Add '+piece,exact:true}).click();for(let i=0;i<10;i++)await page.keyboard.press(key);

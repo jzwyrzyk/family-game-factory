@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { StudioNotebook,STUDIO_KEY,validateNotebook } from '../src/studio/notebook';
-import { StudioGames } from '../src/studio/adapter';
+import { StudioGames, isGeneratedRemoteKind } from '../src/studio/adapter';
+import { installStudioRemixRouting } from '../src/studio/host-navigation';
+import { installRemixFallback } from '../src/factory/remix-routing';
 import { defaults } from '../src/runtime/manifests';
 class Memory {
  data=new Map<string,string>();fail=false;
@@ -20,6 +22,14 @@ test('unknown schema does not erase original storage',()=>{const bad=new Memory(
 test('quota failure is atomic',()=>{const prior=storage.getItem(STUDIO_KEY);storage.fail=true;assert.throws(()=>notebook.update(s.id,owner,x=>{x.name='lost';}));storage.fail=false;assert.equal(storage.getItem(STUDIO_KEY),prior);});
 test('stale notebook instance re-reads latest state',()=>{const a=new StudioNotebook(storage),b=new StudioNotebook(storage);a.message(s.id,owner,'child','one');b.message(s.id,owner,'child','two');assert.equal(a.get(s.id,owner).messages.at(-1)?.text,'two');assert.equal(a.get(s.id,owner).messages.at(-2)?.text,'one');});
 test('backup restores drafts but rejects invalid preview data',()=>{const backup=notebook.read();const target=new StudioNotebook(new Memory());target.restore(backup);assert.equal(target.get(s.id,owner).candidate?.id,'candidate1');const bad=structuredClone(backup);bad.sessions[0].candidate!.config={count:NaN};assert.throws(()=>target.restore(bad));});
+test('background builds preserve the selected test and new draft through reload',()=>{
+ const memory=new Memory(),book=new StudioNotebook(memory),session=book.create(owner,'hill','My experiments','ride-project');
+ const first={id:'test-one',baseId:'main-one',config:{enginePower:1.2},prompt:'More power',summary:'Power test'};
+ book.saveExperiment(session.id,owner,first);book.update(session.id,owner,x=>{x.draft='A newer idea I am still typing';x.job={id:'job-two',api:'https://workshop.test',status:'ready',revisionId:'ready-two'};});
+ book.saveExperiment(session.id,owner,{id:'test-two',baseId:'main-one',remoteId:'ready-two',prompt:'Different scene',summary:'Scene test'},[],'redesign','child',false);
+ const loaded=new StudioNotebook(memory).get(session.id,owner);assert.equal(loaded.candidate?.id,'test-one');assert.equal(loaded.selectedTest,'test-one');assert.equal(loaded.draft,'A newer idea I am still typing');assert.equal(loaded.experiments?.length,2);assert.equal(loaded.job?.revisionId,'ready-two');
+ book.selectExperiment(session.id,owner,'test-two');assert.equal(book.get(session.id,owner).candidate?.remoteId,'ready-two');assert.equal(book.get(session.id,owner).remoteId,null,'opening a ready test does not promote it');
+});
 const gameStorage=new Memory();let child:any={id:owner,skills:{'mul:8x7':{tries:5,right:3}},constructionStates:{}};let canSave=true;
 const fg={store:{current:()=>child,save:()=>canSave}};
 const games=new StudioGames(gameStorage as unknown as Storage,fg);
@@ -35,4 +45,58 @@ test('save as new preserves source and play state',()=>{const fork=games.fork(ow
 test('state save failure restores working pointer',()=>{canSave=false;assert.throws(()=>games.keep(owner,game.id,kept.id,{...nextConfig,gumBudget:16},'failure','','candidateA'));canSave=true;assert.equal(games.revision(game.id,owner).id,kept.id);});
 test('math evidence never modified',()=>{assert.deepEqual(child.skills,{'mul:8x7':{tries:5,right:3}});});
 test('profile isolation in state copying',()=>{child={...child,id:'player2'};assert.throws(()=>games.clonePlayState(owner,original.id,'cross-profile'));});
-console.log(`${passed} studio unit tests passed.`);
+test('hill notebooks reload and restore without changing prior games or accepting unknown game IDs',()=>{
+ const memory=new Memory(),book=new StudioNotebook(memory),ride=book.create(owner,'hill','My hill ride','hill-project');
+ book.message(ride.id,owner,'child','Try larger wheels');book.update(ride.id,owner,x=>{x.draft='Keep the soft springs';});
+ const reopened=new StudioNotebook(memory);assert.equal(reopened.get(ride.id,owner).game,'hill');assert.equal(reopened.get(ride.id,owner).draft,'Keep the soft springs');
+ const restored=new StudioNotebook(new Memory());restored.restore(book.read());assert.deepEqual(restored.get(ride.id,owner),book.get(ride.id,owner));
+ const bad=book.read() as any;bad.sessions[0].game='__proto__';assert.throws(()=>validateNotebook(bad));
+ assert.equal(notebook.get(s.id,owner).game,'buckets');
+});
+test('ride experiments preserve setup, paint and saved progress independently of the main version',()=>{
+ const memory=new Memory(),profile:any={id:owner,constructionStates:{}},adapter=new StudioGames(memory as unknown as Storage,{store:{current:()=>profile,save:()=>true}});
+ const project=adapter.create(owner,'hill','My hill ride',defaults('hill')),main=adapter.revision(project.id,owner);
+ profile.constructionStates[main.id]={qualityConstruction:{schema:'quality-hill-v1',track:'ridge',paint:'#50a89a',best:{ridge:19}}};
+ adapter.clonePlayState(owner,main.id,'hill-test');profile.constructionStates['hill-test'].qualityConstruction.best.ridge=24;
+ assert.equal(profile.constructionStates[main.id].qualityConstruction.best.ridge,19);
+ const next=adapter.keep(owner,project.id,main.id,{...main.config,wheelSize:.57},'Bigger wheels','','hill-test');
+ assert.equal(adapter.revision(project.id,owner).config.wheelSize,.57);
+ assert.deepEqual(profile.constructionStates[next.id].qualityConstruction,{schema:'quality-hill-v1',track:'ridge',paint:'#50a89a',best:{ridge:24}});
+ assert.equal(adapter.revision(project.id,owner,main.id).config.wheelSize,.52);
+});
+test('both generated module versions keep the generated builder discriminator',()=>{
+ assert.equal(isGeneratedRemoteKind('generated-module-v1'),true);assert.equal(isGeneratedRemoteKind('generated-module-v2'),true);
+ assert.equal(isGeneratedRemoteKind('star-catcher-v1'),false);assert.equal(isGeneratedRemoteKind(undefined),false);
+});
+// Exercise actual EventTarget registration order. A synthetic capture-first
+// dispatcher would miss the direct-window dispatch that failed in Chromium CI.
+async function routingTests(){
+ const events=new EventTarget(),requests:(string|undefined)[]=[];let legacy=0;
+ const removeLegacy=installRemixFallback(()=>legacy++,events);
+ const removeStudio=installStudioRemixRouting({activeGame:()=> 'hill',openRequest:prompt=>requests.push(prompt)},events);
+ const event=new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:'Make the wheels bigger'}});
+ assert.equal(events.dispatchEvent(event),false,'Studio claims the request during dispatch');
+ await Promise.resolve();
+ test('a later Studio listener consumes a garage prompt before the already-registered fallback runs',()=>{
+  assert.equal(event.defaultPrevented,true);assert.deepEqual(requests,['Make the wheels bigger']);assert.equal(legacy,0);
+ });
+ events.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));await Promise.resolve();
+ test('an embedded Improve request opens Studio without invoking the legacy host',()=>{assert.deepEqual(requests,['Make the wheels bigger',undefined]);assert.equal(legacy,0);});
+ removeStudio();events.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));await Promise.resolve();
+ test('native remix still runs once when Studio is uninstalled',()=>{assert.equal(legacy,1);assert.equal(requests.length,2);});
+ events.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));removeLegacy();await Promise.resolve();
+ test('uninstalling the fallback cancels its already-queued action',()=>assert.equal(legacy,1));
+
+ const otherEvents=new EventTarget();let active=true,otherRequests=0,otherLegacy=0;
+ const stopFallback=installRemixFallback(()=>otherLegacy++,otherEvents);
+ const stopStudio=installStudioRemixRouting({activeGame:()=>active?'hill':null,openRequest:()=>otherRequests++},otherEvents);
+ otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'gum',prompt:'More gum'}}));
+ active=false;otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));
+ active=true;otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:{unexpected:true}}}));
+ otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{detail:{game:'hill'}}));await Promise.resolve();
+ test('foreign games, inactive sessions, malformed prompts and noncancelable events keep their existing host',()=>{assert.equal(otherRequests,0);assert.equal(otherLegacy,4);});
+ const claimed=new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}});claimed.preventDefault();otherEvents.dispatchEvent(claimed);await Promise.resolve();
+ test('a request already claimed by another host runs neither Studio nor fallback',()=>{assert.equal(otherRequests,0);assert.equal(otherLegacy,4);});
+ stopStudio();stopFallback();console.log(`${passed} studio unit tests passed.`);
+}
+void routingTests().catch(error=>{console.error(error);process.exitCode=1;});

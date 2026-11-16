@@ -43,7 +43,7 @@ export function migrateWorkspace(value: unknown): Workspace {
   const d=empty();
   for (const g of old.games) {
     if (!isGameId(g.game)) throw Error('Unknown game in v1 workspace.');
-    const revisionId=id();d.projects.push({id:g.id,owner:g.owner,game:g.game,name:g.name,headId:revisionId});
+    const revisionId:string=id();d.projects.push({id:g.id,owner:g.owner,game:g.game,name:g.name,headId:revisionId});
     d.revisions.push({id:revisionId,projectId:g.id,parentId:null,config:validateConfig(g.game,g.config),label:'Migrated version',hypothesis:'',createdAt:new Date().toISOString(),state:'private'});
   }
   return validateWorkspace(d);
@@ -65,21 +65,21 @@ export class RevisionStore {
   revision(projectId:string,owner:string,revisionId?:string):Revision {const p=this.project(projectId,owner);const r=this.data.revisions.find(r=>r.id===(revisionId||p.headId)&&r.projectId===p.id);if(!r)throw Error('Version not found.');return copy(r);}
   list(owner:string):Project[]{return copy(this.data.projects.filter(p=>p.owner===owner));}
   history(projectId:string,owner:string):Revision[]{this.project(projectId,owner);return copy(this.data.revisions.filter(r=>r.projectId===projectId));}
-  create(owner:string,game:GameId,name:string,config=defaults(game)):Project {
+  create(owner:string,game:GameId,name:string,config=defaults(game),revisionId:string=id()):Project {
     const checked=validateConfig(game,config);
-    return this.transaction(d=>{const projectId=id(),revisionId=id();const p={id:projectId,owner,game,name:name.trim().slice(0,60)||'My remix',headId:revisionId};d.projects.push(p);d.revisions.push({id:revisionId,projectId,parentId:null,config:checked,label:'Starting game',hypothesis:'',createdAt:new Date().toISOString(),state:'private'});return p;});
+    return this.transaction(d=>{const projectId=id();const p={id:projectId,owner,game,name:name.trim().slice(0,60)||'My remix',headId:revisionId};d.projects.push(p);d.revisions.push({id:revisionId,projectId,parentId:null,config:checked,label:'Starting game',hypothesis:'',createdAt:new Date().toISOString(),state:'private'});return p;});
   }
-  commit(projectId:string,owner:string,config:Mechanics,label:string,hypothesis=''):Revision {
+  commit(projectId:string,owner:string,config:Mechanics,label:string,hypothesis='',revisionId:string=id()):Revision {
     const p=this.project(projectId,owner),checked=validateConfig(p.game,config);
-    return this.transaction(d=>{const revision={id:id(),projectId,parentId:p.headId,config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);d.projects.find(x=>x.id===p.id)!.headId=revision.id;return revision;});
+    return this.transaction(d=>{const revision={id:revisionId,projectId,parentId:p.headId,config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);d.projects.find(x=>x.id===p.id)!.headId=revision.id;return revision;});
   }
   keep(projectId:string,owner:string):void {const p=this.project(projectId,owner);this.transaction(d=>{d.projects.find(x=>x.id===p.id)!.keptId=p.headId;return true;});}
   checkout(projectId:string,owner:string,revisionId:string):void {this.revision(projectId,owner,revisionId);this.transaction(d=>{d.projects.find(p=>p.id===projectId)!.headId=revisionId;return true;});}
   undo(projectId:string,owner:string):void {const r=this.revision(projectId,owner);if(!r.parentId)throw Error('You are at the starting version.');this.checkout(projectId,owner,r.parentId);}
   redo(projectId:string,owner:string,childId?:string):void {const current=this.revision(projectId,owner);const children=this.history(projectId,owner).filter(r=>r.parentId===current.id);const next=childId?children.find(r=>r.id===childId):children.at(-1);if(!next)throw Error('No later change on this branch. Choose another version in Compare.');this.checkout(projectId,owner,next.id);}
-  fork(projectId:string,owner:string,name:string):Project {
+  fork(projectId:string,owner:string,name:string,revisionId:string=id()):Project {
     const p=this.project(projectId,owner),r=this.revision(projectId,owner);
-    return this.transaction(d=>{const project={id:id(),owner,game:p.game,name:name.trim().slice(0,60)||'My new remix',headId:id()};d.projects.push(project);d.revisions.push({...r,id:project.headId,projectId:project.id,parentId:null,sourceRevisionId:r.id,label:'Saved as a new game'});return project;});
+    return this.transaction(d=>{const project={id:id(),owner,game:p.game,name:name.trim().slice(0,60)||'My new remix',headId:revisionId};d.projects.push(project);d.revisions.push({...r,id:project.headId,projectId:project.id,parentId:null,sourceRevisionId:r.id,label:'Saved as a new game'});return project;});
   }
   record(projectId:string,owner:string,revisionId:string,outcome:PlayOutcome):PlayRecord {
     this.revision(projectId,owner,revisionId);

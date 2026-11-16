@@ -15,6 +15,9 @@ installOffline();
 import {installDrawings} from './assets/ui';
 installDrawings();
 
+import {installQualityCards} from './quality/cards';
+installQualityCards();
+
 // Opt-in review: same runtime and backend, one persistent creative workspace.
 import {installStudio} from "./studio/ui";
 import {installStudioHostNavigation} from "./studio/host-navigation";

@@ -71,7 +71,15 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   root.append(feedback);
   const support=el('div','math-support-actions'),hintButton=button('Give me a hint'),showButton=button('Show me how');
   hintButton.dataset.action='hint';showButton.dataset.action='show-solution';support.append(hintButton,showButton);root.append(support);
-  const hintPanel=el('section','math-hint');hintPanel.hidden=true;hintPanel.setAttribute('aria-label','Math help');
+  const hintPanel=el('section','math-hint');hintPanel.hidden=true;
+  const hintTitle=el('h3'),hintText=el('p'),helpActions=el('div','math-help-actions');
+  hintTitle.id=`${prefix}-help-title`;hintTitle.tabIndex=-1;hintText.id=`${prefix}-help-text`;
+  hintTitle.setAttribute('aria-describedby',hintText.id);hintPanel.setAttribute('aria-labelledby',hintTitle.id);
+  // Automatic hints announce their reasoning without moving an answer control.
+  // Explicit help moves to the described heading so its text is read once.
+  const helpAnnouncement=el('div','math-sr-only');helpAnnouncement.dataset.mathAnnouncement='help';
+  helpAnnouncement.setAttribute('role','status');helpAnnouncement.setAttribute('aria-live','polite');helpAnnouncement.setAttribute('aria-atomic','true');
+  root.append(helpAnnouncement);
   root.append(hintPanel);
   const saveWarning=el('p','math-save-warning','This device could not save your practice. Ask a grown-up before closing this page.');
   saveWarning.hidden=true;saveWarning.setAttribute('role','alert');root.append(saveWarning);
@@ -86,6 +94,29 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   // Math controls keep their native keyboard behavior without also sending
   // Space, Enter, or arrow keys to the paused game's document handlers.
   on(root,'keydown',event=>event.stopPropagation());on(root,'keyup',event=>event.stopPropagation());
+  function reveal(node:HTMLElement,block:ScrollLogicalPosition='nearest') {
+    if(disposed||!root.isConnected||!root.getClientRects().length)return false;
+    node.scrollIntoView({block,inline:'nearest',behavior:'instant'});return true;
+  }
+  function focusAndReveal(node:HTMLElement,block:ScrollLogicalPosition='nearest') {
+    if(!reveal(node,block))return false;
+    node.focus({preventScroll:true});return document.activeElement===node;
+  }
+  function focusQuestion() {
+    if(done||!reveal(root,'start'))return false;
+    title.focus({preventScroll:true});return document.activeElement===title;
+  }
+  function returnToAnswer() {
+    const area=answerArea.hidden?interactionArea:answerArea;
+    const control=area.querySelector<HTMLElement>('input:not([hidden]),button:not(:disabled)');
+    if(control)focusAndReveal(control);else focusQuestion();
+  }
+  function presentHelp(heading:string,text:string) {
+    hintPanel.hidden=false;hintTitle.textContent=heading;hintText.textContent=text;
+    helpActions.replaceChildren();hintPanel.replaceChildren(hintTitle,hintText);
+    const back=button('Back to my answer');back.dataset.action='back-to-answer';
+    on(back,'click',returnToAnswer);helpActions.append(back);
+  }
   function complete(outcome:MathActivityResult['outcome'], independent=false) {
     if(disposed||done)return;
     done=true;locked=true;
@@ -98,22 +129,25 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     if(disposed||done||locked)return;
     hintDepth=Math.max(hintDepth,item.hints.length+1);
     useHint(options.profile,attempt.id,hintDepth);save();
-    hintPanel.hidden=false;hintPanel.replaceChildren(el('h3',undefined,'Let’s work it out together'),el('p',undefined,item.workedExample));
+    presentHelp('Let’s work it out together',item.workedExample);
     const visual=item.hints.at(-1)?.visual;
     if(visual)hintPanel.append(renderMathVisual(visual));
     const continueButton=button('Continue playing','math-primary');continueButton.dataset.action='continue-supported';
-    on(continueButton,'click',()=>complete('shown',false));hintPanel.append(continueButton);
+    on(continueButton,'click',()=>complete('shown',false));helpActions.prepend(continueButton);hintPanel.append(helpActions);
     feedback.textContent='You can use this example. We’ll try a related idea another time.';feedback.dataset.state='support';
     hintButton.disabled=true;showButton.disabled=true;
-    continueButton.focus({preventScroll:true});
+    helpAnnouncement.textContent='';focusAndReveal(hintTitle,'start');
   }
-  function revealHint() {
+  function revealHint(requested=false) {
     if(disposed||done||locked)return;
     if(hintDepth>=item.hints.length){showWorked();return;}
     const hint=item.hints[hintDepth++];useHint(options.profile,attempt.id,hintDepth);save();
-    hintPanel.hidden=false;hintPanel.replaceChildren(el('h3',undefined,`Hint ${hintDepth} of ${item.hints.length}`),el('p',undefined,hint.text));
+    presentHelp(`Hint ${hintDepth} of ${item.hints.length}`,hint.text);
     if(hint.visual)hintPanel.append(renderMathVisual(hint.visual));
+    hintPanel.append(helpActions);
     hintButton.textContent=hintDepth<item.hints.length?'Another hint':'Show how to finish';
+    if(requested){helpAnnouncement.textContent='';focusAndReveal(hintTitle,'start');}
+    else helpAnnouncement.textContent=`Hint ${hintDepth}. ${hint.text}`;
   }
   function submit(raw:string) {
     if(disposed||done||locked)return;
@@ -132,7 +166,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     if(errors>=3){showWorked();return;}
     if(options.profile.hints!==false)revealHint();
   }
-  on(hintButton,'click',revealHint);on(showButton,'click',showWorked);
+  on(hintButton,'click',()=>revealHint(true));on(showButton,'click',showWorked);
 
   const form=el('form','math-answer-form');form.noValidate=true;
   const input=el('input','math-answer-input');input.id=options.legacyIds?'math-answer':`${prefix}-answer`;
@@ -182,14 +216,16 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     if(kind==='answer'&&mode==='interaction')prompt.textContent='This idea uses a written answer. You can still explore the hints.';
   }
   function setPath(interactive:boolean){const usable=kind==='quantity'||kind==='fraction';interactionArea.hidden=!interactive||!usable;answerArea.hidden=interactive&&usable;typeTab.setAttribute('aria-pressed',String(!interactive));buildTab.setAttribute('aria-pressed',String(interactive));}
-  on(typeTab,'click',()=>{setPath(false);input.focus({preventScroll:true});});on(buildTab,'click',()=>setPath(true));
+  on(typeTab,'click',()=>{setPath(false);returnToAnswer();});on(buildTab,'click',()=>{setPath(true);returnToAnswer();});
   // Showing the model first makes visual-form evidence truthful in both mode,
   // even when the child later chooses the written response for the same item.
   setPath(mode!=='checkpoint');
-  if(mode!=='checkpoint'&&(kind==='quantity'||kind==='fraction'))title.focus({preventScroll:true});else if(!input.hidden)input.focus({preventScroll:true});else title.focus({preventScroll:true});
+  // A question is the entry point, including on touch devices. Focusing a text
+  // input here would open the software keyboard before the child can read it.
+  focusQuestion();
 
   return {
-    item, attemptId:attempt.id,
+    item, attemptId:attempt.id, focus:focusQuestion,
     dispose(reason:'interrupted'='interrupted') {
       if(disposed)return;disposed=true;if(completionTimer)clearTimeout(completionTimer);listeners.abort();
       if(!done){finishAttempt(options.profile,attempt.id,reason);save();}

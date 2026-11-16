@@ -20,3 +20,12 @@ import './learning-engine.test';
 import './learning-policy.test';
 
 import './learning-builder-contract.test';
+import './quality-runtime.test';
+import './quality-physics.test';
+
+import './quality-generated.test';
+
+import './quality-clock.test';
+
+import './learning-runtime.test';
+import './generated-v1-playtest.test';

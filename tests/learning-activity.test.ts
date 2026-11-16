@@ -15,9 +15,9 @@ before(async()=>{
 });
 after(async()=>{await browser?.close();});
 
-async function mount(item:MathItem,mode:LearningMode='checkpoint',hints=false,challenge=false) {
-  const page=await browser.newPage({viewport:{width:390,height:850}});
-  await page.setContent(`<style>body{margin:0;background:#10132d;font-family:system-ui}button,input{font:inherit}*{box-sizing:border-box}${styles}</style><main id="mount"></main>`);
+async function mount(item:MathItem,mode:LearningMode='checkpoint',hints=false,challenge=false,layout:{offset?:number;height?:number}={}) {
+  const page=await browser.newPage({viewport:{width:390,height:layout.height||850}});
+  await page.setContent(`<style>html{scroll-behavior:smooth}body{margin:0;background:#10132d;font-family:system-ui}button,input{font:inherit}*{box-sizing:border-box}${styles}</style><header style="height:${layout.offset||0}px"></header><main id="mount"></main><footer style="height:200px"></footer>`);
   await page.addScriptTag({content:bundle});
   await page.evaluate(({item,mode,hints,challenge})=>{
     const w=window as any;w.profile={id:'test-child',grade:4,age:9,skills:{},hints};w.results=[];w.saves=0;
@@ -29,6 +29,69 @@ async function mount(item:MathItem,mode:LearningMode='checkpoint',hints=false,ch
 }
 const multiply=()=>generateItem('g3-multiply',{factId:'mul:8x7',representation:'symbolic',random:()=>0});
 async function evidence(page:Page){return page.evaluate(()=>{const w=window as any;return {profile:w.profile,results:w.results,saves:w.saves};});}
+
+test('a below-fold question receives visible heading focus without opening a text input',async()=>{
+  const page=await mount(multiply(),'checkpoint',false,false,{offset:1100,height:568});try{
+    const state=await page.locator('.math-activity h2').evaluate(node=>{
+      const box=node.getBoundingClientRect();return {focused:document.activeElement===node,top:box.top,bottom:box.bottom,height:innerHeight,scroll:scrollY};
+    });
+    assert.equal(state.focused,true);assert.ok(state.scroll>0);assert.ok(state.top>=0&&state.bottom<=state.height,'the actual question is in the mobile viewport');
+    assert.equal(await page.locator('#math-answer').evaluate(node=>document.activeElement===node),false,'entry does not request the software keyboard');
+    await page.keyboard.press('Tab');assert.equal(await page.locator('#math-answer').evaluate(node=>document.activeElement===node),true,'the next keyboard step reaches the answer');
+    const e=await evidence(page);assert.equal(e.profile.learning.attempts.length,1);assert.equal(e.profile.learning.attempts[0].answers.length,0);
+  }finally{await page.close();}
+});
+
+test('requested hints expose their reasoning and offer a visible way back to the same answer',async()=>{
+  const item=multiply(),page=await mount(item,'checkpoint',false,false,{offset:900,height:568});try{
+    const id=await page.locator('.math-activity').getAttribute('data-attempt-id');
+    await page.getByRole('button',{name:'Give me a hint',exact:true}).click();
+    const help=await page.locator('.math-hint h3').evaluate(node=>{
+      const box=node.getBoundingClientRect(),description=document.getElementById(node.getAttribute('aria-describedby')||'');
+      return {focused:document.activeElement===node,text:description?.textContent,top:box.top,bottom:box.bottom,height:innerHeight};
+    });
+    assert.equal(help.focused,true);assert.equal(help.text,item.hints[0].text);assert.ok(help.top>=0&&help.bottom<=help.height);
+    await page.getByRole('button',{name:'Back to my answer',exact:true}).click();
+    const answer=await page.locator('#math-answer').evaluate(node=>{const box=node.getBoundingClientRect();return {focused:document.activeElement===node,visible:box.top>=0&&box.bottom<=innerHeight};});
+    assert.deepEqual(answer,{focused:true,visible:true});assert.equal(await page.locator('.math-activity').getAttribute('data-attempt-id'),id);
+    const e=await evidence(page);assert.equal(e.profile.learning.attempts[0].answers.length,0);assert.equal(e.profile.learning.attempts[0].hintLevel,1);
+  }finally{await page.close();}
+});
+
+test('automatic hints announce the reasoning while keeping the current answer control',async()=>{
+  const item=multiply(),page=await mount(item,'checkpoint',true);try{
+    await page.fill('#math-answer','55');await page.click('#math-submit');
+    assert.equal(await page.locator('#math-submit').evaluate(node=>document.activeElement===node),true);
+    const announcement=page.locator('[data-math-announcement="help"]');
+    assert.equal(await announcement.getAttribute('aria-live'),'polite');assert.equal(await announcement.getAttribute('aria-atomic'),'true');
+    assert.equal(await announcement.textContent(),`Hint 1. ${item.hints[0].text}`);
+    const e=await evidence(page);assert.equal(e.profile.learning.attempts[0].answers.length,1);assert.equal(e.profile.learning.attempts[0].hintLevel,1);
+  }finally{await page.close();}
+});
+
+test('worked examples focus the explanation before a keyboard continuation',async()=>{
+  const item=multiply(),page=await mount(item,'checkpoint',false,false,{offset:900,height:568});try{
+    for(let i=0;i<3;i++){await page.fill('#math-answer','1');await page.click('#math-submit');}
+    const help=await page.locator('.math-hint h3').evaluate(node=>{
+      const box=node.getBoundingClientRect();return {focused:document.activeElement===node,text:document.getElementById(node.getAttribute('aria-describedby')||'')?.textContent,visible:box.top>=0&&box.bottom<=innerHeight};
+    });
+    assert.deepEqual(help,{focused:true,text:item.workedExample,visible:true});
+    await page.keyboard.press('Tab');assert.equal(await page.locator('[data-action=continue-supported]').evaluate(node=>document.activeElement===node),true);
+    await page.keyboard.press('Enter');const e=await evidence(page);
+    assert.equal(e.results.length,1);assert.equal(e.results[0].outcome,'shown');assert.equal(e.results[0].independent,false);assert.equal(e.profile.learning.attempts[0].answers.length,3);
+  }finally{await page.close();}
+});
+
+test('focus recovery does not revive a disposed activity or steal navigation focus',async()=>{
+  const page=await mount(multiply());try{
+    const recovered=await page.evaluate(()=>{
+      const w=window as any,exit=document.createElement('button');exit.id='left-math';exit.textContent='My games';document.body.append(exit);exit.focus();w.activity.dispose();
+      return {focused:w.activity.focus(),active:document.activeElement?.id};
+    });
+    assert.deepEqual(recovered,{focused:false,active:'left-math'});
+    const e=await evidence(page);assert.equal(e.profile.learning.attempts[0].outcome,'interrupted');assert.equal(e.results.length,0);
+  }finally{await page.close();}
+});
 
 test('help is available before an error and the successful answer remains assisted',async()=>{
   const page=await mount(multiply());try{
