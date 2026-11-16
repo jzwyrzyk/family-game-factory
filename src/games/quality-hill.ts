@@ -3,6 +3,7 @@ import { createVehicle, TRACKS, type VehicleSnapshot, type VehicleOptions } from
 import { createFixedClock, interpolateBody } from '../quality/clock';
 import { createGameAudio } from '../quality/audio';
 import { drawLandscape, drawPart, drawFlag, palette } from '../quality/art';
+import {loadActiveCar,type DrawnCar} from '../drawing/rally';
 
 type Mode = 'ready' | 'drive' | 'result';
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; size: number }
@@ -31,6 +32,8 @@ export default class QualityHill implements GameInstance {
   private onWindowResize = () => this.resize();
   private listeners = new AbortController();
   private simulation: ReturnType<typeof createVehicle>;
+  private drawnCar: DrawnCar|null = null;
+  private drawingOwner = '';
   private scene: VehicleSnapshot;
   private options: VehicleOptions;
   private mode: Mode = 'ready';
@@ -116,6 +119,15 @@ export default class QualityHill implements GameInstance {
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(stage);
     window.addEventListener('resize', this.onWindowResize, { signal: this.listeners.signal });
     this.resize(); this.resetCamera(); this.hud(); this.clock.start();
+    // Explicitly selected drawing is optional. Never reveal another profile's art;
+    // loading stays local and cannot mutate an unmounted game.
+    this.drawingOwner=String((window as any).FG?.store?.current()?.id||'');
+    if(this.drawingOwner)void loadActiveCar(this.drawingOwner).then(asset=>{
+      if(!asset||this.disposed||this.drawingOwner!==String((window as any).FG?.store?.current()?.id||''))return;
+      this.drawnCar=asset;
+      if(this.mode==='ready')this.restart();
+      else this.status.textContent='Your drawing is ready. It will appear on the next ride.';
+    }).catch(()=>{if(!this.disposed)this.status.textContent='Could not open your drawing here. The original Rally car still works.';});
   }
 
   private button(label: string, className: string, action: () => void) { const b = el('button', className, label); b.type = 'button'; b.addEventListener('click', action); return b; }
@@ -228,10 +240,21 @@ export default class QualityHill implements GameInstance {
     const bodies = this.scene.bodies.map(b => interpolateBody(b, alpha)), chassis = bodies[0];
     c.save(); c.strokeStyle = '#5e6d6d'; c.lineWidth = Math.max(2, s * .07);
     for (const wheel of bodies.slice(1)) {
-      const dx = wheel.id === 'rear-wheel' ? -.95 : .95, ax = chassis.x + Math.cos(chassis.angle) * dx, ay = chassis.y + Math.sin(chassis.angle) * dx;
+      const custom=this.drawnCar?.geometry.wheels[wheel.id==='rear-wheel'?0:1];
+      const dx = custom?.x??(wheel.id==='rear-wheel'?-.95:.95),dy=custom?.y??0;
+      const ax = chassis.x + Math.cos(chassis.angle)*dx - Math.sin(chassis.angle)*dy;
+      const ay = chassis.y + Math.sin(chassis.angle)*dx + Math.cos(chassis.angle)*dy;
       const bx = wheel.x, by = wheel.y; c.beginPath(); c.moveTo(x(ax), y(ay)); for (let i = 1; i < 8; i++) c.lineTo(x(ax + (bx - ax) * i / 8) + (i % 2 ? 3 : -3), y(ay + (by - ay) * i / 8)); c.lineTo(x(bx), y(by)); c.stroke();
     }
-    for (const body of bodies) { c.save(); c.translate(x(body.x), y(body.y)); c.rotate(body.angle); drawPart(c, body.kind, body.width * s, body.height * s, { time: elapsed, tint: this.paint }); c.restore(); }
+    for (const body of bodies) {
+      c.save();c.translate(x(body.x),y(body.y));c.rotate(body.angle);
+      const custom=this.drawnCar,part=body.id==='chassis'?custom?.pieces.body:
+        body.id==='rear-wheel'?custom?.pieces.wheels[0]:body.id==='front-wheel'?custom?.pieces.wheels[1]:undefined;
+      const sprite=part&&custom?.layers.get(part.id);
+      if(sprite)c.drawImage(sprite,-body.width*s/2,-body.height*s/2,body.width*s,body.height*s);
+      else drawPart(c,body.kind,body.width*s,body.height*s,{time:elapsed,tint:this.paint});
+      c.restore();
+    }
     for (const p of this.particles) { c.globalAlpha = clamp(p.life * 2, 0, 1); c.fillStyle = '#e4d7bb'; c.beginPath(); c.arc(x(p.x), y(p.y), p.size * s, 0, Math.PI * 2); c.fill(); }
     c.restore();
     if (this.clock?.paused) { c.fillStyle = '#edf2e2b3'; c.fillRect(0, 0, v.w, v.h); c.fillStyle = palette.ink; c.textAlign = 'center'; c.font = 'bold 25px ui-rounded, system-ui'; c.fillText('Taking a little pit stop', v.w / 2, v.h / 2 - 8); c.font = '14px system-ui'; c.fillText('Press Play or P when you’re ready.', v.w / 2, v.h / 2 + 22); }
@@ -240,11 +263,11 @@ export default class QualityHill implements GameInstance {
   isPlaying() { return !this.disposed && !this.finished && !this.hostPaused && !this.clock.paused && this.mode === 'drive'; }
   pause() { if (this.disposed || this.hostPaused) return false; this.hostPaused = true; this.clearInput(); this.clock.pause('host'); return true; }
   resume() { if (!this.hostPaused) return; this.hostPaused = false; this.clock.resume('host'); }
-  restart() { if (this.disposed || this.hostPaused) return; this.manualPause = false; this.save(); this.clearInput(); this.simulation.dispose(); this.simulation = createVehicle(this.options, this.track); this.scene = this.simulation.snapshot(); this.mode = 'ready'; this.finished = false; this.particles = []; this.result.hidden = true; this.driveButton.textContent = 'Let’s drive →'; this.driveButton.disabled = false; this.audio.setMotor(0); this.audio.setScene('build'); this.clock.resume('user'); this.clock.resume('host'); this.resetCamera(); this.hud(); }
+  restart() { if (this.disposed || this.hostPaused) return; this.manualPause = false; this.save(); this.clearInput(); this.simulation.dispose(); this.simulation = createVehicle(this.options, this.track, this.drawnCar?.geometry); this.scene = this.simulation.snapshot(); this.mode = 'ready'; this.finished = false; this.particles = []; this.result.hidden = true; this.driveButton.textContent = 'Let’s drive →'; this.driveButton.disabled = false; this.audio.setMotor(0); this.audio.setScene('build'); this.clock.resume('user'); this.clock.resume('host'); this.resetCamera(); this.hud(); }
   retry() { this.restart(); }
   next() { const tracks = Object.keys(TRACKS); this.track = tracks[(tracks.indexOf(this.track) + 1) % tracks.length]; this.trackSelect.value = this.track; this.save(); this.restart(); }
   snapshot() { return { engine: 'quality-hill-v1', mode: this.mode, paused: this.clock.paused, hostPaused: this.hostPaused, track: this.track, options: { ...this.options }, paint: this.paint,
     distance: this.scene.distance, status: this.scene.status, time: this.scene.time, bodies: this.scene.bodies, best: { ...this.best }, grounded: this.scene.grounded, speed: this.scene.speed,
-    inputActive: this.keys.size + this.pedals.size, performance: this.clock.stats, resources: { bodies: 3, joints: 2, particles: this.particles.length }, storageBlocked: this.storageBlocked }; }
+    inputActive: this.keys.size + this.pedals.size, drawingRigId: this.drawnCar?.rigId??null, performance: this.clock.stats, resources: { bodies: 3, joints: 2, particles: this.particles.length }, storageBlocked: this.storageBlocked }; }
   unmount() { if (this.disposed) return; this.disposed = true; this.save(); this.clock.dispose(); this.audio.dispose(); this.simulation.dispose(); this.resizeObserver.disconnect(); this.listeners.abort(); this.clearInput(); this.mount.replaceChildren(); }
 }
