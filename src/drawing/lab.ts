@@ -15,7 +15,10 @@ const button=(label:string,action:()=>void)=>{const b=document.createElement('bu
 
 /** On-device component editor. No service, model call, upload or hidden asset publishing. */
 export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>void){
+ const stillOwner=()=>String((window as any).FG?.store?.current()?.id||'')===owner;
+ if(!stillOwner())throw Error('That drawing belongs to another player.');
  const image=await createImageBitmap(drawingBlob(source));
+ if(!stillOwner()){image.close();throw Error('The active player changed. Open your own drawings.');}
  const sourceCanvas=document.createElement('canvas');
  const shrink=Math.min(1,768/Math.max(image.width,image.height));
  sourceCanvas.width=Math.max(1,Math.round(image.width*shrink));sourceCanvas.height=Math.max(1,Math.round(image.height*shrink));
@@ -42,6 +45,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  const historyInput=q<HTMLSelectElement>(working,'[data-history]');
  for(const role of roles){const o=document.createElement('option');o.value=role;o.textContent=role.charAt(0).toUpperCase()+role.slice(1);roleInput.append(o);}
  let kind:DrawingKind='car',assembly:DrawingAssembly,selected='',mode:'edit'|'play'='edit',disposed=false;
+ const onProfile=()=>{if(!stillOwner())working.close();};
+ window.addEventListener('factory-profile',onProfile);
  let pendingNew=false,history:SavedRig|null=null,lastStored:SavedRig|null=null;
  let drag:null|{pointer:number;type:'create'|'move'|'resize';id:string;startX:number;startY:number;before:DrawingAssembly} = null;
  const undo:DrawingAssembly[]=[];
@@ -234,7 +239,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  canvas.addEventListener('pointercancel',e=>{if(!drag||drag.pointer!==e.pointerId)return;assembly=drag.before;drag=null;layerCache.clear();refresh();});
  q<HTMLButtonElement>(working,'[data-close]').addEventListener('click',()=>working.close());
  working.addEventListener('close',()=>{
-  disposed=true;stopPlay();imageRect={x:0,y:0,w:1,h:1};working.remove();
+  disposed=true;stopPlay();window.removeEventListener('factory-profile',onProfile);imageRect={x:0,y:0,w:1,h:1};working.remove();
  });
  q<HTMLSelectElement>(working,'[data-kind]').addEventListener('change',e=>{
   if(mode==='play')setMode('edit');kind=(e.target as HTMLSelectElement).value as DrawingKind;
@@ -309,15 +314,16 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    validateAssembly(assembly);assemblyRig(assembly);if(kind==='car')vehicleGeometry(assembly);
    const before=lastStored;
    const copy={...assembly,revision:Math.min(10000,assembly.revision+1)};
+   if(!stillOwner())throw Error('The active player changed.');
    const saved=await saveRig(owner,copy,before?.id||history?.id||null);
-   if(disposed)return;lastStored=saved;history=saved;assembly=copy;
+   if(disposed||!stillOwner())return;lastStored=saved;history=saved;assembly=copy;
    q<HTMLButtonElement>(working,'[data-use]').disabled=kind!=='car';
    message('Saved as a new test. Your drawing and other versions are safe.');await versions();
   }catch(e){message((e as Error).message);}
  });
  q<HTMLButtonElement>(working,'[data-use]').addEventListener('click',async()=>{
-  if(!lastStored)return;
-  try{await selectRig(owner,lastStored.id);if(disposed)return;message('Your moving car is ready in Rally!');
+  if(!lastStored||!stillOwner())return;
+  try{await selectRig(owner,lastStored.id);if(disposed||!stillOwner())return;message('Your moving car is ready in Rally!');
    working.close();onPlayCar?.();
   }catch(e){message((e as Error).message);}
  });

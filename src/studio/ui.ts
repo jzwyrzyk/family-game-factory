@@ -61,7 +61,7 @@ export async function installStudio(){
  const originalNav=document.querySelector('.site-header nav') as HTMLElement;
  originalNav.hidden=true;
  const nav=el('nav','studio-nav');nav.setAttribute('aria-label','Main navigation');
- nav.innerHTML='<button id="studioNavHome">🎮 My Games</button><button id="studioNavCreate">＋ Create</button><button id="studioNavPowers">⚡ My Powers</button>';
+ nav.innerHTML='<button id="studioNavHome">🎮 My Games</button><button id="studioNavCreate">＋ Create</button><button id="studioNavDrawings">🎨 My Drawings</button><button id="studioNavPowers">⚡ My Powers</button>';
  originalNav.after(nav);document.body.classList.add('studio-review');
  const profileBar=document.querySelector('.profile-bar') as HTMLElement,profileChoices=$('profile-choices');
  const profileMenu=document.createElement('details');profileMenu.id='studioProfileMenu';profileMenu.className='studio-profile-menu';
@@ -373,6 +373,7 @@ export async function installStudio(){
  $('studioMore').querySelector('summary')!.addEventListener('click',event=>{if(guardMath())event.preventDefault();});
  $('studioHome').onclick=()=>act(home);$('studioNavHome').onclick=()=>act(home);$('studioNew').onclick=()=>act(newIdea);$('studioNavCreate').onclick=()=>act(newIdea);$('studioChooseStarter').onclick=()=>act(home);
  $('studioNavPowers').onclick=()=>act(()=>{flushDraft();disposeGame();FG.app.page('lab');route='other';});
+ $('studioNavDrawings').onclick=()=>act(()=>{flushDraft();disposeGame();FG.app.page('creations');route='other';});
  $('studioPlay').onclick=()=>act(playViewed);$('studioKeep').onclick=()=>act(keep);$('studioUndo').onclick=()=>act(undo);
  $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;});await playCandidate();return;}if(!s.projectId)return;games.redo(s.owner,s.projectId);await playWorking();});
  $('studioCompare').onclick=()=>act(()=>{if(setTab('versions'))$<HTMLDetailsElement>('studioMore').open=false;});$('studioCloseVersions').onclick=()=>act(()=>{setTab('game');focusView($('studioReturnToPlay')||$('studioPlay'));});$('studioBackWorking').onclick=()=>act(playWorking);
