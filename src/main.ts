@@ -14,3 +14,8 @@ installOffline();
 
 import {installDrawings} from './assets/ui';
 installDrawings();
+
+// Opt-in review: same runtime and backend, one persistent creative workspace.
+import {installStudio} from "./studio/ui";
+import {installStudioHostNavigation} from "./studio/host-navigation";
+void installStudio().then(installStudioHostNavigation);
