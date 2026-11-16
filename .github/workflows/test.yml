@@ -12,7 +12,35 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - name: Build production
+        id: build
+        run: npm run build
+      # These suites are independent once the production bundle exists. Preserve
+      # every failure while still collecting the rest of the required evidence.
+      - name: Unit and contract checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:unit
+      - name: Learning activities
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:learning-ui
+      - name: Learning integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:learning-integration
+      - name: Deployment configuration checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:deployment
+      - name: Arcade and sandbox journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser
+      - name: Studio journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:studio
+      - name: Design coach checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:coach
+      - name: Real agent activation status
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:real-agent
       - uses: actions/upload-artifact@v4
         if: always()
         with:

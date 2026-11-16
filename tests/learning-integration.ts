@@ -79,7 +79,9 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     const ended=(await attempts(page)).find((a:any)=>a.id===firstId);
     assert.equal(ended.outcome,'interrupted');assert.equal(ended.answers.length,1);assert.equal(ended.hintEvents.length,1);
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
-    const reloaded=(await attempts(page)).find((a:any)=>a.id===firstId);assert.deepEqual(reloaded,ended,'responses and help survive reload after abandonment');
+    // Optional undefined fields are absent in JSON storage. Compare the complete
+    // durable record, including every response and hint, across the reload.
+    const reloaded=(await attempts(page)).find((a:any)=>a.id===firstId);assert.deepEqual(reloaded,JSON.parse(JSON.stringify(ended)),'responses and help survive reload after abandonment');
 
     // Both profiles practice through the real UI; neither child's history is copied or cleared.
     const ownerHistory=JSON.stringify((await profile(page)).learning);
@@ -291,11 +293,17 @@ async function main(){
     const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}/arcade/`;
     const output=await build({entryPoints:['src/learning/remote.ts'],bundle:true,format:'iife',globalName:'PreviewLearningTest',platform:'browser',write:false});
     browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
+    const activeBrowser=browser,failures:Error[]=[];
+    const run=async(label:string,journey:()=>Promise<void>)=>{
+      try{await journey();}
+      catch(error){console.error(`FAIL integration journey: ${label}`,error);failures.push(new Error(label,{cause:error}));}
+    };
     for(const device of devices){
-      await applicationJourney(browser,base,device);
-      for(const kind of ['declarative','generated'] as const)await previewJourney(browser,base,output.outputFiles[0].text,device,kind);
+      await run(`application ${device[0]}`,()=>applicationJourney(activeBrowser,base,device));
+      for(const kind of ['declarative','generated'] as const)await run(`${kind} preview ${device[0]}`,()=>previewJourney(activeBrowser,base,output.outputFiles[0].text,device,kind));
     }
-    await recoveryJourney(browser,base);
+    await run('future-state recovery',()=>recoveryJourney(activeBrowser,base));
+    if(failures.length)throw new AggregateError(failures,`${failures.length} of 7 learning integration journeys failed`);
   }finally{await browser?.close();await new Promise<void>(resolve=>server.close(()=>resolve()));}
 }
 void main().catch(error=>{console.error(error);process.exitCode=1;});
