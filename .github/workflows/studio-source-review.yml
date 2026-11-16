@@ -12,10 +12,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Archive tracked public source only
-        run: git archive --format=zip --output=studio-source.zip HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Package lockfile-pinned dependencies only
+        run: tar -czf studio-deps.tar.gz node_modules
       - uses: actions/upload-artifact@v4
         with:
-          name: studio-source-review
-          path: studio-source.zip
+          name: studio-dependencies-review
+          path: studio-deps.tar.gz
           retention-days: 1
