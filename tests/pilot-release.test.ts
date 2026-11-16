@@ -51,4 +51,8 @@ test('gateway image and tracked build context include the new coach runtime depe
  assert.match(readFileSync('server/Dockerfile.gateway','utf8'),/COPY --chown=node:node src\/studio\/design.ts/);
  assert.match(readFileSync('.dockerignore','utf8'),/!src\/studio\/design.ts/);
  assert.match(readFileSync('scripts/deployment/build.py','utf8'),/'src\/studio\/design.ts'/);
+ const sandbox=readFileSync('server/sandbox/Dockerfile','utf8');
+ assert.match(sandbox,/COPY --chmod=644 server\/sandbox\/trusted\//);
+ assert.match(sandbox,/find trusted -type d -exec chmod 755/);
+ assert.match(sandbox,/USER node/);
 });
