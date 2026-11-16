@@ -1,0 +1,65 @@
+name: Apply checksum-reviewed studio source
+on:
+  push:
+    branches: [feature/unified-studio-review]
+    paths: [.github/workflows/coach-apply-reviewed.yml]
+permissions:
+  contents: read
+jobs:
+  apply:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/feature/unified-studio-review' && github.actor == 'jzwyrzyk'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate and apply exact reviewed source; never execute application code
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, lzma, os, pathlib, subprocess
+          parts = [pathlib.Path(f'.github/studio-transfer/part-{i}.bin').read_bytes() for i in range(4)]
+          assert [len(p) for p in parts] == [11000, 11000, 11000, 9332]
+          decoder = lzma.LZMADecompressor(memlimit=128 * 1024 * 1024)
+          patch = decoder.decompress(b''.join(parts), max_length=200000)
+          assert decoder.eof and not decoder.unused_data and len(patch) == 159965
+          assert hashlib.sha256(patch).hexdigest() == '18b080eb496cae8147ebca453d5abe9cbb15e7c34c1081864d85a349c18e1732'
+          allowed = {
+            'docs/design-coach/GOLD_STANDARD.md', 'docs/design-coach/RELEASE_AND_EVALUATION.md',
+            'docs/design-coach/evaluation-cases.json', 'package.json',
+            'server/coach/http.ts', 'server/coach/policy.ts', 'server/coach/service.ts',
+            'server/gateway.ts', 'server/pipeline/types.ts', 'src/studio/coaching.ts',
+            'src/studio/design.ts', 'src/studio/notebook.ts', 'src/studio/style.css', 'src/studio/ui.ts',
+            'tests/design-coach-browser.cjs', 'tests/design-coach-http.ts',
+            'tests/design-coach-unit.ts', 'tests/studio-journey.cjs',
+          }
+          patchfile = pathlib.Path(os.environ['RUNNER_TEMP']) / 'reviewed-studio.patch'
+          patchfile.write_bytes(patch)
+          subprocess.run(['git', 'apply', '--check', '--index', str(patchfile)], check=True)
+          subprocess.run(['git', 'apply', '--index', str(patchfile)], check=True)
+          changed = set(subprocess.check_output(['git', 'diff', '--cached', '--name-only'], text=True).splitlines())
+          assert changed == allowed, (changed - allowed, allowed - changed)
+          subprocess.run(['git', 'rm', '-r', '.github/studio-transfer', '.github/workflows/coach-apply-reviewed.yml', '.github/workflows/studio-source-review.yml'], check=True)
+          subprocess.run(['git', 'diff', '--cached', '--check'], check=True)
+          print('Verified exact patch and 18 allowed source paths; temporary transfer files removed.')
+          PY
+      - name: Commit only to the existing review branch with a head lease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, os, subprocess
+          branch = 'refs/heads/feature/unified-studio-review'
+          assert os.environ['GITHUB_REF'] == branch
+          env = dict(os.environ)
+          token = env.pop('GH_TOKEN')
+          env.update(GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='http.https://github.com/.extraheader', GIT_CONFIG_VALUE_0='AUTHORIZATION: basic ' + base64.b64encode(('x-access-token:' + token).encode()).decode())
+          head = subprocess.check_output(['git', 'ls-remote', 'origin', branch], env=env, text=True).split()[0]
+          assert head == os.environ['GITHUB_SHA'], 'Review branch changed; refusing concurrent overwrite.'
+          subprocess.run(['git', '-c', 'user.name=github-actions[bot]', '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com', 'commit', '-m', 'feat: child-owned design coach, independent test shelf and deliberate main promotion'], check=True)
+          subprocess.run(['git', 'push', 'origin', 'HEAD:' + branch], env=env, check=True)
+          print('Reviewed source commit:', subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip())
+          PY
