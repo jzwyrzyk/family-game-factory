@@ -29,9 +29,36 @@ jobs:
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
-      - name: Arcade and sandbox journeys
+      - name: Arcade journey
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser
+        run: node tests/journeys.cjs
+      - name: Live remix journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/live-remix.cjs
+      - name: Builder journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/builder-browser.ts
+      - name: Build actions
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/actions-e2e.ts
+      - name: Generated worker security
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/generated-worker-security.ts
+      - name: Restored games
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/restored-games.cjs
+      - name: Learning persistence and pacing
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/learning-repair.cjs
+      - name: Offline shell
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/offline-shell.cjs
+      - name: Construction touch controls
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/construction-touch.cjs
+      - name: Private drawings
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/private-drawings.cjs
       - name: Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:studio

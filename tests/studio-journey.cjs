@@ -14,7 +14,7 @@ const {start}=require('./browser-server.cjs');
   await page.goto(url);await page.waitForFunction(()=>FG.studio&&FG.factory&&FG.builder);
   // This suite checks studio/history isolation. A recent question satisfies the
   // ordinary pacing budget; math remains mandatory and is tested separately.
-  const original=await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills);});
+  const seededSkill=await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills['mul:8x7']);});
   const notebook=()=>page.evaluate(()=>FG.studio.exportNotebook());
   const workspace=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
   const talk=async()=>{await page.click('#studioChange');};
@@ -26,8 +26,14 @@ const {start}=require('./browser-server.cjs');
   assert.ok(guardedAttempt);await page.click('#studioPlay');
   assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),guardedAttempt);
   assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'open');
+  await page.screenshot({path:`test-results/math-studio-${device}.png`,fullPage:true});
   await page.click('#studioNavHome');assert.equal(await page.evaluate(()=>FG.learning.active),false);
   assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'interrupted');
+  assert.deepEqual(await page.evaluate(id=>{const a=FG.store.current().learning.attempts.find(a=>a.id===id);return {answers:a.answers.length,correct:a.correct,independent:a.independent};},guardedAttempt),{answers:0,correct:false,independent:false});
+  assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills['mul:8x7'])),seededSkill);
+  // The intentional presentation may create a zero-count legacy fact. Subsequent
+  // design/history actions must preserve this post-checkpoint learning baseline.
+  const original=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
   await page.click('[data-starter="gum"]');await page.waitForSelector('.construction-stage');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();assert.equal(await page.locator('[data-part="body"]').count(),1);
   const base=(await workspace()).projects[0].headId;

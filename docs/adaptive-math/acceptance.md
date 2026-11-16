@@ -30,7 +30,9 @@ Required acceptance behaviors:
 9. Mobile layouts and core controls remain reachable; screenshots are saved as CI evidence.
 10. Failed saves preserve drafts/working revisions and report the failure; future/damaged learning records remain exportable.
 
-Final CI run, commit, and exact totals will be filled in after the review branch has run.
+The [draft review checks](https://github.com/jzwyrzyk/family-game-factory/pull/19/checks) are the source of truth for the tested commit and current complete-gate status. Every required suite runs in its own CI stage after the production build, so one failing suite cannot hide the others. A failed stage still fails the job; no browser gate is optional. The `browser-evidence` artifact contains the rendered desktop/mobile screenshots for visual review.
+
+The isolated activity suite has passed all nine browser checks. The complete production recovery journey has also passed: unsupported stored evidence remains byte-for-byte exportable and cannot silently become a replacement learner record. The Studio and design-coach checks cover the integration with the separate design workflow; the coach's optional help or reflection controls do not remove required math. The final development handoff links the completed CI run and distinguishes executed checks from the human review below.
 
 ## Release validation that automated tests cannot substitute for
 

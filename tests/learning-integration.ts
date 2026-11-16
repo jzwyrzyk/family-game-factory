@@ -14,6 +14,7 @@ import {hash, type GeneratedGame} from '../server/agent/generated';
 const STORE='family-game-factory-state-v1';
 const devices=[['desktop',{width:1280,height:960}],['mobile',{width:390,height:844}]] as const;
 const activeItem=(page:Page):Promise<MathItem>=>page.evaluate(()=>window.FG.learning.activeItem);
+const activity=(page:Page)=>page.locator('.math-activity:visible');
 const profile=(page:Page)=>page.evaluate(()=>window.FG.store.current());
 const attempts=(page:Page)=>page.evaluate(()=>window.FG.store.current().learning?.attempts||[]);
 const nav=(page:Page,name:string)=>page.getByRole('navigation').getByRole('button',{name,exact:true}).click();
@@ -21,12 +22,12 @@ const nav=(page:Page,name:string)=>page.getByRole('navigation').getByRole('butto
 async function submitWritten(page:Page,item:MathItem,answer=String(item.answer)) {
   if(item.answerKind==='choice'){
     const choice=item.choices?.find(c=>c.value===answer);assert.ok(choice,'choice value must be defined by the item');
-    await page.locator('.math-activity').getByRole('button',{name:choice.label,exact:true}).click();
+    await activity(page).getByRole('button',{name:choice.label,exact:true}).click();
   }else{
-    const tab=page.getByRole('button',{name:'Write an answer',exact:true});
+    const tab=activity(page).getByRole('button',{name:'Write an answer',exact:true});
     if(await tab.isVisible())await tab.click();
-    await page.locator('.math-activity .math-answer-input').fill(answer);
-    await page.locator('.math-activity').getByRole('button',{name:'Check answer',exact:true}).click();
+    await activity(page).locator('.math-answer-input').fill(answer);
+    await activity(page).getByRole('button',{name:'Check answer',exact:true}).click();
   }
 }
 function wrongAnswer(item:MathItem):string {
@@ -36,8 +37,8 @@ function wrongAnswer(item:MathItem):string {
   return String(item.answer)==='1:00'?'2:00':'1:00';
 }
 async function finishWithHelp(page:Page) {
-  await page.locator('[data-action="show-solution"]').click();
-  await page.locator('[data-action="continue-supported"]').click();
+  await activity(page).locator('[data-action="show-solution"]').click();
+  await activity(page).locator('[data-action="continue-supported"]').click();
   await page.waitForFunction(()=>!window.FG.learning.active);
 }
 async function advanceBudget(page:Page) {
@@ -67,12 +68,12 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.screenshot({path:`test-results/math-settings-${name}.png`,fullPage:true});
 
     // A real Math Lab item, including a first error, help request, and abandoned activity.
-    await nav(page,'⚡ My Powers');await page.waitForSelector('.math-activity');
+    await nav(page,'⚡ My Powers');await activity(page).waitFor({state:'visible'});
     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
     await submitWritten(page,first,wrongAnswer(first));
     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});
     assert.equal(savedWrong.answers.length,1);assert.equal(savedWrong.answers[0].correct,false);assert.equal(savedWrong.outcome,'open');
-    await page.locator('[data-action="hint"]').click();
+    await activity(page).locator('[data-action="hint"]').click();
     const hinted=(await attempts(page)).find((a:any)=>a.id===firstId);assert.equal(hinted.hintLevel,1);
     await page.screenshot({path:`test-results/math-lab-help-${name}.png`,fullPage:true});
     await nav(page,'🎮 Play');
@@ -107,7 +108,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     const originalX=await page.evaluate(()=>window.FG.runtime.snapshot().state.parts[0].x);
     await page.clock.runFor(91_000);await page.waitForSelector('#stage-overlay .math-activity');
     const nativeId=await page.evaluate(()=>window.FG.learning.activeAttemptId);
-    assert.equal(await page.locator('.math-activity').getAttribute('data-mode'),'checkpoint');
+    assert.equal(await activity(page).getAttribute('data-mode'),'checkpoint');
     assert.equal(await page.locator('#game-mount').evaluate(el=>(el as HTMLElement).inert),true,'paused native controls are inert for keyboard and pointer input');
     await page.evaluate(()=>(document.activeElement as HTMLElement)?.blur());
     await page.keyboard.press('ArrowLeft');
@@ -135,7 +136,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.factory.exportWorkspace())),workspaceBefore,'format preferences do not rewrite game versions');
     await advanceBudget(page);await page.click('#livePlay');await page.getByRole('button',{name:'Add Bottle',exact:true}).click();
     await page.clock.runFor(91_000);await page.waitForSelector('#stage-overlay .math-activity');
-    assert.equal(await page.locator('.math-activity').getAttribute('data-mode'),'both');
+    assert.equal(await activity(page).getAttribute('data-mode'),'both');
     const remixId=await page.evaluate(()=>window.FG.learning.activeAttemptId);await submitWritten(page,await activeItem(page));
     await page.clock.runFor(600);await page.waitForFunction(()=>!window.FG.learning.active);
     const afterRemix=await attempts(page),remix=afterRemix.find((a:any)=>a.id===remixId);
@@ -150,13 +151,13 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
       const w=window as any;w.fractionResult=null;
       window.FG.learning.mount(document.getElementById('lab-question'),{item,mode:'both',context:{gameId:'math-lab',projectId:'math-lab',mode:'both'},onComplete(result:any){w.fractionResult=result;}});
     },fraction);
-    assert.equal(await page.locator('.math-built-number').textContent(),'0/2');
-    await page.locator('[data-fraction-part="denominator"][data-delta="1"]').click();
-    await page.locator('[data-fraction-part="denominator"][data-delta="1"]').click();
-    await page.locator('[data-fraction-part="numerator"][data-delta="1"]').click();
-    assert.equal(await page.locator('.math-built-number').textContent(),'1/4');
+    assert.equal(await activity(page).locator('.math-built-number').textContent(),'0/2');
+    await activity(page).locator('[data-fraction-part="denominator"][data-delta="1"]').click();
+    await activity(page).locator('[data-fraction-part="denominator"][data-delta="1"]').click();
+    await activity(page).locator('[data-fraction-part="numerator"][data-delta="1"]').click();
+    assert.equal(await activity(page).locator('.math-built-number').textContent(),'1/4');
     await page.screenshot({path:`test-results/math-fraction-${name}.png`,fullPage:true});
-    await page.locator('[data-action="check-interaction"]').click();await page.clock.runFor(600);
+    await activity(page).locator('[data-action="check-interaction"]').click();await page.clock.runFor(600);
     assert.equal(await page.evaluate(()=>(window as any).fractionResult?.independent),true);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'math views stay inside the mobile viewport');
     assert.deepEqual(errors,[]);
@@ -200,9 +201,9 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     assert.equal(await frame.locator('body').evaluate(()=>{try{return !!parent.document.body;}catch{return false;}}),false,'the actual wrapper remains sandboxed away from child data');
     const packet={type:'factory-preview',channel,artifactId,event:'round-complete',roundId:1,won:true,score:2};
     await page.evaluate(packet=>window.postMessage(packet,'*'),packet); // Correct data from the wrong source.
-    await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{...packet,channel:'incorrect-channel'});
-    await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{...packet,artifactId:'incorrect-artifact'});
-    await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{...packet,score:-1});
+    await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{...packet,channel:'incorrect-channel'});
+    await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{...packet,artifactId:'incorrect-artifact'});
+    await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{...packet,score:-1});
     await page.waitForTimeout(80);
     assert.equal(await page.evaluate(()=>window.FG.learning.active),false);assert.equal((await attempts(page)).length,0);
     assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),0,'spoofed or malformed outcomes cannot advance learning or the game');
@@ -227,8 +228,8 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     assert.equal(await frame.locator(kind==='declarative'?'#restart':'#replay').isDisabled(),false,'the trusted host resumes the actual wrapper');
     assert.equal((await attempts(page)).find((a:any)=>a.id===firstId).independent,true);
     // Browser-generated message.source from the same sandbox, but an already consumed round ID.
-    await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),packet);
-    await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{...packet,checkpointId:999});
+    await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),packet);
+    await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{...packet,checkpointId:999});
     await page.waitForTimeout(60);
     assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),1);assert.equal((await attempts(page)).length,1);
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),false);
@@ -244,11 +245,11 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
       // Exercise a completion already in flight when the trusted wrapper's
       // mid-round checkpoint pauses play. These are explicit protocol fixtures.
       await advanceBudget(page);await frame.locator('#replay').click();
-      await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{type:'factory-preview',channel,artifactId,event:'math-checkpoint',roundId:3,checkpointId:1});
+      await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{type:'factory-preview',channel,artifactId,event:'math-checkpoint',roundId:3,checkpointId:1});
       await page.waitForSelector('.learning-preview-cover .math-activity');
       const pendingId=await page.evaluate(()=>window.FG.learning.activeAttemptId);
-      await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{...packet,roundId:3});
-      await frame.locator('body').evaluate(packet=>parent.postMessage(packet,'*'),{...packet,roundId:3,checkpointId:77});
+      await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{...packet,roundId:3});
+      await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{...packet,roundId:3,checkpointId:77});
       await page.waitForTimeout(60);
       assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),2,'the in-flight outcome waits for the active math activity');
       assert.equal(await page.evaluate(()=>window.FG.learning.activeAttemptId),pendingId);

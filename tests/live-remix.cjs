@@ -64,7 +64,10 @@ const {start}=require('./browser-server.cjs');
  }
  // Native Splash uses title → hero → intro → play. A splash is a visual outcome;
  // the optional Original Challenge ends a run after a wrong math answer.
+ // Explicit configs must opt into originalRules; an omitted flag preserves the
+ // simplified adapter for compatible older saved games.
  const nativeRound=async()=>{
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().config.originalRules),true,'This regression must exercise the restored native Splash adapter');
   for(let i=0;i<3;i++){
    const mode=await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode);
    if(!['title','hero','intro'].includes(mode))break;
@@ -86,7 +89,7 @@ const {start}=require('./browser-server.cjs');
    await activity.getByRole('button',{name:'Check answer',exact:true}).click();
   }
  };
- await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:8,punish:true});FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});
+ await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:8,punish:true});FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{originalRules:true,bucketCount:3,revealSafe:false,splashMs:400}})});
  await nativeRound();await answerNative(false);await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);
  await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),1);
  await pluginPage.clock.fastForward(80_000); // Respect spacing while the retry is still on its intro screen.
@@ -97,7 +100,7 @@ const {start}=require('./browser-server.cjs');
 
  // Answer and change games in one browser task so navigation always precedes
  // the 450 ms completion callback, regardless of CI transport scheduling.
- await pluginPage.evaluate(()=>{FG.store.changeProfile({punish:false});FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});
+ await pluginPage.evaluate(()=>{FG.store.changeProfile({punish:false});FG.app.openGame('buckets',{config:{originalRules:true,bucketCount:3,revealSafe:false,splashMs:400}})});
  await nativeRound();
  await pluginPage.evaluate(()=>{
   const item=FG.learning.activeItem,activity=document.querySelector('#stage-overlay .math-activity');
