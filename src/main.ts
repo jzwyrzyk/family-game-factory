@@ -17,4 +17,5 @@ installDrawings();
 
 // Opt-in review: same runtime and backend, one persistent creative workspace.
 import {installStudio} from "./studio/ui";
-void installStudio();
+import {installStudioHostNavigation} from "./studio/host-navigation";
+void installStudio().then(installStudioHostNavigation);
