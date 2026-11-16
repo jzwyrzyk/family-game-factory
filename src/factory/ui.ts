@@ -1,3 +1,4 @@
+import { interpretMathRequest, MODE_LABELS } from '../learning/policy';
 import { defaults, manifests, isGameId, playableMechanics } from '../runtime/manifests';
 import { examples, interpret, type Intent } from './interpreter';
 import { RevisionStore, type Revision, migrateWorkspace } from './workspace';
@@ -72,7 +73,7 @@ export function initLiveRemix() {
   }
   function play(r:Revision){
     const p=project(),capturedOwner=owner();$('playedVersion').hidden=false;$('playedVersion').textContent=`Playing ${p.name}: ${playableMechanics(p.game,r.config).map(m=>`${m.label} ${display(m.key,r.config[m.key])}`).join(' · ')}`;$('returnLive').hidden=false;
-    FG.app.openGame(p.game,{config:r.config,stateKey:r.id,onOutcome:(outcome:PlayOutcome)=>guarded(()=>{
+    FG.app.openGame(p.game,{config:r.config,stateKey:r.id,projectId:p.id,onOutcome:(outcome:PlayOutcome)=>guarded(()=>{
       const record=store.record(p.id,capturedOwner,r.id,outcome);if(owner()===capturedOwner){coach.observe(record,r);renderCoach();$('playedVersion').textContent=`${coach.summary} Tap “Back to Live Remix” to reflect or change your game.`;}
     })});
   }
@@ -80,7 +81,7 @@ export function initLiveRemix() {
   $('liveProjects').onchange=()=>guarded(()=>{active=value('liveProjects');coach.reset();clearPending();render();});
   $('liveKeep').onclick=()=>guarded(()=>{store.keep(project().id,owner());$('liveStatus').textContent='Kept! This version is pinned in your private remix history.';});
   $('livePlay').onclick=()=>guarded(()=>play(revision()));
-  $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(()=>{clearPending();const p=project(),r=revision(),prompt=value('livePrompt');const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
+  $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(()=>{clearPending();const p=project(),r=revision(),prompt=value('livePrompt');const mathRequest=interpretMathRequest(prompt);if(mathRequest){if(mathRequest.kind==='required')$('liveIntent').textContent=mathRequest.message;else{FG.learning.setMode(p.id,mathRequest.mode);$('liveIntent').textContent='Math format: '+MODE_LABELS[mathRequest.mode]+'. Your learning history stays with you.';}return;}const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
     if(intent.kind==='supported'){pending=intent;$('liveIntent').textContent=intent.summary;applyPending();}
     else{$('liveIntent').textContent=intent.message;$('saveNovelIdea').hidden=intent.kind!=='generation-needed';if(intent.kind==='generation-needed')FG.builder?.request({gameId:p.game,baseRevisionId:r.id,config:r.config,prompt});}
   });};

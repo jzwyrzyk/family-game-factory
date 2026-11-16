@@ -17,11 +17,23 @@ const {chromium}=require('playwright');
     const r=await locator.boundingBox(); assert.ok(r);
     await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
    };
+   const assertTouch=async phase=>{
+    const capability=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarse:matchMedia('(pointer: coarse)').matches,anyCoarse:matchMedia('(any-pointer: coarse)').matches,innerWidth,innerHeight}));
+    assert.ok(capability.maxTouchPoints>0&&capability.coarse&&capability.anyCoarse,`${orientation} ${phase}: real tablet touch emulation remains active: ${JSON.stringify(capability)}`);
+   };
+   const capture=async (name,target)=>{
+    await target.scrollIntoViewIfNeeded();await assertTouch(`before ${name} capture`);
+    // Beyond-viewport element/full-page captures can clear Chromium touch
+    // emulation in this version: microsoft/playwright#42607. Keep the actual
+    // tablet viewport while this journey continues to exercise touch input.
+    await page.screenshot({path:`test-results/quality-tablet-${name}-${orientation}.png`,fullPage:false});
+    await assertTouch(`after ${name} capture`);
+   };
    try{
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
     await page.waitForFunction(()=>window.FG?.app);
-    assert.equal(await page.evaluate(()=>matchMedia('(pointer: coarse)').matches),true,'tablet emulation must have a coarse pointer');
-    await page.evaluate(()=>{FG.store.changeProfile({rate:0});FG.app.openGame('gum')});
+    await assertTouch('after navigation');
+    await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.app.openGame('gum')});
     const root=page.locator('.quality-builder'),button=name=>root.getByRole('button',{name,exact:true}),canvas=root.locator('.q-canvas');
     await root.waitFor();await touch(button('Start fresh'));await touch(button('Add Bottle'));await touch(button('Add Cardboard box'));
     let state=await page.evaluate(()=>FG.runtime.snapshot().state);
@@ -40,7 +52,7 @@ const {chromium}=require('playwright');
     const bounds=await canvas.boundingBox();assert.ok(bounds&&bounds.height>250);
     if(orientation==='landscape')assert.ok(bounds.height<=viewport.height*.48+2,'landscape tablet reserves room for controls');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'no horizontal page overflow');
-    await root.screenshot({path:`test-results/quality-tablet-builder-${orientation}.png`});
+    await capture('builder',root.locator('.q-piece-picker'));
     await page.evaluate(()=>FG.app.openGame('hill'));
     const hill=page.locator('.quality-hill'),go=hill.locator('[data-pedal=go]');
     await hill.waitFor();
@@ -77,7 +89,7 @@ const {chromium}=require('playwright');
     await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     state=await page.evaluate(()=>FG.runtime.snapshot().state);
     assert.equal(state.inputActive,0,'releasing touch stops the motor command');
-    await hill.screenshot({path:`test-results/quality-tablet-rally-${orientation}.png`});
+    await capture('rally',go);
     assert.deepEqual(errors,[]);
     console.log(`PASS tablet ${orientation}: touch piece-picker/rotate, landscape stage, large pedal, held driving and release`);
    }finally{await context.close();}

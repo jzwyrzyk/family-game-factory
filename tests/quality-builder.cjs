@@ -54,7 +54,9 @@ const { chromium } = require('playwright');
       await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
       await page.waitForFunction(() => window.FG?.app);
       await page.evaluate(() => {
-        FG.store.changeProfile({ rate: 0 });
+        // This suite isolates physical behavior using the normal recent-question budget.
+        FG.store.changeProfile({ rate: 1 });
+        FG.store.current().mathWindow=[Date.now()];FG.store.save();
         FG.app.openGame('gum');
       });
       await root.waitFor();
@@ -261,7 +263,7 @@ const { chromium } = require('playwright');
       await button('Test machine  ▶').click();
       await advance(32000);
       assert.equal((await state()).simulation.status, 'lost');
-      assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'an unsuccessful test never forces the math/result overlay');
+      assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'an unsuccessful test respects the recent-question pacing budget');
       await root.locator('.q-result').getByRole('button', { name: 'Change my machine', exact: true }).focus();
       await page.keyboard.press('Enter');
       assert.deepEqual(await blueprint(), unsuccessful);
@@ -281,7 +283,7 @@ const { chromium } = require('playwright');
         await button('Test machine  ▶').click();
         await advance(5000);
         assert.equal((await state()).simulation.status, 'won', `${mission} starter reaches its real goal`);
-        assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'a win waits for an explicit finish action');
+        assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'the paced physics fixture can review the win before its explicit finish action');
         await root.screenshot({ path: `test-results/quality-gum-${mission}-${mobile ? 'mobile' : 'desktop'}.png` });
         if (mission === 'delivery') {
           await button('Finish challenge →').click();

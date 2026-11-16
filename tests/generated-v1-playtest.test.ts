@@ -13,7 +13,7 @@ function controlledPreview(options:{stalled?:boolean;inFlightFrames?:boolean}={}
  let now=0,id=0,mouseDown=false,target:any=null,inFlight=!!options.inFlightFrames;
  const timers=new Map<number,{at:number;repeat:number;callback:()=>void}>(),blobs=new Map<string,string>();
  const elements:Record<string,any>={};
- for(const name of ['game','status','score','start','replay'])elements[name]={dataset:{},textContent:'',disabled:true};
+ for(const name of ['game','status','score','start','replay'])elements[name]={dataset:{},textContent:'',disabled:true,attributes:{} as Record<string,string>,setAttribute(key:string,value:string){this.attributes[key]=value;}};
  const action={dataset:{control:'action'}} as any,right={dataset:{control:'right'}} as any;
  const canvas=elements.game;canvas.getBoundingClientRect=()=>({left:0,top:0,width:720,height:400});
  canvas.getContext=()=>({clearRect(){},fillRect(){},beginPath(){},arc(){},fill(){},fillText(){}});
@@ -30,10 +30,13 @@ function controlledPreview(options:{stalled?:boolean;inFlightFrames?:boolean}={}
  const code=transformSync(hopper.source,{loader:'ts',format:'iife',globalName:'GameModule'}).code;
  const game={...hopper,compiled:{code,sourceHash:hash(hopper.source),codeHash:hash(code),tests:{desktop:true,mobile:true,replay:true,isolation:true}}};
  const html=renderGenerated(game,'v1-input-fixture','v1-input-channel').html,script=html.match(/<script>([\s\S]*)<\/script>/)![1];
- runInNewContext(script,{document:{getElementById:(name:string)=>elements[name],querySelectorAll:()=>[action,right],body:{scrollHeight:680}},parent:{postMessage(){}},Blob:BlobStub,Worker:WorkerStub,
+ // The current trusted host also registers its learning and visibility lifecycle.
+ // Supply those browser surfaces without connecting a learner or changing input behavior.
+ const listeners=new Map<string,Function[]>(),addEventListener=(event:string,listener:Function)=>listeners.set(event,[...listeners.get(event)||[],listener]);
+ const realm:any={document:{hidden:false,addEventListener,getElementById:(name:string)=>elements[name],querySelectorAll:()=>[action,right],body:{scrollHeight:680}},parent:{postMessage(){}},addEventListener,Blob:BlobStub,Worker:WorkerStub,
   URL:{createObjectURL:(blob:BlobStub)=>{const url='fixture:'+ ++id;blobs.set(url,blob.source);return url;},revokeObjectURL:(url:string)=>blobs.delete(url)},
-  performance:{now:()=>now},setInterval:(fn:()=>void,ms:number)=>schedule(fn,ms,ms),setTimeout:(fn:()=>void,ms:number)=>schedule(fn,ms),clearInterval:(key:number)=>timers.delete(key)},
-  {timeout:1000});
+  performance:{now:()=>now},setInterval:(fn:()=>void,ms:number)=>schedule(fn,ms,ms),setTimeout:(fn:()=>void,ms:number)=>schedule(fn,ms),clearInterval:(key:number)=>timers.delete(key),clearTimeout:(key:number)=>timers.delete(key)};
+ realm.window=realm;runInNewContext(script,realm,{timeout:1000});
  function move(next:any){if(target!==next)target?.onpointerleave?.();target=next;}
  function down(){mouseDown=true;target?.onpointerdown?.();}
  function up(){mouseDown=false;target?.onpointerup?.();target?.onclick?.({clientX:80,clientY:60});}

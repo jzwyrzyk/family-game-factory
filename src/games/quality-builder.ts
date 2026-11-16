@@ -77,6 +77,7 @@ export default class QualityBuilder implements GameInstance {
     private hostFinished = false;
     private storageBlocked = false;
     private manualPause = false;
+    private hostPaused = false;
     private view = { w: 1000, h: 560, scale: 40, x: 0, y: 0 };
     private resizeObserver: ResizeObserver;
     private onWindowResize = () => this.resize();
@@ -162,8 +163,8 @@ export default class QualityBuilder implements GameInstance {
         this.piecePicker.setAttribute('role', 'group');
         this.piecePicker.setAttribute('aria-label', 'Choose a part of your machine');
         this.piecePickerLabel.setAttribute('aria-live', 'polite');
-        this.previousPieceButton = this.button('◀ Previous', 'q-chip q-piece-step', () => { this.cyclePart(-1); this.canvas.focus({ preventScroll: true }); });
-        this.nextPieceButton = this.button('Next ▶', 'q-chip q-piece-step', () => { this.cyclePart(1); this.canvas.focus({ preventScroll: true }); });
+        this.previousPieceButton = this.button('◀ Previous', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(-1); this.canvas.focus({ preventScroll: true }); });
+        this.nextPieceButton = this.button('Next ▶', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(1); this.canvas.focus({ preventScroll: true }); });
         this.previousPieceButton.setAttribute('aria-label', 'Previous piece');
         this.nextPieceButton.setAttribute('aria-label', 'Next piece');
         this.piecePicker.append(this.previousPieceButton, this.piecePickerLabel, this.nextPieceButton);
@@ -182,10 +183,10 @@ export default class QualityBuilder implements GameInstance {
         this.testButton.dataset.action = 'test';
         const boost = this.button('Hold to boost ↑', 'q-button q-orange', () => { });
         boost.setAttribute('aria-label', 'Hold to boost');
-        boost.onpointerdown = e => { if (this.mode !== 'run')
+        boost.onpointerdown = e => { if (this.hostPaused || this.clock.paused || this.mode !== 'run')
             return; e.preventDefault(); boost.setPointerCapture(e.pointerId); this.pointerAction = true; void this.audio.unlock(); };
         boost.onpointerup = boost.onpointercancel = boost.onlostpointercapture = () => { this.pointerAction = false; };
-        boost.onkeydown = e => { if (!e.ctrlKey && !e.metaKey && !e.altKey && this.mode === 'run' && !this.clock.paused && (e.key === ' ' || e.key === 'Enter')) {
+        boost.onkeydown = e => { if (this.hostPaused || this.clock.paused) return; if (!e.ctrlKey && !e.metaKey && !e.altKey && this.mode === 'run' && (e.key === ' ' || e.key === 'Enter')) {
             e.preventDefault();
             this.pointerAction = true;
         } };
@@ -226,7 +227,7 @@ export default class QualityBuilder implements GameInstance {
         this.resizeObserver.observe(stage);
         window.addEventListener('resize', this.onWindowResize);
         this.resize();
-        this.clock = createFixedClock({ update: dt => this.update(dt), render: (alpha, time) => this.draw(alpha, time), onPause: () => { this.action = this.pointerAction = false; this.audio.pause(); this.cancelDrag(); }, onResume: () => { this.audio.resume(); } });
+        this.clock = createFixedClock({ update: dt => this.update(dt), render: (alpha, time) => this.draw(alpha, time), onPause: () => { this.action = this.pointerAction = false; this.audio.pause(); this.cancelDrag(); this.context.emit?.({ type: 'pause', name: 'workshop' }); }, onResume: () => { this.audio.resume(); this.context.emit?.({ type: 'resume', name: 'workshop' }); } });
         this.clock.start();
         this.updateAudio();
         this.refresh();
@@ -351,6 +352,7 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(e));
     } }
     private pointerDown(e: PointerEvent) {
+        if (this.hostPaused) return;
         if (this.mode !== 'build' || this.storageBlocked || e.button > 0 || this.drag)
             return;
         e.preventDefault();
@@ -385,7 +387,7 @@ export default class QualityBuilder implements GameInstance {
         }
         this.refresh();
     }
-    private pointerMove(e: PointerEvent) { const q = this.point(e); this.pointer = q; if (this.joining) {
+    private pointerMove(e: PointerEvent) { if (this.hostPaused) return; const q = this.point(e); this.pointer = q; if (this.joining) {
         const p = this.hit(q.x, q.y);
         this.joinTarget = p && p.id !== this.selected ? p.id : null;
         this.updateJoinPreview();
@@ -415,6 +417,7 @@ export default class QualityBuilder implements GameInstance {
         return true;
     }
     private keyDown(e: KeyboardEvent) {
+        if (this.hostPaused || this.mode === 'run' && this.clock.paused) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.mode === 'run') {
             if (e.code === 'Space' || e.code === 'ArrowUp') {
@@ -426,7 +429,6 @@ export default class QualityBuilder implements GameInstance {
         }
         if (this.mode !== 'build' || this.storageBlocked)
             return;
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.drag && (['Escape', 'Delete', 'Backspace', '[', ']', 'Enter'].includes(e.key) || e.key.startsWith('Arrow') || ['r', 'g'].includes(e.key.toLowerCase()) || e.code === 'Space')) {
             this.cancelDrag(); this.refresh();
             if (e.key === 'Escape') { e.preventDefault(); this.message('Move cancelled. Your last position is restored.'); return; }
@@ -537,7 +539,7 @@ export default class QualityBuilder implements GameInstance {
         this.missionSelect.value = this.mission;
         return;
     } this.cancelDrag(); this.builds[this.mission] = cloneBlueprint(this.blueprint); this.mission = missionById(id).id; this.blueprint = this.builds[this.mission] ? cloneBlueprint(this.builds[this.mission]) : this.mission === 'free' ? { version: 1, parts: [], joints: [] } : starterBlueprint(this.mission); this.selected = null; this.history = []; this.joining = false; this.missionSelect.value = this.mission; this.save(); this.refresh(); this.message('Your other builds are saved. Here is a new challenge.'); }
-    private test() { if (this.storageBlocked || !this.blueprint.parts.length)
+    private test() { if (this.hostPaused || this.storageBlocked || !this.blueprint.parts.length)
         return; this.cancelDrag(); if (this.gumShortage() > 0) { this.message(this.gumHelp()); this.refresh(); return; } void this.audio.unlock(); this.save(); this.simulation?.dispose(); try {
         this.simulation = createConstruction(cloneBlueprint(this.blueprint), { jointStrength: Number(this.context.config.jointStrength) || 1, gumBudget: budgetOf(this.context), gravity: Number(this.context.config.gravity) || 10, thrust: Number(this.context.config.thrust) || 1 }, this.mission);
         this.scene = this.simulation.snapshot();
@@ -563,7 +565,7 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(e));
         this.refresh();
     } }
-    private edit() { this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); this.canvas.focus({ preventScroll: true }); }
+    private edit() { if (this.hostPaused) return; this.hostFinished = false; this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); this.canvas.focus({ preventScroll: true }); }
     private update(dt: number) {
         if (this.mode === 'run' && this.simulation) {
             this.previous = this.scene;
@@ -620,6 +622,7 @@ export default class QualityBuilder implements GameInstance {
         this.result.append(actions);
         this.result.hidden = false;
         this.refresh();
+        this.context.emit?.({ type: 'checkpoint', name: won ? 'construction-tested' : 'construction-retry' });
     }
     private draw(alpha: number, time: number) {
         if (this.disposed)
@@ -755,16 +758,20 @@ export default class QualityBuilder implements GameInstance {
         };
     }; if (data.id === 'free' || !data.goal)
         return; const c = this.c, g = data.goal, w = g.width ?? g.w ?? 2, h = g.height ?? g.h ?? 2; c.save(); c.fillStyle = '#f8d77b22'; c.strokeStyle = '#8cac7a'; c.lineWidth = 2; c.setLineDash([6, 7]); c.beginPath(); c.roundRect(g.x * s, g.y * s, w * s, h * s, 12); c.fill(); c.stroke(); c.setLineDash([]); drawFlag(c, (g.x + w) * s, (g.y + h) * s, Math.max(23, s * .95), 'HERE'); c.restore(); }
-    private togglePause() { this.manualPause = !this.manualPause; if (this.manualPause)
-        this.pause();
-    else
-        this.resume(); }
-    pause() { this.manualPause = true; this.action = this.pointerAction = false; this.clock.pause('user'); this.pauseButton.textContent = '▶'; this.pauseButton.setAttribute('aria-label', 'Resume game'); }
-    resume() { this.manualPause = false; this.clock.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); }
+    private togglePause() {
+        if (this.hostPaused) return;
+        this.manualPause = !this.manualPause;
+        if (this.manualPause) this.clock.pause('user'); else this.clock.resume('user');
+        this.pauseButton.textContent = this.manualPause ? '▶' : 'Ⅱ';
+        this.pauseButton.setAttribute('aria-label', this.manualPause ? 'Resume game' : 'Pause game');
+    }
+    isPlaying() { return !this.disposed && !this.hostFinished && !this.hostPaused && !this.clock.paused && this.mode !== 'result'; }
+    pause() { if (this.disposed || this.hostPaused) return false; this.hostPaused = true; this.action = this.pointerAction = false; this.clock.pause('host'); return true; }
+    resume() { if (!this.hostPaused) return; this.hostPaused = false; this.clock.resume('host'); }
     next() { const ms = missionValues().filter(m => m.id !== 'free'), i = ms.findIndex(m => m.id === this.mission); this.edit(); this.chooseMission(ms[(i + 1) % ms.length].id); }
     restart() { this.test(); }
     retry() { this.test(); }
-    snapshot() { return { ...this.saved(), level: Math.max(1, missionValues().filter(m => m.id !== 'free').findIndex(m => m.id === this.mission) + 1), mode: this.mode, selected: this.selected, paused: this.clock.paused, storageBlocked: this.storageBlocked, joining: this.joining, joinTarget: this.joinTarget, dragActive: !!this.drag, resources: { parts: this.blueprint.parts.length, joints: this.blueprint.joints.length, particles: this.particles.length, canvasPixels: this.canvas.width * this.canvas.height + this.backdrop.width * this.backdrop.height }, parts: structuredClone(this.blueprint.parts), joints: structuredClone(this.blueprint.joints), gumRemaining: budgetOf(this.context) - this.blueprint.joints.length, simulation: this.scene ? structuredClone(this.scene) : null, clock: this.clock.stats, audio: this.audio.settings }; }
+    snapshot() { return { ...this.saved(), level: Math.max(1, missionValues().filter(m => m.id !== 'free').findIndex(m => m.id === this.mission) + 1), mode: this.mode, selected: this.selected, paused: this.clock.paused, hostPaused: this.hostPaused, storageBlocked: this.storageBlocked, joining: this.joining, joinTarget: this.joinTarget, dragActive: !!this.drag, resources: { parts: this.blueprint.parts.length, joints: this.blueprint.joints.length, particles: this.particles.length, canvasPixels: this.canvas.width * this.canvas.height + this.backdrop.width * this.backdrop.height }, parts: structuredClone(this.blueprint.parts), joints: structuredClone(this.blueprint.joints), gumRemaining: budgetOf(this.context) - this.blueprint.joints.length, simulation: this.scene ? structuredClone(this.scene) : null, clock: this.clock.stats, audio: this.audio.settings }; }
     unmount() { if (this.disposed)
         return; this.cancelDrag(); this.save(); this.disposed = true; this.clock.dispose(); this.audio.dispose(); this.simulation?.dispose(); this.resizeObserver.disconnect(); window.removeEventListener('resize', this.onWindowResize); this.root.remove(); }
 }

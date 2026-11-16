@@ -27,7 +27,7 @@ let current: GameLifecycle | undefined;
 export function snapshot() { return current?.snapshot(); }
 // Compatibility edge for the existing orchestration; plugins themselves do not know profiles or math.
 const FG = (window as any).FG;
-FG.runtime = { snapshot, pause: () => current?.pause(), resume: () => current?.resume() };
+FG.runtime = { snapshot, isPlaying: () => current?.isPlaying() ?? false, pause: () => current?.pause(), resume: () => current?.resume() };
 FG.games = Object.fromEntries((Object.keys(plugins) as GameId[]).map(id => [id, {
   name: manifests[id].name, ...details[id], build: function(target: HTMLElement, ctx: {difficulty: Difficulty; config?: Mechanics; stateKey?:string; finish(outcome: PlayOutcome): void}) {
     const config = ctx.config || defaults(id, ctx.difficulty), key = ctx.stateKey || id;
@@ -49,6 +49,6 @@ FG.games = Object.fromEntries((Object.keys(plugins) as GameId[]).map(id => [id, 
     });
     current = lifecycle;
     lifecycle.start();
-    return { next: () => lifecycle.next(), restart: () => lifecycle.retry(), retry: () => lifecycle.retry(), pause: () => lifecycle.pause(), resume: () => lifecycle.resume(), unmount: () => lifecycle.dispose() };
+    return { next: () => lifecycle.next(), restart: () => lifecycle.retry(), retry: () => lifecycle.retry(), isPlaying:()=>lifecycle.isPlaying(),pause:()=>lifecycle.pause(),resume:()=>lifecycle.resume(),unmount: () => lifecycle.dispose() };
   },
 }]));

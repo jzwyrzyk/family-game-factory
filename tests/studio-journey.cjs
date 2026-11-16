@@ -12,23 +12,41 @@ const {start}=require('./browser-server.cjs');
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(r.url().includes('/v1/jobs'))jobs.push(r.url());});
   const url=`http://127.0.0.1:${server.address().port}/arcade/?studio=1`;
   await page.goto(url);await page.waitForFunction(()=>FG.studio&&FG.factory&&FG.builder);
-  const original=await page.evaluate(()=>{FG.store.changeProfile({rate:0});FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills);});
+  // This suite checks studio/history isolation. A recent question satisfies the
+  // ordinary pacing budget; math remains mandatory and is tested separately.
+  const seededSkill=await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills['mul:8x7']);});
   const notebook=()=>page.evaluate(()=>FG.studio.exportNotebook());
   const workspace=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
   const runtime=()=>page.evaluate(()=>FG.runtime.snapshot());
   const bottles=async()=>(await runtime()).state.parts.filter(p=>p.kind==='bottle').length;
   const budget=async expected=>{await page.waitForFunction(n=>FG.runtime.snapshot().config.gumBudget===n,expected);const r=await runtime();assert.equal(r.state.gumRemaining,expected-r.state.joints.length);};
   const talk=async()=>{await page.click('#studioChange');};
+  const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore summary');};
+  const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
   assert.equal(await page.locator('#studioStarters [data-starter]').count(),4);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
+  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+  // A replay/version control must retain an active host activity; leaving the game may interrupt it.
+  const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
+  assert.ok(guardedAttempt);await page.click('#studioPlay');
+  assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),guardedAttempt);
+  assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'open');
+  await page.screenshot({path:`test-results/math-studio-${device}.png`,fullPage:true});
+  await page.click('#studioNavHome');assert.equal(await page.evaluate(()=>FG.learning.active),false);
+  assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'interrupted');
+  assert.deepEqual(await page.evaluate(id=>{const a=FG.store.current().learning.attempts.find(a=>a.id===id);return {answers:a.answers.length,correct:a.correct,independent:a.independent};},guardedAttempt),{answers:0,correct:false,independent:false});
+  assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills['mul:8x7'])),seededSkill);
+  // The intentional presentation may create a zero-count legacy fact. Subsequent
+  // design/history actions must preserve this post-checkpoint learning baseline.
+  const original=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();assert.equal(await bottles(),1);
   const base=(await workspace()).projects[0].headId;
   await talk();await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');
   assert.equal((await workspace()).projects[0].headId,base,'Try must not change working pointer');
   await budget(15);assert.equal(await bottles(),1);
-  await page.click('#studioUndo');await budget(10);
-  await page.click('#studioRedo');await budget(15);
+  await more();await page.click('#studioUndo');await budget(10);
+  await more();await page.click('#studioRedo');await budget(15);
   await page.click('#studioKeep');assert.notEqual((await workspace()).projects[0].headId,base);
   for(const prompt of ['Make joints stronger','Give me six gum sticks','Make joints stronger','Give me ten gum sticks']){
    await talk();await page.fill('#studioPrompt',prompt);await page.click('#studioSend');assert.equal(await page.locator('#studioPreviewNotice').isVisible(),true);assert.equal(await bottles(),1);await page.click('#studioKeep');
@@ -44,12 +62,12 @@ const {start}=require('./browser-server.cjs');
   await talk();assert.match(await page.textContent('#studioMessages'),/fun or tricky/);
   await page.click('#studioReflectAnswer');await page.fill('#studioPrompt','I liked seeing my rocket stay together.');await page.click('#studioSend');
   assert.match(await page.textContent('#studioMessages'),/I liked seeing/);
-  await page.click('#studioCopy');await page.fill('#studioCopyName',`Space workshop ${device}`);await page.click('#studioCopyForm button[type="submit"]');
+  await more();await page.click('#studioCopy');await page.fill('#studioCopyName',`Space workshop ${device}`);await page.click('#studioCopyForm button[type="submit"]');
   assert.deepEqual((await runtime()).state.blueprint,testedBlueprint);
   await talk();await page.fill('#studioPrompt','An unfinished idea for next time');await page.click('#studioHome');await page.reload();await page.waitForFunction(()=>FG.studio);
   await page.locator('#studioLibrary button').filter({hasText:`Space workshop ${device}`}).click();await page.waitForFunction(()=>FG.runtime.snapshot().state.clock.frames>0);await talk();
   assert.equal(await page.inputValue('#studioPrompt'),'An unfinished idea for next time');assert.match(await page.textContent('#studioMessages'),/Give me 15 gum sticks/);
-  await page.click('#studioCompare');assert.ok(await page.locator('.studio-version-card').count()>=1);
+  await more();await page.click('#studioCompare');assert.ok(await page.locator('.studio-version-card').count()>=1);
   await page.click('#studioCloseVersions');
   assert.equal(await page.locator('#studioPausedPreview').isVisible(),true,'closing versions shows the paused build instead of a blank host');
   assert.equal(await page.locator('.quality-builder').count(),0,'the preview does not keep the live game mounted');assert.equal((await runtime()).disposed,true);
@@ -68,9 +86,9 @@ const {start}=require('./browser-server.cjs');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'mounting a game releases the copied frame');assert.equal((await runtime()).disposed,false);assert.deepEqual((await runtime()).state.blueprint,testedBlueprint);
   const after=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));assert.equal(after,original);
   // Profile isolation must not lose an immediately typed draft.
-  await talk();await page.fill('#studioPrompt','My private unfinished idea');await page.locator('.profile-choice').nth(1).click();assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);
+  await talk();await page.fill('#studioPrompt','My private unfinished idea');await profiles();await page.locator('.profile-choice').nth(1).click();assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);
   assert.equal(await page.locator('#studioPausedPreview').textContent(),'');assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a profile switch releases the previous profile’s scene');
-  await page.locator('.profile-choice').first().click();await page.locator('#studioLibrary button').filter({hasText:`Space workshop ${device}`}).click();await talk();assert.equal(await page.inputValue('#studioPrompt'),'My private unfinished idea');
+  await profiles();await page.locator('.profile-choice').first().click();await page.locator('#studioLibrary button').filter({hasText:`Space workshop ${device}`}).click();await talk();assert.equal(await page.inputValue('#studioPrompt'),'My private unfinished idea');
   // Garage requests stay in this notebook and continue the currently played test.
   await page.click('#studioHome');await page.click('[data-starter="hill"]');await page.waitForSelector('.quality-hill');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a different project never inherits the previous frame');
@@ -106,9 +124,9 @@ const {start}=require('./browser-server.cjs');
   else data={errorCode:'NOT_FOUND'};
   await route.fulfill({status:data.errorCode?404:200,headers,contentType:'application/json',body:JSON.stringify(data)});
  });
- await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><h1>Explicit test fixture</h1><button>Play</button>'}));
+ await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script>`}));
  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);
- await page.click('#studioNavCreate');await page.fill('#studioPrompt','Create a novel test fixture');await page.click('#studioSend');await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');await page.waitForSelector('#studioRemoteHost iframe');
+ await page.click('#studioNavCreate');await page.fill('#studioPrompt','Create a novel test fixture');await page.click('#studioSend');await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');await page.waitForSelector('#studioReady:not([hidden])');await page.click('#studioReady');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');
  assert.match(await page.textContent('#studioPlayNote'),/mock/);assert.equal(kept,0);

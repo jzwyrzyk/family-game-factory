@@ -12,10 +12,109 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - name: Build production
+        id: build
+        run: npm run build
+      # These suites are independent once the production bundle exists. Preserve
+      # every failure while still collecting the rest of the required evidence.
+      - name: Unit and contract checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:unit
+      - name: Deployment configuration checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:deployment
+      - name: Arcade journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/journeys.cjs
+      - name: Live remix journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/live-remix.cjs
+      - name: Builder journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/builder-browser.ts
+      - name: Build actions
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/actions-e2e.ts
+      - name: Generated worker security
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/generated-worker-security.ts
+      - name: Restored games
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/restored-games.cjs
+      - name: Offline shell
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/offline-shell.cjs
+      - name: Construction touch controls
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/construction-touch.cjs
+      - name: Private drawings
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/private-drawings.cjs
+      - name: Real agent activation status
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:real-agent
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: browser-evidence
+          path: test-results/
+          if-no-files-found: ignore
+  learning:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build production
+        id: build
+        run: npm run build
+      - name: Learning activities
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:learning-ui
+      - name: Learning integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:learning-integration
+      - name: Learning persistence and pacing
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/learning-repair.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: learning-evidence
+          path: test-results/
+          if-no-files-found: ignore
+  creative:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build production
+        id: build
+        run: npm run build
+      - name: Physical and generated games
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:quality
+      - name: Studio journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:studio
+      - name: Design coach checks
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:coach
+      - name: Child journey and recovery
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:child-journey
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: creative-evidence
           path: test-results/
           if-no-files-found: ignore

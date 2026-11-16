@@ -2,7 +2,7 @@ export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'ca
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
 export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number}
-export interface Preview {revisionId:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
+export interface Preview {revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
 const loopback=(url:URL)=>['127.0.0.1','localhost','[::1]'].includes(url.hostname);
 export function validateBuilderConfig(input:unknown):BuilderConfig {
  const config=input as BuilderConfig;if(!config||config.version!==1||!['unavailable','remote'].includes(config.mode))throw Error('BUILDER_UNAVAILABLE');if(config.mode==='unavailable')return {version:1,mode:'unavailable'};
@@ -36,6 +36,11 @@ export class BuilderClient {
  async cancel(){const job=this.last;if(!job)throw Error('NO_ACKNOWLEDGED_JOB');++this.generation;const response=await this.api('/v1/jobs/'+job.jobId+'/cancel',{});this.last=response;this.update(response);}
  disconnect(){++this.generation;this.last=null;this.request=null;}
  async preview(revisionId:string):Promise<Preview>{
-  const data=await this.api('/v1/revisions/'+encodeURIComponent(revisionId)+'/preview');const url=new URL(data.url);if(url.origin!==this.config.previewOrigin||typeof data.artifactId!=='string'||data.expiresAt<=Date.now())throw Error('UNSAFE_PREVIEW');return {...data,revisionId};
+  if(!/^[\w-]{1,100}$/.test(revisionId))throw Error('UNSAFE_PREVIEW');
+  const data=await this.api('/v1/revisions/'+encodeURIComponent(revisionId)+'/preview');const url=new URL(data.url);
+  const projectId=data.projectId===undefined?revisionId:data.projectId;
+  if(url.origin!==this.config.previewOrigin||typeof data.artifactId!=='string'||!Number.isFinite(data.expiresAt)||data.expiresAt<=Date.now()
+    ||typeof projectId!=='string'||!/^[\w-]{1,100}$/.test(projectId)||['__proto__','constructor','prototype'].includes(projectId))throw Error('UNSAFE_PREVIEW');
+  return {...data,revisionId,projectId};
  }
 }

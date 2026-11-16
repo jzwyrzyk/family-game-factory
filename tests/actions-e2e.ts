@@ -1,4 +1,4 @@
-import {chromium} from 'playwright';
+import {chromium,type FrameLocator,type Page} from 'playwright';
 import {createServer,type Server} from 'node:http';
 import {randomBytes} from 'node:crypto';
 import {existsSync,readFileSync,mkdirSync,writeFileSync} from 'node:fs';
@@ -12,8 +12,64 @@ import {signSession} from '../server/pipeline/auth';
 import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
 import {FixtureOnlyGate} from '../server/testing/fixture-gate';
 import {hopper,painter} from '../server/testing/generated-fixtures';
+import type {MathItem} from '../src/learning/types';
 import {verifyV1InputOrdering} from './generated-v1-input-browser';
 const listen=(s:Server,host?:string)=>new Promise<number>(r=>s.listen(0,host,()=>r((s.address() as {port:number}).port)));
+async function finishPreviewRound(page:Page){
+ // A worker win arrives before the host finishes its required learning activity.
+ // Wait for that message to be handled; later rounds can legitimately use the pacing budget.
+ await page.waitForFunction(()=>window.FG.learning.active||/^You (finished|tried) this round\./.test(document.getElementById('previewOutcome')?.textContent||''));
+ if(await page.evaluate(()=>window.FG.learning.active)){
+  const item:MathItem|null=await page.evaluate(()=>window.FG.learning.activeItem);
+  assert.ok(item,'an active learning activity must expose its actual item');
+  assert.notEqual(item.answer,undefined);assert.notEqual(item.answer,null);
+  const answer=String(item.answer);assert.ok(answer.trim(),'the item must have a nonblank answer');
+  const activity=page.locator('.learning-preview-cover .math-activity');
+  if(item.answerKind==='choice'){
+   const choice=item.choices?.find(option=>option.value===answer);assert.ok(choice,'the correct choice must belong to this item');
+   await activity.getByRole('button',{name:choice.label,exact:true}).click();
+  }else{
+   const write=activity.getByRole('button',{name:'Write an answer',exact:true});if(await write.isVisible())await write.click();
+   // Preserve fractional and text answers verbatim; zero is a valid number answer.
+   await activity.locator('.math-answer-input').fill(answer);
+   await activity.getByRole('button',{name:'Check answer',exact:true}).click();
+  }
+  await page.waitForFunction(()=>!window.FG.learning.active);
+ }
+ await page.locator('#previewOutcome').filter({hasText:/^You (finished|tried) this round\./}).waitFor();
+}
+async function playAuthoredPreview(page:Page,frame:FrameLocator,title:'Moon Hopper'|'Rainbow Trail',device:string){
+ await frame.getByRole('button',{name:'Play!',exact:true}).click();
+ try{
+  if(title==='Moon Hopper'){
+   // The unchanged authored fixture samples held Action input. Keep one ordinary
+   // gesture down until its real win; another click could race the math cover.
+   const action=frame.getByRole('button',{name:'⭐ Action',exact:true});await action.hover();
+   const bounds=await action.boundingBox();assert.ok(bounds,'the authored Action control must be visible');
+   await page.mouse.down();
+   try{await frame.locator('#status[data-state=won]').waitFor({timeout:5000});}
+   finally{
+    // Release outside the button so no click pulse is queued after the win.
+    try{await page.mouse.move(bounds.x+bounds.width+2,bounds.y+bounds.height/2);}
+    finally{await page.mouse.up();}
+   }
+  }else{
+   // A returned score acknowledges each actual canvas tap before the next one.
+   // Four acknowledged taps finish this fixture; never send a fifth behind math.
+   for(let i=0;i<4;i++){
+    await frame.locator('#game').click({position:{x:40+i*40,y:60}});
+    await frame.locator('#score').filter({hasText:new RegExp('^Score: '+(i+1)+'$')}).waitFor({timeout:5000});
+   }
+   await frame.locator('#status[data-state=won]').waitFor({timeout:5000});
+  }
+ }catch(error){
+  console.error('Fixture play failure',device,title,await frame.locator('#status').getAttribute('data-state'),await frame.locator('#score').textContent(),await frame.locator('#game').getAttribute('data-inputs'));throw error;
+ }
+ await finishPreviewRound(page);
+ // V1's host pause leaves the authored terminal state intact beneath the cover.
+ assert.equal(await frame.locator('#status').getAttribute('data-state'),'won','real host math must finish without replacing the authored win');
+ assert.match(await page.locator('#previewOutcome').textContent()||'',/^You finished this round\./);
+}
 async function main(){
  const approval:AgentApproval={enabled:true,approvalId:'test-fixture-not-live',model:'gpt-5.4-mini',inputUsdPerMillion:.75,outputUsdPerMillion:4.5,maxInputTokens:64000,maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)};
  const repo=new MemoryRepository(),parent={subject:'test-owner',familyId:'test-family',role:'parent' as const,expiresAt:Date.now()+600000};const service=new JobService(repo,{kind:'metered-api',testFixture:true,available:true,generate:async()=>{throw Error('external only')}},{test:async()=>{throw Error('external only')}},{allowMock:true,maxUnits:120000,timeoutMs:60000,maxRetries:2});await service.setAllowance(parent,5000000,true);
@@ -54,8 +110,19 @@ async function main(){
   await page.waitForFunction(()=>{const status=document.getElementById('builderStatus')?.textContent||'';return status.includes('preview is ready')||/did not work|unavailable|allowance|Build cancelled|No job was queued|Keep names/.test(status);},{},{polling:100,timeout:Math.max(1,60000-(Date.now()-buildStartedAt))});
   assert.match(await page.textContent('#builderStatus')||'',/preview is ready/,`Initial ${device} build ended without a playable preview`);
   const initialJob=(await repo.snapshot()).jobs.find(j=>j.id===acknowledgement.jobId);assert.equal(initialJob?.status,'ready');assert.ok((initialJob?.attempts||0)>=2,'The intentionally invalid first candidate must go through automatic repair');
-  assert.match(await page.textContent('#builderMode')||'',/Test builder \(mock\)/);const frame=page.frameLocator('#generatedPreview');await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<5;i++){await frame.getByRole('button',{name:'⭐ Action',exact:true}).click();await page.waitForTimeout(100);if(await frame.locator('#status').getAttribute('data-state')==='won')break;}await frame.locator('#status[data-state=won]').waitFor({timeout:5000}).catch(async e=>{console.error('Fixture play failure',device,await frame.locator('#status').getAttribute('data-state'),await frame.locator('#score').textContent(),await frame.locator('#game').getAttribute('data-inputs'));throw e;});await page.click('#keepBuild');await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();
-  await page.fill('#reviseBuildPrompt','Change this into a rainbow paint trail, painting tiles where I tap');await page.click('#reviseBuildForm button[type=submit]');await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor({timeout:60000});await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<4;i++){await frame.locator('#game').click({position:{x:40+i*40,y:60}});await page.waitForTimeout(100);}await frame.locator('#status[data-state=won]').waitFor({timeout:5000}).catch(async e=>{console.error('Fixture play failure',device,await frame.locator('#status').getAttribute('data-state'),await frame.locator('#score').textContent(),await frame.locator('#game').getAttribute('data-inputs'));throw e;});await page.click('#keepBuild');await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();for(const title of ['Moon Hopper','Rainbow Trail','Moon Hopper']){await page.fill('#reviseBuildPrompt',title==='Moon Hopper'?'Make a moon hopper again':'Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await frame.getByRole('heading',{name:title,exact:true}).waitFor({timeout:60000});await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<5;i++){if(title==='Moon Hopper')await frame.getByRole('button',{name:'⭐ Action',exact:true}).click();else await frame.locator('#game').click({position:{x:40+i*35,y:70}});await page.waitForTimeout(100);if(await frame.locator('#status').getAttribute('data-state')==='won')break;}await frame.locator('#status[data-state=won]').waitFor({timeout:5000}).catch(async e=>{console.error('Fixture play failure',device,await frame.locator('#status').getAttribute('data-state'),await frame.locator('#score').textContent(),await frame.locator('#game').getAttribute('data-inputs'));throw e;});await page.click('#keepBuild');await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();}
+  assert.match(await page.textContent('#builderMode')||'',/Test builder \(mock\)/);const frame=page.frameLocator('#generatedPreview');
+  await playAuthoredPreview(page,frame,'Moon Hopper',device);
+  await page.click('#keepBuild');await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();
+  await page.fill('#reviseBuildPrompt','Change this into a rainbow paint trail, painting tiles where I tap');await page.click('#reviseBuildForm button[type=submit]');
+  await page.getByRole('button',{name:'Try ready preview',exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor({timeout:60000});
+  await playAuthoredPreview(page,frame,'Rainbow Trail',device);
+  await page.click('#keepBuild');await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();
+  for(const title of ['Moon Hopper','Rainbow Trail','Moon Hopper'] as const){
+   await page.fill('#reviseBuildPrompt',title==='Moon Hopper'?'Make a moon hopper again':'Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');
+   await page.getByRole('button',{name:'Try ready preview',exact:true}).click();await frame.getByRole('heading',{name:title,exact:true}).waitFor({timeout:60000});
+   await playAuthoredPreview(page,frame,title,device);
+   await page.click('#keepBuild');await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();
+  }
   await page.click('#undoBuild');await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await page.fill('#builtGameName','My generated '+device);await page.click('#forkBuildForm button[type=submit]');await page.getByText('Saved as a new builder game. Your original version is unchanged.',{exact:true}).waitFor();
   // Reload while an acknowledged job waits in the durable dispatcher; no prompt or credential is stored in the browser.
   paused=true;await page.fill('#reviseBuildPrompt','Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.reload();await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.click('#cancelBuild');await page.getByText('Build cancelled. Your current game is safe.',{exact:true}).waitFor();paused=false;

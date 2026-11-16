@@ -22,6 +22,14 @@ test('unknown schema does not erase original storage',()=>{const bad=new Memory(
 test('quota failure is atomic',()=>{const prior=storage.getItem(STUDIO_KEY);storage.fail=true;assert.throws(()=>notebook.update(s.id,owner,x=>{x.name='lost';}));storage.fail=false;assert.equal(storage.getItem(STUDIO_KEY),prior);});
 test('stale notebook instance re-reads latest state',()=>{const a=new StudioNotebook(storage),b=new StudioNotebook(storage);a.message(s.id,owner,'child','one');b.message(s.id,owner,'child','two');assert.equal(a.get(s.id,owner).messages.at(-1)?.text,'two');assert.equal(a.get(s.id,owner).messages.at(-2)?.text,'one');});
 test('backup restores drafts but rejects invalid preview data',()=>{const backup=notebook.read();const target=new StudioNotebook(new Memory());target.restore(backup);assert.equal(target.get(s.id,owner).candidate?.id,'candidate1');const bad=structuredClone(backup);bad.sessions[0].candidate!.config={count:NaN};assert.throws(()=>target.restore(bad));});
+test('background builds preserve the selected test and new draft through reload',()=>{
+ const memory=new Memory(),book=new StudioNotebook(memory),session=book.create(owner,'hill','My experiments','ride-project');
+ const first={id:'test-one',baseId:'main-one',config:{enginePower:1.2},prompt:'More power',summary:'Power test'};
+ book.saveExperiment(session.id,owner,first);book.update(session.id,owner,x=>{x.draft='A newer idea I am still typing';x.job={id:'job-two',api:'https://workshop.test',status:'ready',revisionId:'ready-two'};});
+ book.saveExperiment(session.id,owner,{id:'test-two',baseId:'main-one',remoteId:'ready-two',prompt:'Different scene',summary:'Scene test'},[],'redesign','child',false);
+ const loaded=new StudioNotebook(memory).get(session.id,owner);assert.equal(loaded.candidate?.id,'test-one');assert.equal(loaded.selectedTest,'test-one');assert.equal(loaded.draft,'A newer idea I am still typing');assert.equal(loaded.experiments?.length,2);assert.equal(loaded.job?.revisionId,'ready-two');
+ book.selectExperiment(session.id,owner,'test-two');assert.equal(book.get(session.id,owner).candidate?.remoteId,'ready-two');assert.equal(book.get(session.id,owner).remoteId,null,'opening a ready test does not promote it');
+});
 const gameStorage=new Memory();let child:any={id:owner,skills:{'mul:8x7':{tries:5,right:3}},constructionStates:{}};let canSave=true;
 const fg={store:{current:()=>child,save:()=>canSave}};
 const games=new StudioGames(gameStorage as unknown as Storage,fg);

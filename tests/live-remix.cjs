@@ -11,8 +11,9 @@ const {start}=require('./browser-server.cjs');
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dialog=>dialog.accept());
   await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);
   const nav=async(name)=>page.getByRole('navigation').getByRole('button',{name,exact:true}).click();
-  // Seed real legacy progress before remixing. New editor must not change math settings/evidence.
-  const original=await page.evaluate(()=>{FG.store.current().skills['mul:8x4']={tries:3,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.changeProfile({rate:0});return JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity})});
+  // Seed real legacy progress before remixing. A recent-question budget isolates
+  // editor/history behavior while mandatory math remains enabled at rate 1.
+  const original=await page.evaluate(()=>{FG.store.current().skills['mul:8x4']={tries:3,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();return JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity})});
   await nav('🎛️ Remix');await page.click('#newLiveGame');
   const snapshot=()=>page.evaluate(()=>FG.runtime.snapshot());
   const ready=async()=>{for(let i=0;i<3;i++)await page.locator('#go').click()};
@@ -57,15 +58,102 @@ const {start}=require('./browser-server.cjs');
   assert.deepEqual(errors,[]);console.log(`PASS ${device}: five real mutations, outcomes/coach, compare, undo/DAG, fork/reload, profile/math isolation, rejected edits, quota safety`);await context.close();
  }
  // Other plugin manifests drive real engine state, not cosmetic labels.
- const pluginPage=await browser.newPage();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
+ const pluginPage=await browser.newPage(),pluginErrors=[];pluginPage.on('pageerror',error=>pluginErrors.push(error.message));await pluginPage.clock.install({time:new Date('2026-11-16T08:00:00Z')});await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
  for(const [game,prompt,key,expected] of [['gum','Give me six gum sticks','gumRemaining',6],['dragon','Give the island 120 resilience','islandHP',120]]){
   await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}if(game==='gum'){const s=await pluginPage.evaluate(()=>FG.runtime.snapshot());assert.equal(s.config.gumBudget,6);assert.equal(s.state.gumRemaining,6-s.state.joints.length);}else assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
- // Deterministic real round regression: lose/retry, win/next; then leave during delayed math feedback.
- await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:0});FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'Bucket 2',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);await pluginPage.click('#resultNext');await pluginPage.getByRole('button',{name:'Bucket 1',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
- await pluginPage.evaluate(()=>{FG.store.changeProfile({rate:8});FG.store.current().mathWindow=[];FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#math-answer');const questionText=await pluginPage.locator('#stage-overlay h2').textContent(),operands=questionText.match(/(\d+)\s*([+−×÷-])\s*(\d+)/),left=+operands[1],right=+operands[3],answer=operands[2]==='+'?left+right:operands[2]==='×'?left*right:operands[2]==='÷'?left/right:left-right;
- await pluginPage.fill('#math-answer',String(answer));await pluginPage.click('#math-submit');await pluginPage.evaluate(()=>FG.app.openGame('gum'));await pluginPage.waitForTimeout(650);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.ok(await pluginPage.locator('.builder-piece').count());
- await pluginPage.close();
+ // Pause while no game is active before manually advancing time. In Playwright
+ // 1.56.1, a pending realtime tick can otherwise undo a fastForward advancement.
+ await pluginPage.clock.pauseAt(new Date('2026-11-16T10:00:00Z'));
+ // Native Splash uses title → hero → intro → play. A splash is a visual outcome;
+ // the optional Original Challenge ends a run after a wrong math answer.
+ // Explicit configs must opt into originalRules; an omitted flag preserves the
+ // simplified adapter for compatible older saved games.
+ const checkpointState=()=>pluginPage.evaluate(()=>{
+  const profile=FG.store.current(),overlay=document.getElementById('stage-overlay'),now=Date.now(),mathWindow=[...(profile.mathWindow||[])];
+  return {now,rate:profile.rate,mathWindow,elapsedSinceLast:mathWindow.length?now-mathWindow.at(-1):null,
+   eligible:FG.math.canAsk(profile),active:FG.learning.active,activeAttemptId:FG.learning.activeAttemptId,
+   native:FG.runtime.snapshot(),overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
+   attempts:(profile.learning?.attempts||[]).slice(-4).map(attempt=>({id:attempt.id,outcome:attempt.outcome,answers:attempt.answers.length,correct:attempt.correct,independent:attempt.independent}))};
+ });
+ const advanceNativeBudget=async()=>{
+  const before=await checkpointState();
+  assert.equal(before.active,false,'Only advance pacing between completed math activities');
+  await pluginPage.clock.fastForward(80_000);
+  const after=await checkpointState();
+  assert.equal(after.now-before.now,80_000,'The controlled clock must advance the full spacing interval');
+  assert.deepEqual(after.mathWindow,before.mathWindow,'Advancing time must retain the previous questions');
+  assert.equal(after.eligible,true,'The next native question must satisfy the real shared pacing policy');
+ };
+ const nativeRound=async(label)=>{
+  try{
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().config.originalRules),true,'This regression must exercise the restored native Splash adapter');
+  for(let i=0;i<3;i++){
+   const mode=await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode);
+   if(!['title','hero','intro'].includes(mode))break;
+   await pluginPage.locator('#go').click();
+  }
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'play');
+  await pluginPage.locator('#go').click();await pluginPage.clock.runFor(3500);
+  await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+  const before=await checkpointState();
+  console.log(`[native-checkpoint:${label}]`,JSON.stringify({now:before.now,rate:before.rate,elapsedSinceLast:before.elapsedSinceLast,eligible:before.eligible,active:before.active,mode:before.native.state.mode,attempts:before.attempts,pluginErrors}));
+  assert.equal(before.eligible,true,`${label} must respect the shared pacing policy: ${JSON.stringify({...before,pluginErrors})}`);
+  assert.equal(before.active,false,`${label} cannot start with a leaked active question: ${JSON.stringify({...before,pluginErrors})}`);
+  await pluginPage.locator('#go').click();
+  try{
+   // Native completion is synchronous. Report a policy skip or mounting error
+   // directly instead of hiding the state behind a missing-question timeout.
+   await pluginPage.waitForSelector('#stage-overlay .math-activity, #stage-overlay #resultNext',{timeout:5000});
+  }catch(error){
+   throw new Error(`${label} did not show math or a result: ${JSON.stringify({...await checkpointState(),pluginErrors})}`,{cause:error});
+  }
+  assert.equal(await pluginPage.locator('#stage-overlay .math-activity').isVisible(),true,`${label} skipped or failed shared math: ${JSON.stringify({...await checkpointState(),pluginErrors})}`);
+  }catch(error){
+   const stem=`test-results/native-checkpoint-${label.toLowerCase().replace(/\W+/g,'-')}`;
+   fs.writeFileSync(`${stem}.json`,JSON.stringify({label,...await checkpointState(),pluginErrors},null,2));
+   await pluginPage.screenshot({path:`${stem}.png`}).catch(()=>{});
+   throw error;
+  }
+ };
+ const answerNative=async(correct)=>{
+  const item=await pluginPage.evaluate(()=>FG.learning.activeItem);assert.ok(item,'Native round must present shared math');
+  const activity=pluginPage.locator('#stage-overlay .math-activity');
+  if(item.answerKind==='choice'){
+   const choice=item.choices.find(option=>correct?option.value===String(item.answer):option.value!==String(item.answer));assert.ok(choice);
+   await activity.getByRole('button',{name:choice.label,exact:true}).click();
+  }else{
+   await activity.getByRole('textbox',{name:'Math answer',exact:true}).fill(correct?String(item.answer):'-999');
+   await activity.getByRole('button',{name:'Check answer',exact:true}).click();
+  }
+ };
+ await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:8,punish:true});FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{originalRules:true,bucketCount:3,revealSafe:false,splashMs:400}})});
+ await nativeRound('Original Challenge incorrect');await answerNative(false);await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);
+ await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),1);
+ await advanceNativeBudget(); // Respect spacing while the retry is still on its intro screen.
+ await nativeRound('Original Challenge correct');await answerNative(true);await pluginPage.clock.runFor(500);
+ await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);
+ await advanceNativeBudget(); // Advance the budget while the game is still at its result.
+ await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
+
+ // Answer and change games in one browser task so navigation always precedes
+ // the 450 ms completion callback, regardless of CI transport scheduling.
+ await pluginPage.evaluate(()=>{FG.store.changeProfile({punish:false});FG.app.openGame('buckets',{config:{originalRules:true,bucketCount:3,revealSafe:false,splashMs:400}})});
+ await nativeRound('Practice before navigation');
+ await pluginPage.evaluate(()=>{
+  const item=FG.learning.activeItem,activity=document.querySelector('#stage-overlay .math-activity');
+  if(!item||!activity)throw Error('A shared math activity is required for the stale-callback regression');
+  if(item.answerKind==='choice'){
+   const button=Array.from(activity.querySelectorAll('.math-choice-grid button')).find(button=>button.dataset.value===String(item.answer));
+   if(!button)throw Error('The correct choice must be present');button.click();
+  }else{
+   activity.querySelector('.math-answer-input').value=String(item.answer);activity.querySelector('form').requestSubmit();
+  }
+  if(activity.querySelector('.math-feedback').dataset.state!=='correct')throw Error('The UI must accept the answer before navigation');
+  FG.app.openGame('gum');
+ });
+ await pluginPage.clock.runFor(700);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.equal(await pluginPage.locator('#game-mount').evaluate(node=>node.inert),false,'A new game must not retain the previous math overlay’s input lock');assert.ok(await pluginPage.locator('.builder-piece').count());
+ assert.deepEqual(pluginErrors,[]);await pluginPage.close();
  // Legacy workspace migration in browser; failed/corrupt load never replaces stored source.
  const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('family-game-factory-workspace-v2',JSON.stringify({version:1,games:[{id:'old-game',owner:'player1',game:'buckets',name:'Migrated Splash',config:{bucketCount:2,revealSafe:true,splashMs:400}}]}))});await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();assert.match(await page.textContent('#liveName'),/Migrated Splash/);await page.click('#livePlay');assert.equal((await page.evaluate(()=>FG.runtime.snapshot())).state.bucketCount,2);await page.close();
  }finally{await browser.close();server.close()}

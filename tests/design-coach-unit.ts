@@ -4,7 +4,49 @@ import {StudioNotebook,STUDIO_KEY,type Candidate} from '../src/studio/notebook';
 import {CoachService,OpenAICoachProvider,type CoachConfig} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {COACH_POLICY} from '../server/coach/policy';
+import {installCoaching} from '../src/studio/coaching';
 class Memory {data=new Map<string,string>();fail=false;getItem(k:string){return this.data.get(k)??null}setItem(k:string,v:string){if(this.fail)throw Error('quota');this.data.set(k,v)}}
+
+// Exercise the real coaching event handlers with a small DOM/storage port. Browser
+// journeys separately verify rendering, focus and touch behavior in production.
+function coachingHarness(){
+ const elements=new Map<string,any>();
+ class Element {
+  children:any[]=[];parentElement:Element|null=null;value='';textContent='';className='';open=false;rows=0;maxLength=0;type='';dataset:Record<string,string>={};
+  onclick?:()=>void;oninput?:()=>void;onchange?:()=>void;private name='';private html='';private listeners=new Map<string,Function[]>();
+  classList={add(..._x:string[]){},remove(..._x:string[]){}};
+  set id(v:string){this.name=v;elements.set(v,this);}get id(){return this.name;}
+  set innerHTML(v:string){this.html=v;for(const m of v.matchAll(/<([a-z][a-z0-9]*)[^>]*\bid="([^"]+)"[^>]*>/g)){const e=new Element();e.id=m[2];this.append(e);}}get innerHTML(){return this.html;}
+  append(...children:any[]){for(const child of children){child.parentElement=this;this.children.push(child);}}
+  prepend(...children:any[]){for(const child of children)child.parentElement=this;this.children.unshift(...children);}
+  after(..._children:any[]){}replaceChildren(...children:any[]){this.children=[];this.append(...children);}
+  setAttribute(_key:string,_value:string){}addEventListener(event:string,listener:Function){this.listeners.set(event,[...this.listeners.get(event)||[],listener]);}
+  querySelector(selector:string){return selector==='.studio-send-row'?get('send-row'):null;}
+  focus(){documentPort.activeElement=this;}
+  dispatchEvent(event:Event){if(event.type==='input')this.oninput?.();for(const listener of this.listeners.get(event.type)||[])listener(event);return true;}
+ }
+ const get=(id:string)=>{if(!elements.has(id)){const e=new Element();e.id=id;}return elements.get(id) as Element;};
+ const documentPort:any={activeElement:null,body:new Element(),createElement:()=>new Element(),getElementById:get};
+ for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
+ const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
+ const storage=new Memory(),book=new StudioNotebook(storage),initial=book.create('child-one','new','Synthetic new game');let active=initial;
+ const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[];
+ Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}}}});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal}))});
+ const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
+  message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
+  config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
+  tryRequest:async()=>{},rules:()=>'',playTest:async()=>{},playMain:async()=>{},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
+ });coach.openSession();
+ return {coach,book,storage,statuses,pending,get,
+  session:()=>book.get(active.id,active.owner),
+  input(id:string,value:string){const input=get(id);input.focus();input.value=value;input.dispatchEvent(new Event('input'));},
+  save(field:string){const input=get('plan-'+field),index=input.parentElement!.children.indexOf(input);input.parentElement!.children[index+2].children[0].onclick();},
+  resolve(reply:CoachReply){pending.shift()!.resolve(new Response(JSON.stringify({mode:'model',reply}),{status:200}));},
+  switchChild(){active=book.create('child-two','new','Another child’s game');coach.openSession();return active;},
+  dispose(){for(const [key,descriptor]of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete (globalThis as any)[key];}}
+ };
+}
 let passed=0;async function test(name:string,fn:()=>unknown|Promise<unknown>){await fn();console.log('PASS '+name);passed++;}
 async function main(){
 const mem=new Memory(),nb=new StudioNotebook(mem),owner='child-one',s=nb.create(owner,'gum','Synthetic rocket','project');
@@ -13,6 +55,23 @@ await test('three independent test alternatives preserve main and each other',()
 await test('continuing a test preserves original and names provenance',()=>{nb.saveExperiment(s.id,owner,c('d',14),['a'],'redesign','child');assert.equal(nb.get(s.id,owner).experiments![0].candidate.config!.gumBudget,12);assert.deepEqual(nb.get(s.id,owner).experiments![3].parents,['a']);});
 await test('select test does not delete unselected alternatives',()=>{nb.selectExperiment(s.id,owner,'b');assert.equal(nb.get(s.id,owner).candidate!.id,'b');assert.equal(nb.get(s.id,owner).experiments!.length,4);});
 await test('notes, predictions, source attribution and shelf survive reload',()=>{nb.note(s.id,owner,'b','Still exciting');const r=new StudioNotebook(mem).get(s.id,owner);assert.equal(r.experiments![1].notes,'Still exciting');assert.equal(r.experiments![3].origin,'child');});
+await test('fork preserves authored history and plan while detaching absent test links',()=>{
+ const storage=new Memory(),book=new StudioNotebook(storage),original=book.create(owner,'gum','Original experiment','original-project');
+ book.saveExperiment(original.id,owner,c('original-test',12));book.note(original.id,owner,'original-test','My original note stays with that test.');
+ book.message(original.id,owner,'child','I want a floating castle.');
+ book.update(original.id,owner,x=>{x.design!.plan.fun={value:'Explore my floating castle',origin:'child',accepted:true,delegated:false};x.reflection=true;});
+ book.observe(original.id,owner,'Completed a round','runtime','original-test');
+ book.observe(original.id,owner,'I liked the wobble, even when it fell.','child','original-test');
+ const before=book.get(original.id,owner),forked=book.fork(original.id,owner,'Castle copy','copied-project',null);
+ assert.equal(forked.reflection,false);assert.deepEqual(forked.experiments,[]);assert.equal(forked.selectedTest,null);
+ assert.deepEqual(forked.messages,before.messages);assert.deepEqual(forked.design!.plan,before.design!.plan);
+ assert.deepEqual(forked.design!.observations,before.design!.observations.map(o=>({...o,experimentId:null})));
+ assert.deepEqual(book.get(original.id,owner),before);
+ assert.equal(book.get(original.id,owner).experiments![0].notes,'My original note stays with that test.');
+ const recentRuntime=forked.design!.observations.filter(o=>o.source==='runtime').at(-1)!;
+ assert.doesNotThrow(()=>book.observe(forked.id,owner,'Now I want to test the copy.','child',recentRuntime.experimentId));
+ assert.equal(new StudioNotebook(storage).get(forked.id,owner).design!.observations.at(-1)!.text,'Now I want to test the copy.');
+});
 await test('cross-profile selection and notes rejected',()=>{assert.throws(()=>nb.selectExperiment(s.id,'other','a'));assert.throws(()=>nb.note(s.id,'other','a','leak'));});
 await test('failed shelf write is atomic',()=>{const old=mem.getItem(STUDIO_KEY);mem.fail=true;assert.throws(()=>nb.saveExperiment(s.id,owner,c('failed',17)));mem.fail=false;assert.equal(mem.getItem(STUDIO_KEY),old);});
 await test('unknown and cyclic test parents rejected',()=>{assert.throws(()=>experiment(c('z',5),nb.get(s.id,owner).experiments!,['z']));});
@@ -22,6 +81,60 @@ await test('unaccepted helper plan is not called child-approved',()=>{const d=fr
 await test('record rejects inferred emotions, secret fields, malformed evidence',()=>{assert.throws(()=>validateDesign({...freshDesign(),emotion:'frustrated'}));assert.throws(()=>validateDesign({...freshDesign(),plan:{token:{value:'secret'}}}));assert.throws(()=>validateExperiments([{...nb.get(s.id,owner).experiments![0],url:'https://secret'}]));});
 const context:CoachContext={message:'I dislike aiming',mode:'discuss',game:'dragon',plan:{fun:{value:'Exciting close calls',origin:'child',accepted:true,delegated:false}},friction:'',helpLevel:0,support:'balanced',conversation:[],observations:[],tests:[]};
 const reply:CoachReply={move:'clarify',text:'We can question the action, not just the difficulty.',question:'Could your hero reach that goal another way?',suggestions:[],proposedChange:null,planSuggestions:[],evidenceIds:[]};
+await test('plan input survives another field save, rerender and durable reload without approving a build',()=>{
+ const h=coachingHarness();try{h.input('plan-action','Jump over the river');h.input('plan-goal','Deliver the pizza');h.save('goal');h.coach.renderPlan();
+  assert.equal(h.get('plan-action').value,'Jump over the river');const restored=new StudioNotebook(h.storage).get(h.session().id,h.session().owner);
+  assert.equal(restored.design!.plan.action!.value,'Jump over the river');assert.equal(restored.design!.plan.goal!.value,'Deliver the pizza');assert.equal(restored.design!.approvedPlan,false);
+ }finally{h.dispose();}
+});
+await test('autosave retains unchanged helper provenance and explicit acceptance remains separate',()=>{
+ const h=coachingHarness();try{const s=h.session();h.book.update(s.id,s.owner,x=>{x.design!.plan.style={value:'A cloud castle',origin:'helper',accepted:false,delegated:false};});h.coach.openSession();
+  h.input('plan-style','A cloud castle');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,false);
+  h.input('plan-style','A cloud castle with penguins');assert.equal(h.session().design!.plan.style!.origin,'child');
+  h.input('plan-style','A cloud castle');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,false);
+  h.save('style');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,true);assert.equal(h.session().design!.approvedPlan,false);
+ }finally{h.dispose();}
+});
+await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
+ const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');assert.equal(h.pending.length,1);
+  h.input('studioPrompt','Maybe the penguin could bounce');h.resolve(reply);await turn;
+  assert.equal(h.get('studioPrompt').value,'Maybe the penguin could bounce');assert.equal(h.session().draft,'Maybe the penguin could bounce');assert.equal(h.session().messages[0].text,'I want a different way to move');assert.equal(h.statuses.some(s=>s.error),false);
+ }finally{h.dispose();}
+});
+await test('retyping the same draft while the coach replies still counts as new work',async()=>{
+ const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
+});
+await test('a late coach suggestion cannot overwrite a newer child plan answer',async()=>{
+ const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
+});
+await test('an old rejected coach request cannot write into a new child or interrupt their reply',async()=>{
+ const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss'),oldRequest=h.pending.shift()!;
+  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;
+  assert.equal(h.get('coachModeStatus').textContent,'Thinking together…');assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
+  h.resolve(reply);await current;assert.equal(h.session().messages.length,2);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
+ }finally{h.dispose();}
+});
+await test('a failed plan autosave keeps the visible answer through another save and can retry',()=>{
+ const h=coachingHarness();try{h.storage.fail=true;h.input('plan-action','Balance on a wobbly bridge');assert.equal(h.session().design!.plan.action,undefined);assert.match(h.get('planSaveStatus').textContent,/has not saved/);
+  h.storage.fail=false;h.input('plan-goal','Reach the treehouse');h.save('goal');h.coach.renderPlan();assert.equal(h.get('plan-action').value,'Balance on a wobbly bridge');assert.equal(h.get('plan-credit-action').textContent,'Not saved yet');assert.match(h.get('planSaveStatus').textContent,/Some answers have not saved/);
+  h.save('action');assert.equal(h.session().design!.plan.action!.value,'Balance on a wobbly bridge');assert.equal(h.session().design!.approvedPlan,false);assert.equal(h.statuses.some(s=>s.error),true);
+ }finally{h.dispose();}
+});
+await test('navigation flush blocks on an unsaved plan, then saves all visible drafts before reopening',()=>{
+ const h=coachingHarness();try{
+  h.storage.fail=true;h.input('plan-fun','A funny wobbly bridge');h.input('designPrediction','The lighter bridge might sway');h.input('coachFriction','I want to try balancing');
+  assert.throws(()=>h.coach.flushDrafts(),/Could not save this notebook/);assert.equal(h.get('plan-fun').value,'A funny wobbly bridge');assert.equal(h.session().design!.plan.fun,undefined);
+  h.storage.fail=false;h.coach.flushDrafts();h.coach.openSession();
+  assert.equal(h.get('plan-fun').value,'A funny wobbly bridge');assert.equal(h.get('designPrediction').value,'The lighter bridge might sway');assert.equal(h.get('coachFriction').value,'I want to try balancing');
+  const restored=new StudioNotebook(h.storage).get(h.session().id,h.session().owner);assert.equal(restored.design!.plan.fun!.value,'A funny wobbly bridge');assert.equal(restored.hypothesis,'The lighter bridge might sway');assert.equal(restored.design!.friction,'I want to try balancing');assert.equal(restored.design!.approvedPlan,false);
+ }finally{h.dispose();}
+});
+await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
+ const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
+  assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);
+ }finally{h.dispose();}
+});
+
 await test('model cannot declare a build or promotion action',()=>{assert.throws(()=>validateCoachReply({...reply,promote:true},context));assert.throws(()=>validateCoachReply({...reply,move:'execute'},context));});
 await test('unsupported observation citation rejected',()=>{assert.throws(()=>validateCoachReply({...reply,evidenceIds:['not-real']},context));});
 await test('one question per reply, not a disguised interview',()=>{assert.throws(()=>validateCoachReply({...reply,text:'What happened? What next?'},context));});

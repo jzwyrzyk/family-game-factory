@@ -3,6 +3,8 @@
 Evidence date: 16 November 2026. This report separates implemented behavior, measured engineering evidence, browser verification, and release decisions.
 The product standard remains [GAME-QUALITY.md](../GAME-QUALITY.md): a game should be worth playing before a learning prompt appears.
 
+This is the historical game-quality component report for #20. The combined math/quality/child-journey application is reviewed in [draft #21](https://github.com/jzwyrzyk/family-game-factory/pull/21), with its own complete CI evidence and the newer immutable learning-compatible `quality-runtime-v2.0.3`. The source pins and results below remain evidence for their stated component revisions.
+
 ## Review scope and source pins
 
 The work is reviewed in [PR #20](https://github.com/jzwyrzyk/family-game-factory/pull/20), branch `feature/game-quality-v1`.

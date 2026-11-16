@@ -2,6 +2,14 @@
 
 A child-led local game-design loop built on the Family Arcade. See [Assignment 002](docs/assignment-002/README.md), [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
 
+## Integrated child journey review
+
+The [child journey standard](docs/child-journey/README.md) combines the grades 1–4 learning service, physical games, and child-owned Studio. It adds play-first navigation, repeatable help, protected math focus, explicit ready previews, and durable ideas through asynchronous replies and save failures. Review with `?studio=1`; [acceptance](docs/child-journey/acceptance.md) distinguishes automated evidence from the remaining educator/child/device review. The live site and paid activation are unchanged.
+
+## Adaptive Math v1 draft
+
+The grades 1–4 learning implementation is documented in [Adaptive Math v1](docs/adaptive-math/README.md), with a [73-unit coverage catalog](docs/adaptive-math/curriculum.md), [game integration contracts](docs/adaptive-math/integration.md), and [acceptance evidence](docs/adaptive-math/acceptance.md). It shares learning across games, keeps math enabled, separates independent and assisted work, and supports checkpoints and mathematical answer construction. It builds on the optional Studio draft (`?studio=1`) and also works in the ordinary arcade.
+
 ## Game Quality v1
 
 The [Game Quality standard](docs/GAME-QUALITY.md) defines the physical-play implementation. The [validation report](docs/game-quality/VALIDATION.md) records source pins, tests, screenshots, measurements, and remaining release checks. New Bubble Gum Builders games use a real construction simulation with ten household parts, breakable gum, three missions and free play. Junkyard Rally adds wheel suspension, terrain, throttle/brake, three trails, and handling changes saved as experiments. Both use local toy artwork, music and effects; gameplay makes no model requests.
