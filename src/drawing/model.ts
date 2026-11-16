@@ -92,9 +92,10 @@ export function assemblyRig(input:DrawingAssembly):DrawingRig {
     return {id:piece.id,parentId:piece.parentId,part,offset:{x:clamp((c.x-anchor.x)*scale,-8,8),y:clamp((c.y-anchor.y)*scale,-8,8)},angle:0,physical:piece.physical};
   });
   const body=a.pieces.find(p=>p.role==='body');
-  const bindings=body?a.pieces.filter(p=>p.role==='wheel'&&p.id!==body.id).map(p=>({
-    a:body.id,b:p.id,attachmentA:'center',attachmentB:'axle',kind:'suspension' as const
-  })):[];
+  const bindings=a.pieces.filter(p=>p.parentId!==null).map(p=>({
+    a:p.parentId!,b:p.id,attachmentA:'center',attachmentB:p.role==='wheel'?'axle':'center',
+    kind:(p.role==='wheel'?'suspension':p.role==='limb'||p.role==='wing'||p.role==='propeller'?'axle':'fixed') as 'fixed'|'axle'|'suspension'
+  }));
   return validateDrawingRig({schemaVersion:1,id:'drawing_rig',components,bindings});
 }
 export function defaultAssembly(source:{id:string;sha256:string},kind:DrawingKind,regions:DrawingPiece[]):DrawingAssembly{
