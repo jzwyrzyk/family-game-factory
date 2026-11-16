@@ -20,12 +20,6 @@ jobs:
       - name: Unit and contract checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:unit
-      - name: Learning activities
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:learning-ui
-      - name: Learning integration
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:learning-integration
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
@@ -47,9 +41,6 @@ jobs:
       - name: Restored games
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/restored-games.cjs
-      - name: Learning persistence and pacing
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/learning-repair.cjs
       - name: Offline shell
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/offline-shell.cjs
@@ -72,5 +63,33 @@ jobs:
         if: always()
         with:
           name: browser-evidence
+          path: test-results/
+          if-no-files-found: ignore
+  learning:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build production
+        id: build
+        run: npm run build
+      - name: Learning activities
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:learning-ui
+      - name: Learning integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:learning-integration
+      - name: Learning persistence and pacing
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/learning-repair.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: learning-evidence
           path: test-results/
           if-no-files-found: ignore

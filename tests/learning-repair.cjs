@@ -52,14 +52,38 @@ const assert=require('node:assert/strict');
    return {...active,raw};
   };
   const attempts=[];
+  const checkpointState=()=>page.evaluate(()=>{
+   const profile=FG.store.current(),overlay=document.getElementById('stage-overlay'),item=FG.learning.activeItem;
+   const mathWindow=[...(profile.mathWindow||[])],now=Date.now();
+   return {now,rate:profile.rate,grade:profile.grade,mathWindow,elapsedSinceLast:mathWindow.length?now-mathWindow.at(-1):null,
+    eligibleNow:FG.math.canAsk(profile),active:FG.learning.active,activeAttemptId:FG.learning.activeAttemptId,
+    activeItem:item?{id:item.id,skillId:item.skillId,grade:item.grade}:null,native:FG.runtime.snapshot(),
+    overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
+    attempts:(profile.learning?.attempts||[]).slice(-4).map(attempt=>({id:attempt.id,outcome:attempt.outcome,answers:attempt.answers.length,correct:attempt.correct,independent:attempt.independent}))};
+  });
   for(const challenge of [false,true]){
+   const phase=challenge?'Original Challenge':'Practice';
    if(challenge)await page.clock.fastForward(80_000); // Advance pacing while at the completed result, without replaying idle animation frames.
    await page.evaluate(challenge=>{FG.store.changeProfile({punish:challenge,rate:8});FG.app.openGame('buckets')},challenge);
    for(let i=0;i<4;i++)await page.locator('#go').click();
    await page.clock.runFor(6500);
    await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+   const before=await checkpointState();
+   console.log(`[learning-repair:${phase}] before checkpoint`,JSON.stringify({...before,pageErrors:errors}));
+   assert.equal(before.eligibleNow,true,`${phase} must respect the real pacing policy: ${JSON.stringify(before)}`);
+   assert.equal(before.active,false,`${phase} cannot start with a leaked active attempt: ${JSON.stringify(before)}`);
    await page.locator('#go').click();
-   await page.waitForSelector('#stage-overlay .math-activity');
+   try{
+    // Both outcomes are synchronous in the native host. Capture a policy-skip
+    // result or a mounting error directly instead of waiting for missing math.
+    await page.waitForSelector('#stage-overlay .math-activity, #stage-overlay #resultNext',{timeout:5000});
+   }catch(error){
+    const state=await checkpointState();
+    throw new Error(`${phase} did not show a learning activity or result: ${JSON.stringify({...state,pageErrors:errors})}`,{cause:error});
+   }
+   const after=await checkpointState();
+   console.log(`[learning-repair:${phase}] after checkpoint`,JSON.stringify({...after,pageErrors:errors}));
+   assert.equal(await page.locator('#stage-overlay .math-activity').isVisible(),true,`${phase} skipped or failed math: ${JSON.stringify({...after,pageErrors:errors})}`);
    const attempt=await answerActivity(false);attempts.push(attempt);
    const storedWrong=await page.evaluate(id=>{
     const data=JSON.parse(localStorage.getItem('family-game-factory-state-v1'));
