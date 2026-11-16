@@ -73,21 +73,43 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
  const ctx=canvas.getContext('2d',{willReadFrequently:true})!;
  ctx.drawImage(image,r.x*w,r.y*h,r.w*w,r.h*h,0,0,canvas.width,canvas.height);
  const pixels=ctx.getImageData(0,0,canvas.width,canvas.height),d=pixels.data;
- // Estimate the paper/background from the full source outside the crop at integration.
- // For V1 pale paper near white is removed; complex photo backgrounds need guided correction.
- for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++){
-  const i=(y*canvas.width+x)*4,rr=d[i],g=d[i+1],b=d[i+2];
-  const brightness=Math.min(rr,g,b),spread=Math.max(rr,g,b)-brightness;
-  if(brightness>245&&spread<17)d[i+3]=0;
+ // Find pale paper by sampling the original image BORDER. The original is never altered.
+ // Only flood-connected background is removed: enclosed white details remain visible.
+ const source=(image as HTMLCanvasElement).getContext?.('2d',{willReadFrequently:true});
+ let paper:[number,number,number]=[255,255,255];
+ if(source){
+  const probes=[[1,1],[w-2,1],[1,h-2],[w-2,h-2],[w*.5,1],[w*.5,h-2],[1,h*.5],[w-2,h*.5]];
+  const samples=probes.map(([x,y])=>Array.from(source.getImageData(Math.max(0,Math.min(w-1,Math.floor(x))),Math.max(0,Math.min(h-1,Math.floor(y))),1,1).data).slice(0,3));
+  paper=[0,1,2].map(k=>samples.map(s=>s[k]).sort((a,b)=>a-b)[Math.floor(samples.length/2)]) as [number,number,number];
+ }
+ const eligible=paper.every(c=>c>=105);
+ const W=canvas.width,H=canvas.height,seen=new Uint8Array(W*H),queue=new Int32Array(W*H);
+ let head=0,tail=0;
+ const isPaper=(index:number)=>{const p=index*4;
+  return d[p+3]>0&&Math.hypot(d[p]-paper[0],d[p+1]-paper[1],d[p+2]-paper[2])<32;
+ };
+ const enqueue=(index:number)=>{if(index<0||index>=W*H||seen[index]||!isPaper(index))return;seen[index]=1;queue[tail++]=index;};
+ if(eligible){
+  for(let x=0;x<W;x++){enqueue(x);enqueue((H-1)*W+x);}
+  for(let y=0;y<H;y++){enqueue(y*W);enqueue(y*W+W-1);}
+  while(head<tail){
+   const i=queue[head++],x=i%W,y=Math.floor(i/W);
+   if(x>0)enqueue(i-1);if(x<W-1)enqueue(i+1);
+   if(y>0)enqueue(i-W);if(y<H-1)enqueue(i+W);
+  }
+ }
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+  const i=y*W+x,p=i*4;
+  if(seen[i])d[p+3]=0;
   if(piece.region.shape==='ellipse'){
-    const nx=(x+.5)/canvas.width*2-1,ny=(y+.5)/canvas.height*2-1;
-    if(nx*nx+ny*ny>1)d[i+3]=0;
+    const nx=(x+.5)/W*2-1,ny=(y+.5)/H*2-1;
+    if(nx*nx+ny*ny>1)d[p+3]=0;
   }
   if(piece.role==='body'){
-   const ax=(r.x+(x+.5)/canvas.width*r.w),ay=(r.y+(y+.5)/canvas.height*r.h);
+   const ax=r.x+(x+.5)/W*r.w,ay=r.y+(y+.5)/H*r.h;
    for(const other of pieces)if(other.id!==piece.id&&other.role==='wheel'){
     const q=other.region,nx=(ax-q.x-q.w/2)/(q.w/2),ny=(ay-q.y-q.h/2)/(q.h/2);
-    if(nx*nx+ny*ny<.92)d[i+3]=0;
+    if(nx*nx+ny*ny<.92)d[p+3]=0;
    }
   }
  }
