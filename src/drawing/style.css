@@ -32,3 +32,14 @@
 @media(max-width:830px){.dl-main{grid-template-columns:1fr}.dl-tools{max-height:none}.dl-header{padding:12px}.dl-main{padding:9px}.dl-footer{flex-wrap:wrap}}
 @media(pointer:coarse){.drawing-lab button{min-height:52px}.dl-stage-actions [data-go],.dl-stage-actions [data-jump]{min-width:116px;min-height:65px;font-size:16px}}
 @media(prefers-reduced-motion:reduce){.drawing-lab::backdrop{backdrop-filter:none}}
+
+.drawing-paint .dp-work{display:grid;grid-template-columns:minmax(0,2.5fr) minmax(225px,.7fr);gap:12px;padding:12px}
+.drawing-paint [data-paper]{width:100%;height:auto;aspect-ratio:900/560;background:white;border-radius:13px;border:2px solid #9ebbb0;touch-action:none}
+.drawing-paint .dp-tools{display:flex;flex-direction:column;gap:12px}
+.drawing-paint .dp-tools label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px}
+.drawing-paint .dp-tools input{min-height:44px;padding:9px;border:1px solid #9ebbb0;border-radius:9px}
+.drawing-paint [data-colors]{display:flex;gap:5px;flex-wrap:wrap}
+.drawing-paint [data-colors] button{width:42px;height:42px;min-height:42px;min-width:42px;padding:0;border-radius:50%}
+.drawing-paint [data-colors] button[aria-pressed=true]{outline:3px solid #f1ad4c;outline-offset:2px}
+.drawing-paint [data-save]{background:#21816c;color:white}
+@media(max-width:830px){.drawing-paint .dp-work{grid-template-columns:1fr}.drawing-paint .dp-tools{display:flex;flex-flow:row wrap;align-items:center}.drawing-paint .dp-tools label{flex:1 1 150px}.drawing-paint [data-colors]{width:100%}}
