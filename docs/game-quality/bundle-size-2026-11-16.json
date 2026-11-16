@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "scope": "Core static HTML/CSS/JavaScript. Excludes existing original-game images and service-worker cache downloads. Native quality assets add no external art/audio files. Gzip level6; not a mobile startup-time measurement.",
   "baselineCommit": "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
-  "qualityCommit": "90ccc7a17216fd6c466e7e9a5bba5589cdb99f01",
+  "qualityCommit": "226e44dc44e54de237c0faf4e1038087f4c1738a",
   "builds": [
     {
       "build": "baseline",
@@ -33,14 +33,14 @@
         {
           "path": "index.html",
           "bytes": 13823,
-          "gzipBytes": 4839,
-          "sha256": "ba9a48018bde8e731e6aeaff024e20fe96f207eb8c8d3e972132d3dc810a4211"
+          "gzipBytes": 4838,
+          "sha256": "37ba3879384051524db295650654bd5d747cd5e1035d70ac10f1823c23767118"
         },
         {
-          "path": "assets/index-Bo1xz4E4.js",
-          "bytes": 445794,
-          "gzipBytes": 128850,
-          "sha256": "849a1a50267a7311b84641298c5dce6050f52c78b49e0aadfc5ac0534bcd9641"
+          "path": "assets/index-Cnf8OCN4.js",
+          "bytes": 447521,
+          "gzipBytes": 129334,
+          "sha256": "f390535b62dfc741904cd2fa49df95d46127749fc19ab64af30960a0ac3c869d"
         },
         {
           "path": "assets/index-D4HvPenY.css",
@@ -50,5 +50,10 @@
         }
       ]
     }
-  ]
+  ],
+  "existingArtwork": {
+    "files": 23,
+    "bytes": 4367688,
+    "scope": "Unchanged original-game PNG assets, outside core-gzip totals; service-worker caching and actual request timing are separate from this size measurement."
+  }
 }

@@ -4,12 +4,14 @@ Each approved directory is an immutable trusted package, separate from the child
 
 `bundle-v2.cjs` keeps an explicit version → SHA-256 registry. A compiled game records both `runtimeVersion` and `runtimeHash`, in addition to its separate source and compiled-code hashes. The preview looks up its exact archived version. New sandbox attestations must use the current approved version. An unknown version or changed archive fails closed. V1 continues through the original primitive renderer and gate.
 
+The current package is `quality-runtime-v2.0.1`. It fixes a contact-time failure in the initial `v2.0.0` candidate: Planck's continuous-collision solver uses `Date.now()` for internal profiling, while the generated realm intentionally has no ambient clock. The new archive captures that profiler clock inside the trusted closure before sealing globals. Generated code runs in a separate sibling scope and still sees no `Date`. A 180-tick test of the exact sealed archive covers falling onto and settling on a floor. The earlier archive remains byte-for-byte intact; it is no longer accepted for new attestations. No live generated game was accepted during this development review.
+
 ## Updating an approved runtime
 
 1. Change the trusted source and its `VERSION` in `runtime-v2.ts`; choose a new version.
 2. Run `node scripts/build-generated-runtime.cjs quality-runtime-v2.MINOR.PATCH`. The packager refuses to overwrite an existing archive.
 3. Review the manifest, exact worker/client output, source hashes and dependency versions. Append the new hash to `bundle-v2.cjs` and update its default `VERSION`, preserving every previous approved registry entry and archive.
-4. Update the generation prompt's supported version and run the trusted unit and browser containment/mechanic suites against this exact archive. The source-hash guard includes the bootstrap, language allowlist, hardening, frame copier, renderer, physics facade, catalogue and artwork. Do not treat a source-only review or VM unit fixture as browser/gVisor evidence.
+4. Update the generation prompt's supported version and run the trusted unit and browser containment/mechanic suites against this exact archive. The source-hash guard includes the bootstrap, private profiling clock, language allowlist, hardening, frame copier, renderer, physics facade, catalogue and artwork. Do not treat a source-only review or VM unit fixture as browser/gVisor evidence.
 5. Build/review a new immutable sandbox image and coordinate the existing private worker's reviewed public-source pin. Keep existing gateway/private-worker trust identities, approval flags and runner gates intact. Activation remains a separate authorized deployment step.
 
 Never overwrite an approved directory or remove an approved registry entry to make new code pass. Saved games retain their original package; a future upgrade is a new revision. The initial unregistered development snapshot was replaced before the first approved hash was recorded; no published or accepted game referred to that draft.

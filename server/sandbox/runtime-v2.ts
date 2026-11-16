@@ -5,7 +5,7 @@ import {World,Vec2,Box,Circle,Polygon,DistanceJoint,WeldJoint,RevoluteJoint,Whee
 import type {Body,Joint} from 'planck';
 import {PARTS} from '../../src/quality/parts';
 
-export const VERSION='quality-runtime-v2.0.0';
+export const VERSION='quality-runtime-v2.0.1';
 export const LIMITS=Object.freeze({bodies:40,joints:60,events:24,commands:240,steps:4});
 const SCALE=40, STEP=1/60;
 const number=(v:unknown,min:number,max:number,fallback?:number):number=>{if(v===undefined&&fallback!==undefined)return fallback;if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)throw Error('CAPABILITY_NUMBER_LIMIT');return v;};
