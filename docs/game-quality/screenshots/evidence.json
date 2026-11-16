@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "featureCommit": "ca9b53d70e89bb2dba86654b2face902752d4795",
+  "mainBaseline": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+  "workflow": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/43813166576",
+  "workflowConclusion": "success",
+  "event": "pull_request",
+  "scope": "Actual screenshots from the complete passing PR validation of this feature against the main baseline. Generated-game images show reviewed authored fixtures, not live model output. Desktop/mobile browser viewports are not real-device thermal or child-enjoyment evidence.",
+  "artifact": {
+    "id": 14201881270,
+    "name": "browser-evidence",
+    "zipSha256": "a9a3eccedda25f01456ede134470065aa9a9c1214f05076b33c7ce540cd4a778"
+  },
+  "independentExactHeadReview": {
+    "workflow": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/43813161679",
+    "conclusion": "success",
+    "recordedGitHead": "ca9b53d70e89bb2dba86654b2face902752d4795",
+    "artifactId": 14201706474,
+    "zipSha256": "8e6edbd2c4c81dbd0ab8fbb35b2b0147cee19e3e5357354d393b7a811b4cbd90"
+  },
+  "images": [
+    {
+      "file": "workshop-desktop.png",
+      "artifactPath": "quality-gum-desktop.png",
+      "bytes": 107074,
+      "sha256": "334805e8256b8607c569a4ea1028340b51237a691388c18ee61461fac5b30c8a"
+    },
+    {
+      "file": "workshop-mobile.png",
+      "artifactPath": "quality-gum-mobile.png",
+      "bytes": 55791,
+      "sha256": "7353d38551466690fbf9f8b980702b1d3a9a26b3f5c64c0d4bdd4628523a6c90"
+    },
+    {
+      "file": "rally-desktop.png",
+      "artifactPath": "quality-hill-desktop.png",
+      "bytes": 101586,
+      "sha256": "2ed1ffb75fec86efd72f730baa6f5d4dc7aadaeb1b5e8a45b344afe5f1bdef20"
+    },
+    {
+      "file": "rally-mobile.png",
+      "artifactPath": "quality-hill-mobile.png",
+      "bytes": 60350,
+      "sha256": "f3365683aceceb8569a167ab86fd52c907720cb2d5e8a66d84771930439c77cb"
+    },
+    {
+      "file": "generated-desktop.png",
+      "artifactPath": "quality-generated-desktop.png",
+      "bytes": 84987,
+      "sha256": "e4e526aa1182084d85b5b202b7c4a306cd5f760cfe5404afda4bd1b37e4ac145"
+    },
+    {
+      "file": "generated-mobile.png",
+      "artifactPath": "quality-generated-mobile.png",
+      "bytes": 41097,
+      "sha256": "ca2e461501a9a7bef0bc87fa7590304620c425c18f96c31b5658fea2131423e6"
+    },
+    {
+      "file": "studio-paused-desktop.png",
+      "artifactPath": "studio-paused-workshop-desktop.png",
+      "bytes": 138896,
+      "sha256": "4a6beb76354ee981baf8dbdd2f1dbe3c7aeb8a8b7782da90c661ecf4d0ff6d5a"
+    },
+    {
+      "file": "studio-paused-mobile.png",
+      "artifactPath": "studio-paused-workshop-mobile.png",
+      "bytes": 22044,
+      "sha256": "0199789eab55e3577120a9dee14f8cdd294a94f610836175864da605a9cc7afa"
+    }
+  ]
+}

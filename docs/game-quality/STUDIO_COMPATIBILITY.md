@@ -11,6 +11,8 @@
 
 The patch was originally checked against the exact Studio source above and reapplied to its identical tree in the main merge. It touches six Studio source files and three Studio test files. Current integration pins and CI scope are recorded in `docs/studio-review/quality-ci-pins.json` and `QUALITY_INTEGRATION_CI.md`.
 
+Later commits add the deferred legacy fallback, generated runtime v2.0.2, and an in-memory paused native-game scene. The latter copies one bounded frame before the existing teardown, then clears it on navigation, profile/session changes or remount. These changes preserve the existing coaching and save/restart decisions. See [VALIDATION.md](VALIDATION.md) for the tested source and current evidence; the archived patch remains the original integration record.
+
 ## Prerequisites outside this patch
 
 The package merge retains Planck 1.4.2 and all native/generated scripts, and adds main's Studio and coach scripts. Both client initializers are retained. Those two merge resolutions are deliberately excluded from the archived compatibility patch.

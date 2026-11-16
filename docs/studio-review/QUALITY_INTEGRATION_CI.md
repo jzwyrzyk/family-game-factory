@@ -2,6 +2,8 @@
 
 Studio and the design coach are already part of `main` through merge commit `ca73ceba4ae2c79f9f669c3fcbaa66922230d601`. The game-quality feature branch integrates that main baseline, preserves its coaching behavior, and adds compatibility for the physical games and generated runtime. It does not create or merge a separate Studio PR.
 
+This document records the original integration inputs and preflight. Subsequent source changes and final browser results are recorded in the [validation review](../game-quality/VALIDATION.md); the parent/runtime pins below remain the historical merge inputs.
+
 ## Exact source
 
 - Native/generated parent: `16864e669d3c71f7f6b63b4eff68f1700e4f0f6c`.
@@ -32,7 +34,7 @@ Browser execution belongs to CI in this environment. Local preflight does not es
 
 The workflow **Studio quality integration review** accepts only pushes or manual runs on `feature/game-quality-v1`. Its permissions are read-only. It uses Ubuntu 24.04, Node 22, a clean `npm ci`, and the project's pinned Playwright Chromium. It has no deployment, generation-activation, or private-worker-repin steps.
 
-After a successful build, Studio unit, coach unit, coach HTTP, Studio browser, and design-coach browser steps run independently. Each uses `!cancelled()` plus the build outcome, so an earlier failed test does not prevent the other browser suite from reporting. The existing **Arcade journeys** workflow remains unchanged and runs the complete combined `npm test` suite separately.
+After a successful build, Studio unit, coach unit, coach HTTP, generated-physics/presentation, Studio browser, design-coach browser, and mocked generation steps run independently. Each uses `!cancelled()` plus the build outcome, so an earlier failed test does not prevent the other browser suites from reporting. The existing **Arcade journeys** workflow remains unchanged and runs the complete combined `npm test` suite separately.
 
 The dedicated artifact `studio-quality-review-evidence` contains the tested commit, parent history, Node version, and screenshots. The browser suites use local/offline behavior and explicitly labeled remote transport fixtures; they do not call a live model.
 

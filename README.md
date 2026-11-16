@@ -4,7 +4,7 @@ A child-led local game-design loop built on the Family Arcade. See [Assignment 0
 
 ## Game Quality v1
 
-The [Game Quality standard](docs/GAME-QUALITY.md) defines the physical-play implementation and its acceptance evidence. New Bubble Gum Builders games use a real construction simulation with ten household parts, breakable gum, three missions and free play. Junkyard Rally adds wheel suspension, terrain, throttle/brake, three trails, and handling changes saved as experiments. Both use local toy artwork, music and effects; gameplay makes no model requests.
+The [Game Quality standard](docs/GAME-QUALITY.md) defines the physical-play implementation. The [validation report](docs/game-quality/VALIDATION.md) records source pins, tests, screenshots, measurements, and remaining release checks. New Bubble Gum Builders games use a real construction simulation with ten household parts, breakable gum, three missions and free play. Junkyard Rally adds wheel suspension, terrain, throttle/brake, three trails, and handling changes saved as experiments. Both use local toy artwork, music and effects; gameplay makes no model requests.
 
 Start a physical game, then choose **Improve this game** or a garage change. Try **Make wheels bigger**, **Make springs softer**, **Make car lighter**, **Make joints stronger**, or **Make fan stronger**. The build or ride carries into the new version. Compare, Keep, undo, or save a different game. Older saved gum versions keep their original engine. Drawing decomposition has a validated component/rig contract and remains a separate branch.
 
@@ -19,7 +19,7 @@ npm ci
 npm run dev
 ```
 
-Use the printed local URL. Vite serves the TypeScript modules; opening raw `index.html` as a file is no longer supported. `npm run build` typechecks and produces a static `dist/` site. No runtime server or provider key is needed.
+Use the printed local URL. Add `?studio=1` to use the integrated play-and-design Studio review route; the default arcade and its saved games remain available. Vite serves the TypeScript modules; opening raw `index.html` as a file is no longer supported. `npm run build` typechecks and produces a static `dist/` site. No runtime server or provider key is needed.
 
 ## Try Live Remix
 
@@ -47,13 +47,13 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-Strict TypeScript check, Vite production build, unit/contract tests, original v0.3 browser journeys and desktop/mobile five-iteration remix journeys run in CI on pinned Ubuntu 24.04. CI always uses the Playwright-pinned Chromium installed by the workflow. Local runs may use system Chromium when installed; otherwise Playwright's Chromium is used. `CHROMIUM_PATH` overrides it. Tests serve built assets under a repository-style `/arcade/` path and create synthetic screenshots in `test-results/`.
+Strict TypeScript check, Vite production build, unit/contract tests, original v0.3 browser journeys and desktop/mobile five-iteration remix journeys run in CI on pinned Ubuntu 24.04. CI always uses the Playwright-pinned Chromium installed by the workflow. Local runs may use system Chromium when installed; otherwise Playwright's Chromium is used. `CHROMIUM_PATH` overrides it. Tests serve built assets under a repository-style `/arcade/` path and capture browser screenshots from authored test fixtures in `test-results/`.
 
 ## GitHub Pages and cloud limits
 
 The source now requires a Vite build. After review/merge, choose **GitHub Actions** as the repository's Pages source, then manually dispatch **Build reviewed Pages site** on `main` to publish `dist/`. The workflow refuses other branches. PR test runs never deploy. Existing live Pages content stays untouched until that explicit action. Relative asset URLs support repository subpaths.
 
-`server/` contains typed managed-service ports, an authenticated and budget-limited job API, private preview rendering and an OpenAPI spec. Tests use durable local storage, declared mock agents and authored provider responses. The source-generation adapter and its isolated build/test path are described below; the default local app needs neither an account nor a model key. Generated code is accepted only through the approved pipeline and its versioned preview contract. It is never executed in the gateway process or inserted as arbitrary page HTML. This branch does not activate provider billing or deploy cloud resources. See the [pipeline](docs/agent-pipeline.md), [current quality contract](docs/GAME-QUALITY.md) and [Codex research](docs/codex-agent-research.md) for scope and evidence; drawing decomposition and private drawing import remain separate work.
+`server/` contains typed managed-service ports, an authenticated and budget-limited job API, private preview rendering and an OpenAPI spec. Tests use durable local storage, declared mock agents and authored provider responses. The source-generation adapter and its isolated build/test path are described below; the default local app needs neither an account nor a model key. Generated code is accepted only through the approved pipeline and its versioned preview contract. It is never executed in the gateway process or inserted as arbitrary page HTML. This branch does not activate provider billing or deploy cloud resources. See the [pipeline](docs/agent-pipeline.md), [current quality contract](docs/GAME-QUALITY.md) and [Codex research](docs/codex-agent-research.md) for scope and evidence; physical drawing decomposition and playable-rig import remain separate work.
 
 Real-agent smoke testing is explicitly skipped: no verified funded production adapter/API exists here. Before adding a live smoke test, verify the destination, identity and billing authorization; do not export personal credentials to an arbitrary endpoint. No live-agent credentials are read by the test suite.
 

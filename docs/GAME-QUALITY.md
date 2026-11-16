@@ -2,6 +2,8 @@
 
 ## Product commitment
 
+The [validation review](game-quality/VALIDATION.md) records source pins, browser evidence, screenshots, measurements, and the remaining release gates for this implementation.
+
 The game must be worth playing before a learning prompt appears. The reference is the feel of a small hill-driving game: understandable controls, weight, momentum, suspension, readable consequences, fast recovery, and a reason to try a slightly different idea. Enjoyment is a product outcome to observe with children; passing an automated test does not establish it.
 
 This branch owns the physical play, graphics, sound, input, and runtime. The separate learning branches own adaptive mathematics and design coaching. This branch exposes local checkpoint/mechanic/pause events and preserves their existing data and outcome interfaces. A child can test a machine, watch it fail, restore its intact blueprint, and change it without a mandatory question after every experiment.
@@ -52,6 +54,8 @@ These capability, rendering and audio budgets do **not** impose a hard JavaScrip
 New gum configs have `qualityVersion: 1`. A stored gum config without that field resolves to `qualityVersion: 0`, retaining its prior original or legacy rules. Compatibility fields are hidden from the child-facing controls: only mechanics used by the selected engine are displayed.
 
 Physical editor saves use `quality-construction-v1`; rides use `quality-hill-v1`. They are nested under `constructionStates[stateKey].qualityConstruction`. Existing legacy state fields remain intact. This also lets Studio's whole-record state copy preserve the new physical state. A run snapshot is never written over the construction blueprint.
+
+When Studio pauses a native game for designing, it copies one painted frame before the existing game teardown. The still image is bounded to 960 × 600 pixels and stays only in memory. The simulation and sound stop; returning to play follows Studio's existing saved-construction/restart behavior. Navigation, profile/project changes and remounting clear the image. A missing frame gets a named placeholder, so closing the versions panel never leaves an unexplained blank stage.
 
 Unknown schemas and invalid geometry produce a recovery notice and retain the saved payload until the user explicitly starts a new example/build. Failed storage writes preserve the previous source and report the failure. When making a version, the build copy is saved before advancing the revision. A failed later workspace write can leave an unused copied slot, but cannot replace the old build or advance its durable head.
 
