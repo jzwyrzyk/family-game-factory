@@ -29,34 +29,55 @@ export interface ClockCallbacks {
 export function createFixedClock(callbacks: ClockCallbacks, options: { step?: number; maxSteps?: number; autoPause?: boolean } = {}) {
   const stepper = createFixedStepper(options.step, options.maxSteps);
   const reasons = new Set<string>();
-  let disposed = false, started = false, raf = 0, last: number | null = null, elapsed = 0, frames = 0, frameMs = 0;
+  let disposed = false, started = false, raf: number | null = null, inFrame = false, renderRequested = true;
+  let last: number | null = null, elapsed = 0, frames = 0, frameMs = 0;
   const durations: number[] = [];
+  function schedule() {
+    if (!disposed && started && !inFrame && raf === null) raf = requestAnimationFrame(frame);
+  }
+  /** Repaint a resized or edited paused view once, without advancing its simulation. */
+  function invalidate() {
+    if (disposed) return;
+    renderRequested = true;
+    schedule();
+  }
   function pause(reason = 'user') {
     if (disposed || reasons.has(reason)) return;
     const wasPaused = reasons.size > 0;
     reasons.add(reason); stepper.reset(); last = null;
     if (!wasPaused) callbacks.onPause?.();
+    invalidate();
   }
   function resume(reason = 'user') {
     if (disposed || !reasons.delete(reason)) return;
     stepper.reset(); last = null;
     if (!reasons.size) callbacks.onResume?.();
+    invalidate();
   }
   function frame(now: number) {
+    raf = null;
     if (disposed || !started) return;
-    const delta = last === null ? 0 : Math.max(0, (now - last) / 1000);
-    last = now;
-    let alpha = 1;
-    if (!reasons.size) {
-      elapsed += Math.min(delta, .1);
-      alpha = stepper.advance(delta, dt => { if (!disposed && !reasons.size) callbacks.update(dt); });
-      if (delta > 0) { frameMs = delta * 1000; durations.push(frameMs); if (durations.length > 180) durations.shift(); }
+    inFrame = true;
+    try {
+      let alpha = 1;
+      if (!reasons.size) {
+        const delta = last === null ? 0 : Math.max(0, (now - last) / 1000);
+        last = now;
+        elapsed += Math.min(delta, .1);
+        alpha = stepper.advance(delta, dt => { if (!disposed && !reasons.size) callbacks.update(dt); });
+        if (delta > 0) { frameMs = delta * 1000; durations.push(frameMs); if (durations.length > 180) durations.shift(); }
+      }
+      // An update may synchronously finish the host flow and unmount this game.
+      // A pause inside an update paints its latest state, then becomes quiescent.
+      if (disposed) return;
+      renderRequested = false;
+      callbacks.render(reasons.size ? 1 : alpha, elapsed); frames++;
+    } finally {
+      inFrame = false;
     }
-    // An update may synchronously finish the host flow and unmount this game.
-    // Do not draw the detached view or schedule a new callback after disposal.
-    if (disposed) return;
-    callbacks.render(alpha, elapsed); frames++;
-    if (!disposed) raf = requestAnimationFrame(frame);
+    // A pause or invalidation from render itself needs one fresh paint. All
+    // requests coalesce into this single chain, including reentrant callbacks.
+    if (!reasons.size || renderRequested) schedule();
   }
   const visibility = () => document.hidden ? pause('visibility') : resume('visibility');
   const blur = () => pause('focus');
@@ -70,11 +91,13 @@ export function createFixedClock(callbacks: ClockCallbacks, options: { step?: nu
       if (started || disposed) return;
       started = true;
       if (options.autoPause !== false) { visibility(); if (!document.hasFocus()) pause('focus'); }
-      if (!disposed) raf = requestAnimationFrame(frame);
+      invalidate();
     },
-    pause, resume,
+    pause, resume, invalidate,
     dispose() {
-      if (disposed) return; disposed = true; stepper.reset(); cancelAnimationFrame(raf);
+      if (disposed) return; disposed = true; stepper.reset();
+      if (raf !== null) cancelAnimationFrame(raf);
+      raf = null;
       document.removeEventListener('visibilitychange', visibility);
       window.removeEventListener('blur', blur); window.removeEventListener('focus', focus);
       reasons.clear();

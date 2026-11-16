@@ -21,3 +21,4 @@ import './quality-physics.test';
 import './quality-generated.test';
 
 import './quality-clock.test';
+import './generated-v1-playtest.test';

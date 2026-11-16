@@ -289,9 +289,10 @@ export default class QualityBuilder implements GameInstance {
         this.root.dataset.selected = this.selected || '';
         this.root.dataset.mission = this.mission;
         this.canvas.dataset.partCount = String(this.blueprint.parts.length);
+        this.clock?.invalidate();
     }
     private updateAudio() { this.musicButton.setAttribute('aria-pressed', String(this.audio.settings.music)); this.effectsButton.setAttribute('aria-pressed', String(this.audio.settings.effects)); this.musicButton.textContent = this.audio.settings.music ? '♫' : '♫ off'; this.effectsButton.textContent = this.audio.settings.effects ? '◖))' : '◖ off'; }
-    private resize() { const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width), h = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54); this.canvas.style.height = h + 'px'; const dpr = Math.min(2, devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.view = { w, h, scale: Math.min(w / 24, h / 13.5), x: 0, y: 0 }; this.view.x = (w - 24 * this.view.scale) / 2; this.view.y = (h - 13.5 * this.view.scale) / 2; this.c.setTransform(dpr, 0, 0, dpr, 0, 0); this.backdropKey = ''; }
+    private resize() { const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width), h = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54); this.canvas.style.height = h + 'px'; const dpr = Math.min(2, devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.view = { w, h, scale: Math.min(w / 24, h / 13.5), x: 0, y: 0 }; this.view.x = (w - 24 * this.view.scale) / 2; this.view.y = (h - 13.5 * this.view.scale) / 2; this.c.setTransform(dpr, 0, 0, dpr, 0, 0); this.backdropKey = ''; this.clock?.invalidate(); }
     private point(e: PointerEvent) { const r = this.canvas.getBoundingClientRect(); return { x: (e.clientX - r.left - this.view.x) / this.view.scale, y: (e.clientY - r.top - this.view.y) / this.view.scale }; }
     private hit(x: number, y: number, touchRadius = 0) { const candidates = [...this.blueprint.parts].reverse().map(p => { const d = PARTS[p.kind], dx = x - p.x, dy = y - p.y, co = Math.cos(-p.angle), si = Math.sin(-p.angle), px = dx * co - dy * si, py = dx * si + dy * co; return { p, inside: Math.abs(px) <= d.width * .55 + .12 && Math.abs(py) <= d.height * .55 + .12, distance: Math.hypot(Math.max(0, Math.abs(px) - d.width / 2), Math.max(0, Math.abs(py) - d.height / 2)), center: Math.hypot(dx, dy) }; }); return candidates.find(p => p.inside)?.p || (touchRadius ? candidates.filter(p => p.distance < touchRadius).sort((a, b) => a.center - b.center)[0]?.p : undefined); }
     private add(kind: PartKind) { if (this.mode !== 'build' || this.storageBlocked)
@@ -320,6 +321,7 @@ export default class QualityBuilder implements GameInstance {
         if (this.joining && this.selected) {
             if (p && p.id !== this.selected)
                 this.connect(p.id);
+            this.clock?.invalidate();
             return;
         }
         if (p) {
@@ -347,9 +349,10 @@ export default class QualityBuilder implements GameInstance {
         const p = this.hit(q.x, q.y);
         this.joinTarget = p && p.id !== this.selected ? p.id : null;
         this.updateJoinPreview();
+        this.clock?.invalidate();
     } if (!this.drag || this.drag.pointer !== e.pointerId)
         return; const d = this.drag; if (!d.moved && Math.hypot(q.x - d.startX, q.y - d.startY) * this.view.scale < 4)
-        return; d.moved = true; const p = this.blueprint.parts.find(p => p.id === d.id)!; p.x = clamp(d.partX + q.x - d.startX, .5, 23.5); p.y = clamp(d.partY + q.y - d.startY, .5, 11.5); }
+        return; d.moved = true; const p = this.blueprint.parts.find(p => p.id === d.id)!; p.x = clamp(d.partX + q.x - d.startX, .5, 23.5); p.y = clamp(d.partY + q.y - d.startY, .5, 11.5); this.clock?.invalidate(); }
     private pointerUp(e: PointerEvent) { const d = this.drag; if (!d || d.pointer !== e.pointerId)
         return; this.drag = undefined; if (d.moved) {
         try {
@@ -361,13 +364,14 @@ export default class QualityBuilder implements GameInstance {
             this.message('That position did not fit. Your last position is restored.');
         }
     } if (this.canvas.hasPointerCapture(e.pointerId))
-        this.canvas.releasePointerCapture(e.pointerId); }
+        this.canvas.releasePointerCapture(e.pointerId); this.clock?.invalidate(); }
     private cancelDrag() {
         const drag = this.drag;
         if (!drag) return false;
         this.drag = undefined;
         if (drag.moved) this.blueprint = drag.before;
         if (this.canvas.hasPointerCapture(drag.pointer)) this.canvas.releasePointerCapture(drag.pointer);
+        this.clock?.invalidate();
         return true;
     }
     private keyDown(e: KeyboardEvent) {
@@ -511,7 +515,7 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(e));
         this.refresh();
     } }
-    private edit() { this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); }
+    private edit() { this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); this.canvas.focus({ preventScroll: true }); }
     private update(dt: number) {
         if (this.mode === 'run' && this.simulation) {
             this.previous = this.scene;

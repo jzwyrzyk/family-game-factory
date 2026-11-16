@@ -28,6 +28,28 @@ const { chromium } = require('playwright');
       const button = name => root.getByRole('button', { name, exact: true });
       const undo = () => button('↶ Undo').click();
       const advance = ms => page.clock.runFor(ms);
+      const canvasPixels = () => canvas.evaluate(c => {
+        const data = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        let hash = 2166136261, painted = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3]) painted++;
+          hash = Math.imul(hash ^ (data[i] | data[i + 1] << 8 | data[i + 2] << 16 | data[i + 3] << 24), 16777619);
+        }
+        return { width: c.width, height: c.height, painted, hash: hash >>> 0 };
+      });
+      const settlePaused = async time => {
+        let frames = -1;
+        for (let pass = 0; pass < 8; pass++) {
+          // ResizeObserver may produce more than one notification; require the
+          // actual game frame counter to settle instead of fixing that count.
+          await page.waitForTimeout(25); await advance(100);
+          const current = await state();
+          assert.equal(current.paused, true); assert.equal(current.simulation?.time ?? null, time);
+          if (current.clock.frames === frames) return current;
+          frames = current.clock.frames;
+        }
+        assert.fail('the paused workshop continued repainting after settling');
+      };
       await page.clock.install();
       await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
       await page.waitForFunction(() => window.FG?.app);
@@ -187,16 +209,49 @@ const { chromium } = require('playwright');
       assert.deepEqual(running.blueprint, free, 'the saved machine never becomes the simulated wreck');
       await button('Pause game').click();
       const paused = (await state()).simulation.time;
+      const stopped = await settlePaused(paused);
       await advance(1000);
       assert.equal((await state()).simulation.time, paused, 'pause stops simulation time');
       assert.equal((await state()).paused, true);
+      assert.equal((await state()).clock.frames, stopped.clock.frames, 'pause stops recurring workshop redraws');
+      const originalViewport = page.viewportSize(), beforeResize = await canvasPixels();
+      await page.setViewportSize({ width: mobile ? 350 : 1040, height: originalViewport.height });
+      await page.waitForFunction(width => document.querySelector('.quality-builder .q-canvas').width !== width,
+        beforeResize.width, { polling: 50, timeout: 5000 });
+      const resized = await settlePaused(paused), resizedPixels = await canvasPixels();
+      assert.ok(resized.clock.frames > stopped.clock.frames, 'resizing a paused workshop requests a new paint');
+      assert.ok(resizedPixels.painted > resizedPixels.width * resizedPixels.height / 2, 'the resized backing canvas is painted, not blank');
+      await advance(500); assert.equal((await state()).clock.frames, resized.clock.frames, 'the resized view becomes quiescent again');
+      await page.setViewportSize(originalViewport);
+      await page.waitForFunction(width => document.querySelector('.quality-builder .q-canvas').width !== width,
+        resizedPixels.width, { polling: 50, timeout: 5000 });
+      await settlePaused(paused);
       await button('Resume game').click();
       await advance(200);
       assert.ok((await state()).simulation.time > paused);
-      await button('Change my machine').click();
+      await button('Change my machine').focus();
+      await page.keyboard.press('Enter');
+      assert.equal(await canvas.evaluate(c => document.activeElement === c), true, 'returning from a run puts keyboard focus on the editable machine');
       assert.deepEqual(await blueprint(), free);
       assert.equal((await state()).simulation, null);
       assert.ok((await state()).resources.particles <= 80);
+
+      // Editing can repaint a paused view without restarting the simulation.
+      await button('Pause game').click();
+      const pausedEditor = await settlePaused(null), held = free.parts[0];
+      const pausedFrom = await worldPoint(held.x, held.y), pausedTo = await worldPoint(held.x + 1, held.y + .7);
+      await page.mouse.move(pausedFrom.x, pausedFrom.y); await page.mouse.down();
+      await settlePaused(null); const beforePausedDrag = await canvasPixels();
+      await page.mouse.move(pausedTo.x, pausedTo.y, { steps: 3 });
+      const draggedPaused = await settlePaused(null);
+      assert.equal(draggedPaused.dragActive, true); assert.ok(draggedPaused.parts[0].x > held.x + .8);
+      assert.notEqual((await canvasPixels()).hash, beforePausedDrag.hash, 'paused drag movement is actually painted');
+      assert.equal(draggedPaused.clock.steps, pausedEditor.clock.steps, 'editing a paused view does not restart fixed updates');
+      await canvas.dispatchEvent('pointercancel', { pointerId: 1, pointerType: 'mouse' }); await page.mouse.up();
+      const cancelledPaused = await settlePaused(null);
+      assert.deepEqual(await blueprint(), free); assert.equal(cancelledPaused.clock.steps, pausedEditor.clock.steps);
+      assert.equal((await canvasPixels()).hash, beforePausedDrag.hash, 'cancelling the paused drag repaints its restored geometry');
+      await button('Resume game').click();
 
       // A stopped design times out as a genuine failed physical experiment.
       await root.getByRole('combobox', { name: 'Choose construction challenge' }).selectOption('delivery');
@@ -207,7 +262,15 @@ const { chromium } = require('playwright');
       await advance(32000);
       assert.equal((await state()).simulation.status, 'lost');
       assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'an unsuccessful test never forces the math/result overlay');
-      await root.locator('.q-result').getByRole('button', { name: 'Change my machine', exact: true }).click();
+      await root.locator('.q-result').getByRole('button', { name: 'Change my machine', exact: true }).focus();
+      await page.keyboard.press('Enter');
+      assert.deepEqual(await blueprint(), unsuccessful);
+      assert.equal(await canvas.evaluate(c => document.activeElement === c), true, 'hiding the result controls restores canvas focus');
+      await page.keyboard.press(']');
+      assert.equal((await state()).selected, unsuccessful.parts[0].id);
+      await page.keyboard.press('ArrowRight');
+      assert.ok(Math.abs((await state()).parts[0].x - unsuccessful.parts[0].x - .2) < 1e-9, 'keyboard editing works immediately after Change my machine without clicking the canvas');
+      await undo();
       assert.deepEqual(await blueprint(), unsuccessful);
 
       // All three goals are reached by actual starter bodies and hold conditions.
@@ -292,7 +355,7 @@ const { chromium } = require('playwright');
       assert.equal(await page.evaluate(() => FG.store.current().constructionStates['original-gum'].legacyMarker), 'retain me');
       assert.deepEqual(errors, []);
       await context.close();
-      console.log(`PASS quality builder ${mobile ? 'touch' : 'desktop'}: editing, keyboard gum, undo, cancellation, real physics/three missions, explicit finish, pause, persistence, future-data protection`);
+      console.log(`PASS quality builder ${mobile ? 'touch' : 'desktop'}: editing, keyboard gum/focus recovery, undo, cancellation, real physics/three missions, explicit finish, paused redraw/resize/editing, persistence, future-data protection`);
     }
   } finally {
     await browser?.close();

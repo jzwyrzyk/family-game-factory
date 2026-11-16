@@ -88,7 +88,7 @@ export default class QualityHill implements GameInstance {
     const summary = el('summary', '', 'Make this ride your own'); summary.style.cssText = 'font-size:13px;font-weight:700;cursor:pointer'; garage.append(summary);
     const choices = el('div', 'q-tuning'); choices.style.padding = '12px 0';
     for (const [name, paint] of [['Apricot', '#e99b55'], ['Sea green', '#50a89a'], ['Lilac', '#b29bd5']]) {
-      const b = this.button(name, 'q-chip', () => { this.paint = paint; this.save(); this.audio.play('pick'); for (const child of choices.children) child.setAttribute('aria-pressed', String(child === b)); });
+      const b = this.button(name, 'q-chip', () => { this.paint = paint; this.save(); this.audio.play('pick'); for (const child of choices.children) child.setAttribute('aria-pressed', String(child === b)); this.clock.invalidate(); });
       b.setAttribute('aria-pressed', String(this.paint === paint)); b.style.borderColor = paint; choices.append(b);
     }
     garage.append(choices, el('p', 'q-subtitle', 'Try a change in Live Remix. Your versions keep their own handling and trail.'));
@@ -121,11 +121,12 @@ export default class QualityHill implements GameInstance {
       void this.audio.unlock(); b.setPointerCapture(event.pointerId); this.pedals.set(event.pointerId, name); b.setAttribute('aria-pressed', 'true'); });
     const release = (e: PointerEvent) => { this.pedals.delete(e.pointerId); b.setAttribute('aria-pressed', 'false'); };
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'] as const) b.addEventListener(type, release);
-    b.addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (this.clock.paused || this.mode === 'result') return; if (this.mode === 'ready') this.begin(false); this.keys.add(name); } });
-    b.addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); this.keys.delete(name); } });
+    b.addEventListener('keydown', e => { if (e.ctrlKey || e.metaKey || e.altKey) return; if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (this.clock.paused || this.mode === 'result') return; if (this.mode === 'ready') this.begin(false); this.keys.add(name); } });
+    b.addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'Enter') { if (!e.ctrlKey && !e.metaKey && !e.altKey) e.preventDefault(); this.keys.delete(name); } });
     b.addEventListener('blur', () => { this.keys.delete(name); }); return b;
   }
   private keydown = (e: KeyboardEvent) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
     if ((e.target as HTMLElement)?.closest('input,textarea,select,[contenteditable=true]')) return;
     if (['ArrowLeft', 'ArrowRight', 'KeyA', 'KeyD', 'KeyR', 'KeyP', 'Escape'].includes(e.code)) e.preventDefault();
     if (!e.repeat && e.code === 'KeyR') { this.restart(); return; }
@@ -149,8 +150,9 @@ export default class QualityHill implements GameInstance {
     const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width), h = w < 600 ? Math.max(290, w * .75) : w * .54;
     const dpr = Math.min(2, window.devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.canvas.style.height = h + 'px';
     this.context2d.setTransform(dpr, 0, 0, dpr, 0, 0); this.view.w = w; this.view.h = h; this.view.scale = clamp(w / 17, 27, 65);
+    this.clock?.invalidate();
   }
-  private resetCamera() { const body = this.scene.bodies[0]; this.view.x = body.x - this.view.w * .3 / this.view.scale; this.view.y = body.y - this.view.h * .58 / this.view.scale; }
+  private resetCamera() { const body = this.scene.bodies[0]; this.view.x = body.x - this.view.w * .3 / this.view.scale; this.view.y = body.y - this.view.h * .58 / this.view.scale; this.clock?.invalidate(); }
   private update(dt: number) {
     this.elapsed += dt;
     if (this.mode !== 'drive') return;

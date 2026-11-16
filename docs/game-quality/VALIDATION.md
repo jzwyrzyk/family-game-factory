@@ -42,6 +42,12 @@ The report and retained screenshots are documentation added after that tested re
 The complete logs were inspected and both downloaded artifact digests were verified. Selected actual screenshots and per-image hashes are retained in [screenshots/evidence.json](screenshots/evidence.json).
 Automated acceptance establishes the tested behavior, not target-device thermals, measured end-to-end input latency, child enjoyment or learning efficacy.
 
+## Continuation review — verification pending
+
+After the original validation, both full runs on documentation revision `2558fb7e0c53e6c793cdaec8536c01f961825df9` passed: [feature push](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814706176) and [PR integration](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814711922). A [separate repeated review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/43814706234) failed in the mocked Actions journey: the known v1 hopper fixture exhausted repair after `NO_ACHIEVABLE_WIN_IN_PLAYTEST`.
+
+The continuation addresses that input-ordering failure and three native interaction issues: recurring rendering while paused, Rally consuming modified browser shortcuts, and the workshop losing canvas focus after returning to edit. Focused regressions accompany the changes. Their complete browser verification will be recorded here after CI; the earlier passed revision and its evidence remain pinned above.
+
 ## Implemented behavior
 
 | Area | Implemented scope and evidence entry point |
@@ -155,6 +161,8 @@ The automated source review and screenshot inspection above are complete. The re
 2. Observe children in the intended age range: first-minute comprehension, self-directed retry, explanations of cause and effect, accessible controls, and comfortable stopping/switching.
 3. Tune challenge, feedback and content from those observations. Automated goals and responsive graphics do not establish enjoyment or learning benefit.
 4. Before accepting live generated v2 games, run the approved gVisor gate against the exact package/image and complete the separately reviewed private-worker rollout.
+
+Use [PLAY_REVIEW.md](PLAY_REVIEW.md) for the local-device setup and observation tasks. It is a blank guide; no actual child or device observations have been collected by this implementation work.
 
 Useful entry points: `npm run build`, `npm run test:unit`, `npm run test:quality`, `npm run test:studio`, and `npm run test:coach`.
 `npm run benchmark:quality` reproduces CPU evidence; `npm run test:sandbox` requires the separately provisioned isolated environment. Neither command's presence is evidence that it ran successfully.

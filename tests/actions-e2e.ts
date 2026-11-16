@@ -12,6 +12,7 @@ import {signSession} from '../server/pipeline/auth';
 import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
 import {FixtureOnlyGate} from '../server/testing/fixture-gate';
 import {hopper,painter} from '../server/testing/generated-fixtures';
+import {verifyV1InputOrdering} from './generated-v1-input-browser';
 const listen=(s:Server,host?:string)=>new Promise<number>(r=>s.listen(0,host,()=>r((s.address() as {port:number}).port)));
 async function main(){
  const approval:AgentApproval={enabled:true,approvalId:'test-fixture-not-live',model:'gpt-5.4-mini',inputUsdPerMillion:.75,outputUsdPerMillion:4.5,maxInputTokens:64000,maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)};
@@ -35,6 +36,7 @@ async function main(){
  const server=createServer((req,res)=>{if(req.url?.startsWith('/v1/')){void api(req,res);return;}if(req.url==='/arcade/factory-config.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({version:1,mode:'remote',apiBaseUrl:config.appOrigin,previewOrigin:config.previewOrigin}));return;}const name=new URL(req.url!,'http://local').pathname.replace(/^\/arcade\//,'/'),file=resolve('dist','.'+(name==='/'?'/index.html':name));if(!file.startsWith(resolve('dist')+'/')||!existsSync(file)){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json'} as Record<string,string>)[extname(file)]||'text/plain');res.end(readFileSync(file));});config.appOrigin='http://127.0.0.1:'+await listen(server,'127.0.0.1');
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{
+ await verifyV1InputOrdering(browser);
  for(const [device,viewport]of [['desktop',{width:1280,height:900}],['mobile',{width:375,height:812}]] as const){
   const deviceActor={...parent,familyId:'test-family-'+device,expiresAt:Date.now()+600000};await service.setAllowance(deviceActor,5000000,true);failFirst=true;
   const context=await browser.newContext({viewport,hasTouch:device==='mobile'}),page=await context.newPage(),errors:string[]=[];

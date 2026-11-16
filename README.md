@@ -21,6 +21,8 @@ npm run dev
 
 Use the printed local URL. Add `?studio=1` to use the integrated play-and-design Studio review route; the default arcade and its saved games remain available. Vite serves the TypeScript modules; opening raw `index.html` as a file is no longer supported. `npm run build` typechecks and produces a static `dist/` site. No runtime server or provider key is needed.
 
+The [device and play review guide](docs/game-quality/PLAY_REVIEW.md) explains how to try the reviewed build on a phone or tablet and record specific usability or performance observations. It is a blank guide, not evidence of completed child testing.
+
 ## Try Live Remix
 
 1. Open **Remix**, start a Splash or Pass remix, and **Play this version**.

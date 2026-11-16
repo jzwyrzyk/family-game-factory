@@ -15,6 +15,38 @@ const fs=require('node:fs');
    await page.evaluate(()=>{FG.store.changeProfile({rate:0});FG.app.openGame('hill')});
    const root=page.locator('.quality-hill'),button=name=>root.getByRole('button',{name,exact:true});
    const snapshot=()=>page.evaluate(()=>FG.runtime.snapshot());
+   const canvas=root.locator('.q-canvas');
+   const canvasPixels=()=>canvas.evaluate(c=>{
+    const data=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let hash=2166136261,painted=0;
+    for(let i=0;i<data.length;i+=4){if(data[i+3])painted++;hash=Math.imul(hash^(data[i]|data[i+1]<<8|data[i+2]<<16|data[i+3]<<24),16777619)}
+    return {width:c.width,height:c.height,painted,hash:hash>>>0};
+   });
+   const settlePaused=async time=>{
+    let frames=-1;
+    for(let pass=0;pass<8;pass++){
+     await page.waitForTimeout(25);await page.clock.runFor(100);
+     const current=(await snapshot()).state;assert.equal(current.paused,true);assert.equal(current.time,time);
+     if(current.performance.frames===frames)return current;
+     frames=current.performance.frames;
+    }
+    assert.fail('the paused ride continued repainting after settling');
+   };
+   const checkModifiedShortcuts=async()=>{
+    const checks=await root.evaluate(root=>{
+     const capture=()=>{const s=FG.runtime.snapshot().state;return {mode:s.mode,paused:s.paused,time:s.time,distance:s.distance,inputActive:s.inputActive}};
+     const commands=[['.q-canvas','KeyR','r'],['.q-canvas','KeyP','p'],['.q-canvas','KeyA','a'],['.q-canvas','KeyD','d'],
+      ['.q-canvas','ArrowLeft','ArrowLeft'],['.q-canvas','ArrowRight','ArrowRight'],['.q-canvas','Escape','Escape'],
+      ['[data-pedal=go]','Space',' '],['[data-pedal=go]','Enter','Enter'],['[data-pedal=brake]','Space',' '],['[data-pedal=brake]','Enter','Enter']];
+     const checks=[];
+     for(const modifier of ['ctrlKey','metaKey','altKey'])for(const [target,code,key] of commands){
+      const before=capture(),event=new KeyboardEvent('keydown',{key,code,[modifier]:true,bubbles:true,cancelable:true});
+      root.querySelector(target).dispatchEvent(event);
+      checks.push({label:`${modifier} + ${code} on ${target}`,before,after:capture(),prevented:event.defaultPrevented});
+     }
+     return checks;
+    });
+    for(const check of checks){assert.equal(check.prevented,false,`${check.label} preserves the browser shortcut`);assert.deepEqual(check.after,check.before,`${check.label} does not change the ride or its controls`)}
+   };
    assert.equal((await snapshot()).state.engine,'quality-hill-v1');assert.equal((await snapshot()).state.mode,'ready');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
    if(mobile){
@@ -24,6 +56,7 @@ const fs=require('node:fs');
     await page.setViewportSize({width:390,height:844});await page.clock.runFor(50);
    }
    await root.screenshot({path:`test-results/quality-hill-${mobile?'mobile':'desktop'}.png`});
+   await checkModifiedShortcuts();
    await button('Go →').focus();await page.keyboard.down('Space');await page.clock.runFor(200);await page.keyboard.up('Space');
    assert.equal((await snapshot()).state.inputActive,0,'keyboard pedal release clears its logical input after starting');
    await button('↶ Try again').click();
@@ -31,7 +64,32 @@ const fs=require('node:fs');
    await page.keyboard.down('ArrowRight');await page.clock.runFor(1000);await page.keyboard.up('ArrowRight');
    const moving=await snapshot();assert.ok(moving.state.distance>1,'the wheels actually propel the chassis');assert.ok(moving.state.speed>1);
    assert.equal(moving.state.resources.bodies,3);assert.equal(moving.state.resources.joints,2);
-   await button('Pause game').click();const paused=(await snapshot()).state.time;await page.clock.runFor(1500);assert.equal((await snapshot()).state.time,paused);
+   await checkModifiedShortcuts();
+   await page.keyboard.down('ArrowRight');assert.equal((await snapshot()).state.inputActive,1);
+   await root.locator('.q-canvas').dispatchEvent('keyup',{key:'ArrowRight',code:'ArrowRight',ctrlKey:true,bubbles:true,cancelable:true});
+   assert.equal((await snapshot()).state.inputActive,0,'adding a modifier before key release cannot leave the motor held');
+   await page.keyboard.up('ArrowRight');
+   await button('Go →').focus();await page.keyboard.down('Space');assert.equal((await snapshot()).state.inputActive,1);
+   const modifiedPedalRelease=await button('Go →').evaluate(pedal=>{const event=new KeyboardEvent('keyup',{key:' ',code:'Space',metaKey:true,bubbles:true,cancelable:true});pedal.dispatchEvent(event);return event.defaultPrevented});
+   assert.equal(modifiedPedalRelease,false);assert.equal((await snapshot()).state.inputActive,0,'modified keyup also releases a focused keyboard pedal');await page.keyboard.up('Space');
+   await button('Pause game').click();const paused=(await snapshot()).state.time,stopped=await settlePaused(paused);
+   await page.clock.runFor(1500);assert.equal((await snapshot()).state.time,paused);
+   assert.equal((await snapshot()).state.performance.frames,stopped.performance.frames,'pause stops recurring Rally redraws');
+   const originalViewport=page.viewportSize(),beforeResize=await canvasPixels();
+   await page.setViewportSize({width:mobile?350:1040,height:originalViewport.height});
+   await page.waitForFunction(width=>document.querySelector('.quality-hill .q-canvas').width!==width,beforeResize.width,{polling:50,timeout:5000});
+   const resized=await settlePaused(paused),resizedPixels=await canvasPixels();
+   assert.ok(resized.performance.frames>stopped.performance.frames,'resizing a paused ride requests a new paint');
+   assert.ok(resizedPixels.painted>resizedPixels.width*resizedPixels.height/2,'the resized backing canvas is painted, not blank');
+   await page.clock.runFor(500);assert.equal((await snapshot()).state.performance.frames,resized.performance.frames,'the resized ride becomes quiescent again');
+   await page.setViewportSize(originalViewport);
+   await page.waitForFunction(width=>document.querySelector('.quality-hill .q-canvas').width!==width,resizedPixels.width,{polling:50,timeout:5000});
+   await settlePaused(paused);
+   await root.locator('summary').click();await settlePaused(paused);const beforePaint=await canvasPixels();
+   await button('Lilac').click();const repainted=await settlePaused(paused);
+   assert.equal(repainted.paint,'#b29bd5');assert.notEqual((await canvasPixels()).hash,beforePaint.hash,'a paint change redraws the paused car');
+   assert.equal(repainted.performance.steps,stopped.performance.steps,'changing paint does not restart fixed updates');
+   assert.equal(repainted.inputActive,0);await button('Apricot').click();await root.locator('summary').click();await settlePaused(paused);
    await button('Resume game').click();assert.equal((await snapshot()).state.inputActive,0);
    // Losing focus clears a held pedal and never accumulates a hidden catch-up interval.
    await page.keyboard.down('ArrowRight');await page.evaluate(()=>window.dispatchEvent(new Event('blur')));const hiddenTime=(await snapshot()).state.time;
@@ -87,7 +145,7 @@ const fs=require('node:fs');
     assert.deepEqual(await page.evaluate(()=>FG.store.current().constructionStates['original-hill'].qualityConstruction.track),track,'unsupported saved ride stays intact');
    }
    assert.deepEqual(requests,[],'gameplay and local changes need no paid/server generation');assert.deepEqual(errors,[]);
-   await context.close();console.log(`PASS quality hill ${mobile?'touch':'desktop'}: motor, suspension, focus, retry, physical win, five changes, fork/reload and owner-scoped saves`);
+   await context.close();console.log(`PASS quality hill ${mobile?'touch':'desktop'}: motor, suspension, focus, browser shortcuts, paused redraw/resize/paint, retry, physical win, five changes, fork/reload and owner-scoped saves`);
   }
  }finally{await browser.close();server.close()}
 })().catch(error=>{console.error(error);process.exitCode=1});
