@@ -43,6 +43,9 @@ jobs:
       - name: Coach HTTP contracts
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/design-coach-http.ts
+      - name: Generated physics and presentation
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/quality-generated-browser.ts
       - name: Desktop and mobile Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/studio-journey.cjs

@@ -43,3 +43,10 @@ body.studio-review{background:#f3f5fb;color:#17223d;color-scheme:light;font-fami
 }
 
 .experiment-shelf > #combineExperiments{grid-column:1/-1;min-height:44px;justify-self:start;padding:12px 18px}.experiment-card textarea{min-height:80px}.design-controls details{margin:8px 0}.design-controls details select,.design-controls details input{width:100%;padding:8px}.design-plan{max-height:65vh;overflow:auto}.studio-review .studio-workspace{min-height:160px}
+.studio-paused-preview{display:flex;flex-direction:column;min-height:470px;background:#edf2ed;color:#304653}
+.studio-paused-scene{flex:1;display:grid;place-items:center;min-height:280px;background:radial-gradient(ellipse at center,#fff8e9,#e5eeea)}
+.studio-paused-scene canvas{display:block;width:100%;height:auto;max-height:480px;object-fit:contain}
+.studio-paused-symbol{display:grid;place-items:center;width:84px;height:84px;border-radius:24px;background:#fff9eb;color:#728b83;font-size:40px}
+.studio-paused-caption{padding:18px 22px;border-top:1px solid #d5e0d9;background:#f8faf4;overflow-wrap:anywhere}
+.studio-paused-caption strong{display:block;font-size:16px;color:#304653}.studio-paused-caption p{margin:7px 0 0;font-size:13px;line-height:1.5;color:#62766f}
+@media(max-width:760px){.studio-paused-preview{min-height:330px}.studio-paused-scene{min-height:220px}.studio-paused-scene canvas{max-height:360px}.studio-paused-caption{padding:15px 17px}}

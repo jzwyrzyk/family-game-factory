@@ -46,6 +46,8 @@ export async function installStudio(){
  <section id="studioVersions" class="studio-versions" aria-labelledby="studioVersionsTitle" hidden><div class="studio-section-heading"><div><h2 id="studioVersionsTitle">Try a version. Keep your choice.</h2><p>Playing an older version does not overwrite your working game.</p></div><button class="studio-button" id="studioCloseVersions">Close</button></div><div id="studioVersionCards" class="studio-version-cards"></div></section>
  <dialog id="studioCopyDialog" class="studio-dialog"><form id="studioCopyForm"><h2>Give this game a new name</h2><p>Your original stays exactly as it is. The conversation comes with your copy.</p><label for="studioCopyName">Game name</label><input id="studioCopyName" maxlength="60" required><div><button class="studio-button" id="studioCopyCancel" type="button">Cancel</button><button class="studio-button studio-primary" type="submit">Save new game</button></div></form></dialog>`;
  document.querySelector('main')!.append(page);
+ const pausedPreview=el('section','studio-paused-preview');pausedPreview.id='studioPausedPreview';pausedPreview.hidden=true;
+ pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
  library.innerHTML=`<div class="studio-library-hero"><div><span class="studio-kicker">PLAY · IMAGINE · MAKE IT YOURS</span><h1>Your ideas.<br><em>Your games.</em></h1><p>Open a game and change it while you play.<br>Your conversation and versions stay together.</p><button class="studio-button studio-primary" id="studioNew">＋ Create something new</button></div><div class="studio-hero-shapes" aria-hidden="true"><span>✦</span><span>↗</span><span>◒</span></div></div><div id="studioContinue"></div><div class="studio-section-heading"><div><h2>My games & ideas</h2><p>Working games, previews and unfinished ideas—right where you left them.</p></div><span class="studio-storage">This browser · this player</span></div><div id="studioLibrary" class="studio-library-grid"></div><div class="studio-section-heading"><div><h2>Start with a family favorite</h2><p>Make your own copy. The original stays safe.</p></div></div><div id="studioStarters" class="studio-library-grid"></div><p class="studio-library-note">Saving is private to this browser—not a public release. AI generation requires your configured family workshop. A saved idea is labeled separately from a playable game.</p>`;
  document.querySelector('main')!.append(library);
@@ -61,7 +63,7 @@ export async function installStudio(){
  function message(s:StudioSession,role:'child'|'helper'|'reflection',text:string){notebook.message(s.id,s.owner,role,text);if(activeId===s.id&&owner()===s.owner)renderConversation();}
  function flushDraft(){clearTimeout(draftTimer);if(!activeId)return;const s=current();if(s.draft!==$<HTMLTextAreaElement>('studioPrompt').value)notebook.update(s.id,s.owner,x=>{x.draft=$<HTMLTextAreaElement>('studioPrompt').value;});$('studioDraftStatus').textContent='Draft saved on this device';}
  function setTab(tab:'game'|'talk'|'versions'){
-  if(tab==='talk'){document.body.classList.add('studio-designing');if(mounted){if($('math-answer')){status('Finish the current math question before designing.');return;}disposeGame();showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}}
+  if(tab==='talk'){document.body.classList.add('studio-designing');if(mounted){if($('math-answer')){status('Finish the current math question before designing.');return;}disposeGame(true);showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}}
   if(tab==='game')document.body.classList.remove('studio-designing');
   $('page-studio').querySelector('.studio-workspace')!.setAttribute('data-mobile-panel',tab);
   document.querySelectorAll('[data-studio-tab]').forEach(b=>b.setAttribute('aria-pressed',String((b as HTMLElement).dataset.studioTab===tab)));
@@ -71,7 +73,27 @@ export async function installStudio(){
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));page.classList.remove('hidden');route='studio';
   nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
  }
- function disposeGame(){
+ function clearPausedPreview(){pausedPreview.hidden=true;pausedPreview.replaceChildren();}
+ function capturePausedPreview(){
+  clearPausedPreview();const name=$('studioTitle').textContent||'Your game',scene=el('div','studio-paused-scene'),caption=el('div','studio-paused-caption');
+  // Copy pixels once, before unmount. No game instance, animation, URL or storage is retained.
+  const mount=$('game-mount'),source=mount.querySelector('canvas')||Array.from(mount.children).map(child=>child.shadowRoot?.querySelector('canvas')).find(Boolean);
+  if(source&&source.width>0&&source.height>0)try{
+   const frame=document.createElement('canvas'),scale=Math.min(1,960/source.width,600/source.height);
+   frame.width=Math.max(1,Math.round(source.width*scale));frame.height=Math.max(1,Math.round(source.height*scale));
+   const context=frame.getContext('2d');if(context){
+    context.drawImage(source,0,0,frame.width,frame.height);
+    const pixels=context.getImageData(0,0,frame.width,frame.height).data;
+    // A just-mounted or unavailable canvas may have no painted frame yet.
+    for(let i=3;i<pixels.length;i+=4)if(pixels[i]){frame.setAttribute('role','img');frame.setAttribute('aria-label',name+' — paused scene');scene.append(frame);break;}
+   }
+  }catch{/* A missing or unreadable frame still gets the named placeholder below. */}
+  if(!scene.childElementCount){const symbol=el('span','studio-paused-symbol','Ⅱ');symbol.setAttribute('aria-hidden','true');scene.append(symbol);}
+  caption.append(el('strong','',name),el('p','','Paused for your ideas. Choose Play to return to your game.'));
+  pausedPreview.append(scene,caption);pausedPreview.hidden=false;
+ }
+ function disposeGame(keepScene=false){
+  if(keepScene&&mounted)capturePausedPreview();else clearPausedPreview();
   ++epoch;iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
   // The original host cleans listeners, timers, audio and pending math callbacks.
   if(mounted){FG.app.page('home');mounted=false;}
@@ -296,7 +318,7 @@ export async function installStudio(){
   localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details();return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:games.revision(s.projectId,s.owner).config,prompt).kind==='supported';},
   tryRequest:async(prompt)=>{$<HTMLTextAreaElement>('studioPrompt').value=prompt;flushDraft();await submit();},
   playTest:async id=>{const s=current();notebook.selectExperiment(s.id,s.owner,id);await playCandidate();},playMain:playWorking,combineTests,
-  pauseForThinking:()=>{if($('math-answer')){status('Finish the current math question first.');return false;}if(mounted){disposeGame();showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}return true;},
+  pauseForThinking:()=>{if($('math-answer')){status('Finish the current math question first.');return false;}if(mounted){disposeGame(true);showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}return true;},
   showTalk:()=>{showStudio();setTab('talk');$('studioPrompt').focus();}
  });
  installStudioRemixRouting({
