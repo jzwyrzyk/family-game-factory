@@ -50,6 +50,22 @@ const {chromium}=require('playwright');
       innerWidth,innerHeight,coarse:matchMedia('(pointer: coarse)').matches,anyCoarse:matchMedia('(any-pointer: coarse)').matches
     }));
     assert.ok(pedal&&pedal.width>=147&&pedal.height>=75,'tablet pedals are large: '+JSON.stringify({pedal,orientation,pedalDiagnostics}));
+    // Opening a lazy game can expose the DOM before ResizeObserver/viewport layout has settled.
+    // Require the final physical canvas height, not an intermediate browser frame.
+    if(orientation==='landscape'){
+      await page.waitForFunction(maxHeight=>{
+        const canvas=document.querySelector('.quality-hill .q-canvas');
+        return canvas&&canvas.style.height&&canvas.getBoundingClientRect().height<=maxHeight;
+      },viewport.height*.48+2,{timeout:3000}).catch(async()=>{
+        const layout=await hill.locator('.q-canvas').evaluate(c=>({
+          rect:c.getBoundingClientRect().toJSON(),inlineHeight:c.style.height,computedHeight:getComputedStyle(c).height,
+          stageWidth:c.parentElement.getBoundingClientRect().width,innerWidth,innerHeight,
+          pointerCoarse:matchMedia('(pointer: coarse)').matches,anyPointerCoarse:matchMedia('(any-pointer: coarse)').matches,
+          maxTouchPoints:navigator.maxTouchPoints
+        }));
+        throw Error('Landscape tablet stage failed to settle: '+JSON.stringify(layout));
+      });
+    }
     const hillCanvas=await hill.locator('.q-canvas').boundingBox();assert.ok(hillCanvas&&hillCanvas.height>250);
     if(orientation==='landscape')assert.ok(hillCanvas.height<=viewport.height*.48+2,'landscape driving stage reserves room for pedals');
     const session=await context.newCDPSession(page);
