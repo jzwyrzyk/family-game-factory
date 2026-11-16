@@ -113,6 +113,14 @@ const fs=require('node:fs');
    await button('Let’s drive →').click();await page.keyboard.down('ArrowRight');await page.clock.runFor(12000);await page.keyboard.up('ArrowRight');
    assert.equal((await snapshot()).state.status,'won','an actual drive reaches camp');assert.equal((await snapshot()).state.mode,'result');
    assert.equal(await page.locator('#stage-overlay').isVisible(),false,'the recent-question budget leaves this physical replay available');
+   const finalHud=await root.evaluate(root=>{
+    const state=FG.runtime.snapshot().state,text=root.querySelector('.q-meter').textContent.trim();
+    const displayed=/^(\d+) \/ \d+ m · Best (\d+) m$/.exec(text);
+    return {text,displayed:displayed?{distance:Number(displayed[1]),best:Number(displayed[2])}:null,
+     runtime:{mode:state.mode,status:state.status,track:state.track,distance:state.distance,best:state.best[state.track]}};
+   });
+   assert.deepEqual(finalHud.displayed,{distance:Math.floor(finalHud.runtime.distance),best:Math.floor(finalHud.runtime.best)},
+    `${mobile?'mobile':'desktop'} camp HUD must show the completed ride and saved best before capture: ${JSON.stringify(finalHud)}`);
    await root.screenshot({path:`test-results/quality-hill-camp-${mobile?'mobile':'desktop'}.png`});
    await button('Finish this trip').click();await page.waitForSelector('#resultNext');await page.click('#resultNext');
    assert.equal((await snapshot()).state.track,'ridge');

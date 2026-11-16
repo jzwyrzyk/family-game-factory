@@ -9,7 +9,7 @@ function svg<K extends keyof SVGElementTagNameMap>(name: K, attrs: Record<string
 }
 function label(root: SVGElement, x: number, y: number, value: string, size = 15) {
   const node = svg('text', {x, y, fill: INK, 'text-anchor': 'middle', 'font-size': size, 'font-family': 'system-ui, sans-serif'});
-  node.textContent = value; root.append(node);
+  node.textContent = value; root.append(node); return node;
 }
 function line(root: SVGElement, x1: number, y1: number, x2: number, y2: number, color = EDGE, width = 2) {
   root.append(svg('line', {x1, y1, x2, y2, stroke: color, 'stroke-width': width}));
@@ -78,7 +78,16 @@ export function renderMathVisual(visual: MathVisual): HTMLElement {
       const fractionalStep=visual.jumps.find(j=>Math.abs(j)>0&&Math.abs(j)<1);
       const parts=fractionalStep?Math.round(span/Math.abs(fractionalStep)):0;
       const ticks = parts>=2&&parts<=16&&Math.abs(parts*Math.abs(fractionalStep!)-span)<1e-8 ? parts : span <= 20 && Number.isInteger(span) ? Math.max(1, span) : 10;
-      for (let i = 0; i <= ticks; i++) { const v = min + span * i / ticks, x = pos(v); line(drawing, x, 137, x, 153); label(drawing, x, 178, span<=2?fractionLabel(v):fmt(v), ticks > 12 ? 11 : 13); }
+      const tickLabels=Array.from({length:ticks+1},(_,i)=>{const v=min+span*i/ticks;return span<=2?fractionLabel(v):fmt(v);});
+      // Keep every value and its exact position. Dense labels use alternating
+      // rows, with guides to their ticks, instead of shrinking into a number string.
+      const labelSize=16,stagger=tickLabels.some(text=>text.length*labelSize*.65+6>310/ticks);
+      for(let i=0;i<=ticks;i++){
+        const v=min+span*i/ticks,x=pos(v),y=178+(stagger&&i%2?26:0);
+        line(drawing,x,137,x,153);
+        if(stagger)line(drawing,x,153,x,y-20,EDGE,1);
+        label(drawing,x,y,tickLabels[i],labelSize).setAttribute('data-number-line-label',fmt(v));
+      }
       if (visual.start >= min && visual.start <= max) dot(drawing, pos(visual.start), 145, 7, GOLD);
       let start = visual.start;
       visual.jumps.slice(0, 12).forEach((jump, i) => {

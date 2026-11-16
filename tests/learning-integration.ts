@@ -317,6 +317,7 @@ async function archivedProtocolJourney(browser:Browser,base:string,bridge:string
       w.archivedLearning=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id});frame.srcdoc=html;
     },{html,channel,artifactId});
     await page.getByText('This saved preview needs an updated game player to include math.',{exact:false}).waitFor();
+    await page.screenshot({path:'test-results/math-archived-protocol-blocked.png',fullPage:true});
     assert.equal(await page.locator('#archived-learning-preview').evaluate(el=>(el as HTMLIFrameElement).inert),true);
     assert.equal(await page.evaluate(()=>(window as any).archivedLearning.ready),false);
     assert.equal(await page.evaluate(()=>window.FG.learning.active),false);assert.equal((await attempts(page)).length,0,'blocking an incompatible player does not invent learning evidence');

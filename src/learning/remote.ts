@@ -13,6 +13,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
   const FG=(window as any).FG,seen=new Set<string>();
   let instanceId=crypto.randomUUID(),alive=true,ready=false,cover:HTMLDivElement|null=null,waiting=false,waitingRound=0,pendingRound:PreviewEvent|null=null;
   let handshakeTimer:ReturnType<typeof setTimeout>|undefined;
+  let protocolError:string|null=null,connectionPaused=false;
   const parent=frame.parentElement!,oldPosition=parent.style.position;
   parent.style.position='relative';
   const owns=()=>alive&&options.ownerId===FG.store.current().id;
@@ -34,7 +35,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
   function remember(token:string){seen.add(token);if(seen.size>500)seen.delete(seen.values().next().value!);}
   function pause(roundId:number){waiting=true;waitingRound=roundId;tell('pause');inert();makeCover();notifyReady();}
   function failed(message:string,retry?:()=>void){
-    inert();tell('pause');notifyReady();const target=makeCover();target.replaceChildren();
+    inert();tell('pause');if(!waiting)connectionPaused=true;notifyReady();const target=makeCover();target.replaceChildren();
     const box=document.createElement('section');box.className='math-activity';
     const title=document.createElement('h2');title.textContent='Your game is paused';title.tabIndex=-1;
     const text=document.createElement('p');text.setAttribute('role','alert');text.textContent=message;box.append(title,text);
@@ -42,7 +43,12 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     target.append(box);if(owns()&&visible()){title.focus({preventScroll:true});title.scrollIntoView({block:'nearest'});}
   }
   function handshake(){
-    clearTimeout(handshakeTimer);ready=false;inert();notifyReady();const target=makeCover();target.replaceChildren();
+    clearTimeout(handshakeTimer);ready=false;inert();notifyReady();
+    // A renderer's one ready packet can precede the iframe load event. Preserve
+    // an explicit rejection until a compatible renderer actually answers; old
+    // archives cannot answer connect and must not become a generic timeout.
+    if(protocolError){failed(protocolError);tell('connect');return;}
+    const target=makeCover();target.replaceChildren();
     const text=document.createElement('p');text.className='math-activity';text.setAttribute('role','status');text.textContent='Opening your game…';target.append(text);
     tell('connect');
     handshakeTimer=setTimeout(()=>{if(owns()&&!ready)failed('The game has not connected yet. Your saved version is safe.',handshake);},10_000);
@@ -66,15 +72,15 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     const d=message.data;
     if(!d||d.type!=='factory-preview'||d.channel!==options.channel||d.artifactId!==options.artifactId)return;
     if(d.event==='ready'){
-      if(d.learningProtocol!==1){ready=false;clearTimeout(handshakeTimer);failed('This saved preview needs an updated game player to include math. Leave this preview and ask a grown-up to update the workshop.');return;}
-      if(ready)return;
+      if(d.learningProtocol!==1){ready=false;clearTimeout(handshakeTimer);protocolError='This saved preview needs an updated game player to include math. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);return;}
+      protocolError=null;if(ready)return;
       ready=true;clearTimeout(handshakeTimer);
-      if(!waiting){cover?.remove();cover=null;frame.inert=false;frame.style.pointerEvents='';}
+      if(!waiting){cover?.remove();cover=null;frame.inert=false;frame.style.pointerEvents='';if(connectionPaused){connectionPaused=false;tell('resume');}}
       notifyReady();return;
     }
     if(!ready||!['round-complete','math-checkpoint'].includes(d.event))return;
     if(!boundedId(d.roundId)){
-      if(d.roundId===undefined&&!waiting){ready=false;failed('This preview needs an updated game player to include math. Leave this preview and ask a grown-up to update the workshop.');}
+      if(d.roundId===undefined&&!waiting){ready=false;protocolError='This preview needs an updated game player to include math. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);}
       return;
     }
     if(d.event==='round-complete'&&(typeof d.won!=='boolean'||!Number.isInteger(d.score)||d.score<0||d.score>1_000_000))return;

@@ -2,6 +2,8 @@
 
 ## Scope of evidence
 
+This is the historical math-component acceptance record for #19. The [integrated child-journey acceptance](../child-journey/acceptance.md) and [draft #21 checks](https://github.com/jzwyrzyk/family-game-factory/pull/21/checks) cover the combined application, newer activity/focus tests, physical-game checkpoints, and the current generated-player protocol.
+
 This record covers the grades 1–4 draft implementation, not the live deployed site. All learner profiles in automated checks are synthetic. No real child learning outcome, independent educator review, paid model execution, cloud deployment, or publication is claimed.
 
 ## Checks completed in the development workspace

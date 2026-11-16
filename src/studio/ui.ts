@@ -248,7 +248,7 @@ export async function installStudio(){
       games.clonePlayState(s.owner,decision.continueTest&&s.candidate?s.candidate.id:working.id,c.id);
       notebook.saveExperiment(s.id,s.owner,c,decision.parents,decision.depth,decision.origin);
       notebook.update(s.id,s.owner,x=>{x.draft='';x.job=null;});$<HTMLTextAreaElement>('studioPrompt').value='';
-      message(s,'helper',`${intent.summary}. This is a preview. Play it before choosing Keep change.`);await playCandidate();return;
+      message(s,'helper',`${intent.summary}. This is a test. Play it before choosing Make this my main game.`);await playCandidate();return;
     }
     if(intent.kind!=='generation-needed'){message(s,'helper',intent.message);render();return;}
   }

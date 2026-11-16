@@ -169,6 +169,36 @@ test('a disposed activity cannot call back into another game after its success d
   }finally{await page.close();}
 });
 
+test('dense number lines keep every exact tick label readable at mobile widths',async()=>{
+  const page=await browser.newPage({viewport:{width:390,height:844}});try{
+    await page.setContent(`<style>body{margin:0;background:#10132d;font-family:system-ui}main{padding:0 24px}${styles}</style><main><div class="math-activity" id="diagrams"></div></main>`);
+    await page.addScriptTag({content:bundle});
+    await page.evaluate(()=>{
+      const w=window as any,host=document.getElementById('diagrams')!;
+      host.append(w.LearningUITest.renderMathVisual({kind:'number-line',min:0,max:20,start:18,jumps:[]}),w.LearningUITest.renderMathVisual({kind:'number-line',min:0,max:1,start:0,jumps:[1/12]}));
+    });
+    for(const width of [320,390,960]){
+      await page.setViewportSize({width,height:844});
+      const diagrams=await page.locator('.math-visual').evaluateAll(figures=>figures.map(figure=>{
+        const bounds=figure.querySelector('svg')!.getBoundingClientRect();
+        return {left:bounds.left,right:bounds.right,bottom:bounds.bottom,labels:Array.from(figure.querySelectorAll('[data-number-line-label]')).map(node=>{
+          const box=node.getBoundingClientRect();return {text:node.textContent,left:box.left,right:box.right,top:box.top,bottom:box.bottom};
+        })};
+      }));
+      assert.deepEqual(diagrams[0].labels.map(label=>label.text),Array.from({length:21},(_,i)=>String(i)),'every integer remains labelled');
+      assert.equal(diagrams[1].labels.length,13);assert.ok(diagrams[1].labels.some(label=>label.text==='11/12'),'fraction ticks remain exact');
+      for(const diagram of diagrams)for(let i=0;i<diagram.labels.length;i++){
+        const label=diagram.labels[i];
+        assert.ok(label.left>=diagram.left&&label.right<=diagram.right&&label.bottom<=diagram.bottom,`${width}px: ${label.text} stays inside its drawing`);
+        for(const other of diagram.labels.slice(i+1))if(label.top<other.bottom&&other.top<label.bottom){
+          const gap=Math.max(other.left-label.right,label.left-other.right);
+          assert.ok(gap>=4,`${width}px: labels ${label.text} and ${other.text} have visible separation (${gap}px)`);
+        }
+      }
+    }
+  }finally{await page.close();}
+});
+
 test('diagrams are mathematical, mobile-safe and curriculum text is never HTML',async()=>{
   const item={...multiply(),question:'<img src=x onerror="alert(1)"> stays text'},page=await mount(item);try{
     assert.equal(await page.locator('.math-activity img').count(),0);

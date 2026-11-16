@@ -28,7 +28,7 @@ async function returnToViewed(page,device){
 }
 async function failureScreenshot(page,name){try{await page.screenshot({path:`test-results/child-${name}-failure.png`,fullPage:true});}catch{}}
 async function prepare(browser,viewport,device){
- const context=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
+ const context=await browser.newContext({viewport,isMobile:device==='mobile',hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
  page.setDefaultTimeout(8000);page.on('pageerror',error=>errors.push(error.message));page.on('dialog',dialog=>dialog.accept());
  return {context,page,errors};
 }
@@ -50,10 +50,12 @@ async function localJourney(browser,url,device,viewport){
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();await localTest(page);
   const candidate=(await currentSession(page)).candidate.id;
   assert.equal(await mainId(page),originalMain);
+  const touchCapabilities=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarsePointer:matchMedia('(pointer:coarse)').matches,viewportWidth:innerWidth}));
+  if(device==='mobile')assert.ok(touchCapabilities.maxTouchPoints>0||touchCapabilities.coarsePointer,`mobile Help requires an emulated touch device: ${JSON.stringify(touchCapabilities)}`);
   await page.click('#studioHelp');await page.waitForSelector('#studioHelpPanel');
   assert.equal((await runtime(page)).disposed,true,'help pauses the mounted game');
   assert.equal(await page.locator('#studioHelpTitle').evaluate(node=>document.activeElement===node),true);
-  if(device==='mobile')assert.match(await page.textContent('#studioHelpControls'),/Tap a part/);
+  if(device==='mobile')assert.match(await page.textContent('#studioHelpControls'),/Tap a part/,`Help must describe touch controls on this device: ${JSON.stringify(touchCapabilities)}`);
   await page.screenshot({path:`test-results/child-help-${device}.png`,fullPage:true});
   await page.click('#studioCloseHelp');await returnToViewed(page,device);await expectBudget(page,15);
   assert.equal((await currentSession(page)).candidate.id,candidate,'returning from help resumes the selected test');

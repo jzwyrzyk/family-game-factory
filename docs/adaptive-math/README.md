@@ -8,7 +8,7 @@ The release includes 73 bounded supplemental skill units across grades 1–4, pr
 
 This is the implementation of the learning-model phase. It does not certify a complete school curriculum or demonstrated learning gains. The code and automated acceptance gates can be reviewed now; educator review and a pilot across real elapsed days remain release-validation work. [The curriculum catalog](curriculum.md) states the exact coverage and limits.
 
-This branch is stacked on the existing `feature/unified-studio-review` draft. The ordinary arcade path still works. Add `?studio=1` to the development URL to inspect Studio integration. Opening or testing the draft does not merge it, change the live Pages site, provision cloud services, or enable the paid agent.
+The math component was developed in [draft #19](https://github.com/jzwyrzyk/family-game-factory/pull/19). It is now combined with the current physical games and child journey in [integrated draft #21](https://github.com/jzwyrzyk/family-game-factory/pull/21); that review's checks are the authority for the combined application. The ordinary arcade path still works. Add `?studio=1` to the development URL to inspect Studio integration. Opening or testing the draft does not merge it, change the live Pages site, provision cloud services, or enable the paid agent.
 
 ## Gaps bridged
 

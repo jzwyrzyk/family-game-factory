@@ -81,3 +81,39 @@ test('archived trusted v2 package matches the source math handshake contract',()
   const trusted=require('../server/sandbox/bundle-v2.cjs').runtimeBundle();const h=clientHarness(trusted.client);
   h.command('connect');assert.equal(h.reports.at(-1).learningProtocol,1);h.nodes.start.onclick();h.flush();h.command('pause');assert.equal(h.nodes.replay.disabled,true);h.command('resume');assert.equal(h.nodes.replay.disabled,false);
 });
+
+function remoteHarness(){
+  const events=new Map<string,(event:any)=>void>(),frameEvents=new Map<string,()=>void>(),timers=new Map<number,()=>void>(),sent:any[]=[];
+  let sequence=0;
+  class Element {
+    children:Element[]=[];parent:Element|null=null;className='';textContent='';tabIndex=0;style:Record<string,string>={};inert=false;isConnected=true;
+    append(...nodes:Element[]){for(const node of nodes){node.parent=this;this.children.push(node);}}
+    replaceChildren(...nodes:Element[]){for(const node of this.children)node.parent=null;this.children=[];this.append(...nodes);}
+    remove(){if(this.parent){this.parent.children=this.parent.children.filter(child=>child!==this);this.parent=null;}}
+    setAttribute(){}focus(){}scrollIntoView(){}getClientRects(){return [{}];}
+    get text():string{return this.textContent+this.children.map(child=>child.text).join('');}
+  }
+  const parent=new Element(),frame:any=new Element();parent.append(frame);frame.parentElement=parent;
+  frame.contentWindow={postMessage:(packet:any)=>sent.push(packet)};frame.addEventListener=(type:string,listener:()=>void)=>frameEvents.set(type,listener);frame.removeEventListener=(type:string)=>frameEvents.delete(type);
+  const window:any={FG:{store:{current:()=>({id:'learner'})},learning:{dispose(){},checkpoint(){throw Error('No learning should start before a validated player');}}},addEventListener:(type:string,listener:any)=>events.set(type,listener),removeEventListener:(type:string)=>events.delete(type)};
+  const realm:any={window,document:{createElement:()=>new Element()},crypto:{randomUUID:()=>`fixture-${++sequence}`},setTimeout:(fn:()=>void)=>{timers.set(++sequence,fn);return sequence;},clearTimeout:(id:number)=>timers.delete(id)};
+  runInNewContext(bundle('src/learning/remote.ts','LearningRemote'),realm);
+  const bridge=realm.LearningRemote.attachPreviewLearning(frame,{channel:'fixture-channel',artifactId:'fixture-artifact',ownerId:'learner'});
+  function ready(protocol?:number){events.get('message')!({source:frame.contentWindow,data:{type:'factory-preview',channel:'fixture-channel',artifactId:'fixture-artifact',event:'ready',...(protocol===undefined?{}:{learningProtocol:protocol})}});}
+  return {parent,frame,bridge,sent,ready,load:()=>frameEvents.get('load')!(),timeout:()=>{for(const fn of [...timers.values()])fn();}};
+}
+
+test('incompatible preview rejection survives either ready/load order and a connection timeout',()=>{
+  for(const readyFirst of [true,false]){
+    const h=remoteHarness();
+    if(readyFirst){h.ready();h.load();}else{h.load();h.ready();}
+    h.timeout();assert.match(h.parent.text,/This saved preview needs an updated game player to include math/);
+    assert.equal(h.frame.inert,true);assert.equal(h.bridge.ready,false);assert.equal(h.sent.some(packet=>packet.action==='resume'),false,'an unsupported archive is never resumed');h.bridge.dispose();
+  }
+});
+
+test('a later valid protocol can replace the rejected player without retaining its connection pause',()=>{
+  const h=remoteHarness();h.ready();h.load();h.ready(1);
+  assert.equal(h.bridge.ready,true);assert.equal(h.frame.inert,false);assert.doesNotMatch(h.parent.text,/updated game player/);
+  assert.equal(h.sent.at(-1).action,'resume','the valid renderer is released from the prior connection hold');h.bridge.dispose();
+});
