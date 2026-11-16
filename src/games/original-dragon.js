@@ -1,3 +1,4 @@
+import { createFixedClock } from '../quality/clock';
 // Adapted from checksum-pinned recovered original; native scoped DOM, shared lifecycle.
 export default class Original { constructor(mount,host){
  this.next=()=>{};this.restart=()=>{};this.unmount=()=>{};this.snapshot=()=>({});
@@ -79,11 +80,13 @@ let selected = 'queen';
 let mode='loading';
 let muted=false;
 const keys={};
-listen('keydown',e=>{ if(/INPUT|TEXTAREA/.test(e.target.tagName))return; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault(); keys[e.code]=true; if(e.code==='Space') keys.Space=true; if(e.code==='Escape'&&mode==='playing') pause();});
+let clock; let jumpBuffer=0;
+const clearInput=()=>{Object.keys(keys).forEach(k=>delete keys[k]);jumpBuffer=0};
+listen('keydown',e=>{ if(/INPUT|TEXTAREA/.test(e.target.tagName))return; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault(); if(!e.repeat&&(e.code==='Space'||e.code==='ArrowUp'))jumpBuffer=.12; keys[e.code]=true; if(e.code==='Space') keys.Space=true; if(e.code==='Escape'&&mode==='playing') pause();});
 listen('keyup',e=>{ keys[e.code]=false; if(e.code==='Space') keys.Space=false;});
 document.querySelectorAll('#touch button').forEach(btn=>{
   const key=btn.dataset.key;
-  const down=e=>{e.preventDefault(); keys[key]=true; if(key==='Space') keys.Space=true;};
+  const down=e=>{e.preventDefault(); if(key==='Space'||key==='ArrowUp')jumpBuffer=.12; keys[key]=true; if(key==='Space') keys.Space=true;};
   const up=e=>{e.preventDefault(); keys[key]=false; if(key==='Space') keys.Space=false;};
   btn.addEventListener('pointerdown',down); btn.addEventListener('pointerup',up); btn.addEventListener('pointerleave',up); btn.addEventListener('pointercancel',up);
 });
@@ -115,12 +118,12 @@ function buildHeroes(){
   return arranged.map((def,i)=>({ def, isPlayer:i===0, x:300+offsets[i], y:548, vx:0, vy:0, grounded:true, jumpCooldown:0, walkT:Math.random()*10, facing:1, jumpGlow:0, bob:0, sauce:0 }));
 }
 function showToast(txt,t=1.7){ const el=$('#toast'); el.textContent=txt; el.classList.remove('hidden'); game.toastT=t; }
-function setMode(m){ mode=m; $('#menu').classList.toggle('hidden',m!=='menu'); $('#pausePanel').classList.toggle('hidden',m!=='pause'); $('#victoryPanel').classList.toggle('hidden',m!=='victoryPanel'); $('#losePanel').classList.toggle('hidden',m!=='losePanel'); }
-function startGame(resetLevel=true){ if(resetLevel){ game.level=1; } game.levelSeed=Math.random(); game.bg=randomBg(); game.heroes=buildHeroes(); game.leader=game.heroes[0]; startLevel(game.level); setMode('playing'); }
-function startLevel(lv){ game.timer=0; game.islandHP=host.config.groundResilience; game.dragonMax = Math.min(6, 2 + Math.floor((lv-1)/2)); game.dragonHP = game.dragonMax; game.dragonX=1035; game.dragonY=342; game.dragonFireT=2.2; game.fireballs=[]; game.sparks=[]; game.sauceDrops=[]; game.cracks=[]; game.loseT=0; game.victoryT=0; game.bg=randomBg(); game.heroes.forEach((h,idx)=>{ h.x=300+idx*78; h.y=548; h.vx=0; h.vy=0; h.grounded=true; h.jumpCooldown=0; h.sauce=0; }); updateHUD(); showToast('Level '+lv+'!'); playTone(660,.11,'triangle'); }
+function setMode(m){ mode=m; $('#menu').classList.toggle('hidden',m!=='menu'); $('#pausePanel').classList.toggle('hidden',m!=='pause'); $('#victoryPanel').classList.toggle('hidden',m!=='victoryPanel'); $('#losePanel').classList.toggle('hidden',m!=='losePanel'); clock?.invalidate(); }
+function startGame(resetLevel=true){ clock?.resume('user'); clearInput(); if(resetLevel){ game.level=1; } game.levelSeed=Math.random(); game.bg=randomBg(); game.heroes=buildHeroes(); game.leader=game.heroes[0]; startLevel(game.level); setMode('playing'); }
+function startLevel(lv){ game.timer=0; game.islandHP=host.config.groundResilience; game.dragonMax = Math.min(6, 2 + Math.floor((lv-1)/2)); game.dragonHP = game.dragonMax; game.dragonX=1035; game.dragonY=342; game.dragonFireT=2.2; game.fireballs=[]; game.sparks=[]; game.sauceDrops=[]; game.cracks=[]; game.loseT=0; game.victoryT=0; game.bg=randomBg(); game.heroes.forEach((h,idx)=>{ h.x=300+idx*78; h.y=548; h.previousX=h.x; h.previousY=h.y; h.vx=0; h.vy=0; h.grounded=true; h.jumpCooldown=0; h.sauce=0; }); updateHUD(); showToast('Level '+lv+'!'); playTone(660,.11,'triangle'); }
 function updateHUD(){ $('#heroHUD').textContent = HERO_DEFS.find(h=>h.id===selected).label; $('#levelHUD').textContent = 'Level '+game.level; $('#islandHUD').textContent = Math.max(0,Math.round(game.islandHP))+'%'; $('#dragonBar').style.width = (100*game.dragonHP/game.dragonMax)+'%'; $('#bestHUD').textContent = best; }
-function pause(){ if(mode==='playing'){ setMode('pause'); mode='pause'; } }
-function resume(){ if(mode==='pause'){ mode='playing'; setMode('playing'); }}
+function pause(){ clearInput(); if(mode==='playing'){setMode('pause'); clock?.pause('user');} }
+function resume(){if(mode==='pause'){clearInput();clock?.resume('user');setMode('playing');}}
 $('#pauseBtn').onclick=()=>{ if(mode==='playing') pause(); else if(mode==='pause') resume(); };
 $('#resumeBtn').onclick=resume;
 $('#againBtn').onclick=()=>{ startGame(true); };
@@ -159,6 +162,8 @@ function damageDragon(){ game.dragonHP--; game.dragonHurt=.28; playTone(190,.18,
 function damageIsland(x){ const damage=Math.min(34,23 + 2*(game.level-1)); game.islandHP=Math.max(0,game.islandHP-damage); game.cracks.push({x,life:99,size:rrange(25,65)}); updateHUD(); playTone(120,.1,'triangle',0.04); if(game.islandHP<=0){ mode='loseAnim'; game.loseT=2.5; for(let i=0;i<90;i++) game.sauceDrops.push({x:rrange(40,W-40),y:rrange(-H*0.2,60),vy:rrange(4,9),len:rrange(20,70),w:rrange(8,22),life:3}); }}
 
 function update(dt){
+  for(const object of [...game.heroes,...game.fireballs]){object.previousX=object.x;object.previousY=object.y;}
+  jumpBuffer=Math.max(0,jumpBuffer-dt);
   if(game.toastT>0){ game.toastT-=dt; if(game.toastT<=0) $('#toast').classList.add('hidden'); }
   if(mode==='playing'){
     game.timer+=dt; updateHUD();
@@ -166,7 +171,7 @@ function update(dt){
     if(keys.ArrowLeft) { leader.vx=Math.max(leader.vx-0.8,-4.2); leader.facing=-1; }
     if(keys.ArrowRight){ leader.vx=Math.min(leader.vx+0.8,4.2); leader.facing=1; }
     if(!keys.ArrowLeft && !keys.ArrowRight) leader.vx*=0.82;
-    if((keys.ArrowUp||keys.Space) && leader.grounded) jumpHero(leader,12.1);
+    if((keys.ArrowUp||keys.Space||jumpBuffer>0) && leader.grounded){jumpHero(leader,12.1);jumpBuffer=0;}
     if(keys.ArrowDown && !leader.grounded) leader.vy += 0.25;
 
     // Companions are visible friends, but cannot jump into fireballs or repair the island.
@@ -312,10 +317,13 @@ function drawFireballs(){
 function drawUIState(){
   if(mode==='victory'){ ctx.fillStyle='rgba(255,255,255,.16)'; ctx.fillRect(0,0,W,H); for(let i=0;i<24;i++){ const x=(i*49+game.timer*140)%W; const y=120+Math.sin(i+game.timer*5)*38; ctx.fillStyle=['#ffdf63','#ff91a1','#95d8ff','#abf1a7'][i%4]; ctx.fillRect(x,y,8,18); }}
 }
-function render(){
-  ctx.clearRect(0,0,W,H); drawScene(); drawDragon(); game.heroes.forEach(h=>drawHero(h)); drawFireballs(); drawUIState();
+function render(alpha=1){
+  const moved=[...game.heroes,...game.fireballs].map(o=>({o,x:o.x,y:o.y}));
+  if(mode==='playing')for(const {o,x,y} of moved){o.x=(o.previousX??x)+(x-(o.previousX??x))*alpha;o.y=(o.previousY??y)+(y-(o.previousY??y))*alpha;}
+  ctx.clearRect(0,0,W,H);drawScene();drawDragon();game.heroes.forEach(h=>drawHero(h));drawFireballs();drawUIState();
+  for(const {o,x,y} of moved){o.x=x;o.y=y;}
 }
-let last=performance.now(); function loop(t){ const dt=Math.min(.033,(t-last)/1000); last=t; update(dt); render(); frame(loop);} 
+clock=createFixedClock({update,render,onPause:()=>{clearInput();playTone.ac?.suspend().catch(()=>{});pause();},onResume:()=>{clearInput();playTone.ac?.resume().catch(()=>{});}}); 
 
 (async function init(){
   renderHeroCards();
@@ -323,10 +331,10 @@ let last=performance.now(); function loop(t){ const dt=Math.min(.033,(t-last)/10
   renderHeroCards();
   game.bg=randomBg(); game.heroes=buildHeroes(); game.leader=game.heroes[0];
   setMode('menu'); mode='menu';
-  frame(loop);
+  clock.start();
 })().catch(()=>{if(alive)root.getElementById('toast').textContent='Artwork could not load. Reopen the game to retry.'});
 
-this.next=()=>{game.level++;startLevel(game.level);setMode('playing')};this.restart=()=>{startLevel(game.level);setMode('playing')};this.snapshot=()=>({level:game.level,mode,islandHP:game.islandHP,dragonHP:game.dragonHP,player:game.leader,fireballs:game.fireballs,cracks:game.cracks.length,assets:Object.keys(processed).length});this.unmount=()=>{alive=false;cancelAnimationFrame(raf);listeners.forEach(([t,f])=>window.removeEventListener(t,f));timers.forEach(clearTimeout);playTone.ac?.close();mount.replaceChildren()};
+this.pause=pause;this.resume=resume;this.next=()=>{clock.resume('user');clearInput();game.level++;startLevel(game.level);setMode('playing')};this.restart=()=>{clock.resume('user');clearInput();startLevel(game.level);setMode('playing')};this.snapshot=()=>({level:game.level,mode,time:game.timer,paused:clock.paused,clock:clock.stats,islandHP:game.islandHP,dragonHP:game.dragonHP,player:game.leader,fireballs:game.fireballs,cracks:game.cracks.length,assets:Object.keys(processed).length});this.unmount=()=>{alive=false;clock.dispose();clearInput();cancelAnimationFrame(raf);listeners.forEach(([t,f])=>window.removeEventListener(t,f));timers.forEach(clearTimeout);playTone.ac?.close();mount.replaceChildren()};
 }
 run.call(this,scopeDocument);
 }

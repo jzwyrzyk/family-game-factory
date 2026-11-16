@@ -2,7 +2,8 @@ import {installCoaching} from './coaching';
 import {freshDesign} from './design';
 import './style.css';
 import { StudioNotebook, validateNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
-import { StudioGames } from './adapter';
+import { StudioGames, isGeneratedRemoteKind } from './adapter';
+import { installStudioRemixRouting } from './host-navigation';
 import { defaults, manifests, validateConfig } from '../runtime/manifests';
 import { interpret, examples } from '../factory/interpreter';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
@@ -10,8 +11,8 @@ import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView 
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
-const icon:Record<string,string>={gum:'🚀',buckets:'🪣',dragon:'🐉',new:'✨'};
-const names:Record<string,string>={gum:'Bubble Gum Builders',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',new:'A brand-new idea'};
+const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',new:'✨'};
+const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',new:'A brand-new idea'};
 const busy=(s:StudioSession)=>!!s.job&&['queued','building','testing'].includes(s.job.status);
 const human=(v:number|boolean)=>typeof v==='boolean'?(v?'On':'Off'):String(v);
 
@@ -45,6 +46,8 @@ export async function installStudio(){
  <section id="studioVersions" class="studio-versions" aria-labelledby="studioVersionsTitle" hidden><div class="studio-section-heading"><div><h2 id="studioVersionsTitle">Try a version. Keep your choice.</h2><p>Playing an older version does not overwrite your working game.</p></div><button class="studio-button" id="studioCloseVersions">Close</button></div><div id="studioVersionCards" class="studio-version-cards"></div></section>
  <dialog id="studioCopyDialog" class="studio-dialog"><form id="studioCopyForm"><h2>Give this game a new name</h2><p>Your original stays exactly as it is. The conversation comes with your copy.</p><label for="studioCopyName">Game name</label><input id="studioCopyName" maxlength="60" required><div><button class="studio-button" id="studioCopyCancel" type="button">Cancel</button><button class="studio-button studio-primary" type="submit">Save new game</button></div></form></dialog>`;
  document.querySelector('main')!.append(page);
+ const pausedPreview=el('section','studio-paused-preview');pausedPreview.id='studioPausedPreview';pausedPreview.hidden=true;
+ pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
  library.innerHTML=`<div class="studio-library-hero"><div><span class="studio-kicker">PLAY · IMAGINE · MAKE IT YOURS</span><h1>Your ideas.<br><em>Your games.</em></h1><p>Open a game and change it while you play.<br>Your conversation and versions stay together.</p><button class="studio-button studio-primary" id="studioNew">＋ Create something new</button></div><div class="studio-hero-shapes" aria-hidden="true"><span>✦</span><span>↗</span><span>◒</span></div></div><div id="studioContinue"></div><div class="studio-section-heading"><div><h2>My games & ideas</h2><p>Working games, previews and unfinished ideas—right where you left them.</p></div><span class="studio-storage">This browser · this player</span></div><div id="studioLibrary" class="studio-library-grid"></div><div class="studio-section-heading"><div><h2>Start with a family favorite</h2><p>Make your own copy. The original stays safe.</p></div></div><div id="studioStarters" class="studio-library-grid"></div><p class="studio-library-note">Saving is private to this browser—not a public release. AI generation requires your configured family workshop. A saved idea is labeled separately from a playable game.</p>`;
  document.querySelector('main')!.append(library);
@@ -60,7 +63,7 @@ export async function installStudio(){
  function message(s:StudioSession,role:'child'|'helper'|'reflection',text:string){notebook.message(s.id,s.owner,role,text);if(activeId===s.id&&owner()===s.owner)renderConversation();}
  function flushDraft(){clearTimeout(draftTimer);if(!activeId)return;const s=current();if(s.draft!==$<HTMLTextAreaElement>('studioPrompt').value)notebook.update(s.id,s.owner,x=>{x.draft=$<HTMLTextAreaElement>('studioPrompt').value;});$('studioDraftStatus').textContent='Draft saved on this device';}
  function setTab(tab:'game'|'talk'|'versions'){
-  if(tab==='talk'){document.body.classList.add('studio-designing');if(mounted){if($('math-answer')){status('Finish the current math question before designing.');return;}disposeGame();showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}}
+  if(tab==='talk'){document.body.classList.add('studio-designing');if(mounted){if($('math-answer')){status('Finish the current math question before designing.');return;}disposeGame(true);showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}}
   if(tab==='game')document.body.classList.remove('studio-designing');
   $('page-studio').querySelector('.studio-workspace')!.setAttribute('data-mobile-panel',tab);
   document.querySelectorAll('[data-studio-tab]').forEach(b=>b.setAttribute('aria-pressed',String((b as HTMLElement).dataset.studioTab===tab)));
@@ -70,7 +73,27 @@ export async function installStudio(){
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));page.classList.remove('hidden');route='studio';
   nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
  }
- function disposeGame(){
+ function clearPausedPreview(){pausedPreview.hidden=true;pausedPreview.replaceChildren();}
+ function capturePausedPreview(){
+  clearPausedPreview();const name=$('studioTitle').textContent||'Your game',scene=el('div','studio-paused-scene'),caption=el('div','studio-paused-caption');
+  // Copy pixels once, before unmount. No game instance, animation, URL or storage is retained.
+  const mount=$('game-mount'),source=mount.querySelector('canvas')||Array.from(mount.children).map(child=>child.shadowRoot?.querySelector('canvas')).find(Boolean);
+  if(source&&source.width>0&&source.height>0)try{
+   const frame=document.createElement('canvas'),scale=Math.min(1,960/source.width,600/source.height);
+   frame.width=Math.max(1,Math.round(source.width*scale));frame.height=Math.max(1,Math.round(source.height*scale));
+   const context=frame.getContext('2d');if(context){
+    context.drawImage(source,0,0,frame.width,frame.height);
+    const pixels=context.getImageData(0,0,frame.width,frame.height).data;
+    // A just-mounted or unavailable canvas may have no painted frame yet.
+    for(let i=3;i<pixels.length;i+=4)if(pixels[i]){frame.setAttribute('role','img');frame.setAttribute('aria-label',name+' — paused scene');scene.append(frame);break;}
+   }
+  }catch{/* A missing or unreadable frame still gets the named placeholder below. */}
+  if(!scene.childElementCount){const symbol=el('span','studio-paused-symbol','Ⅱ');symbol.setAttribute('aria-hidden','true');scene.append(symbol);}
+  caption.append(el('strong','',name),el('p','','Paused for your ideas. Choose Play to return to your game.'));
+  pausedPreview.append(scene,caption);pausedPreview.hidden=false;
+ }
+ function disposeGame(keepScene=false){
+  if(keepScene&&mounted)capturePausedPreview();else clearPausedPreview();
   ++epoch;iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
   // The original host cleans listeners, timers, audio and pending math callbacks.
   if(mounted){FG.app.page('home');mounted=false;}
@@ -85,7 +108,7 @@ export async function installStudio(){
   if(!entries.length)box.append(el('p','studio-no-games','Your first creation starts below. Choose a favorite or dream up something new.'));
   entries.filter(s=>!s.playOnly||s.experiments?.length||s.candidate).forEach(s=>{const card=el('button','studio-library-card');card.setAttribute('data-session',s.id);card.append(el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name));const label=busy(s)?'Build in progress':s.candidate?'Preview ready':s.projectId||s.remoteId?'Playable':'Idea · not built yet';card.append(el('span','studio-card-state',label),el('span','studio-card-link','Open in studio →'));card.onclick=()=>act(()=>open(s.id));box.append(card);});
   const starters=$('studioStarters');starters.replaceChildren();
-  (['gum','buckets','dragon'] as GameId[]).forEach(game=>{const b=el('button',`studio-library-card studio-starter ${game}`);b.setAttribute('data-starter',game);b.append(el('span','studio-card-icon',icon[game]),el('span','studio-card-name',names[game]),el('span','studio-card-state','Original game · make your own copy'),el('span','studio-card-link','Play & change →'));b.onclick=()=>act(()=>start(game));starters.append(b);});
+  (Object.keys(manifests) as GameId[]).forEach(game=>{const b=el('button',`studio-library-card studio-starter ${game}`);b.setAttribute('data-starter',game);b.append(el('span','studio-card-icon',icon[game]),el('span','studio-card-name',names[game]),el('span','studio-card-state','Original game · make your own copy'),el('span','studio-card-link','Play & change →'));b.onclick=()=>act(()=>start(game));starters.append(b);});
  }
  function home(){flushDraft();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.id==='studioNavHome'));window.scrollTo(0,0);}
  function start(game:GameId){
@@ -180,7 +203,7 @@ export async function installStudio(){
   sending.add(s.id);render();status('Sending your request. No job has been queued yet.');
   const r=s.projectId?games.revision(s.projectId,s.owner):null;
   const chosen=continueTest?s.candidate:null;
-  const input={gameId:s.remoteId||chosen?.remoteId?(s.remoteKind==='generated-module-v1'?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
+  const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
   try{await clientFor(s).submit(input);}catch(error){message(s,'helper','The builder could not finish or could not accept this request. Your current game and typed idea are still safe.');if(activeId===s.id&&owner()===s.owner){status((error as Error).message==='SPENDING_CUTOFF'?'The workshop allowance has been reached. No working game was replaced.':'The builder is unavailable. No success has been claimed.',true);render();}}finally{sending.delete(s.id);if(activeId===s.id&&owner()===s.owner)render();}
  }
  async function onJob(captured:StudioSession,job:JobView){
@@ -295,8 +318,27 @@ export async function installStudio(){
   localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details();return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:games.revision(s.projectId,s.owner).config,prompt).kind==='supported';},
   tryRequest:async(prompt)=>{$<HTMLTextAreaElement>('studioPrompt').value=prompt;flushDraft();await submit();},
   playTest:async id=>{const s=current();notebook.selectExperiment(s.id,s.owner,id);await playCandidate();},playMain:playWorking,combineTests,
-  pauseForThinking:()=>{if($('math-answer')){status('Finish the current math question first.');return false;}if(mounted){disposeGame();showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}return true;},
+  pauseForThinking:()=>{if($('math-answer')){status('Finish the current math question first.');return false;}if(mounted){disposeGame(true);showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}return true;},
   showTalk:()=>{showStudio();setTab('talk');$('studioPrompt').focus();}
+ });
+ installStudioRemixRouting({
+  activeGame:()=>activeId&&route==='studio'&&mounted?current().game as GameId:null,
+  openRequest:prompt=>act(async()=>{
+   if($('math-answer')){status('Finish the current math question before changing this game.');return;}
+   flushDraft();const s=current(),fromCandidate=showing==='candidate'&&!!s.candidate,fromHistory=showing==='history';reflecting=false;
+   // Unmount before copying a revision so its latest construction/ride state is saved.
+   showStudio();setTab('talk');$<HTMLSelectElement>('experimentStart').value=fromCandidate?'continue':'main';
+   if(!prompt){render();$('studioPrompt').focus();return;}
+   if(s.draft.trim()&&s.draft.trim()!==prompt){
+    const joined=s.draft+'\n\n'+prompt;
+    if(joined.length<=2000){$<HTMLTextAreaElement>('studioPrompt').value=joined;flushDraft();status('Added that idea to your saved draft. Edit it or choose Send when you are ready.');}
+    else status('Your saved draft is full. Finish it first, then try: '+prompt);
+    render();$('studioPrompt').focus();return;
+   }
+   $<HTMLTextAreaElement>('studioPrompt').value=prompt;flushDraft();
+   if(fromHistory){render();status('Your idea is saved. Choose your starting version in Tests & versions before trying this change.');$('studioPrompt').focus();return;}
+   await coaching!.tryPreset(prompt);
+  })
  });
  home();
  try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{remote={version:1,mode:'unavailable'};}configReady=true;if(activeId)render();

@@ -1,0 +1,365 @@
+diff --git a/src/studio/adapter.ts b/src/studio/adapter.ts
+index a97c4e6..45bf6f1 100644
+--- a/src/studio/adapter.ts
++++ b/src/studio/adapter.ts
+@@ -1,6 +1,8 @@
+ /** Existing game engines, learning host and revision storage remain authoritative. */
+ import { RevisionStore } from '../factory/workspace';
+ import type { Mechanics, GameId } from '../runtime/types';
++/** Both generated formats use the generated revision endpoint; neither is a star catcher. */
++export function isGeneratedRemoteKind(kind: unknown): boolean { return kind === 'generated-module-v1' || kind === 'generated-module-v2'; }
+ export class StudioGames {
+   constructor(private storage: Storage, private fg: any) {}
+   private store(){return new RevisionStore(this.storage);}
+diff --git a/src/studio/coaching.ts b/src/studio/coaching.ts
+index 5b6c9d8..ed882f0 100644
+--- a/src/studio/coaching.ts
++++ b/src/studio/coaching.ts
+@@ -88,5 +88,5 @@ export function installCoaching(h:Hooks){
+  function newBase(){return $<HTMLSelectElement>('experimentStart').value==='continue';}
+  function details(){const s=h.current();return {continueTest:newBase(),parents:newBase()&&s.candidate&&s.selectedTest===s.candidate.id?[s.selectedTest]:[],depth,origin:!force&&h.current().draft===selectedSuggestion?'helper':origin};}
+  function openSession(){combineSelection.clear();selectedSuggestion=null;generation++;controller?.abort();thinking=false;$('coachProposals').replaceChildren();$<HTMLSelectElement>('experimentStart').value='main';document.body.classList.remove('studio-designing');const s=h.current();if(!s.design)h.notebook.update(s.id,s.owner,x=>{x.design=freshDesign();});$<HTMLInputElement>('designPrediction').value=s.hypothesis;$<HTMLSelectElement>('coachSupport').value=s.design?.support||'balanced';$<HTMLInputElement>('coachFriction').value=s.design?.friction||'';renderPlan();}
+- return {intercept,details,renderShelf,renderPlan,openSession,discuss,reset:()=>{generation++;controller?.abort();thinking=false;},afterOutcome:(text:string,testId:string|null)=>{const s=h.current();h.notebook.observe(s.id,s.owner,text,'runtime',testId);},pauseReflection:()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;});}};
++ return {intercept,details,renderShelf,renderPlan,openSession,discuss,tryPreset:(prompt:string)=>request(prompt,'helper','tune'),reset:()=>{generation++;controller?.abort();thinking=false;},afterOutcome:(text:string,testId:string|null)=>{const s=h.current();h.notebook.observe(s.id,s.owner,text,'runtime',testId);},pauseReflection:()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;});}};
+ }
+diff --git a/src/studio/host-navigation.ts b/src/studio/host-navigation.ts
+index 0ba9ad5..be69762 100644
+--- a/src/studio/host-navigation.ts
++++ b/src/studio/host-navigation.ts
+@@ -1,3 +1,22 @@
++import { isGameId } from '../runtime/manifests';
++import type { GameId } from '../runtime/types';
++
++/** Capture runs before the legacy window bubble listener, even when installed later.
++ * Only the matching embedded game belongs to this Studio. Other routes keep their host.
++ */
++export function installStudioRemixRouting(host: { activeGame(): GameId | null; openRequest(prompt?: string): void }, target: Pick<Window, 'addEventListener' | 'removeEventListener'> = window) {
++  const listener = (event: Event) => {
++    const detail = (event as CustomEvent<{ game?: unknown; prompt?: unknown }>).detail;
++    if (event.defaultPrevented || !event.cancelable || !detail || !isGameId(detail.game) ||
++        detail.prompt !== undefined && (typeof detail.prompt !== 'string' || detail.prompt.length > 2000) ||
++        host.activeGame() !== detail.game) return;
++    event.preventDefault();
++    host.openRequest(typeof detail.prompt === 'string' ? detail.prompt : undefined);
++  };
++  target.addEventListener('factory-remix-request', listener, true);
++  return () => target.removeEventListener('factory-remix-request', listener, true);
++}
++
+ /** Bridge the original round-result Home button back to the studio library. */
+ export function installStudioHostNavigation() {
+   const fg = (window as any).FG;
+diff --git a/src/studio/notebook.ts b/src/studio/notebook.ts
+index e2210c5..1a8e5dd 100644
+--- a/src/studio/notebook.ts
++++ b/src/studio/notebook.ts
+@@ -1,4 +1,6 @@
+ import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
++import { isGameId } from '../runtime/manifests';
++import type { GameId } from '../runtime/types';
+ /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
+ export const STUDIO_KEY = 'family-game-factory-studio-v1';
+ export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
+@@ -6,7 +8,7 @@ export type Message = { id: string; role: 'child' | 'helper' | 'reflection'; tex
+ export type Candidate = { id: string; baseId: string | null; config?: Record<string, number | boolean>; remoteId?: string; prompt: string; summary: string };
+ export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled' };
+ export interface StudioSession {
+-  id: string; owner: string; name: string; game: 'gum' | 'buckets' | 'dragon' | 'new';
++  id: string; owner: string; name: string; game: GameId | 'new';
+   projectId: string | null; remoteId: string | null; remoteKind?: string;
+   candidate: Candidate | null; undone?: Candidate | null; draft: string; messages: Message[];
+   job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
+@@ -23,7 +25,7 @@ export function validateNotebook(input: unknown): Notebook {
+   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
+   const ids = new Set<string>();
+   for (const s of n.sessions) {
+-    if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !['gum','buckets','dragon','new'].includes(s.game) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
++    if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
+     ids.add(s.id);
+     if (s.projectId !== null && !ident(s.projectId) || s.remoteId !== null && !ident(s.remoteId) || s.remoteKind !== undefined && !safeText(s.remoteKind,60)) throw Error('Invalid studio reference.');
+     if (!Array.isArray(s.messages) || s.messages.length > 200 || !s.messages.every(m => m && ident(m.id) && ['child','helper','reflection'].includes(m.role) && safeText(m.text,2200) && safeText(m.at,40) && Number.isFinite(Date.parse(m.at)))) throw Error('Invalid studio conversation.');
+diff --git a/src/studio/style.css b/src/studio/style.css
+index ede3066..879d462 100644
+--- a/src/studio/style.css
++++ b/src/studio/style.css
+@@ -10,6 +10,7 @@ body.studio-review{background:#f3f5fb;color:#17223d;color-scheme:light;font-fami
+ @media(max-width:1000px){.studio-review main{padding:20px 18px 40px}.studio-workspace{grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr)}.studio-actions .studio-button{font-size:11px;padding:9px 10px}.studio-heading{gap:13px}.studio-title-wrap h1{font-size:24px}.studio-heading>.studio-storage{display:none}}
+ @media(max-width:760px){.studio-review .site-header{padding:13px;flex-wrap:wrap;gap:15px}.studio-review .studio-nav{justify-content:center}.studio-nav button{padding:9px 12px;font-size:12px}.studio-review main{padding:16px 12px 35px}.studio-library-hero{padding:27px 23px;min-height:245px}.studio-library-hero h1{font-size:42px}.studio-library-hero p{font-size:13px}.studio-hero-shapes{display:none}.studio-library-grid{grid-template-columns:1fr 1fr;gap:10px}.studio-library-card{padding:16px;min-height:165px}.studio-card-name{font-size:14px}.studio-card-state{font-size:11px}.studio-section-heading{align-items:flex-start}.studio-section-heading h2{font-size:19px}.studio-section-heading>.studio-storage{display:none}.studio-section-heading p{font-size:12px}.studio-continue{padding:13px;font-size:12px}.studio-continue .studio-button{font-size:11px;min-height:38px;padding:8px}.studio-heading{align-items:flex-start;gap:13px;margin-bottom:14px}.studio-back{font-size:11px;white-space:nowrap}.studio-title-wrap h1{font-size:21px;letter-spacing:-.4px}.studio-kicker{font-size:8px;letter-spacing:1.6px}.studio-topbar{display:block}.studio-version{font-size:11px;margin-bottom:10px}.studio-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.studio-actions .studio-button{font-size:10px;min-height:40px;padding:8px 4px}.studio-status{font-size:11px;margin:10px 0}.studio-mobile-tabs{display:flex;border:1px solid #d9e1ef;border-radius:12px;overflow:hidden;margin:12px 0;background:white}.studio-mobile-tabs button{flex:1;border:0;padding:12px 5px;font:700 11px system-ui;color:#73819b;background:white;min-height:43px}.studio-mobile-tabs button[aria-pressed="true"]{background:#e9ecff;color:#5159b1}.studio-workspace{display:block}.studio-workspace[data-mobile-panel="game"] .studio-conversation{display:none}.studio-workspace[data-mobile-panel="talk"] .studio-canvas-column{display:none}.studio-workspace[data-mobile-panel="versions"]{display:none}.studio-game-host,.studio-empty,.studio-native-game .game-stage{min-height:330px}.studio-messages{height:260px}.studio-preview-notice{font-size:10px;gap:8px}.studio-preview-notice button{font-size:10px}.studio-versions{padding:14px}.studio-version-cards{grid-template-columns:1fr}.studio-conversation{border-radius:16px}.studio-footnote{font-size:10px}.studio-native-game .game-stage .builder-controls{flex-wrap:wrap}}
+ @media(prefers-reduced-motion:reduce){.studio-review *{scroll-behavior:auto!important}.studio-library-card{transform:none!important}}
++.studio-starter.hill{background:linear-gradient(160deg,#fff,#edf7e8)}
+ /* Gold-standard design coaching: play-first, progressive tools, optional learning. */
+ .studio-review:not(.studio-designing) .studio-workspace{grid-template-columns:minmax(0,1fr)}
+ .studio-review:not(.studio-designing) .studio-conversation,.studio-review:not(.studio-designing) #designPlan{display:none}
+diff --git a/src/studio/ui.ts b/src/studio/ui.ts
+index 2cf4aa7..62f511d 100644
+--- a/src/studio/ui.ts
++++ b/src/studio/ui.ts
+@@ -2,7 +2,8 @@ import {installCoaching} from './coaching';
+ import {freshDesign} from './design';
+ import './style.css';
+ import { StudioNotebook, validateNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
+-import { StudioGames } from './adapter';
++import { StudioGames, isGeneratedRemoteKind } from './adapter';
++import { installStudioRemixRouting } from './host-navigation';
+ import { defaults, manifests, validateConfig } from '../runtime/manifests';
+ import { interpret, examples } from '../factory/interpreter';
+ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
+@@ -10,8 +11,8 @@ import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView
+ 
+ const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
+ const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
+-const icon:Record<string,string>={gum:'🚀',buckets:'🪣',dragon:'🐉',new:'✨'};
+-const names:Record<string,string>={gum:'Bubble Gum Builders',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',new:'A brand-new idea'};
++const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',new:'✨'};
++const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',new:'A brand-new idea'};
+ const busy=(s:StudioSession)=>!!s.job&&['queued','building','testing'].includes(s.job.status);
+ const human=(v:number|boolean)=>typeof v==='boolean'?(v?'On':'Off'):String(v);
+ 
+@@ -85,7 +86,7 @@ export async function installStudio(){
+   if(!entries.length)box.append(el('p','studio-no-games','Your first creation starts below. Choose a favorite or dream up something new.'));
+   entries.filter(s=>!s.playOnly||s.experiments?.length||s.candidate).forEach(s=>{const card=el('button','studio-library-card');card.setAttribute('data-session',s.id);card.append(el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name));const label=busy(s)?'Build in progress':s.candidate?'Preview ready':s.projectId||s.remoteId?'Playable':'Idea · not built yet';card.append(el('span','studio-card-state',label),el('span','studio-card-link','Open in studio →'));card.onclick=()=>act(()=>open(s.id));box.append(card);});
+   const starters=$('studioStarters');starters.replaceChildren();
+-  (['gum','buckets','dragon'] as GameId[]).forEach(game=>{const b=el('button',`studio-library-card studio-starter ${game}`);b.setAttribute('data-starter',game);b.append(el('span','studio-card-icon',icon[game]),el('span','studio-card-name',names[game]),el('span','studio-card-state','Original game · make your own copy'),el('span','studio-card-link','Play & change →'));b.onclick=()=>act(()=>start(game));starters.append(b);});
++  (Object.keys(manifests) as GameId[]).forEach(game=>{const b=el('button',`studio-library-card studio-starter ${game}`);b.setAttribute('data-starter',game);b.append(el('span','studio-card-icon',icon[game]),el('span','studio-card-name',names[game]),el('span','studio-card-state','Original game · make your own copy'),el('span','studio-card-link','Play & change →'));b.onclick=()=>act(()=>start(game));starters.append(b);});
+  }
+  function home(){flushDraft();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.id==='studioNavHome'));window.scrollTo(0,0);}
+  function start(game:GameId){
+@@ -180,7 +181,7 @@ export async function installStudio(){
+   sending.add(s.id);render();status('Sending your request. No job has been queued yet.');
+   const r=s.projectId?games.revision(s.projectId,s.owner):null;
+   const chosen=continueTest?s.candidate:null;
+-  const input={gameId:s.remoteId||chosen?.remoteId?(s.remoteKind==='generated-module-v1'?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
++  const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
+   try{await clientFor(s).submit(input);}catch(error){message(s,'helper','The builder could not finish or could not accept this request. Your current game and typed idea are still safe.');if(activeId===s.id&&owner()===s.owner){status((error as Error).message==='SPENDING_CUTOFF'?'The workshop allowance has been reached. No working game was replaced.':'The builder is unavailable. No success has been claimed.',true);render();}}finally{sending.delete(s.id);if(activeId===s.id&&owner()===s.owner)render();}
+  }
+  async function onJob(captured:StudioSession,job:JobView){
+@@ -298,6 +299,25 @@ export async function installStudio(){
+   pauseForThinking:()=>{if($('math-answer')){status('Finish the current math question first.');return false;}if(mounted){disposeGame();showStudio();status('Paused for designing. Construction is saved; action games restart this round when you resume.');}return true;},
+   showTalk:()=>{showStudio();setTab('talk');$('studioPrompt').focus();}
+  });
++ installStudioRemixRouting({
++  activeGame:()=>activeId&&route==='studio'&&mounted?current().game as GameId:null,
++  openRequest:prompt=>act(async()=>{
++   if($('math-answer')){status('Finish the current math question before changing this game.');return;}
++   flushDraft();const s=current(),fromCandidate=showing==='candidate'&&!!s.candidate,fromHistory=showing==='history';reflecting=false;
++   // Unmount before copying a revision so its latest construction/ride state is saved.
++   showStudio();setTab('talk');$<HTMLSelectElement>('experimentStart').value=fromCandidate?'continue':'main';
++   if(!prompt){render();$('studioPrompt').focus();return;}
++   if(s.draft.trim()&&s.draft.trim()!==prompt){
++    const joined=s.draft+'\n\n'+prompt;
++    if(joined.length<=2000){$<HTMLTextAreaElement>('studioPrompt').value=joined;flushDraft();status('Added that idea to your saved draft. Edit it or choose Send when you are ready.');}
++    else status('Your saved draft is full. Finish it first, then try: '+prompt);
++    render();$('studioPrompt').focus();return;
++   }
++   $<HTMLTextAreaElement>('studioPrompt').value=prompt;flushDraft();
++   if(fromHistory){render();status('Your idea is saved. Choose your starting version in Tests & versions before trying this change.');$('studioPrompt').focus();return;}
++   await coaching!.tryPreset(prompt);
++  })
++ });
+  home();
+  try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{remote={version:1,mode:'unavailable'};}configReady=true;if(activeId)render();
+  FG.studio={version:1,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
+diff --git a/tests/design-coach-browser.cjs b/tests/design-coach-browser.cjs
+index 0c036f6..84efac4 100644
+--- a/tests/design-coach-browser.cjs
++++ b/tests/design-coach-browser.cjs
+@@ -18,23 +18,23 @@ async function load(page,url,saved={}){
+   const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.setDefaultTimeout(7000);
+   const url=`http://127.0.0.1:${server.address().port}/arcade/?studio=1`;await load(page,url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);await page.evaluate(()=>FG.store.changeProfile({rate:0}));
+   const session=()=>page.evaluate(()=>FG.studio.exportNotebook().sessions.at(-1));const projects=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects);
+-  await page.click('[data-starter="gum"]');await page.waitForSelector('.construction-stage');assert.equal(await page.locator('#studioPrompt').isVisible(),false,'play-first hides design tools');
++  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');assert.equal(await page.locator('#studioPrompt').isVisible(),false,'play-first hides design tools');
+   await page.click('#studioHome');await page.click('[data-starter="gum"]');assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
+   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();const baseline=(await projects())[0].headId;
+-  const talk=async()=>{await page.click('#studioChange');};const tryLocal=async text=>{await talk();await page.fill('#studioPrompt',text);await page.click('#studioSend');await page.waitForSelector('.construction-stage');};
++  const talk=async()=>{await page.click('#studioChange');};const tryLocal=async text=>{await talk();await page.fill('#studioPrompt',text);await page.click('#studioSend');await page.waitForSelector('.quality-builder');};
+   await talk();await page.fill('#studioPrompt','I won but it was boring');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+   assert.match(await page.textContent('#studioMessages'),/action or goal/);assert.equal((await session()).experiments.length,0);assert.equal((await projects())[0].headId,baseline);
+   await page.fill('#studioPrompt',"I don't know");await page.click('#studioSend');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);
+   await page.click('#coachIdeas');await page.waitForFunction(()=>document.querySelectorAll('#coachProposals button').length>=2);assert.equal((await session()).experiments.length,0);
+-  await page.fill('#studioPrompt','Give me 15 gum sticks');await page.getByText('My guess about this experiment (optional)',{exact:true}).click();await page.fill('#designPrediction','More chances to test a joint');await page.click('#studioSend');await page.waitForSelector('.construction-stage');assert.equal(await page.locator('[data-part="body"]').count(),1);
++  await page.fill('#studioPrompt','Give me 15 gum sticks');await page.getByText('My guess about this experiment (optional)',{exact:true}).click();await page.fill('#designPrediction','More chances to test a joint');await page.click('#studioSend');await page.waitForSelector('.quality-builder');assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.parts.filter(p=>p.kind==='bottle').length),1);
+   await tryLocal('Make joints stronger');await tryLocal('Give me six gum sticks');let s=await session();assert.equal(s.experiments.length,3);assert.equal(s.experiments[0].candidate.config.gumBudget,15);assert.equal(s.experiments[1].candidate.config.gumBudget,10,'B starts from main, not A');assert.equal((await projects())[0].headId,baseline);
+-  await page.click('#studioCompare');assert.equal(await page.locator('.experiment-card').count(),3);await page.locator('[aria-label="Notes for Test A"]').fill('A little easier. I liked having choices.');await page.locator('[aria-label="Combine Test A"]').check();await page.locator('[aria-label="Combine Test B"]').check();await page.click('#combineExperiments');await page.waitForSelector('.construction-stage');s=await session();assert.equal(s.experiments.length,4);assert.equal(s.experiments[3].parents.length,2);assert.equal(s.experiments[3].candidate.config.gumBudget,15);assert.equal(s.experiments[3].candidate.config.jointStrength,1.25);assert.equal((await projects())[0].headId,baseline);
++  await page.click('#studioCompare');assert.equal(await page.locator('.experiment-card').count(),3);await page.locator('[aria-label="Notes for Test A"]').fill('A little easier. I liked having choices.');await page.locator('[aria-label="Combine Test A"]').check();await page.locator('[aria-label="Combine Test B"]').check();await page.click('#combineExperiments');await page.waitForSelector('.quality-builder');s=await session();assert.equal(s.experiments.length,4);assert.equal(s.experiments[3].parents.length,2);assert.equal(s.experiments[3].candidate.config.gumBudget,15);assert.equal(s.experiments[3].candidate.config.jointStrength,1.25);assert.equal((await projects())[0].headId,baseline);
+   await page.click('#studioCompare');await page.getByRole('button',{name:'Play Test A',exact:true}).click();assert.match(await page.textContent('#studioVersion'),/Test A/);assert.equal((await projects())[0].headId,baseline);
+   await page.click('#studioKeep');assert.notEqual((await projects())[0].headId,baseline);assert.equal((await session()).experiments.length,4,'promotion preserves all alternatives');
+-  await page.click('#studioCompare');await page.locator('.experiment-card').nth(2).getByRole('button',{name:'Develop this test'}).click();await page.fill('#studioPrompt','Make joints stronger');await page.click('#studioSend');await page.waitForSelector('.construction-stage');s=await session();assert.equal(s.experiments.length,5);assert.equal(s.experiments[4].candidate.config.gumBudget,6);assert.equal(s.experiments[4].baseId,baseline,'old experiment baseline is not silently rebased');
++  await page.click('#studioCompare');await page.locator('.experiment-card').nth(2).getByRole('button',{name:'Develop this test'}).click();await page.fill('#studioPrompt','Make joints stronger');await page.click('#studioSend');await page.waitForSelector('.quality-builder');s=await session();assert.equal(s.experiments.length,5);assert.equal(s.experiments[4].candidate.config.gumBudget,6);assert.equal(s.experiments[4].baseId,baseline,'old experiment baseline is not silently rebased');
+   await page.click('#studioCompare');await page.screenshot({path:`test-results/design-experiments-${device}.png`,fullPage:true});
+   await page.click('#studioCloseVersions');await talk();await page.fill('#studioPrompt','The aiming action is awkward. Could we rethink it?');await page.click('#studioSend');await page.waitForFunction(()=>!document.getElementById('coachModeStatus').textContent.includes('Thinking'));await page.screenshot({path:`test-results/design-conversation-${device}.png`,fullPage:true});
+-  const retained=(await session()).experiments.length;await page.click('#coachThink');assert.equal((await session()).design.paused,true);await page.waitForSelector('.construction-stage');assert.equal((await session()).experiments.length,retained);
++  const retained=(await session()).experiments.length;await page.click('#coachThink');assert.equal((await session()).design.paused,true);await page.waitForSelector('.quality-builder');assert.equal((await session()).experiments.length,retained);
+   await page.click('#studioHome');const saved=inline?await page.evaluate(()=>Object.fromEntries(window.__reviewStorage)):{};if(inline)await load(page,url,saved);else await page.reload();await page.waitForFunction(()=>window.FG?.studio);
+   await page.locator('#studioLibrary [data-session]').first().click();await page.click('#studioCompare');assert.equal(await page.locator('.experiment-card').count(),5);assert.equal(await page.locator('[aria-label="Notes for Test A"]').inputValue(),'A little easier. I liked having choices.');
+   await page.locator('.profile-choice').nth(1).click();assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);await page.locator('.profile-choice').first().click();
+diff --git a/tests/studio-journey.cjs b/tests/studio-journey.cjs
+index 4032452..c6f9f29 100644
+--- a/tests/studio-journey.cjs
++++ b/tests/studio-journey.cjs
+@@ -15,34 +15,37 @@ const {start}=require('./browser-server.cjs');
+   const original=await page.evaluate(()=>{FG.store.changeProfile({rate:0});FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills);});
+   const notebook=()=>page.evaluate(()=>FG.studio.exportNotebook());
+   const workspace=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
++  const runtime=()=>page.evaluate(()=>FG.runtime.snapshot());
++  const bottles=async()=>(await runtime()).state.parts.filter(p=>p.kind==='bottle').length;
++  const budget=async expected=>{await page.waitForFunction(n=>FG.runtime.snapshot().config.gumBudget===n,expected);const r=await runtime();assert.equal(r.state.gumRemaining,expected-r.state.joints.length);};
+   const talk=async()=>{await page.click('#studioChange');};
+-  assert.equal(await page.locator('#studioStarters [data-starter]').count(),3);
++  assert.equal(await page.locator('#studioStarters [data-starter]').count(),4);
+   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
+-  await page.click('[data-starter="gum"]');await page.waitForSelector('.construction-stage');
+-  await page.getByRole('button',{name:'Add Bottle',exact:true}).click();assert.equal(await page.locator('[data-part="body"]').count(),1);
++  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
++  await page.getByRole('button',{name:'Add Bottle',exact:true}).click();assert.equal(await bottles(),1);
+   const base=(await workspace()).projects[0].headId;
+   await talk();await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');
+   assert.equal((await workspace()).projects[0].headId,base,'Try must not change working pointer');
+-  assert.match(await page.textContent('.builder-message'),/15 \/ 15/);assert.equal(await page.locator('[data-part="body"]').count(),1);
+-  await page.click('#studioUndo');assert.match(await page.textContent('.builder-message'),/10 \/ 10/);
+-  await page.click('#studioRedo');assert.match(await page.textContent('.builder-message'),/15 \/ 15/);
++  await budget(15);assert.equal(await bottles(),1);
++  await page.click('#studioUndo');await budget(10);
++  await page.click('#studioRedo');await budget(15);
+   await page.click('#studioKeep');assert.notEqual((await workspace()).projects[0].headId,base);
+   for(const prompt of ['Make joints stronger','Give me six gum sticks','Make joints stronger','Give me ten gum sticks']){
+-   await talk();await page.fill('#studioPrompt',prompt);await page.click('#studioSend');assert.equal(await page.locator('#studioPreviewNotice').isVisible(),true);assert.equal(await page.locator('[data-part="body"]').count(),1);await page.click('#studioKeep');
++   await talk();await page.fill('#studioPrompt',prompt);await page.click('#studioSend');assert.equal(await page.locator('#studioPreviewNotice').isVisible(),true);assert.equal(await bottles(),1);await page.click('#studioKeep');
+   }
+   assert.equal((await workspace()).revisions.length,6,'five kept edits plus starting version');
+-  // Complete a real construction to observe the ordinary host's outcome and optional reflection.
+-  for(const [name,key,count] of [['Cone','ArrowUp',10],['Fan','ArrowDown',10],['Spoon','ArrowLeft',10],['Paddle','ArrowRight',10]]){
+-   await page.getByRole('button',{name:'Add '+name,exact:true}).click();for(let i=0;i<count;i++)await page.keyboard.press(key);
+-  }
+-  for(const id of ['nose','engine','left','right']){await page.click('[data-part="body"]');await page.getByRole('button',{name:'Chew gum & connect',exact:true}).click();await page.click(`[data-part="${id}"]`);}
+-  await page.getByRole('button',{name:'Test construction',exact:true}).click();
++  // Complete a real physical construction, then explicitly enter the ordinary host outcome.
++  await page.getByRole('button',{name:'Use example',exact:true}).click();const testedBlueprint=(await runtime()).state.blueprint;
++  await page.getByRole('button',{name:/Test machine/}).click();
++  await page.waitForFunction(()=>FG.runtime.snapshot().state.simulation?.status==='won',null,{timeout:15000});
++  assert.equal((await notebook()).sessions.some(s=>s.reflection),false,'physics success alone does not force reflection');
++  await page.getByRole('button',{name:'Finish challenge →',exact:true}).click();
+   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.reflection));
+   await talk();assert.match(await page.textContent('#studioMessages'),/fun or tricky/);
+   await page.click('#studioReflectAnswer');await page.fill('#studioPrompt','I liked seeing my rocket stay together.');await page.click('#studioSend');
+   assert.match(await page.textContent('#studioMessages'),/I liked seeing/);
+   await page.click('#studioCopy');await page.fill('#studioCopyName',`Space workshop ${device}`);await page.click('#studioCopyForm button[type="submit"]');
+-  assert.equal(await page.locator('[data-part="body"]').count(),1);
++  assert.deepEqual((await runtime()).state.blueprint,testedBlueprint);
+   await talk();await page.fill('#studioPrompt','An unfinished idea for next time');await page.click('#studioHome');await page.reload();await page.waitForFunction(()=>FG.studio);
+   await page.locator('#studioLibrary button').filter({hasText:`Space workshop ${device}`}).click();await talk();
+   assert.equal(await page.inputValue('#studioPrompt'),'An unfinished idea for next time');assert.match(await page.textContent('#studioMessages'),/Give me 15 gum sticks/);
+@@ -52,21 +55,33 @@ const {start}=require('./browser-server.cjs');
+   // Profile isolation must not lose an immediately typed draft.
+   await talk();await page.fill('#studioPrompt','My private unfinished idea');await page.locator('.profile-choice').nth(1).click();assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);
+   await page.locator('.profile-choice').first().click();await page.locator('#studioLibrary button').filter({hasText:`Space workshop ${device}`}).click();await talk();assert.equal(await page.inputValue('#studioPrompt'),'My private unfinished idea');
++  // Garage requests stay in this notebook and continue the currently played test.
++  await page.click('#studioHome');await page.click('[data-starter="hill"]');await page.waitForSelector('.quality-hill');
++  const hillMain=(await workspace()).projects.find(p=>p.game==='hill').headId,projectCount=(await workspace()).projects.length,sessionCount=(await notebook()).sessions.length;
++  await page.locator('.quality-hill summary').click();await page.getByRole('button',{name:'Sea green',exact:true}).click();await page.getByRole('combobox',{name:'Choose a trail',exact:true}).selectOption('ridge');
++  await page.getByRole('button',{name:'Make the wheels bigger',exact:true}).click();await page.waitForFunction(()=>FG.runtime.snapshot().config.wheelSize===.57);
++  let ride=await runtime(),rideSession=(await notebook()).sessions.find(s=>s.game==='hill');const firstRideTest=rideSession.candidate.id;
++  assert.equal(ride.state.paint,'#50a89a');assert.equal(ride.state.track,'ridge');assert.equal(rideSession.experiments[0].origin,'helper');
++  assert.equal((await workspace()).projects.length,projectCount);assert.equal((await notebook()).sessions.length,sessionCount);assert.equal((await workspace()).projects.find(p=>p.game==='hill').headId,hillMain);
++  assert.equal(await page.locator('#page-feedback').isVisible(),false,'the legacy remix screen never opens');
++  await page.locator('.quality-hill summary').click();await page.getByRole('button',{name:'Make the motor stronger',exact:true}).click();await page.waitForFunction(()=>FG.runtime.snapshot().config.enginePower===1.2);
++  ride=await runtime();rideSession=(await notebook()).sessions.find(s=>s.game==='hill');assert.equal(ride.config.wheelSize,.57);assert.equal(ride.state.paint,'#50a89a');assert.deepEqual(rideSession.experiments.at(-1).parents,[firstRideTest]);
++  await page.click('#studioKeep');assert.notEqual((await workspace()).projects.find(p=>p.game==='hill').headId,hillMain);
+   await page.click('#studioNavCreate');await page.fill('#studioPrompt','Build a brand new flying banana universe');await page.click('#studioSend');assert.match(await page.textContent('#studioMessages'),/Local design helper/);await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');assert.match(await page.textContent('#studioMessages'),/no build was started/);assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);
+   const n=await notebook();assert.ok(n.sessions.some(s=>s.game==='new'&&!s.projectId&&!s.remoteId));
+-  console.log(`PASS ${device}: production studio, five staged changes, real construction, optional reflection, undo/redo/fork, private draft/reload and honest offline AI`);await ctx.close();
++  console.log(`PASS ${device}: production studio, five staged changes, physical construction, optional reflection, Hill garage routing, undo/redo/fork, private draft/reload and honest offline AI`);await ctx.close();
+  }
+  // Transport fixtures exercise in-tool remote states. They are NOT real model inference.
+- const ctx=await browser.newContext(),page=await ctx.newPage();let polls=0,phase='ready',kept=0;const errors=[];page.on('pageerror',e=>errors.push(e.message));
++ const ctx=await browser.newContext(),page=await ctx.newPage();let polls=0,phase='ready',kept=0;const errors=[],remoteRequests=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:'https://studio-api.test',previewOrigin:'https://studio-preview.test'})}));
+  await page.route('https://studio-api.test/**',async route=>{
+   const req=route.request(),path=new URL(req.url()).pathname;let data;
+   const headers={'Access-Control-Allow-Origin':`http://127.0.0.1:${server.address().port}`,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
+   if(req.method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
+-  if(path==='/v1/jobs'&&req.method()==='POST'){polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
++  if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
+   else if(path==='/v1/jobs/fixture-job'){polls++;data=polls<2?{jobId:'fixture-job',status:'testing',adapter:'mock'}:phase==='failed'?{jobId:'fixture-job',status:'failed',adapter:'mock'}:{jobId:'fixture-job',status:'ready',revisionId:'fixture-rev',adapter:'mock'};}
+-  else if(path.endsWith('/preview'))data={url:'https://studio-preview.test/game?capability=TEST_ONLY',artifactId:'fixture-artifact',expiresAt:Date.now()+60000,kind:'generated-module-v1',adapter:'mock'};
++  else if(path.endsWith('/preview'))data={url:'https://studio-preview.test/game?capability=TEST_ONLY',artifactId:'fixture-artifact',expiresAt:Date.now()+60000,kind:'generated-module-v2',adapter:'mock'};
+   else if(path.endsWith('/keep')){kept++;data={ok:true};}
+   else if(path.endsWith('/fork'))data={revisionId:'fixture-fork'};
+   else data={errorCode:'NOT_FOUND'};
+@@ -80,7 +95,7 @@ const {start}=require('./browser-server.cjs');
+  assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'signed preview capabilities must not persist');
+  await page.click('#studioKeep');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.remoteId==='fixture-rev'&&!s.candidate));assert.equal(kept,1);
+  phase='failed';await page.click('#studioChange');await page.fill('#studioPrompt','Try another fixture revision');await page.click('#coachTry');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='failed'));
+- assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions[0].remoteId),'fixture-rev');assert.equal(kept,1);assert.deepEqual(errors,[]);
++ assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions[0].remoteId),'fixture-rev');assert.equal(remoteRequests.at(-1).gameId,'generated-module');assert.equal(kept,1);assert.deepEqual(errors,[]);
+  console.log('PASS remote fixture: durable ACK, progress, isolated preview, explicit keep, failed-change preservation, no capability persistence (NO live AI calls)');await ctx.close();
+  }finally{await browser.close();await new Promise(r=>server.close(r));}
+ })().catch(e=>{console.error(e);process.exitCode=1;});
+diff --git a/tests/studio-unit.ts b/tests/studio-unit.ts
+index 010fc25..4c44550 100644
+--- a/tests/studio-unit.ts
++++ b/tests/studio-unit.ts
+@@ -1,6 +1,7 @@
+ import assert from 'node:assert/strict';
+ import { StudioNotebook,STUDIO_KEY,validateNotebook } from '../src/studio/notebook';
+-import { StudioGames } from '../src/studio/adapter';
++import { StudioGames, isGeneratedRemoteKind } from '../src/studio/adapter';
++import { installStudioRemixRouting } from '../src/studio/host-navigation';
+ import { defaults } from '../src/runtime/manifests';
+ class Memory {
+  data=new Map<string,string>();fail=false;
+@@ -35,4 +36,53 @@ test('save as new preserves source and play state',()=>{const fork=games.fork(ow
+ test('state save failure restores working pointer',()=>{canSave=false;assert.throws(()=>games.keep(owner,game.id,kept.id,{...nextConfig,gumBudget:16},'failure','','candidateA'));canSave=true;assert.equal(games.revision(game.id,owner).id,kept.id);});
+ test('math evidence never modified',()=>{assert.deepEqual(child.skills,{'mul:8x7':{tries:5,right:3}});});
+ test('profile isolation in state copying',()=>{child={...child,id:'player2'};assert.throws(()=>games.clonePlayState(owner,original.id,'cross-profile'));});
++test('hill notebooks reload and restore without changing prior games or accepting unknown game IDs',()=>{
++ const memory=new Memory(),book=new StudioNotebook(memory),ride=book.create(owner,'hill','My hill ride','hill-project');
++ book.message(ride.id,owner,'child','Try larger wheels');book.update(ride.id,owner,x=>{x.draft='Keep the soft springs';});
++ const reopened=new StudioNotebook(memory);assert.equal(reopened.get(ride.id,owner).game,'hill');assert.equal(reopened.get(ride.id,owner).draft,'Keep the soft springs');
++ const restored=new StudioNotebook(new Memory());restored.restore(book.read());assert.deepEqual(restored.get(ride.id,owner),book.get(ride.id,owner));
++ const bad=book.read() as any;bad.sessions[0].game='__proto__';assert.throws(()=>validateNotebook(bad));
++ assert.equal(notebook.get(s.id,owner).game,'buckets');
++});
++test('ride experiments preserve setup, paint and saved progress independently of the main version',()=>{
++ const memory=new Memory(),profile:any={id:owner,constructionStates:{}},adapter=new StudioGames(memory as unknown as Storage,{store:{current:()=>profile,save:()=>true}});
++ const project=adapter.create(owner,'hill','My hill ride',defaults('hill')),main=adapter.revision(project.id,owner);
++ profile.constructionStates[main.id]={qualityConstruction:{schema:'quality-hill-v1',track:'ridge',paint:'#50a89a',best:{ridge:19}}};
++ adapter.clonePlayState(owner,main.id,'hill-test');profile.constructionStates['hill-test'].qualityConstruction.best.ridge=24;
++ assert.equal(profile.constructionStates[main.id].qualityConstruction.best.ridge,19);
++ const next=adapter.keep(owner,project.id,main.id,{...main.config,wheelSize:.57},'Bigger wheels','','hill-test');
++ assert.equal(adapter.revision(project.id,owner).config.wheelSize,.57);
++ assert.deepEqual(profile.constructionStates[next.id].qualityConstruction,{schema:'quality-hill-v1',track:'ridge',paint:'#50a89a',best:{ridge:24}});
++ assert.equal(adapter.revision(project.id,owner,main.id).config.wheelSize,.52);
++});
++test('both generated module versions keep the generated builder discriminator',()=>{
++ assert.equal(isGeneratedRemoteKind('generated-module-v1'),true);assert.equal(isGeneratedRemoteKind('generated-module-v2'),true);
++ assert.equal(isGeneratedRemoteKind('star-catcher-v1'),false);assert.equal(isGeneratedRemoteKind(undefined),false);
++});
++// Node's EventTarget does not implement DOM capture ordering. This fixture explicitly
++// models the two window listener phases; browser CI still owns the real DOM journey.
++class WindowEvents {
++ listeners:{type:string;listener:EventListener;capture:boolean}[]=[];
++ addEventListener(type:string,listener:EventListener,capture=false){this.listeners.push({type,listener,capture});}
++ removeEventListener(type:string,listener:EventListener,capture=false){this.listeners=this.listeners.filter(l=>l.type!==type||l.listener!==listener||l.capture!==capture);}
++ dispatch(event:Event){for(const capture of [true,false])for(const l of [...this.listeners])if(l.type===event.type&&l.capture===capture)l.listener(event);}
++}
++test('a later Studio capture handler consumes garage prompts before the legacy remix handler',()=>{
++ const events=new WindowEvents(),requests:(string|undefined)[]=[];let legacy=0;
++ events.addEventListener('factory-remix-request',event=>{if(!event.defaultPrevented)legacy++;});
++ const uninstall=installStudioRemixRouting({activeGame:()=> 'hill',openRequest:prompt=>requests.push(prompt)},events as unknown as Window);
++ const event=new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:'Make the wheels bigger'}});events.dispatch(event);
++ assert.equal(event.defaultPrevented,true);assert.deepEqual(requests,['Make the wheels bigger']);assert.equal(legacy,0);
++ events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));assert.deepEqual(requests,['Make the wheels bigger',undefined]);assert.equal(legacy,0);
++ uninstall();events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));assert.equal(legacy,1);
++});
++test('Studio routing leaves foreign games, inactive sessions and malformed prompts to their existing host',()=>{
++ const events=new WindowEvents();let active=true,requests=0,legacy=0;
++ events.addEventListener('factory-remix-request',event=>{if(!event.defaultPrevented)legacy++;});
++ installStudioRemixRouting({activeGame:()=>active?'hill':null,openRequest:()=>requests++},events as unknown as Window);
++ events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'gum',prompt:'More gum'}}));
++ active=false;events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));
++ active=true;events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:{unexpected:true}}}));
++ assert.equal(requests,0);assert.equal(legacy,3);
++});
+ console.log(`${passed} studio unit tests passed.`);

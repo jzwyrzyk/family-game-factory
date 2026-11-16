@@ -1,6 +1,7 @@
 const {createHash}=require('node:crypto');
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGenerated(game,artifactId,channel){
+ if(game.kind==='generated-module-v2')return require('./preview-v2.cjs').renderGeneratedV2(game,artifactId,channel);
  if(!game.compiled||!/^[\w-]{1,100}$/.test(artifactId)||!/^[\w-]{8,100}$/.test(channel))throw Error('INVALID_GENERATED_PREVIEW');
  const worker=game.compiled.code+`\nconst game=GameModule.createGame();let state;self.onunhandledrejection=()=>{self.postMessage({failed:true})};self.onmessage=e=>{const m=e.data;if(m.type==='start')state=game.init();else if(m.type==='step')state=game.step(state,m.input,m.dt);else return;const commands=game.draw(state),outcome=game.outcome(state);self.postMessage({commands,outcome});};`;
  const data=JSON.stringify({worker,artifactId,channel,controls:game.controls}).replace(/</g,'\\u003c');

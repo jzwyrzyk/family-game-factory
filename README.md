@@ -2,6 +2,14 @@
 
 A child-led local game-design loop built on the Family Arcade. See [Assignment 002](docs/assignment-002/README.md), [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
 
+## Game Quality v1
+
+The [Game Quality standard](docs/GAME-QUALITY.md) defines the physical-play implementation. The [validation report](docs/game-quality/VALIDATION.md) records source pins, tests, screenshots, measurements, and remaining release checks. New Bubble Gum Builders games use a real construction simulation with ten household parts, breakable gum, three missions and free play. Junkyard Rally adds wheel suspension, terrain, throttle/brake, three trails, and handling changes saved as experiments. Both use local toy artwork, music and effects; gameplay makes no model requests.
+
+Start a physical game, then choose **Improve this game** or a garage change. Try **Make wheels bigger**, **Make springs softer**, **Make car lighter**, **Make joints stronger**, or **Make fan stronger**. The build or ride carries into the new version. Compare, Keep, undo, or save a different game. Older saved gum versions keep their original engine. Drawing decomposition has a validated component/rig contract and remains a separate branch.
+
+The generated-game pipeline also has a versioned v2 contract for trusted physics, illustrated parts, camera movement, pointer dragging, sound and 60 Hz fixed stepping. The engine and artwork are immutable approved packages separate from the model's 30 KB source allowance; saved v1 games retain their original contract. V2 smoke tests require an input-dependent scene response and clean replay/pause, while allowing ordinary losses and endless construction. Authored fixtures test specific physical goals. Automated checks do not establish child enjoyment or a hard per-game browser JavaScript memory cap. Paid generation and production acceptance remain behind the existing approval and isolated-worker controls.
+
 ## Run locally
 
 Node 22 or newer:
@@ -11,7 +19,9 @@ npm ci
 npm run dev
 ```
 
-Use the printed local URL. Vite serves the TypeScript modules; opening raw `index.html` as a file is no longer supported. `npm run build` typechecks and produces a static `dist/` site. No runtime server or provider key is needed.
+Use the printed local URL. Add `?studio=1` to use the integrated play-and-design Studio review route; the default arcade and its saved games remain available. Vite serves the TypeScript modules; opening raw `index.html` as a file is no longer supported. `npm run build` typechecks and produces a static `dist/` site. No runtime server or provider key is needed.
+
+The [device and play review guide](docs/game-quality/PLAY_REVIEW.md) explains how to try the reviewed build on a phone or tablet and record specific usability or performance observations. It is a blank guide, not evidence of completed child testing.
 
 ## Try Live Remix
 
@@ -20,9 +30,9 @@ Use the printed local URL. Vite serves the TypeScript modules; opening raw `inde
 3. Type **Give me four buckets**, press **Try It**. Four selectable buckets really appear. Try **Show the safe bucket**, **Make the splash last 1 second**, **Hide the safe bucket**, or **Give me two buckets**.
 4. Use **Undo last change**, or expand **Compare versions & save a new game** to compare/play/restore versions. Name and **Save as new game**; reopen it from **My Creations** after reload.
 
-Each local Try saves an immutable private version on this browser; Keep pins a version. A connected secure builder can handle unsupported requests through a real acknowledged queue. The default configuration says “Needs builder” without pretending to queue anything. New-game Create has a one-button Try It action; remote previews can be played, kept, compared, revised, undone, forked and reopened from the family catalog. Undo retains alternate futures. Builder supports matching-piece highlights and extra decoys; Dragon supports hearts and breath speed. Game changes never change parent math difficulty. These are bounded local language rules, not an AI service. Unfamiliar mechanics are reported as unsupported and may be saved only as ideas, never represented as generated playable games.
+Each local Try saves an immutable private version on this browser; Keep pins a version. A connected secure builder can handle unsupported requests through a real acknowledged queue. The default configuration says “Needs builder” without pretending to queue anything. New-game Create has a one-button Try It action; remote previews can be played, kept, compared, revised, undone, forked and reopened from the family catalog. Undo retains alternate futures. The physical workshop exposes gum supply, joint strength, gravity and fan power; Rally exposes motor, suspension, wheel size, body weight and grip. Restored Dragon exposes island resilience, fireball cadence and shield timing. Earlier saved engines retain their own controls. Game changes never change parent math difficulty. These are bounded local language rules, not an AI service. Unfamiliar mechanics are reported as unsupported and may be saved only as ideas, never represented as generated playable games.
 
-**Play** retains all three existing games and presets. **Create** still saves new game ideas. **My Powers** retains the adaptive math practice. Grown-ups can use the footer for settings and JSON backups. There is no secure local parental login or cross-device sync.
+**Play** includes four games and retains saved earlier engines and presets. **Create** still saves new game ideas. **My Powers** retains the adaptive math practice. Grown-ups can use the footer for settings and JSON backups. There is no secure local parental login or cross-device sync.
 
 ## Storage and backups
 
@@ -39,13 +49,13 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-Strict TypeScript check, Vite production build, unit/contract tests, original v0.3 browser journeys and desktop/mobile five-iteration remix journeys run in CI on pinned Ubuntu 24.04. CI always uses the Playwright-pinned Chromium installed by the workflow. Local runs may use system Chromium when installed; otherwise Playwright's Chromium is used. `CHROMIUM_PATH` overrides it. Tests serve built assets under a repository-style `/arcade/` path and create synthetic screenshots in `test-results/`.
+Strict TypeScript check, Vite production build, unit/contract tests, original v0.3 browser journeys and desktop/mobile five-iteration remix journeys run in CI on pinned Ubuntu 24.04. CI always uses the Playwright-pinned Chromium installed by the workflow. Local runs may use system Chromium when installed; otherwise Playwright's Chromium is used. `CHROMIUM_PATH` overrides it. Tests serve built assets under a repository-style `/arcade/` path and capture browser screenshots from authored test fixtures in `test-results/`.
 
 ## GitHub Pages and cloud limits
 
 The source now requires a Vite build. After review/merge, choose **GitHub Actions** as the repository's Pages source, then manually dispatch **Build reviewed Pages site** on `main` to publish `dist/`. The workflow refuses other branches. PR test runs never deploy. Existing live Pages content stays untouched until that explicit action. Relative asset URLs support repository subpaths.
 
-`server/` contains typed managed-service ports plus an authenticated, budget-limited reference job API/worker, private preview renderer and OpenAPI spec. A durable single-process file adapter and a clearly labeled mock agent are exercised by tests. No production backend, identity provider, real coding-agent adapter or cloud resource is configured/deployed. See [pipeline](docs/agent-pipeline.md) and [Codex research](docs/codex-agent-research.md). Arbitrary generated JS is not accepted; the mock produces a genuine new star-catching mechanic through a closed declarative artifact. Arbitrary new mechanics, full original-game fidelity, offline PWA support and drawing workflows remain explicitly pending in the gap analysis.
+`server/` contains typed managed-service ports, an authenticated and budget-limited job API, private preview rendering and an OpenAPI spec. Tests use durable local storage, declared mock agents and authored provider responses. The source-generation adapter and its isolated build/test path are described below; the default local app needs neither an account nor a model key. Generated code is accepted only through the approved pipeline and its versioned preview contract. It is never executed in the gateway process or inserted as arbitrary page HTML. This branch does not activate provider billing or deploy cloud resources. See the [pipeline](docs/agent-pipeline.md), [current quality contract](docs/GAME-QUALITY.md) and [Codex research](docs/codex-agent-research.md) for scope and evidence; physical drawing decomposition and playable-rig import remain separate work.
 
 Real-agent smoke testing is explicitly skipped: no verified funded production adapter/API exists here. Before adding a live smoke test, verify the destination, identity and billing authorization; do not export personal credentials to an arbitrary endpoint. No live-agent credentials are read by the test suite.
 
@@ -53,6 +63,6 @@ Real-agent smoke testing is explicitly skipped: no verified funded production ad
 
 The preferred path is now implemented as **website → authenticated GCP gateway → GitHub Actions → generated TypeScript → isolated build/test/repair → private preview**. It reuses the existing jobs, revisions, signed preview, keep/undo/fork, authentication and child UI contracts. A real metered OpenAI Responses coding adapter runs only in the Actions generation job; compilation/play runs in a different gVisor job without the model key. Reviewed immutable worker tags, stage-bound OIDC and private callbacks keep prompts/source out of public workflow inputs/artifacts. Subscription-based Codex entitlement remains unverified and disabled.
 
-The default website configuration and paid activation remain **off**. No provider key, funded account, GitHub App, runner or GCP service is provisioned by this PR. Account-owner actions, current cost estimates, evidence and remaining limits are in [setup](docs/assignment-002/owner-setup.md), [costs](docs/assignment-002/cost-estimate.md) and [evidence](docs/assignment-002/evidence.md). No real inference is claimed from the mocked E2E. The full browser-container smoke is locally blocked by the 8 GiB VFS environment; it is a mandatory runner setup gate with no unsafe fallback.
+The default website configuration and paid activation remain **off**. No provider key, funded account, GitHub App, runner or GCP service is provisioned by this PR. Account-owner actions, pricing assumptions, evidence and remaining limits are in [setup](docs/assignment-002/owner-setup.md), [costs](docs/assignment-002/cost-estimate.md) and [evidence](docs/assignment-002/evidence.md); pricing must be reviewed before activation. No real inference is claimed from the mocked E2E. Full container smoke requires an explicitly provisioned immutable image and gVisor runtime. A successful ordinary CI run does not replace that gate.
 
-`npm test` includes the original games/data regressions plus five source-generation/revision requests on desktop/mobile through mocked Actions and fixture provider responses, automatic repair, private preview and worker security probes. `npm run test:sandbox` additionally requires an explicitly supplied immutable worker image and gVisor Docker socket. It never silently executes arbitrary generated source on the host. Source games currently use bounded canvas/emoji rendering and trusted input controls, not arbitrary HTML, network assets or packages.
+`npm test` includes the original games/data regressions plus five source-generation/revision requests on desktop/mobile through mocked Actions and fixture provider responses, automatic repair, private preview, and worker containment probes. Quality suites add the physical workshop, driving game and authored generated-v2 cases. `npm run test:sandbox` separately requires an explicitly supplied immutable worker image and gVisor Docker socket. It never silently executes arbitrary generated source on the host. V1 source games use the original primitive canvas API. V2 adds approved illustrated sprites, bounded Planck capabilities, camera and local synthesis; neither contract admits arbitrary HTML, remote assets or imported packages from generated source.

@@ -10,6 +10,8 @@ import { validateArtifact,renderPreview } from '../server/pipeline/artifacts';
 import { MockAgent } from '../server/testing/mock-agent';
 import type { AgentAdapter } from '../server/pipeline/types';
 import type { VerifiedSession } from '../server/contracts/api';
+import { defaults, manifests } from '../src/runtime/manifests';
+import type { GameId } from '../src/runtime/types';
 const session:VerifiedSession={subject:'designer-a',familyId:'family-a',role:'parent',expiresAt:Date.now()+60000};
 const request={gameId:'new',baseRevisionId:null,prompt:'Catch five stars',clientRequestId:'request-123'};
 const gate={test:async()=>{}}; // Unit fake; browser suite supplies an actual isolated browser smoke gate.
@@ -22,6 +24,18 @@ test('job submissions are idempotent, family-scoped and reject private/unknown i
  await assert.rejects(service.submit(session,{...request,prompt:'Catch six stars'}),/CONFLICT/);await assert.rejects(service.get({...session,familyId:'other'},a.jobId),/Forbidden/);
  assert.throws(()=>validateBuildRequest({...request,secret:'no'}));assert.throws(()=>validateBuildRequest({...request,gameId:'unknown-game'}));assert.throws(()=>validateBuildRequest({...request,prompt:'email me at child@example.org'}),/PRIVATE/);
  const denied=new JobService(new MemoryRepository(),new MockAgent(),gate);await assert.rejects(denied.submit(session,request),/UNAVAILABLE/);
+});
+test('every reviewed native game can seed a family-scoped builder request, including the hill ride',async()=>{
+ const repo=new MemoryRepository(),service=new JobService(repo,new MockAgent(),gate,{allowMock:true,maxUnits:0,timeoutMs:1000,maxRetries:1});
+ for(const gameId of Object.keys(manifests) as GameId[]){
+  const config=defaults(gameId),base=await service.registerBase(session,{gameId,localRevisionId:'native-'+gameId,config});
+  const submission={gameId,baseRevisionId:base.revisionId,prompt:'Add a new physical obstacle to my game',clientRequestId:'change-'+gameId};
+  const ack=await service.submit(session,submission);assert.equal(ack.status,'queued');
+  const revision=(await repo.snapshot()).revisions.find(r=>r.id===base.revisionId)!;assert.equal(revision.sourceGame,gameId);assert.deepEqual(revision.config,config);
+  await assert.rejects(service.submit({...session,familyId:'other-family'},submission),/Forbidden/);
+ }
+ for(const gameId of ['unknown-game','constructor','__proto__'])assert.throws(()=>validateBuildRequest({...request,gameId}),/INVALID_REQUEST/);
+ assert.equal((await repo.snapshot()).jobs.length,Object.keys(manifests).length);
 });
 test('spending is disabled by default, reserved atomically, cut off under concurrent jobs and parent-controlled',async()=>{
  const adapter:AgentAdapter={available:true,kind:'metered-api',async generate(){return {candidate:{format:'declarative-v1',game:{kind:'star-catcher-v1',target:3,seconds:10}},usageUnits:2}}};

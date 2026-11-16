@@ -1,0 +1,63 @@
+name: Studio quality integration review
+
+on:
+  push:
+    branches: [feature/game-quality-v1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-quality-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  studio-quality:
+    if: github.ref == 'refs/heads/feature/game-quality-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Record tested source
+        run: |
+          mkdir -p test-results
+          git rev-parse HEAD > test-results/studio-quality-head.txt
+          git log -4 --format='%H %P %s' > test-results/studio-quality-parents.txt
+          node --version > test-results/studio-quality-node.txt
+      - name: Build combined production client
+        id: build
+        run: npm run build
+      - name: Studio unit contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/studio-unit.ts
+      - name: Coach unit contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/design-coach-unit.ts
+      - name: Coach HTTP contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/design-coach-http.ts
+      - name: Generated physics and presentation
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/quality-generated-browser.ts
+      - name: Desktop and mobile Studio journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/studio-journey.cjs
+      - name: Desktop and mobile design-coach journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/design-coach-browser.cjs
+      - name: Mocked generation journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/actions-e2e.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: studio-quality-review-evidence
+          path: test-results/
+          if-no-files-found: warn

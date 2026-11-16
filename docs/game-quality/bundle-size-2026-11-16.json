@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "scope": "Core static HTML/CSS/JavaScript: dist/index.html plus dist/assets/*.js and dist/assets/*.css, compressed individually at gzip level 6. Excludes existing original-game PNGs, service-worker cache downloads, and generated-runtime worker assets. Native quality adds no external art/audio files. This measures build/transfer size, not mobile startup time, frame time, or child enjoyment.",
+  "baselineCommit": "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
+  "qualityCommit": "226e44dc44e54de237c0faf4e1038087f4c1738a",
+  "builds": [
+    {
+      "build": "baseline",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13311,
+          "gzipBytes": 4729,
+          "sha256": "ec3ee297b1642d204982a7009555c9da27e9ca3f6cd08a2a2282cd58d6179906"
+        },
+        {
+          "path": "assets/index-RzuAoPI2.js",
+          "bytes": 145979,
+          "gzipBytes": 53591,
+          "sha256": "3b326eb8af8bc5ef8f2e499a149ee0676fbb594afac79eb7544d5299397a3ebe"
+        },
+        {
+          "path": "assets/index-CRdLEPUG.css",
+          "bytes": 16163,
+          "gzipBytes": 4665,
+          "sha256": "a78c7d595e3228c6cc6ef1f1228c11d7dc1c8cdace689b7b6a910071cbd59348"
+        }
+      ]
+    },
+    {
+      "build": "quality-v1",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4838,
+          "sha256": "37ba3879384051524db295650654bd5d747cd5e1035d70ac10f1823c23767118"
+        },
+        {
+          "path": "assets/index-Cnf8OCN4.js",
+          "bytes": 447521,
+          "gzipBytes": 129334,
+          "sha256": "f390535b62dfc741904cd2fa49df95d46127749fc19ab64af30960a0ac3c869d"
+        },
+        {
+          "path": "assets/index-D4HvPenY.css",
+          "bytes": 25179,
+          "gzipBytes": 6557,
+          "sha256": "7d062993170fe5c7bc86d637ce339ab6c8ad680d5d5f77bc647ebeead9ac5be0"
+        }
+      ]
+    },
+    {
+      "build": "current-main-studio",
+      "label": "Current main with Studio and design coach, before Game Quality v1",
+      "sourceCommit": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13311,
+          "gzipBytes": 4730,
+          "sha256": "dd60e50de19367840f079cb75a7943cf48a70f7ee26e0e2d37e5577c40f50ee0"
+        },
+        {
+          "path": "assets/index-Ck5jGJvx.js",
+          "bytes": 207561,
+          "gzipBytes": 72682,
+          "sha256": "49e3e24dbd8e525a3aa1e76a0c8de47f709ee3bdbf3458a07e01da3cc7260187"
+        },
+        {
+          "path": "assets/index-BGw_rkgz.css",
+          "bytes": 33719,
+          "gzipBytes": 8304,
+          "sha256": "b4a5c6a0aa31d93ca712987467a292bc594b7b13079db3af8d4d782dd5c229d1"
+        }
+      ],
+      "totals": {
+        "bytes": 254591,
+        "gzipBytes": 85716
+      }
+    },
+    {
+      "build": "quality-studio-combined",
+      "label": "Combined Game Quality v1 and current-main Studio integration",
+      "sourceCommit": "832a705256ec28f0ce917ff40bd91bc1e826c527",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4841,
+          "sha256": "58246c4efc2e9b684909997d3e29c6c86c0590b350149e620c1770e18e1c2461"
+        },
+        {
+          "path": "assets/index-B2zbVMK4.js",
+          "bytes": 510528,
+          "gzipBytes": 148931,
+          "sha256": "ffff4169ee223762ce540b24bd2083dd141c0323e6024e730fdfe79e0f387316"
+        },
+        {
+          "path": "assets/index-CeZk1au0.css",
+          "bytes": 42804,
+          "gzipBytes": 10147,
+          "sha256": "7ab99a4a6cc4deeb415ef644dd15d4942af88b0521c05d14a17381232782a9fe"
+        }
+      ],
+      "totals": {
+        "bytes": 567155,
+        "gzipBytes": 163919
+      }
+    },
+    {
+      "build": "quality-studio-review",
+      "label": "Game Quality v1 with Studio routing and bounded paused-scene preview",
+      "sourceCommit": "d957657e8db31d5044830f070aab22c36f48ed12",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4838,
+          "sha256": "ba1d9eb903879acc46139e5e2d9607bea913bcfa6e564a5f96e2084da9eeeccf"
+        },
+        {
+          "path": "assets/index-DAgNqcGh.js",
+          "bytes": 512145,
+          "gzipBytes": 149479,
+          "sha256": "bee0cedd38fc65d26631643e1bb4a70f2e9ad4921e3d27ae8d148efe3be130f6"
+        },
+        {
+          "path": "assets/index-qkIcYNom.css",
+          "bytes": 43755,
+          "gzipBytes": 10334,
+          "sha256": "a8fcae754cfa280e5c1794825f5ab4053550e0faaaedfbe5ca973351eabc7b8f"
+        }
+      ],
+      "totals": {
+        "bytes": 569723,
+        "gzipBytes": 164651
+      }
+    },
+    {
+      "build": "quality-studio-continuation",
+      "label": "Game Quality v1 with quiescent native pauses and keyboard continuity",
+      "sourceCommit": "562d5ba6bb008edb7509c470b316798c5af663aa",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4838,
+          "sha256": "e23a00f52a25cfc616cef8ac8205a38b305ec9ed925b5f152f23f67f01170c11"
+        },
+        {
+          "path": "assets/index-DsSD4Ug8.js",
+          "bytes": 512869,
+          "gzipBytes": 149686,
+          "sha256": "216954053643c0b2014e2d51bda71473c1a1b773ce5d5282404706f251316d86"
+        },
+        {
+          "path": "assets/index-qkIcYNom.css",
+          "bytes": 43755,
+          "gzipBytes": 10334,
+          "sha256": "a8fcae754cfa280e5c1794825f5ab4053550e0faaaedfbe5ca973351eabc7b8f"
+        }
+      ],
+      "totals": {
+        "bytes": 570447,
+        "gzipBytes": 164858
+      }
+    }
+  ],
+  "existingArtwork": {
+    "files": 23,
+    "bytes": 4367688,
+    "scope": "The same 23 original-game PNGs total 4,367,688 bytes in all six source commits. Outside the core-gzip totals. Generated-runtime assets, service-worker caching, and actual request timing are separate from this measurement.",
+    "directory": "public/assets/original-dragon/*.png",
+    "verifiedSourceCommits": [
+      "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
+      "226e44dc44e54de237c0faf4e1038087f4c1738a",
+      "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+      "832a705256ec28f0ce917ff40bd91bc1e826c527",
+      "d957657e8db31d5044830f070aab22c36f48ed12",
+      "562d5ba6bb008edb7509c470b316798c5af663aa"
+    ],
+    "manifestSha256": "2019558eefa449de0a4f24284e70139dd4fba1cbd1b3ffb748432123039cfe2b",
+    "manifestDigestFormat": "SHA-256 of UTF-8 canonical JSON (sorted keys, compact separators) for lexicographically sorted objects containing public-relative path, bytes, and sha256."
+  },
+  "buildSourceCommits": {
+    "baseline": "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
+    "quality-v1": "226e44dc44e54de237c0faf4e1038087f4c1738a",
+    "current-main-studio": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+    "quality-studio-combined": "832a705256ec28f0ce917ff40bd91bc1e826c527",
+    "quality-studio-review": "d957657e8db31d5044830f070aab22c36f48ed12",
+    "quality-studio-continuation": "562d5ba6bb008edb7509c470b316798c5af663aa"
+  },
+  "currentComparison": {
+    "baselineBuild": "current-main-studio",
+    "combinedBuild": "quality-studio-continuation",
+    "baselineTotals": {
+      "bytes": 254591,
+      "gzipBytes": 85716
+    },
+    "combinedTotals": {
+      "bytes": 570447,
+      "gzipBytes": 164858
+    },
+    "increase": {
+      "bytes": 315856,
+      "gzipBytes": 79142
+    }
+  },
+  "currentMeasurement": {
+    "measuredAtUtc": "2026-11-16T05:29:02.188440+00:00",
+    "command": "npm run build",
+    "isolatedWorktrees": true,
+    "nodeVersion": "v24.22.1",
+    "viteVersion": "6.4.1",
+    "dependencyReuse": "Both isolated builds reuse the directory installed with npm ci --offline for the integrated lockfile. Every non-root locked package entry was compared byte-for-byte as JSON: 196 entries for current main, 198 for combined; all matched. No tracked source files were modified in either build worktree.",
+    "compression": {
+      "implementation": "Python gzip.compress(data, compresslevel=6, mtime=0)",
+      "pythonVersion": "3.12.14",
+      "zlibVersion": "1.3.2",
+      "level": 6,
+      "mtime": 0,
+      "perFile": true
+    },
+    "historicalRowsPreserved": true,
+    "scopeNote": "The baseline and quality-v1 rows and their original measurements are preserved. The two appended rows measure the exact source commits shown, excluding subsequent uncommitted fixes."
+  },
+  "reviewMeasurement": {
+    "measuredAtUtc": "2026-11-16T05:48:15.930242+00:00",
+    "command": "npm run build",
+    "sourceCommit": "d957657e8db31d5044830f070aab22c36f48ed12",
+    "isolatedWorktree": false,
+    "trackedApplicationInputsClean": true,
+    "uncommittedTrackedPaths": [
+      "README.md",
+      "docs/GAME-QUALITY.md",
+      "docs/game-quality/STUDIO_COMPATIBILITY.md",
+      "docs/studio-review/QUALITY_INTEGRATION_CI.md"
+    ],
+    "nodeVersion": "v24.22.1",
+    "viteVersion": "6.4.1",
+    "compression": {
+      "implementation": "Python gzip.compress(data, compresslevel=6, mtime=0)",
+      "pythonVersion": "3.12.14",
+      "zlibVersion": "1.3.2",
+      "level": 6,
+      "mtime": 0,
+      "perFile": true
+    },
+    "historicalRowsPreserved": true,
+    "scopeNote": "Production app/build inputs were verified unchanged from the source commit. Uncommitted edits were documentation only. build-info.json and sw.js carry working-tree metadata and are excluded from this core HTML/CSS/JS measurement, as in every prior row. Generated runtime archives are also excluded."
+  },
+  "continuationMeasurement": {
+    "measuredAtUtc": "2026-11-16T06:34:24.378567+00:00",
+    "command": "npm run build",
+    "sourceCommit": "562d5ba6bb008edb7509c470b316798c5af663aa",
+    "isolatedWorktree": false,
+    "trackedApplicationInputsMatchSource": true,
+    "applicationInputGitObjects": {
+      "src": "486d5814671c708bd9605cc626773f6a239da7f8",
+      "public": "2cd14cc981d01e606bd682471234792ac61f3c4b",
+      "index.html": "c03bf43785a8099f7484eabad483af163380f76b",
+      "package.json": "3ce44b4fd930e7debb1f962133ebf6a321bc0ec5",
+      "package-lock.json": "33c01f0b540ee95e58e416cfb82379db5483093d",
+      "tsconfig.json": "6b1f07ab46a3929e6dffa51d12153654ea7cefde",
+      "vite.config.ts": "68f9b315ed3c476f213f97621110b88e7718972f"
+    },
+    "nodeVersion": "v24.22.1",
+    "viteVersion": "6.4.1",
+    "compression": {
+      "implementation": "Python gzip.compress(data, compresslevel=6, mtime=0)",
+      "pythonVersion": "3.12.14",
+      "zlibVersion": "1.3.2",
+      "level": 6,
+      "mtime": 0,
+      "perFile": true
+    },
+    "historicalRowsPreserved": true,
+    "scopeNote": "The successful build was performed before committing this batch; the identical tracked app/build inputs were subsequently verified at sourceCommit. Only core HTML/CSS/JS are measured. build-info.json and sw.js carry build-time checkout metadata and are excluded consistently, as are generated-runtime archives. The original-artwork Git subtree is identical to the previous reviewed client."
+  }
+}
