@@ -319,10 +319,11 @@ export default class QualityBuilder implements GameInstance {
     private resize() {
         const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
         const normalHeight = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54);
-        // Landscape tablet: leave room for the actual on-screen controls.
-        const tabletLandscape = window.matchMedia('(any-pointer: coarse)').matches
-            && window.innerWidth > window.innerHeight && window.innerHeight >= 600 && w >= 600;
-        const h = tabletLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
+        // Size compact landscape screens for visible controls regardless of the active pointer.
+        // A touch tablet with an attached mouse may report a fine pointer mid-session.
+        const compactLandscape = window.innerWidth > window.innerHeight
+            && window.innerHeight >= 600 && window.innerHeight <= 900 && w >= 600;
+        const h = compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
         this.canvas.style.height = h + 'px';
         const dpr = Math.min(2, devicePixelRatio || 1);
         this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
