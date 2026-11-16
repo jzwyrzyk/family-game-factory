@@ -1,0 +1,21 @@
+name: Studio review source snapshot
+on:
+  push:
+    branches: [feature/unified-studio-review]
+    paths: [.github/workflows/studio-source-review.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Archive tracked public source only
+        run: git archive --format=zip --output=studio-source.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-source-review
+          path: studio-source.zip
+          retention-days: 1
