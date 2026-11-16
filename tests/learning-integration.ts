@@ -1,6 +1,6 @@
 /** Production-shell integration; all game content here is a named local fixture. No model calls. */
 import assert from 'node:assert/strict';
-import {existsSync, mkdirSync, readFileSync} from 'node:fs';
+import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import type {AddressInfo} from 'node:net';
 import {build, transformSync} from 'esbuild';
 import {chromium, type Browser, type Page} from 'playwright';
@@ -187,6 +187,9 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
   const context=await browser.newContext({viewport,hasTouch:name==='mobile',reducedMotion:'reduce'}),page=await context.newPage(),errors:string[]=[];
   page.on('pageerror',e=>errors.push(e.message));
   try{
+    // Install before the preview creates timers. Only move Date for pacing;
+    // let the worker and browser callbacks continue in real time throughout.
+    await page.clock.install();
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);await page.addScriptTag({content:bridge});
     await page.evaluate(({html,channel,artifactId,kind})=>{
       const w=window as any;window.FG.store.changeProfile({grade:4,focus:'adaptive',rate:1,hints:true,punish:false});
@@ -201,6 +204,16 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     const frame=page.frameLocator('#math-fixture-frame');
     await frame.locator(kind==='declarative'?'#restart':'#start').waitFor();
     await page.waitForFunction(()=> (window as any).previewBridge.ready===true);
+    const gameFrame=await (await page.locator('#math-fixture-frame').elementHandle())!.contentFrame();assert.ok(gameFrame);
+    const acknowledgeScore=async(expected:number)=>{
+      await gameFrame.waitForFunction(expected=>{
+        const state=document.getElementById('status')?.dataset.state;
+        return state==='error'||(Number(document.getElementById('game')?.dataset.frames)>0&&document.getElementById('score')?.textContent===`Score: ${expected}`);
+      },expected,{timeout:5000});
+      const state=await gameFrame.evaluate(()=>({status:document.getElementById('status')?.dataset.state,score:document.getElementById('score')?.textContent,canvas:{...document.getElementById('game')?.dataset}}));
+      assert.equal(state.status,'playing',`The real generated worker must remain playable: ${JSON.stringify(state)}`);
+      assert.equal(state.score,`Score: ${expected}`,`The real generated worker must acknowledge the input: ${JSON.stringify(state)}`);
+    };
     assert.equal(await page.locator('#math-fixture-frame').evaluate(el=>(el as HTMLIFrameElement).inert),false,'only the validated current protocol enables preview interaction');
     assert.equal(await frame.locator('body').evaluate(()=>{try{return !!parent.document.body;}catch{return false;}}),false,'the actual wrapper remains sandboxed away from child data');
     const packet={type:'factory-preview',channel,artifactId,event:'round-complete',roundId:1,won:true,score:2};
@@ -217,7 +230,10 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
         for(let i=0;i<2;i++)await frame.getByRole('button',{name:'Catch star',exact:true}).first().click();
       }else{
         await frame.locator(replay?'#replay':'#start').click();
-        await frame.locator('#game').click({position:{x:80,y:80}});await frame.getByText('Score: 1',{exact:true}).waitFor();
+        // Protocol readiness permits interaction; a returned initial frame
+        // separately confirms that this round's actual worker has started.
+        await acknowledgeScore(0);
+        await frame.locator('#game').click({position:{x:80,y:80}});await acknowledgeScore(1);
         await frame.locator('#game').click({position:{x:80,y:80}});
       }
       await page.waitForSelector('.learning-preview-cover .math-activity');
@@ -237,10 +253,10 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     await page.waitForTimeout(60);
     assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),1);assert.equal((await attempts(page)).length,1);
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),false);
-    await page.clock.install();await advanceBudget(page);
+    await advanceBudget(page);
     await playRound(true);
     const secondId=await page.evaluate(()=>window.FG.learning.activeAttemptId);assert.notEqual(secondId,firstId);
-    await submitWritten(page,await activeItem(page));await page.clock.runFor(600);await page.waitForFunction(()=>(window as any).previewRounds.length===2);
+    await submitWritten(page,await activeItem(page));await page.waitForFunction(()=>(window as any).previewRounds.length===2);
     const history=await attempts(page);assert.equal(history.length,2);assert.ok(history.every((a:any)=>a.independent&&a.context.gameId===`fixture-${kind}`));
     const rounds=await page.evaluate(()=>(window as any).previewMessages.filter((m:any)=>m.event==='round-complete'&&m.channel!=='incorrect-channel').map((m:any)=>m.roundId));
     assert.ok(rounds.includes(1)&&rounds.includes(2),'the real wrapper increments its round ID on replay');
@@ -257,13 +273,23 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
       await page.waitForTimeout(60);
       assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),2,'the in-flight outcome waits for the active math activity');
       assert.equal(await page.evaluate(()=>window.FG.learning.activeAttemptId),pendingId);
-      await submitWritten(page,await activeItem(page));await page.clock.runFor(600);
+      await submitWritten(page,await activeItem(page));
       await page.waitForFunction(()=>(window as any).previewRounds.length===3);
       assert.equal((await attempts(page)).length,3,'the checkpoint and its pending completion share one learning opportunity');
       assert.equal(await page.locator('.learning-preview-cover').count(),0);
     }
     assert.deepEqual(errors,[]);
     console.log(`PASS ${kind} preview ${name}: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling`);
+  }catch(error){
+    const frame=page.frameLocator('#math-fixture-frame');
+    const state={name,kind,errors,
+      preview:await frame.locator('body').evaluate(()=>({status:document.getElementById('status')?.textContent,state:document.getElementById('status')?.dataset.state,score:document.getElementById('score')?.textContent,canvas:{...document.getElementById('game')?.dataset},hidden:document.hidden})).catch(cause=>({unavailable:String(cause)})),
+      host:await page.evaluate(()=>({active:window.FG?.learning.active,ready:(window as any).previewBridge?.ready,rounds:(window as any).previewRounds,messages:(window as any).previewMessages})).catch(cause=>({unavailable:String(cause)}))};
+    console.error('Generated preview failure state',JSON.stringify(state));
+    const stem=`test-results/math-${kind}-preview-${name}-failure`;
+    writeFileSync(`${stem}.json`,JSON.stringify(state,null,2));
+    await page.screenshot({path:`${stem}.png`}).catch(()=>{});
+    throw error;
   }finally{await context.close();}
 }
 

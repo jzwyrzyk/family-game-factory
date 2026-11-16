@@ -8,7 +8,7 @@ const assert=require('node:assert/strict');
   const page=await browser.newPage(),errors=[];
   page.on('pageerror',error=>errors.push(error.message));
   page.on('dialog',dialog=>dialog.accept());
-  await page.clock.install();
+  await page.clock.install({time:new Date('2026-11-16T08:00:00Z')});
   await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
   await page.waitForFunction(()=>window.FG?.app&&window.FG?.learning?.version===2);
 
@@ -32,6 +32,9 @@ const assert=require('node:assert/strict');
   assert.ok(selection.some(item=>item.factId==='mul:8x7'&&item.purpose==='focus'));
   assert.ok(selection.some(item=>item.factId!=='mul:8x7'),'Focused practice must retain its broader learning mix');
   assert.ok(selection.every(item=>item.grade<=3));
+  // Pause before manually advancing the native rounds. A pending realtime tick
+  // in Playwright 1.56.1 can otherwise move Date.now behind a recorded question.
+  await page.clock.pauseAt(new Date('2026-11-16T10:00:00Z'));
 
   const answerActivity=async(correct)=>{
    const active=await page.evaluate(()=>({item:FG.learning.activeItem,attemptId:FG.learning.activeAttemptId}));
@@ -63,7 +66,18 @@ const assert=require('node:assert/strict');
   });
   for(const challenge of [false,true]){
    const phase=challenge?'Original Challenge':'Practice';
-   if(challenge)await page.clock.fastForward(80_000); // Advance pacing while at the completed result, without replaying idle animation frames.
+   if(challenge){
+    // Advance pacing at the completed result without replaying idle animation.
+    const previous=await checkpointState();
+    assert.equal(previous.active,false);
+    assert.equal(previous.eligibleNow,false,'The previous question must still consume the shared pacing budget');
+    await page.clock.fastForward(80_000);
+    const advanced=await checkpointState();
+    assert.equal(advanced.now-previous.now,80_000,'The controlled clock must advance the full spacing interval');
+    assert.deepEqual(advanced.mathWindow,previous.mathWindow,'Elapsed time must retain prior question timestamps');
+    assert.deepEqual(advanced.attempts,previous.attempts,'Elapsed time must retain the completed practice evidence');
+    assert.equal(advanced.eligibleNow,true,'The next question must satisfy the real shared pacing policy');
+   }
    await page.evaluate(challenge=>{FG.store.changeProfile({punish:challenge,rate:8});FG.app.openGame('buckets')},challenge);
    for(let i=0;i<4;i++)await page.locator('#go').click();
    await page.clock.runFor(6500);
@@ -84,6 +98,9 @@ const assert=require('node:assert/strict');
    const after=await checkpointState();
    console.log(`[learning-repair:${phase}] after checkpoint`,JSON.stringify({...after,pageErrors:errors}));
    assert.equal(await page.locator('#stage-overlay .math-activity').isVisible(),true,`${phase} skipped or failed math: ${JSON.stringify({...after,pageErrors:errors})}`);
+   assert.deepEqual(after.mathWindow,[...before.mathWindow,after.now],`${phase} must append exactly one current question timestamp`);
+   assert.equal(after.elapsedSinceLast,0,'A just-presented question cannot be in the future');
+   assert.equal(after.eligibleNow,false,'A just-presented question must prevent an immediate second question');
    const attempt=await answerActivity(false);attempts.push(attempt);
    const storedWrong=await page.evaluate(id=>{
     const data=JSON.parse(localStorage.getItem('family-game-factory-state-v1'));
