@@ -18,7 +18,7 @@ test('required math allows three per-game formats and no off state; ownership st
 test('explicit child requests switch the format while attempts to remove all math remain bounded',()=>{
  for(const prompt of ['Remove math','Turn off the math','No arithmetic please','Skip all maths','Make this game without math','Never show learning questions'])assert.equal(interpretMathRequest(prompt)?.kind,'required',prompt);
  for(const [prompt,mode] of [['Use math at checkpoints','checkpoint'],['Math between rounds please','checkpoint'],['Put math inside the game','interaction'],['Math without popups','interaction'],['Use both types of math','both'],['Mix math at pauses and inside the game','both']] as const)assert.deepEqual(interpretMathRequest(prompt),{kind:'mode',mode});
- for(const prompt of ['Give me four buckets','Remove the red blocks','Make multiplication easier','I love math'])assert.equal(interpretMathRequest(prompt),null,prompt);
+ for(const prompt of ['Give me four buckets','Remove the red blocks','Make multiplication easier','I love math','Build a math game with no score.','Create a math game with no losing','Make a math adventure with both a dragon and a robot','Build my game. Approved game plan: no score, math at checkpoints'])assert.equal(interpretMathRequest(prompt),null,prompt);
 });
 
 test('safe lifecycle pauses freeze controls, exclude learning time and cannot revive a disposed game',()=>{

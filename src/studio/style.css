@@ -10,3 +10,35 @@ body.studio-review{background:#f3f5fb;color:#17223d;color-scheme:light;font-fami
 @media(max-width:1000px){.studio-review main{padding:20px 18px 40px}.studio-workspace{grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr)}.studio-actions .studio-button{font-size:11px;padding:9px 10px}.studio-heading{gap:13px}.studio-title-wrap h1{font-size:24px}.studio-heading>.studio-storage{display:none}}
 @media(max-width:760px){.studio-review .site-header{padding:13px;flex-wrap:wrap;gap:15px}.studio-review .studio-nav{justify-content:center}.studio-nav button{padding:9px 12px;font-size:12px}.studio-review main{padding:16px 12px 35px}.studio-library-hero{padding:27px 23px;min-height:245px}.studio-library-hero h1{font-size:42px}.studio-library-hero p{font-size:13px}.studio-hero-shapes{display:none}.studio-library-grid{grid-template-columns:1fr 1fr;gap:10px}.studio-library-card{padding:16px;min-height:165px}.studio-card-name{font-size:14px}.studio-card-state{font-size:11px}.studio-section-heading{align-items:flex-start}.studio-section-heading h2{font-size:19px}.studio-section-heading>.studio-storage{display:none}.studio-section-heading p{font-size:12px}.studio-continue{padding:13px;font-size:12px}.studio-continue .studio-button{font-size:11px;min-height:38px;padding:8px}.studio-heading{align-items:flex-start;gap:13px;margin-bottom:14px}.studio-back{font-size:11px;white-space:nowrap}.studio-title-wrap h1{font-size:21px;letter-spacing:-.4px}.studio-kicker{font-size:8px;letter-spacing:1.6px}.studio-topbar{display:block}.studio-version{font-size:11px;margin-bottom:10px}.studio-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.studio-actions .studio-button{font-size:10px;min-height:40px;padding:8px 4px}.studio-status{font-size:11px;margin:10px 0}.studio-mobile-tabs{display:flex;border:1px solid #d9e1ef;border-radius:12px;overflow:hidden;margin:12px 0;background:white}.studio-mobile-tabs button{flex:1;border:0;padding:12px 5px;font:700 11px system-ui;color:#73819b;background:white;min-height:43px}.studio-mobile-tabs button[aria-pressed="true"]{background:#e9ecff;color:#5159b1}.studio-workspace{display:block}.studio-workspace[data-mobile-panel="game"] .studio-conversation{display:none}.studio-workspace[data-mobile-panel="talk"] .studio-canvas-column{display:none}.studio-workspace[data-mobile-panel="versions"]{display:none}.studio-game-host,.studio-empty,.studio-native-game .game-stage{min-height:330px}.studio-messages{height:260px}.studio-preview-notice{font-size:10px;gap:8px}.studio-preview-notice button{font-size:10px}.studio-versions{padding:14px}.studio-version-cards{grid-template-columns:1fr}.studio-conversation{border-radius:16px}.studio-footnote{font-size:10px}.studio-native-game .game-stage .builder-controls{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.studio-review *{scroll-behavior:auto!important}.studio-library-card{transform:none!important}}
+/* Gold-standard design coaching: play-first, progressive tools, optional learning. */
+.studio-review:not(.studio-designing) .studio-workspace{grid-template-columns:minmax(0,1fr)}
+.studio-review:not(.studio-designing) .studio-conversation,.studio-review:not(.studio-designing) #designPlan{display:none}
+.studio-review .design-controls{border:1px solid #c6d1e6;border-radius:14px;background:#f5f7fd;padding:12px;margin-bottom:12px;color:#263652}
+.studio-review .design-mode{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:10px}
+.studio-review .design-mode strong{width:100%;font-size:13px}
+.studio-review .design-mode button{border:1px solid #bdcce2;background:white;border-radius:16px;padding:7px 10px;color:#293e60;font:inherit;font-size:12px;cursor:pointer}
+.studio-review .design-controls label{font-size:12px;display:block;margin:8px 0 4px}
+.studio-review .design-controls select{width:100%;border:1px solid #b8c8df;border-radius:9px;background:#fff;color:#263652;padding:8px;margin-bottom:8px}
+.studio-review #coachModeStatus{display:block;font-size:11px;line-height:1.5;margin-top:9px}
+.studio-review #coachProposals{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+.studio-review .design-plan{background:#fff9e9;color:#29364b;border:1px solid #e3d3a6;border-radius:15px;padding:15px;margin:12px 0}
+.studio-review .design-plan summary{cursor:pointer;font-weight:800}
+.studio-review .design-plan label{display:block;margin:16px 0 5px;font-size:14px;font-weight:700}
+.studio-review .design-plan textarea,.studio-review .experiment-card textarea{width:100%;resize:vertical;border:1px solid #b8c8df;background:#fff;color:#233552;border-radius:9px;padding:10px;font:inherit;font-size:14px}
+.studio-review .design-plan small{display:block;color:#59697e;margin:5px 0}
+.studio-review .design-plan-actions{display:flex;gap:6px;margin-bottom:12px}
+.studio-review .experiment-shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px;margin-bottom:22px}
+.studio-review .experiment-shelf>h2,.studio-review .experiment-shelf>p{grid-column:1/-1;margin:0}
+.studio-review .experiment-card{border-top:4px solid #8d6ecd;display:flex;flex-direction:column;gap:10px}
+.studio-review .experiment-card small{color:#64718b;line-height:1.5}
+.studio-review .experiment-card button{align-self:flex-start;max-width:100%;white-space:normal}
+.studio-review .studio-actions{flex-wrap:wrap}
+@media(max-width:760px){
+ .studio-review .design-controls{padding:10px}
+ .studio-review .design-mode button{min-height:40px}
+ .studio-review .studio-conversation{min-width:0}
+ .studio-review .design-plan{grid-column:1/-1}
+ .studio-review .experiment-shelf{grid-template-columns:1fr}
+}
+
+.experiment-shelf > #combineExperiments{grid-column:1/-1;min-height:44px;justify-self:start;padding:12px 18px}.experiment-card textarea{min-height:80px}.design-controls details{margin:8px 0}.design-controls details select,.design-controls details input{width:100%;padding:8px}.design-plan{max-height:65vh;overflow:auto}.studio-review .studio-workspace{min-height:160px}

@@ -23,16 +23,20 @@ export type MathRequest = { kind: 'required'; message: string } | { kind: 'mode'
 /** Bounded interpretation of explicit learning-format requests. No model or proficiency mutation. */
 export function interpretMathRequest(text: string): MathRequest | null {
   const t = text.toLowerCase().replace(/[’']/g, "'").trim();
-  if (!/\b(math|maths|arithmetic|learning questions)\b/.test(t)) return null;
-  if (/\b(no|without|remove|disable|delete|skip|eliminate|stop|hide|off|zero|don't|never)\b/.test(t) &&
-      !/\b(instead|replace|move)\b/.test(t) && !/\b(no|without) (?:more )?(?:popups?|pop-ups?|interruptions?)\b/.test(t)) {
-    return { kind: 'required', message: REQUIRED_MATH_MESSAGE };
-  }
+  const math = '(?:maths?|arithmetic|learning questions)';
+  if (!new RegExp('\\b'+math+'\\b').test(t)) return null;
+  // Negation must attach to math. “A math game with no score” is a valid design.
+  const removal = new RegExp('\\b(?:remove|disable|delete|skip|eliminate|hide|stop|turn off|switch off|get rid of)\\s+(?:(?:all|the|any|these|every)\\s+){0,2}'+math+'\\b|\\b(?:no|without|zero)\\s+(?:(?:more|any|the)\\s+){0,2}'+math+'\\b|\\b'+math+'(?: questions| problems| activities)?\\s+(?:off|disabled|removed)\\b|\\bdon\'t (?:want|include|show|ask for)\\s+(?:any |the )?'+math+'\\b|\\bnever (?:show |ask |include )?(?:any |the )?'+math+'\\b');
+  const replaceFormat = /\b(instead|replace|move)\b/.test(t) && /\b(checkpoints?|pauses?|inside|within|interactive|interaction|both)\b/.test(t);
+  const negatedRemoval = /\b(?:don't|never) (?:remove|disable|delete|skip) (?:the |all )?(?:maths?|arithmetic)\b/.test(t);
+  if (removal.test(t) && !replaceFormat && !negatedRemoval) return { kind: 'required', message: REQUIRED_MATH_MESSAGE };
+  // An approved/new game brief is still a game request, not just a format toggle.
+  if (/^(?:please )?(?:build|create|design|invent)\b/.test(t) || /^(?:please )?make (?:a|an|new)\b/.test(t) || /approved game plan/.test(t)) return null;
   if (/\b(both|mix|mixture|combine)\b/.test(t)) return { kind: 'mode', mode: 'both' };
   if (/\b(inside|within|interactive|interaction|embedded|build.and.solve)\b/.test(t) || /math (?:in|as part of) (?:the |my )?game/.test(t) || /without (?:more )?(?:popups?|pop-ups?|interruptions?)/.test(t)) {
     return { kind: 'mode', mode: 'interaction' };
   }
   if (/\b(checkpoints?|pauses?|between|breaks?)\b/.test(t)) return { kind: 'mode', mode: 'checkpoint' };
-  if (/\b(remove|disable|delete|skip|eliminate|off|without)\b/.test(t)) return { kind: 'required', message: REQUIRED_MATH_MESSAGE };
+  if (removal.test(t) && !negatedRemoval) return { kind: 'required', message: REQUIRED_MATH_MESSAGE };
   return null;
 }
