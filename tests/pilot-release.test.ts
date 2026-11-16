@@ -8,6 +8,14 @@ import {apiHandler} from '../server/pipeline/http';
 import {signSession} from '../server/pipeline/auth';
 import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
 import {physicalWorkshop} from '../server/testing/quality-generated-fixtures';
+import {prepareOwnerAccess} from '../server/owner-setup';
+import {MemoryRepository} from '../server/pipeline/repository';
+test('owner invitation and budget setup needs no App PEM, model key or generation and preserves spend/data',async()=>{
+ const repo=new MemoryRepository();await repo.transaction(s=>{s.ledgers.owner={month:new Date().toISOString().slice(0,7),allowance:1,used:200,reserved:100,paidEnabled:false};s.revisions.push({id:'saved',familyId:'owner',parentId:null,projectId:'saved',adapter:'metered-api',game:physicalWorkshop});return true;});
+ const token=await prepareOwnerAccess({active:true,familyId:'owner',workspace:'existing'},5000000,repo);
+ const state=await repo.snapshot();assert.equal(state.ledgers.owner.used,200);assert.equal(state.ledgers.owner.reserved,100);assert.equal(state.ledgers.owner.allowance,5000000);assert.equal(state.revisions[0].id,'saved');assert.equal(state.invitations?.length,1);assert.ok(!JSON.stringify(state).includes(token));
+ await assert.rejects(prepareOwnerAccess({active:true,familyId:'__proto__',workspace:'existing'},5,repo));
+});
 test('real Responses adapter sends v2 schema/physics/required math and preserves source in paid-usage reports',async()=>{
  const approval:AgentApproval={enabled:true,approvalId:'synthetic-only',model:'gpt-5.4-mini-2026-03-17',reasoningEffort:'low',inputUsdPerMillion:.75,outputUsdPerMillion:4.5,maxInputTokens:64000,maxOutputTokens:8000,priceReviewedOn:new Date().toISOString().slice(0,10)};
  let calls=0;
