@@ -7,14 +7,15 @@
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "test:unit": "node --import tsx tests/unit.ts",
-    "test:browser": "node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs",
+    "test:browser": "node tests/quality-builder.cjs && node tests/quality-hill.cjs && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs",
     "test": "npm run build && npm run test:unit && npm run test:deployment && npm run test:browser && npm run test:real-agent",
     "test:real-agent": "node tests/real-agent-status.cjs",
     "test:sandbox": "node --import tsx tests/generated-sandbox.ts",
     "start:gateway": "node --import tsx server/gateway.ts",
     "start:preview": "node --import tsx server/preview-server.ts",
     "setup:owner": "node --import tsx server/owner-setup.ts",
-    "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v"
+    "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
+    "test:quality": "node tests/quality-builder.cjs && node tests/quality-hill.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
@@ -26,5 +27,8 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite": "^6.4.1"
+  },
+  "dependencies": {
+    "planck": "1.4.2"
   }
 }
