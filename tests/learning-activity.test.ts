@@ -21,7 +21,9 @@ async function mount(item:MathItem,mode:LearningMode='checkpoint',hints=false,ch
   await page.addScriptTag({content:bundle});
   await page.evaluate(({item,mode,hints,challenge})=>{
     const w=window as any;w.profile={id:'test-child',grade:4,age:9,skills:{},hints};w.results=[];w.saves=0;
-    w.activity=w.LearningUITest.mountMathActivity(document.getElementById('mount'),{profile:w.profile,item,mode,legacyIds:true,challenge,onComplete:(result:unknown)=>w.results.push(result),onSave:()=>w.saves++});
+    // Native methods remain self-contained when Playwright serializes this
+    // function; tsx's named-arrow transform would reference a Node-only helper.
+    w.activity=w.LearningUITest.mountMathActivity(document.getElementById('mount'),{profile:w.profile,item,mode,legacyIds:true,challenge,onComplete(result:unknown){w.results.push(result);},onSave(){w.saves++;}});
   },{item,mode,hints,challenge});
   return page;
 }
@@ -110,9 +112,8 @@ test('diagrams are mathematical, mobile-safe and curriculum text is never HTML',
     const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));assert.ok(dimensions.scroll<=dimensions.client);
     const result=await page.evaluate(()=>{
       const w=window as any, triangle=w.LearningUITest.renderMathVisual({kind:'shape',shape:'triangle'}),rect=w.LearningUITest.renderMathVisual({kind:'shape',shape:'rectangle',width:6,height:3}),line=w.LearningUITest.renderMathVisual({kind:'number-line',min:0,max:1,start:0,jumps:[1/3,1/3]});
-      const points=(node:HTMLElement)=>node.querySelector('polygon')!.getAttribute('points')!.split(' ').map(p=>p.split(',').map(Number));
       const plot=w.LearningUITest.renderMathVisual({kind:'line-plot',labels:['1/4 m','2/4 m','3/4 m'],values:[2,4,1]});
-      return {triangle:points(triangle),rectangle:points(rect),line:line.textContent,plotMarks:plot.querySelectorAll('[data-frequency-mark]').length,plot:plot.textContent};
+      return {triangle:triangle.querySelector('polygon')!.getAttribute('points')!.split(' ').map((p:string)=>p.split(',').map(Number)),rectangle:rect.querySelector('polygon')!.getAttribute('points')!.split(' ').map((p:string)=>p.split(',').map(Number)),line:line.textContent,plotMarks:plot.querySelectorAll('[data-frequency-mark]').length,plot:plot.textContent};
     });
     const distances=result.triangle.map((p:number[],i:number)=>Math.hypot(p[0]-result.triangle[(i+1)%3][0],p[1]-result.triangle[(i+1)%3][1]));
     assert.ok(Math.max(...distances)-Math.min(...distances)<.001);

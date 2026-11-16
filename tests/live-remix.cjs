@@ -58,23 +58,60 @@ const {start}=require('./browser-server.cjs');
   assert.deepEqual(errors,[]);console.log(`PASS ${device}: five real mutations, outcomes/coach, compare, undo/DAG, fork/reload, profile/math isolation, rejected edits, quota safety`);await context.close();
  }
  // Other plugin manifests drive real engine state, not cosmetic labels.
- const pluginPage=await browser.newPage();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
+ const pluginPage=await browser.newPage();await pluginPage.clock.install();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
  for(const [game,prompt,key,expected] of [['gum','Give me six gum sticks','gumRemaining',6],['dragon','Give the island 120 resilience','islandHP',120]]){
   await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
- // Deterministic round regression uses the same recent-question budget for
- // lose/retry and win/next. The next case clears it to exercise actual math.
- await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'Bucket 2',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);await pluginPage.click('#resultNext');await pluginPage.getByRole('button',{name:'Bucket 1',exact:true}).click();await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
- await pluginPage.evaluate(()=>{FG.store.changeProfile({rate:8});FG.store.current().mathWindow=[];FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});await pluginPage.getByRole('button',{name:'🪣 Choose bucket',exact:true}).click();await pluginPage.waitForSelector('.math-activity');
- const activeItem=await pluginPage.evaluate(()=>FG.learning.activeItem);
- assert.ok(activeItem,'math feedback regression must exercise an actual learning item');
- if(activeItem.answerKind==='choice'){
-  const choice=activeItem.choices.find(c=>c.value===String(activeItem.answer));assert.ok(choice);
-  await pluginPage.getByRole('button',{name:choice.label,exact:true}).click();
- }else{
-  await pluginPage.fill('#math-answer',String(activeItem.answer));await pluginPage.click('#math-submit');
- }
- await pluginPage.evaluate(()=>FG.app.openGame('gum'));await pluginPage.waitForTimeout(650);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.ok(await pluginPage.locator('.builder-piece').count());
+ // Native Splash uses title → hero → intro → play. A splash is a visual outcome;
+ // the optional Original Challenge ends a run after a wrong math answer.
+ const nativeRound=async()=>{
+  for(let i=0;i<3;i++){
+   const mode=await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode);
+   if(!['title','hero','intro'].includes(mode))break;
+   await pluginPage.locator('#go').click();
+  }
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'play');
+  await pluginPage.locator('#go').click();await pluginPage.clock.runFor(3500);
+  await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+  await pluginPage.locator('#go').click();await pluginPage.waitForSelector('#stage-overlay .math-activity');
+ };
+ const answerNative=async(correct)=>{
+  const item=await pluginPage.evaluate(()=>FG.learning.activeItem);assert.ok(item,'Native round must present shared math');
+  const activity=pluginPage.locator('#stage-overlay .math-activity');
+  if(item.answerKind==='choice'){
+   const choice=item.choices.find(option=>correct?option.value===String(item.answer):option.value!==String(item.answer));assert.ok(choice);
+   await activity.getByRole('button',{name:choice.label,exact:true}).click();
+  }else{
+   await activity.getByRole('textbox',{name:'Math answer',exact:true}).fill(correct?String(item.answer):'-999');
+   await activity.getByRole('button',{name:'Check answer',exact:true}).click();
+  }
+ };
+ await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:8,punish:true});FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});
+ await nativeRound();await answerNative(false);await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);
+ await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),1);
+ await pluginPage.clock.fastForward(80_000); // Respect spacing while the retry is still on its intro screen.
+ await nativeRound();await answerNative(true);await pluginPage.clock.runFor(500);
+ await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);
+ await pluginPage.clock.fastForward(80_000); // Advance the budget while the game is still at its result.
+ await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
+
+ // Answer and change games in one browser task so navigation always precedes
+ // the 450 ms completion callback, regardless of CI transport scheduling.
+ await pluginPage.evaluate(()=>{FG.store.changeProfile({punish:false});FG.app.openGame('buckets',{config:{bucketCount:3,revealSafe:false,splashMs:400}})});
+ await nativeRound();
+ await pluginPage.evaluate(()=>{
+  const item=FG.learning.activeItem,activity=document.querySelector('#stage-overlay .math-activity');
+  if(!item||!activity)throw Error('A shared math activity is required for the stale-callback regression');
+  if(item.answerKind==='choice'){
+   const button=Array.from(activity.querySelectorAll('.math-choice-grid button')).find(button=>button.dataset.value===String(item.answer));
+   if(!button)throw Error('The correct choice must be present');button.click();
+  }else{
+   activity.querySelector('.math-answer-input').value=String(item.answer);activity.querySelector('form').requestSubmit();
+  }
+  if(activity.querySelector('.math-feedback').dataset.state!=='correct')throw Error('The UI must accept the answer before navigation');
+  FG.app.openGame('gum');
+ });
+ await pluginPage.clock.runFor(700);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.equal(await pluginPage.locator('#game-mount').evaluate(node=>node.inert),false,'A new game must not retain the previous math overlay’s input lock');assert.ok(await pluginPage.locator('.builder-piece').count());
  await pluginPage.close();
  // Legacy workspace migration in browser; failed/corrupt load never replaces stored source.
  const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('family-game-factory-workspace-v2',JSON.stringify({version:1,games:[{id:'old-game',owner:'player1',game:'buckets',name:'Migrated Splash',config:{bucketCount:2,revealSafe:true,splashMs:400}}]}))});await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();assert.match(await page.textContent('#liveName'),/Migrated Splash/);await page.click('#livePlay');assert.equal((await page.evaluate(()=>FG.runtime.snapshot())).state.bucketCount,2);await page.close();

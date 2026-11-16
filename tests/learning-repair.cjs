@@ -53,7 +53,7 @@ const assert=require('node:assert/strict');
   };
   const attempts=[];
   for(const challenge of [false,true]){
-   if(challenge)await page.clock.runFor(80_000); // Respect the real shared pacing interval.
+   if(challenge)await page.clock.fastForward(80_000); // Advance pacing while at the completed result, without replaying idle animation frames.
    await page.evaluate(challenge=>{FG.store.changeProfile({punish:challenge,rate:8});FG.app.openGame('buckets')},challenge);
    for(let i=0;i<4;i++)await page.locator('#go').click();
    await page.clock.runFor(6500);

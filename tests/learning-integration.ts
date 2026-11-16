@@ -146,7 +146,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     const fraction=generateItem('g3-unit-fraction',{random:()=>.55,representation:'visual'});
     await page.evaluate(item=>{
       const w=window as any;w.fractionResult=null;
-      window.FG.learning.mount(document.getElementById('lab-question'),{item,mode:'both',context:{gameId:'math-lab',projectId:'math-lab',mode:'both'},onComplete:(result:any)=>{w.fractionResult=result;}});
+      window.FG.learning.mount(document.getElementById('lab-question'),{item,mode:'both',context:{gameId:'math-lab',projectId:'math-lab',mode:'both'},onComplete(result:any){w.fractionResult=result;}});
     },fraction);
     assert.equal(await page.locator('.math-built-number').textContent(),'0/2');
     await page.locator('[data-fraction-part="denominator"][data-delta="1"]').click();
@@ -189,7 +189,7 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
       const frame=document.createElement('iframe');frame.id='math-fixture-frame';frame.title='Audited learning preview fixture';frame.sandbox.add('allow-scripts');frame.style.cssText='width:100%;height:760px;border:0;';
       host.append(frame);document.getElementById('page-home')!.prepend(host);
       window.addEventListener('message',event=>{if(event.source===frame.contentWindow&&event.data?.type==='factory-preview')w.previewMessages.push(event.data);});
-      w.previewBridge=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id,gameId:`fixture-${kind}`,projectId:`fixture-${kind}`,mode:'checkpoint',onRound:(result:any)=>w.previewRounds.push(result)});
+      w.previewBridge=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id,gameId:`fixture-${kind}`,projectId:`fixture-${kind}`,mode:'checkpoint',onRound(result:any){w.previewRounds.push(result);}});
       frame.srcdoc=html;
     },{html,channel,artifactId,kind});
     const frame=page.frameLocator('#math-fixture-frame');

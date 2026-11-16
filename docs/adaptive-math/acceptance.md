@@ -7,7 +7,7 @@ This record covers the grades 1–4 draft implementation, not the live deployed 
 ## Checks completed in the development workspace
 
 - Strict TypeScript and Vite production build passed during integration.
-- The integrated unit/contract suite passed with 98 checks before the final five builder-contract additions. The final count is recorded below after the complete review branch runs.
+- The integrated unit/contract suite passed all 103 checks after the builder-contract additions. The existing Studio suite passed 17 checks; the integrated design-coach suite passed 35 unit checks and eight HTTP contract checks.
 - Curriculum tests independently check 6,570 generated samples across all 73 units and additional fraction, line-plot, range, and graph cases.
 - Focused learning engine/store checks passed: conservative across-day evidence, exact target mixing, recent support, automatic challenge increase/decrease, grade restrictions, hints before errors, immediate wrong-answer persistence, interruption, duplicate completion, migration and recovery.
 - Eleven deployment/configuration regression tests passed. These are dry-run/unit tests and perform no deployment or paid activation.

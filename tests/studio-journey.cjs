@@ -21,6 +21,14 @@ const {start}=require('./browser-server.cjs');
   assert.equal(await page.locator('#studioStarters [data-starter]').count(),3);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
   await page.click('[data-starter="gum"]');await page.waitForSelector('.construction-stage');
+  // A replay/version control must retain an active host activity; leaving the game may interrupt it.
+  const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
+  assert.ok(guardedAttempt);await page.click('#studioPlay');
+  assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),guardedAttempt);
+  assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'open');
+  await page.click('#studioNavHome');assert.equal(await page.evaluate(()=>FG.learning.active),false);
+  assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'interrupted');
+  await page.click('[data-starter="gum"]');await page.waitForSelector('.construction-stage');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();assert.equal(await page.locator('[data-part="body"]').count(),1);
   const base=(await workspace()).projects[0].headId;
   await talk();await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');

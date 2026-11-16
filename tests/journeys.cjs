@@ -36,6 +36,7 @@ const fs = require('node:fs');
  // Every original game and each difficulty can launch and exit.
  for(const game of ['gum','buckets','dragon'])for(const difficulty of ['gentle','classic','stretch']){
  await nav('🎛️ Remix');await page.selectOption('#remixGame',game);await page.selectOption('#remixDifficulty',difficulty);await page.click('#playRemix');await page.waitForSelector('#page-game:not(.hidden)');
+ assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),false,'Opening another game must release an earlier checkpoint’s input lock');
  if(game==='gum')assert.ok(await page.locator('.builder-piece').count()>0);
  if(game==='dragon'){await page.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await page.locator('#startBtn').click();assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.dragonHP),2)}
  if(game==='buckets'){for(let i=0;i<4;i++)await page.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');await page.locator('#go').click();assert.equal(await page.locator('#stage-overlay').isVisible(),true)}
