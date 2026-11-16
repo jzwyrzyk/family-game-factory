@@ -4,6 +4,16 @@ Use this guide after the reviewed branch has passed its automated checks. It gat
 
 This is a blank review guide, not a report of completed child or device testing. Keep completed observations separate from the repository and CI artifacts; names, profiles, drawings, prompts and recordings are unnecessary for these checks.
 
+## Target devices and control priority
+
+**Primary:** tablet touch, in both landscape and portrait, with direct part manipulation and large, reachable on-screen controls. **Secondary:** computer keyboard, especially Space and arrow keys for action games, plus a mouse for precise strategic placement and gum attachment. Phone is a regression target, not the design baseline.
+
+The browser checks emulate **820 × 1180 CSS px** (tablet portrait), **1180 × 820 CSS px** (tablet landscape), and **1280 × 1000 CSS px** (desktop). These are representative viewport sizes, not verified physical tablet models or measured performance.
+
+- **Rally:** hold Space, Right Arrow, or D to drive when the stage is focused; Left Arrow/A brakes. On touch, hold Go or Brake. Letting go, switching apps, and pausing should release input.
+- **Bubble Gum Builders:** touch or mouse drag selects/moves parts, and touch Previous/Next piece selects between small or overlapping parts. The keyboard also uses [ and ] to cycle parts; R rotates, G connects, Space tests, and holding Space during a run boosts.
+- **Landscape tablet:** the game and primary touch controls should be usable together without a long scroll, while preserving an intact canvas after rotation.
+
 ## Open the reviewed build
 
 Check out `feature/game-quality-v1`, then run:
@@ -36,8 +46,8 @@ Run this once before inviting a child to try the build. Record **passed**, **pro
 | Check | Action and expected observation |
 | --- | --- |
 | First load | Open the arcade, then each native game. Artwork and controls appear; the page fits without horizontal scrolling. Record a visibly slow load rather than guessing a cause. |
-| Sustained driving | Drive, brake and retry on each trail. Watch for repeated stutters, missed releases, or an uncomfortable increase in device warmth. |
-| Construction | Select adjacent parts, move and rotate one, connect gum, test, and return to editing. Check the smaller phone layout as well as a larger display if available. |
+| Sustained driving | On tablet, hold Go and Brake in both orientations; on computer, hold/release Space to drive and use Arrow/D or A to brake. Retry on each trail and note stutters, missed releases, or warmth. |
+| Construction | On tablet, select adjacent or overlapping parts using direct touch and Previous/Next piece, rotate, connect gum, test, and return to editing. On computer, repeat with mouse and keyboard. Check phone as a regression layout. |
 | Pause and resize | Pause, rotate the device or resize the window, and resume. The paused scene remains visible, controls fit, and the game resumes without a large movement jump. |
 | Background and return | Leave the browser with a pedal or action held, return, and resume. The old input must be released; hidden time must not rush through the simulation. |
 | Sound | Start music and effects through an ordinary interaction. Pause and leave the game. Sound should stop appropriately and restart only with the supported flow. |
