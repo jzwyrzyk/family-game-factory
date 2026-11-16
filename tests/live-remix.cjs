@@ -58,10 +58,13 @@ const {start}=require('./browser-server.cjs');
   assert.deepEqual(errors,[]);console.log(`PASS ${device}: five real mutations, outcomes/coach, compare, undo/DAG, fork/reload, profile/math isolation, rejected edits, quota safety`);await context.close();
  }
  // Other plugin manifests drive real engine state, not cosmetic labels.
- const pluginPage=await browser.newPage(),pluginErrors=[];pluginPage.on('pageerror',error=>pluginErrors.push(error.message));await pluginPage.clock.install();await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
+ const pluginPage=await browser.newPage(),pluginErrors=[];pluginPage.on('pageerror',error=>pluginErrors.push(error.message));await pluginPage.clock.install({time:new Date('2026-11-16T08:00:00Z')});await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
  for(const [game,prompt,key,expected] of [['gum','Give me six gum sticks','gumRemaining',6],['dragon','Give the island 120 resilience','islandHP',120]]){
   await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}if(game==='gum'){const s=await pluginPage.evaluate(()=>FG.runtime.snapshot());assert.equal(s.config.gumBudget,6);assert.equal(s.state.gumRemaining,6-s.state.joints.length);}else assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
+ // Pause while no game is active before manually advancing time. In Playwright
+ // 1.56.1, a pending realtime tick can otherwise undo a fastForward advancement.
+ await pluginPage.clock.pauseAt(new Date('2026-11-16T10:00:00Z'));
  // Native Splash uses title → hero → intro → play. A splash is a visual outcome;
  // the optional Original Challenge ends a run after a wrong math answer.
  // Explicit configs must opt into originalRules; an omitted flag preserves the
@@ -73,6 +76,15 @@ const {start}=require('./browser-server.cjs');
    native:FG.runtime.snapshot(),overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
    attempts:(profile.learning?.attempts||[]).slice(-4).map(attempt=>({id:attempt.id,outcome:attempt.outcome,answers:attempt.answers.length,correct:attempt.correct,independent:attempt.independent}))};
  });
+ const advanceNativeBudget=async()=>{
+  const before=await checkpointState();
+  assert.equal(before.active,false,'Only advance pacing between completed math activities');
+  await pluginPage.clock.fastForward(80_000);
+  const after=await checkpointState();
+  assert.equal(after.now-before.now,80_000,'The controlled clock must advance the full spacing interval');
+  assert.deepEqual(after.mathWindow,before.mathWindow,'Advancing time must retain the previous questions');
+  assert.equal(after.eligible,true,'The next native question must satisfy the real shared pacing policy');
+ };
  const nativeRound=async(label)=>{
   try{
   assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().config.originalRules),true,'This regression must exercise the restored native Splash adapter');
@@ -118,10 +130,10 @@ const {start}=require('./browser-server.cjs');
  await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:8,punish:true});FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{originalRules:true,bucketCount:3,revealSafe:false,splashMs:400}})});
  await nativeRound('Original Challenge incorrect');await answerNative(false);await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);
  await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),1);
- await pluginPage.clock.fastForward(80_000); // Respect spacing while the retry is still on its intro screen.
+ await advanceNativeBudget(); // Respect spacing while the retry is still on its intro screen.
  await nativeRound('Original Challenge correct');await answerNative(true);await pluginPage.clock.runFor(500);
  await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Next/);
- await pluginPage.clock.fastForward(80_000); // Advance the budget while the game is still at its result.
+ await advanceNativeBudget(); // Advance the budget while the game is still at its result.
  await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),2);
 
  // Answer and change games in one browser task so navigation always precedes
