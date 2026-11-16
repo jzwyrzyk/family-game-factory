@@ -14,7 +14,7 @@ The current review's GitHub checks and artifacts are the authority for its teste
 | `tests/learning-repair.cjs` | Actual native practice/challenge persistence, hints, and pacing |
 | `test:studio` | Durable drafts, independent tests, nonselecting background tests, version promotion/copy/history, construction/ride continuity, profiles, remote fixture readiness |
 | `test:coach` | Child/helper provenance, exact-quote decisions, field autosave, newer input during delayed replies, HTTP/auth/moderation/budget boundaries, desktop/mobile journeys |
-| `test:quality` | Physical workshop, hill driving, touch/keyboard controls, sound/pause/replay, standalone generated physics and containment |
+| `test:quality` | Physical workshop, hill driving, touch/keyboard controls, tablet portrait/landscape selection and held pedals, sound/pause/replay, standalone generated physics and containment |
 | `test:child-journey` | First-screen play, primary target size, current-test help/return, real native math while using mobile panels, explicit ready preview, newer draft retention, visible storage failure and retry |
 | Existing browser/deployment gates | Arcade, live remix, builder, five generated revisions, worker security, restored original games, offline shell, touch, private drawings, deployment-policy dry runs |
 

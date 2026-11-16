@@ -49,6 +49,8 @@ Failed saves keep typed text visible. Navigation/profile changes that would disc
 
 The physical workshop and Junkyard Rally use the same learner, grade bounds, pacing budget, hint policy, and evidence as other games. Native host pauses are separate from a player's manual pause: answering math cannot override a deliberate pause, and game keys cannot resume a simulation behind a question. Both longer active play and eligible completed attempts can reach the host checkpoint.
 
+The current tablet controls are included: larger pedals and part controls, a previous/next piece selector for small or overlapping construction pieces, landscape stages that leave room for controls, and held Space driving when the game canvas has keyboard focus. Touch and keyboard controls retain the same host learning pause. Tablet evidence is browser emulation in portrait and landscape; actual family hardware remains part of the observed review.
+
 The trusted generated player now advertises learning protocol 1 and validates the parent channel/artifact connection. Round identifiers, pause/resume, input cleanup, and active-play checkpoints connect generated v2 physics games to the existing learning service. The new immutable runtime archive is `quality-runtime-v2.0.3`; older archive bytes are retained. A saved renderer that cannot advertise the required protocol stays unavailable behind an update message rather than opening a math-free game. Frontend and reviewed trusted runtime must therefore be released together.
 
 The parent owns questions, answer evaluation, and learning history. The generated worker receives no learner name, history, or answer authority. Existing sandbox, source/hash, resource, and paid-activation gates remain in place. This is reviewed code and fixture validation, not proof of a provisioned production worker or live model operation.
@@ -60,7 +62,7 @@ See [acceptance](acceptance.md) for exact checks and remaining human validation.
 Source integration starts from:
 
 - Adaptive Math: `69f50387842e0943ad2e3a83a988247eb2fcb97d` (draft #19).
-- Game Quality: `562d5ba6bb008edb7509c470b316798c5af663aa` (draft #20).
+- Game Quality: `4ed8595697c55edb6bbb5a2c94fcc66da0ef5fa7` (draft #20, including the tablet controls added after its `562d5ba` continuation).
 - Both include the merged Studio/design-coach work on main `ca73ceba4ae2c79f9f669c3fcbaa66922230d601`.
 
 This branch resolves the overlap and adds the journey changes above. Earlier branch reports remain historical evidence, not validation of this combined tree.

@@ -80,6 +80,11 @@ export default class QualityBuilder implements GameInstance {
     private hostPaused = false;
     private view = { w: 1000, h: 560, scale: 40, x: 0, y: 0 };
     private resizeObserver: ResizeObserver;
+    private onWindowResize = () => this.resize();
+    private piecePicker = el('div', 'q-piece-picker');
+    private piecePickerLabel = el('span', 'q-piece-picker-label');
+    private previousPieceButton: HTMLButtonElement;
+    private nextPieceButton: HTMLButtonElement;
     private drag: {
         pointer: number;
         startX: number;
@@ -155,6 +160,15 @@ export default class QualityBuilder implements GameInstance {
             this.tray.append(b);
         }
         const toolbar = el('div', 'q-toolbar');
+        this.piecePicker.setAttribute('role', 'group');
+        this.piecePicker.setAttribute('aria-label', 'Choose a part of your machine');
+        this.piecePickerLabel.setAttribute('aria-live', 'polite');
+        this.previousPieceButton = this.button('◀ Previous', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(-1); this.canvas.focus({ preventScroll: true }); });
+        this.nextPieceButton = this.button('Next ▶', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(1); this.canvas.focus({ preventScroll: true }); });
+        this.previousPieceButton.setAttribute('aria-label', 'Previous piece');
+        this.nextPieceButton.setAttribute('aria-label', 'Next piece');
+        this.piecePicker.append(this.previousPieceButton, this.piecePickerLabel, this.nextPieceButton);
+        this.piecePicker.hidden = true;
         this.rotateButton = this.button('↻ Rotate', 'q-button', () => this.rotate());
         this.rotateButton.setAttribute('aria-label', 'Rotate selected part');
         this.glueButton = this.button('● Gum', 'q-button', () => this.beginJoin());
@@ -172,7 +186,7 @@ export default class QualityBuilder implements GameInstance {
         boost.onpointerdown = e => { if (this.hostPaused || this.clock.paused || this.mode !== 'run')
             return; e.preventDefault(); boost.setPointerCapture(e.pointerId); this.pointerAction = true; void this.audio.unlock(); };
         boost.onpointerup = boost.onpointercancel = boost.onlostpointercapture = () => { this.pointerAction = false; };
-        boost.onkeydown = e => { if (this.hostPaused || this.clock.paused) return; if (e.key === ' ' || e.key === 'Enter') {
+        boost.onkeydown = e => { if (this.hostPaused || this.clock.paused) return; if (!e.ctrlKey && !e.metaKey && !e.altKey && this.mode === 'run' && (e.key === ' ' || e.key === 'Enter')) {
             e.preventDefault();
             this.pointerAction = true;
         } };
@@ -198,7 +212,7 @@ export default class QualityBuilder implements GameInstance {
         footer.append(footerLeft, el('span', '', 'Drag or tap to place · R rotates · G adds gum'));
         this.saveNotice.hidden = true;
         this.saveNotice.setAttribute('role', 'status');
-        this.root.append(top, missionBar, stage, instructions, this.tray, toolbar, this.saveNotice, footer);
+        this.root.append(top, missionBar, stage, instructions, this.piecePicker, this.tray, toolbar, this.saveNotice, footer);
         mount.replaceChildren(this.root);
         this.canvas.onpointerdown = e => this.pointerDown(e);
         this.canvas.onpointermove = e => this.pointerMove(e);
@@ -211,6 +225,7 @@ export default class QualityBuilder implements GameInstance {
         this.canvas.onblur = () => { this.action = false; if (this.cancelDrag()) this.refresh(); };
         this.resizeObserver = new ResizeObserver(() => this.resize());
         this.resizeObserver.observe(stage);
+        window.addEventListener('resize', this.onWindowResize);
         this.resize();
         this.clock = createFixedClock({ update: dt => this.update(dt), render: (alpha, time) => this.draw(alpha, time), onPause: () => { this.action = this.pointerAction = false; this.audio.pause(); this.cancelDrag(); this.context.emit?.({ type: 'pause', name: 'workshop' }); }, onResume: () => { this.audio.resume(); this.context.emit?.({ type: 'resume', name: 'workshop' }); } });
         this.clock.start();
@@ -286,6 +301,14 @@ export default class QualityBuilder implements GameInstance {
         this.glueButton.textContent = this.joining ? 'Tap another part…' : '● Gum';
         this.undoButton.disabled = !this.history.length || !building || this.storageBlocked;
         this.testButton.disabled = !this.blueprint.parts.length || this.storageBlocked;
+        const selectable = this.blueprint.parts.filter(p => !this.joining || p.id !== this.selected);
+        const index = selectable.findIndex(p => p.id === (this.joining ? this.joinTarget : this.selected));
+        const piece = index >= 0 ? selectable[index] : undefined;
+        this.piecePicker.hidden = !building || this.storageBlocked || this.blueprint.parts.length < 2;
+        this.previousPieceButton.disabled = this.nextPieceButton.disabled = !selectable.length;
+        this.piecePickerLabel.textContent = piece
+            ? `${this.joining ? 'Gum target' : 'Selected'} ${index + 1} of ${selectable.length} · ${PARTS[piece.kind].name}`
+            : `${this.joining ? 'Choose a gum target' : 'Choose a piece'} · ${selectable.length} available`;
         this.root.dataset.mode = this.mode;
         this.root.dataset.selected = this.selected || '';
         this.root.dataset.mission = this.mission;
@@ -293,7 +316,23 @@ export default class QualityBuilder implements GameInstance {
         this.clock?.invalidate();
     }
     private updateAudio() { this.musicButton.setAttribute('aria-pressed', String(this.audio.settings.music)); this.effectsButton.setAttribute('aria-pressed', String(this.audio.settings.effects)); this.musicButton.textContent = this.audio.settings.music ? '♫' : '♫ off'; this.effectsButton.textContent = this.audio.settings.effects ? '◖))' : '◖ off'; }
-    private resize() { const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width), h = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54); this.canvas.style.height = h + 'px'; const dpr = Math.min(2, devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.view = { w, h, scale: Math.min(w / 24, h / 13.5), x: 0, y: 0 }; this.view.x = (w - 24 * this.view.scale) / 2; this.view.y = (h - 13.5 * this.view.scale) / 2; this.c.setTransform(dpr, 0, 0, dpr, 0, 0); this.backdropKey = ''; this.clock?.invalidate(); }
+    private resize() {
+        const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
+        const normalHeight = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54);
+        // Landscape tablet: leave room for the actual on-screen controls.
+        const tabletLandscape = window.matchMedia('(any-pointer: coarse)').matches
+            && window.innerWidth > window.innerHeight && window.innerHeight >= 600 && w >= 600;
+        const h = tabletLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
+        this.canvas.style.height = h + 'px';
+        const dpr = Math.min(2, devicePixelRatio || 1);
+        this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
+        this.view = { w, h, scale: Math.min(w / 24, h / 13.5), x: 0, y: 0 };
+        this.view.x = (w - 24 * this.view.scale) / 2;
+        this.view.y = (h - 13.5 * this.view.scale) / 2;
+        this.c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.backdropKey = '';
+        this.clock?.invalidate();
+    }
     private point(e: PointerEvent) { const r = this.canvas.getBoundingClientRect(); return { x: (e.clientX - r.left - this.view.x) / this.view.scale, y: (e.clientY - r.top - this.view.y) / this.view.scale }; }
     private hit(x: number, y: number, touchRadius = 0) { const candidates = [...this.blueprint.parts].reverse().map(p => { const d = PARTS[p.kind], dx = x - p.x, dy = y - p.y, co = Math.cos(-p.angle), si = Math.sin(-p.angle), px = dx * co - dy * si, py = dx * si + dy * co; return { p, inside: Math.abs(px) <= d.width * .55 + .12 && Math.abs(py) <= d.height * .55 + .12, distance: Math.hypot(Math.max(0, Math.abs(px) - d.width / 2), Math.max(0, Math.abs(py) - d.height / 2)), center: Math.hypot(dx, dy) }; }); return candidates.find(p => p.inside)?.p || (touchRadius ? candidates.filter(p => p.distance < touchRadius).sort((a, b) => a.center - b.center)[0]?.p : undefined); }
     private add(kind: PartKind) { if (this.mode !== 'build' || this.storageBlocked)
@@ -378,6 +417,7 @@ export default class QualityBuilder implements GameInstance {
     }
     private keyDown(e: KeyboardEvent) {
         if (this.hostPaused || this.mode === 'run' && this.clock.paused) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.mode === 'run') {
             if (e.code === 'Space' || e.code === 'ArrowUp') {
                 e.preventDefault();
@@ -388,7 +428,6 @@ export default class QualityBuilder implements GameInstance {
         }
         if (this.mode !== 'build' || this.storageBlocked)
             return;
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.drag && (['Escape', 'Delete', 'Backspace', '[', ']', 'Enter'].includes(e.key) || e.key.startsWith('Arrow') || ['r', 'g'].includes(e.key.toLowerCase()) || e.code === 'Space')) {
             this.cancelDrag(); this.refresh();
             if (e.key === 'Escape') { e.preventDefault(); this.message('Move cancelled. Your last position is restored.'); return; }
@@ -452,11 +491,18 @@ export default class QualityBuilder implements GameInstance {
         const a = this.blueprint.parts.find(p => p.id === this.selected)!;
         this.joinTarget = this.blueprint.parts.filter(p => p.id !== a.id && !this.blueprint.joints.some(j => (j.a === a.id && j.b === p.id) || (j.b === a.id && j.a === p.id))).sort((p, q) => Math.hypot(p.x - a.x, p.y - a.y) - Math.hypot(q.x - a.x, q.y - a.y))[0]?.id || null;
     } this.message(this.joining ? 'Tap a second part to stick it. Keyboard: [ or ] to choose, Enter to stick.' : 'Connection cancelled.'); this.refresh(); this.canvas.focus({ preventScroll: true }); }
-    private cyclePart(direction: number) { const list = this.blueprint.parts.filter(p => !this.joining || p.id !== this.selected); if (!list.length)
-        return; const id = this.joining ? this.joinTarget : this.selected, index = list.findIndex(p => p.id === id), next = list[(index + direction + list.length) % list.length]; if (this.joining)
-        this.joinTarget = next.id;
-    else
-        this.selected = next.id; this.pointer = { x: next.x, y: next.y }; this.message(PARTS[next.kind].name + (this.joining ? ' is the other part. Enter adds gum.' : ' selected. Arrow keys move it; R turns it.')); this.refresh(); }
+    private cyclePart(direction: number) {
+        const list = this.blueprint.parts.filter(p => !this.joining || p.id !== this.selected);
+        if (!list.length) return;
+        const currentId = this.joining ? this.joinTarget : this.selected;
+        const index = list.findIndex(p => p.id === currentId);
+        const next = list[index < 0 ? (direction < 0 ? list.length - 1 : 0) : (index + direction + list.length) % list.length];
+        if (this.joining) this.joinTarget = next.id;
+        else this.selected = next.id;
+        this.pointer = { x: next.x, y: next.y };
+        this.message(PARTS[next.kind].name + (this.joining ? ' is the other part. Enter adds gum.' : ' selected. Arrow keys move it; R turns it.'));
+        this.refresh();
+    }
     private updateJoinPreview() { this.joinValid = false; if (!this.joining || !this.selected || !this.joinTarget || this.blueprint.joints.length >= budgetOf(this.context))
         return; try {
         connectParts(this.blueprint, this.selected, this.joinTarget);
@@ -726,5 +772,5 @@ export default class QualityBuilder implements GameInstance {
     retry() { this.test(); }
     snapshot() { return { ...this.saved(), level: Math.max(1, missionValues().filter(m => m.id !== 'free').findIndex(m => m.id === this.mission) + 1), mode: this.mode, selected: this.selected, paused: this.clock.paused, hostPaused: this.hostPaused, storageBlocked: this.storageBlocked, joining: this.joining, joinTarget: this.joinTarget, dragActive: !!this.drag, resources: { parts: this.blueprint.parts.length, joints: this.blueprint.joints.length, particles: this.particles.length, canvasPixels: this.canvas.width * this.canvas.height + this.backdrop.width * this.backdrop.height }, parts: structuredClone(this.blueprint.parts), joints: structuredClone(this.blueprint.joints), gumRemaining: budgetOf(this.context) - this.blueprint.joints.length, simulation: this.scene ? structuredClone(this.scene) : null, clock: this.clock.stats, audio: this.audio.settings }; }
     unmount() { if (this.disposed)
-        return; this.cancelDrag(); this.save(); this.disposed = true; this.clock.dispose(); this.audio.dispose(); this.simulation?.dispose(); this.resizeObserver.disconnect(); this.root.remove(); }
+        return; this.cancelDrag(); this.save(); this.disposed = true; this.clock.dispose(); this.audio.dispose(); this.simulation?.dispose(); this.resizeObserver.disconnect(); window.removeEventListener('resize', this.onWindowResize); this.root.remove(); }
 }

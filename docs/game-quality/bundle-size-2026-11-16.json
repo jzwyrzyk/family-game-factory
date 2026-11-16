@@ -136,19 +136,49 @@
         "bytes": 569723,
         "gzipBytes": 164651
       }
+    },
+    {
+      "build": "quality-studio-continuation",
+      "label": "Game Quality v1 with quiescent native pauses and keyboard continuity",
+      "sourceCommit": "562d5ba6bb008edb7509c470b316798c5af663aa",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4838,
+          "sha256": "e23a00f52a25cfc616cef8ac8205a38b305ec9ed925b5f152f23f67f01170c11"
+        },
+        {
+          "path": "assets/index-DsSD4Ug8.js",
+          "bytes": 512869,
+          "gzipBytes": 149686,
+          "sha256": "216954053643c0b2014e2d51bda71473c1a1b773ce5d5282404706f251316d86"
+        },
+        {
+          "path": "assets/index-qkIcYNom.css",
+          "bytes": 43755,
+          "gzipBytes": 10334,
+          "sha256": "a8fcae754cfa280e5c1794825f5ab4053550e0faaaedfbe5ca973351eabc7b8f"
+        }
+      ],
+      "totals": {
+        "bytes": 570447,
+        "gzipBytes": 164858
+      }
     }
   ],
   "existingArtwork": {
     "files": 23,
     "bytes": 4367688,
-    "scope": "The same 23 original-game PNGs total 4,367,688 bytes in all five source commits. Outside the core-gzip totals. Generated-runtime assets, service-worker caching, and actual request timing are separate from this measurement.",
+    "scope": "The same 23 original-game PNGs total 4,367,688 bytes in all six source commits. Outside the core-gzip totals. Generated-runtime assets, service-worker caching, and actual request timing are separate from this measurement.",
     "directory": "public/assets/original-dragon/*.png",
     "verifiedSourceCommits": [
       "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
       "226e44dc44e54de237c0faf4e1038087f4c1738a",
       "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
       "832a705256ec28f0ce917ff40bd91bc1e826c527",
-      "d957657e8db31d5044830f070aab22c36f48ed12"
+      "d957657e8db31d5044830f070aab22c36f48ed12",
+      "562d5ba6bb008edb7509c470b316798c5af663aa"
     ],
     "manifestSha256": "2019558eefa449de0a4f24284e70139dd4fba1cbd1b3ffb748432123039cfe2b",
     "manifestDigestFormat": "SHA-256 of UTF-8 canonical JSON (sorted keys, compact separators) for lexicographically sorted objects containing public-relative path, bytes, and sha256."
@@ -158,22 +188,23 @@
     "quality-v1": "226e44dc44e54de237c0faf4e1038087f4c1738a",
     "current-main-studio": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
     "quality-studio-combined": "832a705256ec28f0ce917ff40bd91bc1e826c527",
-    "quality-studio-review": "d957657e8db31d5044830f070aab22c36f48ed12"
+    "quality-studio-review": "d957657e8db31d5044830f070aab22c36f48ed12",
+    "quality-studio-continuation": "562d5ba6bb008edb7509c470b316798c5af663aa"
   },
   "currentComparison": {
     "baselineBuild": "current-main-studio",
-    "combinedBuild": "quality-studio-review",
+    "combinedBuild": "quality-studio-continuation",
     "baselineTotals": {
       "bytes": 254591,
       "gzipBytes": 85716
     },
     "combinedTotals": {
-      "bytes": 569723,
-      "gzipBytes": 164651
+      "bytes": 570447,
+      "gzipBytes": 164858
     },
     "increase": {
-      "bytes": 315132,
-      "gzipBytes": 78935
+      "bytes": 315856,
+      "gzipBytes": 79142
     }
   },
   "currentMeasurement": {
@@ -218,5 +249,33 @@
     },
     "historicalRowsPreserved": true,
     "scopeNote": "Production app/build inputs were verified unchanged from the source commit. Uncommitted edits were documentation only. build-info.json and sw.js carry working-tree metadata and are excluded from this core HTML/CSS/JS measurement, as in every prior row. Generated runtime archives are also excluded."
+  },
+  "continuationMeasurement": {
+    "measuredAtUtc": "2026-11-16T06:34:24.378567+00:00",
+    "command": "npm run build",
+    "sourceCommit": "562d5ba6bb008edb7509c470b316798c5af663aa",
+    "isolatedWorktree": false,
+    "trackedApplicationInputsMatchSource": true,
+    "applicationInputGitObjects": {
+      "src": "486d5814671c708bd9605cc626773f6a239da7f8",
+      "public": "2cd14cc981d01e606bd682471234792ac61f3c4b",
+      "index.html": "c03bf43785a8099f7484eabad483af163380f76b",
+      "package.json": "3ce44b4fd930e7debb1f962133ebf6a321bc0ec5",
+      "package-lock.json": "33c01f0b540ee95e58e416cfb82379db5483093d",
+      "tsconfig.json": "6b1f07ab46a3929e6dffa51d12153654ea7cefde",
+      "vite.config.ts": "68f9b315ed3c476f213f97621110b88e7718972f"
+    },
+    "nodeVersion": "v24.22.1",
+    "viteVersion": "6.4.1",
+    "compression": {
+      "implementation": "Python gzip.compress(data, compresslevel=6, mtime=0)",
+      "pythonVersion": "3.12.14",
+      "zlibVersion": "1.3.2",
+      "level": 6,
+      "mtime": 0,
+      "perFile": true
+    },
+    "historicalRowsPreserved": true,
+    "scopeNote": "The successful build was performed before committing this batch; the identical tracked app/build inputs were subsequently verified at sourceCommit. Only core HTML/CSS/JS are measured. build-info.json and sw.js carry build-time checkout metadata and are excluded consistently, as are generated-runtime archives. The original-artwork Git subtree is identical to the previous reviewed client."
   }
 }

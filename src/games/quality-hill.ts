@@ -28,6 +28,7 @@ export default class QualityHill implements GameInstance {
   private audio = createGameAudio();
   private clock: ReturnType<typeof createFixedClock>;
   private resizeObserver: ResizeObserver;
+  private onWindowResize = () => this.resize();
   private listeners = new AbortController();
   private simulation: ReturnType<typeof createVehicle>;
   private scene: VehicleSnapshot;
@@ -79,7 +80,7 @@ export default class QualityHill implements GameInstance {
     this.trackSelect.value = this.track; this.trackSelect.setAttribute('aria-label', 'Choose a trail');
     this.trackSelect.addEventListener('change', () => { this.track = this.trackSelect.value; this.save(); this.restart(); });
     mission.append(el('div', 'q-mission-icon', '⚑'), copy, this.trackSelect);
-    const stage = el('div', 'q-stage'); this.canvas.setAttribute('aria-label', 'Driving trail. Right arrow or D to drive; left arrow or A to brake.'); this.canvas.tabIndex = 0;
+    const stage = el('div', 'q-stage'); this.canvas.setAttribute('aria-label', 'Driving trail. Hold Space, right arrow or D to drive; left arrow or A to brake.'); this.canvas.tabIndex = 0;
     this.distance.style.cssText = 'position:absolute;right:14px;top:12px;background:#fffbecdf;border-radius:14px;padding:8px 12px;pointer-events:none';
     this.result.hidden = true; this.result.setAttribute('aria-live', 'polite'); this.status.setAttribute('role', 'status'); stage.append(this.canvas, el('div', 'q-stage-label', 'THE GREAT OUTDOORS'), this.distance, this.status, this.result);
     const toolbar = el('div', 'q-toolbar'), actions = el('div', 'q-edit-actions'), pedals = el('div', 'q-drive-controls');
@@ -99,7 +100,7 @@ export default class QualityHill implements GameInstance {
       prompts.append(this.button(prompt, 'q-chip', () => window.dispatchEvent(new CustomEvent('factory-remix-request', { cancelable: true, detail: { game: 'hill', prompt } }))));
     }
     garage.append(prompts);
-    const footer = el('div', 'q-footer'); footer.append(el('span', '', '→ / D drive · ← / A brake · R retry · P pause'), el('span', '', 'Your own best. No timer to beat.'));
+    const footer = el('div', 'q-footer'); footer.append(el('span', '', 'Hold Space / → / D to drive · ← / A brake · R retry · P pause'), el('span', '', 'Your own best. No timer to beat.'));
     this.saveNotice.hidden = true; this.saveNotice.setAttribute('role', 'status'); this.saveNotice.dataset.saveNotice = 'hill';
     this.root.append(top, mission, stage, toolbar, garage, this.saveNotice, footer);
     if (this.storageBlocked) {
@@ -113,6 +114,7 @@ export default class QualityHill implements GameInstance {
     window.addEventListener('keydown', this.keydown, { signal: this.listeners.signal });
     window.addEventListener('keyup', this.keyup, { signal: this.listeners.signal });
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(stage);
+    window.addEventListener('resize', this.onWindowResize, { signal: this.listeners.signal });
     this.resize(); this.resetCamera(); this.hud(); this.clock.start();
   }
 
@@ -131,6 +133,15 @@ export default class QualityHill implements GameInstance {
     if (this.hostPaused) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if ((e.target as HTMLElement)?.closest('input,textarea,select,[contenteditable=true]')) return;
+    // Space is a held primary action only on the stage, not on focused buttons or form controls.
+    if (e.code === 'Space' && e.target === this.canvas) {
+      e.preventDefault();
+      if (!this.clock.paused) {
+        if (this.mode === 'ready') this.begin(false);
+        if (this.mode === 'drive') this.keys.add('Space');
+      }
+      return;
+    }
     if (['ArrowLeft', 'ArrowRight', 'KeyA', 'KeyD', 'KeyR', 'KeyP', 'Escape'].includes(e.code)) e.preventDefault();
     if (!e.repeat && e.code === 'KeyR') { this.restart(); return; }
     if (!e.repeat && (e.code === 'KeyP' || e.code === 'Escape')) { this.togglePause(); return; }
@@ -150,7 +161,11 @@ export default class QualityHill implements GameInstance {
   }
   private begin(focus=true) { if (this.hostPaused) return; if (this.mode === 'result') this.restart(); if (this.mode !== 'ready') return; this.mode = 'drive'; this.clock.resume('user'); void this.audio.unlock(); this.audio.setScene('run'); this.driveButton.textContent = 'Driving'; this.driveButton.disabled = true; this.hud(); if(focus)this.canvas.focus({ preventScroll: true }); }
   private resize() {
-    const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width), h = w < 600 ? Math.max(290, w * .75) : w * .54;
+    const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
+    const normalHeight = w < 600 ? Math.max(290, w * .75) : w * .54;
+    const tabletLandscape = window.matchMedia('(any-pointer: coarse)').matches
+      && window.innerWidth > window.innerHeight && window.innerHeight >= 600 && w >= 600;
+    const h = tabletLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
     const dpr = Math.min(2, window.devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.canvas.style.height = h + 'px';
     this.context2d.setTransform(dpr, 0, 0, dpr, 0, 0); this.view.w = w; this.view.h = h; this.view.scale = clamp(w / 17, 27, 65);
     this.clock?.invalidate();
@@ -159,7 +174,7 @@ export default class QualityHill implements GameInstance {
   private update(dt: number) {
     this.elapsed += dt;
     if (this.mode !== 'drive') return;
-    const go = this.keys.has('ArrowRight') || this.keys.has('KeyD') || this.keys.has('go') || [...this.pedals.values()].includes('go');
+    const go = this.keys.has('ArrowRight') || this.keys.has('KeyD') || this.keys.has('Space') || this.keys.has('go') || [...this.pedals.values()].includes('go');
     const brake = this.keys.has('ArrowLeft') || this.keys.has('KeyA') || this.keys.has('brake') || [...this.pedals.values()].includes('brake');
     this.simulation.step(dt, { throttle: go ? 1 : 0, brake }); this.scene = this.simulation.snapshot();
     const body = this.scene.bodies[0], look = this.reduced ? 0 : clamp(body.vx * .1, -1, 2);

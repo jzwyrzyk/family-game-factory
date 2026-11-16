@@ -36,7 +36,7 @@ const fs=require('node:fs');
     const checks=await root.evaluate(root=>{
      const capture=()=>{const s=FG.runtime.snapshot().state;return {mode:s.mode,paused:s.paused,time:s.time,distance:s.distance,inputActive:s.inputActive}};
      const commands=[['.q-canvas','KeyR','r'],['.q-canvas','KeyP','p'],['.q-canvas','KeyA','a'],['.q-canvas','KeyD','d'],
-      ['.q-canvas','ArrowLeft','ArrowLeft'],['.q-canvas','ArrowRight','ArrowRight'],['.q-canvas','Escape','Escape'],
+      ['.q-canvas','ArrowLeft','ArrowLeft'],['.q-canvas','ArrowRight','ArrowRight'],['.q-canvas','Escape','Escape'],['.q-canvas','Space',' '],
       ['[data-pedal=go]','Space',' '],['[data-pedal=go]','Enter','Enter'],['[data-pedal=brake]','Space',' '],['[data-pedal=brake]','Enter','Enter']];
      const checks=[];
      for(const modifier of ['ctrlKey','metaKey','altKey'])for(const [target,code,key] of commands){
@@ -58,6 +58,13 @@ const fs=require('node:fs');
    }
    await root.screenshot({path:`test-results/quality-hill-${mobile?'mobile':'desktop'}.png`});
    await checkModifiedShortcuts();
+   await canvas.focus();await page.keyboard.down('Space');await page.clock.runFor(800);
+   const spaceRide=(await snapshot()).state;
+   assert.equal(spaceRide.mode,'drive','Space begins driving from the focused game canvas');
+   assert.ok(spaceRide.distance>.15,'holding Space moves the actual vehicle');
+   assert.equal(spaceRide.inputActive,1);await page.keyboard.up('Space');
+   assert.equal((await snapshot()).state.inputActive,0,'Space release stops the held motor command');
+   await button('↶ Try again').click();
    await button('Go →').focus();await page.keyboard.down('Space');await page.clock.runFor(200);await page.keyboard.up('Space');
    assert.equal((await snapshot()).state.inputActive,0,'keyboard pedal release clears its logical input after starting');
    await button('↶ Try again').click();
