@@ -135,6 +135,36 @@ const { chromium } = require('playwright');
       await undo();
       await undo();
       assert.deepEqual(await blueprint(), connected);
+      // Connected dragging temporarily moves geometry; keyboard actions must restore/rebind first.
+      const heldPart = connected.parts[1];
+      const holdConnected = async () => {
+        const from = await worldPoint(heldPart.x, heldPart.y), to = await worldPoint(heldPart.x + .8, heldPart.y + .7);
+        await page.mouse.move(from.x, from.y);
+        await page.mouse.down();
+        await page.mouse.move(to.x, to.y, { steps: 5 });
+        assert.equal((await state()).dragActive, true);
+      };
+      await holdConnected();
+      await page.keyboard.press('Escape');
+      assert.equal((await state()).dragActive, false);
+      assert.equal(await canvas.evaluate(c => c.hasPointerCapture(1)), false, 'Escape releases pointer capture');
+      await page.mouse.up();
+      assert.deepEqual(await blueprint(), connected, 'Escape restores the exact connected blueprint');
+      await holdConnected();
+      await page.keyboard.press('r');
+      assert.equal((await state()).dragActive, false);
+      assert.equal((await state()).parts[1].x, heldPart.x);
+      assert.ok(Math.abs((await state()).parts[1].angle - Math.PI / 12) < 1e-9, 'rotation uses stable geometry');
+      await page.mouse.up();
+      await undo();
+      assert.deepEqual(await blueprint(), connected);
+      await holdConnected();
+      await page.keyboard.press('Space');
+      await page.mouse.up();
+      assert.equal((await state()).dragActive, false, 'Test clears an unfinished gesture');
+      assert.equal((await state()).mode, 'build');
+      assert.match(await root.locator('.q-status').textContent(), /Add the little passenger/);
+      assert.deepEqual(await blueprint(), connected);
       await canvas.focus();
       await page.keyboard.press(']');
       await button('Detach selected part').click();
@@ -229,6 +259,21 @@ const { chromium } = require('playwright');
       assert.equal((await state()).mission, 'free');
       assert.deepEqual(await blueprint(), free);
       assert.equal((await state()).audio.music, music);
+
+      // Save failure stays visible while edits continue; a later successful save clears it.
+      const savedBeforeFailure = await page.evaluate(() => JSON.stringify(FG.store.current().constructionStates['original-gum']));
+      await page.evaluate(() => { window.qualityBuilderSave = FG.store.save; FG.store.save = () => false; });
+      await button('Add Bottle').click();
+      assert.equal(await root.locator('.q-save-notice').isVisible(), true);
+      await page.keyboard.press('r');
+      assert.equal(await root.locator('.q-save-notice').isVisible(), true, 'ordinary edit messages do not hide the save warning');
+      assert.match(await root.locator('.q-save-notice').textContent(), /could not save.*earlier saved build is safe/);
+      assert.equal(await page.evaluate(() => JSON.stringify(FG.store.current().constructionStates['original-gum'])), savedBeforeFailure);
+      await page.evaluate(() => { FG.store.save = window.qualityBuilderSave; delete window.qualityBuilderSave; });
+      await undo();
+      assert.equal(await root.locator('.q-save-notice').isVisible(), false, 'successful saving clears the warning');
+      await undo();
+      assert.deepEqual(await blueprint(), free);
 
       // Unsupported future data is retained verbatim until a deliberate fresh/example choice.
       await page.evaluate(() => {

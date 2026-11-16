@@ -1,0 +1,652 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-16T05:01:27.861Z",
+  "benchmark": "quality-headless-cpu-v1",
+  "physicsVersion": "planck-1.4.2-quality-1",
+  "scope": "Synthetic synchronous CPU simulation benchmark. No DOM, Canvas, GPU, WebAudio, browser frame pacing, mobile thermals, or child enjoyment assessment.",
+  "methodology": {
+    "fixedDtSeconds": 0.016666666666666666,
+    "wallClock": "performance.now",
+    "cpuClock": "process.cpuUsage (user + system microseconds)",
+    "cpuCaveat": "Process CPU includes GC/helper threads and measurement overhead; wall elapsed includes scheduling. Baseline is reported, not subtracted.",
+    "episodePolicy": "Fresh deterministic scene for each episode. Warm up each scenario, then measure every active tick; stop at goals to exclude frozen-world no-ops.",
+    "seed": "Authored deterministic scenes; no simulation randomness.",
+    "noAbsoluteHardwarePassGate": true
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "v8": "13.6.233.17-node.58",
+    "platform": "linux",
+    "release": "6.18.57",
+    "arch": "x64",
+    "planck": "1.4.2",
+    "cpuModel": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "logicalCpus": 9,
+    "totalMemoryBytes": 10451423232,
+    "ci": false
+  },
+  "source": {
+    "gitHead": "7f3e4fc37c65513bb95892e11cfa286b7e401d95",
+    "worktreeDirty": true,
+    "hashes": {
+      "src/quality/parts.ts": "1c9cd20902cc1129e64d187b11add96c7a5f7e34681429c8075af606db8d83f3",
+      "src/quality/blueprint.ts": "fa3fbefa67effb21c6d24b6cf69cabc6ee47931d0060511ab2884cbdb286e201",
+      "src/quality/physics.ts": "215aa07d87bebd7067cecc8968ccbe6bc4ca90f9ee2d72a5db31399dbf6a7941",
+      "tools/quality-benchmark.ts": "bff3228e3c3544fab3fc4f50fb63f6960859fad11702832823478c9271e28682"
+    }
+  },
+  "measurementBaseline": {
+    "elapsedMs": {
+      "samples": 5000,
+      "min": 0.000066,
+      "p50": 0.00007,
+      "p95": 0.000191,
+      "p99": 0.01397,
+      "max": 0.099767,
+      "mean": 0.000332
+    },
+    "processCpuMs": {
+      "samples": 5000,
+      "min": 0,
+      "p50": 0.001,
+      "p95": 0.002,
+      "p99": 0.017,
+      "max": 0.503,
+      "mean": 0.001611
+    }
+  },
+  "results": [
+    {
+      "id": "delivery-standard",
+      "description": "Five household parts, two free axles and two gum joints; physical delivery including collision events.",
+      "configuration": {
+        "mission": "delivery",
+        "parts": 5,
+        "joints": 4,
+        "options": "defaults"
+      },
+      "warmupEpisodes": 3,
+      "measuredEpisodes": 12,
+      "maxTicksPerEpisode": 180,
+      "stepElapsedMs": {
+        "samples": 2124,
+        "min": 0.010773,
+        "p50": 0.023634,
+        "p95": 0.126016,
+        "p99": 0.468143,
+        "max": 1.935931,
+        "mean": 0.045787
+      },
+      "stepProcessCpuMs": {
+        "samples": 2124,
+        "min": 0.011,
+        "p50": 0.024,
+        "p95": 0.178,
+        "p99": 2.432,
+        "max": 10.422,
+        "mean": 0.101316
+      },
+      "snapshotAndEventsElapsedMs": {
+        "samples": 2124,
+        "min": 0.001176,
+        "p50": 0.002268,
+        "p95": 0.015225,
+        "p99": 0.065219,
+        "max": 0.301345,
+        "mean": 0.004504
+      },
+      "snapshotAndEventsProcessCpuMs": {
+        "samples": 2124,
+        "min": 0.001,
+        "p50": 0.003,
+        "p95": 0.017,
+        "p99": 0.088,
+        "max": 11.226,
+        "mean": 0.018855
+      },
+      "combinedElapsedMs": {
+        "samples": 2124,
+        "min": 0.012238,
+        "p50": 0.026357,
+        "p95": 0.143332,
+        "p99": 0.473324,
+        "max": 1.940132,
+        "mean": 0.050291
+      },
+      "combinedProcessCpuMs": {
+        "samples": 2124,
+        "min": 0.014,
+        "p50": 0.028,
+        "p95": 0.203,
+        "p99": 2.698,
+        "max": 11.28,
+        "mean": 0.120171
+      },
+      "creationElapsedMs": {
+        "samples": 12,
+        "min": 0.497854,
+        "p50": 0.790589,
+        "p95": 2.654345,
+        "p99": 2.654345,
+        "max": 2.654345,
+        "mean": 1.092474
+      },
+      "eventCounts": {
+        "impact": 24,
+        "win": 12
+      },
+      "episodeEnds": [
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        },
+        {
+          "time": 2.95,
+          "status": "won",
+          "brokenJoints": 0
+        }
+      ],
+      "heapUsedBytes": {
+        "before": 18188504,
+        "after": 16218128,
+        "caveat": "No forced GC; this is neither retained memory nor a leak test."
+      }
+    },
+    {
+      "id": "bridge-standard",
+      "description": "Six parts and five loaded gum joints spanning the gap; measured before the goal freezes the world.",
+      "configuration": {
+        "mission": "bridge",
+        "parts": 6,
+        "joints": 5,
+        "options": "defaults"
+      },
+      "warmupEpisodes": 3,
+      "measuredEpisodes": 12,
+      "maxTicksPerEpisode": 180,
+      "stepElapsedMs": {
+        "samples": 2160,
+        "min": 0.011997,
+        "p50": 0.017537,
+        "p95": 0.069894,
+        "p99": 0.204082,
+        "max": 0.832929,
+        "mean": 0.028791
+      },
+      "stepProcessCpuMs": {
+        "samples": 2160,
+        "min": 0.013,
+        "p50": 0.018,
+        "p95": 0.105,
+        "p99": 1.429,
+        "max": 11.445,
+        "mean": 0.079556
+      },
+      "snapshotAndEventsElapsedMs": {
+        "samples": 2160,
+        "min": 0.001148,
+        "p50": 0.001712,
+        "p95": 0.00436,
+        "p99": 0.026823,
+        "max": 2.806149,
+        "mean": 0.004944
+      },
+      "snapshotAndEventsProcessCpuMs": {
+        "samples": 2160,
+        "min": 0.001,
+        "p50": 0.002,
+        "p95": 0.005,
+        "p99": 0.056,
+        "max": 5.302,
+        "mean": 0.014965
+      },
+      "combinedElapsedMs": {
+        "samples": 2160,
+        "min": 0.013405,
+        "p50": 0.019308,
+        "p95": 0.081408,
+        "p99": 0.242812,
+        "max": 2.823483,
+        "mean": 0.033735
+      },
+      "combinedProcessCpuMs": {
+        "samples": 2160,
+        "min": 0.015,
+        "p50": 0.021,
+        "p95": 0.132,
+        "p99": 2.799,
+        "max": 11.451,
+        "mean": 0.094521
+      },
+      "creationElapsedMs": {
+        "samples": 12,
+        "min": 0.541443,
+        "p50": 0.865861,
+        "p95": 1.43844,
+        "p99": 1.43844,
+        "max": 1.43844,
+        "mean": 0.943166
+      },
+      "eventCounts": {
+        "impact": 36
+      },
+      "episodeEnds": [
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 3,
+          "status": "playing",
+          "brokenJoints": 0
+        }
+      ],
+      "heapUsedBytes": {
+        "before": 24350928,
+        "after": 15908496,
+        "caveat": "No forced GC; this is neither retained memory nor a leak test."
+      }
+    },
+    {
+      "id": "meadow-standard",
+      "description": "A chassis, two motorised wheels and two suspension joints climbing and landing on the meadow terrain.",
+      "configuration": {
+        "track": "meadow",
+        "parts": 3,
+        "joints": 2,
+        "options": "defaults",
+        "throttle": 1
+      },
+      "warmupEpisodes": 3,
+      "measuredEpisodes": 12,
+      "maxTicksPerEpisode": 360,
+      "stepElapsedMs": {
+        "samples": 4320,
+        "min": 0.005094,
+        "p50": 0.016814,
+        "p95": 0.064037,
+        "p99": 0.204376,
+        "max": 0.714422,
+        "mean": 0.025248
+      },
+      "stepProcessCpuMs": {
+        "samples": 4320,
+        "min": 0.005,
+        "p50": 0.018,
+        "p95": 0.08,
+        "p99": 0.707,
+        "max": 9.841,
+        "mean": 0.06078
+      },
+      "snapshotAndEventsElapsedMs": {
+        "samples": 4320,
+        "min": 0.000666,
+        "p50": 0.001233,
+        "p95": 0.002615,
+        "p99": 0.004755,
+        "max": 0.469804,
+        "mean": 0.001978
+      },
+      "snapshotAndEventsProcessCpuMs": {
+        "samples": 4320,
+        "min": 0.001,
+        "p50": 0.002,
+        "p95": 0.004,
+        "p99": 0.007,
+        "max": 8.109,
+        "mean": 0.009371
+      },
+      "combinedElapsedMs": {
+        "samples": 4320,
+        "min": 0.00576,
+        "p50": 0.018091,
+        "p95": 0.069623,
+        "p99": 0.217463,
+        "max": 0.719226,
+        "mean": 0.027225
+      },
+      "combinedProcessCpuMs": {
+        "samples": 4320,
+        "min": 0.006,
+        "p50": 0.019,
+        "p95": 0.09,
+        "p99": 0.966,
+        "max": 9.844,
+        "mean": 0.070151
+      },
+      "creationElapsedMs": {
+        "samples": 12,
+        "min": 0.172247,
+        "p50": 0.209524,
+        "p95": 1.00868,
+        "p99": 1.00868,
+        "max": 1.00868,
+        "mean": 0.334648
+      },
+      "eventCounts": {
+        "impact": 372,
+        "land": 24
+      },
+      "episodeEnds": [
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        },
+        {
+          "time": 6,
+          "status": "playing",
+          "brokenJoints": 0
+        }
+      ],
+      "heapUsedBytes": {
+        "before": 16797776,
+        "after": 20432864,
+        "caveat": "No forced GC; this is neither retained memory nor a leak test."
+      }
+    },
+    {
+      "id": "construction-limit",
+      "description": "32 mixed bodies with 20 connections; four fans keep applying force while the connected rows fall and collide. Breaks remain real.",
+      "configuration": {
+        "mission": "free",
+        "parts": 32,
+        "joints": 20,
+        "options": {
+          "gumBudget": 20,
+          "jointStrength": 2,
+          "gravity": 16
+        }
+      },
+      "warmupEpisodes": 3,
+      "measuredEpisodes": 12,
+      "maxTicksPerEpisode": 240,
+      "stepElapsedMs": {
+        "samples": 2880,
+        "min": 0.027177,
+        "p50": 0.126012,
+        "p95": 0.453641,
+        "p99": 0.97758,
+        "max": 2.518244,
+        "mean": 0.179644
+      },
+      "stepProcessCpuMs": {
+        "samples": 2880,
+        "min": 0.028,
+        "p50": 0.127,
+        "p95": 0.651,
+        "p99": 2.848,
+        "max": 8.604,
+        "mean": 0.246469
+      },
+      "snapshotAndEventsElapsedMs": {
+        "samples": 2880,
+        "min": 0.004357,
+        "p50": 0.007618,
+        "p95": 0.019385,
+        "p99": 0.11718,
+        "max": 4.454644,
+        "mean": 0.013906
+      },
+      "snapshotAndEventsProcessCpuMs": {
+        "samples": 2880,
+        "min": 0.005,
+        "p50": 0.008,
+        "p95": 0.021,
+        "p99": 0.155,
+        "max": 4.461,
+        "mean": 0.020608
+      },
+      "combinedElapsedMs": {
+        "samples": 2880,
+        "min": 0.03205,
+        "p50": 0.134466,
+        "p95": 0.485329,
+        "p99": 1.043039,
+        "max": 4.547458,
+        "mean": 0.19355
+      },
+      "combinedProcessCpuMs": {
+        "samples": 2880,
+        "min": 0.033,
+        "p50": 0.136,
+        "p95": 0.719,
+        "p99": 3.565,
+        "max": 8.619,
+        "mean": 0.267076
+      },
+      "creationElapsedMs": {
+        "samples": 12,
+        "min": 0.60115,
+        "p50": 0.884375,
+        "p95": 2.314997,
+        "p99": 2.314997,
+        "max": 2.314997,
+        "mean": 1.109164
+      },
+      "eventCounts": {
+        "impact": 4656,
+        "snap": 96
+      },
+      "episodeEnds": [
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        },
+        {
+          "time": 4,
+          "status": "playing",
+          "brokenJoints": 8
+        }
+      ],
+      "heapUsedBytes": {
+        "before": 31081648,
+        "after": 34676600,
+        "caveat": "No forced GC; this is neither retained memory nor a leak test."
+      }
+    }
+  ]
+}

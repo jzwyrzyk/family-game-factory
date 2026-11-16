@@ -30,6 +30,7 @@ const missionValues = () => Object.values(MISSIONS);
 const missionById = (id: string) => missionValues().find(m => m.id === id) || missionValues()[0];
 const budgetOf = (ctx: GameContext) => Number(ctx.config.gumBudget) || 10;
 const normalAngle = (n: number) => ((n + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+const trayNames: Record<PartKind, string> = { bottle: 'Bottle', carton: 'Box', can: 'Tin can', spoon: 'Spoon', plank: 'Plank', cone: 'Cone', wheel: 'Lid', fan: 'Fan', balloon: 'Balloon', capsule: 'Little buddy' };
 /** Physical toy and editor. The saved blueprint is NEVER the transient simulated wreck. */
 export default class QualityBuilder implements GameInstance {
     private root = el('section', 'quality-game quality-builder');
@@ -38,6 +39,7 @@ export default class QualityBuilder implements GameInstance {
     private backdropKey = '';
     private c: CanvasRenderingContext2D;
     private status = el('div', 'q-status');
+    private saveNotice = el('div', 'q-tuning q-save-notice');
     private missionCopy = el('div', 'q-mission-copy');
     private gum = el('div', 'q-meter');
     private missionSelect = el('select', 'q-select');
@@ -147,7 +149,7 @@ export default class QualityBuilder implements GameInstance {
             tc.translate(50, 51);
             const sc = Math.min(78 / p.width, 80 / p.height);
             drawPart(tc, p.spriteId, p.width * sc, p.height * sc);
-            const lab = el('span', '', p.name), material = el('small', '', p.material);
+            const lab = el('span', '', trayNames[p.id as PartKind]), material = el('small', '', p.id === 'carton' ? 'cardboard' : p.id === 'cone' ? 'paper' : p.material);
             b.append(thumb, lab, material);
             this.tray.append(b);
         }
@@ -193,17 +195,19 @@ export default class QualityBuilder implements GameInstance {
         const fresh = this.button('Start fresh', '', () => this.reset('empty'));
         footerLeft.append(this.missionSelect, examples, fresh);
         footer.append(footerLeft, el('span', '', 'Drag or tap to place · R rotates · G adds gum'));
-        this.root.append(top, missionBar, stage, instructions, this.tray, toolbar, footer);
+        this.saveNotice.hidden = true;
+        this.saveNotice.setAttribute('role', 'status');
+        this.root.append(top, missionBar, stage, instructions, this.tray, toolbar, this.saveNotice, footer);
         mount.replaceChildren(this.root);
         this.canvas.onpointerdown = e => this.pointerDown(e);
         this.canvas.onpointermove = e => this.pointerMove(e);
         this.canvas.onpointerup = e => this.pointerUp(e);
-        this.canvas.onpointercancel = () => this.cancelDrag();
-        this.canvas.onlostpointercapture = () => this.cancelDrag();
+        this.canvas.onpointercancel = e => { if (this.drag?.pointer === e.pointerId) this.cancelDrag(); };
+        this.canvas.onlostpointercapture = e => { if (this.drag?.pointer === e.pointerId) this.cancelDrag(); };
         this.canvas.onkeydown = e => this.keyDown(e);
         this.canvas.onkeyup = e => { if (e.code === 'Space' || e.code === 'ArrowUp')
             this.action = false; };
-        this.canvas.onblur = () => { this.action = false; };
+        this.canvas.onblur = () => { this.action = false; if (this.cancelDrag()) this.refresh(); };
         this.resizeObserver = new ResizeObserver(() => this.resize());
         this.resizeObserver.observe(stage);
         this.resize();
@@ -234,9 +238,14 @@ export default class QualityBuilder implements GameInstance {
         this.lastMessage = 'Welcome back. Your machine is just where you left it.';
     }
     private saved(): Save { const stable = this.drag?.before || this.blueprint; return { schema: 'quality-construction-v1', mission: this.mission, blueprint: cloneBlueprint(stable), builds: structuredClone({ ...this.builds, [this.mission]: stable }) }; }
-    private save() { if (this.storageBlocked)
-        return; const saved = this.saved(); this.builds = saved.builds; if (this.context.persistence?.save(saved) === false)
-        this.message('This device could not save. Keep this page open to protect your machine.'); }
+    private save() {
+        if (this.storageBlocked) return;
+        const saved = this.saved(); this.builds = saved.builds;
+        let ok = true;
+        try { ok = this.context.persistence?.save(saved) !== false; } catch { ok = false; }
+        this.saveNotice.hidden = ok;
+        this.saveNotice.textContent = ok ? '' : 'This device could not save your latest changes. Keep this page open to protect your machine. Your earlier saved build is safe.';
+    }
     private gumShortage() { return Math.max(0, this.blueprint.joints.length - budgetOf(this.context)); }
     private gumHelp() { const short = this.gumShortage(); return `Your machine needs ${short} more piece${short === 1 ? '' : 's'} of gum. Unstick a connection, or add more gum in Remix, then test again.`; }
     private friendlyError(error: unknown, fallback = 'That change could not be made. Your machine is safe. Try again.') {
@@ -286,7 +295,7 @@ export default class QualityBuilder implements GameInstance {
     private point(e: PointerEvent) { const r = this.canvas.getBoundingClientRect(); return { x: (e.clientX - r.left - this.view.x) / this.view.scale, y: (e.clientY - r.top - this.view.y) / this.view.scale }; }
     private hit(x: number, y: number, touchRadius = 0) { const candidates = [...this.blueprint.parts].reverse().map(p => { const d = PARTS[p.kind], dx = x - p.x, dy = y - p.y, co = Math.cos(-p.angle), si = Math.sin(-p.angle), px = dx * co - dy * si, py = dx * si + dy * co; return { p, inside: Math.abs(px) <= d.width * .55 + .12 && Math.abs(py) <= d.height * .55 + .12, distance: Math.hypot(Math.max(0, Math.abs(px) - d.width / 2), Math.max(0, Math.abs(py) - d.height / 2)), center: Math.hypot(dx, dy) }; }); return candidates.find(p => p.inside)?.p || (touchRadius ? candidates.filter(p => p.distance < touchRadius).sort((a, b) => a.center - b.center)[0]?.p : undefined); }
     private add(kind: PartKind) { if (this.mode !== 'build' || this.storageBlocked)
-        return; void this.audio.unlock(); try {
+        return; this.cancelDrag(); void this.audio.unlock(); try {
         const n = this.blueprint.parts.length;
         const next = addPart(this.blueprint, kind, 3 + (n % 6) * 1.35, 3 + Math.floor(n / 6) * 1.25);
         this.commit(next);
@@ -301,7 +310,7 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(e));
     } }
     private pointerDown(e: PointerEvent) {
-        if (this.mode !== 'build' || this.storageBlocked || e.button > 0)
+        if (this.mode !== 'build' || this.storageBlocked || e.button > 0 || this.drag)
             return;
         e.preventDefault();
         void this.audio.unlock();
@@ -353,11 +362,14 @@ export default class QualityBuilder implements GameInstance {
         }
     } if (this.canvas.hasPointerCapture(e.pointerId))
         this.canvas.releasePointerCapture(e.pointerId); }
-    private cancelDrag() { if (this.drag) {
-        if (this.drag.moved)
-            this.blueprint = this.drag.before;
+    private cancelDrag() {
+        const drag = this.drag;
+        if (!drag) return false;
         this.drag = undefined;
-    } }
+        if (drag.moved) this.blueprint = drag.before;
+        if (this.canvas.hasPointerCapture(drag.pointer)) this.canvas.releasePointerCapture(drag.pointer);
+        return true;
+    }
     private keyDown(e: KeyboardEvent) {
         if (this.mode === 'run') {
             if (e.code === 'Space' || e.code === 'ArrowUp') {
@@ -369,6 +381,11 @@ export default class QualityBuilder implements GameInstance {
         }
         if (this.mode !== 'build' || this.storageBlocked)
             return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (this.drag && (['Escape', 'Delete', 'Backspace', '[', ']', 'Enter'].includes(e.key) || e.key.startsWith('Arrow') || ['r', 'g'].includes(e.key.toLowerCase()) || e.code === 'Space')) {
+            this.cancelDrag(); this.refresh();
+            if (e.key === 'Escape') { e.preventDefault(); this.message('Move cancelled. Your last position is restored.'); return; }
+        }
         if (e.code === 'Space') {
             e.preventDefault();
             this.test();
@@ -422,9 +439,9 @@ export default class QualityBuilder implements GameInstance {
         }
     }
     private rotate(direction = 1) { if (!this.selected || this.mode !== 'build')
-        return; const n = cloneBlueprint(this.blueprint); n.parts.find(p => p.id === this.selected)!.angle = normalAngle(n.parts.find(p => p.id === this.selected)!.angle + direction * Math.PI / 12); this.commit(n); this.audio.play('pick', .5); this.canvas.focus({ preventScroll: true }); this.message('Rotated. Press Shift + R to turn the other way.'); }
+        return; this.cancelDrag(); const n = cloneBlueprint(this.blueprint); n.parts.find(p => p.id === this.selected)!.angle = normalAngle(n.parts.find(p => p.id === this.selected)!.angle + direction * Math.PI / 12); this.commit(n); this.audio.play('pick', .5); this.canvas.focus({ preventScroll: true }); this.message('Rotated. Press Shift + R to turn the other way.'); }
     private beginJoin() { if (!this.selected || this.mode !== 'build')
-        return; this.joining = !this.joining; this.joinTarget = null; if (this.joining) {
+        return; this.cancelDrag(); this.joining = !this.joining; this.joinTarget = null; if (this.joining) {
         const a = this.blueprint.parts.find(p => p.id === this.selected)!;
         this.joinTarget = this.blueprint.parts.filter(p => p.id !== a.id && !this.blueprint.joints.some(j => (j.a === a.id && j.b === p.id) || (j.b === a.id && j.a === p.id))).sort((p, q) => Math.hypot(p.x - a.x, p.y - a.y) - Math.hypot(q.x - a.x, q.y - a.y))[0]?.id || null;
     } this.message(this.joining ? 'Tap a second part to stick it. Keyboard: [ or ] to choose, Enter to stick.' : 'Connection cancelled.'); this.refresh(); this.canvas.focus({ preventScroll: true }); }
@@ -455,19 +472,19 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(err));
     } }
     private detach() { if (!this.selected)
-        return; const n = cloneBlueprint(this.blueprint); n.joints = n.joints.filter(j => j.a !== this.selected && j.b !== this.selected); if (n.joints.length === this.blueprint.joints.length) {
+        return; this.cancelDrag(); const n = cloneBlueprint(this.blueprint); n.joints = n.joints.filter(j => j.a !== this.selected && j.b !== this.selected); if (n.joints.length === this.blueprint.joints.length) {
         this.message('This part has no gum connections yet.');
         return;
     } this.commit(n); this.audio.play('snap', .4); this.message('Unstuck. The gum is back in your supply.'); }
     private remove() { if (!this.selected)
-        return; this.commit(removePart(this.blueprint, this.selected)); this.selected = null; this.joining = false; this.refresh(); this.message('Part removed. Undo brings it back.'); }
-    private undo() { const bp = this.history.pop(); if (!bp)
+        return; this.cancelDrag(); this.commit(removePart(this.blueprint, this.selected)); this.selected = null; this.joining = false; this.refresh(); this.message('Part removed. Undo brings it back.'); }
+    private undo() { if (this.cancelDrag()) { this.refresh(); this.message('Move cancelled. Your last position is restored.'); return; } const bp = this.history.pop(); if (!bp)
         return; this.blueprint = bp; this.selected = null; this.joining = false; this.save(); this.refresh(); this.message('One step back. Your machine is safe.'); }
     private reset(which: 'example' | 'empty') { this.edit(); this.storageBlocked = false; const next = which === 'example' ? starterBlueprint(this.mission) : { version: 1 as const, parts: [], joints: [] }; this.commit(next); this.selected = null; this.refresh(); this.message(which === 'example' ? 'An example to play with. Change anything you like.' : 'A fresh workbench. Pick a part to begin.'); }
     private chooseMission(id: string) { if (this.mode !== 'build' || this.storageBlocked) {
         this.missionSelect.value = this.mission;
         return;
-    } this.builds[this.mission] = cloneBlueprint(this.blueprint); this.mission = missionById(id).id; this.blueprint = this.builds[this.mission] ? cloneBlueprint(this.builds[this.mission]) : this.mission === 'free' ? { version: 1, parts: [], joints: [] } : starterBlueprint(this.mission); this.selected = null; this.history = []; this.joining = false; this.missionSelect.value = this.mission; this.save(); this.refresh(); this.message('Your other builds are saved. Here is a new challenge.'); }
+    } this.cancelDrag(); this.builds[this.mission] = cloneBlueprint(this.blueprint); this.mission = missionById(id).id; this.blueprint = this.builds[this.mission] ? cloneBlueprint(this.builds[this.mission]) : this.mission === 'free' ? { version: 1, parts: [], joints: [] } : starterBlueprint(this.mission); this.selected = null; this.history = []; this.joining = false; this.missionSelect.value = this.mission; this.save(); this.refresh(); this.message('Your other builds are saved. Here is a new challenge.'); }
     private test() { if (this.storageBlocked || !this.blueprint.parts.length)
         return; this.cancelDrag(); if (this.gumShortage() > 0) { this.message(this.gumHelp()); this.refresh(); return; } void this.audio.unlock(); this.save(); this.simulation?.dispose(); try {
         this.simulation = createConstruction(cloneBlueprint(this.blueprint), { jointStrength: Number(this.context.config.jointStrength) || 1, gumBudget: budgetOf(this.context), gravity: Number(this.context.config.gravity) || 10, thrust: Number(this.context.config.thrust) || 1 }, this.mission);
@@ -481,6 +498,7 @@ export default class QualityBuilder implements GameInstance {
         this.manualPause = false;
         this.clock?.resume('user');
         this.pauseButton.textContent = 'Ⅱ';
+        this.pauseButton.setAttribute('aria-label', 'Pause game');
         this.result.hidden = true;
         this.particles = [];
         this.audio.setScene('run');
@@ -493,7 +511,7 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(e));
         this.refresh();
     } }
-    private edit() { this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.refresh(); this.message('Your original machine is ready to change.'); }
+    private edit() { this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); }
     private update(dt: number) {
         if (this.mode === 'run' && this.simulation) {
             this.previous = this.scene;

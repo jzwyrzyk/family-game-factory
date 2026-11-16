@@ -18,5 +18,6 @@ import './private-worker-bridge.test';
 import './quality-runtime.test';
 import './quality-physics.test';
 
+import './quality-generated.test';
 
 import './quality-clock.test';

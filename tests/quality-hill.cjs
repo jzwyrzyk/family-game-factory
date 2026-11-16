@@ -17,7 +17,16 @@ const fs=require('node:fs');
    const snapshot=()=>page.evaluate(()=>FG.runtime.snapshot());
    assert.equal((await snapshot()).state.engine,'quality-hill-v1');assert.equal((await snapshot()).state.mode,'ready');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   if(mobile){
+    await page.setViewportSize({width:320,height:844});await page.clock.runFor(50);
+    const scale=await root.locator('canvas').evaluate(c=>{const r=c.getBoundingClientRect();return {x:c.width/r.width,y:c.height/r.height}});
+    assert.ok(Math.abs(scale.x-scale.y)<.025,'narrow phones preserve circular wheels and uniform canvas scale');
+    await page.setViewportSize({width:390,height:844});await page.clock.runFor(50);
+   }
    await root.screenshot({path:`test-results/quality-hill-${mobile?'mobile':'desktop'}.png`});
+   await button('Go →').focus();await page.keyboard.down('Space');await page.clock.runFor(200);await page.keyboard.up('Space');
+   assert.equal((await snapshot()).state.inputActive,0,'keyboard pedal release clears its logical input after starting');
+   await button('↶ Try again').click();
    await button('Let’s drive →').click();
    await page.keyboard.down('ArrowRight');await page.clock.runFor(1000);await page.keyboard.up('ArrowRight');
    const moving=await snapshot();assert.ok(moving.state.distance>1,'the wheels actually propel the chassis');assert.ok(moving.state.speed>1);
@@ -30,6 +39,11 @@ const fs=require('node:fs');
    await page.keyboard.up('ArrowRight');await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await page.clock.runFor(100);
    assert.ok((await snapshot()).state.time-hiddenTime<.15);
    await button('↶ Try again').click();assert.equal((await snapshot()).state.mode,'ready');assert.equal((await snapshot()).state.time,0);
+   assert.ok((await snapshot()).state.best.meadow>=moving.state.distance,'retry retains an unfinished ride’s best distance');
+   const bestBeforeSwitch=(await snapshot()).state.best.meadow;
+   await root.getByRole('combobox',{name:'Choose a trail'}).selectOption('ridge');
+   assert.equal((await snapshot()).state.best.meadow,bestBeforeSwitch,'changing trails attributes distance to the original trail');
+   await root.getByRole('combobox',{name:'Choose a trail'}).selectOption('meadow');
    if(mobile){
     const pedal=root.locator('[data-pedal=go]');await pedal.scrollIntoViewIfNeeded();const r=await pedal.boundingBox(),client=await context.newCDPSession(page);
     await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x+r.width/2,y:r.y+r.height/2}]});
@@ -61,6 +75,17 @@ const fs=require('node:fs');
    await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();
    await page.getByRole('button',{name:'🎮 My bouncy green car',exact:true}).click();await page.click('#livePlay');
    assert.equal((await snapshot()).state.paint,'#50a89a');assert.equal((await snapshot()).state.track,'ridge');assert.equal((await snapshot()).config.wheelSize,.62);
+   await page.evaluate(()=>{window.qualitySave=FG.store.save;FG.store.save=()=>false});
+   await button('↶ Try again').click();await button('Let’s drive →').click();await page.clock.runFor(300);
+   assert.equal(await root.locator('[data-save-notice=hill]').isVisible(),true,'save failure stays visible through ordinary HUD updates');
+   await page.evaluate(()=>{FG.store.save=window.qualitySave;delete window.qualitySave});await button('↶ Try again').click();
+   assert.equal(await root.locator('[data-save-notice=hill]').isVisible(),false);
+   for(const track of ['constructor',['meadow']]){
+    await page.evaluate(track=>{FG.app.openGame('buckets');FG.store.current().constructionStates['original-hill']={legacyMarker:'retain me',qualityConstruction:{schema:'quality-hill-v1',track,best:{},paint:'#e99b55'}};FG.store.save();FG.app.openGame('hill')},track);
+    assert.equal((await snapshot()).state.storageBlocked,true,'malformed saved trails show recovery instead of accepting coerced keys');
+    await page.evaluate(()=>FG.app.openGame('buckets'));
+    assert.deepEqual(await page.evaluate(()=>FG.store.current().constructionStates['original-hill'].qualityConstruction.track),track,'unsupported saved ride stays intact');
+   }
    assert.deepEqual(requests,[],'gameplay and local changes need no paid/server generation');assert.deepEqual(errors,[]);
    await context.close();console.log(`PASS quality hill ${mobile?'touch':'desktop'}: motor, suspension, focus, retry, physical win, five changes, fork/reload and owner-scoped saves`);
   }

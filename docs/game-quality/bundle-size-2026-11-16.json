@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "scope": "Core static HTML/CSS/JavaScript. Excludes existing original-game images and service-worker cache downloads. Native quality assets add no external art/audio files. Gzip level6; not a mobile startup-time measurement.",
+  "baselineCommit": "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
+  "qualityCommit": "90ccc7a17216fd6c466e7e9a5bba5589cdb99f01",
+  "builds": [
+    {
+      "build": "baseline",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13311,
+          "gzipBytes": 4729,
+          "sha256": "ec3ee297b1642d204982a7009555c9da27e9ca3f6cd08a2a2282cd58d6179906"
+        },
+        {
+          "path": "assets/index-RzuAoPI2.js",
+          "bytes": 145979,
+          "gzipBytes": 53591,
+          "sha256": "3b326eb8af8bc5ef8f2e499a149ee0676fbb594afac79eb7544d5299397a3ebe"
+        },
+        {
+          "path": "assets/index-CRdLEPUG.css",
+          "bytes": 16163,
+          "gzipBytes": 4665,
+          "sha256": "a78c7d595e3228c6cc6ef1f1228c11d7dc1c8cdace689b7b6a910071cbd59348"
+        }
+      ]
+    },
+    {
+      "build": "quality-v1",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4839,
+          "sha256": "ba9a48018bde8e731e6aeaff024e20fe96f207eb8c8d3e972132d3dc810a4211"
+        },
+        {
+          "path": "assets/index-Bo1xz4E4.js",
+          "bytes": 445794,
+          "gzipBytes": 128850,
+          "sha256": "849a1a50267a7311b84641298c5dce6050f52c78b49e0aadfc5ac0534bcd9641"
+        },
+        {
+          "path": "assets/index-D4HvPenY.css",
+          "bytes": 25179,
+          "gzipBytes": 6557,
+          "sha256": "7d062993170fe5c7bc86d637ce339ab6c8ad680d5d5f77bc647ebeead9ac5be0"
+        }
+      ]
+    }
+  ]
+}

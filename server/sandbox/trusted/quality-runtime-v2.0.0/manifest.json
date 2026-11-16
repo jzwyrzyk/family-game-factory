@@ -1,0 +1,18 @@
+{
+  "version": "quality-runtime-v2.0.0",
+  "hash": "e5f8ef24b0aaba929ef933e8035f473798c719f86707979592f93d2122e0d301",
+  "workerHash": "83531d04d3bb56db00fffe7b1875bb02347dcccfa090eb01ac782e959aabe66c",
+  "clientHash": "f76ea1791aabd5940d6e0527dfa072f38e4e995408a5f8f8945696b4dc617ce1",
+  "sourceHashes": {
+    "server/sandbox/runtime-v2.ts": "7a356750bb17c97805a34c1f233a006edcbc4dca0702a6756aef695f636c9340",
+    "server/sandbox/worker-bootstrap-v2.ts": "cd244028b0889c44f0a36b97feb167302878a2c426b3b2a6c578bd01a12be6c0",
+    "server/sandbox/harden-v2.ts": "38c036d1d01dd7e9576fc7798a3e8146aa77a1bcd7788ddb5516b275a36de2ce",
+    "server/sandbox/language-v2.cjs": "a9f30fe33202e378f7f864eb37d2c4690a3f814f7deab29746bc8487433968c8",
+    "server/sandbox/frame-v2.ts": "cb5f8007c2f7ee2389dcfd230d127853db7883d472d4d19db5a2ce782df0d53b",
+    "server/sandbox/client-v2.ts": "07ad38f2161f7e2ff90e51e6b8967dfa978eab6472767645eaf41e5a9993042b",
+    "src/quality/parts.ts": "1c9cd20902cc1129e64d187b11add96c7a5f7e34681429c8075af606db8d83f3",
+    "src/quality/art.ts": "2f7c12430a5b98d9736d04873792e112b6d48105c888974952c4e12a5a3f4574"
+  },
+  "planck": "1.4.2",
+  "esbuild": "0.25.12"
+}

@@ -1,4 +1,4 @@
-import {validateCompiled,type GeneratedGame} from '../agent/generated';
+import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
@@ -54,7 +54,7 @@ export class JobService {
    let previous:GeneratedGame|undefined,diagnostics='',used=0,testedGame:PlayableGame|undefined;
    const maximum=Math.min(2,Math.max(0,this.options.maxRepairAttempts??2));
    for(let attempt=0;attempt<=maximum;attempt++){
-    const input:AgentInput={gameManifest:{id:start.gameId,allowedMechanics:['declarative-star-catcher','generated-module-v1']},baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config},childIntent:start.prompt,allowedCapabilities:['declarative-star-catcher','generated-module-v1'],budget:{maxUnits:start.maxUnits-used,timeoutMs:this.options.timeoutMs},signal:controller.signal};
+    const input:AgentInput={gameManifest:{id:start.gameId,allowedMechanics:['declarative-star-catcher','generated-module-v1','generated-module-v2']},baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config},childIntent:start.prompt,allowedCapabilities:['declarative-star-catcher','generated-module-v1','generated-module-v2'],budget:{maxUnits:start.maxUnits-used,timeoutMs:this.options.timeoutMs},signal:controller.signal};
     await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(!['building','testing'].includes(job.status))throw Error('CANCELLED');if(job.status==='testing')audit(s,job,'building');job.phase=attempt?'repairing':'generating';job.attempts=attempt+1;return true;});
     const result=await Promise.race([attempt&&previous&&this.agent.repair?this.agent.repair(input,previous,diagnostics):this.agent.generate(input),deadline]);
     if(!Number.isInteger(result.usageUnits)||result.usageUnits<0||result.usageUnits>input.budget.maxUnits)throw Error('BUDGET_EXCEEDED');used+=result.usageUnits;
@@ -62,10 +62,10 @@ export class JobService {
     const testing=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='building')return false;job.usedUnits=used;job.phase='testing';audit(s,job,'testing');return true;});if(!testing)return;
     try{
      const built=await Promise.race([this.gate.test(game,{signal:controller.signal}),deadline]);
-     testedGame=game.kind==='generated-module-v1'?validateCompiled(game,built as GeneratedGame):game;
+     testedGame=isGeneratedGame(game)?validateCompiled(game,built as GeneratedGame):game;
      break;
     }catch(error){
-     if(game.kind!=='generated-module-v1'||!this.agent.repair||attempt>=maximum||controller.signal.aborted)throw error;
+     if(!isGeneratedGame(game)||!this.agent.repair||attempt>=maximum||controller.signal.aborted)throw error;
      previous=game;diagnostics=String((error as Error).message).slice(0,1500);
     }
    }
