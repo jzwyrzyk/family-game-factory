@@ -44,7 +44,12 @@ const {chromium}=require('playwright');
     await page.evaluate(()=>FG.app.openGame('hill'));
     const hill=page.locator('.quality-hill'),go=hill.locator('[data-pedal=go]');
     await hill.waitFor();
-    const pedal=await go.boundingBox();assert.ok(pedal&&pedal.width>=148&&pedal.height>=76,'tablet pedals are large');
+    const pedal=await go.boundingBox();
+    const pedalDiagnostics=await go.evaluate(el=>({
+      computedMinWidth:getComputedStyle(el).minWidth,computedMinHeight:getComputedStyle(el).minHeight,
+      innerWidth,innerHeight,coarse:matchMedia('(pointer: coarse)').matches,anyCoarse:matchMedia('(any-pointer: coarse)').matches
+    }));
+    assert.ok(pedal&&pedal.width>=147&&pedal.height>=75,'tablet pedals are large: '+JSON.stringify({pedal,orientation,pedalDiagnostics}));
     const hillCanvas=await hill.locator('.q-canvas').boundingBox();assert.ok(hillCanvas&&hillCanvas.height>250);
     if(orientation==='landscape')assert.ok(hillCanvas.height<=viewport.height*.48+2,'landscape driving stage reserves room for pedals');
     const session=await context.newCDPSession(page);

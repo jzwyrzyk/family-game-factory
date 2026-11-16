@@ -549,7 +549,7 @@
 .quality-game .q-meter[data-short="true"] { color: #a34d2d; }
 
 /* Touch tablets are the primary interface; keyboard and mouse retain their precision. */
-@media (pointer: coarse) and (min-width: 601px) {
+@media (any-pointer: coarse) and (min-width: 601px) {
   .quality-game .q-chip,
   .quality-game .q-button,
   .quality-game .q-select { min-height: 48px; }
@@ -568,4 +568,9 @@
   .quality-game .q-piece-picker { gap: 6px; padding: 7px; }
   .quality-game .q-piece-picker-label { font-size: 11px; min-width: 116px; }
   .quality-game .q-piece-step { min-height: 44px; padding: 8px; }
+}
+
+/* Wide tablet controls remain big even when a paired mouse becomes the primary pointer. */
+@media (min-width: 601px) {
+  .quality-game .q-pedal { min-width: 148px; min-height: 76px; }
 }

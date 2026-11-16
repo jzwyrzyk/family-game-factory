@@ -319,7 +319,7 @@ export default class QualityBuilder implements GameInstance {
         const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
         const normalHeight = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54);
         // Landscape tablet: leave room for the actual on-screen controls.
-        const tabletLandscape = window.matchMedia('(pointer: coarse)').matches
+        const tabletLandscape = window.matchMedia('(any-pointer: coarse)').matches
             && window.innerWidth > window.innerHeight && window.innerHeight >= 600 && w >= 600;
         const h = tabletLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
         this.canvas.style.height = h + 'px';
