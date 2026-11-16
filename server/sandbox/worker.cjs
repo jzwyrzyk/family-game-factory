@@ -15,7 +15,7 @@ async function main(game){
   for(const [device,viewport]of [['desktop',{width:1000,height:800}],['mobile',{width:375,height:812}]]){
    const context=await browser.newContext({viewport,hasTouch:device==='mobile'}),page=await context.newPage();let external=0;await context.route('**/*',r=>{external++;return r.abort();});
    try{
-    if(v2){Object.assign(compiled.tests,await playtestV2(page,tested));if(external)throw Error('ISOLATION_FAILED');compiled.tests[device]=true;continue;}
+    if(v2){Object.assign(compiled.tests,await playtestV2(page,tested,{touch:device==='mobile'}));if(external)throw Error('ISOLATION_FAILED');compiled.tests[device]=true;continue;}
     const artifact=renderGenerated(tested,'sandbox-test','sandbox-channel');await page.setContent('<iframe title="Isolated preview" sandbox="allow-scripts" style="width:100%;height:680px;border:0"></iframe>');await page.locator('iframe').evaluate((el,html)=>el.srcdoc=html,artifact.html);const frame=page.frameLocator('iframe');await frame.getByRole('button',{name:'Play!',exact:true}).click();
     await frame.locator('#game[data-frames]').waitFor({timeout:3000});if(await frame.locator('#status').getAttribute('data-state')==='error')throw Error('RUNTIME_FAILED');
     // Independent exploratory play; no generated tests, host privileges or injected win callbacks.

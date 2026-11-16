@@ -2,8 +2,8 @@
 const path=require('node:path');
 const {readFileSync}=require('node:fs');
 const {createHash}=require('node:crypto');
-const VERSION='quality-runtime-v2.0.1';
-const APPROVED=Object.freeze({'quality-runtime-v2.0.0':'e5f8ef24b0aaba929ef933e8035f473798c719f86707979592f93d2122e0d301','quality-runtime-v2.0.1':'300e11e35c71a916f9271e5c212dec38b8c1d85aa915d2544a9f78e33c9448b4'}),cached=new Map();
+const VERSION='quality-runtime-v2.0.2';
+const APPROVED=Object.freeze({'quality-runtime-v2.0.0':'e5f8ef24b0aaba929ef933e8035f473798c719f86707979592f93d2122e0d301','quality-runtime-v2.0.1':'300e11e35c71a916f9271e5c212dec38b8c1d85aa915d2544a9f78e33c9448b4','quality-runtime-v2.0.2':'de7384ee5ca4b32a49c13ce02ceedda1eae862252e03a3785e3043b0fda40def'}),cached=new Map();
 function runtimeBundle(version=VERSION){
  if(!Object.hasOwn(APPROVED,version))throw Error('UNSUPPORTED_TRUSTED_RUNTIME');
  if(cached.has(version))return cached.get(version);

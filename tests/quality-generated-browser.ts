@@ -1,28 +1,46 @@
 import assert from 'node:assert/strict';
 import {existsSync,mkdirSync} from 'node:fs';
-import {chromium,type Page} from 'playwright';
+import {chromium,type Page,type BrowserContext,type FrameLocator} from 'playwright';
 import {transformSync} from 'esbuild';
 import {runtimeBundle} from '../server/sandbox/bundle-v2.cjs';
 import {renderGeneratedV2} from '../server/sandbox/preview-v2.cjs';
-import {playtestV2} from '../server/sandbox/playtest-v2.cjs';
+import {playtestV2,touchGesture} from '../server/sandbox/playtest-v2.cjs';
 import {hash,type GeneratedGame} from '../server/agent/generated';
-import {physicalWorkshop,suspensionChallenge,ignoresInput} from '../server/testing/quality-generated-fixtures';
+import {physicalWorkshop,suspensionChallenge,ignoresInput,focusedControls} from '../server/testing/quality-generated-fixtures';
 
 // Only reviewed, hand-authored fixtures are compiled here. Production generated source still requires gVisor.
 function fixturePreview(fixture:GeneratedGame){const code=transformSync(fixture.source,{loader:'ts',format:'iife',globalName:'GameModule'}).code,trusted=runtimeBundle();return {...fixture,compiled:{code,sourceHash:hash(fixture.source),codeHash:hash(code),runtimeVersion:trusted.version,runtimeHash:trusted.hash,tests:{desktop:true,mobile:true,replay:true,isolation:true,input:true,resources:true,pause:true}}};}
 async function load(page:Page,game:GeneratedGame){const artifact=renderGeneratedV2(fixturePreview(game),'quality-fixture','quality-channel',{auditTicks:600});await page.setContent('<button id="parent">Parent remains responsive</button><iframe sandbox="allow-scripts" style="width:100%;height:900px;border:0"></iframe>');await page.locator('iframe').evaluate((el,html)=>(el as HTMLIFrameElement).srcdoc=html,artifact.html);const frame=page.frameLocator('iframe');await frame.getByRole('button',{name:'Play!',exact:true}).click();await frame.locator('#game[data-frames]').waitFor({timeout:3000});return frame;}
+async function observeAudio(context:BrowserContext){await context.addInitScript(()=>{
+ const Native=window.AudioContext,probe={created:0,active:0,peak:0,records:[] as {hz:number|null;stops:{immediate:boolean}[]}[]};(window as any).__qualityAudio=probe;
+ if(!Native)return;
+ class ObservedAudio extends Native{createOscillator(){const oscillator=super.createOscillator(),record={hz:null as number|null,stops:[] as {immediate:boolean}[]};probe.created++;probe.records.push(record);const start=oscillator.start.bind(oscillator),stop=oscillator.stop.bind(oscillator),frequency=oscillator.frequency.setValueAtTime.bind(oscillator.frequency);oscillator.frequency.setValueAtTime=(value,time)=>{record.hz=value;return frequency(value,time);};oscillator.start=(when=0)=>{probe.active++;probe.peak=Math.max(probe.peak,probe.active);start(when);};oscillator.stop=(when?:number)=>{record.stops.push({immediate:when===undefined||when<=this.currentTime});if(when===undefined)stop();else stop(when);};oscillator.addEventListener('ended',()=>probe.active--,{once:true});return oscillator;}}
+ window.AudioContext=ObservedAudio;
+});}
+async function controlsAndCueTail(page:Page,frame:FrameLocator,touch:boolean){
+ const activate=(locator:ReturnType<FrameLocator['locator']>)=>touch?locator.tap():locator.click(),canvas=frame.locator('#game'),position=async()=>JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((command:any)=>command.key==='dot').x;
+ let x=await position();await page.keyboard.down('ArrowRight');await page.waitForTimeout(140);assert.ok(await position()>x+8,'arrow keys work immediately after Play without fixture focus');
+ await activate(frame.getByRole('button',{name:'Pause',exact:true}));await page.waitForTimeout(100);x=await position();await page.waitForTimeout(140);assert.equal(await position(),x);await activate(frame.getByRole('button',{name:'Resume',exact:true}));await page.waitForTimeout(140);assert.equal(await position(),x,'resume clears a previously held key');await page.keyboard.up('ArrowRight');await page.keyboard.press('ArrowRight');await page.waitForTimeout(70);assert.ok(await position()>x,'fresh arrow input works immediately after Resume');
+ await activate(frame.getByRole('button',{name:'Music: off',exact:true}));await page.waitForTimeout(300);x=await position();await page.keyboard.down('ArrowRight');await page.waitForTimeout(100);await page.keyboard.up('ArrowRight');assert.ok(await position()>x+5,'direction keys still work while a sound toolbar button has focus');
+ await activate(frame.getByRole('button',{name:'Pause',exact:true}));await page.waitForTimeout(100);assert.equal(await frame.locator('body').evaluate(()=>(window as any).__qualityAudio.active),0,'pause stops sound immediately');await activate(frame.getByRole('button',{name:'Resume',exact:true}));await page.waitForTimeout(300);
+ await activate(canvas);await frame.locator('#status[data-state=won]').waitFor();const atFinish=await frame.locator('body').evaluate(()=>(window as any).__qualityAudio);const success=atFinish.records.findLast((record:any)=>record.hz===780);assert.ok(success,'the authored success cue plays');assert.equal(success.stops.length,1);assert.equal(success.stops[0].immediate,false,'terminal stop preserves the short success cue');assert.ok(atFinish.peak<=10);
+ await page.waitForTimeout(350);const after=await frame.locator('body').evaluate(()=>(window as any).__qualityAudio);assert.equal(after.created,atFinish.created,'terminal stop cancels the music scheduler');assert.equal(after.active,0,'all short cue tails finish without sustained voices');
+}
 async function main(){const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});try{
  for(const [device,viewport]of [['desktop',{width:1024,height:900}],['mobile',{width:375,height:812}]] as const){
-  const context=await browser.newContext({viewport,hasTouch:device==='mobile'}),page=await context.newPage();let requests=0;await context.route('**/*',r=>{requests++;return r.abort();});
+  const context=await browser.newContext({viewport,hasTouch:device==='mobile'});await observeAudio(context);const page=await context.newPage();let requests=0;await context.route('**/*',r=>{requests++;return r.abort();});
   try{
-   for(const fixture of [physicalWorkshop,suspensionChallenge])assert.deepEqual(await playtestV2(page,fixturePreview(fixture)),{input:true,resources:true,pause:true,replay:true,isolation:true});
-   await assert.rejects(()=>playtestV2(page,fixturePreview(ignoresInput)),/NO_MEANINGFUL_INPUT_EFFECT/);
-   let frame=await load(page,suspensionChallenge);await frame.locator('#game').focus();await page.keyboard.down('ArrowRight');await frame.locator('#status[data-state=won]').waitFor({timeout:8500});await page.keyboard.up('ArrowRight');
+   for(const fixture of [physicalWorkshop,suspensionChallenge])assert.deepEqual(await playtestV2(page,fixturePreview(fixture),{touch:device==='mobile'}),{input:true,resources:true,pause:true,replay:true,isolation:true});
+   await assert.rejects(()=>playtestV2(page,fixturePreview(ignoresInput),{touch:device==='mobile'}),/NO_MEANINGFUL_INPUT_EFFECT/);
+   let frame=await load(page,suspensionChallenge);await page.keyboard.down('ArrowRight');await frame.locator('#status[data-state=won]').waitFor({timeout:8500});await page.keyboard.up('ArrowRight');
    mkdirSync('test-results',{recursive:true});await page.locator('iframe').screenshot({path:'test-results/quality-generated-'+device+'.png'});
-   await frame.getByRole('button',{name:'Play again',exact:true}).click();await frame.locator('#game[data-frames]').waitFor({timeout:3000});await frame.locator('#game').focus();await page.keyboard.down('ArrowLeft');await frame.locator('#status[data-state=lost]').waitFor({timeout:8500});await page.keyboard.up('ArrowLeft');
-   frame=await load(page,physicalWorkshop);await page.waitForTimeout(200);const canvas=frame.locator('#game'),before=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy'),box=(await canvas.boundingBox())!;const x=box.x+before.x/720*box.width,y=box.y+before.y/400*box.height;await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+80,y-70,{steps:20});await page.waitForTimeout(350);await page.mouse.up();const after=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy');assert.ok(Math.hypot(after.x-before.x,after.y-before.y)>25,'drag changes physical location');
-   await page.click('#parent');await page.waitForTimeout(100);assert.equal(await canvas.getAttribute('data-paused'),'true','focus loss pauses');const paused=await canvas.getAttribute('data-ticks');await page.waitForTimeout(180);assert.equal(await canvas.getAttribute('data-ticks'),paused);assert.equal(requests,0);
-   console.log('PASS generated v2 '+device+': endless and challenge smoke, input-free animation rejected, suspension reaches known win/loss, physical pointer drag, focus pause, replay, limits and no egress.');
+   await frame.getByRole('button',{name:'Play again',exact:true}).click();await frame.locator('#game[data-frames]').waitFor({timeout:3000});await page.keyboard.down('ArrowLeft');await frame.locator('#status[data-state=lost]').waitFor({timeout:8500});await page.keyboard.up('ArrowLeft');
+   frame=await load(page,focusedControls);await controlsAndCueTail(page,frame,device==='mobile');
+   frame=await load(page,physicalWorkshop);await page.waitForTimeout(200);const canvas=frame.locator('#game'),before=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy'),box=(await canvas.boundingBox())!;const x=box.x+before.x/720*box.width,y=box.y+before.y/400*box.height;
+   if(device==='mobile'){const touch=await context.newCDPSession(page);try{await touchGesture(touch,{x,y},{x:x+80,y:y-70},{steps:20,holdMs:350,cancel:true});}finally{await touch.detach();}}else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+80,y-70,{steps:20});await page.waitForTimeout(350);await page.mouse.up();}
+   const after=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy');assert.ok(Math.hypot(after.x-before.x,after.y-before.y)>25,'drag changes physical location');if(device==='mobile'){await page.waitForTimeout(250);const released=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy');assert.ok(released.y>after.y+2,'touch cancellation releases the spring drag');}
+   if(device==='mobile')await page.locator('#parent').tap();else await page.click('#parent');await page.waitForTimeout(100);assert.equal(await canvas.getAttribute('data-paused'),'true','focus loss pauses');const paused=await canvas.getAttribute('data-ticks');await page.waitForTimeout(180);assert.equal(await canvas.getAttribute('data-ticks'),paused);assert.equal(requests,0);
+   console.log('PASS generated v2 '+device+': endless/challenge smoke, immediate keyboard controls, no held input after pause, bounded success cue tails, real pointer/touch drag+cancel, known win/loss, replay, limits and no egress.');
   }finally{await context.close();}
  }
  // Reviewed attack probes exercise containment independently of the AST gate.

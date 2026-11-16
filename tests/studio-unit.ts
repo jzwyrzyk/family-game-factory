@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { StudioNotebook,STUDIO_KEY,validateNotebook } from '../src/studio/notebook';
 import { StudioGames, isGeneratedRemoteKind } from '../src/studio/adapter';
 import { installStudioRemixRouting } from '../src/studio/host-navigation';
+import { installRemixFallback } from '../src/factory/remix-routing';
 import { defaults } from '../src/runtime/manifests';
 class Memory {
  data=new Map<string,string>();fail=false;
@@ -59,30 +60,35 @@ test('both generated module versions keep the generated builder discriminator',(
  assert.equal(isGeneratedRemoteKind('generated-module-v1'),true);assert.equal(isGeneratedRemoteKind('generated-module-v2'),true);
  assert.equal(isGeneratedRemoteKind('star-catcher-v1'),false);assert.equal(isGeneratedRemoteKind(undefined),false);
 });
-// Node's EventTarget does not implement DOM capture ordering. This fixture explicitly
-// models the two window listener phases; browser CI still owns the real DOM journey.
-class WindowEvents {
- listeners:{type:string;listener:EventListener;capture:boolean}[]=[];
- addEventListener(type:string,listener:EventListener,capture=false){this.listeners.push({type,listener,capture});}
- removeEventListener(type:string,listener:EventListener,capture=false){this.listeners=this.listeners.filter(l=>l.type!==type||l.listener!==listener||l.capture!==capture);}
- dispatch(event:Event){for(const capture of [true,false])for(const l of [...this.listeners])if(l.type===event.type&&l.capture===capture)l.listener(event);}
+// Exercise actual EventTarget registration order. A synthetic capture-first
+// dispatcher would miss the direct-window dispatch that failed in Chromium CI.
+async function routingTests(){
+ const events=new EventTarget(),requests:(string|undefined)[]=[];let legacy=0;
+ const removeLegacy=installRemixFallback(()=>legacy++,events);
+ const removeStudio=installStudioRemixRouting({activeGame:()=> 'hill',openRequest:prompt=>requests.push(prompt)},events);
+ const event=new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:'Make the wheels bigger'}});
+ assert.equal(events.dispatchEvent(event),false,'Studio claims the request during dispatch');
+ await Promise.resolve();
+ test('a later Studio listener consumes a garage prompt before the already-registered fallback runs',()=>{
+  assert.equal(event.defaultPrevented,true);assert.deepEqual(requests,['Make the wheels bigger']);assert.equal(legacy,0);
+ });
+ events.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));await Promise.resolve();
+ test('an embedded Improve request opens Studio without invoking the legacy host',()=>{assert.deepEqual(requests,['Make the wheels bigger',undefined]);assert.equal(legacy,0);});
+ removeStudio();events.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));await Promise.resolve();
+ test('native remix still runs once when Studio is uninstalled',()=>{assert.equal(legacy,1);assert.equal(requests.length,2);});
+ events.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));removeLegacy();await Promise.resolve();
+ test('uninstalling the fallback cancels its already-queued action',()=>assert.equal(legacy,1));
+
+ const otherEvents=new EventTarget();let active=true,otherRequests=0,otherLegacy=0;
+ const stopFallback=installRemixFallback(()=>otherLegacy++,otherEvents);
+ const stopStudio=installStudioRemixRouting({activeGame:()=>active?'hill':null,openRequest:()=>otherRequests++},otherEvents);
+ otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'gum',prompt:'More gum'}}));
+ active=false;otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));
+ active=true;otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:{unexpected:true}}}));
+ otherEvents.dispatchEvent(new CustomEvent('factory-remix-request',{detail:{game:'hill'}}));await Promise.resolve();
+ test('foreign games, inactive sessions, malformed prompts and noncancelable events keep their existing host',()=>{assert.equal(otherRequests,0);assert.equal(otherLegacy,4);});
+ const claimed=new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}});claimed.preventDefault();otherEvents.dispatchEvent(claimed);await Promise.resolve();
+ test('a request already claimed by another host runs neither Studio nor fallback',()=>{assert.equal(otherRequests,0);assert.equal(otherLegacy,4);});
+ stopStudio();stopFallback();console.log(`${passed} studio unit tests passed.`);
 }
-test('a later Studio capture handler consumes garage prompts before the legacy remix handler',()=>{
- const events=new WindowEvents(),requests:(string|undefined)[]=[];let legacy=0;
- events.addEventListener('factory-remix-request',event=>{if(!event.defaultPrevented)legacy++;});
- const uninstall=installStudioRemixRouting({activeGame:()=> 'hill',openRequest:prompt=>requests.push(prompt)},events as unknown as Window);
- const event=new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:'Make the wheels bigger'}});events.dispatch(event);
- assert.equal(event.defaultPrevented,true);assert.deepEqual(requests,['Make the wheels bigger']);assert.equal(legacy,0);
- events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));assert.deepEqual(requests,['Make the wheels bigger',undefined]);assert.equal(legacy,0);
- uninstall();events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));assert.equal(legacy,1);
-});
-test('Studio routing leaves foreign games, inactive sessions and malformed prompts to their existing host',()=>{
- const events=new WindowEvents();let active=true,requests=0,legacy=0;
- events.addEventListener('factory-remix-request',event=>{if(!event.defaultPrevented)legacy++;});
- installStudioRemixRouting({activeGame:()=>active?'hill':null,openRequest:()=>requests++},events as unknown as Window);
- events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'gum',prompt:'More gum'}}));
- active=false;events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill'}}));
- active=true;events.dispatch(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:'hill',prompt:{unexpected:true}}}));
- assert.equal(requests,0);assert.equal(legacy,3);
-});
-console.log(`${passed} studio unit tests passed.`);
+void routingTests().catch(error=>{console.error(error);process.exitCode=1;});

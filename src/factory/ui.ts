@@ -2,6 +2,7 @@ import { defaults, manifests, isGameId, playableMechanics } from '../runtime/man
 import { examples, interpret, type Intent } from './interpreter';
 import { RevisionStore, type Revision, migrateWorkspace } from './workspace';
 import { DesignCoach } from './coach';
+import { installRemixFallback } from './remix-routing';
 import type { GameId, PlayOutcome, Mechanics } from '../runtime/types';
 const FG = (window as any).FG;
 const $ = <T extends HTMLElement = HTMLElement>(id:string) => document.getElementById(id) as T;
@@ -98,8 +99,7 @@ export function initLiveRemix() {
   window.addEventListener('factory-game',event=>{const detail=(event as CustomEvent<{live:boolean;game:GameId;stateKey:string;config?:Mechanics}>).detail;
     currentPlay={game:detail.game,stateKey:detail.stateKey,config:detail.config||defaults(detail.game,FG.store.current().remixes?.[detail.game]||'classic'),owner:owner()};
     if(!detail.live){$('returnLive').hidden=true;$('playedVersion').hidden=true;}});
-  window.addEventListener('factory-remix-request',event=>guarded(()=>{
-    if(event.defaultPrevented)return; // An embedded Studio can own this game's experiment loop.
+  installRemixFallback(event=>guarded(()=>{
     const detail=(event as CustomEvent<{game:GameId;prompt?:string}>).detail;if(!detail||!isGameId(detail.game))return;
     const source=currentPlay?.game===detail.game&&currentPlay.owner===owner()?currentPlay:null;
     FG.app.page('feedback'); // Unmount first so the last ride/build state is flushed.

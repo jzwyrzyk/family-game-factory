@@ -785,6 +785,7 @@
             "enum": [
               "new",
               "gum",
+              "hill",
               "buckets",
               "dragon",
               "star-catcher",
@@ -885,6 +886,7 @@
           "gameId": {
             "enum": [
               "gum",
+              "hill",
               "buckets",
               "dragon"
             ]

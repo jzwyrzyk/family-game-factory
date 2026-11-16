@@ -49,6 +49,9 @@ jobs:
       - name: Desktop and mobile design-coach journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/design-coach-browser.cjs
+      - name: Mocked generation journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx tests/actions-e2e.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -9,7 +9,7 @@ const transitions:Record<JobStatus,readonly JobStatus[]>={draft:['queued','cance
 const safeId=(x:unknown):x is string=>typeof x==='string'&&/^[\w-]{1,100}$/.test(x);
 export function validateBuildRequest(value:unknown):BuildRequest{
  const r=value as BuildRequest;
- if(!r||Object.keys(r).some(k=>!['gameId','baseRevisionId','prompt','clientRequestId','retryOf'].includes(k))||!safeId(r.gameId)||!['new','gum','buckets','dragon','star-catcher','generated-module'].includes(r.gameId)||(r.baseRevisionId!==null&&!safeId(r.baseRevisionId))||typeof r.prompt!=='string'||r.prompt.trim().length<5||r.prompt.length>2000||!safeId(r.clientRequestId)||(r.retryOf!==undefined&&!safeId(r.retryOf)))throw Error('INVALID_REQUEST');
+ if(!r||Object.keys(r).some(k=>!['gameId','baseRevisionId','prompt','clientRequestId','retryOf'].includes(k))||!safeId(r.gameId)||(!isGameId(r.gameId)&&!['new','star-catcher','generated-module'].includes(r.gameId))||(r.baseRevisionId!==null&&!safeId(r.baseRevisionId))||typeof r.prompt!=='string'||r.prompt.trim().length<5||r.prompt.length>2000||!safeId(r.clientRequestId)||(r.retryOf!==undefined&&!safeId(r.retryOf)))throw Error('INVALID_REQUEST');
  if(/[\w.+-]+@[\w.-]+\.[a-z]{2,}|(?:api[_ -]?key|password|secret)\s*[:=]|https?:\/\/|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(r.prompt))throw Error('PRIVATE_INFORMATION');
  return {...r,prompt:r.prompt.trim()};
 }

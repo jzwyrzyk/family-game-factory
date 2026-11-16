@@ -1,10 +1,10 @@
 import { isGameId } from '../runtime/manifests';
 import type { GameId } from '../runtime/types';
 
-/** Capture runs before the legacy window bubble listener, even when installed later.
- * Only the matching embedded game belongs to this Studio. Other routes keep their host.
+/** Claim the matching embedded game's request synchronously. The legacy fallback
+ * waits until dispatch completes, so ownership does not depend on listener order.
  */
-export function installStudioRemixRouting(host: { activeGame(): GameId | null; openRequest(prompt?: string): void }, target: Pick<Window, 'addEventListener' | 'removeEventListener'> = window) {
+export function installStudioRemixRouting(host: { activeGame(): GameId | null; openRequest(prompt?: string): void }, target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> = window) {
   const listener = (event: Event) => {
     const detail = (event as CustomEvent<{ game?: unknown; prompt?: unknown }>).detail;
     if (event.defaultPrevented || !event.cancelable || !detail || !isGameId(detail.game) ||
@@ -14,7 +14,7 @@ export function installStudioRemixRouting(host: { activeGame(): GameId | null; o
     host.openRequest(typeof detail.prompt === 'string' ? detail.prompt : undefined);
   };
   target.addEventListener('factory-remix-request', listener, true);
-  return () => target.removeEventListener('factory-remix-request', listener, true);
+  return () => target.removeEventListener('factory-remix-request', listener, { capture: true });
 }
 
 /** Bridge the original round-result Home button back to the studio library. */

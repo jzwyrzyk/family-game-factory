@@ -15,13 +15,13 @@ The patch was originally checked against the exact Studio source above and reapp
 
 The package merge retains Planck 1.4.2 and all native/generated scripts, and adds main's Studio and coach scripts. Both client initializers are retained. Those two merge resolutions are deliberately excluded from the archived compatibility patch.
 
-The native parent dispatches `factory-remix-request` with `cancelable: true` from both the Hill garage and legacy Improve button. Its legacy Live Remix listener returns immediately when `event.defaultPrevented` is true. These native prerequisites are retained from the final quality parent, rather than copied from an older integration checkout.
+The native parent dispatches `factory-remix-request` with `cancelable: true` from both the Hill garage and legacy Improve button. The current legacy Live Remix fallback waits for synchronous dispatch to finish, then checks `event.defaultPrevented` before acting. This lets Studio claim its request regardless of listener registration order. Removing the fallback also cancels any queued action.
 
 ## Adaptation behavior
 
 Studio notebook validation now shares the runtime's `GameId` contract. Hill notebooks, reloads, restores, starter cards, names, and icons work alongside the existing games. No notebook schema migration or existing saved-game replacement is required.
 
-A capture listener claims only requests from the matching game currently embedded in Studio. It cancels the legacy route, flushes the current native game's saved state, and uses the existing Studio experiment loop. A garage preset while playing a candidate continues that test and preserves its parent reference. The main version remains unchanged until the child chooses to keep the experiment. Presets retain helper attribution.
+A synchronous listener claims only requests from the matching game currently embedded in Studio. It cancels the legacy route, flushes the current native game's saved state, and uses the existing Studio experiment loop. A garage preset while playing a candidate continues that test and preserves its parent reference. The main version remains unchanged until the child chooses to keep the experiment. Presets retain helper attribution.
 
 An unfinished draft is preserved and combined with the selected preset for editing, without immediately submitting both. A full draft remains intact. Historical-version requests are saved as drafts and ask the child to choose a starting version. Pending math must finish before a change starts. Requests outside the active Studio keep their existing host behavior.
 
@@ -42,4 +42,4 @@ The original isolated patch validation passed:
 
 The original combined client bundle was 506.51 kB minified / 148.37 kB gzip; Vite emitted its standard warning for a chunk over 500 kB. That historical measurement predates the final native fixes and is not a browser performance result. Current build results belong to the final combined feature-branch commit.
 
-Local preparation did **not run browsers**. The event-routing unit fixture models capture/bubble phases because Node's EventTarget does not implement browser capture ordering. The dedicated feature-branch workflow runs the real desktop/mobile Studio and coach journeys independently; its exact-commit results are the browser gate. No live inference or child enjoyment claim follows from unit or fixture checks.
+Local preparation did **not run browsers**. The current 26-test Studio unit suite uses a real `EventTarget` and microtask regressions, including later Studio registration, unclaimed native requests, prior cancellation, and cleanup. This replaces an artificial capture-first dispatcher that missed the first combined browser run's routing failure. The dedicated feature-branch workflow runs the real desktop/mobile Studio, coach, and mocked generation journeys independently; its exact-commit results are the browser gate. No live inference or child enjoyment claim follows from unit or fixture checks.

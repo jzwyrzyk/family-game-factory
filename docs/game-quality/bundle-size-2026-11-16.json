@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "Core static HTML/CSS/JavaScript. Excludes existing original-game images and service-worker cache downloads. Native quality assets add no external art/audio files. Gzip level6; not a mobile startup-time measurement.",
+  "scope": "Core static HTML/CSS/JavaScript: dist/index.html plus dist/assets/*.js and dist/assets/*.css, compressed individually at gzip level 6. Excludes existing original-game PNGs, service-worker cache downloads, and generated-runtime worker assets. Native quality adds no external art/audio files. This measures build/transfer size, not mobile startup time, frame time, or child enjoyment.",
   "baselineCommit": "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
   "qualityCommit": "226e44dc44e54de237c0faf4e1038087f4c1738a",
   "builds": [
@@ -49,11 +49,118 @@
           "sha256": "7d062993170fe5c7bc86d637ce339ab6c8ad680d5d5f77bc647ebeead9ac5be0"
         }
       ]
+    },
+    {
+      "build": "current-main-studio",
+      "label": "Current main with Studio and design coach, before Game Quality v1",
+      "sourceCommit": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13311,
+          "gzipBytes": 4730,
+          "sha256": "dd60e50de19367840f079cb75a7943cf48a70f7ee26e0e2d37e5577c40f50ee0"
+        },
+        {
+          "path": "assets/index-Ck5jGJvx.js",
+          "bytes": 207561,
+          "gzipBytes": 72682,
+          "sha256": "49e3e24dbd8e525a3aa1e76a0c8de47f709ee3bdbf3458a07e01da3cc7260187"
+        },
+        {
+          "path": "assets/index-BGw_rkgz.css",
+          "bytes": 33719,
+          "gzipBytes": 8304,
+          "sha256": "b4a5c6a0aa31d93ca712987467a292bc594b7b13079db3af8d4d782dd5c229d1"
+        }
+      ],
+      "totals": {
+        "bytes": 254591,
+        "gzipBytes": 85716
+      }
+    },
+    {
+      "build": "quality-studio-combined",
+      "label": "Combined Game Quality v1 and current-main Studio integration",
+      "sourceCommit": "832a705256ec28f0ce917ff40bd91bc1e826c527",
+      "assets": [
+        {
+          "path": "index.html",
+          "bytes": 13823,
+          "gzipBytes": 4841,
+          "sha256": "58246c4efc2e9b684909997d3e29c6c86c0590b350149e620c1770e18e1c2461"
+        },
+        {
+          "path": "assets/index-B2zbVMK4.js",
+          "bytes": 510528,
+          "gzipBytes": 148931,
+          "sha256": "ffff4169ee223762ce540b24bd2083dd141c0323e6024e730fdfe79e0f387316"
+        },
+        {
+          "path": "assets/index-CeZk1au0.css",
+          "bytes": 42804,
+          "gzipBytes": 10147,
+          "sha256": "7ab99a4a6cc4deeb415ef644dd15d4942af88b0521c05d14a17381232782a9fe"
+        }
+      ],
+      "totals": {
+        "bytes": 567155,
+        "gzipBytes": 163919
+      }
     }
   ],
   "existingArtwork": {
     "files": 23,
     "bytes": 4367688,
-    "scope": "Unchanged original-game PNG assets, outside core-gzip totals; service-worker caching and actual request timing are separate from this size measurement."
+    "scope": "The same 23 original-game PNGs total 4,367,688 bytes in all four source commits. Outside the core-gzip totals. Generated-runtime assets, service-worker caching, and actual request timing are separate from this measurement.",
+    "directory": "public/assets/original-dragon/*.png",
+    "verifiedSourceCommits": [
+      "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
+      "226e44dc44e54de237c0faf4e1038087f4c1738a",
+      "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+      "832a705256ec28f0ce917ff40bd91bc1e826c527"
+    ],
+    "manifestSha256": "2019558eefa449de0a4f24284e70139dd4fba1cbd1b3ffb748432123039cfe2b",
+    "manifestDigestFormat": "SHA-256 of UTF-8 canonical JSON (sorted keys, compact separators) for lexicographically sorted objects containing public-relative path, bytes, and sha256."
+  },
+  "buildSourceCommits": {
+    "baseline": "9b7f1d201afea845ae9e3816ff7d6d285ba10b9b",
+    "quality-v1": "226e44dc44e54de237c0faf4e1038087f4c1738a",
+    "current-main-studio": "ca73ceba4ae2c79f9f669c3fcbaa66922230d601",
+    "quality-studio-combined": "832a705256ec28f0ce917ff40bd91bc1e826c527"
+  },
+  "currentComparison": {
+    "baselineBuild": "current-main-studio",
+    "combinedBuild": "quality-studio-combined",
+    "baselineTotals": {
+      "bytes": 254591,
+      "gzipBytes": 85716
+    },
+    "combinedTotals": {
+      "bytes": 567155,
+      "gzipBytes": 163919
+    },
+    "increase": {
+      "bytes": 312564,
+      "gzipBytes": 78203
+    }
+  },
+  "currentMeasurement": {
+    "measuredAtUtc": "2026-11-16T05:29:02.188440+00:00",
+    "command": "npm run build",
+    "isolatedWorktrees": true,
+    "nodeVersion": "v24.22.1",
+    "viteVersion": "6.4.1",
+    "dependencyReuse": "Both isolated builds reuse the directory installed with npm ci --offline for the integrated lockfile. Every non-root locked package entry was compared byte-for-byte as JSON: 196 entries for current main, 198 for combined; all matched. No tracked source files were modified in either build worktree.",
+    "compression": {
+      "implementation": "Python gzip.compress(data, compresslevel=6, mtime=0)",
+      "pythonVersion": "3.12.14",
+      "zlibVersion": "1.3.2",
+      "level": 6,
+      "mtime": 0,
+      "perFile": true
+    },
+    "historicalRowsPreserved": true,
+    "scopeNote": "The baseline and quality-v1 rows and their original measurements are preserved. The two appended rows measure the exact source commits shown, excluding subsequent uncommitted fixes."
   }
 }
