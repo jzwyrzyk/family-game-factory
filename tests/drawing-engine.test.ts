@@ -46,6 +46,26 @@ test('Shape proposals remain honest offline suggestions and work without a model
  assert.match(result.explanation,/starting guess/i);
  const creature=suggestParts(data,'character');assert.equal(creature.pieces.length,1);
 });
+test('Hinge placement is validated and changes actual revolute joint location',()=>{
+ const machine:DrawingAssembly={...sample,kind:'machine',pieces:[
+  {...sample.pieces[0],id:'machine_body',name:'Engine'},
+  {id:'propeller',name:'Propeller',role:'propeller',parentId:'machine_body',physical:true,
+   region:{x:.4,y:.05,w:.2,h:.26,shape:'rect'},pivot:{x:.02,y:.5}}
+ ]};
+ const left=assemblyRig(machine);
+ assert.equal(left.bindings[0].attachmentB,'pivot');
+ assert.ok(left.components[1].part.pivot.x<0);
+ const origin=createDrawingPlayground(machine);
+ const alternate=structuredClone(machine);alternate.pieces[1].pivot={x:.98,y:.5};
+ const right=createDrawingPlayground(alternate);
+ try{
+  assert.notEqual(origin.snapshot().joints[0].x,right.snapshot().joints[0].x,
+    'the true Planck joint anchor follows the child-selected hinge');
+  assert.equal(origin.snapshot().joints[0].kind,'axle');
+ }finally{origin.dispose();right.dispose();}
+ const bad=structuredClone(machine);bad.pieces[1].pivot={x:1.2,y:.5};
+ assert.throws(()=>validateAssembly(bad));
+});
 test('Other child-created objects instantiate actual independent bodies and joints',()=>{
  const machine:DrawingAssembly={...sample,kind:'machine',pieces:[
   {...sample.pieces[0],id:'machine_body',name:'Engine'},

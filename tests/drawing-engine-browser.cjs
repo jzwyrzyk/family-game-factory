@@ -36,6 +36,8 @@ const fs=require('node:fs');
    });
    assert.ok(cutout.solid>10&&cutout.transparent>10,'a separate part retains colored child art and transparent pixels');
    await lab.locator('[data-cutouts]').click();
+   await lab.locator('[data-piece-list] button').nth(1).click();
+   assert.equal(await lab.locator('[data-pivot]').isDisabled(),true,'car wheels use their real physical centers, not a pretend child hinge');
    await lab.locator('[data-mode="play"]').click();
    await page.waitForFunction(()=>document.querySelector('dialog.drawing-lab [data-retry]')&&!document.querySelector('dialog.drawing-lab [data-retry]').hidden);
    await lab.locator('[data-go]').scrollIntoViewIfNeeded();
@@ -59,6 +61,7 @@ const fs=require('node:fs');
    await lab.waitFor({state:'visible'});
    // The saved design can be reopened without overwriting the source.
    await lab.locator('[data-history]').selectOption({index:1});
+   await page.waitForFunction(()=>document.querySelector('dialog.drawing-lab [data-status]')?.textContent?.includes('This earlier test'));
    assert.match(await lab.locator('[data-status]').textContent(),/earlier test/i);
    await lab.locator('[data-close]').click();
    assert.equal(await page.locator('#drawingList article').count(),originalCount);

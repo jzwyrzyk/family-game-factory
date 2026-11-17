@@ -94,7 +94,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   q<HTMLButtonElement>(working,'[data-undo]').disabled=!undo.length||mode==='play';
   q<HTMLButtonElement>(working,'[data-add]').disabled=assembly.pieces.length>=24||mode==='play';
   const hingeButton=q<HTMLButtonElement>(working,'[data-pivot]');
-  hingeButton.disabled=!piece||mode==='play'||piece.role==='body'||piece.role==='decoration';
+  hingeButton.disabled=!piece||mode==='play'||piece.role==='body'||piece.role==='decoration'||piece.role==='wheel'||piece.parentId===null;
   hingeButton.setAttribute('aria-pressed',String(pendingPivot));
  }
  function fit(){
@@ -284,7 +284,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  });
  q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;pendingPivot=false;refresh();message('Drag a box around the new part on your drawing.');canvas.focus({preventScroll:true});});
  q<HTMLButtonElement>(working,'[data-pivot]').addEventListener('click',()=>{
-   const p=getSelected();if(mode!=='edit'||!p||p.role==='body'||p.role==='decoration')return;
+   const p=getSelected();if(mode!=='edit'||!p||!p.parentId||p.role==='body'||p.role==='decoration'||p.role==='wheel')return;
    pendingPivot=!pendingPivot;pendingNew=false;refresh();
    message(pendingPivot?'Tap where this part should attach or bend.':'Hinge placement cancelled.');
    canvas.focus({preventScroll:true});
