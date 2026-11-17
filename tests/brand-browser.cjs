@@ -4,7 +4,15 @@ const {start}=require('./browser-server.cjs');
 const fs=require('node:fs');
 /** Visual contract for jems. No model calls, paid APIs or child data are used. */
 (async()=>{
- const server=start(),base='http://127.0.0.1:'+server.address().port+'/arcade/';
+ const server=start();
+ // http.Server.listen() is asynchronous. Reading address() immediately can return
+ // null and leave the open server handle alive after a rejected test promise.
+ await new Promise((resolve,reject)=>{
+  if(server.listening){resolve();return;}
+  server.once('listening',resolve);
+  server.once('error',reject);
+ });
+ const base='http://127.0.0.1:'+server.address().port+'/arcade/';
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  fs.mkdirSync('test-results',{recursive:true});
  try{
