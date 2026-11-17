@@ -15,8 +15,9 @@ const {start}=require('./browser-server.cjs');
   for(const device of ['desktop','mobile']){
    const mobile=device==='mobile';
    const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:900},hasTouch:mobile});
-   const page=await context.newPage(),errors=[];
+   const page=await context.newPage(),errors=[],dialogs=[];
    page.on('pageerror',e=>errors.push(e.message));
+   page.on('dialog',dialog=>{dialogs.push(dialog.message());void dialog.accept();});
    await page.goto(base);
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
    assert.equal(await page.locator('#page-studio-library').isVisible(),true,'the normal URL opens Studio');
@@ -36,8 +37,11 @@ const {start}=require('./browser-server.cjs');
    await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
    await page.selectOption('#parentSubject','both');
    await page.click('#saveParent');
-   const savedPermission=await page.evaluate(()=>({allowed:window.FG.store.current().allowSubjectSwitch,subject:window.FG.learning.subject,active:window.FG.learning.active,loadError:window.FG.store.loadError,parentChoice:document.querySelector('#parentSubject').value}));
-   assert.equal(savedPermission.allowed,true,'parent choice must save: '+JSON.stringify(savedPermission));
+   const savedPermission=await page.evaluate(()=>({allowed:window.FG.store.current().allowSubjectSwitch,subject:window.FG.learning.subject,active:window.FG.learning.active,loadError:window.FG.store.loadError,parentChoice:document.querySelector('#parentSubject').value,handler:typeof document.querySelector('#saveParent').onclick,grade:window.FG.store.current().grade}));
+   if(savedPermission.allowed!==true){
+     const directStoreProbe=await page.evaluate(()=>{try{window.FG.store.changeProfile({allowSubjectSwitch:true});return {saved:window.FG.store.current().allowSubjectSwitch}}catch(e){return {error:String(e)}}});
+     throw Error('Parent Both save failed (diagnostic only): '+JSON.stringify({savedPermission,dialogs,directStoreProbe,errors}));
+   }
    await page.click('#studioNavHome');
    const homePermission=await page.evaluate(()=>({allowed:window.FG.store.current().allowSubjectSwitch,subject:window.FG.learning.subject,active:window.FG.learning.active,loadError:window.FG.store.loadError,disabled:document.querySelector('#studioSubjectLanguage').disabled}));
    assert.equal(await page.locator('#studioSubjectLanguage').isDisabled(),false,'both-enabled homepage selector must unlock: '+JSON.stringify(homePermission));
