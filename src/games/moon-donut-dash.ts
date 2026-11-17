@@ -1,7 +1,8 @@
 import type {GameContext,GameInstance} from '../runtime/types';
 
 /** Curated original game. Fully local: no assets, model calls or timers outside this instance. */
-type Donut={x:number;y:number}, Meteor={x:number;y:number;speed:number};
+type Donut={x:number;y:number};
+type Meteor={x:number;y:number;speed:number};
 const make=(tag:string,className:string,text='')=>{const e=document.createElement(tag);e.className=className;e.textContent=text;return e;};
 export default class MoonDonutDash implements GameInstance {
  private root=make('section','favorite-game favorite-moon');
