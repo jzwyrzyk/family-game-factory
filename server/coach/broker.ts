@@ -51,3 +51,27 @@ export class PrivateCoachBroker implements CoachProvider {
   return {reply:result.reply,usedMicroUsd:result.usedMicroUsd};
  }
 }
+
+/** Dedicated, disabled-by-default audio transport to the same private IAM host.
+ * No gateway caller may set the private target or speaker/session identity. */
+export class PrivateSpeechBroker {
+ constructor(private settings:CoachBrokerSettings,private transport:typeof fetch=fetch,
+  private identity:(audience:string,signal:AbortSignal)=>Promise<string>=googleGatewayIdentity){}
+ async transcribe(audio:Uint8Array,mime:string,signal:AbortSignal):Promise<string>{
+  const {origin}=this.settings;
+  if(!validPrivateCoachOrigin(origin)||audio.length>320000||audio.length<100)throw Error('AUDIO_UNAVAILABLE');
+  const token=await this.identity(origin,signal);
+  if(!token||token.length>6000)throw Error('AUDIO_UNAVAILABLE');
+  const response=await this.transport(origin+'/internal/coach/audio',{
+   method:'POST',redirect:'error',cache:'no-store',signal,
+   headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+   body:JSON.stringify({audio:Buffer.from(audio).toString('base64'),mime})
+  });
+  if(!response.ok)throw Error(response.status===429?'RATE_LIMIT':response.status===422?'AUDIO_NO_SPEECH':'AUDIO_PROVIDER_FAILED');
+  const body=await response.text();if(body.length>5000)throw Error('AUDIO_PROVIDER_FAILED');
+  const result=JSON.parse(body);
+  if(!result||Object.keys(result).some(k=>k!=='text')||typeof result.text!=='string'||
+    result.text.length<1||result.text.length>2000)throw Error('AUDIO_PROVIDER_FAILED');
+  return result.text;
+ }
+}
