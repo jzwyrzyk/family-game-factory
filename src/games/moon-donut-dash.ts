@@ -19,7 +19,7 @@ export default class MoonDonutDash implements GameInstance {
  constructor(target:HTMLElement,private context:GameContext) {
   this.goal=Number(context.config.donutGoal);this.gravity=Number(context.config.moonGravity);
   this.rate=Number(context.config.meteorRate);
-  this.canvas.width=900;this.canvas.height=480;this.canvas.className='favorite-canvas';
+  this.canvas.width=900;this.canvas.height=480;this.canvas.className='favorite-canvas';this.canvas.tabIndex=0;
   this.canvas.setAttribute('role','img');this.canvas.setAttribute('aria-label','Moon donut course with cat, donuts and falling meteors');
   this.ctx=this.canvas.getContext('2d')!;
   this.root.setAttribute('aria-label','Moon Donut Dash');
@@ -124,8 +124,8 @@ export default class MoonDonutDash implements GameInstance {
   if(!this.hostPaused&&!this.ended){this.accumulator+=dt;let steps=0;while(this.accumulator>=1000/60&&steps++<4){this.update();this.accumulator-=1000/60;}}
   this.draw();this.raf=requestAnimationFrame(this.loop);
  };
- next(){this.level++;this.reset();this.save();}
- restart(){this.level=1;this.reset();this.save();}
+ next(){if(this.hostPaused||this.stopped)return;this.level++;this.reset();this.save();}
+ restart(){if(this.hostPaused||this.stopped)return;this.level=1;this.reset();this.save();}
  retry(){this.restart();}
  isPlaying(){return !this.stopped&&!this.ended&&!this.hostPaused;}
  pause(){if(!this.isPlaying())return false;this.hostPaused=true;this.pressed.clear();this.heldPointers.clear();return true;}
