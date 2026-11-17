@@ -80,7 +80,13 @@ const fs=require('node:fs');
    assert.equal(await page.getByText('A silly paper robot', {exact:true}).count(),1,'draw-here painting saves as an actual private drawing');
    await page.getByRole('button',{name:'✨ Bring to life',exact:true}).first().click();
    await lab.waitFor({state:'visible'});
-   await page.locator('.profile-choice').nth(1).click();
+   // A modal correctly prevents clicking the profile switcher behind it.
+   // Simulate a store-driven profile change while the editor is open to verify
+   // its defensive cancellation, then use the normal buttons after it closes.
+   await page.evaluate(()=>{
+     if(!FG.store.choose('player2'))throw Error('Missing test player');
+     window.dispatchEvent(new Event('factory-profile'));
+   });
    await page.waitForFunction(()=>!document.querySelector('dialog.drawing-lab')?.open);
    await page.waitForFunction(()=>document.querySelectorAll('#drawingList article').length===0);
    await page.locator('.profile-choice').first().click();
