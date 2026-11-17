@@ -19,6 +19,7 @@ export function speechConfig(env:NodeJS.ProcessEnv):SpeechConfig{
 }
 export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:string;sessionKey:string}){
  return async(req:IncomingMessage,res:ServerResponse)=>{
+  const abort=new AbortController();res.once('close',()=>{if(!res.writableEnded)abort.abort();});
   const reply=(status:number,body:unknown)=>{
    res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store',
     'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});
@@ -52,7 +53,7 @@ export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:st
     const part=Buffer.from(data);size+=part.length;
     if(size>320000)throw Error('INVALID_AUDIO');chunks.push(part);
    }
-   const result=await service.transcribe(session,{id,mime,audio:Buffer.concat(chunks)});
+   const result=await service.transcribe(session,{id,mime,audio:Buffer.concat(chunks)},abort.signal);
    reply(200,result);
   }catch(e){
    const reason=(e as Error).message;

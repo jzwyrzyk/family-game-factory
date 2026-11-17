@@ -28,6 +28,8 @@ export function privateCoachHandler(settings:PrivateCoachHostConfig,provider:Coa
  verify:(token:string,settings:PrivateCoachHostConfig)=>Promise<boolean>=verifyGoogleGateway,
  speech?:PrivateAudioProvider){
  return async(req:IncomingMessage,res:ServerResponse)=>{
+  const abort=new AbortController();res.once('close',()=>{if(!res.writableEnded)abort.abort();});
+  const signal=AbortSignal.any([abort.signal,AbortSignal.timeout(18000)]);
   const send=(status:number,payload:unknown)=>{
    res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store',
     'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});
@@ -51,13 +53,13 @@ export function privateCoachHandler(settings:PrivateCoachHostConfig,provider:Coa
      typeof raw.mime!=='string'||raw.audio.length>430000||
      !/^[A-Za-z0-9+/]+={0,2}$/.test(raw.audio))throw Error('INVALID_REQUEST');
     const bytes=Buffer.from(raw.audio,'base64'),mime=validateAudio(bytes,raw.mime);
-    const recognized=await speech!.transcribe(bytes,mime,AbortSignal.timeout(15000));
+    const recognized=await speech!.transcribe(bytes,mime,signal);
     if(typeof recognized!=='string'||recognized.length<1||recognized.length>2000)throw Error('AUDIO_NO_SPEECH');
     send(200,{text:recognized});return;
    }
    if(!raw||Object.keys(raw).length!==1||!Object.hasOwn(raw,'context'))throw Error('INVALID_REQUEST');
    const context=boundedContext(raw.context);
-   const output=await provider.complete(context,AbortSignal.timeout(18000));
+   const output=await provider.complete(context,signal);
    if(!Number.isSafeInteger(output.usedMicroUsd)||output.usedMicroUsd<0||
      output.usedMicroUsd>settings.coach.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
    const reply=validateCoachReply(output.reply,context);

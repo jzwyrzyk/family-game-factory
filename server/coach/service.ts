@@ -60,7 +60,7 @@ export class CoachService {
   if(!this.available())return false;
   return allowedCoachFamily(await this.repo.snapshot(),session,'model');
  }
- async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'}>{
+ async respond(session:VerifiedSession,input:any,cancel?:AbortSignal):Promise<{reply:CoachReply;mode:'model'}>{
   if(!this.available())throw Error('COACH_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
   if(!input||Object.keys(input).some(k=>!['requestId','context'].includes(k))||typeof input.requestId!=='string'||!/^[\w-]{1,100}$/.test(input.requestId))throw Error('INVALID_REQUEST');
@@ -86,7 +86,8 @@ export class CoachService {
   void reservation;
   let usage=this.config.maxTurnMicroUsd,reply:CoachReply|undefined;
   try{
-   const result=await this.provider.complete(context,AbortSignal.timeout(25000));
+   const signal=cancel?AbortSignal.any([cancel,AbortSignal.timeout(25000)]):AbortSignal.timeout(25000);
+    const result=await this.provider.complete(context,signal);
    if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0||result.usedMicroUsd>this.config.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
    usage=result.usedMicroUsd;reply=validateCoachReply(result.reply,context);
    return {reply,mode:'model'};

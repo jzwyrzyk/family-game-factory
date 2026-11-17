@@ -73,7 +73,7 @@ export class CoachAudioService {
   if(!this.enabled())return false;
   return allowedCoachFamily(await this.repo.snapshot(),session,'audio');
  }
- async transcribe(session:VerifiedSession,input:{id:string;mime:string;audio:Uint8Array}):Promise<{text:string}>{
+ async transcribe(session:VerifiedSession,input:{id:string;mime:string;audio:Uint8Array},cancel?:AbortSignal):Promise<{text:string}>{
   if(!this.enabled())throw Error('AUDIO_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
   if(!input||typeof input.id!=='string'||!/^[a-zA-Z0-9_-]{8,100}$/.test(input.id))throw Error('INVALID_AUDIO');
@@ -100,7 +100,8 @@ export class CoachAudioService {
   });
   let success=false;
   try{
-   const text=await this.provider.transcribe(input.audio,mime,AbortSignal.timeout(15000));
+   const signal=cancel?AbortSignal.any([cancel,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000);
+   const text=await this.provider.transcribe(input.audio,mime,signal);
    if(typeof text!=='string'||text.length<1||text.length>2000)throw Error('AUDIO_NO_SPEECH');
    success=true;return {text};
   }finally{

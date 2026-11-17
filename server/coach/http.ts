@@ -6,6 +6,7 @@ export function coachConfig(env:NodeJS.ProcessEnv):CoachConfig {
 }
 export function coachHandler(service:CoachService,config:{appOrigin:string;sessionKey:string}){
  return async(req:IncomingMessage,res:ServerResponse)=>{
+  const abort=new AbortController();res.once('close',()=>{if(!res.writableEnded)abort.abort();});
   const send=(code:number,data:unknown)=>{res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
   try{
    if(req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
@@ -17,7 +18,7 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(path!=='/v1/coach'||req.method!=='POST')return send(404,{errorCode:'NOT_FOUND'});
    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>50000)throw Error('INVALID_REQUEST');}
-   send(200,await service.respond(session,JSON.parse(body)));
+   send(200,await service.respond(session,JSON.parse(body),abort.signal));
   }catch(err){const c=(err as Error).message;const permitted=['FORBIDDEN','UNAUTHENTICATED','COACH_UNAVAILABLE','SPENDING_CUTOFF','RATE_LIMIT','IDEMPOTENCY_CONFLICT','COACH_REQUEST_EXISTS','COACH_REFUSED','PRIVATE_INFORMATION','COACH_HISTORY_FULL','INVALID_REQUEST'];send(c==='UNAUTHENTICATED'?401:c==='FORBIDDEN'?403:c==='COACH_UNAVAILABLE'?503:400,{errorCode:permitted.includes(c)?c:'COACH_UNAVAILABLE'});}
  };
 }
