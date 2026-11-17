@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { defaults, diff, validateConfig } from '../src/runtime/manifests';
 import { interpret } from '../src/factory/interpreter';
+import {buildPollDelay} from '../src/builder/client';
 import { RevisionStore, migrateWorkspace, WORKSPACE_KEY, validateWorkspace } from '../src/factory/workspace';
 import { DesignCoach } from '../src/factory/coach';
 import { createLifecycle } from '../src/runtime/lifecycle';
@@ -33,6 +34,13 @@ test('six native game manifests and transactional composed changes stay bounded'
  assert.equal(moon.kind,'supported');if(moon.kind==='supported'){assert.equal(moon.config.meteorRate,.75);assert.equal(moon.config.moonGravity,.5);}
  const robot=interpret('robot',defaults('robot'),'Make robot faster and hide my path');
  assert.equal(robot.kind,'supported');if(robot.kind==='supported'){assert.equal(robot.config.robotSpeed,1.25);assert.equal(robot.config.showTrail,false);}
+});
+test('background build polling slows down rather than querying every quarter-second',()=>{
+ assert.equal(buildPollDelay(0),1000);
+ assert.equal(buildPollDelay(14999),1000);
+ assert.equal(buildPollDelay(15000),3000);
+ assert.equal(buildPollDelay(60000),8000);
+ assert.equal(buildPollDelay(600000),8000);
 });
 test('revision DAG preserves alternate futures; undo, compare, fork and reload never overwrite source',()=>{
  const storage=memory(),store=new RevisionStore(storage);const project=store.create('p1','buckets','My game');const root=store.revision(project.id,'p1');
