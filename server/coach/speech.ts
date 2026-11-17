@@ -9,6 +9,7 @@ import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {vertexAccessToken} from './vertex';
 import {allowedCoachFamily} from './consent';
+import {validPrivateCoachOrigin} from './broker';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
 const MAX_BYTES=320000,MIN_BYTES=100;
@@ -34,7 +35,7 @@ export interface SpeechConfig {
 }
 export function audioApproved(c:SpeechConfig):boolean {
  return c.approved===true&&c.privacyApproved===true&&c.parentApproved===true&&c.brokerApproved===true&&
-  c.brokerOrigin.startsWith('https://')&&/^[a-z][a-z0-9-]{4,62}$/.test(c.projectId)&&
+  validPrivateCoachOrigin(c.brokerOrigin)&&/^[a-z][a-z0-9-]{4,62}$/.test(c.projectId)&&
   Number.isSafeInteger(c.maxMicroUsd)&&c.maxMicroUsd>=1000&&c.maxMicroUsd<=100000;
 }
 export class GooglePrivateSpeech implements PrivateAudioProvider{
