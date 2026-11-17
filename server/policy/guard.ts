@@ -8,7 +8,7 @@ export class SafetyGate {
     try{return validateSafetyPolicy(await this.reader.read());}catch{return null;}
   }
   async check(capability:SafetyCapability):Promise<PolicyGrant|null>{
-    if(!ACTIVE_CAPABILITIES.includes(capability))return null;
+    if(!ACTIVE_CAPABILITIES.some(k=>k===capability))return null;
     const policy=await this.current();
     if(!policy||policy.emergencyStop||policy.capabilities[capability]!==true)return null;
     return {epoch:policy.epoch,capability};
