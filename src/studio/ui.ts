@@ -14,8 +14,8 @@ import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView 
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
-const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',new:'✨'};
-const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',new:'A brand-new idea'};
+const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',moon:'🌙',robot:'🤖',new:'✨'};
+const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',moon:'Moon Donut Dash',robot:'Robot Route Lab',new:'A brand-new idea'};
 const busy=(s:StudioSession)=>!!s.job&&['queued','building','testing'].includes(s.job.status);
 const human=(v:number|boolean)=>typeof v==='boolean'?(v?'On':'Off'):String(v);
 
@@ -160,7 +160,7 @@ export async function installStudio(){
   for(const p of games.list(owner())) if(!entries.some(s=>s.projectId===p.id))entries.push({...notebook.create(owner(),p.game,p.name,p.id)});
   const last=notebook.last(owner());$('studioContinue').replaceChildren();
   if(last){const banner=el('div','studio-continue');const description=el('div');description.append(el('small','','Right where you left your ideas'),el('strong','',`${icon[last.game]} ${last.name}`));banner.append(description);const b=el('button','studio-button studio-primary',last.projectId||last.remoteId?'Continue playing →':'Continue my idea →');b.id='studioContinuePlaying';b.onclick=()=>act(()=>open(last.id));banner.append(b);$('studioContinue').append(banner);}
-  const saved=entries.filter(s=>!s.playOnly||s.experiments?.length||s.candidate);$('studioSavedSection').hidden=!saved.length;$('studioStarterTitle').textContent=saved.length?'Family favorites':'Choose an adventure';
+  const saved=entries.filter(s=>!s.playOnly||s.experiments?.length||s.candidate);$('studioSavedSection').hidden=!saved.length;$('studioStarterTitle').textContent='Factory Favorites';
   saved.forEach(s=>{const card=el('button','studio-library-card');card.setAttribute('data-session',s.id);card.append(el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name));const label=busy(s)?'Working on your idea':readyExperiment(s)||s.candidate?'A test is ready to try':s.projectId||s.remoteId?'Ready to play':'Idea · not built yet';card.append(el('span','studio-card-state',label),el('span','studio-card-link','Open my game →'));card.onclick=()=>act(()=>open(s.id));box.append(card);});refreshShelf();
   const starters=$('studioStarters');starters.replaceChildren();
   (Object.keys(manifests) as GameId[]).forEach(game=>{const b=el('button',`studio-library-card studio-starter ${game}`);b.setAttribute('data-starter',game);b.append(el('span','studio-card-icon',icon[game]),el('span','studio-card-name',names[game]),el('span','studio-card-state','Play, then try your ideas'),el('span','studio-card-link','Play & change →'));if(game==='gum'||game==='hill'){const art=document.createElement('canvas');art.className='quality-card-art';art.dataset.qualityCard=game;art.setAttribute('aria-hidden','true');b.querySelector('.studio-card-icon')!.replaceWith(art);}b.onclick=()=>act(()=>start(game));starters.append(b);});installQualityCards();
@@ -250,7 +250,7 @@ export async function installStudio(){
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
   const native=!remoteViewedId&&s.game!=='new';
   $('studioHelpGoal').textContent=native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
-  const touchHelp:Record<string,string>={gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
+  const touchHelp:Record<string,string>={moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
   const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined).config:undefined;
   const oldConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion!==1;
   $('studioHelpControls').textContent=oldConstruction?'Choose a part in your build, then use the move, turn and connect controls shown below it. Try your machine and change it again.':native&&touch?touchHelp[s.game]:native?FG.games[s.game]?.controls||'Use the controls in your game.':'Tap the game first, then use its buttons or keyboard controls.';
