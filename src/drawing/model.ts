@@ -8,6 +8,8 @@ export interface DrawingPiece {
   id:string; name:string; role:Role; region:Region; parentId:string|null;
   /** A fixed layer follows its parent; a moving part receives an independent joint. */
   physical:boolean;
+  /** Optional hinge/pivot location within this piece: fractions 0–1, default center. */
+  pivot?:{x:number;y:number};
 }
 export interface DrawingAssembly {
   schemaVersion:1; sourceId:string; sourceSha256:string; kind:DrawingKind;
@@ -34,9 +36,11 @@ export function validateAssembly(value:unknown):DrawingAssembly {
     throw Error('Unsupported drawing design.');
   const ids=new Set<string>();
   for(const p of a.pieces){
-    if(!p||typeof p!=='object'||!allowed(p,['id','name','role','region','parentId','physical'])||
+    if(!p||typeof p!=='object'||!allowed(p,['id','name','role','region','parentId','physical','pivot'])||
       !ident(p.id)||ids.has(p.id)||typeof p.name!=='string'||!p.name||p.name.length>50||
-      !roles.includes(p.role)||typeof p.physical!=='boolean'||(p.parentId!==null&&!ident(p.parentId)))
+      !roles.includes(p.role)||typeof p.physical!=='boolean'||(p.parentId!==null&&!ident(p.parentId))||
+      (p.pivot!==undefined&&(!p.pivot||typeof p.pivot!=='object'||!allowed(p.pivot,['x','y'])||
+      !isNumber(p.pivot.x)||!isNumber(p.pivot.y)||p.pivot.x<0||p.pivot.x>1||p.pivot.y<0||p.pivot.y>1)))
       throw Error('Invalid drawing component.');
     ids.add(p.id);validRegion(p.region);
   }
@@ -81,19 +85,21 @@ export function assemblyRig(input:DrawingAssembly):DrawingRig {
   const components=a.pieces.map(piece=>{
     const r=piece.region,c=center(r),width=clamp(r.w*scale,.15,8),height=clamp(r.h*scale,.15,8),wheel=piece.role==='wheel';
     const material:Material=wheel?'rubber':piece.role==='wing'?'fabric':piece.role==='platform'?'wood':'plastic';
+    const pivot={x:((piece.pivot?.x??.5)-.5)*width,y:((piece.pivot?.y??.5)-.5)*height};
     const part={
       schemaVersion:1 as const,id:piece.id,name:piece.name,spriteId:piece.id,width,height,
       mass:wheel?.7:piece.role==='decoration'?.5:1.6,material,
       friction:wheel?1.15:.65,restitution:.08,
       collider:wheel?{type:'circle' as const,radius:Math.min(width,height)/2}:{type:'box' as const,width,height},
-      pivot:{x:0,y:0},
-      attachments:[{id:'center',x:0,y:0,role:'mount' as const},{id:'axle',x:0,y:0,role:'axle' as const}],
+      pivot,
+      attachments:[{id:'center',x:0,y:0,role:'mount' as const},{id:'axle',x:0,y:0,role:'axle' as const},
+        {id:'pivot',x:pivot.x,y:pivot.y,role:'axle' as const}],
     };
     return {id:piece.id,parentId:piece.parentId,part,offset:{x:clamp((c.x-anchor.x)*scale,-8,8),y:clamp((c.y-anchor.y)*scale,-8,8)},angle:0,physical:piece.physical};
   });
   const body=a.pieces.find(p=>p.role==='body');
   const bindings=a.pieces.filter(p=>p.parentId!==null).map(p=>({
-    a:p.parentId!,b:p.id,attachmentA:'center',attachmentB:p.role==='wheel'?'axle':'center',
+    a:p.parentId!,b:p.id,attachmentA:'center',attachmentB:p.role==='wheel'?'axle':'pivot',
     kind:(p.role==='wheel'?'suspension':p.role==='limb'||p.role==='wing'||p.role==='propeller'?'axle':'fixed') as 'fixed'|'axle'|'suspension'
   }));
   return validateDrawingRig({schemaVersion:1,id:'drawing_rig',components,bindings});
