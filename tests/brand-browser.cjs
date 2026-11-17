@@ -9,10 +9,11 @@ const fs=require('node:fs');
  fs.mkdirSync('test-results',{recursive:true});
  try{
   for(const [label,width,height] of [['desktop',1280,900],['mobile',390,844]]){
-   const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile'}),errors=[];
+   const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile',serviceWorkers:'block'}),errors=[];
    page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(15000);
-   page.on('pageerror',e=>errors.push(e.message));await page.goto(base);
+   page.on('pageerror',e=>errors.push(e.message));await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
+   console.log('jems brand '+label+': Studio booted');
    const logo=page.locator('img.jems-brand-logo');
    assert.equal(await logo.count(),1);
    assert.equal(await logo.getAttribute('alt'),'jems');
@@ -69,6 +70,7 @@ const fs=require('node:fs');
    if(await mathHead.count())assert.equal(await mathHead.first().evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)','Math question must stay readable on dark lesson');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
    await page.screenshot({path:'test-results/jems-powers-'+label+'.png',fullPage:false});
+   console.log('jems brand '+label+': learning screen verified');
    await page.locator('footer [data-page="parent"]').click();
    assert.equal(await page.locator('#page-parent').isVisible(),true);
    const parentLabel=await page.locator('#page-parent label[for="parentNickname"]').evaluate(e=>getComputedStyle(e).color);
@@ -85,7 +87,8 @@ const fs=require('node:fs');
    console.log('PASS jems brand page:',label);
    await page.close();
   }
-  const legacy=await browser.newPage();legacy.setDefaultTimeout(12000);
+  const legacy=await browser.newPage({serviceWorkers:'block'});legacy.setDefaultTimeout(12000);
+  console.log('jems brand: checking legacy route');
   await legacy.goto(base+'?arcade=1');await legacy.waitForFunction(()=>window.FG?.app);
   assert.equal(await legacy.locator('.jems-brand-logo').count(),1);
   assert.equal(await legacy.locator('.jems-brand-logo').evaluate(img=>img.complete&&img.naturalWidth>0),true);
