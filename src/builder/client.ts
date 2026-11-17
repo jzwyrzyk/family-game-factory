@@ -9,6 +9,8 @@ export function validateBuilderConfig(input:unknown):BuilderConfig {
  const api=new URL(config.apiBaseUrl!),preview=new URL(config.previewOrigin!);if((api.protocol!=='https:'&&!loopback(api))||(preview.protocol!=='https:'&&!loopback(preview))||api.hostname===preview.hostname||api.username||api.password||preview.username||preview.password)throw Error('UNSAFE_BUILDER_CONFIGURATION');
  return {version:1,mode:'remote',apiBaseUrl:api.href.replace(/\/$/,''),previewOrigin:preview.origin};
 }
+/** Adaptive polling avoids thousands of status reads during a long build. */
+export function buildPollDelay(elapsedMs:number){return elapsedMs<15000?1000:elapsedMs<60000?3000:8000;}
 export class BuilderClient {
  private generation=0;private request:RequestChange|null=null;private requestId='';private retryOf:string|undefined;private last:JobView|null=null;
  constructor(readonly config:BuilderConfig,private update:(job:JobView)=>void){}
@@ -24,15 +26,15 @@ export class BuilderClient {
   const acknowledged=await this.api('/v1/jobs',{gameId:input.gameId,baseRevisionId,prompt:input.prompt,clientRequestId:this.requestId,...(this.retryOf?{retryOf:this.retryOf}:{})});
   if(typeof acknowledged.jobId!=='string'||!/^[\w-]{1,100}$/.test(acknowledged.jobId)||!['queued','building','testing','ready','failed','cancelled'].includes(acknowledged.status))throw Error('INVALID_ACKNOWLEDGEMENT');
   if(token!==this.generation)return;this.last=acknowledged;this.update(this.last!);
-  for(let i=0;i<3600&&token===this.generation;i++){
+  const started=Date.now();for(let i=0;i<3600&&token===this.generation&&Date.now()-started<30*60_000;i++){
    if(['ready','failed','cancelled'].includes(this.last!.status))return this.last;
-   await new Promise(resolve=>setTimeout(resolve,250));if(token!==this.generation)return;
+   await new Promise(resolve=>setTimeout(resolve,buildPollDelay(Date.now()-started)));if(token!==this.generation)return;
    const job=await this.api('/v1/jobs/'+acknowledged.jobId);if(token!==this.generation)return;if(job.jobId!==acknowledged.jobId||!['queued','building','testing','ready','failed','cancelled'].includes(job.status))throw Error('INVALID_JOB_RESPONSE');
    this.last=job;this.update(job);
   }
   if(token!==this.generation)return;throw Error('POLL_TIMEOUT');
  }
- async resume(jobId:string){if(!/^[\w-]{1,100}$/.test(jobId))throw Error('INVALID_JOB');const token=++this.generation;for(let i=0;i<3600&&token===this.generation;i++){const job=await this.api('/v1/jobs/'+jobId);if(token!==this.generation)return;if(job.jobId!==jobId||!['queued','building','testing','ready','failed','cancelled'].includes(job.status))throw Error('INVALID_JOB_RESPONSE');this.last=job;this.update(job);if(['ready','failed','cancelled'].includes(job.status))return job;await new Promise(r=>setTimeout(r,250));}if(token!==this.generation)return;throw Error('POLL_TIMEOUT');}
+ async resume(jobId:string){if(!/^[\w-]{1,100}$/.test(jobId))throw Error('INVALID_JOB');const token=++this.generation,started=Date.now();for(let i=0;i<3600&&token===this.generation&&Date.now()-started<30*60_000;i++){const job=await this.api('/v1/jobs/'+jobId);if(token!==this.generation)return;if(job.jobId!==jobId||!['queued','building','testing','ready','failed','cancelled'].includes(job.status))throw Error('INVALID_JOB_RESPONSE');this.last=job;this.update(job);if(['ready','failed','cancelled'].includes(job.status))return job;await new Promise(r=>setTimeout(r,buildPollDelay(Date.now()-started)));}if(token!==this.generation)return;throw Error('POLL_TIMEOUT');}
  async cancel(){const job=this.last;if(!job)throw Error('NO_ACKNOWLEDGED_JOB');++this.generation;const response=await this.api('/v1/jobs/'+job.jobId+'/cancel',{});this.last=response;this.update(response);}
  disconnect(){++this.generation;this.last=null;this.request=null;}
  async preview(revisionId:string):Promise<Preview>{
