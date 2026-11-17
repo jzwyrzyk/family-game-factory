@@ -38,6 +38,7 @@ const savedUtterance=Object.getOwnPropertyDescriptor(globalThis,'SpeechSynthesis
   voice:any=null;lang='';rate=1;
   constructor(public text:string){}
 };
+function current(){if(!active)throw Error('Recognition did not start');return active;}
 async function run(){
   const microphone=new Button(),installPack=new Button(),hearReply=new Button(),status=new Status();
   const transcripts:string[]=[];
@@ -54,10 +55,10 @@ async function run(){
 
   await voice.listen();
   assert.equal(starts,1);
-  assert.equal(active?.processLocally,true,'microphone must require local processing');
+  assert.equal(current().processLocally,true,'microphone must require local processing');
   assert.equal(microphone.attrs['aria-pressed'],'true');
-  active!.onresult?.({results:[{isFinal:true,0:{transcript:'What if the dragon sneezes spaghetti?'}}]});
-  active!.onend?.();
+  current().onresult?.({results:[{isFinal:true,0:{transcript:'What if the dragon sneezes spaghetti?'}}]});
+  current().onend?.();
   await Promise.resolve();
   assert.deepEqual(transcripts,['What if the dragon sneezes spaghetti?']);
   assert.equal(microphone.attrs['aria-pressed'],'false');
@@ -66,16 +67,16 @@ async function run(){
   assert.equal(hearReply.disabled,false);
 
   await voice.listen();assert.equal(starts,2);
-  active!.onresult?.({results:[{isFinal:true,0:{transcript:'Secret from another child'}}]});
-  scope='child-b:game-two';active!.onend?.();
+  current().onresult?.({results:[{isFinal:true,0:{transcript:'Secret from another child'}}]});
+  scope='child-b:game-two';current().onend?.();
   await Promise.resolve();
   assert.equal(transcripts.length,1,'late voice from another player must not cross profiles');
   voice.cancel();
 
   await voice.listen();
   assert.equal(starts,3);
-  active!.onresult?.({results:[{isFinal:true,0:{transcript:'Do not send this'}}]});
-  active!.onerror?.({error:'not-allowed'});active!.onend?.();
+  current().onresult?.({results:[{isFinal:true,0:{transcript:'Do not send this'}}]});
+  current().onerror?.({error:'not-allowed'});current().onend?.();
   await Promise.resolve();
   assert.equal(transcripts.length,1,'permission failure must not submit a transcript');
 
