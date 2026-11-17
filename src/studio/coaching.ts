@@ -9,6 +9,7 @@ interface Hooks {
  tryRequest(prompt:string,origin:Origin,depth:Experiment['depth']):Promise<void>;
  rules():string;playTest(id:string):Promise<void>;playMain():Promise<void>;combineTests(ids:string[]):Promise<void>;
  pauseForThinking():boolean;showTalk():void;
+ onCoachReply?(text:string):void;
 }
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
@@ -82,6 +83,7 @@ export function installCoaching(h:Hooks){
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
   if(reply.proposedChange){const proposal=reply.proposedChange;box.append(action('Try this idea: '+proposal.title,()=>request(proposal.request,'helper',proposal.depth)));}
   renderPlan();
+  h.onCoachReply?.(reply.text+(reply.question?' '+reply.question:''));
  }
  async function discuss(mode:CoachContext['mode'],supplied?:string){
   let captured:StudioSession|undefined,seq=0,turn:AbortController|undefined;
