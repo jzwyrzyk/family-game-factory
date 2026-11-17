@@ -49,7 +49,7 @@ const fs=require('node:fs');
    else await lab.locator('.dl-canvas').click({position:{x:brushBox.width/2,y:brushBox.height/2}});
    await page.waitForFunction(()=>document.querySelector('dialog.drawing-lab [data-status]')?.textContent?.includes('Piece outline updated'));
    const afterErase=await alphaCount();
-   assert.ok(afterErase<beforeMask,'real pixels were removed from the child's component, not just a label changed');
+   assert.ok(afterErase<beforeMask,"real pixels were removed from the child's component, not just a label changed");
    await lab.locator('[data-mask-include]').click();
    brushBox=await lab.locator('.dl-canvas').boundingBox();assert.ok(brushBox);
    if(touch)await page.touchscreen.tap(brushBox.x+brushBox.width/2,brushBox.y+brushBox.height/2);
