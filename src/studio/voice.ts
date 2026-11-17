@@ -47,6 +47,9 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  async function listen(){
   if(recognition){cancel();announce('Microphone stopped. Nothing was sent.');return;}
   if(!ui.canListen()){announce('Finish your current activity before talking.');return;}
+  // Avoid the coach's last spoken response being recognized as a new child turn.
+  try{window.speechSynthesis?.cancel();}catch{/* Speech output is optional. */}
+  speakAfterVoice=false;
   const Ctor=getCtor(),scope=ui.scope(),seq=++generation;
   if(!Ctor||typeof Ctor.available!=='function'){
    announce('Private on-device speech is not supported here. Tap the text box and use your device keyboard microphone, or type.');return;

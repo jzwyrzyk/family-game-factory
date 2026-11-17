@@ -65,6 +65,7 @@ async function run(){
   voice.reply('Would the spaghetti be a funny surprise?');
   assert.deepEqual(spoken,['Would the spaghetti be a funny surprise?'],'a spoken child turn may receive a verified local spoken reply');
   assert.equal(hearReply.disabled,false);
+  voice.cancel();assert.equal(hearReply.disabled,true,'a previous child reply must not survive navigation');
 
   await voice.listen();assert.equal(starts,2);
   current().onresult?.({results:[{isFinal:true,0:{transcript:'Secret from another child'}}]});
