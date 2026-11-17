@@ -120,11 +120,12 @@ export function installCoaching(h:Hooks){
    h.message(captured,'child',text);const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
    let reply:CoachReply,used:'model'|'local'='local';
    try{
-    const config=h.config();if(config.mode!=='remote')throw Error('COACH_UNAVAILABLE');
+    const config=h.config();if(config.mode!=='remote'||!config.apiBaseUrl)throw Error('COACH_UNAVAILABLE');
+    const apiBaseUrl=config.apiBaseUrl;
     const signal=AbortSignal.any([turn.signal,AbortSignal.timeout(15000)]);
-    if(!await remoteReady(config.apiBaseUrl,signal))throw Error('COACH_UNAVAILABLE');
+    if(!await remoteReady(apiBaseUrl,signal))throw Error('COACH_UNAVAILABLE');
     if(turn.signal.aborted||!isCurrent(captured))return;
-    const response=await fetch(config.apiBaseUrl+'/v1/coach',{
+    const response=await fetch(apiBaseUrl+'/v1/coach',{
      method:'POST',credentials:'include',signal,cache:'no-store',
      headers:{'Content-Type':'application/json','X-Factory-Request':'1'},
      body:JSON.stringify({requestId:crypto.randomUUID(),context:c})
