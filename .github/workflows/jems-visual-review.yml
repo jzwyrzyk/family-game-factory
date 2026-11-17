@@ -28,3 +28,37 @@ jobs:
           name: jems-page-by-page-review
           path: test-results/brand-review/
           if-no-files-found: warn
+  brand-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build for isolated smoke test
+        run: npm run build
+      - name: Run isolated jems brand-browser contract
+        run: node tests/brand-browser.cjs
+  studio-journey:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build for isolated smoke test
+        run: npm run build
+      - name: Run isolated Studio save-play-iterate journey
+        run: node tests/studio-journey.cjs
