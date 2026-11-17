@@ -84,6 +84,19 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     await page.clock.runFor(91_000);
     await page.waitForSelector('#stage-overlay .language-activity');
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
+    const geometry=await page.locator('#stage-overlay').evaluate(el=>{
+      const r=el.getBoundingClientRect(),activity=el.querySelector('.language-activity')!.getBoundingClientRect();
+      const text=getComputedStyle(el.querySelector('.language-lead')!).color;
+      return {position:getComputedStyle(el).position,top:r.top,left:r.left,width:r.width,height:r.height,
+        questWidth:activity.width,questLeft:activity.left,questRight:activity.right,questTop:activity.top,text};
+    });
+    assert.equal(geometry.position,'fixed','native learning is a viewport dialog rather than clipped inside the game stage');
+    assert.ok(Math.abs(geometry.top)<2&&Math.abs(geometry.left)<2);
+    assert.ok(geometry.width>=viewport.width-2&&geometry.height>=viewport.height-2);
+    assert.ok(geometry.questWidth>=Math.min(330,viewport.width-30),'child has usable reading width on mobile');
+    assert.ok(geometry.questLeft>=0&&geometry.questRight<=viewport.width+1);
+    assert.ok(!/rgb\(213, 222, 243\)/.test(geometry.text),'text must not inherit pale text from dark modal card');
+    assert.equal(await page.locator('[data-action="leave-game"]').isVisible(),true,'the child can leave without solving or cheating');
     assert.equal(await game.evaluate(el=>(el as HTMLElement).inert),true);
     await page.keyboard.press('ArrowLeft');
     assert.equal(await page.evaluate(()=>window.FG.runtime.snapshot().state.parts[0].x),before,'paused game cannot change while reading');

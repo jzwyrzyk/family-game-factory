@@ -31,13 +31,13 @@ export function installLearningHost() {
     });}catch(error){active=null;activeOwner='';generation++;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));throw error;}
     return active;
   }
-  function checkpoint(target:HTMLElement,context:LearningContext,onComplete:(result:any)=>void,options:{roundId?:string;legacyIds?:boolean;challenge?:boolean}={}) {
+  function checkpoint(target:HTMLElement,context:LearningContext,onComplete:(result:any)=>void,options:{roundId?:string;legacyIds?:boolean;challenge?:boolean;onLeave?:()=>void}={}) {
     const p: LearnerProfile=FG.store.current();
     const token=options.roundId?`${p.id}:${context.gameId}:${context.versionId}:${options.roundId}`:null;
     if(token&&seen.has(token))return false;
     if(active||!FG.math.canAsk(p))return false;
     const key=context.projectId||context.gameId||'game',mode=context.mode||modeFor(p,key);
-    mount(target,{profile:p,context:{...context,mode},mode,legacyIds:options.legacyIds,challenge:options.challenge,onComplete});
+    mount(target,{profile:p,context:{...context,mode},mode,legacyIds:options.legacyIds,challenge:options.challenge,onLeave:options.onLeave,onComplete});
     if(token){seen.add(token);if(seen.size>500)seen.delete(seen.values().next().value!);}
     FG.math.didAsk(p);
     return true;

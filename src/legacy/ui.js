@@ -25,7 +25,7 @@ function safeCheckpoint(kind){
  const open=()=>{
   if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;
   const overlay=overlayHtml('<div id="native-learning-activity" class="modal-card"></div>');
-  try{if(!FG.learning.checkpoint(overlay.firstElementChild,{...learningContext,opportunity:'mid-play'},complete,{roundId:token,legacyIds:true}))complete();}
+  try{if(!FG.learning.checkpoint(overlay.firstElementChild,{...learningContext,opportunity:'mid-play'},complete,{roundId:token,legacyIds:true,onLeave:()=>page('home')}))complete();}
   catch{const box=overlay.firstElementChild;box.replaceChildren();const title=document.createElement('h2'),copy=document.createElement('p'),retry=document.createElement('button');title.textContent='Your game is paused';copy.textContent='A learning activity could not open. Try again, or leave this game and ask a grown-up for help.';retry.className='btn primary';retry.textContent='Try learning again';retry.onclick=open;box.append(title,copy,retry);retry.focus();}
  };
  open();return true;
@@ -51,7 +51,7 @@ function finish(game,result){
    if(session!==gameSession)return;
    const outcome=activeGameId==='buckets'&&p.punish&&p.learningSubject!=='language'&&!response.independent?{...result,won:false,title:'Run complete',description:'Original Challenge: this answer ended the run. Try again when ready.'}:result;
    showResult(outcome,response.independent);
- },{legacyIds:true,challenge:activeGameId==='buckets'&&p.punish&&p.learningSubject!=='language'});
+ },{legacyIds:true,challenge:activeGameId==='buckets'&&p.punish&&p.learningSubject!=='language',onLeave:()=>page('home')});
  if(!asked)showResult(result,true);
 }
 function showResult(result,mathFirstTry){if(!activeGame)return;const p=FG.store.current();const penalty=!!p.punish&&p.learningSubject!=='language'&&!mathFirstTry&&result.won;const won=!!result.won&&!penalty;FG.store.recordGame(activeGameId,won,result.level);let txt=penalty?'Math challenge missed on the first try. Parent challenge mode means repeating this level.':result.description;

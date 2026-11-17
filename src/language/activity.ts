@@ -5,7 +5,7 @@ import type {LearningMode} from '../learning/types';
 
 export interface LanguageActivityOptions {
   profile:LanguageProfile;context?:LanguageContext;item?:LanguageItem;mode?:LearningMode;
-  onComplete(result:LanguageResult):void;onSave():void;legacyIds?:boolean;
+  onComplete(result:LanguageResult):void;onSave():void;onLeave?:()=>void;legacyIds?:boolean;
 }
 let sequence=0;
 const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls?:string,text?:string):HTMLElementTagNameMap[K]=>{
@@ -33,6 +33,12 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   const lead=make('p','language-lead',item.kind==='creative'?
     'Your ideas are yours. This writing adventure has no right-or-wrong grade.':
     'Think it through. Help is always here if you need it.');
+  if(options.onLeave){
+    const top=make('div','language-topbar');
+    const leave=button('← Back to Play','language-leave');leave.dataset.action='leave-game';
+    on(leave,'click',()=>{if(!disposed&&!done)options.onLeave?.();});
+    top.append(leave);root.append(top);
+  }
   root.append(eyebrow,subtitle,title,lead);
   if(item.passage){
     const story=make('section','language-passage');
