@@ -1,5 +1,14 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
+  moon: {version:1,id:'moon',name:'Moon Donut Dash',mechanics:[
+    {key:'donutGoal',label:'Donuts to collect',type:'number',default:6,min:4,max:12,step:1},
+    {key:'moonGravity',label:'Moon gravity',type:'number',default:0.6,min:0.3,max:0.9,step:0.1},
+    {key:'meteorRate',label:'Meteor frequency',type:'number',default:1,min:0.5,max:1.5,step:0.25},
+  ]},
+  robot: {version:1,id:'robot',name:'Robot Route Lab',mechanics:[
+    {key:'robotSpeed',label:'Robot movement speed',type:'number',default:1,min:0.5,max:2,step:0.25},
+    {key:'showTrail',label:'Show my path',type:'boolean',default:true},
+  ]},
   gum: { version: 1, id: 'gum', name: 'Bubble Gum Builders', mechanics: [
     { key: 'qualityVersion', label: 'Physical workshop', type: 'number', default: 1, min: 0, max: 1, step: 1 },
     { key: 'gravity', label: 'Gravity', type: 'number', default: 10, min: 4, max: 16, step: 1 },
@@ -49,6 +58,11 @@ export function validateConfig(game: GameId, value: unknown): Mechanics {
 }
 export function defaults(game: GameId, difficulty: Difficulty = 'classic'): Mechanics {
   const config = Object.fromEntries(manifests[game].mechanics.map(m => [m.key, m.default]));
+  if (game === 'moon' || game === 'robot') {
+    if (difficulty === 'gentle') Object.assign(config,game==='moon'?{donutGoal:4,meteorRate:0.5}:{robotSpeed:0.75,showTrail:true});
+    if (difficulty === 'stretch') Object.assign(config,game==='moon'?{donutGoal:9,meteorRate:1.5}:{robotSpeed:1.5,showTrail:false});
+    return validateConfig(game,config);
+  }
   if (difficulty === 'gentle') Object.assign(config, game === 'gum' ? { highlightMatches: true, jointStrength: 1.5, gravity: 8 } : game === 'buckets' ? { revealSafe: true } : game === 'hill' ? { enginePower: .8, grip: 1.2 } : { hearts: 7, breathSpeed: 0.65, fireballCadence: .75, shieldRadius: 82 });
   if (difficulty === 'stretch') Object.assign(config, game === 'gum' ? { extraDecoys: 2, jointStrength: .75 } : game === 'buckets' ? { bucketCount: 4 } : game === 'hill' ? { enginePower: 1.3, grip: .8 } : { hearts: 3, breathSpeed: 1.4, fireballCadence: 1.25, shieldRadius: 62 });
   // Preset breath speed retains the original 0.65; editable values use steps of 0.05.
