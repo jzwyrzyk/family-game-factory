@@ -20,6 +20,8 @@ const fs=require('node:fs');
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2D7BFF');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
+   const makeHeading=await page.locator('#studioNew .studio-make-copy strong').evaluate(e=>getComputedStyle(e).color);
+   assert.equal(makeHeading,'rgb(255, 255, 255)','Create headline must stay white on saturated blue');
 
   // Brand fidelity regression: validate the exact named palette and semantic accessible roles.
   const tokens=await page.evaluate(()=>{
@@ -60,10 +62,14 @@ const fs=require('node:fs');
    await page.locator('#studioNavHome').click();
    await page.locator('#studioNavPowers').click();
    assert.equal(await page.locator('#page-lab').isVisible(),true);
+   const mathHead=page.locator('#page-lab .math-activity h2');
+   if(await mathHead.count())assert.equal(await mathHead.first().evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)','Math question must stay readable on dark lesson');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
    await page.screenshot({path:'test-results/jems-powers-'+label+'.png',fullPage:false});
    await page.locator('footer [data-page="parent"]').click();
    assert.equal(await page.locator('#page-parent').isVisible(),true);
+   const parentLabel=await page.locator('#page-parent label[for="parentNickname"]').evaluate(e=>getComputedStyle(e).color);
+   assert.equal(parentLabel,'rgb(52, 68, 102)','Parent form labels need strong Ink-on-white contrast');
    await page.screenshot({path:'test-results/jems-parent-'+label+'.png',fullPage:false});
    const manifest=await page.evaluate(()=>fetch('./manifest.webmanifest').then(r=>r.json()));
    assert.equal(manifest.short_name,'jems');
@@ -78,6 +84,10 @@ const fs=require('node:fs');
   assert.equal(await legacy.locator('.jems-brand-logo').count(),1);
   assert.equal(await legacy.locator('.jems-brand-logo').evaluate(img=>img.complete&&img.naturalWidth>0),true);
   assert.equal(await legacy.locator('#page-home').isVisible(),true);
+  const legacyText=await legacy.locator('.hero p').evaluate(e=>getComputedStyle(e).color);
+  assert.equal(legacyText,'rgb(69, 85, 116)','Legacy hero body text must be readable on light surfaces');
+  const legacyAction=await legacy.locator('.hero .btn.ghost').evaluate(e=>getComputedStyle(e).color);
+  assert.equal(legacyAction,'rgb(82, 44, 157)','Legacy secondary action must not use old white-on-white styling');
   await legacy.close();
   console.log('PASS jems brand contract: logo, palette, navigation, Send vs Speak, 6 games, parents, learning, mobile and legacy Arcade');
  }finally{await browser.close();server.close();}
