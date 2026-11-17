@@ -18,8 +18,42 @@ export function installLearningHost() {
   const FG=(window as any).FG;
   const sessionId=crypto.randomUUID();
   let active:Activity|null=null, activeOwner='', generation=0;
+  // A fully unanswered checkpoint remains a learning obligation. Returning to
+  // another game must not turn the old budget receipt into a ten-minute bypass.
+  type BudgetReceipt={profile:LearnerProfile;attemptId:string;at:number;subject:'math'|'language'};
+  let activeBudget:BudgetReceipt|null=null;
   const seen=new Set<string>();
-  function dispose(){generation++;const previous=active;active=null;activeOwner='';previous?.dispose('interrupted');window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));}
+  function didParticipate(receipt:BudgetReceipt) {
+    const state=receipt.subject==='language'?receipt.profile.language:receipt.profile.learning;
+    const attempts=(state as any)?.attempts;
+    const record=Array.isArray(attempts)?attempts.find((a:any)=>a.id===receipt.attemptId):null;
+    // When evidence is unavailable, keep the receipt rather than inventing a refund.
+    if(!record)return true;
+    return !!(record.answers?.length||record.hintEvents?.length||record.hints?.length||
+      record.hintLevel||record.hintDepth||record.readTargetAt!==undefined);
+  }
+  function refundUnanswered(receipt:BudgetReceipt) {
+    if(didParticipate(receipt))return;
+    const window=receipt.profile.mathWindow;
+    if(!Array.isArray(window))return;
+    const at=window.lastIndexOf(receipt.at);
+    if(at<0)return;
+    const prior=window.slice();
+    window.splice(at,1);
+    if(!FG.store.save()){
+      receipt.profile.mathWindow=prior;
+      // Storage failures are already reported by the learning host; no false
+      // claim that the new eligibility was durably saved.
+    }
+  }
+  function dispose(){
+    generation++;
+    const previous=active,receipt=activeBudget;
+    active=null;activeOwner='';activeBudget=null;
+    previous?.dispose('interrupted');
+    if(previous&&receipt)refundUnanswered(receipt);
+    window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));
+  }
   function mount(target:HTMLElement, options:any) {
     if(FG.store.loadError)throw Error(FG.store.loadError);
     dispose();const own=++generation,profile=options.profile||FG.store.current();activeOwner=profile.id||'';
@@ -27,7 +61,7 @@ export function installLearningHost() {
     try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
       onSave:()=>{if(!FG.store.save()){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}} options.onSave?.();},
-      onComplete:(result:any)=>{if(own!==generation||activeOwner!==FG.store.current().id)return;active=null;activeOwner='';window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));options.onComplete(result);},
+      onComplete:(result:any)=>{if(own!==generation||activeOwner!==FG.store.current().id)return;active=null;activeOwner='';activeBudget=null;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));options.onComplete(result);},
     });}catch(error){active=null;activeOwner='';generation++;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));throw error;}
     return active;
   }
@@ -40,6 +74,8 @@ export function installLearningHost() {
     mount(target,{profile:p,context:{...context,mode},mode,legacyIds:options.legacyIds,challenge:options.challenge,onLeave:options.onLeave,onComplete});
     if(token){seen.add(token);if(seen.size>500)seen.delete(seen.values().next().value!);}
     FG.math.didAsk(p);
+    const askedAt=Array.isArray(p.mathWindow)?p.mathWindow.at(-1):undefined;
+    if(active&&typeof askedAt==='number')activeBudget={profile:p,attemptId:active.attemptId,at:askedAt,subject:subjectFor(p)};
     return true;
   }
   function saveMode(key:string,value:unknown) {

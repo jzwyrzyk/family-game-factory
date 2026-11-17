@@ -39,3 +39,5 @@ The app is a supplementary learning toy, not an IXL/Lexia replacement, normed as
 ## Immutable curriculum archive
 
 The initial v1 bank has a pinned fingerprint. Once released, preserve it byte-for-byte and introduce revised instructional content in a v2 (or later) pack; never silently edit past question templates or their answers. CI validates a stored task's contentPack, explanation, answer, response form and graded options. Simulate a historic v1 backup when deploying any future pack.
+
+- An entirely unanswered native learning checkpoint followed by Back to Games is recorded as interrupted and **does not** consume the remaining rolling-budget opportunity. A supported/answered checkpoint still consumes its shared budget. This prevents checkpoint abandonment becoming a learning-off pathway.

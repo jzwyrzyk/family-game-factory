@@ -29,3 +29,7 @@ A target question is visible and focused before a keyboard appears. Optional spe
 ## Reviewed task revisions and backward compatibility
 
 Each item carries a **contentPack** and a versioned ID (`skill-id:v1:index`). The v1 192-item bank is pinned by a test fingerprint. Future editorial fixes, new examples and grade expansion must publish a **new** content pack and keep old pack material available for validating historic attempts; changing v1 in place after any family uses it could make saved data unreadable. The new pack ID is part of a task's unique identity and retention evidence. Bump the pack revision rather than rewriting an archive. A saved attempt's answer, choice set, response form, task text, hint chain and explanation are checked against its declared reviewed pack.
+
+## Unanswered checkpoints and question-budget integrity
+
+Each host-owned checkpoint gets a shared-budget receipt. If a child leaves a **completely unanswered** checkpoint without requesting a hint, worked example or reading support, the original interrupted record is retained but the budget receipt is refunded. This prevents leaving a game from producing an extended learning-free period. A valid response or meaningful help remains a practice interaction and retains its budget receipt. The host refuses an unsupported refund if the original attempt cannot be identified or saving fails. This policy applies equally to Math and Language Arts because they use the same trusted host.

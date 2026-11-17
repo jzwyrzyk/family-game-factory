@@ -131,6 +131,8 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     const exited=await page.evaluate(id=>window.FG.store.current().language.attempts.find((a:any)=>a.id===id),abandoned);
     assert.equal(exited.outcome,'interrupted','leaving a game cannot invent a wrong response');
     assert.equal(exited.answers.length,0);
+    assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),true,
+      'An unanswered exit cannot consume a ten-minute checkpoint and create a learning-free game');
     await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
     await page.selectOption('#parentSubject','math');
     await page.click('#saveParent');
