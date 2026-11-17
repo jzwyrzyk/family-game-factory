@@ -16,6 +16,8 @@ server/**/*.key
 server/**/*private*config*.json
 
 server/testing/**
+# Operator-only tooling must not ship inside the public runtime images.
+server/policy/owner-stop.ts
 
 server/**/config.json
 server/**/config.*.json
