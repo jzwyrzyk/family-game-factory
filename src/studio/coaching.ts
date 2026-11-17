@@ -77,7 +77,7 @@ export function installCoaching(h:Hooks){
   }catch(error){if(!token||token===requestGeneration)report(error,captured);}finally{if(token&&token===requestGeneration){force=false;requestInFlight=false;origin='child';depth='tune';}}
  }
  function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession){
-  h.message(captured,'helper',(mode==='local'?'Local design helper: ':'AI design coach: ')+reply.text+(reply.question?'\n'+reply.question:''));
+  h.message(captured,'helper',(mode==='local'?'jems · offline helper: ':'jems · AI helper: ')+reply.text+(reply.question?'\n'+reply.question:''));
   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();let changed=false;for(const d of reply.childDecisions||[]){if(!s.design.plan[d.field]?.accepted){s.design.plan[d.field]={value:d.quote,origin:'child',accepted:true,delegated:false};changed=true;}}for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:current?.delegated||false};changed=true;}}if(changed)s.design.approvedPlan=false;});
   const box=$('coachProposals');box.replaceChildren();
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
