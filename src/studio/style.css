@@ -334,3 +334,6 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-review #page-studio-library .studio-card-state{font-size:11px}
  .studio-review #page-studio-library .studio-card-link{font-size:11px;padding-top:7px}
 }
+
+/* Keep the optional update banner legible against the light Studio shell. */
+body.studio-review > .factory-update-notice{color:#394862}
