@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="appTitle"><title id="appTitle">jems app icon</title><rect x="2" y="2" width="188" height="188" rx="40" fill="#FFF7EE"/><svg x="17" y="17" width="158" height="158" viewBox="0 0 120 120">
+<defs><clipPath id="jemsGemClip"><path d="M27 12H93L116 47L60 114L4 47Z"/></clipPath></defs>
+<g clip-path="url(#jemsGemClip)">
+<path d="M4 47 27 12 49 12 54 43 18 65Z" fill="#2D9EFF"/>
+<path d="M27 12H93L86 44 54 43 49 12Z" fill="#8A4DFF"/>
+<path d="M93 12 116 47 99 62 86 44Z" fill="#AE79FF"/>
+<path d="M4 47 54 43 60 72 18 65Z" fill="#0A6EEB"/>
+<path d="M54 43 86 44 116 47 99 62 60 72Z" fill="#5125BF"/>
+<path d="M4 47 18 65 60 114 57 75Z" fill="#16D6B2"/>
+<path d="M18 65 60 72 60 114Z" fill="#2D7BFF"/>
+<path d="M116 47 99 62 60 114 60 72Z" fill="#FF6B7A"/>
+<path id="jems-wrench" d="M51 45 C44 45 37 54 37 67 C37 79 44 88 54 92 L54 114 H66 V92 C76 88 83 79 83 67 C83 54 76 45 69 45 V59 C69 66 66 69 60 69 C54 69 51 66 51 59 Z" fill="#FFFFFF"/>
+<path d="M51 45H69V59C69 66 66 69 60 69C54 69 51 66 51 59Z" fill="#5125BF"/>
+</g></svg></svg>

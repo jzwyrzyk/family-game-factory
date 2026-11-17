@@ -1,6 +1,7 @@
 import {freshDesign, PLAN_FIELDS, PLAN_LABELS, missingPlan,localCoach,validateCoachReply,type CoachContext,type CoachReply,type Experiment,type Origin,type PlanField,type DesignField} from './design';
 import type {StudioNotebook,StudioSession} from './notebook';
 import type {BuilderConfig} from '../builder/client';
+import {celebrateJem} from '../brand/delight';
 interface Hooks {
  notebook:StudioNotebook;current():StudioSession;owner():string;
  message(s:StudioSession,role:'child'|'helper'|'reflection',text:string):void;
@@ -77,7 +78,7 @@ export function installCoaching(h:Hooks){
   }catch(error){if(!token||token===requestGeneration)report(error,captured);}finally{if(token&&token===requestGeneration){force=false;requestInFlight=false;origin='child';depth='tune';}}
  }
  function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession){
-  h.message(captured,'helper',(mode==='local'?'Local design helper: ':'AI design coach: ')+reply.text+(reply.question?'\n'+reply.question:''));
+  h.message(captured,'helper',(mode==='local'?'jems · offline helper: ':'jems · AI helper: ')+reply.text+(reply.question?'\n'+reply.question:''));
   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();let changed=false;for(const d of reply.childDecisions||[]){if(!s.design.plan[d.field]?.accepted){s.design.plan[d.field]={value:d.quote,origin:'child',accepted:true,delegated:false};changed=true;}}for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:current?.delegated||false};changed=true;}}if(changed)s.design.approvedPlan=false;});
   const box=$('coachProposals');box.replaceChildren();
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
@@ -94,7 +95,10 @@ export function installCoaching(h:Hooks){
    if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');
    seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;
    h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(/don.t know|stuck/i.test(text))s.design.helpLevel=Math.min(3,s.design.helpLevel+1);});
-   h.message(captured,'child',text);const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
+   const firstIdea=captured.game==='new'&&!captured.messages.some(m=>m.role==='child');
+   h.message(captured,'child',text);
+   if(firstIdea&&isCurrent(captured))celebrateJem('idea','studioConversation');
+   const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
    let reply:CoachReply,used:'model'|'local'='local';
    try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
     const response=await fetch(config.apiBaseUrl+'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
