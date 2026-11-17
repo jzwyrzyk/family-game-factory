@@ -39,7 +39,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     const box=document.createElement('section');box.className='math-activity';
     const title=document.createElement('h2');title.textContent='Your game is paused';title.tabIndex=-1;
     const text=document.createElement('p');text.setAttribute('role','alert');text.textContent=message;box.append(title,text);
-    if(retry){const button=document.createElement('button');button.className='math-primary';button.textContent=waiting?'Try math again':'Try opening the game again';button.onclick=retry;box.append(button);}
+    if(retry){const button=document.createElement('button');button.className='math-primary';button.textContent=waiting?'Try learning again':'Try opening the game again';button.onclick=retry;box.append(button);}
     target.append(box);if(owns()&&visible()){title.focus({preventScroll:true});title.scrollIntoView({block:'nearest'});}
   }
   function handshake(){
@@ -61,10 +61,10 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
       if(completed)options.onRound?.({won:completed.won!,score:completed.score!});
     };
     try{
-      const asked=FG.learning.checkpoint(cover,{gameId:options.gameId||'generated',versionId:options.versionId,projectId:options.projectId||options.gameId||'generated',mode:options.mode},complete,{roundId:`${instanceId}:${token}`});
+      const asked=FG.learning.checkpoint(cover,{gameId:options.gameId||'generated',versionId:options.versionId,projectId:options.projectId||options.gameId||'generated',mode:options.mode,opportunity:d.event==='round-complete'?'round-end':'mid-play'},complete,{roundId:`${instanceId}:${token}`});
       if(!asked)complete();
     }catch{
-      failed('Math could not open, so this game is paused. Try again, or leave the game and ask a grown-up to check saved progress.',()=>begin(d,token));
+      failed('Learning activity could not open, so this game is paused. Try again, or leave the game and ask a grown-up to check saved progress.',()=>begin(d,token));
     }
   }
   function event(message:MessageEvent) {
@@ -72,7 +72,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     const d=message.data;
     if(!d||d.type!=='factory-preview'||d.channel!==options.channel||d.artifactId!==options.artifactId)return;
     if(d.event==='ready'){
-      if(d.learningProtocol!==1){ready=false;clearTimeout(handshakeTimer);protocolError='This saved preview needs an updated game player to include math. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);return;}
+      if(d.learningProtocol!==1){ready=false;clearTimeout(handshakeTimer);protocolError='This saved preview needs an updated game player to include '+(FG.learning.subject==='language'?'learning':'math')+'. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);return;}
       protocolError=null;if(ready)return;
       ready=true;clearTimeout(handshakeTimer);
       if(!waiting){cover?.remove();cover=null;frame.inert=false;frame.style.pointerEvents='';if(connectionPaused){connectionPaused=false;tell('resume');}}
@@ -80,7 +80,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     }
     if(!ready||!['round-complete','math-checkpoint'].includes(d.event))return;
     if(!boundedId(d.roundId)){
-      if(d.roundId===undefined&&!waiting){ready=false;protocolError='This preview needs an updated game player to include math. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);}
+      if(d.roundId===undefined&&!waiting){ready=false;protocolError='This preview needs an updated game player to include '+(FG.learning.subject==='language'?'learning':'math')+'. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);}
       return;
     }
     if(d.event==='round-complete'&&(typeof d.won!=='boolean'||!Number.isInteger(d.score)||d.score<0||d.score>1_000_000))return;

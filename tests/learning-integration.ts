@@ -5,7 +5,7 @@ import type {AddressInfo} from 'node:net';
 import {build, transformSync} from 'esbuild';
 import {chromium, type Browser, type Page} from 'playwright';
 import {start} from './browser-server.cjs';
-import {generateItem} from '../src/learning/content';
+import {generateItem,evaluateAnswer} from '../src/learning/content';
 import type {MathItem} from '../src/learning/types';
 import {renderPreview} from '../server/pipeline/artifacts';
 import {renderGenerated} from '../server/sandbox/preview.cjs';
@@ -33,10 +33,16 @@ async function submitWritten(page:Page,item:MathItem,answer=String(item.answer))
   }
 }
 function wrongAnswer(item:MathItem):string {
-  if(item.answerKind==='choice')return item.choices!.find(c=>c.value!==String(item.answer))!.value;
-  if(item.answerKind==='number')return String(Number(item.answer)+1);
-  if(item.answerKind==='fraction')return Number(String(item.answer).split('/')[0])===0?'1/1':'0/1';
-  return String(item.answer)==='1:00'?'2:00':'1:00';
+  const choices=item.answerKind==='choice'
+    ?(item.choices||[]).map(c=>c.value)
+    :item.answerKind==='text'
+      ?['definitely incorrect','1:00','2:00',String(item.answer)+' different']
+      :item.answerKind==='fraction'
+        ?['0/1','1/1','2/1','1/2','3/4']
+        :['0','1','2','3','-1','10','100',String(Number(item.answer)+1)];
+  const candidate=choices.find(raw=>{const result=evaluateAnswer(item,raw);return result.valid&&!result.correct;});
+  assert.ok(candidate,'The fixture needs a valid-but-incorrect response for '+item.skillId);
+  return candidate;
 }
 async function finishWithHelp(page:Page) {
   await activity(page).locator('[data-action="show-solution"]').click();
@@ -74,7 +80,11 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
     await submitWritten(page,first,wrongAnswer(first));
     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});
-    assert.equal(savedWrong.answers.length,1);assert.equal(savedWrong.answers[0].correct,false);assert.equal(savedWrong.outcome,'open');
+    assert.equal(savedWrong.answers.length,1,
+      'Every accepted wrong response must be saved immediately; '+JSON.stringify({
+        skill:first.skillId,kind:first.answerKind,answer:first.answer,
+        candidate:wrongAnswer(first),lastAttempt:savedWrong
+      }));assert.equal(savedWrong.answers[0].correct,false);assert.equal(savedWrong.outcome,'open');
     await activity(page).locator('[data-action="hint"]').click();
     const hinted=(await attempts(page)).find((a:any)=>a.id===firstId);assert.equal(hinted.hintLevel,1);
     await page.screenshot({path:`test-results/math-lab-help-${name}.png`,fullPage:true});
