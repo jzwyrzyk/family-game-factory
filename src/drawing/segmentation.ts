@@ -73,6 +73,10 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
  const ctx=canvas.getContext('2d',{willReadFrequently:true})!;
  ctx.drawImage(image,r.x*w,r.y*h,r.w*w,r.h*h,0,0,canvas.width,canvas.height);
  const pixels=ctx.getImageData(0,0,canvas.width,canvas.height),d=pixels.data;
+ // Hold the input alpha for explicit "bring it back" strokes; do not create
+ // pixels not present in the original drawing.
+ const originalAlpha=piece.maskStrokes?.length?new Uint8Array(canvas.width*canvas.height):null;
+ if(originalAlpha)for(let i=0;i<originalAlpha.length;i++)originalAlpha[i]=d[i*4+3];
  // Find pale paper by sampling the original image BORDER. The original is never altered.
  // Only flood-connected background is removed: enclosed white details remain visible.
  const source=(image as HTMLCanvasElement).getContext?.('2d',{willReadFrequently:true});
@@ -111,6 +115,31 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
     const q=other.region,nx=(ax-q.x-q.w/2)/(q.w/2),ny=(ay-q.y-q.h/2)/(q.h/2);
     if(nx*nx+ny*ny<.92)d[p+3]=0;
    }
+  }
+ }
+ if(originalAlpha&&piece.maskStrokes?.length){
+  // A small browser canvas rasterizes the child-drawn brush paths. The last
+  // matching stroke wins, while all geometry stays inside the selected region.
+  const overlay=document.createElement('canvas');overlay.width=W;overlay.height=H;
+  const brush=overlay.getContext('2d',{willReadFrequently:true})!;
+  brush.lineCap='round';brush.lineJoin='round';
+  for(const stroke of piece.maskStrokes){
+   const color=stroke.action==='include'?'#00dd00':'#dd0000';
+   const points=stroke.points.map(q=>({
+     x:(q.x-r.x)/r.w*W,y:(q.y-r.y)/r.h*H
+   }));
+   brush.strokeStyle=color;brush.fillStyle=color;
+   brush.lineWidth=Math.max(1,stroke.radius/r.w*W*2);
+   brush.beginPath();brush.moveTo(points[0].x,points[0].y);
+   for(const pt of points.slice(1))brush.lineTo(pt.x,pt.y);
+   brush.stroke();
+   brush.beginPath();brush.arc(points[0].x,points[0].y,brush.lineWidth/2,0,Math.PI*2);brush.fill();
+  }
+  const edits=brush.getImageData(0,0,W,H).data;
+  for(let i=0;i<W*H;i++){
+   const off=i*4;
+   if(edits[off+3]<100)continue;
+   d[off+3]=edits[off+1]>edits[off]?originalAlpha[i]:0;
   }
  }
  ctx.putImageData(pixels,0,0);return canvas;
