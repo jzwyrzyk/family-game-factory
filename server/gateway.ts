@@ -1,4 +1,5 @@
 import {CoachService} from './coach/service';
+import {PrivateCoachBroker} from './coach/broker';
 import {coachConfig,coachHandler} from './coach/http';
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {createServer} from 'node:http';
@@ -44,7 +45,11 @@ export async function createGateway(config:GatewayConfig){
  const dispatcher=new GitHubDispatcher({enabled:paidEnabled,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:paidEnabled&&config.approval.enabled});
  const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker});
  const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
- const coach=coachHandler(new CoachService(repo,coachConfig(process.env)),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
+ // Never place a model key in the gateway, even when the coach is disabled.
+ if(process.env.FACTORY_COACH_API_KEY)throw Error('GATEWAY_COACH_MODEL_KEY_FORBIDDEN');
+ const settings=coachConfig(process.env);
+ const broker=new PrivateCoachBroker({origin:process.env.FACTORY_COACH_BROKER_ORIGIN||''});
+ const coach=coachHandler(new CoachService(repo,settings,broker),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
  const api=apiHandler(service,http),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
