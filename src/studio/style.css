@@ -301,3 +301,36 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-review #page-studio-library .studio-starter,.studio-make-tile{transition:none}
  .studio-review #page-studio-library .studio-starter:hover,.studio-make-tile:hover{transform:none}
 }
+
+
+/* Screenshot-reviewed refinements: no decorative focus ring on static headings;
+   keep a complete playable card above the fold on 390x844 phones. */
+.studio-review #studioLibraryTitle:focus{outline:none}
+.studio-review .studio-profile-menu>summary{min-height:48px}
+.studio-review .factory-update-notice{max-width:1160px;width:calc(100% - 28px);margin:16px auto;padding:13px 16px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:#f9faff;border:1px solid #dde3f5;border-radius:15px;color:#475575;box-shadow:0 8px 21px #303c710c;font:600 13px/1.5 system-ui}
+.studio-review .factory-update-notice .btn{font-size:13px;min-height:44px;background:#eeeaff;color:#463d9e;border:1px solid #bbb3e8}
+@media(max-width:650px){
+ .studio-review .site-header{padding:8px 13px 6px;gap:6px}
+ .studio-review .studio-nav{gap:4px}
+ .studio-review .studio-nav button{padding:8px 10px;min-height:44px}
+ .studio-review .profile-bar{padding:0 12px}
+ .studio-review .studio-profile-menu>summary{min-height:44px;padding:7px 12px}
+ .studio-review main{padding:8px 12px 30px}
+ .studio-review #page-studio-library .studio-home-hero{padding:20px 22px 17px;gap:13px}
+ .studio-home-intro .studio-kicker{font-size:9px;letter-spacing:1.5px}
+ .studio-home-intro h1{font-size:34px;line-height:1.03;margin:8px 0 6px}
+ .studio-home-intro>p{font-size:14px}
+ .studio-make-tile{min-height:85px;padding:11px 14px}
+ .studio-make-icon{width:42px;height:42px;font-size:24px}
+ .studio-make-copy strong{font-size:20px}
+ .studio-home-action{gap:6px}
+ .studio-creation-note{font-size:10px;line-height:1.35}
+ .studio-review #page-studio-library .studio-section-heading{margin:18px 0 10px}
+ .studio-review #page-studio-library .studio-home-favorites .studio-section-heading p{display:none}
+ .studio-review #page-studio-library .studio-starter{min-height:201px}
+ .studio-game-art{height:88px}
+ .studio-card-info{padding:10px 12px 12px}
+ .studio-review #page-studio-library .studio-card-name{font-size:14px}
+ .studio-review #page-studio-library .studio-card-state{font-size:11px}
+ .studio-review #page-studio-library .studio-card-link{font-size:11px;padding-top:7px}
+}
