@@ -6,6 +6,14 @@ A child-led local game-design loop built on the Family Arcade. See [Assignment 0
 
 The [child journey standard](docs/child-journey/README.md) combines the grades 1–4 learning service, physical games, and child-owned Studio. It adds play-first navigation, repeatable help, protected math focus, explicit ready previews, and durable ideas through asynchronous replies and save failures. Review with `?studio=1`; [acceptance](docs/child-journey/acceptance.md) distinguishes automated evidence from the remaining educator/child/device review. The live site and paid activation are unchanged.
 
+## Child continuity & six Factory Favorites draft
+
+In the optional review Studio (`?studio=1`), **Factory Favorites** now lists six distinct native games: Bubble Gum Builders, Junkyard Rally, Splash or Pass, Dragon Island Rescue, Moon Donut Dash, and Robot Route Lab. New Moon/Robot play supports native safe math pause/resume, and device-local mission/route recovery. Novel AI builds are still disabled by the public config.
+
+While a private build is pending, children can keep playing, open any favorite, use optional extra practice in My Powers, and make independent local quick edits on the same project without clearing the background job. A nonmodal build shelf shows acknowledged status across Studio. The composer accepts a bounded set of up to four known local mechanics updates in one atomic test. Unfamiliar edits still require an approved AI worker; there is no fake starter game, no automatic promotion and no crowdsourced publication.
+
+Read the [implementation and release limitations](docs/child-continuity/README.md). This remains an unmerged draft reviewed in [PR #25](https://github.com/jzwyrzyk/family-game-factory/pull/25), not a change to the live site. Observed child enjoyment and live provider latency have not been established.
+
 ## Adaptive Math v1 draft
 
 The grades 1–4 learning implementation is documented in [Adaptive Math v1](docs/adaptive-math/README.md), with a [73-unit coverage catalog](docs/adaptive-math/curriculum.md), [game integration contracts](docs/adaptive-math/integration.md), and [acceptance evidence](docs/adaptive-math/acceptance.md). It shares learning across games, keeps math enabled, separates independent and assisted work, and supports checkpoints and mathematical answer construction. It builds on the optional Studio draft (`?studio=1`) and also works in the ordinary arcade.
