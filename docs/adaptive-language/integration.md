@@ -33,3 +33,7 @@ Each item carries a **contentPack** and a versioned ID (`skill-id:v1:index`). Th
 ## Unanswered checkpoints and question-budget integrity
 
 Each host-owned checkpoint gets a shared-budget receipt. If a child leaves a **completely unanswered** checkpoint without requesting a hint, worked example or reading support, the original interrupted record is retained but the budget receipt is refunded. This prevents leaving a game from producing an extended learning-free period. A valid response or meaningful help remains a practice interaction and retains its budget receipt. The host refuses an unsupported refund if the original attempt cannot be identified or saving fails. This policy applies equally to Math and Language Arts because they use the same trusted host.
+
+## Opt-in subject switching in the Studio-first UI
+
+A grown-up may select **Both — child can switch**. The stored `learningSubject: math | language` remains unchanged for backward compatibility; the additional optional boolean `allowSubjectSwitch` controls whether children may change the active subject between questions. Existing saved profiles/backups without that flag remain single-subject until a grown-up opts in. A child cannot grant permission through a game-design prompt. Active activities cannot be switched away; invalid or failed saves keep the prior subject. The child-facing selector changes only future activities, not completed grades, separate Math/ELA evidence histories, shared mandatory-checkpoint pacing, game code or archived versions. Parent reports show both sets of evidence.
