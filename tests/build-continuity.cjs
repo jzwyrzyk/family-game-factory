@@ -40,6 +40,20 @@ async function switchProfile(page,index){
     await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='testing'));
     assert.equal(submitted,1);
     assert.equal(await page.locator('#studioBuildShelf').isVisible(),true);
+    // A background-build shortcut must stop on-device recording before leaving Studio.
+    await page.evaluate(()=>{
+     class LocalSpeech {
+      static async available(options){if(options.processLocally!==true)throw Error('Remote speech forbidden');return 'available';}
+      processLocally=false;lang='';continuous=false;interimResults=false;onresult=null;onerror=null;onend=null;aborted=false;
+      start(){window.__continuityMic=this;}
+      abort(){this.aborted=true;this.onend?.();}
+     }
+     Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:LocalSpeech});
+    });
+    await page.click('#studioMic');
+    await page.waitForFunction(()=>window.__continuityMic?.processLocally===true);
+    await page.locator('#studioBuildShelf').getByRole('button',{name:/Extra practice/}).click();
+    assert.equal(await page.evaluate(()=>window.__continuityMic.aborted),true,'extra-practice navigation must release microphone');
     await page.reload();await page.waitForFunction(()=>FG.studio&&FG.studio.mode()==='remote');
     await page.waitForSelector('#studioBuildShelf:not([hidden])');
     assert.match(await page.textContent('#studioBuildShelf'),/Testing your game/);
