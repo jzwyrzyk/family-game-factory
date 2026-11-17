@@ -43,17 +43,29 @@ export default class RobotRoute implements GameInstance {
    b.addEventListener('click',fn,{signal:this.abort.signal});actions.append(b);return b;
   };
   const run=action('▶ Run my plan',()=>this.run());run.classList.add('favorite-control-primary');
-  action('↶ Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();}});
-  action('↺ Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();}});
+  action('↶ Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();this.save();}});
+  action('↺ Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();this.save();}});
   this.canvas.addEventListener('keydown',e=>{const direction:Record<string,Direction>={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};if(direction[e.key]){e.preventDefault();this.add(direction[e.key]);}},{signal:this.abort.signal});
   this.root.append(title,subtitle,this.hud,this.canvas,this.instructions,controls,this.commands,actions);target.replaceChildren(this.root);
-  this.reset();this.raf=requestAnimationFrame(this.loop);
+  this.reset();
+  // Reopening a test restores the child's route, not a fabricated solved result.
+  const saved=context.persistence?.load() as any;
+  if(saved&&saved.schema==='robot-route-v1'&&Number.isInteger(saved.level)&&saved.level>=1&&saved.level<=50
+    &&Array.isArray(saved.plan)&&saved.plan.length<=24&&saved.plan.every((d:unknown)=>typeof d==='string'&&Object.hasOwn(delta,d))){
+   this.level=saved.level;this.reset();this.plan=[...saved.plan];this.renderPlan();
+   this.instructions.textContent='Your arrow plan is saved. Run it, or try another idea!';
+  }
+  this.raf=requestAnimationFrame(this.loop);
  }
  private mission(){return missions[(this.level-1)%missions.length];}
  private legal(p:Point){return p.x>=0&&p.x<5&&p.y>=0&&p.y<5&&!this.mission().walls.includes(key(p));}
+ private save(){
+  const ok=this.context.persistence?.save({schema:'robot-route-v1',level:this.level,plan:[...this.plan]});
+  if(ok===false)this.instructions.textContent='Could not save your arrows. Keep this page open and ask a grown-up to export progress.';
+ }
  private add(d:Direction){
   if(this.hostPaused||this.ended||this.running||this.plan.length>=24)return;
-  this.plan.push(d);this.renderPlan();
+  this.plan.push(d);this.renderPlan();this.save();
  }
  private renderPlan(){
   this.commands.textContent=this.plan.length?'My arrows: '+this.plan.map(d=>({up:'↑',down:'↓',left:'←',right:'→'}[d])).join(' '):'Choose arrows for your robot.';
@@ -70,14 +82,14 @@ export default class RobotRoute implements GameInstance {
  private run(){
   if(this.ended||this.hostPaused||this.running||!this.plan.length)return;
   this.running=true;this.index=0;this.position={...this.mission().start};this.trail=[{...this.position}];
-  this.instructions.textContent='Testing your plan…';this.accumulator=0;this.last=0;
+  this.instructions.textContent='Testing your plan…';this.accumulator=0;this.last=0;this.save();
  }
  private step(){
   if(!this.running||this.hostPaused)return;
   if(this.index>=this.plan.length){this.running=false;this.instructions.textContent='Not there yet. What arrow would you change or add?';return;}
   const next=move(this.position,this.plan[this.index++]);
   if(!this.legal(next)){this.running=false;this.instructions.textContent='Bonk! Your robot hit a wall. Undo a move or try a different route.';return;}
-  this.position=next;this.trail.push({...next});
+  this.position=next;this.trail.push({...next});this.save();
   const goal=this.mission().goal;
   if(next.x===goal.x&&next.y===goal.y){
    this.running=false;this.ended=true;this.instructions.textContent='Great route! Choose Next to try a new puzzle.';
@@ -116,12 +128,12 @@ export default class RobotRoute implements GameInstance {
   }
   this.draw();this.raf=requestAnimationFrame(this.loop);
  };
- next(){this.level++;this.reset();}
- restart(){this.level=1;this.reset();}
- retry(){this.reset();}
+ next(){this.level++;this.reset();this.save();}
+ restart(){this.level=1;this.reset();this.save();}
+ retry(){this.reset();this.save();}
  isPlaying(){return !this.stopped&&!this.ended&&!this.hostPaused;}
  pause(){if(!this.isPlaying())return false;this.hostPaused=true;return true;}
  resume(){if(!this.stopped){this.hostPaused=false;this.last=0;}}
  snapshot(){return {level:this.level,planLength:this.plan.length,index:this.index,running:this.running,position:{...this.position},hostPaused:this.hostPaused};}
- unmount(){this.stopped=true;cancelAnimationFrame(this.raf);this.abort.abort();this.root.remove();}
+ unmount(){this.save();this.stopped=true;cancelAnimationFrame(this.raf);this.abort.abort();this.root.remove();}
 }
