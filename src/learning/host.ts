@@ -71,11 +71,11 @@ export function installLearningHost() {
     if(token&&seen.has(token))return false;
     if(active||!FG.math.canAsk(p))return false;
     const key=context.projectId||context.gameId||'game',mode=context.mode||modeFor(p,key);
-    mount(target,{profile:p,context:{...context,mode},mode,legacyIds:options.legacyIds,challenge:options.challenge,onLeave:options.onLeave,onComplete});
+    const mounted=mount(target,{profile:p,context:{...context,mode},mode,legacyIds:options.legacyIds,challenge:options.challenge,onLeave:options.onLeave,onComplete});
     if(token){seen.add(token);if(seen.size>500)seen.delete(seen.values().next().value!);}
     FG.math.didAsk(p);
     const askedAt=Array.isArray(p.mathWindow)?p.mathWindow.at(-1):undefined;
-    if(active&&typeof askedAt==='number')activeBudget={profile:p,attemptId:active.attemptId,at:askedAt,subject:subjectFor(p)};
+    if(mounted&&typeof askedAt==='number')activeBudget={profile:p,attemptId:mounted.attemptId,at:askedAt,subject:subjectFor(p)};
     return true;
   }
   function saveMode(key:string,value:unknown) {
