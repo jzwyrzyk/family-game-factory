@@ -1,5 +1,5 @@
 import { attachPreviewLearning } from '../learning/remote';
-import { interpretMathRequest, REQUIRED_MATH_MESSAGE } from '../learning/policy';
+import { interpretLearningRequest } from '../learning/policy';
 import { BuilderClient,validateBuilderConfig,type RequestChange,type JobView,type BuilderConfig } from './client';
 import type { LearningMode } from '../learning/types';
 const FG=(window as any).FG;
@@ -23,7 +23,7 @@ export async function initBuilder(){
  const stillCurrent=(at:ReturnType<typeof operation>)=>at.owner===FG.store.current().id&&at.page===currentPage&&at.page===previousPage&&at.sequence===previewSequence&&at.revision===currentRevision&&!panel.hidden;
  function showError(err:Error){if(err.message==='NO_PREVIOUS_VERSION'){$('builderStatus').textContent='This is your first builder version. Your game is safe.';return;}$('builderStatus').textContent=errorMessage(err);$('cancelBuild').hidden=true;$('retryBuild').hidden=config.mode!=='remote';}
  function move(page:string){$('page-'+page).querySelector('.page-head')!.after(panel);panel.hidden=false;previousPage=page;}
- function mathBusy(){if(!FG.learning?.active)return false;$('builderStatus').textContent='Finish the current math activity before changing this game.';FG.learning.focus?.();return true;}
+ function mathBusy(){if(!FG.learning?.active)return false;$('builderStatus').textContent='Finish the current learning activity before changing this game.';FG.learning.focus?.();return true;}
  function queuePreview(revisionId:string,inheritedMode?:LearningMode,jobId?:string){readyPreview={revisionId,owner:FG.store.current().id,inheritedMode,jobId};$('openReadyBuild').hidden=false;}
  $('openReadyBuild').onclick=()=>{const ready=readyPreview;if(!ready||ready.owner!==FG.store.current().id||mathBusy())return;void showPreview(ready.revisionId,ready.inheritedMode).catch(error=>{if(ready.owner===FG.store.current().id)showError(error);});};
 
@@ -59,7 +59,7 @@ export async function initBuilder(){
   if(readyPreview?.revisionId===revisionId&&readyPreview.owner===owner){if(readyPreview.jobId)try{const saved=JSON.parse(localStorage.getItem(pendingKey)||'null');if(saved?.owner===owner&&saved.jobId===readyPreview.jobId)localStorage.removeItem(pendingKey);}catch{}readyPreview=null;$('openReadyBuild').hidden=true;}
   return true;
  }
- async function request(input:RequestChange,page=previousPage){const owner=FG.store.current().id,at=profileSequence;move(page);try{const mathRequest=interpretMathRequest(input.prompt);if(mathRequest?.kind==='required'){$('builderStatus').textContent=REQUIRED_MATH_MESSAGE;return;}if(mathRequest?.kind==='mode'){if(mathKey()&&input.baseRevisionId===currentRevision){FG.learning.setMode(mathKey(),mathRequest.mode);$('builderStatus').textContent='Math format updated for the next safe learning moment.';}else $('builderStatus').textContent='Open the game you want to change, then choose its math format.';return;}if(config.mode==='unavailable')throw Error('BUILDER_UNAVAILABLE');$('builderStatus').textContent='Sending your request. No queued job has been acknowledged yet.';await client.submit(input);}catch(err){if(owner===FG.store.current().id&&at===profileSequence)showError(err as Error);}}
+ async function request(input:RequestChange,page=previousPage){const owner=FG.store.current().id,at=profileSequence;move(page);try{const mathRequest=interpretLearningRequest(input.prompt,FG.learning.subject);if(mathRequest?.kind==='required'){$('builderStatus').textContent=mathRequest.message;return;}if(mathRequest?.kind==='mode'){if(mathKey()&&input.baseRevisionId===currentRevision){FG.learning.setMode(mathKey(),mathRequest.mode);$('builderStatus').textContent='Learning format updated for the next safe learning moment.';}else $('builderStatus').textContent='Open the game you want to change, then choose its learning format.';return;}if(config.mode==='unavailable')throw Error('BUILDER_UNAVAILABLE');$('builderStatus').textContent='Sending your request. No queued job has been acknowledged yet.';await client.submit(input);}catch(err){if(owner===FG.store.current().id&&at===profileSequence)showError(err as Error);}}
  create.onclick=()=>{const idea=$<HTMLTextAreaElement>('inventIdea');if(!idea.reportValidity())return;void request({gameId:'new',baseRevisionId:null,prompt:idea.value},'create');};
  $('cancelBuild').onclick=()=>{void client.cancel().catch(showError);};$('retryBuild').onclick=()=>{void client.retry().catch(showError);};
  $('keepBuild').onclick=()=>{if(mathBusy())return;const at=operation();if(at.revision)void at.client.api('/v1/revisions/'+at.revision+'/keep',{}).then(()=>{if(!stillCurrent(at))return;$('builderStatus').textContent='Kept! Find your playable game in My Creations.';return refresh();}).catch(error=>{if(stillCurrent(at))showError(error);});};

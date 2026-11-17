@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { interpretMathRequest, LEARNING_MODES, modeFor, setMode } from '../src/learning/policy';
+import { interpretMathRequest, interpretLearningRequest, learningFormatLabel, LEARNING_MODES, modeFor, setMode } from '../src/learning/policy';
 import { createLifecycle } from '../src/runtime/lifecycle';
 import { defaults, manifests } from '../src/runtime/manifests';
 import type { GameContext, GamePlugin } from '../src/runtime/types';
@@ -30,4 +30,35 @@ test('safe lifecycle pauses freeze controls, exclude learning time and cannot re
  lifecycle.resume();assert.equal(target.inert,false);assert.equal(lifecycle.isPlaying(),true);const prior=resumes;lifecycle.resume();assert.equal(resumes,prior);
  context!.finish({won:true,level:1,title:'Done',description:'Done'});assert.equal(lifecycle.pause(),false);
  lifecycle.next();assert.equal(lifecycle.isPlaying(),true);lifecycle.pause();lifecycle.dispose();assert.equal(target.inert,false);assert.equal(lifecycle.isPlaying(),false);assert.equal(lifecycle.pause(),false);
+});
+
+test('Language Arts prompt policy preserves mandatory checkpoints without hijacking game creativity or Math legacy behavior',()=>{
+  for(const phrase of ['No reading please','Remove all english','Turn off language arts','Skip learning','Make a game without learning questions','No checkpoints','Give me math instead of English','Switch the learning subject to math']){
+    const result=interpretLearningRequest(phrase,'language');
+    assert.equal(result?.kind,'required',phrase);
+    assert.match((result as {message:string}).message,/Language Arts checkpoints/);
+  }
+  for(const [phrase,mode] of [
+    ['Language at checkpoints','checkpoint'],
+    ['Reading between rounds','checkpoint'],
+    ['Build words with word tiles inside the game','interaction'],
+    ['Put spelling inside the game','interaction'],
+    ['Mix reading and word activities','both'],
+  ] as const){
+    assert.deepEqual(interpretLearningRequest(phrase,'language'),{kind:'mode',mode});
+    assert.ok(learningFormatLabel('language',mode).length>8);
+  }
+  for(const phrase of [
+    'Remove all math','Take the math away',
+    'Make a game where a dragon eats words',
+    'Create a game with reading and a cat',
+    "Don't remove reading",
+    'Make this game with a letter maze',
+    'Build a math game with a word dragon',
+    'I love reading',
+  ]){
+    assert.equal(interpretLearningRequest(phrase,'language'),null,phrase);
+  }
+  assert.equal(interpretLearningRequest('Remove math','math')?.kind,'required');
+  assert.deepEqual(interpretLearningRequest('Use math at checkpoints','math'),{kind:'mode',mode:'checkpoint'});
 });

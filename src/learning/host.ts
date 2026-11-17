@@ -4,7 +4,7 @@ import {reportLanguage,selectLanguageItem} from '../language/engine';
 import { mountMathActivity } from './activity';
 import { report, selectItem, type LearningReport } from './engine';
 import { SKILLS } from './curriculum';
-import { MODE_LABELS, LEARNING_MODES, modeFor, setMode, interpretMathRequest } from './policy';
+import { MODE_LABELS, LANGUAGE_MODE_LABELS, LEARNING_MODES, modeFor, setMode, interpretMathRequest, interpretLearningRequest } from './policy';
 import type { LearnerProfile, LearningContext, LearningMode } from './types';
 
 const stateNames: Record<string,string> = {
@@ -14,7 +14,6 @@ const stateNames: Record<string,string> = {
 const create = (tag:string, text='', className='') => { const n=document.createElement(tag);n.textContent=text;n.className=className;return n; };
 type Activity = ReturnType<typeof mountMathActivity> | ReturnType<typeof mountLanguageActivity>;
 const subjectFor = (profile:LearnerProfile):'math'|'language' => profile.learningSubject==='language'?'language':'math';
-const languageModeLabels:Record<LearningMode,string>={checkpoint:'Reading at a pause',interaction:'Build words & sentences',both:'A mix of both'};
 export function installLearningHost() {
   const FG=(window as any).FG;
   const sessionId=crypto.randomUUID();
@@ -54,7 +53,7 @@ export function installLearningHost() {
     const heading=subject==='language'?'Language Arts in this game':'Math in this game';
     const wrap=create('div','','learning-mode-control'),label=create('label',heading);
     const select=document.createElement('select');select.setAttribute('aria-label',heading);
-    for(const mode of LEARNING_MODES){const o=document.createElement('option');o.value=mode;o.textContent=subject==='language'?languageModeLabels[mode]:MODE_LABELS[mode];select.append(o);}
+    for(const mode of LEARNING_MODES){const o=document.createElement('option');o.value=mode;o.textContent=subject==='language'?LANGUAGE_MODE_LABELS[mode]:MODE_LABELS[mode];select.append(o);}
     select.value=modeFor(FG.store.current(),key);label.append(select);
     const note=create('small','Learning checkpoints are always included. The format can change.');wrap.append(label,note);
     select.onchange=()=>{try{saveMode(key,select.value);onChange?.(select.value as LearningMode);}catch(error){select.value=modeFor(FG.store.current(),key);note.textContent=(error as Error).message;}};
@@ -100,7 +99,7 @@ export function installLearningHost() {
   }
   window.addEventListener('factory-profile',dispose);
   window.addEventListener('pagehide',dispose);
-  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,renderReport,report:()=>report(FG.store.current()),selectItem,
+  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,interpretLearningRequest,renderReport,report:()=>report(FG.store.current()),selectItem,
     get subject(){return subjectFor(FG.store.current());},get skills(){return subjectFor(FG.store.current())==='language'?LANGUAGE_SKILLS:SKILLS;},mathSkills:SKILLS,languageSkills:LANGUAGE_SKILLS,selectLanguageItem,reportLanguage,
      get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
 }
