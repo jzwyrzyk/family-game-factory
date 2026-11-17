@@ -4,10 +4,12 @@ export const manifests: Record<GameId, Manifest> = {
     {key:'donutGoal',label:'Donuts to collect',type:'number',default:6,min:4,max:12,step:1},
     {key:'moonGravity',label:'Moon gravity',type:'number',default:0.6,min:0.3,max:0.9,step:0.1},
     {key:'meteorRate',label:'Meteor frequency',type:'number',default:1,min:0.5,max:1.5,step:0.25},
+    {key:'bouncePads',label:'Springy bounce pads',type:'boolean',default:false},
   ]},
   robot: {version:1,id:'robot',name:'Robot Route Lab',mechanics:[
     {key:'robotSpeed',label:'Robot movement speed',type:'number',default:1,min:0.5,max:2,step:0.25},
     {key:'showTrail',label:'Show my path',type:'boolean',default:true},
+    {key:'portalEnabled',label:'Robot portals',type:'boolean',default:false},
   ]},
   gum: { version: 1, id: 'gum', name: 'Bubble Gum Builders', mechanics: [
     { key: 'qualityVersion', label: 'Physical workshop', type: 'number', default: 1, min: 0, max: 1, step: 1 },
