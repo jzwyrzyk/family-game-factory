@@ -355,3 +355,8 @@ body.studio-review > .factory-update-notice{color:#394862}
 .parent-subject-report{margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #dce4f0}
 .parent-subject-report h3{font-size:17px;margin:2px 0 10px;color:#263b73}
 @media(max-width:680px){.studio-learning-choice{flex-wrap:wrap;align-items:stretch}.studio-learning-choice>.learning-subject-switch{width:100%}.learning-subject-switch button{flex:1}.learning-adventure .learning-subject-switch{width:100%}}
+
+.studio-game-subject{display:grid;justify-items:start;gap:7px;margin:4px 8px 12px;padding:10px 12px;border-radius:12px;background:#f8faff;border:1px solid #e0e6f2}
+.studio-game-subject strong{font-size:13px;color:#344a79}
+.studio-game-subject small{font-size:12px;color:#687690}
+.studio-game-subject .learning-subject-switch button{font-size:13px}
