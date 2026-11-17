@@ -2,7 +2,7 @@
 export function installOffline(){
  if(!('serviceWorker' in navigator)||!window.isSecureContext)return;
  navigator.serviceWorker.register(new URL('sw.js',document.baseURI),{scope:'./'}).then(reg=>{
-  const offer=()=>{if(!reg.waiting)return;const bar=document.createElement('div');bar.className='notice factory-update-notice';bar.setAttribute('role','status');bar.append('A new game update is ready. Saved games and learning progress stay on this device. ');const b=document.createElement('button');b.className='btn secondary';b.textContent='Update games';b.onclick=()=>{navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});reg.waiting?.postMessage({type:'ACTIVATE_REVIEWED_UPDATE'});};bar.append(b);document.body.append(bar)};
+  const offer=()=>{if(!reg.waiting)return;const bar=document.createElement('div');bar.className='notice factory-update-notice';bar.setAttribute('role','status');bar.append('A jems update is ready. Saved games and learning progress stay on this device. ');const b=document.createElement('button');b.className='btn secondary';b.textContent='Update jems';b.onclick=()=>{navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});reg.waiting?.postMessage({type:'ACTIVATE_REVIEWED_UPDATE'});};bar.append(b);document.body.append(bar)};
   offer();reg.addEventListener('updatefound',()=>reg.installing?.addEventListener('statechange',()=>{if(reg.waiting)offer()}));
  }).catch(()=>{/* Cached play is optional; online play remains available. */});
 }
