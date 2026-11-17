@@ -85,7 +85,7 @@ export async function installStudio(){
    const b=el('button','studio-button',readyExperiment(s)?'Try ready test':'Open game') as HTMLButtonElement;
    b.type='button';b.onclick=()=>act(async()=>{
     // A ready card is a deliberate choice, never an automatic interrupt.
-    if(route==='studio'&&guardMath())return;
+    if(guardMath())return;
     await open(s.id);
     if(owner()!==s.owner||route!=='studio'||activeId!==s.id)return;
     const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
