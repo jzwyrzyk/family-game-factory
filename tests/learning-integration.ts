@@ -389,7 +389,7 @@ async function main(){
   const server=start();let browser:Browser|undefined;
   try{
     if(!server.listening)await new Promise<void>(resolve=>server.once('listening',resolve));
-    const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}/arcade/`;
+    const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}/arcade/?arcade=1`;
     const output=await build({entryPoints:['src/learning/remote.ts'],bundle:true,format:'iife',globalName:'PreviewLearningTest',platform:'browser',write:false});
     browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
     const activeBrowser=browser,failures:Error[]=[];

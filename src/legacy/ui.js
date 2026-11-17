@@ -58,13 +58,34 @@ function showResult(result,mathFirstTry){if(!activeGame)return;const p=FG.store.
  const el=overlayHtml(`<div class="modal-card"><div class="big-icon">${won?'🏆':'💛'}</div><div class="eyebrow">${won?'LEVEL CLEARED':'TRY AGAIN'}</div><h2 id="native-result-title" tabindex="-1">${escapeHtml(penalty?'One more try!':result.title)}</h2><p>${escapeHtml(txt||'')}</p><div class="modal-actions"><button class="btn primary" id="resultNext">${won?'Next level →':'🔁 Retry level'}</button><button class="btn secondary" id="resultHome">🏠 Arcade</button></div></div>`);
  $('resultNext').addEventListener('click',()=>{dismiss();if(won)activeGame.next();else if(typeof activeGame.retry==='function')activeGame.retry();else activeGame.restart()});$('resultHome').addEventListener('click',()=>page('home'));$('native-result-title').focus();
 }
-function loadLab(){labStreak=0;question=null;renderLabReport();if(FG.store.loadError){$('lab-question').textContent=FG.store.loadError;$('lab-controls').replaceChildren();return}nextLab()}
-function renderLabReport(){FG.learning.renderReport($('skill-report'));}
+function renderLabSubjectPicker(){
+ const p=FG.store.current(),both=!!p.allowSubjectSwitch,active=!!FG.learning.active,subject=FG.learning.subject;
+ for(const [id,value] of [['labSubjectMath','math'],['labSubjectLanguage','language']]){
+   const button=$(id);button.setAttribute('aria-pressed',String(subject===value));
+   button.disabled=!both||active||!!FG.store.loadError;
+ }
+ $('labSubjectNote').textContent=both?(active?'Finish this activity before changing subjects.':'Choose Math or English. Each keeps its own progress.'):'Your grown-up chose this subject. They can enable both in Parent Controls.';
+}
+function selectLabSubject(subject){
+ try{FG.learning.setSubject(subject);renderLabSubjectPicker();renderLabReport();}
+ catch(error){$('labSubjectNote').textContent=error.message;}
+}
+function loadLab(){
+ labStreak=0;question=null;renderLabReport();renderLabSubjectPicker();
+ if(FG.store.loadError){$('lab-question').textContent=FG.store.loadError;$('lab-controls').replaceChildren();return}
+ if(FG.store.current().allowSubjectSwitch){
+   $('lab-question').textContent='Pick your learning adventure, then start practicing.';
+   const button=document.createElement('button');button.id='lab-next';button.className='btn primary';button.textContent='Start practicing →';button.onclick=nextLab;
+   $('lab-controls').replaceChildren(button);return;
+ }
+ nextLab();
+}
+function renderLabReport(){FG.learning.renderReport($('skill-report'),FG.store.current(),FG.learning.subject);}
 function nextLab(){
  $('lab-controls').replaceChildren();
  FG.learning.mount($('lab-question'),{profile:FG.store.current(),context:{gameId:FG.learning.subject==='language'?'language-lab':'math-lab',projectId:FG.learning.subject==='language'?'language-lab':'math-lab',mode:'both',opportunity:'practice'},mode:'both',legacyIds:false,onSave:renderLabReport,onComplete:()=>{
-   renderLabReport();const b=document.createElement('button');b.id='lab-next';b.className='btn primary';b.textContent='Try another →';b.onclick=nextLab;$('lab-controls').replaceChildren(b);b.focus();
- }});
+   renderLabReport();renderLabSubjectPicker();const b=document.createElement('button');b.id='lab-next';b.className='btn primary';b.textContent='Try another →';b.onclick=nextLab;$('lab-controls').replaceChildren(b);b.focus();
+ }});renderLabSubjectPicker();
 }
 function renderFeedback(){const box=$('feedbackList');box.replaceChildren();const list=FG.store.data.feedback;
  if(!list.length){const p=document.createElement('p');p.className='muted';p.textContent='Your treasure chest is ready! Tap Create to save your first game dream.';box.append(p);return}
@@ -79,19 +100,30 @@ function populateSkills(){
  const lang=$('parentLanguageSkill'),prior=lang.value;lang.replaceChildren();const auto=document.createElement('option');auto.value='';auto.textContent='Let the language model choose';lang.append(auto);
  for(const skill of FG.learning.languageSkills.filter(x=>x.grade<=grade)){const option=document.createElement('option');option.value=skill.id;option.textContent='Grade '+skill.grade+' · '+skill.title;lang.append(option);}
  if([...lang.options].some(x=>x.value===prior))lang.value=prior;
- const language=$('parentSubject').value==='language';$('parentMathSettings').hidden=language;$('parentLanguageSettings').hidden=!language;
- $('parentPunish').closest('label').hidden=language;
+ const choice=$('parentSubject').value;$('parentMathSettings').hidden=choice==='language';$('parentLanguageSettings').hidden=choice==='math';
+ $('parentPunish').closest('label').hidden=choice==='language';
  const multiplication=grade>=3;for(const o of $('parentFocus').options)if(['times8','mul','div'].includes(o.value))o.disabled=!multiplication;
  $('parentFacts').disabled=!multiplication;if(!multiplication&&['times8','mul','div'].includes($('parentFocus').value))$('parentFocus').value='adaptive';
 }
 function loadParent(){
- const p=FG.store.current();$('parentSubject').value=p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
- populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';FG.learning.renderReport($('parentStats'),p);
+ const p=FG.store.current();$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
+ populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(p);
+}
+function renderParentReports(p){
+ const target=$('parentStats');
+ if(!p.allowSubjectSwitch){FG.learning.renderReport(target,p);return;}
+ target.replaceChildren();
+ for(const [subject,title] of [['math','🔢 Math progress'],['language','📚 English progress']]){
+   const section=document.createElement('section');section.className='parent-subject-report';
+   const heading=document.createElement('h3');heading.textContent=title;section.append(heading);
+   const details=document.createElement('div');section.append(details);target.append(section);
+   FG.learning.renderReport(details,p,subject);
+ }
 }
 function saveParent(){
- const grade=Number($('parentGrade').value),subject=$('parentSubject').value,facts=subject==='math'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
+ const grade=Number($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.learning.subject:choice,facts=choice!=='language'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
  if(facts.length>20||facts.some(x=>!/^(?:[1-9]|1[0-2])x(?:[1-9]|1[0-2])$/.test(x))){alert('Use up to 20 facts like 8x7, with numbers from 1 to 12. Settings have not changed.');return;}
- try{FG.store.changeProfile({name:$('parentNickname').value,grade,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
+ try{FG.store.changeProfile({name:$('parentNickname').value,grade,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,allowSubjectSwitch:choice==='both',languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
 }
 function download(text,name){const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200)}
 let wizardStep=0;
@@ -101,6 +133,7 @@ function loadRemix(){$('remixDifficulty').value=FG.store.current().remixes?.[$('
 function describeRemix(){const descriptions={gum:{gentle:'Stronger gum and gentler gravity help your invention hold together.',classic:'Build, test and change your machine.',stretch:'Stretchier gum makes balance matter more.'},hill:{gentle:'Gentler acceleration and grippy tires.',classic:'Find your rhythm over the hills.',stretch:'More motor power and less tire grip.'},buckets:{gentle:'A star shows the safe bucket. Follow the clue!',classic:'Pick a bucket and see what happens!',stretch:'Four buckets and only one keeps you dry!'},dragon:{gentle:'More time between fireballs and a wider shield.',classic:'The original dragon adventure.',stretch:'More frequent fireballs and a smaller shield.'}};$('remixDescription').textContent=descriptions[$('remixGame').value][$('remixDifficulty').value]}
 function bind(){document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>gameOpen(b.dataset.game)));$('homeBtn').onclick=()=>page('home');$('playFeatured').onclick=()=>gameOpen('gum');$('exitGame').onclick=()=>page('home');$('improveThis').onclick=()=>{if(activeGameId)window.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:activeGameId}}))};$('gameHelp').onclick=()=>alert(FG.games[activeGameId]?.controls||'Use the controls shown in the game');
  if(FG.store.loadError){const notice=document.createElement('section');notice.id='storageRecovery';notice.className='panel learning-save-warning';notice.setAttribute('role','alert');const message=document.createElement('p');message.textContent=FG.store.loadError;const exportButton=document.createElement('button');exportButton.className='btn secondary';exportButton.textContent='Save original progress for recovery';exportButton.onclick=()=>download(FG.store.recoveryRaw,'family-game-factory-recovery.json');notice.append(message,exportButton);document.querySelector('main').prepend(notice);}
+ $('labSubjectMath').onclick=()=>selectLabSubject('math');$('labSubjectLanguage').onclick=()=>selectLabSubject('language');
  $('parentGrade').onchange=populateSkills;$('parentSubject').onchange=populateSkills;$('parentRate').oninput=e=>$('parentRateValue').textContent=e.target.value;$('saveParent').onclick=saveParent;
  $('feedbackForm').onsubmit=e=>{e.preventDefault();const worked=FG.store.addFeedback({game:$('feedbackGame').value,type:$('feedbackType').value,idea:$('feedbackText').value});if(!worked)$('feedbackStatus').textContent='Could not save. Keep your idea here and try again.';if(worked){$('feedbackText').value='';$('feedbackStatus').textContent='💡 Saved! Find it in My Creations.'}};
  $('inventForm').onsubmit=e=>{e.preventDefault();if(wizardStep!==2)return;const worked=FG.store.addFeedback({game:'new',type:'new game design',idea:designCard()});if(worked){$('inventForm').reset();wizardStep=0;showWizard();page('creations')}else $('createStatus').textContent='Your idea could not be saved. Keep it here and try again.'};

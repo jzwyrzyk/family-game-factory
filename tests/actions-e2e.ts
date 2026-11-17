@@ -102,7 +102,7 @@ async function main(){
   page.on('response',r=>{const path=new URL(r.url()).pathname;if(path.startsWith('/v1/')&&(r.request().method()==='POST'||r.status()>=400))recordApi({method:r.request().method(),path,status:r.status()});});
   page.on('requestfailed',r=>{const path=new URL(r.url()).pathname;if(path.startsWith('/v1/'))recordApi({method:r.method(),path,error:r.failure()?.errorText.slice(0,200)});});
   try{
-  await context.addCookies([{name:'factory_session',value:signSession(deviceActor,config.sessionKey),url:config.appOrigin,httpOnly:true,sameSite:'Strict'}]);await page.goto(config.appOrigin+'/arcade/');await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.fill('#inventIdea','Make a moon hopper with a gate to jump through');
+  await context.addCookies([{name:'factory_session',value:signSession(deviceActor,config.sessionKey),url:config.appOrigin,httpOnly:true,sameSite:'Strict'}]);await page.goto(config.appOrigin+'/arcade/?arcade=1');await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.fill('#inventIdea','Make a moon hopper with a gate to jump through');
   const buildStartedAt=Date.now();
   const [submitted]=await Promise.all([page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs',{timeout:10000}),page.click('#createTry')]);
   const acknowledgement=await submitted.json();assert.equal(submitted.status(),202,`Initial ${device} submission failed: ${acknowledgement.errorCode||submitted.status()}`);assert.equal(acknowledgement.status,'queued');

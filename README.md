@@ -1,6 +1,10 @@
-# Family Game Factory 2.0 foundation
+# Family Game Factory 2.0 — Studio-first homepage
 
 A child-led local game-design loop built on the Family Arcade. See [Assignment 002](docs/assignment-002/README.md), [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
+
+## Studio-first homepage (review PR)
+
+The normal website route enters the child's **Studio library**, not the separate Arcade wizard. Six Factory Favorites, a clear **Invent a game** action, recent work, and saved creations lead into one Studio experience. The original Arcade remains available through `?arcade=1` for comparison or rollback; `?studio=1` remains a supported Studio alias. When the builder is unavailable, the homepage accurately describes ideas as saveable rather than promising a generated game. This changes frontend entry and presentation only: **no paid AI, remote services, or public sharing are activated**. GitHub Pages publishing remains manual.
 
 ## Integrated child journey review
 

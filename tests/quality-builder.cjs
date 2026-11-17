@@ -51,7 +51,7 @@ const { chromium } = require('playwright');
         assert.fail('the paused workshop continued repainting after settling');
       };
       await page.clock.install();
-      await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
+      await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);
       await page.waitForFunction(() => window.FG?.app);
       await page.evaluate(() => {
         // This suite isolates physical behavior using the normal recent-question budget.
