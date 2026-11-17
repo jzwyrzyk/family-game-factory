@@ -157,3 +157,14 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-review .studio-version-card .studio-button{font-size:14px;min-height:44px}
  .studio-review .design-plan{max-height:70dvh}.studio-review .design-plan textarea{font-size:16px}
 }
+
+
+/* Conversation is the primary child action; building remains a separate choice. */
+.studio-review .studio-send-row{justify-content:flex-start;flex-wrap:wrap}
+.studio-review #studioDraftStatus{flex:1 0 100%;min-width:0}
+.studio-review #studioTalk,.studio-review #studioSend{min-height:44px;flex:1 1 125px}
+.studio-voice-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.studio-voice-row .studio-button{min-height:44px;font-size:13px}
+.studio-voice-row #studioMic[aria-pressed="true"]{background:#fde9e5;border-color:#da7969;color:#822e2e}
+.studio-voice-row #studioVoiceStatus{flex:1 0 100%;font-size:12px;line-height:1.5;color:#53627e;overflow-wrap:anywhere}
+.studio-voice-note{margin:8px 0 0;font-size:11px;line-height:1.45;color:#66748e}
