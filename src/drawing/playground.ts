@@ -16,6 +16,7 @@ export function createDrawingPlayground(input:DrawingAssembly){
  const floor=world.createBody({position:Vec2(0,10.8)});
  floor.createFixture(Box(24,.3),{friction:.9});
  const bodies=new Map<string,Body>(),order=rig.components,joints:{a:string;b:string;kind:string;joint:Joint}[]=[];
+ const moving:{role:'wing'|'limb';joint:RevoluteJoint;phase:number}[]=[];
  let contactCount=0,time=0,disposed=false,jumpLatch=false;
  world.on('begin-contact',()=>{contactCount++;});
  // Every independently selected moving piece becomes its own physical body.
@@ -42,7 +43,17 @@ export function createDrawingPlayground(input:DrawingAssembly){
   let joint:Joint|null;
   if(bind.kind==='fixed')joint=world.createJoint(new WeldJoint({collideConnected:false,frequencyHz:0,dampingRatio:.7},a,b,p));
   else if(bind.kind==='suspension')joint=world.createJoint(new WheelJoint({motorSpeed:0,maxMotorTorque:12,enableMotor:true,frequencyHz:4,dampingRatio:.75,collideConnected:false},a,b,p,Vec2(0,1)));
-  else joint=world.createJoint(new RevoluteJoint({enableMotor:child.role==='propeller',motorSpeed:child.role==='propeller'?5:0,maxMotorTorque:child.role==='propeller'?3:0,collideConnected:false},a,b,p));
+  else {
+   const wing=child.role==='wing',limb=child.role==='limb',propeller=child.role==='propeller';
+   const hinge=new RevoluteJoint({
+      enableMotor:wing||limb||propeller,motorSpeed:propeller?5:0,
+      maxMotorTorque:wing?8:limb?7:propeller?3:0,
+      enableLimit:wing||limb,lowerAngle:wing?-.6:-.4,upperAngle:wing?.6:.4,
+      collideConnected:false
+   },a,b,p);
+   joint=world.createJoint(hinge);
+   if(joint&&(wing||limb))moving.push({role:wing?'wing':'limb',joint:hinge,phase:moving.length*Math.PI});
+  }
   if(joint)joints.push({a:bind.a,b:bind.b,kind:bind.kind,joint});
  }
  const root=rig.components.find(c=>c.physical&&c.parentId===null)||rig.components.find(c=>c.physical);
@@ -59,6 +70,15 @@ export function createDrawingPlayground(input:DrawingAssembly){
       if(controls.jump&&!jumpLatch)main.applyLinearImpulse(Vec2(0,-Math.min(9,main.getMass()*4)),main.getWorldCenter(),true);
     }
     jumpLatch=!!controls.jump;
+    // The selected wing/limb roles imply an authored, bounded movement preset.
+    // These motor impulses affect the same physical bodies and contact forces
+    // used by the rest of the playground; no sprite-only fake flapping.
+    for(const motion of moving){
+      const t=time*(motion.role==='wing'?5:7)+motion.phase;
+      const target=motion.role==='wing'?Math.sin(t)*.45:controls.go?Math.sin(t)*.32:0;
+      const error=target-motion.joint.getJointAngle();
+      motion.joint.setMotorSpeed(Math.max(-6,Math.min(6,error*10)));
+    }
     world.step(1/60,8,3);time+=1/60;
    }
   },

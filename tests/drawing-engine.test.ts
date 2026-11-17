@@ -80,6 +80,21 @@ test('Hinge placement is validated and changes actual revolute joint location',(
  const bad=structuredClone(machine);bad.pieces[1].pivot={x:1.2,y:.5};
  assert.throws(()=>validateAssembly(bad));
 });
+test('A drawn wing flaps through a bounded physics motor, not by rotating a picture',()=>{
+ const creature:DrawingAssembly={...sample,kind:'character',pieces:[
+  {...sample.pieces[0],id:'dragon_body',name:'Dragon'},
+  {id:'wing',name:'Wing',role:'wing',parentId:'dragon_body',physical:true,
+   pivot:{x:.08,y:.5},region:{x:.50,y:.05,w:.22,h:.30,shape:'rect'}}
+ ]};
+ const world=createDrawingPlayground(creature);
+ try{
+  const angles:number[]=[];
+  for(let i=0;i<180;i++){world.step(1/60);if(i%10===0)angles.push(world.snapshot().parts[1].angle);}
+  assert.ok(angles.every(Number.isFinite));
+  assert.ok(Math.max(...angles)-Math.min(...angles)>.05,'wing actually moves through physics');
+  assert.equal(world.snapshot().joints[0].kind,'axle');
+ }finally{world.dispose();}
+});
 test('Other child-created objects instantiate actual independent bodies and joints',()=>{
  const machine:DrawingAssembly={...sample,kind:'machine',pieces:[
   {...sample.pieces[0],id:'machine_body',name:'Engine'},
