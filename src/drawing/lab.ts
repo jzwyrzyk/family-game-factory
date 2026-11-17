@@ -29,12 +29,12 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">✏️ Fix parts</button><button type="button" data-mode="play">▶ Try it!</button><button type="button" data-cutouts>✂️ Check cutouts</button><button type="button" data-retry hidden>↶ Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Jump ↑</button></div><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
   <aside class="dl-tools"><label>What did you draw?<select data-kind><option value="car">Car or vehicle</option><option value="character">Character or creature</option><option value="machine">Invention or machine</option><option value="scene">World or level</option></select></label>
   <p data-explanation class="dl-note" aria-live="polite"></p><div data-piece-list class="dl-piece-list" role="group" aria-label="Pieces in this drawing"></div>
-  <div class="dl-edit-tools"><button type="button" data-add>＋ Mark another part</button><button type="button" data-pivot aria-pressed="false">🔩 Place hinge</button><button type="button" data-undo>↶ Undo</button><button type="button" data-delete>Remove part</button>
+  <div class="dl-edit-tools"><button type="button" data-add>＋ Mark another part</button><button type="button" data-pivot aria-pressed="false">🔩 Place hinge</button><button type="button" data-mask-exclude aria-pressed="false">🧽 Erase extra pixels</button><button type="button" data-mask-include aria-pressed="false">🖍️ Restore pixels</button><label>Brush size<input data-brush-size type="range" min="6" max="34" value="18"></label><button type="button" data-undo>↶ Undo</button><button type="button" data-delete>Remove part</button>
   <label>What is this part?<input data-piece-name maxlength="50" placeholder="Name this part"></label>
   <label>What should it do?<select data-role></select></label>
   <label>Outline shape<select data-shape><option value="rect">Square or rectangle</option><option value="ellipse">Round or oval</option></select></label>
   <label>Attached to<select data-parent></select></label>
-  <p class="dl-guidance">Tap a part or its name. Drag its outline to move it; drag the corner to resize. To mark a new part, draw its box. For an arm or wing, choose “Place hinge” and tap where it connects.</p></div>
+  <p class="dl-guidance">Tap a part or its name. Drag its outline to move it; drag the corner to resize. To mark a new part, draw its box. For an arm or wing, place the hinge where it connects. If a cutout looks wrong, use Erase or Restore to brush over the pixels you want to change.</p></div>
   <div class="dl-version"><button type="button" data-save>💾 Save this test</button><button type="button" data-use disabled>⭐ Use my car in Rally</button><label>Earlier tests<select data-history><option value="">Choose a saved version</option></select></label></div></aside></div>
   <footer class="dl-footer"><span data-status role="status" aria-live="polite">Choose the parts of your drawing. Nothing leaves this device.</span><span>On computer: hold Space to move during a test.</span></footer></div>`;
  document.body.append(working);
@@ -47,8 +47,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  let kind:DrawingKind='car',assembly:DrawingAssembly,selected='',mode:'edit'|'play'='edit',disposed=false;
  const onProfile=()=>{if(!stillOwner())working.close();};
  window.addEventListener('factory-profile',onProfile);
- let pendingNew=false,pendingPivot=false,history:SavedRig|null=null,lastStored:SavedRig|null=null;
- let drag:null|{pointer:number;type:'create'|'move'|'resize';id:string;startX:number;startY:number;before:DrawingAssembly} = null;
+ let pendingNew=false,pendingPivot=false,brushMode:'include'|'exclude'|null=null,history:SavedRig|null=null,lastStored:SavedRig|null=null;
+ let drag:null|{pointer:number;type:'create'|'move'|'resize'|'mask';id:string;startX:number;startY:number;before:DrawingAssembly} = null;
  const undo:DrawingAssembly[]=[];
  const partsPanel=q<HTMLElement>(working,'[data-piece-list]'),clockHolder:{clock?:ReturnType<typeof createFixedClock>}={};
  const cutoutPreview=q<HTMLElement>(working,'[data-cutout-preview]');
@@ -70,7 +70,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const p=suggestParts(originalForeground(),next);
   assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:'',revision:1};
   notice.textContent=p.explanation+' You can change any piece.';
-  selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;layerCache.clear();history=null;lastStored=null;
+  selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;brushMode=null;layerCache.clear();history=null;lastStored=null;
   q<HTMLButtonElement>(working,'[data-use]').disabled=true;
   resetHistory();refresh();
  }
@@ -96,6 +96,11 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const hingeButton=q<HTMLButtonElement>(working,'[data-pivot]');
   hingeButton.disabled=!piece||mode==='play'||piece.role==='body'||piece.role==='decoration'||piece.role==='wheel'||piece.parentId===null;
   hingeButton.setAttribute('aria-pressed',String(pendingPivot));
+  for(const action of ['include','exclude'] as const){
+   const brush=q<HTMLButtonElement>(working,'[data-mask-'+action+']');
+   brush.disabled=!piece||mode==='play';
+   brush.setAttribute('aria-pressed',String(brushMode===action));
+  }
  }
  function fit(){
   const w=contentWidth(),h=Math.max(310,Math.min(530,w*.64));
@@ -128,7 +133,21 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const s=Math.min((w-36)/sourceCanvas.width,(h-36)/sourceCanvas.height);
   imageRect={x:(w-sourceCanvas.width*s)/2,y:(h-sourceCanvas.height*s)/2,w:sourceCanvas.width*s,h:sourceCanvas.height*s};
   ctx.fillStyle='white';ctx.fillRect(imageRect.x-3,imageRect.y-3,imageRect.w+6,imageRect.h+6);
-  ctx.drawImage(sourceCanvas,imageRect.x,imageRect.y,imageRect.w,imageRect.h);
+  if(brushMode&&getSelected()){
+   // In mask mode show the actual extracted layer over a pale source guide,
+   // so children see the transparency they are painting rather than a fake mask.
+   const step=14;
+   for(let cy=imageRect.y;cy<imageRect.y+imageRect.h;cy+=step)
+    for(let cx=imageRect.x;cx<imageRect.x+imageRect.w;cx+=step){
+     ctx.fillStyle=((Math.floor((cx-imageRect.x)/step)+Math.floor((cy-imageRect.y)/step))%2)?'#e0e6de':'#ffffff';
+     ctx.fillRect(cx,cy,Math.min(step,imageRect.x+imageRect.w-cx),Math.min(step,imageRect.y+imageRect.h-cy));
+    }
+   ctx.save();ctx.globalAlpha=.18;
+   ctx.drawImage(sourceCanvas,imageRect.x,imageRect.y,imageRect.w,imageRect.h);ctx.restore();
+   const piece=getSelected()!,r=piece.region;
+   const layer=layerCanvas(sourceCanvas,sourceCanvas.width,sourceCanvas.height,piece,assembly.pieces);
+   ctx.drawImage(layer,imageRect.x+r.x*imageRect.w,imageRect.y+r.y*imageRect.h,r.w*imageRect.w,r.h*imageRect.h);
+  }else ctx.drawImage(sourceCanvas,imageRect.x,imageRect.y,imageRect.w,imageRect.h);
   for(const p of assembly.pieces){
    const r=p.region,x=imageRect.x+r.x*imageRect.w,y=imageRect.y+r.y*imageRect.h,pw=r.w*imageRect.w,ph=r.h*imageRect.h;
    ctx.save();ctx.strokeStyle=p.id===selected?'#f5a739':'#238277';ctx.lineWidth=p.id===selected?4:2;
@@ -195,7 +214,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    }else{
     assemblyRig(assembly);other=createDrawingPlayground(assembly);otherScene=other.snapshot();
    }
-   mode='play';pendingPivot=false;pendingNew=false;
+   mode='play';pendingPivot=false;pendingNew=false;brushMode=null;
     canvas.setAttribute('aria-label','Play with your moving drawing. Hold Space to move; use the buttons on touch.');
     updatePanel();
    for(const b of working.querySelectorAll<HTMLButtonElement>('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode==='play'));
@@ -215,7 +234,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  }
  function setMode(next:'edit'|'play'){
   if(next==='play'){startPlay();return;}
-  stopPlay();mode='edit';pendingPivot=false;pendingNew=false;
+  stopPlay();mode='edit';pendingPivot=false;pendingNew=false;brushMode=null;
   canvas.setAttribute('aria-label','Drawing editor. Tap, move or resize a highlighted part.');
   for(const b of working.querySelectorAll<HTMLButtonElement>('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode==='edit'));
   message('Move the outlines if we misunderstood your drawing. Your original is unchanged.');refresh();
@@ -230,6 +249,15 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  canvas.addEventListener('pointerdown',e=>{
   if(mode!=='edit'||e.button>0||drag)return;
   const point=position(e),before=structuredClone(assembly);
+  if(brushMode){
+   const p=getSelected();
+   if(!p||!includes(p,point.x,point.y)){message('Brush inside the selected piece to change its cutout.');return;}
+   if((p.maskStrokes?.length||0)>=48){message('This piece has enough brush corrections. Save it and start another test.');return;}
+   const radius=clamp(Number(q<HTMLInputElement>(working,'[data-brush-size]').value)/Math.max(1,imageRect.w),.002,.08);
+   (p.maskStrokes??=[]).push({action:brushMode,radius,points:[point]});
+   drag={pointer:e.pointerId,type:'mask',id:p.id,startX:point.x,startY:point.y,before};
+   canvas.setPointerCapture(e.pointerId);layerCache.clear();drawEdit();e.preventDefault();return;
+  }
   if(pendingPivot){
    const p=getSelected();
    if(!p||!includes(p,point.x,point.y)){message('Tap inside the selected moving part to place its hinge.');return;}
@@ -257,6 +285,13 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const point=position(e),p=assembly.pieces.find(p=>p.id===drag!.id),old=drag.before.pieces.find(p=>p.id===drag!.id);
   if(!p||!old)return;
   const dx=point.x-drag.startX,dy=point.y-drag.startY;
+  if(drag.type==='mask'){
+   const stroke=p.maskStrokes?.at(-1),last=stroke?.points.at(-1);
+   if(stroke&&last&&stroke.points.length<128&&Math.hypot(point.x-last.x,point.y-last.y)>.002){
+     stroke.points.push(point);layerCache.clear();drawEdit();
+   }
+   e.preventDefault();return;
+  }
   if(drag.type==='create'){
    const x=Math.min(drag.startX,point.x),y=Math.min(drag.startY,point.y);
    p.region={...p.region,x,y,w:clamp(Math.abs(point.x-drag.startX),.025,1-x),h:clamp(Math.abs(point.y-drag.startY),.025,1-y)};
@@ -282,13 +317,22 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   if(mode==='play')setMode('edit');kind=(e.target as HTMLSelectElement).value as DrawingKind;
   proposals(kind);message('These are suggestions. Mark the pieces that should move.');
  });
- q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;pendingPivot=false;refresh();message('Drag a box around the new part on your drawing.');canvas.focus({preventScroll:true});});
+ q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;pendingPivot=false;brushMode=null;refresh();message('Drag a box around the new part on your drawing.');canvas.focus({preventScroll:true});});
  q<HTMLButtonElement>(working,'[data-pivot]').addEventListener('click',()=>{
    const p=getSelected();if(mode!=='edit'||!p||!p.parentId||p.role==='body'||p.role==='decoration'||p.role==='wheel')return;
-   pendingPivot=!pendingPivot;pendingNew=false;refresh();
+   pendingPivot=!pendingPivot;pendingNew=false;brushMode=null;refresh();
    message(pendingPivot?'Tap where this part should attach or bend.':'Hinge placement cancelled.');
    canvas.focus({preventScroll:true});
  });
+ for(const action of ['include','exclude'] as const){
+  q<HTMLButtonElement>(working,'[data-mask-'+action+']').addEventListener('click',()=>{
+   if(mode!=='edit'||!getSelected())return;
+   brushMode=brushMode===action?null:action;pendingNew=false;pendingPivot=false;refresh();
+   message(brushMode==='exclude'?'Brush over unwanted pixels. Your original picture stays safe.':
+    brushMode==='include'?'Brush where pixels should come back. Save when it looks right.':'Back to moving pieces.');
+   canvas.focus({preventScroll:true});
+  });
+ }
  q<HTMLButtonElement>(working,'[data-undo]').addEventListener('click',()=>{const previous=undo.pop();if(!previous)return;assembly=previous;selected=assembly.pieces[0].id;layerCache.clear();refresh();});
  q<HTMLButtonElement>(working,'[data-delete]').addEventListener('click',()=>{
   if(assembly.pieces.length===1)return;
@@ -305,7 +349,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   p.role=roleInput.value as Role;p.physical=!['decoration'].includes(p.role);
   if(p.role==='wing'&&!p.pivot)p.pivot={x:.12,y:.5};
   if(p.role==='limb'&&!p.pivot)p.pivot={x:.5,y:.12};
-  pendingPivot=false;
+  pendingPivot=false;brushMode=null;
   if(p.role==='body')p.parentId=null;
   remember(before);layerCache.clear();refresh();
  });
