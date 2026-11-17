@@ -38,7 +38,7 @@ The brand extends well beyond the header. All artwork below is an original, loca
 - `jems-sparks.svg` — restrained gold/purple idea accents; `jems-blocks.svg` — modular makers' building pieces
 - `jems-clouds.svg` — lilac ambient shapes for welcoming/empty states
 - `jems-facets-pattern.svg` — optional colorful geometric facet motif (don't wallpaper the learning surface)
-- `arcade-icon.svg` stays an alias for legacy references while using the same approved mark
+- `arcade-icon.svg` stays an alias for legacy references while using the same approved mark; the HTML explicitly declares `jems-mark.svg` as favicon and the PWA manifest prefers the dedicated square `jems-app-icon.svg` as its installable icon
 
 Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac** for softly selected sections, **Gem Blue/Purple** as accent identity, **Mint** for building/progress and **Gold** for limited sparks. Coral is a playful accent and must not serve as the only indicator of an error.
 

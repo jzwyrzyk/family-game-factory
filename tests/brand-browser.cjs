@@ -67,7 +67,9 @@ const fs=require('node:fs');
    await page.screenshot({path:'test-results/jems-parent-'+label+'.png',fullPage:false});
    const manifest=await page.evaluate(()=>fetch('./manifest.webmanifest').then(r=>r.json()));
    assert.equal(manifest.short_name,'jems');
-   assert.equal(manifest.icons[0].src,'./jems-mark.svg');
+   assert.equal(manifest.icons[0].src,'./jems-app-icon.svg','installable jems icon should use its dedicated approved app tile');
+   assert.equal(manifest.icons[1].src,'./jems-mark.svg','bare mark remains available as a vector icon');
+   assert.equal(await page.locator('link[rel="icon"]').getAttribute('href'),'./jems-mark.svg','browser tab uses jems favicon');
    assert.deepEqual(errors,[]);
    await page.close();
   }
