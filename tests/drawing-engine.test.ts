@@ -60,6 +60,18 @@ test('Shape proposals remain honest offline suggestions and work without a model
  assert.match(result.explanation,/starting guess/i);
  const creature=suggestParts(data,'character');assert.equal(creature.pieces.length,1);
 });
+test('Reshaping a drawn car body changes its real collider and mass, not only the picture',()=>{
+ const long=structuredClone(sample);
+ long.pieces[0].region.w=.84;
+ const base=vehicleGeometry(sample),changed=vehicleGeometry(long);
+ assert.ok(changed.chassisWidth>base.chassisWidth);
+ const a=createVehicle({},'meadow',base),b=createVehicle({},'meadow',changed);
+ try{
+  const left=a.snapshot().bodies[0],right=b.snapshot().bodies[0];
+  assert.ok(right.width>left.width);
+  assert.ok(right.mass>left.mass);
+ }finally{a.dispose();b.dispose();}
+});
 test('Hinge placement is validated and changes actual revolute joint location',()=>{
  const machine:DrawingAssembly={...sample,kind:'machine',pieces:[
   {...sample.pieces[0],id:'machine_body',name:'Engine'},

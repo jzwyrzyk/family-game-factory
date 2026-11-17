@@ -80,14 +80,17 @@ export function vehicleGeometry(input:DrawingAssembly):VehicleDrawingGeometry {
   if(a.kind!=='car')throw Error('This design is not a car.');
   const body=a.pieces.find(p=>p.role==='body'),wheels=a.pieces.filter(p=>p.role==='wheel').sort((l,r)=>center(l.region).x-center(r.region).x);
   if(!body||wheels.length!==2)throw Error('Choose one body and exactly two wheels before driving.');
-  const b=center(body.region),scale=2.9/body.region.w;
+  // Both the body's visible shape and its selected wheel regions govern physics.
+  // Normalize against the reviewed starter's body coverage, then bound the size.
+  const chassisWidth=clamp(body.region.w/.72*2.9,1.65,3.7);
+  const b=center(body.region),scale=chassisWidth/body.region.w;
   const offsets=wheels.map(p=>{
     const q=center(p.region);
     return {x:clamp((q.x-b.x)*scale,-1.75,1.75),y:clamp((q.y-b.y)*scale,-.2,1.4),
       radius:clamp(Math.min(p.region.w,p.region.h)*scale/2,.35,.8)};
   }) as VehicleDrawingGeometry['wheels'];
   if(offsets[1].x-offsets[0].x<.45)throw Error('Move the wheels farther apart to make a stable car.');
-  return {chassisWidth:2.9,chassisHeight:clamp(body.region.h*scale,.55,1.75),wheels:offsets};
+  return {chassisWidth,chassisHeight:clamp(body.region.h*scale,.55,1.75),wheels:offsets};
 }
 /** Verified game-runtime contract; images remain separate private assets. */
 export function assemblyRig(input:DrawingAssembly):DrawingRig {

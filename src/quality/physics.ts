@@ -199,7 +199,7 @@ export function createVehicle(options: VehicleOptions = {}, trackId = 'meadow', 
   const body = world.createDynamicBody({ position: Vec2(2.5, baseY), angularDamping: .3, linearDamping: .02, bullet: true, userData: { id: 'chassis', material: 'metal' } });
   if(custom)body.createFixture(Box(custom.width/2,custom.height/2),{density:1,friction:.4,restitution:.08});
   else body.createFixture(Polygon([Vec2(-1.45, .32), Vec2(1.45, .32), Vec2(1.45, -.05), Vec2(.65, -.55), Vec2(-.7, -.55), Vec2(-1.45, -.1)]), { density: 1, friction: .4, restitution: .08 });
-  mass(body, 3.5 * weight);
+  mass(body, 3.5 * weight * (custom ? (custom.width/2.9)*(custom.height/1.25) : 1));
   const entries: Entry[] = [{ id: 'chassis', kind: 'chassis', body, width: custom?.width??2.9, height: custom?.height??1.25, previous: { x: 2.5, y: baseY, angle: 0 } }];
   const springs: WheelJoint[] = [];
   for (const [index, id] of ['rear-wheel', 'front-wheel'].entries()) {
