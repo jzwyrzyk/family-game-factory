@@ -10,7 +10,7 @@ export interface LanguageSkill {
 }
 export interface LanguageChoice {value:string; label:string}
 export interface LanguageItem {
-  id:string; skillId:string; title:string; grade:Grade; domain:LanguageDomain;
+  id:string; contentPack:string; skillId:string; title:string; grade:Grade; domain:LanguageDomain;
   kind:LanguageKind; form:LanguageForm; tier:LanguageLevel;
   question:string; passage?:string; choices?:LanguageChoice[]; tiles?:string[];
   answer?:string; hints:[string,string,string]; explanation:string;

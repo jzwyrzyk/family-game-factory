@@ -25,3 +25,7 @@ Immutable runtime archives must not be rewritten in place. A future subject-neut
 ## Accessibility and limitations
 
 A target question is visible and focused before a keyboard appears. Optional speech synthesis reads the task/passage on supported browsers and **marks the attempt as assisted**, never proving independent decoding. The browser's voice is not a validated instructional phonics voice; automatic pronunciation and reading-fluency grading remain unimplemented. Controlled local items are checked exactly; creative writing is stored as exploration with optional human review instead of invented AI mastery.
+
+## Reviewed task revisions and backward compatibility
+
+Each item carries a **contentPack** and a versioned ID (`skill-id:v1:index`). The v1 192-item bank is pinned by a test fingerprint. Future editorial fixes, new examples and grade expansion must publish a **new** content pack and keep old pack material available for validating historic attempts; changing v1 in place after any family uses it could make saved data unreadable. The new pack ID is part of a task's unique identity and retention evidence. Bump the pack revision rather than rewriting an archive. A saved attempt's answer, choice set, response form, task text, hint chain and explanation are checked against its declared reviewed pack.

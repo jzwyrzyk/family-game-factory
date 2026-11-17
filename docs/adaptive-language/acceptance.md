@@ -35,3 +35,7 @@ CI in .github/workflows/test.yml runs new ELA UI/integration gates alongside exi
 **Privacy/release:** Existing parent page is a configuration area, not secure authentication. Avoid logging children's identifying information or uploading their writing to public issues. Test backup recovery on Math+ELA profiles and verify rollback on an approved target deployment.
 
 The app is a supplementary learning toy, not an IXL/Lexia replacement, normed assessment, reading diagnosis, or proven intervention. Keep the PR draft until the owner explicitly approves merge and release gates have been reviewed.
+
+## Immutable curriculum archive
+
+The initial v1 bank has a pinned fingerprint. Once released, preserve it byte-for-byte and introduce revised instructional content in a v2 (or later) pack; never silently edit past question templates or their answers. CI validates a stored task's contentPack, explanation, answer, response form and graded options. Simulate a historic v1 backup when deploying any future pack.

@@ -204,7 +204,7 @@ export const LANGUAGE_G1: Record<string,LanguageTemplateBank> = {
         "a": "sun",
         "d": [
           "sin",
-          "son",
+          "pen",
           "seen"
         ],
         "ex": "Sun has short u.",

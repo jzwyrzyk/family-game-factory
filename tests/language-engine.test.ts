@@ -152,3 +152,20 @@ test('longer writing waits for a round boundary rather than breaking action play
   const spontaneous=selectLanguageItem(profile(4),{opportunity:'practice',random:()=>.99});
   assert.ok(spontaneous.grade<=4);
 });
+
+test('versioned authored item is durable, and tampering with explanation/format cannot forge progress',()=>{
+  const p=profile(3),original=generateLanguageItem('g3-main-idea',{random:()=>0});
+  assert.equal(original.contentPack,'v1');
+  correct(p,original,2000);
+  const restored=JSON.parse(JSON.stringify(p.language));
+  assert.equal(validateLanguage(restored),true);
+  for(const mutate of [
+    (i:LanguageItem)=>{i.explanation='fabricated teaching';},
+    (i:LanguageItem)=>{i.form='syntax';},
+    (i:LanguageItem)=>{i.contentPack='v2';},
+  ]){
+    const copy=structuredClone(restored);
+    mutate(copy.attempts[0].item);
+    assert.equal(validateLanguage(copy),false,'stored item does not match its reviewed immutable pack');
+  }
+});

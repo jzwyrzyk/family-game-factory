@@ -1,5 +1,5 @@
 import {LANGUAGE_SKILLS, getLanguageSkill} from './curriculum';
-import {LANGUAGE_BANK, generateLanguageItem, evaluateLanguageAnswer} from './content';
+import {LANGUAGE_BANK, LANGUAGE_PACKS, generateLanguageItem, evaluateLanguageAnswer} from './content';
 import {profileGrade} from '../learning/engine';
 import type {LanguageContext,LanguageForm,LanguageItem,LanguageProfile,LanguageSkill} from './types';
 
@@ -62,28 +62,39 @@ const empty=():LanguageState=>({
 });
 function trustedItem(item:unknown):item is LanguageItem {
   if(!isObject(item)||!safeId(item.skillId)||!safeId(item.id)||item.source!=='reviewed-local')return false;
-  const match=/^(.+):(\d+)$/.exec(item.id);
-  if(!match||match[1]!==item.skillId)return false;
-  const template=LANGUAGE_BANK[item.skillId]?.items[Number(match[2])];
+  const match=/^(.+):(v[1-9]\d*):(\d+)$/.exec(item.id);
+  if(!match||match[1]!==item.skillId||item.contentPack!==match[2])return false;
+  const bank=LANGUAGE_PACKS[item.contentPack];
+  if(!bank||!Object.hasOwn(bank,item.skillId))return false;
+  const template=bank[item.skillId].items[Number(match[3])];
   if(!template||template.q!==item.question||template.kind!==item.kind||template.t!==item.tier)return false;
   if(template.kind!=='creative'&&template.a!==item.answer)return false;
   if(template.kind==='creative'&&item.answer!==undefined)return false;
-  if(item.passage!==template.passage)return false;
+  if(item.passage!==template.passage||item.explanation!==template.ex)return false;
   const skill=LANGUAGE_SKILLS.find(s=>s.id===item.skillId);
-  if(!skill||item.grade!==skill.grade||item.domain!==skill.domain)return false;
+  if(!skill||item.grade!==skill.grade||item.domain!==skill.domain||
+     typeof item.title!=='string'||item.title.length>150)return false;
+  const form=template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
+    template.kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
+  if(item.form!==form)return false;
+  if(item.purpose!==undefined&&!['focus','review','confidence','prerequisite','explore'].includes(item.purpose))return false;
   if(!Array.isArray(item.hints)||item.hints.length!==3||
-      item.hints.some((x:unknown,i:number)=>x!==LANGUAGE_BANK[item.skillId].h[i]))return false;
+      item.hints.some((x:unknown,i:number)=>x!==bank[item.skillId].h[i]))return false;
   if(template.kind==='choice'){
+    if(item.tiles!==undefined)return false;
     const choices=item.choices;
     if(!Array.isArray(choices)||choices.length!==4)return false;
-    return [template.a,...(template.d||[])].every(v=>choices.some((c:any)=>c?.value===v&&c.label===v));
+    const expected=[template.a,...(template.d||[])];
+    return expected.length===4&&new Set(expected).size===4&&
+      new Set(choices.map((c:any)=>c?.value)).size===4&&
+      expected.every(v=>choices.some((c:any)=>c?.value===v&&c.label===v));
   }
   if(template.kind==='word-tiles'||template.kind==='sentence-tiles'){
-    if(!Array.isArray(item.tiles))return false;
+    if(item.choices!==undefined||!Array.isArray(item.tiles))return false;
     const expected=template.kind==='word-tiles'?template.a.split(''):template.a.split(/\s+/);
     return JSON.stringify([...item.tiles].sort())===JSON.stringify([...expected].sort());
   }
-  return true;
+  return item.tiles===undefined&&item.choices===undefined;
 }
 function validEvidence(x:unknown):x is LanguageEvidence {
   if(!isObject(x))return false;

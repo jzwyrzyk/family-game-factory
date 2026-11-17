@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {LANGUAGE_SKILLS} from '../src/language/curriculum';
-import {LANGUAGE_BANK,generateLanguageItem,evaluateLanguageAnswer,languageContentErrors} from '../src/language/content';
+import {ACTIVE_LANGUAGE_PACK,LANGUAGE_PACKS,LANGUAGE_BANK,generateLanguageItem,evaluateLanguageAnswer,languageContentErrors} from '../src/language/content';
 
 test('language curriculum spans four grades with 48 authored, prerequisite-linked skill units',()=>{
   assert.equal(LANGUAGE_SKILLS.length,48);
@@ -66,4 +67,18 @@ test('shuffled choices do not systematically put the correct answer first',()=>{
     positions.add(item.choices!.findIndex(c=>c.value===item.answer));
   }
   assert.ok(positions.size>2);
+});
+
+test('published v1 examples have a pinned snapshot; never mutate archived reviewed packs',()=>{
+  assert.equal(ACTIVE_LANGUAGE_PACK,'v1');
+  assert.ok(Object.hasOwn(LANGUAGE_PACKS,'v1'));
+  const data=JSON.stringify(LANGUAGE_BANK);
+  let h=0x811c9dc5;
+  for(let i=0;i<data.length;i++)h=Math.imul(h^data.charCodeAt(i),0x01000193)>>>0;
+  assert.equal(h.toString(16).padStart(8,'0'),'57e2c234',
+    'Archived pack changed. Publish corrected examples as v2, retain v1 for saved learner history.');
+  assert.equal(createHash('sha256').update(data).digest('hex').length,64);
+  const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>0});
+  assert.equal(item.contentPack,'v1');
+  assert.match(item.id,/:v1:\d+$/);
 });
