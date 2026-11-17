@@ -1,19 +1,19 @@
-import {ACTIVE_CAPABILITIES,SAFETY_POLICY_BLOCKED,validateSafetyPolicy,type ActiveCapability,type SafetyPolicyV1} from './contract';
+import {ACTIVE_CAPABILITIES,SAFETY_POLICY_BLOCKED,validateSafetyPolicy,type ActiveCapability,type SafetyCapability,type SafetyPolicyV1} from './contract';
 export interface SafetyPolicyReader { read():Promise<unknown> }
-export interface PolicyGrant { epoch:number; capability:ActiveCapability }
+export interface PolicyGrant { epoch:number; capability:SafetyCapability }
 export class SafetyGate {
   constructor(private readonly reader:SafetyPolicyReader){}
   /** Every protected boundary reads the authoritative policy; no client cache or silent allow. */
   async current():Promise<SafetyPolicyV1|null>{
     try{return validateSafetyPolicy(await this.reader.read());}catch{return null;}
   }
-  async check(capability:ActiveCapability):Promise<PolicyGrant|null>{
+  async check(capability:SafetyCapability):Promise<PolicyGrant|null>{
     if(!ACTIVE_CAPABILITIES.includes(capability))return null;
     const policy=await this.current();
     if(!policy||policy.emergencyStop||policy.capabilities[capability]!==true)return null;
     return {epoch:policy.epoch,capability};
   }
-  async require(capability:ActiveCapability):Promise<PolicyGrant>{
+  async require(capability:SafetyCapability):Promise<PolicyGrant>{
     const grant=await this.check(capability);
     if(!grant)throw Error(SAFETY_POLICY_BLOCKED);
     return grant;
