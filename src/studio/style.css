@@ -337,3 +337,26 @@ body.studio-review>.notice{color:#f7f5ff}
 
 /* Keep the optional update banner legible against the light Studio shell. */
 body.studio-review > .factory-update-notice{color:#394862}
+
+/* Math / English choice: calm segmented buttons, consistent touch sizing. */
+.studio-learning-choice{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;margin:16px 0 4px;border:1px solid #dfe5f0;border-radius:16px;background:#fff;box-shadow:0 4px 12px #46578608}
+.studio-learning-copy{display:grid;gap:3px;min-width:0}
+.studio-learning-copy strong{color:#27385c;font-size:15px}
+.studio-learning-copy small{color:#687690;font-size:12px;line-height:1.5}
+.learning-subject-switch{display:inline-flex;gap:4px;max-width:100%;padding:4px;background:#edf1fa;border:1px solid #dae2f1;border-radius:13px}
+.learning-subject-switch button{appearance:none;min-height:44px;padding:10px 16px;border:0;border-radius:10px;background:transparent;color:#52617e;white-space:nowrap;font:750 14px/1.2 system-ui;cursor:pointer}
+.learning-subject-switch button[aria-pressed="true"]{background:#fff;color:#30468b;box-shadow:0 2px 7px #283b6a20}
+.learning-subject-switch button:disabled{cursor:default}
+.learning-subject-switch button:disabled:not([aria-pressed="true"]){opacity:.46}
+.learning-subject-switch button:focus-visible{outline:3px solid #747fe5;outline-offset:2px}
+.learning-adventure{display:grid;justify-items:start;gap:9px;padding:14px;margin-bottom:16px;border-radius:15px;background:#fff;color:#233454;border:1px solid #d9e2f1}
+.learning-adventure strong{font-size:16px}
+.learning-adventure-note{color:#5c6b86;font-size:13px;line-height:1.45;margin:0}
+.parent-subject-report{margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #dce4f0}
+.parent-subject-report h3{font-size:17px;margin:2px 0 10px;color:#263b73}
+@media(max-width:680px){.studio-learning-choice{flex-wrap:wrap;align-items:stretch}.studio-learning-choice>.learning-subject-switch{width:100%}.learning-subject-switch button{flex:1}.learning-adventure .learning-subject-switch{width:100%}}
+
+.studio-game-subject{display:grid;justify-items:start;gap:7px;margin:4px 8px 12px;padding:10px 12px;border-radius:12px;background:#f8faff;border:1px solid #e0e6f2}
+.studio-game-subject strong{font-size:13px;color:#344a79}
+.studio-game-subject small{font-size:12px;color:#687690}
+.studio-game-subject .learning-subject-switch button{font-size:13px}

@@ -95,9 +95,9 @@ export function installLearningHost() {
     select.onchange=()=>{try{saveMode(key,select.value);onChange?.(select.value as LearningMode);}catch(error){select.value=modeFor(FG.store.current(),key);note.textContent=(error as Error).message;}};
     target.replaceChildren(wrap);return select;
   }
-  function renderReport(target:HTMLElement,profile:LearnerProfile=FG.store.current()) {
+  function renderReport(target:HTMLElement,profile:LearnerProfile=FG.store.current(),shownSubject?:'math'|'language') {
     target.replaceChildren();
-    if(subjectFor(profile)==='language'){
+    if((shownSubject||subjectFor(profile))==='language'){
       try {
         if(FG.store.loadError)throw Error(FG.store.loadError);
         const data=reportLanguage(profile),practiced=data.skills.filter(x=>x.presentations>0);
@@ -139,5 +139,6 @@ export function installLearningHost() {
     reportLanguage(FG.store.current()):report(FG.store.current()),
     mathReport:()=>report(FG.store.current()),selectItem,
     get subject(){return subjectFor(FG.store.current());},get skills(){return subjectFor(FG.store.current())==='language'?LANGUAGE_SKILLS:SKILLS;},mathSkills:SKILLS,languageSkills:LANGUAGE_SKILLS,selectLanguageItem,reportLanguage,
+    setSubject:(subject:'math'|'language')=>{if(active)throw Error('Finish this activity before switching subjects.');return FG.store.choosePracticeSubject(subject);},
      get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
 }

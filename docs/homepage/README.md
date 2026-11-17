@@ -29,3 +29,11 @@ Make the Studio library the default at `/`. Keep `?studio=1` as a backward-compa
 - Manually check keyboard only, VoiceOver/TalkBack, iPad portrait/landscape, small Android, 200% zoom, two child profiles, local storage full/denied, poor/offline network, parent controls and game exit.
 - Actual children aged 6–8 and 9–12 should attempt unaided: **play a favorite**, **invent an idea**, **continue an existing game**, **return to My Games**. Observe mis-taps, wrong navigation, first-action latency and interpretation of build availability; automated screenshots do not establish age appropriateness.
 - No merge without clean CI and owner visual review; no Pages deployment without a separate intentional action. Rollback: restore preceding main, or visit `?arcade=1` while investigating. No backend release is part of this work.
+
+## Discoverable Math and English practice
+
+The homepage now has a compact **Learning adventure** Math/English control, repeated in **My Powers** before voluntary practice. The grown-up chooses Math only, English only or **Both — child can switch**. The control is visible with the alternate subject disabled when Both is not enabled; it is also disabled while a question is active. Switching selects the subject for future questions, is saved to the current child profile, survives reload, and does not reset separate learning records or the shared required-checkpoint budget. Parent Controls display both subject reports when Both is enabled.
+
+Both means children can **choose** the next subject; there is no forced alternation, no Off mode, and no new claims of curriculum completeness. Existing profiles retain their previously chosen subject and restriction until a grown-up enables Both.
+
+In Studio gameplay, the same subject choice is available unobtrusively under the existing collapsed **Learning in this game** options. It changes the *next* eligible checkpoint, not a currently open activity, and leaves game simulation state untouched.
