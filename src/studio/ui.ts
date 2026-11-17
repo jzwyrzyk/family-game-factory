@@ -33,6 +33,7 @@ export async function installStudio(){
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
  const clients=new Map<string,BuilderClient>();
+ const unknownJobs=new Set<string>();
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
@@ -77,7 +78,7 @@ export async function installStudio(){
   const items=el('div','studio-build-items');
   for(const s of jobs.slice(0,4)){
    const state=readyExperiment(s)?'✨ Your test is ready':s.job!.status==='failed'?'Build needs help · current game safe':
-     s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
+     unknownJobs.has(s.id)||remote.mode!=='remote'?'Status unknown · checking connection':s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
      s.job!.status==='testing'?'Testing your game':'Building your idea';
    const item=el('div','studio-build-item'),copy=el('div','studio-build-copy');
    copy.append(el('strong','',s.name),el('span','',state));
@@ -87,6 +88,10 @@ export async function installStudio(){
   buildShelf.append(items);
   if(jobs.some(busy)){
    const actions=el('div','studio-build-actions'),play=el('button','studio-button','🎮 Factory Favorites') as HTMLButtonElement;
+   if(route==='studio'&&activeId&&jobs.some(s=>s.id===activeId)){
+    const keep=el('button','studio-button','▶ Keep playing') as HTMLButtonElement;
+    keep.type='button';keep.onclick=()=>act(playViewed);actions.append(keep);
+   }
    play.type='button';play.onclick=()=>act(home);
    const practice=el('button','studio-button','⚡ Extra practice (optional)') as HTMLButtonElement;
    practice.type='button';practice.onclick=()=>act(()=>{if(guardMath())return;flushDraft();disposeGame();FG.app.page('lab');route='other';});
@@ -298,7 +303,7 @@ export async function installStudio(){
   try{await clientFor(s).submit(input);}catch(error){message(s,'helper','The builder could not finish or could not accept this request. Your current game and typed idea are still safe.');if(activeId===s.id&&owner()===s.owner){status((error as Error).message==='SPENDING_CUTOFF'?'The workshop allowance has been reached. No working game was replaced.':'The builder is unavailable. No success has been claimed.',true);render();}}finally{sending.delete(s.id);if(activeId===s.id&&owner()===s.owner)render();}
  }
  async function onJob(captured:StudioSession,job:JobView){
-  const prior=notebook.get(captured.id,captured.owner);
+  const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);
   const terminal=['ready','failed','cancelled'].includes(job.status);
   const phase=typeof job.phase==='string'&&/^[a-z-]{1,32}$/.test(job.phase)?job.phase:undefined;
    if(prior.job?.id!==job.jobId||prior.job.status!==job.status||prior.job.revisionId!==job.revisionId||prior.job.phase!==phase)
@@ -313,14 +318,19 @@ export async function installStudio(){
   }
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':texts[job.status]||'Your working game is safe.');render();}
   else if(owner()===captured.owner&&route==='library')renderLibrary();
-   if(owner()===captured.owner)refreshShelf();
+   if(owner()===captured.owner){
+    refreshShelf();
+    if(job.status==='ready'&&prior.job?.status!=='ready'&&(activeId!==captured.id||route!=='studio')&&!FG.learning.active)
+     globalStatus.textContent='✨ '+captured.name+' is ready to try. Your current game is safe.';
+   }
  }
  const retryTimers=new Map<string,ReturnType<typeof setTimeout>>();
   function resume(s:StudioSession){
    if(!s.job||remote.mode!=='remote'||s.job.api!==remote.apiBaseUrl)return;
    void clientFor(s).resume(s.job.id).catch(()=>{
     if(owner()!==s.owner)return;
-    if(activeId===s.id)status('Connection interrupted. The build may still be running. We will check again.');
+    unknownJobs.add(s.id);refreshShelf();
+     if(activeId===s.id)status('Connection interrupted. The build may still be running. We will check again.');
     if(retryTimers.has(s.id))clearTimeout(retryTimers.get(s.id)!);
     retryTimers.set(s.id,setTimeout(()=>{retryTimers.delete(s.id);try{const latest=notebook.get(s.id,s.owner);if(busy(latest))resume(latest);}catch{/* original work remains */}},15000));
    });
@@ -429,7 +439,7 @@ export async function installStudio(){
  $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});$('studioRetry').onclick=()=>act(async()=>{const s=current();await clientFor(s).retry();});
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
  window.addEventListener('factory-learning-active',event=>{if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
- window.addEventListener('factory-profile',()=>{updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);resumeOutstanding();});
+ window.addEventListener('factory-profile',()=>{updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);resumeOutstanding();});
  window.addEventListener('beforeunload',event=>{try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
  // Existing progress backups gain an explicitly versioned optional notebook. Old backups remain valid.
