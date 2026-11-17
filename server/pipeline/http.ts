@@ -50,7 +50,7 @@ export function apiHandler(service:JobService,config:HttpConfig){
   }catch(error){const raw=(error as Error).message,code=raw==='Forbidden'?'FORBIDDEN':raw;const allowed=['UNAUTHENTICATED','FORBIDDEN','NOT_FOUND','BUILDER_UNAVAILABLE','INVALID_REQUEST','PRIVATE_INFORMATION','SPENDING_CUTOFF','RATE_LIMIT','RETRY_LIMIT','IDEMPOTENCY_CONFLICT','NO_PREVIOUS_VERSION',SAFETY_POLICY_BLOCKED];json(response,code==='UNAUTHENTICATED'?401:code==='FORBIDDEN'?403:code==='NOT_FOUND'?404:code==='BUILDER_UNAVAILABLE'||code===SAFETY_POLICY_BLOCKED?503:400,{errorCode:allowed.includes(code)?code:'REQUEST_REJECTED'});}
  };
 }
-export function previewHandler(service:Pick<JobService,'revision'>,config:Pick<HttpConfig,'previewKey'|'previewOrigin'>){
+export function previewHandler(service:Pick<JobService,'revision'>,config:Pick<HttpConfig,'previewKey'|'previewOrigin'|'safety'>){
  if(config.previewKey.length<32)throw Error('Server signing keys are not configured');
  return async(request:IncomingMessage,response:ServerResponse)=>{
   try{
