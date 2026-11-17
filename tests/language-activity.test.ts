@@ -126,3 +126,27 @@ test('creative writing persists unscored and abandoning a separate task is not f
     assert.equal(result.p.language.attempts[0].answers.length,0);
   }finally{await interrupted.close();}
 });
+
+test('supported read-aloud includes displayed choices and never counts as independent reading',async()=>{
+  const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
+  try{
+    const speak=page.locator('[data-action="read-aloud"]');
+    if(await speak.count()===0)return; // Browser/OS without synthesis still has visible written practice.
+    await page.evaluate(()=>{
+      const w=window as any;w.spoken='';
+      window.speechSynthesis.speak=(u:SpeechSynthesisUtterance)=>{w.spoken=u.text;};
+      window.speechSynthesis.cancel=()=>{};
+    });
+    await speak.click();
+    const spoken=await page.evaluate(()=>(window as any).spoken);
+    assert.ok(spoken.includes(item.question));
+    for(const choice of item.choices||[])assert.ok(spoken.includes(choice.label),
+      'Listening support should read the displayed answer choices as well as the question.');
+    await page.locator('.language-choice').filter({hasText:item.answer!}).click();
+    await page.waitForFunction(()=>(window as any).results.length===1);
+    const result=await state(page);
+    assert.equal(result.p.language.attempts[0].readTargetAt>0,true);
+    assert.equal(result.results[0].independent,false);
+    assert.equal(result.p.language.totals.assisted,1);
+  }finally{await page.close();}
+});

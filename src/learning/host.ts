@@ -99,7 +99,9 @@ export function installLearningHost() {
   }
   window.addEventListener('factory-profile',dispose);
   window.addEventListener('pagehide',dispose);
-  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,interpretLearningRequest,renderReport,report:()=>report(FG.store.current()),selectItem,
+  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,interpretLearningRequest,renderReport,report:()=>subjectFor(FG.store.current())==='language'?
+    reportLanguage(FG.store.current()):report(FG.store.current()),
+    mathReport:()=>report(FG.store.current()),selectItem,
     get subject(){return subjectFor(FG.store.current());},get skills(){return subjectFor(FG.store.current())==='language'?LANGUAGE_SKILLS:SKILLS;},mathSkills:SKILLS,languageSkills:LANGUAGE_SKILLS,selectLanguageItem,reportLanguage,
      get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
 }

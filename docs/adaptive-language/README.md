@@ -51,3 +51,7 @@ Recognizing a written vowel pattern in a multiple-choice response is not proof o
 ## Release limits
 
 No claim of educator approval or demonstrated child learning gains. Merge/deploy only after exact-head CI checks, literacy-specialist audit of the actual questions and hints, observed Grades 1–4 device sessions, privacy review, and an across-real-days pilot. The feature branch and draft PR are for review, not a silent production release. A local JSON backup contains sensitive child learning and personal writing and must not be published to public issues.
+
+## Accessibility refinements
+
+Where the browser supports speech synthesis, the Read this to me control reads the passage, prompt and all displayed choices. Use of it is recorded as supported participation, not proof of independent decoding. Browser voice quality varies and is not validated phonics audio. Full-screen native quests use an accurate Back to Games exit; the child can leave with an interrupted evidence record rather than being trapped at a question.

@@ -35,7 +35,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     'Think it through. Help is always here if you need it.');
   if(options.onLeave){
     const top=make('div','language-topbar');
-    const leave=button('← Back to Play','language-leave');leave.dataset.action='leave-game';
+    const leave=button('← Back to Games','language-leave');leave.dataset.action='leave-game';
     on(leave,'click',()=>{if(!disposed&&!done)options.onLeave?.();});
     top.append(leave);root.append(top);
   }
@@ -56,7 +56,10 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
       if(disposed||done)return;
       try {
         window.speechSynthesis.cancel();
-        const utterance=new SpeechSynthesisUtterance((item.passage?item.passage+'. ':'')+item.question);
+        const choices=item.choices?.map((choice,index)=>
+          ' Option '+(index+1)+': '+choice.label+'.').join('')||'';
+        const utterance=new SpeechSynthesisUtterance(
+          (item.passage?item.passage+'. ':'')+item.question+'.'+choices);
         utterance.lang='en-US';utterance.rate=.85;
         window.speechSynthesis.speak(utterance);
         recordLanguageReadAloud(options.profile,attempt.id);save();

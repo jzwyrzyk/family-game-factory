@@ -15,7 +15,14 @@ export interface LanguageTemplateBank {
 // belong in a NEW pack, while the original pack remains available for history validation.
 // Changing an archived pack can otherwise make legitimate saved attempts unreadable.
 export const ACTIVE_LANGUAGE_PACK = 'v1' as const;
-export const LANGUAGE_BANK_V1:Readonly<Record<string,LanguageTemplateBank>> = Object.freeze({
+function deeplyFreeze<T>(value:T):T {
+  if(value!==null&&typeof value==='object'&&!Object.isFrozen(value)){
+    for(const child of Object.values(value as Record<string,unknown>))deeplyFreeze(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+export const LANGUAGE_BANK_V1:Readonly<Record<string,LanguageTemplateBank>> = deeplyFreeze({
   ...LANGUAGE_G1, ...LANGUAGE_G2, ...LANGUAGE_G3, ...LANGUAGE_G4,
 });
 export const LANGUAGE_PACKS:Readonly<Record<string,Readonly<Record<string,LanguageTemplateBank>>>> =
