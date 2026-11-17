@@ -85,9 +85,9 @@ export function localCoach(c:CoachContext):CoachReply {
   move='explain';message='Tuning changes how an action behaves. Redesigning changes the action itself. Rethinking questions the goal. A win alone does not tell us which feels more fun.';question='Which part would you like to explore?';
  }else if(c.mode==='reflect'){
   move='reflect';message=c.plan.fun?.value?`You wanted: ${c.plan.fun.value}. Your preference matters, not just the score.`:'One play is an observation, not proof that a version is better.';question='What worked, or what would you change?';
- }else if(/\\b(win|won|winning|victory|beat|finish)\\b/i.test(c.message)&&/\\b(every|always|too easy|each time)\\b/i.test(c.message)){
+ }else if(/\b(win|won|winning|victory|beat|finish)\b/i.test(c.message)&&/\b(every|always|too easy|each time)\b/i.test(c.message)){
   move='clarify';message='It sounds like winning happens a lot. You get to decide whether this game should be relaxing or more challenging.';question='Should we add a tricky part, or do you like winning every time?';
- }else if(/\\b(seal|penguin|dragon|cat|robot)\\b/i.test(c.message)&&/\\b(game|jump|ice|moon|pizza|make|create|build|want|bounc)\\b/i.test(c.message)){
+ }else if(/\b(seal|penguin|dragon|cat|robot)\b/i.test(c.message)&&/\b(game|jump|ice|moon|pizza|make|create|build|want|bounc)\b/i.test(c.message)){
   move='clarify';message='I saved the idea you described. We can figure out how the character plays before choosing Build my game.';question='What is the most fun thing your character should do?';
  }else if(/\b(don.t know|stuck|help)\b/i.test(c.message)){
   move='clarify';question=c.helpLevel===0?'Which moment felt tricky?':c.helpLevel===1?'Was it the controls, understanding what happened, or something else?':'Would an example or a completely different direction help?';message='We can make the question smaller, or you can ask for ideas.';
