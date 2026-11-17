@@ -37,7 +37,26 @@ export default class MoonDonutDash implements GameInstance {
   window.addEventListener('keydown',e=>{if(this.hostPaused||this.ended||!/^(ArrowLeft|ArrowRight|ArrowUp| |a|d|w)$/i.test(e.key)||/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName))return;e.preventDefault();this.pressed.add(e.key.toLowerCase());if(e.key===' '||e.key==='ArrowUp'||e.key.toLowerCase()==='w')this.jump();},{signal:this.abort.signal});
   window.addEventListener('keyup',e=>this.pressed.delete(e.key.toLowerCase()),{signal:this.abort.signal});
   window.addEventListener('blur',()=>{this.pressed.clear();this.heldPointers.clear();},{signal:this.abort.signal});
-  this.reset();this.raf=requestAnimationFrame(this.loop);
+  this.reset();
+  const saved=context.persistence?.load() as any;
+  if(saved&&saved.schema==='moon-donuts-v1'&&Number.isInteger(saved.level)&&saved.level>=1&&saved.level<=50
+    &&typeof saved.x==='number'&&saved.x>=25&&saved.x<=875
+    &&typeof saved.y==='number'&&saved.y>=0&&saved.y<=398
+    &&Number.isInteger(saved.hearts)&&saved.hearts>=1&&saved.hearts<=3
+    &&Number.isInteger(saved.collected)&&saved.collected>=0&&saved.collected<this.goal
+    &&Array.isArray(saved.donuts)&&saved.donuts.length>0&&saved.donuts.length<=3
+    &&saved.donuts.every((d:any)=>d&&Number.isFinite(d.x)&&d.x>=50&&d.x<=850&&d.y===388)){
+     this.level=saved.level;this.x=saved.x;this.y=saved.y;this.hearts=saved.hearts;
+     this.collected=saved.collected;this.donuts=saved.donuts.map((d:Donut)=>({...d}));
+     this.hud.textContent='🍩 '+this.collected+' / '+this.goal+'     '+('❤️'.repeat(this.hearts))+'     Level '+this.level;
+     this.note.textContent='Welcome back! Your moon donut mission is saved.';
+  }
+  this.raf=requestAnimationFrame(this.loop);
+ }
+ private save(){
+  const ok=this.context.persistence?.save({schema:'moon-donuts-v1',level:this.level,
+   x:this.x,y:this.y,collected:this.collected,hearts:this.hearts,donuts:this.donuts.map(d=>({...d}))});
+  if(ok===false)this.note.textContent='Could not save your mission. Keep this page open and ask a grown-up to export progress.';
  }
  private reset(){
   this.x=75;this.y=398;this.vy=0;this.frame=0;this.collected=0;this.hearts=3;this.invulnerable=0;
@@ -50,6 +69,7 @@ export default class MoonDonutDash implements GameInstance {
  private update(){
   if(this.ended||this.hostPaused)return;
   this.frame++;
+  if(this.frame%90===0)this.save();
   const left=this.pressed.has('arrowleft')||this.pressed.has('a')||[...this.heldPointers.values()].includes('left');
   const right=this.pressed.has('arrowright')||this.pressed.has('d')||[...this.heldPointers.values()].includes('right');
   this.x=Math.max(25,Math.min(875,this.x+(Number(right)-Number(left))*4.1));
@@ -57,7 +77,7 @@ export default class MoonDonutDash implements GameInstance {
   if(this.invulnerable>0)this.invulnerable--;
   for(let i=this.donuts.length-1;i>=0;i--){
    const d=this.donuts[i];if(Math.hypot(this.x-d.x,this.y-d.y)<36){
-    this.donuts.splice(i,1);this.collected++;
+    this.donuts.splice(i,1);this.collected++;this.save();
     if(this.collected>=this.goal){this.ended=true;this.context.finish({won:true,level:this.level,title:'Donut explorer!',description:'You collected '+this.collected+' moon donuts.'});break;}
     this.donuts.push({x:100+Math.floor(Math.random()*690),y:388});
    }
@@ -69,7 +89,7 @@ export default class MoonDonutDash implements GameInstance {
    const m=this.meteors[i];m.y+=m.speed;
    if(m.y>465){this.meteors.splice(i,1);continue;}
    if(this.invulnerable===0&&Math.hypot(this.x-m.x,this.y-m.y)<34){
-    this.meteors.splice(i,1);this.hearts--;this.invulnerable=85;
+    this.meteors.splice(i,1);this.hearts--;this.invulnerable=85;this.save();
     this.note.textContent=this.hearts?'A meteor bounced you! You can try again.':'The meteors caught you. Choose Retry to try again.';
     if(this.hearts===0){this.ended=true;this.context.finish({won:false,level:this.level,title:'Moon mission paused',description:'You collected '+this.collected+' donuts. Try a new route!'});break;}
    }
@@ -103,12 +123,12 @@ export default class MoonDonutDash implements GameInstance {
   if(!this.hostPaused&&!this.ended){this.accumulator+=dt;let steps=0;while(this.accumulator>=1000/60&&steps++<4){this.update();this.accumulator-=1000/60;}}
   this.draw();this.raf=requestAnimationFrame(this.loop);
  };
- next(){this.level++;this.reset();}
- restart(){this.level=1;this.reset();}
+ next(){this.level++;this.reset();this.save();}
+ restart(){this.level=1;this.reset();this.save();}
  retry(){this.restart();}
  isPlaying(){return !this.stopped&&!this.ended&&!this.hostPaused;}
  pause(){if(!this.isPlaying())return false;this.hostPaused=true;this.pressed.clear();this.heldPointers.clear();return true;}
  resume(){if(!this.stopped){this.hostPaused=false;this.last=0;this.accumulator=0;}}
  snapshot(){return {level:this.level,donuts:this.collected,goal:this.goal,hearts:this.hearts,x:this.x,y:this.y,hostPaused:this.hostPaused};}
- unmount(){this.stopped=true;cancelAnimationFrame(this.raf);this.abort.abort();this.root.remove();}
+ unmount(){this.save();this.stopped=true;cancelAnimationFrame(this.raf);this.abort.abort();this.root.remove();}
 }
