@@ -1,3 +1,6 @@
+import {mountLanguageActivity} from '../language/activity';
+import {LANGUAGE_SKILLS} from '../language/curriculum';
+import {reportLanguage,selectLanguageItem} from '../language/engine';
 import { mountMathActivity } from './activity';
 import { report, selectItem, type LearningReport } from './engine';
 import { SKILLS } from './curriculum';
@@ -9,7 +12,9 @@ const stateNames: Record<string,string> = {
   independent:'Solving independently', 'remembered-later':'Remembered later',
 };
 const create = (tag:string, text='', className='') => { const n=document.createElement(tag);n.textContent=text;n.className=className;return n; };
-type Activity = ReturnType<typeof mountMathActivity>;
+type Activity = ReturnType<typeof mountMathActivity> | ReturnType<typeof mountLanguageActivity>;
+const subjectFor = (profile:LearnerProfile):'math'|'language' => profile.learningSubject==='language'?'language':'math';
+const languageModeLabels:Record<LearningMode,string>={checkpoint:'Reading at a pause',interaction:'Build words & sentences',both:'A mix of both'};
 export function installLearningHost() {
   const FG=(window as any).FG;
   const sessionId=crypto.randomUUID();
@@ -20,7 +25,7 @@ export function installLearningHost() {
     if(FG.store.loadError)throw Error(FG.store.loadError);
     dispose();const own=++generation,profile=options.profile||FG.store.current();activeOwner=profile.id||'';
     window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:true}));
-    try{active=mountMathActivity(target,{
+    try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
       onSave:()=>{if(!FG.store.save()){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}} options.onSave?.();},
       onComplete:(result:any)=>{if(own!==generation||activeOwner!==FG.store.current().id)return;active=null;activeOwner='';window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));options.onComplete(result);},
@@ -45,16 +50,39 @@ export function installLearningHost() {
     return value;
   }
   function modeControl(target:HTMLElement,key:string,onChange?:(mode:LearningMode)=>void) {
-    const wrap=create('div','','learning-mode-control'),label=create('label','Math in this game');
-    const select=document.createElement('select');select.setAttribute('aria-label','Math in this game');
-    for(const mode of LEARNING_MODES){const o=document.createElement('option');o.value=mode;o.textContent=MODE_LABELS[mode];select.append(o);}
+    const subject=subjectFor(FG.store.current());
+    const heading=subject==='language'?'Language Arts in this game':'Math in this game';
+    const wrap=create('div','','learning-mode-control'),label=create('label',heading);
+    const select=document.createElement('select');select.setAttribute('aria-label',heading);
+    for(const mode of LEARNING_MODES){const o=document.createElement('option');o.value=mode;o.textContent=subject==='language'?languageModeLabels[mode]:MODE_LABELS[mode];select.append(o);}
     select.value=modeFor(FG.store.current(),key);label.append(select);
-    const note=create('small','Math is always included. The format can change.');wrap.append(label,note);
+    const note=create('small','Learning checkpoints are always included. The format can change.');wrap.append(label,note);
     select.onchange=()=>{try{saveMode(key,select.value);onChange?.(select.value as LearningMode);}catch(error){select.value=modeFor(FG.store.current(),key);note.textContent=(error as Error).message;}};
     target.replaceChildren(wrap);return select;
   }
   function renderReport(target:HTMLElement,profile:LearnerProfile=FG.store.current()) {
-    target.replaceChildren();let r:LearningReport;
+    target.replaceChildren();
+    if(subjectFor(profile)==='language'){
+      try {
+        if(FG.store.loadError)throw Error(FG.store.loadError);
+        const data=reportLanguage(profile),practiced=data.skills.filter(x=>x.presentations>0);
+        target.append(create('p','Language practice is not a reading diagnosis or a school grade. Independent work, help and listening support stay separate.','muted fine'));
+        if(!practiced.length){target.append(create('p','A few activities cannot define your reading ability. We are discovering what to practice.'));return;}
+        target.append(create('p',data.totals.independent+' independent · '+data.totals.assisted+' with help · '+data.due.length+' review skills','learning-report-summary'));
+        for(const row of practiced){
+          const card=create('article','','learning-progress-card');card.dataset.skillId=row.id;card.dataset.state=row.state;
+          const label=row.state==='independent'?'Solving independently':row.state==='remembered-later'?'Remembered later':row.state==='learning-with-support'?'Learning with help':'Still discovering';
+          card.append(create('strong','Grade '+row.grade+' · '+row.title),create('span',label,'learning-state'));
+          card.append(create('small',row.independent+' independent · '+row.assisted+' with help · '+row.distinctDays+' separate days'));
+          if(row.readSupport)card.append(create('small','Read-aloud help used in '+row.readSupport+' recent activities'));
+          if(row.explored)card.append(create('small',row.explored+' unscored writing practice activities'));
+          if(row.dueAt)card.append(create('small',row.reviewDue?'Ready to revisit':'Review after '+new Date(row.dueAt).toLocaleDateString()));
+          target.append(card);
+        }
+      }catch(error){target.append(create('p',(error as Error).message,'learning-save-warning'));}
+      return;
+    }
+    let r:LearningReport;
     try{if(FG.store.loadError)throw Error(FG.store.loadError);r=report(profile);}catch(error){target.append(create('p',(error as Error).message,'learning-save-warning'));return;}
     const practiced=r.skills.filter(x=>x.presentations>0);
     target.append(create('p','Progress describes practice here. It is not a school grade or an assessment score.','muted fine'));
@@ -72,6 +100,7 @@ export function installLearningHost() {
   }
   window.addEventListener('factory-profile',dispose);
   window.addEventListener('pagehide',dispose);
-  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,renderReport,report:()=>report(FG.store.current()),skills:SKILLS,selectItem,
-    get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
+  FG.learning={version:2,sessionId,mount,checkpoint,dispose,focus:()=>active?.focus()||false,modeFor:(key:string)=>modeFor(FG.store.current(),key),setMode:saveMode,modeControl,interpretMathRequest,renderReport,report:()=>report(FG.store.current()),selectItem,
+    get subject(){return subjectFor(FG.store.current());},get skills(){return subjectFor(FG.store.current())==='language'?LANGUAGE_SKILLS:SKILLS;},mathSkills:SKILLS,languageSkills:LANGUAGE_SKILLS,selectLanguageItem,reportLanguage,
+     get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
 }
