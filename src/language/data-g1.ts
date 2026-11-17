@@ -212,9 +212,9 @@ export const LANGUAGE_G1: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "word-tiles",
-        "q": "Build the three-letter word for a small round toy you kick or throw.",
-        "a": "ball",
-        "ex": "Ball has four letters: b-a-l-l.",
+        "q": "Build the three-letter word for the star that lights our day.",
+        "a": "sun",
+        "ex": "Sun has three letters: s-u-n.",
         "t": 2
       }
     ]
@@ -289,7 +289,7 @@ export const LANGUAGE_G1: Record<string,LanguageTemplateBank> = {
         "a": "thin",
         "d": [
           "tin",
-          "theny",
+          "ten",
           "win"
         ],
         "ex": "Thin begins with t-h.",

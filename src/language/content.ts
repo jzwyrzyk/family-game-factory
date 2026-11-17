@@ -11,7 +11,7 @@ export interface LanguageTemplate {
 export interface LanguageTemplateBank {
   h:string[]; items:LanguageTemplate[];
 }
-export const LANGUAGE_BANK:ReadOnly<Record<string,LanguageTemplateBank>> = Object.freeze({
+export const LANGUAGE_BANK:Readonly<Record<string,LanguageTemplateBank>> = Object.freeze({
   ...LANGUAGE_G1, ...LANGUAGE_G2, ...LANGUAGE_G3, ...LANGUAGE_G4,
 });
 const unit=(random:()=>number):number=>{
