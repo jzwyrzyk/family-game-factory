@@ -33,3 +33,12 @@ Avoid using pastel colors as small text on white. Maintain readable navy text on
 
 ## Verified guide alignment
 The original approved style-guide board specifies **Ink #0B1E3B**, **Jem Blue #2E6BFF**, **Spark #8B5CF6**, **Play #FF5E7A**, **Idea #FFC24D**, and **Build #22D3A6**. Any earlier near-match values are superseded by these exact codes. Use the approved lower-case wordmark and the *white center of the wrench in the monochrome silhouette*; transparent knockouts that expose a dark background are not accepted. "Send to jems" submits a typed conversation turn; "Speak" is the distinct voice-input control when supported. Full interactive journey parity with the approved 16-screen UX prototype is a separate production feature acceptance, not established by the branding layer alone.
+
+### Delivered vector lockups and patterns
+- `public/jems-logo.svg`: gem + traced lower-case wordmark + tagline and sparkle, referencing the approved raster guide.
+- `public/jems-mark.svg` / `public/arcade-icon.svg`: isolated faceted gem with open-ended white wrench and gold rays.
+- `public/jems-mono.svg`: navy-on-light logo; central wrench **solid white** (never see-through).
+- `public/jems-reversed.svg`: white-on-ink logo for dark surfaces.
+- `public/jems-pattern.svg`: subtle decorative gem, wrench and spark pattern; no network dependency.
+
+The original brand board remains the reference for pixel-level art direction; these code-native vectors are an interpretation, not a replacement for an independently supplied editable master. Future font substitution must use a properly licensed display font and must not bundle an unapproved font file.
