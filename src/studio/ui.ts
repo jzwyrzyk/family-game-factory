@@ -82,8 +82,15 @@ export async function installStudio(){
      s.job!.status==='testing'?'Testing your game':'Building your idea';
    const item=el('div','studio-build-item'),copy=el('div','studio-build-copy');
    copy.append(el('strong','',s.name),el('span','',state));
-   const b=el('button','studio-button',readyExperiment(s)?'Try test':'Open') as HTMLButtonElement;
-   b.type='button';b.onclick=()=>act(()=>open(s.id));item.append(copy,b);items.append(item);
+   const b=el('button','studio-button',readyExperiment(s)?'Try ready test':'Open game') as HTMLButtonElement;
+   b.type='button';b.onclick=()=>act(async()=>{
+    // A ready card is a deliberate choice, never an automatic interrupt.
+    if(route==='studio'&&guardMath())return;
+    await open(s.id);
+    if(owner()!==s.owner||route!=='studio'||activeId!==s.id)return;
+    const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
+    if(ready?.candidate.remoteId)await showRemote(latest,ready.candidate.remoteId,'candidate',ready.id);
+   });item.append(copy,b);items.append(item);
   }
   buildShelf.append(items);
   if(jobs.some(busy)){
