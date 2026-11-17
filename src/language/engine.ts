@@ -117,7 +117,7 @@ export function validateLanguage(value:unknown):boolean {
   if(!isObject(value)||value.version!==1||!safeCount(value.sequence)||!safeCount(value.selectionCount)||!isObject(value.totals)||!isObject(value.skills))return false;
   if(!Array.isArray(value.attempts)||value.attempts.length>MAX_ATTEMPTS||value.attempts.some((x:unknown)=>!validAttempt(x)))return false;
   for(const k of ['presentations','independent','assisted','shown','interrupted','skipped','explored'])if(!safeCount(value.totals[k]))return false;
-  for(const [id,x] of Object.entries(value.skills))if(!safeId(id)||!LANGUAGE_BANK[id]||!validEvidence(x))return false;
+  for(const [id,x] of Object.entries(value.skills))if(!safeId(id)||!Object.hasOwn(LANGUAGE_BANK,id)||!validEvidence(x))return false;
   for(const k of ['recentItems','recentSkills'])if(!Array.isArray(value[k])||value[k].length>24||value[k].some((v:unknown)=>!safeId(v)))return false;
   return true;
 }
@@ -238,7 +238,7 @@ export function languageEvidenceState(summary?:LanguageEvidence):LanguageProgres
   const stable=latest.length>=3&&latest.filter(x=>x.independent).length>=3;
   const across=summary.independent>=4&&summary.independentDays.length>=2&&summary.independentItems.length>=3&&stable;
   if(across&&summary.independent>=5&&summary.independentDays.length>=3&&
-     summary.independentForms.length>=2&&summary.delayedSuccesses>=2&&
+     summary.independentItems.length>=3&&summary.delayedSuccesses>=2&&
      summary.firstIndependentAt!==null&&summary.lastIndependentAt!==null&&
      summary.lastIndependentAt-summary.firstIndependentAt>=7*DAY)return 'remembered-later';
   if(across)return 'independent';
@@ -281,7 +281,8 @@ export function selectLanguageItem(profile:LanguageProfile,context:LanguageConte
   const variation=evidence?.independentItems.length||0;
   const struggling=evidence?.recent.slice(-2).some(x=>x.struggled);
   const intensity=profile.intensity||'balanced';
-  const tier=intensity==='gentle'||struggling?0:recentIndependent>=4&&variation>=3?2:intensity==='stretch'?1:0;
+  const tier=struggling?0:intensity==='gentle'?(recentIndependent>=3&&variation>=2?1:0):
+    recentIndependent>=4&&variation>=3?2:recentIndependent>=2&&variation>=2?1:intensity==='stretch'?1:0;
   const item=generateLanguageItem(skill.id,{random,tier,excludeIds:state.recentItems.slice(0,8)});
   return {...item,purpose};
 }

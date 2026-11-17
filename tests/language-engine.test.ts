@@ -113,3 +113,30 @@ test('wrong choice is not credited, and interruption preserves a partial attempt
   assert.equal(ensureLanguage(p).totals.interrupted,1);
   assert.equal(ensureLanguage(p).totals.independent,0);
 });
+
+test('repeated independent retrieval on varied authored passages reaches conservative across-day states',()=>{
+  const p=profile(4),skill='g3-main-idea',base=Date.UTC(2026,9,1,9);
+  const first=generateLanguageItem(skill,{tier:0,random:()=>0});
+  const second=generateLanguageItem(skill,{tier:0,random:()=>.99});
+  const third=generateLanguageItem(skill,{tier:1,random:()=>0});
+  const fourth=generateLanguageItem(skill,{tier:2,random:()=>0});
+  assert.equal(new Set([first.id,second.id,third.id,fourth.id]).size,4);
+  correct(p,first,base);
+  correct(p,second,base+DAY+1000);
+  correct(p,third,base+3*DAY+1000);
+  correct(p,fourth,base+4*DAY+1000);
+  assert.equal(reportLanguage(p,base+5*DAY).skills.find(s=>s.id===skill)?.state,'independent');
+  correct(p,first,base+7*DAY+1000);
+  assert.equal(reportLanguage(p,base+8*DAY).skills.find(s=>s.id===skill)?.state,'remembered-later');
+});
+test('Gentle can reach enough task variety without jumping to stretch tier',()=>{
+  const p=profile(3);p.intensity='gentle';p.languageFocus=['g3-main-idea'];
+  const base=Date.UTC(2026,9,1,9);
+  const first=generateLanguageItem('g3-main-idea',{tier:0,random:()=>0});
+  const second=generateLanguageItem('g3-main-idea',{tier:0,random:()=>.99});
+  correct(p,first,base);
+  correct(p,second,base+500);
+  correct(p,first,base+1000);
+  const next=selectLanguageItem(p,{now:base+1500,random:()=>0});
+  assert.equal(next.tier,1,'after varied success, Gentle exposes a third task without stretch tier');
+});
