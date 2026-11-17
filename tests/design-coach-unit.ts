@@ -30,15 +30,15 @@ function coachingHarness(){
  for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
  const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
  const storage=new Memory(),book=new StudioNotebook(storage),initial=book.create('child-one','new','Synthetic new game');let active=initial;
- const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[];
- Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}}}});
+ const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[];
+ Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}},dispatchEvent:(event:Event)=>{if(event.type==='jems:milestone')milestones.push((event as CustomEvent<{kind:string}>).detail.kind);return true;}}});
  Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal}))});
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
   tryRequest:async()=>{},rules:()=>'',playTest:async()=>{},playMain:async()=>{},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
  });coach.openSession();
- return {coach,book,storage,statuses,pending,get,
+ return {coach,book,storage,statuses,pending,milestones,get,
   session:()=>book.get(active.id,active.owner),
   input(id:string,value:string){const input=get(id);input.focus();input.value=value;input.dispatchEvent(new Event('input'));},
   save(field:string){const input=get('plan-'+field),index=input.parentElement!.children.indexOf(input);input.parentElement!.children[index+2].children[0].onclick();},
@@ -96,7 +96,7 @@ await test('autosave retains unchanged helper provenance and explicit acceptance
  }finally{h.dispose();}
 });
 await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');assert.equal(h.pending.length,1);
+ const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');assert.equal(h.pending.length,1);assert.deepEqual(h.milestones,['idea'],'first persisted child idea emits its earned milestone');
   h.input('studioPrompt','Maybe the penguin could bounce');h.resolve(reply);await turn;
   assert.equal(h.get('studioPrompt').value,'Maybe the penguin could bounce');assert.equal(h.session().draft,'Maybe the penguin could bounce');assert.equal(h.session().messages[0].text,'I want a different way to move');assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
