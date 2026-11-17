@@ -8,6 +8,7 @@ import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCop
 import './style.css';
 import '../brand/jems.css';
 import '../brand/playful.css';
+import '../brand/experience.css';
 import { installQualityCards } from '../quality/cards';
 import { StudioNotebook, validateNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
 import { StudioGames, isGeneratedRemoteKind } from './adapter';
