@@ -138,6 +138,9 @@ async function run(){
   voice.reply('Another reply');
   hearReply.onclick?.();
   assert.equal(spoken.length,speechCount,'off-device text-to-speech is not permitted');
+  (window as any).speechSynthesis.getVoices=()=>[{lang:'en-US',localService:true}];
+  voice.armReply();voice.reply('Private voice turn receives an approved local speaking voice.');
+  assert.equal(spoken.at(-1),'Private voice turn receives an approved local speaking voice.');
   console.log('PASS local-only microphone, child speech -> chat, spoken reply, stop, profile isolation, microphone denial, local pack and off-device refusal');
 }
 run().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{
