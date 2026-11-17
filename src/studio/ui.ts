@@ -4,6 +4,7 @@ import {installCoaching} from './coaching';
 import {celebrateJem} from '../brand/delight';
 import {installStudioVoice} from './voice';
 import {freshDesign} from './design';
+import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCopy,canCompareExperiments,type BuilderReadiness,type CoachConnection} from './experience';
 import './style.css';
 import '../brand/jems.css';
 import '../brand/playful.css';
@@ -42,6 +43,7 @@ export async function installStudio(){
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
+ let coachConnection:CoachConnection='checking',builderReadiness:BuilderReadiness='checking';
  let saving=false, reflecting=false, lastOutcome:string|null=null,viewedRevisionId:string|null=null,remoteViewedId:string|null=null;
  let coaching:ReturnType<typeof installCoaching>|undefined;
  let voice:ReturnType<typeof installStudioVoice>|undefined;
@@ -59,6 +61,29 @@ export async function installStudio(){
  <section id="studioVersions" class="studio-versions" aria-labelledby="studioVersionsTitle" hidden><div class="studio-section-heading"><div><h2 id="studioVersionsTitle" tabindex="-1">My tests & versions</h2><p>Try your ideas. You choose which one becomes your main game.</p></div><button class="studio-button" id="studioCloseVersions">Back to game</button></div><div id="studioVersionCards" class="studio-version-cards"></div></section>
  <dialog id="studioCopyDialog" class="studio-dialog" aria-labelledby="studioCopyTitle"><form id="studioCopyForm"><h2 id="studioCopyTitle">Give this game a new name</h2><p>Your original stays safe. Your ideas come with the copy.</p><label for="studioCopyName">Game name</label><input id="studioCopyName" maxlength="60" required><div><button class="studio-button" id="studioCopyCancel" type="button">Cancel</button><button class="studio-button studio-primary" type="submit">Save new game</button></div></form></dialog>`;
  document.querySelector('main')!.append(page);
+ // One child-facing journey: an idea-first workspace, a composer with attached
+ // actions, and a separate status card that only represents observed build states.
+ const creationHero=el('section','studio-creation-hero');
+ creationHero.id='studioCreationHero';
+ creationHero.innerHTML='<img src="./jems-workbench.svg" alt="" aria-hidden="true"><div><span class="studio-creation-kicker">✨ ANY IDEA CAN START HERE</span><h2>What game can you dream up?</h2><p>A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!</p></div>';
+ $('studioConversation').querySelector('.studio-helper-heading')!.after(creationHero);
+ const sendRow=$('studioPromptForm').querySelector('.studio-send-row')!;
+ sendRow.prepend($('studioMic'));
+ sendRow.after($('studioDraftStatus'));
+ const workshopNote=el('span','studio-workshop-availability');
+ workshopNote.id='studioWorkshopAvailability';
+ $('studioSend').after(workshopNote);
+ const progressBanner=el('section','studio-progress-banner');
+ progressBanner.id='studioBuildProgress';progressBanner.hidden=true;
+ progressBanner.setAttribute('role','status');progressBanner.setAttribute('aria-live','polite');
+ const progressTitle=el('strong','studio-progress-title'),progressDetails=el('p','studio-progress-detail');
+ progressBanner.append(progressTitle,progressDetails);
+ $('studioPromptForm').before(progressBanner);
+ progressBanner.append($('studioReady'));
+ const voiceDetails=el('details','studio-voice-details');
+ voiceDetails.append(el('summary','','Voice & accessibility options'));
+ $('studioPromptForm').querySelector('.studio-voice-row')!.before(voiceDetails);
+ voiceDetails.append($('studioPromptForm').querySelector('.studio-voice-row')!, $('studioPromptForm').querySelector('.studio-voice-note')!);
  const pausedPreview=el('section','studio-paused-preview');pausedPreview.id='studioPausedPreview';pausedPreview.hidden=true;
  pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
@@ -179,9 +204,7 @@ export async function installStudio(){
  }
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;
-  note.textContent=!configReady?'Checking which creation tools are ready…':remote.mode==='remote'?
-   'Your ideas save here. You choose when to try building something new.':
-   'Save any idea now. Building brand-new playable games is not connected yet.';
+  note.textContent=!configReady?'Checking which creation tools are ready…':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;
@@ -203,6 +226,22 @@ export async function installStudio(){
  function chooseLearningSubject(subject:'math'|'language'){
    try{FG.learning.setSubject(subject);refreshLearningChoice();const message=(subject==='math'?'Math':'English')+' selected for your next learning activity.';if(route==='studio')status(message);else globalStatus.textContent=message;}
    catch(error){globalStatus.textContent=(error as Error).message;}
+ }
+ async function refreshServiceReadiness(){
+  if(remote.mode!=='remote')return;
+  // Public configuration merely selects URLs; only an authenticated server
+  // check can distinguish an available service, session failure and allowance.
+  const check=async(path:string)=>{
+   const response=await fetch(remote.apiBaseUrl+path,{credentials:'include',cache:'no-store'});
+   if(!response.ok)throw Error(response.status===401||response.status===403?'UNAUTHENTICATED':'SERVICE_UNAVAILABLE');
+   return response.json();
+  };
+  const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
+  if(coach.status==='fulfilled')coachConnection=coach.value?.available?'available':'unavailable';
+  else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
+  if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
+  else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
+  if(activeId)render();else updateCreationNote();
  }
  function renderLibrary(){
   refreshLearningChoice();
@@ -283,7 +322,17 @@ export async function installStudio(){
   const n=s.projectId?games.history(s.projectId,s.owner).findIndex(r=>r.id===working?.id)+1:0;
   $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · version ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
   $('studioPreviewNotice').hidden=showing==='working';
-  $('studioAvailability').textContent=!configReady?'Checking tools…':remote.mode==='remote'?'AI builder configured · conversational AI may be offline':'Limited local conversation · AI chat is not connected';
+  const creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
+  page.classList.toggle('studio-creating',creating);
+  creationHero.hidden=!creating;
+  $('studioAvailability').textContent=coachConnectionCopy(configReady?coachConnection:'checking');
+  workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
+  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id));
+  progressBanner.hidden=!progress;
+  progressBanner.dataset.phase=progress?.phase||'';
+  progressTitle.textContent=progress?.title||'';
+  progressDetails.textContent=progress?.description||'';
+  
   $<HTMLButtonElement>('studioPlay').disabled=!(working||s.remoteId||s.candidate);
   $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);$('studioPlay').textContent=pausedForTools?'▶ Back to my game':'▶ Play';
   $<HTMLButtonElement>('studioUndo').disabled=!s.candidate&&!working?.parentId&&!s.remoteId;
@@ -291,7 +340,8 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
   $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving;$('studioSend').textContent=reflecting?'Save thought →':'Try a change →';
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
-  $('studioPromptLabel').textContent=reflecting?'What did you notice?':s.game==='new'&&!s.remoteId?'What game would you like to imagine?':'What do you want to talk about?';
+  $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?'Tell jems your game idea':'Tell jems what you want to discuss or change';
+  $('studioSend').textContent=reflecting?'Save thought →':creating?'✨ Build my game':'Try a change →';
   $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=s.job?.status!=='failed';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
   if(s.projectId&&!s.remoteId)(examples[s.game as GameId]||[]).slice(0,2).forEach(text=>{const b=el('button','studio-chip',text);b.setAttribute('type','button');b.onclick=()=>{reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value=text;flushDraft();render();$('studioPrompt').focus();};suggestions.append(b);});
@@ -397,9 +447,10 @@ export async function installStudio(){
     if(activeId===s.id&&owner()===s.owner)
      status('Connection interrupted. The builder may still be working; checking again.');
    }else{
-    message(s,'helper','The builder could not accept or confirm this request. Your current game and idea are safe.');
-    if(activeId===s.id&&owner()===s.owner)
-     status((error as Error).message==='SPENDING_CUTOFF'?'The workshop allowance has been reached. No working game was replaced.':'No build was confirmed. You can still make local changes.',true);
+    const code=error instanceof Error?error.message:undefined;
+    const explanation=buildErrorCopy(code);
+    message(s,'helper',explanation);
+    if(activeId===s.id&&owner()===s.owner)status(explanation,true);
    }
   }).finally(()=>{
    sending.delete(s.id);
@@ -419,14 +470,14 @@ export async function installStudio(){
    if(sending.has(captured.id)){sending.delete(captured.id);}
    if(job.status==='queued'&&prior.pendingExperiment){if(activeId===captured.id&&owner()===captured.owner)flushDraft();const submitted=prior.pendingExperiment.prompt;notebook.update(captured.id,captured.owner,s=>{if(s.draft===submitted)s.draft='';});if(activeId===captured.id&&owner()===captured.owner&&$<HTMLTextAreaElement>('studioPrompt').value===submitted)$<HTMLTextAreaElement>('studioPrompt').value='';}
   const texts:Record<string,string>={queued:'Your request is queued.',building:'Building a separate preview…',testing:job.phase==='repairing'?'Repairing the preview…':'Testing the preview…',ready:'Your new preview is ready.',failed:'The build did not work. Your current game is safe.',cancelled:'Build cancelled. Your current game is unchanged.'};
-  if(terminal&&prior.job?.status!==job.status)message(captured,'helper',(job.adapter==='mock'?'Test builder (mock): ':'')+texts[job.status]);
+  if(terminal&&prior.job?.status!==job.status)message(captured,'helper',(job.adapter==='mock'?'Test builder (mock): ':'')+(job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]));
   if(job.status==='ready'&&job.revisionId&&!prior.experiments?.some(e=>e.candidate.remoteId===job.revisionId)){
     const pending=prior.pendingExperiment;const c:Candidate={id:crypto.randomUUID(),baseId:pending?.baseId||prior.remoteId,remoteId:job.revisionId,prompt:pending?.prompt||prior.draft,summary:job.adapter==='mock'?'New test-builder preview (mock)':'New AI-built preview'};
     notebook.saveExperiment(captured.id,captured.owner,c,pending?.parents||[],pending?.depth||'redesign',pending?.origin||'child',false);
     notebook.update(captured.id,captured.owner,s=>{s.pendingExperiment=null;});
   }
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){
-   status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':texts[job.status]||'Your working game is safe.');render();
+   status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]||'Your working game is safe.');render();
    // Only a confirmed new real revision earns the playable burst; never a mock or queued job.
    if(job.status==='ready'&&job.revisionId&&job.adapter!=='mock'&&prior.job?.status!=='ready'&&!FG.learning.active)
     celebrateJem('playable','studioReady');
@@ -568,6 +619,7 @@ export async function installStudio(){
  const importInput=$<HTMLInputElement>('importData');importInput.addEventListener('change',event=>{event.stopImmediatePropagation();const file=importInput.files?.[0];if(!file)return;act(async()=>{try{if(file.size>20_000_000)throw Error('That backup is too large.');const data=JSON.parse(await file.text());if(data.factoryStudio)validateNotebook(data.factoryStudio);if(data.factoryWorkspace)FG.factory.validateWorkspace(data.factoryWorkspace);if(!confirm('Restore this backup? Current progress will be replaced.'))return;const prior=JSON.stringify(FG.store.data),oldWorkspace=games.export(),oldNotebook=notebook.read();try{FG.store.restore(JSON.stringify(data));if(data.factoryWorkspace)FG.factory.restoreWorkspace(data.factoryWorkspace);if(data.factoryStudio)notebook.restore(data.factoryStudio);}catch(error){FG.store.restore(prior);FG.factory.restoreWorkspace(oldWorkspace);notebook.restore(oldNotebook);throw error;}location.reload();}finally{importInput.value='';}});},true);
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
   onCoachReply:text=>voice?.reply(text),
+  onCoachState:state=>{coachConnection=state;if(activeId)render();},
   rules:()=>{const s=current();if(s.game==='new')return 'New game: rules are being agreed; do not invent recorded outcomes.';const r=s.projectId?games.revision(s.projectId,s.owner):null;return JSON.stringify({game:s.game,instructions:FG.games[s.game]?.instructions,controls:FG.games[s.game]?.controls,settings:r?.config,learningSubject:FG.learning.subject,editable:manifests[s.game as GameId]?.mechanics.map(m=>({key:m.key,label:m.label}))}).slice(0,2000);},
   localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details();return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:games.revision(s.projectId,s.owner).config,prompt).kind==='supported';},
   tryRequest:async(prompt)=>{$<HTMLTextAreaElement>('studioPrompt').value=prompt;flushDraft();await submit();},
@@ -607,6 +659,10 @@ export async function installStudio(){
   })
  });
  home();
- try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{remote={version:1,mode:'unavailable'};}configReady=true;if(activeId)render();else updateCreationNote();resumeOutstanding();refreshShelf();
+ try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI),{cache:'no-store'})).json());}catch{remote={version:1,mode:'unavailable'};}
+ configReady=true;
+ if(remote.mode!=='remote'){coachConnection='unavailable';builderReadiness='not-configured';}
+ if(activeId)render();else updateCreationNote();
+ void refreshServiceReadiness();resumeOutstanding();refreshShelf();
  FG.studio={version:1,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
 }
