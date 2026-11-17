@@ -479,6 +479,7 @@ export async function installStudio(){
  });
  $('studioPromptForm').onsubmit=e=>{e.preventDefault();act(submit);};
  $('studioTalk').onclick=()=>act(()=>{
+  stopSpeech();
   if(!$<HTMLTextAreaElement>('studioPrompt').value.trim()){status('Say or type a thought to talk about.');return;}
   return coaching?.discuss('discuss');
  });
@@ -542,11 +543,13 @@ export async function installStudio(){
   },
   onTranscript:async text=>{
    if(reflecting){$<HTMLTextAreaElement>('studioPrompt').value=text;flushDraft();await submit();return;}
-   await coaching?.discuss('discuss',text,true);
+   voice?.armReply();await coaching?.discuss('discuss',text,true);
   }
  });
  // A new microphone choice must stop the previous microphone immediately.
  $('studioMic').addEventListener('click',()=>privateSpeech?.cancel(),{capture:true});
+ for(const action of ['coachDiscuss','coachIdeas','coachExplain'])
+  $(action).addEventListener('click',()=>stopSpeech(),{capture:true});
  installStudioRemixRouting({
   activeGame:()=>activeId&&route==='studio'&&mounted?current().game as GameId:null,
   openRequest:prompt=>act(async()=>{
