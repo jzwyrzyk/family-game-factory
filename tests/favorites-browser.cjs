@@ -17,6 +17,7 @@ const {start}=require('./browser-server.cjs');
     assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon','gum','hill','moon','robot']);
     assert.match(await page.locator('#studioStarterTitle').textContent(),/Factory Favorites/);
     await page.click('[data-starter="moon"]');await page.waitForSelector('.favorite-moon .favorite-canvas');
+    await page.locator('.favorite-moon .favorite-canvas').focus();
     const original=await page.evaluate(()=>FG.runtime.snapshot().state.x);
     await page.keyboard.down('ArrowRight');await page.waitForTimeout(250);await page.keyboard.up('ArrowRight');
     const moved=await page.evaluate(()=>FG.runtime.snapshot().state.x);
