@@ -30,9 +30,15 @@ function coachingHarness(){
  for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
  const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
  const storage=new Memory(),book=new StudioNotebook(storage),initial=book.create('child-one','new','Synthetic new game');let active=initial;
- const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[];
+ const statuses:{text:string;error:boolean}[]=[],pending:{
+  resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal;body:any
+ }[]=[];
+ let modelAvailable=true;
  Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}}}});
- Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal}))});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>{
+  if(String(_url).endsWith('/v1/coach/status'))return Promise.resolve(new Response(JSON.stringify({available:modelAvailable,mode:modelAvailable?'model':'unavailable'})));
+  return new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal,body:JSON.parse(String(options.body))}));
+ }});
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
@@ -43,6 +49,9 @@ function coachingHarness(){
   input(id:string,value:string){const input=get(id);input.focus();input.value=value;input.dispatchEvent(new Event('input'));},
   save(field:string){const input=get('plan-'+field),index=input.parentElement!.children.indexOf(input);input.parentElement!.children[index+2].children[0].onclick();},
   resolve(reply:CoachReply){pending.shift()!.resolve(new Response(JSON.stringify({mode:'model',reply}),{status:200}));},
+  refuse(code='COACH_REFUSED'){pending.shift()!.resolve(new Response(JSON.stringify({errorCode:code}),{status:400}));},
+  setAvailability(value:boolean){modelAvailable=value;coach.openSession();},
+  async requestReady(){for(let i=0;i<6&&!pending.length;i++)await new Promise<void>(r=>setImmediate(r));assert.ok(pending.length,'expected model-bound request');},
   switchChild(){active=book.create('child-two','new','Another child’s game');coach.openSession();return active;},
   dispose(){for(const [key,descriptor]of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete (globalThis as any)[key];}}
  };
@@ -96,20 +105,20 @@ await test('autosave retains unchanged helper provenance and explicit acceptance
  }finally{h.dispose();}
 });
 await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');assert.equal(h.pending.length,1);
+ const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');await h.requestReady();assert.equal(h.pending.length,1);
   h.input('studioPrompt','Maybe the penguin could bounce');h.resolve(reply);await turn;
   assert.equal(h.get('studioPrompt').value,'Maybe the penguin could bounce');assert.equal(h.session().draft,'Maybe the penguin could bounce');assert.equal(h.session().messages[0].text,'I want a different way to move');assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
 });
 await test('retyping the same draft while the coach replies still counts as new work',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
+ const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');await h.requestReady();h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
 });
 await test('a late coach suggestion cannot overwrite a newer child plan answer',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
+ const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');await h.requestReady();h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
 });
 await test('an old rejected coach request cannot write into a new child or interrupt their reply',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss'),oldRequest=h.pending.shift()!;
-  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;
+ const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss');await h.requestReady();const oldRequest=h.pending.shift()!;
+  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;await h.requestReady();
   assert.equal(h.get('coachModeStatus').textContent,'Thinking together…');assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
   h.resolve(reply);await current;assert.equal(h.session().messages.length,2);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
@@ -130,11 +139,45 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
  }finally{h.dispose();}
 });
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
+ const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');h.storage.fail=true;await h.requestReady();h.resolve(reply);await assert.doesNotReject(turn);
   assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);
  }finally{h.dispose();}
 });
 
+await test('two model turns preserve child context without repeating the current message',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt','A dragon flies over the moon');
+  const first=h.coach.discuss('discuss');await h.requestReady();
+  assert.equal(h.pending[0].body.context.message,'A dragon flies over the moon');
+  assert.deepEqual(h.pending[0].body.context.conversation,[]);
+  h.resolve(reply);await first;
+  h.input('studioPrompt','What color should it be?');
+  const second=h.coach.discuss('discuss');await h.requestReady();
+  const c=h.pending[0].body.context;
+  assert.equal(c.message,'What color should it be?');
+  assert.deepEqual(c.conversation.map((m:any)=>m.role),['child','helper']);
+  assert.equal(c.conversation[0].text,'A dragon flies over the moon');
+  assert.ok(!c.conversation.some((m:any)=>m.text===c.message));
+  h.resolve(reply);await second;
+ }finally{h.dispose();}
+});
+await test('inference is never sent when family/model status is unavailable',async()=>{
+ const h=coachingHarness();try{
+  h.setAvailability(false);h.input('studioPrompt','My first idea');
+  await h.coach.discuss('discuss');
+  assert.equal(h.pending.length,0);
+  assert.match(h.session().messages.at(-1)!.text,/Local design helper/);
+ }finally{h.dispose();}
+});
+await test('model safety refusal never falls through to scripted coaching',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt','A child asked for private contact');
+  const turn=h.coach.discuss('discuss');await h.requestReady();
+  h.refuse();await turn;
+  assert.doesNotMatch(h.session().messages.at(-1)!.text,/Local design helper/);
+  assert.match(h.session().messages.at(-1)!.text,/safe/);
+ }finally{h.dispose();}
+});
 await test('model cannot declare a build or promotion action',()=>{assert.throws(()=>validateCoachReply({...reply,promote:true},context));assert.throws(()=>validateCoachReply({...reply,move:'execute'},context));});
 await test('unsupported observation citation rejected',()=>{assert.throws(()=>validateCoachReply({...reply,evidenceIds:['not-real']},context));});
 await test('one question per reply, not a disguised interview',()=>{assert.throws(()=>validateCoachReply({...reply,text:'What happened? What next?'},context));});
