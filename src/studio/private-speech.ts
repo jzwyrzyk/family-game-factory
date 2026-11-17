@@ -54,6 +54,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
   cleanup();
  }
  async function refresh(){
+  if(recording||request)return;
   const at=++seq,scope=h.scope(),controller=new AbortController();
   if(!scope||!h.canListen()){
    approved=false;h.button.hidden=true;return;
@@ -121,6 +122,9 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
   try{recorder.stop();}catch{cancel();status('Recording stopped. No message was sent.');}
  }
  h.button.hidden=true;button(false);
+ if(typeof window.addEventListener==='function')window.addEventListener('pagehide',cancel);
+ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)cancel();});
  h.button.onclick=()=>{if(recording)finish();else if(request){cancel();status('Private speech cancelled.');}else void begin();};
  return {refresh,cancel,active:()=>recording||!!request};
 }
