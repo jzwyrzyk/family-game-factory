@@ -71,7 +71,7 @@ export function privateCoachHandler(settings:PrivateCoachHostConfig,provider:Coa
   }
  };
 }
-async function main(){
+export async function startPrivateCoach(){
  // Private coach runs only after a separately approved IAM/deployment/retention review.
  const env=process.env,config=coachConfig(env),origin=env.FACTORY_COACH_BROKER_ORIGIN||'';
  const gatewayServiceAccount=env.FACTORY_COACH_GATEWAY_SA||'';
@@ -95,7 +95,7 @@ async function main(){
    .catch(()=>{if(!res.headersSent)res.writeHead(503);res.end();});
  }).listen(Number(env.PORT)||8080);
 }
-if(process.argv.some(x=>/[/\\]private-http\.ts$/.test(x)))void main().catch(()=>{
+if(process.argv.some(x=>/[/\\]private-http\.ts$/.test(x)))void startPrivateCoach().catch(()=>{
  console.error('Private coach refused startup. No provider or identity secrets were logged.');
  process.exitCode=1;
 });
