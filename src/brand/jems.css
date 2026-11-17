@@ -1,0 +1,140 @@
+/* jems · Universal brand layer — loaded after existing arcade and Studio styles. */
+/* Brand portfolio approved Nov 2026; legacy local data keys are intentionally unchanged. */
+:root {
+ --jems-ink:#0B1D4D; --jems-blue:#2D7BFF; --jems-purple:#8A4DFF;
+ --jems-mint:#34D7B3; --jems-gold:#FFC828; --jems-coral:#FF6B7A;
+ --jems-cloud:#FFF7EE; --jems-lilac:#E6D8FF;
+ --jems-text:#0B1D4D; --jems-muted:#596583; --jems-border:#DBDFF0;
+ --jems-shadow:0 10px 30px #0B1D4D12;
+ --jems-round:"Arial Rounded MT Bold","Nunito","Trebuchet MS",ui-rounded,system-ui,sans-serif;
+ --jems-body:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+ --bg:#F8F9FE; --ink:#0B1D4D; --muted:#596583; --edge:#DBDFF0;
+ --pink:#FF6B7A; --yellow:#FFC828; --aqua:#34D7B3; --blue:#2D7BFF;
+}
+body,body.studio-review {
+ background:radial-gradient(circle at 95% -15%,#E6D8FF85,transparent 43%),#F8F9FE;
+ color:var(--jems-ink);color-scheme:light;font-family:var(--jems-body);
+}
+h1,h2,h3,.brand,.studio-card-name,.studio-make-copy strong,.studio-library-heading h1,
+.studio-review .studio-home-intro h1,.favorite-title,.page-head h1,.page-heading h1 {
+ font-family:var(--jems-round);letter-spacing:-.45px;color:var(--jems-ink);
+}
+.site-header,.studio-review .site-header {max-width:1230px;border-bottom:1px solid #E6E7F1;padding:11px 24px;}
+.brand,.studio-review .brand {display:flex;align-items:center;gap:0;min-height:55px;padding:0;color:var(--jems-ink);}
+.jems-brand-logo{display:block;width:176px;height:59px;max-width:100%;object-fit:contain;object-position:left center}
+.site-header nav .nav,.studio-review .studio-nav button {border-radius:999px;color:#4F5D7C;font-size:14px;font-weight:750;}
+.studio-review .studio-nav button.active,.studio-review .studio-nav button:hover,.nav.active,.nav:hover {background:#E6D8FF;color:#3C217F;border-color:#C6B3FF;}
+.studio-review .profile-bar{background:transparent;border:0;}
+.studio-review .studio-profile-menu>summary,.profile-choice {border-color:#DEE2F1;color:#34446D;}
+.studio-review .profile-choice.active,.profile-choice.active {background:#E6D8FF;color:#4C2799;border-color:#BA97FF;}
+.studio-review main {max-width:1230px;}
+.studio-review #page-studio-library .studio-home-hero,.hero {
+ background:linear-gradient(120deg,#FFFDFD 0%,#F6F0FF 57%,#E9F1FF 100%);
+ border-color:#E3D9FA;box-shadow:0 14px 34px #0B1D4D0B;
+}
+.studio-review #page-studio-library .studio-home-hero::before,
+.studio-review #page-studio-library .studio-home-hero::after{border-color:#CFC4FF}
+.studio-review .studio-home-intro .studio-kicker,.studio-kicker,.eyebrow{color:#6B38D4;}
+.studio-review .studio-home-intro h1 span {color:#7540DC;}
+.studio-review .studio-home-intro>p,.studio-review .studio-section-heading p{color:#56627F;}
+.studio-review .studio-hero-sparkles{color:#FFC828}
+.studio-review .studio-make-tile {
+ background:linear-gradient(135deg,#2D7BFF 0%,#3466E7 100%);
+ border-color:#2C6CE4;box-shadow:0 16px 29px #2D7BFF33;color:white;
+}
+.studio-review .studio-make-tile:hover {box-shadow:0 18px 32px #2D7BFF44;}
+.studio-review .studio-make-icon{background:#FFFFFF28;border:1px solid #FFFFFF66;}
+.studio-review .studio-make-copy small{color:#F3F7FF}
+.studio-review .studio-creation-note,.studio-library-note{color:#5B6683}
+.studio-review #page-studio-library .studio-library-grid{gap:17px}
+.studio-review #page-studio-library .studio-starter,
+.studio-review #page-studio-library .studio-saved-card,
+.studio-review .studio-continue {border-color:#E1E4F1;box-shadow:0 6px 22px #0B1D4D0C;background:white}
+.studio-review #page-studio-library .studio-starter:hover,.studio-review .studio-library-card:hover{border-color:#B394F9;box-shadow:0 12px 25px #0B1D4D1A}
+.studio-review .studio-art-buckets{background:linear-gradient(135deg,#FFF7EE,#FFE4D6)}
+.studio-review .studio-art-dragon{background:linear-gradient(135deg,#EEE2FF,#E6D8FF)}
+.studio-review .studio-art-moon{background:linear-gradient(135deg,#DEE5FF,#E9E2FF)}
+.studio-review .studio-art-robot{background:linear-gradient(135deg,#D8FFF2,#E6F6FE)}
+.studio-review .studio-card-name{color:#0B1D4D}
+.studio-review .studio-card-state{color:#5D6B88}
+.studio-review .studio-card-link{color:#6837CC}
+.studio-review .studio-continue-art{background:#E6D8FF}
+.studio-review .studio-continue .studio-primary{color:#4D2BAA;border-color:#B699F9}
+.studio-review .studio-section-kicker{color:#7641D8}
+.studio-review .studio-section-heading h2 {color:#0B1D4D}
+.studio-button,.btn,.studio-review .studio-button {border-radius:12px;font-family:var(--jems-body);font-weight:750;}
+.btn.primary,.studio-button.studio-primary,.studio-review .studio-button.studio-primary {
+ background:#2D7BFF;border-color:#2D7BFF;color:white;box-shadow:0 6px 18px #2D7BFF28;
+}
+.btn.primary:hover,.studio-review .studio-button.studio-primary:hover{background:#195FD0;border-color:#195FD0}
+.studio-review .studio-button.studio-keep,.studio-review .studio-ready{background:#DAFAEF;border-color:#89DECB;color:#0B634C;box-shadow:none;}
+.studio-review .studio-button:hover:not(:disabled):not(.studio-primary) {background:#F1EAFF;border-color:#B79AFC;color:#502CA2}
+.studio-review .studio-chip:hover,.studio-review .studio-chip[aria-pressed=true]{background:#EEE5FF;color:#4D259F;border-color:#BBA0FF}
+.studio-review .studio-heading h1,.studio-review .studio-helper-heading h2{color:#0B1D4D}
+.studio-review .studio-helper-icon{background:#E6D8FF;color:#6938D4;border:1px solid #DAC3FF;overflow:hidden}
+.jems-helper-mark{display:block;width:30px;height:30px;object-fit:contain}
+.studio-review .studio-conversation,.studio-review .studio-game-host,.panel,.game-card,.studio-review .studio-library-card{
+ border-color:#DFE2F0;box-shadow:0 7px 22px #0B1D4D09;
+}
+.studio-review .studio-conversation{background:#fff}
+.studio-review .studio-helper-heading{border-bottom-color:#EEE7FA;background:#FBF9FF}
+.studio-review .studio-prompt{background:#FCFBFF;border-top-color:#EAE5F2}
+.studio-review .studio-prompt textarea{background:white;color:#0B1D4D;border-color:#C8D1E6;font-size:15px}
+.studio-review .studio-message p{background:#F2F4FC;color:#304467}
+.studio-review .studio-message.child p{background:#EDE4FF;color:#3B2672}
+.studio-review .studio-message.reflection p{background:#E4FBF2;color:#215847}
+.studio-review .studio-chip,.studio-review .studio-more>summary{background:#FFF;color:#415276}
+.studio-review #studioTalk {font-size:15px;font-weight:800}
+.studio-review #studioMic {background:#F1E8FF;color:#5327A7;border-color:#BCA2EF}
+.studio-review #studioMic[aria-pressed=true] {background:#FFE4DF;color:#772D37;border-color:#FF7E89}
+.studio-review .studio-build-shelf{background:#12265F;color:#fff;border-color:#2D4383}
+.studio-review .studio-build-item{background:#223B72;border-color:#4766A3}
+.studio-review .studio-build-copy span{color:#D1DDF5}
+.studio-review .studio-versions,.studio-review .design-plan{border-color:#CFC9EC}
+.studio-review .studio-preview-notice{background:#FFF3D0;border-color:#FFD878;color:#5B4306}
+.studio-review .studio-profile-menu .profile-choices{border-color:#DED5EF}
+.studio-review #page-parent,.studio-review #page-lab,.studio-review #page-creations,
+.studio-review #page-create,.studio-review #page-feedback{color:#0B1D4D}
+.page-head h1,.page-head p,.panel h2,.panel h3{color:#0B1D4D}
+.page-head p,.muted,.fine,.studio-footnote{color:#596583}
+.panel{background:#fff;border-color:#DCE1F0}
+.notice{background:#FFF7EE;color:#5C4C34;border:1px solid #EDD9C2;border-radius:13px}
+.studio-review .page-head{color:#0B1D4D}
+#page-parent input,#page-parent select,#page-parent textarea,
+#page-create input,#page-create select,#page-create textarea,#page-feedback textarea {
+ background:#FFFFFF;color:#0B1D4D;border-color:#CCD3E6;
+}
+.game-card{background:#fff;color:#0B1D4D}
+.game-card .card-body h3{color:#0B1D4D}
+.game-card .card-body p{color:#5B6683}
+.game-card .card-foot{color:#6736C6}
+.game-stage{border-color:#CFCFF0}
+.favorite-game{color:#EAF2FF}
+.math-activity {
+ --math-ink:#FFFFFF;--math-muted:#D6E2FA;--math-panel:#182B60;--math-edge:#6283C9;
+ --math-accent:#FFC828;
+ background:linear-gradient(148deg,#223872,#0B1D4D);
+ border-color:#506CB3;box-shadow:0 15px 35px #0B1D4D31;
+}
+.math-activity button.math-primary{background:#FFC828;color:#0B1D4D;border-color:#FFC828}
+.math-activity .math-answer-input{background:#081942;color:#fff}
+.math-activity .math-eyebrow{color:#34D7B3}
+.language-activity{border-color:#CBC5ED}
+.language-activity button:focus-visible,.math-activity button:focus-visible,
+.studio-review button:focus-visible,.studio-review input:focus-visible,.studio-review textarea:focus-visible{
+ outline:3px solid #7136C9;outline-offset:3px;
+}
+.math-activity button:focus-visible{outline-color:#FFC828}
+body.studio-review > .factory-update-notice{background:#F9F7FF;color:#26375B;border-color:#D5D9EA}
+footer,.studio-review footer{border-color:#E2E4F0;color:#62718F}
+@media(max-width:650px){
+ .site-header,.studio-review .site-header{padding:9px 13px}
+ .jems-brand-logo{width:135px;height:48px}
+ .studio-review .studio-nav button{min-height:44px}
+ .studio-review #page-studio-library .studio-home-hero{padding:20px 22px 17px}
+ .studio-review #studioTalk,.studio-review #studioSend{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+ .studio-review .studio-make-tile,.studio-review .studio-library-card{transition:none}
+ .studio-review .studio-make-tile:hover,.studio-review .studio-library-card:hover{transform:none}
+}
