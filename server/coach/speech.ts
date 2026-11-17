@@ -8,6 +8,7 @@ import {createHash} from 'node:crypto';
 import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {vertexAccessToken} from './vertex';
+import {allowedCoachFamily} from './consent';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
 const MAX_BYTES=320000,MIN_BYTES=100;
@@ -67,6 +68,10 @@ export class GooglePrivateSpeech implements PrivateAudioProvider{
 export class CoachAudioService {
  constructor(private repo:Repository,private config:SpeechConfig,private provider:PrivateAudioProvider){}
  enabled(){return audioApproved(this.config);}
+ async familyAvailable(session:VerifiedSession):Promise<boolean>{
+  if(!this.enabled())return false;
+  return allowedCoachFamily(await this.repo.snapshot(),session,'audio');
+ }
  async transcribe(session:VerifiedSession,input:{id:string;mime:string;audio:Uint8Array}):Promise<{text:string}>{
   if(!this.enabled())throw Error('AUDIO_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
@@ -76,6 +81,7 @@ export class CoachAudioService {
   // Never hash/store the voice bytes or the resulting transcript.
   const hash=createHash('sha256').update(id).digest('hex');
   await this.repo.transaction(state=>{
+   if(!allowedCoachFamily(state,session,'audio',now))throw Error('AUDIO_UNAVAILABLE');
    state.coachReceipts ||= [];
    for(let i=state.coachReceipts.length-1;i>=0;i--)if(state.coachReceipts[i].at<now-7*86400000)state.coachReceipts.splice(i,1);
    const list=state.coachReceipts;
