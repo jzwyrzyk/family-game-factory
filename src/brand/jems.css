@@ -138,3 +138,197 @@ footer,.studio-review footer{border-color:#E2E4F0;color:#62718F}
  .studio-review .studio-make-tile,.studio-review .studio-library-card{transition:none}
  .studio-review .studio-make-tile:hover,.studio-review .studio-library-card:hover{transform:none}
 }
+
+/* Brand implementation v2: semantic roles preserve the approved eight-color palette.
+   Contrast note: white on raw Gem Blue is 3.9:1, so small white button labels
+   use a deeper interactive shade (#195FD0, 5.85:1). */
+:root {
+  --jems-action-blue:#195FD0; --jems-action-blue-hover:#124FB2;
+  --jems-action-purple:#7136C9; --jems-action-purple-hover:#5B28AA;
+  --jems-success-ink:#0B634C; --jems-warning-ink:#5B4306;
+  --jems-surface:#FFFFFF; --jems-surface-soft:#FBF9FF;
+  --jems-radius-sm:10px; --jems-radius-md:15px; --jems-radius-lg:21px;
+  --jems-focus:#7136C9; --jems-input:#C8D1E6;
+  --jems-shadow-card:0 7px 22px #0B1D4D0C;
+  --jems-shadow-raised:0 14px 30px #0B1D4D16;
+}
+body, body.studio-review {
+  background:radial-gradient(ellipse at 94% 1%,#E6D8FF77,transparent 43%),
+             linear-gradient(162deg,#FFF7EE 0%,#F8F9FE 35%,#FCFAFF 67%,#FFF7EE 100%);
+  color:var(--jems-ink);
+}
+::selection{background:#E6D8FF;color:#0B1D4D}
+button,input,textarea,select,summary{accent-color:var(--jems-action-purple)}
+button:focus-visible,a:focus-visible,summary:focus-visible,
+input:focus-visible,select:focus-visible,textarea:focus-visible {
+  outline:3px solid var(--jems-focus);outline-offset:3px;
+}
+.site-header,.studio-review .site-header {
+  background:linear-gradient(180deg,#FFFFFFBD,#FFF7EE55);
+  backdrop-filter:saturate(125%);
+  border-bottom-color:#E6D8FF;
+}
+.studio-review .studio-nav button.active,
+.studio-review .studio-nav button[aria-current="page"],
+.studio-review .studio-mobile-tabs button[aria-pressed="true"] {
+  background:#E6D8FF;color:#49268E;border-color:#CDB6FF;
+}
+.studio-review .profile-choice.active,
+.studio-review .studio-profile-menu>summary:hover{
+  border-color:#BDA3EC;background:#F3EDFF;
+}
+.studio-review #page-studio-library .studio-home-hero {
+  background-image:url("/jems-clouds.svg"),
+                   linear-gradient(125deg,#FFFDFB 0%,#F8F2FF 55%,#ECF4FF 100%);
+  background-position:right bottom,center;
+  background-size:58% auto,cover;
+  background-repeat:no-repeat;
+  border-color:#DAD0F5;
+  box-shadow:var(--jems-shadow-card);
+}
+.studio-review .studio-home-hero::before{
+  content:"";top:auto;right:-25px;bottom:-50px;width:250px;height:160px;
+  border:0;border-radius:0;opacity:.10;
+  background:url("/jems-blocks.svg") center/contain no-repeat;
+  pointer-events:none;
+}
+.studio-review .studio-home-hero::after{
+  content:"";right:15px;top:7px;width:105px;height:65px;
+  border:0;border-radius:0;opacity:.27;
+  background:url("/jems-sparks.svg") center/contain no-repeat;
+  pointer-events:none;
+}
+.studio-review .studio-hero-sparkles{color:#E5A700}
+.studio-review .studio-home-intro h1 span{color:#7136C9}
+.studio-review .studio-home-intro .studio-kicker{color:#6935C7}
+.studio-review .studio-make-tile {
+  background:linear-gradient(125deg,var(--jems-action-blue) 0%,#225DBF 66%,var(--jems-action-purple) 100%);
+  border-color:#1B57C0;box-shadow:0 15px 30px #195FD034;color:#FFF;
+}
+.studio-review .studio-make-tile:hover{background:linear-gradient(125deg,#124FB2,var(--jems-action-purple));box-shadow:0 19px 35px #195FD040}
+.studio-review .studio-make-icon{border-radius:18px;background:#FFFFFF26;border:1px solid #FFFFFF80}
+.studio-review .studio-make-copy small{color:#FFF}
+.studio-review .studio-home-favorites .studio-section-heading h2::after{
+  content:"✦";margin-left:11px;font-size:18px;color:#E7AD0A;vertical-align:middle;
+}
+.studio-review .studio-home-saved .studio-section-heading h2::after{
+  content:"";display:inline-block;width:19px;height:19px;margin-left:10px;
+  background:url("/jems-mark.svg") center/contain no-repeat;vertical-align:middle;
+}
+.studio-review #page-studio-library .studio-starter,
+.studio-review #page-studio-library .studio-saved-card,
+.studio-review .studio-library-card,
+.studio-review .studio-version-card {
+  border:1px solid #DEE3F0;background:#FFFFFF;
+  border-radius:var(--jems-radius-lg);
+  box-shadow:var(--jems-shadow-card);
+}
+.studio-review #page-studio-library .studio-starter:hover,
+.studio-review #page-studio-library .studio-saved-card:hover{
+  border-color:#B99AF5;box-shadow:var(--jems-shadow-raised);
+}
+.studio-review .studio-continue{border-inline-start:4px solid var(--jems-mint)!important}
+.studio-review .studio-continue-art{background:#E6D8FF}
+.studio-review .studio-card-link{color:#7136C9}
+.studio-review .studio-card-link:focus-visible{outline:3px solid #7136C9}
+.studio-review .studio-section-kicker{color:#7841D9}
+.studio-review .studio-empty{
+  background-image:url("/jems-clouds.svg"),radial-gradient(circle at 50% 44%,#F4EEFF,#FFFFFF 77%);
+  background-position:center bottom,center;background-repeat:no-repeat;
+  background-size:100% auto,cover;
+}
+.studio-review .jems-empty-mark{display:block;width:82px;height:82px;object-fit:contain}
+.studio-review .studio-helper-heading{background:linear-gradient(95deg,#FFFDFB,#F3EEFF);border-color:#E6D8FF}
+.studio-review .studio-conversation,.studio-review .studio-game-host,.studio-review .studio-versions{
+  border-color:#DCE1F0;box-shadow:var(--jems-shadow-card);
+}
+.studio-review .studio-message.child p{background:#EEE6FF;color:#3E266F}
+.studio-review .studio-message.reflection p{background:#DDF8EE;color:#0B634C}
+.studio-review .studio-prompt{background:#FBF9FF;border-top-color:#E9DFF6}
+.studio-review .studio-prompt textarea,
+.studio-review .studio-dialog input,
+.studio-review .design-plan textarea{border-color:var(--jems-input);border-radius:var(--jems-radius-sm)}
+.studio-review .studio-version-card.is-candidate{background:#FFFAEA;border-color:#E8C96D}
+.studio-review .studio-status.is-error{background:#FFF2EF;color:#8D2733;border-color:#F7B8C0}
+.studio-review .studio-preview-notice{background:#FFF5D9;color:var(--jems-warning-ink);border-color:#EECB6D}
+.studio-review .studio-build-shelf{background:linear-gradient(135deg,#0B1D4D,#192F65);border-color:#334A83}
+.studio-review .studio-build-item{background:#213A72;border-color:#4C6298}
+.studio-review .studio-button,
+.studio-review .studio-chip,
+.studio-review #studioTalk,
+.btn {font-family:var(--jems-body);font-weight:750}
+.btn.primary,.studio-button.studio-primary,
+.studio-review .studio-button.studio-primary{
+  background:var(--jems-action-blue);
+  border-color:var(--jems-action-blue);
+  color:#FFFFFF;
+  box-shadow:0 5px 16px #195FD027;
+}
+.btn.primary:hover,.studio-button.studio-primary:hover,
+.studio-review .studio-button.studio-primary:hover {
+  background:var(--jems-action-blue-hover);
+  border-color:var(--jems-action-blue-hover);color:#FFFFFF;
+}
+.studio-review .studio-button.studio-keep,.studio-review .studio-ready{
+  background:#DDF9EF;color:var(--jems-success-ink);border-color:#87DDC7
+}
+.studio-review #studioMic{background:#F0E6FF;color:#5327A7;border-color:#BDA3EC}
+.studio-review #studioMic[aria-pressed=true]{background:#FFE5E6;color:#802B3C;border-color:#F79DA5}
+.studio-review .learning-subject-switch{background:#FFF;border-radius:14px;border-color:#DAD7EF}
+.studio-review .learning-subject-switch button[aria-pressed="true"]{
+  background:#E6D8FF!important;color:#4A228D!important;border-color:#B69BEE!important;
+}
+.studio-review .learning-subject-switch button:disabled{opacity:.63}
+.studio-review .studio-learning-choice,.studio-review .learning-adventure{
+  background:linear-gradient(100deg,#FFFDFB,#F4F0FF);border-color:#DDD3EE;
+}
+.studio-review .studio-dialog{border-color:#C6B2EC}
+.studio-review .studio-math-options,
+.studio-review .studio-help,.studio-review .design-controls{
+  border-color:#DAD4ED;background:#FCFAFF;
+}
+.studio-review .studio-math-options summary,.studio-review .studio-more>summary{color:#55319F}
+.studio-review #page-lab .panel:first-child{border-top:4px solid var(--jems-blue)}
+.studio-review #page-lab .panel:last-child{border-top:4px solid var(--jems-mint)}
+.studio-review #page-parent .panel:first-child{border-top:4px solid var(--jems-purple)}
+.studio-review #page-parent .panel:last-child{border-top:4px solid var(--jems-blue)}
+.studio-review .panel,.panel,.game-card{border-color:#DDE1EF;box-shadow:var(--jems-shadow-card)}
+#page-parent input,#page-parent select,#page-parent textarea,
+#page-lab input,#page-lab select,#page-lab textarea,
+#page-create input,#page-create select,#page-create textarea {
+  border:1px solid var(--jems-input);border-radius:var(--jems-radius-sm);
+  color:#0B1D4D;background:#FFF;
+}
+.studio-review .math-activity{border-radius:18px}
+.studio-review .math-activity button.math-primary {
+  background:var(--jems-gold);color:var(--jems-ink);border-color:#E2AF00;
+}
+.studio-review .language-activity{border-color:#C9B8ED;box-shadow:0 7px 22px #7136C914}
+.studio-review .language-activity :is(button,input,textarea):focus-visible,
+.studio-review .math-activity :is(button,input):focus-visible {outline-offset:3px}
+.studio-review .studio-mobile-tabs{border-color:#DAD3F0}
+.studio-review .studio-mobile-tabs button[aria-pressed="true"]{
+  color:#5628A9;background:#E6D8FF
+}
+.studio-review .factory-update-notice{background:#FFFDFB;border-color:#DAD5EC;color:#26375B}
+.studio-review footer,.studio-review .home-footer{border-color:#E6D8FF}
+body:not(.studio-review) .hero{
+  background-image:url("/jems-clouds.svg"),linear-gradient(135deg,#FFFDFB,#F1EAFF 65%,#EDF5FF);
+  background-position:right bottom,center;background-size:46% auto,cover;background-repeat:no-repeat;
+  border-color:#E2D7F5;color:#0B1D4D;
+}
+body:not(.studio-review) .hero h1,body:not(.studio-review) .hero em{color:#0B1D4D}
+body:not(.studio-review) .panel,body:not(.studio-review) .game-card{background:#FFF;border-color:#DEE2EF}
+body:not(.studio-review) .btn.primary{background:var(--jems-action-blue);border-color:var(--jems-action-blue)}
+/* Keep decorative art optional and out of active game areas. */
+@media(max-width:650px){
+  .studio-review #page-studio-library .studio-home-hero{background-size:100% 68%,cover}
+  .studio-review .studio-home-hero::before,
+  .studio-review .studio-home-hero::after{display:none}
+  .studio-review .studio-home-favorites .studio-section-heading h2::after{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  .studio-review .studio-make-tile,
+  .studio-review .studio-starter,
+  .studio-review .studio-library-card {transition:none!important;transform:none!important}
+}

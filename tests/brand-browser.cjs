@@ -20,6 +20,35 @@ const fs=require('node:fs');
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2D7BFF');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
+
+  // Brand fidelity regression: validate the exact named palette and semantic accessible roles.
+  const tokens=await page.evaluate(()=>{
+    const r=getComputedStyle(document.documentElement);
+    return Object.fromEntries(['ink','blue','purple','mint','gold','coral','cloud','lilac','action-blue','action-purple'].map(k=>[k,r.getPropertyValue('--jems-'+k).trim().toUpperCase()]));
+  });
+  assert.deepEqual(tokens,{
+    ink:'#0B1D4D',blue:'#2D7BFF',purple:'#8A4DFF',mint:'#34D7B3',
+    gold:'#FFC828',coral:'#FF6B7A',cloud:'#FFF7EE',lilac:'#E6D8FF',
+    'action-blue':'#195FD0','action-purple':'#7136C9'
+  });
+  const assets=['jems-mark.svg','jems-logo.svg','jems-wordmark.svg','jems-clouds.svg','jems-blocks.svg','jems-sparks.svg','jems-facets-pattern.svg'];
+  for(const asset of assets){
+    const result=await page.evaluate(p=>fetch('./'+p).then(async r=>({ok:r.ok,text:await r.text()})),asset);
+    assert.ok(result.ok&&result.text.includes('<svg'),asset+' should be served locally');
+    if(asset==='jems-mark.svg')assert.ok(result.text.includes('id="jems-wrench"')&&!result.text.includes('M60 45C49 45'), 'open-ended wrench geometry, not the old circular keyhole');
+    if(asset==='jems-logo.svg')assert.ok(result.text.includes('fill-rule="evenodd"')&&!result.text.includes('<text'), 'wordmark must be outlined, not rendered using a system-dependent font');
+  }
+  const visual=await page.evaluate(()=>({
+    hero:getComputedStyle(document.querySelector('.studio-home-hero')).backgroundImage,
+    button:getComputedStyle(document.querySelector('#studioNew')).backgroundImage,
+    surface:getComputedStyle(document.querySelector('.studio-starter')).borderRadius,
+    learning:!!document.getElementById('studioLearningChoice'),
+    game:!!document.getElementById('studioGameMath')
+  }));
+  assert.ok(visual.hero.includes('jems-clouds.svg'),'subtle brand artwork reaches the homepage, not only logo');
+  assert.match(visual.button,/gradient/i,'child create action uses accessible on-brand gradient');
+  assert.ok(visual.learning&&visual.game,'brand merge retained latest Math/English selector');
+
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'no horizontal overflow');
    await page.screenshot({path:'test-results/jems-home-'+label+'.png',fullPage:false});
    await page.locator('#studioNew').click();
