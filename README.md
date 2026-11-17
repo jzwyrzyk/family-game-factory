@@ -1,6 +1,6 @@
-# Family Game Factory 2.0 — Studio-first homepage
+# jems · Game Maker (formerly Family Game Factory)
 
-A child-led local game-design loop built on the Family Arcade. See [Assignment 002](docs/assignment-002/README.md), [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
+jems is a child-led local game-design loop built on the Family Arcade. See [Assignment 002](docs/assignment-002/README.md), [Issues #3/#4 traceability](docs/requirements-traceability.md), [gaps](docs/gap-analysis.md) and the [implementation charter](docs/factory-v2-implementation-charter.md).
 
 ## Studio-first homepage (review PR)
 
@@ -29,6 +29,9 @@ The [Game Quality standard](docs/GAME-QUALITY.md) defines the physical-play impl
 Start a physical game, then choose **Improve this game** or a garage change. Try **Make wheels bigger**, **Make springs softer**, **Make car lighter**, **Make joints stronger**, or **Make fan stronger**. The build or ride carries into the new version. Compare, Keep, undo, or save a different game. Older saved gum versions keep their original engine. Drawing decomposition has a validated component/rig contract and remains a separate branch.
 
 The generated-game pipeline also has a versioned v2 contract for trusted physics, illustrated parts, camera movement, pointer dragging, sound and 60 Hz fixed stepping. The engine and artwork are immutable approved packages separate from the model's 30 KB source allowance; saved v1 games retain their original contract. V2 smoke tests require an input-dependent scene response and clean replay/pause, while allowing ordinary losses and endless construction. Authored fixtures test specific physical goals. Automated checks do not establish child enjoyment or a hard per-game browser JavaScript memory cap. Paid generation and production acceptance remain behind the existing approval and isolated-worker controls.
+
+## Brand identity
+The approved jems brand system and its usage/release rules are documented in [docs/brand/README.md](docs/brand/README.md). Visual brand assets are in `public/jems-*.svg`; legacy storage keys remain unchanged.
 
 ## Run locally
 
