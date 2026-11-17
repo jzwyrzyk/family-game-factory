@@ -157,3 +157,16 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-review .studio-version-card .studio-button{font-size:14px;min-height:44px}
  .studio-review .design-plan{max-height:70dvh}.studio-review .design-plan textarea{font-size:16px}
 }
+
+/* A status shelf does not trap a child or interrupt the active game. */
+.studio-build-shelf{margin:10px auto 12px;padding:12px 16px;max-width:1160px;width:calc(100% - 32px);
+ border:1px solid #63719c;border-radius:16px;background:#212b50;color:#f5f7ff;display:grid;gap:8px}
+.studio-build-shelf[hidden]{display:none!important}
+.studio-build-items{display:flex;gap:10px;flex-wrap:wrap}
+.studio-build-item{flex:1 1 220px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+ padding:9px 12px;border:1px solid #586895;border-radius:12px;background:#303b68}
+.studio-build-copy{display:grid;gap:2px;font-size:13px;min-width:0}
+.studio-build-copy span{color:#c9d5f2;font-size:12px}
+.studio-build-item .studio-button,.studio-build-actions .studio-button{min-height:44px}
+.studio-build-actions{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:600px){.studio-build-shelf{width:calc(100% - 20px);padding:10px}.studio-build-item{flex-basis:100%}}
