@@ -11,6 +11,7 @@ import {validateCoachReply} from '../../src/studio/design';
 import {coachConfig} from './http';
 import {validPrivateCoachOrigin} from './broker';
 import {VertexChildCoachProvider} from './vertex';
+import {GooglePrivateSpeech,validateAudio,type PrivateAudioProvider} from './speech';
 
 export interface PrivateCoachHostConfig{
  origin:string;gatewayServiceAccount:string;coach:CoachConfig;
@@ -24,7 +25,8 @@ export async function verifyGoogleGateway(token:string,settings:PrivateCoachHost
  return payload.email===settings.gatewayServiceAccount&&payload.email_verified===true;
 }
 export function privateCoachHandler(settings:PrivateCoachHostConfig,provider:CoachProvider,
- verify:(token:string,settings:PrivateCoachHostConfig)=>Promise<boolean>=verifyGoogleGateway){
+ verify:(token:string,settings:PrivateCoachHostConfig)=>Promise<boolean>=verifyGoogleGateway,
+ speech?:PrivateAudioProvider){
  return async(req:IncomingMessage,res:ServerResponse)=>{
   const send=(status:number,payload:unknown)=>{
    res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store',
@@ -33,15 +35,26 @@ export function privateCoachHandler(settings:PrivateCoachHostConfig,provider:Coa
   };
   try{
    if(!approved(settings.coach)||!validPrivateCoachOrigin(settings.origin))throw Error('COACH_UNAVAILABLE');
-   if(req.method!=='POST'||req.url!=='/internal/coach/turn'||
+   const isSpeech=req.url==='/internal/coach/audio';
+   if(req.method!=='POST'||(!isSpeech&&req.url!=='/internal/coach/turn')||
     !req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
+   if(isSpeech&&!speech)throw Error('COACH_UNAVAILABLE');
    const token=req.headers.authorization?.match(/^Bearer ([-\w.]+)$/)?.[1];
    if(!token||!await verify(token,settings))throw Error('FORBIDDEN');
    let text='';for await(const chunk of req){
     text+=chunk;
-    if(Buffer.byteLength(text)>35000)throw Error('INVALID_REQUEST');
+    if(Buffer.byteLength(text)>(isSpeech?450000:35000))throw Error('INVALID_REQUEST');
    }
    const raw=JSON.parse(text);
+   if(isSpeech){
+    if(!raw||Object.keys(raw).length!==2||typeof raw.audio!=='string'||
+     typeof raw.mime!=='string'||raw.audio.length>430000||
+     !/^[A-Za-z0-9+/]+={0,2}$/.test(raw.audio))throw Error('INVALID_REQUEST');
+    const bytes=Buffer.from(raw.audio,'base64'),mime=validateAudio(bytes,raw.mime);
+    const recognized=await speech!.transcribe(bytes,mime,AbortSignal.timeout(15000));
+    if(typeof recognized!=='string'||recognized.length<1||recognized.length>2000)throw Error('AUDIO_NO_SPEECH');
+    send(200,{text:recognized});return;
+   }
    if(!raw||Object.keys(raw).length!==1||!Object.hasOwn(raw,'context'))throw Error('INVALID_REQUEST');
    const context=boundedContext(raw.context);
    const output=await provider.complete(context,AbortSignal.timeout(18000));
@@ -53,7 +66,7 @@ export function privateCoachHandler(settings:PrivateCoachHostConfig,provider:Coa
    const code=(err as Error).message;
    // Never expose model text, profile data, authorization tokens or provider diagnostics.
    send(code==='FORBIDDEN'?403:code==='COACH_UNAVAILABLE'?503:
-    code==='COACH_REFUSED'?422:code==='RATE_LIMIT'?429:400,
+    code==='COACH_REFUSED'||code==='AUDIO_NO_SPEECH'?422:code==='RATE_LIMIT'?429:400,
     {errorCode:['COACH_UNAVAILABLE','COACH_REFUSED','RATE_LIMIT'].includes(code)?code:'COACH_REQUEST_FAILED'});
   }
  };
@@ -67,6 +80,10 @@ async function main(){
   !/^[a-z0-9-]+@[a-z0-9-]+\.iam\.gserviceaccount\.com$/.test(gatewayServiceAccount)||
   !/^[a-z][a-z0-9-]{4,62}$/.test(projectId)||env.FACTORY_COACH_API_KEY)
   throw Error('PRIVATE_COACH_REVIEW_REQUIRED');
+ const speechApproved=env.FACTORY_COACH_AUDIO_APPROVED==='true'&&
+  env.FACTORY_COACH_AUDIO_PRIVACY_APPROVED==='true'&&
+  env.FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED==='true';
+ const speech=speechApproved?new GooglePrivateSpeech(projectId):undefined;
  const provider=new VertexChildCoachProvider(config,{
   projectId,model:config.model,maxOutputTokens:config.maxOutputTokens,
   inputMicroUsdPerMillion:config.inputMicroUsdPerMillion,
@@ -74,7 +91,7 @@ async function main(){
   maxTurnMicroUsd:config.maxTurnMicroUsd
  });
  createServer((req,res)=>{
-  void privateCoachHandler({origin,gatewayServiceAccount,coach:config},provider)(req,res)
+  void privateCoachHandler({origin,gatewayServiceAccount,coach:config},provider,verifyGoogleGateway,speech)(req,res)
    .catch(()=>{if(!res.headersSent)res.writeHead(503);res.end();});
  }).listen(Number(env.PORT)||8080);
 }
