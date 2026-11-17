@@ -36,6 +36,17 @@ const {start}=require('./browser-server.cjs');
   assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'interrupted');
   assert.deepEqual(await page.evaluate(id=>{const a=FG.store.current().learning.attempts.find(a=>a.id===id);return {answers:a.answers.length,correct:a.correct,independent:a.independent};},guardedAttempt),{answers:0,correct:false,independent:false});
   assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills['mul:8x7'])),seededSkill);
+  // An unanswered checkpoint now refunds its pacing receipt. Assert that
+  // requirement, then use the test-only pacing fixture from this suite to
+  // isolate Studio/physics interactions from unrelated later checkpoints.
+  assert.equal(await page.evaluate(()=>FG.math.canAsk(FG.store.current())),true,
+    'Leaving an unanswered checkpoint must not satisfy the learning budget');
+  await page.evaluate(()=>{
+    FG.store.current().mathWindow=[Date.now()];
+    if(!FG.store.save())throw Error('Could not save Studio pacing fixture');
+  });
+  assert.equal(await page.evaluate(()=>FG.math.canAsk(FG.store.current())),false,
+    'The Studio journey requires a deliberately satisfied test-only pacing budget');
   // The intentional presentation may create a zero-count legacy fact. Subsequent
   // design/history actions must preserve this post-checkpoint learning baseline.
   const original=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));

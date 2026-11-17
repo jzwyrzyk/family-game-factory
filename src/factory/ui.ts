@@ -1,4 +1,4 @@
-import { interpretMathRequest, MODE_LABELS } from '../learning/policy';
+import { interpretLearningRequest, learningFormatLabel } from '../learning/policy';
 import { defaults, manifests, isGameId, playableMechanics } from '../runtime/manifests';
 import { examples, interpret, type Intent } from './interpreter';
 import { RevisionStore, type Revision, migrateWorkspace } from './workspace';
@@ -65,7 +65,7 @@ export function initLiveRemix() {
     const projects=store.list(owner());if(!projects.some(p=>p.id===active))active=projects.at(-1)?.id||null;
     $('liveProjects').replaceChildren(...projects.map(p=>option(p.id,p.name)));$<HTMLSelectElement>('liveProjects').value=active||'';$<HTMLSelectElement>('liveProjects').disabled=!projects.length;$('liveEditor').hidden=!active;
     renderCollection();if(!active)return;
-    const p=project(),r=revision(),history=store.history(p.id,owner());$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · version ${history.findIndex(x=>x.id===r.id)+1} · Saved on this device. Math settings stay the same.`;
+    const p=project(),r=revision(),history=store.history(p.id,owner());$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · version ${history.findIndex(x=>x.id===r.id)+1} · Saved on this device. Learning settings stay the same.`;
     $('liveMechanics').replaceChildren(...playableMechanics(p.game,r.config).map(m=>{const card=document.createElement('div');card.className='stat';card.textContent=`${m.label}: ${display(m.key,r.config[m.key])}`;return card;}));
     $<HTMLButtonElement>('liveUndo').disabled=!r.parentId;const redo=$<HTMLButtonElement>('liveRedo');if(redo)redo.disabled=!history.some(x=>x.parentId===r.id);$('compareVersion').replaceChildren(...history.map((rev,i)=>option(rev.id,`Version ${i+1}: ${rev.label}`)));$<HTMLSelectElement>('compareVersion').value=r.parentId||r.id;
     $('liveExamples').replaceChildren(...examples[p.game].map(example=>{const button=document.createElement('button');button.type='button';button.className='text-btn';button.textContent=example;button.onclick=()=>{clearPending();$<HTMLInputElement>('livePrompt').value=example;$('livePrompt').focus()};return button;}));
@@ -81,7 +81,7 @@ export function initLiveRemix() {
   $('liveProjects').onchange=()=>guarded(()=>{active=value('liveProjects');coach.reset();clearPending();render();});
   $('liveKeep').onclick=()=>guarded(()=>{store.keep(project().id,owner());$('liveStatus').textContent='Kept! This version is pinned in your private remix history.';});
   $('livePlay').onclick=()=>guarded(()=>play(revision()));
-  $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(()=>{clearPending();const p=project(),r=revision(),prompt=value('livePrompt');const mathRequest=interpretMathRequest(prompt);if(mathRequest){if(mathRequest.kind==='required')$('liveIntent').textContent=mathRequest.message;else{FG.learning.setMode(p.id,mathRequest.mode);$('liveIntent').textContent='Math format: '+MODE_LABELS[mathRequest.mode]+'. Your learning history stays with you.';}return;}const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
+  $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(()=>{clearPending();const p=project(),r=revision(),prompt=value('livePrompt');const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);if(mathRequest){if(mathRequest.kind==='required')$('liveIntent').textContent=mathRequest.message;else{FG.learning.setMode(p.id,mathRequest.mode);$('liveIntent').textContent='Learning format: '+learningFormatLabel(FG.learning.subject,mathRequest.mode)+'. Your learning history stays with you.';}return;}const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
     if(intent.kind==='supported'){pending=intent;$('liveIntent').textContent=intent.summary;applyPending();}
     else{$('liveIntent').textContent=intent.message;$('saveNovelIdea').hidden=intent.kind!=='generation-needed';if(intent.kind==='generation-needed')FG.builder?.request({gameId:p.game,baseRevisionId:r.id,config:r.config,prompt});}
   });};

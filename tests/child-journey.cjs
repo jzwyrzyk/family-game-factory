@@ -168,7 +168,9 @@ async function remoteJourney(browser,url,device,viewport){
    assert.notEqual(concurrentCandidate,originalCandidate,'the quick edit is an independent recoverable experiment');
    assert.equal((await currentSession(page)).job.status,'testing','the pending AI build survives the local edit');
    assert.equal(requests.length,1,'the quick edit makes no second AI request');
-  const laterDraft='My next idea is a tiny moon elevator. Keep this thought for later.';
+  // Switching back to gameplay correctly hides the design panel. Reopen it before entering the next idea.
+   await page.click('#studioChange');
+   const laterDraft='My next idea is a tiny moon elevator. Keep this thought for later.';
   await page.fill('#studioPrompt',laterDraft);await page.click('#studioPlay');await expectBudget(page,12);
   ready=true;await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='ready'));
   await page.waitForSelector('#studioReady');
