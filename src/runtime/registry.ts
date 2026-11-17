@@ -3,6 +3,8 @@ import OriginalBuckets from '../games/original-buckets.js';
 import Construction from '../games/original-builder.js';
 import QualityBuilder from '../games/quality-builder';
 import Hill from '../games/quality-hill';
+import MoonDonutDash from '../games/moon-donut-dash';
+import RobotRoute from '../games/robot-route';
 import '../quality/quality.css';
 import Builder from '../games/builder.js';
 import Buckets from '../games/buckets.js';
@@ -12,12 +14,16 @@ import { createLifecycle } from './lifecycle';
 import type { GameId, GamePlugin, GameContext, GameLifecycle, Difficulty, Mechanics, PlayOutcome } from './types';
 
 export const plugins: Record<GameId, GamePlugin> = {
+  moon: {manifest:manifests.moon,mount:(target,context)=>new MoonDonutDash(target,context)},
+  robot: {manifest:manifests.robot,mount:(target,context)=>new RobotRoute(target,context)},
   gum: {manifest: manifests.gum, mount: (target, context) => context.config.qualityVersion === 1 ? new QualityBuilder(target, context) : new (context.config.originalRules ? Construction : Builder)(target, context)},
   buckets: {manifest: manifests.buckets, mount: (target, context) => new (context.config.originalRules ? OriginalBuckets : Buckets)(target, context)},
   dragon: {manifest: manifests.dragon, mount: (target, context) => new (context.config.originalRules ? OriginalDragon : Dragon)(target, context)},
   hill: {manifest: manifests.hill, mount: (target, context) => new Hill(target, context)},
 };
 const details = {
+  moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
+  robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route that leads your robot to the star.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},
   gum: { type: 'BUILD & DISCOVER', instructions: 'Build a silly machine. Watch it move. Try your next idea.', controls: 'Drag or tap to place · R rotates · select two parts to connect · Test your machine.' },
   buckets: { type: 'GUESS & SURVIVE', instructions: 'Pick a bucket. Can you stay dry?', controls: 'Tap a numbered bucket or use left/right and Space to choose.' },
   dragon: { type: 'SHIELD ADVENTURE', instructions: 'Jump into falling fireballs to reflect them. Only your hero can save the island.', controls: '← → move · ↑ jump · Space jump / shield · touch controls below' },
