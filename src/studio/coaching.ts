@@ -9,6 +9,7 @@ interface Hooks {
  tryRequest(prompt:string,origin:Origin,depth:Experiment['depth']):Promise<void>;
  rules():string;playTest(id:string):Promise<void>;playMain():Promise<void>;combineTests(ids:string[]):Promise<void>;
  pauseForThinking():boolean;showTalk():void;
+ onCoachReply?(text:string):void;
 }
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
@@ -37,7 +38,7 @@ export function installCoaching(h:Hooks){
  const approve=action('Build this plan',()=>{for(const key of pendingFields.keys())saveField(key,false);const s=h.current(),d=s.design||freshDesign();if(missingPlan(d).length){h.status('Choose an answer or “You choose” for the missing decisions.');plan.open=true;$('plan-'+missingPlan(d)[0]).focus();return;}h.notebook.update(s.id,s.owner,x=>{x.design!.approvedPlan=true;});const first=(s.messages.find(m=>m.role==='child')?.text||s.draft||'Build the game in this plan.').slice(0,350);const brief=PLAN_FIELDS.map(k=>k+': '+(d.plan[k]?.value?.slice(0,160)||'Child delegated this choice; propose a sensible rule.')).join('\n');return request(first+'\n\nApproved game plan (full choices remain in this notebook):\n'+brief,'child','redesign');});approve.id='buildGamePlan';plan.append(approve);
  $('studioPromptForm').after(plan);
  const shelf=node('section','','experiment-shelf');shelf.id='experimentShelf';$('studioVersions').prepend(shelf);
- const change=action('💬 Change my game',()=>{if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');h.showTalk();renderPlan();});change.id='studioChange';$('studioPlay').after(change);
+ const change=action('💬 Talk or change my game',()=>{if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');h.showTalk();renderPlan();});change.id='studioChange';$('studioPlay').after(change);
  $('designPrediction').oninput=()=>run(()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.hypothesis=$<HTMLInputElement>('designPrediction').value;});});
  $('coachSupport').onchange=()=>run(()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.support=$<HTMLSelectElement>('coachSupport').value as 'brief'|'balanced'|'detailed';});});
  $('coachFriction').oninput=()=>run(()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.friction=$<HTMLInputElement>('coachFriction').value;});});
@@ -82,8 +83,9 @@ export function installCoaching(h:Hooks){
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
   if(reply.proposedChange){const proposal=reply.proposedChange;box.append(action('Try this idea: '+proposal.title,()=>request(proposal.request,'helper',proposal.depth)));}
   renderPlan();
+  h.onCoachReply?.(reply.text+(reply.question?' '+reply.question:''));
  }
- async function discuss(mode:CoachContext['mode'],supplied?:string){
+ async function discuss(mode:CoachContext['mode'],supplied?:string,preserveDraft=false){
   let captured:StudioSession|undefined,seq=0,turn:AbortController|undefined;
   try{
    captured=h.current();const input=$<HTMLTextAreaElement>('studioPrompt'),submittedDraft=input.value,submittedVersion=promptVersion;
@@ -102,16 +104,16 @@ export function installCoaching(h:Hooks){
    present(reply,used,captured);$('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
    // A reply may arrive after the child has started another thought. Preserve it
    // immediately, including edits whose ordinary draft debounce has not fired yet.
-   const nextDraft=promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
+   const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
    h.notebook.update(captured.id,captured.owner,s=>{s.draft=nextDraft;});input.value=nextDraft;h.render();
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
   finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}
  }
- async function intercept(prompt:string):Promise<boolean>{
+ async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
-  const s=h.current();if(force){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
+  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
   if(h.localSupported(prompt))return false;
-  // Unfamiliar commands stay conversations until the child chooses Try my idea.
+  // The legacy implicit-send path stays conversational; explicit Try means build/plan.
   await discuss('discuss',prompt);return true;
  }
  function renderShelf(){const s=h.current(),tests=s.experiments||[];shelf.replaceChildren(node('h2','My test ideas'),node('p','Try alternatives. Your main game changes only when you choose. Notes are optional.'));

@@ -91,6 +91,10 @@ export function localCoach(c:CoachContext):CoachReply {
   move='clarify';message='We can question the action itself, not only make it easier.';question='Does your character need to do that action, or could you reach the goal another way?';
  }else if(/\b(boring|not fun|don.t like|hate)\b/i.test(c.message)){
   move='clarify';question='Which part would you want to do differently?';message='Making it easier is only one possibility. We can also change the action or goal.';
- }else{question='Would you like to discuss that, ask for ideas, or try a change?';}
+ }else if(/\b(hello|hi|hey)\b/i.test(c.message)){
+  move='listen';message='Hi! We can talk about your game or any silly idea for it.';question='What is on your mind?';
+ }else if(/\b(what if|imagine|could|maybe|sneeze|spaghetti|silly|funny)\b/i.test(c.message)){
+  move='listen';message='That is an idea worth exploring. I will not change your game unless you choose Try a change.';question='What happens next in your idea?';
+ }else{move='listen';message='I am listening. You can keep talking or choose to try a change when you want.';question=null;}
  return {move,text:message,question,suggestions,proposedChange:null,planSuggestions:[],evidenceIds:[]};
 }

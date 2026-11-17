@@ -161,6 +161,14 @@ async function remoteJourney(browser,url,device,viewport){
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='testing'));
   assert.equal(requests.length,1);assert.equal(await page.inputValue('#studioPrompt'),'','the submitted idea clears only after the durable acknowledgement');
    assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'the child can see a build while continuing to play');
+   // Conversation during a slow remote build must remain child-led and must
+   // not dispatch a second job, change the selected game or interrupt learning.
+   await page.click('#studioChange');await page.fill('#studioPrompt','Could the rocket have a funny secret name?');
+   await page.click('#studioTalk');
+   await page.waitForFunction(()=>document.getElementById('coachModeStatus')?.textContent.includes('Local reflection'));
+   assert.equal(requests.length,1,'conversation cannot dispatch another build');
+   assert.equal((await currentSession(page)).job?.status,'testing','talk preserves the remote job');
+   assert.equal((await currentSession(page)).experiments.length,1,'talk cannot invent a game revision');
    // A slow AI test cannot block a second, instant local experiment.
    await page.click('#studioChange');await page.fill('#studioPrompt','Give me 12 gum sticks');await page.click('#studioSend');
    await expectBudget(page,12);

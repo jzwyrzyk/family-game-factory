@@ -27,9 +27,46 @@ async function load(page,url,saved={}){
   await page.click('#studioHome');await page.click('[data-starter="gum"]');assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();const baseline=(await projects())[0].headId;
   const talk=async()=>{await page.click('#studioChange');};const tryLocal=async text=>{await talk();await page.fill('#studioPrompt',text);await page.click('#studioSend');await page.waitForSelector('.quality-builder');};
-  await talk();await page.fill('#studioPrompt','I won but it was boring');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  await talk();await page.fill('#studioPrompt','I won but it was boring');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
   assert.match(await page.textContent('#studioMessages'),/action or goal/);assert.equal((await session()).experiments.length,0);assert.equal((await projects())[0].headId,baseline);
-  await page.fill('#studioPrompt',"I don't know");await page.click('#studioSend');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);
+  // Conversation must be its own action. Even a recognized local mechanic is
+  // just a thought until the child explicitly chooses Try a change.
+  await page.fill('#studioPrompt','Give me 15 gum sticks');
+  await page.click('#studioTalk');
+  await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  assert.equal((await session()).experiments.length,0,'talking must not build');
+  assert.equal((await projects())[0].headId,baseline,'talking must not change main version');
+  // Exercise the real microphone/UI join with a mocked private browser
+  // recognizer. No recording or network speech service is used in this test.
+  await page.evaluate(()=>{
+   class PrivateSpeech {
+    static async available(options){if(!options.processLocally)throw Error('Off-device recognition forbidden');return 'available';}
+    processLocally=false;lang='';continuous=false;interimResults=false;onresult=null;onerror=null;onend=null;
+    start(){window.__studioVoiceTest=this;}
+    abort(){this.aborted=true;this.onend?.();}
+   }
+   Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:PrivateSpeech});
+  });
+  await page.fill('#studioPrompt','An unsent typed thought');
+  await page.click('#studioMic');
+  await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
+  await page.evaluate(()=>{
+   const mic=window.__studioVoiceTest;
+   mic.onresult({results:[{isFinal:true,0:{transcript:'What if the dragon sneezes noodles?'}}]});
+   mic.onend();
+  });
+  await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('What if the dragon sneezes noodles?')&&document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  assert.equal(await page.locator('#studioPrompt').inputValue(),'An unsent typed thought','spoken conversation must not erase a different typed draft');
+  assert.equal((await session()).experiments.length,0,'speaking must chat, not build');
+  assert.equal((await projects())[0].headId,baseline,'voice must not change game versions');
+  // The explicit Try action must not silently become another discussion.
+  // An unsupported local mechanic fails honestly rather than queueing a fake AI build.
+  await page.fill('#studioPrompt','Make my rocket sneeze spaghetti');
+  await page.click('#studioSend');
+  await page.waitForFunction(()=>document.getElementById('studioStatus').textContent.includes('Idea saved'));
+  assert.equal((await session()).experiments.length,0,'unavailable AI cannot invent a build');
+  assert.equal((await projects())[0].headId,baseline,'unsupported Try preserves main');
+  await page.fill('#studioPrompt',"I don't know");await page.click('#studioTalk');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);
   await page.click('#coachIdeas');await page.waitForFunction(()=>document.querySelectorAll('#coachProposals button').length>=2);assert.equal((await session()).experiments.length,0);
   await page.fill('#studioPrompt','Give me 15 gum sticks');await page.getByText('Experiment options (optional)',{exact:true}).click();await page.fill('#designPrediction','More chances to test a joint');await page.click('#studioSend');await page.waitForSelector('.quality-builder');assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.parts.filter(p=>p.kind==='bottle').length),1);
   await tryLocal('Make joints stronger');await tryLocal('Give me six gum sticks');let s=await session();assert.equal(s.experiments.length,3);assert.equal(s.experiments[0].candidate.config.gumBudget,15);assert.equal(s.experiments[1].candidate.config.gumBudget,10,'B starts from main, not A');assert.equal((await projects())[0].headId,baseline);
@@ -38,12 +75,12 @@ async function load(page,url,saved={}){
   await page.click('#studioKeep');assert.notEqual((await projects())[0].headId,baseline);assert.equal((await session()).experiments.length,4,'promotion preserves all alternatives');
   await gameTool('#studioCompare');await page.locator('.experiment-card').nth(2).getByRole('button',{name:'Develop this test'}).click();await page.fill('#studioPrompt','Make joints stronger');await page.click('#studioSend');await page.waitForSelector('.quality-builder');s=await session();assert.equal(s.experiments.length,5);assert.equal(s.experiments[4].candidate.config.gumBudget,6);assert.equal(s.experiments[4].baseId,baseline,'old experiment baseline is not silently rebased');
   await gameTool('#studioCompare');await page.screenshot({path:`test-results/design-experiments-${device}.png`,fullPage:true});
-  await page.click('#studioCloseVersions');await talk();await page.fill('#studioPrompt','The aiming action is awkward. Could we rethink it?');await page.click('#studioSend');await page.waitForFunction(()=>!document.getElementById('coachModeStatus').textContent.includes('Thinking'));await page.screenshot({path:`test-results/design-conversation-${device}.png`,fullPage:true});
+  await page.click('#studioCloseVersions');await talk();await page.fill('#studioPrompt','The aiming action is awkward. Could we rethink it?');await page.click('#studioTalk');await page.waitForFunction(()=>!document.getElementById('coachModeStatus').textContent.includes('Thinking'));await page.screenshot({path:`test-results/design-conversation-${device}.png`,fullPage:true});
   const retained=(await session()).experiments.length;await page.click('#coachThink');assert.equal((await session()).design.paused,true);await page.waitForSelector('.quality-builder');assert.equal((await session()).experiments.length,retained);
   await page.click('#studioHome');const saved=inline?await page.evaluate(()=>Object.fromEntries(window.__reviewStorage)):{};if(inline)await load(page,url,saved);else await page.reload();await page.waitForFunction(()=>window.FG?.studio);
   await page.locator('#studioLibrary [data-session]').first().click();await gameTool('#studioCompare');assert.equal(await page.locator('.experiment-card').count(),5);assert.equal(await page.locator('[aria-label="Notes for Test A"]').inputValue(),'A little easier. I liked having choices.');
   await chooseProfile(1);assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);await chooseProfile(0);
-  await page.click('#studioNavCreate');await page.fill('#studioPrompt','A penguin delivers pizza on the moon');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.equal((await session()).job,null);
+  await page.click('#studioNavCreate');await page.fill('#studioPrompt','A penguin delivers pizza on the moon');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.equal((await session()).job,null);
   await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();
   await page.fill('#plan-fun','Funny pizza deliveries with a penguin');await page.fill('#plan-goal','Deliver pizzas');await page.locator('#plan-goal').locator('xpath=following-sibling::div[1]').getByRole('button',{name:'Save my answer'}).click();
   assert.equal(await page.locator('#plan-fun').inputValue(),'Funny pizza deliveries with a penguin','moving to and saving another field preserves earlier typing');
@@ -52,6 +89,22 @@ async function load(page,url,saved={}){
   assert.equal(await page.locator('#plan-fun').inputValue(),'Funny pizza deliveries with a penguin');assert.equal(await page.locator('#plan-goal').inputValue(),'Deliver pizzas');assert.equal((await session()).design.approvedPlan,false);
   await page.click('#buildGamePlan');await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('no build was started'));assert.equal((await session()).design.plan.goal.origin,'child');assert.equal((await session()).job,null);
   const mathAfter=await page.evaluate(()=>{const p=FG.store.current();return JSON.stringify({skills:p.skills,learning:p.learning??null,grade:p.grade,focus:p.focus,intensity:p.intensity,rate:p.rate});});assert.equal(mathAfter,mathBefore,'coaching, experiment versions, reload and profile switching preserve learning evidence and settings');
+  // Navigation out of Studio must release the microphone, not just hide its UI.
+  await page.evaluate(()=>{
+   // The browser reloaded above; install the synthetic local recognizer again.
+   class PrivateSpeech {
+    static async available(options){if(!options.processLocally)throw Error('Cloud speech is not allowed');return 'available';}
+    processLocally=false;lang='';continuous=false;interimResults=false;onresult=null;onerror=null;onend=null;aborted=false;
+    start(){window.__studioVoiceTest=this;}
+    abort(){this.aborted=true;this.onend?.();}
+   }
+   Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:PrivateSpeech});
+   window.__studioVoiceTest=null;
+  });
+  await page.click('#studioMic');
+  await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
+  await page.click('#studioNavPowers');
+  assert.equal(await page.evaluate(()=>window.__studioVoiceTest.aborted),true,'My Powers navigation must abort microphone capture');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);console.log(`PASS ${device}: play-first, no duplicate play projects, discussion vs build, support, A/B/C, combination, explicit promotion, old-base continuation, notes/reload, profile and math isolation, skip, first-build plan and honest offline status${inline?' [INLINE HARNESS, not network evidence]':''}`);await ctx.close();
  }
  }finally{await browser.close();await new Promise(r=>server.close(r));}
