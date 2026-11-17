@@ -78,6 +78,12 @@ jobs:
       - name: Learning integration
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:learning-integration
+      - name: Language activities
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:language-ui
+      - name: Language subject integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:language-integration
       - name: Learning persistence and pacing
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/learning-repair.cjs
