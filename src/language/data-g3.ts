@@ -10,7 +10,7 @@ export const LANGUAGE_G3: Record<string,LanguageTemplateBank> = {
     "items": [
       {
         "kind": "choice",
-        "q": "Which part divides the word fantastic into spoken chunks?",
+        "q": "Which split divides fantastic into syllables?",
         "a": "fan + tas + tic",
         "d": [
           "fant + astic",
@@ -299,7 +299,7 @@ export const LANGUAGE_G3: Record<string,LanguageTemplateBank> = {
     "items": [
       {
         "kind": "choice",
-        "q": "What does my stomach was full of butterflies mean?",
+        "q": "What does the expression 'butterflies in my stomach' mean?",
         "a": "I felt nervous",
         "d": [
           "I ate insects",

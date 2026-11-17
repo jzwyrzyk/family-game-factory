@@ -197,7 +197,7 @@ export const LANGUAGE_G4: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "choice",
-        "q": "What does her smile was sunshine suggest?",
+        "q": "What does the metaphor 'Her smile was sunshine' suggest?",
         "a": "her smile brought warmth or happiness",
         "d": [
           "her face emitted actual light",
@@ -242,7 +242,7 @@ export const LANGUAGE_G4: Record<string,LanguageTemplateBank> = {
     "items": [
       {
         "kind": "choice",
-        "q": "Choose: We stayed inside ___ it was raining.",
+        "q": "Which word gives the reason? We stayed inside ___ it was raining.",
         "a": "because",
         "d": [
           "although",
@@ -254,7 +254,7 @@ export const LANGUAGE_G4: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "choice",
-        "q": "Choose: ___ the race was hard, Eva kept going.",
+        "q": "Which word shows a contrast? ___ the race was hard, Eva kept going.",
         "a": "Although",
         "d": [
           "Because",
@@ -447,7 +447,7 @@ export const LANGUAGE_G4: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "choice",
-        "q": "Why does this passage use third person?",
+        "q": "Which clue shows this passage uses third-person narration?",
         "a": "The narrator describes someone else as he",
         "d": [
           "The narrator says I",

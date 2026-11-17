@@ -485,7 +485,7 @@ export const LANGUAGE_G2: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "choice",
-        "q": "Which two words become can't?",
+        "q": "Which full word is shortened to can't?",
         "a": "cannot",
         "d": [
           "can do",

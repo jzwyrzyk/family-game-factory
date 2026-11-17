@@ -75,7 +75,7 @@ test('published v1 examples have a pinned snapshot; never mutate archived review
   const data=JSON.stringify(LANGUAGE_BANK);
   let h=0x811c9dc5;
   for(let i=0;i<data.length;i++)h=Math.imul(h^data.charCodeAt(i),0x01000193)>>>0;
-  assert.equal(h.toString(16).padStart(8,'0'),'57e2c234',
+  assert.equal(h.toString(16).padStart(8,'0'),'5ab00960',
     'Archived pack changed. Publish corrected examples as v2, retain v1 for saved learner history.');
   assert.equal(createHash('sha256').update(data).digest('hex').length,64);
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>0});

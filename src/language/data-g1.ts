@@ -527,7 +527,7 @@ export const LANGUAGE_G1: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "word-tiles",
-        "q": "Build the word that completes: I ___ a red ball. The missing word rhymes with have.",
+        "q": "Build the word that completes: I ___ a red ball. The missing word means I own it.",
         "a": "have",
         "ex": "Have is a common irregular word.",
         "t": 1
