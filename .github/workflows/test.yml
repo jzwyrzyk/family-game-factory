@@ -1,5 +1,10 @@
 name: Arcade journeys
 on: [push, pull_request]
+# Push and PR workflows from the same source branch share one latest-head run.
+# Do not spend runners on superseded commits during rapid review iterations.
+concurrency:
+  group: arcade-journeys-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 jobs:
   browser:
     # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest can move to unsupported OS versions.
