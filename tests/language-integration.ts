@@ -117,11 +117,11 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     // A full-screen native quest must allow a child to leave the game without
     // fabricating an incorrect answer or bypassing the next learning checkpoint.
     await page.evaluate(()=>{
+      // Continue the SAME resumed construction; opening the same saved level
+      // again can legitimately load a state with no unused bottle budget.
       window.FG.store.current().mathWindow=[];
       window.FG.store.save();
-      window.FG.app.openGame('gum',{config:{originalRules:true,qualityVersion:0,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}});
     });
-    await page.getByRole('button',{name:'Add Bottle',exact:true}).click();
     await page.clock.runFor(91_000);
     await page.waitForSelector('#stage-overlay .language-activity');
     const abandoned=await page.evaluate(()=>window.FG.learning.activeAttemptId);
