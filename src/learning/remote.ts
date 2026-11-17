@@ -72,7 +72,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     const d=message.data;
     if(!d||d.type!=='factory-preview'||d.channel!==options.channel||d.artifactId!==options.artifactId)return;
     if(d.event==='ready'){
-      if(d.learningProtocol!==1){ready=false;clearTimeout(handshakeTimer);protocolError='This saved preview needs an updated game player to include learning. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);return;}
+      if(d.learningProtocol!==1){ready=false;clearTimeout(handshakeTimer);protocolError='This saved preview needs an updated game player to include '+(FG.learning.subject==='language'?'learning':'math')+'. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);return;}
       protocolError=null;if(ready)return;
       ready=true;clearTimeout(handshakeTimer);
       if(!waiting){cover?.remove();cover=null;frame.inert=false;frame.style.pointerEvents='';if(connectionPaused){connectionPaused=false;tell('resume');}}
@@ -80,7 +80,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
     }
     if(!ready||!['round-complete','math-checkpoint'].includes(d.event))return;
     if(!boundedId(d.roundId)){
-      if(d.roundId===undefined&&!waiting){ready=false;protocolError='This preview needs an updated game player to include learning. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);}
+      if(d.roundId===undefined&&!waiting){ready=false;protocolError='This preview needs an updated game player to include '+(FG.learning.subject==='language'?'learning':'math')+'. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);}
       return;
     }
     if(d.event==='round-complete'&&(typeof d.won!=='boolean'||!Number.isInteger(d.score)||d.score<0||d.score>1_000_000))return;
