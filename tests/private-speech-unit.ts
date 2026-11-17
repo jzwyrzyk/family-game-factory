@@ -56,6 +56,14 @@ async function main(){
   await speech.refresh();assert.equal(button.hidden,false);
   assert.equal(button.attrs['aria-pressed'],'false');
  });
+ await test('guardian revocation after status display denies microphone at the moment of tap',async()=>{
+  availability=false;
+  button.onclick?.();await tick();
+  assert.equal(mediaStarts,0,'no audio capture after live permission withdrawal');
+  assert.equal(privateUploads,0);
+  assert.equal(button.hidden,true);
+  availability=true;await speech.refresh();assert.equal(button.hidden,false);
+ });
  await test('explicit tap records one short turn, stops tracks and sends one transcript',async()=>{
   button.onclick?.();await tick();
   assert.equal(mediaStarts,1);assert.equal(button.attrs['aria-pressed'],'true');
