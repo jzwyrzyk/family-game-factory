@@ -13,13 +13,13 @@ let delayedAvailability=false,finishAvailability:((value:'available')=>void)|nul
 function releaseAvailability(){const release=finishAvailability;if(!release)throw Error('Missing delayed speech result');release('available');}
 const spoken:string[]=[];
 class FakeRecognition {
-  static async available(options:{langs:string[];processLocally:boolean}){
-    assert.deepEqual(options,{langs:['en-US'],processLocally:true});
+  static async available(options:{langs:string[];processLocally:boolean;quality:'dictation'}){
+    assert.deepEqual(options,{langs:['en-US'],processLocally:true,quality:'dictation'});
     if(delayedAvailability)return await new Promise<'available'>(resolve=>{finishAvailability=resolve;});
     return mode;
   }
-  static async install(options:{processLocally:boolean}){
-    assert.equal(options.processLocally,true);mode='available';return true;
+  static async install(options:{processLocally:boolean;quality:'dictation'}){
+    assert.equal(options.processLocally,true);assert.equal(options.quality,'dictation');mode='available';return true;
   }
   lang='';continuous=true;interimResults=false;processLocally=false;
   onresult:((event:any)=>void)|null=null;onerror:((event:any)=>void)|null=null;onend:(()=>void)|null=null;

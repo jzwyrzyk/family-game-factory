@@ -32,7 +32,7 @@ game success with enjoyment.
 - The model policy favors back-and-forth discussion instead of unsolicited
   optimization or compulsive questioning; the offline fallback is still
   clearly labeled *local*, not connected AI.
-- **Tap to Speak** uses browser on-device SpeechRecognition only. The adapter
+- **Tap to Speak** requests on-device English **dictation** quality rather than the shorter command-recognition default, when the browser supports the quality option. The adapter
   requires explicit availability and processLocally=true. The child starts
   each turn, the browser stops after a phrase, and final recognized text
   enters the existing conversational path. No transcript executes a build.

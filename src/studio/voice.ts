@@ -18,8 +18,8 @@ interface RecognitionLike {
 }
 interface RecognitionCtor {
   new():RecognitionLike;
-  available?(options:{langs:string[];processLocally:true}):Promise<VoiceAvailability>;
-  install?(options:{langs:string[];processLocally:true}):Promise<boolean>;
+  available?(options:{langs:string[];processLocally:true;quality:'dictation'}):Promise<VoiceAvailability>;
+  install?(options:{langs:string[];processLocally:true;quality:'dictation'}):Promise<boolean>;
 }
 export interface StudioVoiceOptions {
   microphone:HTMLButtonElement;installPack:HTMLButtonElement;hearReply:HTMLButtonElement;
@@ -37,7 +37,8 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   ui.microphone.setAttribute('aria-pressed',String(listening));
   ui.installPack.hidden=true;
  };
- const voiceOptions={langs:['en-US'],processLocally:true as const};
+ // Prefer full-thought dictation over the API's short-command default.
+ const voiceOptions={langs:['en-US'],processLocally:true as const,quality:'dictation' as const};
  function cancel(){
   generation++;speakAfterVoice=false;voiceScope='';finalWords='';spokenReply='';ui.hearReply.disabled=true;failed=true;
   const active=recognition;recognition=null;listening=false;buttons();announce('Microphone off.');
