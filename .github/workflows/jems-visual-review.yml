@@ -62,3 +62,20 @@ jobs:
         run: npm run build
       - name: Run isolated Studio save-play-iterate journey
         run: node tests/studio-journey.cjs
+  joy-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build jems with joy layer
+        run: npm run build
+      - name: Test earned celebrations and Math-English accents
+        run: node tests/jems-delight-browser.cjs

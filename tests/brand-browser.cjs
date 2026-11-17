@@ -10,6 +10,7 @@ const fs=require('node:fs');
  try{
   for(const [label,width,height] of [['desktop',1280,900],['mobile',390,844]]){
    const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile'}),errors=[];
+   page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(15000);
    page.on('pageerror',e=>errors.push(e.message));await page.goto(base);
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
    const logo=page.locator('img.jems-brand-logo');
@@ -42,12 +43,14 @@ const fs=require('node:fs');
   }
   const visual=await page.evaluate(()=>({
     hero:getComputedStyle(document.querySelector('.studio-home-hero')).backgroundImage,
+    workbench:getComputedStyle(document.querySelector('.studio-home-hero'),'::before').backgroundImage,
     button:getComputedStyle(document.querySelector('#studioNew')).backgroundImage,
     surface:getComputedStyle(document.querySelector('.studio-starter')).borderRadius,
     learning:!!document.getElementById('studioLearningChoice'),
     game:!!document.getElementById('studioGameMath')
   }));
-  assert.ok(visual.hero.includes('jems-clouds.svg'),'subtle brand artwork reaches the homepage, not only logo');
+  assert.match(visual.hero,/gradient/i,'the brighter jems hero retains a calm surface gradient');
+  assert.ok(visual.workbench.includes('jems-workbench.svg'),'approved invention artwork reaches the homepage, not only logo');
   assert.match(visual.button,/gradient/i,'child create action uses accessible on-brand gradient');
   assert.ok(visual.learning&&visual.game,'brand merge retained latest Math/English selector');
 
@@ -79,9 +82,10 @@ const fs=require('node:fs');
    assert.equal(manifest.icons[1].src,'./jems-mark.svg','bare mark remains available as a vector icon');
    assert.equal(await page.locator('link[rel="icon"]').getAttribute('href'),'./jems-mark.svg','browser tab uses jems favicon');
    assert.deepEqual(errors,[]);
+   console.log('PASS jems brand page:',label);
    await page.close();
   }
-  const legacy=await browser.newPage();
+  const legacy=await browser.newPage();legacy.setDefaultTimeout(12000);
   await legacy.goto(base+'?arcade=1');await legacy.waitForFunction(()=>window.FG?.app);
   assert.equal(await legacy.locator('.jems-brand-logo').count(),1);
   assert.equal(await legacy.locator('.jems-brand-logo').evaluate(img=>img.complete&&img.naturalWidth>0),true);
