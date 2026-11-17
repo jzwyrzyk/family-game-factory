@@ -160,15 +160,25 @@ async function remoteJourney(browser,url,device,viewport){
   await page.click('#studioChange');await page.fill('#studioPrompt','Replace the rocket with a bouncing banana maze');await page.click('#coachTry');
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='testing'));
   assert.equal(requests.length,1);assert.equal(await page.inputValue('#studioPrompt'),'','the submitted idea clears only after the durable acknowledgement');
-  const laterDraft='My next idea is a tiny moon elevator. Keep this thought for later.';
-  await page.fill('#studioPrompt',laterDraft);await page.click('#studioPlay');await expectBudget(page,15);
+   assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'the child can see a build while continuing to play');
+   // A slow AI test cannot block a second, instant local experiment.
+   await page.click('#studioChange');await page.fill('#studioPrompt','Give me 12 gum sticks');await page.click('#studioSend');
+   await expectBudget(page,12);
+   const concurrentCandidate=(await currentSession(page)).candidate.id;
+   assert.notEqual(concurrentCandidate,originalCandidate,'the quick edit is an independent recoverable experiment');
+   assert.equal((await currentSession(page)).job.status,'testing','the pending AI build survives the local edit');
+   assert.equal(requests.length,1,'the quick edit makes no second AI request');
+  // Switching back to gameplay correctly hides the design panel. Reopen it before entering the next idea.
+   await page.click('#studioChange');
+   const laterDraft='My next idea is a tiny moon elevator. Keep this thought for later.';
+  await page.fill('#studioPrompt',laterDraft);await page.click('#studioPlay');await expectBudget(page,12);
   ready=true;await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='ready'));
   await page.waitForSelector('#studioReady');
   const completed=await currentSession(page);
   assert.equal(completed.draft,laterDraft,'the later draft survives job completion');assert.equal(await page.inputValue('#studioPrompt'),laterDraft);
-  assert.equal(completed.candidate.id,originalCandidate,'a background build cannot select itself');assert.equal(completed.selectedTest,originalCandidate);
-  assert.equal(completed.experiments.length,2);assert.equal(completed.experiments.at(-1).candidate.remoteId,'journey-ready');
-  assert.equal(await mainId(page),originalMain);assert.equal((await runtime(page)).disposed,false);assert.equal((await runtime(page)).config.gumBudget,15);
+  assert.equal(completed.candidate.id,concurrentCandidate,'a background build cannot select itself');assert.equal(completed.selectedTest,concurrentCandidate);
+  assert.equal(completed.experiments.length,3);assert.equal(completed.experiments.at(-1).candidate.remoteId,'journey-ready');
+  assert.equal(await mainId(page),originalMain);assert.equal((await runtime(page)).disposed,false);assert.equal((await runtime(page)).config.gumBudget,12);
   assert.equal(await page.locator('#studioRemoteHost iframe').count(),0);assert.deepEqual(previewRequests,[],'no preview is requested before the child chooses it');
   await journeyScreenshot(page,device,'background-ready');
 
@@ -177,7 +187,7 @@ async function remoteJourney(browser,url,device,viewport){
   const heldRequest=page.waitForRequest(request=>request.url()===api+'/v1/revisions/journey-ready/preview');heldRequest.catch(()=>{});
   await page.click('#studioReady');await heldRequest;
   assert.equal((await runtime(page)).disposed,false,'fetching a preview keeps the currently playable game available');
-  assert.equal((await currentSession(page)).candidate.id,originalCandidate,'selection waits for an accepted preview response');
+  assert.equal((await currentSession(page)).candidate.id,concurrentCandidate,'selection waits for an accepted preview response');
   if(device==='mobile')await page.click('[data-studio-tab="talk"]');else await page.click('#studioChange');
   const raceDraft=laterDraft+' I am still thinking about the controls.';await page.fill('#studioPrompt',raceDraft);
   const heldResponse=page.waitForResponse(response=>response.url()===api+'/v1/revisions/journey-ready/preview');
@@ -187,7 +197,7 @@ async function remoteJourney(browser,url,device,viewport){
   assert.equal(await page.locator('#studioPrompt').evaluate(node=>document.activeElement===node),true,'a late open cannot steal typing focus');
   assert.equal(await page.inputValue('#studioPrompt'),raceDraft);assert.equal(await page.locator('#studioRemoteHost iframe').count(),0);
   assert.equal((await runtime(page)).disposed,true,'the earlier game remains intentionally paused for ideas');
-  assert.equal((await runtime(page)).config.gumBudget,15);assert.equal((await currentSession(page)).candidate.id,originalCandidate);
+  assert.equal((await runtime(page)).config.gumBudget,12);assert.equal((await currentSession(page)).candidate.id,concurrentCandidate);
   await page.waitForFunction(text=>FG.studio.exportNotebook().sessions.some(session=>session.draft===text),raceDraft);
   assert.equal(await page.locator('#studioReady').isVisible(),true,'the saved test remains available for an explicit retry');
   await journeyScreenshot(page,device,'preview-race');
