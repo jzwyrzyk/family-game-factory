@@ -57,11 +57,13 @@ async function switchProfile(page,index){
     assert.equal(await page.locator('.favorite-robot .favorite-canvas').isVisible(),true,'completion did not replace the game being played');
     assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'no preview automatically opened');
     assert.equal(previewRequests,0);
-    await page.locator('#studioBuildShelf').getByRole('button',{name:'Try test'}).click();
-    await page.waitForSelector('#studioReady');
+    await page.locator('#studioBuildShelf').getByRole('button',{name:'Try ready test'}).click();
+    await page.waitForFunction(()=>document.querySelector('#studioStatus')?.textContent?.includes('UNEXPECTED_PREVIEW'));
     const returned=await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]);
     assert.equal(returned,initial,'the child can find the saved original project');
-    assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'even returning does not open the new test without consent');
+    assert.equal(previewRequests,1,'only the explicit child click asks for a private preview');
+    assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'a failed preview never becomes an unverified playable game');
+    assert.equal(await page.locator('#studioReady').isVisible(),true,'the ready test is still accessible for another try');
     assert.equal(submitted,1,'reload and navigation do not resubmit a paid job');
     assert.deepEqual(errors,[]);
     console.log('PASS '+device+': durable build, isolated profile, another playable game, explicit ready test');
