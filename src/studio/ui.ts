@@ -554,6 +554,45 @@ export async function installStudio(){
   const checked=validateConfig(s.game as GameId,config),c:Candidate={id:crypto.randomUUID(),baseId:main.id,config:checked,prompt:'Combine '+tests.map(e=>e!.label).join(' + '),summary:tests.map(e=>e!.candidate.summary).join('; ').slice(0,2200)};
   games.clonePlayState(s.owner,main.id,c.id);notebook.saveExperiment(s.id,s.owner,c,ids,'redesign','child');message(s,'helper','Combined only the selected differences into a new test. Your main game and the other tests are unchanged.');await playCandidate();
  }
+ function renderComparison(s:StudioSession,box:HTMLElement){
+  // Only show a comparison when the child intentionally opens Tests & versions
+  // AND at least two independent tests exist. Never fabricate scores or a winner.
+  if(!canCompareExperiments(s.experiments?.length||0))return;
+  const candidates=s.experiments!.slice(-3),section=el('section','studio-comparison');
+  section.setAttribute('aria-label','Compare my game experiments');
+  section.append(el('h3','','Compare my game ideas 🔎'),el('p','','Play your different builds, notice what changes, and choose what you like best.'));
+  const table=document.createElement('table'),head=document.createElement('thead'),header=document.createElement('tr');
+  for(const label of ['','My main game',...candidates.map(e=>e.label)]){
+   const th=document.createElement('th');th.scope='col';th.textContent=label;header.append(th);
+  }
+  head.append(header);table.append(head);
+  const body=document.createElement('tbody'),observations=s.design?.observations||[];
+  const addRow=(label:string,main:string,forTest:(e:NonNullable<StudioSession['experiments']>[number])=>string)=>{
+   const row=document.createElement('tr'),title=document.createElement('th');title.scope='row';title.textContent=label;row.append(title);
+   for(const value of [main,...candidates.map(forTest)]){
+    const td=document.createElement('td');td.textContent=value;row.append(td);
+   }
+   body.append(row);
+  };
+  addRow('What changed','Your original rules',e=>e.candidate.summary);
+  addRow('Play notes','You can compare with your main game',e=>e.notes.trim()||'No notes yet');
+  addRow('Observed play','Main game is safe',e=>observations.some(o=>o.experimentId===e.id)?'A play observation is saved':'No recorded play observation yet');
+  const actions=document.createElement('tr'),label=document.createElement('th');label.scope='row';label.textContent='Try it';actions.append(label);
+  const main=document.createElement('td'),mainButton=el('button','studio-button','▶ Main game') as HTMLButtonElement;
+  mainButton.type='button';mainButton.onclick=()=>act(playWorking);main.append(mainButton);actions.append(main);
+  for(const e of candidates){
+   const cell=document.createElement('td'),button=el('button','studio-button','▶ '+e.label) as HTMLButtonElement;
+   button.type='button';button.onclick=()=>act(async()=>{
+    if(!canChangePlay(s))return;
+    if(e.candidate.remoteId)await showRemote(s,e.candidate.remoteId,'candidate',e.id);
+    else {notebook.selectExperiment(s.id,s.owner,e.id);await playCandidate();}
+   });cell.append(button);actions.append(cell);
+  }
+  body.append(actions);table.append(body);section.append(table);
+  const bases=new Set(candidates.map(e=>e.baseId));
+  if(bases.size>1)section.append(el('p','','These builds have different starting versions. Their results are not directly controlled comparisons.'));
+  box.prepend(section);
+ }
  function renderVersions(){
   if(!activeId)return;coaching?.renderShelf();const s=current(),box=$('studioVersionCards');box.replaceChildren();
   if(s.projectId&&!s.remoteId){const currentRevision=games.revision(s.projectId,s.owner);for(const [i,r] of games.history(s.projectId,s.owner).entries()){
@@ -563,6 +602,7 @@ export async function installStudio(){
     const restore=el('button','studio-button','Use this version');restore.onclick=()=>act(async()=>{if(!canChangePlay(s))return;if(current().candidate&&!confirm('Keep your saved conversation, discard the unkept preview, and use this version?'))return;games.checkout(s.owner,s.projectId!,r.id);notebook.update(s.id,s.owner,x=>{x.candidate=null;});await playWorking();renderVersions();});card.append(play,restore);box.append(card);
   }}else if(s.remoteId){const card=el('article','studio-version-card');card.append(el('strong','','Working game'),el('p','','Kept in the private family workshop.'));const b=el('button','studio-button','Play working game');b.onclick=()=>act(playWorking);card.append(b);const compare=el('button','studio-button','Compare previous');compare.onclick=()=>act(async()=>{const at=epoch;if(!canChangePlay(s,at))return;const c=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(s.remoteId!));if(!canChangePlay(s,at))return;if(!c.parentId){status('This is the first version.');return;}await showRemote(s,c.parentId,'history');});card.append(compare);box.append(card);}
   if(s.candidate){const card=el('article','studio-version-card is-candidate');card.append(el('strong','','Unkept preview'),el('p','',s.candidate.summary));const b=el('button','studio-button studio-primary','Play preview');b.onclick=()=>act(playCandidate);card.append(b);box.append(card);}
+  renderComparison(s,box);
   if(!box.children.length)box.append(el('p','','Your idea is saved. Versions appear when there is a playable game.'));
  }
  async function copyGame(name:string){
