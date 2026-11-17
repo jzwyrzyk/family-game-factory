@@ -104,7 +104,7 @@ async function main(){
    assert.equal(calls,1);
    const disabled=new CoachAudioService(repo,{...speech,approved:false},{transcribe:async()=>{throw Error('MUST_NOT_CALL');}});
    const fake:any={headers:{origin:appOrigin,cookie:cookie},url:'/v1/coach/audio/status',method:'GET'};
-   const result:any={status:0,writeHead(code:number){this.status=code;},setHeader(){},end(){}};
+   const result:any={status:0,writableEnded:false,once(_event:string,_cb:()=>void){return this;},writeHead(code:number){this.status=code;},setHeader(){},end(){this.writableEnded=true;}};
    await speechHttpHandler(disabled,{appOrigin,sessionKey:key})(fake,result);
    assert.equal(result.status,200);assert.equal(disabled.enabled(),false);
   }finally{await new Promise<void>(r=>server.close(()=>r()));}
