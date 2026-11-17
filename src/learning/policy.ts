@@ -41,11 +41,11 @@ export function interpretMathRequest(text: string): MathRequest | null {
   return null;
 }
 
-/** ELA remains required; only a grown-up may switch the learning subject.
+/** ELA remains required; a grown-up controls whether children can switch between activities.
  * Never reinterpret an ordinary game-design request as a learning-policy change.
  */
 export const REQUIRED_LANGUAGE_MESSAGE =
-  'Language Arts checkpoints stay part of every game. A grown-up chooses Math or Language Arts in Parent Controls; children can change how language activities appear, not turn them off.';
+  'Language Arts checkpoints stay part of every game. A grown-up enables Math, Language Arts or Both in Parent Controls. Children can only switch when Both is enabled and no question is active; learning stays required.';
 export const LANGUAGE_MODE_LABELS:Record<LearningMode,string> = {
   checkpoint:'Language at a pause',
   interaction:'Build words & sentences when available',
