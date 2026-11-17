@@ -77,7 +77,7 @@ test('S01: emergency CLI is stop-only, dry-run by default, and bumps epoch',()=>
  const stopped=nextEmergencyPolicy(make(),Date.now());
  assert.equal(stopped.epoch,8);assert.equal(stopped.emergencyStop,true);
  assert.ok(Object.values(stopped.capabilities).every(value=>value===false));
- assert.equal(nextEmergencyPolicy(null).epoch,1);
+ assert.equal(nextEmergencyPolicy(null,1234567890000).epoch,1234567890000);
 });
 test('S01: queued jobs never dispatch and late worker claims never receive child prompts after stop',async()=>{
  let policy=make(),dispatches=0;
