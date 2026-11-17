@@ -170,3 +170,6 @@ body.studio-review>.notice{color:#f7f5ff}
 .studio-build-item .studio-button,.studio-build-actions .studio-button{min-height:44px}
 .studio-build-actions{display:flex;flex-wrap:wrap;gap:8px}
 @media(max-width:600px){.studio-build-shelf{width:calc(100% - 20px);padding:10px}.studio-build-item{flex-basis:100%}}
+
+.studio-starter.moon{background:linear-gradient(160deg,#fff,#edf0ff)}
+.studio-starter.robot{background:linear-gradient(160deg,#fff,#e8f8f0)}
