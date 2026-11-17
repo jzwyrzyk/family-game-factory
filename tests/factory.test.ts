@@ -32,6 +32,10 @@ test('six native game manifests and transactional composed changes stay bounded'
  assert.equal(atomic.kind,'generation-needed');
  const moon=interpret('moon',defaults('moon'),'Make meteors slower and make moon gravity lower');
  assert.equal(moon.kind,'supported');if(moon.kind==='supported'){assert.equal(moon.config.meteorRate,.75);assert.equal(moon.config.moonGravity,.5);}
+ const physical=interpret('moon',defaults('moon'),'Add bounce pads and make moon gravity lower');
+ assert.equal(physical.kind,'supported');if(physical.kind==='supported')assert.equal(physical.config.bouncePads,true);
+ const portal=interpret('robot',defaults('robot'),'Add portals and make robot faster');
+ assert.equal(portal.kind,'supported');if(portal.kind==='supported')assert.equal(portal.config.portalEnabled,true);
  const robot=interpret('robot',defaults('robot'),'Make robot faster and hide my path');
  assert.equal(robot.kind,'supported');if(robot.kind==='supported'){assert.equal(robot.config.robotSpeed,1.25);assert.equal(robot.config.showTrail,false);}
 });
