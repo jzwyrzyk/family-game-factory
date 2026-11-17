@@ -17,7 +17,7 @@ export interface LanguageItem {
   /** Separate written response from reading assistance. */
   source:'reviewed-local'; purpose?:'focus'|'review'|'confidence'|'prerequisite'|'explore';
 }
-export interface LanguageContext extends LearningContext {}
+export interface LanguageContext extends LearningContext { opportunity?:'mid-play'|'round-end'|'practice'; }
 export type LanguageProfile = LearnerProfile & {language?:unknown; learningSubject?:'math'|'language'; languageFocus?:string[]};
 export interface LanguageResult {
   independent:boolean; outcome:'completed'|'shown'|'incorrect'|'explored';

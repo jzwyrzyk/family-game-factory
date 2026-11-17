@@ -140,3 +140,15 @@ test('Gentle can reach enough task variety without jumping to stretch tier',()=>
   const next=selectLanguageItem(p,{now:base+1500,random:()=>0});
   assert.equal(next.tier,1,'after varied success, Gentle exposes a third task without stretch tier');
 });
+
+test('longer writing waits for a round boundary rather than breaking action play',()=>{
+  const p=profile(4);
+  p.languageFocus=['g4-revision'];
+  const fast=selectLanguageItem(p,{opportunity:'mid-play',random:()=>.07});
+  assert.notEqual(fast.kind,'creative');
+  const breakItem=selectLanguageItem(p,{opportunity:'round-end',random:()=>.07});
+  assert.equal(breakItem.skillId,'g4-revision');
+  assert.equal(breakItem.kind,'creative');
+  const spontaneous=selectLanguageItem(profile(4),{opportunity:'practice',random:()=>.99});
+  assert.ok(spontaneous.grade<=4);
+});

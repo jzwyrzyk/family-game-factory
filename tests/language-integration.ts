@@ -96,6 +96,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     const record=await page.evaluate(id=>window.FG.store.current().language.attempts.find((a:any)=>a.id===id),id);
     assert.equal(record.context.gameId,'gum');
     assert.equal(record.context.versionId,'original-gum');
+    assert.equal(record.context.opportunity,'mid-play');
     assert.equal(record.outcome,'shown');
     assert.equal(record.independent,false);
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),false,'subject uses existing rolling budget');
@@ -156,6 +157,7 @@ async function generatedPreview(browser:Browser,base:string){
     assert.equal(await page.locator('.learning-preview-cover').count(),0);
     const stored=await page.evaluate(id=>window.FG.store.current().language.attempts.find((a:any)=>a.id===id),attempt);
     assert.equal(stored.context.gameId,'ela-preview');
+    assert.equal(stored.context.opportunity,'round-end');
     assert.equal(stored.outcome,'shown');
     assert.equal(stored.independent,false);
     assert.deepEqual(errors,[]);

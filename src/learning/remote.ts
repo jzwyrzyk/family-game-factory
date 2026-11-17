@@ -61,7 +61,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
       if(completed)options.onRound?.({won:completed.won!,score:completed.score!});
     };
     try{
-      const asked=FG.learning.checkpoint(cover,{gameId:options.gameId||'generated',versionId:options.versionId,projectId:options.projectId||options.gameId||'generated',mode:options.mode},complete,{roundId:`${instanceId}:${token}`});
+      const asked=FG.learning.checkpoint(cover,{gameId:options.gameId||'generated',versionId:options.versionId,projectId:options.projectId||options.gameId||'generated',mode:options.mode,opportunity:d.event==='round-complete'?'round-end':'mid-play'},complete,{roundId:`${instanceId}:${token}`});
       if(!asked)complete();
     }catch{
       failed('Learning activity could not open, so this game is paused. Try again, or leave the game and ask a grown-up to check saved progress.',()=>begin(d,token));

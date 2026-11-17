@@ -19,9 +19,10 @@ const contextOf=(ctx:LanguageContext):StoredContext=>({
   projectId:String(ctx.projectId||'').slice(0,120),
   versionId:String(ctx.versionId||'').slice(0,120),
   mode:ctx.mode||'checkpoint',
+  ...(ctx.opportunity?{opportunity:ctx.opportunity}:{}),
 });
 export interface StoredContext {
-  sessionId:string;gameId:string;projectId:string;versionId:string;mode:string;
+  sessionId:string;gameId:string;projectId:string;versionId:string;mode:string;opportunity?:string;
 }
 export type LanguageOutcome='open'|'completed'|'shown'|'incorrect'|'interrupted'|'skipped'|'explored';
 export interface LanguageResponse {
@@ -109,6 +110,7 @@ function validAttempt(a:unknown):a is LanguageAttempt {
   if(a.draft!==undefined&&(typeof a.draft!=='string'||a.draft.length>1200))return false;
   if(!Array.isArray(a.answers)||a.answers.length>12||a.answers.some((v:unknown)=>!isObject(v)||typeof v.raw!=='string'||v.raw.length>400||typeof v.normalized!=='string'||v.normalized.length>400||typeof v.correct!=='boolean'||!safeTime(v.at)))return false;
   for(const k of ['sessionId','gameId','projectId','versionId','mode'])if(typeof a.context[k]!=='string'||a.context[k].length>120)return false;
+  if(a.context.opportunity!==undefined&&!['mid-play','round-end','practice'].includes(a.context.opportunity))return false;
   return true;
 }
 /** Reject future/corrupt history without overwriting any original backup bytes. */
@@ -249,7 +251,9 @@ const randomNumber=(fn:()=>number)=>{const n=fn();return Number.isFinite(n)?Math
 const select=(items:LanguageSkill[],random:()=>number):LanguageSkill=>items[Math.floor(randomNumber(random)*items.length)];
 export function selectLanguageItem(profile:LanguageProfile,context:LanguageContext={}):LanguageItem {
   const state=ensureLanguage(profile),grade=profileGrade(profile),random=context.random||Math.random;
-  const allowed=LANGUAGE_SKILLS.filter(s=>s.grade<=grade&&LANGUAGE_BANK[s.id]?.items.length);
+  // Keep extended creative writing for natural breaks or voluntary practice, never a timed mid-game pause.
+  const allowed=LANGUAGE_SKILLS.filter(s=>s.grade<=grade&&LANGUAGE_BANK[s.id]?.items.length&&
+    (context.opportunity!=='mid-play'||!LANGUAGE_BANK[s.id].items.some(item=>item.kind==='creative')));
   if(!allowed.length)throw Error('No language curriculum available.');
   const preferred=(profile.languageFocus||[]).filter(x=>allowed.some(s=>s.id===x));
   const due=allowed.filter(s=>state.skills[s.id]?.dueAt!==null&&state.skills[s.id]?.dueAt!==undefined&&
