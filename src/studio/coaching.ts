@@ -16,12 +16,13 @@ const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.t
 /** UI support only: the model can propose; it cannot execute or promote. */
 export function installCoaching(h:Hooks){
  let generation=0,requestGeneration=0,controller:AbortController|null=null,thinking=false;
+ let readyOrigin='',readyUntil=0,ready=false;
  const helperFields=new Map<PlanField,DesignField>(),pendingFields=new Map<PlanField,string>();
  function isCurrent(s:StudioSession){try{return s.owner===h.owner()&&s.id===h.current().id;}catch{return false;}}
  function report(error:unknown,s?:StudioSession){if(s&&!isCurrent(s))return;h.status(error instanceof Error?error.message:String(error),true);}
  function run(fn:()=>void|Promise<void>){let s:StudioSession|undefined;try{s=h.current();Promise.resolve(fn()).catch(error=>report(error,s));}catch(error){report(error,s);}}
  const action=(label:string,fn:()=>void|Promise<void>)=>{const b=node('button',label,'studio-chip') as HTMLButtonElement;b.type='button';b.onclick=()=>run(fn);return b;};
- function cancelDiscussion(){generation++;controller?.abort();controller=null;thinking=false;$('coachModeStatus').textContent='';}
+ function cancelDiscussion(){generation++;controller?.abort();controller=null;thinking=false;const stop=$('coachStop');if(stop)stop.hidden=true;$('coachModeStatus').textContent='';}
  function cancelRequest(){requestGeneration++;requestInFlight=false;force=false;origin='child';depth='tune';}
 
  const combineSelection=new Set<string>();
@@ -31,6 +32,8 @@ export function installCoaching(h:Hooks){
  const controls=node('section','','design-controls');controls.id='designControls';
  controls.innerHTML='<div class="design-mode"><strong>How can I help?</strong><button type="button" id="coachDiscuss">Talk it through</button><button type="button" id="coachIdeas">Give me ideas</button><button type="button" id="coachExplain">Explain</button><button type="button" id="coachThink">Let me think / play</button></div><details id="coachExperimentOptions" class="design-options"><summary>Experiment options (optional)</summary><label for="experimentStart">Start the next experiment from</label><select id="experimentStart"><option value="main">My main game — a different test</option><option value="continue">This test — develop this idea</option></select><label for="designPrediction">My guess about this experiment (optional)</label><input id="designPrediction" maxlength="300" placeholder="I think this might…"></details><button type="button" id="coachTry" class="studio-button">Try my idea</button><button type="button" id="coachPlanToggle" class="studio-button">My game plan</button><details id="coachSupportOptions" class="design-options"><summary>How much help? (optional)</summary><label for="coachSupport">Explanation style</label><select id="coachSupport"><option value="brief">Short and simple</option><option value="balanced">A little help</option><option value="detailed">Explain more</option></select><label for="coachFriction">What I want to figure out</label><input id="coachFriction" maxlength="1000" placeholder="Optional — in your words"></details><span id="coachModeStatus" role="status"></span><div id="coachProposals"></div>';
  $('studioPromptForm').querySelector('.studio-send-row')!.after(controls);
+ const stopReply=action('Stop this reply',()=>{cancelDiscussion();h.status('Reply stopped. Keep playing or talk again.');});
+ stopReply.id='coachStop';stopReply.hidden=true;controls.append(stopReply);
  const plan=node('details','','design-plan') as HTMLDetailsElement;plan.id='designPlan';
  const summary=node('summary','Our game plan — your choices');plan.append(summary);const planStatus=node('p','','design-plan-status');planStatus.id='planSaveStatus';planStatus.setAttribute('role','status');plan.append(planStatus);
  const intro=node('p','Your answers save as you type. Choose what matters, or ask for suggestions. “No score” and “no losing” are valid designs. Nothing builds until you choose Build this plan.');plan.append(intro);plan.append(action('You choose the remaining details',()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();for(const field of missingPlan(x.design))x.design.plan[field]={value:x.design.plan[field]?.value||'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});renderPlan();}));
@@ -67,7 +70,16 @@ export function installCoaching(h:Hooks){
   if(replaceFocused||document.activeElement!==input)input.value=pendingFields.get(key)??f?.value??'';
   $('plan-credit-'+key).textContent=pendingFields.has(key)?'Not saved yet':!f?'Not decided yet':f.delegated?'You asked the helper to choose; it must report that choice.':f.origin==='child'?'Your choice':f.accepted?'Helper suggestion you chose':'Helper suggestion — not accepted yet';
  }}
- function context(message:string,mode:CoachContext['mode']):CoachContext {const s=h.current(),d=s.design||freshDesign();return {message,mode,game:s.game,plan:d.plan,rules:h.rules(),friction:d.friction,helpLevel:d.helpLevel,support:d.support,conversation:s.messages.slice(-10).map(m=>({role:m.role,text:m.text})),observations:d.observations.slice(-8),tests:(s.experiments||[]).slice(-8).map(e=>({label:e.label,title:e.title,prediction:e.prediction,notes:e.notes}))};}
+ function context(message:string,mode:CoachContext['mode']):CoachContext {
+  const s=h.current(),d=s.design||freshDesign();
+  // The current turn already appears in context.message. Do not repeat it
+  // inside the bounded transcript; this reduces cost and improves pronouns.
+  const previous=s.messages.slice(0,-1).slice(-10);
+  return {message,mode,game:s.game,plan:d.plan,rules:h.rules(),friction:d.friction,helpLevel:d.helpLevel,
+   support:d.support,conversation:previous.map(m=>({role:m.role,text:m.text.replace(/^(AI design coach: |Local design helper: )/,'')})),
+   observations:d.observations.slice(-8),
+   tests:(s.experiments||[]).slice(-8).map(e=>({label:e.label,title:e.title,prediction:e.prediction,notes:e.notes}))};
+ }
  async function request(prompt:string,from:Origin,level:Experiment['depth']){
   let captured:StudioSession|undefined,token=0;
   try{captured=h.current();if(requestInFlight){h.status('One experiment is already being prepared.');return;}
@@ -85,6 +97,17 @@ export function installCoaching(h:Hooks){
   renderPlan();
   h.onCoachReply?.(reply.text+(reply.question?' '+reply.question:''));
  }
+ async function remoteReady(url:string,signal:AbortSignal):Promise<boolean>{
+  if(readyOrigin===url&&Date.now()<readyUntil)return ready;
+  // Check authorization/ZDR/parental gates *before* sending a child's words.
+  const response=await fetch(url+'/v1/coach/status',{method:'GET',credentials:'include',
+   signal,cache:'no-store'});
+  if(!response.ok)throw Error('COACH_UNAVAILABLE');
+  const result=await response.json();
+  const allowed=result?.available===true&&result?.mode==='model';
+  readyOrigin=url;ready=allowed;readyUntil=Date.now()+(allowed?30000:5000);
+  return allowed;
+ }
  async function discuss(mode:CoachContext['mode'],supplied?:string,preserveDraft=false){
   let captured:StudioSession|undefined,seq=0,turn:AbortController|undefined;
   try{
@@ -92,14 +115,35 @@ export function installCoaching(h:Hooks){
    const text=(supplied??submittedDraft).trim()||(mode==='ideas'?'Please help me find ideas.':mode==='explain'?'Explain the relevant game-design choice.':'What could I think about next?');
    if(thinking){h.status('Your design coach is still replying. You can keep playing.');return;}
    if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');
-   seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;
+   seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;stopReply.hidden=false;
    h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(/don.t know|stuck/i.test(text))s.design.helpLevel=Math.min(3,s.design.helpLevel+1);});
    h.message(captured,'child',text);const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
    let reply:CoachReply,used:'model'|'local'='local';
-   try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
-    const response=await fetch(config.apiBaseUrl+'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
-    const data=await response.json();if(!response.ok)throw Error(data.errorCode||'COACH_UNAVAILABLE');if(data.mode!=='model')throw Error('COACH_UNAVAILABLE');reply=validateCoachReply(data.reply,c);used='model';
-   }catch(error){if(turn.signal.aborted)return;reply=localCoach(c);}
+   try{
+    const config=h.config();if(config.mode!=='remote')throw Error('COACH_UNAVAILABLE');
+    const signal=AbortSignal.any([turn.signal,AbortSignal.timeout(15000)]);
+    if(!await remoteReady(config.apiBaseUrl,signal))throw Error('COACH_UNAVAILABLE');
+    if(turn.signal.aborted||!isCurrent(captured))return;
+    const response=await fetch(config.apiBaseUrl+'/v1/coach',{
+     method:'POST',credentials:'include',signal,cache:'no-store',
+     headers:{'Content-Type':'application/json','X-Factory-Request':'1'},
+     body:JSON.stringify({requestId:crypto.randomUUID(),context:c})
+    });
+    const data=await response.json();
+    if(!response.ok)throw Error(data.errorCode||'COACH_UNAVAILABLE');
+    if(data.mode!=='model')throw Error('COACH_UNAVAILABLE');
+    reply=validateCoachReply(data.reply,c);used='model';
+   }catch(error){
+    if(turn.signal.aborted)return;
+    const code=error instanceof Error?error.message:'COACH_UNAVAILABLE';
+    if(code==='COACH_REFUSED'||code==='PRIVATE_INFORMATION'){
+     if(seq!==generation||!isCurrent(captured))return;
+     h.message(captured,'helper','Let’s keep our game ideas safe and leave out private details. A grown-up can help with anything worrying you.');
+     $('coachModeStatus').textContent='This topic cannot be sent to the AI coach.';
+     return; // A safety refusal must not be bypassed by the local helper.
+    }
+    reply=localCoach(c);
+   }
    if(seq!==generation||!isCurrent(captured))return;
    present(reply,used,captured);$('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
    // A reply may arrive after the child has started another thought. Preserve it
@@ -107,7 +151,7 @@ export function installCoaching(h:Hooks){
    const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
    h.notebook.update(captured.id,captured.owner,s=>{s.draft=nextDraft;});input.value=nextDraft;h.render();
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
-  finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}
+  finally{if(seq&&seq===generation){thinking=false;stopReply.hidden=true;if(controller===turn)controller=null;}}
  }
  async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
@@ -136,11 +180,11 @@ export function installCoaching(h:Hooks){
   if(s.hypothesis!==prediction||(s.design?.friction||'')!==friction)h.notebook.update(s.id,s.owner,x=>{x.hypothesis=prediction;x.design ||= freshDesign();x.design.friction=friction;});
  }
  function openSession(){
-  combineSelection.clear();selectedSuggestion=null;cancelDiscussion();cancelRequest();helperFields.clear();pendingFields.clear();planStatus.textContent='';
+  combineSelection.clear();selectedSuggestion=null;cancelDiscussion();cancelRequest();readyOrigin='';readyUntil=0;ready=false;helperFields.clear();pendingFields.clear();planStatus.textContent='';
   $('coachProposals').replaceChildren();$<HTMLSelectElement>('experimentStart').value='main';
   $<HTMLDetailsElement>('coachExperimentOptions').open=false;$<HTMLDetailsElement>('coachSupportOptions').open=false;plan.open=false;
   document.body.classList.remove('studio-designing');const s=h.current();if(!s.design)h.notebook.update(s.id,s.owner,x=>{x.design=freshDesign();});
   $<HTMLInputElement>('designPrediction').value=s.hypothesis;$<HTMLSelectElement>('coachSupport').value=s.design?.support||'balanced';$<HTMLInputElement>('coachFriction').value=s.design?.friction||'';renderPlan(true);
  }
- return {intercept,details,renderShelf,renderPlan,flushDrafts,openSession,discuss,tryPreset:(prompt:string)=>request(prompt,'helper','tune'),reset:()=>{cancelDiscussion();cancelRequest();helperFields.clear();pendingFields.clear();},afterOutcome:(text:string,testId:string|null)=>{const s=h.current();h.notebook.observe(s.id,s.owner,text,'runtime',testId);},pauseReflection:()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;});}};
+ return {intercept,details,renderShelf,renderPlan,flushDrafts,openSession,discuss,tryPreset:(prompt:string)=>request(prompt,'helper','tune'),reset:()=>{cancelDiscussion();cancelRequest();readyOrigin='';readyUntil=0;ready=false;helperFields.clear();pendingFields.clear();},afterOutcome:(text:string,testId:string|null)=>{const s=h.current();h.notebook.observe(s.id,s.owner,text,'runtime',testId);},pauseReflection:()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;});}};
 }
