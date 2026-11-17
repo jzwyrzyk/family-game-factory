@@ -109,11 +109,11 @@ export function installCoaching(h:Hooks){
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
   finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}
  }
- async function intercept(prompt:string):Promise<boolean>{
+ async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
-  const s=h.current();if(force){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
+  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
   if(h.localSupported(prompt))return false;
-  // Unfamiliar commands stay conversations until the child chooses Try my idea.
+  // The legacy implicit-send path stays conversational; explicit Try means build/plan.
   await discuss('discuss',prompt);return true;
  }
  function renderShelf(){const s=h.current(),tests=s.experiments||[];shelf.replaceChildren(node('h2','My test ideas'),node('p','Try alternatives. Your main game changes only when you choose. Notes are optional.'));

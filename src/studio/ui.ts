@@ -241,7 +241,7 @@ export async function installStudio(){
   if(busy(s)||sending.has(s.id)){status('Your current build is still running. Play your working game or cancel the build first.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
   if(mathRequest){message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`);notebook.update(s.id,s.owner,x=>{x.draft='';});$<HTMLTextAreaElement>('studioPrompt').value='';}render();return;}
-  if(await coaching?.intercept(prompt))return;if(!sameView(s,started))return;
+  if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started))return;
   const decision=coaching?.details()||{continueTest:false,parents:[],depth:'tune' as const,origin:'child' as const};
   message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;x.playOnly=false;});
   if(s.projectId&&!s.remoteId&&!s.candidate?.remoteId){

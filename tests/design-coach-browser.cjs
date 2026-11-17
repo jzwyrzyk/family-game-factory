@@ -27,7 +27,7 @@ async function load(page,url,saved={}){
   await page.click('#studioHome');await page.click('[data-starter="gum"]');assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();const baseline=(await projects())[0].headId;
   const talk=async()=>{await page.click('#studioChange');};const tryLocal=async text=>{await talk();await page.fill('#studioPrompt',text);await page.click('#studioSend');await page.waitForSelector('.quality-builder');};
-  await talk();await page.fill('#studioPrompt','I won but it was boring');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  await talk();await page.fill('#studioPrompt','I won but it was boring');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
   assert.match(await page.textContent('#studioMessages'),/action or goal/);assert.equal((await session()).experiments.length,0);assert.equal((await projects())[0].headId,baseline);
   // Conversation must be its own action. Even a recognized local mechanic is
   // just a thought until the child explicitly chooses Try a change.
@@ -59,7 +59,14 @@ async function load(page,url,saved={}){
   assert.equal(await page.locator('#studioPrompt').inputValue(),'An unsent typed thought','spoken conversation must not erase a different typed draft');
   assert.equal((await session()).experiments.length,0,'speaking must chat, not build');
   assert.equal((await projects())[0].headId,baseline,'voice must not change game versions');
-  await page.fill('#studioPrompt',"I don't know");await page.click('#studioSend');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);
+  // The explicit Try action must not silently become another discussion.
+  // An unsupported local mechanic fails honestly rather than queueing a fake AI build.
+  await page.fill('#studioPrompt','Make my rocket sneeze spaghetti');
+  await page.click('#studioSend');
+  await page.waitForFunction(()=>document.getElementById('studioStatus').textContent.includes('Idea saved'));
+  assert.equal((await session()).experiments.length,0,'unavailable AI cannot invent a build');
+  assert.equal((await projects())[0].headId,baseline,'unsupported Try preserves main');
+  await page.fill('#studioPrompt',"I don't know");await page.click('#studioTalk');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);
   await page.click('#coachIdeas');await page.waitForFunction(()=>document.querySelectorAll('#coachProposals button').length>=2);assert.equal((await session()).experiments.length,0);
   await page.fill('#studioPrompt','Give me 15 gum sticks');await page.getByText('Experiment options (optional)',{exact:true}).click();await page.fill('#designPrediction','More chances to test a joint');await page.click('#studioSend');await page.waitForSelector('.quality-builder');assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.parts.filter(p=>p.kind==='bottle').length),1);
   await tryLocal('Make joints stronger');await tryLocal('Give me six gum sticks');let s=await session();assert.equal(s.experiments.length,3);assert.equal(s.experiments[0].candidate.config.gumBudget,15);assert.equal(s.experiments[1].candidate.config.gumBudget,10,'B starts from main, not A');assert.equal((await projects())[0].headId,baseline);
@@ -68,12 +75,12 @@ async function load(page,url,saved={}){
   await page.click('#studioKeep');assert.notEqual((await projects())[0].headId,baseline);assert.equal((await session()).experiments.length,4,'promotion preserves all alternatives');
   await gameTool('#studioCompare');await page.locator('.experiment-card').nth(2).getByRole('button',{name:'Develop this test'}).click();await page.fill('#studioPrompt','Make joints stronger');await page.click('#studioSend');await page.waitForSelector('.quality-builder');s=await session();assert.equal(s.experiments.length,5);assert.equal(s.experiments[4].candidate.config.gumBudget,6);assert.equal(s.experiments[4].baseId,baseline,'old experiment baseline is not silently rebased');
   await gameTool('#studioCompare');await page.screenshot({path:`test-results/design-experiments-${device}.png`,fullPage:true});
-  await page.click('#studioCloseVersions');await talk();await page.fill('#studioPrompt','The aiming action is awkward. Could we rethink it?');await page.click('#studioSend');await page.waitForFunction(()=>!document.getElementById('coachModeStatus').textContent.includes('Thinking'));await page.screenshot({path:`test-results/design-conversation-${device}.png`,fullPage:true});
+  await page.click('#studioCloseVersions');await talk();await page.fill('#studioPrompt','The aiming action is awkward. Could we rethink it?');await page.click('#studioTalk');await page.waitForFunction(()=>!document.getElementById('coachModeStatus').textContent.includes('Thinking'));await page.screenshot({path:`test-results/design-conversation-${device}.png`,fullPage:true});
   const retained=(await session()).experiments.length;await page.click('#coachThink');assert.equal((await session()).design.paused,true);await page.waitForSelector('.quality-builder');assert.equal((await session()).experiments.length,retained);
   await page.click('#studioHome');const saved=inline?await page.evaluate(()=>Object.fromEntries(window.__reviewStorage)):{};if(inline)await load(page,url,saved);else await page.reload();await page.waitForFunction(()=>window.FG?.studio);
   await page.locator('#studioLibrary [data-session]').first().click();await gameTool('#studioCompare');assert.equal(await page.locator('.experiment-card').count(),5);assert.equal(await page.locator('[aria-label="Notes for Test A"]').inputValue(),'A little easier. I liked having choices.');
   await chooseProfile(1);assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);await chooseProfile(0);
-  await page.click('#studioNavCreate');await page.fill('#studioPrompt','A penguin delivers pizza on the moon');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.equal((await session()).job,null);
+  await page.click('#studioNavCreate');await page.fill('#studioPrompt','A penguin delivers pizza on the moon');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.equal((await session()).job,null);
   await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();
   await page.fill('#plan-fun','Funny pizza deliveries with a penguin');await page.fill('#plan-goal','Deliver pizzas');await page.locator('#plan-goal').locator('xpath=following-sibling::div[1]').getByRole('button',{name:'Save my answer'}).click();
   assert.equal(await page.locator('#plan-fun').inputValue(),'Funny pizza deliveries with a penguin','moving to and saving another field preserves earlier typing');
