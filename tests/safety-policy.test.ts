@@ -137,3 +137,29 @@ test('S01: separate-origin preview checks policy before fetching generated game 
  try{assert.equal((await fetch(url)).status,403);assert.equal(lookups,0);}
  finally{await new Promise<void>(r=>srv.close(()=>r()));}
 });
+
+test('S01: a claimed worker cannot publish a late result after emergency stop',async()=>{
+ let policy=make(),dispatched=0;
+ const safety=gate(async()=>policy),repo=new MemoryRepository();
+ await repo.transaction(s=>{
+  s.ledgers.family={allowance:5000,used:0,reserved:100,paidEnabled:true,month:new Date().toISOString().slice(0,7)};
+  s.jobs.push({id:'in-flight',familyId:'family',policyEpoch:7,gameId:'new',baseRevisionId:null,prompt:'a private game idea',
+   clientRequestId:'request-in-flight',status:'queued',adapter:'metered-api',maxUnits:100,usedUnits:0,retryCount:0});
+  return true;
+ });
+ const approval:any={enabled:true,model:'synthetic',approvalId:'synthetic',inputUsdPerMillion:1,outputUsdPerMillion:1,
+  maxInputTokens:10000,maxOutputTokens:2000,priceReviewedOn:new Date().toISOString().slice(0,10)};
+ const coordinator=new ActionCoordinator(repo,{dispatch:async()=>{dispatched++;}},approval,900000,safety);
+ await coordinator.tick();assert.equal(dispatched,1);
+ const identity:any={stage:'generate',runId:'run-1',repositoryId:'synthetic',sha:'a'.repeat(40)};
+ const claimed:any=await coordinator.claim('in-flight',0,'generate',identity);
+ assert.equal(claimed.input.childIntent,'a private game idea');
+ policy=nextEmergencyPolicy(policy);
+ await assert.rejects(coordinator.report('in-flight',0,'generate',identity,{usageUnits:1,candidate:{}}),/SAFETY_POLICY_BLOCKED/);
+ const state=await repo.snapshot();
+ assert.equal(state.jobs[0].status,'failed');
+ assert.equal(state.jobs[0].errorCode,'SAFETY_POLICY_BLOCKED');
+ assert.equal(state.revisions.length,0);
+ assert.equal(state.ledgers.family.reserved,0);
+ assert.equal(state.ledgers.family.used,100);
+});
