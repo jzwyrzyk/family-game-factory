@@ -24,7 +24,7 @@ The two new native games have touch/keyboard controls, win/retry/progression hoo
 ### Route work before using the AI
 
 1. **Tier 1 (bounded instant edit):** map one known instruction to a validated local mechanic, save an independent test, and immediately play it.
-2. **Tier 2 (bounded composition):** split two to four fully understood commands joined by 'and', 'then', a comma or semicolon, apply them to a temporary config in order, validate every change, and save one atomic test. **No partial application**, no model call and no invented mechanic. This is a first useful version of local composition, not a general behavior plugin registry.
+2. **Tier 2 (bounded composition):** split up to four supported changes joined by 'and', 'then', comma or semicolon. These may include actual **prebuilt gameplay behaviors**, such as Moon bounce pads and Robot portals, in addition to parameter tuning. Apply changes transactionally, validate all outcomes, and save one independent test. No partial application, model call or unreviewed executable code.
 3. **Tier 3 (novel AI):** explicitly queue one durable remote experiment from a known starting revision, then use the global shelf and favorite library while the builder generates/tests/repairs. Paid activation remains disabled unless the separate owner approval gates are fulfilled.
 
 The default public factory config is still `mode:unavailable`. Novel builds must never pretend to start when the worker is disconnected.
@@ -50,7 +50,7 @@ Creative coaching remains child-authored: a clear build request is not turned in
 ## What this branch does not claim
 
 - No real measured AI generation latency, live model success rate or end-to-end hosted activation
-- No general mechanical component graph; Tier 2 currently composes **known parameter edits** only
+- No general mechanical component graph; Tier 2 currently composes **known parameter edits and two prebuilt behaviors** only
 - No universal mid-frame preservation for all original action games; Studio may restart those rounds after design tools, and communicates this
 - No automatic merge of a quick-edited experiment into an independently built AI result
 - No real-child enjoyment, learning-outcome, screen-reader or actual-device validation
