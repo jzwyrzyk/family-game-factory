@@ -29,6 +29,12 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
   try{
     await page.goto(base);
     await page.waitForFunction(()=>window.FG?.learning&&window.FG?.app);
+    // Record an actual math attempt first, to test preservation of nonempty learner history.
+    await page.evaluate(()=>{
+      const p=window.FG.store.current(),q=window.FG.math.select(p,Date.now(),()=>0.23);
+      window.FG.math.record(p,q,true,false,Date.now(),1);
+      window.FG.store.save();
+    });
     await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
     // Parent reports may legitimately initialize the empty legacy math-v2 record.
     // Compare after initial parent view, before any subject edit, to test actual preservation.

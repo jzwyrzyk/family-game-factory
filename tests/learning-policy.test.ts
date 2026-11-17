@@ -41,7 +41,7 @@ test('Language Arts prompt policy preserves mandatory checkpoints without hijack
   for(const [phrase,mode] of [
     ['Language at checkpoints','checkpoint'],
     ['Reading between rounds','checkpoint'],
-    ['Build words with word tiles inside the game','interaction'],
+    ['Put word tiles inside the game','interaction'],
     ['Put spelling inside the game','interaction'],
     ['Mix reading and word activities','both'],
   ] as const){
