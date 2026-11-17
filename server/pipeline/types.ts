@@ -20,7 +20,7 @@ export interface AgentAdapter {
 export interface BuildRequest { gameId:string; baseRevisionId:string|null; prompt:string; clientRequestId:string; retryOf?:string }
 export interface Job extends BuildRequest {
  execution?:ActionExecution;
-  id:string;familyId:string;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
+  id:string;familyId:string;policyEpoch?:number;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
   maxUnits:number;usedUnits:number;attempts?:number;phase?:string;revisionId?:string;errorCode?:string;retryCount:number;
 }
 export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;adapter?:string }

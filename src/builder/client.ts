@@ -16,7 +16,7 @@ export class BuilderClient {
  constructor(readonly config:BuilderConfig,private update:(job:JobView)=>void){}
  async api(path:string,body?:unknown){
   if(this.config.mode!=='remote')throw Error('BUILDER_UNAVAILABLE');const response=await fetch(this.config.apiBaseUrl+path,{method:body===undefined?'GET':'POST',credentials:'include',headers:body===undefined?{}:{'Content-Type':'application/json','X-Factory-Request':'1'},body:body===undefined?undefined:JSON.stringify(body)});
-  const data=await response.json();if(!response.ok)throw Error(data.errorCode||'BUILDER_UNAVAILABLE');return data;
+  const data=await response.json();if(!response.ok){if(data?.errorCode==='SAFETY_POLICY_BLOCKED')throw Error('Building is paused right now. Your saved game is safe. You can keep playing.');throw Error(data.errorCode||'BUILDER_UNAVAILABLE');}return data;
  }
  async submit(input:RequestChange){this.request={...input};this.requestId=crypto.randomUUID();this.retryOf=undefined;this.last=null;return this.send();}
  async retry(){if(!this.request){if(this.last?.status!=='failed')throw Error('NO_REQUEST');const ack=await this.api('/v1/jobs/'+this.last.jobId+'/retry',{clientRequestId:crypto.randomUUID()});return this.resume(ack.jobId);}if(this.last?.status==='failed'){this.retryOf=this.last.jobId;this.requestId=crypto.randomUUID();}return this.send();}

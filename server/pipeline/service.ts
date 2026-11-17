@@ -27,24 +27,24 @@ export class JobService {
   // A server-owned seed ID binds an approved local manifest/config to this family, not a caller-selected foreign resource.
   return this.repo.transaction(s=>{const id='seed-'+createHash('sha256').update(session.familyId+':'+r.localRevisionId).digest('hex');const existing=s.revisions.find(x=>x.id===id);if(existing&&JSON.stringify(existing.config)!==JSON.stringify(config))throw Error('IDEMPOTENCY_CONFLICT');if(!existing)s.revisions.push({id,familyId:session.familyId,parentId:null,projectId:id,game:null,sourceGame:r.gameId,config});return {revisionId:id};});
  }
- async submit(session:VerifiedSession,input:unknown){
-  requireFamily(session,{id:'submission',familyId:session.familyId});const r=validateBuildRequest(input);
+ async submit(session:VerifiedSession,input:unknown,policyEpoch?:number){
+  requireFamily(session,{id:'submission',familyId:session.familyId});if(policyEpoch!==undefined&&(!Number.isSafeInteger(policyEpoch)||policyEpoch<1))throw Error('SAFETY_POLICY_BLOCKED');const r=validateBuildRequest(input);
   if(this.agent.testFixture&&!this.options.allowMock)throw Error('TEST_FIXTURE_FORBIDDEN');
   if(!this.agent.available||this.agent.kind==='codex-subscription'||this.agent.kind==='local-rule'||(this.agent.kind==='mock'&&!this.options.allowMock))throw Error('BUILDER_UNAVAILABLE');
   return this.repo.transaction(s=>{
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId);
-   if(existing){if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
+   if(existing){if(policyEpoch!==undefined&&existing.policyEpoch!==policyEpoch)throw Error('SAFETY_POLICY_BLOCKED');if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
    if(r.baseRevisionId){const base=s.revisions.find(x=>x.id===r.baseRevisionId);if(!base)throw Error('NOT_FOUND');requireFamily(session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
    let retryCount=0;if(r.retryOf){const prior=s.jobs.find(j=>j.id===r.retryOf);if(!prior)throw Error('NOT_FOUND');requireFamily(session,prior);if(prior.status!=='failed'||prior.gameId!==r.gameId||prior.prompt!==r.prompt||prior.baseRevisionId!==r.baseRevisionId||prior.retryCount>=this.options.maxRetries)throw Error('RETRY_LIMIT');retryCount=prior.retryCount+1;}
    const recent=s.audit.filter(e=>e.familyId===session.familyId&&e.status==='queued'&&Date.parse(e.at)>Date.now()-60000);if(recent.length>=10)throw Error('RATE_LIMIT');
    let ledger=s.ledgers[session.familyId];if(!ledger||ledger.month!==month())ledger=s.ledgers[session.familyId]={allowance:0,used:0,reserved:ledger?.reserved||0,paidEnabled:false,month:month()};
    const maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
    if(maxUnits&&(!ledger.paidEnabled||ledger.used+ledger.reserved+maxUnits>ledger.allowance))throw Error('SPENDING_CUTOFF');
-   ledger.reserved+=maxUnits;const job:Job={...r,id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
+   ledger.reserved+=maxUnits;const job:Job={...r,id:uuid(),familyId:session.familyId,...(policyEpoch===undefined?{}:{policyEpoch}),status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
   });
  }
  async get(session:VerifiedSession,id:string){const j=await this.authorized(session,id);return {jobId:j.id,status:j.status,revisionId:j.revisionId,errorCode:j.errorCode,adapter:j.adapter,phase:j.phase,attempts:j.attempts};}
- async retry(session:VerifiedSession,id:string,clientRequestId:string){const j=await this.authorized(session,id);return this.submit(session,{gameId:j.gameId,baseRevisionId:j.baseRevisionId,prompt:j.prompt,clientRequestId,retryOf:j.id});}
+ async retry(session:VerifiedSession,id:string,clientRequestId:string,policyEpoch?:number){const j=await this.authorized(session,id);return this.submit(session,{gameId:j.gameId,baseRevisionId:j.baseRevisionId,prompt:j.prompt,clientRequestId,retryOf:j.id},policyEpoch);}
  async cancel(session:VerifiedSession,id:string){await this.authorized(session,id);this.controllers.get(id)?.abort();return this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(['queued','building','testing'].includes(job.status)){audit(s,job,'cancelled');s.ledgers[job.familyId].reserved-=job.maxUnits;job.usedUnits=job.maxUnits;s.ledgers[job.familyId].used+=job.maxUnits;}return {jobId:id,status:job.status};});}
  async run(id:string){
   const start=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job||job.status!=='queued')return null;audit(s,job,'building');return job;});if(!start)return;
