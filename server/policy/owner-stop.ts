@@ -26,7 +26,7 @@ export function parseStopArguments(args:readonly string[]):StopArguments {
 /** Monotonic epoch invalidates already queued owner-pilot jobs across stop/resume. */
 export function nextEmergencyPolicy(prior:unknown,now=Date.now()):SafetyPolicyV1 {
  const previous=prior&&typeof prior==='object'?Number((prior as any).epoch):NaN;
- const epoch=Number.isSafeInteger(previous)&&previous>=1&&previous<Number.MAX_SAFE_INTEGER?previous+1:1;
+ const epoch=Number.isSafeInteger(previous)&&previous>=1&&previous<Number.MAX_SAFE_INTEGER?previous+1:now;
  return disabledPolicy(now,epoch);
 }
 async function main(){
