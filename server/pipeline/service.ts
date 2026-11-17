@@ -33,7 +33,7 @@ export class JobService {
   if(!this.agent.available||this.agent.kind==='codex-subscription'||this.agent.kind==='local-rule'||(this.agent.kind==='mock'&&!this.options.allowMock))throw Error('BUILDER_UNAVAILABLE');
   return this.repo.transaction(s=>{
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId);
-   if(existing){if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
+   if(existing){if(policyEpoch!==undefined&&existing.policyEpoch!==policyEpoch)throw Error('SAFETY_POLICY_BLOCKED');if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
    if(r.baseRevisionId){const base=s.revisions.find(x=>x.id===r.baseRevisionId);if(!base)throw Error('NOT_FOUND');requireFamily(session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
    let retryCount=0;if(r.retryOf){const prior=s.jobs.find(j=>j.id===r.retryOf);if(!prior)throw Error('NOT_FOUND');requireFamily(session,prior);if(prior.status!=='failed'||prior.gameId!==r.gameId||prior.prompt!==r.prompt||prior.baseRevisionId!==r.baseRevisionId||prior.retryCount>=this.options.maxRetries)throw Error('RETRY_LIMIT');retryCount=prior.retryCount+1;}
    const recent=s.audit.filter(e=>e.familyId===session.familyId&&e.status==='queued'&&Date.parse(e.at)>Date.now()-60000);if(recent.length>=10)throw Error('RATE_LIMIT');
