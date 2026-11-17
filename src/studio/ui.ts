@@ -103,7 +103,7 @@ export async function installStudio(){
    }
    play.type='button';play.onclick=()=>act(home);
    const practice=el('button','studio-button','⚡ Extra practice (optional)') as HTMLButtonElement;
-   practice.type='button';practice.onclick=()=>act(()=>{if(guardMath())return;flushDraft();disposeGame();FG.app.page('lab');route='other';});
+   practice.type='button';practice.onclick=()=>act(()=>{if(guardMath())return;voice?.cancel();flushDraft();disposeGame();FG.app.page('lab');route='other';});
    actions.append(play,practice);buildShelf.append(actions);
   }
  }
