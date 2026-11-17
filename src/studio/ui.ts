@@ -69,7 +69,7 @@ export async function installStudio(){
  const globalStatus=el('div','studio-status');globalStatus.id='studioGlobalStatus';globalStatus.setAttribute('role','status');globalStatus.setAttribute('aria-live','polite');globalStatus.setAttribute('aria-atomic','true');document.querySelector('main')!.prepend(globalStatus);
  // Background builds are visible on every Studio screen without taking focus.
  const buildShelf=el('aside','studio-build-shelf');buildShelf.id='studioBuildShelf';
- buildShelf.setAttribute('aria-label','Background game builds');buildShelf.hidden=true;nav.after(buildShelf);
+ buildShelf.setAttribute('aria-label','Background game builds');buildShelf.hidden=true;globalStatus.after(buildShelf);
  function refreshShelf(){
   const jobs=notebook.list(owner()).filter(s=>s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
