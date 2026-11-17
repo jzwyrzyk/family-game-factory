@@ -13,7 +13,7 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Request');res.setHeader('Access-Control-Allow-Methods','GET,POST');res.writeHead(204);res.end();return;}
    const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('factory_session='))?.slice(16);
    const session=verifySession(token,config.sessionKey);const path=new URL(req.url!,'http://internal').pathname;
-   if(path==='/v1/coach/status'&&req.method==='GET')return send(200,{available:service.available(),mode:service.available()?'model':'unavailable'});
+   if(path==='/v1/coach/status'&&req.method==='GET'){const available=await service.familyAvailable(session);return send(200,{available,mode:available?'model':'unavailable'});}
    if(path!=='/v1/coach'||req.method!=='POST')return send(404,{errorCode:'NOT_FOUND'});
    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>50000)throw Error('INVALID_REQUEST');}
