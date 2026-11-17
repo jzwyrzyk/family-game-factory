@@ -1,5 +1,7 @@
 import {CoachService} from './coach/service';
-import {PrivateCoachBroker} from './coach/broker';
+import {PrivateCoachBroker,PrivateSpeechBroker} from './coach/broker';
+import {CoachAudioService} from './coach/speech';
+import {speechConfig,speechHttpHandler} from './coach/audio-http';
 import {coachConfig,coachHandler} from './coach/http';
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {createServer} from 'node:http';
@@ -50,6 +52,8 @@ export async function createGateway(config:GatewayConfig){
  const settings=coachConfig(process.env);
  const broker=new PrivateCoachBroker({origin:process.env.FACTORY_COACH_BROKER_ORIGIN||''});
  const coach=coachHandler(new CoachService(repo,settings,broker),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
+ const speech=speechHttpHandler(new CoachAudioService(repo,speechConfig(process.env),
+  new PrivateSpeechBroker({origin:process.env.FACTORY_COACH_BROKER_ORIGIN||''})),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
  const api=apiHandler(service,http),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
@@ -60,7 +64,10 @@ export async function createGateway(config:GatewayConfig){
   if(url.pathname==='/v1/internal/dispatch'){
    try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
   }
-  if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'){await coach(req,res);return;}
+  if(url.pathname==='/v1/coach/audio'||url.pathname==='/v1/coach/audio/status'){
+    await speech(req,res);return;
+   }
+   if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'){await coach(req,res);return;}
   if(url.pathname==='/v1/sessions'){await sessions(req,res);return;}
   await api(req,res);
  }};
