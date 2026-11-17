@@ -139,6 +139,10 @@ export function installStudioVoice(ui:StudioVoiceOptions){
    window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);
   }catch{announce('Could not read this reply aloud. It is still shown as text.');}
  }
+ function armReply(){
+  // Only call after a child explicitly speaks through an approved mic.
+  voiceScope=ui.scope();speakAfterVoice=true;
+ }
  function reply(text:string){
   spokenReply=text.slice(0,1800);ui.hearReply.disabled=!spokenReply;
   if(speakAfterVoice&&voiceScope===ui.scope())speak(spokenReply);
@@ -148,5 +152,8 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  ui.installPack.onclick=()=>{void installPack();};
  ui.hearReply.onclick=()=>{if(spokenReply)speak(spokenReply);};
  ui.hearReply.disabled=true;buttons();
- return {cancel,reply,listen};
+ if(typeof window.addEventListener==='function')window.addEventListener('pagehide',cancel);
+ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)cancel();});
+ return {cancel,reply,listen,armReply};
 }
