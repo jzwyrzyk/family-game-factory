@@ -11,6 +11,7 @@ interface Hooks {
  rules():string;playTest(id:string):Promise<void>;playMain():Promise<void>;combineTests(ids:string[]):Promise<void>;
  pauseForThinking():boolean;showTalk():void;
  onCoachReply?(text:string):void;
+ onCoachState?(state:'connected'|'limited'|'sign-in'|'unavailable'):void;
 }
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
@@ -78,7 +79,7 @@ export function installCoaching(h:Hooks){
   }catch(error){if(!token||token===requestGeneration)report(error,captured);}finally{if(token&&token===requestGeneration){force=false;requestInFlight=false;origin='child';depth='tune';}}
  }
  function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession){
-  h.message(captured,'helper',(mode==='local'?'jems · offline helper: ':'jems · AI helper: ')+reply.text+(reply.question?'\n'+reply.question:''));
+  h.message(captured,'helper',reply.text+(reply.question?'\n'+reply.question:''));
   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();let changed=false;for(const d of reply.childDecisions||[]){if(!s.design.plan[d.field]?.accepted){s.design.plan[d.field]={value:d.quote,origin:'child',accepted:true,delegated:false};changed=true;}}for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:current?.delegated||false};changed=true;}}if(changed)s.design.approvedPlan=false;});
   const box=$('coachProposals');box.replaceChildren();
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
@@ -99,13 +100,15 @@ export function installCoaching(h:Hooks){
    h.message(captured,'child',text);
    if(firstIdea&&isCurrent(captured))celebrateJem('idea','studioConversation');
    const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
-   let reply:CoachReply,used:'model'|'local'='local';
+   let reply:CoachReply,used:'model'|'local'='local',reason='';
    try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
     const response=await fetch(config.apiBaseUrl+'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
     const data=await response.json();if(!response.ok)throw Error(data.errorCode||'COACH_UNAVAILABLE');if(data.mode!=='model')throw Error('COACH_UNAVAILABLE');reply=validateCoachReply(data.reply,c);used='model';
-   }catch(error){if(turn.signal.aborted)return;reply=localCoach(c);}
+   }catch(error){if(turn.signal.aborted)return;reason=error instanceof Error?error.message:'COACH_UNAVAILABLE';reply=localCoach(c);}
    if(seq!==generation||!isCurrent(captured))return;
-   present(reply,used,captured);$('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
+   present(reply,used,captured);
+   h.onCoachState?.(used==='model'?'connected':reason==='UNAUTHENTICATED'||reason==='FORBIDDEN'?'sign-in':h.config().mode==='remote'?'limited':'unavailable');
+   $('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
    // A reply may arrive after the child has started another thought. Preserve it
    // immediately, including edits whose ordinary draft debounce has not fired yet.
    const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
@@ -115,7 +118,7 @@ export function installCoaching(h:Hooks){
  }
  async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
-  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
+  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();plan.scrollIntoView({block:'nearest'});return true;}return false;}
   if(h.localSupported(prompt))return false;
   // The legacy implicit-send path stays conversational; explicit Try means build/plan.
   await discuss('discuss',prompt);return true;
