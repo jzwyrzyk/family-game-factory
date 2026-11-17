@@ -17,7 +17,9 @@ const fs=require('node:fs');
  fs.mkdirSync('test-results',{recursive:true});
  try{
   for(const [label,width,height] of [['desktop',1280,900],['mobile',390,844]]){
-   const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile',serviceWorkers:'block'}),errors=[];
+   // Use normal browser contexts. Chromium's serviceWorker blocking shim can itself
+   // throw inside sandboxed no-same-origin previews; offline tests exercise that separately.
+   const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile'}),errors=[];
    page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(15000);
    page.on('pageerror',e=>errors.push((e.stack||e.message)));await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
@@ -95,7 +97,7 @@ const fs=require('node:fs');
    console.log('PASS jems brand page:',label);
    await page.close();
   }
-  const legacy=await browser.newPage({serviceWorkers:'block'});legacy.setDefaultTimeout(12000);
+  const legacy=await browser.newPage();legacy.setDefaultTimeout(12000);
   console.log('jems brand: checking legacy route');
   await legacy.goto(base+'?arcade=1');await legacy.waitForFunction(()=>window.FG?.app);
   assert.equal(await legacy.locator('.jems-brand-logo').count(),1);
