@@ -24,9 +24,9 @@ export default class RobotRoute implements GameInstance {
  private plan:Direction[]=[];private trail:Point[]=[];private position:Point={x:0,y:4};
  private level=1;private index=0;private running=false;private ended=false;private stopped=false;private hostPaused=false;
  private last=0;private accumulator=0;private raf=0;
- private readonly showTrail:boolean;private readonly speed:number;
+ private readonly showTrail:boolean;private readonly speed:number;private readonly portalEnabled:boolean;
  constructor(target:HTMLElement,private context:GameContext){
-  this.speed=Number(context.config.robotSpeed);this.showTrail=Boolean(context.config.showTrail);
+  this.speed=Number(context.config.robotSpeed);this.showTrail=Boolean(context.config.showTrail);this.portalEnabled=Boolean(context.config.portalEnabled);
   this.canvas.width=620;this.canvas.height=500;this.canvas.className='favorite-canvas';
   this.canvas.tabIndex=0;this.canvas.setAttribute('role','img');this.canvas.setAttribute('aria-label','Robot grid. Choose arrow commands, then press Run my plan.');
   this.ctx=this.canvas.getContext('2d')!;
@@ -87,8 +87,12 @@ export default class RobotRoute implements GameInstance {
  private step(){
   if(!this.running||this.hostPaused)return;
   if(this.index>=this.plan.length){this.running=false;this.instructions.textContent='Not there yet. What arrow would you change or add?';return;}
-  const next=move(this.position,this.plan[this.index++]);
+  let next=move(this.position,this.plan[this.index++]);
   if(!this.legal(next)){this.running=false;this.instructions.textContent='Bonk! Your robot hit a wall. Undo a move or try a different route.';return;}
+  if(this.portalEnabled&&next.x===0&&next.y===2){
+   this.trail.push({...next});next={x:4,y:2};
+   this.instructions.textContent='Whoosh! Your robot used the portal. Where will it go next?';
+  }
   this.position=next;this.trail.push({...next});this.save();
   const goal=this.mission().goal;
   if(next.x===goal.x&&next.y===goal.y){
@@ -109,6 +113,11 @@ export default class RobotRoute implements GameInstance {
   if(this.showTrail&&this.trail.length>1){
    c.strokeStyle='#5a9ed6';c.lineWidth=7;c.lineJoin='round';c.beginPath();
    this.trail.forEach((p,i)=>i?c.lineTo(x0+p.x*size+size/2,y0+p.y*size+size/2):c.moveTo(x0+p.x*size+size/2,y0+p.y*size+size/2));c.stroke();
+  }
+  if(this.portalEnabled){
+   for(const [p,color] of [[{x:0,y:2},'#8b62e5'],[{x:4,y:2},'#f0a14c']] as const){
+    c.strokeStyle=color;c.lineWidth=6;c.beginPath();c.arc(x0+p.x*size+size/2,y0+p.y*size+size/2,24,0,Math.PI*2);c.stroke();
+   }
   }
   const goal=this.mission().goal;c.fillStyle='#eba944';c.font='44px system-ui';c.textAlign='center';c.textBaseline='middle';
   c.fillText('⭐',x0+goal.x*size+size/2,y0+goal.y*size+size/2);
