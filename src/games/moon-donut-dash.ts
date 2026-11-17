@@ -15,10 +15,11 @@ export default class MoonDonutDash implements GameInstance {
  private raf=0;private last=0;private accumulator=0;private level=1;private frame=0;
  private x=75;private y=398;private vy=0;private collected=0;private hearts=3;private invulnerable=0;
  private donuts:Donut[]=[];private meteors:Meteor[]=[];private ended=false;private stopped=false;private hostPaused=false;
- private readonly goal:number;private readonly gravity:number;private readonly rate:number;
+ private readonly goal:number;private readonly gravity:number;private readonly rate:number;private readonly bouncePads:boolean;
+ private padCooldown=0;
  constructor(target:HTMLElement,private context:GameContext) {
   this.goal=Number(context.config.donutGoal);this.gravity=Number(context.config.moonGravity);
-  this.rate=Number(context.config.meteorRate);
+  this.rate=Number(context.config.meteorRate);this.bouncePads=Boolean(context.config.bouncePads);
   this.canvas.width=900;this.canvas.height=480;this.canvas.className='favorite-canvas';this.canvas.tabIndex=0;
   this.canvas.setAttribute('role','img');this.canvas.setAttribute('aria-label','Moon donut course with cat, donuts and falling meteors');
   this.ctx=this.canvas.getContext('2d')!;
@@ -60,7 +61,7 @@ export default class MoonDonutDash implements GameInstance {
   if(ok===false)this.note.textContent='Could not save your mission. Keep this page open and ask a grown-up to export progress.';
  }
  private reset(){
-  this.x=75;this.y=398;this.vy=0;this.frame=0;this.collected=0;this.hearts=3;this.invulnerable=0;
+  this.x=75;this.y=398;this.vy=0;this.padCooldown=0;this.frame=0;this.collected=0;this.hearts=3;this.invulnerable=0;
   this.ended=false;this.hostPaused=false;this.pressed.clear();this.heldPointers.clear();this.donuts=[{x:160,y:388},{x:350,y:388},{x:565,y:388}];this.meteors=[];
   this.hud.textContent='🍩 0 / '+this.goal+'     ❤️❤️❤️     Level '+this.level;
   this.note.textContent='Collect donuts, avoid falling rocks. Jump using ↑, Space or the button.';
@@ -75,6 +76,11 @@ export default class MoonDonutDash implements GameInstance {
   const right=this.pressed.has('arrowright')||this.pressed.has('d')||[...this.heldPointers.values()].includes('right');
   this.x=Math.max(25,Math.min(875,this.x+(Number(right)-Number(left))*4.1));
   this.vy=Math.min(10,this.vy+this.gravity);this.y=Math.min(398,this.y+this.vy);if(this.y>=398)this.vy=0;
+  if(this.padCooldown>0)this.padCooldown--;
+  if(this.bouncePads&&this.padCooldown===0&&this.y>=392&&this.x>=405&&this.x<=470){
+   this.vy=-14.5;this.y=391;this.padCooldown=60;
+   this.note.textContent='Boing! Your bounce pad launched the cat!';this.save();
+  }
   if(this.invulnerable>0)this.invulnerable--;
   for(let i=this.donuts.length-1;i>=0;i--){
    const d=this.donuts[i];if(Math.hypot(this.x-d.x,this.y-d.y)<36){
@@ -104,6 +110,10 @@ export default class MoonDonutDash implements GameInstance {
   c.fillStyle='#f4e6be';c.beginPath();c.arc(762,91,53,0,Math.PI*2);c.fill();
   c.fillStyle='#d4c69f';for(const [x,y,r] of [[748,73,12],[786,101,9],[753,112,6]]){c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
   c.fillStyle='#a5b5c6';c.beginPath();c.moveTo(0,412);for(let x=0;x<=900;x+=40)c.lineTo(x,410+Math.sin(x*.018)*12);c.lineTo(900,480);c.lineTo(0,480);c.fill();
+  if(this.bouncePads){c.fillStyle='#82dcad';c.fillRect(395,417,90,12);
+   c.fillStyle='#315b59';c.fillRect(405,423,70,8);c.strokeStyle='#d0fff0';c.lineWidth=3;
+   c.beginPath();c.moveTo(407,415);c.quadraticCurveTo(415,405,423,415);c.quadraticCurveTo(432,405,440,415);
+   c.quadraticCurveTo(451,405,465,415);c.stroke();}
   for(const d of this.donuts){c.fillStyle='#e2a75a';c.beginPath();c.arc(d.x,d.y,18,0,Math.PI*2);c.fill();
    c.fillStyle='#fa8fb4';c.beginPath();c.arc(d.x,d.y,15,Math.PI*1.05,Math.PI*2.95);c.fill();
    c.fillStyle='#45567d';c.beginPath();c.arc(d.x,d.y,7,0,Math.PI*2);c.fill();
