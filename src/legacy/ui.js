@@ -121,7 +121,7 @@ function renderParentReports(p){
  }
 }
 function saveParent(){
- const grade=Number($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.store.current().learningSubject:choice,facts=choice!=='language'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
+ const grade=Number($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.learning.subject:choice,facts=choice!=='language'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
  if(facts.length>20||facts.some(x=>!/^(?:[1-9]|1[0-2])x(?:[1-9]|1[0-2])$/.test(x))){alert('Use up to 20 facts like 8x7, with numbers from 1 to 12. Settings have not changed.');return;}
  try{FG.store.changeProfile({name:$('parentNickname').value,grade,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,allowSubjectSwitch:choice==='both',languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
 }

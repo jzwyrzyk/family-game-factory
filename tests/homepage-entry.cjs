@@ -38,10 +38,8 @@ const {start}=require('./browser-server.cjs');
    await page.selectOption('#parentSubject','both');
    await page.click('#saveParent');
    const savedPermission=await page.evaluate(()=>({allowed:window.FG.store.current().allowSubjectSwitch,subject:window.FG.learning.subject,active:window.FG.learning.active,loadError:window.FG.store.loadError,parentChoice:document.querySelector('#parentSubject').value,handler:typeof document.querySelector('#saveParent').onclick,grade:window.FG.store.current().grade}));
-   if(savedPermission.allowed!==true){
-     const directStoreProbe=await page.evaluate(()=>{try{window.FG.store.changeProfile({allowSubjectSwitch:true});return {saved:window.FG.store.current().allowSubjectSwitch}}catch(e){return {error:String(e)}}});
-     throw Error('Parent Both save failed (diagnostic only): '+JSON.stringify({savedPermission,dialogs,directStoreProbe,errors}));
-   }
+   assert.equal(savedPermission.allowed,true,'a first-time profile can enable Both: '+JSON.stringify({savedPermission,dialogs,errors}));
+   assert.ok(dialogs.some(message=>message.startsWith('Learning settings saved')),'parent saved settings successfully: '+JSON.stringify(dialogs));
    await page.click('#studioNavHome');
    const homePermission=await page.evaluate(()=>({allowed:window.FG.store.current().allowSubjectSwitch,subject:window.FG.learning.subject,active:window.FG.learning.active,loadError:window.FG.store.loadError,disabled:document.querySelector('#studioSubjectLanguage').disabled}));
    assert.equal(await page.locator('#studioSubjectLanguage').isDisabled(),false,'both-enabled homepage selector must unlock: '+JSON.stringify(homePermission));
