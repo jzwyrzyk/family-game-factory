@@ -29,8 +29,10 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
   try{
     await page.goto(base);
     await page.waitForFunction(()=>window.FG?.learning&&window.FG?.app);
-    const oldMath=await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null));
     await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+    // Parent reports may legitimately initialize the empty legacy math-v2 record.
+    // Compare after initial parent view, before any subject edit, to test actual preservation.
+    const oldMath=await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null));
     assert.deepEqual(await page.locator('#parentSubject option').evaluateAll(els=>els.map(el=>(el as HTMLOptionElement).value)),['math','language']);
     await page.selectOption('#parentGrade','2');
     await page.selectOption('#parentSubject','language');
