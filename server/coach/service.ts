@@ -3,6 +3,7 @@ import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type Coa
 import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {COACH_POLICY,COACH_SCHEMA} from './policy';
+import {allowedCoachFamily} from './consent';
 export interface CoachConfig {
  enabled:boolean;privacyApproved:boolean;moderationApproved:boolean;
  zdrApproved?:boolean;familyConsentApproved?:boolean;brokerApproved?:boolean;brokerOrigin?:string;
@@ -55,6 +56,10 @@ export class CoachService {
   complete:async()=>{throw Error('COACH_UNAVAILABLE');}
  }){}
  available(){return approved(this.config);}
+ async familyAvailable(session:VerifiedSession):Promise<boolean>{
+  if(!this.available())return false;
+  return allowedCoachFamily(await this.repo.snapshot(),session,'model');
+ }
  async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'}>{
   if(!this.available())throw Error('COACH_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
@@ -65,6 +70,7 @@ export class CoachService {
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
   const hash=createHash('sha256').update(serialized).digest('hex'),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
   const reservation=await this.repo.transaction(state=>{
+   if(!allowedCoachFamily(state,session,'model',now))throw Error('COACH_UNAVAILABLE');
    state.coachReceipts ||= [];const list=state.coachReceipts;
    // Hash-only: no child words or model replies retained in server receipts.
     for(let i=list.length-1;i>=0;i--)if(list[i].at<now-7*86400000)list.splice(i,1);
