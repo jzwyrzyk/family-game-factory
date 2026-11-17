@@ -332,3 +332,101 @@ body:not(.studio-review) .btn.primary{background:var(--jems-action-blue);border-
   .studio-review .studio-starter,
   .studio-review .studio-library-card {transition:none!important;transform:none!important}
 }
+
+/* Screenshot QA: restore legible text on newly light panels while preserving dark playable games.
+   Verified failure surfaces: desktop/mobile Home, Parent Controls, My Powers,
+   Math interaction and optional legacy Arcade after the light-mode conversion. */
+
+/* The global display-heading rule is Ink by default; the creation tile needs white. */
+body.studio-review .studio-make-tile .studio-make-copy strong,
+body.studio-review .studio-make-tile .studio-make-copy small { color:#FFFFFF; }
+body.studio-review .studio-make-tile .studio-make-icon { color:#FFFFFF; }
+
+/* Only parent/learning and other content panels are light; keep game canvases intact. */
+body.studio-review #page-parent .panel,
+body.studio-review #page-lab .panel,
+body.studio-review #page-create .panel,
+body.studio-review #page-feedback .panel,
+body:not(.studio-review) .page .panel { color:var(--jems-ink); }
+
+#page-parent .panel label:not(.check-row),
+#page-create .panel label:not(.check-row),
+#page-feedback .panel label:not(.check-row),
+#page-creations .panel label:not(.check-row),
+#page-parent .panel .check-row,
+#page-parent .panel .stat-title,
+#page-parent .panel .skill-meter,
+#page-parent .panel .learning-progress-card,
+#page-lab #skill-report,
+#page-lab #skill-report .learning-progress-card,
+#page-lab .panel .learning-adventure-note,
+#page-create .panel legend,
+#page-feedback .panel legend {
+ color:#344466;
+}
+#page-parent .panel .stat-title,
+#page-parent .panel .learning-progress-card .row,
+#page-parent .panel .skill-meter .row,
+#page-lab #skill-report .learning-progress-card .row,
+#page-lab #skill-report .skill-meter .row {color:var(--jems-ink);}
+#page-parent .panel .learning-progress-card small,
+#page-lab #skill-report .learning-progress-card small {color:#556684;}
+#page-parent .panel .learning-state,
+#page-lab #skill-report .learning-state{color:#0B7159;}
+
+/* Dark Math activity is a self-contained high-contrast reading surface.
+   Avoid inheriting the dark Ink headline color used on white cards. */
+body.studio-review .math-activity,
+body.studio-review .math-activity h2,
+body.studio-review .math-activity .math-prompt,
+body:not(.studio-review) .math-activity h2 {color:#FFFFFF;}
+body.studio-review .math-activity h3,
+body:not(.studio-review) .math-activity h3 {color:#A8ECDD;}
+body.studio-review .math-activity .math-hint h3 {color:#8CE7D1;}
+body.studio-review .math-activity .math-visual figcaption {color:#D3DEF1;}
+body.studio-review .math-activity .math-activity-label {color:#E9F2FF;}
+
+/* The optional old Arcade is now light like Studio, not a partly dark relic. */
+body:not(.studio-review) .profile-bar {
+ background:#F5F1FF;border-color:#E4DAF5;
+}
+body:not(.studio-review) .profile-label,
+body:not(.studio-review) .local-pill {color:#4A5774;}
+body:not(.studio-review) .profile-choice {
+ background:#FFFFFF;color:#334569;border-color:#C8CDE4;
+}
+body:not(.studio-review) .profile-choice.active{
+ background:#E6D8FF;color:#4B278D;border-color:#BEA3EB;
+}
+body:not(.studio-review) .hero p {color:#455574;}
+body:not(.studio-review) .hero .btn.ghost {
+ color:#522C9D;background:#F0E8FF;border:1px solid #BDA4F3;
+}
+body:not(.studio-review) .hero .btn.ghost:hover {
+ background:#E6D8FF;color:#482187;
+}
+body:not(.studio-review) .game-card .tag,
+body:not(.studio-review) .tag {color:#0C7466;}
+body:not(.studio-review) .home-footer strong,
+body:not(.studio-review) .home-footer h2,
+body:not(.studio-review) .home-footer h3 {color:#FFFFFF;}
+body:not(.studio-review) footer .text-btn {
+ color:#6732C5;min-height:44px;
+}
+
+/* Inputs remain visually calm and readable inside white legacy forms. */
+body:not(.studio-review) :is(#page-create,#page-feedback,#page-parent,#page-creations) :is(input:not([type="checkbox"]):not([type="range"]),select,textarea),
+body:not(.studio-review) #page-feedback .live-factory select {
+ background:#FFFFFF;color:var(--jems-ink);border:1px solid #BDC7E0;
+ border-radius:var(--jems-radius-sm);
+}
+body:not(.studio-review) .page .panel .btn.secondary{
+ background:#F2ECFF;color:#513099;border:1px solid #C8B4F1;
+}
+body:not(.studio-review) #page-feedback .live-factory {color:var(--jems-ink);}
+body:not(.studio-review) #page-feedback .live-factory label {color:#344466;}
+
+/* Preserve legible titles in *dark* modal overlays; these are not white panels. */
+.stage-overlay .modal-card,.studio-review .studio-native-game .modal-card {color:#FFFFFF;}
+.stage-overlay .modal-card h2,.stage-overlay .modal-card h3,
+.studio-review .studio-native-game .modal-card h2 {color:#FFFFFF;}
