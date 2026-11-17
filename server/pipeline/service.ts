@@ -20,6 +20,14 @@ export class JobService {
  private controllers=new Map<string,AbortController>();
  constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
  private async authorized(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),job=state.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireFamily(session,job);return job;}
+ /** Read-only, family-authorized availability. This is NOT evidence that a job started. */
+ async readiness(session:VerifiedSession):Promise<{available:boolean;reason:'READY'|'UNAVAILABLE'|'ALLOWANCE_REQUIRED'}>{
+  requireFamily(session,{id:'readiness',familyId:session.familyId});
+  if(!this.agent.available||this.agent.kind==='local-rule'||this.agent.kind==='codex-subscription'||(this.agent.kind==='mock'&&!this.options.allowMock))return {available:false,reason:'UNAVAILABLE'};
+  const state=await this.repo.snapshot(),ledger=state.ledgers[session.familyId],maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
+  if(maxUnits&&(!ledger||!ledger.paidEnabled||ledger.month!==month()||ledger.used+ledger.reserved+maxUnits>ledger.allowance))return {available:false,reason:'ALLOWANCE_REQUIRED'};
+  return {available:true,reason:'READY'};
+ }
  async setAllowance(session:VerifiedSession,allowance:number,paidEnabled:boolean){requireFamily(session,{id:'budget',familyId:session.familyId});if(session.role!=='parent'||!Number.isInteger(allowance)||allowance<0||allowance>50000000)throw Error('FORBIDDEN');await this.repo.transaction(s=>{const old=s.ledgers[session.familyId];s.ledgers[session.familyId]={month:month(),allowance,paidEnabled,used:old?.month===month()?old.used:0,reserved:old?.reserved||0};return true;});}
  async registerBase(session:VerifiedSession,input:unknown){
   requireFamily(session,{id:'base',familyId:session.familyId});const r=input as {gameId:string;localRevisionId:string;config:unknown};
