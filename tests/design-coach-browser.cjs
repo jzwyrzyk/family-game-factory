@@ -47,6 +47,7 @@ async function load(page,url,saved={}){
    }
    Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:PrivateSpeech});
   });
+  await page.fill('#studioPrompt','An unsent typed thought');
   await page.click('#studioMic');
   await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
   await page.evaluate(()=>{
@@ -55,6 +56,7 @@ async function load(page,url,saved={}){
    mic.onend();
   });
   await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('What if the dragon sneezes noodles?')&&document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  assert.equal(await page.locator('#studioPrompt').inputValue(),'An unsent typed thought','spoken conversation must not erase a different typed draft');
   assert.equal((await session()).experiments.length,0,'speaking must chat, not build');
   assert.equal((await projects())[0].headId,baseline,'voice must not change game versions');
   await page.fill('#studioPrompt',"I don't know");await page.click('#studioSend');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);

@@ -85,7 +85,7 @@ export function installCoaching(h:Hooks){
   renderPlan();
   h.onCoachReply?.(reply.text+(reply.question?' '+reply.question:''));
  }
- async function discuss(mode:CoachContext['mode'],supplied?:string){
+ async function discuss(mode:CoachContext['mode'],supplied?:string,preserveDraft=false){
   let captured:StudioSession|undefined,seq=0,turn:AbortController|undefined;
   try{
    captured=h.current();const input=$<HTMLTextAreaElement>('studioPrompt'),submittedDraft=input.value,submittedVersion=promptVersion;
@@ -104,7 +104,7 @@ export function installCoaching(h:Hooks){
    present(reply,used,captured);$('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
    // A reply may arrive after the child has started another thought. Preserve it
    // immediately, including edits whose ordinary draft debounce has not fired yet.
-   const nextDraft=promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
+   const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
    h.notebook.update(captured.id,captured.owner,s=>{s.draft=nextDraft;});input.value=nextDraft;h.render();
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
   finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}

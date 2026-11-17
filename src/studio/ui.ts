@@ -416,7 +416,7 @@ export async function installStudio(){
    if(reflecting){
     $<HTMLTextAreaElement>('studioPrompt').value=text;flushDraft();await submit();voice?.cancel();return;
    }
-   await coaching?.discuss('discuss',text);
+   await coaching?.discuss('discuss',text,true);
   }
  });
  installStudioRemixRouting({
