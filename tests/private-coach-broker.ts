@@ -5,6 +5,7 @@ import {privateCoachHandler} from '../server/coach/private-http';
 import {VertexChildCoachProvider,vertexAccessToken} from '../server/coach/vertex';
 import {CoachService,approved,type CoachConfig} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
+import {setOwnerCoachConsent} from '../server/coach/consent';
 import type {CoachContext,CoachReply} from '../src/studio/design';
 
 const origin='https://private-coach-example.a.run.app';
@@ -132,6 +133,9 @@ async function main(){
  await test('gateway spending ledger and receipt stay text-free after broker response',async()=>{
   const repo=new MemoryRepository();const family='synthetic-family';
   await repo.transaction(s=>{s.ledgers[family]={allowance:1000000,used:0,reserved:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};return true;});
+  await setOwnerCoachConsent(repo,{subject:'guardian-one',familyId:family,role:'parent',expiresAt:Date.now()+3600000},
+   {familyId:family,model:true,audio:true,verifiedByAdult:true,
+    verificationReceipt:'synthetic-guardian-proof-001',expiresAt:Date.now()+30*86400000});
   const service=new CoachService(repo,config,{complete:async()=>({reply,usedMicroUsd:80})});
   const session={subject:'synthetic-child',familyId:family,role:'designer' as const,expiresAt:Date.now()+100000};
   const r=await service.respond(session,{requestId:'synthetic-turn-1',context});assert.equal(r.reply.text,reply.text);

@@ -4,6 +4,7 @@ import {StudioNotebook,STUDIO_KEY,type Candidate} from '../src/studio/notebook';
 import {CoachService,OpenAICoachProvider,type CoachConfig} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {COACH_POLICY} from '../server/coach/policy';
+import {setOwnerCoachConsent} from '../server/coach/consent';
 import {installCoaching} from '../src/studio/coaching';
 class Memory {data=new Map<string,string>();fail=false;getItem(k:string){return this.data.get(k)??null}setItem(k:string,v:string){if(this.fail)throw Error('quota');this.data.set(k,v)}}
 
@@ -190,6 +191,9 @@ await test('conversation coach respects either required learning subject',()=>{a
 const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,zdrApproved:true,familyConsentApproved:true,brokerApproved:true,brokerOrigin:'https://private-coach-example.a.run.app',model:'synthetic-model',apiKey:'synthetic-secret',maxInputChars:16000,maxOutputTokens:500,maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,pricesReviewedAt:new Date().toISOString()};
 const session={subject:'synthetic-designer',familyId:'family-test',role:'designer' as const,expiresAt:Date.now()+60000};
 const repo=new MemoryRepository();await repo.transaction(s=>{s.ledgers[session.familyId]={allowance:50000,reserved:0,used:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};return true;});
+ await setOwnerCoachConsent(repo,{subject:'guardian-one',familyId:session.familyId,role:'parent',expiresAt:Date.now()+3600000},
+  {familyId:session.familyId,model:true,audio:true,verifiedByAdult:true,
+   verificationReceipt:'synthetic-guardian-proof-001',expiresAt:Date.now()+30*86400000});
 let calls=0;const provider={complete:async()=>{calls++;return {reply,usedMicroUsd:100};}};
 const service=new CoachService(repo,config,provider);
 await test('real service contract uses authorized budgeted provider port',async()=>{const r=await service.respond(session,{requestId:'req1',context});assert.equal(r.mode,'model');assert.equal(r.reply.move,'clarify');assert.equal(calls,1);const ledger=(await repo.snapshot()).ledgers[session.familyId];assert.equal(ledger.used,100);assert.equal(ledger.reserved,0);});
@@ -207,7 +211,7 @@ await test('child-authorship requires an exact child quote, not a helper paraphr
 await test('input moderation refuses before an inference request',async()=>{let inference=0;const p=new OpenAICoachProvider(config,async url=>{if(!String(url).endsWith('/moderations'))inference++;return new Response(JSON.stringify({results:[{flagged:true}]}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(inference,0);});
 await test('output moderation prevents an unsafe response from reaching the child',async()=>{let mod=0;const p=new OpenAICoachProvider(config,async url=>{if(String(url).endsWith('/moderations'))return new Response(JSON.stringify({results:[{flagged:++mod===2}]}));return new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(mod,2);});
 await test('invalid model output never mutates a game or becomes a trusted plan',async()=>{const bad=new CoachService(repo,config,{complete:async()=>({reply:{...reply,tool:'change-main'},usedMicroUsd:4})});await assert.rejects(bad.respond(session,{requestId:'bad-output',context}),/Invalid coach response/);assert.equal((await repo.snapshot()).coachReceipts!.find(r=>r.id==='bad-output')!.state,'failed');});
-await test('request IDs cannot leak another family response',async()=>{const other={...session,familyId:'other-family'};await assert.rejects(service.respond(other,{requestId:'req1',context}),/SPENDING_CUTOFF/);});
+await test('request IDs cannot leak another family response',async()=>{const other={...session,familyId:'other-family'};await assert.rejects(service.respond(other,{requestId:'req1',context}),/COACH_UNAVAILABLE/);});
 console.log(`${passed} design-coach tests passed. Model outputs are fixtures; no live inference or learning efficacy is claimed.`);
 
 }

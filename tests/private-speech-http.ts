@@ -5,6 +5,7 @@ import {PrivateSpeechBroker} from '../server/coach/broker';
 import {speechHttpHandler} from '../server/coach/audio-http';
 import {privateCoachHandler} from '../server/coach/private-http';
 import {MemoryRepository} from '../server/pipeline/repository';
+import {setOwnerCoachConsent} from '../server/coach/consent';
 import {signSession} from '../server/pipeline/auth';
 import type {CoachConfig} from '../server/coach/service';
 const origin='https://private-coach-example.a.run.app',appOrigin='https://family-studio.test';
@@ -62,6 +63,9 @@ async function main(){
  await test('audio gateway family reserve, hash-only receipts, no replay billing, owner and budget gates',async()=>{
   const repo=new MemoryRepository();const family='synthetic-family';
   await repo.transaction(s=>{s.ledgers[family]={allowance:100000,used:0,reserved:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};return true;});
+  await setOwnerCoachConsent(repo,{subject:'guardian-one',familyId:family,role:'parent',expiresAt:Date.now()+3600000},
+   {familyId:family,model:true,audio:true,verifiedByAdult:true,
+    verificationReceipt:'synthetic-guardian-proof-001',expiresAt:Date.now()+30*86400000});
   let calls=0;
   const service=new CoachAudioService(repo,speech,{transcribe:async()=>{calls++;return 'Flying noodles!';}});
   const session={subject:'player-one',familyId:family,role:'designer' as const,expiresAt:Date.now()+60000};
@@ -80,6 +84,9 @@ async function main(){
  await test('audio HTTP requires family cookie, Origin/CSRF, and does not enable by default',async()=>{
   const repo=new MemoryRepository(),key='session-signing-key-for-synthetic-tests-only-'.repeat(2),family='family-test';
   await repo.transaction(s=>{s.ledgers[family]={allowance:100000,used:0,reserved:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};return true;});
+  await setOwnerCoachConsent(repo,{subject:'guardian-one',familyId:family,role:'parent',expiresAt:Date.now()+3600000},
+   {familyId:family,model:true,audio:true,verifiedByAdult:true,
+    verificationReceipt:'synthetic-guardian-proof-001',expiresAt:Date.now()+30*86400000});
   const session={subject:'player-one',familyId:family,role:'designer' as const,expiresAt:Date.now()+100000},cookie='factory_session='+signSession(session,key);
   let calls=0;
   const service=new CoachAudioService(repo,speech,{transcribe:async()=>{calls++;return 'Spaghetti';}});
