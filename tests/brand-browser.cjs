@@ -19,6 +19,17 @@ const fs=require('node:fs');
    const title=await page.title();assert.match(title,/^jems/);
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
+   const artwork=await page.evaluate(async()=>Object.fromEntries(await Promise.all(
+    ['jems-logo.svg','jems-mark.svg','jems-mono.svg','jems-reversed.svg','jems-pattern.svg'].map(async name=>{
+      const response=await fetch('./'+name);return [name,{ok:response.ok,svg:await response.text()}];
+    })
+   )));
+   assert.ok(Object.values(artwork).every(x=>x.ok),'all brand lockups and patterns are shipped locally');
+   assert.match(artwork['jems-logo.svg'].svg,/The Game Factory/i,'approved full wordmark lockup');
+   assert.match(artwork['jems-logo.svg'].svg,/fill="#fff"/,'white open-ended wrench visibly in color logo');
+   assert.match(artwork['jems-mono.svg'].svg,/fill="#fff"/,'monochrome gem wrench interior must remain white');
+   assert.match(artwork['jems-mark.svg'].svg,/viewBox="0 0 237 237"/,'standalone brand mark');
+
    const expectedTokens={'--jems-ink':'#0B1E3B','--jems-purple':'#8B5CF6','--jems-coral':'#FF5E7A','--jems-gold':'#FFC24D','--jems-mint':'#22D3A6'};
    const tokens=await page.evaluate(()=>Object.fromEntries(Object.keys({"--jems-ink":"","--jems-purple":"","--jems-coral":"","--jems-gold":"","--jems-mint":""}).map(key=>[key,getComputedStyle(document.documentElement).getPropertyValue(key).trim().toUpperCase()])));
    assert.deepEqual(tokens,expectedTokens,'brand source-of-truth palette');
@@ -29,6 +40,8 @@ const fs=require('node:fs');
    assert.equal(await page.locator('#page-studio').isVisible(),true);
    assert.match(await page.locator('#studioTalk').innerText(),/Send to jems/,'text composer clearly sends');
    assert.match(await page.locator('#studioMic').innerText(),/Speak/,'microphone has a separate voice affordance');
+   assert.equal(await page.locator('#studioTalk').getAttribute('aria-label'),'Send your written message to jems');
+   assert.match(await page.locator('#studioMic').getAttribute('aria-label')||'',/microphone/);
    assert.equal(await page.locator('#studioPrompt').isVisible(),true);
    await page.screenshot({path:'test-results/jems-studio-'+label+'.png',fullPage:false});
    await page.locator('#studioNavHome').click();
