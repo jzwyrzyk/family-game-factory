@@ -114,11 +114,28 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(record.independent,false);
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),false,'subject uses existing rolling budget');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null)),oldMath,'ELA does not mutate math learner model');
+    // A full-screen native quest must allow a child to leave the game without
+    // fabricating an incorrect answer or bypassing the next learning checkpoint.
+    await page.evaluate(()=>{
+      window.FG.store.current().mathWindow=[];
+      window.FG.store.save();
+      window.FG.app.openGame('gum',{config:{originalRules:true,qualityVersion:0,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}});
+    });
+    await page.getByRole('button',{name:'Add Bottle',exact:true}).click();
+    await page.clock.runFor(91_000);
+    await page.waitForSelector('#stage-overlay .language-activity');
+    const abandoned=await page.evaluate(()=>window.FG.learning.activeAttemptId);
+    await page.locator('#stage-overlay [data-action="leave-game"]').click();
+    assert.equal(await page.locator('#page-home').isVisible(),true);
+    assert.equal(await page.evaluate(()=>window.FG.learning.active),false);
+    const exited=await page.evaluate(id=>window.FG.store.current().language.attempts.find((a:any)=>a.id===id),abandoned);
+    assert.equal(exited.outcome,'interrupted','leaving a game cannot invent a wrong response');
+    assert.equal(exited.answers.length,0);
     await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
     await page.selectOption('#parentSubject','math');
     await page.click('#saveParent');
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
-    assert.equal((await saved(page)).language.totals.presentations,2,'language evidence persists through the switch back');
+    assert.equal((await saved(page)).language.totals.presentations,3,'language evidence including an interrupted exit persists through the switch back');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null)),oldMath,'switch back restores math without resetting');
     assert.deepEqual(errors,[]);
     console.log('PASS Language Arts '+name+': parent selection, required checkpoints, lab, original game, safe pause, shared budget, separate history');
