@@ -1,4 +1,5 @@
 import {mountLanguageActivity} from '../language/activity';
+import {celebrateJem} from '../brand/delight';
 import {LANGUAGE_SKILLS} from '../language/curriculum';
 import {reportLanguage,selectLanguageItem} from '../language/engine';
 import { mountMathActivity } from './activity';
@@ -23,6 +24,8 @@ export function installLearningHost() {
   type BudgetReceipt={profile:LearnerProfile;attemptId:string;at:number;subject:'math'|'language'};
   let activeBudget:BudgetReceipt|null=null;
   const seen=new Set<string>();
+  // In-memory, per-child/per-subject celebration cadence. Never learning evidence.
+  const independentSuccesses=new Map<string,number>();
   function didParticipate(receipt:BudgetReceipt) {
     const state=receipt.subject==='language'?receipt.profile.language:receipt.profile.learning;
     const attempts=(state as any)?.attempts;
@@ -61,7 +64,18 @@ export function installLearningHost() {
     try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
       onSave:()=>{if(!FG.store.save()){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}} options.onSave?.();},
-      onComplete:(result:any)=>{if(own!==generation||activeOwner!==FG.store.current().id)return;active=null;activeOwner='';activeBudget=null;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));options.onComplete(result);},
+      onComplete:(result:any)=>{
+        if(own!==generation||activeOwner!==FG.store.current().id)return;
+        active=null;activeOwner='';activeBudget=null;
+        window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));
+        // First truly completed independent practice, then every fifth. Not every answer.
+        if(result?.outcome==='completed'&&result.independent===true&&!target.dataset.saveFailed){
+          const key=String(profile.id)+':'+subjectFor(profile);
+          const count=(independentSuccesses.get(key)||0)+1;independentSuccesses.set(key,count);
+          if(count===1||count%5===0)celebrateJem('practice','labLearningAdventure');
+        }
+        options.onComplete(result);
+      },
     });}catch(error){active=null;activeOwner='';generation++;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));throw error;}
     return active;
   }
