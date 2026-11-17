@@ -1,0 +1,50 @@
+name: Private conversation coach integrity
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/coach-integrity.yml'
+      - 'server/coach/**'
+      - 'server/gateway.ts'
+      - 'server/owner-setup.ts'
+      - 'server/pipeline/types.ts'
+      - 'src/studio/**'
+      - 'tests/design-coach*'
+      - 'tests/private-*'
+      - 'tests/coach-cancel-unit.ts'
+      - 'tests/family-coach-consent.ts'
+      - 'package.json'
+      - 'scripts/deployment/build-private-coach.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-coach-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coach:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Typecheck and build real Studio
+        run: npm run build
+      - name: Keyless private model, child safety, speech and multi-turn contracts
+        run: npm run test:coach
+      - name: Studio persistence and test/version contracts
+        run: node --import tsx tests/studio-unit.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: private-coach-integrity
+          path: test-results/
+          if-no-files-found: ignore
