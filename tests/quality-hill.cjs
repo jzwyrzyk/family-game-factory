@@ -11,7 +11,7 @@ const fs=require('node:fs');
    const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:1000},hasTouch:mobile});
    const page=await context.newPage(),errors=[],requests=[];page.on('pageerror',e=>errors.push(e.message));
    page.on('request',r=>{if(r.method()==='POST')requests.push(r.url())});await page.clock.install();
-   await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.factory);
+   await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);await page.waitForFunction(()=>window.FG?.factory);
    // Isolate driving with the ordinary recent-question budget; math remains required.
    await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.app.openGame('hill')});
    const root=page.locator('.quality-hill'),button=name=>root.getByRole('button',{name,exact:true});
