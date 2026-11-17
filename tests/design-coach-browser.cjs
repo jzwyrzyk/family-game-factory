@@ -90,7 +90,17 @@ async function load(page,url,saved={}){
   await page.click('#buildGamePlan');await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('no build was started'));assert.equal((await session()).design.plan.goal.origin,'child');assert.equal((await session()).job,null);
   const mathAfter=await page.evaluate(()=>{const p=FG.store.current();return JSON.stringify({skills:p.skills,learning:p.learning??null,grade:p.grade,focus:p.focus,intensity:p.intensity,rate:p.rate});});assert.equal(mathAfter,mathBefore,'coaching, experiment versions, reload and profile switching preserve learning evidence and settings');
   // Navigation out of Studio must release the microphone, not just hide its UI.
-  await page.evaluate(()=>{window.__studioVoiceTest=null;});
+  await page.evaluate(()=>{
+   // The browser reloaded above; install the synthetic local recognizer again.
+   class PrivateSpeech {
+    static async available(options){if(!options.processLocally)throw Error('Cloud speech is not allowed');return 'available';}
+    processLocally=false;lang='';continuous=false;interimResults=false;onresult=null;onerror=null;onend=null;aborted=false;
+    start(){window.__studioVoiceTest=this;}
+    abort(){this.aborted=true;this.onend?.();}
+   }
+   Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:PrivateSpeech});
+   window.__studioVoiceTest=null;
+  });
   await page.click('#studioMic');
   await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
   await page.click('#studioNavPowers');
