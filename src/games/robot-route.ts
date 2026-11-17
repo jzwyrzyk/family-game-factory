@@ -128,9 +128,9 @@ export default class RobotRoute implements GameInstance {
   }
   this.draw();this.raf=requestAnimationFrame(this.loop);
  };
- next(){this.level++;this.reset();this.save();}
- restart(){this.level=1;this.reset();this.save();}
- retry(){this.reset();this.save();}
+ next(){if(this.hostPaused||this.stopped)return;this.level++;this.reset();this.save();}
+ restart(){if(this.hostPaused||this.stopped)return;this.level=1;this.reset();this.save();}
+ retry(){if(this.hostPaused||this.stopped)return;this.reset();this.save();}
  isPlaying(){return !this.stopped&&!this.ended&&!this.hostPaused;}
  pause(){if(!this.isPlaying())return false;this.hostPaused=true;return true;}
  resume(){if(!this.stopped){this.hostPaused=false;this.last=0;}}
