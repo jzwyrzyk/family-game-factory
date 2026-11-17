@@ -84,7 +84,7 @@ async function main(){
    // Confirm config-level ZDR denial before processing any payload.
    const fake:any={method:'POST',url:'/internal/coach/turn',headers:{authorization:'Bearer valid-identity',
     'content-type':'application/json'},async *[Symbol.asyncIterator](){yield Buffer.from(JSON.stringify({context}));}};
-   const res:any={writeHead(status:number){this.status=status;},end(){}};await blocked(fake,res);assert.equal(res.status,503);
+   const res:any={once(_event:string,_cb:()=>void){return this;},writeHead(status:number){this.status=status;},end(){this.writableEnded=true;},writableEnded:false};await blocked(fake,res);assert.equal(res.status,503);
   }finally{await new Promise<void>(r=>server.close(()=>r()));}
  });
  await test('owner approvals default deny independently of spend and model access',()=>{
