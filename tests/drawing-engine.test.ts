@@ -32,6 +32,20 @@ test("Changing the child's wheel geometry changes the actual Planck world",()=>{
   assert.ok(Number.isFinite(a.snapshot().distance)&&Number.isFinite(b.snapshot().distance));
  }finally{a.dispose();b.dispose();}
 });
+test('Mask corrections are bounded and cannot overwrite or masquerade as source art',()=>{
+ const edited=structuredClone(sample);
+ edited.pieces[0].maskStrokes=[
+  {action:'exclude',radius:.018,points:[{x:.4,y:.4},{x:.5,y:.5}]},
+  {action:'include',radius:.011,points:[{x:.5,y:.5}]}
+ ];
+ assert.equal(validateAssembly(edited).pieces[0].maskStrokes?.length,2);
+ const bad=structuredClone(edited);bad.pieces[0].maskStrokes![0].points[0].x=-.3;
+ assert.throws(()=>validateAssembly(bad));
+ const over=structuredClone(edited);over.pieces[0].maskStrokes=Array.from({length:49},()=>({action:'include',radius:.01,points:[{x:.5,y:.5}]}));
+ assert.throws(()=>validateAssembly(over));
+ const unknown=structuredClone(edited) as any;unknown.pieces[0].maskStrokes[0].javascript='alert(1)';
+ assert.throws(()=>validateAssembly(unknown));
+});
 test('Invalid, overlapping or impossible drawing rigs fail explicitly',()=>{
  const duplicate=structuredClone(sample);duplicate.pieces[2].id=duplicate.pieces[1].id;
  assert.throws(()=>validateAssembly(duplicate));
