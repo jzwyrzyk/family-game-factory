@@ -5,7 +5,7 @@ import type {VerifiedSession} from '../contracts/api';
 import {COACH_POLICY,COACH_SCHEMA} from './policy';
 export interface CoachConfig {
  enabled:boolean;privacyApproved:boolean;moderationApproved:boolean;
- zdrApproved?:boolean;familyConsentApproved?:boolean;brokerApproved?:boolean;
+ zdrApproved?:boolean;familyConsentApproved?:boolean;brokerApproved?:boolean;brokerOrigin?:string;
  model:string;apiKey?:string;
  maxInputChars:number;maxOutputTokens:number;maxTurnMicroUsd:number;
  inputMicroUsdPerMillion:number;outputMicroUsdPerMillion:number;pricesReviewedAt:string;
@@ -22,7 +22,8 @@ export function boundedContext(input:any):CoachContext {
 }
 export function approved(c:CoachConfig):boolean {
  return c.enabled&&c.privacyApproved&&c.moderationApproved&&
-  c.zdrApproved===true&&c.familyConsentApproved===true&&c.brokerApproved===true&&/^[a-zA-Z0-9._-]{1,100}$/.test(c.model)&&Number.isSafeInteger(c.maxTurnMicroUsd)&&c.maxTurnMicroUsd>0&&c.maxTurnMicroUsd<=100000&&Number.isInteger(c.maxOutputTokens)&&c.maxOutputTokens>=128&&c.maxOutputTokens<=2000&&Number.isInteger(c.maxInputChars)&&c.maxInputChars>=1000&&c.maxInputChars<=24000&&Number.isSafeInteger(c.inputMicroUsdPerMillion)&&c.inputMicroUsdPerMillion>0&&Number.isSafeInteger(c.outputMicroUsdPerMillion)&&c.outputMicroUsdPerMillion>0&&Date.parse(c.pricesReviewedAt)<=Date.now()&&Date.parse(c.pricesReviewedAt)>Date.now()-31*86400000;
+  c.zdrApproved===true&&c.familyConsentApproved===true&&c.brokerApproved===true&&
+  typeof c.brokerOrigin==='string'&&/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.run\.app$/i.test(c.brokerOrigin)&&/^[a-zA-Z0-9._-]{1,100}$/.test(c.model)&&Number.isSafeInteger(c.maxTurnMicroUsd)&&c.maxTurnMicroUsd>0&&c.maxTurnMicroUsd<=100000&&Number.isInteger(c.maxOutputTokens)&&c.maxOutputTokens>=128&&c.maxOutputTokens<=2000&&Number.isInteger(c.maxInputChars)&&c.maxInputChars>=1000&&c.maxInputChars<=24000&&Number.isSafeInteger(c.inputMicroUsdPerMillion)&&c.inputMicroUsdPerMillion>0&&Number.isSafeInteger(c.outputMicroUsdPerMillion)&&c.outputMicroUsdPerMillion>0&&Date.parse(c.pricesReviewedAt)<=Date.now()&&Date.parse(c.pricesReviewedAt)>Date.now()-31*86400000;
 }
 export class OpenAICoachProvider implements CoachProvider {
  constructor(private config:CoachConfig,private transport:typeof fetch=fetch){}

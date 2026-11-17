@@ -10,7 +10,7 @@ import type {CoachContext,CoachReply} from '../src/studio/design';
 const origin='https://private-coach-example.a.run.app';
 const config:CoachConfig={
  enabled:true,privacyApproved:true,moderationApproved:true,zdrApproved:true,familyConsentApproved:true,brokerApproved:true,
- model:'gpt-6-luna',maxInputChars:16000,maxOutputTokens:600,maxTurnMicroUsd:30000,
+ brokerOrigin:origin,model:'gpt-6-luna',maxInputChars:16000,maxOutputTokens:600,maxTurnMicroUsd:30000,
  inputMicroUsdPerMillion:1000000,outputMicroUsdPerMillion:1000000,pricesReviewedAt:new Date().toISOString()
 };
 const context:CoachContext={
