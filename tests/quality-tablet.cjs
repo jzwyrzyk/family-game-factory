@@ -30,7 +30,7 @@ const {chromium}=require('playwright');
     await assertTouch(`after ${name} capture`);
    };
    try{
-    await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);
     await page.waitForFunction(()=>window.FG?.app);
     await assertTouch('after navigation');
     await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.app.openGame('gum')});
