@@ -78,8 +78,18 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
    status('Private speech recording is unavailable on this device. You can type or use keyboard dictation.');return;
   }
   const current=++seq;
-  h.onRecordingStart?.();
   try{
+   // Cached UI visibility is not authorization. Check the live family scope
+   // immediately before requesting microphone access; revocation must win.
+   const fresh=await h.available(AbortSignal.timeout(5000));
+   if(current!==seq||scope!==h.scope()||!h.canListen())return;
+   if(fresh!==true){
+    approved=false;h.button.hidden=true;
+    status('Private speech permission is no longer active. Nothing was recorded.');
+    return;
+   }
+   allowUntil=Date.now()+30000;
+   h.onRecordingStart?.();
    const media=await navigator.mediaDevices.getUserMedia({video:false,
     audio:{echoCancellation:true,noiseSuppression:true}});
    if(current!==seq||scope!==h.scope()||!h.canListen()){
