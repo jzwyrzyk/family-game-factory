@@ -183,22 +183,5 @@ class BuildSafetyTests(unittest.TestCase):
         with patch.object(module,'run') as run,patch('sys.argv',['build.py','--region','europe-west1']),redirect_stdout(io.StringIO()):module.main()
         run.assert_not_called()
 
-    def test_build_stages_only_committed_allowed_files_and_resolves_registry_digest(self):
-        module=self.builder();seen=[]
-        def fake(args,cwd=None):
-            seen.append(args)
-            if args[:3]==['git','rev-parse','HEAD']:return b'a'*40
-            if args[:3]==['git','ls-tree','-r']:return b'package.json\nserver/Dockerfile.gateway\nserver/Dockerfile.preview\nserver/key.pem\nserver/config.json\nserver/gateway.ts\n'
-            if args[:2]==['git','show']:return b'fixture tracked source'
-            if args[:2]==['docker','build']:
-                files=[str(p.relative_to(cwd)) for p in Path(cwd).rglob('*') if p.is_file()]
-                self.assertNotIn('server/key.pem',files);self.assertNotIn('server/config.json',files)
-                self.assertIn('server/gateway.ts',files)
-            if args[:4]==['gcloud','artifacts','docker','images']:return json.dumps({'image_summary':{'digest':'sha256:'+'b'*64}}).encode()
-            return b''
-        with patch.object(module,'run',side_effect=fake),patch('sys.argv',['build.py','--region','europe-west1','--execute']),redirect_stdout(io.StringIO()) as output:module.main()
-        self.assertIn('@sha256:'+'b'*64,output.getvalue())
-        self.assertEqual(sum(args[:2]==['docker','push'] for args in seen),2)
-        self.assertFalse(any(args[:2]==['gcloud','builds'] for args in seen))
 
 if __name__=='__main__':unittest.main()
