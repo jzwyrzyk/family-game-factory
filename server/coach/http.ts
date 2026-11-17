@@ -23,6 +23,6 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>50000)throw Error('INVALID_REQUEST');}
    send(200,await service.respond(session,JSON.parse(body)));
-  }catch(err){const c=(err as Error).message;const permitted=['FORBIDDEN','UNAUTHENTICATED','COACH_UNAVAILABLE','SPENDING_CUTOFF','RATE_LIMIT','IDEMPOTENCY_CONFLICT','COACH_REQUEST_EXISTS','COACH_REFUSED','PRIVATE_INFORMATION','COACH_HISTORY_FULL','INVALID_REQUEST'];send(c==='UNAUTHENTICATED'?401:c==='FORBIDDEN'?403:c==='COACH_UNAVAILABLE'?503:400,{errorCode:permitted.includes(c)?c:'COACH_UNAVAILABLE'});}
+  }catch(err){const c=(err as Error).message;const permitted=['FORBIDDEN','UNAUTHENTICATED','COACH_UNAVAILABLE','SPENDING_CUTOFF','RATE_LIMIT','IDEMPOTENCY_CONFLICT','COACH_REQUEST_EXISTS','COACH_REFUSED','PRIVATE_INFORMATION','COACH_HISTORY_FULL','INVALID_REQUEST','SAFETY_POLICY_BLOCKED'];send(c==='UNAUTHENTICATED'?401:c==='FORBIDDEN'?403:c==='COACH_UNAVAILABLE'||c==='SAFETY_POLICY_BLOCKED'?503:400,{errorCode:permitted.includes(c)?c:'COACH_UNAVAILABLE'});}
  };
 }
