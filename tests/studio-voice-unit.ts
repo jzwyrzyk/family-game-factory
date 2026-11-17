@@ -116,6 +116,17 @@ async function run(){
   await voice.listen();assert.equal(starts,5,'on-device pack enables voice');
 
   voice.cancel();
+  // Some incompatible browser adapters expose the flag but ignore attempts
+  // to require local processing. That must never start remote audio capture.
+  (window as any).SpeechRecognition=class {
+    static async available(){return 'available';}
+    get processLocally(){return false;}
+    set processLocally(_enabled:boolean){}
+    start(){throw Error('Must not start off-device');}
+  };
+  await voice.listen();
+  assert.equal(starts,5,'ignored private-processing flag must not start listening');
+  assert.match(status.textContent,/cannot guarantee private speech/);
   (window as any).SpeechRecognition=class {
     processLocally=false;start(){throw Error('Must never use off-device recognition');}
   };

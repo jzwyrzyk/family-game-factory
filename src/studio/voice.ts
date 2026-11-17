@@ -73,7 +73,9 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   if(!('processLocally' in next)){
    announce('This browser cannot guarantee private speech recognition. Use keyboard dictation or type.');return;
   }
-  next.processLocally=true;next.lang='en-US';next.continuous=false;next.interimResults=true;
+  try{next.processLocally=true;}catch{announce('This browser cannot guarantee private speech recognition. Use keyboard dictation or type.');return;}
+  if(next.processLocally!==true){announce('This browser cannot guarantee private speech recognition. Use keyboard dictation or type.');return;}
+  next.lang='en-US';next.continuous=false;next.interimResults=true;
   next.onresult=event=>{
    if(seq!==generation||recognition!==next)return;
    const words:string[]=[];
