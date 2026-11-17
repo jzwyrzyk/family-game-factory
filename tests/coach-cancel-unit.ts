@@ -45,7 +45,7 @@ async function run(){
   'an unknown canceled paid turn is conservatively charged at the cap');
  console.log('PASS model request stops and settles its reservation after child cancellation');
  const audioRepo=await setup(),audioCtrl=new AbortController();let audioEntered=false;
- const stt=new CoachAudioService(audioRepo,speech,{transcribe:async(_,_,signal)=>{audioEntered=true;return aborted(signal);}});
+ const stt=new CoachAudioService(audioRepo,speech,{transcribe:async(_bytes,_mime,signal)=>{audioEntered=true;return aborted(signal);}});
  const voice=stt.transcribe(session,{id:'cancel-voice-111',mime:'audio/webm',audio},audioCtrl.signal);
  for(let i=0;i<10&&!audioEntered;i++)await new Promise<void>(r=>setImmediate(r));
  assert.equal(audioEntered,true);audioCtrl.abort();await assert.rejects(voice,/ABORTED/);
