@@ -45,10 +45,11 @@ export function validateSafetyPolicy(raw:unknown,now=Date.now()):SafetyPolicyV1|
     typeof expiresAt!=='number'||!Number.isSafeInteger(expiresAt)||
     updatedAt>now+60_000||updatedAt<now-MAX_POLICY_AGE_MS||
     expiresAt<=now||expiresAt>updatedAt+MAX_POLICY_AGE_MS)return null;
-  if(!plain(raw.capabilities)||!exact(raw.capabilities,ALL_CAPABILITIES)||
-    ALL_CAPABILITIES.some(k=>typeof raw.capabilities![k]!=='boolean')||
-    DEFERRED_CAPABILITIES.some(k=>raw.capabilities![k]!==false))return null;
+  const flags=raw.capabilities;
+  if(!plain(flags)||!exact(flags,ALL_CAPABILITIES)||
+    ALL_CAPABILITIES.some(k=>typeof flags[k]!=='boolean')||
+    DEFERRED_CAPABILITIES.some(k=>flags[k]!==false))return null;
   // Do not expose the untrusted source document as a mutable reference.
   return {version:1,scope:'owner_pilot',epoch,updatedAt,expiresAt,
-    emergencyStop:raw.emergencyStop,capabilities:{...raw.capabilities} as CapabilityFlags};
+    emergencyStop:raw.emergencyStop,capabilities:{...flags} as CapabilityFlags};
 }
