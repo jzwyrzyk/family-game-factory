@@ -64,7 +64,7 @@ export async function installStudio(){
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
  learningChoice.innerHTML='<div class="studio-learning-copy"><strong id="studioLearningTitle">Learning adventure</strong><small id="studioLearningNote"></small></div><div class="learning-subject-switch" role="group" aria-label="Choose practice subject"><button type="button" id="studioSubjectMath" aria-pressed="true">🔢 Math</button><button type="button" id="studioSubjectLanguage" aria-pressed="false">📚 English</button></div>';
- library.querySelector('#studioContinue')!.after(learningChoice);
+ library.querySelector('#studioFavoritesSection')!.after(learningChoice);
  const nativeStage=$('page-game');
  const originalNav=document.querySelector('.site-header nav') as HTMLElement;
  originalNav.hidden=true;

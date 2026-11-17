@@ -146,12 +146,12 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     await page.click('#saveParent');
     assert.equal((await saved(page)).allowSubjectSwitch,true);
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
-    await page.click('#studioNavHome');
-    await page.locator('#studioLearningChoice').waitFor({state:'visible'});
-    assert.equal(await page.locator('#studioSubjectMath').getAttribute('aria-pressed'),'true');
-    await page.click('#studioSubjectLanguage');
+    // This production regression exercises the explicit ?arcade=1 legacy rollback.
+    // Studio's homepage toggle is covered separately by homepage-entry.cjs.
+    await page.getByRole('button',{name:'⚡ My Powers',exact:true}).click();
+    assert.equal(await page.evaluate(()=>window.FG.learning.active),false);
+    await page.click('#labSubjectLanguage');
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
-    assert.equal(await page.locator('#studioSubjectLanguage').getAttribute('aria-pressed'),'true');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null)),oldMath,'switching does not erase Math progress');
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
     assert.equal((await saved(page)).allowSubjectSwitch,true);
