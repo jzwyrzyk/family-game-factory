@@ -39,7 +39,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  };
  const voiceOptions={langs:['en-US'],processLocally:true as const};
  function cancel(){
-  generation++;speakAfterVoice=false;voiceScope='';finalWords='';failed=true;
+  generation++;speakAfterVoice=false;voiceScope='';finalWords='';spokenReply='';ui.hearReply.disabled=true;failed=true;
   const active=recognition;recognition=null;listening=false;buttons();
   try{active?.abort();}catch{/* The browser may already have stopped. */}
   try{window.speechSynthesis?.cancel();}catch{/* Speech output is optional. */}
