@@ -21,7 +21,7 @@
     "test:quality": "node tests/quality-browser.cjs",
     "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
     "test:studio": "node --import tsx tests/studio-unit.ts && node tests/studio-journey.cjs",
-    "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node tests/design-coach-browser.cjs"
+    "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
