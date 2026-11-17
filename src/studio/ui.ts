@@ -567,6 +567,6 @@ export async function installStudio(){
   })
  });
  home();
- try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{remote={version:1,mode:'unavailable'};}configReady=true;if(activeId){render();if(panel==='talk')void privateSpeech?.refresh();}resumeOutstanding();refreshShelf();
+ try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{remote={version:1,mode:'unavailable'};}configReady=true;if(activeId){render();void privateSpeech?.refresh();}resumeOutstanding();refreshShelf();
  FG.studio={version:1,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
 }
