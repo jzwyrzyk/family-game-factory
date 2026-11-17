@@ -9,10 +9,13 @@ class Button {
 class Status {textContent='';}
 let active:FakeRecognition|null=null,mode:'available'|'downloadable'|'unavailable'='available';
 let starts=0,stops=0,scope='child-a:game-one',allowed=true;
+let delayedAvailability=false,finishAvailability:((value:'available')=>void)|null=null;
+function releaseAvailability(){const release=finishAvailability;if(!release)throw Error('Missing delayed speech result');release('available');}
 const spoken:string[]=[];
 class FakeRecognition {
   static async available(options:{langs:string[];processLocally:boolean}){
     assert.deepEqual(options,{langs:['en-US'],processLocally:true});
+    if(delayedAvailability)return await new Promise<'available'>(resolve=>{finishAvailability=resolve;});
     return mode;
   }
   static async install(options:{processLocally:boolean}){
@@ -94,6 +97,16 @@ async function run(){
   allowed=false;
   await voice.listen();assert.equal(starts,4,'learning/activity lock prevents microphone');
   allowed=true;
+  // A late speech-support answer cannot bypass a learning overlay or navigation.
+  delayedAvailability=true;
+  const pendingListen=voice.listen();
+  await Promise.resolve();
+  allowed=false;
+  releaseAvailability();
+  await pendingListen;
+  assert.equal(starts,4,'a stale availability answer must not activate the microphone');
+  assert.match(status.textContent,/Finish your current activity/);
+  allowed=true;delayedAvailability=false;
   mode='downloadable';
   await voice.listen();assert.equal(starts,4,'do not start microphone before local speech pack');
   assert.equal(installPack.hidden,false);

@@ -6,7 +6,7 @@ export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
 export type Message = { id: string; role: 'child' | 'helper' | 'reflection'; text: string; at: string };
 export type Candidate = { id: string; baseId: string | null; config?: Record<string, number | boolean>; remoteId?: string; prompt: string; summary: string };
-export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled'; revisionId?:string };
+export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled'; revisionId?:string; phase?:string };
 export interface StudioSession {
   id: string; owner: string; name: string; game: GameId | 'new';
   projectId: string | null; remoteId: string | null; remoteKind?: string;
@@ -39,7 +39,7 @@ export function validateNotebook(input: unknown): Notebook {
     if(s.selectedTest!==undefined&&s.selectedTest!==null&&!s.experiments?.some(e=>e.id===s.selectedTest))throw Error('Unknown selected test.');
     if(s.playOnly!==undefined&&typeof s.playOnly!=='boolean')throw Error('Invalid play-only state.');
     if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
-    if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
+    if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || s.job.phase!==undefined&&(typeof s.job.phase!=='string'||!/^[a-z-]{1,32}$/.test(s.job.phase)) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.

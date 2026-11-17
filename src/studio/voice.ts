@@ -59,6 +59,9 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   try{availability=await Ctor.available(voiceOptions);}
   catch{announce('Could not check private speech support. You can use keyboard dictation or type.');return;}
   if(seq!==generation||scope!==ui.scope())return;
+  // A learning activity or navigation may begin during the asynchronous check.
+  // Never open a microphone after Studio loses its explicit permission to listen.
+  if(!ui.canListen()){announce('Finish your current activity before talking.');return;}
   if(availability==='downloadable'){
    ui.installPack.hidden=false;announce('An on-device English speech pack is available. Choose Install voice pack, then tap Speak.');return;
   }
