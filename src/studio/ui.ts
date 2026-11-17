@@ -307,21 +307,25 @@ export async function installStudio(){
   const r=s.projectId?games.revision(s.projectId,s.owner):null;
   const chosen=continueTest?s.candidate:null;
   const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
-  try{await clientFor(s).submit(input);}
-   catch(error){
-    // A polling failure after job acknowledgment is NOT a failed build.
-    // Preserve its ID, status and exact candidate base; reconcile remotely.
-    const saved=notebook.get(s.id,s.owner);
-    if(busy(saved)&&saved.job?.api===remote.apiBaseUrl){
-      unknownJobs.add(s.id);refreshShelf();resume(saved);
-      if(activeId===s.id&&owner()===s.owner)
-       status('The connection was interrupted. Your builder may still be working; we will check again.');
-    }else{
-      message(s,'helper','The builder could not accept or confirm this request. Your current game and idea are safe.');
-      if(activeId===s.id&&owner()===s.owner)
-       status((error as Error).message==='SPENDING_CUTOFF'?'The workshop allowance has been reached. No working game was replaced.':'No build was confirmed. You can still make local changes.',true);
-    }
-   }finally{sending.delete(s.id);if(activeId===s.id&&owner()===s.owner)render();}
+  // Request admission ends at the durable ACK, not when a game finishes building.
+  // Continue status polling independently while a child plays or makes other edits.
+  void clientFor(s).submit(input).catch(error=>{
+   const saved=notebook.get(s.id,s.owner);
+   if(busy(saved)&&saved.job?.api===remote.apiBaseUrl){
+    unknownJobs.add(s.id);refreshShelf();resume(saved);
+    if(activeId===s.id&&owner()===s.owner)
+     status('Connection interrupted. The builder may still be working; checking again.');
+   }else{
+    message(s,'helper','The builder could not accept or confirm this request. Your current game and idea are safe.');
+    if(activeId===s.id&&owner()===s.owner)
+     status((error as Error).message==='SPENDING_CUTOFF'?'The workshop allowance has been reached. No working game was replaced.':'No build was confirmed. You can still make local changes.',true);
+   }
+  }).finally(()=>{
+   sending.delete(s.id);
+   if(activeId===s.id&&owner()===s.owner)render();
+  }).catch(error=>{
+   if(activeId===s.id&&owner()===s.owner)status('Could not save the builder status. Your current game is safe.',true);
+  });
  }
  async function onJob(captured:StudioSession,job:JobView){
   const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);
