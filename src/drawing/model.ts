@@ -4,12 +4,18 @@ import {validateDrawingRig, type DrawingRig, type Material} from '../quality/par
 export type DrawingKind = 'car' | 'character' | 'machine' | 'scene';
 export type Role = 'body' | 'wheel' | 'limb' | 'wing' | 'propeller' | 'decoration' | 'platform' | 'obstacle' | 'collectible';
 export type Region = {x:number;y:number;w:number;h:number;shape:'rect'|'ellipse'};
+/** Non-destructive manual alpha correction. Coordinates use the unchanged original. */
+export interface MaskStroke {
+  action:'include'|'exclude';radius:number;points:{x:number;y:number}[];
+}
 export interface DrawingPiece {
   id:string; name:string; role:Role; region:Region; parentId:string|null;
   /** A fixed layer follows its parent; a moving part receives an independent joint. */
   physical:boolean;
   /** Optional hinge/pivot location within this piece: fractions 0–1, default center. */
   pivot?:{x:number;y:number};
+  /** Explicit finger/mouse mask edits; original source pixels are never altered. */
+  maskStrokes?:MaskStroke[];
 }
 export interface DrawingAssembly {
   schemaVersion:1; sourceId:string; sourceSha256:string; kind:DrawingKind;
@@ -36,11 +42,17 @@ export function validateAssembly(value:unknown):DrawingAssembly {
     throw Error('Unsupported drawing design.');
   const ids=new Set<string>();
   for(const p of a.pieces){
-    if(!p||typeof p!=='object'||!allowed(p,['id','name','role','region','parentId','physical','pivot'])||
+    if(!p||typeof p!=='object'||!allowed(p,['id','name','role','region','parentId','physical','pivot','maskStrokes'])||
       !ident(p.id)||ids.has(p.id)||typeof p.name!=='string'||!p.name||p.name.length>50||
       !roles.includes(p.role)||typeof p.physical!=='boolean'||(p.parentId!==null&&!ident(p.parentId))||
       (p.pivot!==undefined&&(!p.pivot||typeof p.pivot!=='object'||!allowed(p.pivot,['x','y'])||
-      !isNumber(p.pivot.x)||!isNumber(p.pivot.y)||p.pivot.x<0||p.pivot.x>1||p.pivot.y<0||p.pivot.y>1)))
+      !isNumber(p.pivot.x)||!isNumber(p.pivot.y)||p.pivot.x<0||p.pivot.x>1||p.pivot.y<0||p.pivot.y>1))||
+      (p.maskStrokes!==undefined&&(!Array.isArray(p.maskStrokes)||p.maskStrokes.length>48||
+        p.maskStrokes.some(stroke=>!stroke||typeof stroke!=='object'||!allowed(stroke,['action','radius','points'])||
+          !['include','exclude'].includes(stroke.action)||!isNumber(stroke.radius)||stroke.radius<.002||stroke.radius>.08||
+          !Array.isArray(stroke.points)||stroke.points.length<1||stroke.points.length>128||
+          stroke.points.some(q=>!q||typeof q!=='object'||!allowed(q,['x','y'])||!isNumber(q.x)||!isNumber(q.y)||
+            q.x<0||q.x>1||q.y<0||q.y>1)))))
       throw Error('Invalid drawing component.');
     ids.add(p.id);validRegion(p.region);
   }
