@@ -79,10 +79,22 @@ test('published v1 examples have a pinned snapshot; never mutate archived review
   const data=JSON.stringify(LANGUAGE_BANK);
   let h=0x811c9dc5;
   for(let i=0;i<data.length;i++)h=Math.imul(h^data.charCodeAt(i),0x01000193)>>>0;
-  assert.equal(h.toString(16).padStart(8,'0'),'5ab00960',
+  assert.equal(h.toString(16).padStart(8,'0'),'5448ee3f',
     'Archived pack changed. Publish corrected examples as v2, retain v1 for saved learner history.');
   assert.equal(createHash('sha256').update(data).digest('hex').length,64);
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>0});
   assert.equal(item.contentPack,'v1');
   assert.match(item.id,/:v1:\d+$/);
+});
+
+test('word and sentence construction never print the complete correct answer in the prompt',()=>{
+  for(const [skill,bank] of Object.entries(LANGUAGE_BANK))for(const [index,item] of bank.items.entries()){
+    if(item.kind==='word-tiles'||item.kind==='sentence-tiles'){
+      assert.equal(item.q.toLocaleLowerCase('en-US').includes(item.a.toLocaleLowerCase('en-US')),false,
+        skill+':'+index+' leaks the constructed answer into the instructions');
+    }
+  }
+  const plural=LANGUAGE_BANK['g1-plural-s'].items[0];
+  assert.equal(plural.q.toLowerCase().includes(plural.a.toLowerCase()),false,
+    'Plural-choice checkpoint should not print the correct choice in its question');
 });

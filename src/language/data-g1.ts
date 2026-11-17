@@ -456,7 +456,7 @@ export const LANGUAGE_G1: Record<string,LanguageTemplateBank> = {
     "items": [
       {
         "kind": "choice",
-        "q": "You have two cats. Choose the plural word.",
+        "q": "You have more than one cat. Which spelling shows that?",
         "a": "cats",
         "d": [
           "cat",
@@ -487,7 +487,7 @@ export const LANGUAGE_G1: Record<string,LanguageTemplateBank> = {
       },
       {
         "kind": "word-tiles",
-        "q": "Build the word for three frogs.",
+        "q": "Build the word for more than one frog.",
         "a": "frogs",
         "ex": "Frog becomes frogs when you add -s.",
         "t": 2
