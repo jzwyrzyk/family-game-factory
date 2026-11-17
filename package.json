@@ -21,9 +21,10 @@
     "test:quality": "node tests/quality-browser.cjs",
     "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
     "test:studio": "node --import tsx tests/studio-unit.ts && node tests/studio-journey.cjs && node tests/favorites-browser.cjs",
-    "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs",
+    "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/private-coach-broker.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs",
     "test:language-ui": "node --import tsx --test tests/language-activity.test.ts",
-    "test:language-integration": "node --import tsx tests/language-integration.ts"
+    "test:language-integration": "node --import tsx tests/language-integration.ts",
+    "start:private-coach": "node --import tsx server/coach/private-http.ts"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
