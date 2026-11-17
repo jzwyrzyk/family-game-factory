@@ -29,6 +29,34 @@ async function load(page,url,saved={}){
   const talk=async()=>{await page.click('#studioChange');};const tryLocal=async text=>{await talk();await page.fill('#studioPrompt',text);await page.click('#studioSend');await page.waitForSelector('.quality-builder');};
   await talk();await page.fill('#studioPrompt','I won but it was boring');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
   assert.match(await page.textContent('#studioMessages'),/action or goal/);assert.equal((await session()).experiments.length,0);assert.equal((await projects())[0].headId,baseline);
+  // Conversation must be its own action. Even a recognized local mechanic is
+  // just a thought until the child explicitly chooses Try a change.
+  await page.fill('#studioPrompt','Give me 15 gum sticks');
+  await page.click('#studioTalk');
+  await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  assert.equal((await session()).experiments.length,0,'talking must not build');
+  assert.equal((await projects())[0].headId,baseline,'talking must not change main version');
+  // Exercise the real microphone/UI join with a mocked private browser
+  // recognizer. No recording or network speech service is used in this test.
+  await page.evaluate(()=>{
+   class PrivateSpeech {
+    static async available(options){if(!options.processLocally)throw Error('Off-device recognition forbidden');return 'available';}
+    processLocally=false;lang='';continuous=false;interimResults=false;onresult=null;onerror=null;onend=null;
+    start(){window.__studioVoiceTest=this;}
+    abort(){this.onend?.();}
+   }
+   Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:PrivateSpeech});
+  });
+  await page.click('#studioMic');
+  await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
+  await page.evaluate(()=>{
+   const mic=window.__studioVoiceTest;
+   mic.onresult({results:[{isFinal:true,0:{transcript:'What if the dragon sneezes noodles?'}}]});
+   mic.onend();
+  });
+  await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('What if the dragon sneezes noodles?')&&document.getElementById('coachModeStatus').textContent.includes('Local reflection'));
+  assert.equal((await session()).experiments.length,0,'speaking must chat, not build');
+  assert.equal((await projects())[0].headId,baseline,'voice must not change game versions');
   await page.fill('#studioPrompt',"I don't know");await page.click('#studioSend');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].design.helpLevel===1);
   await page.click('#coachIdeas');await page.waitForFunction(()=>document.querySelectorAll('#coachProposals button').length>=2);assert.equal((await session()).experiments.length,0);
   await page.fill('#studioPrompt','Give me 15 gum sticks');await page.getByText('Experiment options (optional)',{exact:true}).click();await page.fill('#designPrediction','More chances to test a joint');await page.click('#studioSend');await page.waitForSelector('.quality-builder');assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.parts.filter(p=>p.kind==='bottle').length),1);
