@@ -4,6 +4,7 @@ import {StudioNotebook,STUDIO_KEY,type Candidate} from '../src/studio/notebook';
 import {CoachService,OpenAICoachProvider,type CoachConfig} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {COACH_POLICY} from '../server/coach/policy';
+import {setOwnerCoachConsent} from '../server/coach/consent';
 import {installCoaching} from '../src/studio/coaching';
 class Memory {data=new Map<string,string>();fail=false;getItem(k:string){return this.data.get(k)??null}setItem(k:string,v:string){if(this.fail)throw Error('quota');this.data.set(k,v)}}
 
@@ -30,9 +31,15 @@ function coachingHarness(){
  for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
  const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
  const storage=new Memory(),book=new StudioNotebook(storage),initial=book.create('child-one','new','Synthetic new game');let active=initial;
- const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[];
+ const statuses:{text:string;error:boolean}[]=[],pending:{
+  resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal;body:any
+ }[]=[];
+ let modelAvailable=true;
  Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}}}});
- Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal}))});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>{
+  if(String(_url).endsWith('/v1/coach/status'))return Promise.resolve(new Response(JSON.stringify({available:modelAvailable,mode:modelAvailable?'model':'unavailable'})));
+  return new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal,body:JSON.parse(String(options.body))}));
+ }});
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
@@ -43,6 +50,9 @@ function coachingHarness(){
   input(id:string,value:string){const input=get(id);input.focus();input.value=value;input.dispatchEvent(new Event('input'));},
   save(field:string){const input=get('plan-'+field),index=input.parentElement!.children.indexOf(input);input.parentElement!.children[index+2].children[0].onclick();},
   resolve(reply:CoachReply){pending.shift()!.resolve(new Response(JSON.stringify({mode:'model',reply}),{status:200}));},
+  refuse(code='COACH_REFUSED'){pending.shift()!.resolve(new Response(JSON.stringify({errorCode:code}),{status:400}));},
+  setAvailability(value:boolean){modelAvailable=value;coach.openSession();},
+  async requestReady(){for(let i=0;i<6&&!pending.length;i++)await new Promise<void>(r=>setImmediate(r));assert.ok(pending.length,'expected model-bound request');},
   switchChild(){active=book.create('child-two','new','Another child’s game');coach.openSession();return active;},
   dispose(){for(const [key,descriptor]of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete (globalThis as any)[key];}}
  };
@@ -96,20 +106,20 @@ await test('autosave retains unchanged helper provenance and explicit acceptance
  }finally{h.dispose();}
 });
 await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');assert.equal(h.pending.length,1);
+ const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');await h.requestReady();assert.equal(h.pending.length,1);
   h.input('studioPrompt','Maybe the penguin could bounce');h.resolve(reply);await turn;
   assert.equal(h.get('studioPrompt').value,'Maybe the penguin could bounce');assert.equal(h.session().draft,'Maybe the penguin could bounce');assert.equal(h.session().messages[0].text,'I want a different way to move');assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
 });
 await test('retyping the same draft while the coach replies still counts as new work',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
+ const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');await h.requestReady();h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
 });
 await test('a late coach suggestion cannot overwrite a newer child plan answer',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
+ const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');await h.requestReady();h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
 });
 await test('an old rejected coach request cannot write into a new child or interrupt their reply',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss'),oldRequest=h.pending.shift()!;
-  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;
+ const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss');await h.requestReady();const oldRequest=h.pending.shift()!;
+  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;await h.requestReady();
   assert.equal(h.get('coachModeStatus').textContent,'Thinking together…');assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
   h.resolve(reply);await current;assert.equal(h.session().messages.length,2);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
@@ -130,11 +140,45 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
  }finally{h.dispose();}
 });
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
+ const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');h.storage.fail=true;await h.requestReady();h.resolve(reply);await assert.doesNotReject(turn);
   assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);
  }finally{h.dispose();}
 });
 
+await test('two model turns preserve child context without repeating the current message',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt','A dragon flies over the moon');
+  const first=h.coach.discuss('discuss');await h.requestReady();
+  assert.equal(h.pending[0].body.context.message,'A dragon flies over the moon');
+  assert.deepEqual(h.pending[0].body.context.conversation,[]);
+  h.resolve(reply);await first;
+  h.input('studioPrompt','What color should it be?');
+  const second=h.coach.discuss('discuss');await h.requestReady();
+  const c=h.pending[0].body.context;
+  assert.equal(c.message,'What color should it be?');
+  assert.deepEqual(c.conversation.map((m:any)=>m.role),['child','helper']);
+  assert.equal(c.conversation[0].text,'A dragon flies over the moon');
+  assert.ok(!c.conversation.some((m:any)=>m.text===c.message));
+  h.resolve(reply);await second;
+ }finally{h.dispose();}
+});
+await test('inference is never sent when family/model status is unavailable',async()=>{
+ const h=coachingHarness();try{
+  h.setAvailability(false);h.input('studioPrompt','My first idea');
+  await h.coach.discuss('discuss');
+  assert.equal(h.pending.length,0);
+  assert.match(h.session().messages.at(-1)!.text,/Local design helper/);
+ }finally{h.dispose();}
+});
+await test('model safety refusal never falls through to scripted coaching',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt','A child asked for private contact');
+  const turn=h.coach.discuss('discuss');await h.requestReady();
+  h.refuse();await turn;
+  assert.doesNotMatch(h.session().messages.at(-1)!.text,/Local design helper/);
+  assert.match(h.session().messages.at(-1)!.text,/safe/);
+ }finally{h.dispose();}
+});
 await test('model cannot declare a build or promotion action',()=>{assert.throws(()=>validateCoachReply({...reply,promote:true},context));assert.throws(()=>validateCoachReply({...reply,move:'execute'},context));});
 await test('unsupported observation citation rejected',()=>{assert.throws(()=>validateCoachReply({...reply,evidenceIds:['not-real']},context));});
 await test('one question per reply, not a disguised interview',()=>{assert.throws(()=>validateCoachReply({...reply,text:'What happened? What next?'},context));});
@@ -144,16 +188,20 @@ await test('requests for inspiration get alternatives; no withholding',()=>{asse
 await test('winning does not automatically establish enjoyment',()=>{const r=localCoach({...context,message:'I won but it was boring'});assert.match(r.text,/change the action or goal/);});
 await test('gold policy explicitly preserves redesign, skip, ownership and not overclaiming',()=>{for(const phrase of ['not as a fixed interview','child owns','Rethinking','no nagging','one play is not proof'])assert.ok(COACH_POLICY.toLowerCase().includes(phrase.toLowerCase()),phrase);});
 await test('conversation coach respects either required learning subject',()=>{assert.match(COACH_POLICY,/Math or Language Arts/);assert.match(COACH_POLICY,/cannot change the parent's chosen subject/);assert.match(COACH_POLICY,/required learning layer/);});
-const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,model:'synthetic-model',apiKey:'synthetic-secret',maxInputChars:16000,maxOutputTokens:500,maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,pricesReviewedAt:new Date().toISOString()};
+const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,zdrApproved:true,familyConsentApproved:true,brokerApproved:true,brokerOrigin:'https://private-coach-example.a.run.app',model:'synthetic-model',apiKey:'synthetic-secret',maxInputChars:16000,maxOutputTokens:500,maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,pricesReviewedAt:new Date().toISOString()};
 const session={subject:'synthetic-designer',familyId:'family-test',role:'designer' as const,expiresAt:Date.now()+60000};
 const repo=new MemoryRepository();await repo.transaction(s=>{s.ledgers[session.familyId]={allowance:50000,reserved:0,used:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};return true;});
+ await setOwnerCoachConsent(repo,{subject:'guardian-one',familyId:session.familyId,role:'parent',expiresAt:Date.now()+3600000},
+  {familyId:session.familyId,model:true,audio:true,verifiedByAdult:true,
+   verificationReceipt:'synthetic-guardian-proof-001',expiresAt:Date.now()+30*86400000});
 let calls=0;const provider={complete:async()=>{calls++;return {reply,usedMicroUsd:100};}};
 const service=new CoachService(repo,config,provider);
 await test('real service contract uses authorized budgeted provider port',async()=>{const r=await service.respond(session,{requestId:'req1',context});assert.equal(r.mode,'model');assert.equal(r.reply.move,'clarify');assert.equal(calls,1);const ledger=(await repo.snapshot()).ledgers[session.familyId];assert.equal(ledger.used,100);assert.equal(ledger.reserved,0);});
-await test('idempotent turn does not repeat inference or charge',async()=>{await service.respond(session,{requestId:'req1',context});assert.equal(calls,1);});
+await test('idempotent turn does not repeat inference or charge',async()=>{await assert.rejects(service.respond(session,{requestId:'req1',context}),/COACH_REQUEST_EXISTS/);assert.equal(calls,1);});
+await test('server receipts contain no child/model reply',async()=>{const state=await repo.snapshot();assert.ok(state.coachReceipts?.length);assert.equal(state.coachReceipts?.find(r=>r.id==='req1')?.reply,undefined);});
 await test('payload rebinding rejected',async()=>{await assert.rejects(service.respond(session,{requestId:'req1',context:{...context,message:'different'}}),/IDEMPOTENCY/);});
 await test('expired session rejected before inference',async()=>{await assert.rejects(service.respond({...session,expiresAt:0},{requestId:'expired',context}),/UNAUTHENTICATED/);});
-await test('disabled provider and privacy gates fail closed',async()=>{for(const patch of [{enabled:false},{privacyApproved:false},{moderationApproved:false},{pricesReviewedAt:'2020-01-01'}])await assert.rejects(new CoachService(repo,{...config,...patch},provider).respond(session,{requestId:'gate',context}),/UNAVAILABLE/);});
+await test('disabled provider and privacy gates fail closed',async()=>{for(const patch of [{enabled:false},{privacyApproved:false},{moderationApproved:false},{zdrApproved:false},{familyConsentApproved:false},{brokerApproved:false},{pricesReviewedAt:'2020-01-01'}])await assert.rejects(new CoachService(repo,{...config,...patch},provider).respond(session,{requestId:'gate',context}),/UNAVAILABLE/);});
 await test('contact information blocked before provider call',async()=>{await assert.rejects(service.respond(session,{requestId:'pii',context:{...context,message:'Email test@example.invalid'}}),/PRIVATE_INFORMATION/);assert.equal(calls,1);});
 await test('spending cutoff stops provider calls',async()=>{await repo.transaction(s=>{s.ledgers[session.familyId].allowance=100;return true;});await assert.rejects(service.respond(session,{requestId:'cap',context}),/SPENDING/);assert.equal(calls,1);});
 await test('unknown provider failure conservatively settles reservation',async()=>{await repo.transaction(s=>{s.ledgers[session.familyId].allowance=50000;return true;});const failing=new CoachService(repo,config,{complete:async()=>{throw Error('network');}});await assert.rejects(failing.respond(session,{requestId:'fail',context}));const l=(await repo.snapshot()).ledgers[session.familyId];assert.equal(l.used,10100);assert.equal(l.reserved,0);});
@@ -163,7 +211,7 @@ await test('child-authorship requires an exact child quote, not a helper paraphr
 await test('input moderation refuses before an inference request',async()=>{let inference=0;const p=new OpenAICoachProvider(config,async url=>{if(!String(url).endsWith('/moderations'))inference++;return new Response(JSON.stringify({results:[{flagged:true}]}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(inference,0);});
 await test('output moderation prevents an unsafe response from reaching the child',async()=>{let mod=0;const p=new OpenAICoachProvider(config,async url=>{if(String(url).endsWith('/moderations'))return new Response(JSON.stringify({results:[{flagged:++mod===2}]}));return new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(mod,2);});
 await test('invalid model output never mutates a game or becomes a trusted plan',async()=>{const bad=new CoachService(repo,config,{complete:async()=>({reply:{...reply,tool:'change-main'},usedMicroUsd:4})});await assert.rejects(bad.respond(session,{requestId:'bad-output',context}),/Invalid coach response/);assert.equal((await repo.snapshot()).coachReceipts!.find(r=>r.id==='bad-output')!.state,'failed');});
-await test('request IDs cannot leak another family response',async()=>{const other={...session,familyId:'other-family'};await assert.rejects(service.respond(other,{requestId:'req1',context}),/SPENDING_CUTOFF/);});
+await test('request IDs cannot leak another family response',async()=>{const other={...session,familyId:'other-family'};await assert.rejects(service.respond(other,{requestId:'req1',context}),/COACH_UNAVAILABLE/);});
 console.log(`${passed} design-coach tests passed. Model outputs are fixtures; no live inference or learning efficacy is claimed.`);
 
 }

@@ -69,6 +69,15 @@ export class StudioNotebook {
   message(id:string,owner:string,role:Message['role'],text:string) {
     return this.update(id,owner,s=>{if(s.messages.length>=200)throw Error('This conversation is full. Save a new copy or export your notebook to keep exploring.');s.messages.push({id:crypto.randomUUID(),role,text:text.slice(0,2200),at:new Date().toISOString()});});
   }
+  /** Clear only this child's conversation and unsent prompt, atomically.
+   * Game versions, independent tests, learning records and design-plan choices
+   * remain intact. Exported backups are not altered by this action.
+   */
+  clearConversation(id:string,owner:string):StudioSession {
+    return this.update(id,owner,s=>{
+      s.messages=[];s.draft='';s.reflection=false;
+    });
+  }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
     const source=this.get(id,owner);
     const design=source.design?copy(source.design):undefined;

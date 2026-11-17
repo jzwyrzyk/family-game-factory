@@ -17,6 +17,23 @@ test('separate per-player projects',()=>{assert.equal(notebook.list(owner).lengt
 test('draft and conversation survive reload',()=>{notebook.update(s.id,owner,x=>{x.draft='Try more buckets';});notebook.message(s.id,owner,'child','Give me four buckets');const reopened=new StudioNotebook(storage);assert.equal(reopened.get(s.id,owner).draft,'Try more buckets');assert.equal(reopened.get(s.id,owner).messages[0].text,'Give me four buckets');});
 test('candidate survives reload without becoming working revision',()=>{notebook.update(s.id,owner,x=>{x.candidate={id:'candidate1',baseId:'base1',config:{bucketCount:4},prompt:'Four buckets',summary:'Three to four'};});const r=new StudioNotebook(storage).get(s.id,owner);assert.equal(r.candidate?.config?.bucketCount,4);assert.equal(r.remoteId,null);});
 test('forked conversation is independent',()=>{const f=notebook.fork(s.id,owner,'New copy','project2',null);notebook.message(f.id,owner,'helper','Only in copy');assert.equal(notebook.get(s.id,owner).messages.length,1);assert.equal(notebook.get(f.id,owner).candidate,null);});
+test('per-child clear conversation preserves game, experiments, learning and other profile',()=>{
+ const mem=new Memory(),book=new StudioNotebook(mem);
+ const a=book.create('one','gum','My invention','game-A'),b=book.create('two','dragon','Other child','game-B');
+ book.message(a.id,'one','child','Silly spaghetti cloud');book.message(a.id,'one','helper','What happens next?');
+ book.message(b.id,'two','child','A private other-player idea');
+ book.update(a.id,'one',s=>{s.draft='Unsent words';s.hypothesis='My guess';s.reflection=true;});
+ book.saveExperiment(a.id,'one',{id:'first-test',baseId:'original',config:{gumBudget:15},prompt:'Change',summary:'Bigger idea'});
+ assert.throws(()=>book.clearConversation(a.id,'two'));
+ const before=book.get(a.id,'one');
+ const cleared=book.clearConversation(a.id,'one');
+ assert.deepEqual(cleared.messages,[]);assert.equal(cleared.draft,'');assert.equal(cleared.reflection,false);
+ const loaded=new StudioNotebook(mem).get(a.id,'one');
+ assert.deepEqual(loaded.messages,[]);assert.equal(loaded.experiments?.length,1);
+ assert.equal(loaded.candidate?.id,before.candidate?.id);assert.equal(loaded.hypothesis,'My guess');
+ assert.equal(loaded.projectId,'game-A');
+ assert.equal(book.get(b.id,'two').messages[0].text,'A private other-player idea');
+});
 test('unknown/secret field refused',()=>{const data=notebook.read() as any;data.sessions[0].previewUrl='https://secret/?capability=token';assert.throws(()=>validateNotebook(data));});
 test('unknown schema does not erase original storage',()=>{const bad=new Memory();bad.setItem(STUDIO_KEY,'{"version":99}');assert.throws(()=>new StudioNotebook(bad));assert.equal(bad.getItem(STUDIO_KEY),'{"version":99}');});
 test('quota failure is atomic',()=>{const prior=storage.getItem(STUDIO_KEY);storage.fail=true;assert.throws(()=>notebook.update(s.id,owner,x=>{x.name='lost';}));storage.fail=false;assert.equal(storage.getItem(STUDIO_KEY),prior);});

@@ -8,3 +8,4 @@ dist/
 *.key
 .factory-deployment/
 **/__pycache__/
+dist-private/
