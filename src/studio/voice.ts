@@ -95,7 +95,10 @@ export function installStudioVoice(ui:StudioVoiceOptions){
    if(scope!==ui.scope()||!ui.canListen())return;
    voiceScope=scope;speakAfterVoice=true;
    announce('You said: '+transcript);
-   try{void Promise.resolve(ui.onTranscript(transcript)).catch(()=>{
+   try{void Promise.resolve(ui.onTranscript(transcript)).then(()=>{
+    // A declined turn must not arm an unrelated later reply.
+    speakAfterVoice=false;
+   },()=>{
     speakAfterVoice=false;announce('Your message could not be sent. You can type instead.');
    });}catch{speakAfterVoice=false;announce('Your message could not be sent.');}
   };

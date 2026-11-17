@@ -44,7 +44,7 @@ export function installCoaching(h:Hooks){
  $('coachFriction').oninput=()=>run(()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.friction=$<HTMLInputElement>('coachFriction').value;});});
  $('coachDiscuss').onclick=()=>void discuss('discuss');$('coachIdeas').onclick=()=>void discuss('ideas');$('coachExplain').onclick=()=>void discuss('explain');
  $('coachTry').onclick=()=>{const p=$<HTMLTextAreaElement>('studioPrompt').value.trim();if(p)void request(p,p===selectedSuggestion?'helper':'child','tune');else h.status('Tell me the change you want to try.');};
- $('coachThink').onclick=()=>run(async()=>{if((window as any).FG.learning?.active){h.status('Finish the current math activity first.');return;}cancelDiscussion();cancelRequest();const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;x.reflection=false;});h.status('Your thoughts and tests are saved. Keep playing.');document.body.classList.remove('studio-designing');await h.playMain();});
+ $('coachThink').onclick=()=>run(async()=>{if((window as any).FG.learning?.active){h.status('Finish the current learning activity first.');return;}cancelDiscussion();cancelRequest();const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;x.reflection=false;});h.status('Your thoughts and tests are saved. Keep playing.');document.body.classList.remove('studio-designing');await h.playMain();});
  $('coachPlanToggle').onclick=()=>run(()=>{plan.open=!plan.open;if(plan.open)renderPlan();});
  // Do not let typing in any design field move or jump the game character.
  [controls,plan,shelf].forEach(e=>e.addEventListener('keydown',event=>event.stopPropagation()));
@@ -110,7 +110,7 @@ export function installCoaching(h:Hooks){
   finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}
  }
  async function intercept(prompt:string):Promise<boolean>{
-  if((window as any).FG.learning?.active){h.status('Finish the current math question before changing this game.');return true;}
+  if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
   const s=h.current();if(force){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
   if(h.localSupported(prompt))return false;
   // Unfamiliar commands stay conversations until the child chooses Try my idea.

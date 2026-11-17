@@ -42,14 +42,16 @@ function current(){if(!active)throw Error('Recognition did not start');return ac
 async function run(){
   const microphone=new Button(),installPack=new Button(),hearReply=new Button(),status=new Status();
   const transcripts:string[]=[];
+  let deliverFirstReply:(()=>void)|undefined;
   const voice=installStudioVoice({
     microphone:microphone as unknown as HTMLButtonElement,
     installPack:installPack as unknown as HTMLButtonElement,
     hearReply:hearReply as unknown as HTMLButtonElement,
     status:status as unknown as HTMLElement,
     scope:()=>scope,canListen:()=>allowed,
-    onTranscript:message=>{transcripts.push(message);}
+    onTranscript:message=>{transcripts.push(message);if(message.includes('spaghetti'))deliverFirstReply?.();}
   });
+  deliverFirstReply=()=>voice.reply('Would the spaghetti be a funny surprise?');
   assert.equal(microphone.attrs['aria-pressed'],'false');
   assert.equal(hearReply.disabled,true);
 
@@ -62,7 +64,6 @@ async function run(){
   await Promise.resolve();
   assert.deepEqual(transcripts,['What if the dragon sneezes spaghetti?']);
   assert.equal(microphone.attrs['aria-pressed'],'false');
-  voice.reply('Would the spaghetti be a funny surprise?');
   assert.deepEqual(spoken,['Would the spaghetti be a funny surprise?'],'a spoken child turn may receive a verified local spoken reply');
   assert.equal(hearReply.disabled,false);
   voice.cancel();assert.equal(hearReply.disabled,true,'a previous child reply must not survive navigation');
@@ -72,6 +73,9 @@ async function run(){
   scope='child-b:game-two';current().onend?.();
   await Promise.resolve();
   assert.equal(transcripts.length,1,'late voice from another player must not cross profiles');
+  await Promise.resolve();
+  voice.reply('A typed turn should not be spoken automatically');
+  assert.deepEqual(spoken,['Would the spaghetti be a funny surprise?']);
   voice.cancel();
 
   await voice.listen();
