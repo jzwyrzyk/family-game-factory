@@ -173,3 +173,10 @@ h1,h2,h3,.studio-review .studio-home-intro h1,.studio-review .studio-card-name{
 .studio-review .studio-voice-note,.studio-review .studio-card-state{color:#53627a}
 @media(max-width:650px){.jems-brand-logo{width:142px;max-height:55px}}
 @media(prefers-reduced-motion:reduce){.studio-review .studio-make-tile,.studio-review .studio-library-card{transition:none}}
+
+
+/* Subtle, noninteractive gem-and-spark pattern behind the empty creation canvas. */
+.studio-review .studio-empty{position:relative;isolation:isolate;overflow:hidden}
+.studio-review .jems-empty-decoration{position:absolute;right:-45px;top:-30px;width:350px;height:235px;object-fit:cover;opacity:.22;pointer-events:none;z-index:-1}
+.studio-review .studio-empty > :not(.jems-empty-decoration){position:relative;z-index:1}
+@media(max-width:650px){.studio-review .jems-empty-decoration{width:240px;height:160px;right:-60px;top:-40px;opacity:.15}}
