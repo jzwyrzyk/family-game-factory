@@ -29,8 +29,14 @@ async function pages(device,viewport){
   assert.equal(await p.locator('#studioStarters [data-starter]').count(),6);
   await shot(p,device,'01-studio-home');
   await p.locator('#studioNew').click();await p.locator('#page-studio').waitFor({state:'visible'});
+  if(device==='mobile')await p.locator('[data-studio-tab="game"]').click();
+  await shot(p,device,'02-invention-workbench');
+  if(device==='mobile')await p.locator('[data-studio-tab="talk"]').click();
   await p.locator('#studioPrompt').fill('A cat invents a rocket-powered donut car');
   await shot(p,device,'02-create-idea-conversation');
+  await p.locator('#studioTalk').click();
+  await p.waitForFunction(()=>!!document.querySelector('.jems-delight-toast[data-kind="idea"]'));
+  await shot(p,device,'02-first-idea-celebration');
   if(device==='mobile')await p.locator('[data-studio-tab="versions"]').click();
   else {await p.locator('#studioMore summary').click();await p.locator('#studioCompare').click();}
   await p.locator('#studioVersions').waitFor({state:'visible'});await shot(p,device,'03-versions-and-tests');
@@ -68,7 +74,7 @@ async function pages(device,viewport){
 try{
  await pages('desktop',{width:1440,height:960});
  await pages('mobile',{width:390,height:844});
- assert.equal(report.screenshots.length,34);
+ assert.equal(report.screenshots.length,38);
  console.log('PASS: '+report.screenshots.length+' actual PR screenshots, commit '+report.sha);
 }catch(e){report.errors.push(String(e.stack||e));console.error(e);process.exitCode=1;}
 finally{
