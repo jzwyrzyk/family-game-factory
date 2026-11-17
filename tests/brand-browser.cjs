@@ -70,6 +70,8 @@ const fs=require('node:fs');
    assert.equal(await page.locator('#page-parent').isVisible(),true);
    const parentLabel=await page.locator('#page-parent label[for="parentNickname"]').evaluate(e=>getComputedStyle(e).color);
    assert.equal(parentLabel,'rgb(52, 68, 102)','Parent form labels need strong Ink-on-white contrast');
+   const restoreLabel=await page.locator('#page-parent label.upload-button').evaluate(e=>({color:getComputedStyle(e).color,bg:getComputedStyle(e).backgroundColor}));
+   assert.deepEqual(restoreLabel,{color:'rgb(81, 48, 153)',bg:'rgb(242, 236, 255)'},'Restore progress button must be legible on its light secondary surface');
    await page.screenshot({path:'test-results/jems-parent-'+label+'.png',fullPage:false});
    const manifest=await page.evaluate(()=>fetch('./manifest.webmanifest').then(r=>r.json()));
    assert.equal(manifest.short_name,'jems');

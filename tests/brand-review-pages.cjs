@@ -22,7 +22,7 @@ async function shot(page,device,name){
 async function home(page){await page.locator('#studioNavHome').click();await page.locator('#page-studio-library').waitFor({state:'visible'});}
 async function pages(device,viewport){
  report.viewports[device]=viewport;
- const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),p=await ctx.newPage();
+ const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce',serviceWorkers:'block'}),p=await ctx.newPage();
  p.setDefaultTimeout(14000);p.on('dialog',d=>void d.accept());
  try{
   await p.goto(base);await p.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
@@ -52,7 +52,7 @@ async function pages(device,viewport){
   await shot(p,device,'11-my-powers-english');await home(p);
   await shot(p,device,'12-returning-child-home');
  }finally{await ctx.close();}
- const c2=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),legacy=await c2.newPage();
+ const c2=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce',serviceWorkers:'block'}),legacy=await c2.newPage();
  legacy.setDefaultTimeout(14000);legacy.on('dialog',d=>void d.accept());
  try{
   await legacy.goto(base+'?arcade=1');await legacy.waitForFunction(()=>window.FG?.app);

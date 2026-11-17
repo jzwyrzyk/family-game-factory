@@ -430,3 +430,6 @@ body:not(.studio-review) #page-feedback .live-factory label {color:#344466;}
 .stage-overlay .modal-card,.studio-review .studio-native-game .modal-card {color:#FFFFFF;}
 .stage-overlay .modal-card h2,.stage-overlay .modal-card h3,
 .studio-review .studio-native-game .modal-card h2 {color:#FFFFFF;}
+
+/* Parent restore action uses a pale secondary button rather than dark-on-dark label text. */
+#page-parent .panel label.upload-button.btn.secondary {background:#F2ECFF;color:#513099;border:1px solid #C8B4F1;min-height:44px;}
