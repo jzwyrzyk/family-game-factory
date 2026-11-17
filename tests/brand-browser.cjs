@@ -19,7 +19,7 @@ const fs=require('node:fs');
   for(const [label,width,height] of [['desktop',1280,900],['mobile',390,844]]){
    const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile',serviceWorkers:'block'}),errors=[];
    page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(15000);
-   page.on('pageerror',e=>errors.push(e.message));await page.goto(base,{waitUntil:'domcontentloaded'});
+   page.on('pageerror',e=>errors.push((e.stack||e.message)));await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
    console.log('jems brand '+label+': Studio booted');
    const logo=page.locator('img.jems-brand-logo');
