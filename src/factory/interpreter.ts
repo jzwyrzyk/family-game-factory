@@ -59,11 +59,15 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
     else if(/^make (?:the )?(?:moon )?gravity (?:higher|stronger)$/.test(text))patch.moonGravity=Math.round((Number(current.moonGravity)+0.1)*10)/10;
     else if(/^make meteors (?:slower|less frequent)$/.test(text))patch.meteorRate=Number(current.meteorRate)-0.25;
     else if(/^make meteors (?:faster|more frequent)$/.test(text))patch.meteorRate=Number(current.meteorRate)+0.25;
+    else if(/^(?:add|turn on) (?:a |the )?(?:bounce pads?|trampolines?)$/.test(text))patch.bouncePads=true;
+    else if(/^(?:remove|turn off|hide) (?:the )?(?:bounce pads?|trampolines?)$/.test(text))patch.bouncePads=false;
   } else if(game==='robot'){
     if(/^make (?:the )?robot faster$/.test(text))patch.robotSpeed=Number(current.robotSpeed)+0.25;
     else if(/^make (?:the )?robot slower$/.test(text))patch.robotSpeed=Number(current.robotSpeed)-0.25;
     else if(/^(?:show|draw) (?:my |the )?path$/.test(text))patch.showTrail=true;
     else if(/^(?:hide|remove) (?:my |the )?path$/.test(text))patch.showTrail=false;
+    else if(/^(?:add|turn on) (?:a |the )?portals?$/.test(text))patch.portalEnabled=true;
+    else if(/^(?:remove|turn off|hide) (?:the )?portals?$/.test(text))patch.portalEnabled=false;
   }
   if (game==='gum' && current.qualityVersion!==1 && ['gravity','thrust'].some(k=>k in patch)) return {kind:'invalid',message:'This earlier version uses the original construction rules. Start a physical workshop to try gravity and fan changes.'};
   if(current.originalRules && ['hearts','breathSpeed','highlightMatches','extraDecoys'].some(k=>k in patch)) return {kind:'invalid',message:'That setting belongs to a saved legacy game. Use the restored game examples below.'};
@@ -75,8 +79,8 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
   } catch (err) { return { kind: 'invalid', message: (err as Error).message + ' Your last working version is safe.' }; }
 }
 export const examples: Record<GameId, string[]> = {
-  moon: ['Give me 8 donuts','Make meteors slower','Make moon gravity lower','Make meteors faster and make moon gravity higher'],
-  robot: ['Make robot faster','Show my path','Hide my path','Make robot slower and hide my path'],
+  moon: ['Give me 8 donuts','Add bounce pads','Make moon gravity lower','Add bounce pads and make meteors faster'],
+  robot: ['Make robot faster','Add portals','Show my path','Add portals and make robot slower'],
   buckets: ['Give me four buckets', 'Show the safe bucket', 'Make the splash last 1 second', 'Hide the safe bucket', 'Make it slower'],
   gum: ['Give me ten gum sticks', 'Make joints stronger', 'Make gravity lower', 'Make fan stronger', 'Make gum stretchier'],
   dragon: ['Give the island 120 resilience', 'Make fireballs slower', 'Make shield wider'],
