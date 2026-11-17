@@ -20,6 +20,20 @@ test('honest interpreter accepts bounded child language, rejects mixed/novel ins
  assert.equal(interpret('buckets',defaults('buckets'),'Give me 99 buckets').kind,'invalid');assert.equal(interpret('buckets',defaults('buckets'),'Give me three buckets').kind,'unchanged');
  assert.equal(interpret('gum',defaults('gum'),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
 });
+test('six native game manifests and transactional composed changes stay bounded',()=>{
+ assert.equal(Object.keys(manifests).length,6);
+ assert.equal(defaults('moon').donutGoal,6);assert.equal(defaults('robot','gentle').robotSpeed,.75);
+ assert.throws(()=>validateConfig('moon',{...defaults('moon'),meteorRate:5}));
+ assert.throws(()=>validateConfig('robot',{...defaults('robot'),script:true}));
+ const composed=interpret('gum',defaults('gum'),'Give me 15 gum sticks and make fan stronger');
+ assert.equal(composed.kind,'supported');if(composed.kind==='supported'){assert.equal(composed.config.gumBudget,15);assert.equal(composed.config.thrust,1.1);}
+ const atomic=interpret('gum',defaults('gum'),'Give me 15 gum sticks and make a new universe');
+ assert.equal(atomic.kind,'generation-needed');
+ const moon=interpret('moon',defaults('moon'),'Make meteors slower and make moon gravity lower');
+ assert.equal(moon.kind,'supported');if(moon.kind==='supported'){assert.equal(moon.config.meteorRate,.75);assert.equal(moon.config.moonGravity,.5);}
+ const robot=interpret('robot',defaults('robot'),'Make robot faster and hide my path');
+ assert.equal(robot.kind,'supported');if(robot.kind==='supported'){assert.equal(robot.config.robotSpeed,1.25);assert.equal(robot.config.showTrail,false);}
+});
 test('revision DAG preserves alternate futures; undo, compare, fork and reload never overwrite source',()=>{
  const storage=memory(),store=new RevisionStore(storage);const project=store.create('p1','buckets','My game');const root=store.revision(project.id,'p1');
  const a=store.commit(project.id,'p1',{...root.config,bucketCount:4},'Four buckets','It may be harder');store.undo(project.id,'p1');
