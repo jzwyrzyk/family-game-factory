@@ -29,12 +29,12 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">✏️ Fix parts</button><button type="button" data-mode="play">▶ Try it!</button><button type="button" data-cutouts>✂️ Check cutouts</button><button type="button" data-retry hidden>↶ Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Jump ↑</button></div><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
   <aside class="dl-tools"><label>What did you draw?<select data-kind><option value="car">Car or vehicle</option><option value="character">Character or creature</option><option value="machine">Invention or machine</option><option value="scene">World or level</option></select></label>
   <p data-explanation class="dl-note" aria-live="polite"></p><div data-piece-list class="dl-piece-list" role="group" aria-label="Pieces in this drawing"></div>
-  <div class="dl-edit-tools"><button type="button" data-add>＋ Mark another part</button><button type="button" data-undo>↶ Undo</button><button type="button" data-delete>Remove part</button>
+  <div class="dl-edit-tools"><button type="button" data-add>＋ Mark another part</button><button type="button" data-pivot aria-pressed="false">🔩 Place hinge</button><button type="button" data-undo>↶ Undo</button><button type="button" data-delete>Remove part</button>
   <label>What is this part?<input data-piece-name maxlength="50" placeholder="Name this part"></label>
   <label>What should it do?<select data-role></select></label>
   <label>Outline shape<select data-shape><option value="rect">Square or rectangle</option><option value="ellipse">Round or oval</option></select></label>
   <label>Attached to<select data-parent></select></label>
-  <p class="dl-guidance">Tap a part or its name. Drag the outline to move it; drag its corner to resize. To mark a new part, choose “Mark another part,” then drag a box around it.</p></div>
+  <p class="dl-guidance">Tap a part or its name. Drag its outline to move it; drag the corner to resize. To mark a new part, draw its box. For an arm or wing, choose “Place hinge” and tap where it connects.</p></div>
   <div class="dl-version"><button type="button" data-save>💾 Save this test</button><button type="button" data-use disabled>⭐ Use my car in Rally</button><label>Earlier tests<select data-history><option value="">Choose a saved version</option></select></label></div></aside></div>
   <footer class="dl-footer"><span data-status role="status" aria-live="polite">Choose the parts of your drawing. Nothing leaves this device.</span><span>On computer: hold Space to move during a test.</span></footer></div>`;
  document.body.append(working);
@@ -47,7 +47,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  let kind:DrawingKind='car',assembly:DrawingAssembly,selected='',mode:'edit'|'play'='edit',disposed=false;
  const onProfile=()=>{if(!stillOwner())working.close();};
  window.addEventListener('factory-profile',onProfile);
- let pendingNew=false,history:SavedRig|null=null,lastStored:SavedRig|null=null;
+ let pendingNew=false,pendingPivot=false,history:SavedRig|null=null,lastStored:SavedRig|null=null;
  let drag:null|{pointer:number;type:'create'|'move'|'resize';id:string;startX:number;startY:number;before:DrawingAssembly} = null;
  const undo:DrawingAssembly[]=[];
  const partsPanel=q<HTMLElement>(working,'[data-piece-list]'),clockHolder:{clock?:ReturnType<typeof createFixedClock>}={};
@@ -70,7 +70,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const p=suggestParts(originalForeground(),next);
   assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:'',revision:1};
   notice.textContent=p.explanation+' You can change any piece.';
-  selected=assembly.pieces[0].id;layerCache.clear();history=null;lastStored=null;
+  selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;layerCache.clear();history=null;lastStored=null;
   q<HTMLButtonElement>(working,'[data-use]').disabled=true;
   resetHistory();refresh();
  }
@@ -93,6 +93,9 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   q<HTMLButtonElement>(working,'[data-delete]').disabled=!piece||assembly.pieces.length===1||mode==='play';
   q<HTMLButtonElement>(working,'[data-undo]').disabled=!undo.length||mode==='play';
   q<HTMLButtonElement>(working,'[data-add]').disabled=assembly.pieces.length>=24||mode==='play';
+  const hingeButton=q<HTMLButtonElement>(working,'[data-pivot]');
+  hingeButton.disabled=!piece||mode==='play'||piece.role==='body'||piece.role==='decoration';
+  hingeButton.setAttribute('aria-pressed',String(pendingPivot));
  }
  function fit(){
   const w=contentWidth(),h=Math.max(310,Math.min(530,w*.64));
@@ -135,7 +138,15 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    const label=p.name.slice(0,21);ctx.font='bold 13px system-ui';ctx.fillStyle=p.id===selected?'#e28c22':'#176f65';
    ctx.fillRect(x,Math.max(2,y-21),Math.min(pw,Math.max(46,ctx.measureText(label).width+12)),20);
    ctx.fillStyle='white';ctx.fillText(label,x+6,Math.max(16,y-6));
-   if(p.id===selected){ctx.fillStyle='#f5a739';ctx.fillRect(x+pw-11,y+ph-11,22,22);}
+   if(p.id===selected){
+     ctx.fillStyle='#f5a739';ctx.fillRect(x+pw-11,y+ph-11,22,22);
+     if(p.parentId!==null&&p.role!=='decoration'){
+       const px=x+pw*(p.pivot?.x??.5),py=y+ph*(p.pivot?.y??.5);
+       ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.fillStyle='#ffd259';ctx.fill();
+       ctx.strokeStyle='#263a4a';ctx.lineWidth=2.5;ctx.stroke();
+       ctx.beginPath();ctx.moveTo(px-13,py);ctx.lineTo(px+13,py);ctx.moveTo(px,py-13);ctx.lineTo(px,py+13);ctx.stroke();
+     }
+   }
    ctx.restore();
   }
  }
@@ -184,7 +195,9 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    }else{
     assemblyRig(assembly);other=createDrawingPlayground(assembly);otherScene=other.snapshot();
    }
-   mode='play';canvas.setAttribute('aria-label','Play with your moving drawing. Hold Space to move; use the buttons on touch.');
+   mode='play';pendingPivot=false;pendingNew=false;
+    canvas.setAttribute('aria-label','Play with your moving drawing. Hold Space to move; use the buttons on touch.');
+    updatePanel();
    for(const b of working.querySelectorAll<HTMLButtonElement>('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode==='play'));
    q<HTMLButtonElement>(working,'[data-go]').hidden=false;
    q<HTMLButtonElement>(working,'[data-jump]').hidden=assembly.kind==='car';
@@ -202,7 +215,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  }
  function setMode(next:'edit'|'play'){
   if(next==='play'){startPlay();return;}
-  stopPlay();mode='edit';canvas.setAttribute('aria-label','Drawing editor. Tap, move or resize a highlighted part.');
+  stopPlay();mode='edit';pendingPivot=false;pendingNew=false;
+  canvas.setAttribute('aria-label','Drawing editor. Tap, move or resize a highlighted part.');
   for(const b of working.querySelectorAll<HTMLButtonElement>('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode==='edit'));
   message('Move the outlines if we misunderstood your drawing. Your original is unchanged.');refresh();
  }
@@ -216,6 +230,14 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  canvas.addEventListener('pointerdown',e=>{
   if(mode!=='edit'||e.button>0||drag)return;
   const point=position(e),before=structuredClone(assembly);
+  if(pendingPivot){
+   const p=getSelected();
+   if(!p||!includes(p,point.x,point.y)){message('Tap inside the selected moving part to place its hinge.');return;}
+   const region=p.region;
+   p.pivot={x:clamp((point.x-region.x)/region.w,0,1),y:clamp((point.y-region.y)/region.h,0,1)};
+   pendingPivot=false;remember(before);refresh();
+   message('Hinge placed! Test it to see how this part swings.');e.preventDefault();return;
+  }
   if(pendingNew){
    const n=assembly.pieces.length+1,id='piece_'+n+'_'+Math.round(performance.now())%10000;
    const piece:DrawingPiece={id,name:'My moving piece',role:'limb',region:{x:Math.min(point.x,.974),y:Math.min(point.y,.974),w:.026,h:.026,shape:'rect'},parentId:assembly.pieces[0]?.id||null,physical:true};
@@ -260,7 +282,13 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   if(mode==='play')setMode('edit');kind=(e.target as HTMLSelectElement).value as DrawingKind;
   proposals(kind);message('These are suggestions. Mark the pieces that should move.');
  });
- q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;message('Drag a box around the new part on your drawing.');canvas.focus({preventScroll:true});});
+ q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;pendingPivot=false;refresh();message('Drag a box around the new part on your drawing.');canvas.focus({preventScroll:true});});
+ q<HTMLButtonElement>(working,'[data-pivot]').addEventListener('click',()=>{
+   const p=getSelected();if(mode!=='edit'||!p||p.role==='body'||p.role==='decoration')return;
+   pendingPivot=!pendingPivot;pendingNew=false;refresh();
+   message(pendingPivot?'Tap where this part should attach or bend.':'Hinge placement cancelled.');
+   canvas.focus({preventScroll:true});
+ });
  q<HTMLButtonElement>(working,'[data-undo]').addEventListener('click',()=>{const previous=undo.pop();if(!previous)return;assembly=previous;selected=assembly.pieces[0].id;layerCache.clear();refresh();});
  q<HTMLButtonElement>(working,'[data-delete]').addEventListener('click',()=>{
   if(assembly.pieces.length===1)return;
@@ -275,6 +303,9 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  roleInput.addEventListener('change',()=>{
   const p=getSelected();if(!p)return;const before=structuredClone(assembly);
   p.role=roleInput.value as Role;p.physical=!['decoration'].includes(p.role);
+  if(p.role==='wing'&&!p.pivot)p.pivot={x:.12,y:.5};
+  if(p.role==='limb'&&!p.pivot)p.pivot={x:.5,y:.12};
+  pendingPivot=false;
   if(p.role==='body')p.parentId=null;
   remember(before);layerCache.clear();refresh();
  });
