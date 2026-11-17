@@ -37,7 +37,8 @@ export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:st
     .find(x=>x.startsWith('factory_session='))?.slice(16);
    const session=verifySession(token,config.sessionKey);
    if(req.url==='/v1/coach/audio/status'&&req.method==='GET'){
-    reply(200,{available:service.enabled(),mode:service.enabled()?'private':'unavailable'});return;
+    const available=await service.familyAvailable(session);
+    reply(200,{available,mode:available?'private':'unavailable'});return;
    }
    if(req.url!=='/v1/coach/audio'||req.method!=='POST'||
     req.headers['x-factory-request']!=='1')throw Error('FORBIDDEN');
