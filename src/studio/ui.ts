@@ -6,6 +6,7 @@ import {installStudioVoice} from './voice';
 import {freshDesign} from './design';
 import './style.css';
 import '../brand/jems.css';
+import '../brand/playful.css';
 import { installQualityCards } from '../quality/cards';
 import { StudioNotebook, validateNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
 import { StudioGames, isGeneratedRemoteKind } from './adapter';
