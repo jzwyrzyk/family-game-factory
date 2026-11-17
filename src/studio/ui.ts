@@ -215,6 +215,7 @@ export async function installStudio(){
  async function playCandidate(){const s=current(),c=s.candidate;if(!canChangePlay(s))return;if(!c)return playWorking();if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate');}
  async function playViewed(){
   const s=current();if(!canChangePlay(s))return;
+  voice?.cancel();
   if(showing==='history'){
    if(remoteViewedId){await showRemote(s,remoteViewedId);return;}
    if(s.projectId&&viewedRevisionId){const r=games.revision(s.projectId,s.owner,viewedRevisionId);playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id);return;}
@@ -236,7 +237,7 @@ export async function installStudio(){
   focusView($('studioHelpTitle'));
  }
  async function submit(){
-  if(guardMath())return;flushDraft();const s=current(),prompt=s.draft.trim(),started=epoch;if(!prompt)return;
+  if(guardMath())return;voice?.cancel();flushDraft();const s=current(),prompt=s.draft.trim(),started=epoch;if(!prompt)return;
   if(reflecting){notebook.observe(s.id,s.owner,prompt,'child',s.design?.observations.filter(o=>o.source==='runtime').at(-1)?.experimentId||null);message(s,'reflection',prompt);notebook.update(s.id,s.owner,x=>{x.draft='';x.reflection=false;});reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value='';render();return;}
   if(busy(s)||sending.has(s.id)){status('Your current build is still running. Play your working game or cancel the build first.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
@@ -366,7 +367,7 @@ export async function installStudio(){
   else if(target.dataset.page==='feedback'||target.id==='improveThis'||target.id==='returnLive'){event.preventDefault();event.stopImmediatePropagation();act(()=>{if(activeId){showStudio();setTab('talk');$('studioPrompt').focus();}else home();});}
   else if(target.dataset.game){event.preventDefault();event.stopImmediatePropagation();act(()=>start(target.dataset.game as GameId));}
   else if(target.id==='exitGame'){event.preventDefault();event.stopImmediatePropagation();act(home);}
-  else if(target.dataset.page==='parent'||target.dataset.page==='lab'){act(()=>{flushDraft();disposeGame();route='other';});}
+  else if(target.dataset.page==='parent'||target.dataset.page==='lab'){act(()=>{voice?.cancel();flushDraft();disposeGame();route='other';});}
  },true);
  // Keyboard input in the conversation must not operate a game's controls.
  $('studioPrompt').addEventListener('keydown',event=>event.stopPropagation());
@@ -376,11 +377,11 @@ export async function installStudio(){
  $('studioReady').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;const ready=readyExperiment(s);if(ready?.candidate.remoteId)await showRemote(s,ready.candidate.remoteId,'candidate',ready.id);});
  $('studioMore').querySelector('summary')!.addEventListener('click',event=>{if(guardMath())event.preventDefault();});
  $('studioHome').onclick=()=>act(home);$('studioNavHome').onclick=()=>act(home);$('studioNew').onclick=()=>act(newIdea);$('studioNavCreate').onclick=()=>act(newIdea);$('studioChooseStarter').onclick=()=>act(home);
- $('studioNavPowers').onclick=()=>act(()=>{flushDraft();disposeGame();FG.app.page('lab');route='other';});
+ $('studioNavPowers').onclick=()=>act(()=>{voice?.cancel();flushDraft();disposeGame();FG.app.page('lab');route='other';});
  $('studioPlay').onclick=()=>act(playViewed);$('studioKeep').onclick=()=>act(keep);$('studioUndo').onclick=()=>act(undo);
  $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;});await playCandidate();return;}if(!s.projectId)return;games.redo(s.owner,s.projectId);await playWorking();});
  $('studioCompare').onclick=()=>act(()=>{if(setTab('versions'))$<HTMLDetailsElement>('studioMore').open=false;});$('studioCloseVersions').onclick=()=>act(()=>{setTab('game');focusView($('studioReturnToPlay')||$('studioPlay'));});$('studioBackWorking').onclick=()=>act(playWorking);
- $('studioCopy').onclick=()=>{if(guardMath())return;++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;} $<HTMLInputElement>('studioCopyName').value=current().name+' copy';$<HTMLDialogElement>('studioCopyDialog').showModal();$('studioCopyName').focus();};$('studioCopyCancel').onclick=()=>$<HTMLDialogElement>('studioCopyDialog').close();$<HTMLDialogElement>('studioCopyDialog').addEventListener('close',()=>{if(route==='studio'&&!FG.learning.active)focusView($('studioCopy'));});
+ $('studioCopy').onclick=()=>{if(guardMath())return;voice?.cancel();++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;} $<HTMLInputElement>('studioCopyName').value=current().name+' copy';$<HTMLDialogElement>('studioCopyDialog').showModal();$('studioCopyName').focus();};$('studioCopyCancel').onclick=()=>$<HTMLDialogElement>('studioCopyDialog').close();$<HTMLDialogElement>('studioCopyDialog').addEventListener('close',()=>{if(route==='studio'&&!FG.learning.active)focusView($('studioCopy'));});
  $('studioCopyForm').onsubmit=e=>{e.preventDefault();act(()=>copyGame($<HTMLInputElement>('studioCopyName').value.trim()));};
  $('studioPromptForm').onsubmit=e=>{e.preventDefault();act(submit);};
  $('studioTalk').onclick=()=>act(()=>{
@@ -393,7 +394,7 @@ export async function installStudio(){
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
  window.addEventListener('factory-learning-active',event=>{if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
  window.addEventListener('factory-profile',()=>{updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();activeId=null;reflecting=false;disposeGame();act(home);});
- window.addEventListener('beforeunload',event=>{try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
+ window.addEventListener('beforeunload',event=>{voice?.cancel();try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
  // Existing progress backups gain an explicitly versioned optional notebook. Old backups remain valid.
  const exportButton=$('exportData');exportButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();act(()=>{if(!FG.store.recoveryRaw)flushDraft();const data=FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:games.export(),factoryStudio:notebook.read()},null,2);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a') as HTMLAnchorElement;a.href=url;a.download='family-game-factory-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});},true);

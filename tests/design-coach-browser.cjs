@@ -43,7 +43,7 @@ async function load(page,url,saved={}){
     static async available(options){if(!options.processLocally)throw Error('Off-device recognition forbidden');return 'available';}
     processLocally=false;lang='';continuous=false;interimResults=false;onresult=null;onerror=null;onend=null;
     start(){window.__studioVoiceTest=this;}
-    abort(){this.onend?.();}
+    abort(){this.aborted=true;this.onend?.();}
    }
    Object.defineProperty(window,'SpeechRecognition',{configurable:true,value:PrivateSpeech});
   });
@@ -89,6 +89,12 @@ async function load(page,url,saved={}){
   assert.equal(await page.locator('#plan-fun').inputValue(),'Funny pizza deliveries with a penguin');assert.equal(await page.locator('#plan-goal').inputValue(),'Deliver pizzas');assert.equal((await session()).design.approvedPlan,false);
   await page.click('#buildGamePlan');await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('no build was started'));assert.equal((await session()).design.plan.goal.origin,'child');assert.equal((await session()).job,null);
   const mathAfter=await page.evaluate(()=>{const p=FG.store.current();return JSON.stringify({skills:p.skills,learning:p.learning??null,grade:p.grade,focus:p.focus,intensity:p.intensity,rate:p.rate});});assert.equal(mathAfter,mathBefore,'coaching, experiment versions, reload and profile switching preserve learning evidence and settings');
+  // Navigation out of Studio must release the microphone, not just hide its UI.
+  await page.evaluate(()=>{window.__studioVoiceTest=null;});
+  await page.click('#studioMic');
+  await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
+  await page.click('#studioNavPowers');
+  assert.equal(await page.evaluate(()=>window.__studioVoiceTest.aborted),true,'My Powers navigation must abort microphone capture');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);console.log(`PASS ${device}: play-first, no duplicate play projects, discussion vs build, support, A/B/C, combination, explicit promotion, old-base continuation, notes/reload, profile and math isolation, skip, first-build plan and honest offline status${inline?' [INLINE HARNESS, not network evidence]':''}`);await ctx.close();
  }
  }finally{await browser.close();await new Promise(r=>server.close(r));}
