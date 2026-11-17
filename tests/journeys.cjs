@@ -6,7 +6,7 @@ const fs = require('node:fs');
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await page.waitForFunction(()=>window.FG?.app&&window.FG?.factory&&window.FG?.builder);
+ await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);await page.waitForFunction(()=>window.FG?.app&&window.FG?.factory&&window.FG?.builder);
  const nav=async(name)=>page.getByRole('navigation').getByRole('button',{name,exact:true}).click();
  // Content can be a story, fraction, clock or choice. Read the shared activity
  // contract rather than trying to recover arithmetic from the displayed text.
