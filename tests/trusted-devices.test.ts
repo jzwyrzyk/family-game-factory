@@ -4,6 +4,7 @@ import {createServer} from 'node:http';
 import {test} from 'node:test';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {trustedDeviceHandler,verifyBrowserSession} from '../server/trusted-devices';
+import {sessionHandler} from '../server/sessions';
 import {apiHandler} from '../server/pipeline/http';
 import {mintDeviceInvitation} from '../server/device-owner';
 import {signSession} from '../server/pipeline/auth';
@@ -25,7 +26,8 @@ async function fixture(fn:(args:{
 })=>Promise<void>){
  const repo=new MemoryRepository();
  const handler=trustedDeviceHandler(repo,{appOrigin:origin,familyId,sessionKey:signing});
- const server=createServer((req,res)=>{void handler(req,res);});
+ const legacy=sessionHandler(repo,{appOrigin:origin,familyId,sessionKey:signing});
+ const server=createServer((req,res)=>{void (req.url==='/v1/sessions'?legacy(req,res):handler(req,res));});
  await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
  const url='http://127.0.0.1:'+(server.address() as {port:number}).port;
  const request=(path:string,method:'GET'|'POST'='GET',body?:unknown,cookies='',requestOrigin=origin)=>
@@ -138,6 +140,19 @@ test('trusted device: idle and absolute expiry, legacy compatibility, parent loc
  });
 });
 
+test('trusted-only owner invitation cannot bypass parent trust via legacy login',async()=>{
+ await fixture(async({repo,request})=>{
+  const invite=await mintDeviceInvitation(repo,familyId);
+  assert.equal((await request('/v1/sessions','POST',{invitation:invite})).status,403,
+   'trusted-device invitations cannot mint nonrevocable legacy sessions');
+  const enrolled=await request('/v1/sessions/enroll','POST',{invitation:invite,deviceName:'New tablet',parentPassphrase:passphrase});
+  assert.equal(enrolled.status,200,'same invitation still enrolls one verified trusted device');
+  const oldInvite='z'.repeat(43);
+  await addInvite(repo,oldInvite);
+  assert.equal((await request('/v1/sessions','POST',{invitation:oldInvite})).status,200,
+   'legacy invitations remain compatible until they expire');
+ });
+});
 test('owner invitation issuance does not reset spending allowance or paid execution',async()=>{
  const repo=new MemoryRepository();
  await repo.transaction(s=>{s.ledgers[familyId]={allowance:5000000,used:200000,reserved:100000,paidEnabled:true,month:'2026-11'};return true;});
