@@ -46,6 +46,7 @@ async function cancelFromReload(){
  try{
   globalThis.fetch=(async(input:RequestInfo|URL,init?:RequestInit)=>{
    const url=String(input);calls.push((init?.method||'GET')+' '+url);
+   if(url.endsWith('/v1/sessions/status'))return new Response(JSON.stringify({connected:true}),{status:200});
    if(url.endsWith('/v1/jobs/known-job'))return new Response(JSON.stringify({jobId:'known-job',status:'building'}),{status:200});
    if(url.endsWith('/v1/jobs/known-job/cancel'))return new Response(JSON.stringify({jobId:'known-job',status:'cancelled'}),{status:200});
    throw Error('Unexpected endpoint '+url);
@@ -53,7 +54,7 @@ async function cancelFromReload(){
   const client=new BuilderClient({version:1,mode:'remote',apiBaseUrl:'https://factory.test',previewOrigin:'https://preview.test'},job=>events.push(job.status));
   const stopped=await client.cancel('known-job');
   assert.equal(stopped.status,'cancelled');
-  assert.deepEqual(calls,['GET https://factory.test/v1/jobs/known-job','POST https://factory.test/v1/jobs/known-job/cancel']);
+  assert.deepEqual(calls,['GET https://factory.test/v1/jobs/known-job','GET https://factory.test/v1/sessions/status','POST https://factory.test/v1/jobs/known-job/cancel']);
   assert.deepEqual(events,['cancelled']);
   console.log('PASS exact-job cancellation after reload, verified server transition');
  }finally{globalThis.fetch=originalFetch;}
