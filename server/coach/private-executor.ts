@@ -36,14 +36,20 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
  };
  return async(req:IncomingMessage,res:ServerResponse)=>{
   try{
-   if(!runtime.enabled||!approved(runtime.config)||!runtime.config.apiKey||runtime.config.apiKey.length<16)
-    throw Error('COACH_UNAVAILABLE');
-   if(req.headers.origin||req.method!=='POST'||new URL(req.url||'','http://private').pathname!=='/v1/private-coach/complete')
-    throw Error('FORBIDDEN');
-   if(req.headers['x-factory-request']!=='1'||!String(req.headers['content-type']||'').startsWith('application/json'))
-    throw Error('FORBIDDEN');
+   if(req.headers.origin||req.headers['x-factory-request']!=='1')throw Error('FORBIDDEN');
+   const path=new URL(req.url||'','http://private').pathname;
    const token=req.headers.authorization?.match(/^Bearer ([A-Za-z0-9._-]{40,12000})$/)?.[1];
    if(!token||!await runtime.verifyCaller(token))throw Error('FORBIDDEN');
+   const available=runtime.enabled&&approved(runtime.config)&&
+    !!runtime.config.apiKey&&runtime.config.apiKey.length>=16;
+   // Authenticated, read-only check. It never asks the model anything or
+   // implies that a funded live inference has already completed successfully.
+   if(path==='/v1/private-coach/status'&&req.method==='GET')
+    return send(res,200,{available,mode:available?'model':'unavailable'});
+   if(path!=='/v1/private-coach/complete'||req.method!=='POST'||
+    !String(req.headers['content-type']||'').startsWith('application/json'))
+    throw Error('FORBIDDEN');
+   if(!available)throw Error('COACH_UNAVAILABLE');
    if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
    let data='';
    for await(const chunk of req){
