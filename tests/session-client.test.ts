@@ -6,7 +6,7 @@ async function mockNetwork(handler:(path:string,init:RequestInit)=>Response|Prom
  const originalFetch=globalThis.fetch,originalWindow=Object.getOwnPropertyDescriptor(globalThis,'window');
  const events:string[]=[];
  Object.defineProperty(globalThis,'window',{configurable:true,value:{dispatchEvent:(event:Event)=>{events.push(event.type);return true;}}});
- Object.defineProperty(globalThis,'fetch',{configurable:true,value:(url:string,init:RequestInit={})=>Promise.resolve(handler(new URL(String(url)).pathname,init))});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(url:string,init:RequestInit={})=>Promise.resolve().then(()=>handler(new URL(String(url)).pathname,init))});
  try{await run(events);}finally{
   Object.defineProperty(globalThis,'fetch',{configurable:true,value:originalFetch});
   if(originalWindow)Object.defineProperty(globalThis,'window',originalWindow);else delete (globalThis as any).window;
