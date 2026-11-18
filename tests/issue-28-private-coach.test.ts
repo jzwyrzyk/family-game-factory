@@ -16,7 +16,8 @@ const config:PrivateCoachConfig={
 assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-gateway',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run'}),/DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED/);
 const inactive=dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run'});
 assert.equal(inactive.enabled,false,'inactive Cloud Run may start with no model key');
-assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_OPENAI_API_KEY:'forbidden-secret-on-inactive'}),/COACH_SECRET_FORBIDDEN_WHILE_INACTIVE/);
+assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_COACH_PRIVATE_OPENAI_API_KEY:'forbidden-secret-on-inactive'}),/COACH_SECRET_FORBIDDEN_WHILE_INACTIVE/);
+assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_OPENAI_API_KEY:'old-generation-key'}),/GENERATION_OR_GATEWAY_KEY_FORBIDDEN/);
 assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_COACH_APPROVED:'true'}),/COACH_APPROVAL_REQUIRED/);
 assert.throws(()=>googleCallerVerifier('https://factory-coach-private-demo-uc.a.run.app','random-identity@example.iam.gserviceaccount.com'),/PRIVATE_COACH_IDENTITY_REQUIRED/);
 const context:CoachContext={message:'Only if I jump',mode:'discuss',game:'dragon',plan:{},friction:'',helpLevel:0,
