@@ -62,7 +62,7 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
     /\b(?:faux|fake)\s*3[\s-]?d\b/gi
   ]],
   ['3d-avoided',[
-    /\b(?:no|without|avoid|skip|don't\s+use|do\s+not\s+use|not\s+(?:a|in))\s+(?:(?:true|real|full)\s+)?(?:3[\s-]?d|three[- ]dimensional)(?:\s+(?:game|world|movement|navigation))?\b/gi
+    /\b(?:no|without|avoid|skip|don't\s+use|do\s+not\s+use|not\s+(?:a|in))\s+(?:(?:a|an|the|any|true|real|full)\s+){0,3}(?:3[\s-]?d|three[- ]dimensional)(?:\s+(?:game|world|movement|navigation))?\b/gi
   ]],
   ['explicit-3d',[
     /\b(?:true|real|full)\s*3[\s-]?d(?:imensional)?\b/gi,
