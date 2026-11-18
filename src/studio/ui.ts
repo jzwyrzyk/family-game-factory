@@ -577,8 +577,15 @@ export async function installStudio(){
    body.append(row);
   };
   addRow('What changed','Your original rules',e=>e.candidate.summary);
-  addRow('Play notes','You can compare with your main game',e=>e.notes.trim()||'No notes yet');
-  addRow('Observed play','Main game is safe',e=>observations.some(o=>o.experimentId===e.id)?'A play observation is saved':'No recorded play observation yet');
+  addRow('What I expected','Try your main game to compare',e=>e.prediction.trim()||'No prediction saved');
+  addRow('What happened','My main game is safe',e=>{
+   const last=observations.filter(o=>o.experimentId===e.id&&o.source==='runtime').at(-1);
+   return last?.text||'No recorded play yet';
+  });
+  addRow('What I noticed','Your own impressions',e=>{
+   const note=e.notes.trim(),last=observations.filter(o=>o.experimentId===e.id&&o.source==='child').at(-1);
+   return note||last?.text||'No notes yet';
+  });
   const actions=document.createElement('tr'),label=document.createElement('th');label.scope='row';label.textContent='Try it';actions.append(label);
   const main=document.createElement('td'),mainButton=el('button','studio-button','▶ Main game') as HTMLButtonElement;
   mainButton.type='button';mainButton.onclick=()=>act(playWorking);main.append(mainButton);actions.append(main);
