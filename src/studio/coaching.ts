@@ -149,7 +149,7 @@ export function installCoaching(h:Hooks){
    if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');
    seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;
    h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(/don.t know|stuck/i.test(text))s.design.helpLevel=Math.min(3,s.design.helpLevel+1);});
-   const firstIdea=captured.game==='new'&&!captured.messages.some(m=>m.role==='child');
+   const firstIdea=mode==='discuss'&&captured.game==='new'&&!captured.messages.some(m=>m.role==='child');
    h.message(captured,'child',text);
    if(firstIdea&&isCurrent(captured))celebrateJem('idea','studioConversation');
    const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
@@ -166,6 +166,9 @@ export function installCoaching(h:Hooks){
    // immediately, including edits whose ordinary draft debounce has not fired yet.
    const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
    h.notebook.update(captured.id,captured.owner,s=>{s.draft=nextDraft;});input.value=nextDraft;h.render();
+   // The model may understand an indirect wish to play that did not match our
+   // narrow immediate-skip vocabulary. Navigating back is not a build action.
+   if(reply.move==='play'&&captured.game!=='new'&&(captured.projectId||captured.remoteId||captured.candidate))await h.playMain();
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
   finally{if(seq&&seq===generation){thinking=false;$('coachModeStatus').classList.remove('is-thinking');if(controller===turn)controller=null;}}
  }
