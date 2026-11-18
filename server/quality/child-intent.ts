@@ -49,7 +49,7 @@ const MAX_RELATIONS=24;
 const MAX_UNKNOWNS=12;
 const ID=/^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$/;
 const FACT_ID=/^[a-z][a-z0-9-]{0,39}$/;
-const error=(code:string):never=>{throw Error('CHILD_INTENT_INVALID_'+code);};
+function error(code:string):never { throw Error('CHILD_INTENT_INVALID_'+code); }
 const record=(value:unknown):Record<string,unknown>=>{
   if(!value||typeof value!=='object'||Array.isArray(value))error('SHAPE');
   const obj=value as Record<string,unknown>;
