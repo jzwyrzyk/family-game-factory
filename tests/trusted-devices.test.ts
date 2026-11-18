@@ -113,7 +113,8 @@ test('trusted device: parent unlock, same-family listing, revocation invalidates
     prompt:'Make a cat game',clientRequestId:'revoked-device-001'}),/UNAUTHENTICATED/);
   assert.equal((await repo.snapshot()).jobs.length,0,'revoked device cannot reserve a paid job');
   assert.equal((await request('/v1/sessions/status','GET',undefined,oneCookies)).status,200,'another family device remains connected');
-  const disconnected=await request('/v1/devices/disconnect','POST',{},oneCookies);
+  assert.equal((await request('/v1/devices/disconnect','POST',{},oneCookies)).status,401,'child profile cannot disconnect a trusted device without parent unlock');
+  const disconnected=await request('/v1/devices/disconnect','POST',{},oneCookies+'; '+parent);
   assert.equal(disconnected.status,200);
   assert.ok(disconnected.headers.getSetCookie().some(s=>s.startsWith('factory_device=')&&s.includes('Max-Age=0')));
   assert.equal((await request('/v1/sessions/status','GET',undefined,oneCookies)).status,401);
