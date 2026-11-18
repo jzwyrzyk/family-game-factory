@@ -217,6 +217,8 @@ test('trusted device: coach paid reservation rechecks revocation atomically',asy
   const before=await repo.snapshot();
   await assert.rejects(()=>coach.respond(session,{requestId:'coach-revoked-device',context}),/UNAUTHENTICATED/,
    'an earlier session verification cannot authorize a paid turn after revocation');
+  await assert.rejects(()=>coach.respond(session,{requestId:'coach-active-device',context}),/UNAUTHENTICATED/,
+   'revocation must also prevent replaying a cached coach response');
   const after=await repo.snapshot();
   assert.equal(providerCalls,1,'no additional model call was sent');
   assert.equal(after.coachReceipts?.length,1,'no receipt was reserved for the revoked device');
