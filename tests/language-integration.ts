@@ -15,7 +15,8 @@ const errorsFor=(page:Page)=>{const errors:string[]=[];page.on('pageerror',error
 async function answer(page:Page){
   const question=await page.evaluate(()=>window.FG.learning.activeItem);
   if(question.kind==='choice'){
-    await active(page).locator('.language-choice').filter({hasText:question.answer}).first().click();
+    // Exact answer text matters: substring matching can select an unrelated choice.
+    await active(page).getByRole('button',{name:question.answer,exact:true}).click();
     await page.waitForFunction(()=>!window.FG.learning.active);
     return;
   }
@@ -39,7 +40,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     // Parent reports may legitimately initialize the empty legacy math-v2 record.
     // Compare after initial parent view, before any subject edit, to test actual preservation.
     const oldMath=await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null));
-    assert.deepEqual(await page.locator('#parentSubject option').evaluateAll(els=>els.map(el=>(el as HTMLOptionElement).value)),['math','language']);
+    assert.deepEqual(await page.locator('#parentSubject option').evaluateAll(els=>els.map(el=>(el as HTMLOptionElement).value)),['math','language','both']);
     await page.selectOption('#parentGrade','2');
     await page.selectOption('#parentSubject','language');
     assert.equal(await page.locator('#parentLanguageSettings').isVisible(),true);
@@ -139,6 +140,37 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
     assert.equal((await saved(page)).language.totals.presentations,3,'language evidence including an interrupted exit persists through the switch back');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null)),oldMath,'switch back restores math without resetting');
+    // Parent enables both subjects without changing the existing wire-format enum.
+    await page.selectOption('#parentSubject','both');
+    assert.equal(await page.locator('#parentLanguageSettings').isVisible(),true);
+    assert.equal(await page.locator('#parentMathSettings').isVisible(),true);
+    await page.click('#saveParent');
+    assert.equal((await saved(page)).allowSubjectSwitch,true);
+    assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
+    // This production regression exercises the explicit ?arcade=1 legacy rollback.
+    // Studio's homepage toggle is covered separately by homepage-entry.cjs.
+    await page.getByRole('button',{name:'⚡ My Powers',exact:true}).click();
+    assert.equal(await page.evaluate(()=>window.FG.learning.active),false);
+    await page.click('#labSubjectLanguage');
+    assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
+    assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null)),oldMath,'switching does not erase Math progress');
+    await page.reload();await page.waitForFunction(()=>window.FG?.learning);
+    assert.equal((await saved(page)).allowSubjectSwitch,true);
+    assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language','selection survives refresh');
+    await page.getByRole('button',{name:'⚡ My Powers',exact:true}).click();
+    assert.equal(await page.evaluate(()=>window.FG.learning.active),false,'Both allows choice before beginning a question');
+    assert.equal(await page.locator('#labSubjectLanguage').getAttribute('aria-pressed'),'true');
+    await page.click('#lab-next');
+    await active(page).waitFor({state:'visible'});
+    assert.equal(await page.evaluate(()=>{try{window.FG.learning.setSubject('math');return false;}catch{return true;}}),true,'no subject switch while active');
+    assert.equal(await page.locator('#labSubjectMath').isDisabled(),true);
+    await answer(page);
+    assert.equal(await page.locator('#labSubjectMath').isDisabled(),false);
+    await page.click('#labSubjectMath');
+    assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
+    await page.click('#lab-next');
+    await page.waitForFunction(()=>window.FG.learning.active&&window.FG.learning.subject==='math');
+    assert.equal(await page.evaluate(()=>window.FG.learning.activeItem!==null),true,'math engine still works after language practice');
     assert.deepEqual(errors,[]);
     console.log('PASS Language Arts '+name+': parent selection, required checkpoints, lab, original game, safe pause, shared budget, separate history');
   }catch(error){

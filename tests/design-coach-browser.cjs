@@ -23,6 +23,14 @@ async function load(page,url,saved={}){
   const gameTool=async id=>{if(!await page.locator('#studioMore').evaluate(el=>el.open))await page.locator('#studioMore > summary').click();await page.click(id);};
   const chooseProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(el=>el.open))await page.locator('#studioProfileMenu > summary').click();await page.locator('.profile-choice').nth(index).click();};
   const session=()=>page.evaluate(()=>FG.studio.exportNotebook().sessions.at(-1));const projects=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects);
+  await page.click('[data-starter="gum"]');
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',workspace=JSON.parse(localStorage.getItem(key));
+    const project=workspace?.projects.find(p=>p.game==='gum'),revision=workspace?.revisions.find(r=>r.id===project?.headId);
+    if(!revision)throw Error('Missing physics fixture project');
+    revision.config.qualityVersion=1;localStorage.setItem(key,JSON.stringify(workspace));
+  });
+  await page.reload();await page.waitForFunction(()=>window.FG?.studio);
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');assert.equal(await page.locator('#studioPrompt').isVisible(),false,'play-first hides design tools');
   await page.click('#studioHome');await page.click('[data-starter="gum"]');assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();const baseline=(await projects())[0].headId;
@@ -85,7 +93,7 @@ async function load(page,url,saved={}){
   await page.fill('#plan-fun','Funny pizza deliveries with a penguin');await page.fill('#plan-goal','Deliver pizzas');await page.locator('#plan-goal').locator('xpath=following-sibling::div[1]').getByRole('button',{name:'Save my answer'}).click();
   assert.equal(await page.locator('#plan-fun').inputValue(),'Funny pizza deliveries with a penguin','moving to and saving another field preserves earlier typing');
   const planSession=(await session()).id;assert.equal((await session()).design.approvedPlan,false,'autosave does not approve a build');
-  const planSaved=inline?await page.evaluate(()=>Object.fromEntries(window.__reviewStorage)):{};if(inline)await load(page,url,planSaved);else await page.reload();await page.waitForFunction(()=>window.FG?.studio);await page.locator('#studioLibrary [data-session="'+planSession+'"]').click();await talk();await page.click('#coachPlanToggle');
+  const planSaved=inline?await page.evaluate(()=>Object.fromEntries(window.__reviewStorage)):{};if(inline)await load(page,url,planSaved);else await page.reload();await page.waitForFunction(()=>window.FG?.studio);await page.locator('#studioLibrary [data-session="'+planSession+'"]').click();assert.equal(await page.locator('#studioPrompt').isVisible(),true);await page.click('#coachPlanToggle');
   assert.equal(await page.locator('#plan-fun').inputValue(),'Funny pizza deliveries with a penguin');assert.equal(await page.locator('#plan-goal').inputValue(),'Deliver pizzas');assert.equal((await session()).design.approvedPlan,false);
   await page.click('#buildGamePlan');await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('no build was started'));assert.equal((await session()).design.plan.goal.origin,'child');assert.equal((await session()).job,null);
   const mathAfter=await page.evaluate(()=>{const p=FG.store.current();return JSON.stringify({skills:p.skills,learning:p.learning??null,grade:p.grade,focus:p.focus,intensity:p.intensity,rate:p.rate});});assert.equal(mathAfter,mathBefore,'coaching, experiment versions, reload and profile switching preserve learning evidence and settings');

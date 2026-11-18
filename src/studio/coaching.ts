@@ -1,6 +1,8 @@
 import {freshDesign, PLAN_FIELDS, PLAN_LABELS, missingPlan,localCoach,validateCoachReply,type CoachContext,type CoachReply,type Experiment,type Origin,type PlanField,type DesignField} from './design';
 import type {StudioNotebook,StudioSession} from './notebook';
 import type {BuilderConfig} from '../builder/client';
+import {celebrateJem} from '../brand/delight';
+import {conversationDisposition} from './experience';
 interface Hooks {
  notebook:StudioNotebook;current():StudioSession;owner():string;
  message(s:StudioSession,role:'child'|'helper'|'reflection',text:string):void;
@@ -10,6 +12,7 @@ interface Hooks {
  rules():string;playTest(id:string):Promise<void>;playMain():Promise<void>;combineTests(ids:string[]):Promise<void>;
  pauseForThinking():boolean;showTalk():void;
  onCoachReply?(text:string):void;
+ onCoachState?(state:'connected'|'limited'|'sign-in'|'unavailable'):void;
 }
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
@@ -21,20 +24,38 @@ export function installCoaching(h:Hooks){
  function report(error:unknown,s?:StudioSession){if(s&&!isCurrent(s))return;h.status(error instanceof Error?error.message:String(error),true);}
  function run(fn:()=>void|Promise<void>){let s:StudioSession|undefined;try{s=h.current();Promise.resolve(fn()).catch(error=>report(error,s));}catch(error){report(error,s);}}
  const action=(label:string,fn:()=>void|Promise<void>)=>{const b=node('button',label,'studio-chip') as HTMLButtonElement;b.type='button';b.onclick=()=>run(fn);return b;};
- function cancelDiscussion(){generation++;controller?.abort();controller=null;thinking=false;$('coachModeStatus').textContent='';}
+ function cancelDiscussion(){generation++;controller?.abort();controller=null;thinking=false;$('coachModeStatus').textContent='';$('coachModeStatus').classList.remove('is-thinking');}
  function cancelRequest(){requestGeneration++;requestInFlight=false;force=false;origin='child';depth='tune';}
 
  const combineSelection=new Set<string>();
  let selectedSuggestion:string|null=null,requestInFlight=false,promptVersion=0;
  $('studioPrompt').addEventListener('input',()=>{promptVersion++;});
  let force=false,origin:Origin='child',depth:Experiment['depth']='tune';
+ let guidedPlan=false,guidedField:PlanField|null=null;
  const controls=node('section','','design-controls');controls.id='designControls';
  controls.innerHTML='<div class="design-mode"><strong>How can I help?</strong><button type="button" id="coachDiscuss">Talk it through</button><button type="button" id="coachIdeas">Give me ideas</button><button type="button" id="coachExplain">Explain</button><button type="button" id="coachThink">Let me think / play</button></div><details id="coachExperimentOptions" class="design-options"><summary>Experiment options (optional)</summary><label for="experimentStart">Start the next experiment from</label><select id="experimentStart"><option value="main">My main game — a different test</option><option value="continue">This test — develop this idea</option></select><label for="designPrediction">My guess about this experiment (optional)</label><input id="designPrediction" maxlength="300" placeholder="I think this might…"></details><button type="button" id="coachTry" class="studio-button">Try my idea</button><button type="button" id="coachPlanToggle" class="studio-button">My game plan</button><details id="coachSupportOptions" class="design-options"><summary>How much help? (optional)</summary><label for="coachSupport">Explanation style</label><select id="coachSupport"><option value="brief">Short and simple</option><option value="balanced">A little help</option><option value="detailed">Explain more</option></select><label for="coachFriction">What I want to figure out</label><input id="coachFriction" maxlength="1000" placeholder="Optional — in your words"></details><span id="coachModeStatus" role="status"></span><div id="coachProposals"></div>';
  $('studioPromptForm').querySelector('.studio-send-row')!.after(controls);
  const plan=node('details','','design-plan') as HTMLDetailsElement;plan.id='designPlan';
- const summary=node('summary','Our game plan — your choices');plan.append(summary);const planStatus=node('p','','design-plan-status');planStatus.id='planSaveStatus';planStatus.setAttribute('role','status');plan.append(planStatus);
- const intro=node('p','Your answers save as you type. Choose what matters, or ask for suggestions. “No score” and “no losing” are valid designs. Nothing builds until you choose Build this plan.');plan.append(intro);plan.append(action('You choose the remaining details',()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();for(const field of missingPlan(x.design))x.design.plan[field]={value:x.design.plan[field]?.value||'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});renderPlan();}));
- for(const key of PLAN_FIELDS){const label=node('label',PLAN_LABELS[key]) as HTMLLabelElement;label.htmlFor='plan-'+key;const input=document.createElement('textarea');input.id='plan-'+key;input.rows=2;input.maxLength=700;input.oninput=()=>run(()=>saveField(key,false));const credit=node('small');credit.id='plan-credit-'+key;const buttons=node('div','','design-plan-actions');buttons.append(action('Save my answer',()=>saveField(key)),action('You choose',()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.plan[key]={value:'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});pendingFields.delete(key);helperFields.delete(key);renderPlan();}));plan.append(label,input,credit,buttons);}
+ const summary=node('summary','Our game plan — your choices');plan.append(summary);
+ const guideStatus=node('p','','design-guide-status');guideStatus.id='designGuideStatus';plan.append(guideStatus);
+ const planReview=node('section','','design-plan-review');planReview.id='designPlanReview';planReview.hidden=true;plan.append(planReview);
+ const planStatus=node('p','','design-plan-status');planStatus.id='planSaveStatus';planStatus.setAttribute('role','status');plan.append(planStatus);
+ const intro=node('p','Your answers save as you type. Choose what matters, or ask for suggestions. “No score” and “no losing” are valid designs. Nothing builds until you choose Build this plan.');plan.append(intro);plan.append(action('You choose the remaining details',()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();for(const field of missingPlan(x.design))x.design.plan[field]={value:x.design.plan[field]?.value||'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});if(guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;renderPlan();}));
+ for(const key of PLAN_FIELDS){
+  const field=node('section','','design-plan-field');field.dataset.field=key;
+  const label=node('label',PLAN_LABELS[key]) as HTMLLabelElement;label.htmlFor='plan-'+key;
+  const input=document.createElement('textarea');input.id='plan-'+key;input.rows=2;input.maxLength=700;input.oninput=()=>run(()=>saveField(key,false));
+  const credit=node('small');credit.id='plan-credit-'+key;
+  const buttons=node('div','','design-plan-actions');
+  buttons.append(action('Save my answer',()=>saveField(key)),action('You choose',()=>{
+   const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.plan[key]={value:'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});
+   pendingFields.delete(key);helperFields.delete(key);
+   if(guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;
+   renderPlan();
+   if(guidedPlan&&guidedField)$<HTMLTextAreaElement>('plan-'+guidedField).focus();
+  }));
+  field.append(label,input,credit,buttons);plan.append(field);
+ }
  const approve=action('Build this plan',()=>{for(const key of pendingFields.keys())saveField(key,false);const s=h.current(),d=s.design||freshDesign();if(missingPlan(d).length){h.status('Choose an answer or “You choose” for the missing decisions.');plan.open=true;$('plan-'+missingPlan(d)[0]).focus();return;}h.notebook.update(s.id,s.owner,x=>{x.design!.approvedPlan=true;});const first=(s.messages.find(m=>m.role==='child')?.text||s.draft||'Build the game in this plan.').slice(0,350);const brief=PLAN_FIELDS.map(k=>k+': '+(d.plan[k]?.value?.slice(0,160)||'Child delegated this choice; propose a sensible rule.')).join('\n');return request(first+'\n\nApproved game plan (full choices remain in this notebook):\n'+brief,'child','redesign');});approve.id='buildGamePlan';plan.append(approve);
  $('studioPromptForm').after(plan);
  const shelf=node('section','','experiment-shelf');shelf.id='experimentShelf';$('studioVersions').prepend(shelf);
@@ -45,7 +66,7 @@ export function installCoaching(h:Hooks){
  $('coachDiscuss').onclick=()=>void discuss('discuss');$('coachIdeas').onclick=()=>void discuss('ideas');$('coachExplain').onclick=()=>void discuss('explain');
  $('coachTry').onclick=()=>{const p=$<HTMLTextAreaElement>('studioPrompt').value.trim();if(p)void request(p,p===selectedSuggestion?'helper':'child','tune');else h.status('Tell me the change you want to try.');};
  $('coachThink').onclick=()=>run(async()=>{if((window as any).FG.learning?.active){h.status('Finish the current learning activity first.');return;}cancelDiscussion();cancelRequest();const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;x.reflection=false;});h.status('Your thoughts and tests are saved. Keep playing.');document.body.classList.remove('studio-designing');await h.playMain();});
- $('coachPlanToggle').onclick=()=>run(()=>{plan.open=!plan.open;if(plan.open)renderPlan();});
+ $('coachPlanToggle').onclick=()=>run(()=>{guidedPlan=false;guidedField=null;plan.classList.remove('guided');plan.open=!plan.open;if(plan.open)renderPlan();});
  // Do not let typing in any design field move or jump the game character.
  [controls,plan,shelf].forEach(e=>e.addEventListener('keydown',event=>event.stopPropagation()));
  function saveField(key:PlanField,explicit=true){
@@ -59,10 +80,29 @@ export function installCoaching(h:Hooks){
     :{value,origin:'child',accepted:!!value.trim(),delegated:false};x.design.approvedPlan=false;});}
   catch(error){planStatus.textContent='This answer has not saved yet. Keep it here and try Save my answer again.';throw error;}
   pendingFields.delete(key);planStatus.textContent=pendingFields.size?'Some answers have not saved yet. Use Save my answer beside each one to try again.':'Your answers are saved on this device. Nothing has been built yet.';
-  renderPlan();if(explicit)h.status('Saved your choice. Nothing has been built yet.');
+  if(explicit&&guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;
+  renderPlan();
+  if(explicit&&guidedPlan&&guidedField)$<HTMLTextAreaElement>('plan-'+guidedField).focus();
+  if(explicit)h.status('Saved your choice. Nothing has been built yet.');
  }
- function renderPlan(replaceFocused=false){const d=h.current().design||freshDesign();for(const key of PLAN_FIELDS){
-  const input=$<HTMLTextAreaElement>('plan-'+key),f=d.plan[key];
+ function renderPlan(replaceFocused=false){
+  const d=h.current().design||freshDesign(),missing=missingPlan(d);
+  if(guidedPlan)plan.classList.add('guided');else plan.classList.remove('guided');
+  planReview.hidden=!(guidedPlan&&guidedField===null&&missing.length===0);
+  if(!planReview.hidden){
+   planReview.replaceChildren(node('h3','Your game plan · ready to review'));
+   for(const key of PLAN_FIELDS){
+    const decision=d.plan[key],item=node('div','','design-plan-review-item');
+    const value=decision?.value?.trim()||'jems will suggest a choice when building';
+    item.append(node('strong',PLAN_LABELS[key]),node('p',value),node('small',decision?.delegated?'You asked jems to choose':decision?.origin==='child'?'Your choice':'jems suggestion you accepted'));
+    planReview.append(item);
+   }
+  }
+  guideStatus.textContent=guidedPlan?(guidedField?'Choose one thing at a time · '+(PLAN_FIELDS.length-missing.length+1)+' of '+PLAN_FIELDS.length:'Your game choices are ready to review. Nothing has been built yet.'):'Choose only the details that matter. Your ideas stay yours.';
+  for(const key of PLAN_FIELDS){
+   const field=plan.querySelector<HTMLElement>('.design-plan-field[data-field="'+key+'"]');
+   if(field)field.hidden=guidedPlan&&key!==guidedField;
+   const input=$<HTMLTextAreaElement>('plan-'+key),f=d.plan[key];
   if(f?.origin==='helper'&&!pendingFields.has(key))helperFields.set(key,{...f});
   if(replaceFocused||document.activeElement!==input)input.value=pendingFields.get(key)??f?.value??'';
   $('plan-credit-'+key).textContent=pendingFields.has(key)?'Not saved yet':!f?'Not decided yet':f.delegated?'You asked the helper to choose; it must report that choice.':f.origin==='child'?'Your choice':f.accepted?'Helper suggestion you chose':'Helper suggestion — not accepted yet';
@@ -77,7 +117,7 @@ export function installCoaching(h:Hooks){
   }catch(error){if(!token||token===requestGeneration)report(error,captured);}finally{if(token&&token===requestGeneration){force=false;requestInFlight=false;origin='child';depth='tune';}}
  }
  function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession){
-  h.message(captured,'helper',(mode==='local'?'jems · offline helper: ':'jems · AI helper: ')+reply.text+(reply.question?'\n'+reply.question:''));
+  h.message(captured,'helper',reply.text+(reply.question?'\n'+reply.question:''));
   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();let changed=false;for(const d of reply.childDecisions||[]){if(!s.design.plan[d.field]?.accepted){s.design.plan[d.field]={value:d.quote,origin:'child',accepted:true,delegated:false};changed=true;}}for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:current?.delegated||false};changed=true;}}if(changed)s.design.approvedPlan=false;});
   const box=$('coachProposals');box.replaceChildren();
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
@@ -90,28 +130,52 @@ export function installCoaching(h:Hooks){
   try{
    captured=h.current();const input=$<HTMLTextAreaElement>('studioPrompt'),submittedDraft=input.value,submittedVersion=promptVersion;
    const text=(supplied??submittedDraft).trim()||(mode==='ideas'?'Please help me find ideas.':mode==='explain'?'Explain the relevant game-design choice.':'What could I think about next?');
+   // Stop/play are immediate child requests, never interpreted as build consent.
+   const disposition=conversationDisposition(text);
+   if(disposition!=='continue'){
+    if((window as any).FG?.learning?.active){h.status('Finish the current learning activity before leaving the conversation.');return;}
+    cancelDiscussion();
+    h.message(captured,'child',text);
+    const response=disposition==='cancel'?'Okay! No game changed. Your ideas are saved if you want to return.':
+      captured.game==='new'?'Okay! Your idea is saved. We can build it whenever you are ready.':'Okay! Let’s play your game. Nothing has changed.';
+    h.message(captured,'helper',response);
+    if(!preserveDraft&&input.value===submittedDraft){h.notebook.update(captured.id,captured.owner,s=>{s.draft='';});input.value='';}
+    h.onCoachReply?.(response);
+    h.render();
+    if(disposition==='play'&&captured.game!=='new'&&(captured.projectId||captured.remoteId||captured.candidate))await h.playMain();
+    return;
+   }
    if(thinking){h.status('Your design coach is still replying. You can keep playing.');return;}
    if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');
    seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;
    h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(/don.t know|stuck/i.test(text))s.design.helpLevel=Math.min(3,s.design.helpLevel+1);});
-   h.message(captured,'child',text);const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
-   let reply:CoachReply,used:'model'|'local'='local';
+   const firstIdea=mode==='discuss'&&captured.game==='new'&&!captured.messages.some(m=>m.role==='child');
+   h.message(captured,'child',text);
+   if(firstIdea&&isCurrent(captured))celebrateJem('idea','studioConversation');
+   const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
+   let reply:CoachReply,used:'model'|'local'='local',reason='';
    try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
     const response=await fetch(config.apiBaseUrl+'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
     const data=await response.json();if(!response.ok)throw Error(data.errorCode||'COACH_UNAVAILABLE');if(data.mode!=='model')throw Error('COACH_UNAVAILABLE');reply=validateCoachReply(data.reply,c);used='model';
-   }catch(error){if(turn.signal.aborted)return;reply=localCoach(c);}
+   }catch(error){if(turn.signal.aborted)return;reason=error instanceof Error?error.message:'COACH_UNAVAILABLE';reply=localCoach(c);}
    if(seq!==generation||!isCurrent(captured))return;
-   present(reply,used,captured);$('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
+   present(reply,used,captured);
+   h.onCoachState?.(used==='model'?'connected':reason==='UNAUTHENTICATED'||reason==='FORBIDDEN'?'sign-in':h.config().mode==='remote'?'limited':'unavailable');
+   $('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
    // A reply may arrive after the child has started another thought. Preserve it
    // immediately, including edits whose ordinary draft debounce has not fired yet.
    const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
    h.notebook.update(captured.id,captured.owner,s=>{s.draft=nextDraft;});input.value=nextDraft;h.render();
+   // The model may understand an indirect wish to play that did not match our
+   // narrow immediate-skip vocabulary. Navigating back is not a build action.
+   if(reply.move==='play'&&captured.game!=='new'&&(captured.projectId||captured.remoteId||captured.candidate))await h.playMain();
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
-  finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}
+  finally{if(seq&&seq===generation){thinking=false;$('coachModeStatus').classList.remove('is-thinking');if(controller===turn)controller=null;}}
  }
  async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
-  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();return true;}return false;}
+  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');guidedPlan=true;guidedField=missingPlan(s.design||freshDesign())[0]||null;
+   plan.open=true;renderPlan();plan.scrollIntoView({block:'nearest'});return true;}return false;}
   if(h.localSupported(prompt))return false;
   // The legacy implicit-send path stays conversational; explicit Try means build/plan.
   await discuss('discuss',prompt);return true;
@@ -137,6 +201,7 @@ export function installCoaching(h:Hooks){
  }
  function openSession(){
   combineSelection.clear();selectedSuggestion=null;cancelDiscussion();cancelRequest();helperFields.clear();pendingFields.clear();planStatus.textContent='';
+  guidedPlan=false;guidedField=null;plan.classList.remove('guided');
   $('coachProposals').replaceChildren();$<HTMLSelectElement>('experimentStart').value='main';
   $<HTMLDetailsElement>('coachExperimentOptions').open=false;$<HTMLDetailsElement>('coachSupportOptions').open=false;plan.open=false;
   document.body.classList.remove('studio-designing');const s=h.current();if(!s.design)h.notebook.update(s.id,s.owner,x=>{x.design=freshDesign();});

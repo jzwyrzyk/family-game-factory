@@ -16,6 +16,46 @@
     }
   ],
   "paths": {
+    "/v1/builder/status": {
+      "get": {
+        "summary": "Read-only, authenticated family workshop readiness; never queues a game",
+        "responses": {
+          "200": {
+            "description": "Availability and a coarse readiness reason, not job progress",
+            "content": {"application/json": {"schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["available", "reason"],
+              "properties": {
+                "available": {"type": "boolean"},
+                "reason": {"type": "string", "enum": ["READY", "UNAVAILABLE", "ALLOWANCE_REQUIRED"]}
+              }
+            }}}
+          },
+          "401": {"description": "Missing or expired family session"}
+        }
+      }
+    },
+    "/v1/coach/status": {
+      "get": {
+        "summary": "Read-only, authenticated model-coach configuration readiness; not a proof of a successful inference",
+        "responses": {
+          "200": {
+            "description": "Coach availability",
+            "content": {"application/json": {"schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["available", "mode"],
+              "properties": {
+                "available": {"type": "boolean"},
+                "mode": {"type": "string", "enum": ["model", "unavailable"]}
+              }
+            }}}
+          },
+          "401": {"description": "Missing or expired family session"}
+        }
+      }
+    },
     "/v1/jobs": {
       "post": {
         "summary": "Validate, authorize, reserve quota and durably acknowledge an idempotent job",

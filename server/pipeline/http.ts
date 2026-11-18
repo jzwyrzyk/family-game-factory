@@ -21,6 +21,7 @@ export function apiHandler(service:JobService,config:HttpConfig){
    if(request.method==='POST'&&(request.headers['x-factory-request']!=='1'||origin!==config.appOrigin||!request.headers['content-type']?.startsWith('application/json')))throw Error('FORBIDDEN');
    const cookie=request.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('factory_session='))?.slice('factory_session='.length);
    const session=verifySession(cookie,config.sessionKey);const path=new URL(request.url!,'http://internal').pathname;
+   if(path==='/v1/builder/status'&&request.method==='GET')return json(response,200,await service.readiness(session));
    if(path==='/v1/revisions'&&request.method==='POST')return json(response,200,await service.registerBase(session,await body(request)));
    if(path==='/v1/jobs'&&request.method==='POST'){
     const ack=await service.submit(session,await body(request));json(response,202,ack);if(ack.status==='queued')setImmediate(()=>{void (config.dispatch?config.dispatch(ack.jobId):service.run(ack.jobId)).catch(()=>{});});return;

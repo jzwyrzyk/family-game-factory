@@ -25,6 +25,16 @@ const {start}=require('./browser-server.cjs');
   const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
   assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
+  await page.click('[data-starter="gum"]');
+  // This suite exercises the preserved physical builder; newly created games
+  // default to sticker mode and are tested in sticker-builder-browser.cjs.
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',w=JSON.parse(localStorage.getItem(key));
+    const p=w.projects.find(p=>p.game==='gum'),r=w.revisions.find(r=>r.id===p.headId);
+    r.config.qualityVersion=1;
+    localStorage.setItem(key,JSON.stringify(w));
+  });
+  await page.reload();await page.waitForFunction(()=>FG.studio);
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   // A replay/version control must retain an active host activity; leaving the game may interrupt it.
   const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
@@ -115,7 +125,7 @@ const {start}=require('./browser-server.cjs');
   await page.click('#studioKeep');assert.notEqual((await workspace()).projects.find(p=>p.game==='hill').headId,hillMain);
   await talk();assert.match(await page.textContent('#studioPausedPreview'),/Junkyard Rally/);
   await page.click('#studioNavCreate');assert.equal(await page.locator('#studioPausedPreview').textContent(),'');assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a new idea clears the previous game preview');
-  await page.fill('#studioPrompt','Build a brand new flying banana universe');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('Local design helper'));assert.match(await page.textContent('#studioMessages'),/Local design helper/);await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');assert.match(await page.textContent('#studioMessages'),/no build was started/);assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
+  await page.fill('#studioPrompt','Build a brand new flying banana universe');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.match(await page.textContent('#studioMessages'),/Your new game idea is saved/);await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');assert.match(await page.textContent('#studioMessages'),/no build was started/);assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);
   const n=await notebook();assert.ok(n.sessions.some(s=>s.game==='new'&&!s.projectId&&!s.remoteId));
   console.log(`PASS ${device}: production studio, five staged changes, physical construction, optional reflection, static paused preview and cleanup, Hill garage routing, undo/redo/fork, private draft/reload and honest offline AI`);await ctx.close();

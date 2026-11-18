@@ -146,7 +146,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.fill('#livePrompt','Use both math formats');await page.click('#livePromptForm button[type=submit]');
     assert.equal(await page.evaluate(id=>window.FG.learning.modeFor(id),projectId),'both');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.factory.exportWorkspace())),workspaceBefore,'format preferences do not rewrite game versions');
-    await advanceBudget(page);await page.click('#livePlay');await page.getByRole('button',{name:'Add Bottle',exact:true}).click();
+    await advanceBudget(page);await page.click('#livePlay');await page.locator('.gum-play').waitFor();await page.getByRole('button',{name:'Select Super star'}).click();await page.getByRole('button',{name:'Put a sticker on Top'}).click();
     await page.clock.runFor(91_000);await page.waitForSelector('#stage-overlay .math-activity');
     assert.equal(await activity(page).getAttribute('data-mode'),'both');
     const remixId=await page.evaluate(()=>window.FG.learning.activeAttemptId);await submitWritten(page,await activeItem(page));
@@ -324,7 +324,7 @@ async function qualityNativeJourney(browser:Browser,base:string,device:typeof de
     await hill.getByRole('button',{name:'Finish this trip',exact:true}).click();await page.waitForSelector('#resultNext');
     assert.equal(await page.evaluate(()=>document.activeElement?.id),'native-result-title','round completion moves focus to its labelled result');
     await page.click('#resultNext');assert.equal((await state()).track,'ridge');
-    await advanceBudget(page);await page.evaluate(()=>window.FG.app.openGame('gum'));
+    await advanceBudget(page);await page.evaluate(()=>window.FG.app.openGame('gum',{config:{qualityVersion:1,gravity:10,thrust:1,originalRules:true,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}}));
     const workshop=page.locator('.quality-builder');await workshop.getByRole('button',{name:'Add Bottle',exact:true}).click();
     const part=await page.evaluate(()=>window.FG.runtime.snapshot().state.parts.at(-1));
     await page.clock.runFor(91_000);await page.waitForFunction(()=>window.FG.learning.active);

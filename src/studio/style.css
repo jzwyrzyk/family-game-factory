@@ -337,3 +337,114 @@ body.studio-review>.notice{color:#f7f5ff}
 
 /* Keep the optional update banner legible against the light Studio shell. */
 body.studio-review > .factory-update-notice{color:#394862}
+
+/* Math / English choice: calm segmented buttons, consistent touch sizing. */
+.studio-learning-choice{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;margin:16px 0 4px;border:1px solid #dfe5f0;border-radius:16px;background:#fff;box-shadow:0 4px 12px #46578608}
+.studio-learning-copy{display:grid;gap:3px;min-width:0}
+.studio-learning-copy strong{color:#27385c;font-size:15px}
+.studio-learning-copy small{color:#687690;font-size:12px;line-height:1.5}
+.learning-subject-switch{display:inline-flex;gap:4px;max-width:100%;padding:4px;background:#edf1fa;border:1px solid #dae2f1;border-radius:13px}
+.learning-subject-switch button{appearance:none;min-height:44px;padding:10px 16px;border:0;border-radius:10px;background:transparent;color:#52617e;white-space:nowrap;font:750 14px/1.2 system-ui;cursor:pointer}
+.learning-subject-switch button[aria-pressed="true"]{background:#fff;color:#30468b;box-shadow:0 2px 7px #283b6a20}
+.learning-subject-switch button:disabled{cursor:default}
+.learning-subject-switch button:disabled:not([aria-pressed="true"]){opacity:.46}
+.learning-subject-switch button:focus-visible{outline:3px solid #747fe5;outline-offset:2px}
+.learning-adventure{display:grid;justify-items:start;gap:9px;padding:14px;margin-bottom:16px;border-radius:15px;background:#fff;color:#233454;border:1px solid #d9e2f1}
+.learning-adventure strong{font-size:16px}
+.learning-adventure-note{color:#5c6b86;font-size:13px;line-height:1.45;margin:0}
+.parent-subject-report{margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #dce4f0}
+.parent-subject-report h3{font-size:17px;margin:2px 0 10px;color:#263b73}
+@media(max-width:680px){.studio-learning-choice{flex-wrap:wrap;align-items:stretch}.studio-learning-choice>.learning-subject-switch{width:100%}.learning-subject-switch button{flex:1}.learning-adventure .learning-subject-switch{width:100%}}
+
+.studio-game-subject{display:grid;justify-items:start;gap:7px;margin:4px 8px 12px;padding:10px 12px;border-radius:12px;background:#f8faff;border:1px solid #e0e6f2}
+.studio-game-subject strong{font-size:13px;color:#344a79}
+.studio-game-subject small{font-size:12px;color:#687690}
+.studio-game-subject .learning-subject-switch button{font-size:13px}
+
+
+/* Screenshot corrective: player switch and learning mode share one quiet header.
+   Keep pressed state visible; do not leave a second full-width player bar. */
+.studio-review .site-header{max-width:1220px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.studio-header-tools{display:flex;align-items:center;gap:10px;margin-left:auto;min-width:0}
+.studio-review .site-header .profile-bar{display:block;width:auto;min-width:0;max-width:none;margin:0;padding:0;background:none;border:0}
+.studio-review .site-header .studio-profile-menu{margin:0;max-width:100%}
+.studio-review .site-header .studio-profile-menu>summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px;font-size:13px;min-height:44px}
+.studio-header-tools .studio-learning-choice{margin:0;padding:0;border:0;background:transparent;box-shadow:none;gap:0}
+.studio-header-tools .studio-learning-choice[hidden]{display:none!important}
+.studio-header-tools .studio-learning-copy{display:none}
+.studio-header-tools .learning-subject-switch{padding:3px;border-color:#e2e5f7;border-radius:999px;background:#f2edff;gap:1px}
+.studio-header-tools .learning-subject-switch button{min-height:39px;padding:8px 11px;font-size:12px;border-radius:999px}
+.studio-header-tools .learning-subject-switch button[aria-pressed=true]{color:#4333a4;background:#fff;box-shadow:0 2px 7px #6556b527}
+.studio-review #page-parent .two-column{grid-template-columns:minmax(0,1.35fr) minmax(310px,.9fr);align-items:start}
+.studio-review #page-parent .two-column>.panel:nth-child(2){order:-1}
+.studio-review #page-parent .panel{min-width:0}
+.studio-review #page-parent .panel h2{font-size:23px}
+.studio-review #page-parent #copyFeedback{margin-top:15px;font-size:13px}
+@media(max-width:930px){
+ .studio-review .site-header{justify-content:space-between}
+ .studio-header-tools{margin-left:0}
+ .studio-review #page-parent .two-column{grid-template-columns:1fr}
+ .studio-review #page-parent .two-column>.panel:nth-child(2){order:-1}
+}
+@media(max-width:650px){
+ .studio-review .site-header .brand{order:0}
+ .studio-review .site-header .studio-nav{order:2;flex-basis:100%;justify-content:center}
+ .studio-header-tools{order:1;margin-left:auto;gap:5px}
+ .studio-header-tools .learning-subject-switch button{font-size:11px;padding:8px;min-height:38px}
+ .studio-review .site-header .studio-profile-menu>summary{max-width:120px;min-height:42px;padding:7px 9px;font-size:12px}
+ .studio-review .site-header{gap:3px 6px}
+ .studio-review main{padding-top:7px}
+}
+
+
+/* Dropdown must paint above the home hero's isolated stacking context. */
+.studio-review .site-header{position:relative;z-index:50;isolation:isolate;overflow:visible}
+.studio-review .site-header .studio-header-tools{position:relative;z-index:51}
+.studio-review .site-header .studio-profile-menu[open]{z-index:60}
+.studio-review .site-header .studio-profile-menu[open] .profile-choices{z-index:65}
+
+/* Jems 5: concise child home, reversible project management and prominent approved mark. */
+.studio-review .site-header .jems-brand-logo{width:clamp(185px,18vw,230px);height:73px;max-width:100%;object-fit:contain}
+.studio-review .studio-continue{position:relative;padding-right:64px}
+.studio-review .studio-continue-copy{flex:1;min-width:0;overflow-wrap:anywhere}
+.studio-review .studio-continue-close{position:absolute;top:50%;right:10px;transform:translateY(-50%);min-width:44px;min-height:44px;border:1px solid #e3ddf2;border-radius:999px;background:#fff;color:#4f4183;font-size:25px;line-height:1;cursor:pointer}
+.studio-review .studio-continue-close:hover{background:#f4ecff;border-color:#aa8ad8}
+.studio-review #studioLibrary .studio-saved-card{position:relative;cursor:default;padding:0;overflow:hidden}
+.studio-review #studioLibrary .studio-saved-card:hover{transform:none}
+.studio-review .studio-saved-open{display:flex;flex-direction:column;gap:9px;width:100%;min-height:180px;padding:23px 21px;text-align:left;cursor:pointer;background:transparent;border:0;color:inherit;font:inherit}
+.studio-review .studio-saved-open>.jems-project-badge{max-width:calc(100% - 98px)}
+.studio-review .studio-saved-open .studio-card-link{margin-top:auto}
+.studio-review .studio-put-away{position:absolute;top:9px;right:9px;border:1px solid #dcd2ee;border-radius:10px;background:#faf7ff;color:#573b87;font:750 12px var(--jems-body);min-height:44px;padding:8px 10px;cursor:pointer}
+.studio-review .studio-put-away:hover{background:#eee3ff}
+.studio-review .studio-put-away:disabled{cursor:not-allowed;opacity:.65;font-size:11px}
+.studio-review .studio-archived-details{margin:15px 0 4px;padding:10px 14px;background:#fff;border:1px solid #e1d8f1;border-radius:15px;color:#314265}
+.studio-review .studio-archived-details summary{cursor:pointer;font-weight:750;min-height:44px;display:flex;align-items:center}
+.studio-review .studio-archived-list{display:grid;gap:9px;margin-top:9px}
+.studio-review .studio-archived-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-top:1px solid #ede7f5}
+.studio-review .studio-build-item-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:flex-end}
+.studio-review .studio-stop-build{background:#fff6ed;border-color:#f0b5a9;color:#6c2a2a}
+.studio-review .studio-stop-build:hover{background:#ffece8}
+@media(max-width:930px){.studio-review .site-header .jems-brand-logo{width:190px;height:67px}}
+@media(max-width:650px){
+ .studio-review .site-header .jems-brand-logo{width:150px;height:54px}
+ .studio-review .site-header .studio-profile-menu>summary{max-width:105px}
+ .studio-header-tools .learning-subject-switch button{font-size:11px;padding:7px 6px;min-height:40px}
+ .studio-review .studio-continue{padding-right:60px}
+ .studio-review .studio-continue-close{top:12px;right:9px;transform:none}
+ .studio-review .studio-continue .studio-primary{width:100%}
+ .studio-review .studio-saved-open{min-height:170px;padding:17px 13px}
+ .studio-review .studio-put-away{font-size:11px;top:7px;right:7px;min-height:44px;padding:7px}
+ .studio-review .studio-saved-open>.jems-project-badge{max-width:calc(100% - 90px)}
+ .studio-review .studio-build-item-actions{justify-content:flex-start}
+}
+@media(max-width:370px){.studio-review .site-header .jems-brand-logo{width:145px;height:52px}.studio-header-tools{flex:1 1 100%;justify-content:space-between}}
+
+/* Keep the resume action separate from its dismiss control on large screens. */
+.studio-review .studio-continue #studioContinuePlaying{margin-right:48px}
+@media(max-width:650px){.studio-review .studio-continue #studioContinuePlaying{margin-right:0}}
+
+/* Mobile navigation acceptance: the player menu cannot cover the nav row. */
+.studio-review .site-header .studio-profile-menu>summary{min-height:48px;min-width:44px}
+@media(max-width:650px){
+ .studio-review .site-header .studio-profile-menu[open] .profile-choices{top:calc(100% + 60px)}
+}

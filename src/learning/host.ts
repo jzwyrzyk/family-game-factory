@@ -1,8 +1,11 @@
 import {mountLanguageActivity} from '../language/activity';
+import {celebrateJem} from '../brand/delight';
 import {LANGUAGE_SKILLS} from '../language/curriculum';
-import {reportLanguage,selectLanguageItem} from '../language/engine';
+import {reportLanguage,selectLanguageItem,ensureLanguage} from '../language/engine';
 import { mountMathActivity } from './activity';
-import { report, selectItem, type LearningReport } from './engine';
+import { report, selectItem, ensureLearning } from './engine';
+import { renderParentInsights } from './insights';
+import './insights.css';
 import { SKILLS } from './curriculum';
 import { MODE_LABELS, LANGUAGE_MODE_LABELS, LEARNING_MODES, modeFor, setMode, interpretMathRequest, interpretLearningRequest } from './policy';
 import type { LearnerProfile, LearningContext, LearningMode } from './types';
@@ -23,6 +26,8 @@ export function installLearningHost() {
   type BudgetReceipt={profile:LearnerProfile;attemptId:string;at:number;subject:'math'|'language'};
   let activeBudget:BudgetReceipt|null=null;
   const seen=new Set<string>();
+  // In-memory, per-child/per-subject celebration cadence. Never learning evidence.
+  const independentSuccesses=new Map<string,number>();
   function didParticipate(receipt:BudgetReceipt) {
     const state=receipt.subject==='language'?receipt.profile.language:receipt.profile.learning;
     const attempts=(state as any)?.attempts;
@@ -61,7 +66,18 @@ export function installLearningHost() {
     try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
       onSave:()=>{if(!FG.store.save()){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}} options.onSave?.();},
-      onComplete:(result:any)=>{if(own!==generation||activeOwner!==FG.store.current().id)return;active=null;activeOwner='';activeBudget=null;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));options.onComplete(result);},
+      onComplete:(result:any)=>{
+        if(own!==generation||activeOwner!==FG.store.current().id)return;
+        active=null;activeOwner='';activeBudget=null;
+        window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));
+        // First truly completed independent practice, then every fifth. Not every answer.
+        if(result?.outcome==='completed'&&result.independent===true&&!target.dataset.saveFailed){
+          const key=String(profile.id)+':'+subjectFor(profile);
+          const count=(independentSuccesses.get(key)||0)+1;independentSuccesses.set(key,count);
+          if(count===1||count%5===0)celebrateJem('practice','labLearningAdventure');
+        }
+        options.onComplete(result);
+      },
     });}catch(error){active=null;activeOwner='';generation++;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));throw error;}
     return active;
   }
@@ -95,42 +111,18 @@ export function installLearningHost() {
     select.onchange=()=>{try{saveMode(key,select.value);onChange?.(select.value as LearningMode);}catch(error){select.value=modeFor(FG.store.current(),key);note.textContent=(error as Error).message;}};
     target.replaceChildren(wrap);return select;
   }
-  function renderReport(target:HTMLElement,profile:LearnerProfile=FG.store.current()) {
+  function renderReport(target:HTMLElement,profile:LearnerProfile=FG.store.current(),shownSubject?:'math'|'language') {
     target.replaceChildren();
-    if(subjectFor(profile)==='language'){
-      try {
-        if(FG.store.loadError)throw Error(FG.store.loadError);
-        const data=reportLanguage(profile),practiced=data.skills.filter(x=>x.presentations>0);
-        target.append(create('p','Language practice is not a reading diagnosis or a school grade. Independent work, help and listening support stay separate.','muted fine'));
-        if(!practiced.length){target.append(create('p','A few activities cannot define your reading ability. We are discovering what to practice.'));return;}
-        target.append(create('p',data.totals.independent+' independent · '+data.totals.assisted+' with help · '+data.due.length+' review skills','learning-report-summary'));
-        for(const row of practiced){
-          const card=create('article','','learning-progress-card');card.dataset.skillId=row.id;card.dataset.state=row.state;
-          const label=row.state==='independent'?'Solving independently':row.state==='remembered-later'?'Remembered later':row.state==='learning-with-support'?'Learning with help':'Still discovering';
-          card.append(create('strong','Grade '+row.grade+' · '+row.title),create('span',label,'learning-state'));
-          card.append(create('small',row.independent+' independent · '+row.assisted+' with help · '+row.distinctDays+' separate days'));
-          if(row.readSupport)card.append(create('small','Read-aloud help used in '+row.readSupport+' recent activities'));
-          if(row.explored)card.append(create('small',row.explored+' unscored writing practice activities'));
-          if(row.dueAt)card.append(create('small',row.reviewDue?'Ready to revisit':'Review after '+new Date(row.dueAt).toLocaleDateString()));
-          target.append(card);
-        }
-      }catch(error){target.append(create('p',(error as Error).message,'learning-save-warning'));}
-      return;
-    }
-    let r:LearningReport;
-    try{if(FG.store.loadError)throw Error(FG.store.loadError);r=report(profile);}catch(error){target.append(create('p',(error as Error).message,'learning-save-warning'));return;}
-    const practiced=r.skills.filter(x=>x.presentations>0);
-    target.append(create('p','Progress describes practice here. It is not a school grade or an assessment score.','muted fine'));
-    if(!practiced.length){target.append(create('p','We’re discovering what you know. A few questions cannot define your ability.'));return;}
-    target.append(create('p',`${r.totals.independent} independently solved · ${r.totals.assisted} solved with help · ${r.due.length} skills ready to revisit`,'learning-report-summary'));
-    for(const row of practiced){
-      const card=create('article','','learning-progress-card');card.dataset.skillId=row.id;card.dataset.state=row.state;
-      card.append(create('strong',`Grade ${row.grade} · ${row.title}`),create('span',stateNames[row.state]||'Collecting learning evidence','learning-state'));
-      card.append(create('small',`${row.independent} independent successes · ${row.distinctDays} separate days · ${row.assisted} solved with help`));
-      if(row.dueAt)card.append(create('small',row.reviewDue?'Ready for a review':`Review after ${new Date(row.dueAt).toLocaleDateString()}`));
-      if(row.migrated)card.append(create('small','Includes older practice counts. Earlier days and answer forms were not recorded.'));
-      for(const hypothesis of row.hypotheses)card.append(create('small',hypothesis));
-      target.append(card);
+    try {
+      if(FG.store.loadError)throw Error(FG.store.loadError);
+      const subject=shownSubject||subjectFor(profile);
+      if(subject==='language'){
+        renderParentInsights(target,'language',reportLanguage(profile),ensureLanguage(profile).attempts);
+      }else{
+        renderParentInsights(target,'math',report(profile),ensureLearning(profile).attempts);
+      }
+    }catch(error){
+      target.append(create('p',(error as Error).message,'learning-save-warning'));
     }
   }
   window.addEventListener('factory-profile',dispose);
@@ -139,5 +131,6 @@ export function installLearningHost() {
     reportLanguage(FG.store.current()):report(FG.store.current()),
     mathReport:()=>report(FG.store.current()),selectItem,
     get subject(){return subjectFor(FG.store.current());},get skills(){return subjectFor(FG.store.current())==='language'?LANGUAGE_SKILLS:SKILLS;},mathSkills:SKILLS,languageSkills:LANGUAGE_SKILLS,selectLanguageItem,reportLanguage,
+    setSubject:(subject:'math'|'language')=>{if(active)throw Error('Finish this activity before switching subjects.');return FG.store.choosePracticeSubject(subject);},
      get active(){return !!active;},get activeAttemptId(){return active?.attemptId||null;},get activeItem(){return active?.item||null;}};
 }

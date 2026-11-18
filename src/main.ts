@@ -9,6 +9,10 @@ initLiveRemix();
 import { initBuilder } from './builder/ui';
 void initBuilder();
 
+import {installJemsDelight} from './brand/delight';
+import './brand/delight.css';
+installJemsDelight();
+
 import {installOffline} from './offline';
 installOffline();
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 240" role="img" aria-label="Three mystery buckets with colorful splashes">
+<defs><linearGradient id="a" x2="0" y2="1"><stop stop-color="#D7F5FF"/><stop offset="1" stop-color="#D7D5FF"/></linearGradient></defs>
+<rect width="500" height="240" rx="18" fill="url(#a)"/><circle cx="405" cy="43" r="34" fill="#FFF2C1"/><path d="M0 204q120-44 260 0t240 0v36H0Z" fill="#BBEDDF"/>
+<g stroke="#FFF" stroke-width="5" stroke-linejoin="round"><path d="m71 114 30 104h77l30-104Z" fill="#2D7BFF"/><path d="m212 114 30 104h77l30-104Z" fill="#8A4DFF"/><path d="m353 114 30 104h77l30-104Z" fill="#FF6B7A"/></g>
+<g fill="none" stroke="#0B1D4D" stroke-width="11" stroke-linecap="round"><path d="M74 117q66-52 132 0"/><path d="M215 117q66-52 132 0"/><path d="M356 117q62-48 125 0"/></g>
+<path d="m271 16 11 22 24 5-19 15 2 23-20-12-21 12 4-24-18-15 24-5Z" fill="#FFC828"/><path d="M80 31q-15 32-11 51 3 16 17 16 14-1 16-14 2-16-22-53Z" fill="#34D7B3"/>
+<circle cx="178" cy="73" r="8" fill="#FF6B7A"/><circle cx="187" cy="51" r="5" fill="#FF6B7A"/><circle cx="153" cy="51" r="6" fill="#FFC828"/></svg>

@@ -4,14 +4,26 @@ const {start}=require('./browser-server.cjs');
 const fs=require('node:fs');
 /** Visual contract for jems. No model calls, paid APIs or child data are used. */
 (async()=>{
- const server=start(),base='http://127.0.0.1:'+server.address().port+'/arcade/';
+ const server=start();
+ // http.Server.listen() is asynchronous. Reading address() immediately can return
+ // null and leave the open server handle alive after a rejected test promise.
+ await new Promise((resolve,reject)=>{
+  if(server.listening){resolve();return;}
+  server.once('listening',resolve);
+  server.once('error',reject);
+ });
+ const base='http://127.0.0.1:'+server.address().port+'/arcade/';
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  fs.mkdirSync('test-results',{recursive:true});
  try{
   for(const [label,width,height] of [['desktop',1280,900],['mobile',390,844]]){
+   // Use normal browser contexts. Chromium's serviceWorker blocking shim can itself
+   // throw inside sandboxed no-same-origin previews; offline tests exercise that separately.
    const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile'}),errors=[];
-   page.on('pageerror',e=>errors.push(e.message));await page.goto(base);
+   page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(15000);
+   page.on('pageerror',e=>errors.push((e.stack||e.message)));await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
+   console.log('jems brand '+label+': Studio booted');
    const logo=page.locator('img.jems-brand-logo');
    assert.equal(await logo.count(),1);
    assert.equal(await logo.getAttribute('alt'),'jems');
@@ -19,21 +31,43 @@ const fs=require('node:fs');
    const title=await page.title();assert.match(title,/^jems/);
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
-   const artwork=await page.evaluate(async()=>Object.fromEntries(await Promise.all(
-    ['jems-logo.svg','jems-mark.svg','jems-mono.svg','jems-reversed.svg','jems-pattern.svg'].map(async name=>{
-      const response=await fetch('./'+name);return [name,{ok:response.ok,svg:await response.text()}];
-    })
-   )));
-   assert.ok(Object.values(artwork).every(x=>x.ok),'all brand lockups and patterns are shipped locally');
-   assert.match(artwork['jems-logo.svg'].svg,/The Game Factory/i,'approved full wordmark lockup');
-   assert.match(artwork['jems-logo.svg'].svg,/fill="#fff"/,'white open-ended wrench visibly in color logo');
-   assert.match(artwork['jems-mono.svg'].svg,/fill="#fff"/,'monochrome gem wrench interior must remain white');
-   assert.match(artwork['jems-mark.svg'].svg,/viewBox="0 0 237 237"/,'standalone brand mark');
-
-   const expectedTokens={'--jems-ink':'#0B1E3B','--jems-purple':'#8B5CF6','--jems-coral':'#FF5E7A','--jems-gold':'#FFC24D','--jems-mint':'#22D3A6'};
-   const tokens=await page.evaluate(()=>Object.fromEntries(Object.keys({"--jems-ink":"","--jems-purple":"","--jems-coral":"","--jems-gold":"","--jems-mint":""}).map(key=>[key,getComputedStyle(document.documentElement).getPropertyValue(key).trim().toUpperCase()])));
-   assert.deepEqual(tokens,expectedTokens,'brand source-of-truth palette');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
+   const makeHeading=await page.locator('#studioNew .studio-make-copy strong').evaluate(e=>getComputedStyle(e).color);
+   assert.equal(makeHeading,'rgb(255, 255, 255)','Create headline must stay white on saturated blue');
+
+  // Brand fidelity regression: validate the exact named palette and semantic accessible roles.
+  const tokens=await page.evaluate(()=>{
+    const r=getComputedStyle(document.documentElement);
+    return Object.fromEntries(['ink','blue','purple','mint','gold','coral','cloud','lilac','action-blue','action-purple'].map(k=>[k,r.getPropertyValue('--jems-'+k).trim().toUpperCase()]));
+  });
+  assert.deepEqual(tokens,{
+    ink:'#0B1E3B',blue:'#2E6BFF',purple:'#8B5CF6',mint:'#22D3A6',
+    gold:'#FFC24D',coral:'#FF5E7A',cloud:'#FFF7EE',lilac:'#E6D8FF',
+    'action-blue':'#195FD0','action-purple':'#7136C9'
+  });
+  const assets=['jems-mark.svg','jems-logo.svg','jems-wordmark.svg','jems-clouds.svg','jems-blocks.svg','jems-sparks.svg','jems-facets-pattern.svg','jems-mono.svg','jems-reversed.svg','jems-pattern.svg'];
+  for(const asset of assets){
+    const result=await page.evaluate(p=>fetch('./'+p).then(async r=>({ok:r.ok,text:await r.text()})),asset);
+    assert.ok(result.ok&&result.text.includes('<svg'),asset+' should be served locally');
+    if(asset==='jems-mark.svg')assert.ok(result.text.includes('id="jems-wrench"')&&!result.text.includes('M60 45C49 45'), 'open-ended wrench geometry, not the old circular keyhole');
+    if(asset==='jems-logo.svg')assert.ok(result.text.includes('fill-rule="evenodd"')&&!result.text.includes('<text'), 'wordmark must be outlined, not rendered using a system-dependent font');
+    if(asset==='jems-mono.svg')assert.ok(result.text.includes('fill="#fff"')&&result.text.includes('fill-rule="evenodd"'),'monochrome wrench must be solid white, never a transparent hole');
+    if(asset==='jems-reversed.svg')assert.ok(result.text.includes('fill="#fff"'),'white-on-dark logo must retain its visible white wrench');
+    if(asset==='jems-pattern.svg')assert.ok(result.text.includes('viewBox="0 0 360 240"'),'decorative pattern must be the approved scoped asset');
+  }
+  const visual=await page.evaluate(()=>({
+    hero:getComputedStyle(document.querySelector('.studio-home-hero')).backgroundImage,
+    workbench:getComputedStyle(document.querySelector('.studio-home-hero'),'::before').backgroundImage,
+    button:getComputedStyle(document.querySelector('#studioNew')).backgroundImage,
+    surface:getComputedStyle(document.querySelector('.studio-starter')).borderRadius,
+    learning:!!document.getElementById('studioLearningChoice'),
+    game:!!document.getElementById('studioGameMath')
+  }));
+  assert.match(visual.hero,/gradient/i,'the brighter jems hero retains a calm surface gradient');
+  assert.ok(visual.workbench.includes('jems-workbench.svg'),'approved invention artwork reaches the homepage, not only logo');
+  assert.match(visual.button,/gradient/i,'child create action uses accessible on-brand gradient');
+  assert.ok(visual.learning&&visual.game,'brand merge retained latest Math/English selector');
+
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'no horizontal overflow');
    await page.screenshot({path:'test-results/jems-home-'+label+'.png',fullPage:false});
    await page.locator('#studioNew').click();
@@ -47,22 +81,37 @@ const fs=require('node:fs');
    await page.locator('#studioNavHome').click();
    await page.locator('#studioNavPowers').click();
    assert.equal(await page.locator('#page-lab').isVisible(),true);
+   const mathHead=page.locator('#page-lab .math-activity h2');
+   if(await mathHead.count())assert.equal(await mathHead.first().evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)','Math question must stay readable on dark lesson');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
    await page.screenshot({path:'test-results/jems-powers-'+label+'.png',fullPage:false});
+   console.log('jems brand '+label+': learning screen verified');
    await page.locator('footer [data-page="parent"]').click();
    assert.equal(await page.locator('#page-parent').isVisible(),true);
+   const parentLabel=await page.locator('#page-parent label[for="parentNickname"]').evaluate(e=>getComputedStyle(e).color);
+   assert.equal(parentLabel,'rgb(52, 68, 102)','Parent form labels need strong Ink-on-white contrast');
+   const restoreLabel=await page.locator('#page-parent label.upload-button').evaluate(e=>({color:getComputedStyle(e).color,bg:getComputedStyle(e).backgroundColor}));
+   assert.deepEqual(restoreLabel,{color:'rgb(81, 48, 153)',bg:'rgb(242, 236, 255)'},'Restore progress button must be legible on its light secondary surface');
    await page.screenshot({path:'test-results/jems-parent-'+label+'.png',fullPage:false});
    const manifest=await page.evaluate(()=>fetch('./manifest.webmanifest').then(r=>r.json()));
    assert.equal(manifest.short_name,'jems');
-   assert.equal(manifest.icons[0].src,'./jems-mark.svg');
+   assert.equal(manifest.icons[0].src,'./jems-app-icon.svg','installable jems icon should use its dedicated approved app tile');
+   assert.equal(manifest.icons[1].src,'./jems-mark.svg','bare mark remains available as a vector icon');
+   assert.equal(await page.locator('link[rel="icon"]').getAttribute('href'),'./jems-mark.svg','browser tab uses jems favicon');
    assert.deepEqual(errors,[]);
+   console.log('PASS jems brand page:',label);
    await page.close();
   }
-  const legacy=await browser.newPage();
+  const legacy=await browser.newPage();legacy.setDefaultTimeout(12000);
+  console.log('jems brand: checking legacy route');
   await legacy.goto(base+'?arcade=1');await legacy.waitForFunction(()=>window.FG?.app);
   assert.equal(await legacy.locator('.jems-brand-logo').count(),1);
   assert.equal(await legacy.locator('.jems-brand-logo').evaluate(img=>img.complete&&img.naturalWidth>0),true);
   assert.equal(await legacy.locator('#page-home').isVisible(),true);
+  const legacyText=await legacy.locator('.hero p').evaluate(e=>getComputedStyle(e).color);
+  assert.equal(legacyText,'rgb(69, 85, 116)','Legacy hero body text must be readable on light surfaces');
+  const legacyAction=await legacy.locator('.hero .btn.ghost').evaluate(e=>getComputedStyle(e).color);
+  assert.equal(legacyAction,'rgb(82, 44, 157)','Legacy secondary action must not use old white-on-white styling');
   await legacy.close();
   console.log('PASS jems brand contract: logo, palette, navigation, Send vs Speak, 6 games, parents, learning, mobile and legacy Arcade');
  }finally{await browser.close();server.close();}
