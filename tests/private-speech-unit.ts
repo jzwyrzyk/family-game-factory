@@ -67,7 +67,7 @@ async function main(){
  await test('explicit tap records one thought; transcription enters editable draft only',async()=>{
   button.onclick?.();await tick();
   assert.equal(mediaStarts,1);assert.equal(button.attrs['aria-pressed'],'true');
-  assert.match(status.textContent,/recording/);
+  assert.match(status.textContent,/recording/i);
   button.onclick?.();await tick();assert.equal(trackStops,1);
   assert.equal(privateUploads,1);
   resolveTranscript?.('The dragon sneezes spaghetti!');await tick();
