@@ -86,7 +86,7 @@ export function installCoaching(h:Hooks){
  function renderPlan(replaceFocused=false){
   const d=h.current().design||freshDesign(),missing=missingPlan(d);
   plan.classList.toggle('guided',guidedPlan);
-  guideStatus.textContent=guidedPlan?(guidedField?'Let's decide one thing at a time · '+(PLAN_FIELDS.length-missing.length+1)+' of '+PLAN_FIELDS.length:'Your game choices are ready to review. Nothing has been built yet.'):'Choose only the details that matter. Your ideas stay yours.';
+  guideStatus.textContent=guidedPlan?(guidedField?'Choose one thing at a time · '+(PLAN_FIELDS.length-missing.length+1)+' of '+PLAN_FIELDS.length:'Your game choices are ready to review. Nothing has been built yet.'):'Choose only the details that matter. Your ideas stay yours.';
   for(const key of PLAN_FIELDS){
    const field=plan.querySelector<HTMLElement>('.design-plan-field[data-field="'+key+'"]');
    if(field)field.hidden=guidedPlan&&key!==guidedField;
