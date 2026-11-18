@@ -50,3 +50,14 @@ export function buildProgressCopy(job:BuildView|undefined, sending:boolean, unce
 }
 /** Comparison is a deliberate activity, not an always-visible requirement. */
 export function canCompareExperiments(count:number){return count>=2;}
+
+/** Explicit child requests to stop or return to play are actions, not AI prompts.
+ * Keep the matching narrow so a game idea mentioning "never mind" is not cancelled.
+ */
+export type ConversationDisposition='continue'|'play'|'cancel';
+export function conversationDisposition(message:string):ConversationDisposition {
+ const normalized=message.trim().toLowerCase().replace(/[.!?]+$/,'').trim();
+ if(/^(?:(?:actually|okay|oh)\s+)?(?:never\s?mind|forget (?:it|that)|cancel (?:that|my idea))$/.test(normalized))return 'cancel';
+ if(/^(?:please\s+)?(?:i (?:just )?want to play(?: now)?|just (?:let me )?play(?: now)?|let me play(?: now)?|can i (?:go )?play(?: now)?|back to (?:my|the) game|take me back to (?:my|the) game|stop asking(?: me)? questions|no more questions)$/.test(normalized))return 'play';
+ return 'continue';
+}
