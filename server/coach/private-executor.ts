@@ -10,6 +10,7 @@ import {approved,validateCoachContext,type CoachProvider} from './service';
 import {OpenAICoachProvider,type PrivateCoachConfig} from './private-provider';
 import {validateCoachReply} from '../../src/studio/design';
 import {privateCoachOrigin} from './private-bridge';
+import {speechApproved,speechConfig,validateAudio,GooglePrivateSpeech,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
 export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
@@ -27,14 +28,19 @@ export interface PrivateCoachRuntime {
  verifyCaller:VerifyCaller;
  provider:CoachProvider;
  maxConcurrent?:number;
+ audio?:SpeechProvider;
+ audioConfig?:SpeechConfig;
 }
 export function privateCoachHandler(runtime:PrivateCoachRuntime){
  let active=0;
  const send=(res:ServerResponse,status:number,data:object)=>{
-  res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+  if(res.headersSent||res.writableEnded||res.destroyed)return;
+  res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});
   res.end(JSON.stringify(data));
  };
  return async(req:IncomingMessage,res:ServerResponse)=>{
+  const aborted=new AbortController();
+  res.once('close',()=>{if(!res.writableEnded)aborted.abort();});
   try{
    if(req.headers.origin||req.headers['x-factory-request']!=='1')throw Error('FORBIDDEN');
    const path=new URL(req.url||'','http://private').pathname;
@@ -42,31 +48,52 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    if(!token||!await runtime.verifyCaller(token))throw Error('FORBIDDEN');
    const available=runtime.enabled&&approved(runtime.config)&&
     !!runtime.config.apiKey&&runtime.config.apiKey.length>=16;
-   // Authenticated, read-only check. It never asks the model anything or
-   // implies that a funded live inference has already completed successfully.
+   // Both readiness probes authenticate the exact gateway identity.
+   // No prompt, child ID, audio or provider request is included.
    if(path==='/v1/private-coach/status'&&req.method==='GET')
     return send(res,200,{available,mode:available?'model':'unavailable'});
-   if(path!=='/v1/private-coach/complete'||req.method!=='POST'||
-    !String(req.headers['content-type']||'').startsWith('application/json'))
-    throw Error('FORBIDDEN');
-   if(!available)throw Error('COACH_UNAVAILABLE');
+   const voiceReady=!!runtime.audio&&!!runtime.audioConfig&&speechApproved(runtime.audioConfig);
+   if(path==='/v1/private-coach/audio/status'&&req.method==='GET')
+    return send(res,200,{available:voiceReady,mode:voiceReady?'private':'unavailable'});
+   const isAudio=path==='/v1/private-coach/audio';
+   if((path!=='/v1/private-coach/complete'&&!isAudio)||req.method!=='POST'||
+    !String(req.headers['content-type']||'').startsWith('application/json'))throw Error('FORBIDDEN');
+   if(isAudio?!voiceReady:!available)throw Error(isAudio?'AUDIO_UNAVAILABLE':'COACH_UNAVAILABLE');
    if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
    let data='';
    for await(const chunk of req){
     data+=String(chunk);
-    if(Buffer.byteLength(data,'utf8')>40000)throw Error('INVALID_REQUEST');
+    if(Buffer.byteLength(data,'utf8')>(isAudio?440000:40000))throw Error('INVALID_REQUEST');
    }
    let input:any;
    try{input=JSON.parse(data);}catch{throw Error('INVALID_REQUEST');}
+   if(isAudio){
+    if(!input||input.version!==1||
+     Object.keys(input).length!==3||
+     Object.keys(input).some(k=>!['version','audio','mime'].includes(k))||
+     typeof input.audio!=='string'||typeof input.mime!=='string'||
+     input.audio.length>428000||!/^[A-Za-z0-9+/]+={0,2}$/.test(input.audio))
+      throw Error('INVALID_AUDIO');
+    const bytes=Buffer.from(input.audio,'base64');
+    if(bytes.length>AUDIO_MAX_BYTES||bytes.toString('base64')!==input.audio)throw Error('INVALID_AUDIO');
+    const mime=validateAudio(bytes,input.mime);
+    active++;
+    try{
+     const text=await runtime.audio!.transcribe(bytes,mime,
+      AbortSignal.any([aborted.signal,AbortSignal.timeout(15000)]));
+     if(typeof text!=='string'||!text.trim()||text.length>2000)throw Error('AUDIO_NO_SPEECH');
+     return send(res,200,{text});
+    }finally{active--;}
+   }
    if(!input||Object.keys(input).some(k=>!['version','context'].includes(k))||input.version!==1)throw Error('INVALID_REQUEST');
    const context=validateCoachContext(input.context);
    const serialized=JSON.stringify(context);
    if(serialized.length>runtime.config.maxInputChars)throw Error('INVALID_REQUEST');
-   // Do not allow a direct caller to bypass the gateway's PII rejection.
    if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
    active++;
    try{
-    const {reply,usedMicroUsd}=await runtime.provider.complete(context,AbortSignal.timeout(25000));
+    const {reply,usedMicroUsd}=await runtime.provider.complete(context,
+     AbortSignal.any([aborted.signal,AbortSignal.timeout(25000)]));
     if(!Number.isSafeInteger(usedMicroUsd)||usedMicroUsd<0||usedMicroUsd>runtime.config.maxTurnMicroUsd)
      throw Error('COACH_PROVIDER_FAILED');
     const validated=validateCoachReply(reply,context);
@@ -74,9 +101,9 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    }finally{active--;}
   }catch(error){
    const code=(error as Error).message;
-   return send(res,code==='FORBIDDEN'?403:code==='INVALID_REQUEST'||code==='PRIVATE_INFORMATION'?400:
-    code==='RATE_LIMIT'?429:code==='COACH_REFUSED'?422:503,{errorCode:
-    ['FORBIDDEN','INVALID_REQUEST','PRIVATE_INFORMATION','RATE_LIMIT','COACH_REFUSED'].includes(code)?code:'COACH_UNAVAILABLE'});
+   return send(res,code==='FORBIDDEN'?403:code==='INVALID_REQUEST'||code==='PRIVATE_INFORMATION'||code==='INVALID_AUDIO'?400:
+    code==='RATE_LIMIT'?429:code==='COACH_REFUSED'||code==='AUDIO_NO_SPEECH'?422:503,{errorCode:
+    ['FORBIDDEN','INVALID_REQUEST','PRIVATE_INFORMATION','INVALID_AUDIO','RATE_LIMIT','COACH_REFUSED','AUDIO_NO_SPEECH'].includes(code)?code:'COACH_UNAVAILABLE'});
   }
  };
 }
@@ -107,20 +134,25 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
   throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
  if(env.FACTORY_OPENAI_API_KEY||env.FACTORY_COACH_API_KEY)
   throw Error('GENERATION_OR_GATEWAY_KEY_FORBIDDEN_IN_PRIVATE_COACH');
- const config=privateConfig(env);
+ const config=privateConfig(env),audioConfig=speechConfig(env);
  const requested=env.FACTORY_COACH_APPROVED==='true';
- if(!requested){
-  // Inactive revisions must not have access to an API key at all.
+ const audioRequested=env.FACTORY_COACH_AUDIO_APPROVED==='true';
+ if(!requested&&!audioRequested){
   if(config.apiKey)throw Error('COACH_SECRET_FORBIDDEN_WHILE_INACTIVE');
-  return {config,enabled:false,verifyCaller:async(_token:string)=>false,provider:new OpenAICoachProvider(config)};
+  return {config,enabled:false,verifyCaller:async(_token:string)=>false,
+   provider:new OpenAICoachProvider(config)};
  }
- if(!approved(config)||!config.apiKey||config.apiKey.length<16)
+ if(requested&&(!approved(config)||!config.apiKey||config.apiKey.length<16))
   throw Error('COACH_APPROVAL_REQUIRED');
+ if(!requested&&config.apiKey)throw Error('COACH_SECRET_FORBIDDEN_WHILE_INACTIVE');
+ if(audioRequested&&!speechApproved(audioConfig))throw Error('AUDIO_APPROVAL_REQUIRED');
  const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
  const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
- if(privateCoachOrigin(audience)!==audience)
-  throw Error('COACH_AUDIENCE_REQUIRED');
- return {config,enabled:true,verifyCaller:googleCallerVerifier(audience,caller),provider:new OpenAICoachProvider(config)};
+ if(privateCoachOrigin(audience)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
+ return {config,enabled:requested,verifyCaller:googleCallerVerifier(audience,caller),
+  provider:new OpenAICoachProvider(config),
+  audioConfig,
+  audio:audioRequested?new GooglePrivateSpeech(audioConfig.projectId):undefined};
 }
 async function main(){
  const runtime=dedicatedCoachRuntime(process.env);
