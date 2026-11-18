@@ -7,7 +7,7 @@ import {trustedDeviceHandler,verifyBrowserSession} from '../server/trusted-devic
 import {apiHandler} from '../server/pipeline/http';
 import {mintDeviceInvitation} from '../server/device-owner';
 import {signSession} from '../server/pipeline/auth';
-import type {JobService} from '../server/pipeline/service';
+import {JobService} from '../server/pipeline/service';
 
 const origin='https://jems.example',familyId='family-one',signing='a-really-long-test-only-key-for-session-signing-not-a-secret';
 const day=86400000;
@@ -84,6 +84,7 @@ test('trusted device: parent unlock, same-family listing, revocation invalidates
   const listed=await(await request('/v1/devices','GET',undefined,oneCookies+'; '+parent)).json();
   assert.deepEqual(listed.devices.map((d:{name:string})=>d.name),['Living room','Family phone']);
   const target=listed.devices.find((d:{name:string})=>d.name==='Family phone');
+  const signedTwo=await verifyBrowserSession(repo,twoCookies,signing);
   assert.equal((await request('/v1/devices/revoke','POST',{deviceId:target.id},oneCookies)).status,401);
   assert.equal((await request('/v1/devices/revoke','POST',{deviceId:target.id},oneCookies+'; '+parent)).status,200);
   assert.equal((await request('/v1/sessions/status','GET',undefined,twoCookies)).status,401);
@@ -93,6 +94,14 @@ test('trusted device: parent unlock, same-family listing, revocation invalidates
   const fakeResponse:any={status:0,headers:{},setHeader(name:string,value:string){this.headers[name]=value;return this;},writeHead(code:number,heads:unknown){this.status=code;this.headers=heads;return this;},end(){return this;}};
   await gate({method:'GET',url:'/v1/builder/status',headers:{origin,cookie:twoCookies}} as any,fakeResponse);
   assert.equal(fakeResponse.status,401,'existing signed access is immediately refused after revocation');
+  // Check the authorization again *inside* the atomic paid-job transaction.
+  const admission=new JobService(repo,{available:true,kind:'metered-api',generate:async()=>{throw Error('NO_REAL_GENERATION');}},
+    {test:async()=>{throw Error('NO_REAL_SANDBOX');}},
+    {allowMock:false,maxUnits:100,timeoutMs:30000,maxRetries:2});
+  await admission.setAllowance({...signedTwo,role:'parent'},100000,true);
+  await assert.rejects(admission.submit(signedTwo,{gameId:'new',baseRevisionId:null,
+    prompt:'Make a cat game',clientRequestId:'revoked-device-001'}),/UNAUTHENTICATED/);
+  assert.equal((await repo.snapshot()).jobs.length,0,'revoked device cannot reserve a paid job');
   assert.equal((await request('/v1/sessions/status','GET',undefined,oneCookies)).status,200,'another family device remains connected');
   const disconnected=await request('/v1/devices/disconnect','POST',{},oneCookies);
   assert.equal(disconnected.status,200);
