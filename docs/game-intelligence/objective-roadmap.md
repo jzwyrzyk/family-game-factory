@@ -30,16 +30,16 @@
 | **O8** | Evidence-based quality research | Baseline-vs-research A/B across development and holdout cases, cost/latency, device tests, parent-consented observation | Reproducible metrics and counterexamples; no claim of better enjoyment absent observed child feedback |
 | **O9** | Cumulative merge and deployment | Full integrated PR review, conflict resolution, exact-source CI, approved pinned worker, staged production and rollback | Owner-authorized trusted release; secure worker public-source pin updated only by separate review; smoke tests and rollback verified |
 
-## Current focus: O0
+## O0: Complete; O1 is the only next active objective
 
-Baseline at roadmap creation:
+Baseline verified after the initial draft:
 - Draft PR #43 remains unmerged.
 - Arcade journeys for public app head e4f5e20e5825972f8fc469dd86e57ba6a9e49d11 succeeded, including its browser/learning/creative jobs.
-- The visual-review run for the same head was cancelled overall; screenshots, brand contract and Studio journey passed, while joy-contract was cancelled before finishing setup. Its cancelled job was specifically retriggered; do not count it as a pass until verified.
+- The visual-review run for the same head was initially cancelled, but its cancelled job was rerun. All four jobs subsequently passed: screenshots, brand contract, Studio journey and joy-contract. [View final successful run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320154925).
 - The separate private generation worker checks out an older immutable reviewed public-source SHA and will NOT adopt PR #43 merely because the app branch is merged. No private worker/credential/attestation change is included here.
 - Existing code is a bounded deterministic game-form advisory plus quality-evidence ledger. It is NOT a generalized intent recognizer, a real gameplay quality evaluator, or a measurement of fun.
 
-**O0 exit:** Confirm check results, record any limitations, and preserve the exact code baseline. Then O1 alone becomes active.
+**O0 disposition: COMPLETE for the reviewed code-bearing baseline.** [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320155111) and [full visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320154925) passed at public app code SHA e4f5e20e5825972f8fc469dd86e57ba6a9e49d11. Documentation-only changes on this branch after that SHA do not add runtime behavior, but the final PR still needs its own exact-head checks. **O1 is now the only active next engineering objective.**
 
 ## Ready-to-start scope: O1, not O2
 
