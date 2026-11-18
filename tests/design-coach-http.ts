@@ -22,6 +22,14 @@ async function main(){
   const r=await fetch(base+'/v1/coach',{method:'POST',headers,body:JSON.stringify({requestId:'turn',context})});assert.equal(r.status,200);assert.equal(r.headers.get('cache-control'),'no-store');assert.equal(r.headers.get('access-control-allow-origin'),origin);assert.equal((await r.json() as any).reply.proposedChange,null);
   const replay=await fetch(base+'/v1/coach',{method:'POST',headers,body:JSON.stringify({requestId:'turn',context})});assert.equal(replay.status,200);assert.equal(calls,1);
   const excessive=await fetch(base+'/v1/coach',{method:'POST',headers,body:JSON.stringify({requestId:'large',context:{...context,message:'x'.repeat(51000)}})});assert.equal(excessive.status,400);assert.equal(calls,1);
+  const eraseBody=JSON.stringify({confirm:'ERASE_FAMILY_COACH_RECEIPTS'});
+  const denied=await fetch(base+'/v1/coach/erase',{method:'POST',headers,body:eraseBody});
+  assert.equal(denied.status,403,'children/designers cannot erase family server receipts');
+  const parentCookie='factory_session='+signSession({...session,role:'parent'},key);
+  const erased=await fetch(base+'/v1/coach/erase',{method:'POST',headers:{...headers,Cookie:parentCookie},body:eraseBody});
+  assert.equal(erased.status,200);assert.equal((await erased.json() as any).erased,1);
+  assert.equal((await repo.snapshot()).coachReceipts!.length,0);
+  assert.ok((await repo.snapshot()).ledgers[session.familyId].used>0,'accounting totals remain even after content erasure');
   assert.equal((await repo.snapshot()).jobs.length,0);assert.deepEqual((await repo.snapshot()).active,{});
   console.log('PASS coach HTTP: disabled defaults, authentication, Origin/CSRF, private response headers, authorized fixture, idempotency, size limits, no game actions (8 checks)');
  }finally{await new Promise<void>(r=>server.close(()=>r()));}
