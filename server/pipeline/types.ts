@@ -2,6 +2,7 @@ import type {CoachReceipt} from '../coach/service';
 import type {Invitation} from '../sessions';
 import type {ActionExecution} from '../actions/coordinator';
 import type { GeneratedGame } from '../agent/generated';
+import type {FunctionalGameContract} from '../quality/functional-game-contract';
 export type JobStatus = 'draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface StarGame { kind:'star-catcher-v1'; target:number; seconds:number }
 export type PlayableGame = StarGame | GeneratedGame;
@@ -20,6 +21,12 @@ export interface AgentAdapter {
 export interface BuildRequest { gameId:string; baseRevisionId:string|null; prompt:string; clientRequestId:string; retryOf?:string }
 export interface Job extends BuildRequest {
  execution?:ActionExecution;
+  /** Internal-only, independently authored and source-validated O5 probe;
+   * BuildRequest rejects this field from clients, so it is never user-supplied.
+   * Disabled for ordinary public submissions unless a trusted server process
+   * explicitly attaches an approved contract.
+   */
+  independentIntentPlan?:FunctionalGameContract;
   id:string;familyId:string;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
   maxUnits:number;usedUnits:number;attempts?:number;phase?:string;revisionId?:string;errorCode?:string;retryCount:number;
 }
