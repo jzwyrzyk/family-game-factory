@@ -85,7 +85,7 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
     /\b(?:balance|balancing)\s+(?:a|the)\s+(?:tower|stack|bridge)\b/gi
   ]],
   ['physics-ambiguous',[
-    /\b(?:squishy|springy|wobbly|floppy|bouncy|floating|weightless|tumbling|ragdoll|physically|like\s+physics|realistic\s+movement)\b/gi
+    /\b(?:squishy|springy|wobbly|floppy|bouncy|floating|weightless|tumbling|ragdoll|physically|like\s+physics|realistic\s+movement|suspension)\b/gi
   ]],
   ['drag-action',[
     /\b(?:drag(?:ging)?(?:[- ]and[- ]drop)?|drop(?:ping)?|stick(?:ing)?\s+(?:pieces|parts|stickers?)|stickers?|assemble|assembly|decorate|attach|put\s+(?:pieces|parts|socks?)\s+together)\b/gi
@@ -117,11 +117,13 @@ function gather(raw:string,facts:ChildIntentContract['facts']):GameFormEvidence[
         if(seen.has(key))continue;
         seen.add(key);
         output.push({signal,source,factIds:facts
-          .filter(f=>overlap(f.evidence,source)).map(f=>f.id).slice(0,12)});
+          .filter(f=>overlap(f.evidence,source)).map(f=>f.id)});
       }
     }
   }
-  return output.sort((a,b)=>a.source.start-b.source.start||a.source.end-b.source.end||a.signal.localeCompare(b.signal)).slice(0,48);
+  // Never truncate a physical or 3D constraint and then mistake absence for safety.
+  if(output.length>48)fail('EVIDENCE_LIMIT');
+  return output.sort((a,b)=>a.source.start-b.source.start||a.source.end-b.source.end||a.signal.localeCompare(b.signal));
 }
 function dedupe<T extends string>(items:T[]):T[] {return [...new Set(items)];}
 const signals=(evidence:readonly GameFormEvidence[],signal:GameFormSignal)=>
