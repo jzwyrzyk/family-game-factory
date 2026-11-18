@@ -89,7 +89,12 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
      const existing=state.parentAuth?.[config.familyId];
      if(existing){
       if(existing.lockedUntil>now)throw Error('PARENT_LOCKED');
-      if(!equal(existing.digest,passwordHash(passphrase,existing.salt)))throw Error('INVALID_PARENT_ACCESS');
+      if(!equal(existing.digest,passwordHash(passphrase,existing.salt))){
+       existing.failedAttempts++;
+       if(existing.failedAttempts>=5){existing.lockedUntil=now+15*60000;existing.failedAttempts=0;}
+       return null; // Persist failed attempts; throwing inside a transaction would roll them back.
+      }
+      existing.failedAttempts=0;existing.lockedUntil=0;
      }else{
       state.parentAuth??={};
       state.parentAuth[config.familyId]={salt,digest:passwordHash(passphrase,salt),failedAttempts:0,lockedUntil:0};
@@ -102,6 +107,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
      const device:TrustedDevice={id,familyId:config.familyId,name,secretHash:digest(secret),rotation:0,createdAt:now,lastSeenAt:now,expiresAt:now+DEVICE_MAX};
      state.devices.push(device);return device;
     });
+    if(!enrolled)throw Error('INVALID_PARENT_ACCESS');
     reply(200,{connected:true,trusted:true,deviceName:enrolled.name,expiresAt:now+ACCESS},
       [accessCookie(config.familyId,enrolled.id,config.sessionKey,now),deviceCookie(enrolled,secret,now)]);
     return;
