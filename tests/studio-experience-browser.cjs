@@ -36,6 +36,11 @@ const {start}=require('./browser-server.cjs');
   await page.click('#studioSend');
   assert.equal(await page.locator('#designPlan').evaluate(el=>el.open),true,'the explicit build choice opens the plan before generation');
   assert.equal(await page.locator('.design-plan-field:visible').count(),1,'the guided plan shows only one question at a time');
+  await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();
+  assert.equal(await page.locator('#designPlanReview').isVisible(),true,'the child sees a compact approval review before build');
+  assert.equal(await page.locator('#designPlanReview .design-plan-review-item').count(),8,'all decisions and delegated choices remain reviewable');
+  assert.equal(await page.locator('.design-plan-field:visible').count(),0,'completed guided questions are no longer shown');
+
   assert.equal((await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(x=>x.game==='new'))).job,null,'unapproved plan starts no build');
   assert.equal(errors.length,0,'no page errors: '+errors.join('; '));
   await ctx.close();
