@@ -183,3 +183,6 @@ Important current distinction:
   https://www.ftc.gov/business-guidance/privacy-security/childrens-privacy
 - `docs/design-coach/VOICE_CONVERSATION.md`
 - `docs/assignment-005/OWNER-PILOT.md`
+
+
+**Credential namespace:** only `FACTORY_COACH_PRIVATE_OPENAI_API_KEY` is accepted in the newly approved dedicated coach container, from a new restricted Secret Manager version. The previous GitHub generation key named `FACTORY_OPENAI_API_KEY` must not be copied or mounted; the executor fails closed if it sees that legacy key. An inactive coach has neither key.
