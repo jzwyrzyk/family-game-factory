@@ -134,6 +134,9 @@ jobs:
           path: release-evidence/backend-health.json
   pages_deploy:
     needs: [plan, pages_quality, pages_precheck]
+    concurrency:
+      group: jems-pages-publish
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
