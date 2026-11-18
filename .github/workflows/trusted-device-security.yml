@@ -1,0 +1,21 @@
+name: Trusted family device security
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  auth-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck gateway and client
+        run: npm run typecheck
+      - name: Trusted-device revocation, rotation and parent security
+        run: node --import tsx tests/trusted-devices.test.ts
+      - name: Browser-session renewal and paid POST idempotency
+        run: node --import tsx tests/session-client.test.ts
