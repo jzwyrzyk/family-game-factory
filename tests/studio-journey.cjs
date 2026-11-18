@@ -25,6 +25,16 @@ const {start}=require('./browser-server.cjs');
   const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
   assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
+  await page.click('[data-starter="gum"]');
+  // This suite exercises the preserved physical builder; newly created games
+  // default to sticker mode and are tested in sticker-builder-browser.cjs.
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',w=JSON.parse(localStorage.getItem(key));
+    const p=w.projects.find(p=>p.game==='gum'),r=w.revisions.find(r=>r.id===p.headId);
+    r.config.qualityVersion=1;
+    localStorage.setItem(key,JSON.stringify(w));
+  });
+  await page.reload();await page.waitForFunction(()=>FG.studio);
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   // A replay/version control must retain an active host activity; leaving the game may interrupt it.
   const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
@@ -127,7 +137,11 @@ const {start}=require('./browser-server.cjs');
   const req=route.request(),path=new URL(req.url()).pathname;let data;
   const headers={'Access-Control-Allow-Origin':`http://127.0.0.1:${server.address().port}`,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
   if(req.method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
-  if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
+  // Model a real authenticated modern gateway. An absent session-status
+  // endpoint must NEVER silently authorize a paid build.
+  if(path==='/v1/sessions/status'&&req.method()==='GET')
+   data={connected:true,trusted:true,expiresAt:Date.now()+60000};
+  else if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
   else if(path==='/v1/jobs/fixture-job'){polls++;data=polls<2?{jobId:'fixture-job',status:'testing',adapter:'mock'}:phase==='failed'?{jobId:'fixture-job',status:'failed',adapter:'mock'}:{jobId:'fixture-job',status:'ready',revisionId:'fixture-rev',adapter:'mock'};}
   else if(path.endsWith('/preview'))data={url:'https://studio-preview.test/game?capability=TEST_ONLY',artifactId:'fixture-artifact',expiresAt:Date.now()+60000,kind:'generated-module-v2',adapter:'mock'};
   else if(path.endsWith('/keep')){kept++;data={ok:true};}

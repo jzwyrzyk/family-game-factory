@@ -15,7 +15,7 @@ const {start}=require('./browser-server.cjs');
     const favorites=page.locator('#studioStarters [data-starter]');
     assert.equal(await favorites.count(),6,'six distinct playable favorites');
     assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon','gum','hill','moon','robot']);
-    assert.match(await page.locator('#studioStarterTitle').textContent(),/Favorite games/);
+    assert.equal((await page.locator('#studioStarterTitle').textContent()).trim(),'Ready to Play jems','favorites shelf uses the approved child-facing heading');
     await page.click('[data-starter="moon"]');await page.waitForSelector('.favorite-moon .favorite-canvas');
     await page.locator('.favorite-moon .favorite-canvas').focus();
     const original=await page.evaluate(()=>FG.runtime.snapshot().state.x);

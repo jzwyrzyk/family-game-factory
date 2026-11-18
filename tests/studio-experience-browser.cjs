@@ -24,7 +24,7 @@ const {start}=require('./browser-server.cjs');
    assert(send.y+send.height<=viewport.height-20,'child sees Send to jems on the first mobile screen');
   }
   const color=await page.locator('#studioSend').evaluate(el=>getComputedStyle(el).backgroundColor);
-  assert.equal(color,'rgb(11, 29, 77)','build game is an obvious deep navy CTA');
+  assert.equal(color,'rgb(11, 30, 59)','build game uses the approved Ink navy CTA');
   assert.equal(await page.locator('#designPlan').isVisible(),false,'eight-field plan is not visible before requested');
   assert.equal(await page.locator('#studioIdeaSparks').isVisible(),true,'optional idea sparks can be discovered');
   await page.locator('#studioIdeaSparks summary').click();

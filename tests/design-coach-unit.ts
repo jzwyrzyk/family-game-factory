@@ -33,13 +33,24 @@ function coachingHarness(game:'new'|'gum'='new'){
  const storage=new Memory(),book=new StudioNotebook(storage),initial=game==='new'?book.create('child-one','new','Synthetic new game'):book.create('child-one','gum','Synthetic game','fixture-project');let active=initial;
  const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[],requests:any[]=[];let playCalls=0;
  Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}},dispatchEvent:(event:Event)=>{if(event.type==='jems:milestone')milestones.push((event as CustomEvent<{kind:string}>).detail.kind);return true;}}});
- Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>{requests.push(JSON.parse(String(options.body)));pending.push({resolve,reject,signal:options.signal as AbortSignal});})});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(url:string,options:RequestInit={})=>{
+  // Session preflight is separate from the model reply: no message is queued
+  // and no coach request is made until a valid family session is confirmed.
+  if(url.endsWith('/v1/sessions/status'))return Promise.resolve(new Response(JSON.stringify({connected:true,trusted:true}),{status:200}));
+  return new Promise<Response>((resolve,reject)=>{requests.push(JSON.parse(String(options.body)));pending.push({resolve,reject,signal:options.signal as AbortSignal});});
+ }});
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
   tryRequest:async()=>{},rules:()=>'',playTest:async()=>{},playMain:async()=>{playCalls++;},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
  });coach.openSession();
  return {coach,book,storage,statuses,pending,milestones,requests,get playCalls(){return playCalls;},get,
+  async awaitModelRequest(){
+   // A successful auth preflight adds asynchronous microtasks before the model call.
+   // Wait for the real call rather than assuming it is queued in the same tick.
+   for(let turn=0;turn<20&&!pending.length;turn++)await Promise.resolve();
+   assert.equal(pending.length,1,'expected exactly one model request after session preflight');
+  },
   session:()=>book.get(active.id,active.owner),
   input(id:string,value:string){const input=get(id);input.focus();input.value=value;input.dispatchEvent(new Event('input'));},
   save(field:string){const input=get('plan-'+field),index=input.parentElement!.children.indexOf(input);input.parentElement!.children[index+2].children[0].onclick();},
@@ -101,11 +112,12 @@ await test('model-backed path receives real bounded conversation context over mu
  try{
   h.input('studioPrompt','The dragon should sneeze spaghetti');
   const first=h.coach.discuss('discuss');
-  assert.equal(h.pending.length,1);
+  await h.awaitModelRequest();
   h.resolve({...reply,text:'Spaghetti sneezes could be funny!',question:'When should the dragon sneeze?'});
   await first;
   h.input('studioPrompt','Only if I jump');
   const second=h.coach.discuss('discuss');
+  await h.awaitModelRequest();
   const sent=h.requests.at(-1).context as CoachContext;
   assert.equal(sent.message,'Only if I jump');
   assert.ok(sent.conversation.some(m=>m.role==='child'&&m.text==='The dragon should sneeze spaghetti'));
@@ -124,6 +136,7 @@ await test('model play move returns to the game without any automatic build',asy
  try{
   h.input('studioPrompt','I would rather get back into the game');
   const turn=h.coach.discuss('discuss');
+  await h.awaitModelRequest();
   h.resolve({...reply,move:'play',text:'Okay, go play!',question:null});
   await turn;
   assert.equal(h.playCalls,1);
@@ -152,20 +165,20 @@ await test('just let me play returns to the existing game without interviewing o
  }finally{h.dispose();}
 });
 await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');assert.equal(h.pending.length,1);assert.deepEqual(h.milestones,['idea'],'first persisted child idea emits its earned milestone');
+ const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();assert.deepEqual(h.milestones,['idea'],'first persisted child idea emits its earned milestone');
   h.input('studioPrompt','Maybe the penguin could bounce');h.resolve(reply);await turn;
   assert.equal(h.get('studioPrompt').value,'Maybe the penguin could bounce');assert.equal(h.session().draft,'Maybe the penguin could bounce');assert.equal(h.session().messages[0].text,'I want a different way to move');assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
 });
 await test('retyping the same draft while the coach replies still counts as new work',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
+ const h=coachingHarness();try{h.input('studioPrompt','Make the tower wobble');const turn=h.coach.discuss('discuss');h.input('studioPrompt','');h.input('studioPrompt','Make the tower wobble');await h.awaitModelRequest();h.resolve(reply);await turn;assert.equal(h.session().draft,'Make the tower wobble');assert.equal(h.get('studioPrompt').value,'Make the tower wobble');}finally{h.dispose();}
 });
 await test('a late coach suggestion cannot overwrite a newer child plan answer',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
+ const h=coachingHarness();try{h.input('studioPrompt','I want a castle');const turn=h.coach.discuss('discuss');h.input('plan-style','A castle made of colourful boats');await h.awaitModelRequest();h.resolve({...reply,planSuggestions:[{field:'style',value:'A stone castle'}]});await turn;assert.equal(h.session().design!.plan.style!.value,'A castle made of colourful boats');assert.equal(h.session().design!.plan.style!.origin,'child');assert.equal(h.session().design!.approvedPlan,false);}finally{h.dispose();}
 });
 await test('an old rejected coach request cannot write into a new child or interrupt their reply',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss'),oldRequest=h.pending.shift()!;
-  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;
+ const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss');await h.awaitModelRequest();const oldRequest=h.pending.shift()!;
+  h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');await h.awaitModelRequest();oldRequest.reject(Error('Late aborted network request'));await old;
   assert.match(h.get('coachModeStatus').textContent,/thinking about your idea/i);assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
   h.resolve(reply);await current;assert.equal(h.session().messages.length,2);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
@@ -186,7 +199,7 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
  }finally{h.dispose();}
 });
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
+ const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
   assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);
  }finally{h.dispose();}
 });

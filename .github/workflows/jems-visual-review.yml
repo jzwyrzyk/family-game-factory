@@ -17,7 +17,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build production
         run: npm run build
       - name: Capture all real jems pages
@@ -40,7 +40,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build for isolated smoke test
         run: npm run build
       - name: Run isolated jems brand-browser contract
@@ -57,7 +57,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build for isolated smoke test
         run: npm run build
       - name: Run isolated Studio save-play-iterate journey
@@ -74,7 +74,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build jems with joy layer
         run: npm run build
       - name: Test earned celebrations and Math-English accents

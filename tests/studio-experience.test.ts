@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {JobService} from '../server/pipeline/service';
 import {MemoryRepository} from '../server/pipeline/repository';
+import {BuilderClient} from '../src/builder/client';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,canCompareExperiments,coachConnectionCopy,conversationDisposition} from '../src/studio/experience';
 assert.match(coachConnectionCopy('unavailable'),/not connected/);
 assert.match(coachConnectionCopy('available'),/no game is building/);
@@ -40,4 +41,22 @@ async function readiness(){
  assert.deepEqual(await disabled.readiness(session),{available:false,reason:'UNAVAILABLE'});
  console.log('PASS creation truth, authenticated build-readiness gates, and optional experiment comparison');
 }
-void readiness().catch(error=>{console.error(error);process.exitCode=1;});
+async function cancelFromReload(){
+ const originalFetch=globalThis.fetch,calls:string[]=[],events:string[]=[];
+ try{
+  globalThis.fetch=(async(input:RequestInfo|URL,init?:RequestInit)=>{
+   const url=String(input);calls.push((init?.method||'GET')+' '+url);
+   if(url.endsWith('/v1/sessions/status'))return new Response(JSON.stringify({connected:true}),{status:200});
+   if(url.endsWith('/v1/jobs/known-job'))return new Response(JSON.stringify({jobId:'known-job',status:'building'}),{status:200});
+   if(url.endsWith('/v1/jobs/known-job/cancel'))return new Response(JSON.stringify({jobId:'known-job',status:'cancelled'}),{status:200});
+   throw Error('Unexpected endpoint '+url);
+  }) as typeof fetch;
+  const client=new BuilderClient({version:1,mode:'remote',apiBaseUrl:'https://factory.test',previewOrigin:'https://preview.test'},job=>events.push(job.status));
+  const stopped=await client.cancel('known-job');
+  assert.equal(stopped.status,'cancelled');
+  assert.deepEqual(calls,['GET https://factory.test/v1/jobs/known-job','GET https://factory.test/v1/sessions/status','POST https://factory.test/v1/jobs/known-job/cancel']);
+  assert.deepEqual(events,['cancelled']);
+  console.log('PASS exact-job cancellation after reload, verified server transition');
+ }finally{globalThis.fetch=originalFetch;}
+}
+void (async()=>{await readiness();await cancelFromReload();})().catch(error=>{console.error(error);process.exitCode=1;});
