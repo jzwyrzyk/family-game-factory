@@ -10,7 +10,7 @@ export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:st
   const abort=new AbortController();
   res.once('close',()=>{if(!res.writableEnded)abort.abort();});
   const send=(status:number,data:unknown)=>{
-   if(res.headersSent||res.writableEnded)return;
+   if(res.headersSent||res.writableEnded||res.destroyed)return;
    res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store',
     'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});
    res.end(JSON.stringify(data));
