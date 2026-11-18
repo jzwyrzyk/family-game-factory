@@ -3,7 +3,7 @@ import {createServer} from 'node:http';
 import {PrivateCoachBridge,privateCoachOrigin,metadataIdentityToken} from '../server/coach/private-bridge';
 import {CoachService,COACH_RECEIPT_TTL_MS} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
-import {privateCoachHandler,dedicatedCoachRuntime,type PrivateCoachRuntime} from '../server/coach/private-executor';
+import {privateCoachHandler,dedicatedCoachRuntime,googleCallerVerifier,type PrivateCoachRuntime} from '../server/coach/private-executor';
 import type {CoachContext} from '../src/studio/design';
 import type {PrivateCoachConfig} from '../server/coach/private-provider';
 import {readFileSync} from 'node:fs';
@@ -18,6 +18,7 @@ const inactive=dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_
 assert.equal(inactive.enabled,false,'inactive Cloud Run may start with no model key');
 assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_OPENAI_API_KEY:'forbidden-secret-on-inactive'}),/COACH_SECRET_FORBIDDEN_WHILE_INACTIVE/);
 assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_COACH_APPROVED:'true'}),/COACH_APPROVAL_REQUIRED/);
+assert.throws(()=>googleCallerVerifier('https://factory-coach-private-demo-uc.a.run.app','random-identity@example.iam.gserviceaccount.com'),/PRIVATE_COACH_IDENTITY_REQUIRED/);
 const context:CoachContext={message:'Only if I jump',mode:'discuss',game:'dragon',plan:{},friction:'',helpLevel:0,
  support:'brief',conversation:[{role:'child',text:'The dragon should sneeze spaghetti'},
  {role:'helper',text:'That sounds playful. When should it sneeze?'},
