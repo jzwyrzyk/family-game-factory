@@ -13,7 +13,7 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Request');res.setHeader('Access-Control-Allow-Methods','GET,POST');res.writeHead(204);res.end();return;}
    const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('factory_session='))?.slice(16);
    const session=verifySession(token,config.sessionKey);const path=new URL(req.url!,'http://internal').pathname;
-   if(path==='/v1/coach/status'&&req.method==='GET'){const available=await service.ready();return send(200,{available,mode:available?'model':'unavailable'});}
+   if(path==='/v1/coach/status'&&req.method==='GET'){const available=await service.ready(session);return send(200,{available,mode:available?'model':'unavailable'});}
    if(path==='/v1/coach/erase'&&req.method==='POST'){
     if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
     let raw='';for await(const chunk of req){raw+=String(chunk);if(Buffer.byteLength(raw)>1024)throw Error('INVALID_REQUEST');}
