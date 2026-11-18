@@ -10,7 +10,7 @@ export interface CoachConfig {
 export interface CoachReceipt {id:string;familyId:string;subject:string;hash:string;month:string;reserved:number;at:number;state:'running'|'ready'|'failed';reply?:CoachReply}
 /** Bounded server reply cache: child conversation remains local to the browser. */
 export const COACH_RECEIPT_TTL_MS=15*60_000;
-export interface CoachProvider {complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>}
+export interface CoachProvider {complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>;readiness?(signal:AbortSignal):Promise<boolean>}
 export function validateCoachContext(input:any):CoachContext {
  if(!input||typeof input!=='object'||Object.keys(input).some(k=>!['message','mode','game','plan','rules','friction','helpLevel','support','conversation','observations','tests'].includes(k))||typeof input.message!=='string'||input.message.length>2000||!['discuss','ideas','explain','reflect'].includes(input.mode)||typeof input.game!=='string'||input.game.length>120)throw Error('INVALID_REQUEST');
  validateDesign({...freshDesign(),plan:input.plan,friction:input.friction,helpLevel:input.helpLevel,support:input.support,observations:input.observations});
@@ -25,6 +25,16 @@ export function approved(c:CoachConfig):boolean {
 export class CoachService {
  constructor(private repo:Repository,private config:CoachConfig,private provider?:CoachProvider){}
  available(){return approved(this.config)&&!!this.provider;}
+ /** Configured isn't enough: the production bridge must answer an authenticated
+  * no-inference probe before the UI claims it is reachable. Fixture providers
+  * without a probe preserve existing contract tests, never production claims.
+  */
+ async ready():Promise<boolean>{
+  if(!this.available())return false;
+  if(!this.provider?.readiness)return true;
+  try{return await this.provider.readiness(AbortSignal.timeout(3000));}
+  catch{return false;}
+ }
  /** Parent-authenticated erasure of completed coach content. Usage and security
   * audit totals remain for accounting; no child utterances are stored there.
   * Refuse while an inference is in flight to avoid recreating content after erasure.
