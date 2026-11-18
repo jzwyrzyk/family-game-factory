@@ -68,6 +68,13 @@ export async function installStudio(){
  creationHero.id='studioCreationHero';
  creationHero.innerHTML='<img src="./jems-workbench.svg" alt="" aria-hidden="true"><div><span class="studio-creation-kicker">✨ ANY IDEA CAN START HERE</span><h2>What game can you dream up?</h2><p>A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!</p></div>';
  $('studioConversation').querySelector('.studio-helper-heading')!.after(creationHero);
+ const chatOptions=el('details','studio-chat-options') as HTMLDetailsElement;
+ chatOptions.id='studioChatOptions';
+ const chatSummary=el('summary','','Chat options');chatSummary.setAttribute('aria-label','Chat privacy options');
+ const clearChat=el('button','studio-button','Clear chat on this device') as HTMLButtonElement;
+ clearChat.id='studioClearChat';clearChat.type='button';
+ chatOptions.append(chatSummary,clearChat);
+ $('studioConversation').querySelector('.studio-helper-heading')!.append(chatOptions);
  const sendRow=$('studioPromptForm').querySelector('.studio-send-row')!;
  sendRow.prepend($('studioMic'));
  sendRow.after($('studioDraftStatus'));
@@ -691,6 +698,17 @@ export async function installStudio(){
  $('studioCopy').onclick=()=>{if(guardMath())return;voice?.cancel();++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;} $<HTMLInputElement>('studioCopyName').value=current().name+' copy';$<HTMLDialogElement>('studioCopyDialog').showModal();$('studioCopyName').focus();};$('studioCopyCancel').onclick=()=>$<HTMLDialogElement>('studioCopyDialog').close();$<HTMLDialogElement>('studioCopyDialog').addEventListener('close',()=>{if(route==='studio'&&!FG.learning.active)focusView($('studioCopy'));});
  $('studioCopyForm').onsubmit=e=>{e.preventDefault();act(()=>copyGame($<HTMLInputElement>('studioCopyName').value.trim()));};
  $('studioPromptForm').onsubmit=e=>{e.preventDefault();act(submit);};
+ $('studioClearChat').onclick=()=>act(()=>{
+  if(guardMath())return;
+  const s=current();
+  if(busy(s)||s.pendingExperiment){status('Finish or cancel this build before clearing chat.',true);return;}
+  if(!confirm('Clear this chat and its design notes on this device? Your saved game versions and any remote copies will remain.'))return;
+  voice?.cancel();coaching?.reset();chatOptions.open=false;
+  notebook.clearConversation(s.id,s.owner);
+  $<HTMLTextAreaElement>('studioPrompt').value='';
+  coaching?.openSession();render();
+  status('Chat and design notes cleared on this device. Saved game versions remain.');
+ });
  $('studioTalk').onclick=()=>act(()=>{
   if(!$<HTMLTextAreaElement>('studioPrompt').value.trim()){status('Type a message or choose Speak first.');return;}
   return coaching?.discuss('discuss');
