@@ -9,7 +9,8 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
  return async(req:IncomingMessage,res:ServerResponse)=>{
   const send=(code:number,data:unknown)=>{res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
   try{
-   if(req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
+   if(req.headers.origin&&req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
+   if(req.method!=='GET'&&req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
    res.setHeader('Access-Control-Allow-Origin',config.appOrigin);res.setHeader('Access-Control-Allow-Credentials','true');res.setHeader('Vary','Origin');
    if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Request');res.setHeader('Access-Control-Allow-Methods','GET,POST');res.writeHead(204);res.end();return;}
    const session=await verifyBrowserSession(repo,req.headers.cookie,config.sessionKey);const path=new URL(req.url!,'http://internal').pathname;
