@@ -15,8 +15,15 @@ const errorsFor=(page:Page)=>{const errors:string[]=[];page.on('pageerror',error
 async function answer(page:Page){
   const question=await page.evaluate(()=>window.FG.learning.activeItem);
   if(question.kind==='choice'){
-    await active(page).locator('.language-choice').filter({hasText:question.answer}).first().click();
-    await page.waitForFunction(()=>!window.FG.learning.active);
+    // Text-substring matching can choose the WRONG tile when options share
+    // words (for example "run" versus "running"). The reviewed question's
+    // answer is a choice VALUE, not a fuzzy human-visible caption.
+    const choices=active(page).locator('.language-choice');
+    const values=await choices.evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.value||''));
+    const index=values.indexOf(String(question.answer));
+    assert.ok(index>=0,'reviewed English item must contain an exact matching answer value');
+    await choices.nth(index).click();
+    await page.waitForFunction(()=>!window.FG.learning.active,null,{timeout:8000});
     return;
   }
   await active(page).locator('[data-action="show-solution"]').click();
