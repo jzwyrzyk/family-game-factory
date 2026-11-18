@@ -56,10 +56,18 @@ test('trusted device: invitation enrollment, hashed storage, secure cookies and 
   assert.notEqual(nextCookie,deviceCookie,'rotated device secret');
   const competing=await request('/v1/sessions/renew','POST',{},'factory_device='+deviceCookie);
   assert.equal(competing.status,200);assert.equal(cookie(competing,'factory_device'),nextCookie,'simultaneous tabs receive the same next credential');
+  const thirdTab=await request('/v1/sessions/renew','POST',{},'factory_device='+nextCookie);
+  assert.equal(thirdTab.status,200);
+  assert.equal(cookie(thirdTab,'factory_device'),nextCookie,'already-rotated credential does not race further ahead of other tabs');
   assert.equal((await request('/v1/sessions/status','GET',undefined,jar(renewed))).status,200);
   assert.equal((await request('/v1/sessions/renew','POST',{},'factory_device='+deviceCookie.slice(0,-3)+'bad')).status,401);
   const after=await repo.snapshot();assert.equal(after.devices?.[0].rotation,1);
   assert.equal(after.devices?.[0].previousHash,createHash('sha256').update(deviceCookie.split('.')[1]).digest('hex'));
+  await repo.transaction(state=>{state.devices![0].previousAt=Date.now()-16000;return true;});
+  const later=await request('/v1/sessions/renew','POST',{},'factory_device='+nextCookie);
+  assert.equal(later.status,200);
+  assert.notEqual(cookie(later,'factory_device'),nextCookie,'rotation resumes after bounded grace');
+  assert.equal((await request('/v1/sessions/renew','POST',{},'factory_device='+deviceCookie)).status,401,'stale secret rejected after the next generation');
   assert.ok(session.length>40);
   assert.equal((await request('/v1/sessions/status','GET',undefined,first,'https://evil.example')).status,403);
  });
