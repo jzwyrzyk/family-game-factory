@@ -73,7 +73,7 @@ const {start}=require('./browser-server.cjs');
   const profile=FG.store.current(),overlay=document.getElementById('stage-overlay'),now=Date.now(),mathWindow=[...(profile.mathWindow||[])];
   return {now,rate:profile.rate,mathWindow,elapsedSinceLast:mathWindow.length?now-mathWindow.at(-1):null,
    eligible:FG.math.canAsk(profile),active:FG.learning.active,activeAttemptId:FG.learning.activeAttemptId,
-   native:FG.runtime.snapshot(),overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
+   native:FG.runtime.snapshot(),pageVisibility:document.visibilityState,overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
    attempts:(profile.learning?.attempts||[]).slice(-4).map(attempt=>({id:attempt.id,outcome:attempt.outcome,answers:attempt.answers.length,correct:attempt.correct,independent:attempt.independent}))};
  });
  const advanceNativeBudget=async()=>{
@@ -94,8 +94,18 @@ const {start}=require('./browser-server.cjs');
    await pluginPage.locator('#go').click();
   }
   assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'play');
-  await pluginPage.locator('#go').click();await pluginPage.clock.runFor(3500);
-  await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+  // The original game advances suspense/drop on requestAnimationFrame with capped
+  // simulation dt. A background Chromium tab can throttle rAF, so foreground it
+  // and advance the *real game clock* in bounded steps instead of passively
+  // timing out while the simulated clock is frozen.
+  await pluginPage.bringToFront();
+  await pluginPage.locator('#go').click();
+  for(let frameBatch=0;frameBatch<20;frameBatch++){
+   if(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode==='result'))break;
+   await pluginPage.clock.runFor(500);
+  }
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'result',
+   `${label} original native game did not finish after bounded animation frames: ${JSON.stringify({...await checkpointState(),pluginErrors})}`);
   const before=await checkpointState();
   console.log(`[native-checkpoint:${label}]`,JSON.stringify({now:before.now,rate:before.rate,elapsedSinceLast:before.elapsedSinceLast,eligible:before.eligible,active:before.active,mode:before.native.state.mode,attempts:before.attempts,pluginErrors}));
   assert.equal(before.eligible,true,`${label} must respect the shared pacing policy: ${JSON.stringify({...before,pluginErrors})}`);
