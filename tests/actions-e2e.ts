@@ -97,8 +97,14 @@ async function playV2Marble(page:Page,frame:FrameLocator,device:string):Promise<
  await page.keyboard.up('ArrowRight');await page.waitForTimeout(60);
  const after=await marbleCenter(frame);
  assert.ok(after-before>45,'Right must visibly move the game object');
- if(device==='mobile')await frame.locator('#game').tap({position:{x:320,y:190}});
- else await frame.locator('#game').click({position:{x:320,y:190}});
+ // Canvas CSS pixels shrink on narrow screens; logical 720x400 positions
+ // cannot be passed directly to Playwright's CSS-pixel tap coordinates.
+ // The child taps the actual visible center, on both desktop and mobile.
+ const playfield=frame.locator('#game'),bounds=await playfield.boundingBox();
+ assert.ok(bounds&&bounds.width>100&&bounds.height>60,'rendered mobile canvas must be visible');
+ const center={x:bounds.width/2,y:bounds.height/2};
+ if(device==='mobile')await playfield.tap({position:center});
+ else await playfield.click({position:center});
  await frame.locator('#status[data-state=won]').waitFor({timeout:6500});
  await finishPreviewRound(page);
  assert.equal(await frame.locator('#status').getAttribute('data-state'),'won');
