@@ -27,7 +27,10 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
     else if (/^(?:make it|make the splash) faster$/.test(text)) patch.splashMs = Number(current.splashMs) - 300;
     else if (/^(?:make it|make the splash) slower$/.test(text)) patch.splashMs = Number(current.splashMs) + 300;
   } else if (game === 'gum') {
-    if ((match=text.match(/^give me (\d+) gum sticks$/))) patch.gumBudget=Number(match[1]);
+    if ((match=text.match(/^(?:give me|add|use|show) (\d+) extra stickers?$/))) patch.extraDecoys=Number(match[1]);
+    else if (/^show all (?:the )?(?:stickers|sticker choices)$/.test(text)) patch.extraDecoys=2;
+    else if (/^show (?:the )?basic (?:stickers|sticker choices)$/.test(text)) patch.extraDecoys=0;
+    else if ((match=text.match(/^give me (\d+) gum sticks$/))) patch.gumBudget=Number(match[1]);
     else if (/^make joints stronger$/.test(text)) patch.jointStrength=Number(current.jointStrength)+.25;
     else if (/^(?:make (?:the )?)gum (?:weaker|stretchier)$/.test(text)) patch.jointStrength=Number(current.jointStrength)-.25;
     else if (/^(?:make (?:the )?)gravity (?:lower|lighter)$/.test(text)) patch.gravity=Number(current.gravity)-2;
@@ -69,8 +72,9 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
     else if(/^(?:add|turn on) (?:a |the )?portals?$/.test(text))patch.portalEnabled=true;
     else if(/^(?:remove|turn off|hide) (?:the )?portals?$/.test(text))patch.portalEnabled=false;
   }
-  if (game==='gum' && current.qualityVersion!==1 && ['gravity','thrust'].some(k=>k in patch)) return {kind:'invalid',message:'This earlier version uses the original construction rules. Start a physical workshop to try gravity and fan changes.'};
-  if(current.originalRules && ['hearts','breathSpeed','highlightMatches','extraDecoys'].some(k=>k in patch)) return {kind:'invalid',message:'That setting belongs to a saved legacy game. Use the restored game examples below.'};
+  if (game==='gum' && current.qualityVersion===2 && ['gumBudget','jointStrength','gravity','thrust','highlightMatches'].some(k=>k in patch)) return {kind:'invalid',message:'This sticker world is animated, not powered by physics. Try decorating the machine with different stickers, or use a physical workshop version for those changes.'};
+  if (game==='gum' && current.qualityVersion===0 && ['gravity','thrust'].some(k=>k in patch)) return {kind:'invalid',message:'This earlier version uses the original construction rules. Start a physical workshop to try gravity and fan changes.'};
+  if(current.originalRules && ['hearts','breathSpeed','highlightMatches',...(current.qualityVersion===2?[]:['extraDecoys'])].some(k=>k in patch)) return {kind:'invalid',message:'That setting belongs to a saved legacy game. Use the restored game examples below.'};
   if (!Object.keys(patch).length) return { kind: 'generation-needed', message: 'I cannot build that change with these local tools yet. No game changed. Try an example below, or save your idea for later. No AI service is connected.' };
   try {
     const config = validateConfig(game, { ...current, ...patch }), changes = diff(game, current, config);
@@ -86,3 +90,6 @@ export const examples: Record<GameId, string[]> = {
   dragon: ['Give the island 120 resilience', 'Make fireballs slower', 'Make shield wider'],
   hill: ['Make wheels bigger', 'Make springs softer', 'Make motor gentler', 'Make car lighter', 'Make motor stronger'],
 };
+
+export const examplesFor=(game:GameId,config:Mechanics):string[]=>game==='gum'&&config.qualityVersion===2?
+  ['Give me 2 extra stickers','Show the basic stickers']:examples[game];

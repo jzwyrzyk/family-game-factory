@@ -25,6 +25,16 @@ const {start}=require('./browser-server.cjs');
   const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
   assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
+  await page.click('[data-starter="gum"]');
+  // This suite exercises the preserved physical builder; newly created games
+  // default to sticker mode and are tested in sticker-builder-browser.cjs.
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',w=JSON.parse(localStorage.getItem(key));
+    const p=w.projects.find(p=>p.game==='gum'),r=w.revisions.find(r=>r.id===p.headId);
+    r.config.qualityVersion=1;
+    localStorage.setItem(key,JSON.stringify(w));
+  });
+  await page.reload();await page.waitForFunction(()=>FG.studio);
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   // A replay/version control must retain an active host activity; leaving the game may interrupt it.
   const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
