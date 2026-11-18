@@ -21,7 +21,10 @@ export async function familyFetch(base:string,path:string,init:RequestInit={}):P
   // Before a potentially billable POST, establish authentication without sending
   // any job body. A 401 can be renewed here; a returned POST is never retried.
   const probe=await fetch(base+'/v1/sessions/status',{credentials:'include',cache:'no-store'}).catch(()=>null);
-  if(probe?.status===401){
+  // Never send a potentially billable mutation if the authentication probe could
+  // not be completed. An uncertain network is not proof of a valid family session.
+  if(!probe)return new Response(JSON.stringify({errorCode:'BUILDER_UNAVAILABLE'}),{status:503,headers:{'Content-Type':'application/json'}});
+  if(probe.status===401){
    if(!await renewTrustedSession(base))return probe;
   }else if(probe&&probe.status!==200&&probe.status!==404){
    // 404 preserves compatibility with pre-upgrade fixture servers; all modern
