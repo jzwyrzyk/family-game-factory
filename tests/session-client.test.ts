@@ -27,16 +27,17 @@ test('GET readiness silently renews 401 once, coalesces transport and retries th
   assert.deepEqual(events,['factory-session-restored']);
  });
 });
-test('paid POST is sent exactly once after an independent auth preflight',async()=>{
+test('paid POST is sent exactly once only after the renewed session is reverified',async()=>{
  let sent=0,probes=0,renewals=0;
- await mockNetwork(path=>{
-  if(path==='/v1/sessions/status'){probes++;return json(401);}
+ await mockNetwork((path,init)=>{
+  assert.equal(init.redirect,'error','private endpoints must never follow redirects');
+  if(path==='/v1/sessions/status'){probes++;return json(probes===1?401:200);}
   if(path==='/v1/sessions/renew'){renewals++;return json(200);}
   if(path==='/v1/jobs'){sent++;return json(202);}
   throw Error('Unexpected route '+path);
  },async()=>{
   const response=await familyFetch(base,'/v1/jobs',{method:'POST',body:'{"prompt":"build a cat"}'});
-  assert.equal(response.status,202);assert.equal(sent,1);assert.equal(probes,1);assert.equal(renewals,1);
+  assert.equal(response.status,202);assert.equal(sent,1);assert.equal(probes,2);assert.equal(renewals,1);
  });
 });
 test('an unauthorized or uncertain paid POST response is not automatically retried',async()=>{
@@ -94,6 +95,38 @@ test('a missing or denied session-status route fails closed without coach or bui
    assert.equal(probes,2);
    assert.equal(submitted,0,'denied or unsupported gateway must not receive a paid action');
    assert.equal(renewals,0,'only 401 permits renewal');
+  });
+ }
+});
+
+test('successful renewal without a persisted browser session cannot admit a paid POST',async()=>{
+ let probes=0,renewals=0,paid=0;
+ await mockNetwork(path=>{
+  if(path==='/v1/sessions/status'){probes++;return json(401);}
+  if(path==='/v1/sessions/renew'){renewals++;return json(200);}
+  if(path==='/v1/jobs'||path==='/v1/coach'){paid++;return json(202);}
+  throw Error('Unexpected route '+path);
+ },async()=>{
+  const response=await familyFetch(base,'/v1/jobs',{method:'POST',body:'{"prompt":"a dog"}'});
+  assert.equal(response.status,401);
+  assert.equal(probes,2,'a successful renewal must be independently reverified');
+  assert.equal(renewals,1);assert.equal(paid,0);
+ });
+});
+
+test('misleading HTTP 200 without verified connected:true fails closed',async()=>{
+ for(const body of [{connected:false},{message:'Welcome'},{connected:'true'},'not JSON']){
+  let paid=0;
+  await mockNetwork(path=>{
+   if(path==='/v1/sessions/status')return body==='not JSON'?
+     new Response('<html>Login</html>',{status:200,headers:{'Content-Type':'text/html'}}):
+     new Response(JSON.stringify(body),{status:200,headers:{'Content-Type':'application/json'}});
+   if(path==='/v1/jobs'){paid++;return json(202);}
+   throw Error('Unexpected route '+path);
+  },async()=>{
+   const response=await familyFetch(base,'/v1/jobs',{method:'POST',body:'{}'});
+   assert.equal(response.status,503);
+   assert.equal(paid,0);
   });
  }
 });
