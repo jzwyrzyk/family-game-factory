@@ -33,7 +33,7 @@ async function fixture(fn:(args:{
  try{await fn({repo,url,request});}finally{await new Promise<void>(resolve=>server.close(()=>resolve()));}
 }
 async function addInvite(repo:MemoryRepository,code:string){
- await repo.transaction(state=>{state.invitations??=[];state.invitations.push({hash:createHash('sha256').update(code).digest('hex'),familyId,expiresAt:Date.now()+600000,used:false});});
+ await repo.transaction(state=>{state.invitations??=[];state.invitations.push({hash:createHash('sha256').update(code).digest('hex'),familyId,expiresAt:Date.now()+600000,used:false});return true;});
 }
 test('trusted device: invitation enrollment, hashed storage, secure cookies and renewal across tabs',async()=>{
  await fixture(async({repo,request})=>{
@@ -108,9 +108,9 @@ test('trusted device: idle and absolute expiry, legacy compatibility, parent loc
   assert.equal((await request('/v1/devices/unlock','POST',{parentPassphrase:'x'.repeat(12)},cookies)).status,403);
   for(let i=0;i<4;i++)await request('/v1/devices/unlock','POST',{parentPassphrase:'x'.repeat(12)},cookies);
   assert.equal((await request('/v1/devices/unlock','POST',{parentPassphrase:passphrase},cookies)).status,429,'lockout cannot be skipped by correct password');
-  await repo.transaction(s=>{s.parentAuth![familyId].lockedUntil=0;s.devices![0].lastSeenAt=Date.now()-91*day;});
+  await repo.transaction(s=>{s.parentAuth![familyId].lockedUntil=0;s.devices![0].lastSeenAt=Date.now()-91*day;return true;});
   assert.equal((await request('/v1/sessions/renew','POST',{},'factory_device='+deviceCookie)).status,401,'90-day inactivity');
-  await repo.transaction(s=>{s.devices![0].lastSeenAt=Date.now();s.devices![0].expiresAt=Date.now()-1;});
+  await repo.transaction(s=>{s.devices![0].lastSeenAt=Date.now();s.devices![0].expiresAt=Date.now()-1;return true;});
   assert.equal((await request('/v1/sessions/renew','POST',{},'factory_device='+deviceCookie)).status,401,'12-month absolute expiry');
   const legacy=signSession({subject:'legacy-family',familyId,role:'designer',expiresAt:Date.now()+50000},signing);
   assert.equal((await request('/v1/sessions/status','GET',undefined,'factory_session='+legacy)).status,200,'pre-migration session remains valid until its original expiry');
