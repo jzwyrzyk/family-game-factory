@@ -24,7 +24,7 @@ Child (text or on-device speech)
   -> family-ledger budget reservation and idempotency
   -> keyless PrivateCoachBridge obtains Google-signed ID token from metadata
   -> exact operator-reviewed HTTPS audience
-  -> private generation executor verifies service-account identity AGAIN
+  -> dedicated private Cloud Run coach verifies service-account identity AGAIN
   -> strict context/PII limits + rate/concurrency + independent safety checks
   -> private OpenAI Responses + input/output moderation (ONLY if separately approved)
   -> schema-validated reply + verified metered usage
@@ -57,38 +57,43 @@ The gateway and private executor both require:
 - A family-authorized session and sufficient already-funded family ledger
 - An explicitly reviewed `coachPrivateOrigin`, **not** the OpenAI API host
 
-The private runtime additionally requires:
-- `FACTORY_COACH_EXECUTION_ENV=factory-generation`
-- No Cloud Run `K_SERVICE` environment (fail closed)
+The dedicated runtime additionally requires:
+- `K_SERVICE=factory-coach-private` and `FACTORY_COACH_EXECUTION_ENV=dedicated-cloud-run`.
+  The **inactive** container starts without any model secret and refuses paid requests.
 - Exact `FACTORY_COACH_PRIVATE_AUDIENCE` and
-  `FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT` for verified Google OIDC
-- `FACTORY_OPENAI_API_KEY` **only from the owner-approved generation environment**
-- A private ingress architecture with TLS and a firewall / authorization policy.
-  The executable binds to loopback only; an authorized reverse proxy or private
-  service is required. Merely running the script is not production hosting.
+  `FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT` for independently validated Google OIDC.
+- A **new, coach-only, least-privilege OpenAI project key**, mounted from a
+  pinned Secret Manager version **only after verified ZDR and pilot consent**.
+  Do not move the GitHub `factory-generation` key.
+- Cloud Run `internal` ingress, mandatory IAM invocation from the existing
+  gateway service account and a reviewed VPC routing path. The container binds
+  to `0.0.0.0:$PORT` for Cloud Run.
 
 An environment flag is NOT proof that COPPA, ZDR, IAM or a safe network ingress
 has actually been reviewed. These require independent evidence.
 
-## Architectural blocker to close before activation
+## Owner-approved architecture and remaining operational gates
 
-The existing production pilot intentionally keeps the API key in the
-GitHub `factory-generation` environment; Cloud Run gateway/preview and
-sandbox/test runners must remain keyless. A workflow-dispatched GitHub job
-for *every* conversation turn is too slow and unpredictable for the intended
-back-and-forth experience. Conversely, placing the key in a new Cloud Run service
-would violate the currently accepted boundary.
+The owner approved a **dedicated, tightly restricted private Cloud Run inference service**
+with a newly scoped project key, replacing the earlier generation-environment-only
+rule for **conversational inference only**. The existing worker's key, WIF/IAM pins,
+service identities and image restrictions remain unchanged. This approval
+is **not** evidence that OpenAI API ZDR, parental consent, a model key or
+a private network route exists.
 
-**No suitable always-available, low-latency, credential-authorized private
-inference host is demonstrated in the current connected repositories.**
-PR #36 provides a private boundary and authenticator but does not provision
-or choose that host. The owner/security review must explicitly authorize a
-runtime/credential delivery design (for example a strictly isolated
-factory-generation inference worker with temporary secrets in memory,
-non-public ingress and reliable teardown). Do not create a new project, move
-the existing key or broaden WIF/IAM permissions without that review.
-Any hosting proposal needs actual p50/p95 tablet turn latency, startup cost,
-operating cost and reliability evidence.
+The Cloud Run service is named `factory-coach-private`; the container and offline
+build/owner deployment scripts are now part of PR #36. The service is designed to
+start inactive with no model secret, zero minimum instances, restricted IAM and
+internal-only ingress. The existing gateway's networking must be read-only
+inspected and, if necessary, separately reviewed for VPC connectivity before
+we could claim real service-to-service availability.
+
+**No GCP resource or API key has been created, moved, deployed or activated
+in this code session.** CI tests the code and a local inactive container;
+it is not a production paid-model acceptance.
+
+Full new architecture, exact owner commands and rollback gates:
+`docs/issue-28/CLOUD_RUN_OWNER_PLAN.md`.
 
 ## Under-13 and child-safety gates
 
@@ -152,12 +157,13 @@ Important current distinction:
 1. Finalize runtime threat model and credential scope. Read existing GCP,
    GitHub Actions environment, WIF and worker metadata *before* changing them.
 2. Verify ZDR, child safeguards, current pricing and dedicated family allowance.
-3. Deploy **inactive** identity-verified private executor behind non-public
-   HTTPS; demonstrate that the gateway can obtain an audience-bound token
-   and no browser can reach the backend.
-4. Deploy keyless gateway with `coachPrivateOrigin`, retaining all existing
-   credentials, sessions, artifacts and generation worker pins. Leave all
-   `FACTORY_COACH_*_APPROVED` flags disabled.
+3. Build the dedicated, immutable coach image; owner-review and deploy the
+   **inactive**, identity-verified `factory-coach-private` Cloud Run service.
+   It must have internal ingress, no public invokers, no model key and no paid
+   inference. Verify the gateway's reviewed VPC route separately.
+4. Only after a verified private route, update the keyless gateway's private
+   `coachPrivateOrigin` configuration, retaining existing sessions, artifacts
+   and generation-worker pins. Leave all activation flags disabled.
 5. Review rollback, red-team and tablet acceptance. Separately authorize
    the paid model and per-family opt-in; enable flags in a controlled pilot.
 6. Run a real multi-turn, fully authorized smoke and compare the 20-case rubric.
