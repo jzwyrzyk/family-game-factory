@@ -152,7 +152,15 @@ export async function installStudio(){
  function status(text:string,error=false){const target=route==='studio'?$('studioStatus'):globalStatus;target.textContent=text;target.classList.toggle('is-error',error);target.setAttribute('role',error?'alert':'status');}
  function sameView(s:StudioSession,at=epoch){return at===epoch&&owner()===s.owner&&activeId===s.id&&route==='studio';}
  function canChangePlay(s:StudioSession,at=epoch){if(!sameView(s,at))return false;if(guardMath())return false;return true;}
- function message(s:StudioSession,role:'child'|'helper'|'reflection',text:string){notebook.message(s.id,s.owner,role,text);if(activeId===s.id&&owner()===s.owner)renderConversation();}
+ function message(s:StudioSession,role:'child'|'helper'|'reflection',text:string){
+  notebook.message(s.id,s.owner,role,text);
+  if(activeId===s.id&&owner()===s.owner){
+   renderConversation();
+   // Immediately reveal the child's message; do not leave the first idea
+   // hidden while the model or local helper is still working.
+   if(role==='child'&&s.game==='new')render();
+  }
+ }
  function flushDraft(){
   clearTimeout(draftTimer);if(!activeId)return;const s=current();
   try{coaching?.flushDrafts();if(s.draft!==$<HTMLTextAreaElement>('studioPrompt').value)notebook.update(s.id,s.owner,x=>{x.draft=$<HTMLTextAreaElement>('studioPrompt').value;});$('studioDraftStatus').textContent='Saved on this device';}
@@ -688,6 +696,9 @@ export async function installStudio(){
   pauseForThinking:()=>{if(guardMath())return false;++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;status('Your game is waiting. Your build is saved; action games start a new round when you return.');}return true;},
   showTalk:()=>{showStudio();if(setTab('talk'))focusView($('studioPrompt'));}
  });
+ // Put live response status next to the conversation it describes, not below
+ // unrelated experiment controls. It stays an accessible aria-live status.
+ $('studioMessages').after($('coachModeStatus'));
  voice=installStudioVoice({
   microphone:$<HTMLButtonElement>('studioMic'),installPack:$<HTMLButtonElement>('studioVoicePack'),
   hearReply:$<HTMLButtonElement>('studioHear'),status:$('studioVoiceStatus'),
