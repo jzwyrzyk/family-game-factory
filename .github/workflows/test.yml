@@ -40,6 +40,9 @@ jobs:
       - name: Build actions
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/actions-e2e.ts
+      - name: Independent intent gameplay browser tests
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:intent-playtest
       - name: Generated worker security
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/generated-worker-security.ts
