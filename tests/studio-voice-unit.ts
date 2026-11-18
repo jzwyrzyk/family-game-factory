@@ -25,6 +25,7 @@ class FakeRecognition {
   onresult:((event:any)=>void)|null=null;onerror:((event:any)=>void)|null=null;onend:(()=>void)|null=null;
   constructor(){active=this;}
   start(){starts++;}
+  stop(){this.onend?.();}
   abort(){stops++;this.onend?.();}
 }
 const savedWindow=Object.getOwnPropertyDescriptor(globalThis,'window');
@@ -63,12 +64,14 @@ async function run(){
   assert.equal(current().processLocally,true,'microphone must require local processing');
   assert.equal(microphone.attrs['aria-pressed'],'true');
   current().onresult?.({results:[{isFinal:true,0:{transcript:'What if the dragon sneezes spaghetti?'}}]});
-  current().onend?.();
+  await voice.listen(); // The second button press finishes dictation; it does not send a chat turn.
   await Promise.resolve();
   assert.deepEqual(transcripts,['What if the dragon sneezes spaghetti?']);
   assert.equal(microphone.attrs['aria-pressed'],'false');
-  assert.deepEqual(spoken,['Would the spaghetti be a funny surprise?'],'a spoken child turn may receive a verified local spoken reply');
+  assert.deepEqual(spoken,[],'speech transcription must NOT automatically read a reply aloud');
   assert.equal(hearReply.disabled,false);
+  hearReply.onclick?.();
+  assert.deepEqual(spoken,['Would the spaghetti be a funny surprise?'],'Hear reply is explicit and optional');
   voice.cancel();assert.equal(hearReply.disabled,true,'a previous child reply must not survive navigation');
 
   await voice.listen();assert.equal(starts,2);
@@ -138,7 +141,7 @@ async function run(){
   voice.reply('Another reply');
   hearReply.onclick?.();
   assert.equal(spoken.length,speechCount,'off-device text-to-speech is not permitted');
-  console.log('PASS local-only microphone, child speech -> chat, spoken reply, stop, profile isolation, microphone denial, local pack and off-device refusal');
+  console.log('PASS local-only microphone, speech -> editable draft only, explicit Finish and Hear, profile isolation, microphone denial, local pack and off-device refusal');
 }
 run().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{
   if(savedWindow)Object.defineProperty(globalThis,'window',savedWindow);else delete (globalThis as any).window;
