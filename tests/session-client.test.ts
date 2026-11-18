@@ -63,3 +63,17 @@ test('failed renewal blocks paid submission, with no duplicate request',async()=
   assert.equal(response.status,401);assert.equal(renewals,1);assert.equal(sent,0);
  });
 });
+
+test('unavailable authentication preflight fails closed before a paid mutation',async()=>{
+ let submitted=0;
+ await mockNetwork(path=>{
+  if(path==='/v1/sessions/status')throw Error('Gateway unreachable');
+  if(path==='/v1/jobs'){submitted++;return json(202);}
+  throw Error('Unexpected route '+path);
+ },async()=>{
+  const response=await familyFetch(base,'/v1/jobs',{method:'POST',body:'{"prompt":"Build a game"}'});
+  assert.equal(response.status,503);
+  assert.equal((await response.json()).errorCode,'BUILDER_UNAVAILABLE');
+  assert.equal(submitted,0,'No paid build submission after uncertain authentication');
+ });
+});
