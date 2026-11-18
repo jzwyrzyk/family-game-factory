@@ -1,5 +1,5 @@
 import type { AgentAdapter,AgentInput,CandidateArtifact } from '../pipeline/types';
-import { generationDesignBrief,recommendGameForm } from '../quality/game-intelligence';
+import { privateGenerationPreflight } from '../quality/private-generation-preflight';
 import { isGeneratedGame,validateGenerated,type GeneratedGame } from './generated';
 export interface AgentApproval {
  reasoningEffort?:'low'|'medium';enabled:boolean;approvalId:string;model:string;inputUsdPerMillion:number;outputUsdPerMillion:number;
@@ -36,13 +36,17 @@ export class OpenAIResponsesAgent implements AgentAdapter {
  constructor(private approval:AgentApproval,private key:()=>string,private transport:typeof fetch=fetch){this.available=approval.enabled;if(this.available)validateApproval(approval);}
  private async request(input:AgentInput,previous?:GeneratedGame,diagnostics?:string){
   validateApproval(this.approval);if(input.signal.aborted)throw Error('CANCELLED');
-  const original=previous||input.baseRevision.game;const base=isGeneratedGame(original)?{kind:original.kind,title:original.title,instructions:original.instructions,source:original.source,controls:original.controls}:original||input.baseRevision.config||null;
-  const designAdvice=recommendGameForm(input.childIntent);
-  const oldPhysicalGame=isGeneratedGame(original)&&/\bapi\.physics\b/.test(original.source);
-  const explicitlyRemovePhysics=/\b(?:no|without|remove|skip|avoid)\s+(?:(?:the|real|realistic)\s+)?physics\b/i.test(input.childIntent);
-  const withPhysicalSimulation=designAdvice.motion!=='rule-driven'||(oldPhysicalGame&&!explicitlyRemovePhysics);
-  const data={idea:input.childIntent,base,gameDesignPreflight:generationDesignBrief(input.childIntent),feedback:diagnostics?.slice(0,1500)||null};
-  const user=JSON.stringify(data),instructions=generationInstructionsForForm(withPhysicalSimulation);
+  // The same bounded, source-grounded design advice applies to initial builds
+  // and bounded repairs. Failed candidate code NEVER decides the required
+  // engine; the original verified base and the child's request do.
+  // Run before reading secrets or making any provider request.
+  const preflight=privateGenerationPreflight(input);
+  const original=previous||input.baseRevision.game;
+  const base=isGeneratedGame(original)?
+    {kind:original.kind,title:original.title,instructions:original.instructions,source:original.source,controls:original.controls}:
+    original||input.baseRevision.config||null;
+  const data={idea:input.childIntent,base,gameDesignPreflight:preflight.brief,feedback:diagnostics?.slice(0,1500)||null};
+  const user=JSON.stringify(data),instructions=generationInstructionsForForm(preflight.instructionsMode!=='rule-driven');
   // UTF-8 bytes + conservative protocol overhead upper-bound input tokens. Never assume caching discounts.
   const inputBound=Buffer.byteLength(user)+Buffer.byteLength(instructions)+1024;
   if(inputBound>this.approval.maxInputTokens)throw Error('INPUT_TOKEN_LIMIT');
