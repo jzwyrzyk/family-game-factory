@@ -133,10 +133,10 @@ try{
   'revoked trusted device must never reserve another model call');
  await assert.rejects(metered.eraseFamilyReceipts(designer),/FORBIDDEN/);
  const total=(await repository.snapshot()).ledgers[family].used;
- assert.deepEqual(await metered.eraseFamilyReceipts(parent),{erased:1});
+ assert.deepEqual(await metered.eraseFamilyReceipts(parent),{erased:2});
  assert.equal((await repository.snapshot()).coachReceipts?.length,0);
  assert.equal((await repository.snapshot()).ledgers[family].used,total,'erasure does not falsify charges');
- assert.equal((await repository.snapshot()).audit.length,2,'content-free audit remains');
+ assert.equal((await repository.snapshot()).audit.length,3,'content-free audit remains');
  console.log('PASS private coach: authenticated identity, strict provider-only contract, keyless gateway, hard safety gates and no browser access');
 }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));}
 
