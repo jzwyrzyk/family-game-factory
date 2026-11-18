@@ -108,7 +108,7 @@ def verify_gateway(region: str) -> None:
 def verify_inactive_service(region: str, image: str) -> dict:
     service = cloud("run", "services", "describe", SERVICE, "--region", region)
     service_url=service.get("status",{}).get("url","")
-    if not isinstance(service_url,str) or not re.fullmatch(r"https://factory-coach-private-[a-z0-9.-]+\\.run\\.app",service_url):
+    if not isinstance(service_url,str) or not re.fullmatch(r"https://factory-coach-private-[a-z0-9.-]+\.run\.app",service_url):
         raise GateError("Private coach URL is not the reviewed canonical Cloud Run host; do not connect the gateway.")
     metadata = service.get("metadata", {})
     if metadata.get("labels", {}).get("factory-component") != "private-coach":
