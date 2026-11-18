@@ -27,7 +27,8 @@ export function builderReadinessCopy(state:BuilderReadiness):string {
 }
 export function buildErrorCopy(code:string|undefined):string {
  switch(code){
-  case 'UNAUTHENTICATED': case 'FORBIDDEN':return 'The workshop needs a grown-up to reconnect. Your idea is saved; nothing was built.';
+  case 'UNAUTHENTICATED':return 'The workshop needs a grown-up to reconnect. Your idea is saved; nothing was built.';
+  case 'FORBIDDEN':return 'The workshop denied access. Ask a grown-up to check the device or connection permissions. Your idea is safe.';
   case 'SPENDING_CUTOFF':return 'The family workshop allowance has been reached. Your idea is saved; nothing was built.';
   case 'BUILDER_UNAVAILABLE':return 'The workshop is not available right now. Your idea is saved; no game build started.';
   case 'RATE_LIMIT':return 'The workshop needs a short break before another try. Your idea is safe.';
