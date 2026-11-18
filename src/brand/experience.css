@@ -141,3 +141,18 @@
 .studio-review .studio-progress-banner .studio-build-controls{margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
 .studio-review .studio-progress-banner .studio-build-controls .studio-button{min-height:44px;padding:10px 16px}
 .studio-review .studio-progress-banner[data-phase="failed"] #studioRetry{background:var(--jems-ink);border-color:var(--jems-ink);color:white}
+
+/* When improving an existing game, conversation takes focus; the paused game
+   remains visible as reference but no longer crowds out the child's words. */
+@media(min-width:1080px){
+ .studio-review.studio-designing #page-studio:not(.studio-creating) .studio-workspace{
+  grid-template-columns:minmax(340px,.85fr) minmax(0,1.45fr);
+  align-items:start
+ }
+ .studio-review.studio-designing #page-studio:not(.studio-creating) #studioMessages{
+  height:min(34vh,360px);min-height:255px
+ }
+ .studio-review.studio-designing #page-studio:not(.studio-creating) #studioConversation{
+  border:2px solid #BFA7F5;min-width:0
+ }
+}
