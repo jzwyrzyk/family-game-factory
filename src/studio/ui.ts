@@ -252,7 +252,7 @@ export async function installStudio(){
  }
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;
-  note.textContent=!configReady?'Checking which creation tools are ready…':builderReadiness==='not-configured'?'Building brand-new playable games is not connected yet. Your idea will save here.':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
+  note.textContent=!configReady?'Checking which creation tools are ready…':builderReadiness==='not-configured'?'Game building is not connected yet. Your idea will still save.':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;

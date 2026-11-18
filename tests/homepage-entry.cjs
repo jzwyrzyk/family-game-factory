@@ -23,7 +23,7 @@ const {start}=require('./browser-server.cjs');
    assert.equal(await page.locator('#page-studio-library').isVisible(),true,'the normal URL opens Studio');
    assert.equal(await page.locator('#page-home').isVisible(),false,'the old wizard is not the homepage');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),6,'six playable favorites');
-   assert.equal((await page.locator('#studioLibraryTitle').textContent()).replace(/\\s+/g,' ').trim(),'What jems will you make today?');
+   assert.equal((await page.locator('#studioLibraryTitle').textContent()).replace(/\s+/g,' ').trim(),'What jems will you make today?');
    assert.equal(await page.locator('#studioStarterTitle').textContent(),'Ready to Play jems');
    assert.equal(await page.locator('#studioSavedTitle').textContent(),'My jems');
    assert.equal(await page.locator('#studioFavoritesSection').textContent().then(t=>t.includes('Six games')),false);

@@ -438,3 +438,7 @@ body.studio-review > .factory-update-notice{color:#394862}
  .studio-review .studio-build-item-actions{justify-content:flex-start}
 }
 @media(max-width:370px){.studio-review .site-header .jems-brand-logo{width:145px;height:52px}.studio-header-tools{flex:1 1 100%;justify-content:space-between}}
+
+/* Keep the resume action separate from its dismiss control on large screens. */
+.studio-review .studio-continue #studioContinuePlaying{margin-right:48px}
+@media(max-width:650px){.studio-review .studio-continue #studioContinuePlaying{margin-right:0}}
