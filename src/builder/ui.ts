@@ -192,7 +192,19 @@ export async function initBuilder(){
   void client.api('/v1/devices/disconnect',{}).then(async()=>{await connectionStatus();$('builderDeviceList').replaceChildren();})
    .catch(()=>$('connectionStatus').textContent='Could not disconnect this device. Please try again.');
  };
- window.addEventListener('factory-page',event=>{if((event as CustomEvent<string>).detail==='parent')void connectionStatus();else $('builderNewInvitation').replaceChildren();});
+ window.addEventListener('factory-page',event=>{
+  if((event as CustomEvent<string>).detail==='parent'){void connectionStatus();return;}
+  $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
+  $<HTMLButtonElement>('builderIssueInvite').hidden=true;
+  for(const id of ['builderInvite','builderParentPassphrase','builderParentUnlockPassphrase'])
+   $<HTMLInputElement>(id).value='';
+ });
+ window.addEventListener('factory-profile',()=>{
+  $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
+  $<HTMLButtonElement>('builderIssueInvite').hidden=true;
+  for(const id of ['builderInvite','builderParentPassphrase','builderParentUnlockPassphrase'])
+   $<HTMLInputElement>(id).value='';
+ });
  window.addEventListener('factory-session-restored',()=>{if(!$('page-parent').classList.contains('hidden'))void connectionStatus();});
  void connectionStatus();
  try{const saved=JSON.parse(localStorage.getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl&&config.mode==='remote'){move('create');void client.resume(saved.jobId).catch(showError);}}catch{}
