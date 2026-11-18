@@ -1,5 +1,6 @@
 import {freshDesign, PLAN_FIELDS, PLAN_LABELS, missingPlan,localCoach,validateCoachReply,type CoachContext,type CoachReply,type Experiment,type Origin,type PlanField,type DesignField} from './design';
 import type {StudioNotebook,StudioSession} from './notebook';
+import {familyFetch} from '../builder/session';
 import type {BuilderConfig} from '../builder/client';
 import {celebrateJem} from '../brand/delight';
 import {conversationDisposition} from './experience';
@@ -155,7 +156,7 @@ export function installCoaching(h:Hooks){
    const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
    let reply:CoachReply,used:'model'|'local'='local',reason='';
    try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
-    const response=await fetch(config.apiBaseUrl+'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
+    const response=await familyFetch(config.apiBaseUrl!,'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
     const data=await response.json();if(!response.ok)throw Error(data.errorCode||'COACH_UNAVAILABLE');if(data.mode!=='model')throw Error('COACH_UNAVAILABLE');reply=validateCoachReply(data.reply,c);used='model';
    }catch(error){if(turn.signal.aborted)return;reason=error instanceof Error?error.message:'COACH_UNAVAILABLE';reply=localCoach(c);}
    if(seq!==generation||!isCurrent(captured))return;

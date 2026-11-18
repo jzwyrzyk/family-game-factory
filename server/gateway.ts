@@ -17,6 +17,7 @@ import {workerHandler} from './actions/http';
 import {installationTokenProvider} from './actions/app-token';
 import {validateApproval,type AgentApproval} from './agent/openai';
 import {sessionHandler} from './sessions';
+import {trustedDeviceHandler} from './trusted-devices';
 export interface GatewayConfig {
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
@@ -44,8 +45,8 @@ export async function createGateway(config:GatewayConfig){
  const dispatcher=new GitHubDispatcher({enabled:paidEnabled,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:paidEnabled&&config.approval.enabled});
  const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker});
  const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
- const coach=coachHandler(new CoachService(repo,coachConfig(process.env)),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
- const api=apiHandler(service,http),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
+ const coach=coachHandler(new CoachService(repo,coachConfig(process.env)),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
+ const api=apiHandler(service,http,repo),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey}),trusted=trustedDeviceHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
   const url=new URL(req.url!,config.gatewayOrigin);
@@ -57,6 +58,7 @@ export async function createGateway(config:GatewayConfig){
   }
   if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'){await coach(req,res);return;}
   if(url.pathname==='/v1/sessions'){await sessions(req,res);return;}
+  if(['/v1/sessions/enroll','/v1/sessions/renew','/v1/sessions/status'].includes(url.pathname)||url.pathname==='/v1/devices'||url.pathname.startsWith('/v1/devices/')){await trusted(req,res);return;}
   await api(req,res);
  }};
 }

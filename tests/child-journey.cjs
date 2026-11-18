@@ -154,7 +154,10 @@ async function remoteJourney(browser,url,device,viewport){
   await page.route(api+'/**',async route=>{
    const request=route.request(),path=new URL(request.url()).pathname;let body;
    if(request.method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
-   if(path==='/v1/revisions'&&request.method()==='POST')body={revisionId:'journey-base'};
+   // A declared authenticated fixture is required for remote paid mutations.
+   if(path==='/v1/sessions/status'&&request.method()==='GET')
+    body={connected:true,trusted:true,expiresAt:Date.now()+60000};
+   else if(path==='/v1/revisions'&&request.method()==='POST')body={revisionId:'journey-base'};
    else if(path==='/v1/jobs'&&request.method()==='POST'){requests.push(request.postDataJSON());body={jobId:'journey-job',status:'queued',adapter:'mock'};}
    else if(path==='/v1/jobs/journey-job')body=ready?{jobId:'journey-job',status:'ready',revisionId:'journey-ready',adapter:'mock'}:{jobId:'journey-job',status:'testing',adapter:'mock'};
    else if(path==='/v1/revisions/journey-ready/preview'){

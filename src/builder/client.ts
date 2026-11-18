@@ -1,3 +1,4 @@
+import {familyFetch} from './session';
 export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
@@ -15,7 +16,7 @@ export class BuilderClient {
  private generation=0;private request:RequestChange|null=null;private requestId='';private retryOf:string|undefined;private last:JobView|null=null;
  constructor(readonly config:BuilderConfig,private update:(job:JobView)=>void){}
  async api(path:string,body?:unknown){
-  if(this.config.mode!=='remote')throw Error('BUILDER_UNAVAILABLE');const response=await fetch(this.config.apiBaseUrl+path,{method:body===undefined?'GET':'POST',credentials:'include',headers:body===undefined?{}:{'Content-Type':'application/json','X-Factory-Request':'1'},body:body===undefined?undefined:JSON.stringify(body)});
+  if(this.config.mode!=='remote')throw Error('BUILDER_UNAVAILABLE');const response=await familyFetch(this.config.apiBaseUrl!,path,{method:body===undefined?'GET':'POST',credentials:'include',headers:body===undefined?{}:{'Content-Type':'application/json','X-Factory-Request':'1'},body:body===undefined?undefined:JSON.stringify(body)});
   const data=await response.json();if(!response.ok)throw Error(data.errorCode||'BUILDER_UNAVAILABLE');return data;
  }
  async submit(input:RequestChange){this.request={...input};this.requestId=crypto.randomUUID();this.retryOf=undefined;this.last=null;return this.send();}

@@ -5,6 +5,7 @@ import {celebrateJem} from '../brand/delight';
 import {installStudioVoice} from './voice';
 import {freshDesign} from './design';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCopy,canCompareExperiments,type BuilderReadiness,type CoachConnection} from './experience';
+import {familyFetch} from '../builder/session';
 import './style.css';
 import '../brand/jems.css';
 import '../brand/playful.css';
@@ -286,8 +287,8 @@ export async function installStudio(){
   // Public configuration merely selects URLs; only an authenticated server
   // check can distinguish an available service, session failure and allowance.
   const check=async(path:string)=>{
-   const response=await fetch(remote.apiBaseUrl+path,{credentials:'include',cache:'no-store'});
-   if(!response.ok)throw Error(response.status===401||response.status===403?'UNAUTHENTICATED':'SERVICE_UNAVAILABLE');
+   const response=await familyFetch(remote.apiBaseUrl!,path,{credentials:'include',cache:'no-store'});
+   if(!response.ok)throw Error(response.status===401?'UNAUTHENTICATED':response.status===403?'FORBIDDEN':'SERVICE_UNAVAILABLE');
    return response.json();
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
@@ -760,6 +761,7 @@ export async function installStudio(){
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
  window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
+ window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();});
  window.addEventListener('factory-profile',()=>{voice?.cancel();coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);void refreshServiceReadiness();resumeOutstanding();});
  window.addEventListener('beforeunload',event=>{voice?.cancel();try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
