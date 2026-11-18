@@ -10,7 +10,8 @@ import {approved,validateCoachContext,type CoachProvider} from './service';
 import {OpenAICoachProvider,type PrivateCoachConfig} from './private-provider';
 import {validateCoachReply} from '../../src/studio/design';
 import {privateCoachOrigin} from './private-bridge';
-import {speechApproved,speechConfig,validateAudio,GooglePrivateSpeech,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
+import {speechApproved,speechConfig,validateAudio,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
+import {GooglePrivateSpeech} from './private-speech-provider';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
 export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
