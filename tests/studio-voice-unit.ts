@@ -9,7 +9,7 @@ class Button {
 class Status {textContent='';}
 let active:FakeRecognition|null=null,mode:'available'|'downloadable'|'unavailable'='available';
 let starts=0,stops=0,scope='child-a:game-one',allowed=true;
-let delayedAvailability=false,finishAvailability:((value:'available')=>void)|null=null;
+let stalledStop=false,delayedAvailability=false,finishAvailability:((value:'available')=>void)|null=null;
 function releaseAvailability(){const release=finishAvailability;if(!release)throw Error('Missing delayed speech result');release('available');}
 const spoken:string[]=[];
 class FakeRecognition {
@@ -25,7 +25,7 @@ class FakeRecognition {
   onresult:((event:any)=>void)|null=null;onerror:((event:any)=>void)|null=null;onend:(()=>void)|null=null;
   constructor(){active=this;}
   start(){starts++;}
-  stop(){this.onend?.();}
+  stop(){if(!stalledStop)this.onend?.();}
   abort(){stops++;this.onend?.();}
 }
 const savedWindow=Object.getOwnPropertyDescriptor(globalThis,'window');
@@ -141,6 +141,19 @@ async function run(){
   voice.reply('Another reply');
   hearReply.onclick?.();
   assert.equal(spoken.length,speechCount,'off-device text-to-speech is not permitted');
+  // A browser may never complete its stop() event. The child must be able to
+  // cancel the stuck transcription instead of being trapped by a disabled mic.
+  (window as any).SpeechRecognition=FakeRecognition;
+  mode='available';stalledStop=true;
+  await voice.listen();
+  current().onresult?.({results:[{isFinal:true,0:{transcript:'Unfinished private words'}}]});
+  await voice.listen();
+  assert.match(microphone.textContent,/Cancel transcription/);
+  assert.equal(microphone.disabled,false);
+  await voice.listen();
+  assert.match(status.textContent,/Transcription canceled/);
+  assert.equal(transcripts.length,1,'canceled transcription never sends or modifies a draft');
+  stalledStop=false;
   console.log('PASS local-only microphone, speech -> editable draft only, explicit Finish and Hear, profile isolation, microphone denial, local pack and off-device refusal');
 }
 run().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{
