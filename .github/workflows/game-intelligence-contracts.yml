@@ -1,0 +1,55 @@
+name: Jems Game Intelligence contracts
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/game-intelligence-contracts.yml'
+      - 'server/quality/**'
+      - 'server/agent/openai.ts'
+      - 'server/actions/coordinator.ts'
+      - 'server/actions/worker-cli.ts'
+      - 'server/pipeline/**'
+      - 'tests/game-form.test.ts'
+      - 'tests/child-intent.test.ts'
+      - 'tests/game-intelligence.test.ts'
+      - 'tests/working-game-contract.test.ts'
+      - 'tests/private-generation-preflight.test.ts'
+      - 'tests/unit.ts'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/game-intelligence-contracts.yml'
+      - 'server/quality/**'
+      - 'server/agent/openai.ts'
+      - 'server/actions/coordinator.ts'
+      - 'server/actions/worker-cli.ts'
+      - 'server/pipeline/**'
+      - 'tests/game-form.test.ts'
+      - 'tests/child-intent.test.ts'
+      - 'tests/game-intelligence.test.ts'
+      - 'tests/working-game-contract.test.ts'
+      - 'tests/private-generation-preflight.test.ts'
+      - 'tests/unit.ts'
+permissions:
+  contents: read
+concurrency:
+  group: jems-intelligence-contracts-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Strict TypeScript
+        run: npm run typecheck
+      - name: Entire unit and contract suite
+        run: npm run test:unit
+# This workflow has no browser installer, privileged credentials, paid calls,
+# deployment permissions or worker trust configuration. Full Arcade/creative/
+# learning/visual and private-runner security gates remain separate and mandatory.
