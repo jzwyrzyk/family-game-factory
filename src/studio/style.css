@@ -395,3 +395,10 @@ body.studio-review > .factory-update-notice{color:#394862}
  .studio-review .site-header{gap:3px 6px}
  .studio-review main{padding-top:7px}
 }
+
+
+/* Dropdown must paint above the home hero's isolated stacking context. */
+.studio-review .site-header{position:relative;z-index:50;isolation:isolate;overflow:visible}
+.studio-review .site-header .studio-header-tools{position:relative;z-index:51}
+.studio-review .site-header .studio-profile-menu[open]{z-index:60}
+.studio-review .site-header .studio-profile-menu[open] .profile-choices{z-index:65}
