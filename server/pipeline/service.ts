@@ -1,5 +1,8 @@
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
 import {privateGenerationPreflight} from '../quality/private-generation-preflight';
+import {draftChildIntentContract} from '../quality/child-intent';
+import {chooseGameForm} from '../quality/game-form';
+import {validateFunctionalGameContract,type FunctionalGameContract} from '../quality/functional-game-contract';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
@@ -16,7 +19,7 @@ export function validateBuildRequest(value:unknown):BuildRequest{
 }
 const month=()=>new Date().toISOString().slice(0,7);
 function audit(state:PipelineState,job:Job,status:JobStatus,code?:string){if(!transitions[job.status].includes(status))throw Error('INVALID_TRANSITION');job.status=status;const event:AuditEvent={jobId:job.id,familyId:job.familyId,status,at:new Date().toISOString()};if(code)event.code=code;state.audit.push(event);}
-export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal}):Promise<GeneratedGame|void> }
+export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract}):Promise<GeneratedGame|void> }
 export class JobService {
  private controllers=new Map<string,AbortController>();
  constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
@@ -74,6 +77,14 @@ export class JobService {
   try{
    const state=await this.repo.snapshot(),base=state.revisions.find(r=>r.id===start.baseRevisionId);
    let previous:GeneratedGame|undefined,diagnostics='',used=0,testedGame:PlayableGame|undefined;
+   // The local fallback must enforce the same independently sourced plan as
+   // the private Actions coordinator; no browser-supplied contract is trusted.
+   let independentIntentPlan:FunctionalGameContract|undefined;
+   if(start.independentIntentPlan){
+    if(start.baseRevisionId!==null)throw Error('INTENT_PLAN_REVISION_UNSUPPORTED');
+    const intent=draftChildIntentContract(start.prompt);
+    independentIntentPlan=validateFunctionalGameContract(start.independentIntentPlan,intent,chooseGameForm(intent));
+   }
    const maximum=Math.min(2,Math.max(0,this.options.maxRepairAttempts??2));
    for(let attempt=0;attempt<=maximum;attempt++){
     const input:AgentInput={gameManifest:{id:start.gameId,allowedMechanics:['declarative-star-catcher','generated-module-v1','generated-module-v2']},baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config,sourceGame:base?.sourceGame,projectId:base?.projectId},childIntent:start.prompt,allowedCapabilities:['declarative-star-catcher','generated-module-v1','generated-module-v2'],budget:{maxUnits:start.maxUnits-used,timeoutMs:this.options.timeoutMs},signal:controller.signal};
@@ -83,8 +94,10 @@ export class JobService {
     const game=validateArtifact(result.candidate);
     const testing=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='building')return false;job.usedUnits=used;job.phase='testing';audit(s,job,'testing');return true;});if(!testing)return;
     try{
-     const built=await Promise.race([this.gate.test(game,{signal:controller.signal}),deadline]);
+     const built=await Promise.race([this.gate.test(game,{signal:controller.signal,independentIntentPlan}),deadline]);
      testedGame=isGeneratedGame(game)?validateCompiled(game,built as GeneratedGame):game;
+     if(independentIntentPlan && (testedGame as GeneratedGame).compiled?.tests?.intent!==true)
+      throw Error('INTENT_ATTESTATION_REQUIRED');
      break;
     }catch(error){
      if(!isGeneratedGame(game)||!this.agent.repair||attempt>=maximum||controller.signal.aborted)throw error;
