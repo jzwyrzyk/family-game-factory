@@ -76,6 +76,8 @@ Research v1 adds only a bounded G2 advisory and an **offline evidence ledger**. 
 - Idea fidelity: the actual essential mechanics, story and payoff occur.
 - Gameplay-form fit: controls, 2D/3D presentation, physics choice, complexity.
 - Controls and discoverability: child can find and operate the intended action.
+- Visual and audio presentation: readable worlds, playful color, expressive motion, restrained sound, accessible controls and reward signals.
+- Challenge and agency: challenge suits the game mode; child can influence, recover, experiment and choose without a forced false win.
 - Playability and recovery: can progress or explore, return, retry, recover.
 - Feedback and payoff: responsive cause/effect and requested memorable moments.
 - Child-appropriate accessibility: reading, touch/keyboard, reduced motion, comprehension.
@@ -117,4 +119,4 @@ Each axis requires a declared observation: pass, fail, or not tested, with its m
 - [GUI Agents for Continual Game Generation (2026)](https://aclanthology.org/2026.findings-emnlp.1100/): promising independent GUI playtesting, not demonstrated automatic prediction of young children's enjoyment.
 - [Live Game Design (2025)](https://vrozen.github.io/assets/papers/FDG2025_LiveGameDesign_preprint.pdf): prior research into rapid 2D prototyping and playtesting with children.
 
-See research-protocol.md for the research experiment, holdout and product criteria. No study here establishes an off-the-shelf general fun model.
+See [research-protocol.md](research-protocol.md) for the experiment and holdout, and [cross-vertical-standard.md](cross-vertical-standard.md) for systematic checks across creation, drawing, remix, coaching, math/English, visual design, family reporting and ownership. No study here establishes an off-the-shelf general fun model.
