@@ -32,12 +32,15 @@ export function recommendGameForm(childIdea: string): GameFormAdvice {
     matches(s, /\b(?:move|fly|walk|navigate)\s+(?:freely\s+)?(?:in|through)\s+(?:all\s+)?three\s+(?:axes|dimensions)\b/);
   const forbidPhysics = matches(s, /\b(?:no|without|avoid|skip|don't use|do not use)\s+(?:(?:real|realistic)\s+)?physics\b/) ||
     matches(s, /\b(?:just|only)\s+(?:simple\s+)?(?:stickers|drag[- ]and[- ]drop)\b/);
-  const requirePhysics = matches(s, /\b(?:real(?:istic)?\s+physics|physics\s+(?:game|engine|simulation)|simulate\s+(?:gravity|momentum|inertia)|real(?:istic)?\s+(?:gravity|collisions?|suspension))\b/) ||
-    matches(s, /\b(?:suspension|springs?\s+(?:compress|stretch)|wheels?\s+(?:grip|slip)|bouncy\s+(?:collisions?|balls?)|bounce\s+(?:off|against)|joints?\s+(?:break|snap)|(?:collapse|collapses|collapsing|topple|topples|toppling)\s+(?:under|from)\s+(?:weight|gravity)|catapult\s+(?:launch|trajectory)|balance\s+(?:a|the)\s+(?:tower|stack)|drive\s+(?:a\s+)?(?:car|truck|bike)\s+(?:over|across)\s+(?:bumpy|hilly|rough)\b)/);
+  // Negation is not a contradictory demand: "no real physics" must stay rule-driven.
+  // A separate positive demand ("no physics, but simulate gravity") remains a conflict.
+  const positiveClaims=s.replace(/\b(?:no|without|avoid|skip|don't use|do not use)\s+(?:(?:the|real|realistic)\s+)?physics\b/g,' ');
+  const requirePhysics = matches(positiveClaims, /\b(?:real(?:istic)?\s+physics|physics\s+(?:game|puzzle|engine|simulation)|simulate\s+(?:gravity|momentum|inertia)|real(?:istic)?\s+(?:gravity|collisions?|suspension))\b/) ||
+    matches(positiveClaims, /\b(?:suspension|springs?\s+(?:compress|stretch)|wheels?\s+(?:grip|slip)|bouncy\s+(?:collisions?|balls?)|bounce\s+(?:off|against)|joints?\s+(?:break|snap)|(?:collapse|collapses|collapsing|topple|topples|toppling)\s+(?:under|from)\s+(?:weight|gravity)|catapult\s+(?:launch|trajectory)|balance\s+(?:a|the)\s+(?:tower|stack)|drive\s+(?:a\s+)?(?:car|truck|bike)\s+(?:over|across)\s+(?:bumpy|hilly|rough)\b)/);
   const explicitConflict = forbidPhysics && requirePhysics;
   const motion: GameMotion = explicitConflict ? 'needs-review' : requirePhysics && !forbidPhysics ? 'physics-2d' : 'rule-driven';
   let interaction: GameInteraction = 'open-ended';
-  if (matches(s, /\b(?:drag|drop|stickers?|decorate|attach|assemble|place\s+(?:parts|pieces)|put\s+(?:\w+\s+){0,3}together|bubble\s*gum\s+builders?)\b/)) interaction = 'drag-and-drop';
+  if (matches(s, /\b(?:drag(?:ging)?|drop(?:ping)?|stick(?:ing)?|stickers?|decorate|attach|assemble|place\s+(?:parts|pieces)|put\s+(?:\w+\s+){0,3}together|bubble\s*gum\s+builders?)\b/)) interaction = 'drag-and-drop';
   else if (matches(s, /\b(?:grid|maze|route|directions|coding|program\s+(?:a|the)\s+robot|puzzle|sequence\s+of\s+(?:moves|steps))\b/)) interaction = 'grid-puzzle';
   else if (matches(s, /\b(?:drive|race|hill[- ]?climb|wheels?\s+grip|suspension)\b/)) interaction = 'driving';
   else if (matches(s, /\b(?:collect(?:s|ing)?|catch(?:es|ing)?|eat(?:s|ing)?|jump(?:s|ing)?|dodge|shoot|avoid|run\s+through)\b/)) interaction = 'arcade';
@@ -90,7 +93,7 @@ export function generationDesignBrief(childIdea: string) {
 }
 
 export type QualityAxis =
-  'idea-fidelity' | 'game-form-fit' | 'controls-and-discoverability' |
+  'idea-fidelity' | 'game-form-fit' | 'controls-and-discoverability' | 'visual-and-audio-presentation' | 'challenge-and-agency' |
   'playability-and-recovery' | 'feedback-and-payoff' | 'child-appropriate-accessibility' |
   'learning-boundary' | 'isolation-and-performance';
 export type EvidenceResult = 'pass' | 'fail' | 'not-tested';
@@ -101,7 +104,7 @@ export interface GameQualityEvidence {
   reason: string;
 }
 export const QUALITY_AXES: readonly QualityAxis[] = [
-  'idea-fidelity','game-form-fit','controls-and-discoverability','playability-and-recovery',
+  'idea-fidelity','game-form-fit','controls-and-discoverability','visual-and-audio-presentation','challenge-and-agency','playability-and-recovery',
   'feedback-and-payoff','child-appropriate-accessibility','learning-boundary','isolation-and-performance'
 ] as const;
 export interface GameQualityReview {
