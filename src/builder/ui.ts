@@ -86,7 +86,7 @@ export async function initBuilder(){
   '<p>Keep your parent passphrase private. The first trusted device establishes it; future devices use the same passphrase and a new one-use invitation.</p>'+
   '<button class="btn primary" type="submit">Trust this family device</button></form>'+
   '<div id="builderTrustedControls" hidden><p id="builderDeviceSummary"></p>'+
-  '<button type="button" class="btn secondary" id="builderDisconnect">Disconnect this device</button>'+
+  '<button type="button" class="btn secondary" id="builderDisconnect" hidden>Disconnect this device</button>'+
   '<form id="builderParentUnlock"><label for="builderParentUnlockPassphrase">Parent passphrase</label>'+
   '<input id="builderParentUnlockPassphrase" type="password" autocomplete="current-password" minlength="12" maxlength="128" required>'+
   '<button type="submit" class="btn secondary">Manage family devices</button></form>'+
@@ -98,12 +98,14 @@ export async function initBuilder(){
   try{
    const state=await client.api('/v1/sessions/status');
    const trusted=!!state.trusted;
+   $<HTMLButtonElement>('builderDisconnect').hidden=true;
    $<HTMLFormElement>('builderConnectForm').hidden=trusted;
    $('builderTrustedControls').hidden=!trusted;
    $('builderDeviceSummary').textContent=trusted?'Trusted on '+(state.deviceName||'this device')+'. Connection renews automatically while this device remains trusted.':'';
    $('connectionStatus').textContent=trusted?'This family device is connected.':'A grown-up needs to trust this device once.';
    return trusted;
   }catch{
+   $<HTMLButtonElement>('builderDisconnect').hidden=true;
    $<HTMLFormElement>('builderConnectForm').hidden=false;
    $('builderTrustedControls').hidden=true;
    $('connectionStatus').textContent='No active family workshop session on this browser. Your local games and progress are safe.';
@@ -129,6 +131,7 @@ export async function initBuilder(){
   }
   if(!result.devices.length)target.append(Object.assign(document.createElement('p'),{textContent:'No active devices.'}));
   $<HTMLButtonElement>('builderIssueInvite').hidden=false;
+  $<HTMLButtonElement>('builderDisconnect').hidden=false;
  }
  $('builderIssueInvite').onclick=()=>{
   void (async()=>{
@@ -196,12 +199,14 @@ export async function initBuilder(){
   if((event as CustomEvent<string>).detail==='parent'){void connectionStatus();return;}
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
+  $<HTMLButtonElement>('builderDisconnect').hidden=true;
   for(const id of ['builderInvite','builderParentPassphrase','builderParentUnlockPassphrase'])
    $<HTMLInputElement>(id).value='';
  });
  window.addEventListener('factory-profile',()=>{
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
+  $<HTMLButtonElement>('builderDisconnect').hidden=true;
   for(const id of ['builderInvite','builderParentPassphrase','builderParentUnlockPassphrase'])
    $<HTMLInputElement>(id).value='';
  });
