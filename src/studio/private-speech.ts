@@ -61,7 +61,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
    approved=false;h.button.hidden=true;h.onAvailability?.(false);return;
   }
   try{
-   const access=await h.available(AbortSignal.any([controller.signal,AbortSignal.timeout(5000)]));
+   const access=await h.available(AbortSignal.any([controller.signal,AbortSignal.timeout(12000)]));
    if(at!==seq||h.scope()!==scope||!h.canListen())return;
    approved=access===true;allowedScope=scope;allowUntil=Date.now()+30000;
    h.button.hidden=!approved||!mime();h.onAvailability?.(!h.button.hidden);
@@ -82,7 +82,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
   try{
    // Cached UI visibility is not authorization. Check the live family scope
    // immediately before requesting microphone access; revocation must win.
-   const fresh=await h.available(AbortSignal.timeout(5000));
+   const fresh=await h.available(AbortSignal.timeout(12000));
    if(current!==seq||scope!==h.scope()||!h.canListen())return;
    if(fresh!==true){
     approved=false;h.button.hidden=true;h.onAvailability?.(false);
