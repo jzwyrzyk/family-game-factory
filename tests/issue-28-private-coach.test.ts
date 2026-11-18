@@ -45,6 +45,16 @@ const bridge=new PrivateCoachBridge(origin,async audience=>{identityCalls++;asse
 const result=await bridge.complete(context,new AbortController().signal);
 assert.deepEqual(result,{reply,usedMicroUsd:18});
 assert.equal(privateCalls,1);assert.equal(identityCalls,1);
+const probeBridge=new PrivateCoachBridge(origin,async()=> 'signed-fixture-token',async(url,init)=>{
+ assert.equal(url,origin+'/v1/private-coach/status');
+ assert.equal(init?.method,'GET');
+ assert.equal(init?.body,undefined,'readiness never transmits a child prompt');
+ return new Response(JSON.stringify({available:true,mode:'model'}),{status:200});
+});
+assert.equal(await probeBridge.readiness(new AbortController().signal),true);
+const offlineProbe=new PrivateCoachBridge(origin,async()=> 'signed-fixture-token',
+ async()=>new Response(JSON.stringify({errorCode:'FORBIDDEN'}),{status:403}));
+assert.equal(await offlineProbe.readiness(new AbortController().signal),false);
 const tokenFn=metadataIdentityToken(async(input,init)=>{
  assert.match(String(input),/metadata.google.internal\/computeMetadata/);
  assert.match(String(input),/audience=https%3A%2F%2Ffactory-coach-private-demo-uc.a.run.app/);
@@ -72,6 +82,13 @@ const base='http://127.0.0.1:'+(server.address() as any).port;
 const headers={'Content-Type':'application/json','X-Factory-Request':'1',Authorization:'Bearer '+proof};
 const post=(body:unknown,h:any=headers)=>fetch(base+'/v1/private-coach/complete',{method:'POST',headers:h,body:JSON.stringify(body)});
 try{
+ const ready=await fetch(base+'/v1/private-coach/status',{method:'GET',headers:{
+  Authorization:'Bearer '+proof,'X-Factory-Request':'1'}});
+ assert.equal(ready.status,200);assert.deepEqual(await ready.json(),{available:true,mode:'model'});
+ assert.equal(providerCalls,0,'readiness never invokes the model');
+ const deniedProbe=await fetch(base+'/v1/private-coach/status',{method:'GET',headers:{
+  Authorization:'Bearer '+'z'.repeat(80),'X-Factory-Request':'1'}});
+ assert.equal(deniedProbe.status,403);
  const fail=await post({version:1,context},{...headers,Authorization:'Bearer '+'z'.repeat(80)});
  assert.equal(fail.status,403);assert.equal(providerCalls,0);
  const browser=await post({version:1,context},{...headers,Origin:'https://untrusted.example'});
