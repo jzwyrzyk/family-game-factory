@@ -5,7 +5,7 @@ export type BuildView = {status:'queued'|'building'|'testing'|'ready'|'failed'|'
 export function coachConnectionCopy(state:CoachConnection):string {
  const copy:Record<CoachConnection,string>={
   checking:'Checking if jems can chat…',
-  available:'AI conversation is available · no game is building',
+  available:'jems can try live chat · no game is building',
   connected:'jems is chatting with you · no build started',
   limited:'Limited conversation · AI coach could not respond',
   'sign-in':'Conversation needs a grown-up to reconnect',
@@ -16,7 +16,7 @@ export function coachConnectionCopy(state:CoachConnection):string {
 export function builderReadinessCopy(state:BuilderReadiness):string {
  const copy:Record<BuilderReadiness,string>={
   checking:'Checking the game workshop…',
-  available:'The workshop is ready to accept a request',
+  available:'Workshop settings allow trying a build · nothing has started',
   'not-configured':'Game building is not connected here',
   'sign-in':'Game workshop needs a grown-up to reconnect',
   'allowance-required':'Game building is paused for this family',
