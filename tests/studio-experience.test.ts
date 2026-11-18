@@ -3,6 +3,7 @@ import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,canCompareExperime
 assert.match(coachConnectionCopy('unavailable'),/not connected/);
 assert.match(coachConnectionCopy('available'),/no game is building/);
 assert.match(builderReadinessCopy('allowance-required'),/paused/);
+assert.match(builderReadinessCopy('unverified'),/not been verified/);
 assert.match(buildErrorCopy('SPENDING_CUTOFF'),/allowance/);
 assert.match(buildErrorCopy('UNAUTHENTICATED'),/reconnect/);
 assert.match(buildProgressCopy(undefined,true)!.description,/No build is confirmed yet/);
