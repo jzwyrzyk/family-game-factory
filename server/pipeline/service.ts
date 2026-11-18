@@ -3,6 +3,7 @@ import {privateGenerationPreflight} from '../quality/private-generation-prefligh
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract,type FunctionalGameContract} from '../quality/functional-game-contract';
+import {safeRepairDiagnostic,safeFinalRepairCode} from '../quality/repair-diagnostics';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
@@ -100,8 +101,10 @@ export class JobService {
       throw Error('INTENT_ATTESTATION_REQUIRED');
      break;
     }catch(error){
-     if(!isGeneratedGame(game)||!this.agent.repair||attempt>=maximum||controller.signal.aborted)throw error;
-     previous=game;diagnostics=String((error as Error).message).slice(0,1500);
+     if(!isGeneratedGame(game)||!this.agent.repair||controller.signal.aborted)throw error;
+     if(attempt>=maximum)throw Error(safeFinalRepairCode((error as Error).message,independentIntentPlan));
+     previous=game;
+     diagnostics=safeRepairDiagnostic((error as Error).message,independentIntentPlan).feedback;
     }
    }
    if(!testedGame)throw Error('REPAIR_EXHAUSTED');
