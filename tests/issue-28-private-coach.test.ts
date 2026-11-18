@@ -115,7 +115,7 @@ try{
  const repository=new MemoryRepository(),family='family-synthetic';
  const designer={subject:'designer-fixture',familyId:family,role:'designer' as const,expiresAt:Date.now()+60000};
  const parent={...designer,role:'parent' as const};
- await repository.transaction(state=>{state.ledgers[family]={month:new Date().toISOString().slice(0,7),allowance:50000,reserved:0,used:0,paidEnabled:true};return true;});
+ await repository.transaction(state=>{state.ledgers[family]={month:new Date().toISOString().slice(0,7),allowance:50000,reserved:0,used:0,paidEnabled:true};state.coachConsent=[{familyId:family,guardianSubject:'synthetic-parent',confirmedAt:Date.now(),expiresAt:Date.now()+3600000,policyVersion:'owner-pilot-1',model:true,audio:false,verificationReceipt:'fixture_verified_consent_123'}];return true;});
  const metered=new CoachService(repository,config,{complete:async()=>({reply,usedMicroUsd:22})});
  await metered.respond(designer,{requestId:'turn-first',context});
  await repository.transaction(state=>{state.coachReceipts![0].at=Date.now()-COACH_RECEIPT_TTL_MS-10;return true;});
