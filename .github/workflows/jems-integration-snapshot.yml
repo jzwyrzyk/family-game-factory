@@ -1,4 +1,4 @@
-name: Jems integration source snapshot
+name: Jems integration dependency snapshot
 on:
   push:
     branches: [feature/jems-final-integration-20261118]
@@ -11,21 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           persist-credentials: false
-      - name: Package source for local integration, no code execution
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p packages
-          git archive --format=zip -o packages/final-branch.zip HEAD
-          for entry in 'parent:feat/jems-parent-insights-header-20261117' 'gum:feat/jems-gum-sticker-world-20261117' 'coach:feature/issue-28-private-coach-inference'; do
-            name="${entry%%:*}"; target="${entry#*:}"
-            git fetch --no-tags origin "refs/heads/$target"
-            git archive --format=zip -o "packages/$name.zip" FETCH_HEAD
-          done
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Package pinned dependencies for review, no game execution
+        run: tar czf review-dependencies.tar.gz node_modules
       - uses: actions/upload-artifact@v4
         with:
-          name: jems-source-integration
-          path: packages/*.zip
+          name: jems-dependencies-review
+          path: review-dependencies.tar.gz
           retention-days: 1
