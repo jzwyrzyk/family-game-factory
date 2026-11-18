@@ -5,6 +5,7 @@ import {test} from 'node:test';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {trustedDeviceHandler,verifyBrowserSession} from '../server/trusted-devices';
 import {apiHandler} from '../server/pipeline/http';
+import {mintDeviceInvitation} from '../server/device-owner';
 import {signSession} from '../server/pipeline/auth';
 import type {JobService} from '../server/pipeline/service';
 
@@ -114,4 +115,15 @@ test('trusted device: idle and absolute expiry, legacy compatibility, parent loc
   await handlerOther({method:'GET',url:'/v1/sessions/status',headers:{origin,cookie:'factory_session='+legacy}} as any,response);
   assert.equal(response.status,401);
  });
+});
+
+test('owner invitation issuance does not reset spending allowance or paid execution',async()=>{
+ const repo=new MemoryRepository();
+ await repo.transaction(s=>{s.ledgers[familyId]={allowance:5000000,used:200000,reserved:100000,paidEnabled:true,month:'2026-11'};return true;});
+ const before=(await repo.snapshot()).ledgers[familyId];
+ const token=await mintDeviceInvitation(repo,familyId);
+ const after=await repo.snapshot();
+ assert.deepEqual(after.ledgers[familyId],before);
+ assert.equal(after.invitations?.[0].hash,createHash('sha256').update(token).digest('hex'));
+ assert.ok(!JSON.stringify(after).includes(token),'no plaintext invitation stored');
 });
