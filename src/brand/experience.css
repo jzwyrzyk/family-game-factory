@@ -156,3 +156,45 @@
   border:2px solid #BFA7F5;min-width:0
  }
 }
+
+/* First-screen discipline: the child should see the input and send affordance
+   immediately, especially on a phone. The onboarding hero replaces a verbose
+   duplicate helper message; its original text remains in the saved notebook. */
+.studio-review #page-studio.studio-creating .studio-intro-message{display:none!important}
+.studio-review #page-studio.studio-idea-unstarted #studioMessages{display:none!important}
+.studio-review #page-studio.studio-creating .studio-topbar{display:none!important}
+.studio-review #page-studio.studio-creating .design-controls{
+ background:transparent;border:0;box-shadow:none;padding:1px 0 0;margin:5px 0 0;
+ min-height:0
+}
+.studio-review #page-studio.studio-idea-unstarted .design-controls{display:none!important}
+.studio-review #page-studio.studio-creating #coachModeStatus{display:none!important}
+.studio-review #page-studio.studio-idea-started .studio-creation-hero{padding:13px 19px}
+.studio-review #page-studio.studio-idea-started .studio-creation-hero img{width:95px;height:77px}
+.studio-review #page-studio.studio-idea-started .studio-creation-hero h2{font-size:24px}
+.studio-review #page-studio.studio-creating .studio-prompt #studioPromptLabel:focus{outline:0}
+@media(max-width:760px){
+ .studio-review #page-studio.studio-creating .studio-creation-hero{
+  flex-direction:row;text-align:left;justify-content:flex-start;
+  align-items:center;gap:11px;padding:12px 14px
+ }
+ .studio-review #page-studio.studio-creating .studio-creation-hero img{
+  width:62px;height:62px;flex:none
+ }
+ .studio-review #page-studio.studio-creating .studio-creation-kicker{display:none}
+ .studio-review #page-studio.studio-creating .studio-creation-hero h2{
+  font-size:21px;line-height:1.2;letter-spacing:-.35px;margin:0 0 4px
+ }
+ .studio-review #page-studio.studio-creating .studio-creation-hero p{
+  font-size:12px;line-height:1.4
+ }
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero{padding:10px 14px}
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero img{width:48px;height:48px}
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero h2{font-size:20px}
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero p{display:none}
+ .studio-review #page-studio.studio-creating #studioMessages{
+  height:auto;min-height:0;max-height:190px;padding:9px 13px
+ }
+ .studio-review #page-studio.studio-creating .studio-prompt{margin:9px;padding:12px}
+ .studio-review #page-studio.studio-creating .studio-prompt textarea{min-height:84px}
+}
