@@ -64,8 +64,10 @@ test('O5 private test claim binds source-verified plan and refuses a false inten
   candidate:{format:'generated-source-v1',game:stickerLaunchFixture},usageUnits:1
  });
  const task=await coordinator.claim(job.jobId,0,'test',testing);
+ assert.ok('game' in task,'claim must return the test-stage game, not generate-stage input');
+ if(!('game' in task))throw Error('INTENT_WRONG_STAGE');
  assert.deepEqual(task.independentIntentPlan,spec);
- assert.equal(task.game.source,stickerLaunchFixture.source);
+ assert.deepEqual(task.game,stickerLaunchFixture);
  await assert.rejects(coordinator.report(job.jobId,0,'test',testing,{
   ok:true,game:{...stickerLaunchFixture,compiled:{
    code:'fake',sourceHash:'fake',codeHash:'fake',
