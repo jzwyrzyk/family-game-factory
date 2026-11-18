@@ -231,8 +231,7 @@ export default class StickerBuilder implements GameInstance {
  }
  resume(){
   if(this.disposed||!this.paused)return;
-  this.paused=false;this.root.classList.remove('paused');
-  this.render();
+  this.paused=false;this.root.classList.remove('paused');this.root.querySelector('.gum-scene')?.classList.remove('paused');
   if(this.phase==='launch'&&this.remaining>0)this.countdown(this.remaining);
  }
  snapshot(){return {mode:'stickers',mission:this.mission.id,stage:this.phase,stickers:cloned(this.placed),stickersPlaced:Object.keys(this.placed).length,saveFailed:this.saveFailed};}
