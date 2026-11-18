@@ -47,10 +47,14 @@ export class CoachService {
  async eraseFamilyReceipts(session:VerifiedSession):Promise<{erased:number}>{
   if(!session||session.expiresAt<=Date.now()||session.role!=='parent')throw Error('FORBIDDEN');
   return this.repo.transaction(state=>{
-   if((state.coachReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running'))throw Error('COACH_REQUEST_EXISTS');
-   const prior=state.coachReceipts||[];
+   if((state.coachReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running')||
+      (state.audioReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running'))
+    throw Error('COACH_REQUEST_EXISTS');
+   const prior=state.coachReceipts||[],audio=state.audioReceipts||[];
    state.coachReceipts=prior.filter(r=>r.familyId!==session.familyId);
-   return {erased:prior.length-state.coachReceipts.length};
+   state.audioReceipts=audio.filter(r=>r.familyId!==session.familyId);
+   // Aggregate usage/audit accounting is retained without message/audio content.
+   return {erased:prior.length-state.coachReceipts.length+audio.length-state.audioReceipts.length};
   });
  }
  async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'}>{
