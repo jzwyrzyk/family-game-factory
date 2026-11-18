@@ -117,5 +117,29 @@ class ReleaseContractTests(unittest.TestCase):
             self.assertEqual(json.loads(plan.read_text())["status"], "READY_FOR_PAGES_ONLY")
 
 
+    def test_release_workflow_keeps_cloud_mutation_and_provider_secrets_out(self):
+        root = Path(__file__).resolve().parents[2]
+        workflow = (root / ".github/workflows/jems-release.yml").read_text()
+        legacy = (root / ".github/workflows/pages.yml").read_text()
+        self.assertIn("JEMS_AUTODEPLOY_PAGES", workflow)
+        self.assertIn("on:\n  push:", workflow)
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("run: npm test", workflow)
+        self.assertIn("scripts/release/contract.py precheck", workflow)
+        self.assertIn("scripts/release/contract.py verify", workflow)
+        self.assertIn("actions/deploy-pages@v4", workflow)
+        self.assertIn("group: jems-pages-publish", workflow)
+        self.assertIn("group: jems-pages-publish", legacy)
+        # The only production endpoints come from pre-approved repo variables.
+        self.assertIn("vars.JEMS_GATEWAY_ORIGIN", workflow)
+        self.assertIn("vars.JEMS_PREVIEW_ORIGIN", workflow)
+        self.assertNotIn("inputs.gateway_origin", workflow)
+        self.assertNotIn("inputs.preview_origin", workflow)
+        for forbidden in ("FACTORY_OPENAI_API_KEY", "FACTORY_ACTIONS_APPROVED=true",
+                          "gcloud run deploy", "gcloud run services update",
+                          "roles/owner", "secretmanager.versions.access"):
+            self.assertNotIn(forbidden, workflow)
+
+
 if __name__ == "__main__":
     unittest.main()
