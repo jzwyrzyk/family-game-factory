@@ -59,8 +59,8 @@ const {start}=require('./browser-server.cjs');
  }
  // Other plugin manifests drive real engine state, not cosmetic labels.
  const pluginPage=await browser.newPage(),pluginErrors=[];pluginPage.on('pageerror',error=>pluginErrors.push(error.message));await pluginPage.clock.install({time:new Date('2026-11-16T08:00:00Z')});await pluginPage.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);await pluginPage.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await pluginPage.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();
- for(const [game,prompt,key,expected] of [['gum','Give me six gum sticks','gumRemaining',6],['dragon','Give the island 120 resilience','islandHP',120]]){
-  await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}if(game==='gum'){const s=await pluginPage.evaluate(()=>FG.runtime.snapshot());assert.equal(s.config.gumBudget,6);assert.equal(s.state.gumRemaining,6-s.state.joints.length);}else assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
+ for(const [game,prompt,key,expected] of [['gum','Give me 2 extra stickers','stickersPlaced',0],['dragon','Give the island 120 resilience','islandHP',120]]){
+  await pluginPage.selectOption('#liveGame',game);await pluginPage.click('#newLiveGame');await pluginPage.fill('#livePrompt',prompt);await pluginPage.click('#livePromptForm button[type=submit]');if(game==='dragon'){await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await pluginPage.locator('#startBtn').click();}if(game==='gum'){const s=await pluginPage.evaluate(()=>FG.runtime.snapshot());assert.equal(s.config.qualityVersion,2);assert.equal(s.config.extraDecoys,2);assert.equal(s.state.stickersPlaced,0);assert.equal(await pluginPage.locator('.gum-sticker').count(),8);}else assert.equal(await pluginPage.evaluate(k=>FG.runtime.snapshot().state[k],key),expected);await pluginPage.click('#returnLive');
  }
  // Pause while no game is active before manually advancing time. In Playwright
  // 1.56.1, a pending realtime tick can otherwise undo a fastForward advancement.
@@ -73,7 +73,7 @@ const {start}=require('./browser-server.cjs');
   const profile=FG.store.current(),overlay=document.getElementById('stage-overlay'),now=Date.now(),mathWindow=[...(profile.mathWindow||[])];
   return {now,rate:profile.rate,mathWindow,elapsedSinceLast:mathWindow.length?now-mathWindow.at(-1):null,
    eligible:FG.math.canAsk(profile),active:FG.learning.active,activeAttemptId:FG.learning.activeAttemptId,
-   native:FG.runtime.snapshot(),pageVisibility:document.visibilityState,overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
+   native:FG.runtime.snapshot(),overlayHidden:overlay.classList.contains('hidden'),overlayText:overlay.textContent.slice(0,600),
    attempts:(profile.learning?.attempts||[]).slice(-4).map(attempt=>({id:attempt.id,outcome:attempt.outcome,answers:attempt.answers.length,correct:attempt.correct,independent:attempt.independent}))};
  });
  const advanceNativeBudget=async()=>{
@@ -94,18 +94,17 @@ const {start}=require('./browser-server.cjs');
    await pluginPage.locator('#go').click();
   }
   assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'play');
-  // The original game advances suspense/drop on requestAnimationFrame with capped
-  // simulation dt. A background Chromium tab can throttle rAF, so foreground it
-  // and advance the *real game clock* in bounded steps instead of passively
-  // timing out while the simulated clock is frozen.
-  await pluginPage.bringToFront();
   await pluginPage.locator('#go').click();
-  for(let frameBatch=0;frameBatch<20;frameBatch++){
-   if(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode==='result'))break;
+  // The restored native Splash uses requestAnimationFrame with capped frame
+  // deltas. A single 3.5s fake-clock jump need not simulate 3.5s of frames,
+  // especially when CI is busy. Advance bounded frames until the real game
+  // reaches its result; never mutate its state or bypass the math checkpoint.
+  let reached=false;
+  for(let step=0;step<32;step++){
    await pluginPage.clock.runFor(500);
+   if(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode==='result')){reached=true;break;}
   }
-  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'result',
-   `${label} original native game did not finish after bounded animation frames: ${JSON.stringify({...await checkpointState(),pluginErrors})}`);
+  assert.equal(reached,true,`${label}: native Splash must reach its result through actual animation frames: ${JSON.stringify({...await checkpointState(),pluginErrors})}`);
   const before=await checkpointState();
   console.log(`[native-checkpoint:${label}]`,JSON.stringify({now:before.now,rate:before.rate,elapsedSinceLast:before.elapsedSinceLast,eligible:before.eligible,active:before.active,mode:before.native.state.mode,attempts:before.attempts,pluginErrors}));
   assert.equal(before.eligible,true,`${label} must respect the shared pacing policy: ${JSON.stringify({...before,pluginErrors})}`);
@@ -162,7 +161,7 @@ const {start}=require('./browser-server.cjs');
   if(activity.querySelector('.math-feedback').dataset.state!=='correct')throw Error('The UI must accept the answer before navigation');
   FG.app.openGame('gum');
  });
- await pluginPage.clock.runFor(700);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.equal(await pluginPage.locator('#game-mount').evaluate(node=>node.inert),false,'A new game must not retain the previous math overlay’s input lock');assert.ok(await pluginPage.locator('.builder-piece').count());
+ await pluginPage.clock.runFor(700);assert.equal(await pluginPage.locator('#stage-overlay').isVisible(),false);assert.equal(await pluginPage.locator('#game-mount').evaluate(node=>node.inert),false,'A new game must not retain the previous math overlay’s input lock');assert.ok(await pluginPage.locator('.gum-sticker').count(),'sticker controls recover after mandatory math');
  assert.deepEqual(pluginErrors,[]);await pluginPage.close();
  // Legacy workspace migration in browser; failed/corrupt load never replaces stored source.
  const page=await browser.newPage();await page.addInitScript(()=>{localStorage.setItem('family-game-factory-workspace-v2',JSON.stringify({version:1,games:[{id:'old-game',owner:'player1',game:'buckets',name:'Migrated Splash',config:{bucketCount:2,revealSafe:true,splashMs:400}}]}))});await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'🎛️ Remix',exact:true}).click();assert.match(await page.textContent('#liveName'),/Migrated Splash/);await page.click('#livePlay');assert.equal((await page.evaluate(()=>FG.runtime.snapshot())).state.bucketCount,2);await page.close();

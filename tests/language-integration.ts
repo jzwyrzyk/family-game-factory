@@ -15,7 +15,8 @@ const errorsFor=(page:Page)=>{const errors:string[]=[];page.on('pageerror',error
 async function answer(page:Page){
   const question=await page.evaluate(()=>window.FG.learning.activeItem);
   if(question.kind==='choice'){
-    await active(page).locator('.language-choice').filter({hasText:question.answer}).first().click();
+    // Exact answer text matters: substring matching can select an unrelated choice.
+    await active(page).getByRole('button',{name:question.answer,exact:true}).click();
     await page.waitForFunction(()=>!window.FG.learning.active);
     return;
   }

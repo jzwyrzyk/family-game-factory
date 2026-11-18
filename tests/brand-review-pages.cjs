@@ -40,7 +40,7 @@ async function pages(device,viewport){
   await shot(p,device,'02-first-idea-celebration');
   // New invention deliberately hides old-game tools; compare versions from a playable game.
   await home(p);await p.locator('[data-starter="gum"]').click();
-  await p.locator('.quality-builder').waitFor({state:'visible'});
+  await p.locator('.gum-play').waitFor({state:'visible'});
   if(device==='mobile')await p.locator('[data-studio-tab="versions"]').click();
   else {await p.locator('#studioMore summary').click();await p.locator('#studioCompare').click();}
   await p.locator('#studioVersions').waitFor({state:'visible'});await shot(p,device,'03-versions-and-tests');

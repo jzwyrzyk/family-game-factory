@@ -33,7 +33,7 @@ const {chromium}=require('playwright');
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);
     await page.waitForFunction(()=>window.FG?.app);
     await assertTouch('after navigation');
-    await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.app.openGame('gum')});
+    await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.app.openGame('gum',{config:{qualityVersion:1,gravity:10,thrust:1,originalRules:true,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}})});
     const root=page.locator('.quality-builder'),button=name=>root.getByRole('button',{name,exact:true}),canvas=root.locator('.q-canvas');
     await root.waitFor();await touch(button('Start fresh'));await touch(button('Add Bottle'));await touch(button('Add Cardboard box'));
     let state=await page.evaluate(()=>FG.runtime.snapshot().state);

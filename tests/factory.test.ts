@@ -8,6 +8,7 @@ import { DesignCoach } from '../src/factory/coach';
 import { createLifecycle } from '../src/runtime/lifecycle';
 import { manifests } from '../src/runtime/manifests';
 import type { GamePlugin, GameContext, PlayOutcome } from '../src/runtime/types';
+const physicsGum=()=>({...defaults('gum'),qualityVersion:1});
 const memory=()=>{const values=new Map<string,string>();return {getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{values.set(key,value);}};};
 const outcome:PlayOutcome={game:'buckets',won:true,level:1,title:'Stayed dry',description:'One safe choice',durationMs:900,at:'2026-11-15T00:00:00Z',config:defaults('buckets')};
 test('manifest types, ranges, steps and unknown keys fail closed; presets preserve originals',()=>{
@@ -19,16 +20,16 @@ test('honest interpreter accepts bounded child language, rejects mixed/novel ins
  const intent=interpret('buckets',defaults('buckets'),'Please give me four buckets!');assert.equal(intent.kind,'supported');if(intent.kind==='supported')assert.equal(intent.config.bucketCount,4);
  for(const text of ['Give me four buckets and add a flying dragon','Run this JavaScript: alert(1)','Build a skateboard racing game','Change math difficulty'])assert.equal(interpret('buckets',defaults('buckets'),text).kind,'generation-needed');
  assert.equal(interpret('buckets',defaults('buckets'),'Give me 99 buckets').kind,'invalid');assert.equal(interpret('buckets',defaults('buckets'),'Give me three buckets').kind,'unchanged');
- assert.equal(interpret('gum',defaults('gum'),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
+ assert.equal(interpret('gum',physicsGum(),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
 });
 test('six native game manifests and transactional composed changes stay bounded',()=>{
  assert.equal(Object.keys(manifests).length,6);
  assert.equal(defaults('moon').donutGoal,6);assert.equal(defaults('robot','gentle').robotSpeed,.75);
  assert.throws(()=>validateConfig('moon',{...defaults('moon'),meteorRate:5}));
  assert.throws(()=>validateConfig('robot',{...defaults('robot'),script:true}));
- const composed=interpret('gum',defaults('gum'),'Give me 15 gum sticks and make fan stronger');
+ const composed=interpret('gum',physicsGum(),'Give me 15 gum sticks and make fan stronger');
  assert.equal(composed.kind,'supported');if(composed.kind==='supported'){assert.equal(composed.config.gumBudget,15);assert.equal(composed.config.thrust,1.1);}
- const atomic=interpret('gum',defaults('gum'),'Give me 15 gum sticks and make a new universe');
+ const atomic=interpret('gum',physicsGum(),'Give me 15 gum sticks and make a new universe');
  assert.equal(atomic.kind,'generation-needed');
  const moon=interpret('moon',defaults('moon'),'Make meteors slower and make moon gravity lower');
  assert.equal(moon.kind,'supported');if(moon.kind==='supported'){assert.equal(moon.config.meteorRate,.75);assert.equal(moon.config.moonGravity,.5);}

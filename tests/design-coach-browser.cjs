@@ -23,6 +23,14 @@ async function load(page,url,saved={}){
   const gameTool=async id=>{if(!await page.locator('#studioMore').evaluate(el=>el.open))await page.locator('#studioMore > summary').click();await page.click(id);};
   const chooseProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(el=>el.open))await page.locator('#studioProfileMenu > summary').click();await page.locator('.profile-choice').nth(index).click();};
   const session=()=>page.evaluate(()=>FG.studio.exportNotebook().sessions.at(-1));const projects=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects);
+  await page.click('[data-starter="gum"]');
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',workspace=JSON.parse(localStorage.getItem(key));
+    const project=workspace?.projects.find(p=>p.game==='gum'),revision=workspace?.revisions.find(r=>r.id===project?.headId);
+    if(!revision)throw Error('Missing physics fixture project');
+    revision.config.qualityVersion=1;localStorage.setItem(key,JSON.stringify(workspace));
+  });
+  await page.reload();await page.waitForFunction(()=>window.FG?.studio);
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');assert.equal(await page.locator('#studioPrompt').isVisible(),false,'play-first hides design tools');
   await page.click('#studioHome');await page.click('[data-starter="gum"]');assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();const baseline=(await projects())[0].headId;
