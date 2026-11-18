@@ -1,4 +1,5 @@
 import {createHash,randomUUID} from 'node:crypto';
+import {allowedCoachFamily} from './consent';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
 import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
@@ -29,11 +30,15 @@ export class CoachService {
   * no-inference probe before the UI claims it is reachable. Fixture providers
   * without a probe preserve existing contract tests, never production claims.
   */
- async ready():Promise<boolean>{
-  if(!this.available())return false;
-  if(!this.provider?.readiness)return true;
-  try{return await this.provider.readiness(AbortSignal.timeout(3000));}
-  catch{return false;}
+ async ready(session?:VerifiedSession):Promise<boolean>{
+  if(!this.available()||!session||session.expiresAt<=Date.now())return false;
+  try{
+   const state=await this.repo.snapshot(),ledger=state.ledgers[session.familyId];
+   const month=new Date().toISOString().slice(0,7);
+   if(!allowedCoachFamily(state,session,'model')||!ledger?.paidEnabled||ledger.month!==month||
+    ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)return false;
+   return this.provider?.readiness?await this.provider.readiness(AbortSignal.timeout(3000)):true;
+  }catch{return false;}
  }
  /** Parent-authenticated erasure of completed coach content. Usage and security
   * audit totals remain for accounting; no child utterances are stored there.
@@ -58,6 +63,7 @@ export class CoachService {
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
   const hash=createHash('sha256').update(serialized).digest('hex'),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
   const reservation=await this.repo.transaction(state=>{
+   if(!allowedCoachFamily(state,session,'model',now))throw Error('COACH_UNAVAILABLE');
    state.coachReceipts=(state.coachReceipts||[]).filter(r=>r.state==='running'||r.at>=now-COACH_RECEIPT_TTL_MS);
    const list=state.coachReceipts;
    const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject);
@@ -74,6 +80,7 @@ export class CoachService {
    const result=await this.provider!.complete(context,AbortSignal.timeout(25000));
    if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0||result.usedMicroUsd>this.config.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
    usage=result.usedMicroUsd;reply=validateCoachReply(result.reply,context);
+   if(!allowedCoachFamily(await this.repo.snapshot(),session,'model'))throw Error('COACH_UNAVAILABLE');
    return {reply,mode:'model'};
   }finally{
    await this.repo.transaction(state=>{const r=state.coachReceipts!.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject)!;const ledger=state.ledgers[session.familyId];if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=usage;}r.state=reply?'ready':'failed';if(reply)r.reply=reply;state.audit.push({jobId:'coach-'+randomUUID(),familyId:session.familyId,status:reply?'ready':'failed',at:new Date().toISOString(),code:'COACH_TURN'});return true;});
