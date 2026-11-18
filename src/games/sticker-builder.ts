@@ -22,7 +22,11 @@ const STICKERS:Sticker[]=[
  {id:'flower',name:'Happy flower',shape:'<g fill="#c09fff" stroke="#7553cc" stroke-width="2"><ellipse cx="48" cy="28" rx="13" ry="17"/><ellipse cx="48" cy="68" rx="13" ry="17"/><ellipse cx="28" cy="48" rx="17" ry="13"/><ellipse cx="68" cy="48" rx="17" ry="13"/></g><circle cx="48" cy="48" r="18" fill="#ffcf55" stroke="#d78d2d" stroke-width="3"/><path d="M39 50q9 11 18 0" fill="none" stroke="#4e3f65" stroke-width="3" stroke-linecap="round"/>'},
  {id:'bubble',name:'Mega bubble',shape:'<circle cx="46" cy="45" r="30" fill="#8ee8f8" stroke="#3f99c6" stroke-width="4"/><ellipse cx="34" cy="31" rx="11" ry="6" transform="rotate(-30 34 31)" fill="#fff" opacity=".85"/><circle cx="73" cy="74" r="9" fill="#d0b3fa" stroke="#8964de" stroke-width="2"/>'},
  {id:'rainbow',name:'Rainbow zoom',shape:'<path d="M19 64a29 29 0 0 1 58 0" fill="none" stroke="#ff729f" stroke-width="10"/><path d="M27 64a21 21 0 0 1 42 0" fill="none" stroke="#ffc248" stroke-width="9"/><path d="M35 64a13 13 0 0 1 26 0" fill="none" stroke="#43ccbb" stroke-width="8"/><path d="M43 65a5 5 0 0 1 10 0" fill="none" stroke="#6764df" stroke-width="7"/>'},
- {id:'candy',name:'Candy button',shape:'<path d="M30 34 13 26l-4 21 21 14M66 34l17-8 4 21-21 14" fill="#46cbec" stroke="#1475a9" stroke-width="3"/><rect x="27" y="30" width="42" height="34" rx="17" fill="#ff8bb9" stroke="#d85291" stroke-width="4"/><path d="M38 34 57 60" stroke="#fff" stroke-width="5" stroke-linecap="round"/>'}
+ {id:'candy',name:'Candy button',shape:'<path d="M30 34 13 26l-4 21 21 14M66 34l17-8 4 21-21 14" fill="#46cbec" stroke="#1475a9" stroke-width="3"/><rect x="27" y="30" width="42" height="34" rx="17" fill="#ff8bb9" stroke="#d85291" stroke-width="4"/><path d="M38 34 57 60" stroke="#fff" stroke-width="5" stroke-linecap="round"/>'},
+ {id:'cloud',name:'Cloud puff',shape:'<path d="M24 67Q8 65 12 50q3-14 19-13 0-20 22-20 21 0 24 21 18 1 17 17-1 16-20 16Z" fill="#c5eaff" stroke="#6caad8" stroke-width="4"/><path d="M31 46q4-10 15-10" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>'},
+ {id:'moon',name:'Moon cookie',shape:'<path d="M58 10Q21 23 27 53q7 27 40 26-23 21-48-5-25-31-1-60Q37-6 58 10Z" fill="#ffc85c" stroke="#d48a32" stroke-width="4"/><circle cx="39" cy="40" r="6" fill="#e99b58"/><circle cx="42" cy="62" r="4" fill="#e99b58"/>'},
+ {id:'donut',name:'Donut drive',shape:'<circle cx="48" cy="48" r="30" fill="#d49b61" stroke="#a9655c" stroke-width="4"/><path d="M19 46q-2-30 30-28 34 2 29 34-4 13-12 19-1-15-15-14-14-1-16 16-13-7-16-27Z" fill="#ff89bb"/><circle cx="48" cy="48" r="12" fill="#fff" stroke="#bb7a6b" stroke-width="4"/><g stroke-width="4" stroke-linecap="round"><path d="M29 37l7 5" stroke="#fff"/><path d="M62 34l7 4" stroke="#73d6e0"/><path d="M60 66l6-3" stroke="#ffe06b"/></g>'},
+ {id:'wheel',name:'Bubble wheel',shape:'<circle cx="48" cy="48" r="30" fill="#5e66c4" stroke="#343f91" stroke-width="5"/><circle cx="48" cy="48" r="19" fill="#c7bbff" stroke="#a98adf" stroke-width="4"/><circle cx="48" cy="48" r="9" fill="#ffe091" stroke="#c49742" stroke-width="4"/><path d="M48 30v8M66 48h-8M48 66v-8M30 48h8" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'}
 ];
 const base=(svg:string)=>'<svg class="gum-machine-svg" viewBox="0 0 620 420" focusable="false" aria-hidden="true"><defs><linearGradient id="gumShine" x1="0" x2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#c7f0ff"/><stop offset="1" stop-color="#97b8ff"/></linearGradient></defs>'+svg+'</svg>';
 const MISSIONS:Mission[]=[
@@ -183,7 +187,7 @@ export default class StickerBuilder implements GameInstance {
   const side=make('div','gum-tray');
   side.append(make('h3','','🎨 Pick your stickers'));
   const chooser=make('div','gum-stickers');chooser.setAttribute('role','group');chooser.setAttribute('aria-label','Choose a sticker to stick on your invention');
-  const extra=Math.min(2,Number(this.context.config.extraDecoys)||0);
+  const extra=Math.min(6,Number(this.context.config.extraDecoys)||0);
   for(const sticker of STICKERS.slice(0,6+extra)){
     const b=this.button('','gum-sticker'+(this.selected===sticker.id?' picked':''),()=>{
       if(this.ignoreClick)return;this.select(sticker.id);
