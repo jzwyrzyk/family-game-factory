@@ -122,6 +122,11 @@ export async function installStudio(){
  const profileBar=document.querySelector('.profile-bar') as HTMLElement,profileChoices=$('profile-choices');
  const profileMenu=document.createElement('details');profileMenu.id='studioProfileMenu';profileMenu.className='studio-profile-menu';
  const profileSummary=document.createElement('summary');profileSummary.id='studioProfileSummary';profileMenu.append(profileSummary,profileChoices);profileBar.replaceChildren(profileMenu);
+ // Close the chooser on selection even if a storage fault refuses the switch.
+ // An open menu must never obscure My Games or other child navigation.
+ profileChoices.addEventListener('click',event=>{
+  if((event.target as HTMLElement).closest('.profile-choice'))profileMenu.open=false;
+ },true);
  const headerTools=el('div','studio-header-tools');
  headerTools.append(learningChoice,profileBar);
  document.querySelector('.site-header')!.append(headerTools);

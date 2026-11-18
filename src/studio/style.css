@@ -442,3 +442,9 @@ body.studio-review > .factory-update-notice{color:#394862}
 /* Keep the resume action separate from its dismiss control on large screens. */
 .studio-review .studio-continue #studioContinuePlaying{margin-right:48px}
 @media(max-width:650px){.studio-review .studio-continue #studioContinuePlaying{margin-right:0}}
+
+/* Mobile navigation acceptance: the player menu cannot cover the nav row. */
+.studio-review .site-header .studio-profile-menu>summary{min-height:48px;min-width:44px}
+@media(max-width:650px){
+ .studio-review .site-header .studio-profile-menu[open] .profile-choices{top:calc(100% + 60px)}
+}
