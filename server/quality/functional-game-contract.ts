@@ -170,9 +170,13 @@ export function validateFunctionalGameContract(
       prev=c.after;
       const observations:GameObservation[]=c.observations.map((o:unknown)=>{
         if(!plain(o)||typeof o.kind!=='string')abort('OBSERVATION');
-        if(o.kind==='visible'||o.kind==='hidden'){
+        if(o.kind==='visible'){
           if(!only(o,['kind','key'])||typeof o.key!=='string'||!KEY.test(o.key))abort('OBSERVATION');
-          return {kind:o.kind,key:o.key};
+          return {kind:'visible',key:o.key};
+        }
+        if(o.kind==='hidden'){
+          if(!only(o,['kind','key'])||typeof o.key!=='string'||!KEY.test(o.key))abort('OBSERVATION');
+          return {kind:'hidden',key:o.key};
         }
         if(o.kind==='coordinate'){
           if(!only(o,['kind','key','axis','operator','value'])||typeof o.key!=='string'||
