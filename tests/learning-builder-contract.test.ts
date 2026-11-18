@@ -81,12 +81,13 @@ async function uiHarness() {
     requests.push(path);
     let body: any;
     if (path === '/factory-config.json') body = { version: 1, mode: 'remote', apiBaseUrl: 'https://api.example', previewOrigin: 'https://preview.example' };
+    else if (path === '/v1/sessions/status') body = { connected: true, trusted: true, expiresAt: Date.now() + 60_000 };
     else if (path === '/v1/jobs') body = { jobId: 'job-' + ++jobs, status: 'ready', revisionId: nextRevision };
     else if (path.endsWith('/preview')) return { ok: true, json: () => new Promise((resolve,reject) => pending.set(path.split('/')[3], {resolve,reject})) };
     else if (path.endsWith('/fork')) body = { revisionId: 'fork-revision' };
     else if (path === '/v1/creations') body = [];
     else throw Error('Unexpected test request: ' + path);
-    return { ok: true, json: async () => body };
+    return { ok: true, status: 200, json: async () => body };
   };
   const context: any = { window, document, fetch, URL, crypto: { randomUUID }, setTimeout, clearTimeout,
     localStorage: { getItem: (key: string) => saved.get(key) || null, setItem: (key: string, value: string) => saved.set(key, value), removeItem: (key: string) => saved.delete(key) } };
