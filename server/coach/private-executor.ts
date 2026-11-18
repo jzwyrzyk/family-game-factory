@@ -9,10 +9,11 @@ import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {approved,validateCoachContext,type CoachProvider} from './service';
 import {OpenAICoachProvider,type PrivateCoachConfig} from './private-provider';
 import {validateCoachReply} from '../../src/studio/design';
+import {privateCoachOrigin} from './private-bridge';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
 export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
- if(!/^https:\/\/[^/?#]+$/.test(audience)||!/^[a-z0-9-]+@[a-z0-9.-]+\.gserviceaccount\.com$/.test(approvedServiceAccount))
+ if(!/^https:\/\/[^/?#]+$/.test(audience)||approvedServiceAccount!=='factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com')
   throw Error('PRIVATE_COACH_IDENTITY_REQUIRED');
  const googleKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return async(token)=>{
@@ -109,7 +110,7 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
   throw Error('COACH_APPROVAL_REQUIRED');
  const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
  const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
- if(!audience.startsWith('https://factory-coach-private-'))
+ if(privateCoachOrigin(audience)!==audience)
   throw Error('COACH_AUDIENCE_REQUIRED');
  return {config,enabled:true,verifyCaller:googleCallerVerifier(audience,caller),provider:new OpenAICoachProvider(config)};
 }
