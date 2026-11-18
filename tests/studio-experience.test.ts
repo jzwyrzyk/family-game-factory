@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {JobService} from '../server/pipeline/service';
 import {MemoryRepository} from '../server/pipeline/repository';
-import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,canCompareExperiments,coachConnectionCopy} from '../src/studio/experience';
+import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,canCompareExperiments,coachConnectionCopy,conversationDisposition} from '../src/studio/experience';
 assert.match(coachConnectionCopy('unavailable'),/not connected/);
 assert.match(coachConnectionCopy('available'),/no game is building/);
 assert.match(builderReadinessCopy('allowance-required'),/paused/);
@@ -19,6 +19,12 @@ assert.match(buildProgressCopy({status:'failed'},false)!.description,/not comple
 assert.equal(buildProgressCopy(undefined,false,true)!.phase,'uncertain');
 assert.equal(canCompareExperiments(1),false);
 assert.equal(canCompareExperiments(3),true);
+assert.equal(conversationDisposition('I just want to play now!'),'play');
+assert.equal(conversationDisposition('Let me play.'),'play');
+assert.equal(conversationDisposition('No more questions'),'play');
+assert.equal(conversationDisposition('Actually never mind'),'cancel');
+assert.equal(conversationDisposition('The dragon says never mind, then jumps'),'continue');
+assert.equal(conversationDisposition('Make a game where we play on the moon'),'continue');
 async function readiness(){
  const repository=new MemoryRepository(),session={subject:'family-designer',familyId:'family-1',role:'designer' as const,expiresAt:Date.now()+60000};
  const agent={kind:'metered-api' as const,available:true,generate:async()=>{throw Error('fixture must never generate');}};
