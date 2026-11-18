@@ -105,6 +105,17 @@ async function main(){
   assert.equal(button.attrs['aria-pressed'],'false');
   assert.ok(trackStops>=4);
  });
+ await test('explicit cancel while private transcription is pending prevents a late draft',async()=>{
+  (globalThis as any).document.hidden=false;
+  scope='player:game-one';availability=true;captureAllowed=true;
+  await speech.refresh();
+  button.onclick?.();await tick();button.onclick?.();await tick();
+  assert.equal(privateUploads,3);
+  assert.match(button.textContent,/Cancel transcription/);
+  button.onclick?.();await tick();
+  resolveTranscript?.('Late text after explicit Cancel');await tick();
+  assert.equal(drafts.length,1,'late canceled speech must not change the draft');
+ });
  assert.equal(drafts.length,1,'no cross-child audio transcript; no automatic chat turn or build');
  console.log(count+' private voice interaction tests passed; no live microphone or cloud STT was used.');
 }
