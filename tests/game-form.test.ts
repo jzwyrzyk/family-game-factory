@@ -91,7 +91,7 @@ test('O2: explicit true 3D depth is an unsupported requirement, not disguised as
 });
 
 test('O2: negation does not falsely demand physics; contradictory physical asks are reviewed',()=>{
- for(const raw of ['No real physics. Drag stickers onto a rocket.', 'Make a robot with no physics that dances.', 'Make a game without physics where I press a button.']){
+ for(const raw of ['No real physics. Drag stickers onto a rocket.', 'Make a robot with no physics that dances when I tap it.', 'Make a game without physics where I press a button.']){
    const d=choose(raw);
    assert.equal(d.simulation,'rule-driven',raw);
    assert.equal(d.evidence.some(e=>e.signal==='physics-needed'),false,raw);
