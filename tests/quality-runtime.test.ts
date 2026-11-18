@@ -24,7 +24,7 @@ test('quality drawing: interpolation does not mutate authoritative positions',()
   assert.deepEqual(interpolateBody(body,.5),{...body,x:3,y:6,angle:1});assert.equal(body.x,4);
   assert.equal(interpolateBody(body,5).x,4);assert.equal(interpolateBody(body,-1).x,2);
 });
-test('quality compatibility: new workshop is physical; old revisions keep their engine',()=>{
+test('quality compatibility: new workshop uses stickers; old revisions keep their engine',()=>{
   assert.equal(defaults('gum').qualityVersion,2);
   const old=validateConfig('gum',{originalRules:true,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0});
   assert.equal(old.qualityVersion,0);assert.equal(old.originalRules,true);
