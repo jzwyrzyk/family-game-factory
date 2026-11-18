@@ -69,6 +69,18 @@ export class StudioNotebook {
   message(id:string,owner:string,role:Message['role'],text:string) {
     return this.update(id,owner,s=>{if(s.messages.length>=200)throw Error('This conversation is full. Save a new copy or export your notebook to keep exploring.');s.messages.push({id:crypto.randomUUID(),role,text:text.slice(0,2200),at:new Date().toISOString()});});
   }
+  /** Local-only erasure of chat and design notes for one child/session.
+   * Saved versions retain their own prompts and observations. This is not
+   * deletion of remote artifacts or backups; the interface must say so.
+   */
+  clearConversation(id:string,owner:string):StudioSession {
+    return this.update(id,owner,s=>{
+      if(s.job&&['queued','building','testing'].includes(s.job.status)||s.pendingExperiment)
+        throw Error('Finish or cancel the current build before clearing this chat.');
+      s.messages=[];s.draft='';s.hypothesis='';s.reflection=false;
+      s.design=freshDesign();
+    });
+  }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
     const source=this.get(id,owner);
     const design=source.design?copy(source.design):undefined;
