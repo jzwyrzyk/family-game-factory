@@ -10,7 +10,7 @@ import {createFunctionalGameContract,type FunctionalGameContract} from '../serve
 import {safeRepairDiagnostic,safeFinalRepairCode} from '../server/quality/repair-diagnostics';
 import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
 import {runtimeBundle} from '../server/sandbox/bundle-v2.cjs';
-import {hash,type GeneratedGame,validateCompiled} from '../server/agent/generated';
+import {hash,isGeneratedGame,type GeneratedGame,validateCompiled} from '../server/agent/generated';
 import type {AgentApproval} from '../server/agent/openai';
 import type {AgentInput} from '../server/pipeline/types';
 import type {AgentAdapter} from '../server/pipeline/types';
@@ -133,7 +133,9 @@ test('O6 private Actions keeps same intent contract across failed→repaired att
  const next=await coordinator.claim(id,1,'generate',a1);
  assert.ok('input' in next,'attempt 1 must remain in EXISTING generation stage');
  if(!('input' in next))throw Error('WRONG_REPAIR_STAGE');
- assert.equal(next.previous?.source,bad.source,'repair receives last failing version');
+ assert.ok(isGeneratedGame(next.previous),'repair must use the failed executable game');
+ if(!isGeneratedGame(next.previous)||!next.input)throw Error('REPAIR_PAYLOAD_INVALID');
+ assert.equal(next.previous.source,bad.source,'repair receives last failing version');
  assert.equal(next.input.childIntent,idea,'original idea must survive unchanged');
  assert.match(next.diagnostics||'',/INTENT_REQUIREMENT_FAILED/);
  assert.doesNotMatch(next.diagnostics||'',/malicious prompt/);
@@ -144,6 +146,8 @@ test('O6 private Actions keeps same intent contract across failed→repaired att
  assert.ok('game' in secondTest);
  if(!('game' in secondTest))throw Error('WRONG_TEST_STAGE');
  assert.deepEqual(secondTest.independentIntentPlan,spec);
+ assert.ok(isGeneratedGame(secondTest.game));
+ if(!isGeneratedGame(secondTest.game))throw Error('REPAIRED_ARTIFACT_INVALID');
  assert.equal(secondTest.game.source,stickerLaunchFixture.source);
  await coordinator.report(id,1,'test',t1,{
   ok:true,game:compiledFixture(stickerLaunchFixture)
