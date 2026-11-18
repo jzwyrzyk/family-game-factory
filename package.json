@@ -9,7 +9,7 @@
     "test:unit": "node --import tsx tests/unit.ts",
     "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts",
     "test:learning-integration": "node --import tsx tests/learning-integration.ts",
-    "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest",
+    "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser",
     "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:real-agent",
     "test:child-journey": "node tests/child-journey.cjs && node tests/build-continuity.cjs",
     "test:real-agent": "node tests/real-agent-status.cjs",
@@ -24,7 +24,8 @@
     "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/studio-experience.test.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs && node tests/studio-experience-browser.cjs",
     "test:language-ui": "node --import tsx --test tests/language-activity.test.ts",
     "test:language-integration": "node --import tsx tests/language-integration.ts",
-    "test:intent-playtest": "node --import tsx tests/intent-playtest-browser.ts"
+    "test:intent-playtest": "node --import tsx tests/intent-playtest-browser.ts",
+    "test:intent-repair-browser": "node --import tsx tests/intent-repair-browser.ts"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
