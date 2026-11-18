@@ -39,6 +39,8 @@ def mock_metadata(*args):
             "serviceAccount:"+coach.GATEWAY_IDENTITY]}]}
     if args[:3]==("iam","service-accounts","describe"):
         return {"email":coach.IDENTITY,"disabled":False}
+    if args[:2]==("projects","get-iam-policy"):
+        return {"bindings":[]}
     if args[:3]==("run","services","list"):
         return []
     raise AssertionError("Unexpected command "+repr(args))
@@ -96,6 +98,19 @@ class CloudRunPrivateCoachPlan(unittest.TestCase):
             return mock_metadata(*args)
         with patch.object(coach,"cloud",side_effect=inspect):
             with self.assertRaises(coach.GateError):coach.execute_inactive(REGION,DIGEST)
+        self.assertFalse(any(args[:2]==("run","deploy") for args in operations))
+
+    def test_overprivileged_coach_identity_refuses_first_deployment(self):
+        operations=[]
+        def broad_grant(*args):
+            operations.append(args)
+            if args[:2]==("projects","get-iam-policy"):
+                return {"bindings":[{"role":"roles/editor","members":[
+                    "serviceAccount:"+coach.IDENTITY]}]}
+            return mock_metadata(*args)
+        with patch.object(coach,"cloud",side_effect=broad_grant):
+            with self.assertRaises(coach.GateError):
+                coach.execute_inactive(REGION,DIGEST)
         self.assertFalse(any(args[:2]==("run","deploy") for args in operations))
 
     def test_read_only_verify_cannot_grant_permission(self):
