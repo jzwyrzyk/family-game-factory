@@ -69,7 +69,8 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
     else if(/^(?:add|turn on) (?:a |the )?portals?$/.test(text))patch.portalEnabled=true;
     else if(/^(?:remove|turn off|hide) (?:the )?portals?$/.test(text))patch.portalEnabled=false;
   }
-  if (game==='gum' && current.qualityVersion!==1 && ['gravity','thrust'].some(k=>k in patch)) return {kind:'invalid',message:'This earlier version uses the original construction rules. Start a physical workshop to try gravity and fan changes.'};
+  if (game==='gum' && current.qualityVersion===2 && ['gumBudget','jointStrength','gravity','thrust'].some(k=>k in patch)) return {kind:'invalid',message:'This sticker world is animated, not powered by physics. Try decorating the machine with different stickers, or use a physical workshop version for those changes.'};
+  if (game==='gum' && current.qualityVersion===0 && ['gravity','thrust'].some(k=>k in patch)) return {kind:'invalid',message:'This earlier version uses the original construction rules. Start a physical workshop to try gravity and fan changes.'};
   if(current.originalRules && ['hearts','breathSpeed','highlightMatches','extraDecoys'].some(k=>k in patch)) return {kind:'invalid',message:'That setting belongs to a saved legacy game. Use the restored game examples below.'};
   if (!Object.keys(patch).length) return { kind: 'generation-needed', message: 'I cannot build that change with these local tools yet. No game changed. Try an example below, or save your idea for later. No AI service is connected.' };
   try {
