@@ -48,16 +48,18 @@ async function main(game,independentIntentPlan){
    const context=await browser.newContext({viewport,hasTouch:device==='mobile'}),page=await context.newPage();let external=0;await context.route('**/*',r=>{external++;return r.abort();});
    try{
     if(v2){
-      Object.assign(compiled.tests,await playtestV2(page,tested,{touch:device==='mobile'}));
-      if(external)throw Error('ISOLATION_FAILED');
       if(independentIntentPlan){
-       // The contract is supplied by the authorized gateway test claim,
-       // never by the model output. This is the same credential-free Playwright
-       // renderer as the generic gate, with independent requirements.
+       // Independently authored expectations, never generated source self-tests.
+       // A valid sticker drag can be missed by generic random gestures, so the
+       // requirement-level test MUST pass BEFORE relaxing only that heuristic.
        const assessment=await playtestIntentV2(page,tested,independentIntentPlan,{touch:device==='mobile'});
        if(assessment.status!=='pass')throw Error('INTENT_EXPECTATIONS_NOT_TESTED');
        independentIntentPasses++;
       }
+      Object.assign(compiled.tests,await playtestV2(page,tested,{
+       touch:device==='mobile',independentIntentProof:!!independentIntentPlan
+      }));
+      if(external)throw Error('ISOLATION_FAILED');
       compiled.tests[device]=true;continue;
     }
     const artifact=renderGenerated(tested,'sandbox-test','sandbox-channel');await page.setContent('<iframe title="Isolated preview" sandbox="allow-scripts" style="width:100%;height:680px;border:0"></iframe>');await page.locator('iframe').evaluate((el,html)=>el.srcdoc=html,artifact.html);const frame=page.frameLocator('iframe');await frame.getByRole('button',{name:'Play!',exact:true}).click();
