@@ -81,6 +81,25 @@ export async function installStudio(){
  progressBanner.append(progressTitle,progressDetails);
  page.querySelector('.studio-workspace')!.before(progressBanner);
  progressBanner.append($('studioReady'),$('studioPromptForm').querySelector('.studio-build-controls')!);
+ const ideaSparks=el('details','studio-idea-sparks');ideaSparks.id='studioIdeaSparks';
+ ideaSparks.append(el('summary','','💡 Need a spark of inspiration?'));
+ const sparkOptions=el('div','studio-idea-spark-options');
+ for(const [label,idea] of [
+  ['🦭 Bouncing seal','Make a game where a seal jumps across icy platforms to reach the end.'],
+  ['🐱 Moon cat','Make a game where a cat eats donuts on the moon.'],
+  ['🫧 Bubblegum world','Make a game where you build wild machines out of bubblegum.']
+ ]){
+  const b=el('button','studio-chip',label) as HTMLButtonElement;
+  b.type='button';b.onclick=()=>{
+   const input=$<HTMLTextAreaElement>('studioPrompt');input.value=idea;
+   input.dispatchEvent(new Event('input',{bubbles:true}));ideaSparks.open=false;input.focus();
+  };sparkOptions.append(b);
+ }
+ const askIdeas=el('button','studio-chip','Ask jems for ideas') as HTMLButtonElement;
+ askIdeas.type='button';askIdeas.onclick=()=>act(()=>coaching?.discuss('ideas'));
+ sparkOptions.append(askIdeas);ideaSparks.append(sparkOptions);
+ $('studioPromptForm').after(ideaSparks);
+
  const voiceDetails=el('details','studio-voice-details');
  voiceDetails.append(el('summary','','Voice & accessibility options'));
  $('studioPromptForm').querySelector('.studio-voice-row')!.before(voiceDetails);
@@ -343,6 +362,8 @@ export async function installStudio(){
   page.classList.toggle('studio-idea-unstarted',creating&&!hasIdea);
   page.classList.toggle('studio-idea-started',creating&&hasIdea);
   creationHero.hidden=!creating;
+  ideaSparks.hidden=!creating;
+  if(!creating)ideaSparks.open=false;
   creationHero.querySelector('h2')!.textContent=hasIdea?'Your game is taking shape!':'What game can you dream up?';
   creationHero.querySelector('p')!.textContent=hasIdea?'Keep sharing your ideas, then build when you are ready.':'A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!';
   $('studioAvailability').textContent=coachConnectionCopy(configReady?coachConnection:'checking');
