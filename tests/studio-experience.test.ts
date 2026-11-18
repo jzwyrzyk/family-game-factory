@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import {JobService} from '../server/pipeline/service';
+import {MemoryRepository} from '../server/pipeline/repository';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,canCompareExperiments,coachConnectionCopy} from '../src/studio/experience';
 assert.match(coachConnectionCopy('unavailable'),/not connected/);
 assert.match(coachConnectionCopy('available'),/no game is building/);
@@ -17,4 +19,19 @@ assert.match(buildProgressCopy({status:'failed'},false)!.description,/not comple
 assert.equal(buildProgressCopy(undefined,false,true)!.phase,'uncertain');
 assert.equal(canCompareExperiments(1),false);
 assert.equal(canCompareExperiments(3),true);
-console.log('PASS creation truth states and optional experiment comparison');
+async function readiness(){
+ const repository=new MemoryRepository(),session={subject:'family-designer',familyId:'family-1',role:'designer' as const,expiresAt:Date.now()+60000};
+ const agent={kind:'metered-api' as const,available:true,generate:async()=>{throw Error('fixture must never generate');}};
+ const options={allowMock:false,maxUnits:500,timeoutMs:1000,maxRetries:0};
+ const service=new JobService(repository,agent as any,{test:async()=>{throw Error('no worker execution');}},options);
+ assert.deepEqual(await service.readiness(session),{available:false,reason:'ALLOWANCE_REQUIRED'});
+ await repository.transaction(state=>{state.ledgers['family-1']={month:new Date().toISOString().slice(0,7),allowance:800,used:50,reserved:50,paidEnabled:true};return true;});
+ assert.deepEqual(await service.readiness(session),{available:true,reason:'READY'});
+ await repository.transaction(state=>{state.ledgers['family-1'].reserved=300;return true;});
+ assert.deepEqual(await service.readiness(session),{available:false,reason:'ALLOWANCE_REQUIRED'});
+ assert.equal((await repository.snapshot()).jobs.length,0,'readiness never starts paid execution');
+ const disabled=new JobService(repository,{...agent,available:false} as any,{test:async()=>{}},options);
+ assert.deepEqual(await disabled.readiness(session),{available:false,reason:'UNAVAILABLE'});
+ console.log('PASS creation truth, authenticated build-readiness gates, and optional experiment comparison');
+}
+void readiness().catch(error=>{console.error(error);process.exitCode=1;});
