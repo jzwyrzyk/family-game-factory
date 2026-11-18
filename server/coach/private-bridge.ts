@@ -5,6 +5,7 @@
  * that identity and be non-public at the infrastructure access boundary.
  */
 import type {CoachContext} from '../../src/studio/design';
+import {validateAudio,type AudioMime,type SpeechProvider,AUDIO_MAX_BYTES} from './speech';
 import type {CoachProvider} from './service';
 
 const METADATA_BASE='http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity';
@@ -70,5 +71,47 @@ export class PrivateCoachBridge implements CoachProvider{
     !Object.hasOwn(result,'reply')||!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0)
     throw Error('COACH_PROVIDER_FAILED');
   return {reply:result.reply,usedMicroUsd:result.usedMicroUsd};
+ }
+}
+
+/** A separate, narrowly scoped use of the SAME identity-authenticated private
+ * service: audio goes only to Google STT inside that service, never to OpenAI.
+ */
+export class PrivateSpeechBridge implements SpeechProvider{
+ readonly endpoint:string;
+ constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){
+  this.endpoint=privateCoachOrigin(origin);
+ }
+ async readiness(signal:AbortSignal):Promise<boolean>{
+  try{
+   const token=await this.identity(this.endpoint,signal);
+   const response=await this.transport(this.endpoint+'/v1/private-coach/audio/status',{
+    method:'GET',headers:{Authorization:'Bearer '+token,'X-Factory-Request':'1'},
+    redirect:'error',cache:'no-store',signal
+   });
+   if(!response.ok||Number(response.headers.get('content-length')||0)>1000)return false;
+   const raw=await response.text();if(raw.length>1000)return false;
+   const data=JSON.parse(raw);
+   return !!data&&data.available===true&&data.mode==='private';
+  }catch{return false;}
+ }
+ async transcribe(audio:Uint8Array,mime:AudioMime,signal:AbortSignal):Promise<string>{
+  validateAudio(audio,mime);
+  if(audio.length>AUDIO_MAX_BYTES)throw Error('INVALID_AUDIO');
+  const token=await this.identity(this.endpoint,signal);
+  const response=await this.transport(this.endpoint+'/v1/private-coach/audio',{
+   method:'POST',headers:{Authorization:'Bearer '+token,'X-Factory-Request':'1','Content-Type':'application/json'},
+   redirect:'error',cache:'no-store',signal,
+   body:JSON.stringify({version:1,mime,audio:Buffer.from(audio).toString('base64')})
+  });
+  if(response.status===429)throw Error('RATE_LIMIT');
+  if(response.status===422)throw Error('AUDIO_NO_SPEECH');
+  if(!response.ok)throw Error('AUDIO_UNAVAILABLE');
+  if(Number(response.headers.get('content-length')||0)>8000)throw Error('AUDIO_UNAVAILABLE');
+  const raw=await response.text();if(raw.length>8000)throw Error('AUDIO_UNAVAILABLE');
+  let data:any;try{data=JSON.parse(raw);}catch{throw Error('AUDIO_UNAVAILABLE');}
+  if(!data||Object.keys(data).some(x=>x!=='text')||typeof data.text!=='string'||
+   !data.text.trim()||data.text.length>2000)throw Error('AUDIO_UNAVAILABLE');
+  return data.text;
  }
 }
