@@ -342,6 +342,8 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving;$('studioSend').textContent=reflecting?'Save thought →':'Try a change →';
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
   $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?'Tell jems your game idea':'Tell jems what you want to discuss or change';
+  // A child who already told jems an idea can choose Build without repeating it.
+  $<HTMLTextAreaElement>('studioPrompt').required=!(creating&&s.messages.some(m=>m.role==='child'));
   $('studioSend').textContent=reflecting?'Save thought →':creating?'✨ Build my game':'Try a change →';
   $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=s.job?.status!=='failed';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
@@ -402,7 +404,7 @@ export async function installStudio(){
   focusView($('studioHelpTitle'));
  }
  async function submit(){
-  if(guardMath())return;voice?.cancel();flushDraft();const s=current(),prompt=s.draft.trim(),started=epoch;if(!prompt)return;
+  if(guardMath())return;voice?.cancel();flushDraft();const s=current(),prompt=s.draft.trim()||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':''),started=epoch;if(!prompt)return;
   if(reflecting){notebook.observe(s.id,s.owner,prompt,'child',s.design?.observations.filter(o=>o.source==='runtime').at(-1)?.experimentId||null);message(s,'reflection',prompt);notebook.update(s.id,s.owner,x=>{x.draft='';x.reflection=false;});reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value='';render();return;}
   if(sending.has(s.id)){status('Sending the earlier request. Your ideas and game are safe.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
