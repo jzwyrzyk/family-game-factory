@@ -111,6 +111,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
     const blob=new Blob(chunks,{type:selectedMime}),captured=scope;cleanup();
     if(blob.size<100||blob.size>320000){status('Could not hear a short sentence. Nothing was sent.');return;}
     const controller=new AbortController();request=controller;
+    h.button.textContent='Cancel transcription';h.button.setAttribute('aria-pressed','false');
     status('Transcribing through the parent-approved private speech service…');
     void h.transcribe(blob,AbortSignal.any([controller.signal,AbortSignal.timeout(15000)]))
      .then(async text=>{
@@ -120,7 +121,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
       await h.onTranscript(text);
      }).catch(()=>{
       if(current===seq)status('Private speech could not finish. No new message was sent. You can type instead.');
-     }).finally(()=>{if(request===controller)request=null;});
+     }).finally(()=>{if(request===controller){request=null;button(false);}});
    };
    next.start(300);
    timeout=setTimeout(()=>{if(current===seq&&recording)finish();},12000);
