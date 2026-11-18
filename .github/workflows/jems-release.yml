@@ -1,0 +1,207 @@
+name: Jems controlled release
+run-name: Jems ${{ github.event_name == 'push' && 'main-change' || inputs.operation }} ${{ github.sha }}
+# Push to main is plan-only by default. Pages auto-deploy requires explicit
+# owner opt-in JEMS_AUTODEPLOY_PAGES=true and both reviewed service URLs.
+# No Cloud Run deployment, model credentials or paid AI activation here.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Read-only plan or tested Pages-only release; never activates paid AI
+        type: choice
+        required: true
+        options: [plan, pages]
+        default: plan
+      reviewed_sha:
+        description: Exact 40-character main SHA; required for Pages
+        type: string
+        required: false
+      gateway_origin:
+        description: Existing HTTPS gateway origin (not a secret)
+        type: string
+        required: false
+      preview_origin:
+        description: Existing separate HTTPS preview origin (not a secret)
+        type: string
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: jems-controlled-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    outputs:
+      operation: ${{ steps.intent.outputs.operation }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Determine owner-authorized release scope
+        id: intent
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUESTED_MODE: ${{ inputs.operation }}
+          AUTODEPLOY: ${{ vars.JEMS_AUTODEPLOY_PAGES }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT" == "push" && "$AUTODEPLOY" == "true" ]]; then
+            echo 'operation=pages' >> "$GITHUB_OUTPUT"
+          elif [[ "$EVENT" == "push" ]]; then
+            echo 'operation=plan' >> "$GITHUB_OUTPUT"
+          elif [[ "$REQUESTED_MODE" == "pages" ]]; then
+            echo 'operation=pages' >> "$GITHUB_OUTPUT"
+          else
+            echo 'operation=plan' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify exact main and prepare release contract
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ steps.intent.outputs.operation }}
+          REVIEWED_INPUT: ${{ inputs.reviewed_sha }}
+          GATEWAY: ${{ inputs.gateway_origin || vars.JEMS_GATEWAY_ORIGIN }}
+          PREVIEW: ${{ inputs.preview_origin || vars.JEMS_PREVIEW_ORIGIN }}
+        run: |
+          set -euo pipefail
+          MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          if [[ "$MODE" == "pages" && "$GITHUB_EVENT_NAME" == "push" ]]; then
+            REVIEWED_INPUT="$GITHUB_SHA"
+          fi
+          python3 scripts/release/contract.py plan \
+            --operation "$MODE" --source-sha "$GITHUB_SHA" \
+            --main-sha "$MAIN_SHA" --reviewed-sha "$REVIEWED_INPUT" \
+            --gateway-origin "$GATEWAY" --preview-origin "$PREVIEW" \
+            --output release-evidence/release-plan.json
+          echo "Release scope: $MODE, SHA: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Cloud deployment and paid inference remain separate owner-approved gates." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jems-release-plan
+          path: release-evidence/release-plan.json
+          if-no-files-found: error
+  pages_quality:
+    needs: plan
+    if: needs.plan.outputs.operation == 'pages'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Exact-SHA end-to-end tests
+        run: npm test
+      - name: Capture Jems visual review
+        run: node tests/brand-review-pages.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jems-release-browser-evidence
+          path: test-results/
+          if-no-files-found: warn
+  pages_precheck:
+    needs: [plan, pages_quality]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Read-only health check of existing backend and preview
+        env:
+          GATEWAY: ${{ inputs.gateway_origin || vars.JEMS_GATEWAY_ORIGIN }}
+          PREVIEW: ${{ inputs.preview_origin || vars.JEMS_PREVIEW_ORIGIN }}
+        run: |
+          python3 scripts/release/contract.py precheck \
+            --gateway-origin "$GATEWAY" --preview-origin "$PREVIEW" \
+            --output release-evidence/backend-health.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jems-release-backend-health
+          path: release-evidence/backend-health.json
+  pages_deploy:
+    needs: [plan, pages_quality, pages_precheck]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Refuse stale source before publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          test "$MAIN_SHA" = "$GITHUB_SHA" || { echo 'Main moved; not publishing stale code.' >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Configure existing reviewed public service URLs
+        env:
+          FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin || vars.JEMS_GATEWAY_ORIGIN }}
+          FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin || vars.JEMS_PREVIEW_ORIGIN }}
+        run: node --import tsx scripts/deployment/site-config.ts
+      - name: Stamp immutable release provenance
+        run: |
+          python3 scripts/release/contract.py stamp \
+            --source-sha "$GITHUB_SHA" --output dist/jems-release.json
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
+  pages_verify:
+    needs: [plan, pages_deploy]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Confirm published SHA, exact service URLs and public health
+        env:
+          SITE: ${{ needs.pages_deploy.outputs.page_url }}
+          GATEWAY: ${{ inputs.gateway_origin || vars.JEMS_GATEWAY_ORIGIN }}
+          PREVIEW: ${{ inputs.preview_origin || vars.JEMS_PREVIEW_ORIGIN }}
+        run: |
+          set -euo pipefail
+          SITE="${SITE%/}/"
+          python3 scripts/release/contract.py verify \
+            --site-base "$SITE" --source-sha "$GITHUB_SHA" \
+            --gateway-origin "$GATEWAY" --preview-origin "$PREVIEW" \
+            --output release-evidence/live-verification.json --attempts 8
+          echo "Pages version and public health verified; no live paid model or child UAT performed." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jems-release-live-verification
+          path: release-evidence/live-verification.json
+          if-no-files-found: warn
