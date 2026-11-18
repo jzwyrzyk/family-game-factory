@@ -45,7 +45,7 @@ const fs=require('node:fs');
     gold:'#FFC24D',coral:'#FF5E7A',cloud:'#FFF7EE',lilac:'#E6D8FF',
     'action-blue':'#195FD0','action-purple':'#7136C9'
   });
-  const assets=['jems-mark.svg','jems-logo.svg','jems-wordmark.svg','jems-clouds.svg','jems-blocks.svg','jems-sparks.svg','jems-facets-pattern.svg','jems-mono.svg','jems-reversed.svg','jems-pattern.svg'];
+  const assets=['jems-mark.svg','jems-logo.svg','jems-wordmark.svg','jems-clouds.svg','jems-blocks.svg','jems-sparks.svg','jems-facets-pattern.svg','jems-mono.svg','jems-reversed.svg','jems-pattern.svg','jems-mark-monochrome.svg','jems-mark-inverse.svg','jems-app-icon.svg','arcade-icon.svg'];
   for(const asset of assets){
     const result=await page.evaluate(p=>fetch('./'+p).then(async r=>({ok:r.ok,text:await r.text()})),asset);
     assert.ok(result.ok&&result.text.includes('<svg'),asset+' should be served locally');
@@ -54,6 +54,12 @@ const fs=require('node:fs');
     if(asset==='jems-mono.svg')assert.ok(result.text.includes('fill="#fff"')&&result.text.includes('fill-rule="evenodd"'),'monochrome wrench must be solid white, never a transparent hole');
     if(asset==='jems-reversed.svg')assert.ok(result.text.includes('fill="#fff"'),'white-on-dark logo must retain its visible white wrench');
     if(asset==='jems-pattern.svg')assert.ok(result.text.includes('viewBox="0 0 360 240"'),'decorative pattern must be the approved scoped asset');
+    if(asset==='jems-mark-monochrome.svg')assert.ok(result.text.includes('fill="#fff"')&&!result.text.includes('<mask'),'isolated monochrome gem retains solid white wrench (no dark knockout)');
+    if(asset==='jems-mark-inverse.svg')assert.ok(result.text.includes('fill="#fff"')&&!result.text.includes('<mask'),'inverse gem wrench remains solid white');
+    if(asset==='jems-app-icon.svg')assert.ok(result.text.includes('id="jems-wrench"')&&!result.text.includes('M60 45C49 45'),'installed PWA icon uses the approved gem, not the earlier keyhole-like mark');
+    if(['jems-wordmark.svg','jems-facets-pattern.svg','jems-sparks.svg','jems-blocks.svg','jems-app-icon.svg'].includes(asset)){
+      assert.ok(!/#(?:0B1D4D|2D7BFF|8A4DFF|34D7B3|FFC828|FF6B7A)\b/i.test(result.text),asset+' must not retain the superseded brand swatches');
+    }
   }
   const visual=await page.evaluate(()=>({
     hero:getComputedStyle(document.querySelector('.studio-home-hero')).backgroundImage,
@@ -95,6 +101,8 @@ const fs=require('node:fs');
    await page.screenshot({path:'test-results/jems-parent-'+label+'.png',fullPage:false});
    const manifest=await page.evaluate(()=>fetch('./manifest.webmanifest').then(r=>r.json()));
    assert.equal(manifest.short_name,'jems');
+   assert.equal(manifest.theme_color.toUpperCase(),'#0B1E3B','installable app must use approved Ink');
+   assert.equal(await page.locator('meta[name="theme-color"]').getAttribute('content'),'#0B1E3B','browser theme must match approved Ink');
    assert.equal(manifest.icons[0].src,'./jems-app-icon.svg','installable jems icon should use its dedicated approved app tile');
    assert.equal(manifest.icons[1].src,'./jems-mark.svg','bare mark remains available as a vector icon');
    assert.equal(await page.locator('link[rel="icon"]').getAttribute('href'),'./jems-mark.svg','browser tab uses jems favicon');

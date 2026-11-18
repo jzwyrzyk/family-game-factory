@@ -66,3 +66,9 @@ Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac**
 - `public/jems-pattern.svg`: subtle gem/wrench/spark decoration, optional; do not cover controls or instructional text.
 
 Exact source-guide palette: **Ink #0B1E3B, Jem Blue #2E6BFF, Spark #8B5CF6, Play #FF5E7A, Idea #FFC24D, Build #22D3A6**. The newer Jems 5 homepage, parent dashboard, subject navigation, saved projects, and Bubblegum v2 sticker game remain the baseline. The SVG assets are interpreted traces, **not yet certified master artwork**. Owner visual parity against the originally approved image board and a fresh exact-head browser test run remain mandatory before merge or publication.
+
+
+### Legacy branding asset reconciliation (PR #34)
+The original universal-brand rollout introduced useful supporting assets that must stay in use when this fidelity PR lands. The existing `jems-wordmark.svg`, `jems-facets-pattern.svg`, `jems-sparks.svg` and `jems-blocks.svg` now use the exact six-source-guide colors wherever those named swatches occur. The installable `jems-app-icon.svg` embeds the *same faceted gem and solid-white wrench* as the current `jems-mark.svg`, without external SVG/image dependencies. The compatibility `jems-mark-monochrome.svg` and `jems-mark-inverse.svg` retain their legacy URLs but now use a visible, opaque white center wrench rather than a transparent knockout. The PWA manifest and HTML theme-color use Ink `#0B1E3B`.
+
+The retained Jems 5 homepage, saved games and parent-learning experiences and Bubblegum sticker game are the required integration baseline. These asset updates do **not** authorize activation of child-facing model services, user tracking, or a public rollout; visual master-art parity and final exact-head CI remain review gates.
