@@ -105,9 +105,12 @@ test('O4: saved v2 physics remains physics on an ordinary edit; physical-to-scri
 });
 test('O4: native seed provenance preserves hill/gum physics and legacy gum rules without trusting a client-selected shape',()=>{
  for(const [sourceGame,simulation] of [['hill','physics-2d'],['gum','physics-2d'],['robot','rule-driven']] as const){
-  const base={id:'seed-'+sourceGame,sourceGame,config:defaults(sourceGame),projectId:'seed-project'};
+  // Explicitly identify the new physics workshop instead of inferring
+  // from the game's default preset (which may represent an older version).
+  const config={...defaults(sourceGame),...(sourceGame==='gum'?{qualityVersion:1}:{})};
+  const base={id:'seed-'+sourceGame,sourceGame,config,projectId:'seed-project'};
   const plan=privateGenerationPreflight(input('Make the game a little faster.',base));
-  assert.equal(plan.brief.form.simulation,simulation);
+  assert.equal(plan.brief.form.simulation,simulation,'native '+sourceGame+' with '+JSON.stringify(config));
  }
  const legacyGum={...defaults('gum'),qualityVersion:0};
  const old=privateGenerationPreflight(input('Make the game a little faster.',{
