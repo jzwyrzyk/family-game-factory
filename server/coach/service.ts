@@ -9,7 +9,7 @@ export interface CoachConfig {
 }
 export interface CoachReceipt {id:string;familyId:string;subject:string;hash:string;month:string;reserved:number;at:number;state:'running'|'ready'|'failed';reply?:CoachReply}
 export interface CoachProvider {complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>}
-function boundedContext(input:any):CoachContext {
+export function validateCoachContext(input:any):CoachContext {
  if(!input||typeof input!=='object'||Object.keys(input).some(k=>!['message','mode','game','plan','rules','friction','helpLevel','support','conversation','observations','tests'].includes(k))||typeof input.message!=='string'||input.message.length>2000||!['discuss','ideas','explain','reflect'].includes(input.mode)||typeof input.game!=='string'||input.game.length>120)throw Error('INVALID_REQUEST');
  validateDesign({...freshDesign(),plan:input.plan,friction:input.friction,helpLevel:input.helpLevel,support:input.support,observations:input.observations});
  if(!Array.isArray(input.conversation)||input.conversation.length>16||!input.conversation.every((m:any)=>m&&Object.keys(m).every(k=>['role','text'].includes(k))&&['child','helper','reflection'].includes(m.role)&&typeof m.text==='string'&&m.text.length<=2200))throw Error('INVALID_REQUEST');
@@ -27,7 +27,7 @@ export class CoachService {
   if(!this.available())throw Error('COACH_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
   if(!input||Object.keys(input).some(k=>!['requestId','context'].includes(k))||typeof input.requestId!=='string'||!/^[\w-]{1,100}$/.test(input.requestId))throw Error('INVALID_REQUEST');
-  const context=boundedContext(input.context),serialized=JSON.stringify(context);
+  const context=validateCoachContext(input.context),serialized=JSON.stringify(context);
   if(serialized.length>this.config.maxInputChars)throw Error('INVALID_REQUEST');
   // Defense in depth, not a privacy guarantee or replacement for approved ZDR/minor safeguards.
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
@@ -46,7 +46,7 @@ export class CoachService {
   let usage=this.config.maxTurnMicroUsd,reply:CoachReply|undefined;
   try{
    const result=await this.provider!.complete(context,AbortSignal.timeout(25000));
-   if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0)throw Error('COACH_PROVIDER_FAILED');
+   if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0||result.usedMicroUsd>this.config.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
    usage=result.usedMicroUsd;reply=validateCoachReply(result.reply,context);
    return {reply,mode:'model'};
   }finally{
