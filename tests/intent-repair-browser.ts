@@ -136,7 +136,7 @@ async function main(){
  assert.equal((newRevision.game as GeneratedGame).source,stickerLaunchFixture.source);
  assert.equal((newRevision.game as GeneratedGame).compiled?.tests?.intent,true);
  assert.equal(s.active['previous-project'],'previous-keep');
- assert.equal(s.active[newRevision.projectId],undefined,'success cannot auto-Keep the child's choice');
+ assert.equal(s.active[newRevision.projectId],undefined,"success cannot auto-Keep the child\u0027s choice");
  assert.equal(s.ledgers[parent.familyId].used,5);
  assert.equal(s.ledgers[parent.familyId].reserved,0);
  assert.ok(s.audit.every(x=>!JSON.stringify(x).includes(idea)));
