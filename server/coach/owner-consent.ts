@@ -14,7 +14,8 @@ async function main(){
  const args=new Set(process.argv.slice(2));
  if([...args].some(a=>!['--allow-model','--allow-audio','--revoke','--confirm-external-verification'].includes(a)))
   throw Error('INVALID_CONSENT_COMMAND');
- if(!args.has('--confirm-external-verification'))throw Error('EXTERNAL_VERIFICATION_REQUIRED');
+ // Emergency revocation must remain possible even without a new consent record.
+ if(!args.has('--revoke')&&!args.has('--confirm-external-verification'))throw Error('EXTERNAL_VERIFICATION_REQUIRED');
  const config=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as OwnerConfig;
  if(!config||!/^[A-Za-z0-9_-]{1,100}$/.test(config.familyId)||!/^[A-Za-z0-9_-]{1,100}$/.test(config.workspace))
   throw Error('OWNER_FAMILY_OR_WORKSPACE_REQUIRED');
