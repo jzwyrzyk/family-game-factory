@@ -122,6 +122,15 @@ try{
  await repository.transaction(state=>{state.coachReceipts![0].at=Date.now()-COACH_RECEIPT_TTL_MS-10;return true;});
  await metered.respond(designer,{requestId:'turn-second',context});
  assert.equal((await repository.snapshot()).coachReceipts?.length,1,'expired content receipt pruned');
+ const trustedId='trusted-coach-fixture',trustedSession={...designer,deviceId:trustedId};
+ await repository.transaction(state=>{state.devices=[{id:trustedId,familyId:family,name:'Test tablet',
+  secretHash:'0'.repeat(64),rotation:0,createdAt:Date.now()-1000,lastSeenAt:Date.now(),expiresAt:Date.now()+3600000}];return true;});
+ await metered.respond(trustedSession,{requestId:'turn-device-safe',context});
+ await repository.transaction(state=>{state.devices![0].revokedAt=Date.now();return true;});
+ const beforeRevoked=(await repository.snapshot()).ledgers[family].used;
+ await assert.rejects(metered.respond(trustedSession,{requestId:'turn-device-revoked',context}),/UNAUTHENTICATED/);
+ assert.equal((await repository.snapshot()).ledgers[family].used,beforeRevoked,
+  'revoked trusted device must never reserve another model call');
  await assert.rejects(metered.eraseFamilyReceipts(designer),/FORBIDDEN/);
  const total=(await repository.snapshot()).ledgers[family].used;
  assert.deepEqual(await metered.eraseFamilyReceipts(parent),{erased:1});
