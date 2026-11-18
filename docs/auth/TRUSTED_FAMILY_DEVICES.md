@@ -8,7 +8,7 @@
 - Access sessions are valid for 24 hours. A separate Secure, HttpOnly trusted-device cookie renews them automatically while the device remains trusted. Renewal rotates the credential, tolerating a 15-second overlap for parallel tabs. Neither credential nor the passphrase enters localStorage, source code or logs.
 - Device trust expires at the earliest of 90 days since last renewal or an absolute 365 days from enrollment. Browser data clearance, deliberate revocation, long inactivity or expiry requires a fresh parent enrollment. Routine weekly use never does.
 - Each protected API request checks the device record. Parent revocation stops even an otherwise unexpired access session immediately.
-- Parent device management requires a separate 15-minute parent session authorized by the family passphrase. After five failures, management locks for 15 minutes. Parent Controls can list/revoke trusted devices, issue short-lived invitations to connect additional tablets without returning to Cloud Shell, and self-disconnect.
+- Parent device management requires a separate 15-minute parent session authorized by the family passphrase. After five failures, management locks for 15 minutes. Parent Controls can list/revoke trusted devices, issue short-lived invitations to connect additional tablets without returning to Cloud Shell, and disconnect the current device **only after the parent's passphrase unlock**.
 - Only salted scrypt passphrase hashes and SHA-256 device secret hashes, device names and bounded timestamps persist inside the existing family Firestore workspace. Existing game, learning, saved-version and ledger data are unchanged.
 
 ## Gateway API
