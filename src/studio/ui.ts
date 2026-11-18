@@ -4,6 +4,7 @@ import {installCoaching} from './coaching';
 import {celebrateJem} from '../brand/delight';
 import {installStudioVoice} from './voice';
 import {installStudioPrivateSpeech} from './private-speech';
+import {familyFetch} from '../builder/session';
 import {freshDesign} from './design';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCopy,canCompareExperiments,type BuilderReadiness,type CoachConnection} from './experience';
 import './style.css';
@@ -273,8 +274,8 @@ export async function installStudio(){
   // Public configuration merely selects URLs; only an authenticated server
   // check can distinguish an available service, session failure and allowance.
   const check=async(path:string)=>{
-   const response=await fetch(remote.apiBaseUrl+path,{credentials:'include',cache:'no-store'});
-   if(!response.ok)throw Error(response.status===401||response.status===403?'UNAUTHENTICATED':'SERVICE_UNAVAILABLE');
+   const response=await familyFetch(remote.apiBaseUrl!,path,{credentials:'include',cache:'no-store'});
+   if(!response.ok)throw Error(response.status===401?'UNAUTHENTICATED':response.status===403?'FORBIDDEN':'SERVICE_UNAVAILABLE');
    return response.json();
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
@@ -727,6 +728,7 @@ export async function installStudio(){
  window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-profile',()=>{stopSpeech();coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);void refreshServiceReadiness();resumeOutstanding();});
+ window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('beforeunload',event=>{stopSpeech();try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
  // Existing progress backups gain an explicitly versioned optional notebook. Old backups remain valid.
@@ -770,7 +772,7 @@ export async function installStudio(){
   onRecordingStart:()=>voice?.cancel(),
   available:async signal=>{
    if(remote.mode!=='remote'||!remote.apiBaseUrl)return false;
-   const response=await fetch(remote.apiBaseUrl+'/v1/coach/audio/status',{
+   const response=await familyFetch(remote.apiBaseUrl,'/v1/coach/audio/status',{
     method:'GET',credentials:'include',cache:'no-store',redirect:'error',signal
    });
    if(!response.ok)return false;
@@ -779,7 +781,7 @@ export async function installStudio(){
   },
   transcribe:async(blob,signal)=>{
    if(remote.mode!=='remote'||!remote.apiBaseUrl)throw Error('AUDIO_UNAVAILABLE');
-   const response=await fetch(remote.apiBaseUrl+'/v1/coach/audio',{
+   const response=await familyFetch(remote.apiBaseUrl,'/v1/coach/audio',{
     method:'POST',credentials:'include',cache:'no-store',redirect:'error',signal,
     headers:{'Content-Type':blob.type,'X-Factory-Request':'1','X-Factory-Audio-Id':crypto.randomUUID()},
     body:blob
