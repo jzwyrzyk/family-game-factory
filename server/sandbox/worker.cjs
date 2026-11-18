@@ -3,6 +3,7 @@ const esbuild=require('esbuild'),{chromium}=require('playwright'),{createHash}=r
 const {renderGenerated}=require('./preview.cjs');
 const {runtimeBundle}=require('./bundle-v2.cjs');
 const {playtestV2}=require('./playtest-v2.cjs');
+const {playtestIntentV2}=require('./intent-playtest-v2.cjs');
 const hash=s=>createHash('sha256').update(s).digest('hex');
 const {validateSource}=require('./source-validator.cjs');
 // V1 samples held controls every 50 ms. A zero-duration click followed by moving
@@ -34,17 +35,31 @@ async function pressV1Control(page,frame,control){
   }finally{await page.mouse.up();}
  }
 }
-async function main(game){
+async function main(game,independentIntentPlan){
  validateSource(game);const v2=game.kind==='generated-module-v2';
+ if(independentIntentPlan&&!v2)throw Error('INTENT_PLAN_REQUIRES_V2');
  const result=await esbuild.build({stdin:{contents:game.source,loader:'ts',sourcefile:'game.ts'},bundle:false,write:false,format:'iife',globalName:'GameModule',platform:'browser',target:'es2020',logLevel:'silent'});const code=result.outputFiles[0].text;if(code.length>100000)throw Error('OUTPUT_TOO_LARGE');
  const compiled={code,sourceHash:hash(game.source),codeHash:hash(code),tests:{desktop:false,mobile:false,replay:false,isolation:false}},tested={...game,compiled};
  if(v2){const runtime=runtimeBundle();compiled.runtimeVersion=runtime.version;compiled.runtimeHash=runtime.hash;Object.assign(compiled.tests,{input:false,resources:false,pause:false});}
+ let independentIntentPasses=0;
  const browser=await chromium.launch({executablePath:process.env.WORKER_BROWSER_PATH||undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--disable-background-networking']});
  try{
   for(const [device,viewport]of [['desktop',{width:1000,height:800}],['mobile',{width:375,height:812}]]){
    const context=await browser.newContext({viewport,hasTouch:device==='mobile'}),page=await context.newPage();let external=0;await context.route('**/*',r=>{external++;return r.abort();});
    try{
-    if(v2){Object.assign(compiled.tests,await playtestV2(page,tested,{touch:device==='mobile'}));if(external)throw Error('ISOLATION_FAILED');compiled.tests[device]=true;continue;}
+    if(v2){
+      Object.assign(compiled.tests,await playtestV2(page,tested,{touch:device==='mobile'}));
+      if(external)throw Error('ISOLATION_FAILED');
+      if(independentIntentPlan){
+       // The contract is supplied by the authorized gateway test claim,
+       // never by the model output. This is the same credential-free Playwright
+       // renderer as the generic gate, with independent requirements.
+       const assessment=await playtestIntentV2(page,tested,independentIntentPlan,{touch:device==='mobile'});
+       if(assessment.status!=='pass')throw Error('INTENT_EXPECTATIONS_NOT_TESTED');
+       independentIntentPasses++;
+      }
+      compiled.tests[device]=true;continue;
+    }
     const artifact=renderGenerated(tested,'sandbox-test','sandbox-channel');await page.setContent('<iframe title="Isolated preview" sandbox="allow-scripts" style="width:100%;height:680px;border:0"></iframe>');await page.locator('iframe').evaluate((el,html)=>el.srcdoc=html,artifact.html);const frame=page.frameLocator('iframe');await frame.getByRole('button',{name:'Play!',exact:true}).click();
     await frame.locator('#game[data-frames]').waitFor({timeout:3000});if(await frame.locator('#status').getAttribute('data-state')==='error')throw Error('RUNTIME_FAILED');
     // Independent exploratory play; no generated tests, host privileges or injected win callbacks.
@@ -61,7 +76,16 @@ async function main(game){
    }finally{await context.close();}
   }
  }finally{await browser.close();}
+ if(independentIntentPlan){
+  if(independentIntentPasses!==2)throw Error('INTENT_ATTESTATION_REQUIRED');
+  compiled.tests.intent=true;
+ }
  return tested;
 }
-if(require.main===module){let input='';process.stdin.on('data',c=>{input+=c;if(Buffer.byteLength(input)>50000)process.exit(2)});process.stdin.on('end',()=>{main(JSON.parse(input)).then(game=>process.stdout.write(JSON.stringify({ok:true,game}))).catch(e=>{const errors=e.errors?.map(x=>x.text).join('; ')||e.message;process.stdout.write(JSON.stringify({ok:false,diagnostics:String(errors).slice(0,1500)}));});});}
+if(require.main===module){let input='';process.stdin.on('data',c=>{input+=c;if(Buffer.byteLength(input)>50000)process.exit(2)});process.stdin.on('end',()=>{
+ const value=JSON.parse(input);
+ const withPlan=value&&Object.hasOwn(value,'independentIntentPlan');
+ const game=withPlan?value.game:value;
+ const plan=withPlan?value.independentIntentPlan:undefined;
+ main(game,plan).then(game=>process.stdout.write(JSON.stringify({ok:true,game}))).catch(e=>{const errors=e.errors?.map(x=>x.text).join('; ')||e.message;process.stdout.write(JSON.stringify({ok:false,diagnostics:String(errors).slice(0,1500)}));});});}
 module.exports={pressV1Control};
