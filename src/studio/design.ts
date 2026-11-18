@@ -99,6 +99,10 @@ export function localCoach(c:CoachContext):CoachReply {
   move='listen';message='Hi! We can talk about your game or any silly idea for it.';question='What is on your mind?';
  }else if(/\b(what if|imagine|could|maybe|sneeze|spaghetti|silly|funny)\b/i.test(c.message)){
   move='listen';message='That is an idea worth exploring. I will not change your game unless you choose Try a change.';question='What happens next in your idea?';
- }else{move='listen';message='I am listening. You can keep talking or choose to try a change when you want.';question=null;}
+ }else if(c.game==='new'){
+  move='clarify';message='Your new game idea is saved! We can think about how it should play, even while the live AI coach is unavailable.';question='What should the player do first?';
+ }else{
+  move='clarify';message='Your idea is saved. We can talk about the part you want to improve, or you can try a change when you are ready.';question='Which part of this game would you most like to change?';
+ }
  return {move,text:message,question,suggestions,proposedChange:null,planSuggestions:[],evidenceIds:[]};
 }
