@@ -8,6 +8,8 @@ export interface CoachConfig {
  inputMicroUsdPerMillion:number;outputMicroUsdPerMillion:number;pricesReviewedAt:string;
 }
 export interface CoachReceipt {id:string;familyId:string;subject:string;hash:string;month:string;reserved:number;at:number;state:'running'|'ready'|'failed';reply?:CoachReply}
+/** Bounded server reply cache: child conversation remains local to the browser. */
+export const COACH_RECEIPT_TTL_MS=15*60_000;
 export interface CoachProvider {complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>}
 export function validateCoachContext(input:any):CoachContext {
  if(!input||typeof input!=='object'||Object.keys(input).some(k=>!['message','mode','game','plan','rules','friction','helpLevel','support','conversation','observations','tests'].includes(k))||typeof input.message!=='string'||input.message.length>2000||!['discuss','ideas','explain','reflect'].includes(input.mode)||typeof input.game!=='string'||input.game.length>120)throw Error('INVALID_REQUEST');
@@ -23,6 +25,19 @@ export function approved(c:CoachConfig):boolean {
 export class CoachService {
  constructor(private repo:Repository,private config:CoachConfig,private provider?:CoachProvider){}
  available(){return approved(this.config)&&!!this.provider;}
+ /** Parent-authenticated erasure of completed coach content. Usage and security
+  * audit totals remain for accounting; no child utterances are stored there.
+  * Refuse while an inference is in flight to avoid recreating content after erasure.
+  */
+ async eraseFamilyReceipts(session:VerifiedSession):Promise<{erased:number}>{
+  if(!session||session.expiresAt<=Date.now()||session.role!=='parent')throw Error('FORBIDDEN');
+  return this.repo.transaction(state=>{
+   if((state.coachReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running'))throw Error('COACH_REQUEST_EXISTS');
+   const prior=state.coachReceipts||[];
+   state.coachReceipts=prior.filter(r=>r.familyId!==session.familyId);
+   return {erased:prior.length-state.coachReceipts.length};
+  });
+ }
  async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'}>{
   if(!this.available())throw Error('COACH_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
@@ -33,7 +48,8 @@ export class CoachService {
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
   const hash=createHash('sha256').update(serialized).digest('hex'),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
   const reservation=await this.repo.transaction(state=>{
-   state.coachReceipts ||= [];const list=state.coachReceipts;
+   state.coachReceipts=(state.coachReceipts||[]).filter(r=>r.state==='running'||r.at>=now-COACH_RECEIPT_TTL_MS);
+   const list=state.coachReceipts;
    const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject);
    if(old){if(old.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');if(old.state==='ready')return {cached:old.reply!};throw Error('COACH_REQUEST_EXISTS');}
    if(list.filter(x=>x.familyId===session.familyId&&x.at>now-60000).length>=10)throw Error('RATE_LIMIT');
