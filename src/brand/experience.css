@@ -136,3 +136,8 @@
 /* Existing-game actions must remain full-size tap targets. */
 .studio-review .studio-actions #studioChange{min-height:46px;padding:10px 13px}
 .studio-review .studio-send-row #studioMic[aria-pressed="true"]{background:#FFECE6;border-color:#C34E42;color:#8D2733}
+
+/* Build recovery belongs to the status, never below unrelated chat settings. */
+.studio-review .studio-progress-banner .studio-build-controls{margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
+.studio-review .studio-progress-banner .studio-build-controls .studio-button{min-height:44px;padding:10px 16px}
+.studio-review .studio-progress-banner[data-phase="failed"] #studioRetry{background:var(--jems-ink);border-color:var(--jems-ink);color:white}
