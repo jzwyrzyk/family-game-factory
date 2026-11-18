@@ -5,7 +5,7 @@
 import {createHash,createHmac,randomBytes,randomUUID,scryptSync,timingSafeEqual} from 'node:crypto';
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import type {VerifiedSession} from './contracts/api';
-import type {Repository} from './pipeline/types';
+import type {Repository,PipelineState} from './pipeline/types';
 import {signSession,verifySession} from './pipeline/auth';
 
 export interface TrustedDevice {
@@ -30,12 +30,16 @@ export function cookieValue(raw:string|undefined,name:string){
 function deviceLive(device:TrustedDevice,now:number){
  return !device.revokedAt&&device.expiresAt>now&&device.lastSeenAt+DEVICE_IDLE>now;
 }
+export function assertActiveTrustedDevice(state:Pick<PipelineState,'devices'>,session:VerifiedSession,now=Date.now()){
+ if(!session.deviceId)return; // Old seven-day sessions remain valid only until their own expiry.
+ const device=state.devices?.find(d=>d.id===session.deviceId&&d.familyId===session.familyId);
+ if(!device||!deviceLive(device,now))throw Error('UNAUTHENTICATED');
+}
 export async function verifyBrowserSession(repo:Repository|undefined,rawCookie:string|undefined,key:string,now=Date.now()):Promise<VerifiedSession>{
  const session=verifySession(cookieValue(rawCookie,'factory_session'),key,now);
  if(session.deviceId){
   if(!repo)throw Error('UNAUTHENTICATED');
-  const state=await repo.snapshot(),device=state.devices?.find(d=>d.id===session.deviceId&&d.familyId===session.familyId);
-  if(!device||!deviceLive(device,now))throw Error('UNAUTHENTICATED');
+  assertActiveTrustedDevice(await repo.snapshot(),session,now);
  }
  return session;
 }
