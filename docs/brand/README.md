@@ -4,16 +4,16 @@ The selected public-facing brand is **jems** (lowercase), with a faceted **gem a
 ## Approved color system
 | Token | Hex | Function |
 |---|---|---|
-| Ink | `#0B1D4D` | headlines, body text, dark UI |
-| Gem Blue | `#2D7BFF` | primary action, navigation emphasis |
-| Spark Purple | `#8A4DFF` | imagination, active details |
-| Build Mint | `#34D7B3` | building, successful progress |
-| Idea Gold | `#FFC828` | idea sparks, rewarding emphasis |
-| Play Coral | `#FF6B7A` | playful accents, not alone for errors |
+| Ink | `#0B1E3B` | headlines, body text, dark UI |
+| Gem Blue | `#2E6BFF` | primary action, navigation emphasis |
+| Spark Purple | `#8B5CF6` | imagination, active details |
+| Build Mint | `#22D3A6` | building, successful progress |
+| Idea Gold | `#FFC24D` | idea sparks, rewarding emphasis |
+| Play Coral | `#FF5E7A` | playful accents, not alone for errors |
 | Cloud | `#FFF7EE` | warm surfaces |
 | Soft Lilac | `#E6D8FF` | surfaces, secondary emphasis |
 
-Avoid using pastel colors as small text on white. Maintain readable navy text on mint, gold, coral, and cloud. The brand's guidance calls the display family “Jems Round”, but the supplied portfolio did not include an installable licensed font. The **logo wordmark is outlined from the approved reference**; ordinary headings use a rounded system fallback rather than downloading unlicensed fonts. Interface text uses an Inter-like system stack.
+Avoid using pastel colors as small text on white. Maintain readable navy text on mint, gold, coral, and cloud. The approved style guide calls the display family “Poppins Rounded (Bold)”, but the supplied portfolio did not include an installable licensed font. The **logo wordmark is outlined from the approved reference**; ordinary headings use a rounded system fallback rather than downloading unlicensed fonts. Interface text uses an Inter-like system stack.
 
 ## Logo
 `public/jems-mark.svg` and `public/jems-logo.svg` are scalable SVG implementations of the *approved* faceted-gem/wrench layout. The approved brand portfolio is raster artwork, so the mark is an independently reconstructed faceted SVG with an **open-ended white wrench** (not a keyhole) and the lowercase wordmark is an SVG vector trace of the approved board. Logo, standalone wordmark and inverse variants are scalable; visual owner approval is still required before certification as final production masters. Never stretch, skew, recolor or apply shadows to the logo.
@@ -42,7 +42,7 @@ The brand extends well beyond the header. All artwork below is an original, loca
 
 Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac** for softly selected sections, **Gem Blue/Purple** as accent identity, **Mint** for building/progress and **Gold** for limited sparks. Coral is a playful accent and must not serve as the only indicator of an error.
 
-**Accessibility note:** Raw `#2D7BFF` with white small text is ~3.9:1, not the inaccurate 8.9:1 shown in a concept board. The *palette remains unchanged*; the semantic `--jems-action-blue: #195FD0` is used for small white button text (~5.85:1) and `--jems-action-purple: #7136C9` is an accessible darker purple. Do not use light pastels as text on white.
+**Accessibility note:** Raw `#2E6BFF` with white text is approximately 4.50:1, marginal for small type. Do not rely on this minimum through gradients or antialiasing. The *palette remains unchanged*; the semantic `--jems-action-blue: #195FD0` is used for small white button text (~5.85:1) and `--jems-action-purple: #7136C9` is an accessible darker purple. Do not use light pastels as text on white.
 
 ### Where the identity is applied
 | Experience | Brand expression | Intensity |
@@ -57,3 +57,18 @@ Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac**
 | Legacy Arcade, favicon/PWA/offline | Same tokens, identity and mark with legacy behavior unchanged | Low |
 
 **Non-negotiable restraint:** Graphics never obscure text, hijack input focus, displace playable game media, degrade 390px mobile first-action visibility, or animate while reduced-motion is requested. Branding must never claim educational mastery or model availability not supported by the product.
+
+## Additional source-guide lockups — PR #34
+- `public/jems-logo.svg`: traced lowercase gem/wrench lockup and **THE GAME FACTORY** subline.
+- `public/jems-mark.svg` and `public/arcade-icon.svg`: faceted standalone gem with the open-ended white wrench and gold sparks.
+- `public/jems-mono.svg`: dark silhouette with a **solid white** center wrench; not a transparent knockout.
+- `public/jems-reversed.svg`: white-on-dark alternate logo.
+- `public/jems-pattern.svg`: subtle gem/wrench/spark decoration, optional; do not cover controls or instructional text.
+
+Exact source-guide palette: **Ink #0B1E3B, Jem Blue #2E6BFF, Spark #8B5CF6, Play #FF5E7A, Idea #FFC24D, Build #22D3A6**. The newer Jems 5 homepage, parent dashboard, subject navigation, saved projects, and Bubblegum v2 sticker game remain the baseline. The SVG assets are interpreted traces, **not yet certified master artwork**. Owner visual parity against the originally approved image board and a fresh exact-head browser test run remain mandatory before merge or publication.
+
+
+### Legacy branding asset reconciliation (PR #34)
+The original universal-brand rollout introduced useful supporting assets that must stay in use when this fidelity PR lands. The existing `jems-wordmark.svg`, `jems-facets-pattern.svg`, `jems-sparks.svg` and `jems-blocks.svg` now use the exact six-source-guide colors wherever those named swatches occur. The installable `jems-app-icon.svg` embeds the *same faceted gem and solid-white wrench* as the current `jems-mark.svg`, without external SVG/image dependencies. The compatibility `jems-mark-monochrome.svg` and `jems-mark-inverse.svg` retain their legacy URLs but now use a visible, opaque white center wrench rather than a transparent knockout. The PWA manifest and HTML theme-color use Ink `#0B1E3B`.
+
+The retained Jems 5 homepage, saved games and parent-learning experiences and Bubblegum sticker game are the required integration baseline. These asset updates do **not** authorize activation of child-facing model services, user tracking, or a public rollout; visual master-art parity and final exact-head CI remain review gates.

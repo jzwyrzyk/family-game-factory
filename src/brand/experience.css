@@ -27,9 +27,9 @@
 .studio-review .studio-prompt{
  margin:10px 14px 14px;padding:14px 17px 13px;background:#FFF!important;
  border:2px solid var(--jems-purple)!important;border-radius:18px!important;
- box-shadow:0 6px 20px #8A4DFF11;transition:box-shadow .18s,border-color .18s
+ box-shadow:0 6px 20px #8B5CF611;transition:box-shadow .18s,border-color .18s
 }
-.studio-review .studio-prompt:focus-within{box-shadow:0 0 0 4px #8A4DFF22,0 8px 20px #8A4DFF17;border-color:#6C32D8!important}
+.studio-review .studio-prompt:focus-within{box-shadow:0 0 0 4px #8B5CF622,0 8px 20px #8B5CF617;border-color:#6C32D8!important}
 .studio-review .studio-prompt label{font:800 15px/1.4 var(--jems-round);color:var(--jems-ink)}
 .studio-review .studio-prompt textarea{
  min-height:98px;max-height:260px;font:500 15px/1.6 var(--jems-body);
@@ -42,7 +42,7 @@
 .studio-review .studio-send-row #studioTalk{
  grid-column:3;min-height:49px;min-width:150px;flex:none!important;font-weight:850;
  background:var(--jems-blue);border-color:var(--jems-blue);color:white;
- box-shadow:0 8px 18px #2D7BFF24
+ box-shadow:0 8px 18px #2E6BFF24
 }
 .studio-review .studio-send-row #studioSend{
  grid-column:2;justify-self:end;min-height:47px;flex:none!important;
@@ -52,7 +52,7 @@
  grid-column:1/-1;width:100%;margin-top:12px;min-height:60px;
  background:var(--jems-ink)!important;border:2px solid var(--jems-ink)!important;
  color:#FFFFFF!important;font:850 17px/1.2 var(--jems-round)!important;
- box-shadow:0 12px 26px #0B1D4D2B!important
+ box-shadow:0 12px 26px #0B1E3B2B!important
 }
 .studio-review .studio-send-row #studioSend:disabled,.studio-review .studio-send-row #studioTalk:disabled{opacity:.6}
 .studio-review .studio-workshop-availability{display:none}
