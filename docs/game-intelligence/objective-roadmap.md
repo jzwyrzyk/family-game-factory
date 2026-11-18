@@ -1,64 +1,71 @@
-# Jems Game Intelligence — Objective-by-objective execution plan
+# Jems Game Intelligence — Functional-First Objective Roadmap
 
-**Method:** Develop one narrowly scoped problem at a time in this conversation. Draft PR #43 is the integration branch; Issue #44 is the single master tracker. This page is the objective-level source of truth. Do not create a parallel umbrella PR or merge/deploy incrementally without separate review.
+**Decision review:** November 18, 2026. **Status:** O0–O2 engineering foundations completed; O3 is next. All changes remain in [draft PR #43](https://github.com/jzwyrzyk/family-game-factory/pull/43), tracked by [Issue #44](https://github.com/jzwyrzyk/family-game-factory/issues/44). No automatic merge, public activation or worker trust change.
 
-**Product doctrine (updated): First make the game **WORK**, reliably and faithfully: input responds, requested mechanics actually occur, learning and revision integration remain intact, failures recover safely, and repairs are demonstrably effective. Only after that pursue deeper visual polish and first-play delight. Choose the simplest coherent mechanics; rendering, interaction, physics, art, and learning are independent decisions. Automated code tests do not establish real-child enjoyment.
+## Mission and priority order
 
-## Working agreement
+Jems must reliably convert the child's idea into a **working, faithful, playable, editable game**. The first goal is NOT that a game be dazzling or highly optimized on its first generation. The priority order is:
 
-- **Exactly one active objective.** Don't begin the next until the active objective meets acceptance or a documented blocker is isolated.
-- **Scope lock:** for each objective, specify the question, output, tests, affected interfaces, and explicitly excluded work.
-- **Finish with evidence:** cite exact commit/checks, remaining risks, and mark COMPLETE, BLOCKED, or IN PROGRESS.
-- **Never silently change the idea:** keep original words, game/version ownership, essential mechanics, child-selected Keep action, and the privacy/learning/budget boundaries.
-- **Research is not activation:** no new paid model calls, child telemetry, external sharing, provider credentials, private worker trust changes, or production deployment by default.
-- **Keep other PRs independent:** parent UX, Bubble Gum toy, coach/voice, safety, drawing and learning must not be conflated or overwritten.
-- **One progressive draft:** small, separately reviewable commits on PR #43. Stop and review structure if the accumulated diff or rebase risk becomes too large; do not spontaneously create competing PRs.
-- **Conversation continuity:** each completed objective records the *one next objective*, so the user's "continue" resumes without re-litigating resolved decisions.
+1. **Correct function:** requested action actually works; clear input/state/output; essentials and requested payoff happen; no freezes or false win.
+2. **Robustness and safety:** mobile/touch/keyboard, pause/replay, sandbox, privacy, cost limits, math/English host integration and existing versions behave properly.
+3. **Evidence-driven repair:** detect objective defects and correct them within the child's original requirements; re-run independent tests; preserve prior versions and honest failure messages.
+4. **Enjoyment and polish:** playful art, expressive animation and observed delight are worthwhile only after a reliable experience exists.
 
-## Scope and completion gates
+**Do not introduce a second generation pipeline or a second repair engine.** Reuse the existing authenticated private generator, worker, sandbox/preview, durable revisions, model budgets and bounded repair coordinator. New game-intelligence code must either plug into these or remain explicitly research-only.
 
-| ID | Objective | Core question and tangible deliverable | Done when |
-| --- | --- | --- | --- |
-| **O0** | Foundation and baseline | Lock initial PR/source, verify checks, preserve existing games/risks and document roadmap | CI for exact head reported accurately; skipped/cancelled checks not claimed successful; scope/ownership documented |
-| **O1** | Child intent contract | Versioned source-traceable record of requested action, effect, payoff, characters, constraints, explicit unknowns and revision | Every requirement grounded in verbatim source, nothing invented or lost, ambiguous/negative prompts and legacy edits tested |
-| **O2** | Minimal gameplay architecture | Decide rule-driven vs physical simulation, real 2D vs unsupported true 3D, and interaction affordance based on O1 | Contrast benchmarks prove no theme-driven overphysics, no false 3D claim, true physics preserved; uncertainty not overruled |
-| **O3** | Functional gameplay contract | Specify working controls, deterministic state transitions, reachable goals/open-ended behavior, clear outcomes, reset/replay and recoverability, and the *requested* payoff. Functional quality first; optional visual delight is deferred. | Each essential mechanic has a testable input → state/effect → observable output; explicit failure/retry, learning pauses and save/reopen expectations. No fake successes or invented goals |
-| **O4** | Private generator contract | Pass intent and blueprint to existing trusted generation/repair without loosening schema, safety, learning or cost | Mock provider + legacy/novel contract tests; only needed APIs described; no new external provider call without authorization |
-| **O5** | Independent rendered game playtests | Exercise real controls in isolated preview, verify the built artifact produces promised effects | Bounded screenshots/traces support per-requirement pass/fail/not-tested; detect missing payoff, broken controls, unreachable goal; no self-grading |
-| **O6** | Bounded defect repair and comparison | Fix observable defects, not children's creative preferences, while preserving working versions | Tested repair actually addresses the defect; full safety/learning gates rerun; undo/Keep/version provenance retained |
-| **O7** | Cross-vertical integration | Apply standard across drawing, voice/coaching, live remix/DOE, math/English, wait flow, saved games, parent reports, accessibility | Targeted integration/regression journeys pass without turning drawings into accidental colliders or suppressing learning |
-| **O8** | Verified reliability first, delight research second | Compare baseline versus research on functioning/intent fidelity, broken-control and missing-payoff rates, repair outcomes, latency, cost and device integration; *then* assess child enjoyment with consent. | Baseline A/B and held-out results demonstrate functioning without regressions; only observed child feedback supports enjoyment claims |
-| **O9** | Cumulative merge and deployment | Full integrated PR review, conflict resolution, exact-source CI, approved pinned worker, staged production and rollback | Owner-authorized trusted release; secure worker public-source pin updated only by separate review; smoke tests and rollback verified |
+## Definition of a WORKING game
 
-## O0: Complete; O1 is the only next active objective
+A game is functionally acceptable only when the child can perform the requested primary action using the real intended controls; that action produces a visible, rule-consistent effect; the requested objective or free-play behavior works; the explicit payoff occurs; losing/retry/replay and interruption work; Keep/Undo/history do not lose the game; required learning checkpoints still work; and preview execution stays isolated and within limits. An objective cannot be accepted by source compilation, a mock-only success label or an LLM's self-evaluation. Where an arbitrary game cannot be objectively tested, record **not tested**, not passed.
 
-Baseline verified after the initial draft:
-- Draft PR #43 remains unmerged.
-- Arcade journeys for public app head e4f5e20e5825972f8fc469dd86e57ba6a9e49d11 succeeded, including its browser/learning/creative jobs.
-- The visual-review run for the same head was initially cancelled, but its cancelled job was rerun. All four jobs subsequently passed: screenshots, brand contract, Studio journey and joy-contract. [View final successful run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320154925).
-- The separate private generation worker checks out an older immutable reviewed public-source SHA and will NOT adopt PR #43 merely because the app branch is merged. No private worker/credential/attestation change is included here.
-- Existing code is a bounded deterministic game-form advisory plus quality-evidence ledger. It is NOT a generalized intent recognizer, a real gameplay quality evaluator, or a measurement of fun.
+## Sequential objectives
 
-**O0 disposition: COMPLETE for the reviewed code-bearing baseline.** [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320155111) and [full visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320154925) passed at public app code SHA e4f5e20e5825972f8fc469dd86e57ba6a9e49d11. Documentation-only changes on this branch after that SHA do not add runtime behavior, but the final PR still needs its own exact-head checks. **O1 is now the only active next engineering objective.**
+| ID | Objective | Deliverable in scope | Minimum acceptance gate | State |
+| --- | --- | --- | --- | --- |
+| O0 | Baseline and safety boundary | Pinned code, CI, working-game and production ownership inventory | Exact-head baseline suite and no unauthorized activation | **Complete** |
+| O1 | Source-grounded child intent | Exact original text, verifiable intended actions/constraints/payoff/revision provenance | Negative, ambiguity, Unicode, tampering, revision tests and full source CI | **Engineering complete**; semantic accuracy unproven |
+| O2 | Minimum sufficient game form | Independent 2D / true 3D, scripted / physics, input style decision with evidence, uncertainty and old-version protections | Sticker vs grid vs real suspension vs unsupported 3D and saved-game contrasts; full source CI | **Engineering complete**; not integrated |
+| O3 | **Executable working-game contract** | Convert O1 requirements + O2 form into testable player inputs, state transitions, visible effects, win/free play, retry and replay criteria; establish three small *authored* reference games | Demonstrate a complete sticker-assemble → Launch case end-to-end in a safe local fixture; additionally cover robot-grid and physical-car cases; broken outcome/controls fail | **Next** |
+| O4 | **Connect to existing generation and preview** | Route the validated design contract through existing private agent and authenticated generation/preview contracts, beginning with a fixture-backed vertical slice | A child idea reaches a playable test, a later edit changes actual gameplay, and the prior version remains intact; no false ready, no paid/security bypass | Not started |
+| O5 | **Independent functional gameplay checks** | Test the rendered sandbox game with real input and objective traces; detect unresponsive controls, missing required effect, unreachable goal, broken pause/replay | Red/green tests on deliberately broken games, not just authored valid ones; no generated self-certification or invented fun score | Not started |
+| O6 | **Proven repair and recovery** | Extend existing bounded generation→test→repair coordinator with intent-specific diagnostics; protect prior version | Broken example fails, repair reruns all safety/learning tests, fixed behavior is observed or fail-closed; max retries/budgets preserved, no automatic Keep | Not started |
+| O7 | **Cross-vertical production journey** | Verified child Create → Play → Modify → Test → Compare → Keep → Return across Studio, learning, coach/voice, drawings when enabled, saved versions | Real browser/device and host-contract integration, failure/refresh/reconnect and math/English interruption tests; no silent regression | Not started |
+| O8 | **Reliability benchmarking and product acceptance** | Compare current vs improved generation for essential mechanics functioning, false success, repairs, input failures, latency/cost and accessibility; run observed child feedback separately | Repeatable baseline and genuinely unseen challenge ideas, report failures and uncertainty; child fun/learning claims require human observation | Not started |
+| O9 | **Final security/integration/release** | Rebase with concurrent fixes, review exact head, update private worker code pin through existing trust process, deploy and verify rollback | All mandatory CI and security gates green, actual owner-approved private worker and application smoke, explicit owner authorization | Not started |
 
-## Objective transition: O1 completed for source-contract gate; O2 now active
+## Important change to our working method
 
-**Problem:** Produce a source-traceable experience contract from a child's request without inventing mechanics or taking control of the design.
+**One objective at a time**, but **integration/regression checks at every objective**, not only O7. Each objective may be broken into narrowly scoped commits: (a) code, (b) adversarial fixture, (c) integration check, (d) review. Do not call a stage complete on unit tests alone if its claim concerns real game behavior. No extra child conversation steps merely to satisfy our internal classification.
 
-**Inputs:** exact child words plus optional base revision. **Outputs:** a small typed and versioned contract with child-quoted/source-span entities, actions, causal outcomes, named payoff, explicit “must/avoid” constraints, objective or free-play intent (only if stated), provenance, unknowns and contradictions. Keep model proposals separate from child-authored facts.
+Use **one early vertical slice** to challenge the pipeline: **bubble-gum/sticker assembly, attach pieces, press Launch, animation actually executes, change and replay without losing work.** This is an engineering fixture, not an unreviewed change to the curated Bubble Gum game tracked separately in PR #40. Then confirm **Robot Route Lab** uses grid logic and **Junkyard Rally** retains genuine suspension/physics. These cover simple direct manipulation, deterministic rules and physics without prematurely generalizing to every genre.
 
-**Representative cases:** Gum-stuck socks that blast off (two moments), sticker rocket (no automatic physics), hill-driving suspension (physical), cat eating donuts and growing, a grid robot (no true 3D), real 3-axis navigation (unsupported by current runtime), child drawing with ambiguous wheels, no-physics phrasing and revisions to a saved game.
+## Existing components we must integrate, not rebuild
 
-**O1 verified:** typed source-contract, strict validator and targeted tests passed on application head `bdf0125deb7d1d2ded9dc57ca07217fc52d2c202`, with [Arcade journeys (browser/learning/creative)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44331115328) successful after a focused rerun of a mobile language timeout. The visual-review brand job was originally cancelled in setup and was rerun separately. This is the O1 technical acceptance gate, not universal linguistic correctness. **O2 active:** source-traceable form selection for explicit versus ambiguous physics/3D, plus regression protection for legacy revisions. O2 must not promise running games; those gates come in O3–O7.
+- The private Responses agent currently uses the original O0 game-form advice and does NOT yet consume O2's validated decision. O4 must reconcile this divergence; O2 passing tests alone changes no private worker behavior.
+- Existing Actions coordination already permits up to two bounded repair attempts on failed test reports. O6 should add **intent-specific evidence and verify repaired gameplay**, not create another repair orchestrator.
+- The trusted 2D generated runtime, sandbox execution, required learning host, private preview, revision history, budget gates and immutable worker SHA restrictions are existing non-negotiable infrastructure.
+- Independent generated-code smoke tests exist but do not demonstrate arbitrary child-specific intent fidelity or actual enjoyment. O5 extends their test scope with evidence.
+- Other open UX, coach, safety and bubble-gum PRs may conflict; O7/O9 must reconcile their actual merged/remaining code rather than overwrite them.
 
-## Supporting references
+## Risks and claims
 
-- [Main design standard](README.md)
-- [Independent research / holdout protocol](research-protocol.md)
-- [Cross-vertical acceptance matrix](cross-vertical-standard.md)
-- [Draft PR #43](https://github.com/jzwyrzyk/family-game-factory/pull/43)
-- [Master Issue #44](https://github.com/jzwyrzyk/family-game-factory/issues/44)
+- O1 and O2 are conservative, largely lexical proposals. Passing authored contrast tests does NOT establish robust interpretation across children's arbitrary speech. Ambiguous essential requirements cannot be silently replaced by an easy game.
+- The 24 sample ideas in the publicly visible research document are **reference examples**. Because the named H01–H08 cases are disclosed, do NOT claim them as a genuinely sealed, unseen holdout. The final evaluation must use additional independent withheld examples if a true holdout is required; do not expose private child prompts in public code or logs.
+- Avoid a composite fake 'fun score'. Before functionality is established, compare **working requirement coverage, broken control/outcome incidence, successful verified repair, regression rate, cost and latency**.
+- Private generation is pinned to an approved public source SHA. Merging this draft or deploying static Pages does NOT automatically update the private worker; do not bypass its pin/WIF/runner security restrictions.
+- No public crowdsourced game library, sharing or messaging; child data collection or paid model activation remains separately gated.
 
-## Priority override — reliable functional games before delight
+## Completed-gate evidence and present status
 
-The owner explicitly prioritized **must work, must be integrated, must be repairable** over excellent first-try engagement polish. A functional test failure, silent mechanic omission, broken input, lost revision, interrupted math/English session, or unrecoverable generated preview is release-blocking regardless of artwork or delight. O3 now specifies working game contracts; O5 tests rendered behavior; O6 verifies bounded repairs; O7 verifies cross-vertical integration. O8 adds human enjoyment evidence *after* the reliable mechanics gates. Visual polish, celebratory motion, audio and aesthetics remain valuable but cannot mask gameplay failures. O2 remains strictly about selecting the needed architecture and abstaining when it cannot do so honestly.
+**O0:** baseline application head `e4f5e20e5825972f8fc469dd86e57ba6a9e49d11`, [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320155111) and [full visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44320154925) passed.
+**O1:** contract and tests on `bdf0125deb7d1d2ded9dc57ca07217fc52d2c202`, [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44331115328) passed after isolated mobile learning rerun; this is a technical gate, not universal intent understanding.
+**O2:** on `4bd68e2a770cca3c33ca8bf8324b36bb117eb48e`, both [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44338478637) (browser/learning/creative) and [full visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44338478832) passed. It remains an offline advisory, not activated in the private generator.
+
+**Immediate next objective: O3**, a tiny but executable **functional acceptance contract with test fixtures**, not a large prompt engineer or visual redesign. Its concrete acceptance is that a safe local game reacts to inputs and produces the promised sequence with working reset/replay. Once this is objectively verified, O4 wires it through the real existing generator.
+
+## Supporting documents
+
+- [Original design standard](README.md)
+- [O1 intent contract](objective-01-child-intent.md)
+- [O2 form contract](objective-02-game-form.md)
+- [Cross-vertical test reference](cross-vertical-standard.md)
+- [Research examples and protocol](research-protocol.md)
