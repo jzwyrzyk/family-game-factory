@@ -30,13 +30,30 @@ export function installCoaching(h:Hooks){
  let selectedSuggestion:string|null=null,requestInFlight=false,promptVersion=0;
  $('studioPrompt').addEventListener('input',()=>{promptVersion++;});
  let force=false,origin:Origin='child',depth:Experiment['depth']='tune';
+ let guidedPlan=false,guidedField:PlanField|null=null;
  const controls=node('section','','design-controls');controls.id='designControls';
  controls.innerHTML='<div class="design-mode"><strong>How can I help?</strong><button type="button" id="coachDiscuss">Talk it through</button><button type="button" id="coachIdeas">Give me ideas</button><button type="button" id="coachExplain">Explain</button><button type="button" id="coachThink">Let me think / play</button></div><details id="coachExperimentOptions" class="design-options"><summary>Experiment options (optional)</summary><label for="experimentStart">Start the next experiment from</label><select id="experimentStart"><option value="main">My main game — a different test</option><option value="continue">This test — develop this idea</option></select><label for="designPrediction">My guess about this experiment (optional)</label><input id="designPrediction" maxlength="300" placeholder="I think this might…"></details><button type="button" id="coachTry" class="studio-button">Try my idea</button><button type="button" id="coachPlanToggle" class="studio-button">My game plan</button><details id="coachSupportOptions" class="design-options"><summary>How much help? (optional)</summary><label for="coachSupport">Explanation style</label><select id="coachSupport"><option value="brief">Short and simple</option><option value="balanced">A little help</option><option value="detailed">Explain more</option></select><label for="coachFriction">What I want to figure out</label><input id="coachFriction" maxlength="1000" placeholder="Optional — in your words"></details><span id="coachModeStatus" role="status"></span><div id="coachProposals"></div>';
  $('studioPromptForm').querySelector('.studio-send-row')!.after(controls);
  const plan=node('details','','design-plan') as HTMLDetailsElement;plan.id='designPlan';
- const summary=node('summary','Our game plan — your choices');plan.append(summary);const planStatus=node('p','','design-plan-status');planStatus.id='planSaveStatus';planStatus.setAttribute('role','status');plan.append(planStatus);
+ const summary=node('summary','Our game plan — your choices');plan.append(summary);
+ const guideStatus=node('p','','design-guide-status');guideStatus.id='designGuideStatus';plan.append(guideStatus);
+ const planStatus=node('p','','design-plan-status');planStatus.id='planSaveStatus';planStatus.setAttribute('role','status');plan.append(planStatus);
  const intro=node('p','Your answers save as you type. Choose what matters, or ask for suggestions. “No score” and “no losing” are valid designs. Nothing builds until you choose Build this plan.');plan.append(intro);plan.append(action('You choose the remaining details',()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();for(const field of missingPlan(x.design))x.design.plan[field]={value:x.design.plan[field]?.value||'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});renderPlan();}));
- for(const key of PLAN_FIELDS){const label=node('label',PLAN_LABELS[key]) as HTMLLabelElement;label.htmlFor='plan-'+key;const input=document.createElement('textarea');input.id='plan-'+key;input.rows=2;input.maxLength=700;input.oninput=()=>run(()=>saveField(key,false));const credit=node('small');credit.id='plan-credit-'+key;const buttons=node('div','','design-plan-actions');buttons.append(action('Save my answer',()=>saveField(key)),action('You choose',()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.plan[key]={value:'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});pendingFields.delete(key);helperFields.delete(key);renderPlan();}));plan.append(label,input,credit,buttons);}
+ for(const key of PLAN_FIELDS){
+  const field=node('section','','design-plan-field');field.dataset.field=key;
+  const label=node('label',PLAN_LABELS[key]) as HTMLLabelElement;label.htmlFor='plan-'+key;
+  const input=document.createElement('textarea');input.id='plan-'+key;input.rows=2;input.maxLength=700;input.oninput=()=>run(()=>saveField(key,false));
+  const credit=node('small');credit.id='plan-credit-'+key;
+  const buttons=node('div','','design-plan-actions');
+  buttons.append(action('Save my answer',()=>saveField(key)),action('You choose',()=>{
+   const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.plan[key]={value:'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});
+   pendingFields.delete(key);helperFields.delete(key);
+   if(guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;
+   renderPlan();
+   if(guidedPlan&&guidedField)$<HTMLTextAreaElement>('plan-'+guidedField).focus();
+  }));
+  field.append(label,input,credit,buttons);plan.append(field);
+ }
  const approve=action('Build this plan',()=>{for(const key of pendingFields.keys())saveField(key,false);const s=h.current(),d=s.design||freshDesign();if(missingPlan(d).length){h.status('Choose an answer or “You choose” for the missing decisions.');plan.open=true;$('plan-'+missingPlan(d)[0]).focus();return;}h.notebook.update(s.id,s.owner,x=>{x.design!.approvedPlan=true;});const first=(s.messages.find(m=>m.role==='child')?.text||s.draft||'Build the game in this plan.').slice(0,350);const brief=PLAN_FIELDS.map(k=>k+': '+(d.plan[k]?.value?.slice(0,160)||'Child delegated this choice; propose a sensible rule.')).join('\n');return request(first+'\n\nApproved game plan (full choices remain in this notebook):\n'+brief,'child','redesign');});approve.id='buildGamePlan';plan.append(approve);
  $('studioPromptForm').after(plan);
  const shelf=node('section','','experiment-shelf');shelf.id='experimentShelf';$('studioVersions').prepend(shelf);
@@ -47,7 +64,7 @@ export function installCoaching(h:Hooks){
  $('coachDiscuss').onclick=()=>void discuss('discuss');$('coachIdeas').onclick=()=>void discuss('ideas');$('coachExplain').onclick=()=>void discuss('explain');
  $('coachTry').onclick=()=>{const p=$<HTMLTextAreaElement>('studioPrompt').value.trim();if(p)void request(p,p===selectedSuggestion?'helper':'child','tune');else h.status('Tell me the change you want to try.');};
  $('coachThink').onclick=()=>run(async()=>{if((window as any).FG.learning?.active){h.status('Finish the current learning activity first.');return;}cancelDiscussion();cancelRequest();const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;x.reflection=false;});h.status('Your thoughts and tests are saved. Keep playing.');document.body.classList.remove('studio-designing');await h.playMain();});
- $('coachPlanToggle').onclick=()=>run(()=>{plan.open=!plan.open;if(plan.open)renderPlan();});
+ $('coachPlanToggle').onclick=()=>run(()=>{guidedPlan=false;guidedField=null;plan.classList.remove('guided');plan.open=!plan.open;if(plan.open)renderPlan();});
  // Do not let typing in any design field move or jump the game character.
  [controls,plan,shelf].forEach(e=>e.addEventListener('keydown',event=>event.stopPropagation()));
  function saveField(key:PlanField,explicit=true){
@@ -61,10 +78,19 @@ export function installCoaching(h:Hooks){
     :{value,origin:'child',accepted:!!value.trim(),delegated:false};x.design.approvedPlan=false;});}
   catch(error){planStatus.textContent='This answer has not saved yet. Keep it here and try Save my answer again.';throw error;}
   pendingFields.delete(key);planStatus.textContent=pendingFields.size?'Some answers have not saved yet. Use Save my answer beside each one to try again.':'Your answers are saved on this device. Nothing has been built yet.';
-  renderPlan();if(explicit)h.status('Saved your choice. Nothing has been built yet.');
+  if(explicit&&guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;
+  renderPlan();
+  if(explicit&&guidedPlan&&guidedField)$<HTMLTextAreaElement>('plan-'+guidedField).focus();
+  if(explicit)h.status('Saved your choice. Nothing has been built yet.');
  }
- function renderPlan(replaceFocused=false){const d=h.current().design||freshDesign();for(const key of PLAN_FIELDS){
-  const input=$<HTMLTextAreaElement>('plan-'+key),f=d.plan[key];
+ function renderPlan(replaceFocused=false){
+  const d=h.current().design||freshDesign(),missing=missingPlan(d);
+  plan.classList.toggle('guided',guidedPlan);
+  guideStatus.textContent=guidedPlan?(guidedField?'Let's decide one thing at a time · '+(PLAN_FIELDS.length-missing.length+1)+' of '+PLAN_FIELDS.length:'Your game choices are ready to review. Nothing has been built yet.'):'Choose only the details that matter. Your ideas stay yours.';
+  for(const key of PLAN_FIELDS){
+   const field=plan.querySelector<HTMLElement>('.design-plan-field[data-field="'+key+'"]');
+   if(field)field.hidden=guidedPlan&&key!==guidedField;
+   const input=$<HTMLTextAreaElement>('plan-'+key),f=d.plan[key];
   if(f?.origin==='helper'&&!pendingFields.has(key))helperFields.set(key,{...f});
   if(replaceFocused||document.activeElement!==input)input.value=pendingFields.get(key)??f?.value??'';
   $('plan-credit-'+key).textContent=pendingFields.has(key)?'Not saved yet':!f?'Not decided yet':f.delegated?'You asked the helper to choose; it must report that choice.':f.origin==='child'?'Your choice':f.accepted?'Helper suggestion you chose':'Helper suggestion — not accepted yet';
@@ -118,7 +144,8 @@ export function installCoaching(h:Hooks){
  }
  async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
-  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');plan.open=true;renderPlan();plan.scrollIntoView({block:'nearest'});return true;}return false;}
+  const s=h.current();if(force||explicitTry){if(s.game==='new'&&!s.remoteId&&!(s.design?.approvedPlan)){h.message(s,'helper','Let’s agree on the important game choices first. You can answer, say “none”, or ask me to choose.');guidedPlan=true;guidedField=missingPlan(s.design||freshDesign())[0]||null;
+   plan.open=true;renderPlan();plan.scrollIntoView({block:'nearest'});return true;}return false;}
   if(h.localSupported(prompt))return false;
   // The legacy implicit-send path stays conversational; explicit Try means build/plan.
   await discuss('discuss',prompt);return true;
@@ -144,6 +171,7 @@ export function installCoaching(h:Hooks){
  }
  function openSession(){
   combineSelection.clear();selectedSuggestion=null;cancelDiscussion();cancelRequest();helperFields.clear();pendingFields.clear();planStatus.textContent='';
+  guidedPlan=false;guidedField=null;plan.classList.remove('guided');
   $('coachProposals').replaceChildren();$<HTMLSelectElement>('experimentStart').value='main';
   $<HTMLDetailsElement>('coachExperimentOptions').open=false;$<HTMLDetailsElement>('coachSupportOptions').open=false;plan.open=false;
   document.body.classList.remove('studio-designing');const s=h.current();if(!s.design)h.notebook.update(s.id,s.owner,x=>{x.design=freshDesign();});
