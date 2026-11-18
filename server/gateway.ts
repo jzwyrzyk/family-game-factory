@@ -1,5 +1,7 @@
 import {CoachService} from './coach/service';
-import {PrivateCoachBridge,privateCoachOrigin} from './coach/private-bridge';
+import {PrivateCoachBridge,PrivateSpeechBridge,privateCoachOrigin} from './coach/private-bridge';
+import {CoachAudioService,speechConfig,type SpeechProvider} from './coach/speech';
+import {speechHttpHandler} from './coach/audio-http';
 import {coachConfig,coachHandler} from './coach/http';
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {createServer} from 'node:http';
@@ -55,6 +57,9 @@ export async function createGateway(config:GatewayConfig){
  const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
  const coach=coachHandler(new CoachService(repo,coachConfig(process.env),
    coachTarget?new PrivateCoachBridge(coachTarget):undefined),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
+ const offlineSpeech:SpeechProvider={readiness:async()=>false,transcribe:async()=>{throw Error('AUDIO_UNAVAILABLE');}};
+ const audio=speechHttpHandler(new CoachAudioService(repo,speechConfig(process.env),
+   coachTarget?new PrivateSpeechBridge(coachTarget):offlineSpeech),{appOrigin:config.appOrigin,sessionKey:config.sessionKey});
  const api=apiHandler(service,http),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
@@ -65,7 +70,8 @@ export async function createGateway(config:GatewayConfig){
   if(url.pathname==='/v1/internal/dispatch'){
    try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
   }
-  if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'){await coach(req,res);return;}
+  if(url.pathname==='/v1/coach/audio'||url.pathname==='/v1/coach/audio/status'){await audio(req,res);return;}
+  if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'||url.pathname==='/v1/coach/erase'){await coach(req,res);return;}
   if(url.pathname==='/v1/sessions'){await sessions(req,res);return;}
   await api(req,res);
  }};
