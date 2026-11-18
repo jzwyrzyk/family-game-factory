@@ -32,7 +32,12 @@ function coachingHarness(game:'new'|'gum'='new'){
  const storage=new Memory(),book=new StudioNotebook(storage),initial=game==='new'?book.create('child-one','new','Synthetic new game'):book.create('child-one','gum','Synthetic game','fixture-project');let active=initial;
  const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[],requests:any[]=[];let playCalls=0;
  Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}},dispatchEvent:(event:Event)=>{if(event.type==='jems:milestone')milestones.push((event as CustomEvent<{kind:string}>).detail.kind);return true;}}});
- Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>{requests.push(JSON.parse(String(options.body)));pending.push({resolve,reject,signal:options.signal as AbortSignal});})});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(url:string,options:RequestInit={})=>{
+  // Session preflight is separate from the model reply: no message is queued
+  // and no coach request is made until a valid family session is confirmed.
+  if(url.endsWith('/v1/sessions/status'))return Promise.resolve(new Response(JSON.stringify({connected:true,trusted:true}),{status:200}));
+  return new Promise<Response>((resolve,reject)=>{requests.push(JSON.parse(String(options.body)));pending.push({resolve,reject,signal:options.signal as AbortSignal});});
+ }});
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
