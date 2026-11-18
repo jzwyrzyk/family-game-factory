@@ -8,7 +8,7 @@
 - Access sessions are valid for 24 hours. A separate Secure, HttpOnly trusted-device cookie renews them automatically while the device remains trusted. Renewal rotates the credential, tolerating a 15-second overlap for parallel tabs. Neither credential nor the passphrase enters localStorage, source code or logs.
 - Device trust expires at the earliest of 90 days since last renewal or an absolute 365 days from enrollment. Browser data clearance, deliberate revocation, long inactivity or expiry requires a fresh parent enrollment. Routine weekly use never does.
 - Each protected API request checks the device record. Parent revocation stops even an otherwise unexpired access session immediately.
-- Parent device management requires a separate 15-minute parent session authorized by the family passphrase. After five failures, management locks for 15 minutes. Parent Controls can list and revoke trusted devices; self-disconnect is also possible.
+- Parent device management requires a separate 15-minute parent session authorized by the family passphrase. After five failures, management locks for 15 minutes. Parent Controls can list/revoke trusted devices, issue short-lived invitations to connect additional tablets without returning to Cloud Shell, and self-disconnect.
 - Only salted scrypt passphrase hashes and SHA-256 device secret hashes, device names and bounded timestamps persist inside the existing family Firestore workspace. Existing game, learning, saved-version and ledger data are unchanged.
 
 ## Gateway API
@@ -17,6 +17,7 @@ POST /v1/sessions/enroll — consume a single-use invitation and create a truste
 POST /v1/sessions/renew — rotate device credential and issue 24-hour signed access.
 GET /v1/sessions/status — verify actual access, not merely public gateway URLs.
 POST /v1/devices/unlock — unlock parent device management with passphrase and lockout.
+POST /v1/devices/invite — unlocked parent issues a one-use invitation for another device (up to three active invitations).
 GET /v1/devices — parent-only inventory.
 POST /v1/devices/revoke — parent-only revocation.
 POST /v1/devices/disconnect — revoke the currently authenticated device.
