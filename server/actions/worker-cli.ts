@@ -15,7 +15,7 @@ async function main(){
    const agent=new OpenAIResponsesAgent(task.approval,()=>process.env.FACTORY_OPENAI_API_KEY||'');const input:AgentInput={...task.input,signal:controller.signal};const result=attempt&&task.previous?await agent.repair(input,task.previous,task.diagnostics||'Repair the failing game.'):await agent.generate(input);await api('report',{stage,attempt,report:result});
   }else{
    if(process.env.FACTORY_OPENAI_API_KEY)throw Error('MODEL_KEY_FORBIDDEN_IN_TEST_STAGE');const gate=new DockerArtifactGate({image:process.env.FACTORY_SANDBOX_IMAGE||'',timeoutMs:60000,memoryMb:1536,cpus:1});
-   try{await gate.preflight();const game=await gate.test(task.game,{signal:controller.signal});await api('report',{stage,attempt,report:{ok:true,game}});}catch(error){await api('report',{stage,attempt,report:{ok:false,diagnostics:(error as Error).message.slice(0,1500)}});}
+   try{await gate.preflight();const game=await gate.test(task.game,{signal:controller.signal,independentIntentPlan:task.independentIntentPlan});await api('report',{stage,attempt,report:{ok:true,game}});}catch(error){await api('report',{stage,attempt,report:{ok:false,diagnostics:(error as Error).message.slice(0,1500)}});}
   }
  }catch(error){const code=(error as Error).message,allowed=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_REQUIRED','SPENDING_CUTOFF','INPUT_TOKEN_LIMIT','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED'];if(stage==='generate')await api('report',{stage,attempt,report:{errorCode:allowed.includes(code)?code:'PROVIDER_FAILED'}}).catch(()=>{});throw Error('WORKER_STAGE_FAILED');}finally{clearInterval(heartbeat);}
 }
