@@ -107,18 +107,22 @@ function populateSkills(){
 }
 function loadParent(){
  const p=FG.store.current();$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
- populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(p);
+ populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(p);$('parentStats').after($('copyFeedback'));$('copyFeedback').textContent='📋 Copy saved game ideas for a developer';
 }
 function renderParentReports(p){
- const target=$('parentStats');
+ const target=$('parentStats');target.replaceChildren();
  if(!p.allowSubjectSwitch){FG.learning.renderReport(target,p);return;}
- target.replaceChildren();
- for(const [subject,title] of [['math','🔢 Math progress'],['language','📚 English progress']]){
-   const section=document.createElement('section');section.className='parent-subject-report';
-   const heading=document.createElement('h3');heading.textContent=title;section.append(heading);
-   const details=document.createElement('div');section.append(details);target.append(section);
+ const tabs=document.createElement('div');tabs.className='parent-subject-tabs';tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Which subject to review');
+ const sections=new Map(),buttons=new Map();
+ for(const [subject,title] of [['math','🔢 Math'],['language','📚 English']]){
+   const button=document.createElement('button');button.type='button';button.textContent=title;button.setAttribute('aria-pressed','false');tabs.append(button);buttons.set(subject,button);
+   const section=document.createElement('section');section.className='parent-subject-report';section.setAttribute('aria-label',title+' practice');section.hidden=true;
+   const details=document.createElement('div');section.append(details);sections.set(subject,section);
    FG.learning.renderReport(details,p,subject);
+   button.onclick=()=>{for(const [name,node] of sections)node.hidden=name!==subject;for(const [name,node] of buttons)node.setAttribute('aria-pressed',String(name===subject));};
  }
+ target.append(tabs,...sections.values());
+ buttons.get(p.learningSubject==='language'?'language':'math').click();
 }
 function saveParent(){
  const grade=Number($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.learning.subject:choice,facts=choice!=='language'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
