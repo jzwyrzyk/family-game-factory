@@ -19,6 +19,7 @@ const context:CoachContext={message:'Only if I jump',mode:'discuss',game:'dragon
  {role:'child',text:'Only if I jump'}],observations:[],tests:[]};
 const reply={move:'clarify',text:'So jumping is the trigger!',question:'Should it sneeze once per jump?',
  suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
+async function main(){
 assert.equal(privateCoachOrigin('https://private-coach.run.app'),'https://private-coach.run.app');
 for(const unsafe of ['http://coaching.example.com','https://private-coach.run.app/v1/coach',
  'https://private-coach.run.app?token=secret','https://localhost','https://evil.invalid'])
@@ -104,3 +105,6 @@ try{
  assert.equal((await repository.snapshot()).audit.length,2,'content-free audit remains');
  console.log('PASS private coach: authenticated identity, strict provider-only contract, keyless gateway, hard safety gates and no browser access');
 }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));}
+
+}
+void main().catch(error=>{console.error(error);process.exitCode=1;});
