@@ -3,7 +3,7 @@ import {createServer} from 'node:http';
 import {PrivateCoachBridge,privateCoachOrigin,metadataIdentityToken} from '../server/coach/private-bridge';
 import {CoachService,COACH_RECEIPT_TTL_MS} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
-import {privateCoachHandler,type PrivateCoachRuntime} from '../server/coach/private-executor';
+import {privateCoachHandler,dedicatedCoachRuntime,type PrivateCoachRuntime} from '../server/coach/private-executor';
 import type {CoachContext} from '../src/studio/design';
 import type {PrivateCoachConfig} from '../server/coach/private-provider';
 import {readFileSync} from 'node:fs';
@@ -13,6 +13,11 @@ const config:PrivateCoachConfig={
  maxInputChars:16000,maxOutputTokens:600,maxTurnMicroUsd:10000,
  inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,pricesReviewedAt:new Date().toISOString()
 };
+assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-gateway',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run'}),/DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED/);
+const inactive=dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run'});
+assert.equal(inactive.enabled,false,'inactive Cloud Run may start with no model key');
+assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_OPENAI_API_KEY:'forbidden-secret-on-inactive'}),/COACH_SECRET_FORBIDDEN_WHILE_INACTIVE/);
+assert.throws(()=>dedicatedCoachRuntime({K_SERVICE:'factory-coach-private',FACTORY_COACH_EXECUTION_ENV:'dedicated-cloud-run',FACTORY_COACH_APPROVED:'true'}),/COACH_APPROVAL_REQUIRED/);
 const context:CoachContext={message:'Only if I jump',mode:'discuss',game:'dragon',plan:{},friction:'',helpLevel:0,
  support:'brief',conversation:[{role:'child',text:'The dragon should sneeze spaghetti'},
  {role:'helper',text:'That sounds playful. When should it sneeze?'},
@@ -20,12 +25,12 @@ const context:CoachContext={message:'Only if I jump',mode:'discuss',game:'dragon
 const reply={move:'clarify',text:'So jumping is the trigger!',question:'Should it sneeze once per jump?',
  suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
 async function main(){
-assert.equal(privateCoachOrigin('https://private-coach.run.app'),'https://private-coach.run.app');
-for(const unsafe of ['http://coaching.example.com','https://private-coach.run.app/v1/coach',
- 'https://private-coach.run.app?token=secret','https://localhost','https://evil.invalid'])
+assert.equal(privateCoachOrigin('https://factory-coach-private-demo-uc.a.run.app'),'https://factory-coach-private-demo-uc.a.run.app');
+for(const unsafe of ['https://evil.example.com','https://api.openai.com','http://coaching.example.com','https://factory-coach-private-demo-uc.a.run.app/v1/coach',
+ 'https://factory-coach-private-demo-uc.a.run.app?token=secret','https://localhost','https://evil.invalid'])
  assert.throws(()=>privateCoachOrigin(unsafe));
 let identityCalls=0,privateCalls=0;
-const origin='https://private-coach.run.app';
+const origin='https://factory-coach-private-demo-uc.a.run.app';
 const bridge=new PrivateCoachBridge(origin,async audience=>{identityCalls++;assert.equal(audience,origin);return 'signed-fixture-token';},
  async(url,init)=>{
   privateCalls++;assert.equal(url,origin+'/v1/private-coach/complete');
@@ -41,7 +46,7 @@ assert.deepEqual(result,{reply,usedMicroUsd:18});
 assert.equal(privateCalls,1);assert.equal(identityCalls,1);
 const tokenFn=metadataIdentityToken(async(input,init)=>{
  assert.match(String(input),/metadata.google.internal\/computeMetadata/);
- assert.match(String(input),/audience=https%3A%2F%2Fprivate-coach.run.app/);
+ assert.match(String(input),/audience=https%3A%2F%2Ffactory-coach-private-demo-uc.a.run.app/);
  assert.equal((init?.headers as any)['Metadata-Flavor'],'Google');
  return new Response('a'.repeat(60)+'.'+'b'.repeat(60)+'.'+'c'.repeat(60),{status:200});
 });
