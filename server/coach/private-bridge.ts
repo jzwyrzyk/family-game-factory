@@ -22,7 +22,9 @@ export function privateCoachOrigin(raw:string):string {
 export type IdentityTokenSource=(audience:string,signal:AbortSignal)=>Promise<string>;
 export function metadataIdentityToken(transport:typeof fetch=fetch):IdentityTokenSource{
  return async(audience,signal)=>{
-  const uri=METADATA_BASE+'?audience='+encodeURIComponent(audience);
+  // Full-format identity token includes the verified service-account email claim
+  // required by privateCoachHandler; standard format can omit that claim.
+  const uri=METADATA_BASE+'?audience='+encodeURIComponent(audience)+'&format=full';
   const response=await transport(uri,{method:'GET',headers:{'Metadata-Flavor':'Google'},signal,redirect:'error'});
   if(!response.ok)throw Error('COACH_UNAVAILABLE');
   const token=(await response.text()).trim();
