@@ -126,10 +126,18 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
      if(!device||!deviceLive(device,now))throw Error('UNAUTHENTICATED');
      let next:string;
      if(equal(device.secretHash,oldHash)){
-      const sequence=device.rotation+1;
-      next=rotatedSecret(config.sessionKey,id,sequence,oldSecret);
-      device.previousHash=device.secretHash;device.previousAt=now;
-      device.secretHash=digest(next);device.rotation=sequence;device.lastSeenAt=now;
+      if(device.previousAt!==undefined&&now-device.previousAt<=PREVIOUS_GRACE){
+       // Hold the current generation stable while other tabs finish rotating.
+       // Otherwise tab A using generation 0 could be invalidated by tab C
+       // rotating generation 1 before tab B's generation-0 response arrives.
+       next=oldSecret;
+      }else{
+       const sequence=device.rotation+1;
+       next=rotatedSecret(config.sessionKey,id,sequence,oldSecret);
+       device.previousHash=device.secretHash;device.previousAt=now;
+       device.secretHash=digest(next);device.rotation=sequence;
+      }
+      device.lastSeenAt=now;
      }else if(device.previousHash&&equal(device.previousHash,oldHash)&&now-(device.previousAt||0)<=PREVIOUS_GRACE){
       next=rotatedSecret(config.sessionKey,id,device.rotation,oldSecret);
       if(!equal(device.secretHash,digest(next)))throw Error('UNAUTHENTICATED');
