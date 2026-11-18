@@ -1,8 +1,8 @@
-/** Private, generation-environment-only conversational inference boundary.
- * REVIEW GATE: Never deploy this executable on Cloud Run or the public gateway,
- * and never move model credentials outside an owner-approved factory-generation
- * environment. This implements the HTTP contract; runtime hosting and access
- * approval remain separate, explicit owner operations.
+/** Dedicated private Cloud Run inference boundary, separate from the public
+ * gateway, untrusted game sandbox, preview and GitHub generation worker.
+ * This service is PRIVATE behind Cloud Run IAM and additionally validates the
+ * calling gateway identity. No model request can run unless all child privacy,
+ * model approval and family allowance gates pass.
  */
 import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
 import {createRemoteJWKSet,jwtVerify} from 'jose';
@@ -90,19 +90,36 @@ function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
   pricesReviewedAt:env.FACTORY_COACH_PRICES_REVIEWED||''
  };
 }
+/** Validate deployment wiring without printing configuration or touching
+ * secrets. A first, keyless, fully inactive Cloud Run revision can start.
+ * Later activation requires independently verified ZDR, consent, safeguarding,
+ * a dedicated scoped API key, current prices and the approved gateway identity.
+ */
+export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
+ if(env.K_SERVICE!=='factory-coach-private'||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
+  throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
+ const config=privateConfig(env);
+ const requested=env.FACTORY_COACH_APPROVED==='true';
+ if(!requested){
+  // Inactive revisions must not have access to an API key at all.
+  if(config.apiKey)throw Error('COACH_SECRET_FORBIDDEN_WHILE_INACTIVE');
+  return {config,enabled:false,verifyCaller:async(_token:string)=>false,provider:new OpenAICoachProvider(config)};
+ }
+ if(!approved(config)||!config.apiKey||config.apiKey.length<16)
+  throw Error('COACH_APPROVAL_REQUIRED');
+ const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
+ const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
+ if(!audience.startsWith('https://factory-coach-private-'))
+  throw Error('COACH_AUDIENCE_REQUIRED');
+ return {config,enabled:true,verifyCaller:googleCallerVerifier(audience,caller),provider:new OpenAICoachProvider(config)};
+}
 async function main(){
- // An extra fail-closed policy check. Environment strings alone do NOT certify
- // an approved runtime: deployment must independently attest private isolation.
- if(process.env.K_SERVICE||process.env.FACTORY_COACH_EXECUTION_ENV!=='factory-generation')
-  throw Error('PRIVATE_GENERATION_RUNTIME_REQUIRED');
- const config=privateConfig(process.env);
- if(!approved(config)||!config.apiKey||config.apiKey.length<16)throw Error('COACH_APPROVAL_REQUIRED');
- const audience=process.env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
- const caller=process.env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
- const verifyCaller=googleCallerVerifier(audience,caller);
- const handler=privateCoachHandler({config,enabled:true,verifyCaller,provider:new OpenAICoachProvider(config)});
+ const runtime=dedicatedCoachRuntime(process.env);
+ const handler=privateCoachHandler(runtime);
+ const port=Number(process.env.PORT||8080);
+ if(!Number.isSafeInteger(port)||port<1024||port>65535)throw Error('INVALID_SERVICE_PORT');
  createServer((req,res)=>{void handler(req,res).catch(()=>{res.statusCode=503;res.end();});})
-  .listen(Number(process.env.PORT)||8080,'127.0.0.1');
+  .listen(port,'0.0.0.0');
 }
 if(process.argv.some(x=>/[/\\]private-executor\.ts$/.test(x)))
  void main().catch(()=>{console.error('PRIVATE_COACH_STARTUP_BLOCKED');process.exitCode=1;});
