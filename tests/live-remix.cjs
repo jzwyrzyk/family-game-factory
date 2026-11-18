@@ -94,8 +94,17 @@ const {start}=require('./browser-server.cjs');
    await pluginPage.locator('#go').click();
   }
   assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'play');
-  await pluginPage.locator('#go').click();await pluginPage.clock.runFor(3500);
-  await pluginPage.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+  await pluginPage.locator('#go').click();
+  // The restored native Splash uses requestAnimationFrame with capped frame
+  // deltas. A single 3.5s fake-clock jump need not simulate 3.5s of frames,
+  // especially when CI is busy. Advance bounded frames until the real game
+  // reaches its result; never mutate its state or bypass the math checkpoint.
+  let reached=false;
+  for(let step=0;step<32;step++){
+   await pluginPage.clock.runFor(500);
+   if(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode==='result')){reached=true;break;}
+  }
+  assert.equal(reached,true,`${label}: native Splash must reach its result through actual animation frames: ${JSON.stringify({...await checkpointState(),pluginErrors})}`);
   const before=await checkpointState();
   console.log(`[native-checkpoint:${label}]`,JSON.stringify({now:before.now,rate:before.rate,elapsedSinceLast:before.elapsedSinceLast,eligible:before.eligible,active:before.active,mode:before.native.state.mode,attempts:before.attempts,pluginErrors}));
   assert.equal(before.eligible,true,`${label} must respect the shared pacing policy: ${JSON.stringify({...before,pluginErrors})}`);
