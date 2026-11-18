@@ -131,3 +131,16 @@ test('owner invitation issuance does not reset spending allowance or paid execut
  assert.equal(after.invitations?.[0].hash,createHash('sha256').update(token).digest('hex'));
  assert.ok(!JSON.stringify(after).includes(token),'no plaintext invitation stored');
 });
+
+test('device enrollment applies the same parent-passphrase lockout as device management',async()=>{
+ await fixture(async({repo,request})=>{
+  await addInvite(repo,invitation);
+  assert.equal((await request('/v1/sessions/enroll','POST',{invitation,deviceName:'First',parentPassphrase:passphrase})).status,200);
+  const other='k'.repeat(43);await addInvite(repo,other);
+  for(let i=0;i<5;i++)
+   assert.equal((await request('/v1/sessions/enroll','POST',{invitation:other,deviceName:'Unknown',parentPassphrase:'wrong-passphrase-2026'})).status,403);
+  assert.equal((await request('/v1/sessions/enroll','POST',{invitation:other,deviceName:'Second',parentPassphrase:passphrase})).status,429,'a correct password cannot circumvent lockout');
+  const state=await repo.snapshot();
+  assert.equal(state.devices?.length,1);assert.equal(state.invitations?.find(x=>x.hash===createHash('sha256').update(other).digest('hex'))?.used,false);
+ });
+});
