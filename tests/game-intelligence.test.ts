@@ -47,6 +47,10 @@ test('2D is independent from the decision to run physics; explicit 3D is not fal
  assert.equal(recommendGameForm('Make a 2d physics game with realistic collisions').surface,'2d-canvas');
  assert.equal(recommendGameForm('A game with 3D-looking artwork but only 2D sticker buttons').surface,'2d-canvas');
  assert.equal(recommendGameForm('Make a physics game with a bouncing ball').motion,'physics-2d');
+ assert.equal(recommendGameForm('Make a sticker game with no real physics.').motion,'rule-driven');
+ assert.equal(recommendGameForm('Make a game without physics.').motion,'rule-driven');
+ assert.equal(recommendGameForm('Make a game with no physics but realistic gravity.').motion,'needs-review');
+ assert.equal(recommendGameForm('Make a physics puzzle with gravity.').motion,'physics-2d');
 });
 test('design advice is advisory, bounded, and includes observable first-play acceptance questions',()=>{
  const input='Make a game about a moon donut cat.';
