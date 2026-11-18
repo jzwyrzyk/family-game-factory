@@ -1,3 +1,4 @@
+import './intent-repair.test';
 import './intent-worker-binding.test';
 import './private-generation-preflight.test';
 import './working-game-contract.test';
