@@ -159,6 +159,8 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
     const input=await readBody();expectKeys(input,[]);
     const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
     if(!session.deviceId||session.familyId!==config.familyId)throw Error('UNAUTHENTICATED');
+    const parent=verifySession(cookieValue(request.headers.cookie,'factory_parent'),config.sessionKey,now);
+    if(parent.role!=='parent'||parent.familyId!==session.familyId||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
     await repo.transaction(state=>{
      const device=state.devices?.find(d=>d.id===session.deviceId&&d.familyId===config.familyId);
      if(!device||!deviceLive(device,now))throw Error('UNAUTHENTICATED');
