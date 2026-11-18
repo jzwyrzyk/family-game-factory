@@ -262,7 +262,7 @@ export async function installStudio(){
   // check can distinguish an available service, session failure and allowance.
   const check=async(path:string)=>{
    const response=await familyFetch(remote.apiBaseUrl!,path,{credentials:'include',cache:'no-store'});
-   if(!response.ok)throw Error(response.status===401||response.status===403?'UNAUTHENTICATED':'SERVICE_UNAVAILABLE');
+   if(!response.ok)throw Error(response.status===401?'UNAUTHENTICATED':response.status===403?'FORBIDDEN':'SERVICE_UNAVAILABLE');
    return response.json();
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
