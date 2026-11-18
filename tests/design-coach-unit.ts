@@ -107,6 +107,21 @@ await test('autosave retains unchanged helper provenance and explicit acceptance
   h.save('style');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,true);assert.equal(h.session().design!.approvedPlan,false);
  }finally{h.dispose();}
 });
+await test('safety refusal or private information never falls into unreviewed local coach',async()=>{
+ for(const code of ['COACH_REFUSED','PRIVATE_INFORMATION']){
+  const h=coachingHarness();
+  try{
+   h.input('studioPrompt','Please tell me something private');
+   const turn=h.coach.discuss('discuss');await h.awaitModelRequest();
+   h.pending.shift()!.resolve(new Response(JSON.stringify({errorCode:code}),{status:422}));
+   await turn;
+   assert.match(h.session().messages.at(-1)!.text,/safe game ideas/);
+   assert.match(h.get('coachModeStatus').textContent,/could not be used safely/);
+   assert.equal(h.session().job,null);
+   assert.equal(h.session().experiments?.length,0);
+  }finally{h.dispose();}
+ }
+});
 await test('model-backed path receives real bounded conversation context over multiple synthetic turns, with no build',async()=>{
  const h=coachingHarness();
  try{
