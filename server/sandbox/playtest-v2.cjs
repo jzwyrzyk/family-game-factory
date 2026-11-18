@@ -37,8 +37,15 @@ async function playtestV2(page,game,options={}){
  }
  await completed(frame);const active=await snapshot(frame);
  const scene=frame=>JSON.stringify(JSON.parse(frame.commands||'[]').filter(command=>command.type!=='text'));
- if(scene(idle)===scene(active))throw Error('NO_MEANINGFUL_INPUT_EFFECT');
- if(Number(await canvas.getAttribute('data-inputs'))<1||Number(await canvas.getAttribute('data-changed'))<2)throw Error('NO_VISIBLE_GAMEPLAY_CHANGE');
+ // Generic random taps can miss a valid drag/grid mechanic entirely.
+ // Only a SEPARATE, already-passed, source-bound independent intent probe may
+ // replace the exploratory input-effect heuristic. Never bypass actual
+ // resource, pause/replay, isolation, responsive layout or worker checks.
+ if(!options.independentIntentProof){
+  if(scene(idle)===scene(active))throw Error('NO_MEANINGFUL_INPUT_EFFECT');
+  if(Number(await canvas.getAttribute('data-inputs'))<1||Number(await canvas.getAttribute('data-changed'))<2)
+   throw Error('NO_VISIBLE_GAMEPLAY_CHANGE');
+ }
  if(!['playing','won','lost'].includes(active.state))throw Error('INVALID_GAMEPLAY_OUTCOME');
  const bodyCount=Number(await canvas.getAttribute('data-bodies')),jointCount=Number(await canvas.getAttribute('data-joints'));if(bodyCount>40||jointCount>60)throw Error('RESOURCE_LIMIT');
  await activate(frame.getByRole('button',{name:'Play again',exact:true}));await canvas.locator(':scope[data-frames]').waitFor({timeout:3000});
