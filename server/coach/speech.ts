@@ -65,7 +65,7 @@ export class CoachAudioService {
   if(!allowedCoachFamily(state,session,'audio')||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)return false;
   if(this.provider.readiness){
-   try{return await this.provider.readiness(AbortSignal.timeout(3000));}catch{return false;}
+   try{return await this.provider.readiness(AbortSignal.timeout(9000));}catch{return false;}
   }
   return true;
  }
