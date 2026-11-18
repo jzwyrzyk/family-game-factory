@@ -40,7 +40,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
  const mime=()=>{
   const Ctor=(window as any).MediaRecorder as RecorderCtor|undefined;
   if(!Ctor||typeof Ctor.isTypeSupported!=='function')return '';
-  return ['audio/webm;codecs=opus','audio/mp4','audio/ogg;codecs=opus'].find(type=>Ctor.isTypeSupported(type))||'';
+  return ['audio/webm;codecs=opus','audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/ogg;codecs=opus'].find(type=>Ctor.isTypeSupported(type))||'';
  };
  function cleanup(){
   clearTimeout(timeout);timeout=undefined;
