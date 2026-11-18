@@ -112,7 +112,7 @@ export async function installStudio(){
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
  learningChoice.innerHTML='<div class="studio-learning-copy"><strong id="studioLearningTitle">Learning adventure</strong><small id="studioLearningNote"></small></div><div class="learning-subject-switch" role="group" aria-label="Choose practice subject"><button type="button" id="studioSubjectMath" aria-pressed="true">🔢 Math</button><button type="button" id="studioSubjectLanguage" aria-pressed="false">📚 English</button></div>';
- library.querySelector('#studioFavoritesSection')!.after(learningChoice);
+ // The subject switch belongs to the player's header, not below the game shelf.
  const nativeStage=$('page-game');
  const originalNav=document.querySelector('.site-header nav') as HTMLElement;
  originalNav.hidden=true;
@@ -122,6 +122,9 @@ export async function installStudio(){
  const profileBar=document.querySelector('.profile-bar') as HTMLElement,profileChoices=$('profile-choices');
  const profileMenu=document.createElement('details');profileMenu.id='studioProfileMenu';profileMenu.className='studio-profile-menu';
  const profileSummary=document.createElement('summary');profileSummary.id='studioProfileSummary';profileMenu.append(profileSummary,profileChoices);profileBar.replaceChildren(profileMenu);
+ const headerTools=el('div','studio-header-tools');
+ headerTools.append(learningChoice,profileBar);
+ document.querySelector('.site-header')!.append(headerTools);
  const globalStatus=el('div','studio-status');globalStatus.id='studioGlobalStatus';globalStatus.setAttribute('role','status');globalStatus.setAttribute('aria-live','polite');globalStatus.setAttribute('aria-atomic','true');document.querySelector('main')!.prepend(globalStatus);
  // Background builds are visible on every Studio screen without taking focus.
  const buildShelf=el('aside','studio-build-shelf');buildShelf.id='studioBuildShelf';
@@ -160,7 +163,7 @@ export async function installStudio(){
    actions.append(play,practice);buildShelf.append(actions);
   }
  }
- function updateProfile(){const child=FG.store.current();profileSummary.textContent=`${child.icon||'⭐'} ${child.name} · Switch player`;profileMenu.open=false;}
+ function updateProfile(){const child=FG.store.current();profileSummary.textContent=`${child.icon||'⭐'} ${child.name}`;profileSummary.setAttribute('aria-label','Switch player. Current player: '+child.name);profileSummary.title='Switch player';profileMenu.open=false;}
  updateProfile();
  function focusView(target:HTMLElement){if(!target.isConnected||target.closest('[hidden],.hidden,[inert]'))return;target.focus({preventScroll:true});target.scrollIntoView({block:'nearest',behavior:'instant'});}
  function guardMath(){if(!FG.learning.active)return false;status('Your learning activity is still here. Finish it, or choose My Games to leave.');FG.learning.focus?.();return true;}
@@ -236,6 +239,7 @@ export async function installStudio(){
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;
+   learningChoice.hidden=!both;
    for(const [id,value] of [['studioSubjectMath','math'],['studioSubjectLanguage','language']] as const){
      const button=$<HTMLButtonElement>(id);button.setAttribute('aria-pressed',String(subject===value));
      button.disabled=!both||!!FG.learning.active||!!FG.store.loadError;
@@ -252,7 +256,7 @@ export async function installStudio(){
    }
  }
  function chooseLearningSubject(subject:'math'|'language'){
-   try{FG.learning.setSubject(subject);refreshLearningChoice();const message=(subject==='math'?'Math':'English')+' selected for your next learning activity.';if(route==='studio')status(message);else globalStatus.textContent=message;}
+   try{FG.learning.setSubject(subject);refreshLearningChoice();if(route==='studio')$('studioStatus').textContent='';else globalStatus.textContent='';}
    catch(error){globalStatus.textContent=(error as Error).message;}
  }
  async function refreshServiceReadiness(){
