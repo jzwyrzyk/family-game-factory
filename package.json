@@ -26,7 +26,8 @@
     "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/issue-28-private-coach.test.ts && node --import tsx tests/issue-28-evaluation.test.ts && node --import tsx tests/studio-experience.test.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs && node tests/studio-experience-browser.cjs && node --import tsx tests/issue-28-speech.test.ts && node --import tsx tests/private-speech-unit.ts && node tests/private-speech-browser.cjs",
     "test:language-ui": "node --import tsx --test tests/language-activity.test.ts",
     "test:language-integration": "node --import tsx tests/language-integration.ts",
-    "setup:coach-consent": "node --import tsx server/coach/owner-consent.ts"
+    "setup:coach-consent": "node --import tsx server/coach/owner-consent.ts",
+    "setup:coach-erase": "node --import tsx server/coach/owner-erase.ts"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
