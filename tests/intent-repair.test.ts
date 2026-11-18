@@ -11,7 +11,8 @@ import {safeRepairDiagnostic,safeFinalRepairCode} from '../server/quality/repair
 import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
 import {runtimeBundle} from '../server/sandbox/bundle-v2.cjs';
 import {hash,type GeneratedGame,validateCompiled} from '../server/agent/generated';
-import type {AgentApproval,AgentInput} from '../server/agent/openai';
+import type {AgentApproval} from '../server/agent/openai';
+import type {AgentInput} from '../server/pipeline/types';
 import type {AgentAdapter} from '../server/pipeline/types';
 
 const idea='Drag three bubble gum stickers onto a rocket, then press Launch to blast off.';
