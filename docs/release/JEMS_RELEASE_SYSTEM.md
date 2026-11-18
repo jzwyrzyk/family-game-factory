@@ -33,11 +33,15 @@ and lists blockers and current capability. A JSON evidence artifact is retained.
 
 ### Real Pages-only release (explicit)
 
+Before the first release, the owner must pin the two **existing, reviewed**
+public HTTPS service origins in GitHub repository Actions variables:
+JEMS_GATEWAY_ORIGIN and JEMS_PREVIEW_ORIGIN. Release callers cannot override
+these destinations with arbitrary workflow inputs.
+
 After the PR is merged, go to GitHub > Actions > Jems controlled release >
 Run workflow. Select the main branch and operation **pages**, and supply the exact
-40-character main commit SHA. Supply BOTH existing public HTTPS service origins
-(gateway and separate preview) as inputs, or configure the repository Actions
-variables JEMS_GATEWAY_ORIGIN and JEMS_PREVIEW_ORIGIN once.
+40-character main commit SHA. No cloud credentials or URLs need to be pasted
+into each subsequent release request.
 
 The workflow will:
 1. Refuse stale or unreviewed commit SHA and incomplete/malformed origins.
