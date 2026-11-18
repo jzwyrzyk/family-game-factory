@@ -1,5 +1,9 @@
 name: Build reviewed Pages site
 # Deliberately manual: PRs do not change the existing live arcade.
+# Serialize with the new Jems controller; never race competing Pages artifacts.
+concurrency:
+  group: jems-pages-publish
+  cancel-in-progress: false
 on:
   workflow_dispatch:
     inputs:
