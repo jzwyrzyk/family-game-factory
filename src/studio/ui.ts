@@ -80,7 +80,7 @@ export async function installStudio(){
  const progressTitle=el('strong','studio-progress-title'),progressDetails=el('p','studio-progress-detail');
  progressBanner.append(progressTitle,progressDetails);
  page.querySelector('.studio-workspace')!.before(progressBanner);
- progressBanner.append($('studioReady'));
+ progressBanner.append($('studioReady'),$('studioPromptForm').querySelector('.studio-build-controls')!);
  const voiceDetails=el('details','studio-voice-details');
  voiceDetails.append(el('summary','','Voice & accessibility options'));
  $('studioPromptForm').querySelector('.studio-voice-row')!.before(voiceDetails);
