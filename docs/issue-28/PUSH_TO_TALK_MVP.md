@@ -15,10 +15,10 @@
 - Merged #27/#35 provide Studio conversation, play/build separation, bounded context, local reflection fallback and a privacy-first on-device SpeechRecognition adapter.
 - This #36 branch now stages recognized speech into the text composer and requires explicit Send. A second tap finishes transcription; Cancel/navigation/profile changes abort without sending. Hear reply stays opt-in.
 - The model-backed **text** coach in #36 uses a dedicated private Cloud Run service, authenticated gateway, family ledger and separate scoped OpenAI key *only when all required approvals are verified*. It is still an inactive draft; a green build is not a live conversation.
-- The existing browser-only on-device `SpeechRecognition.processLocally` requirement is **not dependable across iOS Safari and Android Chrome tablets**. The current fallback is OS keyboard dictation or typing, which does not guarantee the Jems Speak button on those browsers.
-- #31 contains an unmerged draft private `MediaRecorder -> authenticated gateway -> private speech recognition` path. Reuse only reviewed, compatible speech transport/tests; **do not merge #31's alternative model/provider architecture** into #36.
+- The existing browser-only on-device `SpeechRecognition.processLocally` requirement is **not dependable across iOS Safari and Android Chrome tablets**. An **inactive, parent-gated MediaRecorder-to-Google-Speech-V2 fallback is now implemented on #36**, including authenticated upload, private IAM hop, edited transcript, receipt-only accounting and CI fixtures. This has **not** been verified with real tablets or activated.
+- The relevant speech-only design from draft #31 has been selectively ported into #36 without importing its alternative model-provider architecture. #31 remains unmerged until a follow-up reconciliation confirms no needed safeguards are missing.
 
-## Dependable transcription architecture (implementation required)
+## Dependable transcription architecture (implemented as draft; real-device/production proof required)
 
 1. User presses Speak. Check parent-controlled speech permissions and feature availability before requesting microphone access.
 2. Prefer verified local recognition only when **actually supported** and sufficiently reliable. No silent switch to potentially remote browser speech recognition.
