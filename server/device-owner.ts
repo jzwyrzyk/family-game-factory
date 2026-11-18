@@ -17,7 +17,7 @@ export async function mintDeviceInvitation(repo:Repository,familyId:string,now=D
  await repo.transaction(state=>{
   state.invitations??=[];
   state.invitations=state.invitations.filter(x=>x.expiresAt>now&&!x.used);
-  state.invitations.push({hash,familyId,expiresAt:now+600000,used:false});
+  state.invitations.push({hash,familyId,expiresAt:now+600000,used:false,purpose:'trusted-device'});
   return true;
  });
  return value;
