@@ -132,3 +132,7 @@
 .studio-review .design-plan.guided #buildGamePlan{font:850 16px var(--jems-round);background:var(--jems-ink);color:white;border-color:var(--jems-ink);min-height:54px;padding:12px 20px}
 .studio-review .design-plan:not(.guided) .design-guide-status{font-size:12px;color:#596583}
 @media(max-width:760px){.studio-review .design-plan.guided{margin:8px;padding:13px}}
+
+/* Existing-game actions must remain full-size tap targets. */
+.studio-review .studio-actions #studioChange{min-height:46px;padding:10px 13px}
+.studio-review .studio-send-row #studioMic[aria-pressed="true"]{background:#FFECE6;border-color:#C34E42;color:#8D2733}
