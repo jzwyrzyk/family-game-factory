@@ -140,7 +140,8 @@ async function playtestIntentV2(page,game,contract,options={}){
  const artifact=renderGeneratedV2(game,'intent-test','intent-test-channel',{auditTicks:600});
  let external=0;
  const context=page.context();
- await context.route('**/*',route=>{external++;return route.abort();});
+ const blockExternal=route=>{external++;return route.abort();};
+ await context.route('**/*',blockExternal);
  const session=touch?await context.newCDPSession(page):null;
  try{
   await page.setContent('<button id="outside">App remains accessible</button><iframe title="Isolated preview" sandbox="allow-scripts" style="width:100%;height:760px;border:0"></iframe>');
@@ -172,7 +173,7 @@ async function playtestIntentV2(page,game,contract,options={}){
    passed,failed:0,sourceSha256:contract.sourceSha256};
  }finally{
   if(session)await session.detach().catch(()=>{});
-  await context.unroute('**/*');
+  await context.unroute('**/*',blockExternal);
  }
 }
 module.exports={playtestIntentV2};
