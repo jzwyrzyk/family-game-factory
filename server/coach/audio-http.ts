@@ -3,9 +3,10 @@
  * public GitHub, previews, AI generation, or the model coach.
  */
 import type {IncomingMessage,ServerResponse} from 'node:http';
-import {verifySession} from '../pipeline/auth';
+import {verifyBrowserSession} from '../trusted-devices';
+import type {Repository} from '../pipeline/types';
 import {CoachAudioService,AUDIO_MAX_BYTES,audioMime} from './speech';
-export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:string;sessionKey:string}){
+export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:string;sessionKey:string},repo?:Repository){
  return async(req:IncomingMessage,res:ServerResponse)=>{
   const abort=new AbortController();
   res.once('close',()=>{if(!res.writableEnded)abort.abort();});
@@ -16,16 +17,15 @@ export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:st
    res.end(JSON.stringify(data));
   };
   try{
-   if(req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
+   if(req.headers.origin&&req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
+   if(req.method!=='GET'&&req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
    res.setHeader('Access-Control-Allow-Origin',config.appOrigin);
    res.setHeader('Access-Control-Allow-Credentials','true');res.setHeader('Vary','Origin');
    if(req.method==='OPTIONS'){
     res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Request,X-Factory-Audio-Id');
     res.setHeader('Access-Control-Allow-Methods','GET,POST');res.writeHead(204);res.end();return;
    }
-   const token=req.headers.cookie?.split(';').map(x=>x.trim())
-    .find(x=>x.startsWith('factory_session='))?.slice(16);
-   const session=verifySession(token,config.sessionKey);
+   const session=await verifyBrowserSession(repo,req.headers.cookie,config.sessionKey);
    const path=new URL(req.url||'','http://gateway').pathname;
    if(path==='/v1/coach/audio/status'&&req.method==='GET'){
     const available=await service.familyAvailable(session);
