@@ -107,7 +107,7 @@ export async function installStudio(){
  const pausedPreview=el('section','studio-paused-preview');pausedPreview.id='studioPausedPreview';pausedPreview.hidden=true;
  pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
- library.innerHTML="<section class=\"studio-home-hero\" aria-labelledby=\"studioLibraryTitle\">\n<div class=\"studio-home-intro\"><span class=\"studio-kicker\">WELCOME TO JEMS</span><h1 id=\"studioLibraryTitle\" tabindex=\"-1\">What will you <span>make today?</span></h1><p>Imagine it. Play it. Make it yours.</p><span class=\"studio-hero-sparkles\" aria-hidden=\"true\">✧ ✦</span></div>\n<div class=\"studio-home-action\"><button type=\"button\" id=\"studioNew\" class=\"studio-make-tile\"><span class=\"studio-make-icon\" aria-hidden=\"true\">✨</span><span class=\"studio-make-copy\"><strong>Invent a game</strong><small>Start with your own idea</small></span><span class=\"studio-make-arrow\" aria-hidden=\"true\">→</span></button><p id=\"studioCreationNote\" class=\"studio-creation-note\" role=\"status\" aria-live=\"polite\"></p></div>\n</section>\n<div id=\"studioContinue\"></div>\n<section id=\"studioFavoritesSection\" class=\"studio-home-favorites\" aria-labelledby=\"studioStarterTitle\"><div class=\"studio-section-heading\"><div><span class=\"studio-section-kicker\">READY TO PLAY</span><h2 id=\"studioStarterTitle\">Favorite games</h2><p>Six games to jump into right now. Change anything you like.</p></div></div><div id=\"studioStarters\" class=\"studio-library-grid\"></div></section>\n<section id=\"studioSavedSection\" class=\"studio-home-saved\" aria-labelledby=\"studioSavedTitle\" hidden><div class=\"studio-section-heading\"><div><span class=\"studio-section-kicker\">PICK UP YOUR IDEAS</span><h2 id=\"studioSavedTitle\">My creations</h2><p>Your games, versions, and ideas, saved for this player.</p></div></div><div id=\"studioLibrary\" class=\"studio-library-grid\"></div></section>\n\n<p class=\"studio-library-note\">Your games and ideas stay in this player's space on this device. Grown-ups can manage learning in Parent Controls.</p>";
+ library.innerHTML="<section class=\"studio-home-hero\" aria-labelledby=\"studioLibraryTitle\">\n<div class=\"studio-home-intro\"><h1 id=\"studioLibraryTitle\" tabindex=\"-1\">What jems will you <span>make today?</span></h1><p>Imagine it. Play it. Make it yours.</p><span class=\"studio-hero-sparkles\" aria-hidden=\"true\">✧ ✦</span></div>\n<div class=\"studio-home-action\"><button type=\"button\" id=\"studioNew\" class=\"studio-make-tile\"><span class=\"studio-make-icon\" aria-hidden=\"true\">✨</span><span class=\"studio-make-copy\"><strong>Invent a game</strong><small>Start with your own idea</small></span><span class=\"studio-make-arrow\" aria-hidden=\"true\">→</span></button><p id=\"studioCreationNote\" class=\"studio-creation-note\" role=\"status\" aria-live=\"polite\"></p></div>\n</section>\n<div id=\"studioContinue\"></div>\n<section id=\"studioFavoritesSection\" class=\"studio-home-favorites\" aria-labelledby=\"studioStarterTitle\"><div class=\"studio-section-heading\"><div><h2 id=\"studioStarterTitle\">Ready to Play jems</h2></div></div><div id=\"studioStarters\" class=\"studio-library-grid\"></div></section>\n<section id=\"studioSavedSection\" class=\"studio-home-saved\" aria-labelledby=\"studioSavedTitle\" hidden><div class=\"studio-section-heading\"><div><h2 id=\"studioSavedTitle\">My jems</h2></div></div><div id=\"studioLibrary\" class=\"studio-library-grid\"></div><div id=\"studioArchived\"></div></section>";
  document.querySelector('main')!.append(library);
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
@@ -130,29 +130,46 @@ export async function installStudio(){
  const buildShelf=el('aside','studio-build-shelf');buildShelf.id='studioBuildShelf';
  buildShelf.setAttribute('aria-label','Background game builds');buildShelf.hidden=true;globalStatus.after(buildShelf);
  function refreshShelf(){
-  const jobs=notebook.list(owner()).filter(s=>s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
+  const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
   buildShelf.append(el('strong','','🏗️ My builds & tests'));
   const items=el('div','studio-build-items');
   for(const s of jobs.slice(0,4)){
    const state=readyExperiment(s)?'✨ Your test is ready':s.job!.status==='failed'?'Build needs help · current game safe':
-     unknownJobs.has(s.id)||remote.mode!=='remote'?'Status unknown · checking connection':s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
-     s.job!.status==='testing'?'Testing your game':'Building your idea';
-   const item=el('div','studio-build-item'),copy=el('div','studio-build-copy');
+    unknownJobs.has(s.id)||remote.mode!=='remote'?'Status unknown · checking connection':s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
+    s.job!.status==='testing'?'Testing your game':'Building your idea';
+   const item=el('div','studio-build-item'),copy=el('div','studio-build-copy'),controls=el('div','studio-build-item-actions');
    copy.append(el('strong','',s.name),el('span','',state));
-   const b=el('button','studio-button',readyExperiment(s)?'Try ready test':'Open game') as HTMLButtonElement;
-   b.type='button';b.onclick=()=>act(async()=>{
-    // A ready card is a deliberate choice, never an automatic interrupt.
+   const openButton=el('button','studio-button',readyExperiment(s)?'Try ready test':'Open game') as HTMLButtonElement;
+   openButton.type='button';openButton.onclick=()=>act(async()=>{
     if(guardMath())return;
     await open(s.id);
     if(owner()!==s.owner||route!=='studio'||activeId!==s.id)return;
     const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
     if(ready?.candidate.remoteId)await showRemote(latest,ready.candidate.remoteId,'candidate',ready.id);
-   });item.append(copy,b);items.append(item);
+   });controls.append(openButton);
+   if(busy(s)){
+    const stop=el('button','studio-button studio-stop-build','Stop build') as HTMLButtonElement;
+    stop.type='button';stop.setAttribute('aria-label','Stop build for '+s.name);
+    stop.onclick=()=>{
+     stop.disabled=true;stop.textContent='Stopping…';
+     void (async()=>{
+      try{
+       const result=await clientFor(s).cancel(s.job!.id);
+       if(owner()!==s.owner)return;
+       if(result.status==='cancelled')status('Build stopped. Your current game is safe.');
+       else{status('Stop requested. Checking the build status.');const latest=notebook.get(s.id,s.owner);if(busy(latest))resume(latest);}
+      }catch{
+       if(owner()===s.owner){unknownJobs.add(s.id);status('Could not confirm stop. The build may still be working.',true);}
+      }finally{if(owner()===s.owner)refreshShelf();}
+     })();
+    };controls.append(stop);
+   }
+   item.append(copy,controls);items.append(item);
   }
   buildShelf.append(items);
   if(jobs.some(busy)){
-   const actions=el('div','studio-build-actions'),play=el('button','studio-button','🎮 Favorite games') as HTMLButtonElement;
+   const actions=el('div','studio-build-actions'),play=el('button','studio-button','🎮 Ready to Play jems') as HTMLButtonElement;
    if(route==='studio'&&activeId&&jobs.some(s=>s.id===activeId)){
     const keep=el('button','studio-button','▶ Keep playing') as HTMLButtonElement;
     keep.type='button';keep.onclick=()=>act(playViewed);actions.append(keep);
@@ -284,21 +301,52 @@ export async function installStudio(){
   if(last){
    const banner=el('div','studio-continue'),art=el('span','studio-continue-art',icon[last.game]),description=el('div','studio-continue-copy');
    art.setAttribute('aria-hidden','true');
-   description.append(el('small','','PICK UP WHERE YOU LEFT OFF'),el('strong','',last.name));
-   const b=el('button','studio-button studio-primary',last.projectId||last.remoteId?'▶ Continue playing':'✦ Continue my idea') as HTMLButtonElement;
-   b.type='button';b.id='studioContinuePlaying';b.onclick=()=>act(()=>open(last.id));
-   banner.append(art,description,b);$('studioContinue').append(banner);
+   description.append(el('strong','',last.name));
+   const continueButton=el('button','studio-button studio-primary',last.projectId||last.remoteId?'▶ Continue playing':'✦ Continue my idea') as HTMLButtonElement;
+   continueButton.type='button';continueButton.id='studioContinuePlaying';continueButton.onclick=()=>act(()=>open(last.id));
+   const dismiss=el('button','studio-continue-close','×') as HTMLButtonElement;
+   dismiss.type='button';dismiss.id='studioDismissResume';dismiss.title='Dismiss reminder';
+   dismiss.setAttribute('aria-label','Dismiss reminder for '+last.name);
+   dismiss.onclick=()=>act(()=>{notebook.dismissResume(last.id,last.owner);renderLibrary();});
+   banner.append(art,description,continueButton,dismiss);$('studioContinue').append(banner);
   }
-  const saved=entries.filter(s=>!s.playOnly||s.experiments?.length||s.candidate);$('studioSavedSection').hidden=!saved.length;$('studioStarterTitle').textContent='Favorite games';
+  const saved=entries.filter(s=>!s.archived&&(!s.playOnly||s.experiments?.length||s.candidate));
+  const archived=entries.filter(s=>s.archived);
+  $('studioSavedSection').hidden=!saved.length&&!archived.length;
+  $('studioStarterTitle').textContent='Ready to Play jems';
   saved.forEach(s=>{
-   const card=el('button','studio-library-card studio-saved-card');card.setAttribute('data-session',s.id);
+   const card=el('article','studio-library-card studio-saved-card');card.setAttribute('data-session',s.id);
    const state:'building'|'ready'|'playable'|'idea'=busy(s)?'building':readyExperiment(s)||s.candidate?'ready':s.projectId||s.remoteId?'playable':'idea';
    const label={building:'Working on your idea',ready:'A test is ready to try',playable:'Ready to play',idea:'Idea · not built yet'}[state];
    const badge={building:'Tools at work',ready:'✦ Test ready',playable:'✦ Playable jem',idea:'✦ Your idea'}[state];
    card.dataset.jemsState=state;
-   card.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),el('span','studio-card-link','Open my game →'));
-   card.onclick=()=>act(()=>open(s.id));box.append(card);
-  });refreshShelf();
+   const openButton=el('button','studio-saved-open') as HTMLButtonElement;
+   openButton.type='button';openButton.setAttribute('aria-label','Open '+s.name);
+   openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),el('span','studio-card-link','Open my game →'));
+   openButton.onclick=()=>act(()=>open(s.id));
+   const putAway=el('button','studio-put-away',busy(s)?'Stop build first':'Put away') as HTMLButtonElement;
+   putAway.type='button';putAway.disabled=busy(s);
+   putAway.setAttribute('aria-label',busy(s)?'Stop the build before putting away '+s.name:'Put away '+s.name);
+   putAway.title=busy(s)?'Stop the build in My builds & tests first':'Put this jem away without deleting it';
+   putAway.onclick=()=>act(()=>{notebook.archive(s.id,s.owner);renderLibrary();});
+   card.append(openButton,putAway);box.append(card);
+  });
+  const archivedBox=$('studioArchived');archivedBox.replaceChildren();
+  if(archived.length){
+   const details=el('details','studio-archived-details');
+   details.append(el('summary','','Put-away jems ('+archived.length+')'));
+   const list=el('div','studio-archived-list');
+   for(const s of archived){
+    const row=el('div','studio-archived-item');
+    row.append(el('span','',s.name));
+    const restore=el('button','studio-button','Bring back') as HTMLButtonElement;
+    restore.type='button';restore.setAttribute('aria-label','Bring back '+s.name);
+    restore.onclick=()=>act(()=>{notebook.unarchive(s.id,s.owner);renderLibrary();});
+    row.append(restore);list.append(row);
+   }
+   details.append(list);archivedBox.append(details);
+  }
+  refreshShelf();
   const starters=$('studioStarters');starters.replaceChildren();
   const descriptions:Record<GameId,string>={
    gum:'Build wild machines with bubble gum.',hill:'Race over hills in a junkyard ride.',
