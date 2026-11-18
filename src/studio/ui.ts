@@ -438,9 +438,10 @@ export async function installStudio(){
   $('studioHelpGoal').textContent=native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
   const touchHelp:Record<string,string>={moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
   const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined).config:undefined;
-  const oldConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion!==1;
-  $('studioHelpControls').textContent=oldConstruction?'Choose a part in your build, then use the move, turn and connect controls shown below it. Try your machine and change it again.':native&&touch?touchHelp[s.game]:native?FG.games[s.game]?.controls||'Use the controls in your game.':'Tap the game first, then use its buttons or keyboard controls.';
-  $('studioHelpKeyboard').textContent=native?FG.games[s.game]?.controls||'Use Tab to reach controls and Enter to choose.':'Use Tab to reach controls and Enter to choose. How a character moves depends on this game.';
+  const oldConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===0;
+  const stickerConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===2;
+  $('studioHelpControls').textContent=stickerConstruction?'Choose a sticker and tap a matching bubble on the machine, or drag and drop a sticker. Add three, then tap Make it GO!':oldConstruction?'Choose a part in your build, then use the move, turn and connect controls shown below it. Try your machine and change it again.':native&&touch?touchHelp[s.game]:native?FG.games[s.game]?.controls||'Use the controls in your game.':'Tap the game first, then use its buttons or keyboard controls.';
+  $('studioHelpKeyboard').textContent=stickerConstruction?'Press Tab to choose a sticker, Enter to select it, then Tab and Enter to place it on a bubble.':native?FG.games[s.game]?.controls||'Use Tab to reach controls and Enter to choose.':'Use Tab to reach controls and Enter to choose. How a character moves depends on this game.';
   focusView($('studioHelpTitle'));
  }
  async function submit(){
