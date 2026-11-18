@@ -1,4 +1,5 @@
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
+import {privateGenerationPreflight} from '../quality/private-generation-preflight';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
@@ -42,7 +43,20 @@ export class JobService {
   return this.repo.transaction(s=>{
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId);
    if(existing){if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
-   if(r.baseRevisionId){const base=s.revisions.find(x=>x.id===r.baseRevisionId);if(!base)throw Error('NOT_FOUND');requireFamily(session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
+   if(r.baseRevisionId){if(!base)throw Error('NOT_FOUND');requireFamily(session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   // O4: reject unsupported or contradictory forms BEFORE reserving an
+   // allowance or acknowledging an asynchronous paid build. This uses only
+   // server-owned, family-authorized revision data; the private worker
+   // independently repeats the same check before reading the model key.
+   if(this.agent.kind==='metered-api'){
+    privateGenerationPreflight({
+      gameManifest:{id:r.gameId,allowedMechanics:[]},
+      baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config,sourceGame:base?.sourceGame,projectId:base?.projectId},
+      childIntent:r.prompt,allowedCapabilities:[],
+      budget:{maxUnits:0,timeoutMs:0},signal:new AbortController().signal
+    });
+   }
    let retryCount=0;if(r.retryOf){const prior=s.jobs.find(j=>j.id===r.retryOf);if(!prior)throw Error('NOT_FOUND');requireFamily(session,prior);if(prior.status!=='failed'||prior.gameId!==r.gameId||prior.prompt!==r.prompt||prior.baseRevisionId!==r.baseRevisionId||prior.retryCount>=this.options.maxRetries)throw Error('RETRY_LIMIT');retryCount=prior.retryCount+1;}
    const recent=s.audit.filter(e=>e.familyId===session.familyId&&e.status==='queued'&&Date.parse(e.at)>Date.now()-60000);if(recent.length>=10)throw Error('RATE_LIMIT');
    let ledger=s.ledgers[session.familyId];if(!ledger||ledger.month!==month())ledger=s.ledgers[session.familyId]={allowance:0,used:0,reserved:ledger?.reserved||0,paidEnabled:false,month:month()};
