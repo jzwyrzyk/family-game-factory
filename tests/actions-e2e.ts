@@ -233,7 +233,7 @@ async function main(){
 
   // A deliberately invalid edit exhausts the *existing* bounded retry loop.
   // Neither false Ready nor an invisible model edit may replace the kept game.
-  const learningBeforeFailure=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
+  const learningBeforeFailure=await page.evaluate(()=>JSON.stringify(window.FG.store.current().skills));
   await page.fill('#reviseBuildPrompt','Break this marble game so it does not work.');
   const [invalidResponse]=await Promise.all([
    page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs'),
@@ -248,7 +248,7 @@ async function main(){
   assert.equal(brokenJob?.attempts,3,'bad game must have at most two automatic repairs');
   assert.equal(brokenJob?.revisionId,undefined);
   assert.equal((await service.list(deviceActor)).some(r=>r.id===fasterId),true);
-  assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills)),learningBeforeFailure,
+  assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.store.current().skills)),learningBeforeFailure,
    'failed build must not alter learning performance');
 
   await page.reload();await page.waitForFunction(()=>window.FG?.builder);
