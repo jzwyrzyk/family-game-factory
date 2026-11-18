@@ -107,6 +107,9 @@ def verify_gateway(region: str) -> None:
 
 def verify_inactive_service(region: str, image: str) -> dict:
     service = cloud("run", "services", "describe", SERVICE, "--region", region)
+    service_url=service.get("status",{}).get("url","")
+    if not isinstance(service_url,str) or not re.fullmatch(r"https://factory-coach-private-[a-z0-9.-]+\\.run\\.app",service_url):
+        raise GateError("Private coach URL is not the reviewed canonical Cloud Run host; do not connect the gateway.")
     metadata = service.get("metadata", {})
     if metadata.get("labels", {}).get("factory-component") != "private-coach":
         raise GateError("Service is not owned by the reviewed private-coach deployment.")
@@ -141,6 +144,7 @@ def verify_inactive_service(region: str, image: str) -> dict:
     if not any(c.get("type")=="Ready" and c.get("status")=="True" for c in service.get("status", {}).get("conditions", [])):
         raise GateError("Inactive coach revision is not ready.")
     return {"reviewedImage": image, "inactive": True, "gatewayIdentityVerified": True,
+            "coachPrivateOrigin":service_url,
             "ingress": "internal", "invokers": ["serviceAccount:" + GATEWAY_IDENTITY],
             "networkRouteVerified": False, "paidModelEnabled": False}
 
