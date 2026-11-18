@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {MemoryRepository} from '../server/pipeline/repository';
+import {CoachService} from '../server/coach/service';
 import {signSession} from '../server/pipeline/auth';
 import {allowedCoachFamily,setOwnerCoachConsent} from '../server/coach/consent';
 import {speechApproved,validateAudio,CoachAudioService,type SpeechConfig} from '../server/coach/speech';
@@ -157,6 +158,21 @@ async function main(){
    assert.equal(privateCalls,1);
    assert.equal(result.headers.get('access-control-allow-origin'),null);
   }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));}
+ });
+ await test('parent erasure removes completed speech metadata but preserves usage accounting',async()=>{
+  const clean=new CoachService(repo,{
+   enabled:false,privacyApproved:false,moderationApproved:false,zdrVerified:false,
+   privateExecutionApproved:false,model:'',maxInputChars:16000,maxOutputTokens:500,
+   maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,
+   pricesReviewedAt:new Date().toISOString()
+  });
+  await assert.rejects(clean.eraseFamilyReceipts(designer),/FORBIDDEN/);
+  const before=(await repo.snapshot()).ledgers[family].used;
+  const result=await clean.eraseFamilyReceipts(parent);
+  assert.ok(result.erased>=2,'two completed synthetic audio requests were erased');
+  const after=await repo.snapshot();
+  assert.equal(after.audioReceipts?.length,0);
+  assert.equal(after.ledgers[family].used,before,'erasure never falsifies spending totals');
  });
  console.log(count+' isolated speech and consent checks passed, without processing real child audio.');
 }
