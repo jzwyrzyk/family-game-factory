@@ -77,7 +77,17 @@ async function main(){
  // Keep the mocked workflow observable without logging credentials, source, or unbounded browser output.
  const startedAt=Date.now(),harnessTrace:{jobId:string;attempt:number;phase:string;elapsedMs:number;diagnostics?:string}[]=[];
  function trace(jobId:string,attempt:number,phase:string,diagnostics?:string){harnessTrace.push({jobId,attempt,phase,elapsedMs:Date.now()-startedAt,...(diagnostics?{diagnostics:diagnostics.slice(0,600)}:{})});if(harnessTrace.length>80)harnessTrace.shift();}
- const provider=new OpenAIResponsesAgent(approval,()=> 'fixture-only-not-a-real-key',(async(url,options)=>{assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(String(options?.body)),request=JSON.parse(body.input);const fixture=request.idea.toLowerCase().includes('paint')?painter:hopper;const game=failFirst?{...fixture,source:'export function createGame(){ invalid syntax ! }'}:fixture;failFirst=false;return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(game)}]}],usage:{input_tokens:100,output_tokens:600}}));}) as typeof fetch);
+ const provider=new OpenAIResponsesAgent(approval,()=> 'fixture-only-not-a-real-key',(async(url,options)=>{assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(String(options?.body)),request=JSON.parse(body.input);
+  // O4 must reach the EXISTING fixture-backed Actions/preview/browser journey.
+  // These are proposed requirements, never claimed as verified gameplay.
+  assert.equal(body.store,false);
+  assert.equal(request.gameDesignPreflight.status,'PROPOSED_NOT_CHILD_CONFIRMED');
+  assert.equal(request.gameDesignPreflight.intentVersion,'jems-child-intent-v1');
+  assert.equal(request.gameDesignPreflight.form.version,'jems-game-form-v2');
+  assert.equal(request.gameDesignPreflight.workability.status,'NOT_TESTED');
+  assert.ok(request.gameDesignPreflight.workability.mandatoryChecks.some((check:string)=>check.includes('visible')));
+  assert.ok(request.gameDesignPreflight.sourceEvidence.every((f:any)=>request.idea.slice(f.start,f.end)===f.quote));
+  const fixture=request.idea.toLowerCase().includes('paint')?painter:hopper;const game=failFirst?{...fixture,source:'export function createGame(){ invalid syntax ! }'}:fixture;failFirst=false;return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(game)}]}],usage:{input_tokens:100,output_tokens:600}}));}) as typeof fetch);
  const coordinator=new ActionCoordinator(repo,{dispatch:async(id,attempt)=>{dispatches.push({id,attempt});trace(id,attempt,paused?'dispatch-paused':'dispatch');if(paused)return;const identity={runId:String(++run),repositoryId:'42',sha:'a'.repeat(40),stage:'generate' as const};setImmediate(()=>{void(async()=>{
   trace(id,attempt,'claim-generate');const task:any=await coordinator.claim(id,attempt,'generate',identity),input={...task.input,signal:new AbortController().signal};
   trace(id,attempt,'provider');const result=attempt?await provider.repair(input,task.previous,task.diagnostics):await provider.generate(input);
