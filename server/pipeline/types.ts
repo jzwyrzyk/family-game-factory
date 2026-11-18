@@ -7,7 +7,7 @@ export interface StarGame { kind:'star-catcher-v1'; target:number; seconds:numbe
 export type PlayableGame = StarGame | GeneratedGame;
 export type CandidateArtifact = {format:'declarative-v1';game:StarGame}|{format:'generated-source-v1';game:GeneratedGame};
 export interface AgentInput {
-  gameManifest:{id:string;allowedMechanics:readonly string[]}; baseRevision:{id:string;game?:PlayableGame;config?:Record<string,number|boolean>};
+  gameManifest:{id:string;allowedMechanics:readonly string[]}; baseRevision:{id:string;game?:PlayableGame;config?:Record<string,number|boolean>;sourceGame?:string;projectId?:string};
   childIntent:string; allowedCapabilities:readonly string[]; budget:{maxUnits:number;timeoutMs:number}; signal:AbortSignal;
 }
 export interface AgentAdapter {
