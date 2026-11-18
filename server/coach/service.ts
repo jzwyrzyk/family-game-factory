@@ -1,6 +1,7 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
 import type {Repository} from '../pipeline/types';
+import {assertActiveTrustedDevice} from '../trusted-devices';
 import type {VerifiedSession} from '../contracts/api';
 import {COACH_POLICY,COACH_SCHEMA} from './policy';
 export interface CoachConfig {
@@ -59,6 +60,9 @@ export class CoachService {
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
   const hash=createHash('sha256').update(serialized).digest('hex'),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
   const reservation=await this.repo.transaction(state=>{
+   // Recheck within the same transaction that reserves money: revocation can
+   // occur after the HTTP session check but before admission.
+   assertActiveTrustedDevice(state,session);
    state.coachReceipts ||= [];const list=state.coachReceipts;
    const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject);
    if(old){if(old.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');if(old.state==='ready')return {cached:old.reply!};throw Error('COACH_REQUEST_EXISTS');}
