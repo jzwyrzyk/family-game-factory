@@ -121,5 +121,5 @@ async function main(){
  createServer((req,res)=>{void handler(req,res).catch(()=>{res.statusCode=503;res.end();});})
   .listen(port,'0.0.0.0');
 }
-if(process.argv.some(x=>/[/\\]private-executor\.ts$/.test(x)))
+if(process.argv.some(x=>/[/\\]private-executor\.(?:ts|mjs)$/.test(x)))
  void main().catch(()=>{console.error('PRIVATE_COACH_STARTUP_BLOCKED');process.exitCode=1;});
