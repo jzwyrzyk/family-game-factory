@@ -6,7 +6,7 @@
  */
 export type GameSurface = '2d-canvas' | '3d-requested';
 export type GameMotion = 'rule-driven' | 'physics-2d' | 'needs-review';
-export type GameInteraction = 'drag-and-drop' | 'grid-puzzle' | 'driving' | 'arcade' | 'open-ended';
+export type GameInteraction = 'drag-and-drop' | 'grid-puzzle' | 'driving' | 'arcade' | 'tap-and-react' | 'open-ended';
 export type SignalConfidence = 'explicit' | 'tentative';
 export interface GameFormAdvice {
   version: 'jems-game-form-advice-v1';
@@ -27,19 +27,21 @@ const matches = (text: string, pattern: RegExp) => pattern.test(text);
  */
 export function recommendGameForm(childIdea: string): GameFormAdvice {
   const s = childIdea.normalize('NFKC').toLowerCase().slice(0, 4000);
-  const threeD = matches(s, /\b(?:3d|three[- ]dimensional|full[- ]3d|true[- ]3d)\b/) ||
+  const styleOnly3D = matches(s, /\b(?:3d[- ](?:looking|style|art)|look(?:s|ing)?\s+(?:like\s+)?3d|faux[- ]3d)\b/);
+  const threeD = (matches(s, /\b(?:3d|three[- ]dimensional|full[- ]3d|true[- ]3d)\b/) && !styleOnly3D) ||
     matches(s, /\b(?:move|fly|walk|navigate)\s+(?:freely\s+)?(?:in|through)\s+(?:all\s+)?three\s+(?:axes|dimensions)\b/);
   const forbidPhysics = matches(s, /\b(?:no|without|avoid|skip|don't use|do not use)\s+(?:(?:real|realistic)\s+)?physics\b/) ||
     matches(s, /\b(?:just|only)\s+(?:simple\s+)?(?:stickers|drag[- ]and[- ]drop)\b/);
-  const requirePhysics = matches(s, /\b(?:real(?:istic)?\s+physics|physics\s+(?:engine|simulation)|simulate\s+(?:gravity|momentum|inertia)|real(?:istic)?\s+(?:gravity|collision|suspension))\b/) ||
-    matches(s, /\b(?:suspension|springs?\s+(?:compress|stretch)|wheels?\s+(?:grip|slip)|bouncy\s+(?:collisions?|balls?)|bounce\s+(?:off|against)|joints?\s+(?:break|snap)|(?:collapse|topple)\s+(?:under|from)\s+(?:weight|gravity)|catapult\s+(?:launch|trajectory)|balance\s+(?:a|the)\s+(?:tower|stack)|drive\s+(?:a\s+)?(?:car|truck|bike)\s+(?:over|across)\s+(?:bumpy|hilly|rough)\b)/);
+  const requirePhysics = matches(s, /\b(?:real(?:istic)?\s+physics|physics\s+(?:game|engine|simulation)|simulate\s+(?:gravity|momentum|inertia)|real(?:istic)?\s+(?:gravity|collisions?|suspension))\b/) ||
+    matches(s, /\b(?:suspension|springs?\s+(?:compress|stretch)|wheels?\s+(?:grip|slip)|bouncy\s+(?:collisions?|balls?)|bounce\s+(?:off|against)|joints?\s+(?:break|snap)|(?:collapse|collapses|collapsing|topple|topples|toppling)\s+(?:under|from)\s+(?:weight|gravity)|catapult\s+(?:launch|trajectory)|balance\s+(?:a|the)\s+(?:tower|stack)|drive\s+(?:a\s+)?(?:car|truck|bike)\s+(?:over|across)\s+(?:bumpy|hilly|rough)\b)/);
   const explicitConflict = forbidPhysics && requirePhysics;
   const motion: GameMotion = explicitConflict ? 'needs-review' : requirePhysics && !forbidPhysics ? 'physics-2d' : 'rule-driven';
   let interaction: GameInteraction = 'open-ended';
-  if (matches(s, /\b(?:drag|drop|stickers?|decorate|attach|assemble|place\s+(?:parts|pieces)|put\s+(?:pieces|parts)\s+together|bubble\s*gum\s+builders?)\b/)) interaction = 'drag-and-drop';
+  if (matches(s, /\b(?:drag|drop|stickers?|decorate|attach|assemble|place\s+(?:parts|pieces)|put\s+(?:\w+\s+){0,3}together|bubble\s*gum\s+builders?)\b/)) interaction = 'drag-and-drop';
   else if (matches(s, /\b(?:grid|maze|route|directions|coding|program\s+(?:a|the)\s+robot|puzzle|sequence\s+of\s+(?:moves|steps))\b/)) interaction = 'grid-puzzle';
   else if (matches(s, /\b(?:drive|race|hill[- ]?climb|wheels?\s+grip|suspension)\b/)) interaction = 'driving';
-  else if (matches(s, /\b(?:collect|catch|eat|jump|dodge|shoot|avoid|run\s+through)\b/)) interaction = 'arcade';
+  else if (matches(s, /\b(?:collect(?:s|ing)?|catch(?:es|ing)?|eat(?:s|ing)?|jump(?:s|ing)?|dodge|shoot|avoid|run\s+through)\b/)) interaction = 'arcade';
+  else if (matches(s, /\b(?:tap|tapping|click|press\s+(?:a|the)\s+button)\b/)) interaction = 'tap-and-react';
   const reasoning = [
     threeD ? 'The request explicitly names spatial depth; current generated runtime is a 2D canvas.' : 'A 2D canvas is the supported presentation default; thematic 3D art does not require a 3D engine.',
     explicitConflict ? 'The text simultaneously requests and forbids physical simulation; require an intentional decision.' :
