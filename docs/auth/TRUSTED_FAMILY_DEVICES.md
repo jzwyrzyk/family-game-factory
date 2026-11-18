@@ -24,7 +24,7 @@ POST /v1/devices/disconnect — revoke the currently authenticated device.
 
 Legacy POST /v1/sessions remains available for original seven-day invitations, but **trusted-device invitations are purpose-bound and explicitly rejected by that route**. Existing seven-day sessions still expire, and must be migrated by one explicit new-device enrollment. Version 1 private Firestore documents remain compatible because all new device fields are optional. Existing signing keys must be preserved across Cloud Run revisions.
 
-Browser clients attempt silent renewal only on an HTTP **401 for safe GET**, or during a separate authentication preflight before an intended POST. They never automatically replay a paid build POST, including after ambiguous connection errors. HTTP 403 is treated as a permission/origin error, not renewable login. Local games, drafts and learning data remain intact during outages.
+Browser clients attempt silent renewal only on an HTTP **401 for safe GET**, or during a separate authentication preflight before an intended POST. The preflight must receive HTTP 200 (or successfully renew a 401); missing status endpoints, redirects, 403 and 5xx fail closed. Build and coach reservations recheck trusted-device revocation inside the atomic allowance transaction. They never automatically replay a paid build POST, including after ambiguous connection errors. HTTP 403 is treated as a permission/origin error, not renewable login. Local games, drafts and learning data remain intact during outages.
 
 ## Account-owner operations
 
