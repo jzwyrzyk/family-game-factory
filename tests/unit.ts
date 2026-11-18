@@ -1,3 +1,4 @@
+import './private-generation-preflight.test';
 import './working-game-contract.test';
 import './game-form.test';
 import './child-intent.test';
