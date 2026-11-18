@@ -2,13 +2,14 @@ import {createHash,randomUUID} from 'node:crypto';
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
+import {safeRepairDiagnostic,safeFinalRepairCode,type RepairCategory} from '../quality/repair-diagnostics';
 import {validateArtifact} from '../pipeline/artifacts';
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
 import type {AgentApproval} from '../agent/openai';
 import type {Repository,Job,PipelineState,CandidateArtifact} from '../pipeline/types';
 import type {WorkerIdentity} from './identity';
 import type {DispatchPort} from './dispatcher';
-export interface ActionExecution {attempt:number;dispatchPending:boolean;queuedAt?:number;dispatchedAt?:number;runId?:string;stage?:'generate'|'test';candidate?:CandidateArtifact;diagnostics?:string;claimAt?:number;generateReport?:string;testReport?:string}
+export interface ActionExecution {attempt:number;dispatchPending:boolean;queuedAt?:number;dispatchedAt?:number;runId?:string;stage?:'generate'|'test';candidate?:CandidateArtifact;diagnostics?:string;repairCategory?:RepairCategory;claimAt?:number;generateReport?:string;testReport?:string}
 export class ActionCoordinator {
  constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000){}
  async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution)j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};return true;});}
@@ -38,6 +39,7 @@ export class ActionCoordinator {
   if(j.independentIntentPlan&&report.game?.compiled?.tests?.intent!==true)
    throw Error('INTENT_ATTESTATION_REQUIRED');
   const candidate=e.candidate?.game;if(!isGeneratedGame(candidate))throw Error('GENERATED_ARTIFACT_REQUIRED');const game=validateCompiled(candidate,report.game as GeneratedGame),base=s.revisions.find(r=>r.id===j.baseRevisionId),revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter};s.revisions.push(revision);j.revisionId=revision.id;j.status='ready';j.phase='ready';e.testReport=fingerprint;delete e.candidate;const l=s.ledgers[j.familyId];l.reserved-=j.maxUnits;l.used+=j.usedUnits;s.audit.push({jobId:id,familyId:j.familyId,status:'ready',at:new Date().toISOString()});}
- else if(e.attempt<2){e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.claimAt=undefined;e.dispatchedAt=undefined;e.dispatchPending=true;e.diagnostics=String(report.diagnostics||'PLAYTEST_FAILED').slice(0,1500);j.status='building';j.phase='repairing';s.audit.push({jobId:id,familyId:j.familyId,status:'building',code:'AUTOMATIC_REPAIR',at:new Date().toISOString()});}else{e.testReport=fingerprint;this.failure(s,j,'REPAIR_EXHAUSTED');}return {accepted:true};});}
+ else if(e.attempt<2){e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.claimAt=undefined;e.dispatchedAt=undefined;e.dispatchPending=true;const safe=safeRepairDiagnostic(report?.diagnostics,j.independentIntentPlan);
+ e.diagnostics=safe.feedback;e.repairCategory=safe.category;j.status='building';j.phase='repairing';s.audit.push({jobId:id,familyId:j.familyId,status:'building',code:'AUTOMATIC_REPAIR',at:new Date().toISOString()});}else{e.testReport=fingerprint;this.failure(s,j,safeFinalRepairCode(report?.diagnostics,j.independentIntentPlan));}return {accepted:true};});}
  async status(id:string,identity:WorkerIdentity){const j=(await this.repo.snapshot()).jobs.find(x=>x.id===id);if(!j||j.execution?.runId!==identity.runId)throw Error('WORKER_FORBIDDEN');return {status:j.status,phase:j.phase};}
 }
