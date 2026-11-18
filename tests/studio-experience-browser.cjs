@@ -31,6 +31,7 @@ const {start}=require('./browser-server.cjs');
   await page.fill('#studioPrompt','A seal jumps across icebergs to reach the end');
   await page.click('#studioSend');
   assert.equal(await page.locator('#designPlan').evaluate(el=>el.open),true,'the explicit build choice opens the plan before generation');
+  assert.equal(await page.locator('.design-plan-field:visible').count(),1,'the guided plan shows only one question at a time');
   assert.equal((await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(x=>x.game==='new'))).job,null,'unapproved plan starts no build');
   assert.equal(errors.length,0,'no page errors: '+errors.join('; '));
   await ctx.close();
