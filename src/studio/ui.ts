@@ -81,7 +81,7 @@ export async function installStudio(){
  progressBanner.append(progressTitle,progressDetails);
  page.querySelector('.studio-workspace')!.before(progressBanner);
  progressBanner.append($('studioReady'),$('studioPromptForm').querySelector('.studio-build-controls')!);
- const ideaSparks=el('details','studio-idea-sparks');ideaSparks.id='studioIdeaSparks';
+ const ideaSparks=el('details','studio-idea-sparks') as HTMLDetailsElement;ideaSparks.id='studioIdeaSparks';
  ideaSparks.append(el('summary','','💡 Need a spark of inspiration?'));
  const sparkOptions=el('div','studio-idea-spark-options');
  for(const [label,idea] of [
