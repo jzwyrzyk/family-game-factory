@@ -207,3 +207,12 @@
  font:750 13px/1.45 var(--jems-body);border-radius:12px;
  padding:9px 13px;margin:5px 13px 0
 }
+
+/* Show a concise, attributable summary before the child approves the first build. */
+.studio-review .design-plan-review{margin:15px 0;padding:15px;background:#FFFFFF;border:2px solid #B99AF5;border-radius:16px;color:var(--jems-ink)}
+.studio-review .design-plan-review[hidden]{display:none!important}
+.studio-review .design-plan-review h3{font:850 18px var(--jems-round);margin:0 0 12px;color:var(--jems-ink)}
+.studio-review .design-plan-review-item{padding:9px 0;border-top:1px solid #E9E2F7}
+.studio-review .design-plan-review-item strong{font-size:13px;display:block}
+.studio-review .design-plan-review-item p{font-size:13px;margin:3px 0;color:#3B496B;overflow-wrap:anywhere}
+.studio-review .design-plan-review-item small{font-size:11px;color:#765AB1}
