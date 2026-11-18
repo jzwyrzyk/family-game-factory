@@ -118,6 +118,18 @@ await test('model-backed path receives real bounded conversation context over mu
   assert.equal(h.requests.length,2,'two model-turn calls, zero game generations');
  }finally{h.dispose();}
 });
+await test('model play move returns to the game without any automatic build',async()=>{
+ const h=coachingHarness('gum');
+ try{
+  h.input('studioPrompt','I would rather get back into the game');
+  const turn=h.coach.discuss('discuss');
+  h.resolve({...reply,move:'play',text:'Okay, go play!',question:null});
+  await turn;
+  assert.equal(h.playCalls,1);
+  assert.equal(h.requests.length,1);
+  assert.equal(h.session().job,null);
+ }finally{h.dispose();}
+});
 await test('never mind cancels without a provider call or an experiment',async()=>{
  const h=coachingHarness();
  try{
