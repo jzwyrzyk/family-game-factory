@@ -14,6 +14,13 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('factory_session='))?.slice(16);
    const session=verifySession(token,config.sessionKey);const path=new URL(req.url!,'http://internal').pathname;
    if(path==='/v1/coach/status'&&req.method==='GET')return send(200,{available:service.available(),mode:service.available()?'model':'unavailable'});
+   if(path==='/v1/coach/erase'&&req.method==='POST'){
+    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
+    let raw='';for await(const chunk of req){raw+=String(chunk);if(Buffer.byteLength(raw)>1024)throw Error('INVALID_REQUEST');}
+    let input:any;try{input=JSON.parse(raw);}catch{throw Error('INVALID_REQUEST');}
+    if(!input||Object.keys(input).length!==1||input.confirm!=='ERASE_FAMILY_COACH_RECEIPTS')throw Error('INVALID_REQUEST');
+    return send(200,await service.eraseFamilyReceipts(session));
+   }
    if(path!=='/v1/coach'||req.method!=='POST')return send(404,{errorCode:'NOT_FOUND'});
    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>50000)throw Error('INVALID_REQUEST');}
