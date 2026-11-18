@@ -9,7 +9,7 @@ class Memory {data=new Map<string,string>();fail=false;getItem(k:string){return 
 
 // Exercise the real coaching event handlers with a small DOM/storage port. Browser
 // journeys separately verify rendering, focus and touch behavior in production.
-function coachingHarness(){
+function coachingHarness(game:'new'|'gum'='new'){
  const elements=new Map<string,any>();
  class Element {
   children:any[]=[];parentElement:Element|null=null;value='';textContent='';className='';open=false;rows=0;maxLength=0;type='';dataset:Record<string,string>={};
@@ -29,16 +29,16 @@ function coachingHarness(){
  const documentPort:any={activeElement:null,body:new Element(),createElement:()=>new Element(),getElementById:get};
  for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
  const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
- const storage=new Memory(),book=new StudioNotebook(storage),initial=book.create('child-one','new','Synthetic new game');let active=initial;
- const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[];
+ const storage=new Memory(),book=new StudioNotebook(storage),initial=game==='new'?book.create('child-one','new','Synthetic new game'):book.create('child-one','gum','Synthetic game','fixture-project');let active=initial;
+ const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[],requests:any[]=[];let playCalls=0;
  Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}},dispatchEvent:(event:Event)=>{if(event.type==='jems:milestone')milestones.push((event as CustomEvent<{kind:string}>).detail.kind);return true;}}});
- Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>pending.push({resolve,reject,signal:options.signal as AbortSignal}))});
+ Object.defineProperty(globalThis,'fetch',{configurable:true,value:(_url:string,options:RequestInit)=>new Promise<Response>((resolve,reject)=>{requests.push(JSON.parse(String(options.body)));pending.push({resolve,reject,signal:options.signal as AbortSignal});})});
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
-  tryRequest:async()=>{},rules:()=>'',playTest:async()=>{},playMain:async()=>{},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
+  tryRequest:async()=>{},rules:()=>'',playTest:async()=>{},playMain:async()=>{playCalls++;},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
  });coach.openSession();
- return {coach,book,storage,statuses,pending,milestones,get,
+ return {coach,book,storage,statuses,pending,milestones,requests,get playCalls(){return playCalls;},get,
   session:()=>book.get(active.id,active.owner),
   input(id:string,value:string){const input=get(id);input.focus();input.value=value;input.dispatchEvent(new Event('input'));},
   save(field:string){const input=get('plan-'+field),index=input.parentElement!.children.indexOf(input);input.parentElement!.children[index+2].children[0].onclick();},
@@ -93,6 +93,49 @@ await test('autosave retains unchanged helper provenance and explicit acceptance
   h.input('plan-style','A cloud castle with penguins');assert.equal(h.session().design!.plan.style!.origin,'child');
   h.input('plan-style','A cloud castle');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,false);
   h.save('style');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,true);assert.equal(h.session().design!.approvedPlan,false);
+ }finally{h.dispose();}
+});
+await test('model-backed path receives real bounded conversation context over multiple synthetic turns, with no build',async()=>{
+ const h=coachingHarness();
+ try{
+  h.input('studioPrompt','The dragon should sneeze spaghetti');
+  const first=h.coach.discuss('discuss');
+  assert.equal(h.pending.length,1);
+  h.resolve({...reply,text:'Spaghetti sneezes could be funny!',question:'When should the dragon sneeze?'});
+  await first;
+  h.input('studioPrompt','Only if I jump');
+  const second=h.coach.discuss('discuss');
+  const sent=h.requests.at(-1).context as CoachContext;
+  assert.equal(sent.message,'Only if I jump');
+  assert.ok(sent.conversation.some(m=>m.role==='child'&&m.text==='The dragon should sneeze spaghetti'));
+  assert.ok(sent.conversation.some(m=>m.role==='helper'&&m.text.includes('When should the dragon sneeze?')));
+  assert.ok(sent.conversation.some(m=>m.role==='child'&&m.text==='Only if I jump'));
+  assert.ok(sent.conversation.length<=16);
+  h.resolve({...reply,text:'So jumping is your trigger.',question:'Should it sneeze once per jump?'});
+  await second;
+  assert.equal(h.session().job,null);
+  assert.equal(h.session().experiments?.length,0);
+  assert.equal(h.requests.length,2,'two model-turn calls, zero game generations');
+ }finally{h.dispose();}
+});
+await test('never mind cancels without a provider call or an experiment',async()=>{
+ const h=coachingHarness();
+ try{
+  h.input('studioPrompt','Actually never mind');
+  await h.coach.discuss('discuss');
+  assert.equal(h.requests.length,0);
+  assert.equal(h.session().job,null);
+  assert.match(h.session().messages.at(-1)!.text,/No game changed/);
+ }finally{h.dispose();}
+});
+await test('just let me play returns to the existing game without interviewing or building',async()=>{
+ const h=coachingHarness('gum');
+ try{
+  h.input('studioPrompt','I just want to play now');
+  await h.coach.discuss('discuss');
+  assert.equal(h.playCalls,1);
+  assert.equal(h.requests.length,0);
+  assert.equal(h.session().job,null);
  }finally{h.dispose();}
 });
 await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
