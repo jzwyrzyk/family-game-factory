@@ -10,7 +10,12 @@ import type {CoachProvider} from './service';
 const METADATA_BASE='http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity';
 export function privateCoachOrigin(raw:string):string {
  let u:URL;try{u=new URL(raw);}catch{throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');}
- if(u.protocol!=='https:'||u.href!==u.origin+'/'||u.username||u.password||u.search||u.hash||u.port||u.hostname==='localhost'||u.hostname.endsWith('.invalid')||!u.hostname.includes('.'))throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');
+ // An operator typo must not turn the audience-bound bearer token and a child's
+ // design context into an HTTP request to an unrelated host. Only the exact
+ // dedicated service's canonical Cloud Run URL family is authorized.
+ if(u.protocol!=='https:'||u.href!==u.origin+'/'||u.username||u.password||u.search||u.hash||u.port||
+  !u.hostname.startsWith('factory-coach-private-')||!u.hostname.endsWith('.run.app')||
+  !/^[a-z0-9.-]+$/.test(u.hostname))throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');
  return u.origin;
 }
 export type IdentityTokenSource=(audience:string,signal:AbortSignal)=>Promise<string>;
