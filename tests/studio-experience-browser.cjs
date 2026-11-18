@@ -19,6 +19,10 @@ const {start}=require('./browser-server.cjs');
   assert.equal(await page.locator('#studioMic').isVisible(),true,'voice is beside the composer');
   const textarea=await page.locator('#studioPrompt').boundingBox(),send=await page.locator('#studioTalk').boundingBox();
   assert(textarea&&send&&send.y-textarea.y-textarea.height<115,'send belongs directly under the text field');
+  if(device==='mobile'){
+   assert(textarea.y>=0&&textarea.y<viewport.height-130,'child sees where to type without scrolling on mobile');
+   assert(send.y+send.height<=viewport.height-20,'child sees Send to jems on the first mobile screen');
+  }
   const color=await page.locator('#studioSend').evaluate(el=>getComputedStyle(el).backgroundColor);
   assert.equal(color,'rgb(11, 29, 77)','build game is an obvious deep navy CTA');
   assert.equal(await page.locator('#designPlan').isVisible(),false,'eight-field plan is not visible before requested');
