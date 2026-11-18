@@ -18,7 +18,7 @@
     "start:preview": "node --import tsx server/preview-server.ts",
     "setup:owner": "node --import tsx server/owner-setup.ts",
     "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
-    "test:quality": "node tests/quality-browser.cjs",
+    "test:quality": "node tests/quality-browser.cjs && node tests/sticker-builder-browser.cjs",
     "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
     "test:studio": "node --import tsx tests/studio-unit.ts && node tests/homepage-entry.cjs && node tests/brand-browser.cjs && node tests/jems-delight-browser.cjs && node tests/studio-journey.cjs && node tests/favorites-browser.cjs",
     "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/studio-experience.test.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs && node tests/studio-experience-browser.cjs",
