@@ -11,13 +11,27 @@ function safePlan(contract){
  if(!contract||contract.version!=='jems-working-game-v1'||
     contract.status!=='authored-unverified-not-release-approved'||
     !Array.isArray(contract.probes)||contract.probes.length<1||contract.probes.length>12||
-    !Array.isArray(contract.requirements)||contract.requirements.length<1||contract.requirements.length>12)
+    !Array.isArray(contract.requirements)||contract.requirements.length<1||contract.requirements.length>12||
+    typeof contract.sourceSha256!=='string'||!/^[a-f0-9]{64}$/.test(contract.sourceSha256))
   throw Error('INTENT_PLAN_UNTRUSTED');
+ const requirements=new Set(contract.requirements.map(r=>r.id));
+ if(requirements.size!==contract.requirements.length||
+    ![...requirements].every(id=>typeof id==='string'&&ID.test(id)))
+  throw Error('INTENT_PLAN_UNTRUSTED');
+ let actualGameplayEvidence=false;
+ const covered=new Set();
  for(const p of contract.probes){
   if(!ID.test(p.id)||!Array.isArray(p.actions)||p.actions.length<1||p.actions.length>24||
+     !Array.isArray(p.covers)||p.covers.length===0||p.covers.some(id=>!requirements.has(id))||
      !Array.isArray(p.checkpoints)||p.checkpoints.length<1||p.checkpoints.length>26||
      p.deterministicReplay!==true)throw Error('INTENT_PLAN_UNTRUSTED');
+  p.covers.forEach(id=>covered.add(id));
+  if(p.actions.some(a=>a.kind!=='wait')&&p.checkpoints.some(cp=>cp.after>0&&
+      (cp.outcome==='won'||cp.observations?.some(o=>o.kind==='changed'||o.kind==='coordinate'))))
+   actualGameplayEvidence=true;
  }
+ if([...requirements].some(id=>!covered.has(id))||!actualGameplayEvidence)
+  throw Error('INTENT_PLAN_NO_PLAY_EVIDENCE');
 }
 async function read(frame){
  return frame.locator('#game').evaluate(canvas=>{
@@ -33,6 +47,10 @@ async function read(frame){
 function visibleCommand(c){
  if(!c||typeof c.x!=='number'||typeof c.y!=='number')return false;
  // The test must reject an off-canvas key that only claims to be visible.
+ if((c.type==='rect'||c.type==='sprite')&&
+    (!(c.width>2)||!(c.height>2)))return false;
+ if(c.type==='circle'&&!(c.radius>2))return false;
+ if(c.type==='text'&&(!c.text||!(c.size>=8)))return false;
  const w=c.width||c.radius*2||1,h=c.height||c.radius*2||1;
  return c.x+w>0&&c.x-w<720&&c.y+h>0&&c.y-h<400;
 }
