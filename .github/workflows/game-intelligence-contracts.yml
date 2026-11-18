@@ -24,6 +24,7 @@ on:
   push:
     branches:
       - main
+      - 'research/game-intelligence-*'
     paths:
       - '.github/workflows/game-intelligence-contracts.yml'
       - 'server/quality/**'
