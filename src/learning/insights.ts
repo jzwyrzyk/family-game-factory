@@ -145,7 +145,7 @@ export function renderParentInsights(host:HTMLElement,subject:'math'|'language',
   details.append(el('summary','','See all skill details ('+practiced.length+' practiced)'));
   const grid=el('div','pi-skills');
   for(const skill of practiced)grid.append(skillCard(skill));
-  if(!practiced.length)grid.append(el('p','','No completed learning evidence yet. Your child's first activities will appear here.'));
+  if(!practiced.length)grid.append(el('p','',"No completed learning evidence yet. Your child's first activities will appear here."));
   details.append(grid);wrap.append(details);
   host.append(wrap);
 }
