@@ -205,7 +205,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
       state.invitations??=[];
       state.invitations=state.invitations.filter(x=>x.expiresAt>now&&!x.used);
       if(state.invitations.filter(x=>x.familyId===session.familyId).length>=3)throw Error('INVITE_LIMIT');
-      state.invitations.push({hash,familyId:session.familyId,expiresAt,used:false});
+      state.invitations.push({hash,familyId:session.familyId,expiresAt,used:false,purpose:'trusted-device'});
       return true;
      });
      reply(200,{invitation,expiresAt});
