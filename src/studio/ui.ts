@@ -79,7 +79,7 @@ export async function installStudio(){
  progressBanner.setAttribute('role','status');progressBanner.setAttribute('aria-live','polite');
  const progressTitle=el('strong','studio-progress-title'),progressDetails=el('p','studio-progress-detail');
  progressBanner.append(progressTitle,progressDetails);
- $('studioPromptForm').before(progressBanner);
+ page.querySelector('.studio-workspace')!.before(progressBanner);
  progressBanner.append($('studioReady'));
  const voiceDetails=el('details','studio-voice-details');
  voiceDetails.append(el('summary','','Voice & accessibility options'));
@@ -205,7 +205,7 @@ export async function installStudio(){
  }
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;
-  note.textContent=!configReady?'Checking which creation tools are ready…':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
+  note.textContent=!configReady?'Checking which creation tools are ready…':builderReadiness==='not-configured'?'Building brand-new playable games is not connected yet. Your idea will save here.':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;
