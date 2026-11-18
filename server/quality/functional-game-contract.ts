@@ -64,7 +64,7 @@ export interface FunctionalGameContract {
   ];
 }
 const ERROR='WORKING_GAME_CONTRACT_';
-const abort=(code:string):never=>{throw Error(ERROR+code);};
+function abort(code:string):never {throw Error(ERROR+code);}
 const LIMITS={requirements:12,probes:12,actions:24,checkpoints:26,observations:12,totalFrames:1400};
 const ID=/^[a-z][a-z0-9-]{0,39}$/;
 const KEY=/^[a-z][A-Za-z0-9_-]{0,59}$/;
