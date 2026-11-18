@@ -24,7 +24,7 @@ const cases: Array<[string,GameFormAdvice['motion'],GameFormAdvice['interaction'
   ['Make a game with realistic gravity and jumping.','physics-2d','arcade'],
   ['Make a racing game where you drive on a track.','rule-driven','driving'],
   ['Create a drag-and-drop rocket that launches, no physics.','rule-driven','drag-and-drop'],
-  ['Make a colorful robot that dances when I tap it.','rule-driven','open-ended'],
+  ['Make a colorful robot that dances when I tap it.','rule-driven','tap-and-react'],
   ['Make a 3D robot that can be walked around in three dimensions.','rule-driven','open-ended'],
   ['Create a space world where I fly through all three axes.','rule-driven','open-ended'],
   ['I want realistic gravity but no physics for this game.','needs-review','open-ended'],
@@ -45,6 +45,8 @@ test('2D is independent from the decision to run physics; explicit 3D is not fal
  assert.equal(requested3d.surface,'3d-requested');
  assert.match(requested3d.capabilities.join(' '),/not supported/);
  assert.equal(recommendGameForm('Make a 2d physics game with realistic collisions').surface,'2d-canvas');
+ assert.equal(recommendGameForm('A game with 3D-looking artwork but only 2D sticker buttons').surface,'2d-canvas');
+ assert.equal(recommendGameForm('Make a physics game with a bouncing ball').motion,'physics-2d');
 });
 test('design advice is advisory, bounded, and includes observable first-play acceptance questions',()=>{
  const input='Make a game about a moon donut cat.';
