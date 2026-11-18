@@ -23,7 +23,7 @@ export function installCoaching(h:Hooks){
  function report(error:unknown,s?:StudioSession){if(s&&!isCurrent(s))return;h.status(error instanceof Error?error.message:String(error),true);}
  function run(fn:()=>void|Promise<void>){let s:StudioSession|undefined;try{s=h.current();Promise.resolve(fn()).catch(error=>report(error,s));}catch(error){report(error,s);}}
  const action=(label:string,fn:()=>void|Promise<void>)=>{const b=node('button',label,'studio-chip') as HTMLButtonElement;b.type='button';b.onclick=()=>run(fn);return b;};
- function cancelDiscussion(){generation++;controller?.abort();controller=null;thinking=false;$('coachModeStatus').textContent='';}
+ function cancelDiscussion(){generation++;controller?.abort();controller=null;thinking=false;$('coachModeStatus').textContent='';$('coachModeStatus').classList.remove('is-thinking');}
  function cancelRequest(){requestGeneration++;requestInFlight=false;force=false;origin='child';depth='tune';}
 
  const combineSelection=new Set<string>();
@@ -125,7 +125,7 @@ export function installCoaching(h:Hooks){
    const firstIdea=captured.game==='new'&&!captured.messages.some(m=>m.role==='child');
    h.message(captured,'child',text);
    if(firstIdea&&isCurrent(captured))celebrateJem('idea','studioConversation');
-   const c=context(text,mode);$('coachModeStatus').textContent='Thinking together…';
+   const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
    let reply:CoachReply,used:'model'|'local'='local',reason='';
    try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
     const response=await fetch(config.apiBaseUrl+'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
@@ -140,7 +140,7 @@ export function installCoaching(h:Hooks){
    const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;
    h.notebook.update(captured.id,captured.owner,s=>{s.draft=nextDraft;});input.value=nextDraft;h.render();
   }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
-  finally{if(seq&&seq===generation){thinking=false;if(controller===turn)controller=null;}}
+  finally{if(seq&&seq===generation){thinking=false;$('coachModeStatus').classList.remove('is-thinking');if(controller===turn)controller=null;}}
  }
  async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
   if((window as any).FG.learning?.active){h.status('Finish the current learning question before changing this game.');return true;}
