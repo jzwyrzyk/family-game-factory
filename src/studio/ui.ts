@@ -314,7 +314,13 @@ export async function installStudio(){
   const atEnd=box.scrollHeight-box.scrollTop-box.clientHeight<40;
   const same=box.dataset.session===s.id&&box.childElementCount<=s.messages.length&&Array.from(box.children).every((node,i)=>(node as HTMLElement).dataset.message===s.messages[i]?.id);
   if(!same){box.replaceChildren();box.dataset.session=s.id;}
-  for(const m of s.messages.slice(box.childElementCount)){const article=el('div',`studio-message ${m.role}`);article.dataset.message=m.id;article.append(el('span','studio-message-author',m.role==='child'?'You':m.role==='reflection'?'Your observation':'Design helper'),el('p','',m.text));box.append(article);}
+  for(const m of s.messages.slice(box.childElementCount)){
+   const article=el('div',`studio-message ${m.role}`);article.dataset.message=m.id;
+   // The original welcome line is already explained by the hero. Keep it in
+   // the durable notebook, but do not take first-screen space repeating it.
+   if(s.game==='new'&&m.role==='helper'&&m.text.startsWith('Tell jems what you imagine. One sentence is enough.'))article.classList.add('studio-intro-message');
+   article.append(el('span','studio-message-author',m.role==='child'?'You':m.role==='reflection'?'Your observation':'jems'),el('p','',m.text));box.append(article);
+  }
   if(!same||atEnd)box.scrollTop=box.scrollHeight;
  }
  function render(){
@@ -324,8 +330,13 @@ export async function installStudio(){
   $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · version ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
   $('studioPreviewNotice').hidden=showing==='working';
   const creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
+  const hasIdea=creating&&s.messages.some(m=>m.role==='child');
   page.classList.toggle('studio-creating',creating);
+  page.classList.toggle('studio-idea-unstarted',creating&&!hasIdea);
+  page.classList.toggle('studio-idea-started',creating&&hasIdea);
   creationHero.hidden=!creating;
+  creationHero.querySelector('h2')!.textContent=hasIdea?'Your game is taking shape!':'What game can you dream up?';
+  creationHero.querySelector('p')!.textContent=hasIdea?'Keep sharing your ideas, then build when you are ready.':'A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!';
   $('studioAvailability').textContent=coachConnectionCopy(configReady?coachConnection:'checking');
   workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
   const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id));
@@ -341,7 +352,7 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
   $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving;$('studioSend').textContent=reflecting?'Save thought →':'Try a change →';
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
-  $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?'Tell jems your game idea':'Tell jems what you want to discuss or change';
+  $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?(hasIdea?'What happens next in your game?':'Tell jems your game idea'):'Tell jems what you want to discuss or change';
   // A child who already told jems an idea can choose Build without repeating it.
   $<HTMLTextAreaElement>('studioPrompt').required=!(creating&&s.messages.some(m=>m.role==='child'));
   $('studioSend').textContent=reflecting?'Save thought →':creating?'✨ Build my game':'Try a change →';
