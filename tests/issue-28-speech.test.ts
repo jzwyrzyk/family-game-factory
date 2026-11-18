@@ -85,6 +85,28 @@ async function main(){
   await setOwnerCoachConsent(repo,parent,{familyId:family,model:true,audio:true,
    verifiedByAdult:true,verificationReceipt:'verified_receipt_123',expiresAt:now()+3600000});
  });
+ await test('trusted device revocation denies paid audio before admission',async()=>{
+  const deviceId='trusted-speech-fixture',session={...designer,deviceId};
+  await repo.transaction(s=>{s.devices=[{id:deviceId,familyId:family,name:'Test tablet',secretHash:'0'.repeat(64),
+   rotation:0,createdAt:now()-1000,lastSeenAt:now(),expiresAt:now()+3600000}];return true;});
+  assert.equal(await service.familyAvailable(session),true);
+  await repo.transaction(s=>{s.devices![0].revokedAt=now();return true;});
+  const before=(await repo.snapshot()).ledgers[family].used;
+  await assert.rejects(service.transcribe(session,{id:'device-revoked-audio',mime:'audio/webm',audio}),/UNAUTHENTICATED/);
+  assert.equal((await repo.snapshot()).ledgers[family].used,before);
+  assert.equal(await service.familyAvailable(session),false);
+ });
+ await test('revocation during transcription prevents late speech disclosure',async()=>{
+  const deviceId='trusted-speech-midflight',session={...designer,deviceId};
+  await repo.transaction(s=>{s.devices=[{id:deviceId,familyId:family,name:'Test tablet',secretHash:'0'.repeat(64),
+   rotation:0,createdAt:now()-1000,lastSeenAt:now(),expiresAt:now()+3600000}];return true;});
+  const revoking=new CoachAudioService(repo,speech,{transcribe:async()=>{
+   await repo.transaction(s=>{s.devices![0].revokedAt=now();return true;});
+   return 'This late transcript must not reach a revoked device';
+  }});
+  await assert.rejects(revoking.transcribe(session,{id:'device-revoked-later',mime:'audio/webm',audio}),/UNAUTHENTICATED/);
+  const state=await repo.snapshot();assert.equal(state.audioReceipts?.find(x=>x.id==='audio-device-revoked-later')?.state,'failed');
+ });
  await test('private OAuth STT adapter uses US V2 and recognized text only',async()=>{
   const adapter=new GooglePrivateSpeech('family-game-factory-jzw',async(url,init)=>{
    assert.match(String(url),/^https:\/\/us-speech.googleapis.com\/v2\/projects\/family-game-factory-jzw\/locations\/us\/recognizers\/_:recognize$/);
