@@ -171,6 +171,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+      - name: Final main-head lease check immediately before Pages publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          test "$MAIN_SHA" = "$GITHUB_SHA" || { echo 'Main advanced while building; refuse stale Pages artifact.' >&2; exit 1; }
       - id: deployment
         uses: actions/deploy-pages@v4
   pages_verify:
