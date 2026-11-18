@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {existsSync} from 'node:fs';
+import {spawn} from 'node:child_process';
 import {chromium} from 'playwright';
 import {transformSync} from 'esbuild';
 import {runtimeBundle} from '../server/sandbox/bundle-v2.cjs';
@@ -89,6 +90,52 @@ function compiled(fixture:GeneratedGame):GeneratedGame{
   runtimeVersion:trusted.version,runtimeHash:trusted.hash,
   tests:{desktop:true,mobile:true,replay:true,isolation:true,input:true,resources:true,pause:true}}};
 }
+
+/** Real existing sandbox worker CLI, exercised on authored source ONLY.
+ * CI doesn't claim gVisor isolation: the production DockerArtifactGate has
+ * that responsibility and its immutable image pin is updated only at release.
+ */
+async function testTrustedWorker(inputGame:GeneratedGame,shouldPass:boolean){
+ if(!allowed.includes(inputGame.source))throw Error('O5_AUTHORED_FIXTURE_ONLY');
+ return new Promise<void>((resolve,reject)=>{
+  const worker=spawn(process.execPath,['server/sandbox/worker.cjs'],{
+   env:{PATH:process.env.PATH,HOME:'/tmp',
+    WORKER_BROWSER_PATH:process.env.CHROMIUM_PATH||chromium.executablePath()},
+   stdio:['pipe','pipe','pipe']
+  });
+  let stdout='',closed=false;
+  const timeout=setTimeout(()=>{worker.kill('SIGKILL');},110000);
+  worker.stdout.on('data',bytes=>{
+   stdout+=String(bytes);
+   if(stdout.length>250000)worker.kill('SIGKILL');
+  });
+  worker.stderr.on('data',()=>{}); // never log private source
+  worker.on('error',err=>{if(!closed){closed=true;clearTimeout(timeout);reject(err);}});
+  worker.on('close',()=>{
+   if(closed)return;
+   closed=true;clearTimeout(timeout);
+   try{
+    const result=JSON.parse(stdout);
+    if(shouldPass){
+     assert.equal(result.ok,true,'valid authored requirement must survive actual worker');
+     assert.equal(result.game?.compiled?.tests?.intent,true,
+      'intent pass must be attested by credential-free test stage');
+     assert.equal(result.game?.compiled?.tests?.input,true);
+     assert.equal(result.game?.compiled?.tests?.replay,true);
+     assert.equal(result.game?.compiled?.tests?.isolation,true);
+    }else{
+     assert.equal(result.ok,false,'a missing required payoff must not be ready');
+     assert.match(result.diagnostics,/INTENT_PLAYTEST_FAILED/);
+     assert.ok(!result.diagnostics.includes(stickerIdea),
+      'diagnostics must not disclose a child prompt');
+    }
+    resolve();
+   }catch(error){reject(error);}
+  });
+  worker.stdin.end(JSON.stringify({game:inputGame,independentIntentPlan:sticker}));
+ });
+}
+
 async function main(){
  const browser=await chromium.launch({
   executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),
@@ -135,5 +182,12 @@ async function main(){
    }finally{await context.close();}
   }
  }finally{await browser.close();}
+ // Stage A: existing sandbox worker compiles and checks the authored sample.
+ // Stage B: a separate, source-bound expectation must prove the real launch.
+ await testTrustedWorker(stickerLaunchFixture,true);
+ const missing={...stickerLaunchFixture,
+  source:stickerLaunchFixture.source.replace('s.launched=true;api.sound','s.launched=false;api.sound')};
+ await testTrustedWorker(missing,false);
+ console.log('PASS O5 existing worker: independent intent attestation and missing-payoff rejection');
 }
 void main().catch(e=>{console.error(e);process.exitCode=1;});
