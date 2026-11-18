@@ -5,6 +5,7 @@
 import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {allowedCoachFamily} from './consent';
+import {assertActiveTrustedDevice} from '../trusted-devices';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
 export const AUDIO_MAX_BYTES=320000;
@@ -62,6 +63,7 @@ export class CoachAudioService {
   if(!this.enabled()||!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))return false;
   const state=await this.repo.snapshot(),month=new Date().toISOString().slice(0,7);
   const ledger=state.ledgers[session.familyId];
+  try{assertActiveTrustedDevice(state,session);}catch{return false;}
   if(!allowedCoachFamily(state,session,'audio')||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)return false;
   if(this.provider.readiness){
@@ -76,6 +78,8 @@ export class CoachAudioService {
   const mime=validateAudio(input.audio,input.mime),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
   const id='audio-'+input.id;
   await this.repo.transaction(state=>{
+   // A device revoked between the HTTP check and spending admission is denied.
+   assertActiveTrustedDevice(state,session,now);
    if(!allowedCoachFamily(state,session,'audio',now))throw Error('AUDIO_UNAVAILABLE');
    state.audioReceipts=(state.audioReceipts||[]).filter(x=>x.state==='running'||x.at>=now-86400000);
    const receipts=state.audioReceipts;
@@ -97,7 +101,9 @@ export class CoachAudioService {
    if(signal.aborted)throw Error('AUDIO_UNAVAILABLE');
    if(typeof text!=='string'||!text.trim()||text.length>2000)throw Error('AUDIO_NO_SPEECH');
    // Consent may have been revoked while a provider request was running.
-   if(!allowedCoachFamily(await this.repo.snapshot(),session,'audio'))throw Error('AUDIO_UNAVAILABLE');
+   const latest=await this.repo.snapshot();
+   assertActiveTrustedDevice(latest,session);
+   if(!allowedCoachFamily(latest,session,'audio'))throw Error('AUDIO_UNAVAILABLE');
    successful=true;return {text};
   }finally{
    await this.repo.transaction(state=>{
