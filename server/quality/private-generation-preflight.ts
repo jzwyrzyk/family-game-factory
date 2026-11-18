@@ -46,7 +46,7 @@ export interface PrivateGenerationRoute{
   instructionsMode:'rule-driven'|'physics-2d'|'unresolved';
   priorSourceKind:'v1'|'v2'|'none';
 }
-const error=(code:string):never=>{throw Error(code);};
+function error(code:string):never { throw Error(code); }
 const PHYSICS=/\bapi\s*(?:\.\s*physics|\[\s*['"]physics['"]\s*\])/;
 function trustedBase(base:TrustedBase):TrustedExistingForm|undefined{
   if(base.id==='new'){
