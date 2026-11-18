@@ -26,6 +26,12 @@ const {start}=require('./browser-server.cjs');
   const color=await page.locator('#studioSend').evaluate(el=>getComputedStyle(el).backgroundColor);
   assert.equal(color,'rgb(11, 29, 77)','build game is an obvious deep navy CTA');
   assert.equal(await page.locator('#designPlan').isVisible(),false,'eight-field plan is not visible before requested');
+  assert.equal(await page.locator('#studioIdeaSparks').isVisible(),true,'optional idea sparks can be discovered');
+  await page.locator('#studioIdeaSparks summary').click();
+  await page.getByRole('button',{name:/Moon cat/}).click();
+  assert.match(await page.locator('#studioPrompt').inputValue(),/cat eats donuts on the moon/);
+  assert.equal((await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(x=>x.game==='new'))).job,null,'a suggestion never automatically builds');
+
   await page.fill('#studioPrompt','I win every time');
   await page.click('#studioTalk');
   await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('more challenging'));
