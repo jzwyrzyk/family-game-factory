@@ -23,7 +23,7 @@ jobs:
           seen=0
           for i in $(seq 1 25); do
             code=$(curl -s --output /dev/null --write-out '%{http_code}' --max-time 2 -X POST http://127.0.0.1:18080/v1/private-coach/complete || true)
-            if [ "$code" = "503" ]; then seen=1; break; fi
+            if [ "$code" = "403" ]; then seen=1; break; fi
             sleep 1
           done
           test "$seen" = "1"
