@@ -28,7 +28,7 @@ const {start}=require('./browser-server.cjs');
   const afterTalk=await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(x=>x.game==='new'));
   assert.equal(afterTalk.job,null,'chat never falsely queues a build');
   assert.match(await page.locator('#studioAvailability').textContent(),/Limited conversation/,'fallback must not claim real AI');
-  await page.fill('#studioPrompt','A seal jumps across icebergs to reach the end');
+  assert.equal(await page.inputValue('#studioPrompt'),'','chat clears its submitted draft only after saving the idea');
   await page.click('#studioSend');
   assert.equal(await page.locator('#designPlan').evaluate(el=>el.open),true,'the explicit build choice opens the plan before generation');
   assert.equal(await page.locator('.design-plan-field:visible').count(),1,'the guided plan shows only one question at a time');
