@@ -16,6 +16,7 @@ on:
       - 'tests/child-intent.test.ts'
       - 'tests/game-intelligence.test.ts'
       - 'tests/working-game-contract.test.ts'
+      - 'tests/intent-repair.test.ts'
       - 'tests/intent-worker-binding.test.ts'
       - 'tests/intent-playtest-browser.ts'
       - 'tests/private-generation-preflight.test.ts'
@@ -34,6 +35,7 @@ on:
       - 'tests/child-intent.test.ts'
       - 'tests/game-intelligence.test.ts'
       - 'tests/working-game-contract.test.ts'
+      - 'tests/intent-repair.test.ts'
       - 'tests/private-generation-preflight.test.ts'
       - 'tests/unit.ts'
 permissions:
