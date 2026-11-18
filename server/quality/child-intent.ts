@@ -187,9 +187,11 @@ function draftClauses(raw:string):Clause[] {
     if(start<end)result.push({span:{start,end,quote:raw.slice(start,end)},preceding});
   };
   for(const match of raw.matchAll(splitter)){
-    append(cursor,match.index);
-    preceding={start:match.index,end:match.index+match[0].length,quote:match[0]};
-    cursor=match.index+match[0].length;
+    const index=match.index;
+    if(index===undefined)error('SPLIT_MATCH');
+    append(cursor,index);
+    preceding={start:index,end:index+match[0].length,quote:match[0]};
+    cursor=index+match[0].length;
   }
   append(cursor,raw.length);
   if(result.length>MAX_FACTS)error('FACT_LIMIT');
@@ -226,7 +228,9 @@ export function draftChildIntentContract(raw:string,context:IntentDraftContext={
   const mentions=/\b(?:bubble\s+gum|gum|socks?|robots?|rockets?|cats?|donuts?|moons?|cars?|trucks?|castles?|dragons?|balls?|submarines?|boats?|dogs?|spaceships?|wheels?|springs?)\b/gi;
   for(const m of raw.matchAll(mentions)){
     if(facts.length>=MAX_FACTS)error('FACT_LIMIT');
-    const start=m.index,end=start+m[0].length;
+    const start=m.index;
+    if(start===undefined)error('MENTION_MATCH');
+    const end=start+m[0].length;
     facts.push({id:'f'+(facts.length+1),facet:'entity-mention',
       evidence:{start,end,quote:m[0]},annotation:'rule-proposal'});
   }
