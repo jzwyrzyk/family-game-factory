@@ -59,6 +59,7 @@ assert.equal(await offlineProbe.readiness(new AbortController().signal),false);
 const tokenFn=metadataIdentityToken(async(input,init)=>{
  assert.match(String(input),/metadata.google.internal\/computeMetadata/);
  assert.match(String(input),/audience=https%3A%2F%2Ffactory-coach-private-demo-uc.a.run.app/);
+ assert.match(String(input),/format=full/,'private gateway identity verification requires the email claim');
  assert.equal((init?.headers as any)['Metadata-Flavor'],'Google');
  return new Response('a'.repeat(60)+'.'+'b'.repeat(60)+'.'+'c'.repeat(60),{status:200});
 });
