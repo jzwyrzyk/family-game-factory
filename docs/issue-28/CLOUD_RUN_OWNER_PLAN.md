@@ -115,3 +115,6 @@ Existing game generation infrastructure, saved games and current Pages site stay
 - OpenAI under-18 API guidance: https://developers.openai.com/api/docs/guides/safety-checks/under-18-api-guidance
 - OpenAI data controls: https://developers.openai.com/api/docs/guides/your-data
 - Existing `docs/assignment-005/OWNER-PILOT.md` and `docs/design-coach/GOLD_STANDARD.md`
+
+
+**Dedicated secret environment variable:** the reviewed Secret Manager version must be mounted as `FACTORY_COACH_PRIVATE_OPENAI_API_KEY` in `factory-coach-private` only. `FACTORY_OPENAI_API_KEY` belongs to the earlier generation environment and is explicitly forbidden in the private coach runtime; the gateway rejects both names. No model key is attached in an inactive deployment.
