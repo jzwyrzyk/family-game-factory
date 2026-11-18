@@ -26,9 +26,9 @@ export async function familyFetch(base:string,path:string,init:RequestInit={}):P
   if(!probe)return new Response(JSON.stringify({errorCode:'BUILDER_UNAVAILABLE'}),{status:503,headers:{'Content-Type':'application/json'}});
   if(probe.status===401){
    if(!await renewTrustedSession(base))return probe;
-  }else if(probe&&probe.status!==200&&probe.status!==404){
-   // 404 preserves compatibility with pre-upgrade fixture servers; all modern
-   // production gateways implement the endpoint and must fail closed.
+  }else if(probe.status!==200){
+   // Only a verified modern gateway may admit a mutation. A 404 is NOT
+   // evidence of a valid session (nor are 403, redirects or server errors).
    return probe;
   }
  }
