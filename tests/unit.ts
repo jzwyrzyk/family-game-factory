@@ -1,3 +1,4 @@
+import './game-intelligence.test';
 import './factory.test';
 import './backend-contracts.test';
 import './pipeline.test';
