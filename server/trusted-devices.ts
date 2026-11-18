@@ -53,7 +53,7 @@ const rotatedSecret=(key:string,deviceId:string,sequence:number,secret:string)=>
 
 export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;familyId:string;sessionKey:string}){
  return async(request:IncomingMessage,response:ServerResponse)=>{
-  const cors={'Access-Control-Allow-Origin':config.appOrigin,'Access-Control-Allow-Credentials':'true','Vary':'Origin','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
+  const cors={'Access-Control-Allow-Origin':config.appOrigin,'Access-Control-Allow-Credentials':'true','Vary':'Origin','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
   const reply=(status:number,value:unknown,cookies?:string[])=>{
    response.writeHead(status,{...cors,'Content-Type':'application/json',...(cookies?{'Set-Cookie':cookies}:{})});
    response.end(JSON.stringify(value));
@@ -70,7 +70,8 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
   };
   const now=Date.now(),path=new URL(request.url||'/', 'https://internal.invalid').pathname;
   try{
-   if(request.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
+   if(request.headers.origin&&request.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
+   if(request.method!=='GET'&&request.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
    if(request.method==='OPTIONS'){
     response.writeHead(204,{...cors,'Access-Control-Allow-Headers':'Content-Type,X-Factory-Request','Access-Control-Allow-Methods':'GET,POST'});
     response.end();return;
@@ -94,6 +95,8 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
       state.parentAuth[config.familyId]={salt,digest:passwordHash(passphrase,salt),failedAttempts:0,lockedUntil:0};
      }
      state.devices??=[];
+     // Bound persistent metadata without resurrecting expired or revoked devices.
+     state.devices=state.devices.filter(d=>d.familyId!==config.familyId||deviceLive(d,now)||(!!d.revokedAt&&d.revokedAt>now-30*DAY));
      if(state.devices.filter(d=>d.familyId===config.familyId&&deviceLive(d,now)).length>=MAX_DEVICES)throw Error('DEVICE_LIMIT');
      invitation.used=true;
      const device:TrustedDevice={id,familyId:config.familyId,name,secretHash:digest(secret),rotation:0,createdAt:now,lastSeenAt:now,expiresAt:now+DEVICE_MAX};
@@ -166,7 +169,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
     reply(200,{unlocked:true,expiresAt:now+PARENT_ACCESS},[parentCookie(config.familyId,session.deviceId,config.sessionKey,now)]);
     return;
    }
-   if((path==='/v1/devices'||path==='/v1/devices/revoke')&&
+   if((path==='/v1/devices'||path==='/v1/devices/revoke'||path==='/v1/devices/invite')&&
       (request.method==='GET'||request.method==='POST')){
     const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
     const parent=verifySession(cookieValue(request.headers.cookie,'factory_parent'),config.sessionKey,now);
@@ -175,6 +178,19 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
      const state=await repo.snapshot();
      reply(200,{devices:(state.devices||[]).filter(d=>d.familyId===session.familyId&&deviceLive(d,now))
       .map(d=>({id:d.id,name:d.name,createdAt:d.createdAt,lastSeenAt:d.lastSeenAt,expiresAt:d.expiresAt,current:d.id===session.deviceId}))});
+     return;
+    }
+    if(path==='/v1/devices/invite'&&request.method==='POST'){
+     const input=await readBody();expectKeys(input,[]);
+     const invitation=token(),hash=digest(invitation),expiresAt=now+600000;
+     await repo.transaction(state=>{
+      state.invitations??=[];
+      state.invitations=state.invitations.filter(x=>x.expiresAt>now&&!x.used);
+      if(state.invitations.filter(x=>x.familyId===session.familyId).length>=3)throw Error('INVITE_LIMIT');
+      state.invitations.push({hash,familyId:session.familyId,expiresAt,used:false});
+      return true;
+     });
+     reply(200,{invitation,expiresAt});
      return;
     }
     if(path==='/v1/devices/revoke'&&request.method==='POST'){
@@ -194,8 +210,8 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
   }catch(error){
    const reason=(error as Error).message;
    const status=reason==='UNAUTHENTICATED'?401:reason==='INVALID_INVITATION'||reason==='INVALID_PARENT_ACCESS'||reason==='FORBIDDEN'?403:
-    reason==='PARENT_LOCKED'||reason==='DEVICE_LIMIT'?429:reason==='INVALID_REQUEST'?400:503;
-   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','PARENT_LOCKED','DEVICE_LIMIT','INVALID_REQUEST'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
+    reason==='PARENT_LOCKED'||reason==='DEVICE_LIMIT'||reason==='INVITE_LIMIT'?429:reason==='INVALID_REQUEST'?400:503;
+   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','INVALID_REQUEST'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
   }
  };
 }
