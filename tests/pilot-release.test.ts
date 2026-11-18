@@ -24,7 +24,7 @@ test('real Responses adapter keeps math and source while selecting physics docs 
   assert.equal(body.store,false);assert.equal(body.text.format.strict,true);assert.ok(body.text.format.schema.properties.kind.enum.includes('generated-module-v2'));
   assert.match(body.instructions,/quality-runtime-v2.0.3/);assert.match(body.instructions,/Math is required/);
   if(calls===1){assert.doesNotMatch(body.instructions,/physics.part/);assert.equal(JSON.parse(body.input).gameDesignPreflight.motion,'rule-driven');}
-  else {assert.match(body.instructions,/physics.part/);assert.match(JSON.parse(body.input).base.source,/api.physics/);}
+  else {assert.doesNotMatch(body.instructions,/physics.part/);assert.match(JSON.parse(body.input).base.source,/api.physics/);assert.equal(JSON.parse(body.input).gameDesignPreflight.form.simulation,'rule-driven','a failed generated candidate cannot choose the engine for its repair');}
   assert.equal(body.reasoning.effort,'low');
   return new Response(JSON.stringify({status:'completed',usage:{input_tokens:3000,output_tokens:2000},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(physicalWorkshop)}]}]}));
  }) as typeof fetch);
