@@ -9,6 +9,7 @@ import {apiHandler} from '../server/pipeline/http';
 import {mintDeviceInvitation} from '../server/device-owner';
 import {signSession} from '../server/pipeline/auth';
 import {JobService} from '../server/pipeline/service';
+import {CoachService,type CoachConfig} from '../server/coach/service';
 
 const origin='https://jems.example',familyId='family-one',signing='a-really-long-test-only-key-for-session-signing-not-a-secret';
 const day=86400000;
@@ -175,5 +176,51 @@ test('device enrollment applies the same parent-passphrase lockout as device man
   assert.equal((await request('/v1/sessions/enroll','POST',{invitation:other,deviceName:'Second',parentPassphrase:passphrase})).status,429,'a correct password cannot circumvent lockout');
   const state=await repo.snapshot();
   assert.equal(state.devices?.length,1);assert.equal(state.invitations?.find(x=>x.hash===createHash('sha256').update(other).digest('hex'))?.used,false);
+ });
+});
+
+test('trusted device: coach paid reservation rechecks revocation atomically',async()=>{
+ await fixture(async({repo,request})=>{
+  await addInvite(repo,invitation);
+  const enrollment=await request('/v1/sessions/enroll','POST',{invitation,deviceName:'Coach tablet',parentPassphrase:passphrase});
+  assert.equal(enrollment.status,200);
+  // Hold a previously verified, unexpired signed session to simulate a
+  // device revoked after the HTTP check but before paid admission.
+  const session=await verifyBrowserSession(repo,jar(enrollment),signing);
+  assert.ok(session.deviceId);
+  await repo.transaction(state=>{
+   state.ledgers[familyId]={allowance:100000,used:0,reserved:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};
+   return true;
+  });
+  const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,
+   model:'fixture-model',apiKey:'fixture-key',maxInputChars:16000,maxOutputTokens:500,
+   maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,
+   pricesReviewedAt:new Date().toISOString()};
+  let providerCalls=0;
+  const coach=new CoachService(repo,config,{complete:async()=>{
+   providerCalls++;
+   return {usedMicroUsd:10,reply:{move:'clarify',text:'Your game is yours to shape.',
+    question:'What should change?',suggestions:[],proposedChange:null,planSuggestions:[],
+    childDecisions:[],evidenceIds:[]}};
+  }});
+  const context={message:'Make a different game',mode:'discuss',game:'dragon',rules:'Jump to win',
+   plan:{},friction:'',helpLevel:0,support:'brief',conversation:[],observations:[],tests:[]};
+  const accepted=await coach.respond(session,{requestId:'coach-active-device',context});
+  assert.equal(accepted.mode,'model','an active trusted device must still use the coach');
+  assert.equal(providerCalls,1);
+  await repo.transaction(state=>{
+   const device=state.devices?.find(d=>d.id===session.deviceId);
+   assert.ok(device);
+   device.revokedAt=Date.now();
+   return true;
+  });
+  const before=await repo.snapshot();
+  await assert.rejects(()=>coach.respond(session,{requestId:'coach-revoked-device',context}),/UNAUTHENTICATED/,
+   'an earlier session verification cannot authorize a paid turn after revocation');
+  const after=await repo.snapshot();
+  assert.equal(providerCalls,1,'no additional model call was sent');
+  assert.equal(after.coachReceipts?.length,1,'no receipt was reserved for the revoked device');
+  assert.deepEqual(after.ledgers[familyId],before.ledgers[familyId],
+   'revocation cannot consume or reserve any additional family allowance');
  });
 });
