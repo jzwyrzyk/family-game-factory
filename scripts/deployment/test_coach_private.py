@@ -25,7 +25,7 @@ def service():
                     "containers":[{"image":DIGEST,"env":[
                         {"name":"FACTORY_COACH_EXECUTION_ENV","value":"dedicated-cloud-run"},
                         {"name":"FACTORY_COACH_APPROVED","value":"false"}]}]}}},
-        "status":{"conditions":[{"type":"Ready","status":"True"}]}
+        "status":{"url":"https://factory-coach-private-demo-uc.a.run.app","conditions":[{"type":"Ready","status":"True"}]}
     }
 
 
