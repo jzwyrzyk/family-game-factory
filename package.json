@@ -8,7 +8,7 @@
     "build": "npm run typecheck && vite build",
     "test:unit": "node --import tsx tests/unit.ts",
     "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts",
-    "test:learning-integration": "node --import tsx tests/learning-integration.ts",
+    "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs",
     "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:real-agent",
     "test:child-journey": "node tests/child-journey.cjs && node tests/build-continuity.cjs",
