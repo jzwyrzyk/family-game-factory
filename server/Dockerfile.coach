@@ -5,6 +5,9 @@ WORKDIR /source
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY server/coach ./server/coach
+# Build-stage shared device-session verifier dependencies. Final image remains bundled-only.
+COPY server/trusted-devices.ts ./server/trusted-devices.ts
+COPY server/pipeline/auth.ts ./server/pipeline/auth.ts
 COPY src/studio/design.ts ./src/studio/design.ts
 # Bundle typed provider + policy + validated private handler. The final image
 # is a single immutable entrypoint, not the general application dependency tree.
