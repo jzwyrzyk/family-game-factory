@@ -90,7 +90,7 @@ test('trusted device: parent unlock, same-family listing, revocation invalidates
   await assert.rejects(()=>verifyBrowserSession(repo,twoCookies,signing),/UNAUTHENTICATED/);
   const fakeService={readiness:async()=>({available:true})} as unknown as JobService;
   const gate=apiHandler(fakeService,{appOrigin:origin,previewOrigin:'https://preview.example',sessionKey:signing,previewKey:signing},repo);
-  const fakeResponse:any={status:0,headers:{},writeHead(code:number,heads:unknown){this.status=code;this.headers=heads;return this;},end(){return this;}};
+  const fakeResponse:any={status:0,headers:{},setHeader(name:string,value:string){this.headers[name]=value;return this;},writeHead(code:number,heads:unknown){this.status=code;this.headers=heads;return this;},end(){return this;}};
   await gate({method:'GET',url:'/v1/builder/status',headers:{origin,cookie:twoCookies}} as any,fakeResponse);
   assert.equal(fakeResponse.status,401,'existing signed access is immediately refused after revocation');
   assert.equal((await request('/v1/sessions/status','GET',undefined,oneCookies)).status,200,'another family device remains connected');
