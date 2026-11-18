@@ -94,6 +94,7 @@ export class CoachAudioService {
   try{
    const signal=cancel?AbortSignal.any([cancel,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000);
    const text=await this.provider.transcribe(input.audio,mime,signal);
+   if(signal.aborted)throw Error('AUDIO_UNAVAILABLE');
    if(typeof text!=='string'||!text.trim()||text.length>2000)throw Error('AUDIO_NO_SPEECH');
    // Consent may have been revoked while a provider request was running.
    if(!allowedCoachFamily(await this.repo.snapshot(),session,'audio'))throw Error('AUDIO_UNAVAILABLE');
