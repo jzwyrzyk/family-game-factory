@@ -71,6 +71,40 @@ async function playAuthoredPreview(page:Page,frame:FrameLocator,title:'Moon Hopp
  assert.equal(await frame.locator('#status').getAttribute('data-state'),'won','real host math must finish without replacing the authored win');
  assert.match(await page.locator('#previewOutcome').textContent()||'',/^You finished this round\./);
 }
+
+/** O7: validate real rendered v2 movement, not just an altered source or title. */
+async function marbleCenter(frame:FrameLocator):Promise<number>{
+ const x=await frame.locator('#game').evaluate((canvas:HTMLCanvasElement)=>{
+  const pixels=canvas.getContext('2d')!.getImageData(0,0,canvas.width,canvas.height);
+  let total=0,count=0;
+  for(let y=183;y<216;y+=3)for(let x=9;x<710;x+=3){
+   const i=(y*pixels.width+x)*4,d=pixels.data;
+   if(d[i]>200&&d[i+1]>130&&d[i+1]<205&&d[i+2]<105&&d[i]>d[i+1]+28){
+    total+=x;count++;
+   }
+  }
+  return count?total/count:null;
+ });
+ assert.ok(typeof x==='number'&&Number.isFinite(x),'marble must actually be visible on canvas');
+ return x;
+}
+async function playV2Marble(page:Page,frame:FrameLocator,device:string):Promise<number>{
+ await frame.getByRole('button',{name:'Play!',exact:true}).click();
+ await frame.locator('#game[data-frames]').waitFor({timeout:4500});
+ const before=await marbleCenter(frame);
+ await frame.locator('[data-control="right"]').focus();
+ await page.keyboard.down('ArrowRight');await page.waitForTimeout(670);
+ await page.keyboard.up('ArrowRight');await page.waitForTimeout(60);
+ const after=await marbleCenter(frame);
+ assert.ok(after-before>45,'Right must visibly move the game object');
+ if(device==='mobile')await frame.locator('#game').tap({position:{x:320,y:190}});
+ else await frame.locator('#game').click({position:{x:320,y:190}});
+ await frame.locator('#status[data-state=won]').waitFor({timeout:6500});
+ await finishPreviewRound(page);
+ assert.equal(await frame.locator('#status').getAttribute('data-state'),'won');
+ return after-before;
+}
+
 async function main(){
  const approval:AgentApproval={enabled:true,approvalId:'test-fixture-not-live',model:'gpt-5.4-mini',inputUsdPerMillion:.75,outputUsdPerMillion:4.5,maxInputTokens:64000,maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)};
  const repo=new MemoryRepository(),parent={subject:'test-owner',familyId:'test-family',role:'parent' as const,expiresAt:Date.now()+600000};const service=new JobService(repo,{kind:'metered-api',testFixture:true,available:true,generate:async()=>{throw Error('external only')}},{test:async()=>{throw Error('external only')}},{allowMock:true,maxUnits:120000,timeoutMs:60000,maxRetries:2});await service.setAllowance(parent,5000000,true);
