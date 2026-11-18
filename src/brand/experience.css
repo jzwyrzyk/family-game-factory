@@ -216,3 +216,12 @@
 .studio-review .design-plan-review-item strong{font-size:13px;display:block}
 .studio-review .design-plan-review-item p{font-size:13px;margin:3px 0;color:#3B496B;overflow-wrap:anywhere}
 .studio-review .design-plan-review-item small{font-size:11px;color:#765AB1}
+
+/* Opt-in inspiration belongs after the primary composer, never between text
+   and Send. It populates a draft; it never sends or starts a build. */
+.studio-review .studio-idea-sparks{margin:4px 20px 14px;padding:0 2px;color:var(--jems-ink)}
+.studio-review .studio-idea-sparks[hidden]{display:none!important}
+.studio-review .studio-idea-sparks>summary{cursor:pointer;font:750 13px/1.5 var(--jems-body);color:#6834C4;list-style-position:inside}
+.studio-review .studio-idea-spark-options{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}
+.studio-review .studio-idea-spark-options .studio-chip{min-height:42px;border-color:#BAA1EE;color:#512996;background:#F6F1FF}
+@media(max-width:760px){.studio-review .studio-idea-sparks{margin:5px 13px 12px}.studio-review .studio-idea-spark-options{gap:7px}}
