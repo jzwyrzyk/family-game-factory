@@ -11,7 +11,7 @@ import {createHash} from 'node:crypto';
 
 export const CHILD_INTENT_VERSION='jems-child-intent-v1' as const;
 export const INTENT_FACETS=[
-  'subject','player-action','observable-effect','payoff','goal',
+  'entity-mention','player-action','observable-effect','payoff','goal',
   'negative-constraint','presentation-request','play-mode','unclassified'
 ] as const;
 export type IntentFacet=(typeof INTENT_FACETS)[number];
@@ -192,7 +192,8 @@ function draftClauses(raw:string):Clause[] {
     cursor=match.index+match[0].length;
   }
   append(cursor,raw.length);
-  return result.slice(0,MAX_FACTS);
+  if(result.length>MAX_FACTS)error('FACT_LIMIT');
+  return result;
 }
 
 function classify(quote:string):IntentFacet {
@@ -204,7 +205,7 @@ function classify(quote:string):IntentFacet {
   if(/\b(?:reach(?:es)?\s+(?:the|a)|finish(?:es)?\s+(?:the|a)|score\s+\d+|win\s+the\s+game)\b/.test(s))return 'goal';
   if(/\b(?:drag(?:ging)?|drop(?:ping)?|put|stick|assemble|place|move|drive|jump|eat(?:s|ing)?|catch|collect(?:s|ing)?|tap|choose|steer|draw|paint|press|program|tell|follow|run|fly|guide|turn|shoot|build\s+a)\b/.test(s))return 'player-action';
   if(/\b(?:2d|3d|three[- ]dimensional|top[- ]down|side[- ]view|cartoon|pixel[- ]art|purple|colorful|colourful)\b/.test(s))return 'presentation-request';
-  if(/\b(?:cat|robot|rocket|socks?|donuts?|moon|car|truck|castle|dragon|ball|submarine|boat|dog|spaceship)\b/.test(s))return 'subject';
+  if(/\b(?:cat|robot|rocket|socks?|donuts?|moon|car|truck|castle|dragon|ball|submarine|boat|dog|spaceship)\b/.test(s))return 'entity-mention';
   return 'unclassified';
 }
 
@@ -215,12 +216,21 @@ function classify(quote:string):IntentFacet {
  */
 export function draftChildIntentContract(raw:string,context:IntentDraftContext={}):ChildIntentContract {
   if(typeof raw!=='string'||!raw.trim()||raw.length>MAX_REQUEST||raw.includes('\0'))error('ORIGINAL_SOURCE');
-  const facts:IntentFact[]=draftClauses(raw).map((clause,i)=>({
+  const clauses=draftClauses(raw);
+  const facts:IntentFact[]=clauses.map((clause,i)=>({
     id:'f'+(i+1),facet:classify(clause.span.quote),evidence:clause.span,
     annotation:'rule-proposal'
   }));
+  // Objects/characters are explicit mentions, NOT a recommendation to create
+  // them (a noun may occur in a prohibition). Preserve the exact source span.
+  const mentions=/\b(?:bubble\s+gum|gum|socks?|robots?|rockets?|cats?|donuts?|moons?|cars?|trucks?|castles?|dragons?|balls?|submarines?|boats?|dogs?|spaceships?|wheels?|springs?)\b/gi;
+  for(const m of raw.matchAll(mentions)){
+    if(facts.length>=MAX_FACTS)error('FACT_LIMIT');
+    const start=m.index,end=start+m[0].length;
+    facts.push({id:'f'+(facts.length+1),facet:'entity-mention',
+      evidence:{start,end,quote:m[0]},annotation:'rule-proposal'});
+  }
   const relations:IntentRelation[]=[];
-  const clauses=draftClauses(raw);
   clauses.forEach((clause,index)=>{
     if(index===0||!clause.preceding||!/\bthen\b/i.test(clause.preceding.quote))return;
     if(relations.length<MAX_RELATIONS)relations.push({
