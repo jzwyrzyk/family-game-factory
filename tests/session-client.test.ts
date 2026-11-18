@@ -77,3 +77,23 @@ test('unavailable authentication preflight fails closed before a paid mutation',
   assert.equal(submitted,0,'No paid build submission after uncertain authentication');
  });
 });
+
+test('a missing or denied session-status route fails closed without coach or build mutation',async()=>{
+ for(const status of [302,403,404,503]){
+  let submitted=0,renewals=0,probes=0;
+  await mockNetwork(path=>{
+   if(path==='/v1/sessions/status'){probes++;return json(status);}
+   if(path==='/v1/sessions/renew'){renewals++;return json(200);}
+   if(path==='/v1/coach'||path==='/v1/jobs'){submitted++;return json(202);}
+   throw Error('Unexpected route '+path);
+  },async()=>{
+   for(const endpoint of ['/v1/jobs','/v1/coach']){
+    const response=await familyFetch(base,endpoint,{method:'POST',body:'{}'});
+    assert.equal(response.status,status,'unexpected preflight status '+status+' on '+endpoint);
+   }
+   assert.equal(probes,2);
+   assert.equal(submitted,0,'denied or unsupported gateway must not receive a paid action');
+   assert.equal(renewals,0,'only 401 permits renewal');
+  });
+ }
+});
