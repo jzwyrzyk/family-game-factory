@@ -25,6 +25,7 @@ export type GameObservation=
   |{kind:'visible';key:string}
   |{kind:'hidden';key:string}
   |{kind:'coordinate';key:string;axis:'x'|'y';operator:'lt'|'gt';value:number}
+  |{kind:'changed';key:string;axis:'x'|'y';minDelta:number}
   |{kind:'world';metric:'bodies'|'joints';operator:'eq'|'gte';value:number};
 export interface RequirementDraft {
   id:string;
@@ -179,6 +180,14 @@ export function validateFunctionalGameContract(
              !['lt','gt'].includes(o.operator as string)||typeof o.value!=='number'||
              !Number.isFinite(o.value)||Math.abs(o.value)>10000)abort('OBSERVATION');
           return {kind:'coordinate',key:o.key,axis:o.axis as 'x'|'y',operator:o.operator as 'lt'|'gt',value:o.value};
+        }
+        if(o.kind==='changed'){
+          if(!only(o,['kind','key','axis','minDelta'])||
+             typeof o.key!=='string'||!KEY.test(o.key)||
+             !['x','y'].includes(o.axis as string)||
+             typeof o.minDelta!=='number'||!Number.isFinite(o.minDelta)||
+             o.minDelta<=0||o.minDelta>10000)abort('OBSERVATION');
+          return {kind:'changed',key:o.key,axis:o.axis as 'x'|'y',minDelta:o.minDelta};
         }
         if(o.kind==='world'){
           if(!only(o,['kind','metric','operator','value'])||
