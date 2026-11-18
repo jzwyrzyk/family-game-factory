@@ -241,7 +241,7 @@ export async function installStudio(){
   if(coach.status==='fulfilled')coachConnection=coach.value?.available?'available':'unavailable';
   else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
   if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
-  else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
+  else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unverified';
   if(activeId)render();else updateCreationNote();
  }
  function renderLibrary(){
