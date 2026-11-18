@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {PrivateCoachBridge,privateCoachOrigin,metadataIdentityToken} from '../server/coach/private-bridge';
+import {CoachService,COACH_RECEIPT_TTL_MS} from '../server/coach/service';
+import {MemoryRepository} from '../server/pipeline/repository';
 import {privateCoachHandler,type PrivateCoachRuntime} from '../server/coach/private-executor';
 import type {CoachContext} from '../src/studio/design';
 import type {PrivateCoachConfig} from '../server/coach/private-provider';
@@ -85,5 +87,20 @@ try{
    {method:'POST',headers,body:JSON.stringify({version:1,context})});
   assert.equal(response.status,503);assert.equal(providerCalls,1);
  }finally{await new Promise<void>(resolve=>other.close(()=>resolve()));}
+ const repository=new MemoryRepository(),family='family-synthetic';
+ const designer={subject:'designer-fixture',familyId:family,role:'designer' as const,expiresAt:Date.now()+60000};
+ const parent={...designer,role:'parent' as const};
+ await repository.transaction(state=>{state.ledgers[family]={month:new Date().toISOString().slice(0,7),allowance:50000,reserved:0,used:0,paidEnabled:true};return true;});
+ const metered=new CoachService(repository,config,{complete:async()=>({reply,usedMicroUsd:22})});
+ await metered.respond(designer,{requestId:'turn-first',context});
+ await repository.transaction(state=>{state.coachReceipts![0].at=Date.now()-COACH_RECEIPT_TTL_MS-10;return true;});
+ await metered.respond(designer,{requestId:'turn-second',context});
+ assert.equal((await repository.snapshot()).coachReceipts?.length,1,'expired content receipt pruned');
+ await assert.rejects(metered.eraseFamilyReceipts(designer),/FORBIDDEN/);
+ const total=(await repository.snapshot()).ledgers[family].used;
+ assert.deepEqual(await metered.eraseFamilyReceipts(parent),{erased:1});
+ assert.equal((await repository.snapshot()).coachReceipts?.length,0);
+ assert.equal((await repository.snapshot()).ledgers[family].used,total,'erasure does not falsify charges');
+ assert.equal((await repository.snapshot()).audit.length,2,'content-free audit remains');
  console.log('PASS private coach: authenticated identity, strict provider-only contract, keyless gateway, hard safety gates and no browser access');
 }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));}
