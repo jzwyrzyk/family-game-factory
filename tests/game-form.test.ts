@@ -88,6 +88,22 @@ test('O2: explicit true 3D depth is an unsupported requirement, not disguised as
  }
  const conflict=choose('Make a 3D space game but it must only be 2D.');
  assert.ok(conflict.blockers.includes('dimension-conflict'));
+ for(const request of [
+  'Make a game with no 3D world, only 2D robot stickers.',
+  'Make a robot puzzle without a 3D game, just 2D buttons.'
+ ]){
+   const d=choose(request);
+   assert.equal(d.rendering,'2d-canvas',request);
+   assert.notEqual(d.disposition,'unsupported',request);
+   assert.ok(d.evidence.some(e=>e.signal==='3d-avoided'),request);
+ }
+});
+test('O2: labelled launch/start buttons count as real secondary tap interactions',()=>{
+ for(const request of ['Drag stickers and then press Launch.', 'Drag stickers and press Make it GO.']){
+   const d=choose(request);
+   assert.equal(d.primaryInput,'drag-and-drop');
+   assert.ok(d.additionalInputs.includes('tap-and-react'),request);
+ }
 });
 
 test('O2: negation does not falsely demand physics; contradictory physical asks are reviewed',()=>{
