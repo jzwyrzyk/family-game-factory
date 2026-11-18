@@ -190,10 +190,12 @@ test('trusted device: coach paid reservation rechecks revocation atomically',asy
   assert.ok(session.deviceId);
   await repo.transaction(state=>{
    state.ledgers[familyId]={allowance:100000,used:0,reserved:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};
+   state.coachConsent=[{familyId,guardianSubject:'synthetic-parent',confirmedAt:Date.now(),expiresAt:Date.now()+3600000,policyVersion:'owner-pilot-1',model:true,audio:false,verificationReceipt:'device_test_guardian_receipt_123'}];
    return true;
   });
   const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,
-   model:'fixture-model',apiKey:'fixture-key',maxInputChars:16000,maxOutputTokens:500,
+   zdrVerified:true,privateExecutionApproved:true,
+   model:'fixture-model',maxInputChars:16000,maxOutputTokens:500,
    maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,
    pricesReviewedAt:new Date().toISOString()};
   let providerCalls=0;
