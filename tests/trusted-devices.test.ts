@@ -74,7 +74,11 @@ test('trusted device: parent unlock, same-family listing, revocation invalidates
   const unlocked=await request('/v1/devices/unlock','POST',{parentPassphrase:passphrase},oneCookies);
   assert.equal(unlocked.status,200);const parent='factory_parent='+cookie(unlocked,'factory_parent');
   assert.equal((await request('/v1/devices','GET',undefined,oneCookies+'; '+parent)).status,200);
-  const secondInvitation='j'.repeat(43);await addInvite(repo,secondInvitation);
+  assert.equal((await request('/v1/devices/invite','POST',{},oneCookies)).status,401,'child session cannot issue adult device invitations');
+  const invitationResponse=await request('/v1/devices/invite','POST',{},oneCookies+'; '+parent);
+  assert.equal(invitationResponse.status,200);
+  const {invitation:secondInvitation}=await invitationResponse.json();
+  assert.equal(typeof secondInvitation,'string');assert.equal(secondInvitation.length,43);
   const two=await request('/v1/sessions/enroll','POST',{invitation:secondInvitation,deviceName:'Family phone',parentPassphrase:passphrase});
   assert.equal(two.status,200);const twoCookies=jar(two);
   const listed=await(await request('/v1/devices','GET',undefined,oneCookies+'; '+parent)).json();
