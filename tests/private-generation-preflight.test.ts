@@ -216,3 +216,28 @@ test('O4: existing JobService makes fixture-backed Create → Playable Revision 
  assert.ok(state.audit.every(event=>!JSON.stringify(event).includes(idea)));
  assert.equal(state.ledgers[parent.familyId].reserved,0);
 });
+
+test('O4: unsupported designs are refused at authenticated submission without queuing or consuming allowance',async()=>{
+ const repo=new MemoryRepository();let keyReads=0,paidRequests=0;
+ const adapter=new OpenAIResponsesAgent(approval,()=>{keyReads++;return 'synthetic-key-not-a-secret';},
+  (async()=>{paidRequests++;return fixtureResponse(stickerLaunchFixture);}) as typeof fetch);
+ const service=new JobService(repo,adapter,{test:async()=>{throw Error('must not test rejected ideas');}},
+  {allowMock:false,maxUnits:100000,timeoutMs:60000,maxRetries:2});
+ const parent={subject:'owner',familyId:'family-a',role:'parent' as const,expiresAt:Date.now()+60000};
+ await service.setAllowance(parent,500000,true);
+ for(const [prompt,code] of [
+  ['Make a true 3D game where I can fly through space.','GAME_FORM_UNSUPPORTED'],
+  ['Make a game with no physics but simulate gravity and momentum.','GAME_FORM_REVIEW_REQUIRED']
+ ] as const){
+  await assert.rejects(service.submit(parent,{
+   gameId:'new',baseRevisionId:null,prompt,clientRequestId:'rejected-'+code
+  }),new RegExp(code));
+ }
+ const saved=await repo.snapshot();
+ assert.equal(saved.jobs.length,0);
+ assert.equal(saved.audit.length,0);
+ assert.equal(saved.ledgers[parent.familyId].reserved,0);
+ assert.equal(saved.ledgers[parent.familyId].used,0);
+ assert.equal(keyReads,0);
+ assert.equal(paidRequests,0);
+});
