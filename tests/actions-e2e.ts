@@ -175,7 +175,92 @@ async function main(){
   await page.click('#undoBuild');await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await page.fill('#builtGameName','My generated '+device);await page.click('#forkBuildForm button[type=submit]');await page.getByText('Saved as a new builder game. Your original version is unchanged.',{exact:true}).waitFor();
   // Reload while an acknowledged job waits in the durable dispatcher; no prompt or credential is stored in the browser.
   paused=true;await page.fill('#reviseBuildPrompt','Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.reload();await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.click('#cancelBuild');await page.getByText('Build cancelled. Your current game is safe.',{exact:true}).waitFor();paused=false;
-  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();await page.getByRole('button',{name:'🌟 My generated '+device,exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<2;i++){await frame.locator('#game').click({position:{x:70+i*55,y:80}});await page.waitForTimeout(100);}mkdirSync('test-results',{recursive:true});await page.locator('#generatedPreview').screenshot({path:`test-results/assignment-002-${device}.png`});assert.deepEqual(errors,[]);console.log(`PASS Assignment 002 ${device}: website → authenticated gateway → mocked Actions → real adapter transport fixture → source compile/test/repair → private worker preview → five playable revisions/keep/undo/fork/reload/cancel`);
+  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();await page.getByRole('button',{name:'🌟 My generated '+device,exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<2;i++){await frame.locator('#game').click({position:{x:70+i*55,y:80}});await page.waitForTimeout(100);}mkdirSync('test-results',{recursive:true});await page.locator('#generatedPreview').screenshot({path:`test-results/assignment-002-${device}.png`});
+  // O7: modern generated-module-v2 Create→Play→Edit→Compare→Keep→Return.
+  // Existing old v1 fixtures above remain required; this is a separate,
+  // exact-source-allowlisted journey through the same authenticated Actions
+  // and private preview/learning host, NOT a real paid model generation.
+  failFirst=false;
+  await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();
+  await page.fill('#inventIdea','Make a marble game where I press Right to move the marble and tap to win.');
+  const [marbleResponse]=await Promise.all([
+   page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs'),
+   page.click('#createTry')
+  ]);
+  assert.equal(marbleResponse.status(),202);
+  const marbleAck=await marbleResponse.json();
+  await page.getByRole('button',{name:'Try ready preview',exact:true}).waitFor({timeout:90000});
+  await page.getByRole('button',{name:'Try ready preview',exact:true}).click();
+  await frame.getByRole('heading',{name:'Marble Playground',exact:true}).waitFor({timeout:15000});
+  const firstDistance=await playV2Marble(page,frame,device);
+  const firstJob=(await repo.snapshot()).jobs.find(j=>j.id===marbleAck.jobId);
+  assert.equal(firstJob?.status,'ready');
+  assert.equal(firstJob?.attempts,1);
+  const firstId=firstJob?.revisionId;
+  assert.ok(firstId);
+  await page.click('#keepBuild');
+  await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();
+
+  await page.fill('#reviseBuildPrompt','Make the marble move faster when I press Right and tap to win.');
+  const [fasterResponse]=await Promise.all([
+   page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs'),
+   page.click('#reviseBuildForm button[type=submit]')
+  ]);
+  assert.equal(fasterResponse.status(),202);
+  const fasterAck=await fasterResponse.json();
+  await page.getByRole('button',{name:'Try ready preview',exact:true}).waitFor({timeout:90000});
+  await page.getByRole('button',{name:'Try ready preview',exact:true}).click();
+  await frame.getByRole('heading',{name:'Faster Marble Playground',exact:true}).waitFor({timeout:15000});
+  const fasterDistance=await playV2Marble(page,frame,device);
+  assert.ok(fasterDistance>firstDistance+25,
+   'the revised game must really move faster, not merely rename itself');
+  const fasterJob=(await repo.snapshot()).jobs.find(j=>j.id===fasterAck.jobId);
+  assert.equal(fasterJob?.status,'ready');
+  const fasterId=fasterJob?.revisionId;
+  assert.ok(fasterId);
+  const fasterVersion=await service.revision(deviceActor,fasterId);
+  assert.equal(fasterVersion.parentId,firstId);
+  assert.equal((await service.list(deviceActor)).some(r=>r.id===fasterId),false,
+   'ready must not silently replace the main game before Keep');
+  assert.equal((await service.list(deviceActor)).some(r=>r.id===firstId),true);
+  await page.click('#compareBuild');
+  await page.locator('#buildComparison').filter({
+   hasText:/Before: Marble Playground\. Now: Faster Marble Playground/
+  }).waitFor();
+  await page.click('#keepBuild');
+  await page.getByText('Kept! Find your playable game in My Creations.',{exact:true}).waitFor();
+  assert.equal((await service.list(deviceActor)).some(r=>r.id===fasterId),true);
+
+  // A deliberately invalid edit exhausts the *existing* bounded retry loop.
+  // Neither false Ready nor an invisible model edit may replace the kept game.
+  const learningBeforeFailure=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
+  await page.fill('#reviseBuildPrompt','Break this marble game so it does not work.');
+  const [invalidResponse]=await Promise.all([
+   page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs'),
+   page.click('#reviseBuildForm button[type=submit]')
+  ]);
+  assert.equal(invalidResponse.status(),202);
+  const invalidAck=await invalidResponse.json();
+  await page.waitForFunction(()=>/did not work/.test(document.getElementById('builderStatus')?.textContent||''),
+   null,{timeout:90000});
+  const brokenJob=(await repo.snapshot()).jobs.find(j=>j.id===invalidAck.jobId);
+  assert.equal(brokenJob?.status,'failed');
+  assert.equal(brokenJob?.attempts,3,'bad game must have at most two automatic repairs');
+  assert.equal(brokenJob?.revisionId,undefined);
+  assert.equal((await service.list(deviceActor)).some(r=>r.id===fasterId),true);
+  assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills)),learningBeforeFailure,
+   'failed build must not alter learning performance');
+
+  await page.reload();await page.waitForFunction(()=>window.FG?.builder);
+  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();
+  await page.getByRole('button',{name:'🌟 Faster Marble Playground',exact:true}).click();
+  await frame.getByRole('heading',{name:'Faster Marble Playground',exact:true}).waitFor({timeout:15000});
+  const returnedDistance=await playV2Marble(page,frame,device);
+  assert.ok(returnedDistance>45,'saved v2 game must remain playable after reload');
+  assert.equal((await service.list(deviceActor)).some(r=>r.id===fasterId),true);
+  console.log('PASS O7 '+device+
+   ': v2 Create→real play+learning→Keep→faster observed edit→Compare→Keep→bad edit recovery→reload→play');
+  assert.deepEqual(errors,[]);console.log(`PASS Assignment 002 ${device}: website → authenticated gateway → mocked Actions → real adapter transport fixture → source compile/test/repair → private worker preview → five playable revisions/keep/undo/fork/reload/cancel`);
   }catch(error){
    const state=await repo.snapshot(),now=Date.now();
    const diagnostic={device,elapsedMs:now-startedAt,paused,sessionRemainingMs:deviceActor.expiresAt-now,builderStatus:await page.locator('#builderStatus').textContent({timeout:1000}).catch(()=>'<unavailable>'),builderMode:await page.locator('#builderMode').textContent({timeout:1000}).catch(()=>'<unavailable>'),errors,apiEvents,ledger:state.ledgers[deviceActor.familyId],jobs:state.jobs.filter(j=>j.familyId===deviceActor.familyId).slice(-8).map(j=>({id:j.id,status:j.status,phase:j.phase,errorCode:j.errorCode,attempts:j.attempts,usedUnits:j.usedUnits,execution:j.execution&&{attempt:j.execution.attempt,stage:j.execution.stage,dispatchPending:j.execution.dispatchPending,runId:j.execution.runId,queuedMsAgo:j.execution.queuedAt&&now-j.execution.queuedAt,claimedMsAgo:j.execution.claimAt&&now-j.execution.claimAt,diagnostics:j.execution.diagnostics?.slice(0,600)}})),trace:harnessTrace.slice(-32)};
