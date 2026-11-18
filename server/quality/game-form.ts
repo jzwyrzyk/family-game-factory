@@ -14,7 +14,7 @@ export type GameRenderMode='2d-canvas'|'true-3d-required';
 export type GameSimulationMode='rule-driven'|'physics-2d'|'unresolved';
 export type GameInputMode='drag-and-drop'|'grid-commands'|'driving'|'arcade'|'tap-and-react'|'unresolved';
 export type GameFormSignal=
-  'explicit-3d'|'3d-looking-art'|'2d-view'|'physics-needed'|'physics-avoided'|
+  'explicit-3d'|'3d-looking-art'|'3d-avoided'|'2d-view'|'physics-needed'|'physics-avoided'|
   'physics-ambiguous'|'drag-action'|'grid-action'|'drive-action'|'arcade-action'|'tap-action';
 export type GameFormBlocker=
   'true-3d-not-supported'|'dimension-conflict'|'physics-conflict'|
@@ -61,6 +61,9 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
     /\b(?:looks?|looking)\s+(?:like\s+)?3[\s-]?d\b/gi,
     /\b(?:faux|fake)\s*3[\s-]?d\b/gi
   ]],
+  ['3d-avoided',[
+    /\b(?:no|without|avoid|skip|don't\s+use|do\s+not\s+use|not\s+(?:a|in))\s+(?:(?:true|real|full)\s+)?(?:3[\s-]?d|three[- ]dimensional)(?:\s+(?:game|world|movement|navigation))?\b/gi
+  ]],
   ['explicit-3d',[
     /\b(?:true|real|full)\s*3[\s-]?d(?:imensional)?\b/gi,
     /\b(?:3[\s-]?d|three[- ]dimensional)\s+(?:game|world|space|camera|environment|movement|navigation|maze)\b/gi,
@@ -100,7 +103,7 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
     /\b(?:collect|collects|collecting|catch|catches|eat|eats|eating|jump|jumps|jumping|dodge|shoot|avoid\s+obstacles|fly\s+through)\b/gi
   ]],
   ['tap-action',[
-    /\b(?:tap|tapping|click|press\s+(?:a|the)\s+button|choose|select)\b/gi
+    /\b(?:tap|tapping|click|press\s+(?:(?:a|the)\s+)?(?:button|launch|start|go|play|make\s+it\s+go)|choose|select)\b/gi
   ]]
 ];
 function gather(raw:string,facts:ChildIntentContract['facts']):GameFormEvidence[] {
@@ -151,13 +154,18 @@ export function chooseGameForm(
   const positive=rawPhysics.filter(e=>!forbidden.some(n=>overlap(n.source,e.source)));
   const ambiguous=signals(all,'physics-ambiguous').filter(e=>!forbidden.some(n=>overlap(n.source,e.source)));
   const styleOnly=signals(all,'3d-looking-art');
-  const depth=signals(all,'explicit-3d').filter(e=>!styleOnly.some(s=>overlap(e.source,s.source)));
+  const forbidden3d=signals(all,'3d-avoided');
+  const depth=signals(all,'explicit-3d').filter(e=>
+    !styleOnly.some(s=>overlap(e.source,s.source))&&
+    !forbidden3d.some(s=>overlap(e.source,s.source)));
   const view2d=signals(all,'2d-view');
   const blockers:GameFormBlocker[]=[];
   const reason:string[]=[];
-  const evidence=all.filter(e=>e.signal!=='physics-needed'||positive.includes(e));
+  const evidence=all.filter(e=>
+    (e.signal!=='physics-needed'||positive.includes(e))&&
+    (e.signal!=='explicit-3d'||depth.includes(e)));
   const asked3d=depth.length>0;
-  const conflictDepth=asked3d && view2d.length>0;
+  const conflictDepth=asked3d && (view2d.length>0 || forbidden3d.length>0);
   if(asked3d)blockers.push('true-3d-not-supported');
   if(conflictDepth)blockers.push('dimension-conflict');
   const rendering:GameRenderMode=asked3d?'true-3d-required':'2d-canvas';
