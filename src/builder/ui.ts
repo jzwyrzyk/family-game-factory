@@ -72,7 +72,103 @@ export async function initBuilder(){
  async function refresh(){if(config.mode!=='remote')return;const owner=FG.store.current().id,at=profileSequence,source=client;try{const games=await source.api('/v1/creations');if(owner!==FG.store.current().id||at!==profileSequence)return;$('builderGames').replaceChildren();$('builderLibraryStatus').textContent='Private games from the connected family workspace.';for(const game of games){const button=document.createElement('button');button.className='btn secondary';button.textContent=`🌟 ${game.name||((game.game.kind==='generated-module-v1'||game.game.kind==='generated-module-v2')?game.game.title:`Catch ${game.game.target} Stars`)}`;button.onclick=()=>{move('create');FG.app.page('create');void showPreview(game.id).catch(showError);};$('builderGames').append(button);}}catch{if(owner===FG.store.current().id&&at===profileSequence)$('builderLibraryStatus').textContent='Private builder games are unavailable. Your local remixes are still here.';}}
  window.addEventListener('factory-page',event=>{const next=(event as CustomEvent<string>).detail;currentPage=next;if(next!==previousPage){previewSequence++;previewLearning?.dispose();previewLearning=null;$<HTMLIFrameElement>('generatedPreview').removeAttribute('src');$('builderPreview').hidden=true;panel.hidden=true;}if(next===previousPage&&readyPreview?.owner===FG.store.current().id)move(next);if(next==='creations')void refresh();});
  window.addEventListener('factory-profile',()=>{previewLearning?.dispose();previewLearning=null;previewSequence++;profileSequence++;client.disconnect();client=makeClient();readyPreview=null;$('openReadyBuild').hidden=true;currentRevision=null;currentProject=null;channel='';previewOwner='';panel.hidden=true;$('builderPreview').hidden=true;$<HTMLIFrameElement>('generatedPreview').removeAttribute('src');$('builderGames').replaceChildren();});
- const connection=document.createElement('form');connection.id='builderConnection';connection.innerHTML='<h3>Connect the private family workshop</h3><label for="builderInvite">One-use setup invitation</label><input id="builderInvite" type="password" autocomplete="off" maxlength="100" required><button class="btn secondary" type="submit">Connect workshop</button><p id="connectionStatus" role="status"></p>';$('page-parent').querySelector('.panel')!.append(connection);connection.onsubmit=e=>{e.preventDefault();void client.api('/v1/sessions',{invitation:$<HTMLInputElement>('builderInvite').value}).then(()=>{$('connectionStatus').textContent='Your private session is connected. Building is available only when the workshop and allowance are ready.';$<HTMLInputElement>('builderInvite').value='';}).catch(()=>{$('connectionStatus').textContent='Could not connect. Check the invitation and private builder configuration.';});};
+ // Family enrollment is a one-time adult action; ordinary renewals remain invisible.
+ // The legacy single-use /v1/sessions route remains server-compatible for old clients.
+ const connection=document.createElement('section');
+ connection.id='builderConnection';connection.className='panel';
+ connection.innerHTML=
+  '<h3>Family game workshop</h3><p>A grown-up trusts this browser once. jems renews access automatically during normal use. No repeating invitations every week.</p>'+
+  '<p id="connectionStatus" role="status" aria-live="polite">Checking this device…</p>'+
+  '<form id="builderConnectForm"><h4>Trust this device</h4>'+
+  '<label for="builderDeviceName">Device name</label><input id="builderDeviceName" maxlength="48" required value="Family tablet" autocomplete="off">'+
+  '<label for="builderInvite">One-use grown-up invitation</label><input id="builderInvite" type="password" autocomplete="off" maxlength="100" required>'+
+  '<label for="builderParentPassphrase">Parent passphrase (at least 12 characters)</label><input id="builderParentPassphrase" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>'+
+  '<p>Keep your parent passphrase private. The first trusted device establishes it; future devices use the same passphrase and a new one-use invitation.</p>'+
+  '<button class="btn primary" type="submit">Trust this family device</button></form>'+
+  '<div id="builderTrustedControls" hidden><p id="builderDeviceSummary"></p>'+
+  '<button type="button" class="btn secondary" id="builderDisconnect">Disconnect this device</button>'+
+  '<form id="builderParentUnlock"><label for="builderParentUnlockPassphrase">Parent passphrase</label>'+
+  '<input id="builderParentUnlockPassphrase" type="password" autocomplete="current-password" minlength="12" maxlength="128" required>'+
+  '<button type="submit" class="btn secondary">Manage family devices</button></form>'+
+  '<div id="builderDeviceList" aria-live="polite"></div></div>';
+ $('page-parent').querySelector('.panel')!.append(connection);
+ async function connectionStatus(){
+  if(config.mode!=='remote'){$('connectionStatus').textContent='The private game workshop has not been configured on this website.';return false;}
+  try{
+   const state=await client.api('/v1/sessions/status');
+   const trusted=!!state.trusted;
+   $<HTMLFormElement>('builderConnectForm').hidden=trusted;
+   $('builderTrustedControls').hidden=!trusted;
+   $('builderDeviceSummary').textContent=trusted?'Trusted on '+(state.deviceName||'this device')+'. Connection renews automatically while this device remains trusted.':'';
+   $('connectionStatus').textContent=trusted?'This family device is connected.':'A grown-up needs to trust this device once.';
+   return trusted;
+  }catch{
+   $<HTMLFormElement>('builderConnectForm').hidden=false;
+   $('builderTrustedControls').hidden=true;
+   $('connectionStatus').textContent='No active family workshop session on this browser. Your local games and progress are safe.';
+   return false;
+  }
+ }
+ async function showDevices(){
+  const target=$('builderDeviceList');target.replaceChildren();
+  const result=await client.api('/v1/devices');
+  if(!Array.isArray(result.devices))throw Error('DEVICE_LIST_UNAVAILABLE');
+  target.append(Object.assign(document.createElement('h4'),{textContent:'Connected family devices'}));
+  for(const device of result.devices){
+   if(typeof device.id!=='string'||typeof device.name!=='string')continue;
+   const row=document.createElement('div');row.className='builder-trusted-device';
+   const label=document.createElement('span');label.textContent=device.name+(device.current?' (this device)':'');
+   const revoke=document.createElement('button');revoke.className='btn secondary';revoke.type='button';revoke.textContent='Disconnect';
+   revoke.onclick=()=>{if(!confirm('Disconnect '+device.name+' from the private game workshop?'))return;
+    void client.api('/v1/devices/revoke',{deviceId:device.id}).then(async()=>{
+     if(device.current){target.replaceChildren();await connectionStatus();}
+     else await showDevices();
+    }).catch(()=>$('connectionStatus').textContent='Could not disconnect that device. Try again from Parent Controls.');
+   };row.append(label,revoke);target.append(row);
+  }
+  if(!result.devices.length)target.append(Object.assign(document.createElement('p'),{textContent:'No active devices.'}));
+ }
+ $<HTMLFormElement>('builderConnectForm').onsubmit=e=>{
+  e.preventDefault();
+  void (async()=>{
+   $('connectionStatus').textContent='Connecting this family device…';
+   try{
+    await client.api('/v1/sessions/enroll',{
+     invitation:$<HTMLInputElement>('builderInvite').value,
+     deviceName:$<HTMLInputElement>('builderDeviceName').value,
+     parentPassphrase:$<HTMLInputElement>('builderParentPassphrase').value
+    });
+    $<HTMLInputElement>('builderInvite').value='';
+    $<HTMLInputElement>('builderParentPassphrase').value='';
+    if(!await connectionStatus()){
+     $('connectionStatus').textContent='The workshop accepted setup, but this browser did not keep its secure cookies. Do not reuse the invitation; check browser cookie restrictions.';
+     return;
+    }
+    window.dispatchEvent(new Event('factory-session-restored'));
+   }catch(error){
+    const code=(error as Error).message;
+    $('connectionStatus').textContent=code==='PARENT_LOCKED'?'Parent access is temporarily locked. Try again later.':
+     code==='DEVICE_LIMIT'?'The family device limit is reached. Disconnect an old device using Parent Controls.':
+     'Could not trust this device. Check the fresh invitation and parent passphrase. Local games are unchanged.';
+   }
+  })();
+ };
+ $<HTMLFormElement>('builderParentUnlock').onsubmit=e=>{
+  e.preventDefault();
+  void (async()=>{try{
+    await client.api('/v1/devices/unlock',{parentPassphrase:$<HTMLInputElement>('builderParentUnlockPassphrase').value});
+    $<HTMLInputElement>('builderParentUnlockPassphrase').value='';
+    await showDevices();$('connectionStatus').textContent='You can now manage trusted family devices.';
+   }catch{$('connectionStatus').textContent='Parent access was not verified. Check your passphrase or temporary lock.';}})();
+ };
+ $('builderDisconnect').onclick=()=>{
+  if(!confirm('Disconnect this device? Local games and learning progress will stay on this browser.'))return;
+  void client.api('/v1/devices/disconnect',{}).then(async()=>{await connectionStatus();$('builderDeviceList').replaceChildren();})
+   .catch(()=>$('connectionStatus').textContent='Could not disconnect this device. Please try again.');
+ };
+ window.addEventListener('factory-page',event=>{if((event as CustomEvent<string>).detail==='parent')void connectionStatus();});
+ window.addEventListener('factory-session-restored',()=>{if(!$('page-parent').classList.contains('hidden'))void connectionStatus();});
+ void connectionStatus();
  try{const saved=JSON.parse(localStorage.getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl&&config.mode==='remote'){move('create');void client.resume(saved.jobId).catch(showError);}}catch{}
  FG.builder={request:(input:RequestChange)=>request(input,'feedback'),mode:config.mode};
 }
