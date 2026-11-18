@@ -37,6 +37,7 @@ const {start}=require('./browser-server.cjs');
    const req=route.request(),path=new URL(req.url()).pathname;
    if(req.method()==='OPTIONS')return route.fulfill({status:204,headers:cors});
    const reply=(data,status=200)=>route.fulfill({status,headers:cors,contentType:'application/json',body:JSON.stringify(data)});
+   if(path==='/v1/sessions/status')return reply({connected:true,trusted:true,expiresAt:Date.now()+3600000});
    if(path==='/v1/coach/audio/status')return reply({available:authorized,mode:authorized?'private':'unavailable'});
    if(path==='/v1/coach/status')return reply({available:false,mode:'unavailable'});
    if(path==='/v1/coach/audio'){
