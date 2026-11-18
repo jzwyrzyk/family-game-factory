@@ -820,6 +820,6 @@ export async function installStudio(){
  configReady=true;
  if(remote.mode!=='remote'){coachConnection='unavailable';builderReadiness='not-configured';}
  if(activeId)render();else updateCreationNote();
- void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();resumeOutstanding();refreshShelf();
+ void refreshServiceReadiness();resumeOutstanding();refreshShelf();
  FG.studio={version:1,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
 }
