@@ -90,7 +90,8 @@ export async function initBuilder(){
   '<form id="builderParentUnlock"><label for="builderParentUnlockPassphrase">Parent passphrase</label>'+
   '<input id="builderParentUnlockPassphrase" type="password" autocomplete="current-password" minlength="12" maxlength="128" required>'+
   '<button type="submit" class="btn secondary">Manage family devices</button></form>'+
-  '<div id="builderDeviceList" aria-live="polite"></div></div>';
+  '<button type="button" class="btn secondary" id="builderIssueInvite" hidden>Invite another family device</button>'+ 
+  '<div id="builderNewInvitation" role="status"></div><div id="builderDeviceList" aria-live="polite"></div></div>';
  $('page-parent').querySelector('.panel')!.append(connection);
  async function connectionStatus(){
   if(config.mode!=='remote'){$('connectionStatus').textContent='The private game workshop has not been configured on this website.';return false;}
@@ -127,7 +128,32 @@ export async function initBuilder(){
    };row.append(label,revoke);target.append(row);
   }
   if(!result.devices.length)target.append(Object.assign(document.createElement('p'),{textContent:'No active devices.'}));
+  $<HTMLButtonElement>('builderIssueInvite').hidden=false;
  }
+ $('builderIssueInvite').onclick=()=>{
+  void (async()=>{
+   const target=$('builderNewInvitation');target.replaceChildren();
+   try{
+    const data=await client.api('/v1/devices/invite',{});
+    if(typeof data.invitation!=='string'||!Number.isFinite(data.expiresAt))throw Error('INVITE_UNAVAILABLE');
+    target.append(Object.assign(document.createElement('p'),{textContent:'This invitation expires in 10 minutes and works only once. Enter it directly on the new device.'}));
+    const input=document.createElement('input');input.type='text';input.readOnly=true;input.value=data.invitation;input.setAttribute('aria-label','One-use device invitation');
+    const copy=document.createElement('button');copy.type='button';copy.className='btn secondary';copy.textContent='Copy invitation';
+    copy.onclick=()=>{
+     input.select();
+     if(navigator.clipboard?.writeText)void navigator.clipboard.writeText(input.value).then(()=>{
+      $('connectionStatus').textContent='Invitation copied. Use it on the new family device.';
+     }).catch(()=>$('connectionStatus').textContent='Copy was blocked. Select and copy the invitation manually.');
+     else $('connectionStatus').textContent='Select and copy this invitation on your device.';
+    };
+    target.append(input,copy);
+    setTimeout(()=>{if(Date.now()>=data.expiresAt&&input.isConnected)target.replaceChildren();},Math.max(0,data.expiresAt-Date.now()+50));
+   }catch{
+    $('connectionStatus').textContent='Could not issue an invitation. Unlock Parent Controls again or let existing invitations expire.';
+    $<HTMLButtonElement>('builderIssueInvite').hidden=true;
+   }
+  })();
+ };
  $<HTMLFormElement>('builderConnectForm').onsubmit=e=>{
   e.preventDefault();
   void (async()=>{
@@ -166,7 +192,7 @@ export async function initBuilder(){
   void client.api('/v1/devices/disconnect',{}).then(async()=>{await connectionStatus();$('builderDeviceList').replaceChildren();})
    .catch(()=>$('connectionStatus').textContent='Could not disconnect this device. Please try again.');
  };
- window.addEventListener('factory-page',event=>{if((event as CustomEvent<string>).detail==='parent')void connectionStatus();});
+ window.addEventListener('factory-page',event=>{if((event as CustomEvent<string>).detail==='parent')void connectionStatus();else $('builderNewInvitation').replaceChildren();});
  window.addEventListener('factory-session-restored',()=>{if(!$('page-parent').classList.contains('hidden'))void connectionStatus();});
  void connectionStatus();
  try{const saved=JSON.parse(localStorage.getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl&&config.mode==='remote'){move('create');void client.resume(saved.jobId).catch(showError);}}catch{}
