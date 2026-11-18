@@ -34,6 +34,22 @@ export class PrivateCoachBridge implements CoachProvider{
  constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){
   this.endpoint=privateCoachOrigin(origin);
  }
+ /** This is only a reachability/configuration check, not a live model test.
+  * No child prompt, family ID, transcript, audio or API key is included.
+  */
+ async readiness(signal:AbortSignal):Promise<boolean>{
+  try{
+   const token=await this.identity(this.endpoint,signal);
+   const response=await this.transport(this.endpoint+'/v1/private-coach/status',{
+    method:'GET',headers:{Authorization:'Bearer '+token,'X-Factory-Request':'1'},
+    redirect:'error',cache:'no-store',signal
+   });
+   if(!response.ok||Number(response.headers.get('content-length')||0)>1000)return false;
+   const raw=await response.text();if(raw.length>1000)return false;
+   const data=JSON.parse(raw);
+   return !!data&&data.available===true&&data.mode==='model';
+  }catch{return false;}
+ }
  async complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>{
   const serialized=JSON.stringify(context);
   if(serialized.length>24000)throw Error('INVALID_REQUEST');
