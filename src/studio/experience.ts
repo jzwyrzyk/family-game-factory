@@ -1,6 +1,6 @@
 /** Truthful, child-readable creation-state copy; no UI state is evidence of a remote job. */
 export type CoachConnection = 'checking'|'available'|'connected'|'limited'|'sign-in'|'unavailable';
-export type BuilderReadiness = 'checking'|'available'|'not-configured'|'sign-in'|'allowance-required'|'unavailable';
+export type BuilderReadiness = 'checking'|'available'|'not-configured'|'sign-in'|'allowance-required'|'unavailable'|'unverified';
 export type BuildView = {status:'queued'|'building'|'testing'|'ready'|'failed'|'cancelled'; phase?:string; errorCode?:string};
 export function coachConnectionCopy(state:CoachConnection):string {
  const copy:Record<CoachConnection,string>={
@@ -16,11 +16,12 @@ export function coachConnectionCopy(state:CoachConnection):string {
 export function builderReadinessCopy(state:BuilderReadiness):string {
  const copy:Record<BuilderReadiness,string>={
   checking:'Checking the game workshop…',
-  available:'The game workshop is available',
+  available:'The workshop is ready to accept a request',
   'not-configured':'Game building is not connected here',
   'sign-in':'Game workshop needs a grown-up to reconnect',
   'allowance-required':'Game building is paused for this family',
-  unavailable:'Game workshop is unavailable right now'
+  unavailable:'Game workshop is unavailable right now',
+  unverified:'Workshop connection has not been verified'
  };
  return copy[state];
 }
