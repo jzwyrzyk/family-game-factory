@@ -14,6 +14,7 @@ export interface StudioSession {
   job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
   design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
+  archived?:boolean; resumeDismissed?:boolean;
 }
 export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string> }
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
@@ -38,12 +39,13 @@ export function validateNotebook(input: unknown): Notebook {
     if(s.experiments!==undefined)validateExperiments(s.experiments);
     if(s.selectedTest!==undefined&&s.selectedTest!==null&&!s.experiments?.some(e=>e.id===s.selectedTest))throw Error('Unknown selected test.');
     if(s.playOnly!==undefined&&typeof s.playOnly!=='boolean')throw Error('Invalid play-only state.');
+    if((s.archived!==undefined&&typeof s.archived!=='boolean')||(s.resumeDismissed!==undefined&&typeof s.resumeDismissed!=='boolean'))throw Error('Invalid home visibility state.');
     if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
     if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || s.job.phase!==undefined&&(typeof s.job.phase!=='string'||!/^[a-z-]{1,32}$/.test(s.job.phase)) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   return copy(n);
 }
@@ -58,7 +60,10 @@ export class StudioNotebook {
   }
   list(owner:string):StudioSession[] {return this.read().sessions.filter(s=>s.owner===owner).sort((a,b)=>b.updated.localeCompare(a.updated));}
   get(id:string,owner:string):StudioSession {const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return s;}
-  last(owner:string):StudioSession|null {const n=this.read();return n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner)||null;}
+  last(owner:string):StudioSession|null {const n=this.read(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?s:null;}
+  dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
+  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
+  unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
   create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
     return this.write(n=>{const s:StudioSession={id:crypto.randomUUID(),owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
@@ -87,11 +92,11 @@ export class StudioNotebook {
     // Prior observations remain truthful history. Their old tests are not on the new shelf,
     // so keep the text, author/source, identifiers and dates while detaching those links.
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
-    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true):Experiment {
     let result:Experiment;
-    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);if(select){s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;}s.playOnly=false;});return result!;
+    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);if(select){s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;}s.playOnly=false;s.resumeDismissed=false;});return result!;
   }
   selectExperiment(id:string,owner:string,testId:string):Experiment {
     const e=this.get(id,owner).experiments?.find(e=>e.id===testId);if(!e)throw Error('Choose one of this project’s tests.');
