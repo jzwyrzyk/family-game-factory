@@ -69,3 +69,31 @@ test('quality evidence is a coverage and failure ledger, not a fabricated fun sc
  assert.throws(()=>reviewGameEvidence([allPass[0],allPass[0]]),/DUPLICATE/);
  assert.throws(()=>reviewGameEvidence([{...allPass[0],reason:''}]),/INVALID/);
 });
+
+test('the private agent supplies a design brief and removes unnecessary physics API instructions',async()=>{
+ const {OpenAIResponsesAgent}=await import('../server/agent/openai');
+ const {hopper}=await import('../server/testing/generated-fixtures');
+ const requests:any[]=[];
+ const agent=new OpenAIResponsesAgent(
+  {enabled:true,approvalId:'fixture-only',model:'game-intelligence-unit-test',inputUsdPerMillion:1,outputUsdPerMillion:1,maxInputTokens:64000,maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)},
+  ()=> 'not-real-unit-test-provider-key',
+  (async(_url,init)=>{
+    requests.push(JSON.parse(String(init?.body)));
+    return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(hopper)}]}],usage:{input_tokens:100,output_tokens:250}}));
+  }) as typeof fetch
+ );
+ const base={gameManifest:{id:'new',allowedMechanics:['generated-module-v2']},baseRevision:{id:'new'},
+   allowedCapabilities:['generated-module-v2'],budget:{maxUnits:100000,timeoutMs:60000},signal:new AbortController().signal};
+ await agent.generate({...base,childIntent:'Stick pieces of bubble gum on a robot and watch it launch.'});
+ await agent.generate({...base,childIntent:'Drive a car over bumpy hills with realistic suspension.'});
+ assert.equal(requests.length,2);
+ const ruleBased=requests[0],physical=requests[1];
+ assert.equal(ruleBased.store,false);assert.equal(ruleBased.text.format.strict,true);
+ assert.ok(!ruleBased.instructions.includes('physics.join({id'));
+ assert.ok(ruleBased.instructions.includes('Do not call api.physics'));
+ assert.ok(physical.instructions.includes('physics.join({id'));
+ assert.equal(JSON.parse(ruleBased.input).gameDesignPreflight.motion,'rule-driven');
+ assert.equal(JSON.parse(physical.input).gameDesignPreflight.motion,'physics-2d');
+ assert.equal(JSON.parse(ruleBased.input).idea,'Stick pieces of bubble gum on a robot and watch it launch.');
+ assert.match(ruleBased.instructions,/The preflight design brief is an advisory hypothesis/);
+});
