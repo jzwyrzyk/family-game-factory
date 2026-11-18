@@ -111,7 +111,8 @@ export default class StickerBuilder implements GameInstance {
  private finish(){
   if(this.disposed||this.paused||this.phase!=='launch')return;
   this.phase='done';
-  this.context.emit?.({type:'checkpoint',name:'completed-sticker-invention'});
+  // The native host already offers the mandatory round-end learning check.
+  // Do not also emit a checkpoint here; that would race the host result overlay.
   this.context.finish({won:true,level:MISSIONS.indexOf(this.mission)+1,title:this.mission.title,description:this.mission.outcome+' You chose all three stickers.'});
  }
  private beginDrag(button:HTMLButtonElement,sticker:Sticker,event:PointerEvent){
