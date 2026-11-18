@@ -29,9 +29,10 @@ async function pages(device,viewport){
   assert.equal(await p.locator('#studioStarters [data-starter]').count(),6);
   await shot(p,device,'01-studio-home');
   await p.locator('#studioNew').click();await p.locator('#page-studio').waitFor({state:'visible'});
-  if(device==='mobile')await p.locator('[data-studio-tab="game"]').click();
+  await p.locator('#studioCreationHero').waitFor({state:'visible'});
   await shot(p,device,'02-invention-workbench');
-  if(device==='mobile')await p.locator('[data-studio-tab="talk"]').click();
+  // Creation is conversation-first on all screen sizes; it has no redundant
+  // mobile Game/Talk tabs until a playable game exists.
   await p.locator('#studioPrompt').fill('A cat invents a rocket-powered donut car');
   await shot(p,device,'02-create-idea-conversation');
   await p.locator('#studioTalk').click();
