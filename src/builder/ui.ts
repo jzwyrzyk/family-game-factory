@@ -94,7 +94,7 @@ export async function initBuilder(){
   '<div id="builderNewInvitation" role="status"></div><div id="builderDeviceList" aria-live="polite"></div></div>';
  $('page-parent').querySelector('.panel')!.append(connection);
  async function connectionStatus(){
-  if(config.mode!=='remote'){$('connectionStatus').textContent='The private game workshop has not been configured on this website.';return false;}
+  if(config.mode!=='remote'){$('builderConnectForm').hidden=true;$('builderTrustedControls').hidden=true;$('connectionStatus').textContent='The private game workshop has not been configured on this website. Your local games are still available.';return false;}
   try{
    const state=await client.api('/v1/sessions/status');
    const trusted=!!state.trusted;
