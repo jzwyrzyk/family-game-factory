@@ -4,7 +4,7 @@ export type GeneratedKind='generated-module-v1'|'generated-module-v2';
 export interface GeneratedGame {
  kind:GeneratedKind; title:string; instructions:string; source:string;
  controls:('left'|'right'|'up'|'down'|'action')[];
- compiled?:{code:string;sourceHash:string;codeHash:string;runtimeVersion?:string;runtimeHash?:string;tests:{desktop:boolean;mobile:boolean;replay:boolean;isolation:boolean;input?:boolean;resources?:boolean;pause?:boolean}};
+ compiled?:{code:string;sourceHash:string;codeHash:string;runtimeVersion?:string;runtimeHash?:string;tests:{desktop:boolean;mobile:boolean;replay:boolean;isolation:boolean;input?:boolean;resources?:boolean;pause?:boolean;intent?:boolean}};
 }
 /** A discriminant for values already validated at a trust boundary. */
 export function isGeneratedGame(value:unknown):value is GeneratedGame{return !!value&&typeof value==='object'&&['generated-module-v1','generated-module-v2'].includes((value as GeneratedGame).kind);}
