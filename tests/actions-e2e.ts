@@ -12,6 +12,7 @@ import {signSession} from '../server/pipeline/auth';
 import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
 import {FixtureOnlyGate} from '../server/testing/fixture-gate';
 import {hopper,painter} from '../server/testing/generated-fixtures';
+import {v2FirstGame,v2RevisedGame} from '../server/testing/v2-journey-fixtures';
 import type {MathItem} from '../src/learning/types';
 import {verifyV1InputOrdering} from './generated-v1-input-browser';
 const listen=(s:Server,host?:string)=>new Promise<number>(r=>s.listen(0,host,()=>r((s.address() as {port:number}).port)));
@@ -87,7 +88,11 @@ async function main(){
   assert.equal(request.gameDesignPreflight.workability.status,'NOT_TESTED');
   assert.ok(request.gameDesignPreflight.workability.mandatoryChecks.some((check:string)=>check.includes('visible')));
   assert.ok(request.gameDesignPreflight.sourceEvidence.every((f:any)=>request.idea.slice(f.start,f.end)===f.quote));
-  const fixture=request.idea.toLowerCase().includes('paint')?painter:hopper;const game=failFirst?{...fixture,source:'export function createGame(){ invalid syntax ! }'}:fixture;failFirst=false;return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(game)}]}],usage:{input_tokens:100,output_tokens:600}}));}) as typeof fetch);
+  const v2=request.idea.toLowerCase().includes('marble');
+  const fixture=v2?(request.idea.toLowerCase().includes('faster')?v2RevisedGame:v2FirstGame):request.idea.toLowerCase().includes('paint')?painter:hopper;
+  const game=(failFirst||request.idea.toLowerCase().includes('break this marble game'))?
+    {...fixture,source:'export function createGame(){ invalid syntax ! }'}:fixture;
+  failFirst=false;return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(game)}]}],usage:{input_tokens:100,output_tokens:600}}));}) as typeof fetch);
  const coordinator=new ActionCoordinator(repo,{dispatch:async(id,attempt)=>{dispatches.push({id,attempt});trace(id,attempt,paused?'dispatch-paused':'dispatch');if(paused)return;const identity={runId:String(++run),repositoryId:'42',sha:'a'.repeat(40),stage:'generate' as const};setImmediate(()=>{void(async()=>{
   trace(id,attempt,'claim-generate');const task:any=await coordinator.claim(id,attempt,'generate',identity),input={...task.input,signal:new AbortController().signal};
   trace(id,attempt,'provider');const result=attempt?await provider.repair(input,task.previous,task.diagnostics):await provider.generate(input);
