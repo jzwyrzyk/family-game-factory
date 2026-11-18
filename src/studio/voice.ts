@@ -34,8 +34,9 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  const getCtor=():RecognitionCtor|undefined=>(window as any).SpeechRecognition||(window as any).webkitSpeechRecognition;
  const announce=(message:string)=>{ui.status.textContent=message;};
  const buttons=()=>{
-  ui.microphone.textContent=listening?(finishing?'Finishing…':'■ Finish speaking'):'🎙 Speak';
-  ui.microphone.disabled=finishing;
+  ui.microphone.textContent=listening?(finishing?'Cancel transcription':'■ Finish speaking'):'🎙 Speak';
+  // A stalled browser speech session must still have an accessible cancel action.
+  ui.microphone.disabled=false;
   ui.microphone.setAttribute('aria-pressed',String(listening));
   ui.installPack.hidden=true;
  };
@@ -49,7 +50,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  }
  async function listen(){
   if(recognition){
-   if(finishing)return;
+   if(finishing){cancel();announce('Transcription canceled. Your existing draft is unchanged.');return;}
    finishing=true;buttons();announce('Finishing speech…');
    try{recognition.stop();}catch{cancel();announce('Could not finish transcription. Please try again or type.');}
    return;
