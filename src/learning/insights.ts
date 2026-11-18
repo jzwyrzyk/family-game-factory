@@ -124,6 +124,26 @@ export function renderParentInsights(host:HTMLElement,subject:'math'|'language',
   }else signal.textContent='More completed practice across two weeks is needed before showing a trend.';
   timeline.append(signal,el('p','pi-method','Week-to-week activities may differ in difficulty. This is a descriptive trend, not proof of learning growth.'));
   wrap.append(timeline);
+  const strengths=report.skills.filter(s=>s.presentations>0&&(s.state==='independent'||s.state==='remembered-later')).sort((a,b)=>
+    (b.state==='remembered-later'?1:0)-(a.state==='remembered-later'?1:0)||b.independent-a.independent).slice(0,3);
+  const gains=el('section','pi-section');
+  const gainsHead=el('div','pi-heading');
+  gainsHead.append(el('h4','','Where things are going well'),
+    el('p','','These are encouraging practice signals, not proof of mastery.'));
+  gains.append(gainsHead);
+  if(strengths.length){
+    const tiles=el('div','pi-opportunities');
+    for(const skill of strengths){
+      const tile=el('article','pi-opportunity pi-positive');
+      tile.append(el('strong','',skill.title),
+        el('span','',skill.state==='remembered-later'?
+          'Solved independently again after a break — a promising retention signal.':
+          skill.independent+' independent successes across '+skill.distinctDays+' recorded practice days.'));
+      tiles.append(tile);
+    }
+    gains.append(tiles);
+  }else gains.append(el('p','pi-signal','Keep exploring. There are not yet enough repeated, independent successes to highlight a skill here.'));
+  wrap.append(gains);
   const focus=el('section','pi-section');
   const focusHead=el('div','pi-heading');focusHead.append(el('h4','','What to try next'));
   focusHead.append(el('p','','Based on review timing and practice evidence — not a diagnosis.'));
