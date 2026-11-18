@@ -1,3 +1,4 @@
+import './child-intent.test';
 import './game-intelligence.test';
 import './factory.test';
 import './backend-contracts.test';
