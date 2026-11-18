@@ -257,6 +257,35 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
    assert.equal(await frame.locator('#status').getAttribute('data-state'),'playing');
    assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');
    assert.equal(await page.locator('.learning-preview-cover').count(),0,'learning handshake unblocks trusted v2 game');
+   // A parent-authorized English setting applies to the same generated v2
+   // preview, not a separate practice-only game. Required learning must pause
+   // play and preserve the actual game state until the child continues.
+   await page.evaluate(()=>{
+    FG.store.changeProfile({learningSubject:'language',allowSubjectSwitch:true,grade:2,rate:1,hints:false});
+    FG.store.current().mathWindow=[];FG.store.save();
+   });
+   assert.equal(await page.evaluate(()=>FG.learning.subject),'language');
+   const control=frame.locator('[data-control="right"]'),area=await control.boundingBox();
+   assert.ok(area,'the v2 right control must remain usable on this device');
+   await page.mouse.move(area.x+area.width/2,area.y+area.height/2);
+   await page.mouse.down();
+   try{await frame.locator('#status[data-state=won]').waitFor({timeout:7000});}
+   finally{await page.mouse.up();}
+   await page.locator('.learning-preview-cover .language-activity').waitFor({timeout:6000});
+   assert.equal(await page.locator('#studioRemoteHost iframe').evaluate(e=>e.inert),true,
+    'required English practice pauses the generated preview');
+   const attempt=await page.evaluate(()=>FG.learning.activeAttemptId);
+   assert.ok(attempt,'real generated-v2 English checkpoint creates a tracked attempt');
+   await page.locator('.learning-preview-cover .language-activity [data-action="show-solution"]').click();
+   await page.locator('.learning-preview-cover .language-activity [data-action="continue-supported"]').click();
+   await page.waitForFunction(()=>!FG.learning.active);
+   const outcome=await page.evaluate(id=>FG.store.current().language.attempts.find(a=>a.id===id),attempt);
+   assert.ok(outcome,'the learning record must survive game resumption');
+   assert.equal(outcome.context.versionId,'journey-ready');
+   assert.equal(outcome.context.opportunity,'round-end');
+   assert.equal(outcome.independent,false,'an assisted response cannot become fake mastery');
+   assert.equal(await page.locator('.learning-preview-cover').count(),0);
+   assert.equal(await mainId(page),originalMain,'learning does not auto-Keep remote test');
    // Talking is child-led: no hidden second build while a generated game plays.
    assert.equal(requests.length,1);
   }
