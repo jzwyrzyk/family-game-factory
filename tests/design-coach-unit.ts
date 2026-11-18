@@ -110,7 +110,7 @@ await test('a late coach suggestion cannot overwrite a newer child plan answer',
 await test('an old rejected coach request cannot write into a new child or interrupt their reply',async()=>{
  const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss'),oldRequest=h.pending.shift()!;
   h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');oldRequest.reject(Error('Late aborted network request'));await old;
-  assert.equal(h.get('coachModeStatus').textContent,'Thinking together…');assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
+  assert.match(h.get('coachModeStatus').textContent,/thinking about your idea/i);assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
   h.resolve(reply);await current;assert.equal(h.session().messages.length,2);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
 });
