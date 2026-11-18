@@ -1,5 +1,7 @@
 # Issue #28 — child voice, device compatibility and offline speech
 
+> **MVP scope update (2026-11-18):** Jems is **not** pursuing continuous or real-time live voice. The accepted design is tap Speak -> transcribe -> **editable draft** -> deliberate **Send to jems** -> normal text AI reply. No automatic Send, automatic Build or automatic spoken answer. A second tap finishes transcription; navigation/profile change aborts. The [push-to-talk MVP acceptance contract](PUSH_TO_TALK_MVP.md) takes precedence over earlier research prioritization below. Reliable iPad/Android in-app Speak requires a separately consented private STT fallback if local browser recognition is unavailable; keyboard dictation/type remains the transparent fallback until that route is approved and tested.
+
 **Status:** research and validation specification; no new microphone service or
 audio transfer is activated by this file.
 
@@ -27,7 +29,7 @@ Sources:
 
 ## Candidate paths and their trade-offs
 
-### A — Private, fully local browser transcription (research priority)
+### A — Private, fully local browser transcription (optional future optimization)
 
 Evaluate a small downloadable English speech-to-text model executing in
 browser-controlled WebAssembly or WebGPU. Do **not** select an unverified
@@ -49,7 +51,7 @@ guarantee that the operating system performs dictation locally and therefore
 must label it as a device-controlled option, never claim it meets the app's
 on-device audio privacy guarantee.
 
-### C — Explicitly approved private speech service (not active)
+### C — Explicitly approved private speech service (MVP target for unsupported mobile browsers; not active)
 
 Requires an independent parent consent/privacy review because children's
 voice data may be personal information. If considered, verify encrypted
@@ -68,8 +70,7 @@ a shortcut. This is a distinct system from text-only LLM inference.
 | Windows PC | Chrome/Edge | Verify on device | Benchmark | Test | Test | Test |
 
 Test short child speech ("make a dragon sneeze spaghetti") and context
-follow-up ("only when I jump") with text always visible and optional local
-spoken response. A child can tap Stop without uploading audio or triggering
+follow-up ("only when I jump") with **transcribed text in an editable composer, no model calls before Send**, text replies always visible and optional local Hear reply. A child can tap Stop without uploading audio or triggering
 a game build. A later transcript never crosses a profile switch. An active
 Math or English question remains authoritative. Missing packs, unsupported
 APIs, denied permission, empty speech and network-offline mode all fail
