@@ -88,7 +88,7 @@ function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
   zdrVerified:env.FACTORY_COACH_ZDR_VERIFIED==='true',
   privateExecutionApproved:env.FACTORY_COACH_PRIVATE_EXECUTION_APPROVED==='true',
   model:env.FACTORY_COACH_MODEL||'',
-  apiKey:env.FACTORY_OPENAI_API_KEY||'',
+  apiKey:env.FACTORY_COACH_PRIVATE_OPENAI_API_KEY||'',
   maxInputChars:Number(env.FACTORY_COACH_INPUT_CHARS||16000),
   maxOutputTokens:Number(env.FACTORY_COACH_OUTPUT_TOKENS||800),
   maxTurnMicroUsd:Number(env.FACTORY_COACH_MAX_MICRO_USD||0),
@@ -105,6 +105,8 @@ function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
 export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
  if(env.K_SERVICE!=='factory-coach-private'||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
   throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
+ if(env.FACTORY_OPENAI_API_KEY||env.FACTORY_COACH_API_KEY)
+  throw Error('GENERATION_OR_GATEWAY_KEY_FORBIDDEN_IN_PRIVATE_COACH');
  const config=privateConfig(env);
  const requested=env.FACTORY_COACH_APPROVED==='true';
  if(!requested){
