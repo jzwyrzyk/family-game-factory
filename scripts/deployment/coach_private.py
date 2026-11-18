@@ -124,6 +124,8 @@ def verify_inactive_service(region: str, image: str) -> dict:
     service_ingress = metadata.get("annotations", {}).get("run.googleapis.com/ingress")
     if service_ingress != "internal":
         raise GateError("Dedicated coach must have internal-only ingress.")
+    if metadata.get("annotations", {}).get("run.googleapis.com/invoker-iam-disabled") == "true":
+        raise GateError("Cloud Run invoker IAM enforcement must be enabled.")
     annotations=service.get("spec", {}).get("template", {}).get("metadata", {}).get("annotations", {})
     if annotations.get("autoscaling.knative.dev/minScale", "0") != "0" or annotations.get("autoscaling.knative.dev/maxScale") != "1":
         raise GateError("Inactive coach min/max instance policy differs from the approved plan.")
@@ -152,6 +154,14 @@ def execute_inactive(region: str, image: str) -> dict:
     account = cloud("iam", "service-accounts", "describe", IDENTITY)
     if account.get("disabled") or account.get("email")!=IDENTITY:
         raise GateError("Dedicated coach service identity is missing or disabled. No deployment attempted.")
+    # A private inference service should have NO project-wide permissions:
+    # the only future privilege is a scoped read on its own model-key secret.
+    project_policy=cloud("projects","get-iam-policy",PROJECT)
+    principal="serviceAccount:"+IDENTITY
+    if any(principal in binding.get("members",[]) for binding in project_policy.get("bindings",[])):
+        raise GateError("Coach identity has project-wide grants; remove/review them before deploying.")
+    # Inherited organization/group permissions are NOT established by this
+    # check; the owner must review those independently before activation.
     # This command is permitted ONLY for a new, inactive service. It refuses
     # to replace an existing service, even if the prior request timed out.
     services = cloud("run", "services", "list", "--region", region)
