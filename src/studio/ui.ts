@@ -693,6 +693,7 @@ export async function installStudio(){
  async function onJob(captured:StudioSession,job:JobView){
   if(owner()!==captured.owner)return;
   const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);
+  let celebratedLevel=false;
   const terminal=['ready','failed','cancelled'].includes(job.status);
   const phase=typeof job.phase==='string'&&/^[a-z-]{1,32}$/.test(job.phase)?job.phase:undefined;
    if(prior.job?.id!==job.jobId||prior.job.status!==job.status||prior.job.revisionId!==job.revisionId||prior.job.phase!==phase)
