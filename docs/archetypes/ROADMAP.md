@@ -59,6 +59,25 @@ A wave is not "done" until its essential gameplay can be built, run, repair,
 save, compare, replay, and pass its safety/device gates. Each implementation
 wave may contain only a few modules/one complete vertical slice per PR.
 
+## D2. Verified creative diversity
+- Keep 22 broad technical families plus 88 **design-only** distinct play
+  patterns; do not claim 88 finished or playable games.
+- Compare original child-requested actions, objectives, challenges and
+  actual gameplay consequences. Artwork recolors do not equal a new game.
+- An explicitly requested reskin or modest edit is valid; never force
+  unwanted mechanics to hit an arbitrary diversity threshold.
+- Run same-art/different-rule and different-art/same-rule browser pairs,
+  independent causal play traces, tablet/desktop checks, and a consented
+  child-perception study before making gameplay-diversity claims.
+- Preserve PR #43 source-backed intent and the existing sandbox, budget,
+  device, learning, privacy and Keep/Undo gates.
+- The current structural reviewer is advisory-only; observed browser
+  differences and child enjoyment remain unproven.
+
+**Acceptance:** demonstrably distinct playable loops using the same trusted
+engine modules, faithfully following the child's intent. See
+[CREATIVE_DIVERSITY.md](CREATIVE_DIVERSITY.md).
+
 ## E. Future quick-edit optimization (second research question, later)
 Only after the playable assembly engine is credible:
 - Emit a per-game **installed-mechanics manifest** at initial creation.
