@@ -12,14 +12,15 @@ export interface NativeLink {
  readonly knobs:Readonly<Record<string,string>>;
  readonly caveat:string;
 }
-export const nativeLinks:readonly NativeLink[]=Object.freeze([
+const rawNativeLinks:NativeLink[]=[
  {game:'moon',archetypeIds:['endless-runner'],knobs:{donutGoal:'collect-item',moonGravity:'gravity',meteorRate:'runner-scroll',bouncePads:'bounce'},caveat:'An example runner, not a general platformer constructor.'},
  {game:'robot',archetypeIds:['grid-navigation','route-programming'],knobs:{robotSpeed:'grid-step',showTrail:'route-playback',portalEnabled:'paired-portals'},caveat:'Robot missions are authored, not arbitrary generated levels.'},
  {game:'gum',archetypeIds:['drag-creation','physical-construction'],knobs:{gravity:'gravity',thrust:'launch-force',gumBudget:'joint-attach',jointStrength:'joint-break',highlightMatches:'sticker-decorate',extraDecoys:'sticker-decorate'},caveat:'qualityVersion 2 is a sticker game; version 1 is physical. Never silently change game engines or saved revisions.'},
  {game:'hill',archetypeIds:['side-driving'],knobs:{enginePower:'drive-throttle',suspension:'vehicle-suspension',wheelSize:'rotating-wheel',chassisMass:'load-balance',grip:'vehicle-traction'},caveat:'This native vehicle is not a reusable driving template yet.'},
  {game:'buckets',archetypeIds:['choice-discovery'],knobs:{bucketCount:'reveal-hidden',revealSafe:'hint-reveal',splashMs:'reveal-hidden'},caveat:'The existing game has bounded choices and authored progression.'},
  {game:'dragon',archetypeIds:['projectile-defense'],knobs:{groundResilience:'health-damage',fireballCadence:'fire-projectile',shieldRadius:'shield-window',hearts:'health-damage',breathSpeed:'fire-projectile'},caveat:'Reflected attacks are not an independently installable mechanic in this native game.'}
-].map(x=>Object.freeze({...x,archetypeIds:Object.freeze([...x.archetypeIds]),knobs:Object.freeze({...x.knobs})})));
+];
+export const nativeLinks:readonly NativeLink[]=Object.freeze(rawNativeLinks.map(x=>Object.freeze({...x,archetypeIds:Object.freeze([...x.archetypeIds]),knobs:Object.freeze({...x.knobs})})));
 export function validateNativeLinks():void {
  if(nativeLinks.length!==6||new Set(nativeLinks.map(x=>x.game)).size!==6)throw Error('NATIVE_ARCHETYPE_LINKS_INCOMPLETE');
  for(const link of nativeLinks){
