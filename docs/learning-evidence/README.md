@@ -7,6 +7,8 @@ Children should be able to create and improve enjoyable games without waiting fo
 
 ## Contents
 - [Current practice coverage audit (73 math, 48 ELA)](coverage-gap-audit.md) and [121-skill machine-readable inventory](current-practice-inventory.csv)
+- **Objective 1 standards inventory and expert-review queue:** [455 standard/substandard codes (JSON)](michigan-grades-1-4-standard-crosswalk.json), [266 primary-standard review queue (CSV)](primary-standard-review-queue.csv), and [gap findings, acceptance gates and source provenance](academic-standards-coverage-audit.md)
+- [Standards drift and mapping guardrail tests](../../tests/learning-evidence-crosswalk.test.mjs) in `npm run test:learning-evidence`
 - [Mathematics benchmark, tests and scoring](mathematics.md)
 - [English / Language Arts benchmark, tests and scoring](language-arts.md)
 - [Computational Thinking benchmark, tests and scoring](computational-thinking.md)
