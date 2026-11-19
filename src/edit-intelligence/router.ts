@@ -68,6 +68,9 @@ export function planEdit(target: EditTarget, originalRequest: string): EditDecis
     return deferred('review-required', originalRequest, target.revisionId, interpreted.message);
   if (interpreted.kind === 'unchanged')
     return deferred('unchanged', originalRequest, target.revisionId, interpreted.message);
+  if (interpreted.kind !== 'supported')
+    return deferred('review-required', originalRequest, target.revisionId,
+      'Unexpected local interpreter result; no game changed.');
   const after = validateConfig(target.game, interpreted.config);
   const changed = diff(target.game, before, after);
   const allowed = new Set(manifest.properties.map(p => p.key));
