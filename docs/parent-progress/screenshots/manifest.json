@@ -1,0 +1,84 @@
+{
+  "source_commit": "e83893cfd392706aca227dbcd01a0fab3cdd7ab2",
+  "source_tree": "a649769cd083efc355fba787212b123e7a6d8ae6",
+  "workflow_run": 44553513882,
+  "workflow_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/44553513882",
+  "artifact_id": 14543774308,
+  "artifact_sha256": "1d148c97c68ce1b503dc9dfee60cfb3b244ba5e20930ba53271da4031380d0db",
+  "scope": "Synthetic production-dist browser evidence; no real learner records or actual-device/parent usability claim. PNG bytes copied without modification.",
+  "visual_review": "Desktop overview, skills, evidence, school, tablet, phone and 320px views inspected. Prior contrast and toolbar/date-label overlap defects corrected; no remaining blocking layout issue observed.",
+  "files": [
+    {
+      "file": "parent-evidence-desktop.png",
+      "sha256": "9d76e5cb52a0c8666cf9421141423d778af5e7d4dc48640b166e52cd6d3c09bc",
+      "bytes": 558614,
+      "dimensions": [
+        1440,
+        1772
+      ]
+    },
+    {
+      "file": "parent-overview-desktop-top.png",
+      "sha256": "f3632411fd803b6b8fc3c737968e33f8d497702b92f4e104e83548d5cc3ebf2d",
+      "bytes": 460258,
+      "dimensions": [
+        1440,
+        1080
+      ]
+    },
+    {
+      "file": "parent-overview-desktop.png",
+      "sha256": "7e6b4a0000c22b912620d8e6f42146081398d0f33eda4d008af571425b1134cf",
+      "bytes": 791959,
+      "dimensions": [
+        1440,
+        3324
+      ]
+    },
+    {
+      "file": "parent-overview-phone.png",
+      "sha256": "a803d2eb7b926d7da74ecde266d4f3a60003e740738ce39b531bc4a745bb34b5",
+      "bytes": 487711,
+      "dimensions": [
+        390,
+        5280
+      ]
+    },
+    {
+      "file": "parent-overview-small-phone.png",
+      "sha256": "44deae5f90849ec2fbbdb8becc117c40892a21ccc69d7619531a7703ee3949ee",
+      "bytes": 482049,
+      "dimensions": [
+        320,
+        5836
+      ]
+    },
+    {
+      "file": "parent-overview-tablet.png",
+      "sha256": "72de161d3bd8aa95a94b1eecc442f77c3f588957638264a627b90b5cfa96672c",
+      "bytes": 619783,
+      "dimensions": [
+        820,
+        4213
+      ]
+    },
+    {
+      "file": "parent-school-desktop.png",
+      "sha256": "017890e1a94b1003b23aa0417b5e3a3f32a2b4071066843475ef22f6bc45aa91",
+      "bytes": 615450,
+      "dimensions": [
+        1440,
+        2067
+      ]
+    },
+    {
+      "file": "parent-skills-desktop.png",
+      "sha256": "f76ff97286a0715205625274fa4335dff3db509daa076be19c10adaf69a85b40",
+      "bytes": 627708,
+      "dimensions": [
+        1440,
+        2047
+      ]
+    }
+  ]
+}
