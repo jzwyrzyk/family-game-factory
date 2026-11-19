@@ -52,7 +52,7 @@ Every form has **form ID**, graded strand/claim, unique slot ID, original standa
 2. Math and ELA distinct scoring contracts + protected question-bank schema: yes.
 3. Deterministic grading for short answers; blind double scoring + adjudication for human-scored tasks: yes, **prototype**.
 4. A complete authoring/assessment process, scoring examples and quality gates: yes, in linked documents.
-5. **Full 915 educational items written, externally content-reviewed, field-tested and equated: NO.** Synthetic 915-slot test uses intentionally fake prompts; it proves only structural completeness.
+5. **All 915 items provisionally drafted privately: YES.** Math 426 and ELA 489 candidate prompts/keys reside **only** in the private worker research branch `research/jems-academic-items-v0` for controlled authoring; **none is approved, scored with children, field-tested, or equated**. The 915-slot synthetic test in this public branch remains separate and proves only structure. Provisional Math v1 removes 39 duplicate prompts; ELA has 48 unrecorded listening items, generic writing anchors, and other substantial quality gaps.
 6. Parent dashboard, inference-driven scoring, child data and classroom readiness: **not activated**.
 
 ## Phase exit gates (do not wait to continue engineering)
