@@ -102,6 +102,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Check production dependency advisories before publication
+        run: npm audit --omit=dev --audit-level=high
       - run: npx playwright install --with-deps chromium
       - name: Exact-SHA end-to-end tests
         run: npm test
