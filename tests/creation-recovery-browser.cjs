@@ -22,7 +22,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   fs.mkdirSync('test-results',{recursive:true});
   const ready=()=>page.waitForFunction(()=>window.FG?.creation&&window.FG?.studio&&document.getElementById('creationParentProgress'));
   const pacing=()=>page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture did not save');});
-  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();};
+  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();await page.locator('[data-parent-tab="settings"]').click();};
   const switchProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.locator('#studioProfileMenu summary').click();await page.locator('.profile-choice').nth(index).click();};
   const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await page.locator('#studioNavScenes').click();await page.locator(`[data-scene="${id}"]`).click();};
   const raw=()=>page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),STATE_KEYS);

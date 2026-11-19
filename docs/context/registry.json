@@ -27,7 +27,9 @@
     "docs/decisions/0009-approved-brand-library-v1-2.md",
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
-    "docs/decisions/0007-creation-and-rebuild-practice.md"
+    "docs/decisions/0007-creation-and-rebuild-practice.md",
+    "docs/parent-progress/README.md",
+    "docs/parent-progress/RESEARCH.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -63,10 +65,33 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:32:39.544Z",
-      "sourceDigest": "edbcdfb154db579bee01c7eaae1be83dda956a72f1aac1059f98413c83b08678",
+      "reviewedAt": "2026-11-19T15:03:30.676Z",
+      "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Brand completion and keyboard hero rendering apply the accepted supplied-art contract without changing child authorship, Send Build Keep, earning policy, learning, privacy or product scope."
+      "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T07:03:47.934Z",
+          "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
+        },
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:24.202Z",
+          "sourceDigest": "d24e39014dffd1394fd967dc06d6d7dc52c160b4968ac1a7165a66f550f32f44",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved current Creation Studio and adult/guardian doctrine while integrating approved ray-free identity, original four-rank maker portraits and brand library v1.2; earning and learning semantics remain unchanged."
+        },
+        {
+          "sourceCommit": "7fa7ff252e277bd9610a11afeca8bf8f1ae13715",
+          "reviewedAt": "2026-11-19T15:03:30.676Z",
+          "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
+        }
+      ]
     },
     {
       "id": "experience",
@@ -102,10 +127,26 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:32:40.086Z",
-      "sourceDigest": "fc8ace23b1c782bb93cf9fed38a73157771ef916817a9c4a908528edb2dd7607",
+      "reviewedAt": "2026-11-19T15:08:24.446Z",
+      "sourceDigest": "2b1586dc33bd25f52137e3adb5f1eb10d80a4e398f91ff46f5e729b9d8c6543e",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented shared SVG controls, truthful state art and voice/navigation labels, active offline assets, and the hero-only synchronous decode that fixes blank keyboard-entry artwork. Exact assets and persisted data contracts are preserved."
+      "reviewReason": "Reviewed the integrated parent route against approved brand v1.2 and maker journey source. Parent reports use shared fonts, semantic colors and the current companion while preserving Settings, profile events and original family controls; architecture records the new integration base.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T14:39:48.683Z",
+          "sourceDigest": "47de8040f2678b39938d4658261da388a415397262aecebbe18709a2d7d29bc9",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the complete recovered v1.2 source against current main and the published PR57 branch. The only new runtime reconciliation closes the Journey picker and hides Journey on entering Creation; existing scene exit, save-without-Keep, learning guards, owner boundaries and five-tab mobile layout remain intact. Canonical architecture and delivery scope now describe this combined behavior."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:29.265Z",
+          "sourceDigest": "0b1511c17500501860cd69c9563a3e39018f6994049739f7be56c000fc9d1d87",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the new parent route, copied report reads, preserved settings and family backup handlers, and family/adult profile event refresh. Canonical doctrine, architecture and parent feature contract now describe these boundaries."
+        }
+      ]
     },
     {
       "id": "creation",
@@ -121,10 +162,26 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "23db9d50cc7c0519c1979489d224bd4431905a6716677e6591f1c260d3a9d3f8",
-      "reviewedAt": "2026-11-19T15:26:28.745Z",
+      "sourceDigest": "5c914c861d90fb128e8d2d598a4a2a2cad3cbb40587ef7a3f82e1671b8e13c2b",
+      "reviewedAt": "2026-11-19T15:08:24.948Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed Creation UI and responsive controls: supplied icons, 44px secondary targets, truthful video labels and retained keyboard focus on Pause Resume. Scene editing, explicit Check and Keep, autosave, learning records and authoring contracts remain unchanged; shared surface behavior is documented in architecture and brand guidance."
+      "reviewReason": "Combined main retains its reviewed Creation and Journey navigation and assertions. The parent change only selects Settings before existing recovery controls; scene storage, checked revisions, child ownership and challenge behavior remain unchanged.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:58:08.260Z",
+          "sourceDigest": "79550dae3c5cd44758f0fabef07732504db741af6b4f907af6eee6a8dc923ff6",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented explicit scene exit when navigating to chat Create or My journey: guard learning, preserve pending scene version without Keep, and stop hidden playback. Added regression cases while retaining current scene evidence, adapters and backup schema."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:29.799Z",
+          "sourceDigest": "10c3746e45402bb430ca64b1fa65de7a6e2b1ba9be0900b0fe7addc705396ef8",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Only the existing creation recovery browser helper now selects the Settings tab before using the preserved backup controls. Scene records, behavioral checks, revision ownership and creation storage source are unchanged."
+        }
+      ]
     },
     {
       "id": "games",
@@ -144,10 +201,10 @@
         "docs/game-quality/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:26:28.894Z",
-      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed registered playable-game control diffs including native shadow roots: supplied SVGs replace action glyphs, dynamic pause and audio labels remain truthful, and existing handlers/data-key/pointer behavior remain intact. Physics, scoring, game artwork, robot command notation and learning callbacks are unchanged."
+      "reviewedAt": "2026-11-19T06:35:41.812Z",
+      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
+      "reviewOutcome": "updated",
+      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
     },
     {
       "id": "learning",
@@ -164,10 +221,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:26:29.186Z",
-      "sourceDigest": "a5459e9518e24d1db636dd0d070070203421d45acb1c56f871820f842bf1d517",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Language activity changes are decorative support/control icons and their changing text labels. Question stimuli, hints, scoring, read-aloud support, evidence recording and completion policy are unchanged; routed browser fixtures now serve the real local sprite."
+      "reviewedAt": "2026-11-19T04:27:59.211Z",
+      "sourceDigest": "8b49aa409e5ccb46e9d5e510feed52240415b85cfa5f4e5bfd55516d85e4a033",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed subject-specific host contracts and current Math and Language sources against the canonical learning principles; separated independent and assisted evidence from unproven learning efficacy."
     },
     {
       "id": "services",
@@ -264,10 +321,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "7e6053d4cdf072d667b7f6331f3ceffa818f5b4837c432831629feacf523c9a8",
-      "reviewedAt": "2026-11-19T15:26:29.336Z",
+      "sourceDigest": "3806ee61659d06b10c5db3ff0b9c58d26009b0bd15e57bd8b6329cff61386f64",
+      "reviewedAt": "2026-11-19T07:03:52.307Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Adult and parent privacy changes render supplied icons on existing headings/actions. Unlock, consent submission, pending external verification, revocation, data isolation and endpoint contracts are untouched; the isolated privacy browser fixture now uses an HTTP origin."
+      "reviewReason": "Relative to merged main, the OpenAPI addition is only a read-only scene route through service.revision. Inspected same-family/device/adult-audience enforcement and tests for cross-profile and revoked-grant denial; the quality stage retains main's original-grant and consent policy."
     },
     {
       "id": "validation",
@@ -290,10 +347,26 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:39:51.529Z",
-      "sourceDigest": "f6c1ecb1443371bacd7deb80283562306fc22d786a7e825af7d84281ae69a651",
+      "reviewedAt": "2026-11-19T15:18:56.944Z",
+      "sourceDigest": "e54bb2445cf937b69d6033dc625e4bd968a2345768e476b91ff724728be90ad0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the builder contract DOM fixture correction for real SVG and text-node operations; every original navigation/profile/learning assertion remains. All 11 affected contracts and all 354 unit tests pass. Updated delivery evidence distinguishes the initial CI fixture failure from the rerun; runtime and artwork are unchanged."
+      "reviewReason": "Added geometry checks after actual screenshot review exposed overlapping phone report controls despite a passing page-width check. Tests now require separated control/date boxes, readable mobile select sizes and observed-first Skills defaults that preserve later filter choices.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:25.107Z",
+          "sourceDigest": "b0158a975de90f442c7cdcf1d9695661013a090eaa92179d0365fe58f26a2f50",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved all current main CI jobs; added brand asset verifier, narrow phone layout and scene-to-Create/Journey regressions alongside existing illustrated progression, offline and saved-state checks. Local build/nonbrowser results recorded separately from pending CI browser evidence."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:57:15.605Z",
+          "sourceDigest": "321ed825245f691048c66461c2c2de27bc7a590027be5da16de2264590f73874",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added browser assertions that unscored saved writing and exact checked scene titles remain inspectable even without a first scored response; synthetic fixture grade scope now includes the existing reviewed writing activity."
+        }
+      ]
     },
     {
       "id": "delivery",
@@ -315,10 +388,33 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:39:51.781Z",
-      "sourceDigest": "720ba6fdba93e4e4554a642c1a75445af9962dc97616922b889c7820cf6b2923",
+      "reviewedAt": "2026-11-19T15:57:06.701Z",
+      "sourceDigest": "e31d0714638304191b2c7d51e5fa744f6b6bbdfcb5f6a1808de7422de4f131bd",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR69 initial source, completed native-game acceptance and the SVG-capable contract-fixture correction with 354 passing local unit tests. Final published-head CI and the eventual merge remain separate from the initial failed gate and production deployment."
+      "reviewReason": "Recorded the observed PR65 merge at 864bee8 on November 19 at 15:53:45 UTC, its complete-tree equality to tested final head d308216, all five passing final-head workflows and the source-only release boundary. Inspected the focused receipt and parent dispositions; preserved earlier failures, captures, run identities and unrelated feature records.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T14:39:49.831Z",
+          "sourceDigest": "f11b89808e6e8b82b00edb653f7da9476a706df106543c55072e1062512804ce",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved latest main eebeebeb and PR63 release receipts, PR58 hosted results, PR62 measurement limits and private worker14 status without duplicate capability rows. Reviewed the retained CI diagnostic as read-only source-digest output. Recorded current merge authorization separately from pending exact-candidate browser/CI and merge evidence; earlier launcher failures, smoke success and historical suite results retain their scopes."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:57:16.414Z",
+          "sourceDigest": "68b357798b8b050a58b0e9198bd8c6925c02cd4a7152d8b7a0d9916dbfec2039",
+          "reviewOutcome": "updated",
+          "reviewReason": "Pinned the dedicated parent job to the same Ubuntu 24.04 and browser install pattern as existing successful repository journeys after the new latest runner resolved to unsupported Ubuntu 26.04. Recorded the setup failure without treating it as application evidence."
+        },
+        {
+          "sourceCommit": "7fa7ff252e277bd9610a11afeca8bf8f1ae13715",
+          "reviewedAt": "2026-11-19T15:03:31.282Z",
+          "sourceDigest": "42ab7a524f224769708b9edccb6edf6dc032f3bafb77f653546230103c2660bd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded observed PR57 merge c6576c16 at 2026-11-19T15:02:05Z, exact tree equality to tested source1488871/local879c93e, all four final hosted workflows, scoped local acceptance and the source-only release boundary. Preserved earlier receipts as historical and documented actual handbook coverage."
+        }
+      ]
     },
     {
       "id": "context",
@@ -339,10 +435,44 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T12:57:25.915Z",
-      "sourceDigest": "9314eb35617cf99993071c8e0b9111cc38031e901cd52beb55f9d81e002bf67c",
+      "reviewedAt": "2026-11-19T15:08:25.696Z",
+      "sourceDigest": "63831be7901fee77d0d2ce23f5ceb89e70d1a2398e6163a32f533fa2c6530e43",
       "reviewOutcome": "updated",
-      "reviewReason": "Resolved ADR collisions by preserving main decisions 0006/0007 and renumbering unpublished brand decisions 0008/0009; routed asset contracts and preserved all canonical links and current-main registry areas."
+      "reviewReason": "Resolved the documentation merge by preserving parent reporting and approved brand and maker-journey references, all thirteen routed areas and both historical receipts. Current combined-source review records replace no historical evidence.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:25.915Z",
+          "sourceDigest": "9314eb35617cf99993071c8e0b9111cc38031e901cd52beb55f9d81e002bf67c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Resolved ADR collisions by preserving main decisions 0006/0007 and renumbering unpublished brand decisions 0008/0009; routed asset contracts and preserved all canonical links and current-main registry areas."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:31.544Z",
+          "sourceDigest": "94d5ed0db4d3faf049edd394e1a1800613c81c2229dfa60c79413d61f1649007",
+          "reviewOutcome": "updated",
+          "reviewReason": "Registered the new parent-reporting source and test family with canonical and feature references, added required parent contract and research documents, and linked the dated reporting decision from the documentation indexes."
+        }
+      ]
+    },
+    {
+      "id": "parent-reporting",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/parent-progress/*.md",
+        "docs/decisions/2026-11-19-parent-evidence-reporting.md"
+      ],
+      "sources": [
+        "src/parent/**",
+        "tests/parent-dashboard*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "2584e349c630a4e692acd5b529fb889247b12dbb72af45c16709576a8564d3a6",
+      "reviewedAt": "2026-11-19T15:18:57.172Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the phone toolbar grid, noncolliding chart labels and evidence-first Skills entry after inspecting the completed synthetic captures. Documented the new navigation defaults and prior visual findings; numeric evidence rules and current-profile behavior remain unchanged."
     }
   ]
 }

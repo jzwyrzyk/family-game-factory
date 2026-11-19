@@ -53,6 +53,7 @@ async function pages(device,viewport){
   await shot(p,device,'08-my-powers-math');
   await p.locator('footer [data-page="parent"]').click();await p.locator('#page-parent').waitFor({state:'visible'});
   await shot(p,device,'09-parent-controls');
+  await p.locator('[data-parent-tab="settings"]').click();
   await p.locator('#parentSubject').selectOption('both');await p.locator('#saveParent').click();
   assert.equal(await p.locator('#parentSubject').inputValue(),'both');
   await shot(p,device,'10-parent-both-subjects');

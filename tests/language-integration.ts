@@ -43,6 +43,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
       window.FG.store.save();
     });
     await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
+    await page.locator('[data-parent-tab="settings"]').click();
     // Parent reports may legitimately initialize the empty legacy math-v2 record.
     // Compare after initial parent view, before any subject edit, to test actual preservation.
     const oldMath=await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null));
@@ -141,6 +142,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),true,
       'An unanswered exit cannot consume a ten-minute checkpoint and create a learning-free game');
     await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
+    await page.locator('[data-parent-tab="settings"]').click();
     await page.selectOption('#parentSubject','math');
     await page.click('#saveParent');
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
