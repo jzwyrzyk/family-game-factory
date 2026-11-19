@@ -1,7 +1,8 @@
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest, learningFormatLabel, setMode } from '../learning/policy';
 import {installCoaching} from './coaching';
-import {celebrateJem} from '../brand/delight';
+import {celebrateJem, type JemMilestone} from '../brand/delight';
+import {builderLevel, gemStage, GEM_STAGE_LABELS, type GemStage} from '../brand/gem-progress';
 import {installStudioVoice} from './voice';
 import {installStudioPrivateSpeech} from './private-speech';
 import {freshDesign} from './design';
@@ -65,6 +66,8 @@ export async function installStudio(){
  <aside id="studioConversation" class="studio-conversation" aria-label="Your game ideas"><div class="studio-helper-heading"><span class="studio-helper-icon" aria-hidden="true"><img class="jems-helper-mark" src="./jems-mark.svg" alt=""></span><div><h2>jems · Your idea partner</h2><p id="studioAvailability">Checking available tools…</p></div></div><div id="studioMessages" class="studio-messages" role="log" aria-label="Project conversation" aria-live="polite" aria-relevant="additions text"></div><div id="studioReflection" class="studio-reflection" hidden><p id="studioReflectionQuestion">What was fun or tricky?</p><div><button id="studioReflectAnswer" class="studio-chip">Share a thought</button><button id="studioReflectSkip" class="studio-chip">Keep playing</button></div></div><form id="studioPromptForm" class="studio-prompt"><label for="studioPrompt" id="studioPromptLabel" tabindex="-1">What should happen next?</label><textarea id="studioPrompt" rows="3" maxlength="2000" placeholder="Tell me what you imagine…" required></textarea><div id="studioSuggestions" class="studio-suggestions"></div><div class="studio-send-row"><span id="studioDraftStatus" role="status" aria-live="polite">Your ideas save as you type</span><button id="studioTalk" class="studio-button studio-primary" type="button" aria-label="Send your written message to jems">➤ Send to jems</button><button id="studioSend" class="studio-button" type="submit">Try a change →</button></div><div class="studio-voice-row"><button id="studioMic" class="studio-button" type="button" aria-pressed="false" aria-label="Speak to jems using the microphone when supported">🎙 Speak</button><button id="studioVoicePack" class="studio-button" type="button" hidden>Install voice pack</button><button id="studioHear" class="studio-button" type="button" disabled>🔊 Hear reply</button><span id="studioVoiceStatus" role="status" aria-live="polite">Tap Speak, review the words, then press Send to jems.</span></div><p class="studio-voice-note">Speak uses private on-device recognition when supported or a parent-approved private transcription service. A short recording may be sent for transcription, but never automatically to the game builder. Review the words before choosing Send to jems. You can always type.</p><div class="studio-build-controls"><button id="studioCancel" class="studio-button" type="button" hidden>Cancel build</button><button id="studioRetry" class="studio-button" type="button" hidden>Try build again</button></div></form></aside></div>
  <section id="studioVersions" class="studio-versions" aria-labelledby="studioVersionsTitle" hidden><div class="studio-section-heading"><div><h2 id="studioVersionsTitle" tabindex="-1">My tests & versions</h2><p>Try your ideas. You choose which one becomes your main game.</p></div><button class="studio-button" id="studioCloseVersions">Back to game</button></div><div id="studioVersionCards" class="studio-version-cards"></div></section>
  <dialog id="studioCopyDialog" class="studio-dialog" aria-labelledby="studioCopyTitle"><form id="studioCopyForm"><h2 id="studioCopyTitle">Give this game a new name</h2><p>Your original stays safe. Your ideas come with the copy.</p><label for="studioCopyName">Game name</label><input id="studioCopyName" maxlength="60" required><div><button class="studio-button" id="studioCopyCancel" type="button">Cancel</button><button class="studio-button studio-primary" type="submit">Save new game</button></div></form></dialog>`;
+ const studioGemBadge=el('span','jems-gem-status');studioGemBadge.id='studioGemBadge';studioGemBadge.hidden=true;
+ $('studioVersion').after(studioGemBadge);
  document.querySelector('main')!.append(page);
  // One child-facing journey: an idea-first workspace, a composer with attached
  // actions, and a separate status card that only represents observed build states.
@@ -124,6 +127,9 @@ export async function installStudio(){
  pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
  library.innerHTML="<section class=\"studio-home-hero\" aria-labelledby=\"studioLibraryTitle\">\n<div class=\"studio-home-intro\"><h1 id=\"studioLibraryTitle\" tabindex=\"-1\">What jems will you <span>make today?</span></h1><p>Imagine it. Play it. Make it yours.</p><span class=\"studio-hero-sparkles\" aria-hidden=\"true\">✧ ✦</span></div>\n<div class=\"studio-home-action\"><button type=\"button\" id=\"studioNew\" class=\"studio-make-tile\"><span class=\"studio-make-icon\" aria-hidden=\"true\">✨</span><span class=\"studio-make-copy\"><strong>Invent a game</strong><small>Start with your own idea</small></span><span class=\"studio-make-arrow\" aria-hidden=\"true\">→</span></button><p id=\"studioCreationNote\" class=\"studio-creation-note\" role=\"status\" aria-live=\"polite\"></p></div>\n</section>\n<div id=\"studioContinue\"></div>\n<section id=\"studioFavoritesSection\" class=\"studio-home-favorites\" aria-labelledby=\"studioStarterTitle\"><div class=\"studio-section-heading\"><div><h2 id=\"studioStarterTitle\">Ready to Play jems</h2></div></div><div id=\"studioStarters\" class=\"studio-library-grid\"></div></section>\n<section id=\"studioSavedSection\" class=\"studio-home-saved\" aria-labelledby=\"studioSavedTitle\" hidden><div class=\"studio-section-heading\"><div><h2 id=\"studioSavedTitle\">My jems</h2></div></div><div id=\"studioLibrary\" class=\"studio-library-grid\"></div><div id=\"studioArchived\"></div></section>";
+ const gemSummary=el('section','jems-builder-progress');gemSummary.id='studioGemProgress';gemSummary.hidden=true;
+ gemSummary.setAttribute('aria-label','My builder level');
+ library.querySelector('#studioSavedSection .studio-section-heading')!.after(gemSummary);
  document.querySelector('main')!.append(library);
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
@@ -207,6 +213,22 @@ export async function installStudio(){
  function guardMath(){if(!FG.learning.active)return false;status('Your learning activity is still here. Finish it, or choose My Games to leave.');FG.learning.focus?.();return true;}
  function readyExperiment(s:StudioSession){return s.job?.status==='ready'&&s.job.revisionId?s.experiments?.find(e=>e.candidate.remoteId===s.job!.revisionId&&e.candidate.remoteId!==s.remoteId&&e.id!==s.selectedTest):undefined;}
 
+ function hasKeptVersion(s:StudioSession):boolean {
+  if(s.remoteId)return true;
+  if(!s.projectId)return false;
+  try{return games.history(s.projectId,s.owner).some(r=>!!r.parentId);}catch{return false;}
+ }
+ const stageFor=(s:StudioSession)=>gemStage(s,hasKeptVersion(s));
+ const levelForOwner=()=>builderLevel(notebook.list(owner()).map(stageFor));
+ const progressSnapshot=(s:StudioSession)=>({stage:stageFor(s),level:levelForOwner().level});
+ function gemAchievement(before:{stage:GemStage;level:number},s:StudioSession):JemMilestone|null {
+  const after=progressSnapshot(s);
+  if(after.stage==='polished'&&before.stage!=='polished')
+   return after.level>before.level?'builder-polished':'gem-polished';
+  if(after.stage==='cut'&&before.stage!=='cut')
+   return after.level>before.level?'builder-cut':'gem-cut';
+  return null;
+ }
  function current(){if(!activeId)throw Error('Choose a project first.');return notebook.get(activeId,owner());}
  function act(action:()=>void|Promise<void>){const actor=owner();try{const result=action(),project=activeId,view=route;Promise.resolve(result).catch(error=>{if(owner()===actor&&activeId===project&&route===view)status((error as Error).message,true);});}catch(error){if(owner()===actor)status((error as Error).message,true);}}
  function status(text:string,error=false){const target=route==='studio'?$('studioStatus'):globalStatus;target.textContent=text;target.classList.toggle('is-error',error);target.setAttribute('role',error?'alert':'status');}
@@ -332,6 +354,19 @@ export async function installStudio(){
    banner.append(art,description,continueButton,dismiss);$('studioContinue').append(banner);
   }
   const saved=entries.filter(s=>!s.archived&&(!s.playOnly||s.experiments?.length||s.candidate));
+   const level=levelForOwner();
+   gemSummary.hidden=level.level===0;gemSummary.replaceChildren();
+   if(level.level>0){
+    const currentStage=(['rough','rough','cut','polished'] as const)[level.level];
+    const art=el('span','jems-gem-shape is-'+currentStage);art.setAttribute('aria-hidden','true');
+    const copy=el('div','jems-builder-copy');
+    copy.append(el('strong','','Builder Level '+level.level+' · '+level.name),el('small','',level.description));
+    const steps=el('span','jems-builder-steps');steps.setAttribute('aria-hidden','true');
+    (['rough','cut','polished'] as const).forEach((stage,i)=>{
+     steps.append(el('span','jems-gem-shape is-'+stage+(i<level.level?' is-earned':'')));
+    });
+    gemSummary.append(art,copy,steps);
+   }
   const archived=entries.filter(s=>s.archived);
   $('studioSavedSection').hidden=!saved.length&&!archived.length;
   $('studioStarterTitle').textContent='Ready to Play jems';
@@ -344,7 +379,13 @@ export async function installStudio(){
    const openButton=el('button','studio-saved-open') as HTMLButtonElement;
    openButton.type='button';openButton.setAttribute('aria-label','Open '+s.name);
    openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),el('span','studio-card-link','Open my game →'));
-   openButton.onclick=()=>act(()=>open(s.id));
+   const stage=stageFor(s);
+    if(stage!=='none'){
+     const gemLabel=el('span','jems-gem-status');
+     const gemArt=el('span','jems-gem-shape is-'+stage);gemArt.setAttribute('aria-hidden','true');
+     gemLabel.append(gemArt,el('span','',GEM_STAGE_LABELS[stage]));openButton.append(gemLabel);
+    }
+    openButton.onclick=()=>act(()=>open(s.id));
    const putAway=el('button','studio-put-away',busy(s)?'Stop build first':'Put away') as HTMLButtonElement;
    putAway.type='button';putAway.disabled=busy(s);
    putAway.setAttribute('aria-label',busy(s)?'Stop the build before putting away '+s.name:'Put away '+s.name);
@@ -426,6 +467,11 @@ export async function installStudio(){
  function render(){
   if(!activeId)return;const s=current(),working=s.projectId?games.revision(s.projectId,s.owner):null;refreshShelf();
   refreshGameSubject();FG.learning.modeControl($('studioMathMode'),s.id);$('studioTitle').textContent=s.name;$('studioStorage').textContent=s.remoteId||s.candidate?.remoteId?'Private family game · local conversation':'Saved on this device';
+  const projectStage=stageFor(s);studioGemBadge.hidden=projectStage==='none';studioGemBadge.replaceChildren();
+  if(projectStage!=='none'){
+   const art=el('span','jems-gem-shape is-'+projectStage);art.setAttribute('aria-hidden','true');
+   studioGemBadge.append(art,el('span','',GEM_STAGE_LABELS[projectStage]));
+  }
   const n=s.projectId?games.history(s.projectId,s.owner).findIndex(r=>r.id===working?.id)+1:0;
   $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · version ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
   $('studioPreviewNotice').hidden=showing==='working';
@@ -520,7 +566,14 @@ export async function installStudio(){
  }
  async function submit(){
   if(guardMath())return;stopSpeech();flushDraft();const s=current(),prompt=s.draft.trim()||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':''),started=epoch;if(!prompt)return;
-  if(reflecting){notebook.observe(s.id,s.owner,prompt,'child',s.design?.observations.filter(o=>o.source==='runtime').at(-1)?.experimentId||null);message(s,'reflection',prompt);notebook.update(s.id,s.owner,x=>{x.draft='';x.reflection=false;});reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value='';render();return;}
+  if(reflecting){
+   const before=progressSnapshot(s);
+   notebook.observe(s.id,s.owner,prompt,'child',s.design?.observations.filter(o=>o.source==='runtime').at(-1)?.experimentId||null);
+   message(s,'reflection',prompt);notebook.update(s.id,s.owner,x=>{x.draft='';x.reflection=false;});
+   reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value='';
+   const achievement=gemAchievement(before,notebook.get(s.id,s.owner));
+   render();if(achievement)celebrateJem(achievement,'studioVersion');return;
+  }
   if(sending.has(s.id)){status('Sending the earlier request. Your ideas and game are safe.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
   if(mathRequest){message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`);notebook.update(s.id,s.owner,x=>{x.draft='';});$<HTMLTextAreaElement>('studioPrompt').value='';}render();return;}
@@ -648,11 +701,12 @@ export async function installStudio(){
 
  });
  async function keep(){
-  if(saving)return;const s=current(),c=s.candidate,at=epoch;if(!c||!canChangePlay(s,at))return;if(c.remoteId&&(!previewLearning?.ready||remoteViewedId!==c.remoteId)){status('Open this test and wait for the game before choosing it as your main game.');return;}saving=true;render();
+  if(saving)return;const s=current(),c=s.candidate,at=epoch;if(!c||!canChangePlay(s,at))return;if(c.remoteId&&(!previewLearning?.ready||remoteViewedId!==c.remoteId)){status('Open this test and wait for the game before choosing it as your main game.');return;}
+   const gemBefore=progressSnapshot(s);saving=true;render();
   try{
     if(c.remoteId){await clientFor(s).api('/v1/revisions/'+encodeURIComponent(c.remoteId)+'/keep',{});notebook.update(s.id,s.owner,x=>{x.remoteId=c.remoteId!;x.candidate=null;x.undone=null;});}
     else if(s.projectId){const latest=games.revision(s.projectId,s.owner);if(latest.id!==c.baseId&&!confirm('This test started from an earlier main version. Make this whole test the new main game, without silently adding later changes?'))return;const next=games.keep(s.owner,s.projectId,latest.id,c.config!,c.prompt,s.hypothesis,c.id);notebook.update(s.id,s.owner,x=>{x.candidate=null;x.undone=null;});message(s,'helper',`Kept your change. Your earlier versions are still available in Versions.`);void next;}
-    if(sameView(s,at)){showing='working';status('Kept privately. Nothing was published.');celebrateJem('kept','studioKeep');if(!FG.learning.active)await playWorking();}
+    if(sameView(s,at)){showing='working';status('Kept privately. Nothing was published.');celebrateJem(gemAchievement(gemBefore,notebook.get(s.id,s.owner))||'kept','studioKeep');if(!FG.learning.active)await playWorking();}
   }finally{saving=false;if(activeId===s.id&&owner()===s.owner)render();}
  }
  async function undo(){
