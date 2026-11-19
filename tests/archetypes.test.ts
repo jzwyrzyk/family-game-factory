@@ -34,7 +34,8 @@ test('existing native edit is only a candidate for real local interpreter',()=>{
 test('new ideas do not become instant games just because they match a native example',()=>{
  const plan=assessAssembly({originalIdea:'Drive a dinosaur truck over hills and collect eggs',archetypeId:'side-driving',requestedMechanics:['collect-item']});
  assert.equal(plan.route,'generation-required');
- assert.ok(plan.unverifiedPortableMechanics.includes('vehicle-suspension'));
+ assert.ok(!plan.essentialMechanics.includes('vehicle-suspension'),'do not invent a suspension requirement from the child\'s text');
+ assert.ok(plan.blockers.includes('HEADLESS_ONLY_NO_PLAYABLE_ASSEMBLY'),'a headless collectible does not create a playable car');
  assert.equal(plan.canPlayNow,false);
 });
 test('structural changes cannot masquerade as parameter edits',()=>{
