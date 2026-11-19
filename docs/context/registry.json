@@ -290,10 +290,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:32:40.481Z",
-      "sourceDigest": "0933fe5fa2c84641cd514068dc51cd5491aaa6f0da7e9ef3021079afbbb449c0",
+      "reviewedAt": "2026-11-19T15:39:51.529Z",
+      "sourceDigest": "f6c1ecb1443371bacd7deb80283562306fc22d786a7e825af7d84281ae69a651",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current-source local acceptance and expanded existing tests for icon paths and accessibility, API-driven state art, offline loading, keyboard hero rendering and Creation focus. Existing control-name selectors and routed isolated fixtures reflect the actual application; behavior checks remain intact."
+      "reviewReason": "Reviewed the builder contract DOM fixture correction for real SVG and text-node operations; every original navigation/profile/learning assertion remains. All 11 affected contracts and all 354 unit tests pass. Updated delivery evidence distinguishes the initial CI fixture failure from the rerun; runtime and artwork are unchanged."
     },
     {
       "id": "delivery",
@@ -315,10 +315,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:32:40.744Z",
-      "sourceDigest": "6d83b952df4a162a483608f5cb9c0d6bdb15ad6440e7c993727e84fa7a21eb14",
+      "reviewedAt": "2026-11-19T15:39:51.781Z",
+      "sourceDigest": "720ba6fdba93e4e4554a642c1a75445af9962dc97616922b889c7820cf6b2923",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current local branding verification and its source base, the focused rendering/focus fixes and remaining published-CI/native-game gate. Prior PR57 evidence remains historical; merge and production deployment are separate observations."
+      "reviewReason": "Recorded PR69 initial source, completed native-game acceptance and the SVG-capable contract-fixture correction with 354 passing local unit tests. Final published-head CI and the eventual merge remain separate from the initial failed gate and production deployment."
     },
     {
       "id": "context",
