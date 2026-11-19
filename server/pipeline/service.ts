@@ -7,6 +7,7 @@ import {safeRepairDiagnostic,safeFinalRepairCode} from '../quality/repair-diagno
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import {assertActiveTrustedDevice} from '../trusted-devices';
+import {verifiedParentScope} from '../privacy/parent-consent';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
 import { validateArtifact } from './artifacts';
 import type { AgentAdapter,AuditEvent,BuildRequest,BuiltRevision,Job,JobStatus,PipelineState,Repository,PlayableGame,AgentInput } from './types';
@@ -24,13 +25,15 @@ function audit(state:PipelineState,job:Job,status:JobStatus,code?:string){if(!tr
 export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract}):Promise<GeneratedGame|void> }
 export class JobService {
  private controllers=new Map<string,AbortController>();
- constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
+ constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
  private async authorized(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),job=state.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireFamily(session,job);return job;}
  /** Read-only, family-authorized availability. This is NOT evidence that a job started. */
  async readiness(session:VerifiedSession):Promise<{available:boolean;reason:'READY'|'UNAVAILABLE'|'ALLOWANCE_REQUIRED'}>{
   requireFamily(session,{id:'readiness',familyId:session.familyId});
   if(!this.agent.available||this.agent.kind==='local-rule'||this.agent.kind==='codex-subscription'||(this.agent.kind==='mock'&&!this.options.allowMock))return {available:false,reason:'UNAVAILABLE'};
-  const state=await this.repo.snapshot(),ledger=state.ledgers[session.familyId],maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
+  const state=await this.repo.snapshot();
+  if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'generation'))return {available:false,reason:'UNAVAILABLE'};
+  const ledger=state.ledgers[session.familyId],maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
   if(maxUnits&&(!ledger||!ledger.paidEnabled||ledger.month!==month()||ledger.used+ledger.reserved+maxUnits>ledger.allowance))return {available:false,reason:'ALLOWANCE_REQUIRED'};
   return {available:true,reason:'READY'};
  }
@@ -47,6 +50,7 @@ export class JobService {
   if(!this.agent.available||this.agent.kind==='codex-subscription'||this.agent.kind==='local-rule'||(this.agent.kind==='mock'&&!this.options.allowMock))throw Error('BUILDER_UNAVAILABLE');
   return this.repo.transaction(s=>{
    assertActiveTrustedDevice(s,session);
+   if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId);
    if(existing){if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
    const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
@@ -79,6 +83,7 @@ export class JobService {
   const controller=new AbortController();this.controllers.set(id,controller);let timeout:ReturnType<typeof setTimeout>|undefined;const deadline=new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{reject(Error('BUILD_TIMEOUT'));controller.abort();},this.options.timeoutMs);controller.signal.addEventListener('abort',()=>reject(Error('CANCELLED')),{once:true});});
   try{
    const state=await this.repo.snapshot(),base=state.revisions.find(r=>r.id===start.baseRevisionId);
+   if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(state,start.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
    let previous:GeneratedGame|undefined,diagnostics='',used=0,testedGame:PlayableGame|undefined;
    // The local fallback must enforce the same independently sourced plan as
    // the private Actions coordinator; no browser-supplied contract is trusted.
@@ -110,7 +115,9 @@ export class JobService {
     }
    }
    if(!testedGame)throw Error('REPAIR_EXHAUSTED');
-   await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='testing')return false;const revision:BuiltRevision={id:uuid(),familyId:job.familyId,parentId:job.baseRevisionId,projectId:base?.projectId||uuid(),game:testedGame!,adapter:job.adapter};s.revisions.push(revision);job.revisionId=revision.id;job.usedUnits=used;job.phase='ready';const ledger=s.ledgers[job.familyId];ledger.reserved-=job.maxUnits;ledger.used+=job.usedUnits;audit(s,job,'ready');return true;});
+   await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;
+    if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(s,job.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
+    if(job.status!=='testing')return false;const revision:BuiltRevision={id:uuid(),familyId:job.familyId,parentId:job.baseRevisionId,projectId:base?.projectId||uuid(),game:testedGame!,adapter:job.adapter};s.revisions.push(revision);job.revisionId=revision.id;job.usedUnits=used;job.phase='ready';const ledger=s.ledgers[job.familyId];ledger.reserved-=job.maxUnits;ledger.used+=job.usedUnits;audit(s,job,'ready');return true;});
   }catch(err){await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(['building','testing'].includes(job.status)){job.errorCode=(err as Error).message;const ledger=s.ledgers[job.familyId];ledger.reserved-=job.maxUnits;ledger.used+=job.maxUnits;job.usedUnits=job.maxUnits;audit(s,job,'failed',job.errorCode);}return true;});}
   finally{if(timeout)clearTimeout(timeout);this.controllers.delete(id);}
  }

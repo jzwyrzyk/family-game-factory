@@ -44,3 +44,5 @@ import './trusted-devices.test';
 import './session-client.test';
 
 import './parent-privacy.test';
+
+import './parent-privacy-paid.test';

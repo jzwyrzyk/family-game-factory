@@ -5,6 +5,7 @@
 import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {allowedCoachFamily} from './consent';
+import {verifiedParentScope} from '../privacy/parent-consent';
 import {assertActiveTrustedDevice} from '../trusted-devices';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
@@ -15,6 +16,7 @@ export interface AudioReceipt {
 }
 export interface SpeechConfig {
  approved:boolean;privacyApproved:boolean;providerApproved:boolean;parentConsentApproved:boolean;
+ requireVerifiedParentPrivacy?:boolean;
  projectId:string;maxMicroUsd:number;pricesReviewedAt:string;
 }
 export function audioMime(raw:string):AudioMime|null {
@@ -64,7 +66,8 @@ export class CoachAudioService {
   const state=await this.repo.snapshot(),month=new Date().toISOString().slice(0,7);
   const ledger=state.ledgers[session.familyId];
   try{assertActiveTrustedDevice(state,session);}catch{return false;}
-  if(!allowedCoachFamily(state,session,'audio')||!ledger?.paidEnabled||ledger.month!==month||
+  if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'remoteSpeech'))||
+   !allowedCoachFamily(state,session,'audio')||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)return false;
   if(this.provider.readiness){
    try{return await this.provider.readiness(AbortSignal.timeout(9000));}catch{return false;}
@@ -80,7 +83,8 @@ export class CoachAudioService {
   await this.repo.transaction(state=>{
    // A device revoked between the HTTP check and spending admission is denied.
    assertActiveTrustedDevice(state,session,now);
-   if(!allowedCoachFamily(state,session,'audio',now))throw Error('AUDIO_UNAVAILABLE');
+   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'remoteSpeech',now))||
+     !allowedCoachFamily(state,session,'audio',now))throw Error('AUDIO_UNAVAILABLE');
    state.audioReceipts=(state.audioReceipts||[]).filter(x=>x.state==='running'||x.at>=now-86400000);
    const receipts=state.audioReceipts;
    if(receipts.some(x=>x.id===id))throw Error('AUDIO_REQUEST_EXISTS');
@@ -103,7 +107,8 @@ export class CoachAudioService {
    // Consent may have been revoked while a provider request was running.
    const latest=await this.repo.snapshot();
    assertActiveTrustedDevice(latest,session);
-   if(!allowedCoachFamily(latest,session,'audio'))throw Error('AUDIO_UNAVAILABLE');
+   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(latest,session.familyId,'remoteSpeech'))||
+      !allowedCoachFamily(latest,session,'audio'))throw Error('AUDIO_UNAVAILABLE');
    successful=true;return {text};
   }finally{
    await this.repo.transaction(state=>{

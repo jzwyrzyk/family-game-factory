@@ -1,11 +1,13 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {allowedCoachFamily} from './consent';
+import {verifiedParentScope} from '../privacy/parent-consent';
 import {assertActiveTrustedDevice} from '../trusted-devices';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
 import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 export interface CoachConfig {
  enabled:boolean;privacyApproved:boolean;moderationApproved:boolean;zdrVerified:boolean;privateExecutionApproved:boolean;model:string;
+ requireVerifiedParentPrivacy?:boolean;
  maxInputChars:number;maxOutputTokens:number;maxTurnMicroUsd:number;
  inputMicroUsdPerMillion:number;outputMicroUsdPerMillion:number;pricesReviewedAt:string;
 }
@@ -36,7 +38,8 @@ export class CoachService {
   try{
    const state=await this.repo.snapshot(),ledger=state.ledgers[session.familyId];
    const month=new Date().toISOString().slice(0,7);
-   if(!allowedCoachFamily(state,session,'model')||!ledger?.paidEnabled||ledger.month!==month||
+   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'conversation'))||
+    !allowedCoachFamily(state,session,'model')||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)return false;
    return this.provider?.readiness?await this.provider.readiness(AbortSignal.timeout(3000)):true;
   }catch{return false;}
@@ -70,7 +73,8 @@ export class CoachService {
   const reservation=await this.repo.transaction(state=>{
    // #42 device revocation must win atomically before a funded model call.
    assertActiveTrustedDevice(state,session,now);
-   if(!allowedCoachFamily(state,session,'model',now))throw Error('COACH_UNAVAILABLE');
+   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'conversation',now))||
+      !allowedCoachFamily(state,session,'model',now))throw Error('COACH_UNAVAILABLE');
    state.coachReceipts=(state.coachReceipts||[]).filter(r=>r.state==='running'||r.at>=now-COACH_RECEIPT_TTL_MS);
    const list=state.coachReceipts;
    const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject);
@@ -89,7 +93,8 @@ export class CoachService {
    usage=result.usedMicroUsd;reply=validateCoachReply(result.reply,context);
    const latest=await this.repo.snapshot();
    assertActiveTrustedDevice(latest,session);
-   if(!allowedCoachFamily(latest,session,'model'))throw Error('COACH_UNAVAILABLE');
+   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(latest,session.familyId,'conversation'))||
+      !allowedCoachFamily(latest,session,'model')){reply=undefined;throw Error('COACH_UNAVAILABLE');}
    return {reply,mode:'model'};
   }finally{
    await this.repo.transaction(state=>{const r=state.coachReceipts!.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject)!;const ledger=state.ledgers[session.familyId];if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=usage;}r.state=reply?'ready':'failed';if(reply)r.reply=reply;state.audit.push({jobId:'coach-'+randomUUID(),familyId:session.familyId,status:reply?'ready':'failed',at:new Date().toISOString(),code:'COACH_TURN'});return true;});
