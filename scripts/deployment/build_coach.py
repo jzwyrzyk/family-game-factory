@@ -39,9 +39,20 @@ def config_for(region: str, sha: str) -> dict:
 
 
 def verify_build(build: dict, expected: dict) -> str:
-    for key in ("serviceAccount","images","steps","tags"):
+    for key in ("serviceAccount","images","tags"):
         if build.get(key)!=expected.get(key):
-            raise RuntimeError("Cloud Build source, image, identity or steps differ from reviewed private-coach plan.")
+            raise RuntimeError("Cloud Build source, image or identity differs from reviewed private-coach plan.")
+    # Cloud Build adds read-only execution metadata to returned BuildStep records.
+    # Ignore only those fields, retaining exact comparison of every executable
+    # setting (name, args, entrypoint, env, secrets, script, volumes, etc.).
+    runtime_metadata = {"status", "pullTiming", "timing", "exitCode"}
+    actual_steps = build.get("steps") or []
+    planned_steps = expected["steps"]
+    if len(actual_steps) != len(planned_steps) or any(
+        {k: v for k, v in actual.items() if k not in runtime_metadata} != planned
+        for actual, planned in zip(actual_steps, planned_steps)
+    ):
+        raise RuntimeError("Cloud Build executable steps differ from reviewed private-coach plan.")
     if build.get("status")!="SUCCESS":
         raise RuntimeError("Coach build has not completed successfully; do not deploy.")
     images=build.get("results",{}).get("images") or []

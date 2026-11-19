@@ -139,6 +139,14 @@ class ReviewedCoachBuild(unittest.TestCase):
                 "results":{"images":[{"name":cfg["images"][0],"digest":"sha256:"+"a"*64}]}}
         with patch.object(builder,"cloud",return_value={"image_summary":{"digest":"sha256:"+"a"*64}}):
             self.assertEqual(builder.verify_build(result,cfg),DIGEST)
+            # GCP adds these runtime-only fields after a successful build.
+            observed={**result,"steps":[{**cfg["steps"][0],
+                "status":"SUCCESS","pullTiming":{"startTime":"2026-11-19T00:00:00Z"},
+                "timing":{"startTime":"2026-11-19T00:00:01Z"},"exitCode":0}]}
+            self.assertEqual(builder.verify_build(observed,cfg),DIGEST)
+            # Do not ignore executable settings merely because GCP adds metadata.
+            unexpected={**observed,"steps":[{**observed["steps"][0],"entrypoint":"bash"}]}
+            with self.assertRaises(RuntimeError):builder.verify_build(unexpected,cfg)
         with patch.object(builder,"cloud",side_effect=AssertionError("no cloud access")):
             with self.assertRaises(RuntimeError):builder.verify_build({**result,"steps":[]},cfg)
 
