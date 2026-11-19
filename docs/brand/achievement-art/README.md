@@ -26,3 +26,5 @@ The source sheets and the background share soft light, warm expressive faces, pu
 ## Review
 
 Use `npm run test:gem-journey` after a production build. It produces actual browser screenshots under `test-results/`, using clearly isolated test evidence to preview earned states and real save/keep actions to exercise the live achievement popup. Selected review screenshots are included alongside this document; the evidence rules live in [GEM_PROGRESS.md](../GEM_PROGRESS.md).
+
+Selected captures: [desktop journey](previews/journey-desktop.png), [character picker](previews/character-picker.png), [Gem Master](previews/gem-master.png), [mobile journey](previews/journey-mobile.png), and [achievement popup](previews/achievement-popup.png). These are local browser/synthetic-profile evidence, not observed child or physical-device acceptance. [ADR 0005](../../decisions/0005-cosmetic-making-journey.md) records the design choice; [delivery state](../../../DELIVERY-STATE.md) records integration and release status.

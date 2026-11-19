@@ -1,5 +1,5 @@
 # Jems MVP — push-to-talk, editable transcription, and turn-based AI chat
-**Decision: 2026-11-18. Status: design and implementation acceptance contract; not a deployment or provider approval.**
+**Decision: 2026-11-18. Source state:** the implementation from [PR #36](https://github.com/jzwyrzyk/family-game-factory/pull/36) is merged and included in the #43 application baseline. This remains a design and acceptance contract, not deployment or provider evidence. Consult [Delivery state](../../DELIVERY-STATE.md) for current authorized pilot scope and observed operational status.
 
 ## Product decision and exclusions
 
@@ -13,12 +13,12 @@
 ## What is implemented now vs. missing
 
 - Merged #27/#35 provide Studio conversation, play/build separation, bounded context, local reflection fallback and a privacy-first on-device SpeechRecognition adapter.
-- This #36 branch now stages recognized speech into the text composer and requires explicit Send. A second tap finishes transcription; Cancel/navigation/profile changes abort without sending. Hear reply stays opt-in.
-- The model-backed **text** coach in #36 uses a dedicated private Cloud Run service, authenticated gateway, family ledger and separate scoped OpenAI key *only when all required approvals are verified*. It is still an inactive draft; a green build is not a live conversation.
-- The existing browser-only on-device `SpeechRecognition.processLocally` requirement is **not dependable across iOS Safari and Android Chrome tablets**. An **inactive, parent-gated MediaRecorder-to-Google-Speech-V2 fallback is now implemented on #36**, including authenticated upload, private IAM hop, edited transcript, receipt-only accounting and CI fixtures. This has **not** been verified with real tablets or activated.
+- Merged #36 stages recognized speech into the text composer and requires explicit Send. A second tap finishes transcription; Cancel/navigation/profile changes abort without sending. Hear reply stays opt-in.
+- The model-backed **text** coach from #36 uses a dedicated private Cloud Run service, authenticated gateway, family ledger and separate scoped OpenAI key *only when all required approvals are verified*. It is implemented with default-denied activation gates; a green build is not a live conversation and does not identify current live configuration.
+- The existing browser-only on-device `SpeechRecognition.processLocally` requirement is **not dependable across iOS Safari and Android Chrome tablets**. Merged #36 includes a **parent-gated MediaRecorder-to-Google-Speech-V2 fallback**, authenticated upload, private IAM hop, edited transcript, receipt-only accounting and CI fixtures. Its merge evidence does not establish real-tablet or production acceptance; newer observations belong in [Delivery state](../../DELIVERY-STATE.md).
 - The relevant speech-only design from draft #31 has been selectively ported into #36 without importing its alternative model-provider architecture. #31 remains unmerged until a follow-up reconciliation confirms no needed safeguards are missing.
 
-## Dependable transcription architecture (implemented as draft; real-device/production proof required)
+## Transcription architecture (merged implementation; real-device/production proof separate)
 
 1. User presses Speak. Check parent-controlled speech permissions and feature availability before requesting microphone access.
 2. Prefer verified local recognition only when **actually supported** and sufficiently reliable. No silent switch to potentially remote browser speech recognition.
@@ -43,13 +43,15 @@
 - Security: wrong origin, forged/expired session, missing speech consent, over-budget, oversized audio, malicious content, cancelled upload and stale response must fail closed without leaking content or charging an unapproved request.
 - End-to-end private paid synthetic text smoke; supervised real-child pilot only after verified model/provider privacy approvals and authorization. Report p50/p95 round-trip text, STT latency, transcription failure rate and costs. Mock-only CI is not production acceptance.
 
-## Development, merge and release ordering
+## Source integration and operational release
 
-1. **#42 first:** trusted-device session code integration after exact-head checks; deploy compatible gateway before frontend. Independently test browser cookies and first-party/same-site solution, export/import across origin changes, renew/revoke on real devices.
-2. **#43 second:** finish O3–O9 functional generation/repair/preview objectives; reconcile onto main after #42; exact-head tests and real private-worker pin/production integration approval. Do not prematurely merge the research foundation as complete functioning generation.
-3. **#36 next, as ONE chosen coach implementation:** land this push-to-talk-to-draft behavior; implement and test approved private speech fallback if needed for tablet Speak acceptance; reconcile session/auth changes from #42 and any generation interaction with #43. Use #36's dedicated private OpenAI text-inference architecture; cherry-pick only speech-related pieces from #31 after review. Align #29 production safety policy so the owner-pilot coach is an explicit, separately gated capability, not a hard-disabled path.
-4. Close or explicitly supersede #31 *only after* any approved speech components are ported and acceptance is tracked. Do not merge two competing model services.
-5. Deploy text-coach private runtime inactive behind approved gateway/network; verify identity, scoped secrets, ZDR, guardian consent, moderation, spend, erasure and provider eligibility; then authorize a narrow funded synthetic smoke and a private-family pilot. No child AI data before approval.
-6. Stage frontend and private worker, run integrated production smoke, then supervised UAT of game build/edit/learning, session renew, turn-based chat and push-to-talk on actual tablets. Track functional defects, child outcomes, rollback and version preservation. Public release requires separate readiness review.
+The source merge order was **#42 → #36 → #43**. These changes are now integrated on the reviewed application baseline. The earlier proposed #42 → #43 → #36 ordering is superseded; do not reopen completed merges or describe O8/O9 operational work as completed by merging source.
+
+1. Reconcile later changes against current main, preserving #42 trusted-device/paid-admission checks, #36's single private coach architecture and #43's generation/repair integration. Run the affected integrated checks on the proposed release source.
+2. Account for any remaining #29 safeguards and selectively ported #31 speech components before the applicable release. Retire or supersede competing work only after required behavior and evidence have been mapped; do not merge a second model service.
+3. Use [Delivery state](../../DELIVERY-STATE.md) for the current authorized audience and release scope. Inspect existing gateway/private service identities, images, networking, flags and provider permissions before changing them. Record scoped evidence rather than inferring it from a merged PR or environment flag.
+4. Deploy compatible backend changes before the frontend. Independently test real app/API cookies, renewal/revocation, microphone codecs, learning interruptions and version recovery. Preserve device-local progress across any origin change; maintain an inspected rollback target.
+5. Run the authorized adult/operator synthetic smoke and real-device acceptance for the release being made. Child-enabled use additionally requires the applicable verified child-data permissions, provider safeguards, retention/deletion and supervised pilot acceptance described in [the speech release contract](PRIVATE_SPEECH_RELEASE.md).
+6. Track private-worker repinning/image acceptance separately from voice rollout. A frontend or coach deployment does not update generated-game execution. Record each component's deployed identity, actual enabled capabilities and observed journey results in the delivery ledger.
 
 **Merge is not deployment; deploy is not acceptance.** Every final declaration must identify the merged SHA, deployed frontend/gateway/preview/worker/coach revisions, exact approved configuration, and verified real-device evidence.

@@ -32,7 +32,10 @@
     "setup:coach-erase": "node --import tsx server/coach/owner-erase.ts",
     "test:intent-playtest": "node --import tsx tests/intent-playtest-browser.ts",
     "test:intent-repair-browser": "node --import tsx tests/intent-repair-browser.ts",
-    "test:gem-journey": "node --import tsx tests/gem-journey-browser.cjs"
+    "test:gem-journey": "node --import tsx tests/gem-journey-browser.cjs",
+    "docs:check": "node scripts/check-docs.mjs check",
+    "docs:review": "node scripts/check-docs.mjs refresh",
+    "test:docs": "node --test scripts/tests/check-docs.test.mjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

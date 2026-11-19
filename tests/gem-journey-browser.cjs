@@ -6,6 +6,7 @@
  */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const {once}=require('node:events');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const {StudioNotebook,STUDIO_KEY,validateNotebook}=require('../src/studio/notebook.ts');
@@ -36,7 +37,10 @@ function visualFixture(){
 
 (async()=>{
  const server=start();
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,chromiumSandbox:true});
+ let browser;
+ try{
+ await once(server,'listening');
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
  const base='http://127.0.0.1:'+server.address().port+'/arcade/';
  fs.mkdirSync('test-results',{recursive:true});
  const newPage=async({fixture,viewport={width:1400,height:1000},reducedMotion='reduce'}={})=>{
@@ -96,7 +100,6 @@ function visualFixture(){
   Storage.prototype.setItem=blocked?function(name,value){if(name===key)throw new DOMException('Test storage full','QuotaExceededError');return window.__originalStorageSetItem.call(this,name,value);}:window.__originalStorageSetItem;
  },{key:STUDIO_KEY,blocked});
 
- try{
   // No progress for opening an empty page; picking a character is cosmetic.
   {
    const {page,context,errors}=await newPage();
@@ -296,5 +299,8 @@ function visualFixture(){
    assert.deepEqual(errors,[]);await context.close();
   }
   console.log('PASS gem journey: four illustrated stages, empty state, owner-isolated persistent characters, storage failures, preview honesty, real reflection/keep/Master, no replay, archive/clear, accessible modal, responsive layouts and reduced motion');
- }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
+ }finally{
+  try{await browser?.close();}
+  finally{await new Promise(resolve=>server.close(resolve));}
+ }
 })().catch(error=>{console.error(error);process.exitCode=1;});

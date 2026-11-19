@@ -1,4 +1,7 @@
 # jems — web identity and product implementation
+
+> **Brand contract with historical review notes.** PR #33/#34 draft, merge and release wording below records those reviews. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current integration and deployment evidence. Preserve the documented visual identity and asset-certification limits; code merge is not proof of final master-art approval.
+
 The selected public-facing brand is **jems** (lowercase), with a faceted **gem and central wrench** mark. The brand is intended for children who invent, reason, solve, make and play; parents should see confident STEM/creative problem-solving, not an AI toy that designs everything for the child.
 
 ## Approved color system
@@ -20,6 +23,7 @@ Avoid using pastel colors as small text on white. Maintain readable navy text on
 
 ## Cross-surface implementation
 - Homepage, returning-player strip, six Factory Favorites, game workspace, chat composer and version shelf.
+- The [illustrated making journey](GEM_PROGRESS.md), cosmetic character picker and saved-progress popups; source and release status remain scoped to [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57).
 - Parent Controls, My Powers, Math/Language Arts checkpoints, error/success notices, profile controls and optional offline update notification.
 - PWA manifest, icon, document title/metadata and original legacy Arcade escape route.
 - Product messaging: **Create. Solve. Build. Play. Grow.** Child creates/decides; jems is a helper. **Send to jems** sends a typed message; **Speak** is the microphone action.
@@ -32,7 +36,7 @@ Avoid using pastel colors as small text on white. Maintain readable navy text on
 4. Branding **does not** grant approval to publish the website, enable AI services, process private child data, or launch a public family service. Preserve existing P0/owner gates and a manual Pages deployment.
 
 ## Supporting artwork & semantic tokens
-The brand extends well beyond the header. All artwork below is an original, locally served SVG, without CDNs, font trackers, or external network dependencies:
+The brand extends well beyond the header. The established marks and decorative assets in this list are locally served SVGs, without CDNs, font trackers, or external network dependencies. The newer making journey uses the separate [WebP artwork contract](achievement-art/README.md) and does not replace these identity assets:
 - `jems-logo.svg` — approved-style gem + outlined lowercase wordmark lockup; `jems-wordmark.svg` is the isolated vector signature
 - `jems-mark.svg`, `jems-mark-monochrome.svg`, `jems-mark-inverse.svg`, `jems-app-icon.svg` — colored mark, single-color, reversed and installed-app variants
 - `jems-sparks.svg` — restrained gold/purple idea accents; `jems-blocks.svg` — modular makers' building pieces
@@ -51,12 +55,15 @@ Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac**
 | Studio homepage | Cloud/lilac atmosphere, faint cloud/blocks/spark graphics, accessible blue→purple creation action | Medium |
 | Six Factory Favorites | Distinct game art, quiet white frames, lilac hover/focus, readable Ink metadata | Low |
 | Saved projects, versions, background builds | Mint continuity border, gentle facets, Ink build shelf, accessible statuses | Low |
+| Making journey and character choice | Bright white page, four evolving character/gem stages, short labels and truthful earned/preview states | Illustrated hero; restrained controls and popup |
 | Conversation/voice | Faceted helper badge, subtle lilac child bubbles and mint reflections; separate Send and Speak | Low |
 | Math/Language Arts/My Powers | Blue or mint frame accents; purple selected controls; do not decorate the question text | Minimal |
 | Grown-up controls, backups, privacy | Calm cream/white panels and clear focus/contrast, no cartoon takeover | Minimal |
 | Legacy Arcade, favicon/PWA/offline | Same tokens, identity and mark with legacy behavior unchanged | Low |
 
 **Non-negotiable restraint:** Graphics never obscure text, hijack input focus, displace playable game media, degrade 390px mobile first-action visibility, or animate while reduced-motion is requested. Branding must never claim educational mastery or model availability not supported by the product.
+
+The making journey's **Gem Master** label describes saved creation cycles, not educational mastery. Both Spark and Nova have the same progression and are presented without gender labels. See the [evidence and UI contract](GEM_PROGRESS.md), [decision rationale](../decisions/0005-cosmetic-making-journey.md), and [review artwork](achievement-art/README.md) before changing those surfaces. Ordinary Math/Language questions and grown-up controls retain the calm treatments above.
 
 ## Additional source-guide lockups — PR #34
 - `public/jems-logo.svg`: traced lowercase gem/wrench lockup and **THE GAME FACTORY** subline.
