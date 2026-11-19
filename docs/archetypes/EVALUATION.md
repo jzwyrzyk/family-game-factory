@@ -15,6 +15,18 @@ Do not label template matching as validated creation.
 All results must be reported for real executable games. Classifier accuracy is
 a separate metric and must not be conflated with actual completion.
 
+### Creative differentiation is a separate, testable failure mode
+The catalog offers **22 engine families + 88 distinct editorial play patterns**,
+but neither count demonstrates that children will perceive 88 different games.
+Validate gameplay distinctness separately from visual uniqueness, correct
+classification and child enjoyment. The 88 patterns are design-only proposals.
+
+For explicit *new and different* requests, flag same player verb/challenge/
+goal/required gameplay mechanics despite new themes, labels or artwork. A
+small change or intentional reskin must **not** be penalized. No system may
+silently add unrequested mechanics solely to inflate novelty.
+
+
 ## Sampling and holdout
 - Plan 200–300 independent *ideas* before implementation-based tuning. Sample
   across grades/ages, familiar and unfamiliar games, creative and rule-driven
@@ -47,6 +59,29 @@ can complete an interaction, finds the result worth continuing and can choose
 whether to Keep. Do not infer fun from a model or bot.
 **F6 — Safety and continuity:** Paid job boundaries, privacy, sandbox limits,
 learning checkpoints, cancellation, version safety and durable saved work.
+
+## Differentiation methodology
+For each independently requested new game, label the primary player verb,
+objective, challenge source, mechanics and observed payoff. Pair candidate
+games within and across the same broad archetype, with a blind assessor
+comparing the **actual first-play interactions and causal outcomes**.
+Measure same-theme/different-gameplay and different-theme/same-gameplay
+separately. Keep visual themes, animation polish and age/device usability as
+independent measures.
+
+Report duplication at both design-structure and actual behavioral-trace levels;
+a design-only fingerprint is never sufficient to declare two games different.
+Compare the same approved module SHA across game forms, with goal and
+input-device effects verified. Include the child's own unchanged-game
+revisions as an intentional-repeat stratum, not as failures.
+
+Independent consented child testing must ask whether games **felt**
+different and whether the intended actions were fun and understandable.
+No synthetic evaluator or LLM is accepted as a substitute for real child
+judgment; observed child delight is not proven by completed test fixtures.
+
+See [CREATIVE_DIVERSITY.md](CREATIVE_DIVERSITY.md) for exact automated and
+human evaluation criteria.
 
 ## Metrics
 | Metric | Correct denominator and interpretation |
