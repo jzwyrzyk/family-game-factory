@@ -202,9 +202,28 @@ jobs:
             --gateway-origin "$GATEWAY" --preview-origin "$PREVIEW" \
             --output release-evidence/live-verification.json --attempts 8
           echo "Pages version and public health verified; no live paid model or child UAT performed." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Verify live Jems website and local favorite in desktop/mobile browsers
+        env:
+          SITE: ${{ needs.pages_deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          SITE="${SITE%/}/"
+          node --check tests/release-live-browser.cjs
+          node tests/release-live-browser.cjs "$SITE"
+          echo "Desktop and mobile Jems browser boot, favorites, assets, and local play smoke passed." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: jems-release-live-verification
-          path: release-evidence/live-verification.json
+          path: |
+            release-evidence/live-verification.json
+            release-evidence/live-browser-smoke.json
+            release-evidence/live-desktop.png
+            release-evidence/live-mobile.png
           if-no-files-found: warn
