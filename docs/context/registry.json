@@ -71,7 +71,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+      "sourceDigest": "1ee70fd779bc05e8a18f3979c6104befe7bd5d222af6de93275a2c928c7b61be",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed combined parent reporting and lifetime rewards against product doctrine: inspectable learning evidence remains distinct from engagement gems, maker-rank evidence and externally validated proficiency claims.",
       "reviewHistory": [
@@ -134,7 +134,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "2b1586dc33bd25f52137e3adb5f1eb10d80a4e398f91ff46f5e729b9d8c6543e",
+      "sourceDigest": "050030092e580e583c63e22181aabdad140ad2c67fa44f251626fb2000179f42",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed approved branding, parent dashboard navigation, rewards header and page, single-writer startup and adult profile isolation; both new surfaces retain accessible existing controls.",
       "reviewHistory": [
@@ -169,7 +169,7 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5c914c861d90fb128e8d2d598a4a2a2cad3cbb40587ef7a3f82e1671b8e13c2b",
+      "sourceDigest": "fea32ded41a236a86f97ff12f52b29d16afcfa6588b4d1be5f46f97bbdf5f57b",
       "reviewedAt": "2026-11-19T16:07:00.000Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed checked-scene outboxes, maker progression and parent read-only reporting; rewards grant once per verified challenge while creation evidence and assisted status remain unchanged.",
@@ -206,7 +206,7 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a661fee7caa8b8ccbbe539d86f08fc2190e0c346f8b0472abe582a7bf81609d7",
+      "sourceDigest": "3d70cfde2aac851e04e374cde7a32bc2d1ea0695330dbc3640d95b4de7352946",
       "reviewedAt": "2026-11-19T15:06:46.476Z",
       "reviewOutcome": "updated",
       "reviewReason": "Updated the feature scope to inherit approved artwork and maker ranks from main c6576c16 after the verified PR57 merge. Runtime, reward rules, outboxes, ledger and recovery remain unchanged; volatile publication and review status belongs only in delivery state."
@@ -251,7 +251,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "8b49aa409e5ccb46e9d5e510feed52240415b85cfa5f4e5bfd55516d85e4a033",
+      "sourceDigest": "473ce6752757395f995584ea8ec6ce6f6fdde286f513bda388bd7015b3a7cd36",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed Math/Language source-backed reward events with the parent evidence reporting model; the reporting dashboard continues to separate hints and correctness from equal engagement grants."
     },
@@ -350,7 +350,7 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "3806ee61659d06b10c5db3ff0b9c58d26009b0bd15e57bd8b6329cff61386f64",
+      "sourceDigest": "5eaf6d3199be0c8ee8d271c26efc59361fa67948fd0f7111f22426d8880922c3",
       "reviewedAt": "2026-11-19T16:07:00.000Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed family versus adult rewards, parent Settings and dashboard, backup restore handover, and private adult authorization; no consent or provider authority expands."
@@ -378,7 +378,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "e54bb2445cf937b69d6033dc625e4bd968a2345768e476b91ff724728be90ad0",
+      "sourceDigest": "dd22ff1616decf473b9cf4a0eeb271564e8bf00642981659a2e1346a2d8b1026",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed the combined parent reporting and rewards browser coverage, six-item navigation, Settings routing and backup reload semantics while preserving privacy and learning checks.",
       "reviewHistory": [
@@ -419,7 +419,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "e31d0714638304191b2c7d51e5fa744f6b6bbdfcb5f6a1808de7422de4f131bd",
+      "sourceDigest": "895cbff804369f0e59df454dc0b85ec7712f1cc277f9bb0907e2e5ff3037c825",
       "reviewOutcome": "updated",
       "reviewReason": "Reconciled PR65's observed parent-reporting merge and PR67's successful previous CI, including shared runtime startup, tests and explicit source-only release boundaries; combined-head CI remains to be verified.",
       "reviewHistory": [
@@ -466,7 +466,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "63831be7901fee77d0d2ce23f5ceb89e70d1a2398e6163a32f533fa2c6530e43",
+      "sourceDigest": "06b37abc321b9d2e1c4648c0dac5df29ae39e23e0555ff344d6d9e5ed1ab7615",
       "reviewOutcome": "updated",
       "reviewReason": "Reconciled the complete parent reporting and rewards registries, routed source and documents, decision links, explicit reviews and their distinct verified merge and premerge delivery receipts.",
       "reviewHistory": [
