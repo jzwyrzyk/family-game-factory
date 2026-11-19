@@ -69,7 +69,7 @@
 - All are **logic/integration tests, not item-content or psychometric validation**.
 
 ## 8. Remaining engineering work without waiting on teachers
-1. Populate the secure bank outside this public repo with **426 Math and 489 ELA original drafts**, linked to 915 slots; ensure distinct A/B/C story/passage forms and answer-key tests. The empty slot plan is *not* the item bank.
+1. **Provisional bank authoring done privately:** 426 Math + 489 ELA *machine-drafted* candidates linked to all 915 slots, on private `research/jems-academic-items-v0`. Source-level duplicate-prompt repairs are recorded and a private audit can verify full stimulus uniqueness. **Do not** treat those files as completed validated item banks or store them in the actual game generation worker; move to dedicated isolated assessment infrastructure after extensive rewriting.
 2. Validate original item keys via independent numeric oracles, inspect for duplicate solutions; record authoring revisions and reviewer notes. Produce real audio and appropriately varied protected reading passages.
 3. Implement a private assessment-only delivery service behind verified family authorization, session boundaries, item-bank access control and audited human rating. Keep it disconnected from production until privacy gates are satisfied.
 4. Design independent parent research report with sample-size/uncertainty labels, avoiding standardization or outcome comparisons prior to data.
