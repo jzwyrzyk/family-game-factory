@@ -7,6 +7,7 @@ import {installStudioPrivateSpeech} from './private-speech';
 import {freshDesign} from './design';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCopy,canCompareExperiments,type BuilderReadiness,type CoachConnection} from './experience';
 import {familyFetch} from '../builder/session';
+import {profileStorage} from '../adult-pilot/storage';
 import './style.css';
 import '../brand/jems.css';
 import '../brand/playful.css';
@@ -34,10 +35,10 @@ export async function installStudio(){
  const FG=(window as any).FG;
  if(!FG?.app||!FG?.store)return;
  let notebook:StudioNotebook;
- try{notebook=new StudioNotebook(localStorage);}catch(error){
+ try{notebook=new StudioNotebook(profileStorage(localStorage));}catch(error){
   const warning=el('p','notice',String((error as Error).message));$('page-home').prepend(warning);return;
  }
- const games=new StudioGames(localStorage,FG), owner=()=>String(FG.store.current().id);
+ const games=new StudioGames(profileStorage(localStorage),FG), owner=()=>String(FG.store.current().id);
  try{games.export();}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
@@ -299,6 +300,7 @@ export async function installStudio(){
  }
  async function refreshServiceReadiness(){
   if(remote.mode!=='remote')return;
+  const actor=owner(),at=epoch;
   // Public configuration merely selects URLs; only an authenticated server
   // check can distinguish an available service, session failure and allowance.
   const check=async(path:string)=>{
@@ -307,6 +309,7 @@ export async function installStudio(){
    return response.json();
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
+  if(actor!==owner()||at!==epoch)return;
   if(coach.status==='fulfilled')coachConnection=coach.value?.available?'available':'unavailable';
   else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
   if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
@@ -510,7 +513,7 @@ export async function installStudio(){
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
   const native=!remoteViewedId&&s.game!=='new';
   $('studioHelpGoal').textContent=native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
-  const touchHelp:Record<string,string>={factory:'Tap a gem that matches your order. Time the cut, rub or hold to polish, then pack it up!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
+  const touchHelp:Record<string,string>={factory:'Tilt the ramp toward Order or Return, then drop a gem. Fill the recipe, time the cut, polish and pack your gift!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
   const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined).config:undefined;
   const oldConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===0;
   const physicalConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===1;
@@ -560,6 +563,7 @@ export async function installStudio(){
   // Request admission ends at the durable ACK, not when a game finishes building.
   // Continue status polling independently while a child plays or makes other edits.
   void clientFor(s).submit(input).catch(error=>{
+   if(owner()!==s.owner)return;
    const saved=notebook.get(s.id,s.owner);
    if(busy(saved)&&saved.job?.api===remote.apiBaseUrl){
     unknownJobs.add(s.id);refreshShelf();resume(saved);
@@ -579,6 +583,7 @@ export async function installStudio(){
   });
  }
  async function onJob(captured:StudioSession,job:JobView){
+  if(owner()!==captured.owner)return;
   const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);
   const terminal=['ready','failed','cancelled'].includes(job.status);
   const phase=typeof job.phase==='string'&&/^[a-z-]{1,32}$/.test(job.phase)?job.phase:undefined;
@@ -790,6 +795,7 @@ export async function installStudio(){
  window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
+ window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
  window.addEventListener('factory-profile',()=>{stopSpeech();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
@@ -801,7 +807,7 @@ export async function installStudio(){
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
  // Existing progress backups gain an explicitly versioned optional notebook. Old backups remain valid.
  const exportButton=$('exportData');exportButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();act(()=>{if(!FG.store.recoveryRaw)flushDraft();const data=FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:games.export(),factoryStudio:notebook.read()},null,2);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a') as HTMLAnchorElement;a.href=url;a.download='family-game-factory-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});},true);
- const importInput=$<HTMLInputElement>('importData');importInput.addEventListener('change',event=>{event.stopImmediatePropagation();const file=importInput.files?.[0];if(!file)return;act(async()=>{try{if(file.size>20_000_000)throw Error('That backup is too large.');const data=JSON.parse(await file.text());if(data.factoryStudio)validateNotebook(data.factoryStudio);if(data.factoryWorkspace)FG.factory.validateWorkspace(data.factoryWorkspace);if(!confirm('Restore this backup? Current progress will be replaced.'))return;const prior=JSON.stringify(FG.store.data),oldWorkspace=games.export(),oldNotebook=notebook.read();try{FG.store.restore(JSON.stringify(data));if(data.factoryWorkspace)FG.factory.restoreWorkspace(data.factoryWorkspace);if(data.factoryStudio)notebook.restore(data.factoryStudio);}catch(error){FG.store.restore(prior);FG.factory.restoreWorkspace(oldWorkspace);notebook.restore(oldNotebook);throw error;}location.reload();}finally{importInput.value='';}});},true);
+ const importInput=$<HTMLInputElement>('importData');importInput.addEventListener('change',event=>{event.stopImmediatePropagation();const file=importInput.files?.[0];if(!file)return;act(async()=>{try{if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');if(file.size>20_000_000)throw Error('That backup is too large.');const data=JSON.parse(await file.text());if(data.factoryStudio)validateNotebook(data.factoryStudio);if(data.factoryWorkspace)FG.factory.validateWorkspace(data.factoryWorkspace);if(!confirm('Restore this backup? Current progress will be replaced.'))return;const prior=JSON.stringify(FG.store.data),oldWorkspace=games.export(),oldNotebook=notebook.read();try{FG.store.restore(JSON.stringify(data));if(data.factoryWorkspace)FG.factory.restoreWorkspace(data.factoryWorkspace);if(data.factoryStudio)notebook.restore(data.factoryStudio);}catch(error){FG.store.restore(prior);FG.factory.restoreWorkspace(oldWorkspace);notebook.restore(oldNotebook);throw error;}location.reload();}finally{importInput.value='';}});},true);
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
   onCoachReply:text=>voice?.reply(text),
   onCoachState:state=>{coachConnection=state;if(activeId)render();},

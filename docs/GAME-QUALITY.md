@@ -2,7 +2,7 @@
 
 > **Scope: physical-v1 and generated-runtime quality contract.** [PR40](https://github.com/jzwyrzyk/family-game-factory/pull/40) made the sticker workshop the default for newly created Bubble Gum games. Saved physical-v1 and older engines remain supported. The physical implementation/evidence below is retained for that scope; it is not a claim that legacy physics issues are fixed or that this is the new-game default. See [product doctrine](../PRODUCT-DOCTRINE.md) and [delivery state](../DELIVERY-STATE.md).
 
-The current draft also implements the [presentation and playable quality contract](game-intelligence/PRESENTATION-QUALITY.md): style-diverse planning and assets, actual desktop/tablet capture, and mandatory separate review for new real generated games and v2 revisions. The physical reference below is one game family, not a required appearance or simulation for every game. [ADR0005](decisions/0005-style-diverse-playable-quality.md) records that choice. Source implementation is not a live-provider or release-activation claim.
+The current draft also implements the [presentation and playable quality contract](game-intelligence/PRESENTATION-QUALITY.md): style-diverse planning and assets, actual desktop/tablet capture, and mandatory separate review for new real generated games and v2 revisions. The physical reference below is one game family, not a required appearance or simulation for every game. [ADR0006](decisions/0006-style-diverse-playable-quality.md) records that choice. Source implementation is not a live-provider or release-activation claim.
 
 ## Product commitment
 

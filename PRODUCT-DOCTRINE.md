@@ -1,7 +1,7 @@
 # jems product doctrine
 
 **Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.
-**Source review:** original doctrine audit November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`; the owner's subsequent style-diverse quality direction is recorded in [ADR0005](docs/decisions/0005-style-diverse-playable-quality.md), November 19, 2026 (UTC).
+**Source review:** original doctrine audit November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`; the owner's subsequent style-diverse quality direction is recorded in [ADR0006](docs/decisions/0006-style-diverse-playable-quality.md), November 19, 2026 (UTC).
 **Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
 
 Read [current architecture](ARCHITECTURE-CURRENT.md) for implementation boundaries and [delivery state](DELIVERY-STATE.md) for what is planned, merged, deployed, activated and verified. A past feature document's draft/release wording is not current operational evidence. The [decision index](docs/decisions/README.md) preserves the reasons behind these commitments.
@@ -22,7 +22,7 @@ A ready experiment must combine correct function with deliberate presentation, r
 
 Hold pixel art, flat digital 2D, illustration, dimensional art and realistic treatment to equivalent standards of craft in their own styles. Preserve the child's chosen appearance and the identity of saved artwork through unrelated mechanic changes. Gem Factory can set a reference for finish without becoming every game's palette, theme or loop. A simple complete game can meet the standard; an open-ended toy does not need a forced win, and a beautiful static scene does not establish meaningful play.
 
-See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0005-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
+See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0006-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
 
 ## 3. Choose the simplest method that preserves the intent
 
@@ -67,6 +67,8 @@ The brand is lowercase **jems**. Preserve the approved gem/wrench mark and wordm
 Distinguish available local behavior, a real accepted remote job, an unavailable service and an unknown network outcome. Show grounded progress, never a fictitious ETA, generated game, saved result or successful deployment. A merge, image build, deployed service, activated capability and successful end-to-end journey are different facts.
 
 Preserve deterministic identity, authorization, spending, isolation and version controls while improving convenience. Keep family data, transcripts, recordings, drawings, credentials and signed private URLs out of public repository examples and logs. Do not invent consent or provider privacy approval. A new feature, brand change or research result does not itself authorize unrelated data processing, spending or public sharing. Existing applicable owner authorization must be carried forward accurately.
+
+For the accepted temporary development scope, the adult profile lives on the existing site and its authenticated switch makes approved AI tools available directly. Keep adult test work separate from child profiles and retain server authorization; a profile label is not evidence of consent or age. [ADR0005](docs/decisions/0005-temporary-adult-profile.md) records the owner's one-site requirement, temporary scope and removal condition. It does not change the child's Send, Build, Keep or learning contracts.
 
 ## Changing this doctrine
 

@@ -48,3 +48,13 @@ import './illustrations.test';
 import './presentation-quality.test';
 import './quality-pipeline.test';
 import './gem-factory-physics.test';
+import './parent-privacy.test';
+
+import './parent-privacy-paid.test';
+
+import './adult-pilot.test';
+import './adult-profile-auth.test';
+
+import './adult-api.test';
+import './adult-workspace.test';
+import './adult-profile-client.test';

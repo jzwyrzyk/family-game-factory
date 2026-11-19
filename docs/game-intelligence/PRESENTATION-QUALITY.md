@@ -2,7 +2,7 @@
 
 **Scope:** the style-aware production and acceptance path implemented on this branch for real generated games. This extends the earlier [Game Intelligence work](README.md); it does not replace its independent authored behavioral probes, authorization, learning host or execution isolation. Source implementation is not deployment or provider activation. See [delivery state](../../DELIVERY-STATE.md) for dated release evidence.
 
-**Decision:** [ADR0005](../decisions/0005-style-diverse-playable-quality.md), following the owner's request to carry the craft of Gem Factory into generated games without making every game look or play alike. Child art uploads and a new art-library workflow remain later work.
+**Decision:** [ADR0006](../decisions/0006-style-diverse-playable-quality.md), following the owner's request to carry the craft of Gem Factory into generated games without making every game look or play alike. Child art uploads and a new art-library workflow remain later work.
 
 ## The quality target
 
@@ -133,6 +133,10 @@ Repair sees bounded findings for style mismatch, incoherent art, unreadable layo
 ## Privacy, persistence and release integration
 
 The browser, gateway, preview and sandbox remain model-keyless. Generation/image preparation and review run in the private hosted credential boundary; only the isolated test stage executes generated code. The test container retains no-network, read-only-root, resource and gVisor requirements. Worker callbacks remain authenticated and tied to the expected job, attempt, stage and workflow identity. The new quality review stage needs corresponding private workflow/environment integration; merging public source alone cannot enable it.
+
+The quality path preserves [PR55's adult-profile and guardian-consent boundary](../privacy/ADULT_CHILD_RELEASE_INTEGRATION.md). The coordinator rechecks applicable current generation consent and the exact original adult grant at dispatch, each generate/test/review claim and each state-changing report, again before releasing review evidence and immediately before Ready. A later adult unlock cannot revive a job admitted under a revoked or expired grant. Jobs and accepted revisions retain their adult audience; the quality verdict cannot change ownership or authorize a child profile to read adult work.
+
+The in-process service checks the same permission before each generation/repair, before sandbox execution, before sending images for review, after review returns and at final publication. Denied authorization is not a repair finding and cannot trigger an automatic paid repair. Terminal failure/cancellation clears retained candidate/evidence fields without replacing the kept game. A provider call already underway may still incur usage; an eventual passing verdict cannot publish after permission has expired or been revoked. These are source-enforced boundaries, distinct from the combined integration tests and live deployment acceptance recorded in [delivery state](../../DELIVERY-STATE.md).
 
 Raw captures are temporary job evidence. On Ready, cancellation, failure or interrupted-run recovery, live job candidate/evidence fields are removed. Accepted revisions retain the compact bound review and their own approved game assets, not raw screenshot evidence. Private content-addressed artifact externalization can store candidates/evidence outside the transactional document. Limits are **8 MiB per private object** and **10 MiB for authenticated worker request bodies and sandbox output**, with existing aggregate quotas and integrity checks.
 

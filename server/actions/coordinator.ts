@@ -1,4 +1,6 @@
 import {createHash,randomUUID} from 'node:crypto';
+import {verifiedParentScope} from '../privacy/parent-consent';
+import {adultPilotJobAllowed} from '../adult-pilot';
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
@@ -22,8 +24,13 @@ const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_R
  'IMAGE_PROVIDER_RATE_LIMIT','IMAGE_PROVIDER_FAILED','QUALITY_REVIEW_REQUIRED'];
 
 export class ActionCoordinator {
- constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000){}
+ constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false){}
  async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution)j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};return true;});}
+ private permissionError(s:PipelineState,j:Job):string|undefined {
+  if(this.requireVerifiedParentPrivacy&&!verifiedParentScope(s,j.familyId,'generation'))return 'GUARDIAN_CONSENT_REQUIRED';
+  if((this.adultPilotMode||j.adultPilotDeviceId||j.adultPilotSessionId||j.adultPilotProfileId)&&
+    (!this.adultPilotMode||!adultPilotJobAllowed(s,j)))return 'ADULT_PILOT_ACCESS_REQUIRED';
+ }
  private failure(s:PipelineState,j:Job,code:string){
   if(['ready','failed','cancelled'].includes(j.status))return;
   j.status='failed';j.errorCode=code;j.phase='failed';const ledger=s.ledgers[j.familyId];
@@ -39,8 +46,11 @@ export class ActionCoordinator {
    budget:{maxUnits:j.maxUnits-j.usedUnits,timeoutMs:600000}};
  }
  private ready(s:PipelineState,j:Job,game:GeneratedGame){
+  // Review cannot publish under a replacement unlock or a consent/grant that
+  // expired while its artifact and screenshot bindings were being validated.
+  const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);return;}
   const base=s.revisions.find(r=>r.id===j.baseRevisionId);
-  const revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter};
+  const revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter,...(j.adultPilotProfileId?{adultPilotProfileId:j.adultPilotProfileId}:{})};
   s.revisions.push(revision);j.revisionId=revision.id;j.status='ready';j.phase='ready';
   if(j.execution){delete j.execution.candidate;delete j.execution.qualityEvidence;}
   const ledger=s.ledgers[j.familyId];ledger.reserved-=j.maxUnits;ledger.used+=j.usedUnits;
@@ -64,6 +74,7 @@ export class ActionCoordinator {
     if(j.status==='queued'&&!j.execution)j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};
     const e=j.execution;if(!e||['ready','failed','cancelled'].includes(j.status))continue;
     if(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled){this.failure(s,j,'OWNER_APPROVAL_REQUIRED');continue;}
+    const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);continue;}
     if(!e.runId&&e.queuedAt&&Date.now()-e.queuedAt>this.leaseMs){this.failure(s,j,'WORKER_QUEUE_EXPIRED');continue;}
     if(e.claimAt&&Date.now()-e.claimAt>this.leaseMs){this.failure(s,j,'WORKER_LEASE_EXPIRED');continue;}
     if(e.dispatchPending&&(!e.dispatchedAt||Date.now()-e.dispatchedAt>30000)){
@@ -79,6 +90,7 @@ export class ActionCoordinator {
   return this.repo.transaction(s=>{
    const j=s.jobs.find(x=>x.id===id),e=j?.execution;
    if(identity.stage!==stage||!j||!e||e.attempt!==attempt||['ready','failed','cancelled'].includes(j.status)||e.runId&&e.runId!==identity.runId)throw Error('WORKER_CLAIM_REJECTED');
+   const denied=this.permissionError(s,j);if(denied)throw Error(denied);
    applyCurrentQualityPolicy(j,s.revisions.find(r=>r.id===j.baseRevisionId)?.game);
    if(stage==='generate'){
     if(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled)throw Error('OWNER_APPROVAL_REQUIRED');
@@ -92,6 +104,7 @@ export class ActionCoordinator {
     if(!j.qualityRequired||j.status!=='testing'||j.phase!=='reviewing'||e.stage!=='test'||!e.testReport||!isGeneratedGame(e.candidate?.game)||!e.qualityEvidence)throw Error('WORKER_CLAIM_REJECTED');
     const game=e.candidate.game,evidence=validateQualityEvidence(game,e.qualityEvidence);
     requireProductionCandidate(j,game);e.stage=stage;e.claimAt=Date.now();
+    const denied=this.permissionError(s,j);if(denied)throw Error(denied);
     return {input:this.input(s,j),approval:this.approval,game,qualityEvidence:evidence,independentIntentPlan:undefined};
    }
    if(e.runId!==identity.runId||j.status!=='testing'||!e.candidate||e.stage!=='generate'||!e.generateReport)throw Error('WORKER_CLAIM_REJECTED');
@@ -114,8 +127,13 @@ export class ActionCoordinator {
    applyCurrentQualityPolicy(j,s.revisions.find(r=>r.id===j.baseRevisionId)?.game);
    const receipt=()=>({accepted:true,reviewRequired:stage==='test'&&j.phase==='reviewing'});
    const existing=stage==='generate'?e.generateReport:stage==='test'?e.testReport:e.reviewReport;
-   if(existing){if(existing!==fingerprint)throw Error('WORKER_REPORT_CONFLICT');return receipt();}
-   if(['failed','cancelled','ready'].includes(j.status)||e.stage!==stage)throw Error('WORKER_REPORT_REJECTED');
+   if(existing&&existing!==fingerprint)throw Error('WORKER_REPORT_CONFLICT');
+   const terminal=['failed','cancelled','ready'].includes(j.status);
+   if(!existing&&(terminal||e.stage!==stage))throw Error('WORKER_REPORT_REJECTED');
+   // An idempotent receipt cannot keep a still-pending review alive after its
+   // original grant is lost. Terminal receipts remain harmless acknowledgments.
+   if(!terminal){const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);return receipt();}}
+   if(existing)return receipt();
    if(stage==='generate'||stage==='review'){
     if(!report||report.errorCode){
      if(stage==='generate')e.generateReport=fingerprint;else e.reviewReport=fingerprint;

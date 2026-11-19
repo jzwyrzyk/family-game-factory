@@ -1,4 +1,4 @@
-# 0005 — Require playable quality without a single house game style
+# 0006 — Require playable quality without a single house game style
 
 **Status:** Accepted
 **Recorded:** November 19, 2026 (UTC)

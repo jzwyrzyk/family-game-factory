@@ -2,9 +2,11 @@
  * Gateway performs authentication, consent and atomic spending admission.
  * Audio is never stored in Firestore, logged, replayed, or placed in previews.
  */
-import type {Repository} from '../pipeline/types';
+import type {Repository,PipelineState} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {allowedCoachFamily} from './consent';
+import {verifiedParentScope} from '../privacy/parent-consent';
+import {adultPilotAllowed,adultPilotConfigured,adultPilotFlags,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
@@ -15,6 +17,7 @@ export interface AudioReceipt {
 }
 export interface SpeechConfig {
  approved:boolean;privacyApproved:boolean;providerApproved:boolean;parentConsentApproved:boolean;
+ requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
  projectId:string;maxMicroUsd:number;pricesReviewedAt:string;
 }
 export function audioMime(raw:string):AudioMime|null {
@@ -33,6 +36,7 @@ export function validateAudio(bytes:Uint8Array,contentType:string):AudioMime {
 }
 export function speechConfig(env:NodeJS.ProcessEnv):SpeechConfig{
  return {
+  adultPilot:adultPilotFlags(env),
   approved:env.FACTORY_COACH_AUDIO_APPROVED==='true',
   privacyApproved:env.FACTORY_COACH_AUDIO_PRIVACY_APPROVED==='true',
   providerApproved:env.FACTORY_COACH_AUDIO_PROVIDER_VERIFIED==='true',
@@ -44,7 +48,8 @@ export function speechConfig(env:NodeJS.ProcessEnv):SpeechConfig{
 }
 export function speechApproved(config:SpeechConfig):boolean {
  const at=Date.parse(config.pricesReviewedAt),now=Date.now();
- return config.approved&&config.privacyApproved&&config.providerApproved&&config.parentConsentApproved&&
+ return config.approved&&config.privacyApproved&&config.providerApproved&&
+  (config.adultPilot?.enabled===true?adultPilotConfigured(config.adultPilot):config.parentConsentApproved)&&
   /^[a-z][a-z0-9-]{4,62}$/.test(config.projectId)&&
   Number.isSafeInteger(config.maxMicroUsd)&&config.maxMicroUsd>=1000&&config.maxMicroUsd<=100000&&
   Number.isFinite(at)&&at<=now&&at>now-31*86400000;
@@ -59,28 +64,39 @@ export interface SpeechProvider {
 export class CoachAudioService {
  constructor(private repo:Repository,private config:SpeechConfig,private provider:SpeechProvider){}
  enabled(){return speechApproved(this.config);}
+ private permitted(state:PipelineState,session:VerifiedSession,now=Date.now()):boolean{
+  try{assertActiveTrustedDevice(state,session,now);}catch{return false;}
+  if(this.config.adultPilot?.enabled===true)return adultPilotAllowed(state,session,now);
+  if(session.adultSessionId||session.adultProfileId)return false;
+  return allowedCoachFamily(state,session,'audio',now)&&
+   (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'remoteSpeech',now));
+ }
  async familyAvailable(session:VerifiedSession):Promise<boolean>{
   if(!this.enabled()||!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))return false;
   const state=await this.repo.snapshot(),month=new Date().toISOString().slice(0,7);
   const ledger=state.ledgers[session.familyId];
   try{assertActiveTrustedDevice(state,session);}catch{return false;}
-  if(!allowedCoachFamily(state,session,'audio')||!ledger?.paidEnabled||ledger.month!==month||
+  const permitted=this.permitted(state,session);
+  if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)return false;
   if(this.provider.readiness){
-   try{return await this.provider.readiness(AbortSignal.timeout(9000));}catch{return false;}
+   try{if(!await this.provider.readiness(AbortSignal.timeout(9000)))return false;}catch{return false;}
   }
-  return true;
+  return this.permitted(await this.repo.snapshot(),session);
  }
  async transcribe(session:VerifiedSession,input:{id:string;mime:string;audio:Uint8Array},cancel?:AbortSignal):Promise<{text:string}>{
   if(!this.enabled())throw Error('AUDIO_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
   if(!input||typeof input.id!=='string'||!/^[A-Za-z0-9_-]{8,100}$/.test(input.id))throw Error('INVALID_AUDIO');
-  const mime=validateAudio(input.audio,input.mime),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
+  const mime=validateAudio(input.audio,input.mime);
   const id='audio-'+input.id;
+  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
   await this.repo.transaction(state=>{
+   const now=Date.now(),month=new Date(now).toISOString().slice(0,7);
    // A device revoked between the HTTP check and spending admission is denied.
    assertActiveTrustedDevice(state,session,now);
-   if(!allowedCoachFamily(state,session,'audio',now))throw Error('AUDIO_UNAVAILABLE');
+   if(!this.enabled()||!this.permitted(state,session,now))
+    throw Error('AUDIO_UNAVAILABLE');
    state.audioReceipts=(state.audioReceipts||[]).filter(x=>x.state==='running'||x.at>=now-86400000);
    const receipts=state.audioReceipts;
    if(receipts.some(x=>x.id===id))throw Error('AUDIO_REQUEST_EXISTS');
@@ -90,32 +106,38 @@ export class CoachAudioService {
    if(!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
    ledger.reserved+=this.config.maxMicroUsd;
-   receipts.push({id,familyId:session.familyId,subject:session.subject,month,at:now,
+   receipts.push({id,familyId:session.familyId,subject,month,at:now,
     reserved:this.config.maxMicroUsd,state:'running'});
    return true;
   });
-  let successful=false;
+  let transcript:string|undefined,failure:unknown;
   try{
    const signal=cancel?AbortSignal.any([cancel,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000);
    const text=await this.provider.transcribe(input.audio,mime,signal);
    if(signal.aborted)throw Error('AUDIO_UNAVAILABLE');
    if(typeof text!=='string'||!text.trim()||text.length>2000)throw Error('AUDIO_NO_SPEECH');
-   // Consent may have been revoked while a provider request was running.
-   const latest=await this.repo.snapshot();
-   assertActiveTrustedDevice(latest,session);
-   if(!allowedCoachFamily(latest,session,'audio'))throw Error('AUDIO_UNAVAILABLE');
-   successful=true;return {text};
-  }finally{
-   await this.repo.transaction(state=>{
-    const receipt=state.audioReceipts?.find(x=>x.id===id&&x.familyId===session.familyId&&x.subject===session.subject);
+   transcript=text;
+  }catch(error){failure=error;}
+  // Settle the charge and recheck authorization atomically before returning
+  // the transient transcript. It is never written to a receipt or audit log.
+  const completion=await this.repo.transaction(state=>{
+    const receipt=state.audioReceipts?.find(x=>x.id===id&&x.familyId===session.familyId&&x.subject===subject);
     if(!receipt)throw Error('AUDIO_UNAVAILABLE');
     const ledger=state.ledgers[session.familyId];
     if(ledger&&ledger.month===receipt.month){
      ledger.reserved=Math.max(0,ledger.reserved-receipt.reserved);
      ledger.used+=receipt.reserved;
     }
-    receipt.state=successful?'ready':'failed';return true;
+    const now=Date.now();let authenticated=true;
+    try{assertActiveTrustedDevice(state,session,now);}catch{authenticated=false;}
+    const permitted=!failure&&!!transcript&&!cancel?.aborted&&authenticated&&this.permitted(state,session,now);
+    receipt.state=permitted?'ready':'failed';return {permitted,authenticated};
    });
-  }
+  if(failure)throw failure;
+  // Report device revocation distinctly, after the failed receipt and charge
+  // settle atomically. A revoked profile remains an unavailable capability.
+  if(!completion.authenticated)throw Error('UNAUTHENTICATED');
+  if(!completion.permitted||!transcript)throw Error('AUDIO_UNAVAILABLE');
+  return {text:transcript};
  }
 }

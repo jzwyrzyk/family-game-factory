@@ -20,10 +20,11 @@ export class BuilderClient {
   const data=await response.json();if(!response.ok)throw Error(data.errorCode||'BUILDER_UNAVAILABLE');return data;
  }
  async submit(input:RequestChange){this.request={...input};this.requestId=crypto.randomUUID();this.retryOf=undefined;this.last=null;return this.send();}
- async retry(){if(!this.request){if(this.last?.status!=='failed')throw Error('NO_REQUEST');const ack=await this.api('/v1/jobs/'+this.last.jobId+'/retry',{clientRequestId:crypto.randomUUID()});return this.resume(ack.jobId);}if(this.last?.status==='failed'){this.retryOf=this.last.jobId;this.requestId=crypto.randomUUID();}return this.send();}
+ async retry(){if(!this.request){if(this.last?.status!=='failed')throw Error('NO_REQUEST');const token=++this.generation;const ack=await this.api('/v1/jobs/'+this.last.jobId+'/retry',{clientRequestId:crypto.randomUUID()});if(token!==this.generation)return;return this.resume(ack.jobId);}if(this.last?.status==='failed'){this.retryOf=this.last.jobId;this.requestId=crypto.randomUUID();}return this.send();}
  private async send(){
   const token=++this.generation,input=this.request!;let baseRevisionId=input.baseRevisionId;
   if(input.config&&baseRevisionId){const base=await this.api('/v1/revisions',{gameId:input.gameId,localRevisionId:baseRevisionId,config:input.config});baseRevisionId=base.revisionId;}
+  if(token!==this.generation)return; // Profile changed while registering the starting revision.
   const acknowledged=await this.api('/v1/jobs',{gameId:input.gameId,baseRevisionId,prompt:input.prompt,clientRequestId:this.requestId,...(this.retryOf?{retryOf:this.retryOf}:{})});
   if(typeof acknowledged.jobId!=='string'||!/^[\w-]{1,100}$/.test(acknowledged.jobId)||!['queued','building','testing','ready','failed','cancelled'].includes(acknowledged.status))throw Error('INVALID_ACKNOWLEDGEMENT');
   if(token!==this.generation)return;this.last=acknowledged;this.update(this.last!);
@@ -41,6 +42,7 @@ export class BuilderClient {
   if(!id||!/^[\w-]{1,100}$/.test(id))throw Error('NO_ACKNOWLEDGED_JOB');
   const token=++this.generation;
   const job=this.last?.jobId===id?this.last:await this.api('/v1/jobs/'+id);
+  if(token!==this.generation)throw Error('PROFILE_CHANGED');
   if(job?.jobId!==id||!['queued','building','testing','ready','failed','cancelled'].includes(job.status))throw Error('INVALID_JOB_RESPONSE');
   if(['ready','failed','cancelled'].includes(job.status)){
    if(token===this.generation){this.last=job;this.update(job);}return job as JobView;

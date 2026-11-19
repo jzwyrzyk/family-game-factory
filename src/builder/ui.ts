@@ -1,6 +1,8 @@
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest } from '../learning/policy';
 import { BuilderClient,validateBuilderConfig,type RequestChange,type JobView,type BuilderConfig } from './client';
+import {installParentPrivacy} from './privacy';
+import {profileStorage} from '../adult-pilot/storage';
 import type { LearningMode } from '../learning/types';
 const FG=(window as any).FG;
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
@@ -28,7 +30,7 @@ export async function initBuilder(){
  $('openReadyBuild').onclick=()=>{const ready=readyPreview;if(!ready||ready.owner!==FG.store.current().id||mathBusy())return;void showPreview(ready.revisionId,ready.inheritedMode).catch(error=>{if(ready.owner===FG.store.current().id)showError(error);});};
 
  async function update(job:JobView){
-  $('builderMode').textContent=job.adapter==='mock'?'Test builder (mock) — this is not real AI generation.':'Private workshop · acknowledged job';$('builderStatus').textContent=job.phase==='repairing'?'That version needed a fix. The builder is trying again.':job.status==='failed'&&job.errorCode==='PROVIDER_RATE_LIMIT'?'The builder is busy. Your current game is safe. Try again in a little while.':job.status==='failed'&&job.errorCode==='SPENDING_CUTOFF'?'The workshop has reached its allowance. Your current game is safe.':messages[job.status]||'Your current game is safe.';try{if(['failed','cancelled'].includes(job.status))localStorage.removeItem(pendingKey);else localStorage.setItem(pendingKey,JSON.stringify({owner:FG.store.current().id,api:config.apiBaseUrl,jobId:job.jobId}));}catch{}$('cancelBuild').hidden=!['queued','building','testing'].includes(job.status);$('retryBuild').hidden=job.status!=='failed';
+  $('builderMode').textContent=job.adapter==='mock'?'Test builder (mock) — this is not real AI generation.':'Private workshop · acknowledged job';$('builderStatus').textContent=job.phase==='repairing'?'That version needed a fix. The builder is trying again.':job.status==='failed'&&job.errorCode==='PROVIDER_RATE_LIMIT'?'The builder is busy. Your current game is safe. Try again in a little while.':job.status==='failed'&&job.errorCode==='SPENDING_CUTOFF'?'The workshop has reached its allowance. Your current game is safe.':messages[job.status]||'Your current game is safe.';try{if(['failed','cancelled'].includes(job.status))profileStorage(localStorage).removeItem(pendingKey);else profileStorage(localStorage).setItem(pendingKey,JSON.stringify({owner:FG.store.current().id,api:config.apiBaseUrl,jobId:job.jobId}));}catch{}$('cancelBuild').hidden=!['queued','building','testing'].includes(job.status);$('retryBuild').hidden=job.status!=='failed';
   if(job.status==='ready'&&job.revisionId){
    queuePreview(job.revisionId,undefined,job.jobId);
    // First previews may open in the waiting view; a background revision never
@@ -56,7 +58,7 @@ export async function initBuilder(){
   previewLearning=attachPreviewLearning(frame,{channel,artifactId,ownerId:previewOwner,gameId:'generated',projectId:key,versionId:revisionId,onRound:d=>{$('previewOutcome').textContent=currentKind==='star-catcher-v1'?`You caught ${d.score} stars! Keep it or try your own next change.`:`You ${d.won?'finished':'tried'} this round. Score: ${d.score}. Keep it or try your next change.`;}});
   let mathMode=$('builderMathMode');if(!mathMode){mathMode=document.createElement('div');mathMode.id='builderMathMode';frame.before(mathMode);}
   FG.learning.modeControl(mathMode,key);$('builderPreview').hidden=false;$('previewOutcome').textContent='Play the preview. It has not replaced your current game.';
-  if(readyPreview?.revisionId===revisionId&&readyPreview.owner===owner){if(readyPreview.jobId)try{const saved=JSON.parse(localStorage.getItem(pendingKey)||'null');if(saved?.owner===owner&&saved.jobId===readyPreview.jobId)localStorage.removeItem(pendingKey);}catch{}readyPreview=null;$('openReadyBuild').hidden=true;}
+  if(readyPreview?.revisionId===revisionId&&readyPreview.owner===owner){if(readyPreview.jobId)try{const saved=JSON.parse(profileStorage(localStorage).getItem(pendingKey)||'null');if(saved?.owner===owner&&saved.jobId===readyPreview.jobId)profileStorage(localStorage).removeItem(pendingKey);}catch{}readyPreview=null;$('openReadyBuild').hidden=true;}
   return true;
  }
  async function request(input:RequestChange,page=previousPage){const owner=FG.store.current().id,at=profileSequence;move(page);try{const mathRequest=interpretLearningRequest(input.prompt,FG.learning.subject);if(mathRequest?.kind==='required'){$('builderStatus').textContent=mathRequest.message;return;}if(mathRequest?.kind==='mode'){if(mathKey()&&input.baseRevisionId===currentRevision){FG.learning.setMode(mathKey(),mathRequest.mode);$('builderStatus').textContent='Learning format updated for the next safe learning moment.';}else $('builderStatus').textContent='Open the game you want to change, then choose its learning format.';return;}if(config.mode==='unavailable')throw Error('BUILDER_UNAVAILABLE');$('builderStatus').textContent='Sending your request. No queued job has been acknowledged yet.';await client.submit(input);}catch(err){if(owner===FG.store.current().id&&at===profileSequence)showError(err as Error);}}
@@ -93,6 +95,10 @@ export async function initBuilder(){
   '<button type="button" class="btn secondary" id="builderIssueInvite" hidden>Invite another family device</button>'+ 
   '<div id="builderNewInvitation" role="status"></div><div id="builderDeviceList" aria-live="polite"></div></div>';
  $('page-parent').querySelector('.panel')!.append(connection);
+ const privacy=installParentPrivacy(client,$('page-parent'));
+ let managementSequence=0;
+ const managementView=()=>({profile:profileSequence,page:managementSequence});
+ const sameManagementView=(at:ReturnType<typeof managementView>)=>at.profile===profileSequence&&at.page===managementSequence&&currentPage==='parent';
  async function connectionStatus(){
   if(config.mode!=='remote'){$('builderConnectForm').hidden=true;$('builderTrustedControls').hidden=true;$('connectionStatus').textContent='The private game workshop has not been configured on this website. Your local games are still available.';return false;}
   try{
@@ -113,8 +119,10 @@ export async function initBuilder(){
   }
  }
  async function showDevices(){
+  const at=managementView();if(!sameManagementView(at))return;
   const target=$('builderDeviceList');target.replaceChildren();
   const result=await client.api('/v1/devices');
+  if(!sameManagementView(at))return;
   if(!Array.isArray(result.devices))throw Error('DEVICE_LIST_UNAVAILABLE');
   target.append(Object.assign(document.createElement('h4'),{textContent:'Connected family devices'}));
   for(const device of result.devices){
@@ -124,9 +132,10 @@ export async function initBuilder(){
    const revoke=document.createElement('button');revoke.className='btn secondary';revoke.type='button';revoke.textContent='Disconnect';
    revoke.onclick=()=>{if(!confirm('Disconnect '+device.name+' from the private game workshop?'))return;
     void client.api('/v1/devices/revoke',{deviceId:device.id}).then(async()=>{
+     if(!sameManagementView(at))return;
      if(device.current){target.replaceChildren();await connectionStatus();}
      else await showDevices();
-    }).catch(()=>$('connectionStatus').textContent='Could not disconnect that device. Try again from Parent Controls.');
+    }).catch(()=>{if(sameManagementView(at))$('connectionStatus').textContent='Could not disconnect that device. Try again from Parent Controls.';});
    };row.append(label,revoke);target.append(row);
   }
   if(!result.devices.length)target.append(Object.assign(document.createElement('p'),{textContent:'No active devices.'}));
@@ -134,10 +143,12 @@ export async function initBuilder(){
   $<HTMLButtonElement>('builderDisconnect').hidden=false;
  }
  $('builderIssueInvite').onclick=()=>{
+  const at=managementView();if(!sameManagementView(at))return;
   void (async()=>{
    const target=$('builderNewInvitation');target.replaceChildren();
    try{
     const data=await client.api('/v1/devices/invite',{});
+    if(!sameManagementView(at))return;
     if(typeof data.invitation!=='string'||!Number.isFinite(data.expiresAt))throw Error('INVITE_UNAVAILABLE');
     target.append(Object.assign(document.createElement('p'),{textContent:'This invitation expires in 10 minutes and works only once. Enter it directly on the new device.'}));
     const input=document.createElement('input');input.type='text';input.readOnly=true;input.value=data.invitation;input.setAttribute('aria-label','One-use device invitation');
@@ -152,6 +163,7 @@ export async function initBuilder(){
     target.append(input,copy);
     setTimeout(()=>{if(Date.now()>=data.expiresAt&&input.isConnected)target.replaceChildren();},Math.max(0,data.expiresAt-Date.now()+50));
    }catch{
+    if(!sameManagementView(at))return;
     $('connectionStatus').textContent='Could not issue an invitation. Unlock Parent Controls again or let existing invitations expire.';
     $<HTMLButtonElement>('builderIssueInvite').hidden=true;
    }
@@ -183,12 +195,15 @@ export async function initBuilder(){
   })();
  };
  $<HTMLFormElement>('builderParentUnlock').onsubmit=e=>{
-  e.preventDefault();
+  e.preventDefault();const at=managementView();if(!sameManagementView(at))return;
   void (async()=>{try{
     await client.api('/v1/devices/unlock',{parentPassphrase:$<HTMLInputElement>('builderParentUnlockPassphrase').value});
     $<HTMLInputElement>('builderParentUnlockPassphrase').value='';
-    await showDevices();$('connectionStatus').textContent='You can now manage trusted family devices.';
-   }catch{$('connectionStatus').textContent='Parent access was not verified. Check your passphrase or temporary lock.';}})();
+    if(!sameManagementView(at))return;
+    await showDevices();
+    if(!sameManagementView(at))return;
+    await privacy.show();$('connectionStatus').textContent='You can now manage trusted devices and permissions.';
+   }catch{if(sameManagementView(at))$('connectionStatus').textContent='Parent access was not verified. Check your passphrase or temporary lock.';}})();
  };
  $('builderDisconnect').onclick=()=>{
   if(!confirm('Disconnect this device? Local games and learning progress will stay on this browser.'))return;
@@ -196,6 +211,8 @@ export async function initBuilder(){
    .catch(()=>$('connectionStatus').textContent='Could not disconnect this device. Please try again.');
  };
  window.addEventListener('factory-page',event=>{
+  ++managementSequence;
+  privacy.hide();
   if((event as CustomEvent<string>).detail==='parent'){void connectionStatus();return;}
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
@@ -204,6 +221,8 @@ export async function initBuilder(){
    $<HTMLInputElement>(id).value='';
  });
  window.addEventListener('factory-profile',()=>{
+  ++managementSequence;
+  privacy.hide();
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
   $<HTMLButtonElement>('builderDisconnect').hidden=true;
@@ -212,6 +231,7 @@ export async function initBuilder(){
  });
  window.addEventListener('factory-session-restored',()=>{if(!$('page-parent').classList.contains('hidden'))void connectionStatus();});
  void connectionStatus();
- try{const saved=JSON.parse(localStorage.getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl&&config.mode==='remote'){move('create');void client.resume(saved.jobId).catch(showError);}}catch{}
+ try{const saved=JSON.parse(profileStorage(localStorage).getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl&&config.mode==='remote'){move('create');void client.resume(saved.jobId).catch(showError);}}catch{}
  FG.builder={request:(input:RequestChange)=>request(input,'feedback'),mode:config.mode};
+ return config;
 }
