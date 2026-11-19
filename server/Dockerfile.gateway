@@ -3,6 +3,9 @@ WORKDIR /app
 COPY --chown=node:node package.json package-lock.json ./
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY --chown=node:node server ./server
+# Gateway includes only keyless transport; private provider and private executor are removed.
+RUN rm -f /app/server/coach/private-provider.ts /app/server/coach/private-executor.ts \
+    /app/server/coach/private-speech-provider.ts /app/server/coach/cloud-token.ts
 COPY --chown=node:node src/runtime/types.ts src/runtime/manifests.ts ./src/runtime/
 COPY --chown=node:node src/studio/design.ts ./src/studio/
 ENV NODE_ENV=production

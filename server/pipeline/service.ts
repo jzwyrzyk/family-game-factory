@@ -6,6 +6,7 @@ import {validateFunctionalGameContract,type FunctionalGameContract} from '../qua
 import {safeRepairDiagnostic,safeFinalRepairCode} from '../quality/repair-diagnostics';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
+import {assertActiveTrustedDevice} from '../trusted-devices';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
 import { validateArtifact } from './artifacts';
 import type { AgentAdapter,AuditEvent,BuildRequest,BuiltRevision,Job,JobStatus,PipelineState,Repository,PlayableGame,AgentInput } from './types';
@@ -45,6 +46,7 @@ export class JobService {
   if(this.agent.testFixture&&!this.options.allowMock)throw Error('TEST_FIXTURE_FORBIDDEN');
   if(!this.agent.available||this.agent.kind==='codex-subscription'||this.agent.kind==='local-rule'||(this.agent.kind==='mock'&&!this.options.allowMock))throw Error('BUILDER_UNAVAILABLE');
   return this.repo.transaction(s=>{
+   assertActiveTrustedDevice(s,session);
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId);
    if(existing){if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
    const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;

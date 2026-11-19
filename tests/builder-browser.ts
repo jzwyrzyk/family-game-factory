@@ -7,6 +7,7 @@ import { MemoryRepository } from '../server/pipeline/repository';
 import { JobService } from '../server/pipeline/service';
 import { apiHandler,previewHandler } from '../server/pipeline/http';
 import { signSession } from '../server/pipeline/auth';
+import { verifyBrowserSession } from '../server/trusted-devices';
 import { MockAgent } from '../server/testing/mock-agent';
 import { renderPreview } from '../server/pipeline/artifacts';
 import type { AgentAdapter,AgentInput } from '../server/pipeline/types';
@@ -23,6 +24,16 @@ async function main(){
  const config={sessionKey:randomBytes(32).toString('hex'),previewKey:randomBytes(32).toString('hex'),appOrigin:'',previewOrigin:''};
  const api=apiHandler(service,config),preview=createServer(previewHandler(service,config));const previewPort=await listen(preview);config.previewOrigin=`http://localhost:${previewPort}`;
  const server=createServer((req,res)=>{
+  // Authenticate this mock server's signed legacy sessions before reporting
+  // a verified connection. A missing status route may never allow a build.
+  if(req.url==='/v1/sessions/status'&&req.method==='GET'){
+   void verifyBrowserSession(repository,req.headers.cookie,config.sessionKey).then(session=>{
+    res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
+    res.end(JSON.stringify({connected:true,trusted:!!session.deviceId,expiresAt:session.expiresAt}));
+   }).catch(()=>{res.writeHead(401,{'Content-Type':'application/json','Cache-Control':'no-store'});
+    res.end(JSON.stringify({errorCode:'UNAUTHENTICATED'}));});
+   return;
+  }
   if(req.url?.startsWith('/v1/')){void api(req,res);return;}
   if(req.url==='/arcade/factory-config.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({version:1,mode:'remote',apiBaseUrl:config.appOrigin,previewOrigin:config.previewOrigin}));return;}
   const name=new URL(req.url!,'http://local').pathname.replace(/^\/arcade\//,'/'),file=resolve('dist','.'+(name==='/'?'/index.html':name));if(!file.startsWith(resolve('dist')+'/')||!existsSync(file)){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json'} as Record<string,string>)[extname(file)]||'text/plain');res.end(readFileSync(file));

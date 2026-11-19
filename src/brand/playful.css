@@ -3,16 +3,16 @@
  * Saturated colors belong in artwork, meaningful actions and verified milestones.
  */
 :root{
- --jems-zone-imagine:#8A4DFF;--jems-zone-build:#34D7B3;
- --jems-zone-play:#2D7BFF;--jems-zone-discover:#FFC828;
- --jems-zone-test:#FF6B7A;--jems-zone-learn-math:#2D7BFF;
- --jems-zone-learn-english:#8A4DFF;
+ --jems-zone-imagine:#8B5CF6;--jems-zone-build:#22D3A6;
+ --jems-zone-play:#2E6BFF;--jems-zone-discover:#FFC24D;
+ --jems-zone-test:#FF5E7A;--jems-zone-learn-math:#2E6BFF;
+ --jems-zone-learn-english:#8B5CF6;
 }
 /* The welcome is a creative workshop, not a wall of decorative elements. */
 body.studio-review #page-studio-library .studio-home-hero{
  background-image:linear-gradient(111deg,#FFFDFC 0%,#F4ECFF 54%,#E3F1FF 100%);
  border-color:#D8CAF5;
- box-shadow:0 12px 32px #0B1D4D12;
+ box-shadow:0 12px 32px #0B1E3B12;
 }
 body.studio-review #page-studio-library .studio-home-hero::before{
  background:url('/jems-workbench.svg') center/contain no-repeat;
@@ -28,11 +28,11 @@ body.studio-review .studio-home-intro,body.studio-review .studio-home-action{z-i
 body.studio-review .studio-home-intro h1{letter-spacing:-1.8px}
 body.studio-review .studio-home-intro .studio-kicker{color:#6632BA}
 body.studio-review .studio-hero-sparkles{
- color:#D6A000;text-shadow:0 2px 9px #FFC82837;
+ color:#D6A000;text-shadow:0 2px 9px #FFC24D37;
  animation:jems-idle-spark 5s ease-in-out infinite;
 }
 body.studio-review .studio-make-tile{
- background:linear-gradient(125deg,#195FD0 0%,#2D7BFF 45%,#7136C9 100%);
+ background:linear-gradient(125deg,#195FD0 0%,#2E6BFF 45%,#7136C9 100%);
  border:1px solid #265FC5;box-shadow:0 13px 26px #195FD036;
 }
 body.studio-review .studio-make-tile .studio-make-copy strong{color:#FFFFFF}
@@ -40,7 +40,7 @@ body.studio-review .studio-make-tile .studio-make-copy small{color:#FFFFFF}
 body.studio-review .studio-make-icon{background:#FFFFFF26;border:1px solid #FFFFFF94}
 body.studio-review .studio-make-icon::after{
  content:'✦';position:absolute;top:-14px;right:-13px;font-size:19px;
- color:#FFC828;text-shadow:0 2px 8px #0B1D4D38;
+ color:#FFC24D;text-shadow:0 2px 8px #0B1E3B38;
 }
 body.studio-review .studio-make-tile:hover,
 body.studio-review .studio-make-tile:focus-visible{
@@ -60,13 +60,13 @@ body.studio-review .studio-starter.dragon{--jems-world-color:#723DCE;--jems-worl
 body.studio-review .studio-starter.moon{--jems-world-color:#255BC2;--jems-world-light:#E0E9FF}
 body.studio-review .studio-starter.robot{--jems-world-color:#07877E;--jems-world-light:#D4F8F0}
 body.studio-review #page-studio-library .studio-starter{
- border-color:#D9D9EB;box-shadow:0 6px 19px #0B1D4D0F;
+ border-color:#D9D9EB;box-shadow:0 6px 19px #0B1E3B0F;
  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
 }
 body.studio-review #page-studio-library .studio-starter:hover,
 body.studio-review #page-studio-library .studio-starter:focus-visible{
  border-color:var(--jems-world-color);
- box-shadow:0 13px 28px #0B1D4D22;transform:translateY(-4px);
+ box-shadow:0 13px 28px #0B1E3B22;transform:translateY(-4px);
 }
 body.studio-review #page-studio-library .studio-starter:focus-visible{
  outline:3px solid #7136C9;outline-offset:3px;
@@ -81,10 +81,10 @@ body.studio-review .studio-game-art:has(.jems-world-scene) :is(.studio-art-halo,
 body.studio-review .jems-world-chip{
  display:inline-flex;align-items:center;position:absolute;top:9px;left:10px;z-index:4;
  padding:5px 9px;border-radius:999px;background:#FFFFFFE6;
- color:var(--jems-world-color,#0B1D4D);
+ color:var(--jems-world-color,#0B1E3B);
  border:1px solid #FFFFFF;font:900 10px/1 system-ui,sans-serif;
  letter-spacing:.5px;text-shadow:none;
- box-shadow:0 2px 7px #0B1D4D16;pointer-events:none;
+ box-shadow:0 2px 7px #0B1E3B16;pointer-events:none;
 }
 body.studio-review .studio-starter .studio-card-info{
  border-top:3px solid var(--jems-world-color);
@@ -112,7 +112,7 @@ body.studio-review .jems-empty-workbench{
  filter:drop-shadow(0 10px 16px #7B55D51C);
  animation:jems-bob 6s ease-in-out infinite;
 }
-body.studio-review .studio-empty h2{max-width:410px;color:#0B1D4D}
+body.studio-review .studio-empty h2{max-width:410px;color:#0B1E3B}
 body.studio-review .studio-empty p{color:#516383}
 body.studio-review #studioChooseStarter{
  color:#542AAB;background:#F1E8FF;border-color:#CDB9F6;
@@ -120,11 +120,11 @@ body.studio-review #studioChooseStarter{
 
 /* Creations and versions should feel owned, but never like a reward economy. */
 body.studio-review .studio-saved-card{
- position:relative;min-height:165px;border-left:4px solid #8A4DFF;
+ position:relative;min-height:165px;border-left:4px solid #8B5CF6;
  background:linear-gradient(135deg,#FFF,#F9F5FF);
 }
 body.studio-review .studio-saved-card[data-jems-state='playable']{border-left-color:#22BAA2}
-body.studio-review .studio-saved-card[data-jems-state='ready']{border-left-color:#2D7BFF}
+body.studio-review .studio-saved-card[data-jems-state='ready']{border-left-color:#2E6BFF}
 body.studio-review .studio-saved-card[data-jems-state='building']{border-left-color:#EFB913}
 body.studio-review .jems-project-badge,
 body.studio-review .jems-version-badge{
@@ -162,9 +162,9 @@ body.studio-review #page-lab .page-head{
 }
 body.studio-review #page-lab .page-head::after{
  content:'✦';position:absolute;top:9px;right:21px;
- font-size:30px;color:#FFC828;opacity:.8;pointer-events:none;
+ font-size:30px;color:#FFC24D;opacity:.8;pointer-events:none;
 }
-body.studio-review #page-lab .page-head h1{color:#0B1D4D}
+body.studio-review #page-lab .page-head h1{color:#0B1E3B}
 body.studio-review #page-lab .panel:first-child{border-top:4px solid var(--jems-zone-learn-math)}
 body.studio-review #page-lab .panel:last-child{border-top:4px solid var(--jems-zone-build)}
 body.studio-review #page-lab:has(#labSubjectLanguage[aria-pressed='true']) .panel:first-child{

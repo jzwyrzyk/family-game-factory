@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" aria-hidden="true">
-<ellipse cx="296" cy="264" rx="255" ry="22" fill="#0B1D4D" opacity=".07"/>
+<ellipse cx="296" cy="264" rx="255" ry="22" fill="#0B1E3B" opacity=".07"/>
 <g transform="translate(54,68)">
 <rect x="0" y="55" width="198" height="140" rx="24" fill="#7040D9"/>
-<path d="M0 74Q0 55 22 55H173Q198 55 198 80V107H0Z" fill="#8A4DFF"/>
+<path d="M0 74Q0 55 22 55H173Q198 55 198 80V107H0Z" fill="#8B5CF6"/>
 <rect x="40" y="23" width="48" height="46" rx="13" fill="#A66CFF"/><ellipse cx="64" cy="24" rx="24" ry="12" fill="#B889FF"/>
 <rect x="120" y="23" width="48" height="46" rx="13" fill="#A66CFF"/><ellipse cx="144" cy="24" rx="24" ry="12" fill="#B889FF"/>
 <path d="M198 101V177Q198 195 178 195H161V109Z" fill="#5A28BB" opacity=".55"/>
 </g>
 <g transform="translate(266,88)">
 <rect x="0" y="62" width="168" height="120" rx="22" fill="#17BFA4"/>
-<path d="M0 82Q0 62 22 62H146Q168 62 168 84V112H0Z" fill="#34D7B3"/>
+<path d="M0 82Q0 62 22 62H146Q168 62 168 84V112H0Z" fill="#22D3A6"/>
 <rect x="55" y="28" width="58" height="48" rx="14" fill="#25CEAE"/><ellipse cx="84" cy="28" rx="29" ry="14" fill="#55E5CA"/>
 <path d="M168 100V165Q168 182 149 182H132V107Z" fill="#0EAB92" opacity=".6"/>
 </g>
 <g transform="translate(428,29)">
 <rect x="0" y="56" width="125" height="108" rx="18" fill="#F1AE13"/>
-<path d="M0 72Q0 56 18 56H108Q125 56 125 74V98H0Z" fill="#FFC828"/>
-<rect x="35" y="26" width="56" height="42" rx="12" fill="#FFC828"/><ellipse cx="63" cy="26" rx="28" ry="12" fill="#FFDA69"/>
+<path d="M0 72Q0 56 18 56H108Q125 56 125 74V98H0Z" fill="#FFC24D"/>
+<rect x="35" y="26" width="56" height="42" rx="12" fill="#FFC24D"/><ellipse cx="63" cy="26" rx="28" ry="12" fill="#FFDA69"/>
 <path d="M125 91V146Q125 164 107 164H98V98Z" fill="#D89703" opacity=".55"/>
 </g></svg>

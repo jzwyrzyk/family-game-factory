@@ -23,7 +23,10 @@ async function switchProfile(page,index){
     const request=route.request(),path=new URL(request.url()).pathname;
     if(request.method()==='OPTIONS'){await route.fulfill({status:204,headers:cors});return;}
     let body;
-    if(path==='/v1/revisions'&&request.method()==='POST')body={revisionId:'continuity-base'};
+    // Explicit authenticated fixture; a missing endpoint must fail closed.
+    if(path==='/v1/sessions/status'&&request.method()==='GET')
+     body={connected:true,trusted:true,expiresAt:Date.now()+60000};
+    else if(path==='/v1/revisions'&&request.method()==='POST')body={revisionId:'continuity-base'};
     else if(path==='/v1/jobs'&&request.method()==='POST'){submitted++;body={jobId:'continuity-job',status:'queued',adapter:'mock'};}
     else if(path==='/v1/jobs/continuity-job')body=ready?{jobId:'continuity-job',status:'ready',revisionId:'continuity-ready',adapter:'mock'}:{jobId:'continuity-job',status:'testing',phase:'testing',adapter:'mock'};
     else if(path.endsWith('/preview')){previewRequests++;body={errorCode:'UNEXPECTED_PREVIEW'};}

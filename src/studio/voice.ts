@@ -6,6 +6,7 @@
  * it requires both an on-device availability check and processLocally=true.
  * No MediaRecorder, remote STT endpoint, raw audio, or persistent microphone
  * state is used. System-keyboard dictation remains a separate OS choice.
+ * Recognition creates an editable draft ONLY; the child explicitly sends it.
  */
 type VoiceAvailability = 'available' | 'downloadable' | 'downloading' | 'unavailable';
 interface RecognitionResult {isFinal:boolean;[index:number]:{transcript:string}}
@@ -14,7 +15,7 @@ interface RecognitionLike {
   onresult:((event:{results:ArrayLike<RecognitionResult>})=>void)|null;
   onerror:((event:{error:string})=>void)|null;
   onend:(()=>void)|null;
-  start():void;abort():void;
+  start():void;stop():void;abort():void;
 }
 interface RecognitionCtor {
   new():RecognitionLike;
@@ -28,29 +29,35 @@ export interface StudioVoiceOptions {
 }
 export function installStudioVoice(ui:StudioVoiceOptions){
  let recognition:RecognitionLike|null=null;
- let generation=0,finalWords='',listening=false,failed=false;
- let spokenReply='',speakAfterVoice=false,voiceScope='';
+ let generation=0,finalWords='',listening=false,failed=false,finishing=false;
+ let spokenReply='';
  const getCtor=():RecognitionCtor|undefined=>(window as any).SpeechRecognition||(window as any).webkitSpeechRecognition;
  const announce=(message:string)=>{ui.status.textContent=message;};
  const buttons=()=>{
-  ui.microphone.textContent=listening?'■ Stop listening':'🎙 Speak';
+  ui.microphone.textContent=listening?(finishing?'Cancel transcription':'■ Finish speaking'):'🎙 Speak';
+  // A stalled browser speech session must still have an accessible cancel action.
+  ui.microphone.disabled=false;
   ui.microphone.setAttribute('aria-pressed',String(listening));
   ui.installPack.hidden=true;
  };
  // Prefer full-thought dictation over the API's short-command default.
  const voiceOptions={langs:['en-US'],processLocally:true as const,quality:'dictation' as const};
  function cancel(){
-  generation++;speakAfterVoice=false;voiceScope='';finalWords='';spokenReply='';ui.hearReply.disabled=true;failed=true;
+  generation++;finalWords='';spokenReply='';ui.hearReply.disabled=true;failed=true;finishing=false;
   const active=recognition;recognition=null;listening=false;buttons();announce('Microphone off.');
   try{active?.abort();}catch{/* The browser may already have stopped. */}
   try{window.speechSynthesis?.cancel();}catch{/* Speech output is optional. */}
  }
  async function listen(){
-  if(recognition){cancel();announce('Microphone stopped. Nothing was sent.');return;}
+  if(recognition){
+   if(finishing){cancel();announce('Transcription canceled. Your existing draft is unchanged.');return;}
+   finishing=true;buttons();announce('Finishing speech…');
+   try{recognition.stop();}catch{cancel();announce('Could not finish transcription. Please try again or type.');}
+   return;
+  }
   if(!ui.canListen()){announce('Finish your current activity before talking.');return;}
   // Avoid the coach's last spoken response being recognized as a new child turn.
   try{window.speechSynthesis?.cancel();}catch{/* Speech output is optional. */}
-  speakAfterVoice=false;
   const Ctor=getCtor(),scope=ui.scope(),seq=++generation;
   if(!Ctor||typeof Ctor.available!=='function'){
    announce('Private on-device speech is not supported here. Tap the text box and use your device keyboard microphone, or type.');return;
@@ -83,7 +90,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
     const item=event.results[i];if(item.isFinal)words.push(item[0]?.transcript||'');
    }
    finalWords=words.join(' ').trim().slice(0,2000);
-   if(finalWords)announce('Heard you. Finishing your turn…');
+   if(finalWords)announce('Heard you. Finishing transcription…');
   };
   next.onerror=event=>{
    if(seq!==generation)return;
@@ -95,21 +102,17 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   };
   next.onend=()=>{
    if(recognition!==next||seq!==generation)return;
-   recognition=null;listening=false;buttons();
+   recognition=null;listening=false;finishing=false;buttons();
    const transcript=finalWords;finalWords='';
    if(failed||!transcript){if(!failed)announce('Nothing was sent. Tap Speak to try again.');return;}
    if(scope!==ui.scope()||!ui.canListen())return;
-   voiceScope=scope;speakAfterVoice=true;
-   announce('You said: '+transcript);
-   try{void Promise.resolve(ui.onTranscript(transcript)).then(()=>{
-    // A declined turn must not arm an unrelated later reply.
-    speakAfterVoice=false;
-   },()=>{
-    speakAfterVoice=false;announce('Your message could not be sent. You can type instead.');
-   });}catch{speakAfterVoice=false;announce('Your message could not be sent.');}
+   announce('Words ready. Review them, then choose Send to jems.');
+   try{void Promise.resolve(ui.onTranscript(transcript)).catch(()=>{
+    announce('Could not add the words to your draft. Please type instead.');
+   });}catch{announce('Could not add the words to your draft. Please type instead.');}
   };
-  finalWords='';failed=false;recognition=next;listening=true;buttons();
-  announce('Listening on this device. Speak one thought, then pause.');
+  finalWords='';failed=false;finishing=false;recognition=next;listening=true;buttons();
+  announce('Listening on this device. Speak one thought, then pause or tap Finish speaking.');
   try{next.start();}
   catch{recognition=null;listening=false;buttons();announce('Could not start on-device speech. Use keyboard dictation or type.');}
  }
@@ -141,8 +144,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  }
  function reply(text:string){
   spokenReply=text.slice(0,1800);ui.hearReply.disabled=!spokenReply;
-  if(speakAfterVoice&&voiceScope===ui.scope())speak(spokenReply);
-  speakAfterVoice=false;
+  // Replies are read aloud only when the child explicitly chooses Hear reply.
  }
  ui.microphone.onclick=()=>{void listen();};
  ui.installPack.onclick=()=>{void installPack();};

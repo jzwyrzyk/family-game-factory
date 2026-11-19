@@ -2,7 +2,8 @@ import {isGeneratedGame} from '../agent/generated';
 import {renderGenerated} from '../sandbox/preview.cjs';
 import type { IncomingMessage,ServerResponse } from 'node:http';
 import { createHmac,timingSafeEqual } from 'node:crypto';
-import { verifySession } from './auth';
+import {verifyBrowserSession} from '../trusted-devices';
+import type {Repository} from './types';
 import { renderPreview } from './artifacts';
 import { JobService } from './service';
 interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>}
@@ -10,7 +11,7 @@ function json(response:ServerResponse,status:number,value:unknown){response.writ
 async function body(request:IncomingMessage){let text='';for await(const chunk of request){text+=chunk;if(Buffer.byteLength(text)>12000)throw Error('REQUEST_TOO_LARGE');}return JSON.parse(text||'{}');}
 const signature=(key:string,fields:string)=>createHmac('sha256',key).update(fields).digest('base64url');
 const equal=(a:string,b:string)=>{const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&timingSafeEqual(x,y);};
-export function apiHandler(service:JobService,config:HttpConfig){
+export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository){
  if(config.sessionKey.length<32||config.previewKey.length<32)throw Error('Server signing keys are not configured');
  return async(request:IncomingMessage,response:ServerResponse)=>{
   try{
@@ -19,8 +20,7 @@ export function apiHandler(service:JobService,config:HttpConfig){
    if(origin){response.setHeader('Access-Control-Allow-Origin',config.appOrigin);response.setHeader('Access-Control-Allow-Credentials','true');response.setHeader('Vary','Origin');}
    if(request.method==='OPTIONS'){response.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Request');response.setHeader('Access-Control-Allow-Methods','GET,POST');response.writeHead(204);response.end();return;}
    if(request.method==='POST'&&(request.headers['x-factory-request']!=='1'||origin!==config.appOrigin||!request.headers['content-type']?.startsWith('application/json')))throw Error('FORBIDDEN');
-   const cookie=request.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('factory_session='))?.slice('factory_session='.length);
-   const session=verifySession(cookie,config.sessionKey);const path=new URL(request.url!,'http://internal').pathname;
+   const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey);const path=new URL(request.url!,'http://internal').pathname;
    if(path==='/v1/builder/status'&&request.method==='GET')return json(response,200,await service.readiness(session));
    if(path==='/v1/revisions'&&request.method==='POST')return json(response,200,await service.registerBase(session,await body(request)));
    if(path==='/v1/jobs'&&request.method==='POST'){

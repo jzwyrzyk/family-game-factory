@@ -27,9 +27,9 @@
 .studio-review .studio-prompt{
  margin:10px 14px 14px;padding:14px 17px 13px;background:#FFF!important;
  border:2px solid var(--jems-purple)!important;border-radius:18px!important;
- box-shadow:0 6px 20px #8A4DFF11;transition:box-shadow .18s,border-color .18s
+ box-shadow:0 6px 20px #8B5CF611;transition:box-shadow .18s,border-color .18s
 }
-.studio-review .studio-prompt:focus-within{box-shadow:0 0 0 4px #8A4DFF22,0 8px 20px #8A4DFF17;border-color:#6C32D8!important}
+.studio-review .studio-prompt:focus-within{box-shadow:0 0 0 4px #8B5CF622,0 8px 20px #8B5CF617;border-color:#6C32D8!important}
 .studio-review .studio-prompt label{font:800 15px/1.4 var(--jems-round);color:var(--jems-ink)}
 .studio-review .studio-prompt textarea{
  min-height:98px;max-height:260px;font:500 15px/1.6 var(--jems-body);
@@ -42,7 +42,7 @@
 .studio-review .studio-send-row #studioTalk{
  grid-column:3;min-height:49px;min-width:150px;flex:none!important;font-weight:850;
  background:var(--jems-blue);border-color:var(--jems-blue);color:white;
- box-shadow:0 8px 18px #2D7BFF24
+ box-shadow:0 8px 18px #2E6BFF24
 }
 .studio-review .studio-send-row #studioSend{
  grid-column:2;justify-self:end;min-height:47px;flex:none!important;
@@ -52,7 +52,7 @@
  grid-column:1/-1;width:100%;margin-top:12px;min-height:60px;
  background:var(--jems-ink)!important;border:2px solid var(--jems-ink)!important;
  color:#FFFFFF!important;font:850 17px/1.2 var(--jems-round)!important;
- box-shadow:0 12px 26px #0B1D4D2B!important
+ box-shadow:0 12px 26px #0B1E3B2B!important
 }
 .studio-review .studio-send-row #studioSend:disabled,.studio-review .studio-send-row #studioTalk:disabled{opacity:.6}
 .studio-review .studio-workshop-availability{display:none}
@@ -225,3 +225,9 @@
 .studio-review .studio-idea-spark-options{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}
 .studio-review .studio-idea-spark-options .studio-chip{min-height:42px;border-color:#BAA1EE;color:#512996;background:#F6F1FF}
 @media(max-width:760px){.studio-review .studio-idea-sparks{margin:5px 13px 12px}.studio-review .studio-idea-spark-options{gap:7px}}
+
+/* Conversation privacy actions remain discreet and are never mixed with Send. */
+.studio-review .studio-helper-heading .studio-chat-options{margin-left:auto;align-self:center;position:relative;z-index:5}
+.studio-review .studio-chat-options>summary{cursor:pointer;font:700 11px/1.3 var(--jems-body);color:#596583;padding:10px 6px;min-height:43px;display:flex;align-items:center}
+.studio-review .studio-chat-options[open] .studio-button{position:absolute;right:0;top:100%;background:#fff;min-width:240px;z-index:6;border-color:#C9B6F0;box-shadow:0 14px 32px #0B1D4D21;white-space:normal}
+@media(max-width:760px){.studio-review .studio-chat-options>summary{font-size:10px;padding:8px 4px}}

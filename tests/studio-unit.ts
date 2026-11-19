@@ -30,6 +30,40 @@ test('background builds preserve the selected test and new draft through reload'
  const loaded=new StudioNotebook(memory).get(session.id,owner);assert.equal(loaded.candidate?.id,'test-one');assert.equal(loaded.selectedTest,'test-one');assert.equal(loaded.draft,'A newer idea I am still typing');assert.equal(loaded.experiments?.length,2);assert.equal(loaded.job?.revisionId,'ready-two');
  book.selectExperiment(session.id,owner,'test-two');assert.equal(book.get(session.id,owner).candidate?.remoteId,'ready-two');assert.equal(book.get(session.id,owner).remoteId,null,'opening a ready test does not promote it');
 });
+test('dismissed home reminder stays dismissed per child without deleting projects',()=>{
+ const mem=new Memory(),book=new StudioNotebook(mem),one=book.create('child-one','new','Moon idea');
+ const two=book.create('child-two','new','Donut idea');
+ book.dismissResume(one.id,'child-one');
+ const reload=new StudioNotebook(mem);
+ assert.equal(reload.last('child-one'),null);
+ assert.equal(reload.get(one.id,'child-one').name,'Moon idea');
+ assert.equal(reload.last('child-two')?.id,two.id);
+ assert.throws(()=>book.dismissResume(two.id,'child-one'),/own profile/);
+ const newer=book.create('child-one','new','New machine');
+ assert.equal(book.last('child-one')?.id,newer.id);
+});
+test('put-away and bring-back preserve draft, versions and profile isolation',()=>{
+ const mem=new Memory(),book=new StudioNotebook(mem),one=book.create('child-one','new','Sticker rocket');
+ book.update(one.id,'child-one',s=>{s.draft='Keep the pink rocket';s.candidate={id:'preview-1',baseId:null,config:{power:5},prompt:'Try pink',summary:'Pink rocket'};});
+ book.archive(one.id,'child-one');
+ const reopened=new StudioNotebook(mem);
+ assert.equal(reopened.get(one.id,'child-one').archived,true);
+ assert.equal(reopened.get(one.id,'child-one').draft,'Keep the pink rocket');
+ assert.equal(reopened.get(one.id,'child-one').candidate?.id,'preview-1');
+ assert.equal(reopened.last('child-one'),null);
+ assert.throws(()=>reopened.unarchive(one.id,'child-two'),/own profile/);
+ reopened.unarchive(one.id,'child-one');
+ assert.equal(reopened.last('child-one')?.id,one.id);
+});
+test('ongoing build cannot be hidden by archiving',()=>{
+ const mem=new Memory(),book=new StudioNotebook(mem),one=book.create('child-one','new','A busy build');
+ book.update(one.id,'child-one',s=>{s.job={id:'job1',api:'https://builder.example',status:'building'};});
+ assert.throws(()=>book.archive(one.id,'child-one'),/Stop the build/);
+ assert.equal(book.get(one.id,'child-one').archived,undefined);
+ book.update(one.id,'child-one',s=>{s.job!.status='cancelled';});
+ book.archive(one.id,'child-one');
+ assert.equal(book.get(one.id,'child-one').archived,true);
+});
 const gameStorage=new Memory();let child:any={id:owner,skills:{'mul:8x7':{tries:5,right:3}},constructionStates:{}};let canSave=true;
 const fg={store:{current:()=>child,save:()=>canSave}};
 const games=new StudioGames(gameStorage as unknown as Storage,fg);
@@ -67,6 +101,22 @@ test('ride experiments preserve setup, paint and saved progress independently of
 test('both generated module versions keep the generated builder discriminator',()=>{
  assert.equal(isGeneratedRemoteKind('generated-module-v1'),true);assert.equal(isGeneratedRemoteKind('generated-module-v2'),true);
  assert.equal(isGeneratedRemoteKind('star-catcher-v1'),false);assert.equal(isGeneratedRemoteKind(undefined),false);
+});
+test('local chat erasure preserves saved versions but removes transcript and design notes per player',()=>{
+ const memory=new Memory(),book=new StudioNotebook(memory);
+ const one=book.create('first','gum','My first game','project-1');
+ const two=book.create('second','new','Their idea');
+ book.message(one.id,'first','child','A private made-up world');book.message(two.id,'second','child','Other child private idea');
+ book.update(one.id,'first',x=>{x.draft='secret draft';x.hypothesis='secret guess';x.design!.plan.goal={value:'secret design',origin:'child',accepted:true,delegated:false};});
+ book.saveExperiment(one.id,'first',{id:'v-one',baseId:'original',config:{gumBudget:12},prompt:'try 12',summary:'new version'});
+ const erased=book.clearConversation(one.id,'first');
+ assert.deepEqual(erased.messages,[]);assert.equal(erased.draft,'');assert.equal(erased.hypothesis,'');
+ assert.deepEqual(erased.design!.plan,{});assert.equal(erased.experiments!.length,1,'do not silently erase game versions');
+ assert.equal(book.get(two.id,'second').messages[0].text,'Other child private idea');
+ assert.throws(()=>book.clearConversation(one.id,'second'),/own profile/);
+ book.update(one.id,'first',x=>{x.job={id:'job-running',api:'https://private.example',status:'building'};});
+ assert.throws(()=>book.clearConversation(one.id,'first'),/Finish or cancel/);
+ assert.equal(book.get(one.id,'first').job!.status,'building');
 });
 // Exercise actual EventTarget registration order. A synthetic capture-first
 // dispatcher would miss the direct-window dispatch that failed in Chromium CI.

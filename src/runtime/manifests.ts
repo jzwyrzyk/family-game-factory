@@ -12,7 +12,7 @@ export const manifests: Record<GameId, Manifest> = {
     {key:'portalEnabled',label:'Robot portals',type:'boolean',default:false},
   ]},
   gum: { version: 1, id: 'gum', name: 'Bubble Gum Builders', mechanics: [
-    { key: 'qualityVersion', label: 'Physical workshop', type: 'number', default: 1, min: 0, max: 1, step: 1 },
+    { key: 'qualityVersion', label: 'Build world (stickers / physics / original)', type: 'number', default: 2, min: 0, max: 2, step: 1 },
     { key: 'gravity', label: 'Gravity', type: 'number', default: 10, min: 4, max: 16, step: 1 },
     { key: 'thrust', label: 'Fan power', type: 'number', default: 1, min: .5, max: 1.5, step: .1 },
     { key: 'originalRules', label: 'Restored original rules', type: 'boolean', default: true },
@@ -75,7 +75,7 @@ export function diff(game: GameId, before: Mechanics, after: Mechanics) {
 }
 /** Show the controls that actually affect this saved engine, never compatibility flags. */
 export function playableMechanics(game: GameId, config: Mechanics) {
-  const keys = game === 'gum' ? (config.qualityVersion === 1 ? ['gumBudget','jointStrength','gravity','thrust']
+  const keys = game === 'gum' ? (config.qualityVersion === 2 ? ['extraDecoys'] : config.qualityVersion === 1 ? ['gumBudget','jointStrength','gravity','thrust']
     : config.originalRules ? ['gumBudget','jointStrength'] : ['highlightMatches','extraDecoys'])
     : game === 'dragon' ? (config.originalRules ? ['groundResilience','fireballCadence','shieldRadius'] : ['hearts','breathSpeed']) : null;
   return manifests[game].mechanics.filter(m => keys ? keys.includes(m.key) : m.key !== 'originalRules');

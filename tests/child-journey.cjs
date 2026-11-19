@@ -25,6 +25,21 @@ async function assertTargets(page,selectors){
  for(const selector of selectors){const box=await page.locator(selector).boundingBox();assert.ok(box&&box.width>=44&&box.height>=44,`${selector} is a visible target of at least 44 × 44 CSS pixels`);}
 }
 async function expectBudget(page,value){await page.waitForFunction(expected=>FG.runtime.snapshot().config.gumBudget===expected,value);}
+async function openPhysicalGum(page){
+  // The physics journey exercises the preserved v1 game; the v2 sticker
+  // construction has its own separate browser acceptance suite.
+  await page.click('[data-starter="gum"]');
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',workspace=JSON.parse(localStorage.getItem(key));
+    const project=workspace?.projects.find(p=>p.game==='gum'),revision=workspace?.revisions.find(r=>r.id===project?.headId);
+    if(!revision)throw Error('Missing physical workshop project');
+    revision.config.qualityVersion=1;
+    localStorage.setItem(key,JSON.stringify(workspace));
+  });
+  await page.reload();await page.waitForFunction(()=>window.FG?.studio);
+  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+}
+
 async function localTest(page){await page.click('#studioChange');await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');await expectBudget(page,15);}
 async function returnToViewed(page,device){
  if(device==='mobile')await page.click('[data-studio-tab="game"]');else await page.click('#studioReturnToPlay');
@@ -62,7 +77,7 @@ async function localJourney(browser,url,device,viewport){
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
   await journeyScreenshot(page,device,'first-screen');
 
-  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+  await openPhysicalGum(page);
   await assertTargets(page,['#studioPlay','#studioChange','#studioHelp','#studioMore > summary']);
   const originalMain=await mainId(page);
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();await localTest(page);
@@ -158,7 +173,10 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await page.route(api+'/**',async route=>{
    const request=route.request(),path=new URL(request.url()).pathname;let body;
    if(request.method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
-   if(path==='/v1/revisions'&&request.method()==='POST')body={revisionId:'journey-base'};
+   // A declared authenticated fixture is required for remote paid mutations.
+   if(path==='/v1/sessions/status'&&request.method()==='GET')
+    body={connected:true,trusted:true,expiresAt:Date.now()+60000};
+   else if(path==='/v1/revisions'&&request.method()==='POST')body={revisionId:'journey-base'};
    else if(path==='/v1/jobs'&&request.method()==='POST'){requests.push(request.postDataJSON());body={jobId:'journey-job',status:'queued',adapter:'mock'};}
    else if(path==='/v1/jobs/journey-job')body=ready?{jobId:'journey-job',status:'ready',revisionId:'journey-ready',adapter:'mock'}:{jobId:'journey-job',status:'testing',adapter:'mock'};
    else if(path==='/v1/revisions/journey-ready/preview'){
@@ -176,7 +194,7 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
    return route.fulfill({headers:{'Content-Security-Policy':rendered.csp},contentType:'text/html',body:rendered.html});
   });
   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&FG.studio.mode()==='remote');
-  await page.click('[data-starter="gum"]');await localTest(page);
+  await openPhysicalGum(page);await localTest(page);
   const originalCandidate=(await currentSession(page)).candidate.id,originalMain=await mainId(page);
   await page.click('#studioChange');await page.fill('#studioPrompt','Replace the rocket with a bouncing banana maze');await page.click('#coachTry');
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='testing'));

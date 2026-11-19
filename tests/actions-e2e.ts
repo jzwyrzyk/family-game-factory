@@ -9,6 +9,7 @@ import {JobService} from '../server/pipeline/service';
 import {ActionCoordinator} from '../server/actions/coordinator';
 import {apiHandler,previewHandler} from '../server/pipeline/http';
 import {signSession} from '../server/pipeline/auth';
+import {verifyBrowserSession} from '../server/trusted-devices';
 import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
 import {FixtureOnlyGate} from '../server/testing/fixture-gate';
 import {hopper,painter} from '../server/testing/generated-fixtures';
@@ -144,7 +145,17 @@ async function main(){
  })().catch(e=>{trace(id,attempt,'harness-error',(e as Error).message);console.error('Mocked Actions harness failed:',JSON.stringify({jobId:id,attempt,error:(e as Error).message.slice(0,600)}));});});}},approval);
  const config={sessionKey:randomBytes(32).toString('hex'),previewKey:randomBytes(32).toString('hex'),appOrigin:'',previewOrigin:'',dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();}};
  const preview=createServer(previewHandler(service,config));config.previewOrigin='http://localhost:'+await listen(preview);const api=apiHandler(service,config);
- const server=createServer((req,res)=>{if(req.url?.startsWith('/v1/')){void api(req,res);return;}if(req.url==='/arcade/factory-config.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({version:1,mode:'remote',apiBaseUrl:config.appOrigin,previewOrigin:config.previewOrigin}));return;}const name=new URL(req.url!,'http://local').pathname.replace(/^\/arcade\//,'/'),file=resolve('dist','.'+(name==='/'?'/index.html':name));if(!file.startsWith(resolve('dist')+'/')||!existsSync(file)){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json'} as Record<string,string>)[extname(file)]||'text/plain');res.end(readFileSync(file));});config.appOrigin='http://127.0.0.1:'+await listen(server,'127.0.0.1');
+ const server=createServer((req,res)=>{
+  // Verify the real signed test session before admitting any paid mock action.
+  if(req.url==='/v1/sessions/status'&&req.method==='GET'){
+   void verifyBrowserSession(repo,req.headers.cookie,config.sessionKey).then(session=>{
+    res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
+    res.end(JSON.stringify({connected:true,trusted:!!session.deviceId,expiresAt:session.expiresAt}));
+   }).catch(()=>{res.writeHead(401,{'Content-Type':'application/json','Cache-Control':'no-store'});
+    res.end(JSON.stringify({errorCode:'UNAUTHENTICATED'}));});
+   return;
+  }
+  if(req.url?.startsWith('/v1/')){void api(req,res);return;}if(req.url==='/arcade/factory-config.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({version:1,mode:'remote',apiBaseUrl:config.appOrigin,previewOrigin:config.previewOrigin}));return;}const name=new URL(req.url!,'http://local').pathname.replace(/^\/arcade\//,'/'),file=resolve('dist','.'+(name==='/'?'/index.html':name));if(!file.startsWith(resolve('dist')+'/')||!existsSync(file)){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json'} as Record<string,string>)[extname(file)]||'text/plain');res.end(readFileSync(file));});config.appOrigin='http://127.0.0.1:'+await listen(server,'127.0.0.1');
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{
  await verifyV1InputOrdering(browser);
