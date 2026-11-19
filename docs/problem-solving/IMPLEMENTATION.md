@@ -1,6 +1,6 @@
 # Problem-solving implementation and acceptance
 
-**Status:** source integration candidate in [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64), branch `feature/jems-problem-solving-evidence-20261119`. This document describes the contract under implementation; the acceptance table records the scoped evidence below. The owner has authorized merge once current-source checks pass. The PR tracks subsequent candidate checks. It does not claim merged, deployed or child-validated behavior.
+**Status:** [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64) merged into `main` as `09e43beb4405526117493ab27688b076136078f4` on November 19, 2026, at 12:31:14 p.m. America/New_York. The merged tree `62893dc035abdf589533de6e4ad9a21dd48f7963` exactly matches tested head `3f316a8a57f5aea86e1d259cd09b9dc5edc4effd`. All five published-head workflows and the scoped desktop/touch visual review passed. This is source integration; deployment and educational validation remain separate.
 
 ## Components
 
@@ -56,6 +56,8 @@ Source activities own their own save contract. An optional observer records only
 6. Do not label early/recent raw differences as measured growth. Fresh variants target similar demands but are not psychometrically equated.
 
 ## Acceptance evidence
+
+**Final combined-source acceptance:** all five workflows passed on `3f316a8a57f5aea86e1d259cd09b9dc5edc4effd`: [Arcade](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939712), [parent reporting](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939679), [full visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939590), [security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939840), and [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575940022). The new practice/backup journey passed desktop and touch with four retained episodes each. Native parent, Rewards, Creation, existing-game and recovery journeys also passed. Screenshots covering the actual practice, journal, seven-entry 320px navigation and Rewards were inspected without blocking defects. The [merge receipt](../../DELIVERY-STATE.md#pr64-formative-problem-solving--merged) records the exact tree and release boundary. Earlier entries below preserve how those results were reached; their pending wording is historical.
 
 **Initial published candidate:** `6d1b2d6769c11900266fcfc8aed095e460e021f1`, tree `d2f197785c3cc7c4820a2c622f38ae2922b4b246`, against main `eebeebeb8896554bd3619029d8ca80d4b06b2f2b`. On November 19, 2026, [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301428), [family security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301796), and all five [visual-review jobs](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301785) passed. The visual artifact's synthetic merge `833a3da779b6484b5a13b968b086d2b4dd39954f` has the same tree as that candidate. Desktop/mobile host screens and desktop practice screenshots were inspected.
 
