@@ -18,13 +18,19 @@ The roster has **22 selected entries and 23 individual character profiles**: F r
 - Preserve each approved base separately from its grown form. Store current and superseded artwork references per character and per form in the [character reference index](../pals/art/character-references.json). Keep candidate status, selection status and exact-reference resolution distinct.
 - Replace the blanket current growth pause with per-form status. The old pause remains in the earlier decision as history. These selections do not grant blanket approval to all mature-form candidates.
 
+## Follow-up: two growth stages, total
+
+The owner's subsequent November 19 decision settles **two visual stages only** for this release: **Stage 1 Base** (the approved original) and **Stage 2 Grown** (the individually selected mature form). The artwork index maps `forms.base` and `forms.mature` to those design stages. Do not generate a Bright/intermediate body, add a third illustrated step, or infer approval for unresolved mature portraits. Any future extra form will require a new design decision.
+
+This does **not** set a numerical adventure threshold or modify the companion implementation on PR68. That branch currently has three derived stages and must be updated before it merges or ships; tests, labels, growth celebrations, save/reload and backups must remain coherent. No accumulated adventure, activity receipt or collection ownership is deleted by adopting a two-form plan. The preferred Chimi and Navi references remain selected but their exact files are unresolved.
+
 ## Consequences and limits
 
 The [artwork entry point](../pals/art/README.md) is the review and handoff source for current character choices. The base manifest preserves the original base specifications; the character reference index tracks the later form decisions. Stable source references and content hashes protect against accidental substitution during future edits.
 
 The selected images are concept portraits with presentation backgrounds and labels. They are not isolated production sprites, expression sheets, animation rigs or verified game assets. Growth capabilities describe fictional design intent, not implemented simulation or measured physical performance.
 
-The companion implementation still uses separate persistent identities and three growth states. This art decision assigns no runtime ID, collection rule, numerical threshold or visual-to-stage mapping. Preserve existing collections, saved scenes and backup semantics when that integration is implemented. Follow-up work must explicitly cover any missing stage art rather than stretching one portrait or silently changing the progression model.
+The companion implementation still uses separate persistent identities and three **legacy runtime** growth states. The follow-up decision above now establishes two **visual form** stages, Base and Grown, but assigns no runtime ID, acquisition rule, numerical adventure threshold or completed in-game asset binding. Runtime code and UI must be reconciled before merge; preserve existing collections, saved scenes and backups. Missing selected Grown artwork remains unresolved and must never be replaced by a guessed version.
 
 ## Evidence and related documents
 
