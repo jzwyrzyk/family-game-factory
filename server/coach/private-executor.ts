@@ -12,6 +12,7 @@ import {validateCoachReply} from '../../src/studio/design';
 import {privateCoachOrigin} from './private-bridge';
 import {speechApproved,speechConfig,validateAudio,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
 import {GooglePrivateSpeech} from './private-speech-provider';
+import {adultPilotFlags} from '../adult-pilot';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
 export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
@@ -110,6 +111,7 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
 }
 function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
  return {
+  adultPilot:adultPilotFlags(env),
   enabled:env.FACTORY_COACH_APPROVED==='true',
   privacyApproved:env.FACTORY_COACH_PRIVACY_APPROVED==='true',
   moderationApproved:env.FACTORY_COACH_SAFEGUARDS_APPROVED==='true',

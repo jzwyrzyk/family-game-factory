@@ -21,7 +21,7 @@
     "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
     "test:quality": "node tests/quality-browser.cjs && node tests/sticker-builder-browser.cjs",
     "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
-    "test:studio": "node --import tsx tests/studio-unit.ts && node tests/homepage-entry.cjs && node tests/brand-browser.cjs && node tests/jems-delight-browser.cjs && node tests/studio-journey.cjs && node tests/favorites-browser.cjs",
+    "test:studio": "node --import tsx tests/studio-unit.ts && node tests/homepage-entry.cjs && node tests/brand-browser.cjs && node tests/jems-delight-browser.cjs && node tests/studio-journey.cjs && node tests/favorites-browser.cjs && node tests/parent-privacy-browser.cjs && node tests/adult-profile-browser.cjs",
     "test:coach": "node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/issue-28-private-coach.test.ts && node --import tsx tests/issue-28-evaluation.test.ts && node --import tsx tests/studio-experience.test.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs && node tests/studio-experience-browser.cjs && node --import tsx tests/issue-28-speech.test.ts && node --import tsx tests/private-speech-unit.ts && node tests/private-speech-browser.cjs",
     "test:language-ui": "node --import tsx --test tests/language-activity.test.ts",
     "test:language-integration": "node --import tsx tests/language-integration.ts",
@@ -31,6 +31,9 @@
     "setup:coach-erase": "node --import tsx server/coach/owner-erase.ts",
     "test:intent-playtest": "node --import tsx tests/intent-playtest-browser.ts",
     "test:intent-repair-browser": "node --import tsx tests/intent-repair-browser.ts",
+    "setup:parent-privacy-verify": "node --import tsx server/privacy/owner-verify.ts",
+    "setup:adult-pilot": "node --import tsx server/adult-pilot-owner.ts",
+    "test:adult-pilot": "node --import tsx --test tests/adult-profile-auth.test.ts tests/adult-api.test.ts tests/adult-workspace.test.ts tests/adult-pilot.test.ts tests/adult-profile-client.test.ts && node tests/adult-profile-browser.cjs",
     "docs:check": "node scripts/check-docs.mjs check",
     "docs:review": "node scripts/check-docs.mjs refresh",
     "test:docs": "node --test scripts/tests/check-docs.test.mjs"

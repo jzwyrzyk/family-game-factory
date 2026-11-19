@@ -66,6 +66,8 @@ Distinguish available local behavior, a real accepted remote job, an unavailable
 
 Preserve deterministic identity, authorization, spending, isolation and version controls while improving convenience. Keep family data, transcripts, recordings, drawings, credentials and signed private URLs out of public repository examples and logs. Do not invent consent or provider privacy approval. A new feature, brand change or research result does not itself authorize unrelated data processing, spending or public sharing. Existing applicable owner authorization must be carried forward accurately.
 
+For the accepted temporary development scope, the adult profile lives on the existing site and its authenticated switch makes approved AI tools available directly. Keep adult test work separate from child profiles and retain server authorization; a profile label is not evidence of consent or age. [ADR0005](docs/decisions/0005-temporary-adult-profile.md) records the owner's one-site requirement, temporary scope and removal condition. It does not change the child's Send, Build, Keep or learning contracts.
+
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.

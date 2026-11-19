@@ -42,3 +42,14 @@ import './language-content.test';
 import './language-engine.test';
 import './trusted-devices.test';
 import './session-client.test';
+
+import './parent-privacy.test';
+
+import './parent-privacy-paid.test';
+
+import './adult-pilot.test';
+import './adult-profile-auth.test';
+
+import './adult-api.test';
+import './adult-workspace.test';
+import './adult-profile-client.test';
