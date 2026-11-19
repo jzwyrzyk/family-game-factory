@@ -1,6 +1,8 @@
 /**
  * Jems Objective 2 independent assessment kernel (research-only).
  * The PUBLIC repository holds this code and slot plans, NEVER protected test items.
+ * A future backend must authenticate authorized raters and construct trustedServerSource;
+ * the flag is an internal trust assertion, NOT a cryptographic signature or authorization.
  * No child identity, network, runtime UI, data retention or standardized claims.
  */
 const SUBJECTS=new Set(["math","ela"]), FORMATS=new Set(["closed_choice","numeric","short_text","audio_choice","human_rubric"]);
@@ -120,7 +122,8 @@ export function adjudicateRubric(slot,ratings,adjudication){
   }
   return {status:"scored",points:Object.values(ratings[0].marks).reduce((a,b)=>a+b,0),adjudicated:false};
 }
-export function scoreSecureItem(slot,item,resp){
+/** Rater evidence is supplied ONLY by a trusted assessment backend, never the child response. */
+export function scoreSecureItem(slot,item,resp,serverRaterEvidence){
   if(!isObj(slot)||!isObj(item)||item.slotId!==slot.id||!isObj(resp)||resp.itemId!==slot.id||!STATES.has(resp.status)||!HELP.has(resp.assistance))fail("invalid score envelope");
   const base={itemId:slot.id,maxPoints:slot.points,claim:slot.claim,strand:slot.strand,points:null};
   if(resp.status!=="answered")return {...base,status:resp.status==="skipped"?"missing":resp.status};
@@ -142,18 +145,20 @@ export function scoreSecureItem(slot,item,resp){
     return {...base,status:"scored",points:item.acceptedAnswers.map(norm).includes(norm(resp.answer))?1:0};
   }
   if(slot.format==="human_rubric"){
-    const r=adjudicateRubric(slot,resp.ratings||[],resp.adjudication);
+    const trusted=isObj(serverRaterEvidence)&&serverRaterEvidence.trustedServerSource===true?serverRaterEvidence:null;
+    const r=adjudicateRubric(slot,trusted?.ratings||[],trusted?.adjudication);
     if(r.points!==null&&r.points>slot.points)fail("rubric exceeds maximum");
     return {...base,...r};
   }
   fail("unknown format");
 }
-export function scoreSecureForm(form,bank,responses){
+export function scoreSecureForm(form,bank,responses,serverRaterEvidenceByItem={}){
   validateSecureFormBank(form,bank);
   if(!Array.isArray(responses)||responses.length!==form.slots.length)return {status:"incomplete",points:null,notNormed:true,growthClaimAllowed:false};
   const seen=new Map();
   for(const r of responses){if(seen.has(r.itemId))fail("duplicate response");seen.set(r.itemId,r);}
-  const results=form.slots.map(slot=>seen.has(slot.id)?scoreSecureItem(slot,bank.items.find(x=>x.slotId===slot.id),seen.get(slot.id)):{itemId:slot.id,status:"missing",points:null,maxPoints:slot.points});
+  if(!isObj(serverRaterEvidenceByItem))fail("server rater evidence must be an object");
+  const results=form.slots.map(slot=>seen.has(slot.id)?scoreSecureItem(slot,bank.items.find(x=>x.slotId===slot.id),seen.get(slot.id),serverRaterEvidenceByItem[slot.id]):{itemId:slot.id,status:"missing",points:null,maxPoints:slot.points});
   const excluded=results.filter(x=>x.status!=="scored");
   if(excluded.length)return {status:"incomplete_or_unscorable",points:null,notNormed:true,growthClaimAllowed:false,excluded:excluded.map(x=>({itemId:x.itemId,reason:x.status}))};
   const points=results.reduce((n,x)=>n+x.points,0),possible=results.reduce((n,x)=>n+x.maxPoints,0);
