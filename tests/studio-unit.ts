@@ -102,6 +102,22 @@ test('both generated module versions keep the generated builder discriminator',(
  assert.equal(isGeneratedRemoteKind('generated-module-v1'),true);assert.equal(isGeneratedRemoteKind('generated-module-v2'),true);
  assert.equal(isGeneratedRemoteKind('star-catcher-v1'),false);assert.equal(isGeneratedRemoteKind(undefined),false);
 });
+test('local chat erasure preserves saved versions but removes transcript and design notes per player',()=>{
+ const memory=new Memory(),book=new StudioNotebook(memory);
+ const one=book.create('first','gum','My first game','project-1');
+ const two=book.create('second','new','Their idea');
+ book.message(one.id,'first','child','A private made-up world');book.message(two.id,'second','child','Other child private idea');
+ book.update(one.id,'first',x=>{x.draft='secret draft';x.hypothesis='secret guess';x.design!.plan.goal={value:'secret design',origin:'child',accepted:true,delegated:false};});
+ book.saveExperiment(one.id,'first',{id:'v-one',baseId:'original',config:{gumBudget:12},prompt:'try 12',summary:'new version'});
+ const erased=book.clearConversation(one.id,'first');
+ assert.deepEqual(erased.messages,[]);assert.equal(erased.draft,'');assert.equal(erased.hypothesis,'');
+ assert.deepEqual(erased.design!.plan,{});assert.equal(erased.experiments!.length,1,'do not silently erase game versions');
+ assert.equal(book.get(two.id,'second').messages[0].text,'Other child private idea');
+ assert.throws(()=>book.clearConversation(one.id,'second'),/own profile/);
+ book.update(one.id,'first',x=>{x.job={id:'job-running',api:'https://private.example',status:'building'};});
+ assert.throws(()=>book.clearConversation(one.id,'first'),/Finish or cancel/);
+ assert.equal(book.get(one.id,'first').job!.status,'building');
+});
 // Exercise actual EventTarget registration order. A synthetic capture-first
 // dispatcher would miss the direct-window dispatch that failed in Chromium CI.
 async function routingTests(){

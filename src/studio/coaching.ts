@@ -154,15 +154,26 @@ export function installCoaching(h:Hooks){
    h.message(captured,'child',text);
    if(firstIdea&&isCurrent(captured))celebrateJem('idea','studioConversation');
    const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
-   let reply:CoachReply,used:'model'|'local'='local',reason='';
+   let reply:CoachReply,used:'model'|'local'='local',reason='',safetyRefusal=false;
    try{const config=h.config();if(config.mode!=='remote')throw Error('LOCAL');
     const response=await familyFetch(config.apiBaseUrl!,'/v1/coach',{method:'POST',credentials:'include',signal:turn.signal,headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({requestId:crypto.randomUUID(),context:c})});
     const data=await response.json();if(!response.ok)throw Error(data.errorCode||'COACH_UNAVAILABLE');if(data.mode!=='model')throw Error('COACH_UNAVAILABLE');reply=validateCoachReply(data.reply,c);used='model';
-   }catch(error){if(turn.signal.aborted)return;reason=error instanceof Error?error.message:'COACH_UNAVAILABLE';reply=localCoach(c);}
+   }catch(error){
+    if(turn.signal.aborted)return;
+    reason=error instanceof Error?error.message:'COACH_UNAVAILABLE';
+    // A model/moderation refusal is a safety decision. Never route that
+    // rejected child request through a separate unreviewed local helper.
+    safetyRefusal=reason==='COACH_REFUSED'||reason==='PRIVATE_INFORMATION';
+    reply=safetyRefusal?
+     {move:'listen',text:'I can help with safe game ideas. Let’s try another idea without sharing private details.',
+      question:'What would you like to create instead?',suggestions:[],proposedChange:null,
+      planSuggestions:[],childDecisions:[],evidenceIds:[]}:
+     localCoach(c);
+   }
    if(seq!==generation||!isCurrent(captured))return;
    present(reply,used,captured);
    h.onCoachState?.(used==='model'?'connected':reason==='UNAUTHENTICATED'||reason==='FORBIDDEN'?'sign-in':h.config().mode==='remote'?'limited':'unavailable');
-   $('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':'Local reflection help · conversational AI is not connected';
+   $('coachModeStatus').textContent=used==='model'?'Connected AI coach · no game changed':safetyRefusal?'This request could not be used safely · no game changed':'Local reflection help · conversational AI is not connected';
    // A reply may arrive after the child has started another thought. Preserve it
    // immediately, including edits whose ordinary draft debounce has not fired yet.
    const nextDraft=preserveDraft?input.value:promptVersion===submittedVersion&&input.value===submittedDraft?'':input.value;

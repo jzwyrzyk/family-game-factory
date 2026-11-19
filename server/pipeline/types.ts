@@ -1,4 +1,6 @@
 import type {CoachReceipt} from '../coach/service';
+import type {FamilyCoachConsent} from '../coach/consent';
+import type {AudioReceipt} from '../coach/speech';
 import type {TrustedDevice,FamilyParentAuth} from '../trusted-devices';
 import type {Invitation} from '../sessions';
 import type {ActionExecution} from '../actions/coordinator';
@@ -27,5 +29,5 @@ export interface Job extends BuildRequest {
 export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;adapter?:string }
 export interface AuditEvent { jobId:string;familyId:string;status:JobStatus;at:string;code?:string }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
-export interface PipelineState { coachReceipts?:CoachReceipt[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
+export interface PipelineState { coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
 export interface Repository { transaction<T>(update:(state:PipelineState)=>T):Promise<T>; snapshot():Promise<PipelineState> }

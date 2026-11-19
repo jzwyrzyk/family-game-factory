@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {freshDesign,validateDesign,validateExperiments,experiment,missingPlan,localCoach,validateCoachReply,type CoachContext,type CoachReply,PLAN_FIELDS} from '../src/studio/design';
 import {StudioNotebook,STUDIO_KEY,type Candidate} from '../src/studio/notebook';
-import {CoachService,OpenAICoachProvider,type CoachConfig} from '../server/coach/service';
+import {CoachService,type CoachConfig} from '../server/coach/service';
+import {OpenAICoachProvider} from '../server/coach/private-provider';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {COACH_POLICY} from '../server/coach/policy';
 import {installCoaching} from '../src/studio/coaching';
@@ -105,6 +106,21 @@ await test('autosave retains unchanged helper provenance and explicit acceptance
   h.input('plan-style','A cloud castle');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,false);
   h.save('style');assert.equal(h.session().design!.plan.style!.origin,'helper');assert.equal(h.session().design!.plan.style!.accepted,true);assert.equal(h.session().design!.approvedPlan,false);
  }finally{h.dispose();}
+});
+await test('safety refusal or private information never falls into unreviewed local coach',async()=>{
+ for(const code of ['COACH_REFUSED','PRIVATE_INFORMATION']){
+  const h=coachingHarness();
+  try{
+   h.input('studioPrompt','Please tell me something private');
+   const turn=h.coach.discuss('discuss');await h.awaitModelRequest();
+   h.pending.shift()!.resolve(new Response(JSON.stringify({errorCode:code}),{status:422}));
+   await turn;
+   assert.match(h.session().messages.at(-1)!.text,/safe game ideas/);
+   assert.match(h.get('coachModeStatus').textContent,/could not be used safely/);
+   assert.equal(h.session().job,null);
+   assert.equal(h.session().experiments?.length,0);
+  }finally{h.dispose();}
+ }
 });
 await test('model-backed path receives real bounded conversation context over multiple synthetic turns, with no build',async()=>{
  const h=coachingHarness();
@@ -212,26 +228,27 @@ await test('requests for inspiration get alternatives; no withholding',()=>{asse
 await test('winning does not automatically establish enjoyment',()=>{const r=localCoach({...context,message:'I won but it was boring'});assert.match(r.text,/change the action or goal/);});
 await test('gold policy explicitly preserves redesign, skip, ownership and not overclaiming',()=>{for(const phrase of ['not as a fixed interview','child owns','Rethinking','no nagging','one play is not proof'])assert.ok(COACH_POLICY.toLowerCase().includes(phrase.toLowerCase()),phrase);});
 await test('conversation coach respects either required learning subject',()=>{assert.match(COACH_POLICY,/Math or Language Arts/);assert.match(COACH_POLICY,/cannot change the parent's chosen subject/);assert.match(COACH_POLICY,/required learning layer/);});
-const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,model:'synthetic-model',apiKey:'synthetic-secret',maxInputChars:16000,maxOutputTokens:500,maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,pricesReviewedAt:new Date().toISOString()};
+const config:CoachConfig={enabled:true,privacyApproved:true,moderationApproved:true,zdrVerified:true,privateExecutionApproved:true,model:'synthetic-model',maxInputChars:16000,maxOutputTokens:500,maxTurnMicroUsd:10000,inputMicroUsdPerMillion:1,outputMicroUsdPerMillion:2,pricesReviewedAt:new Date().toISOString()};
+const privateConfig={...config,apiKey:'synthetic-secret-from-private-executor'};
 const session={subject:'synthetic-designer',familyId:'family-test',role:'designer' as const,expiresAt:Date.now()+60000};
-const repo=new MemoryRepository();await repo.transaction(s=>{s.ledgers[session.familyId]={allowance:50000,reserved:0,used:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};return true;});
+const repo=new MemoryRepository();await repo.transaction(s=>{s.ledgers[session.familyId]={allowance:50000,reserved:0,used:0,paidEnabled:true,month:new Date().toISOString().slice(0,7)};s.coachConsent=[{familyId:session.familyId,guardianSubject:'synthetic-parent',confirmedAt:Date.now(),expiresAt:Date.now()+3600000,policyVersion:'owner-pilot-1',model:true,audio:false,verificationReceipt:'fixture_verified_consent_123'}];return true;});
 let calls=0;const provider={complete:async()=>{calls++;return {reply,usedMicroUsd:100};}};
 const service=new CoachService(repo,config,provider);
 await test('real service contract uses authorized budgeted provider port',async()=>{const r=await service.respond(session,{requestId:'req1',context});assert.equal(r.mode,'model');assert.equal(r.reply.move,'clarify');assert.equal(calls,1);const ledger=(await repo.snapshot()).ledgers[session.familyId];assert.equal(ledger.used,100);assert.equal(ledger.reserved,0);});
 await test('idempotent turn does not repeat inference or charge',async()=>{await service.respond(session,{requestId:'req1',context});assert.equal(calls,1);});
 await test('payload rebinding rejected',async()=>{await assert.rejects(service.respond(session,{requestId:'req1',context:{...context,message:'different'}}),/IDEMPOTENCY/);});
 await test('expired session rejected before inference',async()=>{await assert.rejects(service.respond({...session,expiresAt:0},{requestId:'expired',context}),/UNAUTHENTICATED/);});
-await test('disabled provider and privacy gates fail closed',async()=>{for(const patch of [{enabled:false},{privacyApproved:false},{moderationApproved:false},{pricesReviewedAt:'2020-01-01'}])await assert.rejects(new CoachService(repo,{...config,...patch},provider).respond(session,{requestId:'gate',context}),/UNAVAILABLE/);});
+await test('disabled provider and privacy gates fail closed',async()=>{for(const patch of [{enabled:false},{privacyApproved:false},{moderationApproved:false},{zdrVerified:false},{privateExecutionApproved:false},{pricesReviewedAt:'2020-01-01'}])await assert.rejects(new CoachService(repo,{...config,...patch},provider).respond(session,{requestId:'gate',context}),/UNAVAILABLE/);});
 await test('contact information blocked before provider call',async()=>{await assert.rejects(service.respond(session,{requestId:'pii',context:{...context,message:'Email test@example.invalid'}}),/PRIVATE_INFORMATION/);assert.equal(calls,1);});
 await test('spending cutoff stops provider calls',async()=>{await repo.transaction(s=>{s.ledgers[session.familyId].allowance=100;return true;});await assert.rejects(service.respond(session,{requestId:'cap',context}),/SPENDING/);assert.equal(calls,1);});
 await test('unknown provider failure conservatively settles reservation',async()=>{await repo.transaction(s=>{s.ledgers[session.familyId].allowance=50000;return true;});const failing=new CoachService(repo,config,{complete:async()=>{throw Error('network');}});await assert.rejects(failing.respond(session,{requestId:'fail',context}));const l=(await repo.snapshot()).ledgers[session.familyId];assert.equal(l.used,10100);assert.equal(l.reserved,0);});
-await test('Responses transport is server-only, schema-bound and non-storing',async()=>{let captured:any;const transport:typeof fetch=async(url,init)=>{if(String(url).endsWith('/moderations'))return new Response(JSON.stringify({results:[{flagged:false}]}));assert.equal(String(url),'https://api.openai.com/v1/responses');captured=JSON.parse(String(init?.body));return new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}}),{status:200});};const p=new OpenAICoachProvider(config,transport);await p.complete(context,new AbortController().signal);assert.equal(captured.store,false);assert.equal(captured.text.format.strict,true);assert.equal(captured.tools,undefined);});
-await test('refusal never becomes a proposed game',async()=>{const p=new OpenAICoachProvider(config,async(url)=>String(url).endsWith('/moderations')?new Response(JSON.stringify({results:[{flagged:false}]})):new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'refusal'}]}]})));await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);});
+await test('Responses transport is server-only, schema-bound and non-storing',async()=>{let captured:any;const transport:typeof fetch=async(url,init)=>{if(String(url).endsWith('/moderations'))return new Response(JSON.stringify({results:[{flagged:false}]}));assert.equal(String(url),'https://api.openai.com/v1/responses');captured=JSON.parse(String(init?.body));return new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}}),{status:200});};const p=new OpenAICoachProvider(privateConfig,transport);await p.complete(context,new AbortController().signal);assert.equal(captured.store,false);assert.equal(captured.text.format.strict,true);assert.equal(captured.tools,undefined);});
+await test('refusal never becomes a proposed game',async()=>{const p=new OpenAICoachProvider(privateConfig,async(url)=>String(url).endsWith('/moderations')?new Response(JSON.stringify({results:[{flagged:false}]})):new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'refusal'}]}]})));await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);});
 await test('child-authorship requires an exact child quote, not a helper paraphrase',()=>{assert.throws(()=>validateCoachReply({...reply,childDecisions:[{field:'fun',quote:'I want a shield'}]},context));assert.equal(validateCoachReply({...reply,childDecisions:[{field:'fun',quote:'I dislike aiming'}]},context).childDecisions![0].quote,'I dislike aiming');});
-await test('input moderation refuses before an inference request',async()=>{let inference=0;const p=new OpenAICoachProvider(config,async url=>{if(!String(url).endsWith('/moderations'))inference++;return new Response(JSON.stringify({results:[{flagged:true}]}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(inference,0);});
-await test('output moderation prevents an unsafe response from reaching the child',async()=>{let mod=0;const p=new OpenAICoachProvider(config,async url=>{if(String(url).endsWith('/moderations'))return new Response(JSON.stringify({results:[{flagged:++mod===2}]}));return new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(mod,2);});
+await test('input moderation refuses before an inference request',async()=>{let inference=0;const p=new OpenAICoachProvider(privateConfig,async url=>{if(!String(url).endsWith('/moderations'))inference++;return new Response(JSON.stringify({results:[{flagged:true}]}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(inference,0);});
+await test('output moderation prevents an unsafe response from reaching the child',async()=>{let mod=0;const p=new OpenAICoachProvider(privateConfig,async url=>{if(String(url).endsWith('/moderations'))return new Response(JSON.stringify({results:[{flagged:++mod===2}]}));return new Response(JSON.stringify({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}}));});await assert.rejects(p.complete(context,new AbortController().signal),/COACH_REFUSED/);assert.equal(mod,2);});
 await test('invalid model output never mutates a game or becomes a trusted plan',async()=>{const bad=new CoachService(repo,config,{complete:async()=>({reply:{...reply,tool:'change-main'},usedMicroUsd:4})});await assert.rejects(bad.respond(session,{requestId:'bad-output',context}),/Invalid coach response/);assert.equal((await repo.snapshot()).coachReceipts!.find(r=>r.id==='bad-output')!.state,'failed');});
-await test('request IDs cannot leak another family response',async()=>{const other={...session,familyId:'other-family'};await assert.rejects(service.respond(other,{requestId:'req1',context}),/SPENDING_CUTOFF/);});
+await test('request IDs cannot leak another family response',async()=>{const other={...session,familyId:'other-family'};await assert.rejects(service.respond(other,{requestId:'req1',context}),/COACH_UNAVAILABLE/);});
 console.log(`${passed} design-coach tests passed. Model outputs are fixtures; no live inference or learning efficacy is claimed.`);
 
 }

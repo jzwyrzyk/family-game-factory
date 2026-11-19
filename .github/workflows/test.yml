@@ -6,6 +6,28 @@ concurrency:
   group: arcade-journeys-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
+  private-coach-image:
+    # No provider key, cloud identity or funded API endpoint is available here.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build dedicated isolated coach image
+        run: docker build --file server/Dockerfile.coach --tag jems-private-coach:ci .
+      - name: Prove inactive image starts and refuses inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint /bin/sh jems-private-coach:ci -c 'test ! -f /app/server/gateway.ts && test ! -d /app/src'
+          id=$(docker run -d --rm -p 127.0.0.1:18080:8080 -e K_SERVICE=factory-coach-private -e FACTORY_COACH_EXECUTION_ENV=dedicated-cloud-run jems-private-coach:ci)
+          trap 'docker rm -f "$id" >/dev/null 2>&1 || true' EXIT
+          seen=0
+          for i in $(seq 1 25); do
+            code=$(curl -s --output /dev/null --write-out '%{http_code}' --max-time 2 -X POST http://127.0.0.1:18080/v1/private-coach/complete || true)
+            if [ "$code" = "403" ]; then seen=1; break; fi
+            sleep 1
+          done
+          test "$seen" = "1"
+          test "$(docker inspect --format '{{.State.Running}}' "$id")" = "true"
   browser:
     # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest can move to unsupported OS versions.
     runs-on: ubuntu-24.04
