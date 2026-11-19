@@ -272,10 +272,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:52:30.251Z",
-      "sourceDigest": "89d4ed92a1de9098e125cf20db73c590e7f913181e9ed9f04aa51f1cd627ed30",
+      "reviewedAt": "2026-11-19T14:57:15.605Z",
+      "sourceDigest": "321ed825245f691048c66461c2c2de27bc7a590027be5da16de2264590f73874",
       "reviewOutcome": "updated",
-      "reviewReason": "Added 13 deterministic reporting tests and a production-dist parent journey for responsive layouts, source examples, private export, read-only snapshots, settings persistence and family/adult transitions. Recorded local successes and the local browser environment failure separately from pending hosted evidence."
+      "reviewReason": "Added browser assertions that unscored saved writing and exact checked scene titles remain inspectable even without a first scored response; synthetic fixture grade scope now includes the existing reviewed writing activity."
     },
     {
       "id": "delivery",
@@ -297,10 +297,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:52:30.641Z",
-      "sourceDigest": "c8174bc193d023f78dc0f914e8ba417ed9399e0e091a2060c928af58a5444814",
+      "reviewedAt": "2026-11-19T14:57:16.414Z",
+      "sourceDigest": "68b357798b8b050a58b0e9198bd8c6925c02cd4a7152d8b7a0d9916dbfec2039",
       "reviewOutcome": "updated",
-      "reviewReason": "Added a read-only CI workflow for parent-reporting checks and synthetic screenshots, with no deployment or provider activation. Updated package test routing and the branch verification ledger while retaining earlier release receipts."
+      "reviewReason": "Pinned the dedicated parent job to the same Ubuntu 24.04 and browser install pattern as existing successful repository journeys after the new latest runner resolved to unsupported Ubuntu 26.04. Recorded the setup failure without treating it as application evidence."
     },
     {
       "id": "context",
@@ -339,10 +339,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5962650ae3ea3a4094b98cc18e8f5889c0f73cb160c0e3e81651ba34974f38eb",
-      "reviewedAt": "2026-11-19T14:52:31.127Z",
+      "sourceDigest": "275274121b56a1cca57a113674daf51ed2c1dccdaff32c802194440c122637c2",
+      "reviewedAt": "2026-11-19T14:57:16.046Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed copied selected-profile snapshots, all four separate domains, retained date windows, exact supporting examples, unknown assistance, comparable task pairs, calendar bins and local summary downloads. Parent contract, primary-source research and decision record match the implementation and stated limits."
+      "reviewReason": "Reviewed added synthetic writing and checked-scene-title browser coverage against the retained response and provenance contract. Product report semantics and current-profile isolation remain unchanged."
     }
   ]
 }

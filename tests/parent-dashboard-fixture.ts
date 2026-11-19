@@ -2,7 +2,7 @@
 import {generateItem} from '../src/learning/content';
 import {beginAttempt, submitAnswer, useHint, finishAttempt} from '../src/learning/engine';
 import {generateLanguageItem} from '../src/language/content';
-import {beginLanguageAttempt, submitLanguageAnswer, useLanguageHint, finishLanguageAttempt, recordLanguageReadAloud} from '../src/language/engine';
+import {beginLanguageAttempt, submitLanguageAnswer, useLanguageHint, finishLanguageAttempt, recordLanguageReadAloud, saveCreativeDraft} from '../src/language/engine';
 import type {LearnerProfile} from '../src/learning/types';
 import {CreationStore} from '../src/creation/storage';
 import {createChallengeTarget} from '../src/creation/challenges';
@@ -10,7 +10,7 @@ import {createChallengeTarget} from '../src/creation/challenges';
 const DAY = 86_400_000;
 export function parentDashboardFixture(now = Date.now()) {
   const profile: LearnerProfile = {
-    id:'player1', name:'Demo Explorer', icon:'🌟', grade:3, age:9, focus:'adaptive',
+    id:'player1', name:'Demo Explorer', icon:'🌟', grade:4, age:9, focus:'adaptive',
     intensity:'balanced', rate:3, hints:true, punish:false, skills:{}, stats:{},
     mathWindow:[], learningSubject:'math', allowSubjectSwitch:true,
   };
@@ -35,6 +35,9 @@ export function parentDashboardFixture(now = Date.now()) {
     submitLanguageAnswer(profile,attempt.id,item.answer!,at+3500);
     finishLanguageAttempt(profile,attempt.id,'completed',at+4000);
   }
+  const writing=generateLanguageItem('g4-revision',{tier:0,random:()=>0.1});
+  const writingAttempt=beginLanguageAttempt(profile,writing,context(now-DAY-10_000));
+  saveCreativeDraft(profile,writingAttempt.id,'Demo story: The moon dragon built a rocket from leaves.',now-DAY-5000);
   const abandoned=beginAttempt(profile,generateItem('g3-multiply',{random:()=>0.3}),context(now-DAY));
   finishAttempt(profile,abandoned.id,'interrupted',now-DAY+1000);
   const storage=new Map<string,string>();

@@ -77,8 +77,12 @@ async function main() {
         await page.locator('#parentPanel-evidence [data-evidence-id] summary').first().click();
         assert.match(await page.locator('#parentPanel-evidence').innerText(),/Exact revision/);
         assert.match(await page.locator('#parentPanel-evidence').innerText(),/hint/);
+        assert.match(await page.locator('#parentPanel-evidence').innerText(),/Demo: Dance on a click/,'checked scene title is visible without a scored first response');
         await noOverflow(page,device+' evidence');
         if(device==='desktop')await page.screenshot({path:'test-results/parent-dashboard/parent-evidence-desktop.png',fullPage:true});
+        await page.getByRole('combobox',{name:'Filter evidence by learning area'}).selectOption('language');
+        await page.locator('#parentPanel-evidence [data-evidence-id]').filter({hasText:'Writing explored'}).locator('summary').first().click();
+        assert.match(await page.locator('#parentPanel-evidence').innerText(),/Demo story: The moon dragon built a rocket from leaves/,'unscored writing remains inspectable');
         await page.getByRole('combobox',{name:'Filter evidence by learning area'}).selectOption('math');
         await page.locator('#parentPanel-evidence [data-evidence-id] summary').first().click();
         assert.match(await page.locator('#parentPanel-evidence').innerText(),/What was asked/);

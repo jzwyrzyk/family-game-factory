@@ -19,6 +19,7 @@ No-data states are neutral. Scene checks are not independent-authorship or codin
 | Existing source regressions | 65 Math/Language engine and creation-storage checks passed locally. These are software contracts, not observed learning outcomes. |
 | TypeScript / production build | Passed during development; exact submitted-source CI is authoritative for the final revision. |
 | Local browser attempt | Chromium could not start because the workspace denied its socket operation. The shared browser could not reach the workspace's loopback preview. Neither attempt is a UI pass. |
+| Initial hosted runner setup | The new job's first run used `ubuntu-latest`, which resolved to Ubuntu 26.04, unsupported by this repository's pinned Playwright 1.56.1. The job is now pinned to Ubuntu 24.04 with the same browser installation step as the existing working journeys. No test assertion was changed to address this setup failure. |
 | Hosted dashboard journey | Dedicated `Parent reporting and dashboard` workflow runs production-dist desktop, tablet and phone fixtures, local export, settings persistence, family isolation and adult-profile event handling. Its returned result and screenshots must be recorded before calling this journey verified. |
 | Existing browser journeys | Adapted only to choose the new Settings tab before interacting with prior controls. Existing assertions remain. Their final CI results retain their own scope. |
 
