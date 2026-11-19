@@ -126,3 +126,13 @@ test('portable prototype compiler pins exact versions and validates composition 
  assert.throws(()=>compilePrototypeRecipe(cat),/PORTABLE_DEPENDENCY_MISSING/);
  assert.throws(()=>compilePrototypeRecipe({...rocket,mechanics:['fire-projectile' as any]}),/PORTABLE_COMPONENT_UNVERIFIED/);
 });
+
+test('child-required action is authoritative; genre sample mechanics are never silently inserted',()=>{
+ const proposed=assessAssembly({originalIdea:'I shoot arrows at target balloons for points',archetypeId:'projectile-defense',requestedMechanics:['aim-direction','fire-projectile','score-counter']});
+ assert.ok(!proposed.essentialMechanics.includes('reflect-projectile'));
+ assert.ok(!proposed.essentialMechanics.includes('shield-window'));
+ assert.equal(proposed.route,'generation-required');
+ const vague=assessAssembly({originalIdea:'Make something about a dragon',archetypeId:'projectile-defense',requestedMechanics:[]});
+ assert.equal(vague.route,'review-required');
+ assert.ok(vague.blockers.includes('ESSENTIAL_MECHANICS_UNSPECIFIED'));
+});
