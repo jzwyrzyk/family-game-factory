@@ -20,6 +20,11 @@
     "docs/adult-pilot/VOICE_RELEASE_AND_UAT.md",
     "docs/privacy/ADULT_CHILD_RELEASE_INTEGRATION.md",
     "docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md",
+    "docs/brand/GEM_PROGRESS.md",
+    "docs/brand/achievement-art/README.md",
+    "docs/brand/LIBRARY_V1_2.md",
+    "docs/decisions/0008-cosmetic-making-journey.md",
+    "docs/decisions/0009-approved-brand-library-v1-2.md",
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
     "docs/decisions/0007-creation-and-rebuild-practice.md"
@@ -35,6 +40,11 @@
     "docs/context/*.md",
     "docs/adult-pilot/*.md",
     "docs/privacy/*.md",
+    "docs/brand/GEM_PROGRESS.md",
+    "docs/brand/achievement-art/README.md",
+    "docs/brand/*.md",
+    "docs/brand/art-library/README.md",
+    "docs/brand/art-library/licenses/README.md",
     "docs/brand/GEM_FACTORY.md",
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
     "docs/creation-studio/*.md"
@@ -53,10 +63,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:47.934Z",
-      "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+      "reviewedAt": "2026-11-19T12:57:24.202Z",
+      "sourceDigest": "d24e39014dffd1394fd967dc06d6d7dc52c160b4968ac1a7165a66f550f32f44",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
+      "reviewReason": "Preserved current Creation Studio and adult/guardian doctrine while integrating approved ray-free identity, original four-rank maker portraits and brand library v1.2; earning and learning semantics remain unchanged."
     },
     {
       "id": "experience",
@@ -69,7 +79,10 @@
         "docs/brand/*.md",
         "docs/adult-pilot/*.md",
         "docs/privacy/*.md",
-        "docs/decisions/0005-temporary-adult-profile.md"
+        "docs/decisions/0005-temporary-adult-profile.md",
+        "docs/brand/achievement-art/README.md",
+        "docs/brand/art-library/README.md",
+        "docs/brand/art-library/licenses/README.md"
       ],
       "sources": [
         "src/main.ts",
@@ -83,13 +96,16 @@
         "src/brand/**",
         "public/**",
         "index.html",
-        "src/adult-pilot/**"
+        "src/adult-pilot/**",
+        "docs/brand/achievement-art/README.md",
+        "docs/brand/achievement-art/*.json",
+        "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:48.744Z",
-      "sourceDigest": "b54da7165c9d2186fb1e97f275a099ec4bc64a4172132de3a4baac403315cdb4",
+      "reviewedAt": "2026-11-19T14:39:48.683Z",
+      "sourceDigest": "47de8040f2678b39938d4658261da388a415397262aecebbe18709a2d7d29bc9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Gem Factory first-card and Creation entrances: the scene card stays after the playable shelf; unsupported Animate and code errors now stay visible in Studio. Desktop/tablet creation and mobile child-entry checks preserve source versions and profile boundaries."
+      "reviewReason": "Reviewed the complete recovered v1.2 source against current main and the published PR57 branch. The only new runtime reconciliation closes the Journey picker and hides Journey on entering Creation; existing scene exit, save-without-Keep, learning guards, owner boundaries and five-tab mobile layout remain intact. Canonical architecture and delivery scope now describe this combined behavior."
     },
     {
       "id": "creation",
@@ -105,10 +121,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3621e272a397fb56794fe0362ce7ac4463ae573a2590880d3103072f66a62f57",
-      "reviewedAt": "2026-11-19T12:52:54.972Z",
+      "sourceDigest": "79550dae3c5cd44758f0fabef07732504db741af6b4f907af6eee6a8dc923ff6",
+      "reviewedAt": "2026-11-19T12:58:08.260Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Audited the sole Check my scene evaluation/attempt call site, persisted goal/version/time/hint fields, last-five profile observations and fixed challenge selection. Clarified that cross-subject reasoning inference and adaptive computational practice are not implemented; recorded the confirmed merge without changing source behavior."
+      "reviewReason": "Documented explicit scene exit when navigating to chat Create or My journey: guard learning, preserve pending scene version without Keep, and stop hidden playback. Added regression cases while retaining current scene evidence, adapters and backup schema."
     },
     {
       "id": "games",
@@ -263,17 +279,21 @@
         "docs/game-intelligence/*.md",
         "docs/context/MAINTENANCE.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/brand/GEM_PROGRESS.md",
+        "docs/brand/achievement-art/README.md",
+        "docs/brand/LIBRARY_V1_2.md"
       ],
       "sources": [
         "tests/**",
-        "tools/**"
+        "tools/**",
+        "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:52.984Z",
-      "sourceDigest": "259c764251cb5be70a689f35ed5ee6b90fac2069990fc0248ecbee61225c2060",
+      "reviewedAt": "2026-11-19T12:57:25.107Z",
+      "sourceDigest": "b0158a975de90f442c7cdcf1d9695661013a090eaa92179d0365fe58f26a2f50",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 77 creation and 354 existing unit passes, focused combined quality/asset/companion and nine budget regressions, production desktop/tablet authoring and eight recovery journeys. Kept earlier failed and green CI scoped to their original heads; no live provider or actual-device claim."
+      "reviewReason": "Preserved all current main CI jobs; added brand asset verifier, narrow phone layout and scene-to-Create/Journey regressions alongside existing illustrated progression, offline and saved-state checks. Local build/nonbrowser results recorded separately from pending CI browser evidence."
     },
     {
       "id": "delivery",
@@ -295,10 +315,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:12:38.899Z",
-      "sourceDigest": "a99be4656635d84bf76deb99654afe3bd6a5c6a34eadee67f26b0c97ac28280e",
+      "reviewedAt": "2026-11-19T14:39:49.831Z",
+      "sourceDigest": "f11b89808e6e8b82b00edb653f7da9476a706df106543c55072e1062512804ce",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged PR58 final-head checks, owner-only Gem Factory publication and rollback against PR63, then reconciled PR61 and PR62 on current main. Verified distinct private worker main/PR13/PR14 source pins and the latest manual Pages workflow. Source integration, site-specific publication and CI do not establish general production activation, real devices, or child learning results."
+      "reviewReason": "Preserved latest main eebeebeb and PR63 release receipts, PR58 hosted results, PR62 measurement limits and private worker14 status without duplicate capability rows. Reviewed the retained CI diagnostic as read-only source-digest output. Recorded current merge authorization separately from pending exact-candidate browser/CI and merge evidence; earlier launcher failures, smoke success and historical suite results retain their scopes."
     },
     {
       "id": "context",
@@ -319,10 +339,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:54.226Z",
-      "sourceDigest": "32c4eb525a0f2896d0b6ed8db2dcd17490c757913460a76e56f169a6083a4b0f",
+      "reviewedAt": "2026-11-19T12:57:25.915Z",
+      "sourceDigest": "9314eb35617cf99993071c8e0b9111cc38031e901cd52beb55f9d81e002bf67c",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged both document routes and required references. Renumbered the unmerged Creation decision to ADR0007, preserving merged quality ADR0006, and retained creation, Gem Factory and presentation-quality coverage and local links."
+      "reviewReason": "Resolved ADR collisions by preserving main decisions 0006/0007 and renumbering unpublished brand decisions 0008/0009; routed asset contracts and preserved all canonical links and current-main registry areas."
     }
   ]
 }

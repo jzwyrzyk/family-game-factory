@@ -1,0 +1,184 @@
+[
+  {
+    "id": "hero_workshop",
+    "alpha": false,
+    "prompt": "Create a finished premium 3D cartoon raster asset for Jems, a happy professional children's game-making playground. Art direction: beautifully crafted tactile toy-like forms, rounded bevels but clearly readable gemstone facets, sophisticated clean studio rendering, pearlescent satin surfaces with restrained glossy edge highlights, big readable silhouettes, playful warmth, soft light from upper left, contact shadow down-right, no gritty texture, no photoreal humans, no flat SVG look. Color family: navy #0B1E3B, blue #2E6BFF, violet #8B5CF6, coral #FF5E7A, warm gold #FFC24D, mint #22D3A6. Colors can have natural light/shadow. Absolutely no text, letters, numerals, wordmarks, logos or wrench marks; all brand marks and UI labels are composed separately. Asset type: wide website hero environment, 3:2 landscape composition. A marvelous whimsical GEM WORKSHOP floating on a small island on the RIGHT TWO THIRDS: mint-and-violet rounded miniature polishing machines, coral curved pipes, a golden little conveyor carrying blue purple mint gems, a glass display bell containing a splendid rainbow-cut gem, small cream stairs, lilac cloud puffs. A bright airy soft cream/lavender sky, subtle distant floating islands, a few sculptural sparkling stars. Leave LEFT THIRD calm near-white negative space for live text. Highest quality charming cartoon game world, handmade collectible feeling, polished professional art. No characters needed, no letters or signage, no UI or logos. Make the scene lush and beautifully composed without clutter.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "spot_work_in_progress",
+    "ref": "hero_workshop",
+    "prompt": "Extract and recompose a SINGLE compact gem-polishing station from this Jems workshop world as a transparent product spot illustration. Preserve this illustration's upper-left lighting, mint/violet/coral/gold colors, rounded high-quality 3D cartoon machinery and gemstone styling. One charming mint-and-lilac polishing machine with small cream soft polishing wheel, a short golden conveyor holding one violet gem and one rough lavender stone, a little curved coral pipe and two rounded gold knobs. Front three-quarter angle, entire station isolated centered with transparent background and enough edge padding. No scenery, sky, island, text, logo, UI, characters, extra machines or signs. Clean readable at 160px.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "gem_blue",
+    "ref": "gem_polished_rainbow",
+    "alpha": true,
+    "prompt": "Edit this Jems collectible into a BLUE DIAMOND variant. Preserve exact premium rounded-bevel 3D cartoon material, bright readable facets, upper-left studio light, centered scale and transparent margins. Change silhouette to a classic chunky diamond with wide flat-cut top and single point at bottom; saturated blue #2E6BFF front facets with cyan and lilac light reflections, tiny gold four-point glint upper-right. No other colors as dominant surfaces, no face, logo, wrench, text or platform. One jewel, truly transparent background.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "gem_mint",
+    "ref": "gem_polished_rainbow",
+    "alpha": true,
+    "prompt": "Edit this Jems collectible into a MINT SQUARE variant. Preserve premium rounded-bevel 3D cartoon material, readable gem facets, upper-left studio light, centered scale and transparent margins. Change silhouette to a chunky square emerald-cut gemstone with clipped corners and broad mint #22D3A6 face; teal and pale aqua side facets, tiny gold four-point glint upper-right. The SQUARE silhouette must be clear independently of color. No face, logo, wrench, text or platform. One jewel, truly transparent background.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "gem_gold",
+    "ref": "gem_polished_rainbow",
+    "alpha": true,
+    "prompt": "Edit this Jems collectible into a GOLD TEARDROP variant. Preserve premium rounded-bevel 3D cartoon material, readable jewel facets, soft upper-left light, centered scale and transparent margins. Change silhouette to one warm-gold #FFC24D pear/teardrop-cut gem with a rounded bottom and one gentle point at top; honey amber side facets and cream highlights, tiny gold four-point glint upper-right. Distinct teardrop silhouette independent of color. No face, logo, wrench, text or platform. One jewel, truly transparent background.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "gem_coral",
+    "ref": "gem_polished_rainbow",
+    "alpha": true,
+    "prompt": "Edit this Jems collectible into a CORAL HEART variant. Preserve premium rounded-bevel 3D cartoon material, readable jewel facets, soft upper-left light, centered scale and transparent margins. Change silhouette to one friendly chunky HEART-cut gemstone, clear two round lobes on top and soft point at bottom. Coral #FF5E7A main face, warm pink/lilac edge reflections, tiny gold four-point glint upper-right. Distinct heart silhouette independent of color. No face, logo, wrench, text or platform. One jewel, truly transparent background.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "hero_mind_your_jems",
+    "ref": "/workspace/scratch/2fbf3387861a/references/Jems Game Factory: Mind Your Jems.png",
+    "alpha": false,
+    "prompt": "Edit the reference's beautiful Mind Your Jems game ART into ONE pristine 3:2 landscape COVER SCENE, not a UI screenshot or collage. Completely remove ALL headers, words, logos, numbers, panels, buttons, speech bubbles and game overlays. Keep the reference's playful premium cartoon art direction and recognizable giant friendly lavender rock head with huge eyes glancing UP at gems growing on its crown, expressive dark eyebrows, coral and mint hair tufts, beautiful faceted blue/violet/gold crystals. One tiny cheerful child miner with gold helmet and violet overalls standing on a little wooden ladder, examining a crown crystal, and a mint/violet cart of gems on small grass platform right. Full composition joyful pastel sky with cloud puffs and floating island distance. Do not draw ANY logo or wrench marking anywhere, including clothing/cart. One balanced polished cover scene, artwork only, bottom quarter calm enough for a separate UI title outside the image.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "hero_gembots",
+    "ref": "hero_workshop",
+    "alpha": false,
+    "prompt": "Create ONE beautiful 3:2 landscape GEMBOTS starter-game COVER SCENE belonging to this exact Jems workshop universe: same polished high-end 3D cartoon materials, rounded forms, soft upper-left light and violet/mint/coral/gold palette. A small friendly robot on a cream-and-lilac floor grid has a very prominent faceted violet-blue GEMSTONE as its torso/core (make gems central). White rounded small head with navy face panel and two friendly cyan eyes, mint mitten arms and boots. It is placing oversized purple gem-shaped command tiles with simple white directional arrow symbols into a short path to a gold crystal objective. Tiny bits of mint/coral machinery and clouds frame the scene, bright happy small workshop world. No readable words, letters, numbers, logos or wrench marks, no interface screenshot, no menus. Clear large subject, delightfully crafted, simple enough to read as a 320px game thumbnail.",
+    "record_type": "original-generation-prompt",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "spot_safe_storage",
+    "ref": "hero_workshop",
+    "alpha": true,
+    "prompt": "A premium tactile cartoon storage spot: lilac keepsake box with mint lid and gold clasp, open to reveal three beautiful gems. Same Jems workshop materials, palette and soft upper-left light. Isolated transparent background; no text, numbers, padlock claim or logo.",
+    "record_type": "normalized-generation-brief",
+    "note": "Normalized brief recorded after generation; original raw request is not retained.",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "spot_reconnect",
+    "ref": "hero_workshop",
+    "alpha": true,
+    "prompt": "A friendly reconnect spot: two rounded toy connector ends in mint and lilac with a softly curved coral and blue cable, harmless small gold glint between them. Same tactile Jems materials and studio lighting. Transparent background, no text, logo, scary electricity or broken imagery.",
+    "record_type": "normalized-generation-brief",
+    "note": "Normalized brief recorded after generation; original raw request is not retained.",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "makers_together",
+    "ref": "hero_workshop",
+    "alpha": true,
+    "prompt": "Two original fictional young makers examining a gemstone together at a rounded cream and lilac worktable. Girl around nine with medium-brown skin, curly hair puffs, purple goggles and mint overalls; boy around nine with light warm skin, backward gold cap and coral shirt. Happy thoughtful cartoon expressions, premium tactile Jems render, soft upper-left lighting. Transparent composition, no wordmarks, badges, logos or UI.",
+    "record_type": "normalized-generation-brief",
+    "note": "Normalized brief recorded after generation; original raw request is not retained.",
+    "record_status": "preserved-v1-asset"
+  },
+  {
+    "id": "character_spark_wave",
+    "alpha": true,
+    "refs": [
+      "/workspace/scratch/2fbf3387861a/jems_brand_library_v1/art/character_spark_wave.png",
+      "/workspace/scratch/2fbf3387861a/tmp/revision-fixed-renders/jems-mark.png"
+    ],
+    "prompt": "Use case: identity-preserve. Asset: updated Jems gem companion, welcome pose. Image 1 is the exact existing cute companion whose face, friendliness, small lilac hands, mint boots and premium tactile cartoon quality must be preserved. Image 2 is the corrected brand mark, supplied ONLY as a geometric and color reference, not as a graphic to reproduce. Change the companion's body from a squat purple hexagon to a clearly faceted broad-top diamond inspired by image 2: a flatter wide crown, sloped angular shoulders, blue/cyan left facets, rich violet center facets, vivid coral/magenta right facets, a lower half that tapers to a small distinct point between two short legs. Use a few large intentional facets, subtle small edge bevels, clean confident silhouette, saturated brand colors. Keep a big warm navy-eyed smile, two small coral cheek patches, eyebrows, two arms and two legs; one hand warmly raised in greeting. It should read as the SAME adorable companion now belonging to the logo's gem family. Moderate polished toy finish and soft upper-left studio light; no cloudy blobs, no oversized specular flares. Full body, front three-quarter stance, centered, transparent background with a small controlled contact shadow, generous clear margin. NO wrench on the character, NO logo, text, stars, rays, floating sparkles, three-tick accent, ribbons, wings, medal, scenery or extra objects.",
+    "cleanup": null,
+    "record_type": "v1.1-image-generation-or-edit",
+    "record_status": "current-proposed-art",
+    "version": "1.1.0",
+    "file": "art/character_spark_wave.png",
+    "sha256": "0ee72973597493499b251fde68134bb03e91184f761fc271ef0cc131b2fef001"
+  },
+  {
+    "id": "character_spark_think",
+    "alpha": true,
+    "refs": [
+      "/workspace/scratch/2fbf3387861a/generated_images/exec-55b9abdf-97c0-4a90-bd50-02ad676fe622.png"
+    ],
+    "prompt": "Edit the provided new Jems Gem companion master. Preserve EXACT same diamond body silhouette, wide flat crown, sharp sloped shoulders, tapered lower point, all large facet placement, cyan/blue left, violet middle, coral/magenta right, tiny orange upper-right, navy eyes, lilac limbs, mint boots, face proportions and premium tactile cartoon finish. Same studio upper-left light and restrained highlights. Full body, front view with the same gentle three-quarter depth, centered, transparent background with tiny controlled contact shadow. No text, wrench, logo, stars, rays, confetti, ribbons, wings, extra props, scenery or new accessories. Change only the following pose/expression: Curious and thinking, one small lilac hand touching the cheek near chin, other hand relaxed, gentle closed-mouth smile, inquisitive eyebrows. Friendly and engaged.",
+    "cleanup": null,
+    "record_type": "v1.1-image-generation-or-edit",
+    "record_status": "current-proposed-art",
+    "version": "1.1.0",
+    "file": "art/character_spark_think.png",
+    "sha256": "417d9d6425b725962694a46a5ea5886657ee267e8b101041d33e453591b8793a"
+  },
+  {
+    "id": "character_spark_celebrate",
+    "alpha": true,
+    "refs": [
+      "/workspace/scratch/2fbf3387861a/generated_images/exec-55b9abdf-97c0-4a90-bd50-02ad676fe622.png"
+    ],
+    "prompt": "Edit the provided new Jems Gem companion master. Preserve EXACT same diamond body silhouette, wide flat crown, sharp sloped shoulders, tapered lower point, all large facet placement, cyan/blue left, violet middle, coral/magenta right, tiny orange upper-right, navy eyes, lilac limbs, mint boots, face proportions and premium tactile cartoon finish. Same studio upper-left light and restrained highlights. Full body, front view with the same gentle three-quarter depth, centered, transparent background with tiny controlled contact shadow. No text, wrench, logo, stars, rays, confetti, ribbons, wings, extra props, scenery or new accessories. Change only the following pose/expression: A joyful confident little jump, both hands lifted, open happy smile, feet slightly lifted, subtle grounded shadow. No additional sparkles or confetti.",
+    "cleanup": null,
+    "record_type": "v1.1-image-generation-or-edit",
+    "record_status": "current-proposed-art",
+    "version": "1.1.0",
+    "file": "art/character_spark_celebrate.png",
+    "sha256": "f6b2c74022b266ffd5408ec3ea4579d6aff91d9e98fe21e3e87349fec313a9e5"
+  },
+  {
+    "id": "character_spark_recover",
+    "alpha": true,
+    "refs": [
+      "/workspace/scratch/2fbf3387861a/generated_images/exec-55b9abdf-97c0-4a90-bd50-02ad676fe622.png"
+    ],
+    "prompt": "Edit the provided new Jems Gem companion master. Preserve EXACT same diamond body silhouette, wide flat crown, sharp sloped shoulders, tapered lower point, all large facet placement, cyan/blue left, violet middle, coral/magenta right, tiny orange upper-right, navy eyes, lilac limbs, mint boots, face proportions and premium tactile cartoon finish. Same studio upper-left light and restrained highlights. Full body, front view with the same gentle three-quarter depth, centered, transparent background with tiny controlled contact shadow. No text, wrench, logo, stars, rays, confetti, ribbons, wings, extra props, scenery or new accessories. Change only the following pose/expression: Warm encouragement, one hand open with palm up in a helpful gesture, relaxed grounded stance, reassuring smile and calm brows. Do not look sad, guilty, worried or defeated.",
+    "cleanup": {
+      "id": "character_spark_recover",
+      "prompt": "Precise production cutout cleanup of the supplied existing image. Keep the subject absolutely unchanged: same silhouette, geometry, scale, pose, facial expression, colors, facets, metallic frame if present, materials, internal highlights, lighting, and placement. Remove ONLY every external halo, aura, bloom, diffuse luminous haze, white/gray fringe and disconnected stray pixels outside the actual object silhouette. Make the exterior completely transparent right up to the clean antialiased object edge. No outer glow, no cast glow, no wisps, no grainy remnants. For the character only retain a tiny compact foot-contact shadow. Do not redesign, add elements, change colors, soften corners, or repaint internal details. This is edge cleanup and background removal for a crisp professional UI asset. Output transparent PNG.",
+      "reference": "/workspace/scratch/2fbf3387861a/generated_images/exec-e1f1b227-646f-4b86-84b8-c554e57cf37b.png"
+    },
+    "record_type": "v1.1-image-generation-or-edit",
+    "record_status": "current-proposed-art",
+    "version": "1.1.0",
+    "file": "art/character_spark_recover.png",
+    "sha256": "d1e42f7c475d23f1fe798d5dbfcff62497a081cefd9e617e7394aed52968339c"
+  },
+  {
+    "id": "character_spark_rest",
+    "alpha": true,
+    "refs": [
+      "/workspace/scratch/2fbf3387861a/generated_images/exec-55b9abdf-97c0-4a90-bd50-02ad676fe622.png"
+    ],
+    "prompt": "Edit the provided new Jems Gem companion master. Preserve EXACT same diamond body silhouette, wide flat crown, sharp sloped shoulders, tapered lower point, all large facet placement, cyan/blue left, violet middle, coral/magenta right, tiny orange upper-right, navy eyes, lilac limbs, mint boots, face proportions and premium tactile cartoon finish. Same studio upper-left light and restrained highlights. Full body, front view with the same gentle three-quarter depth, centered, transparent background with tiny controlled contact shadow. No text, wrench, logo, stars, rays, confetti, ribbons, wings, extra props, scenery or new accessories. Change only the following pose/expression: Sitting comfortably with both mint boots visible in front, hands gently resting, eyes peacefully closed, small content smile. Preserve pointed gem body. Restful, not asleep from exhaustion; no Z symbols.",
+    "cleanup": null,
+    "record_type": "v1.1-image-generation-or-edit",
+    "record_status": "current-proposed-art",
+    "version": "1.1.0",
+    "file": "art/character_spark_rest.png",
+    "sha256": "7175f8f97728f3e70b56181d9e4a8154c5cfe62c8b61a4f2993333cd3dc55316"
+  },
+  {
+    "id": "spot_first_idea",
+    "alpha": true,
+    "refs": [
+      "/workspace/scratch/2fbf3387861a/jems_brand_library_v1/art/spot_first_idea.png"
+    ],
+    "prompt": "Precise-object-edit. Remove ONLY the three short gold/orange ray dashes just to the right of the small floating gemstone. Preserve the notebook, blank pages, lilac cover, coral pencil, gemstone, their exact layout, colors, shapes, light, texture, shadow and transparency. Leave the space where those dashes were completely clean and transparent. Do not introduce any substitute star, spark, dot, streak, text or ray ornament. No other change.",
+    "cleanup": {
+      "id": "spot_first_idea",
+      "prompt": "Production background removal from this supplied illustration. Keep ONLY the open cream-page lilac-covered notebook, the coral pencil with gold metal band, and the single small blue-violet faceted gem floating above it. Keep those three physical subjects identical in shape, position, lighting, color and detail. Completely REMOVE all other material: the entire black/charcoal smoky vignette, all purple/white/gold halo, all colored bloom, all outer glow and all mist between or around the subjects. There must be absolutely NOTHING outside the solid object edges; exterior and gaps are pure transparent alpha zero. Clean antialiased cutout edges. No dark backdrop, no replacement background, no atmospheric lighting, no black matte fringe. Do not add ray marks, stars, ticks, text or new props. The result must look crisp on a white or pale cream website background, like isolated product photography. Transparent PNG cutout.",
+      "reference": "/workspace/scratch/2fbf3387861a/generated_images/exec-c73a5c0c-56a4-4ffd-9cd9-ee5814643602.png"
+    },
+    "record_type": "v1.1-image-generation-or-edit",
+    "record_status": "current-proposed-art",
+    "version": "1.1.0",
+    "file": "art/spot_first_idea.png",
+    "sha256": "70b14edfc6fab82d684f948feb5914a1f075fda3bdfb744d02e892de53bb4c23"
+  }
+]

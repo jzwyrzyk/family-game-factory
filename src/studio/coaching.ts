@@ -14,6 +14,8 @@ interface Hooks {
  pauseForThinking():boolean;showTalk():void;
  onCoachReply?(text:string):void;
  onCoachState?(state:'connected'|'limited'|'sign-in'|'unavailable'):void;
+ /** Fired only after a design choice or test note is durably saved. */
+ onSavedDesignChange?(before:StudioSession,after:StudioSession):void;
 }
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
@@ -50,6 +52,7 @@ export function installCoaching(h:Hooks){
   const buttons=node('div','','design-plan-actions');
   buttons.append(action('Save my answer',()=>saveField(key)),action('You choose',()=>{
    const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.plan[key]={value:'',origin:'helper',accepted:false,delegated:true};x.design.approvedPlan=false;});
+   h.onSavedDesignChange?.(s,h.notebook.get(s.id,s.owner));
    pendingFields.delete(key);helperFields.delete(key);
    if(guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;
    renderPlan();
@@ -80,6 +83,7 @@ export function installCoaching(h:Hooks){
     ?{...unchangedHelper,accepted:explicit||unchangedHelper.accepted,delegated:explicit?false:unchangedHelper.delegated}
     :{value,origin:'child',accepted:!!value.trim(),delegated:false};x.design.approvedPlan=false;});}
   catch(error){planStatus.textContent='This answer has not saved yet. Keep it here and try Save my answer again.';throw error;}
+  h.onSavedDesignChange?.(s,h.notebook.get(s.id,s.owner));
   pendingFields.delete(key);planStatus.textContent=pendingFields.size?'Some answers have not saved yet. Use Save my answer beside each one to try again.':'Your answers are saved on this device. Nothing has been built yet.';
   if(explicit&&guidedPlan)guidedField=missingPlan(h.current().design||freshDesign())[0]||null;
   renderPlan();
@@ -114,12 +118,15 @@ export function installCoaching(h:Hooks){
   try{captured=h.current();if(requestInFlight){h.status('One experiment is already being prepared.');return;}
    token=++requestGeneration;cancelDiscussion();requestInFlight=true;force=true;origin=from;depth=level;
    h.notebook.update(captured.id,captured.owner,x=>{x.design ||= freshDesign();let idea=x.design.ideas.find(i=>i.text===prompt.slice(0,1000)&&i.origin===from);if(idea)idea.adopted=true;else x.design.ideas.push({id:crypto.randomUUID(),text:prompt.slice(0,1000),origin:from,adopted:true});});
+   h.onSavedDesignChange?.(captured,h.notebook.get(captured.id,captured.owner));
    await h.tryRequest(prompt,from,level);
   }catch(error){if(!token||token===requestGeneration)report(error,captured);}finally{if(token&&token===requestGeneration){force=false;requestInFlight=false;origin='child';depth='tune';}}
  }
  function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession){
   h.message(captured,'helper',reply.text+(reply.question?'\n'+reply.question:''));
+  const before=h.notebook.get(captured.id,captured.owner);
   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();let changed=false;for(const d of reply.childDecisions||[]){if(!s.design.plan[d.field]?.accepted){s.design.plan[d.field]={value:d.quote,origin:'child',accepted:true,delegated:false};changed=true;}}for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:current?.delegated||false};changed=true;}}if(changed)s.design.approvedPlan=false;});
+  h.onSavedDesignChange?.(before,h.notebook.get(captured.id,captured.owner));
   const box=$('coachProposals');box.replaceChildren();
   reply.suggestions.forEach(text=>{h.notebook.update(captured.id,captured.owner,s=>{s.design!.ideas.push({id:crypto.randomUUID(),text,origin:'helper',adopted:false});});box.append(action(text,()=>{$<HTMLTextAreaElement>('studioPrompt').value=text;selectedSuggestion=text;$('studioPrompt').dispatchEvent(new Event('input'));h.status('A helper suggestion. Change it or choose to try it.');}));});
   if(reply.proposedChange){const proposal=reply.proposedChange;box.append(action('Try this idea: '+proposal.title,()=>request(proposal.request,'helper',proposal.depth)));}
@@ -196,7 +203,7 @@ export function installCoaching(h:Hooks){
   if(!tests.length){shelf.append(node('p','Your first experiment will appear here.'));return;}
   for(const e of tests){const card=node('article','','studio-version-card experiment-card');card.dataset.experiment=e.id;card.append(node('strong',e.label+' · '+e.title),node('p',e.candidate.summary),node('small',`${e.origin==='child'?'Your idea':'Helper suggestion you chose'} · ${{tune:'Small adjustment',redesign:'New way to play',rethink:'New direction'}[e.depth]} · ${e.parents.length?'Developed from '+e.parents.map(id=>tests.find(t=>t.id===id)?.label).join(' + '):'Started from the main game at that time'}`));
    if(e.prediction)card.append(node('p','Your prediction: '+e.prediction));
-   const note=document.createElement('textarea');note.rows=2;note.maxLength=2000;note.value=e.notes;note.setAttribute('aria-label','Notes for '+e.label);note.placeholder='What did you notice? Or just remember it.';note.oninput=()=>run(()=>{if(isCurrent(s))h.notebook.note(s.id,s.owner,e.id,note.value);});
+   const note=document.createElement('textarea');note.rows=2;note.maxLength=2000;note.value=e.notes;note.setAttribute('aria-label','Notes for '+e.label);note.placeholder='What did you notice? Or just remember it.';note.oninput=()=>run(()=>{if(isCurrent(s)){const before=h.notebook.get(s.id,s.owner);h.notebook.note(s.id,s.owner,e.id,note.value);h.onSavedDesignChange?.(before,h.notebook.get(s.id,s.owner));}});
    const include=document.createElement('input');include.type='checkbox';include.checked=combineSelection.has(e.id);include.setAttribute('aria-label','Combine '+e.label);include.onchange=()=>{if(include.checked)combineSelection.add(e.id);else combineSelection.delete(e.id);};const combineLabel=node('label','Include in a combined test');combineLabel.prepend(include);card.append(combineLabel);
    card.append(action('Play '+e.label,()=>h.playTest(e.id)),action('Develop this test',()=>{h.notebook.selectExperiment(s.id,s.owner,e.id);$<HTMLSelectElement>('experimentStart').value='continue';$<HTMLDetailsElement>('coachExperimentOptions').open=true;h.showTalk();h.status('Your next test will start from '+e.label+'. This test stays on the shelf.');}),note);shelf.append(card);
   }

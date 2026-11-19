@@ -1,0 +1,38 @@
+[
+  {
+    "file": "public/jems-journey/background.webp",
+    "width": 1774,
+    "height": 887,
+    "bytes": 220302,
+    "sha256": "1b1460063ff8d1d3c353b0952731f3a73059c500800d3118ba558fd76300be84",
+    "alpha_min": null,
+    "alpha_max": null
+  },
+  {
+    "file": "public/jems-journey/characters-nova.webp",
+    "width": 2172,
+    "height": 724,
+    "bytes": 490808,
+    "sha256": "ea9cef9ed711727c6ef946835b4679193959b46a711ac277f4fe3579ef119458",
+    "alpha_min": 0,
+    "alpha_max": 255
+  },
+  {
+    "file": "public/jems-journey/characters-spark.webp",
+    "width": 2172,
+    "height": 724,
+    "bytes": 408768,
+    "sha256": "1e4b6df769edb7f552050d6cbede494a4adacdb45d9e202a4f825e472f1828ac",
+    "alpha_min": 0,
+    "alpha_max": 255
+  },
+  {
+    "file": "public/jems-journey/gems.webp",
+    "width": 2172,
+    "height": 724,
+    "bytes": 401276,
+    "sha256": "c4200528c270872c0709380874d6a867fa2da12777548b1f650da6cfc66d30a2",
+    "alpha_min": 0,
+    "alpha_max": 255
+  }
+]

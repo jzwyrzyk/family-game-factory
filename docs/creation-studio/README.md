@@ -131,3 +131,7 @@ The accepted longer-term direction is a more continuous project model across gam
 - [Harvard Creative Computing](https://creativecomputing.gse.harvard.edu/guide/): creative projects and computational practices; this reference does not validate the Jems exercises.
 - [Blockly custom blocks](https://docs.blockly.com/guides/create-custom-blocks/overview/), [serialization](https://docs.blockly.com/guides/configure/serialization/), and [execution scope](https://docs.blockly.com/guides/app-integration/run-code/): background for future editor-library decisions. V1 uses Jems action cards and its own bounded interpreter, not Blockly or a Scratch fork.
 - [Scratch editor repository](https://github.com/scratchfoundation/scratch-editor): an example of separate editor, runtime, rendering, and asset components. Do not assume that integrating a visual editor also supplies a Jems game runtime or measurement system.
+
+## Branding and creator navigation integration (PR57)
+
+The five main destinations include both Create and Create & code alongside My journey. Leaving a visible scene for the chat creator saves a pending scene version without choosing Keep, then uses the normal page transition to stop scene playback, recording and the checkpoint clock. An active learning checkpoint blocks this navigation before a blank chat project can be created. Scene ownership, saved versions and backup records remain unchanged. The production-browser suite covers running scene → Create → My journey, stopped simulation, scene reopening and draft preservation.
