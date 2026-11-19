@@ -203,6 +203,44 @@ def verified_pages(site_base, source_sha, gateway, preview, getter=fetch_json):
     }
 
 
+def final_pages_verdict(http_evidence, browser_evidence):
+    """A single final status exists only when BOTH live checks succeeded."""
+    if (not isinstance(http_evidence, dict) or
+            http_evidence.get("status") != "PAGES_AND_PUBLIC_HEALTH_VERIFIED" or
+            not isinstance(browser_evidence, dict) or
+            browser_evidence.get("kind") != "public-browser-smoke" or
+            browser_evidence.get("releaseSuccess") is not True or
+            http_evidence.get("siteBase") != browser_evidence.get("siteBase") or
+            browser_evidence.get("paidRequestsStarted") != 0 or
+            browser_evidence.get("realProviderInferenceTested") is not False or
+            browser_evidence.get("parentDeviceUAT") is not False):
+        raise ReleaseError("Final Pages release requires matching HTTP and browser evidence")
+    tested=browser_evidence.get("tested")
+    if (not isinstance(tested, list) or
+            {x.get("device") for x in tested if isinstance(x, dict)} != {"desktop", "mobile"} or
+            len(tested) != 2 or
+            not all(isinstance(x, dict) and all(x.get(k) is True for k in
+                        ("homepage", "sixFavorites", "logo", "localGame")) and
+                    x.get("uncaughtPageErrors") == 0 and
+                    x.get("failedPublicAssets") == 0 for x in tested)):
+        raise ReleaseError("Final Pages release lacks two clean real-browser smoke results")
+    checked_sha(http_evidence.get("sourceSha"))
+    return {
+        "schema": 1, "status": "PAGES_BROWSER_VERIFIED",
+        "sourceSha": http_evidence["sourceSha"],
+        "siteBase": http_evidence["siteBase"],
+        "gatewayOrigin": http_evidence["gatewayOrigin"],
+        "previewOrigin": http_evidence["previewOrigin"],
+        "httpHealthVerified": True,
+        "realBrowserDevicesTested": ["desktop", "mobile"],
+        "localGameVerified": True,
+        "paidModelActivatedByThisRelease": False,
+        "realProviderInferenceTested": False,
+        "parentDeviceUAT": False,
+        "backendDeployedByThisRelease": False,
+    }
+
+
 def write_evidence(path, payload):
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -213,7 +251,7 @@ def write_evidence(path, payload):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for command in ("plan", "stamp", "precheck", "verify", "auto-scope"):
+    for command in ("plan", "stamp", "precheck", "verify", "auto-scope", "finalize"):
         p = sub.add_parser(command)
         p.add_argument("--output", required=True)
         if command not in ("precheck", "auto-scope"):
@@ -221,6 +259,9 @@ def main(argv=None):
         if command in ("plan", "precheck", "verify"):
             p.add_argument("--gateway-origin", default="")
             p.add_argument("--preview-origin", default="")
+        if command == "finalize":
+            p.add_argument("--http-evidence", required=True)
+            p.add_argument("--browser-evidence", required=True)
         if command == "plan":
             p.add_argument("--operation", choices=["plan", "pages"], default="plan")
             p.add_argument("--main-sha", required=True)
@@ -234,6 +275,10 @@ def main(argv=None):
                               args.main_sha, args.gateway_origin, args.preview_origin)
     elif args.command == "auto-scope":
         result = automatic_pages_scope(sys.stdin.read().splitlines())
+    elif args.command == "finalize":
+        result = final_pages_verdict(
+            json.loads(Path(args.http_evidence).read_text(encoding="utf-8")),
+            json.loads(Path(args.browser_evidence).read_text(encoding="utf-8")))
     elif args.command == "stamp":
         result = {"schema": 1, "sourceSha": checked_sha(args.source_sha), "releaseType": "pages-only"}
     elif args.command == "precheck":
