@@ -16,6 +16,7 @@ import {installQualityCards} from './quality/cards';
 import {installStudio} from './studio/ui';
 import {installStudioHostNavigation} from './studio/host-navigation';
 import {installRewardWriteGuard,setRewardSourceMaintenance} from './rewards/write-guard';
+import {installParentDashboard} from './parent/ui';
 import {installRewards} from './rewards/service';
 import {recoverRewardBackup,hasPendingRewardBackup,installRewardBackupControls} from './rewards/backup';
 
@@ -30,7 +31,7 @@ void installRewardWriteGuard().then(async writable=>{
   installRewardBackupControls(rewards);
   initLiveRemix();
   void initBuilder().then(installAdultProfile);
-  installJemsDelight();installOffline();installDrawings();installQualityCards();
+  installJemsDelight();installOffline();installDrawings();installQualityCards();installParentDashboard();
   await installStudio();installStudioHostNavigation();
 }).catch(error=>{
   setRewardSourceMaintenance(true);
@@ -42,3 +43,4 @@ void installRewardWriteGuard().then(async writable=>{
   const retry=document.createElement('button');retry.type='button';retry.textContent='Try reloading Jems';retry.style.minHeight='48px';retry.onclick=()=>location.reload();
   recovery.append(title,message,retry);document.body.append(recovery);retry.focus();
 });
+

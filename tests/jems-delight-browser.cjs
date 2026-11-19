@@ -31,6 +31,7 @@ const {start}=require('./browser-server.cjs');
   await page.locator('#studioNavHome').click();
   assert.ok(await page.locator('[data-session] .jems-project-badge').count(),'honest badge on saved creation');
   await page.locator('footer [data-page="parent"]').click();
+  await page.locator('[data-parent-tab="settings"]').click();
   await page.locator('#parentSubject').selectOption('both');await page.locator('#saveParent').click();
   await page.locator('#studioNavHome').click();
   assert.equal(await page.locator('#studioSubjectLanguage').isDisabled(),false);

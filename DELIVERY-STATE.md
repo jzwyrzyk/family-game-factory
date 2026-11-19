@@ -1,5 +1,23 @@
 # jems delivery state
 
+## PR65 parent reporting — merged
+
+**Merge observed:** November 19, 2026, **10:53:45 a.m. America/New_York** (`2026-11-19T15:53:45Z`). Under the owner's explicit merge instruction, [PR65](https://github.com/jzwyrzyk/family-game-factory/pull/65) merged into `main` as [`864bee8f9427bce4a8dc0e7df5495e576fd3bcdc`](https://github.com/jzwyrzyk/family-game-factory/commit/864bee8f9427bce4a8dc0e7df5495e576fd3bcdc), following main `7fa7ff252e277bd9610a11afeca8bf8f1ae13715`.
+
+The merge's complete Git tree, `365160ea59cd951f3b4675d06d2738b361aae915`, exactly matches final PR head [`d3082160d82c131e44f1a738378ce1455f3c8858`](https://github.com/jzwyrzyk/family-game-factory/commit/d3082160d82c131e44f1a738378ce1455f3c8858). All five final-head PR workflows passed:
+
+| Workflow | Final-head result |
+| --- | --- |
+| Parent dashboard | [Passed — 44556150312](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44556150312) |
+| Arcade journeys | [Passed — 44556151134](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44556151134) |
+| Full visual review | [Passed — 44556150334](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44556150334) |
+| Trusted family-device security | [Passed — 44556150493](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44556150493) |
+| Documentation context | [Passed — 44556274156](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44556274156); [earlier duplicate also passed](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44556151016) |
+
+No reviews or review threads were present at merge. Duplicate push jobs were cancelled, not failed. The [implementation ledger](docs/parent-progress/IMPLEMENTATION.md) retains earlier failures, corrections, synthetic captures and their original source/run identities.
+
+**Release boundary:** this receipt establishes the parent area's source integration and exact tested-tree identity. It records no frontend/service deployment, provider activation, private-worker repin, cross-device parent account, actual-family acceptance or validated learning outcome. The optional Problem Solving adapter does not merge its separately developed provider.
+
 ## Lifetime rewards implementation — November 19, 2026
 
 The owner authorized immediate development of shared lifetime gem increments, milestones, a Rewards page, progress and popups using the approved branding. Companion artwork and the companion system remain separate work. `feature/jems-rewards-v1` started from the clean local branding candidate `a7655cfe548f72853bbcd0715427d2180afd4e9d`, which contained the reconciled main and PR57 source at that checkpoint. Following PR57's merge, rewards is a separate feature prepared directly against main; GitHub publication, review and any later release remain distinct from its local integration.
@@ -86,6 +104,12 @@ The earlier branding integration request was the **approved brand library v1.2 a
 The baseline audit collected GitHub source, PR metadata and workflow history; the scoped PR57 update also records local contract/browser validation and screenshot review. No live Cloud Run inventory, provider configuration, paid request or actual-device session was inspected for this feature. Accordingly, live activation and end-to-end acceptance remain **unverified here**, rather than asserted enabled or disabled. The approved code path and the current production path can differ.
 
 ### Creation Studio merge receipt
+
+### Earlier parent reporting preparation — superseded by the PR65 merge receipt above
+
+The owner requested research and implementation of a holistic parent area following the learning-measurement work. `feature/jems-parent-progress-20261119` starts from main `eebeebeb8896554bd3619029d8ca80d4b06b2f2b` and adds the [parent reporting contract](docs/parent-progress/README.md), [primary-source benchmark](docs/parent-progress/RESEARCH.md), and [verification ledger](docs/parent-progress/IMPLEMENTATION.md). The implementation reads existing evidence, preserves subject/profile boundaries and existing controls, and connects the separately developed problem-solving provider only when available.
+
+Local parent-model and snapshot checks passed 16/16; existing Math/Language and creation-storage regression checks passed 65/65. TypeScript and a production build passed during development. Local browser execution was blocked by the environment, so the dedicated hosted workflow owns final browser evidence. The review branch integrated then-current main `7fa7ff252e277bd9610a11afeca8bf8f1ae13715` (approved brand library and maker journey). The first hosted dashboard run exercised desktop flows but failed because its fixture also tried to seed sandboxed game frames; the fixture now seeds only the top-level app. Screenshot review exposed and corrected low-contrast inherited text. These earlier runs do not establish a passing integrated candidate. Corrected source `e83893cfd392706aca227dbcd01a0fab3cdd7ab2` subsequently passed the dedicated [parent workflow 44553513882](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44553513882), including 16 model/snapshot checks and full desktop/tablet/390px/320px journeys. Reviewed synthetic captures are preserved with source hashes in [parent screenshots](docs/parent-progress/screenshots/README.md). All five PR workflows passed for that exact application source, including [Arcade run 44553513968](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44553513968), full visual review, family-device security and documentation context. The subsequent receipt/capture commit changed only documentation and review evidence; application, assets, tests and workflows remained identical. This preparation entry records evidence collected before [PR65's merge](#pr65-parent-reporting--merged), without claiming deployment, provider activation or validated educational outcomes.
 
 **Creation Studio merged — November 19, 2026, 07:50:41 America/New_York (`2026-11-19T12:50:41Z`):** the owner authorized pushing and merging after asking how problem-solving performance is tracked. [PR62](https://github.com/jzwyrzyk/family-game-factory/pull/62) merged as [`c4ce21be410e7fccb16922c4711f4c4172edbc7e`](https://github.com/jzwyrzyk/family-game-factory/commit/c4ce21be410e7fccb16922c4711f4c4172edbc7e), preserving reviewed head `8e305150b9811479d866bae7e252c59b4045bbbf` and prior main `02bdb58d17d5687e39ab20bd884f02a18007ede5`. GitHub confirms the PR is merged/closed; fetched main has the same complete tree (`256a14cd3d8cb4487da2216b440cc11ffb04623b`) as the verified PR head. All five PR validation workflows passed, including the original twelve jobs and the later documentation recheck; the earlier duplicate push Arcade run remains explicitly canceled. Local evidence includes the production build/typecheck, 77 creation tests, 354 existing unit tests, desktop/touch authoring, eight recovery journeys, child continuity and Gem Factory gameplay. The [acceptance record](docs/creation-studio/ACCEPTANCE.md) preserves exact runs and limits.
 

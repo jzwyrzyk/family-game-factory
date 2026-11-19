@@ -183,14 +183,14 @@ async function installAuthFixture(context) {
     await page.click('#jemsRewardsBack');
 
     // The parent selects English through the ordinary settings; the child completes its real activity.
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     await page.selectOption('#parentSubject', 'language'); await page.click('#saveParent');
     await page.click('#studioNavPowers');
     if (!await page.evaluate(() => FG.learning.active)) await page.click('#lab-next');
     await page.locator('.language-activity:visible').waitFor();
     await answerLanguage(page); await expectTotal(page, 32);
     assert.equal((await summary(page)).counts.language, 1);
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     await page.selectOption('#parentSubject', 'math'); await page.click('#saveParent');
     await page.click('#studioNavHome');
 
@@ -233,7 +233,7 @@ async function installAuthFixture(context) {
     assert.equal((await summary(page)).counts.coding, 1);
 
     // Parent UI exports the actual ledger; restoring it twice remains idempotent.
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     const downloadPromise = page.waitForEvent('download'); await page.click('#exportData');
     const download = await downloadPromise, backupPath = path.resolve('test-results/rewards-family-backup.json');
     await download.saveAs(backupPath);
@@ -244,7 +244,7 @@ async function installAuthFixture(context) {
     assert.equal(rewardBackup.data.profiles.find(profile => profile.owner === 'player1').receipts.reduce((sum, receipt) => sum + receipt.amount, 0), 100);
     assert.equal(rewardBackup.data.profiles.some(profile => profile.owner.startsWith('adult:')), false);
     for (let copy = 0; copy < 2; copy++) {
-      await page.locator('footer [data-page="parent"]').click();
+      await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
       const reloaded = page.waitForNavigation({ waitUntil: 'load' });
       const restored = page.waitForEvent('dialog', { predicate: dialog => dialog.type() === 'alert' && /restored successfully/i.test(dialog.message()) });
       await page.locator('#importData').setInputFiles(backupPath); await restored;
@@ -259,7 +259,7 @@ async function installAuthFixture(context) {
     await page.waitForFunction(id => FG.store.current().id === id, ADULT); await expectTotal(page, 0);
     await startMath(page); await answerMath(page); await expectTotal(page, 2);
     await chooseFamily(page, 0); await expectTotal(page, 100);
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     const afterAdultDownload = page.waitForEvent('download'); await page.click('#exportData');
     const afterAdultPath = path.resolve('test-results/rewards-family-after-adult.json');
     await (await afterAdultDownload).saveAs(afterAdultPath);

@@ -46,11 +46,12 @@ const {start}=require('./browser-server.cjs');
   const after=await page.evaluate(()=>JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity}));assert.equal(after,original);
   // Full backups round-trip exactly. A missing optional domain replaces it with
   // an empty workspace, and restores finish by reloading fresh in-memory state.
-  await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();const downloadPromise=page.waitForEvent('download');await page.click('#exportData');const download=await downloadPromise,backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.equal(backup.factoryWorkspace.version,2);const workspaceBefore=JSON.stringify(backup.factoryWorkspace);
+  await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();await page.locator('[data-parent-tab="settings"]').click();const downloadPromise=page.waitForEvent('download');await page.click('#exportData');const download=await downloadPromise,backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.equal(backup.factoryWorkspace.version,2);const workspaceBefore=JSON.stringify(backup.factoryWorkspace);
   const rewardCounts=()=>page.evaluate(async()=>{const summary=await FG.rewards.refresh();return {gems:summary.lifetimeGems,grants:summary.totalGrants};});
   const rewardsBefore=await rewardCounts();
   const importBackup=async(name,value)=>{
    await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+   await page.locator('[data-parent-tab="settings"]').click();
    await Promise.all([
     page.waitForNavigation({waitUntil:'load'}),
     page.setInputFiles('#importData',{name,mimeType:'application/json',buffer:Buffer.from(JSON.stringify(value))})
