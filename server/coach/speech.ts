@@ -120,7 +120,7 @@ export class CoachAudioService {
   }catch(error){failure=error;}
   // Settle the charge and recheck authorization atomically before returning
   // the transient transcript. It is never written to a receipt or audit log.
-  const successful=await this.repo.transaction(state=>{
+  const completion=await this.repo.transaction(state=>{
     const receipt=state.audioReceipts?.find(x=>x.id===id&&x.familyId===session.familyId&&x.subject===subject);
     if(!receipt)throw Error('AUDIO_UNAVAILABLE');
     const ledger=state.ledgers[session.familyId];
@@ -128,11 +128,16 @@ export class CoachAudioService {
      ledger.reserved=Math.max(0,ledger.reserved-receipt.reserved);
      ledger.used+=receipt.reserved;
     }
-    const permitted=!failure&&!!transcript&&!cancel?.aborted&&this.permitted(state,session);
-    receipt.state=permitted?'ready':'failed';return permitted;
+    const now=Date.now();let authenticated=true;
+    try{assertActiveTrustedDevice(state,session,now);}catch{authenticated=false;}
+    const permitted=!failure&&!!transcript&&!cancel?.aborted&&authenticated&&this.permitted(state,session,now);
+    receipt.state=permitted?'ready':'failed';return {permitted,authenticated};
    });
   if(failure)throw failure;
-  if(!successful||!transcript)throw Error('AUDIO_UNAVAILABLE');
+  // Report device revocation distinctly, after the failed receipt and charge
+  // settle atomically. A revoked profile remains an unavailable capability.
+  if(!completion.authenticated)throw Error('UNAUTHENTICATED');
+  if(!completion.permitted||!transcript)throw Error('AUDIO_UNAVAILABLE');
   return {text:transcript};
  }
 }

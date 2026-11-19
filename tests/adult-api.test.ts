@@ -138,13 +138,13 @@ test('model and speech completion cannot publish a late reply after device revoc
    });
    if(capability==='model'){
     const service=new CoachService(f.repo,modelConfig,{complete:async()=>{await revoke();return {reply,usedMicroUsd:50};}});
-    await assert.rejects(service.respond(f.adult,{requestId:'late-model',context}),/COACH_UNAVAILABLE/);
+    await assert.rejects(service.respond(f.adult,{requestId:'late-model',context}),reason==='device'?/UNAUTHENTICATED/:/COACH_UNAVAILABLE/);
     const state=await f.repo.snapshot();assert.equal(state.coachReceipts![0].state,'failed');assert.equal(state.coachReceipts![0].reply,undefined);
     assert.equal(state.ledgers[familyId].reserved,0);assert.equal(state.ledgers[familyId].used,50);
    }else{
     const service=new CoachAudioService(f.repo,audioConfig,{transcribe:async()=>{await revoke();return 'Never publish this late transcript';}});
     const wave=new Uint8Array(200);wave.set([0x1a,0x45,0xdf,0xa3]);
-    await assert.rejects(service.transcribe(f.adult,{id:'late-speech',mime:'audio/webm',audio:wave}),/AUDIO_UNAVAILABLE/);
+    await assert.rejects(service.transcribe(f.adult,{id:'late-speech',mime:'audio/webm',audio:wave}),reason==='device'?/UNAUTHENTICATED/:/AUDIO_UNAVAILABLE/);
     const state=await f.repo.snapshot();assert.equal(state.audioReceipts![0].state,'failed');
     assert.equal(JSON.stringify(state).includes('Never publish this late transcript'),false);
     assert.equal(state.ledgers[familyId].reserved,0);assert.equal(state.ledgers[familyId].used,2000);

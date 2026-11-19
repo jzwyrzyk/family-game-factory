@@ -110,18 +110,23 @@ export class CoachService {
   }catch(error){failure=error;}
   // The permission check and cache publication share a transaction. A device
   // revocation or profile lock while the provider runs must leave no reply.
-  const reply=await this.repo.transaction(state=>{
+  const completion=await this.repo.transaction(state=>{
    const r=state.coachReceipts?.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===subject);
    if(!r)throw Error('COACH_UNAVAILABLE');
    const ledger=state.ledgers[session.familyId];
    if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=usage;}
-   const result=!failure&&candidate&&this.permitted(state,session)?candidate:null;
+   const now=Date.now();let authenticated=true;
+   try{assertActiveTrustedDevice(state,session,now);}catch{authenticated=false;}
+   const result=!failure&&candidate&&authenticated&&this.permitted(state,session,now)?candidate:null;
    r.state=result?'ready':'failed';if(result)r.reply=result;else delete r.reply;
    state.audit.push({jobId:'coach-'+randomUUID(),familyId:session.familyId,status:result?'ready':'failed',at:new Date().toISOString(),code:'COACH_TURN'});
-   return result;
+   return {reply:result,authenticated};
   });
   if(failure)throw failure;
-  if(!reply)throw Error('COACH_UNAVAILABLE');
-  return {reply,mode:'model'};
+  // Keep the existing authentication error after committing failed completion
+  // and usage accounting; throwing inside the transaction would roll them back.
+  if(!completion.authenticated)throw Error('UNAUTHENTICATED');
+  if(!completion.reply)throw Error('COACH_UNAVAILABLE');
+  return {reply:completion.reply,mode:'model'};
  }
 }

@@ -195,10 +195,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:58:41.634Z",
-      "sourceDigest": "7a33091bda1bde4683c4d99aabbd3d09b5889e127864a6bc73e0c63d2ae571cc",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed adult versus guardian permission paths, fresh transaction-time admission, grant-specific reply caches and atomic model/speech completion checks; documented unchanged explicit voice flow and private provider credential boundaries."
+      "reviewedAt": "2026-11-19T05:15:29.595Z",
+      "sourceDigest": "d242273dcce3a2661255df5b4f9e18e242088778a592c6abe580f54742da8ad9",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed model and speech completion settlement: a revoked trusted device now returns the existing UNAUTHENTICATED error after the failed receipt and usage charge commit atomically. Adult lock still yields capability unavailable; no reply or transcript is published. Architecture and release contracts already describe these authorization and accounting boundaries accurately."
     },
     {
       "id": "adult-privacy",
@@ -222,10 +222,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "3e6125a693df6bbe8435f83e6a1e2aa49d18b0b3d0175783d9fc9a9a0c5051ee",
-      "reviewedAt": "2026-11-19T05:01:21.223Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the authenticated profile switch, cookie plus tab proof, fixed expiry, isolated adult storage/jobs and current-notice parent evidence with their negative tests; recorded the accepted temporary one-site decision, exact operator IDs, artifact-store reuse and removal limits."
+      "sourceDigest": "f365dca67c80347ced2643d51235478aadafd1dd133ab663ce6c30ae33fc78a5",
+      "reviewedAt": "2026-11-19T05:15:31.019Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the model and speech late-result assertions against the adult grant and guardian privacy contracts. Distinguishing revoked-device authentication failure from a locked adult capability leaves fixed session expiry, separate child consent, withheld results and usage settlement unchanged; existing feature documentation remains accurate."
     },
     {
       "id": "validation",
@@ -244,10 +244,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:58:42.419Z",
-      "sourceDigest": "8bf3a35525756223cbd9cc1facd18ff2f8312c6357116dcb0569ee214e39229d",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed adult authorization, cross-tab client and browser cases, workspace and worker publication tests, parent consent negatives and preview HTTP coverage; delivery evidence records scoped fixture passes while final-head CI and real-provider/device acceptance remain pending."
+      "reviewedAt": "2026-11-19T05:15:30.288Z",
+      "sourceDigest": "6724cf6b51f58cea3884e83947828ed3568ec46bdf5520ab71c63d782fa01d28",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the late-completion test adjustment: device revocation must report UNAUTHENTICATED while adult profile lock remains unavailable; both model and speech still assert failed receipts, withheld content and settled usage. This preserves the existing acceptance contract and does not turn the separate local intent-run failure or fixture evidence into a production claim."
     },
     {
       "id": "delivery",
