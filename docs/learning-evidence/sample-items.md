@@ -5,6 +5,8 @@
 ## Administration
 Neutral adult directions only; do not tell the child correct responses or supply strategies. Use age-appropriate independent response and note accommodations. These are paper review examples, not an online assessment. Domain scoring cannot be merged into an overall "learning IQ."
 
+**Missing is not zero.** Every zero anchor below describes a valid, observed response that does not meet the criterion. An unanswered/skipped step, no opportunity, interruption or technical failure is missing/invalid (`null`), with a reason. Incomplete scenarios or forms have no overall total. Record support at each decision; permitted neutral access support is distinct from content/strategy/answer help, and an absent app hint is not verified independence. These demonstrations use the research-only human scoring and administration rules in [assessment-scoring.md](assessment-scoring.md).
+
 ## 1. Mathematics original six-item demonstration per grade
 Items 1–5: one point each; item 6: open reasoning, 0/1/2. Maximum **7 demonstration points per grade**. All problems new relative to this doc's examples; objective keys deterministic, reasoning rubric as in [mathematics.md](mathematics.md).
 
@@ -48,7 +50,7 @@ Items 1–5: one point each; item 6: open reasoning, 0/1/2. Maximum **7 demonstr
 | M4-5 | An angle opens exactly one quarter of a full turn. How many degrees? | 90°; `4.MD.C.5` |
 | M4-6 | A store has 18 boxes of 12 markers. It sells 45 markers. How many remain? Explain. | 171; 18×12−45; 1pt valid relationship, 2pts correct result/reason |
 
-**Math rubric item 6:** 0 missing/invalid reasoning; 1 correct relevant structure but incomplete/wrong result; 2 correct result with valid explanation or representation.
+**Math rubric item 6:** 0 an observed response without a valid mathematical relationship; 1 correct relevant structure but incomplete/wrong result; 2 correct result with valid explanation or representation. An unanswered, skipped or technically invalid response is missing/null, not zero.
 
 ## 2. ELA original passage and sample questions per grade
 These passages are authored only as **short demos**; educator review of decoding difficulty, passage length, syntax and cultural relevance is outstanding. **Do not use** them for a national literacy score or pre/post evidence. Questions 1–3 one point each; writing prompt 0–8 using the four-criterion rubric in [language-arts.md](language-arts.md). These demos omit full decoding/conventions/vocabulary coverage required in the real blueprint.
@@ -117,7 +119,7 @@ All logic/puzzle prompts are original and **unplugged**, with one point per item
 **Limitations:** several decomposition prototypes are open response; independent evaluation requires human scoring or conversion to unambiguous selection items. Coordinate puzzles require pilot review for age suitability and visual layout. **Do not use these mixed-format samples as a 4-point calibrated scale.**
 
 ## 4. Active Problem-Solving grade-specific scenario mini-probes
-One original scenario per grade; score six 0–3 dimensions according to [active-problem-solving.md](active-problem-solving.md); **0–18 max**, not a national scaled score. The full independent instrument requires **two diverse scenarios per form** and new held-out tasks.
+One original scenario per grade; score six 0–3 dimensions according to [active-problem-solving.md](active-problem-solving.md); **0–18 max for a complete scenario only**, not a national scaled score. Missing relevant opportunities or invalid responses withhold the total. The full independent instrument requires **two diverse scenarios per form** and new held-out tasks.
 
 | Grade | Scenario | Child actions required and observer evidence |
 |---|---|---|
@@ -129,12 +131,12 @@ One original scenario per grade; score six 0–3 dimensions according to [active
 ### Rubric for each scenario (all grades, with separate grade-specific anchors)
 | Dimension | 0 | 1 | 2 | 3 |
 |---|---|---|---|---|
-| Define goal | none | vague | concrete success | concrete plus relevant constraint/grade-valid detail |
-| Options | none | one weak | viable alternative(s) | reasoned comparison against goal |
-| Test plan | none | arbitrary | relevant observation/prediction | fair, justified comparison (older grades) |
-| Evidence | wrong/none | repeats superficial result | relates result to goal | compares and recognizes limitation |
+| Define goal | Stated goal misses the task | vague | concrete success | concrete plus relevant constraint/grade-valid detail |
+| Options | Chosen option does not address the goal | one weak | viable alternative(s) | reasoned comparison against goal |
+| Test plan | Proposed test cannot inform the question | arbitrary | relevant observation/prediction | fair, justified comparison (older grades) |
+| Evidence | Observed explanation contradicts or does not use results | repeats superficial result | relates result to goal | compares and recognizes limitation |
 | Revision | irrelevant | untargeted | fixes a cause supported by result | improves and explains next test |
-| Transfer | none | same words | applies method to new situation | explains how it might need adapting |
+| Transfer | Proposed application does not fit the new situation | same words | applies method to new situation | explains how it might need adapting |
 
 **Grade-1 full-credit must be defined relative to age:** a child can earn a 3 through a clear choice, simple relevant explanation and valid comparison; do not demand grade-4 engineering vocabulary. Not suitable for independent scoring without detailed annotated child responses.
 
