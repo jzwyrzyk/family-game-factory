@@ -2,12 +2,16 @@
 
 **Critical distinction:** APS measures a child's *active use of a process* to solve an unfamiliar problem by defining success, making a proposal, testing, using evidence and improving. It is not a synonym for computational thinking, creativity, grit, behavior or broad general intelligence.
 
+**Clarified November 19, 2026:** this remains a research specification for independently administered scenarios and human scoring. The owner-authorized formative implementation is a separate development track. Its local observations do not activate this benchmark, validate this rubric, or establish independent performance from an absent hint flag.
+
 ## Standards and research anchors
 - **NGSS K–2-ETS1-1/2/3:** observe a need, develop a model/sketch, use results of two designs to compare strengths/weaknesses.
 - **NGSS 3–5-ETS1-1/2/3:** identify criteria and constraints, compare alternative designs, plan fair tests, control variables and identify improvements.
 - **EEF 2025 metacognition:** planning, monitoring and evaluating, a useful instructional underpinning but **not** a validated APS scale.
 - **IES grade 4–8 math problem-solving:** visualization, reflection, alternative strategies; domain-specific, not evidence for universal problem-solving transfer.
 - **OECD PISA 2012 problem solving and PISA 2022 creative thinking:** conceptual model of exploration/planning/evaluation and generating/evaluating ideas. Their tests focus on older students; **do not norm elementary children against PISA or reuse PISA items without permission**.
+- **OECD PISA 2025 Learning in the Digital World:** a current design precedent for iterative learning with computational tools, combining response and process evidence. Its adolescent population and assessment models do not validate elementary Jems scores, emotions, or general thinking inferences.
+- **CSTA 2026 PK–12 standards:** a current adjacent CT reference, including evaluating, modifying and debugging programs. It supports separating child-attributable computing practices from the appearance of an AI-built artifact; it supplies no general APS norm or Jems certification.
 
 ## Six separately observable competencies
 | Competency | What gets credited | Evidence source |
@@ -32,7 +36,7 @@
 These are **grade-appropriate performance anchors**, not published national APS norms, grade placements or NGSS certifications.
 
 ## Direct performance assessment — two scenario tasks per time point
-**Design:** Form A and B each consist of **two unfamiliar design-test-revise scenarios**, one about a physical system (e.g. ramp/bridge) and one about a resource or arrangement problem (e.g. moving water/protecting objects). Use standardized materials and predetermined trial outcomes; switch superficial surface details without changing latent difficulty. Each scenario requires child choices; passive multiple choice alone is insufficient.
+**Design:** Form A and B each consist of **two unfamiliar design-test-revise scenarios**, one about a physical system (e.g. ramp/bridge) and one about a resource or arrangement problem (e.g. moving water/protecting objects). Use standardized materials and predetermined trial outcomes. Vary surface details while targeting the same task demands; this does **not** establish equal latent difficulty. Form comparability requires empirical investigation before interpreting a difference as growth. Each scenario requires child choices; passive multiple choice alone is insufficient.
 
 **Sequence per scenario:**
 1. Present goal and materials objectively. Child identifies desired change/success criterion (record *before* coaching).
@@ -47,12 +51,16 @@ These are **grade-appropriate performance anchors**, not published national APS 
 ## Performance rubric — 6 competencies × 0–3 per scenario
 The **unit of scoring is child-independent behavior**, not the final machine outcome.
 
+Each planned step is a separate opportunity. Preserve the first committed decision at that step, what task evidence the child then saw, and any support received before the next decision. A mistaken initial prediction followed by a well-supported, child-authored revision can demonstrate interpretation and iteration. The simulation's planned results are evidence to reason from, not automatically a disqualifying hint. Revealing a solution or proposing the child's next reasoning step makes that affected step supported; it does not erase an earlier unaided observation.
+
 | Score | General anchor applied to each competency |
 |---|---|
-| 0 | Not demonstrated, contradiction to presented evidence, or task response missing (missingness flagged separately) |
+| 0 | A valid observed response does not meet the criterion or contradicts the presented evidence |
 | 1 | Relevant but mostly unsubstantiated, incomplete, or confuses key condition |
 | 2 | Adequate grade-level action, valid proposal or interpretation and some justification |
 | 3 | Clear, independently justified action with appropriate evidence, criterion/constraint, and novel transfer where applicable |
+
+**Missing is not zero.** No opportunity, an unanswered/skipped step, interruption or technical failure is recorded as missing/invalid with a reason and no score (`null`). An incomplete scenario or form has no overall total. A missing transfer opportunity cannot become evidence that the child failed to transfer.
 
 ### Item-specific examples of the rubric
 - **Define:** 0 = no identifiable goal; 1 = says "make it better"; 2 = names a testable success criterion; 3 = names criterion and relevant constraint/tradeoff when grade appropriate.
@@ -62,7 +70,7 @@ The **unit of scoring is child-independent behavior**, not the final machine out
 - **Iterate:** 0 = no relevant change; 1 = arbitrary change; 2 = targeted change addressing outcome; 3 = causal justification and reasonable next test.
 - **Transfer:** 0 = unable to apply; 1 = repeats example without change; 2 = applies principle to novel scenario; 3 = applies and explains when principle might fail/need adjustment (age-appropriate anchor).
 
-**Score:** 0–18 per task, 0–36 total per form. Also display six 0–6 dimension subscores only in research mode due sparse samples. Raw total is **unvalidated ordinal performance**, not a percentile, national proficiency or overall intelligence score; do not scale it to 100 and imply precision. Track completion, modality, facilitator, time, hints (must be absent during score), rubric version, and rater IDs.
+**Research-only human score:** 0–18 per complete task, 0–36 per complete form, using trained human raters and the protocol below. Six 0–6 dimension subscores are also research-only because samples are sparse. Equal weighting, category spacing and aggregation are design choices requiring investigation; a deterministic sum does not establish a valid scale. Raw total is **unvalidated ordinal performance**, not a percentile, national proficiency or overall intelligence score; do not scale it to 100 or expose it as an everyday background ability score. Track completion, response modality, facilitator, task exposure, support at each step, rubric version and rater IDs. Neutral access support and reasoning assistance must be distinguished for the skill actually being assessed.
 
 ## Realistic standardized task examples (public demonstrations)
 ### Scenario A: The small bridge (grade 1–2 form style)
@@ -76,12 +84,15 @@ The **unit of scoring is child-independent behavior**, not the final machine out
 - Two **trained and blinded human raters** independently score an appropriate subset; calibrate anchored exemplars and adjudicate disagreements. If agreement is weak, revise prompts and scoring, not merely instruct raters to agree.
 - Report weighted kappa per ordinal rubric dimension and intraclass correlation for aggregated total where appropriate, confidence intervals and subgroup inspection. No fixed numeric cutoff is claimed as industry universal.
 - Avoid LLM scorer as sole truth. An LLM may help extract structured *evidence* in a formative pipeline, but human adjudication needed until separately validated.
+- Distinguish observed no reasoning help under the administration protocol from merely no in-app hint recorded. Unknown external/adult/AI help remains unknown. Retain the source and timing of support; do not silently convert missing provenance into independence.
+- Neutral spoken directions, pointing or an accessible input method need not reduce APS evidence when reading or motor speed is not the construct. They do not establish independent decoding in a separate ELA task. Record the accommodation and keep comparisons under comparable administration conditions.
 - Test scenario/form equivalence and response-process validity via cognitive interviews; measure whether reading, language, motor skills, familiarity with physical objects or science knowledge dominate results.
 - Assess **near transfer** first (new ramp vs bridge) and **farther transfer** second (resource/problem context); making broad "general problem-solving" claims requires evidence across multiple divergent contexts.
 - Separate from CT: a child may score high on APS but low on algorithms, and vice versa. Do not aggregate four domains into an "intelligence index".
 
 ## Product instrument integration
 - For *formative* activity evidence: log child-specified goal, stated hypothesis, options they chose, trials/observations, independently initiated changes, cited result and transfer explanation. The AI may render a simulation, **not invent or credit the child's reasoning**.
+- In background data, retain prompted versus spontaneous behavior and child versus helper authorship. Do not award competence for producing a nonempty prediction, accepting an AI suggestion, repeating an unchanged successful check, or completing an elaborate generated game. Such context can guide a new structured opportunity without being scored itself.
 - For *summative* APS: proctored novel task, deterministic scenario engine, no generative coach, locked materials and graded human review. Record if adult transcribed without supplying content.
 - Scenario production must support touchscreen/keyboard, accessible designs, optional neutral audio instructions, no uncontrolled physics nondeterminism affecting outcome.
 - Don't require APS check-in to unlock a game; separate from product quality validation and game bug testing.
@@ -92,3 +103,5 @@ The **unit of scoring is child-independent behavior**, not the final machine out
 - EEF 2025 second edition: https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/metacognition
 - IES problem-solving grade 4–8: https://ies.ed.gov/ncee/WWC/PracticeGuide/16
 - OECD PISA creative thinking framework (older children, conceptual only): https://www.oecd.org/en/publications/pisa-2022-assessment-and-analytical-framework_dfe0bf9c-en/full-report/component-5.html
+- OECD PISA 2025 Learning in the Digital World (current conceptual precedent; age-15 assessment): https://www.oecd.org/en/topics/sub-issues/learning-in-the-digital-world/pisa-2025-learning-in-the-digital-world.html
+- CSTA 2026 standards overview: https://csteachers.org/pk12standards/about/ and https://csteachers.org/2026-csta-pk-12-computer-science-standards/

@@ -2,6 +2,8 @@
 
 **Documented decision record:** 2026-11-18. **Status:** DRAFT. Every numeric test length, item count, rubric cut and timing is a Jems pilot hypothesis unless linked to a cited instrument's own spec.
 
+**Reference correction, November 19, 2026:** CSTA 2026 is now the current published standards reference. Its full publication carries CC BY-NC-SA 4.0; existing 2017-inspired Jems grade anchors have not been revalidated against it. PISA 2025 Learning in the Digital World adds a relevant process-assessment precedent for adolescents, not elementary norms. The background formative feature is a separately authorized implementation; the independent assessments, external records and research operations below retain their own gates.
+
 ## A. Explicit assumptions and risk ledger
 | ID | Assumption | Evidence status | Risk if false | Required test / owner |
 |---|---|---|---|---|
@@ -26,7 +28,9 @@
 | A19 | More practice time produces meaningful academic exposure | **not established** | engagement with negligible gains | measure dose of actually relevant problems |
 | A20 | Math and ELA grade scores could predict school test outcomes | untested | marketing overclaim | prospective correlations on provider-native scores |
 | A21 | Adult-only initial production continues until child legal gates pass | project deployment boundary | inadvertent minor use | release gating, owner sign-off |
-| A22 | CSTA public standards can be used commercially | **FALSE absent separate permission** | IP violation | contact licensor, avoid reproduction/certification |
+| A22 | Public availability licenses commercial reproduction or official endorsement of CSTA standards | **Not established**; 2026 publication is CC BY-NC-SA 4.0 | unauthorized reproduction or alignment claims | review applicable rights and formal alignment process; cite broad concepts in original language |
+| A23 | Six equally weighted APS ratings form a valid total scale | **Untested research choice** | misleading precision or composite ability claim | human anchor calibration and dimensionality/aggregation review; no background total |
+| A24 | No recorded in-app hint proves unassisted reasoning | **False** | external/adult/AI help counted as independent | preserve unknown help and step-level source/timing; use protocol-observed evidence for benchmarks |
 
 ## B. Rights register and permitted design uses
 | Resource | Publicly available? | Can Jems copy test items into commercial product? | Approved use for this R&D |
@@ -40,7 +44,7 @@
 | NCII tools chart | Public | not a free licensed test bank | method for evaluating psychometric properties |
 | IXL diagnostics | Proprietary platform | **No** | optional authorized score import subject to provider terms/contracts |
 | MAP Growth / Star | Proprietary licensed tests | **No** | external licensed outcome when agreed |
-| CSTA 2017 standards | Yes, CC BY-NC-SA | **Commercial use/reproduction/claimed official alignment requires permission/review** | reference broad concepts, own original language |
+| CSTA 2026 standards; legacy 2017 mapping | Yes, published 2026 document is CC BY-NC-SA 4.0 | No commercial reproduction or official endorsement permission is established here | cite current reference; original tasks; educator review of 2017-to-2026 mapping |
 | TechCheck | Descriptive info/examples public; full test by request | **No commercial rights established** | pursue direct permission; no item copying |
 | cCTt/BCTt | Research published | **Rights unknown** | request authorized instrument |
 | NGSS engineering design | Public | reproduce only after applicable terms reviewed | original performance tasks mapped by codes |
@@ -95,7 +99,9 @@ No valid assessment content has been field-tested in this PR. There is no establ
 
 ## References
 CCSS commercial license: https://www.thecorestandards.org/commercial-license/ 
-CSTA licensing/alignment: https://csteachers.org/2017standards/interactive/
+CSTA 2026 publication and current overview: https://csteachers.org/2026-csta-pk-12-computer-science-standards/ and https://csteachers.org/pk12standards/about/
+CSTA legacy mapping reference: https://csteachers.org/2017standards/interactive/
+OECD PISA 2025 Learning in the Digital World: https://www.oecd.org/en/topics/sub-issues/learning-in-the-digital-world/pisa-2025-learning-in-the-digital-world.html
 TechCheck request: https://sites.bc.edu/devtech/assessments/techcheck/
 NCME standards: https://ncme.org/resources/books/testing-standards/
 Michigan early benchmarks: https://www.michigan.gov/mde/services/student-assessment/early-literacy-and-mathematics-benchmark-assessments
