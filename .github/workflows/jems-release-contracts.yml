@@ -15,6 +15,13 @@ jobs:
         run: python3 -m unittest discover -s scripts/release -p 'test_*.py' -v
       - name: Ensure production browser smoke is syntactically valid
         run: node --check tests/release-live-browser.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Reject known high and critical production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
       - name: Verify default read-only operation produces evidence without credentials
         run: |
           python3 scripts/release/contract.py plan \
