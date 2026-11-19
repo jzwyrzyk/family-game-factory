@@ -1,6 +1,19 @@
 # PR #56 — bounded recovery handoff
 
-Observed: 2026-11-19T08:01:54-05:00. Updated through Batch 2: recovery and two-file reconciliation are complete; source delivery remains blocked. No game changes, tests, merge or deployment were performed.
+Observed: 2026-11-19T08:01:54-05:00. Updated through Batch 2B: recovery and two-file reconciliation are complete; source delivery is blocked by unavailable workspace access. No game changes, tests, merge or deployment were performed.
+
+## Full-overhaul objective — unchanged
+
+The owner reconfirmed on November 19, 2026 that the objective remains the complete overhaul of Mind Your Jems to the approved illustrated design and intended gameplay. Recovery, uploading, tests and batch checkpoints are progress; none alone establishes completion.
+
+Completion requires all of the following, with remaining gaps explicitly recorded:
+
+- The actual rendered game matches the approved dimensional cartoon direction: expressive rock giant/head and eyes, cheerful miner and poses, glossy gems, floating islands and visibly filling cart.
+- The complete mine, carry, bank, warning, grab/hold, shake and gem-loss loop works with the intended visible consequences.
+- Child-friendly controls and clear layouts work across desktop, tablet and phone.
+- Studio's acknowledged-build entry, readiness, explicit return to the generated game, cancellation/failure recovery and return to the idea composer work without breaking existing boundaries.
+- The reviewed implementation and all required assets are actually in PR56, with scoped validation tied to the final source commit. Missing visual, gameplay or integration evidence remains open.
+- Preserve the bounded-session rule. Do not expand into other branding, reward or companion PRs; those do not replace this game's accepted visual and interaction requirements.
 
 ## Verified remote state
 
@@ -63,7 +76,19 @@ Observed: 2026-11-19T08:01:54-05:00. Updated through Batch 2: recovery and two-f
 - A non-forced, expected-head-guarded update to f4ed3f9 failed with GitHub missing/not_found. Direct git push then failed with unable to get password from user. Neither delivered the recovered implementation.
 - No tests, browser review, merge or deployment were performed.
 
-## Next action — Batch 2B: bounded transfer only
+## Batch 2B result — blocked before transfer by workspace failure
+
+The execution environment now reports an exec-server initialization timeout. A direct file-read attempt failed with “No usable execution environment is available.” The local transfer manifest and source/art bytes therefore could not be read in this turn. This does not establish that the files have been deleted.
+
+The GitHub checkpoint remains accessible. PR56 was rechecked open and unmerged at 319b2df2d3e689162d7a49a2916cecfccbe562de. Attempts to preserve a remote commit using either known recovery tree were both rejected with GitHub 422 “Tree SHA does not exist”:
+- f4ed3f9 source tree: 0f546922b72c55887959cbf37e2e3ff293ea0e47.
+- ab68a88 source tree: b2e8f31b9f641529a9ef07625d59118204bb74fa.
+
+An individual artwork-blob read returned a binary UTF-8 decoding error; this is not verified full-source delivery. Neither commit-creation attempt succeeded or moved a branch. No new asset upload, game edit, test, merge or deployment was completed in Batch 2B.
+
+Immediate resume condition: a working execution connection to the saved source/manifest is needed. Resume the transfer procedure below once accessible; do not repeat the completed four-copy inventory or two-file reconciliation. Verify which individual blobs already exist before needlessly re-uploading them. The full-overhaul objective above remains outstanding.
+
+## Next action — resume Batch 2B transfer when workspace is accessible
 
 Continue source delivery using the connected GitHub Git-data tools. Do not repeat recovery or the two-file comparison. Recheck the PR head before changing its branch. Read the prepared transfer manifest below; upload binary blobs using create_blob(base64), verifying returned SHA against the manifest. Record completed uploads at the batch boundary. Once all referenced blobs exist, create_tree using base_tree plus tree_elements, require the resulting tree SHA to equal source_tree, create a commit with the live PR head as parent (also preserve the recovery version's already-merged main ancestry using a verified additional parent when needed), then update_ref without force and with expected_sha. Verify the PR head and remote tree. Do not claim the new connector-created commit is the original local commit; the verified tree equality establishes source identity. Main reconciliation and final merge-readiness checks remain later work unless required for safe delivery.
 
