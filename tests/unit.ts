@@ -42,3 +42,5 @@ import './language-content.test';
 import './language-engine.test';
 import './trusted-devices.test';
 import './session-client.test';
+
+import './mind-your-jems.test';
