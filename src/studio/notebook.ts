@@ -1,6 +1,9 @@
 import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
 import { isGameId } from '../runtime/manifests';
 import type { GameId } from '../runtime/types';
+import { builderJourney } from '../brand/gem-progress';
+import { createRewardFact, enqueueRewardFact, rewardFactId, validateRewardOutbox, type RewardFact } from '../rewards/model';
+import { assertRewardSourceWritable } from '../rewards/write-guard';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -11,7 +14,7 @@ export type PendingJob = { id: string; api: string; status: 'queued' | 'building
 export type BuilderAvatar = 'spark' | 'nova';
 /** Written only after the underlying revision service confirms this exact keep. */
 export type KeptExperiment = {experimentId:string; revisionId:string; baseId:string; kind:'local'|'remote'; at:string};
-export type KeptExperimentInput = Pick<KeptExperiment,'revisionId'|'kind'> & {baseId:string|null};
+export type KeptExperimentInput = Pick<KeptExperiment,'revisionId'|'kind'> & {baseId:string|null;contentChanged?:boolean};
 export interface StudioSession {
   id: string; owner: string; name: string; game: GameId | 'new';
   projectId: string | null; remoteId: string | null; remoteKind?: string;
@@ -21,8 +24,10 @@ export interface StudioSession {
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
   archived?:boolean; resumeDismissed?:boolean;
   keptExperiments?:KeptExperiment[]; verifiedRemoteExperiments?:string[];
+  /** Canonical source project, retained through copies and local/remote transitions. */
+  rewardProjectId?:string;
 }
-export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar> }
+export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[] }
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
 const safeText = (x: unknown, max: number): x is string => typeof x === 'string' && x.length <= max;
@@ -30,13 +35,14 @@ const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(
 export function validateNotebook(input: unknown): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
-  if(Object.keys(n).some(k=>!['version','sessions','active','avatars'].includes(k)))throw Error('Unknown studio data; not restored.');
+  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox'].includes(k)))throw Error('Unknown studio data; not restored.');
   if(n.avatars!==undefined&&(!n.avatars||typeof n.avatars!=='object'||Array.isArray(n.avatars)||Object.keys(n.avatars).length>80||!Object.entries(n.avatars).every(([owner,choice])=>ident(owner)&&(choice==='spark'||choice==='nova'))))throw Error('Invalid builder character choice.');
   const ids = new Set<string>();
   for (const s of n.sessions) {
     if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
     ids.add(s.id);
     if (s.projectId !== null && !ident(s.projectId) || s.remoteId !== null && !ident(s.remoteId) || s.remoteKind !== undefined && !safeText(s.remoteKind,60)) throw Error('Invalid studio reference.');
+    if(s.rewardProjectId!==undefined&&!ident(s.rewardProjectId))throw Error('Invalid reward project reference.');
     if (!Array.isArray(s.messages) || s.messages.length > 200 || !s.messages.every(m => m && ident(m.id) && ['child','helper','reflection'].includes(m.role) && safeText(m.text,2200) && safeText(m.at,40) && Number.isFinite(Date.parse(m.at)))) throw Error('Invalid studio conversation.');
     for (const c of [s.candidate,s.undone??null]) if (c !== null) {
       if (!c || !ident(c.id) || c.baseId !== null && !ident(c.baseId) || !safeText(c.prompt,2000) || !safeText(c.summary,2200) || (!!c.config === !!c.remoteId)) throw Error('Invalid preview.');
@@ -62,17 +68,39 @@ export function validateNotebook(input: unknown): Notebook {
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
+  if(n.rewardOutbox!==undefined){
+    const facts=validateRewardOutbox(n.rewardOutbox);
+    if(facts.some(fact=>!n.sessions.some(s=>s.owner===fact.owner)||!['maker.milestone','game.developed'].includes(fact.kind)||
+      fact.kind==='game.developed'&&!n.sessions.some(s=>s.owner===fact.owner&&(s.rewardProjectId??s.projectId??s.id)===fact.sourceId)))throw Error('Invalid studio reward receipt.');
+  }
   return copy(n);
 }
 export class StudioNotebook {
-  constructor(private storage: StoragePort) { this.read(); }
+  constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void) { this.read(); }
   read(): Notebook { const raw=this.storage.getItem(STUDIO_KEY); return raw===null ? fresh() : validateNotebook(JSON.parse(raw)); }
   private write<T>(fn:(n:Notebook)=>T):T {
+    assertRewardSourceWritable();
     // Re-read on every synchronous transaction: don't overwrite a newer workspace snapshot.
-    const n=this.read(), result=fn(n); validateNotebook(n);
+    const n=this.read();
+    const previousFacts=new Set((n.rewardOutbox??[]).map(fact=>fact.owner+'|'+rewardFactId(fact)));
+    const previous=new Map([...new Set(n.sessions.map(s=>s.owner))].map(owner=>[owner,builderJourney(n.sessions,owner).level]));
+    const result=fn(n); validateNotebook(n);
+    // Only a new saved transition creates a receipt. Reading or restoring an old
+    // notebook never retroactively mints its existing maker history.
+    for(const owner of new Set(n.sessions.map(s=>s.owner))){
+      const before=previous.get(owner)??0,after=builderJourney(n.sessions,owner).level;
+      for(let level=before+1;level<=after;level++)n.rewardOutbox=enqueueRewardFact(n.rewardOutbox??[],createRewardFact({owner,kind:'maker.milestone',level:level as 1|2|3|4,occurredAt:Date.now()}));
+    }
+    validateNotebook(n);
     try { this.storage.setItem(STUDIO_KEY, JSON.stringify(n)); } catch { throw Error('Could not save this notebook. Your working game is safe. Export a backup before freeing browser space.'); }
+    const changedOwners=new Set((n.rewardOutbox??[]).filter(fact=>!previousFacts.has(fact.owner+'|'+rewardFactId(fact))).map(fact=>fact.owner));
+    for(const owner of changedOwners){
+      // Notification only, never an award. If projection is unavailable, the
+      // committed outbox remains retryable and the saved work still succeeded.
+      try{this.onRewardSourceSaved?.(owner);}catch{}
+    }
     return copy(result);
   }
   list(owner:string):StudioSession[] {return this.read().sessions.filter(s=>s.owner===owner).sort((a,b)=>b.updated.localeCompare(a.updated));}
@@ -90,7 +118,7 @@ export class StudioNotebook {
   archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
   create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
-    return this.write(n=>{const s:StudioSession={id:crypto.randomUUID(),owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
     return this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');fn(s);s.updated=new Date().toISOString();return s;});
@@ -120,7 +148,7 @@ export class StudioNotebook {
     // Prior observations remain truthful history. Their old tests are not on the new shelf,
     // so keep the text, author/source, identifiers and dates while detaching those links.
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
-    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true,verifiedRemote=false):Experiment {
     let result:Experiment;
@@ -136,9 +164,11 @@ export class StudioNotebook {
    * can still be kept by their existing workflow but never award progress.
    */
   keepExperiment(id:string,owner:string,testId:string,receipt:KeptExperimentInput):StudioSession {
-    return this.update(id,owner,s=>{
+    return this.write(n=>{
+      const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');
       const test=s.experiments?.find(e=>e.id===testId);
       if(!test||!receipt||!ident(receipt.revisionId)||!['local','remote'].includes(receipt.kind)||receipt.baseId!==test.candidate.baseId||receipt.baseId!==test.baseId||receipt.baseId!==null&&!ident(receipt.baseId))throw Error('Kept version does not match its experiment.');
+      if(receipt.contentChanged!==undefined&&typeof receipt.contentChanged!=='boolean')throw Error('Invalid saved change receipt.');
       if(receipt.kind==='remote'?test.candidate.remoteId!==receipt.revisionId:!s.projectId||!test.candidate.config)throw Error('Kept version does not match its experiment.');
       if(receipt.revisionId===receipt.baseId)throw Error('Keep a new version of this experiment.');
       if(receipt.kind==='remote')s.remoteId=receipt.revisionId;
@@ -147,8 +177,16 @@ export class StudioNotebook {
       if(receipt.baseId!==null&&verified){
         s.keptExperiments ||= [];
         // Repeating a keep does not create extra project or milestone credit.
-        if(!s.keptExperiments.some(k=>k.experimentId===test.id))s.keptExperiments.push({...receipt,baseId:receipt.baseId,experimentId:test.id,at:new Date().toISOString()});
+        if(!s.keptExperiments.some(k=>k.experimentId===test.id))s.keptExperiments.push({kind:receipt.kind,revisionId:receipt.revisionId,baseId:receipt.baseId,experimentId:test.id,at:new Date().toISOString()});
       }
+      // The first real remote build can earn development credit without claiming
+      // an improvement over a nonexistent base. Local callers must verify an
+      // actual config change against the saved base; clicking Keep alone cannot.
+      if(receipt.kind==='remote'?verified:receipt.contentChanged===true){
+        const sourceId=s.rewardProjectId??s.projectId??s.id;s.rewardProjectId=sourceId;
+        n.rewardOutbox=enqueueRewardFact(n.rewardOutbox??[],createRewardFact({owner,kind:'game.developed',sourceId,occurredAt:Date.now()}));
+      }
+      s.updated=new Date().toISOString();return s;
     });
   }
   selectExperiment(id:string,owner:string,testId:string):Experiment {
@@ -159,5 +197,10 @@ export class StudioNotebook {
   observe(id:string,owner:string,text:string,source:'runtime'|'child',experimentId:string|null=null){
     this.update(id,owner,s=>{s.design ||= freshDesign();if(experimentId&&!s.experiments?.some(e=>e.id===experimentId))throw Error('Unknown observation test.');s.design.observations.push({id:crypto.randomUUID(),experimentId,text:text.slice(0,1200),source,at:new Date().toISOString()});});
   }
-  restore(data:unknown) {const checked=validateNotebook(data);this.storage.setItem(STUDIO_KEY,JSON.stringify(checked));}
+  pendingRewards(owner:string):RewardFact[] {if(!ident(owner))throw Error('Invalid player.');return (this.read().rewardOutbox??[]).filter(fact=>fact.owner===owner);}
+  acknowledgeRewards(owner:string,factIds:string[]):void {
+    if(!ident(owner)||!Array.isArray(factIds)||!factIds.every(id=>typeof id==='string'))throw Error('Invalid reward acknowledgment.');
+    const ids=new Set(factIds);this.write(n=>{n.rewardOutbox=(n.rewardOutbox??[]).filter(fact=>fact.owner!==owner||!ids.has(rewardFactId(fact)));return true;});
+  }
+  restore(data:unknown) {assertRewardSourceWritable();const checked=validateNotebook(data);this.storage.setItem(STUDIO_KEY,JSON.stringify(checked));}
 }

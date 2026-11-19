@@ -1,5 +1,6 @@
 import { defaults, isGameId, validateConfig } from '../runtime/manifests';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
+import { assertRewardSourceWritable } from '../rewards/write-guard';
 export const WORKSPACE_KEY = 'family-game-factory-workspace-v2';
 export interface Revision { id: string; projectId: string; parentId: string | null; sourceRevisionId?: string; config: Mechanics; label: string; hypothesis: string; createdAt: string; state: 'private' }
 export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string }
@@ -57,6 +58,7 @@ export class RevisionStore {
   }
   snapshot(): Workspace { return copy(this.data); }
   private transaction<T>(mutate:(next:Workspace)=>T):T {
+    assertRewardSourceWritable();
     const next=copy(this.data), result=mutate(next);validateWorkspace(next);
     try { this.storage.setItem(WORKSPACE_KEY,JSON.stringify(next)); } catch { throw Error('Could not save on this device. Your last working version is safe. Free some space and try again.'); }
     this.data=next;return copy(result);

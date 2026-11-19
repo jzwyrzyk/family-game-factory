@@ -6,6 +6,8 @@ The original PR33 joy-layer palette and system-font-only setup are superseded by
 
 The existing verified-event controller remains the host. PR57 adds the [cosmetic making journey](GEM_PROGRESS.md) and short, nonblocking earned popups. V1.2 makes the chosen Spark/Nova original outfit the primary rank thumbnail in those popups and Journey; no framed medal replaces the character. Engine, learning, ownership, adult/guardian authorization and explicit Keep behavior remain intact. The historical deliverables and checks below retain their original scope; they are not new exact-head acceptance results.
 
+**Later shared rewards:** [ADR0010](../decisions/0010-lifetime-gems-and-shared-rewards.md) adds a separate lifetime engagement-gem ledger and its [Rewards UI](../rewards/README.md). The historical Delight events below remain presentation events and cannot mint gem receipts. The new completion reward accepts supported work without changing the earlier evidence labels or maker-rank criteria.
+
 ## Original PR33 deliverables · historical scope
 - Local, reusable maker-workbench and four original world-scene SVGs, with existing quality-rendered Gum and Rally thumbnails preserved.
 - World-specific *accent* identities for six favorite game cards; headline readability, small meaningful category chips, focus-visible states and reduced-motion-friendly hover affordances.
