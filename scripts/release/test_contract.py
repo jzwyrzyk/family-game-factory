@@ -133,6 +133,46 @@ class ReleaseContractTests(unittest.TestCase):
         with self.assertRaises(release.ReleaseError):
             release.automatic_pages_scope([])
 
+    def test_final_release_verdict_requires_matching_http_and_real_browser_proof(self):
+        http = {"schema":1,"status":"PAGES_AND_PUBLIC_HEALTH_VERIFIED",
+                "sourceSha":SHA,"siteBase":SITE,
+                "gatewayOrigin":GATEWAY,"previewOrigin":PREVIEW}
+        def good(device):
+            return {"device":device,"homepage":True,"sixFavorites":True,
+                    "logo":True,"localGame":True,"uncaughtPageErrors":0,
+                    "failedPublicAssets":0}
+        browser = {"kind":"public-browser-smoke","siteBase":SITE,"releaseSuccess":True,
+                   "paidRequestsStarted":0,"realProviderInferenceTested":False,
+                   "parentDeviceUAT":False,"tested":[good("desktop"),good("mobile")]}
+        result = release.final_pages_verdict(http,browser)
+        self.assertEqual(result["status"],"PAGES_BROWSER_VERIFIED")
+        self.assertFalse(result["paidModelActivatedByThisRelease"])
+        self.assertFalse(result["realProviderInferenceTested"])
+        for wrong in (
+            {**browser, "siteBase":"https://other.example/"},
+            {**browser, "releaseSuccess":False},
+            {**browser, "paidRequestsStarted":1},
+            {**browser, "realProviderInferenceTested":True},
+            {**browser, "tested":[good("desktop")]},
+            {**browser, "tested":[good("desktop"),{**good("mobile"),"localGame":False}]},
+            {**browser, "tested":[good("desktop"),{**good("mobile"),"uncaughtPageErrors":1}]},
+        ):
+            with self.subTest(bad=wrong),self.assertRaises(release.ReleaseError):
+                release.final_pages_verdict(http,wrong)
+        with self.assertRaises(release.ReleaseError):
+            release.final_pages_verdict({**http,"status":"READ_ONLY_PLAN"},browser)
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            good_http=root/"http.json"
+            good_browser=root/"browser.json"
+            verdict=root/"verdict.json"
+            good_http.write_text(json.dumps(http))
+            good_browser.write_text(json.dumps(browser))
+            release.main(["finalize","--http-evidence",str(good_http),
+                          "--browser-evidence",str(good_browser),
+                          "--output",str(verdict)])
+            self.assertEqual(json.loads(verdict.read_text())["status"],"PAGES_BROWSER_VERIFIED")
+
     def test_release_workflow_keeps_cloud_mutation_and_provider_secrets_out(self):
         root = Path(__file__).resolve().parents[2]
         workflow = (root / ".github/workflows/jems-release.yml").read_text()
@@ -146,6 +186,8 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertIn("npm audit --omit=dev --audit-level=high", workflow)
         self.assertIn("scripts/release/contract.py auto-scope", workflow)
         self.assertIn("tests/release-live-browser.cjs", workflow)
+        self.assertIn("scripts/release/contract.py finalize", workflow)
+        self.assertIn("release-evidence/final-verdict.json", workflow)
         self.assertIn("sourceSha", (root / "scripts/release/contract.py").read_text())
         self.assertIn("node --check tests/release-live-browser.cjs", workflow)
         self.assertIn("actions/deploy-pages@v4", workflow)
