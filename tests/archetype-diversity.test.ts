@@ -144,3 +144,13 @@ test('same-family play patterns cannot collapse into mere art, reward-text or ti
  assert.ok(distinct>minor,'the editorial catalog must emphasize substantial, not tiny, differences');
  // No numeric novelty score or observed-child delight is manufactured by these counts.
 });
+
+test('rhythm and dialogue can affect play; only inert embellishments are ignored',()=>{
+ const b=get('choice-discovery/splash-choice');
+ const moreStory:ExperienceSignature={...b,mechanics:[...b.mechanics,'narrative-dialogue']};
+ assert.equal(reviewDiversity(b,moreStory,'different-game').comparison,'small-gameplay-variation');
+ const rhythm:ExperienceSignature={...b,mechanics:[...b.mechanics,'rhythm-beat']};
+ assert.ok(reviewDiversity(b,rhythm,'different-game').changedMechanics.includes('rhythm-beat'));
+ const decorated:ExperienceSignature={...b,mechanics:[...b.mechanics,'sound-effect','celebration','launch-animation']};
+ assert.equal(reviewDiversity(b,decorated,'different-game').comparison,'cosmetic-only');
+});
