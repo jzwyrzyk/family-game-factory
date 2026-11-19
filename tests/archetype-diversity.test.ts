@@ -115,3 +115,15 @@ test('no declared novelty score replaces real gameplay observation or child cons
   assert.ok(result.mustStillTest.some(x=>/child.*requested action/i.test(x)));
  }
 });
+
+test('each play pattern selects its own mechanic mix instead of inheriting every genre example',()=>{
+ const archery=get('projectile-defense/archery-range'),dragon=get('projectile-defense/dragon-mirror');
+ assert.ok(archery.mechanics.includes('aim-direction'));
+ assert.ok(archery.mechanics.includes('fire-projectile'));
+ assert.ok(!archery.mechanics.includes('reflect-projectile'),'archery must not silently become shield reflection');
+ assert.ok(!archery.mechanics.includes('shield-window'));
+ assert.ok(dragon.mechanics.includes('reflect-projectile'));
+ assert.ok(dragon.mechanics.includes('shield-window'));
+ const hill=get('side-driving/egg-courier');
+ assert.ok(hill.mechanics.includes('drive-throttle'),'editorial driving patterns keep the actual vehicle control');
+});
