@@ -3,6 +3,7 @@
  * A browser click must never enable a remote model or microphone provider.
  */
 import type {BuilderClient} from './client';
+import {iconMarkup} from '../brand/icons';
 
 const NOTICE='jems-parent-privacy-2026-11-v1';
 export function installParentPrivacy(client:BuilderClient,container:HTMLElement){
@@ -10,9 +11,9 @@ export function installParentPrivacy(client:BuilderClient,container:HTMLElement)
  root.className='panel parent-privacy';root.hidden=true;
  root.setAttribute('aria-labelledby','builderPrivacyTitle');
  root.innerHTML=`
-  <h3 id="builderPrivacyTitle">Privacy & permissions</h3>
+  <h3 id="builderPrivacyTitle">${iconMarkup('shield')} Privacy & permissions</h3>
   <p>These choices remain pending until an independent guardian check is recorded. Submitting this form never activates paid AI or speech by itself.</p>
-  <details><summary>Read the privacy notice & provider disclosures</summary>
+  <details><summary>${iconMarkup('book')} Read the privacy notice & provider disclosures</summary>
    <p>AI generation and conversation can send ideas and relevant game context to OpenAI. Remote dictation sends a short recording to Google Cloud Speech-to-Text. Each is a separate choice.</p>
    <p>Jems stores saved games, drafts, local learning progress, account/device metadata, operational receipts and some backups. Clear chat does not erase every saved game or provider record.</p>
    <p>OpenAI Zero Data Retention requires separate provider/project approval and has endpoint limitations. This form does not establish ZDR, guarantee that Jems stores no data, or authorize child processing before those approvals.</p>
@@ -24,12 +25,12 @@ export function installParentPrivacy(client:BuilderClient,container:HTMLElement)
    <label><input id="privacySpeech" type="checkbox"> Remote speech transcription (Google Cloud)</label>
    <label><input id="privacyGuardian" type="checkbox" required> I am the parent or legal guardian.</label>
    <label><input id="privacyProvider" type="checkbox" required> I have read the notice and understand selected provider processing.</label>
-   <button class="btn primary" type="submit">Submit choices for verification</button>
+   <button class="btn primary" type="submit">${iconMarkup('send')} Submit choices for verification</button>
   </form>
-  <button class="btn secondary" type="button" id="privacyRevoke" hidden>Withdraw permissions</button>
-  <details><summary>Clear temporary server conversation records</summary>
+  <button class="btn secondary" type="button" id="privacyRevoke" hidden>${iconMarkup('lock')} Withdraw permissions</button>
+  <details><summary>${iconMarkup('trash')} Clear temporary server conversation records</summary>
    <p>This deletes cached AI replies and speech usage receipts for this family on the server. Local notebooks, saved games, billing totals, backups and provider records are separate. Clear a local conversation from that game’s Chat options.</p>
-   <button class="btn secondary" type="button" id="privacyErase">Clear temporary server records</button>
+   <button class="btn secondary" type="button" id="privacyErase">${iconMarkup('trash')} Clear temporary server records</button>
   </details>
   <p id="privacyChoiceReference" hidden></p>
   <p role="status" aria-live="polite" id="builderPrivacyStatus">Unlock Parent Controls to review permissions.</p>`;

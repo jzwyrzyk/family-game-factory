@@ -286,7 +286,7 @@ async function installAuthFixture(context) {
     // The legacy host still participates in the same reward ledger without an alternate award path.
     await page.goto(base + '?arcade=1'); await page.waitForFunction(() => window.FG?.rewards && window.FG?.learning);
     assert.equal(await total(page), 100);
-    await page.getByRole('navigation').getByRole('button', { name: '⚡ My Powers', exact: true }).click();
+    await page.getByRole('navigation').getByRole('button', { name: 'My Powers', exact: true }).click();
     await answerMath(page); await expectTotal(page, 102);
 
     // A second real tab cannot write over the active tab. Taking over reloads its

@@ -19,7 +19,7 @@ function Builder(mount,ctx){
   const done=pieces.find(p=>p.id===id&&placed[id]);const slot=button(done?`${done.emoji}  ${title}`:`✚  ${title}`,()=>place(id),'build-slot'+(done?' filled':''));
   if(done){const small=make('span','',`✓ ${done.name}`);small.style.display='block';slot.append(small)}else{const note=make('small','', 'Tap to attach');note.style.display='block';slot.append(note)}slots.append(slot);
  });
- const ctl=make('div','builder-controls');const info=make('span','builder-counter',`🔗 ${Object.keys(placed).length}/${bp.slots.length} parts connected`);ctl.append(info);ctl.append(button('🔄 Mix up the pile',()=>{pieces=shuffle(pieces);render()},'btn secondary small'));root.append(ctl);
+ const ctl=make('div','builder-controls');const info=make('span','builder-counter',`🔗 ${Object.keys(placed).length}/${bp.slots.length} parts connected`);ctl.append(info);ctl.append(button('Mix up the pile',()=>{pieces=shuffle(pieces);render()},'btn secondary small','retry'));root.append(ctl);
  const label=make('p','builder-message','YOUR JUNK PILE — pick one:');label.style.margin='14px 0 8px';root.append(label);
  const stash=make('div','builder-pieces');pieces.forEach(p=>{const taken=!!placed[p.id];const item=button(`${p.emoji} ${p.name}`,()=>{selected=p.id;render()},'builder-piece'+(selected===p.id?' selected':''));if(ctx.config.highlightMatches&&bp.slots.some(([id])=>id===p.id))item.style.borderColor='#26945e';item.disabled=taken||ended;stash.append(item)});root.append(stash);
  const foot=make('p','builder-message','Tip: matching a piece to its purpose is more important than making it look perfect. Try different inventions!');foot.style.marginTop='14px';root.append(foot);

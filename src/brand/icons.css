@@ -1,0 +1,17 @@
+/* The supplied sprite owns each path; functional icons inherit control colour. */
+.jems-icon {
+  display: inline-block;
+  inline-size: 1.2em;
+  block-size: 1.2em;
+  flex: 0 0 auto;
+  vertical-align: -0.2em;
+  color: inherit;
+  fill: none;
+  pointer-events: none;
+}
+
+.jems-icon-label { vertical-align: middle; }
+.jems-icon--back { transform: rotate(180deg); }
+.jems-icon--up { transform: rotate(-90deg); }
+.jems-icon--down { transform: rotate(90deg); }
+.jems-icon--mirror { transform: scaleX(-1); }

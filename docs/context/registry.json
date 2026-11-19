@@ -70,10 +70,10 @@
         "docs/rewards/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "1ee70fd779bc05e8a18f3979c6104befe7bd5d222af6de93275a2c928c7b61be",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "edbcdfb154db579bee01c7eaae1be83dda956a72f1aac1059f98413c83b08678",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed combined parent reporting and lifetime rewards against product doctrine: inspectable learning evidence remains distinct from engagement gems, maker-rank evidence and externally validated proficiency claims.",
+      "reviewReason": "Reviewed combined PR69 brand fidelity and shared rewards against child-first product doctrine; gem engagement totals do not imply mastery, and selected-maker stages retain actual making evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -133,10 +133,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "050030092e580e583c63e22181aabdad140ad2c67fa44f251626fb2000179f42",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "79ff2d1c9bf803d73dd3d3aef9306075b47e539c6fc96a12818a22d574adc537",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed approved branding, parent dashboard navigation, rewards header and page, single-writer startup and adult profile isolation; both new surfaces retain accessible existing controls.",
+      "reviewReason": "Reviewed the merged approved icon/illustration system with six Studio destinations, parent reporting, rewards header and page, startup recovery and adult profile separation. Icons preserve visible text and focus.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -169,10 +169,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fea32ded41a236a86f97ff12f52b29d16afcfa6588b4d1be5f46f97bbdf5f57b",
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
+      "sourceDigest": "14aa3ac7fce93f6320ef2c84452b68eea2f60ba7876a5d56f8ee472f518fea86",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed checked-scene outboxes, maker progression and parent read-only reporting; rewards grant once per verified challenge while creation evidence and assisted status remain unchanged.",
+      "reviewReason": "Reviewed newly styled Creation controls and saved challenge reward outboxes; source-backed checks remain deterministic and assistance evidence and prior scene versions remain distinct.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -229,10 +229,10 @@
         "docs/game-quality/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:41.812Z",
-      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed new action icons and existing native game controls including Gem Factory, driving and construction; original physics, content, scores, evidence and runtime remain unchanged."
     },
     {
       "id": "learning",
@@ -250,10 +250,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "473ce6752757395f995584ea8ec6ce6f6fdde286f513bda388bd7015b3a7cd36",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "a5459e9518e24d1db636dd0d070070203421d45acb1c56f871820f842bf1d517",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Math/Language source-backed reward events with the parent evidence reporting model; the reporting dashboard continues to separate hints and correctness from equal engagement grants."
+      "reviewReason": "Reviewed approved brand navigation and Math/Language engagement grants with parent reporting; assistance, correctness and retained evidence keep their established independent meanings."
     },
     {
       "id": "services",
@@ -350,10 +350,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "5eaf6d3199be0c8ee8d271c26efc59361fa67948fd0f7111f22426d8880922c3",
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
+      "sourceDigest": "7e6053d4cdf072d667b7f6331f3ceffa818f5b4837c432831629feacf523c9a8",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed family versus adult rewards, parent Settings and dashboard, backup restore handover, and private adult authorization; no consent or provider authority expands."
+      "reviewReason": "Reviewed brand control changes alongside family/adult reward namespaces and parent Settings backup controls; no guardian scope, device trust or paid provider permission changes."
     },
     {
       "id": "validation",
@@ -377,10 +377,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "dd22ff1616decf473b9cf4a0eeb271564e8bf00642981659a2e1346a2d8b1026",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "bb542408b35bf0dda8b3fb7093edc30278e8b161f8b40f2010fa2f5f62adc619",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined parent reporting and rewards browser coverage, six-item navigation, Settings routing and backup reload semantics while preserving privacy and learning checks.",
+      "reviewReason": "Reviewed PR69 icon and control-state tests together with rewards browser, mobile navigation, parent Settings, backup import and Creation recovery regressions. Combined-head CI is required before merge.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -418,10 +418,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "895cbff804369f0e59df454dc0b85ec7712f1cc277f9bb0907e2e5ff3037c825",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "1c566a03ed1c628cd0a6ff033eea9ad2f8f2efd903fad9d7da68701385880e21",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled PR65's observed parent-reporting merge and PR67's successful previous CI, including shared runtime startup, tests and explicit source-only release boundaries; combined-head CI remains to be verified.",
+      "reviewReason": "Reconciled main PR69 branding completion, merged PR65 parent reporting and PR67 rewards integration, retaining exact prior CI evidence and a separate source-merge versus production boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -465,10 +465,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:07:00.000Z",
-      "sourceDigest": "06b37abc321b9d2e1c4648c0dac5df29ae39e23e0555ff344d6d9e5ed1ab7615",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "63831be7901fee77d0d2ce23f5ceb89e70d1a2398e6163a32f533fa2c6530e43",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the complete parent reporting and rewards registries, routed source and documents, decision links, explicit reviews and their distinct verified merge and premerge delivery receipts.",
+      "reviewReason": "Combined the PR69 brand-reconciliation review and parent evidence registry with the independent Rewards area, its explicit policy/document routes, and preserved historical source review receipts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -186,7 +186,7 @@ async function main(){
   page.on('response',r=>{const path=new URL(r.url()).pathname;if(path.startsWith('/v1/')&&(r.request().method()==='POST'||r.status()>=400))recordApi({method:r.request().method(),path,status:r.status()});});
   page.on('requestfailed',r=>{const path=new URL(r.url()).pathname;if(path.startsWith('/v1/'))recordApi({method:r.method(),path,error:r.failure()?.errorText.slice(0,200)});});
   try{
-  await context.addCookies([{name:'factory_session',value:signSession(deviceActor,config.sessionKey),url:config.appOrigin,httpOnly:true,sameSite:'Strict'}]);await page.goto(config.appOrigin+'/arcade/?arcade=1');await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.fill('#inventIdea','Make a moon hopper with a gate to jump through');
+  await context.addCookies([{name:'factory_session',value:signSession(deviceActor,config.sessionKey),url:config.appOrigin,httpOnly:true,sameSite:'Strict'}]);await page.goto(config.appOrigin+'/arcade/?arcade=1');await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'Create',exact:true}).click();await page.fill('#inventIdea','Make a moon hopper with a gate to jump through');
   const buildStartedAt=Date.now();
   const [submitted]=await Promise.all([page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs',{timeout:10000}),page.click('#createTry')]);
   const acknowledgement=await submitted.json();assert.equal(submitted.status(),202,`Initial ${device} submission failed: ${acknowledgement.errorCode||submitted.status()}`);assert.equal(acknowledgement.status,'queued');
@@ -209,14 +209,14 @@ async function main(){
   }
   await page.click('#undoBuild');await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await page.fill('#builtGameName','My generated '+device);await page.click('#forkBuildForm button[type=submit]');await page.getByText('Saved as a new builder game. Your original version is unchanged.',{exact:true}).waitFor();
   // Reload while an acknowledged job waits in the durable dispatcher; no prompt or credential is stored in the browser.
-  paused=true;await page.fill('#reviseBuildPrompt','Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.reload();await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.click('#cancelBuild');await page.getByText('Build cancelled. Your current game is safe.',{exact:true}).waitFor();paused=false;
-  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();await page.getByRole('button',{name:'🌟 My generated '+device,exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<2;i++){await frame.locator('#game').click({position:{x:70+i*55,y:80}});await page.waitForTimeout(100);}mkdirSync('test-results',{recursive:true});await page.locator('#generatedPreview').screenshot({path:`test-results/assignment-002-${device}.png`});
+  paused=true;await page.fill('#reviseBuildPrompt','Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.reload();await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'Create',exact:true}).click();await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.click('#cancelBuild');await page.getByText('Build cancelled. Your current game is safe.',{exact:true}).waitFor();paused=false;
+  await page.getByRole('navigation').getByRole('button',{name:'My Creations',exact:true}).click();await page.getByRole('button',{name:'My generated '+device,exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<2;i++){await frame.locator('#game').click({position:{x:70+i*55,y:80}});await page.waitForTimeout(100);}mkdirSync('test-results',{recursive:true});await page.locator('#generatedPreview').screenshot({path:`test-results/assignment-002-${device}.png`});
   // O7: modern generated-module-v2 Create→Play→Edit→Compare→Keep→Return.
   // Existing old v1 fixtures above remain required; this is a separate,
   // exact-source-allowlisted journey through the same authenticated Actions
   // and private preview/learning host, NOT a real paid model generation.
   failFirst=false;
-  await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();
+  await page.getByRole('navigation').getByRole('button',{name:'Create',exact:true}).click();
   await page.fill('#inventIdea','Make a marble game where I press Right to move the marble and tap to win.');
   const [marbleResponse]=await Promise.all([
    page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs'),
@@ -287,8 +287,8 @@ async function main(){
    'failed build must not alter learning performance');
 
   await page.reload();await page.waitForFunction(()=>window.FG?.builder);
-  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();
-  await page.getByRole('button',{name:'🌟 Faster Marble Playground',exact:true}).click();
+  await page.getByRole('navigation').getByRole('button',{name:'My Creations',exact:true}).click();
+  await page.getByRole('button',{name:'Faster Marble Playground',exact:true}).click();
   await frame.getByRole('heading',{name:'Faster Marble Playground',exact:true}).waitFor({timeout:15000});
   const returnedDistance=await playV2Marble(page,frame,device);
   assert.ok(returnedDistance>45,'saved v2 game must remain playable after reload');

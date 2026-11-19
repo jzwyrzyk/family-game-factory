@@ -1,3 +1,4 @@
+import {setIconLabel,type IconName} from '../brand/icons';
 import type {GameContext,GameInstance} from '../runtime/types';
 import './sticker-builder.css';
 
@@ -30,13 +31,13 @@ const STICKERS:Sticker[]=[
 ];
 const base=(svg:string)=>'<svg class="gum-machine-svg" viewBox="0 0 620 420" focusable="false" aria-hidden="true"><defs><linearGradient id="gumShine" x1="0" x2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#c7f0ff"/><stop offset="1" stop-color="#97b8ff"/></linearGradient></defs>'+svg+'</svg>';
 const MISSIONS:Mission[]=[
- {id:'rocket',title:'Rocket Pop',tagline:'Dress up your rocket and send it to the stars!',verb:'🚀 BLAST OFF!',outcome:'Your bubblegum rocket zoomed into the stars!',slots:[
+ {id:'rocket',title:'Rocket Pop',tagline:'Dress up your rocket and send it to the stars!',verb:'BLAST OFF!',outcome:'Your bubblegum rocket zoomed into the stars!',slots:[
   {id:'top',name:'Top',x:51,y:23},{id:'middle',name:'Window',x:37,y:56},{id:'boost',name:'Boost',x:65,y:72}
  ],art:base('<ellipse cx="310" cy="382" rx="102" ry="15" fill="#6575cf" opacity=".18"/><path d="M273 245 221 308 276 296M347 245l52 63-55-12" fill="#ff689e" stroke="#aa3e90" stroke-width="8" stroke-linejoin="round"/><path d="M312 63c-65 66-73 154-56 236h112c16-82 9-170-56-236Z" fill="url(#gumShine)" stroke="#3a54ae" stroke-width="9" stroke-linejoin="round"/><path d="M312 63c-27 28-40 59-48 83h96c-8-24-21-55-48-83Z" fill="#946aff" stroke="#6544ca" stroke-width="5"/><circle cx="312" cy="202" r="44" fill="#42c9e9" stroke="#5365cb" stroke-width="9"/><circle cx="304" cy="194" r="25" fill="#c5f7ff" opacity=".8"/><path d="M275 299h74l-11 40h-52Z" fill="#7b62f1" stroke="#4c44a8" stroke-width="7"/><path d="M304 341q-25 24 8 62 33-38 8-62Z" fill="#ffbe4b" stroke="#f07653" stroke-width="7"/><path d="M307 344q-14 18 5 40 19-22 5-40Z" fill="#fff3a3"/>')},
- {id:'sub',title:'Bubble Sub',tagline:'Make a silly sub and cruise through the bubble sea!',verb:'🐠 DIVE AWAY!',outcome:'Your bubblegum submarine made a splash and sailed away!',slots:[
+ {id:'sub',title:'Bubble Sub',tagline:'Make a silly sub and cruise through the bubble sea!',verb:'DIVE AWAY!',outcome:'Your bubblegum submarine made a splash and sailed away!',slots:[
   {id:'top',name:'Top',x:48,y:19},{id:'middle',name:'Window',x:32,y:53},{id:'boost',name:'Tail',x:76,y:61}
  ],art:base('<ellipse cx="312" cy="350" rx="190" ry="16" fill="#5f9ec7" opacity=".17"/><path d="M310 181V118h65v63" fill="#9c7bfa" stroke="#4c51a8" stroke-width="8"/><rect x="294" y="111" width="92" height="24" rx="11" fill="#ffd064" stroke="#bb7691" stroke-width="6"/><path d="M135 219q-2-79 170-92 173-1 189 97 5 104-191 106-170 0-168-111Z" fill="#ffca60" stroke="#cd7b53" stroke-width="9"/><path d="M475 208 550 165v127l-75-53" fill="#ed73b8" stroke="#ae4c9a" stroke-width="8"/><circle cx="235" cy="224" r="46" fill="#6bdef2" stroke="#7757d5" stroke-width="9"/><circle cx="350" cy="224" r="46" fill="#6bdef2" stroke="#7757d5" stroke-width="9"/><circle cx="228" cy="216" r="20" fill="#fff" opacity=".58"/><circle cx="343" cy="216" r="20" fill="#fff" opacity=".58"/><path d="M272 284q26 15 49 0" stroke="#a64c77" stroke-width="5" fill="none" stroke-linecap="round"/>')},
- {id:'robot',title:'Silly Bot',tagline:'Give your robot a personality, then make it dance!',verb:'🤖 DANCE TIME!',outcome:'Your sticker-powered robot did the happiest dance!',slots:[
+ {id:'robot',title:'Silly Bot',tagline:'Give your robot a personality, then make it dance!',verb:'DANCE TIME!',outcome:'Your sticker-powered robot did the happiest dance!',slots:[
   {id:'top',name:'Head',x:51,y:24},{id:'middle',name:'Heart',x:51,y:62},{id:'boost',name:'Arm',x:74,y:46}
  ],art:base('<ellipse cx="313" cy="379" rx="130" ry="16" fill="#5965c2" opacity=".2"/><path d="M228 244 182 287M395 244l51 43" stroke="#7554d9" stroke-width="24" stroke-linecap="round"/><circle cx="180" cy="291" r="21" fill="#ffcc61" stroke="#b57db0" stroke-width="7"/><circle cx="447" cy="291" r="21" fill="#ffcc61" stroke="#b57db0" stroke-width="7"/><path d="M268 337 259 376M362 337l11 39" stroke="#5977d9" stroke-width="24" stroke-linecap="round"/><rect x="221" y="208" width="185" height="132" rx="36" fill="#70e1cf" stroke="#4764b1" stroke-width="9"/><rect x="220" y="93" width="185" height="128" rx="39" fill="url(#gumShine)" stroke="#4764b1" stroke-width="9"/><circle cx="276" cy="151" r="22" fill="#6c56d9"/><circle cx="352" cy="151" r="22" fill="#6c56d9"/><circle cx="281" cy="144" r="7" fill="#fff"/><circle cx="357" cy="144" r="7" fill="#fff"/><path d="M285 185q26 23 56 0" stroke="#b567a1" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M312 91V59" stroke="#4764b1" stroke-width="8"/><circle cx="312" cy="52" r="16" fill="#ffcb49" stroke="#bc7c34" stroke-width="5"/>')}
 ];
@@ -82,8 +83,8 @@ export default class StickerBuilder implements GameInstance {
   const saved:Saved={schema:'gum-stickers-v1',mission:this.mission.id,placed:{...this.placed}};
   this.saveFailed=!!this.context.persistence&&!this.context.persistence.save(saved);
  }
- private button(label:string,css:string,fn:()=>void){
-  const b=make('button',css,label) as HTMLButtonElement;b.type='button';b.onclick=fn;return b;
+ private button(label:string,css:string,fn:()=>void,icon?:IconName){
+  const b=make('button',css,label) as HTMLButtonElement;b.type='button';if(icon)setIconLabel(b,icon,label);b.onclick=fn;return b;
  }
  private select(id:string){if(this.paused||this.phase!=='stick'||this.storageBlocked)return;this.selected=id;this.render();}
  private place(slotId:string,id=this.selected){
@@ -210,11 +211,11 @@ export default class StickerBuilder implements GameInstance {
   progress.append(make('strong','',count+' of 3 stickers on!'));
   const dots=make('span','gum-step-dots');for(let i=0;i<3;i++)dots.append(make('i',i<count?'done':''));
   progress.append(dots);side.append(progress);
-  const launch=this.button(ready?'✨ '+this.mission.verb:'Put on 3 stickers to GO','gum-launch',()=>this.launch());
+  const launch=this.button(ready?this.mission.verb:'Put on 3 stickers to GO','gum-launch',()=>this.launch(),'play');
   launch.disabled=!ready||this.phase!=='stick'||this.paused||this.storageBlocked;
   side.append(launch);
   const small=make('div','gum-secondary-actions');
-  small.append(this.button('↶ Undo','gum-link',()=>this.undo()),this.button('Start fresh','gum-link',()=>this.reset(this.mission.id,true)));
+  small.append(this.button('Undo','gum-link',()=>this.undo(),'undo'),this.button('Start fresh','gum-link',()=>this.reset(this.mission.id,true),'retry'));
   small.firstElementChild!.toggleAttribute('disabled',!this.history.length||this.phase!=='stick'||this.paused);
   side.append(small);
   if(this.storageBlocked)side.append(make('p','gum-warning','An older save was found. It has not been replaced. Choose Start fresh to begin new sticker play.'));
