@@ -1,0 +1,34 @@
+name: Jems release contract checks
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: jems-release-contracts-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  offline-release-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release input, provenance and safety regression tests
+        run: python3 -m unittest discover -s scripts/release -p 'test_*.py' -v
+      - name: Ensure production browser smoke is syntactically valid
+        run: node --check tests/release-live-browser.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Reject known high and critical production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify default read-only operation produces evidence without credentials
+        run: |
+          python3 scripts/release/contract.py plan \
+            --operation plan --source-sha "$GITHUB_SHA" --main-sha "$GITHUB_SHA" \
+            --output release-evidence/ci-plan.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jems-release-contract-evidence
+          path: release-evidence/ci-plan.json
+          if-no-files-found: error
