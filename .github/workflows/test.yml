@@ -47,9 +47,6 @@ jobs:
       - name: Unit and contract checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:unit
-      - name: Earned gem progress contracts
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:gem-progress
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
@@ -74,6 +71,12 @@ jobs:
       - name: Generated worker security
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/generated-worker-security.ts
+      - name: Approved artwork and archived runtime compatibility
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:generated-art
+      - name: Actual normal-motion review captures and input receipts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:quality-capture
       - name: Restored games
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/restored-games.cjs
@@ -148,9 +151,18 @@ jobs:
       - name: Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:studio
+      - name: Gem progress evidence
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-progress
       - name: Illustrated gem journey
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:gem-journey
+      - name: Editable creation contracts and behavioral challenges
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation
+      - name: Creation desktop and touch journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation-browser
       - name: Design coach checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:coach

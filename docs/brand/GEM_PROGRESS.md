@@ -1,6 +1,6 @@
 # Jems — the illustrated making journey
 
-This is the detailed feature contract for [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57). [ADR 0005](../decisions/0005-cosmetic-making-journey.md) records the decision and threshold limits; [current architecture](../../ARCHITECTURE-CURRENT.md) maps implementation, and [delivery state](../../DELIVERY-STATE.md) owns branch, CI and operational evidence.
+This is the detailed feature contract for [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57). [ADR 0008](../decisions/0008-cosmetic-making-journey.md) records the decision and threshold limits; [current architecture](../../ARCHITECTURE-CURRENT.md) maps implementation, and [delivery state](../../DELIVERY-STATE.md) owns branch, CI and operational evidence.
 
 ## Design intent
 

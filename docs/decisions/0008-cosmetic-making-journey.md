@@ -1,4 +1,4 @@
-# 0005 — Four illustrated making levels with cosmetic character choice
+# 0008 — Four illustrated making levels with cosmetic character choice
 
 **Status:** Accepted owner-directed visual/product scope; the initial Gem Master threshold is an implementation policy within that scope.
 **Recorded:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`).

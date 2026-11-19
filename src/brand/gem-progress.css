@@ -54,8 +54,8 @@ body.studio-review #page-studio-library .studio-home-action .studio-creation-not
  body.studio-review .site-header .studio-nav{order:2;flex-basis:100%;justify-content:center}
 }
 @media(max-width:650px){
- body.studio-review .site-header .studio-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;gap:3px}
- body.studio-review .site-header .studio-nav button{font-size:11px;padding:9px 2px;white-space:nowrap}
+ body.studio-review .site-header .studio-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;gap:3px}
+ body.studio-review .site-header .studio-nav button{font-size:10px;padding:9px 2px;white-space:normal;overflow-wrap:anywhere;min-height:44px;min-width:0}
  body.studio-review #page-studio-library .studio-home-hero{padding:25px 22px 0;min-height:370px;justify-content:flex-start;gap:16px;border-radius:23px}
  body.studio-review #page-studio-library .studio-home-intro{width:100%;max-width:310px}
  body.studio-review #page-studio-library .studio-home-intro h1{font-size:32px;max-width:300px;letter-spacing:-1.2px}
@@ -84,3 +84,6 @@ body.studio-review #page-studio-library .studio-home-action .studio-creation-not
  body.studio-review #page-studio-library .studio-home-intro h1{font-size:29px}
  body.studio-review #page-studio-library .studio-home-action{width:61%}
 }
+
+/* Keep the five-tab header and character illustrations clear on narrow phones. */
+@media(max-width:650px){body.studio-review #page-studio-library .studio-home-hero{min-height:410px}body.studio-review #page-studio-library .studio-home-intro{position:relative;z-index:2}body.studio-review #page-studio-library .studio-home-action{position:relative;z-index:2}.jems-home-characters{pointer-events:none;z-index:1}}

@@ -1,5 +1,10 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
+  factory: {version:1,id:'factory',name:'Gem Factory',mechanics:[
+    {key:'orderSize',label:'Gifts per day',type:'number',default:3,min:2,max:5,step:1},
+    {key:'cutterSpeed',label:'Cutting speed',type:'number',default:1,min:0.5,max:1.5,step:0.25},
+    {key:'sparkleBoost',label:'Extra sparkles',type:'boolean',default:false},
+  ]},
   moon: {version:1,id:'moon',name:'Moon Donut Dash',mechanics:[
     {key:'donutGoal',label:'Donuts to collect',type:'number',default:6,min:4,max:12,step:1},
     {key:'moonGravity',label:'Moon gravity',type:'number',default:0.6,min:0.3,max:0.9,step:0.1},
@@ -60,6 +65,11 @@ export function validateConfig(game: GameId, value: unknown): Mechanics {
 }
 export function defaults(game: GameId, difficulty: Difficulty = 'classic'): Mechanics {
   const config = Object.fromEntries(manifests[game].mechanics.map(m => [m.key, m.default]));
+  if (game === 'factory') {
+    if (difficulty === 'gentle') Object.assign(config,{orderSize:2,cutterSpeed:0.75});
+    if (difficulty === 'stretch') Object.assign(config,{orderSize:5,cutterSpeed:1.25});
+    return validateConfig(game,config);
+  }
   if (game === 'moon' || game === 'robot') {
     if (difficulty === 'gentle') Object.assign(config,game==='moon'?{donutGoal:4,meteorRate:0.5}:{robotSpeed:0.75,showTrail:true});
     if (difficulty === 'stretch') Object.assign(config,game==='moon'?{donutGoal:9,meteorRate:1.5}:{robotSpeed:1.5,showTrail:false});

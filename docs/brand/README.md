@@ -63,7 +63,7 @@ Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac**
 
 **Non-negotiable restraint:** Graphics never obscure text, hijack input focus, displace playable game media, degrade 390px mobile first-action visibility, or animate while reduced-motion is requested. Branding must never claim educational mastery or model availability not supported by the product.
 
-The making journey's **Gem Master** label describes saved creation cycles, not educational mastery. Both Spark and Nova have the same progression and are presented without gender labels. See the [evidence and UI contract](GEM_PROGRESS.md), [decision rationale](../decisions/0005-cosmetic-making-journey.md), and [review artwork](achievement-art/README.md) before changing those surfaces. Ordinary Math/Language questions and grown-up controls retain the calm treatments above.
+The making journey's **Gem Master** label describes saved creation cycles, not educational mastery. Both Spark and Nova have the same progression and are presented without gender labels. See the [evidence and UI contract](GEM_PROGRESS.md), [decision rationale](../decisions/0008-cosmetic-making-journey.md), and [review artwork](achievement-art/README.md) before changing those surfaces. Ordinary Math/Language questions and grown-up controls retain the calm treatments above.
 
 ## Additional source-guide lockups — PR #34
 - `public/jems-logo.svg`: traced lowercase gem/wrench lockup and **THE GAME FACTORY** subline.

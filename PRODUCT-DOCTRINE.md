@@ -1,8 +1,7 @@
 # jems product doctrine
 
 **Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.
-**Source review:** November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`.
-**Scoped addition:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`), [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57), source `f650bdac730be9bb6655325b32052a9524880933`: the illustrated making journey described in section 7. Other principles retain their recorded review scope.
+**Source review:** original doctrine audit November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`; the owner's subsequent style-diverse quality direction is recorded in [ADR0006](docs/decisions/0006-style-diverse-playable-quality.md), November 19, 2026 (UTC).
 **Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
 
 Read [current architecture](ARCHITECTURE-CURRENT.md) for implementation boundaries and [delivery state](DELIVERY-STATE.md) for what is planned, merged, deployed, activated and verified. A past feature document's draft/release wording is not current operational evidence. The [decision index](docs/decisions/README.md) preserves the reasons behind these commitments.
@@ -15,13 +14,21 @@ Support tuning, redesigning the interaction and rethinking the objective. An unu
 
 The [owner-approved coaching standard](docs/design-coach/GOLD_STANDARD.md) is the detailed behavioral contract. A software defect is the system's responsibility, not evidence of a child's poor thinking.
 
+### One creation journey: games, scenes, and problem solving
+
+The owner's November 19, 2026 direction adds child-facing computational practice to the creation experience. A child's game characters and ideas can become editable stories, animations, and behavior rules. Free creation and **watch a scene, then rebuild it** practice share meaningful actions; practice should help children gain control of their own creations. Children can start with a game, a story, or a challenge without a compulsory ladder.
+
+Use demonstrated behavior, predictions, experiments, and revisions as specific formative observations. Allow equivalent working programs. An AI-authored scene, copied solution, or hint-supported attempt must not be counted as independent mastery. Critical thinking and computational thinking are intended capabilities, with no global thinking score or validated growth claim implied by this first implementation. [ADR0007](docs/decisions/0007-creation-and-rebuild-practice.md) records the accepted development direction; the [Creation Studio contract](docs/creation-studio/README.md) distinguishes current source adapters from the broader continuous-project vision.
+
 ## 2. Deliver the actual playable experience
 
 The requested player action must produce the intended visible consequence, and the essential payoff must happen. Collection without the requested growth, assembly without the launch, or a changed label without a changed mechanic does not fulfill an idea. Open-ended play can be complete without a manufactured win condition.
 
-Establish correct function, then robust integration and verified repairs, then polish and observed enjoyment. Readable worlds, expressive art, responsive controls and rewarding feedback remain product requirements; a compile pass cannot substitute for them. Keep idea fidelity, game-form fit, technical playability and observed player experience as separate judgments. Record missing evidence explicitly instead of averaging it into a reassuring score.
+A ready experiment must combine correct function with deliberate presentation, responsive controls, visible consequences and appropriate variation or expression. Polish is part of that acceptance floor, not work deferred until after a compile pass has made a game Ready. Keep idea fidelity, game-form fit, technical playability, presentation and observed player experience as separate judgments. Record missing evidence explicitly instead of averaging it into a reassuring score.
 
-See the [Game Intelligence standard](docs/game-intelligence/README.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit.
+Hold pixel art, flat digital 2D, illustration, dimensional art and realistic treatment to equivalent standards of craft in their own styles. Preserve the child's chosen appearance and the identity of saved artwork through unrelated mechanic changes. Gem Factory can set a reference for finish without becoming every game's palette, theme or loop. A simple complete game can meet the standard; an open-ended toy does not need a forced win, and a beautiful static scene does not establish meaningful play.
+
+See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0006-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
 
 ## 3. Choose the simplest method that preserves the intent
 
@@ -59,11 +66,7 @@ Computational thinking and active problem solving are intended opportunities, no
 
 Tablet/touch use and desktop/keyboard/mouse use are first-class product targets. Controls, layouts, voice recovery, focus, pause/resume and saved versions need evidence on the intended devices. A desktop screenshot or simulated mobile viewport does not establish actual tablet reliability. Preserve readable text, accessible targets, keyboard operation and reduced-motion behavior.
 
-The brand is lowercase **jems**. Preserve the approved gem/wrench mark and wordmark; use the supplied assets and documented palette rather than inventing a replacement logo. Supporting characters, worlds, banners and rewards should form a coherent visual family. Keep learning and grown-up surfaces calm and legible. Do not describe reconstructed assets as certified masters without the required visual review. See [brand standards](docs/brand/README.md) and [journey acceptance](docs/child-journey/acceptance.md).
-
-The making journey uses a bright white illustrated page, short labels, and two equally capable character choices that evolve across **Gem Maker → Gem Cutter → Gem Polisher → Gem Master**. The choices are cosmetic; do not label or store gender. Show the earned level separately from previews of future artwork. Popups celebrate a durably saved making transition without blocking play, taking focus, or replaying on reload/profile changes.
-
-Making progress comes from saved child-authored design evidence, real experiments, the child's linked reflection, and explicit Keep of that same experiment. It is separate from learning assessment, game scores and provider activity. The initial Gem Master rule is three distinct polished projects, an implementation threshold rather than a calibrated measure of ability. Do not add currency, streak pressure or rankings to this journey. Retained work remains the authority: archives preserve evidence, while erasing required evidence removes its dependent credit. See the [detailed evidence contract](docs/brand/GEM_PROGRESS.md) and [making-journey decision](docs/decisions/0005-cosmetic-making-journey.md).
+The brand is lowercase **jems**. Preserve the approved gem/wrench mark and wordmark; use the supplied assets and documented palette rather than inventing a replacement logo. The host's supporting characters, banners and rewards should form a coherent visual family. Child-created game worlds can have distinct styles; host brand consistency must not flatten their creative choices into one house look. Keep learning and grown-up surfaces calm and legible. Do not describe reconstructed assets as certified masters without the required visual review. See [brand standards](docs/brand/README.md) and [journey acceptance](docs/child-journey/acceptance.md).
 
 ## 8. Truth, privacy and ownership are part of the product
 
@@ -71,6 +74,12 @@ Distinguish available local behavior, a real accepted remote job, an unavailable
 
 Preserve deterministic identity, authorization, spending, isolation and version controls while improving convenience. Keep family data, transcripts, recordings, drawings, credentials and signed private URLs out of public repository examples and logs. Do not invent consent or provider privacy approval. A new feature, brand change or research result does not itself authorize unrelated data processing, spending or public sharing. Existing applicable owner authorization must be carried forward accurately.
 
+For the accepted temporary development scope, the adult profile lives on the existing site and its authenticated switch makes approved AI tools available directly. Keep adult test work separate from child profiles and retain server authorization; a profile label is not evidence of consent or age. [ADR0005](docs/decisions/0005-temporary-adult-profile.md) records the owner's one-site requirement, temporary scope and removal condition. It does not change the child's Send, Build, Keep or learning contracts.
+
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.
+
+
+### Cosmetic making journey
+Children may choose Spark or Nova and explore four outfit stages: Gem Maker, Gem Cutter, Gem Polisher and Gem Master. Advancement depends on saved design/test/reflection/keep evidence as specified by [Gem progress](docs/brand/GEM_PROGRESS.md). These levels are **not** learning-proficiency scores, and mocked tests cannot satisfy real-test requirements.

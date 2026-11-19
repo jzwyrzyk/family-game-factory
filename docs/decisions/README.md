@@ -10,7 +10,10 @@ These records explain durable choices without turning chat history into another 
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
 | [0003](0003-explicit-voice-and-build.md) | Editable dictation, explicit Send and separate Build | Accepted, retrospectively documented | November 18, 2026 push-to-talk decision |
 | [0004](0004-separated-private-execution.md) | Separate private generation, untrusted play execution and coaching | Accepted, retrospectively documented | Generation-isolation contracts and PR36's scoped coach exception |
-| [0005](0005-cosmetic-making-journey.md) | Four illustrated making levels with cosmetic character choice | Accepted visual/product scope; initial threshold documented as implementation policy | Owner-directed refinement tracked in PR57 |
+| [0005](0005-temporary-adult-profile.md) | Activate temporary development AI through an authenticated adult profile on the existing site | Accepted for temporary development | Owner's November 18, 2026 same-site/profile-switch direction; PR55 integration |
+| [0006](0006-style-diverse-playable-quality.md) | Require presentation and playable quality across distinct art styles | Accepted | Owner's Gem Factory follow-up: improve the real pipeline without uniform-looking games; child art uploads deferred |
+| [0007](0007-creation-and-rebuild-practice.md) | Share editable scenes and actions between free creation and behavior-based rebuild practice | Accepted for development | Owner's November 19, 2026 request to implement a separate integrated page in a new PR |
+| [0008](0008-cosmetic-making-journey.md) | Four cosmetic maker outfits with saved evidence and no gender labels | Accepted visual direction | PR57 and the owner's November 19 approval |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 

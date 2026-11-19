@@ -31,7 +31,7 @@ const fs=require('node:fs');
    const title=await page.title();assert.match(title,/^jems/);
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
-   assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
+   assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
    const makeHeading=await page.locator('#studioNew .studio-make-copy strong').evaluate(e=>getComputedStyle(e).color);
    assert.equal(makeHeading,'rgb(255, 255, 255)','Create headline must stay white on saturated blue');
 
