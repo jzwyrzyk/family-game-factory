@@ -74,6 +74,19 @@ export function createJourneyCharacter(character: JourneyCharacter, level: numbe
   return art;
 }
 
+/** One soft rank tile: the original maker, outfit and held jem stay together.
+ * An undecided owner sees both makers; rendering never makes a saved choice. */
+export function createJourneyRankThumbnail(character: JourneyCharacter | null, level: number, artwork: Pick<JourneyArtwork, 'spark' | 'nova'> = DEFAULT_ARTWORK) {
+  const tile = node('span', 'jems-rank-thumbnail');
+  tile.setAttribute('aria-hidden', 'true');
+  tile.dataset.character = character ?? 'both';
+  tile.dataset.level = String(level);
+  tile.classList.toggle('is-pair', !character);
+  const choices: JourneyCharacter[] = character ? [character] : ['spark', 'nova'];
+  for (const choice of choices) tile.append(createJourneyCharacter(choice, level, artwork[choice]));
+  return tile;
+}
+
 export function createJourneyGem(level: number, asset = DEFAULT_ARTWORK.gems) {
   const art = node('span', 'jems-journey-sprite jems-gem-art');
   art.setAttribute('aria-hidden', 'true');
@@ -143,8 +156,7 @@ export function installGemJourney(options: GemJourneyOptions) {
   const aura = node('div', 'jems-journey-aura');
   const characters = node('div', 'jems-journey-characters');
   characters.id = 'jemsJourneyCharacters';
-  const heroGem = node('span', 'jems-journey-hero-gem');
-  stage.append(aura, characters, heroGem);
+  stage.append(aura, characters);
   hero.append(heroCopy, stage);
 
   const trailHeader = node('div', 'jems-journey-trail-heading');
@@ -165,15 +177,12 @@ export function installGemJourney(options: GemJourneyOptions) {
     top.append(number, status);
     const illustration = node('div', 'jems-journey-card-art');
     illustration.setAttribute('aria-hidden', 'true');
-    const characterArt = node('span', 'jems-journey-card-character');
-    const gemArt = node('span', 'jems-journey-card-gem');
-    illustration.append(characterArt, gemArt);
     const name = node('strong', 'jems-journey-card-name', level.name);
     card.append(top, illustration, name);
     card.addEventListener('click', () => { previewLevel = level.level; renderView(); });
     item.append(card);
     trail.append(item);
-    return { ...level, card, status, characterArt, gemArt };
+    return { ...level, card, status, illustration };
   });
   const masterProgress = node('div', 'jems-journey-master-progress');
   masterProgress.id = 'jemsJourneyMasterProgress';
@@ -243,8 +252,11 @@ export function installGemJourney(options: GemJourneyOptions) {
   });
 
   function renderChoices() {
+    hint.textContent = previewLevel !== Math.max(1, state.level)
+      ? `Your style. Same adventure. Previewing the Level ${previewLevel} outfit.`
+      : 'Your style. Same adventure.';
     for (const item of choiceButtons) {
-      setJourneySprite(item.art, artwork[item.character], Math.max(1, state.level));
+      item.art.replaceChildren(createJourneyRankThumbnail(item.character, previewLevel, artwork));
       item.choice.setAttribute('aria-pressed', String(state.character === item.character));
       item.choice.disabled = saving;
       item.selected.hidden = state.character !== item.character;
@@ -282,7 +294,6 @@ export function installGemJourney(options: GemJourneyOptions) {
       setJourneySprite(art, artwork[character], previewLevel);
       characters.append(art);
     }
-    setJourneySprite(heroGem, artwork.gems, previewLevel);
     for (const card of cards) {
       const earned = state.level >= card.level;
       card.card.classList.toggle('is-earned', earned);
@@ -294,8 +305,7 @@ export function installGemJourney(options: GemJourneyOptions) {
       const status = earned ? (state.level === card.level ? 'Your level' : 'Reached') : state.level + 1 === card.level ? 'Next' : 'To come';
       card.status.textContent = earned ? '✓ ' + status : status;
       card.card.setAttribute('aria-label', `Level ${card.level}, ${card.name}, ${status}. Preview this level.`);
-      setJourneySprite(card.characterArt, artwork[state.character ?? 'spark'], card.level);
-      setJourneySprite(card.gemArt, artwork.gems, card.level);
+      card.illustration.replaceChildren(createJourneyRankThumbnail(state.character, card.level, artwork));
     }
     masterProgress.hidden = state.level < 3;
     masterProgressText.textContent = state.level === 4 ? 'Three projects. So many possibilities.' : `${Math.min(3, state.polishedCount)} of 3 polished projects toward Gem Master`;

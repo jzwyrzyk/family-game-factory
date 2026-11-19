@@ -1,4 +1,4 @@
-import {createJourneyCharacter,createJourneyGem,type JourneyCharacter} from './journey';
+import {createJourneyRankThumbnail,type JourneyCharacter} from './journey';
 /** Non-blocking, brand-specific celebrations for real accomplishments only.
  * No scores, child names, attention telemetry, rewards, network calls or persisted badges. */
 export type JemMilestone = 'idea' | 'playable' | 'kept' | 'copied' | 'practice' | 'gem-cut' | 'gem-polished' | 'builder-maker' | 'builder-cut' | 'builder-polished' | 'builder-master';
@@ -47,18 +47,21 @@ export function installJemsDelight():void {
     toast.setAttribute('role','status');
     toast.setAttribute('aria-live','polite');
     toast.setAttribute('aria-atomic','true');
-    const level=levels[kind],character=detail.character==='spark'||detail.character==='nova'?detail.character:null;
+    const unlockedLevel=levels[kind],character=detail.character==='spark'||detail.character==='nova'?detail.character:null;
+    const suppliedLevel=typeof detail.level==='number'&&Number.isInteger(detail.level)&&detail.level>=1&&detail.level<=4?detail.level:undefined;
+    const projectLevel=kind==='gem-cut'?2:kind==='gem-polished'?3:undefined;
+    // A new project facet does not put an already experienced maker in an older outfit.
+    const level=unlockedLevel??suppliedLevel??projectLevel;
     if(level){
-      toast.classList.add('is-level-up');toast.dataset.level=String(level);
-      const art=document.createElement('span');art.className='jems-delight-character';art.setAttribute('aria-hidden','true');
-      if(character)art.append(createJourneyCharacter(character,level));else art.append(createJourneyGem(level));
+      toast.classList.add('has-rank-thumbnail');toast.classList.toggle('is-level-up',!!unlockedLevel);toast.dataset.level=String(level);
+      const art=createJourneyRankThumbnail(character,level);
       const copy=document.createElement('span');copy.className='jems-delight-copy';
-      const kicker=document.createElement('small');kicker.textContent='Level '+level+' unlocked';
+      const kicker=document.createElement('small');kicker.textContent=unlockedLevel?'Level '+unlockedLevel+' unlocked':'Your making journey';
       const label=document.createElement('strong');label.textContent=messages[kind];copy.append(kicker,label);
-      toast.append(art,copy,createJourneyGem(level));
+      toast.append(art,copy);
     }else{
-      const emblem=kind==='gem-cut'||kind==='gem-polished'?createJourneyGem(kind==='gem-cut'?2:3):document.createElement('img');
-      if(emblem instanceof HTMLImageElement){emblem.src='./jems-mark.svg';emblem.alt='';emblem.setAttribute('aria-hidden','true');}
+      const emblem=document.createElement('img');
+      emblem.src='./jems-mark.svg';emblem.alt='';emblem.setAttribute('aria-hidden','true');
       const label=document.createElement('span');label.textContent=messages[kind];toast.append(emblem,label);
     }
     host.append(toast);
@@ -85,6 +88,6 @@ export function installJemsDelight():void {
       });
       host.append(sparks);
     }
-    timer=setTimeout(()=>{host.replaceChildren();timer=undefined;},level?3600:2600);
+    timer=setTimeout(()=>{host.replaceChildren();timer=undefined;},unlockedLevel?3600:2600);
   });
 }

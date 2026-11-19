@@ -145,6 +145,38 @@ const {start}=require('./browser-server.cjs');
         assert.equal(played.actors[0].y,start.actors[0].y);
         assert.equal(played.actors[0].jumpOffset,0);
         assert.equal(played.trace.filter(item=>item.type==='complete'&&item.actionType==='jump').length,2);
+
+        // Switching to the chat creator must actually leave a running scene.
+        // My journey then coexists with both creators without a hidden player.
+        await pacing();await activate('#creationRun');
+        await page.waitForFunction(()=>FG.creation.snapshot()?.status==='running');
+        const beforeNavigation=await workspace(),beforeNavigationScene=await scene();
+        await activate('#studioNavCreate');
+        assert.equal(await page.locator('#page-studio').isVisible(),true);
+        assert.equal(await page.locator('#page-creation').isVisible(),false);
+        assert.equal(await page.evaluate(()=>document.body.classList.contains('creation-open')),false);
+        const stopped=await snapshot();assert.equal(stopped.status,'paused','Leaving the scene stops its player');
+        await page.waitForTimeout(180);
+        assert.equal((await snapshot()).timeMs,stopped.timeMs,'The hidden scene cannot keep advancing');
+        await activate('#studioNavJourney');
+        assert.equal(await page.locator('#page-jems-journey').isVisible(),true);
+        assert.equal(await page.locator('#page-creation').isVisible(),false);
+        assert.equal((await snapshot()).timeMs,stopped.timeMs);
+        assert.deepEqual(await workspace(),beforeNavigation,'Navigation does not Keep or rewrite the scene');
+        await activate('#studioNavScenes');await activate(`[data-scene="${projectId}"]`);
+        assert.deepEqual((await scene()).programs,beforeNavigationScene.programs);
+
+        // A pending scene edit must be saved before selecting a chat project.
+        await set(page.locator('#creationTitle'),title+' draft');
+        const beforeDraftExit=(await workspace()).projects.find(item=>item.id===projectId);
+        await activate('#studioNavCreate');
+        const afterDraftExit=(await workspace()).projects.find(item=>item.id===projectId);
+        assert.notEqual(afterDraftExit.headId,beforeDraftExit.headId,'Leaving saves the pending scene version');
+        assert.equal(afterDraftExit.keptId,beforeDraftExit.keptId,'Saving on navigation does not silently Keep');
+        await activate('#studioNavScenes');await activate(`[data-scene="${projectId}"]`);
+        assert.equal((await scene()).title,title+' draft');
+        assert.equal(await page.locator('#creationRecovery').isVisible(),false,'A completed navigation save needs no draft recovery');
+        await set(page.locator('#creationTitle'),title);
         await activate('#creationKeep');
         let saved=await workspace(),entry=saved.projects.find(item=>item.id===projectId);
         assert.equal(entry.keptId,entry.headId,'Only explicit Keep selects this version');
@@ -277,6 +309,10 @@ const {start}=require('./browser-server.cjs');
         const guarded=await page.evaluate(()=>({id:FG.learning.activeAttemptId,time:FG.creation.snapshot().timeMs}));
         assert.ok(guarded.id);
         await activate('#creationRun');await activate('#creationStep');await activate('#creationWatchTarget');
+        const notebookBeforeGuard=await page.evaluate(()=>FG.studio.exportNotebook());
+        await activate('#studioNavCreate');await activate('#studioNavJourney');
+        assert.equal(await page.locator('#page-creation').isVisible(),true,'Creator and Journey navigation preserve an open scene checkpoint');
+        assert.deepEqual(await page.evaluate(()=>FG.studio.exportNotebook()),notebookBeforeGuard,'Blocked navigation creates no empty chat project');
         assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),guarded.id);
         assert.equal((await snapshot()).timeMs,guarded.time,'Editor controls do not bypass the learning host');
         await page.screenshot({path:`test-results/creation-checkpoint-${device}.png`,fullPage:true});
@@ -300,7 +336,7 @@ const {start}=require('./browser-server.cjs');
         assert.deepEqual(paidRequests,[],'Local creation never requests a model or paid build');
         assert.deepEqual(errors,[],'No unhandled production UI errors');
         results.push({device,viewport,touchEmulated:touch,status:'passed',paidRequests:0,pageErrors:0,
-          verified:['honest unsupported native-source feedback','saved-game source continuity','same-source scene reopen','UI-authored blocks','reorder and undo','nested repeat and condition branches','play/pause/step','Keep/reload','editable file export','real canvas video export','profile isolation','target separation','behavioral challenge feedback','persistent hint history','event taps','variable boundary behavior','learning checkpoint guard','profile-scoped progress','overflow']});
+          verified:['honest unsupported native-source feedback','saved-game source continuity','same-source scene reopen','UI-authored blocks','reorder and undo','nested repeat and condition branches','play/pause/step','scene-to-Create-to-Journey cleanup','scene draft save without Keep on navigation','Keep/reload','editable file export','real canvas video export','profile isolation','target separation','behavioral challenge feedback','persistent hint history','event taps','variable boundary behavior','learning checkpoint guard','profile-scoped progress','overflow']});
         console.log(`PASS ${device}: production Creation Studio UI, real block edits and playback, saved ownership, target reconstruction, tap behavior and learning guard`);
       } catch(error) {
         await page.screenshot({path:`test-results/creation-failure-${device}.png`,fullPage:true}).catch(()=>{});

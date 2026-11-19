@@ -1,6 +1,7 @@
 # 0008 — Four illustrated making levels with cosmetic character choice
 
 **Status:** Accepted owner-directed visual/product scope; the initial Gem Master threshold is an implementation policy within that scope.
+**Numbering:** Originally recorded as 0005 on PR57, then locally renumbered 0006 when integrating the merged adult-profile decision. Renumbered to 0008 during the latest-main reconciliation because merged style-diverse quality and Creation Studio decisions own 0006 and 0007. The original decision scope and evidence are retained.
 **Recorded:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`).
 **Decision source:** [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57) and its [making-journey contract](../brand/GEM_PROGRESS.md). The request is paraphrased here; the exact original request timestamp is not independently recorded in the repository. This decision does not approve a deployment or certify educational efficacy.
 

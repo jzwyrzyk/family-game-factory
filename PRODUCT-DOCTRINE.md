@@ -2,6 +2,9 @@
 
 **Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.
 **Source review:** original doctrine audit November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`; the owner's subsequent style-diverse quality direction is recorded in [ADR0006](docs/decisions/0006-style-diverse-playable-quality.md), November 19, 2026 (UTC).
+**Scoped addition:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`), [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57), source `f650bdac730be9bb6655325b32052a9524880933`: the illustrated making journey described in section 7. Other principles retain their recorded review scope.
+**Integration review:** November 19, 2026: preserve the merged Creation Studio, style-diverse quality, learning/evidence and adult/guardian contracts on main `eebeebeb8896554bd3619029d8ca80d4b06b2f2b` while adopting the owner-approved v1.2 visual library and PR57 making journey. [ADR0009](docs/decisions/0009-approved-brand-library-v1-2.md) records the accepted visual refinement; earning and authorization rules are unchanged.
+
 **Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
 
 Read [current architecture](ARCHITECTURE-CURRENT.md) for implementation boundaries and [delivery state](DELIVERY-STATE.md) for what is planned, merged, deployed, activated and verified. A past feature document's draft/release wording is not current operational evidence. The [decision index](docs/decisions/README.md) preserves the reasons behind these commitments.
@@ -68,6 +71,12 @@ Tablet/touch use and desktop/keyboard/mouse use are first-class product targets.
 
 The brand is lowercase **jems**. Preserve the approved gem/wrench mark and wordmark; use the supplied assets and documented palette rather than inventing a replacement logo. The host's supporting characters, banners and rewards should form a coherent visual family. Child-created game worlds can have distinct styles; host brand consistency must not flatten their creative choices into one house look. Keep learning and grown-up surfaces calm and legible. Do not describe reconstructed assets as certified masters without the required visual review. See [brand standards](docs/brand/README.md) and [journey acceptance](docs/child-journey/acceptance.md).
 
+The approved [v1.2 library](docs/brand/LIBRARY_V1_2.md) carries that identity across the shell: the supplied ray-free SVGs, a separate five-pose Gem companion, preserved factory artwork, local Nunito/Inter fonts and consistent control states. Rank thumbnails use the chosen Spark/Nova character in the exact original outfit holding its level gem across Journey, cards and earned popups. Keep the soft original characters; retired metal medals and generated replacements do not return. Shared shell styling does not constrain the visual style of a child-created game.
+
+The making journey uses a bright white illustrated page, short labels, and two equally capable character choices that evolve across **Gem Maker → Gem Cutter → Gem Polisher → Gem Master**. The choices are cosmetic; do not label or store gender. Show the earned level separately from previews of future artwork. Popups celebrate a durably saved making transition without blocking play, taking focus, or replaying on reload/profile changes.
+
+Making progress comes from saved child-authored design evidence, real experiments, the child's linked reflection, and explicit Keep of that same experiment. It is separate from learning assessment, game scores and provider activity. The initial Gem Master rule is three distinct polished projects, an implementation threshold rather than a calibrated measure of ability. Do not add currency, streak pressure or rankings to this journey. Retained work remains the authority: archives preserve evidence, while erasing required evidence removes its dependent credit. See the [detailed evidence contract](docs/brand/GEM_PROGRESS.md) and [making-journey decision](docs/decisions/0008-cosmetic-making-journey.md).
+
 ## 8. Truth, privacy and ownership are part of the product
 
 Distinguish available local behavior, a real accepted remote job, an unavailable service and an unknown network outcome. Show grounded progress, never a fictitious ETA, generated game, saved result or successful deployment. A merge, image build, deployed service, activated capability and successful end-to-end journey are different facts.
@@ -79,7 +88,3 @@ For the accepted temporary development scope, the adult profile lives on the exi
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.
-
-
-### Cosmetic making journey
-Children may choose Spark or Nova and explore four outfit stages: Gem Maker, Gem Cutter, Gem Polisher and Gem Master. Advancement depends on saved design/test/reflection/keep evidence as specified by [Gem progress](docs/brand/GEM_PROGRESS.md). These levels are **not** learning-proficiency scores, and mocked tests cannot satisfy real-test requirements.

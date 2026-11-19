@@ -90,6 +90,21 @@ function visualFixture(){
  const events=page=>page.evaluate(()=>window.__jemsMilestones);
  const levelEventCount=async(page,level)=>(await events(page)).filter(event=>event.kind.startsWith('builder-')&&event.level===level).length;
  const noOverflow=async page=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'layout fits the viewport without horizontal scrolling');
+ const assertRankThumbnail=async(locator,character,level)=>{
+  const actual=await locator.evaluate(tile=>({
+   character:tile.dataset.character,level:Number(tile.dataset.level),
+   art:[...tile.querySelectorAll('.jems-character-art')].map(art=>({character:art.dataset.character,level:Number(art.dataset.level),src:art.dataset.spriteSrc,position:parseFloat(art.style.backgroundPosition),aspect:parseFloat(art.style.aspectRatio)})),
+   gems:tile.querySelectorAll('.jems-gem-art').length
+  }));
+  assert.equal(actual.character,character??'both');assert.equal(actual.level,level);
+  assert.equal(actual.gems,0,'a rank thumbnail keeps the original held gem inside the maker illustration');
+  assert.deepEqual(actual.art.map(art=>art.character),character?[character]:['spark','nova']);
+  for(const art of actual.art){
+   assert.equal(art.src,`jems-journey/characters-${art.character}.webp`,'rank art uses the original native maker atlas');
+   assert.equal(art.level,level);assert.equal(art.aspect,.75,'native full-figure aspect stays intact');
+   assert.ok(Math.abs(art.position-100*(level-1)/3)<.001,'the displayed frame matches the stated rank');
+  }
+ };
  const preview=async(page,name)=>{
   await page.evaluate(()=>window.scrollTo(0,0));
   const clip=await page.locator('#page-jems-journey').evaluate(element=>({x:0,y:0,width:innerWidth,height:Math.ceil(element.getBoundingClientRect().bottom+16)}));
@@ -114,6 +129,8 @@ function visualFixture(){
    await page.click('#jemsChangeCharacter');
    await page.locator('#jemsCharacterDialog').waitFor({state:'visible'});
    assert.equal(await page.locator('[data-journey-character]').count(),2);
+   for(const character of ['spark','nova'])await assertRankThumbnail(page.locator(`[data-journey-character="${character}"] .jems-rank-thumbnail`),character,4);
+   assert.match(await page.locator('#jemsCharacterHint').innerText(),/Previewing the Level 4 outfit/,'chooser identifies an unearned outfit preview');
    assert.doesNotMatch(await page.locator('#jemsCharacterDialog').innerText(),/\b(boy|girl|male|female|gender)\b/i);
    await page.keyboard.press('Escape');
    assert.equal(await page.locator('#jemsCharacterDialog').isVisible(),false);
@@ -165,6 +182,28 @@ function visualFixture(){
     await noOverflow(page);
     await page.screenshot({path:'test-results/jems-journey-zoom.png',fullPage:true});
     await page.evaluate(()=>document.documentElement.style.zoom='');
+    const sessions=JSON.stringify((await notebook(page)).sessions);
+    // All eight original outfit frames remain aligned in hero, rank tile and
+    // chooser. Cosmetic preview must not rewrite evidence or replay a reward.
+    for(const character of ['spark','nova']){
+     const previousPreview=await page.locator('#page-jems-journey').getAttribute('data-preview-level');
+     await page.click('#jemsChangeCharacter');await page.click(`[data-journey-character="${character}"]`);
+     assert.equal(await page.locator('#page-jems-journey').getAttribute('data-preview-level'),previousPreview,'choosing a maker preserves the outfit preview');
+     for(let level=1;level<=4;level++){
+      await page.click(`[data-journey-level="${level}"]`);await assertLevel(page,3);
+      assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-character'),character);
+      assert.equal(await page.locator('#jemsJourneyCharacters [data-character]').getAttribute('data-level'),String(level));
+      for(let rank=1;rank<=4;rank++)await assertRankThumbnail(page.locator(`[data-journey-level="${rank}"] .jems-rank-thumbnail`),character,rank);
+      assert.equal(await page.locator('.jems-journey-hero-gem,.jems-journey-card-gem').count(),0,'rank art has no separate floating gem');
+      await page.click('#jemsChangeCharacter');
+      for(const choice of ['spark','nova'])await assertRankThumbnail(page.locator(`[data-journey-character="${choice}"] .jems-rank-thumbnail`),choice,level);
+      await page.keyboard.press('Escape');
+     }
+    }
+    await page.click('#jemsChangeCharacter');await page.click('[data-journey-character="spark"]');
+    await page.click('[data-journey-level="3"]');
+    assert.equal(JSON.stringify((await notebook(page)).sessions),sessions,'all maker/outfit previews leave earned evidence intact');
+    assert.deepEqual(await events(page),[],'maker/outfit previews emit no achievements');
    }
    if(name==='mobile'){
     await page.setViewportSize({width:320,height:740});await noOverflow(page);
@@ -214,6 +253,8 @@ function visualFixture(){
    assert.equal(gemStage(session),'polished');
    assert.ok(session.keptExperiments.some(kept=>kept.experimentId===testId&&kept.baseId===baseId));
    assert.equal(await levelEventCount(page,3),1,'one polished-level popup for the exact verified keep');
+   await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),null,3);
+   assert.equal(await page.locator('.jems-delight-toast .jems-gem-art').count(),0,'unselected makers use the two original outfits, never a gem-only reward');
    assert.equal(await page.locator('#jems-delight-host').evaluate(element=>getComputedStyle(element).pointerEvents),'none');
    assert.equal(await page.locator('.jems-delight-toast').getAttribute('aria-live'),'polite');
    assert.equal(await page.locator('.jems-delight-sparks').count(),0);
@@ -245,10 +286,14 @@ function visualFixture(){
    assert.equal(await testNote.inputValue(),noteText,'progress refresh must not interrupt typing the reflection');
    assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Notes for Test A');
    assert.equal(gemStage((await notebook(page)).sessions.find(session=>session.game==='hill')),'cut');
+   await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),'nova',3);
+   assert.equal(await page.locator('.jems-delight-toast').getAttribute('data-kind'),'gem-cut','a second project Cut event keeps the already earned Polisher outfit');
    await page.click('#studioCloseVersions');await page.click('#studioKeep');
    await page.waitForFunction(()=>window.__jemsMilestones.some(event=>event.level===4));
    assert.equal(await levelEventCount(page,4),1,'the third distinct polished project earns one Gem Master event');
    assert.equal((await earned(page)).level,4);
+   await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),'nova',4);
+   assert.equal(await page.locator('.jems-delight-toast .jems-rank-thumbnail').evaluate(tile=>Math.round(tile.getBoundingClientRect().width)),96,'the approved compact popup tile is 96px');
    await openJourney(page);await assertLevel(page,4);
    await page.locator('.jems-delight-toast').screenshot({path:'test-results/jems-gem-master-toast.png'});
    await page.screenshot({path:'test-results/jems-journey-master-popup.png',fullPage:true});

@@ -2,6 +2,8 @@
 
 This is the detailed feature contract for [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57). [ADR 0008](../decisions/0008-cosmetic-making-journey.md) records the decision and threshold limits; [current architecture](../../ARCHITECTURE-CURRENT.md) maps implementation, and [delivery state](../../DELIVERY-STATE.md) owns branch, CI and operational evidence.
 
+**Current visual refinement:** the owner-approved [library v1.2](LIBRARY_V1_2.md) uses the chosen maker's exact original outfit frame as primary rank art across this page, rank cards and earned popups. The [visual decision](../decisions/0009-approved-brand-library-v1-2.md) replaces framed medal presentation without changing any evidence rule below.
+
 ## Design intent
 
 Use the **bright white reference** as the visual direction: generous white space, soft lilac accents, richly illustrated child inventors, and tactile gemstones. The art should carry the story. Keep the interface cheerful, legible, and short enough to understand without reading a reward explanation.
@@ -60,14 +62,14 @@ The production page uses local assets in `public/jems-journey/`:
 | --- | --- |
 | `characters-spark.webp` | Four equally spaced stages of Spark |
 | `characters-nova.webp` | Four equally spaced stages of Nova |
-| `gems.webp` | Four illustrated gemstone appearances for the journey |
+| `gems.webp` | Four native stage-gem frames, reserved for tiny secondary progress indicators |
 | `background.webp` | Soft illustrated world behind the main character |
 
 Character and gem atlases keep the same framing, scale, and stage order. The character should remain recognizably the same person as the outfit, tools, and gem details develop. Both choices need the same polish and visual importance. Stage 4 must feel like a distinct final evolution.
 
-`src/brand/journey.ts` owns atlas placement and the accessible page/dialog. Relative assets resolve against `document.baseURI`, so deployment under a subdirectory such as `/arcade/` works. No remote image request, runtime generation, or user upload is required to show the journey. Existing Jems brand marks stay intact.
+`src/brand/journey.ts` owns atlas placement and the accessible page/dialog. Relative assets resolve against `document.baseURI`, so deployment under a subdirectory such as `/arcade/` works. No remote image request, runtime generation, or user upload is required to show the journey. Existing identity URLs remain stable; supplied SVGs follow the explicitly approved v1.2 ray-removal revision, separate from native Journey art.
 
-The page uses a large illustrated hero and four visual stage cards, with two columns on narrow screens. The current level label stays truthful while a future stage is previewed. Decorative artwork is hidden from screen readers; concise visible and accessible names describe the stage and its earned/preview status. Do not communicate earned status by color alone.
+The page uses a large illustrated human-maker hero and four original full-figure rank cards, with two columns on narrow screens. `createJourneyRankThumbnail()` centralizes the chosen-maker/level mapping and is reused by the earned popup; when no maker is saved, it can show both equally. Chooser portraits follow the explicit previewed outfit level while preserving the actual earned level. Keep the native face, held gem, outfit and shoes visible; do not add metal medal/shield frames or a large floating gem in place of the figure. The current level label stays truthful while a future stage is previewed. Decorative artwork is hidden from screen readers; concise visible and accessible names describe the stage and its earned/preview status. Do not communicate earned status by color alone.
 
 ### Product copy
 
@@ -87,11 +89,14 @@ Long explanations of provenance, storage, remote adapters, and eligibility belon
 
 Use the existing `jems:milestone` and Delight host for short, illustrated popups after a meaningful **saved transition**. Compare the owner's evidence before and after the durable action. Prefer the new overall level when a project stage and overall level advance together, so one action has one achievement popup. The third distinct polished project receives the Gem Master celebration.
 
+The rank portrait uses the owner's current overall earned level. A project-stage notification may describe a newly cut project while the owner is already Gem Polisher or Gem Master; its thumbnail must keep the current overall outfit rather than visually regress to that project stage. This is display selection, not another progress calculation.
+
 Rendering a page, choosing a character, previewing an outfit, restoring/importing already-earned data, reloading, putting a project away, or switching profiles must never replay an earned milestone. Do not persist a secondary award history solely to achieve this; emit from the successful action boundary.
 
 The popup must:
 
 - Stay compact and use `pointer-events: none` throughout its host.
+- Use the same native chosen-maker rank thumbnail as Journey, with the correct original outfit and held gem; no medal or large standalone gem substitutes for the character.
 - Announce a concise message through a polite status region.
 - Keep keyboard focus where the child left it and never pause play.
 - Use no automatic audio.

@@ -1,0 +1,145 @@
+{
+  "version": "1.1.0",
+  "date": "2026-11-19",
+  "status": "user-directed-identity-revision",
+  "authorization": "User explicitly requested removal of the three short ray marks above the gem in the red-circled logo reference, with gem alignment adjusted if needed. The separate four-point sparkle beside the wordmark was not selected for removal.",
+  "prior_source": "provenance.json",
+  "source_main": "493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7",
+  "policy": "The revised files are the current locked baseline. Historical source evidence remains intact. No other logo shapes, wordmark lettering, tagline, wrench or color values were altered. New art must not reintroduce the three-ray motif.",
+  "parity_caveat": "The prior repository SVGs remain interpreted traces of the approved raster identity, not certified pixel-identical original master artwork. This surgical user-directed revision does not change that provenance.",
+  "alignment": "Full lockups retain their existing composition. Standalone marks and the app icon internal viewBox move from y=0 to y=18, centering the remaining gem after upper-ray removal without moving any paths.",
+  "changes": [
+    {
+      "source_path": "public/arcade-icon.svg",
+      "file": "identity/arcade-icon.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#ffb000\" fill-rule=\"evenodd\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 2481,
+      "original_sha256": "25b423f5520c5026075f4075ddb07f78140bbd79f049eb161e1577f1ecddbab3",
+      "original_bytes": 2702,
+      "revised_sha256": "dcf92c3e92ee11c82f58a6884f9530612168cf07867a81c0d84fab7234e38021",
+      "revised_bytes": 2488,
+      "revised_git_blob_sha": "f9662a5e7f59d3d103df093e359a32d6c114c0aa",
+      "viewbox_edit": {
+        "old": "viewBox=\"0 0 237 237\"",
+        "new": "viewBox=\"0 18 237 237\"",
+        "reason": "Optically center the remaining gem silhouette in its square canvas after removing the upper rays; all path geometry is unchanged."
+      }
+    },
+    {
+      "source_path": "public/jems-app-icon.svg",
+      "file": "identity/jems-app-icon.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#ffb000\" fill-rule=\"evenodd\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 2651,
+      "original_sha256": "d9e9806188f85903ecc94640e9a4cf42ac1135e083d41ed45f51a5d8425593f0",
+      "original_bytes": 2879,
+      "revised_sha256": "bf70291498f98aafef6d6e469f615b9758f76881c04080e199f21959af79177f",
+      "revised_bytes": 2665,
+      "revised_git_blob_sha": "a2da5a53f86e844148cc9a8838936722d95f38da",
+      "viewbox_edit": {
+        "old": "viewBox=\"0 0 237 237\"",
+        "new": "viewBox=\"0 18 237 237\"",
+        "reason": "Optically center the remaining gem silhouette in its square canvas after removing the upper rays; all path geometry is unchanged."
+      }
+    },
+    {
+      "source_path": "public/jems-logo.svg",
+      "file": "identity/jems-logo.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#ffb000\" fill-rule=\"evenodd\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 2464,
+      "original_sha256": "8ba33912acdbaa07c51d1503a373b2a83564e45b10a033ad6edbb553bbfc4abc",
+      "original_bytes": 6447,
+      "revised_sha256": "c95e2765a954eb1c71d61af0d72dfe877f3ddb85974b94555f4bd1e9651d00a7",
+      "revised_bytes": 6232,
+      "revised_git_blob_sha": "76f76d95973bdede7dbbe13363bb85acd18170d7",
+      "viewbox_edit": null
+    },
+    {
+      "source_path": "public/jems-mark-inverse.svg",
+      "file": "identity/jems-mark-inverse.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#fff\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 1242,
+      "original_sha256": "729e709d24ad7f840174b3c9ea3ab215b797164a2e357213cf01056a027d9475",
+      "original_bytes": 1441,
+      "revised_sha256": "3df782a4926663467ac643d6ddc38040a5b673904f6b333fc3720f74c1e5c8ed",
+      "revised_bytes": 1250,
+      "revised_git_blob_sha": "87e3592724b55a5e5457f18ca324de3dfa1b410e",
+      "viewbox_edit": {
+        "old": "viewBox=\"0 0 237 237\"",
+        "new": "viewBox=\"0 18 237 237\"",
+        "reason": "Optically center the remaining gem silhouette in its square canvas after removing the upper rays; all path geometry is unchanged."
+      }
+    },
+    {
+      "source_path": "public/jems-mark-monochrome.svg",
+      "file": "identity/jems-mark-monochrome.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#0B1E3B\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 1192,
+      "original_sha256": "8120dc59b986da7ca6755e2bb2c21e209e7befc0f3ce231d23fc707d65dfecbe",
+      "original_bytes": 1394,
+      "revised_sha256": "2844d2177edac660d15984ef35f03341bc252f7385824b8ed3dbb0b0d143982a",
+      "revised_bytes": 1200,
+      "revised_git_blob_sha": "bbc7390332920e5d1ec4327a3a974f2aa660e057",
+      "viewbox_edit": {
+        "old": "viewBox=\"0 0 237 237\"",
+        "new": "viewBox=\"0 18 237 237\"",
+        "reason": "Optically center the remaining gem silhouette in its square canvas after removing the upper rays; all path geometry is unchanged."
+      }
+    },
+    {
+      "source_path": "public/jems-mark.svg",
+      "file": "identity/jems-mark.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#ffb000\" fill-rule=\"evenodd\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 2481,
+      "original_sha256": "25b423f5520c5026075f4075ddb07f78140bbd79f049eb161e1577f1ecddbab3",
+      "original_bytes": 2702,
+      "revised_sha256": "dcf92c3e92ee11c82f58a6884f9530612168cf07867a81c0d84fab7234e38021",
+      "revised_bytes": 2488,
+      "revised_git_blob_sha": "f9662a5e7f59d3d103df093e359a32d6c114c0aa",
+      "viewbox_edit": {
+        "old": "viewBox=\"0 0 237 237\"",
+        "new": "viewBox=\"0 18 237 237\"",
+        "reason": "Optically center the remaining gem silhouette in its square canvas after removing the upper rays; all path geometry is unchanged."
+      }
+    },
+    {
+      "source_path": "public/jems-mono.svg",
+      "file": "identity/jems-mono.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#0B1E3B\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 1189,
+      "original_sha256": "344dbd034da9582034fa3fc56d8cc773f88e24b835b65ff42e02e5fe034050ff",
+      "original_bytes": 5132,
+      "revised_sha256": "6286feac237996dd40e52b5aa6472110b7e3334abca493ac4a4aeeea8e4382a2",
+      "revised_bytes": 4937,
+      "revised_git_blob_sha": "dda81493f3822f3874326163d88e0aac81eb62f3",
+      "viewbox_edit": null
+    },
+    {
+      "source_path": "public/jems-reversed.svg",
+      "file": "identity/jems-reversed.svg",
+      "operation": "remove-three-ray-path",
+      "removed_path_d": "M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z",
+      "removed_path_xml": "<path fill=\"#fff\" d=\"M228,38 225,35 222,35 202,47 200,52 202,54 207,54 226,43Z M205,9 203,8 198,12 183,36 185,40 189,41 200,26 207,13Z M168,7 165,9 165,34 167,36 171,36 173,33 173,11 171,8Z\"/>",
+      "original_removal_offset": 1247,
+      "original_sha256": "ed63a421d27b89563877febafdf6a8c946118c046ae208b12aec115269cddbe2",
+      "original_bytes": 5181,
+      "revised_sha256": "c6c085d7142f478e5da04a030351401ae7a480d7cd059de02c4c68ea0fe0b416",
+      "revised_bytes": 4989,
+      "revised_git_blob_sha": "316a091ab56bd6d29d7983d9e430381b7e3ad95e",
+      "viewbox_edit": null
+    }
+  ]
+}

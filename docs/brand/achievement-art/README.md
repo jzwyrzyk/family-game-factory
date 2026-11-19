@@ -1,6 +1,6 @@
 # Production achievement artwork
 
-This set implements the approved bright-white dashboard direction in PR #57. The two characters have equal visual treatment and the same four costume/gem stages. Spark and Nova are cosmetic choices; the product does not label or store gender.
+This unchanged native atlas set implements the approved bright-white dashboard direction in PR #57 and remains the human-art authority for [library v1.2](../LIBRARY_V1_2.md). The current primary rank thumbnail is the chosen maker in its original level outfit, holding the original gem; Journey, cards and earned popups share that mapping. The two characters have equal visual treatment and the same four costume/gem stages. Spark and Nova are cosmetic choices; the product does not label or store gender.
 
 ## Asset contract
 
@@ -15,7 +15,9 @@ Frames run left to right: Gem Maker, Gem Cutter, Gem Polisher, Gem Master. Use a
 
 The world is optional decoration; all labels, level state, controls and keyboard behavior are real DOM elements. Local image assets resolve relative to the application base URL and are included in the existing offline build. No external art host or runtime image generation is involved.
 
-## Generation and refinement
+The four `gems.webp` frames are secondary tiny progress indicators. The Master star remains the original fourth frame; no generated pointed diamond or framed metal medal is used. The five separate logo-aligned Gem companion poses are supporting shell art, not replacements for Spark/Nova rank portraits.
+
+## Original generation and refinement
 
 Artwork was generated with the built-in OpenAI image-generation tool, using the supplied **Jems: Create Your Adventure Dashboard.png** as the visual reference. The generated atlases were refined for consistent character identity, clean transparent silhouettes, four distinct costumes and unmarked clothing. Jems' existing brand assets were not redrawn or replaced.
 
@@ -27,4 +29,6 @@ The source sheets and the background share soft light, warm expressive faces, pu
 
 Use `npm run test:gem-journey` after a production build. It produces actual browser screenshots under `test-results/`, using clearly isolated test evidence to preview earned states and real save/keep actions to exercise the live achievement popup. Selected review screenshots are included alongside this document; the evidence rules live in [GEM_PROGRESS.md](../GEM_PROGRESS.md).
 
-Selected captures: [desktop journey](previews/journey-desktop.png), [character picker](previews/character-picker.png), [Gem Master](previews/gem-master.png), [mobile journey](previews/journey-mobile.png), and [achievement popup](previews/achievement-popup.png). These are local browser/synthetic-profile evidence, not observed child or physical-device acceptance. [ADR 0008](../../decisions/0008-cosmetic-making-journey.md) records the design choice; [delivery state](../../../DELIVERY-STATE.md) records integration and release status.
+The linked captures below are historical PR57 application evidence from before the v1.2 rank-thumbnail refinement. They must not be presented as fresh screenshots of the new integration candidate. New exact-head acceptance belongs in delivery state and its scoped test artifacts.
+
+Historical captures: [desktop journey](previews/journey-desktop.png), [character picker](previews/character-picker.png), [Gem Master](previews/gem-master.png), [mobile journey](previews/journey-mobile.png), and [achievement popup](previews/achievement-popup.png). These are local browser/synthetic-profile evidence, not observed child or physical-device acceptance. [ADR 0008](../../decisions/0008-cosmetic-making-journey.md) records the design choice; [delivery state](../../../DELIVERY-STATE.md) records integration and release status.

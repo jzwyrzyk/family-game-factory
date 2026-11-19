@@ -32,6 +32,28 @@ const fs=require('node:fs');
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
+   // Keep the five current destinations tappable and hero copy clear of the
+   // original maker portraits at phone widths, including narrow 320px screens.
+   if(label==='mobile'){
+    for(const phoneWidth of [390,320]){
+     await page.setViewportSize({width:phoneWidth,height});
+     await page.evaluate(()=>document.fonts.ready);
+     const layout=await page.evaluate(()=>{
+      const rect=selector=>document.querySelector(selector).getBoundingClientRect();
+      const action=rect('.studio-home-action'),characters=rect('.jems-home-characters');
+      return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,
+       overlap:action.left<characters.right&&action.right>characters.left&&action.top<characters.bottom&&action.bottom>characters.top,
+       buttons:[...document.querySelectorAll('.studio-nav button')].map(button=>({height:button.getBoundingClientRect().height,top:button.getBoundingClientRect().top,fits:button.scrollWidth<=button.clientWidth+1}))};
+     });
+     assert.equal(layout.buttons.length,5,'all current navigation destinations remain available');
+     assert.ok(layout.buttons.every(button=>button.height>=44&&button.fits),'navigation labels fit touch-sized buttons');
+     assert.ok(layout.buttons.every(button=>Math.abs(button.top-layout.buttons[0].top)<2),'the five destinations share one row');
+     assert.equal(layout.overlap,false,'maker artwork cannot cover home actions or service status');
+     assert.ok(layout.scrollWidth<=layout.width+2,'narrow home does not scroll horizontally');
+     await page.screenshot({path:'test-results/jems-brand-home-'+phoneWidth+'.png',fullPage:false});
+    }
+    await page.setViewportSize({width,height});
+   }
    const makeHeading=await page.locator('#studioNew .studio-make-copy strong').evaluate(e=>getComputedStyle(e).color);
    assert.equal(makeHeading,'rgb(255, 255, 255)','Create headline must stay white on saturated blue');
 
@@ -78,6 +100,17 @@ const fs=require('node:fs');
    await page.screenshot({path:'test-results/jems-home-'+label+'.png',fullPage:false});
    await page.locator('#studioNew').click();
    assert.equal(await page.locator('#page-studio').isVisible(),true);
+   const approvedArt=await page.evaluate(async()=>{
+    const images=[...document.querySelectorAll('#studioCreationHero > img, .jems-empty-workbench, .jems-helper-mark')];
+    await Promise.all(images.map(img=>img.decode()));
+    const fonts=await Promise.all([document.fonts.load('800 24px Nunito'),document.fonts.load('500 15px Inter')]);
+    return {images:images.map(img=>({src:img.getAttribute('src'),loaded:img.naturalWidth>0,alt:img.alt})),fonts:fonts.map(f=>f.length)};
+   });
+   assert.deepEqual(approvedArt.images.map(img=>img.src).sort(),[
+    './jems-art/character_spark_think.webp','./jems-art/hero_workshop.webp','./jems-art/spot_first_idea.webp'
+   ],'approved factory, companion and empty-state art load under the deployed subpath');
+   assert.ok(approvedArt.images.every(img=>img.loaded&&img.alt===''),'supporting artwork stays decorative beside live text');
+   assert.ok(approvedArt.fonts.every(count=>count>0),'both licensed local interface fonts load');
    assert.match(await page.locator('#studioTalk').innerText(),/Send to jems/,'text composer clearly sends');
    assert.match(await page.locator('#studioMic').innerText(),/Speak/,'microphone has a separate voice affordance');
    assert.equal(await page.locator('#studioTalk').getAttribute('aria-label'),'Send your written message to jems');
