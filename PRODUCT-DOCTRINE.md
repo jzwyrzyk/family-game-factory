@@ -7,7 +7,7 @@
 
 **Rewards extension:** November 19, 2026: the owner subsequently requested shared lifetime gem increments, milestones and a cohesive Rewards page while reserving companion artwork and the companion system for separate work. [ADR0010](docs/decisions/0010-lifetime-gems-and-shared-rewards.md) records this additive earning policy; the creator-rank criteria and learning assessment remain separate.
 
-**Pal artwork adoption:** November 19, 2026: the owner approved six additional base designs, bringing the selected Gem Pal design roster to 22, and paused growth work while its approach changes. The [base-design decision](docs/decisions/2026-11-19-pal-base-design-adoption.md) and [artwork registry](docs/pals/art/README.md) record that visual scope. Runtime binding, acquisition rules, expressions and the replacement growth approach are not established by this approval.
+**Pal artwork adoption:** November 19, 2026: the selected Gem Pal design roster contains 22 entries, represented by 23 individual profiles because Navi and Mote share entry F. The [base-design decision](docs/decisions/2026-11-19-pal-base-design-adoption.md), [later form-selection decision](docs/decisions/2026-11-19-pal-form-reconciliation.md) and [artwork registry](docs/pals/art/README.md) preserve the approved bases and each form's actual selection status. Growth review has resumed with meaningful changes to anatomy, capability and purpose; a current review candidate is not an approved asset. Runtime binding, acquisition rules, expressions and production assets retain separate implementation and review scopes.
 
 **Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
 

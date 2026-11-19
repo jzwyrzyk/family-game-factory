@@ -1,0 +1,1388 @@
+{
+  "reference_index_id": "jems-gem-pals-character-references",
+  "revision": 1,
+  "date": "2026-11-19",
+  "timezone": "America/New_York",
+  "scope": "Reconciled design references and user selections; not a declaration that every mature artwork or application stage is complete.",
+  "counts": {
+    "roster_entries": 22,
+    "individual_character_profiles": 23,
+    "base_reference_profiles_resolved": 23,
+    "mature_status_counts": {
+      "current_reference_unresolved": 11,
+      "selected_exact_asset_pending": 2,
+      "approved_direction_profile_pending": 2,
+      "in_review": 5,
+      "approved_art_reference": 3
+    }
+  },
+  "reference_rules": [
+    "Keep character identity, visual form, art revision, expression set, animation rig and application binding separate.",
+    "A newer generated image never replaces a selected reference without a user decision.",
+    "Use approved_art_reference only with an exact selected artifact. Keep selected_exact_asset_pending explicit until that artifact is recovered.",
+    "Base identity anchors constrain base edits; mature architecture may deliberately change. Do not overwrite base specifications.",
+    "F is one roster entry containing F1 Navi and F2 Mote. Do not invent acquisition, ownership or runtime mapping semantics.",
+    "Single-character mature production profiles contain one character. Multi-character source boards are references, not final isolated assets.",
+    "Do not invent a middle form or bind base/mature to runtime stages implicitly.",
+    "Retain superseded artwork and reasons; do not delete revision history."
+  ],
+  "set_aside": [
+    {
+      "alias": "C",
+      "name": "Tollo"
+    },
+    {
+      "alias": "J",
+      "name": "Pock"
+    }
+  ],
+  "assets": {
+    "base_A": {
+      "asset_id": "base_A",
+      "source_filename": "Luma\u2019s crystal lantern illuminates a stone.png",
+      "library_file_id": "libfile_fde3_f-d3903e8b517c8191b2334d4587e20777_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-d3903e8b517c8191b2334d4587e20777_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:51:45.901232+00:00",
+      "sha256": "9f2b7a6bb8c63284e7236d1f310421c9e84fdea1e953b5ac353ee321768a3d90",
+      "size_bytes": 1761672,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_B": {
+      "asset_id": "base_B",
+      "source_filename": "Luma's Beam, Nook's Gem Nursery.png",
+      "library_file_id": "libfile_fde3_f-5fbd5cf2fcc48191bd1375e47469f30e_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-5fbd5cf2fcc48191bd1375e47469f30e_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:51:44.384487+00:00",
+      "sha256": "895887bad7517adc62e0cdca778d23ea9f6e863e2d4e3aa3947f94949b44d638",
+      "size_bytes": 2035697,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_DEF": {
+      "asset_id": "base_DEF",
+      "source_filename": "Three Gemmed Creatures, Three Ways to Shine.png",
+      "library_file_id": "libfile_fde3_f-5bff8aebfa3c8191b3729a24575341cb_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-5bff8aebfa3c8191b3729a24575341cb_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:00:06.775926+00:00",
+      "sha256": "42c89a70b42957109ac24f8d15551a745de3eb7d2ddb334d3d4154d6af585efc",
+      "size_bytes": 2041849,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_GHI": {
+      "asset_id": "base_GHI",
+      "source_filename": "Three gem-crafted creatures at work.png",
+      "library_file_id": "libfile_fde3_f-dd35e40edafc819181887b9cfcc1c9ed_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-dd35e40edafc819181887b9cfcc1c9ed_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:29:36.195108+00:00",
+      "sha256": "feb862cf22b9c07168af9a94150d78c9a20e4a97519cbf2347f785234d737990",
+      "size_bytes": 1903011,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_HO": {
+      "asset_id": "base_HO",
+      "source_filename": "H Furl and O Weft gemstone duo.png",
+      "library_file_id": "libfile_fde3_f-75c4fa8f62048191a5bc3a2bb39522d2_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-75c4fa8f62048191a5bc3a2bb39522d2_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:51:45.178786+00:00",
+      "sha256": "2c2adb588ff93655bd65513dab290b48bd57346f240923bda56875e1e1b8af1c",
+      "size_bytes": 1801241,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_JKL": {
+      "asset_id": "base_JKL",
+      "source_filename": "Jems creature trio: crystal talents.png",
+      "library_file_id": "libfile_fde3_f-545e330eb0288191937db57d3f381427_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-545e330eb0288191937db57d3f381427_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:29:35.616241+00:00",
+      "sha256": "46ab4a9e1b0f058c617f319d971725e0e6c19c302c851ad48e9b6907cf6e4ec8",
+      "size_bytes": 1771695,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_MNO": {
+      "asset_id": "base_MNO",
+      "source_filename": "Jems: Three Gem-Powered Creature Designs.png",
+      "library_file_id": "libfile_fde3_f-26b870d9a8088191bdef91b77c0860ab_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-26b870d9a8088191bdef91b77c0860ab_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:29:36.813788+00:00",
+      "sha256": "4eeb5d92fd36af9393afedf2f976f314f18a6c0a425f8dffb3e7e03cdb3028e6",
+      "size_bytes": 1717713,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_PQR": {
+      "asset_id": "base_PQR",
+      "source_filename": "Three gem-bonded creature designs.png",
+      "library_file_id": "libfile_fde3_f-7a33362fd7a48191a44559e777eb015b_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-7a33362fd7a48191a44559e777eb015b_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T19:29:37.487501+00:00",
+      "sha256": "62114939791c50fb3cc8a3d8625967a25ff11cbd2a81c3da30909ac1e752cc54",
+      "size_bytes": 2027132,
+      "role": "selected_base_source_board",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "base_SU_r2": {
+      "asset_id": "base_SU_r2",
+      "source_filename": "U Pleeko\u2019s Four-Legged Revision.png",
+      "library_file_id": "libfile_fde3_f-a1995cbd14f4819192819125db414e66_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-a1995cbd14f4819192819125db414e66_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T20:15:50.461279+00:00",
+      "sha256": "c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49",
+      "size_bytes": 1899161,
+      "role": "approved_base_board_r2",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": "boards/pals-s-u-r2.png",
+      "reference_location": "repository_and_library",
+      "repository_verification": "Exact source bytes, SHA-256 and byte length verified during this import."
+    },
+    "base_VX_r2": {
+      "asset_id": "base_VX_r2",
+      "source_filename": "Jems triptych with Whorl arrows removed.png",
+      "library_file_id": "libfile_fde3_f-7501b48842108191a79dc8c6763b6a21_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-7501b48842108191a79dc8c6763b6a21_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T20:15:51.163883+00:00",
+      "sha256": "47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9",
+      "size_bytes": 1915988,
+      "role": "approved_base_board_r2",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": "boards/pals-v-x-r2.png",
+      "reference_location": "repository_and_library",
+      "repository_verification": "Exact source bytes, SHA-256 and byte length verified during this import."
+    },
+    "mature_S_this_chat": {
+      "asset_id": "mature_S_this_chat",
+      "source_filename": "Mature Poff\u2019s floating crystal bellows.png",
+      "library_file_id": "libfile_fde3_f-eb99cbb9a7588191a467e6c6efc97e93_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-eb99cbb9a7588191a467e6c6efc97e93_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T22:40:45.282112+00:00",
+      "sha256": "10bee703b157868035b77add5df360568a671f04b61567e3df9e494b451ab083",
+      "size_bytes": 1969934,
+      "role": "in_review",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_T_this_chat": {
+      "asset_id": "mature_T_this_chat",
+      "source_filename": "T Chimi's crystal harmony evolution.png",
+      "library_file_id": "libfile_fde3_f-be36cbe03a0c8191b52950933f86c1b5_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-be36cbe03a0c8191b52950933f86c1b5_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T22:40:43.967985+00:00",
+      "sha256": "5151bcb8bb03579ed06c46ce15cf3c9a82b32934226a32cf5f2ff5223693af0b",
+      "size_bytes": 2146940,
+      "role": "superseded_by_user_preference",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_U_this_chat": {
+      "asset_id": "mature_U_this_chat",
+      "source_filename": "U Pleeko\u2019s Emerald-Hinged Ascent.png",
+      "library_file_id": "libfile_fde3_f-6eb59a3579608191a7c6eb7295c878aa_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-6eb59a3579608191a7c6eb7295c878aa_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T22:40:44.644226+00:00",
+      "sha256": "fa4b7948259ec286aa1cacd6b29d6527b753a803e1674a7b783f0a845e327ab8",
+      "size_bytes": 1961567,
+      "role": "selected",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": "growth-selected/pleeko-u-growth-selected.png",
+      "reference_location": "repository_and_library",
+      "repository_verification": "Exact source bytes, SHA-256 and byte length verified during this import."
+    },
+    "mature_V_this_chat": {
+      "asset_id": "mature_V_this_chat",
+      "source_filename": "Talli\u2019s Ribbon Trail Scout.png",
+      "library_file_id": "libfile_fde3_f-d3be7cd284748191b467ab401f7165f3_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-d3be7cd284748191b467ab401f7165f3_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T22:40:46.487908+00:00",
+      "sha256": "3918ad275e9761bb0e2b75e55ae27fc01ba5496537e9699378e736d0bc210aee",
+      "size_bytes": 1809520,
+      "role": "selected",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": "growth-selected/talli-v-growth-selected.png",
+      "reference_location": "repository_and_library",
+      "repository_verification": "Exact source bytes, SHA-256 and byte length verified during this import."
+    },
+    "mature_W_this_chat": {
+      "asset_id": "mature_W_this_chat",
+      "source_filename": "W Zippa\u2019s Four-Legged Canopy.png",
+      "library_file_id": "libfile_fde3_f-67f94aa08b108191885ecce2eeeff910_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-67f94aa08b108191885ecce2eeeff910_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T22:40:47.526798+00:00",
+      "sha256": "f8f2022ef8988196cafbda0b803a7b3a6cdb2c131146def273fe543f4d91c7ad",
+      "size_bytes": 1969051,
+      "role": "in_review",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_X_this_chat": {
+      "asset_id": "mature_X_this_chat",
+      "source_filename": "X Whorl: Sapphire acrobat evolution.png",
+      "library_file_id": "libfile_fde3_f-c5dbe1a270ac819188a0288f27794069_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-c5dbe1a270ac819188a0288f27794069_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T22:40:45.850998+00:00",
+      "sha256": "1f30067a5928d0139e9f2a5fd20c6eafe9a40f4da507de3ae7cf4f88ac510306",
+      "size_bytes": 1741223,
+      "role": "selected",
+      "source_conversation": "Gem Pal development methodology / this conversation",
+      "verification": "Visually inspected source; exact Library download byte-for-byte identical to retained local source (SHA-256 verified).",
+      "repository_path": "growth-selected/whorl-x-growth-selected.png",
+      "reference_location": "repository_and_library",
+      "repository_verification": "Exact source bytes, SHA-256 and byte length verified during this import."
+    },
+    "mature_M_other_chat": {
+      "asset_id": "mature_M_other_chat",
+      "source_filename": "Skiff's radiant ripple turn.png",
+      "library_file_id": "libfile_fde3_f-4ae0ae9b02c881919b7f3fb09319309d_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-4ae0ae9b02c881919b7f3fb09319309d_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:46:15.919575+00:00",
+      "sha256": "53cb011abd656d7005fa1c85247c44a8431e7a8c8a1905d84f4fd54fb43dacfb",
+      "size_bytes": 1932945,
+      "role": "in_review",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_P_other_chat": {
+      "asset_id": "mature_P_other_chat",
+      "source_filename": "Cache\u2019s radiant seed nursery.png",
+      "library_file_id": "libfile_fde3_f-976e2a59097c8191a5bf8b287150f5a2_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-976e2a59097c8191a5bf8b287150f5a2_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:46:16.569429+00:00",
+      "sha256": "3e71b3399482893a2a36dfa88c38559f54dc30f70fca975492ec000d6c54f1b4",
+      "size_bytes": 2166956,
+      "role": "in_review",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_Q_other_chat": {
+      "asset_id": "mature_Q_other_chat",
+      "source_filename": "Brim\u2019s Opal Shade.png",
+      "library_file_id": "libfile_fde3_f-e829b8466f5c819193162c5e7a311b30_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-e829b8466f5c819193162c5e7a311b30_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:46:17.181835+00:00",
+      "sha256": "5a77f869d13c38c7760c5336733607dabfb577126fdcef1ec7b3f372bf422c76",
+      "size_bytes": 1917349,
+      "role": "in_review",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_N_other_chat": {
+      "asset_id": "mature_N_other_chat",
+      "source_filename": "Apricot Peep with four visible feet.png",
+      "library_file_id": "libfile_fde3_f-89e490ec2f508191bc55fa54c421ae54_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-89e490ec2f508191bc55fa54c421ae54_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:46:18.554486+00:00",
+      "sha256": "9dad6a8c5ffba2f406699e1c296fb616b9821e50d0313838bcfa05ceee79e56d",
+      "size_bytes": 2057240,
+      "role": "superseded",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "mature_R_other_chat": {
+      "asset_id": "mature_R_other_chat",
+      "source_filename": "Radiant Wink's Ruby Welcome.png",
+      "library_file_id": "libfile_fde3_f-5c5a8e88cd1081918c3e098c6e7d8744_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-5c5a8e88cd1081918c3e098c6e7d8744_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:46:17.854254+00:00",
+      "sha256": "040fd3f8884d62b914b497e03018346bb11a18228afdc3074dcc2309f5409c1f",
+      "size_bytes": 2065675,
+      "role": "superseded",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "growth_direction_G": {
+      "asset_id": "growth_direction_G",
+      "source_filename": "Sivo\u2019s radiant river arch evolution.png",
+      "library_file_id": "libfile_fde3_f-f6ed95891ff08191acd30be7251a6b1d_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-f6ed95891ff08191acd30be7251a6b1d_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:11:56.644601+00:00",
+      "sha256": "c2e748f773b33f7e4b736a0e768119cafd0d3a5a73e93865e7fab32a9304ec4d",
+      "size_bytes": 2141209,
+      "role": "accepted_direction_study_not_single_profile",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    },
+    "growth_direction_O": {
+      "asset_id": "growth_direction_O",
+      "source_filename": "Weft: The Weave Becomes a Bridge.png",
+      "library_file_id": "libfile_fde3_f-224ff4ec0b90819191819b914f4ab244_64db2735d5688191ad02463aaa0cddc5",
+      "library_file_version": "0",
+      "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-224ff4ec0b90819191819b914f4ab244_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
+      "created_at": "2026-11-19T21:11:55.940933+00:00",
+      "sha256": "42fa4a67474b3782787091715162b4e6a42f1da0b6051d7f383f53a0519bddc0",
+      "size_bytes": 2115452,
+      "role": "accepted_direction_study_not_single_profile",
+      "source_conversation": "Merge strategy for companions",
+      "verification": "Exact local source bytes retained; original references visually inspected.",
+      "repository_path": null,
+      "reference_location": "library_only"
+    }
+  },
+  "roster_entries": [
+    {
+      "roster_alias": "A",
+      "display_name": "Luma",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/A",
+          "alias": "A",
+          "display_name": "Luma",
+          "roster_alias": "A",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_A",
+                "region": "whole image"
+              },
+              "identity_note": "Back-mounted light; no eye beam.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "B",
+      "display_name": "Nook",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/B",
+          "alias": "B",
+          "display_name": "Nook",
+          "roster_alias": "B",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_B",
+                "region": "right panel"
+              },
+              "identity_note": "Gem nursery contains gems, not eggs.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Earlier mature proposal was flagged as lacking meaningful growth on 2026-11-19 at22:26UTC. Exact corrected individual profile remains unresolved; never restore the rejected image as current.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "D",
+      "display_name": "Mizzle",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/D",
+          "alias": "D",
+          "display_name": "Mizzle",
+          "roster_alias": "D",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_DEF",
+                "region": "left panel"
+              },
+              "identity_note": "Dew gardener.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "E",
+      "display_name": "Tumble",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/E",
+          "alias": "E",
+          "display_name": "Tumble",
+          "roster_alias": "E",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_DEF",
+                "region": "center panel"
+              },
+              "identity_note": "Tail-gem balancing.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "F",
+      "display_name": "Navi and Mote",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/F1",
+          "alias": "F1",
+          "display_name": "Navi",
+          "roster_alias": "F",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_DEF",
+                "region": "right panel, large peach hooded character"
+              },
+              "identity_note": "Navi is the peach hooded caster, not the floating gem character.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "selected_exact_asset_pending",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "User selection is recorded. Exact newest image file/ID is unavailable here; do not redraw it, choose a similar image, or use this chat alternative.",
+              "history": [
+                {
+                  "asset_id": null,
+                  "description": "Groundwarden Navi",
+                  "status": "superseded",
+                  "reason": "User retained floating-gem mage/caster direction."
+                }
+              ],
+              "selected_reference_intent": {
+                "source_conversation": "Merge strategy for companions",
+                "after_user_correction_utc": "2026-11-19T22:38:10Z",
+                "assistant_revision_utc": "2026-11-19T22:42:11Z",
+                "description": "Other chat latest Navi: hovering crystal caster, broad natural hood, curled lower body and two hands guiding a floating violet gem; groundwarden superseded."
+              },
+              "description": "Other chat latest Navi: hovering crystal caster, broad natural hood, curled lower body and two hands guiding a floating violet gem; groundwarden superseded.",
+              "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          },
+          "identity_note": "Keep F1 Navi separate from F2 Mote. Verify the selected floating-gem portrait itself before deciding whether the gem is Mote or a non-character spell gem."
+        },
+        {
+          "character_key": "first-round-2026-11-19/F2",
+          "alias": "F2",
+          "display_name": "Mote",
+          "roster_alias": "F",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_DEF",
+                "region": "right panel, small violet floating gem character"
+              },
+              "identity_note": "Mote is the violet faceted character with two orange eyes; a distinct partner, not an unnamed accessory.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "G",
+      "display_name": "Sivo",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/G",
+          "alias": "G",
+          "display_name": "Sivo",
+          "roster_alias": "G",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_GHI",
+                "region": "left panel"
+              },
+              "identity_note": "Sieve hands.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "approved_direction_profile_pending",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Growth direction accepted; existing study includes multiple characters/forms. Retrieve the later single-character mature profile before exact artwork selection.",
+              "history": [],
+              "description": "Long river-tending body with raised chest, four limbs, filtering underside and divided crystal tail.",
+              "direction_reference": "growth_direction_G"
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "H",
+      "display_name": "Furl",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/H",
+          "alias": "H",
+          "display_name": "Furl",
+          "roster_alias": "H",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_HO",
+                "region": "left panel"
+              },
+              "identity_note": "Corrected matching wing construction.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "I",
+      "display_name": "Tessit",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/I",
+          "alias": "I",
+          "display_name": "Tessit",
+          "roster_alias": "I",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_GHI",
+                "region": "right panel"
+              },
+              "identity_note": "Tile-stamping gem feet.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "K",
+      "display_name": "Flick",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/K",
+          "alias": "K",
+          "display_name": "Flick",
+          "roster_alias": "K",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_JKL",
+                "region": "center panel"
+              },
+              "identity_note": "Seed collector. J/Pock at left is excluded.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Latest individual mature profile has not been retrieved. Do not substitute an older growth board or infer approval.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "L",
+      "display_name": "Clasp",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/L",
+          "alias": "L",
+          "display_name": "Clasp",
+          "roster_alias": "L",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_JKL",
+                "region": "right panel"
+              },
+              "identity_note": "Hook-gem climber.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Earlier mature proposal was flagged as lacking meaningful growth on 2026-11-19 at22:26UTC. Exact corrected individual profile remains unresolved; never restore the rejected image as current.",
+              "history": []
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "M",
+      "display_name": "Skiff",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/M",
+          "alias": "M",
+          "display_name": "Skiff",
+          "roster_alias": "M",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_MNO",
+                "region": "left panel"
+              },
+              "identity_note": "Gem gliding foot.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "in_review",
+              "selected_reference": null,
+              "current_review_reference": {
+                "asset_id": "mature_M_other_chat",
+                "region": "whole image"
+              },
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "An exact review candidate is available; no user approval is inferred.",
+              "history": [],
+              "description": "Coral upright curved body with two arms and a broad blue-crystal gliding underside, banking over a water ripple."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "N",
+      "display_name": "Peep",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/N",
+          "alias": "N",
+          "display_name": "Peep",
+          "roster_alias": "N",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_MNO",
+                "region": "center panel"
+              },
+              "identity_note": "Magnifying gem eye.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Earlier mature proposal was flagged as lacking meaningful growth on 2026-11-19 at22:26UTC. Exact corrected individual profile remains unresolved; never restore the rejected image as current.",
+              "history": [
+                {
+                  "asset_id": "mature_N_other_chat",
+                  "status": "superseded",
+                  "reason": "Predates user feedback that this character lacked meaningful growth.",
+                  "visual_note": "Four supporting feet plus two separate arms visible; do not summarize this old image as four limbs total."
+                }
+              ]
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "O",
+      "display_name": "Weft",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/O",
+          "alias": "O",
+          "display_name": "Weft",
+          "roster_alias": "O",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_HO",
+                "region": "right panel"
+              },
+              "identity_note": "Four arms with coherent origins and tasks.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "approved_direction_profile_pending",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Growth direction accepted; existing study includes multiple characters/forms. Retrieve the later single-character mature profile before exact artwork selection.",
+              "history": [],
+              "description": "Weft carries and unfolds its woven crystal lattice as a bridge; making something becomes helping others cross.",
+              "direction_reference": "growth_direction_O"
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "P",
+      "display_name": "Cache",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/P",
+          "alias": "P",
+          "display_name": "Cache",
+          "roster_alias": "P",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_PQR",
+                "region": "left panel"
+              },
+              "identity_note": "Geode storage.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "in_review",
+              "selected_reference": null,
+              "current_review_reference": {
+                "asset_id": "mature_P_other_chat",
+                "region": "whole image"
+              },
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "An exact review candidate is available; no user approval is inferred.",
+              "history": [],
+              "description": "Seated violet pal holding a compartmented amber geode seed container; change is mainly the object and story.",
+              "review_note": "Body remains close to base; the geode box is a held object. Anatomical growth and role change are not approved."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "Q",
+      "display_name": "Brim",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/Q",
+          "alias": "Q",
+          "display_name": "Brim",
+          "roster_alias": "Q",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_PQR",
+                "region": "center panel"
+              },
+              "identity_note": "Shade canopy.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "in_review",
+              "selected_reference": null,
+              "current_review_reference": {
+                "asset_id": "mature_Q_other_chat",
+                "region": "whole image"
+              },
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "An exact review candidate is available; no user approval is inferred.",
+              "history": [],
+              "description": "Coral quadruped with three opal shade plates supported on curved stalks above a sprout.",
+              "review_note": "Clarify overlapping canopy stalk supports before rigging."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "R",
+      "display_name": "Wink",
+      "members": [
+        {
+          "character_key": "first-round-2026-11-19/R",
+          "alias": "R",
+          "display_name": "Wink",
+          "roster_alias": "R",
+          "species_id": null,
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_PQR",
+                "region": "right panel"
+              },
+              "identity_note": "Signal-tail gems.",
+              "art_revision": null
+            },
+            "mature": {
+              "status": "current_reference_unresolved",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "Earlier mature proposal was flagged as lacking meaningful growth on 2026-11-19 at22:26UTC. Exact corrected individual profile remains unresolved; never restore the rejected image as current.",
+              "history": [
+                {
+                  "asset_id": "mature_R_other_chat",
+                  "status": "superseded",
+                  "reason": "Predates user feedback that this character lacked meaningful growth."
+                }
+              ]
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "S",
+      "display_name": "Poff",
+      "members": [
+        {
+          "character_key": "expansion-2026-11-19/S",
+          "alias": "S",
+          "display_name": "Poff",
+          "roster_alias": "S",
+          "species_id": "GP-S019",
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_SU_r2",
+                "region": "left panel"
+              },
+              "identity_note": "Mint concertina body; two violet air valves.",
+              "art_revision": 2
+            },
+            "mature": {
+              "status": "in_review",
+              "selected_reference": null,
+              "current_review_reference": {
+                "asset_id": "mature_S_this_chat",
+                "region": "whole image"
+              },
+              "source_conversation": "Gem Pal development methodology / this conversation",
+              "resolution_note": "An exact review candidate is available; no user approval is inferred.",
+              "history": [],
+              "description": "Broad horizontal pleated hover body; directional violet crystal valves and crystal-lined folds."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "T",
+      "display_name": "Chimi",
+      "members": [
+        {
+          "character_key": "expansion-2026-11-19/T",
+          "alias": "T",
+          "display_name": "Chimi",
+          "roster_alias": "T",
+          "species_id": "GP-S020",
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_SU_r2",
+                "region": "center panel"
+              },
+              "identity_note": "Lilac crescent; five graduated musical gem tines.",
+              "art_revision": 2
+            },
+            "mature": {
+              "status": "selected_exact_asset_pending",
+              "selected_reference": null,
+              "current_review_reference": null,
+              "source_conversation": "Merge strategy for companions",
+              "resolution_note": "User selection is recorded. Exact newest image file/ID is unavailable here; do not redraw it, choose a similar image, or use this chat alternative.",
+              "history": [
+                {
+                  "asset_id": "mature_T_this_chat",
+                  "status": "superseded_by_user_preference",
+                  "reason": "User prefers the other chat corrected Chimi."
+                }
+              ],
+              "selected_reference_intent": {
+                "source_conversation": "Merge strategy for companions",
+                "after_user_correction_utc": "2026-11-19T22:38:10Z",
+                "assistant_revision_utc": "2026-11-19T22:42:11Z",
+                "description": "Other chat latest Chimi: paired shoulder sound chambers with shorter, clearly attached arms after the arm correction."
+              },
+              "description": "Other chat latest Chimi: paired shoulder sound chambers with shorter, clearly attached arms after the arm correction.",
+              "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "U",
+      "display_name": "Pleeko",
+      "members": [
+        {
+          "character_key": "expansion-2026-11-19/U",
+          "alias": "U",
+          "display_name": "Pleeko",
+          "roster_alias": "U",
+          "species_id": "GP-S021",
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_SU_r2",
+                "region": "right panel"
+              },
+              "identity_note": "Corrected four-legged peach folding body with emerald hinges.",
+              "art_revision": 2
+            },
+            "mature": {
+              "status": "approved_art_reference",
+              "selected_reference": {
+                "asset_id": "mature_U_this_chat",
+                "region": "whole image"
+              },
+              "current_review_reference": null,
+              "source_conversation": "Gem Pal development methodology / this conversation",
+              "resolution_note": "Exact selected image retained. Approval covers concept art, not production rig or runtime integration.",
+              "history": [],
+              "description": "Tall peach articulated four-legged climber; folded torso and three emerald hinge pivots.",
+              "art_revision": "mature-this-chat-r1",
+              "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "V",
+      "display_name": "Talli",
+      "members": [
+        {
+          "character_key": "expansion-2026-11-19/V",
+          "alias": "V",
+          "display_name": "Talli",
+          "roster_alias": "V",
+          "species_id": "GP-S022",
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_VX_r2",
+                "region": "left panel"
+              },
+              "identity_note": "Blue ribbon loop and flat tail; one coral terminal anchor.",
+              "art_revision": 2
+            },
+            "mature": {
+              "status": "approved_art_reference",
+              "selected_reference": {
+                "asset_id": "mature_V_this_chat",
+                "region": "whole image"
+              },
+              "current_review_reference": null,
+              "source_conversation": "Gem Pal development methodology / this conversation",
+              "resolution_note": "Exact selected image retained. Approval covers concept art, not production rig or runtime integration.",
+              "history": [],
+              "description": "Long lifted blue ribbon body and four ribbon legs; coral tail anchor and inset ankle facets.",
+              "art_revision": "mature-this-chat-r1",
+              "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "W",
+      "display_name": "Zippa",
+      "members": [
+        {
+          "character_key": "expansion-2026-11-19/W",
+          "alias": "W",
+          "display_name": "Zippa",
+          "roster_alias": "W",
+          "species_id": "GP-S023",
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_VX_r2",
+                "region": "center panel"
+              },
+              "identity_note": "Twin magenta mantle lobes; paired golden joining gems.",
+              "art_revision": 2
+            },
+            "mature": {
+              "status": "in_review",
+              "selected_reference": null,
+              "current_review_reference": {
+                "asset_id": "mature_W_this_chat",
+                "region": "whole image"
+              },
+              "source_conversation": "Gem Pal development methodology / this conversation",
+              "resolution_note": "An exact review candidate is available; no user approval is inferred.",
+              "history": [],
+              "description": "Broad magenta four-legged living canopy; paired golden joining seam over an open sheltered underside."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    },
+    {
+      "roster_alias": "X",
+      "display_name": "Whorl",
+      "members": [
+        {
+          "character_key": "expansion-2026-11-19/X",
+          "alias": "X",
+          "display_name": "Whorl",
+          "roster_alias": "X",
+          "species_id": "GP-S024",
+          "application_mapping": null,
+          "forms": {
+            "base": {
+              "status": "approved_base_concept",
+              "selected_reference": {
+                "asset_id": "base_VX_r2",
+                "region": "right panel"
+              },
+              "identity_note": "Aqua hoop; sapphire rotor with two visible axle supports; no misleading rotation arrows.",
+              "art_revision": 2
+            },
+            "mature": {
+              "status": "approved_art_reference",
+              "selected_reference": {
+                "asset_id": "mature_X_this_chat",
+                "region": "whole image"
+              },
+              "current_review_reference": null,
+              "source_conversation": "Gem Pal development methodology / this conversation",
+              "resolution_note": "Exact selected image retained. Approval covers concept art, not production rig or runtime integration.",
+              "history": [],
+              "description": "Open aqua torso acrobat with two arms, two long legs, counterbalance tail and supported sapphire rotor.",
+              "art_revision": "mature-this-chat-r1",
+              "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions."
+            }
+          },
+          "production": {
+            "isolated_assets": "pending",
+            "expressions": "form_specific_compatibility_review_pending",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null
+          }
+        }
+      ]
+    }
+  ],
+  "next_steps": [
+    "Recover the exact selected Chimi and Navi portraits and unresolved latest mature profiles; assemble the complete visual roster.",
+    "Review any still-unapproved mature forms individually.",
+    "Resolve artwork coverage for the existing three-stage runtime without inventing intermediate forms or changing reward thresholds.",
+    "Prepare isolated assets, scale/grounding conventions, face regions and clear anatomy/attachment views for each selected form.",
+    "Verify expressions and movement against those exact forms, then implement stage-aware artwork lookup and full roster mapping.",
+    "Check collection, growth, take-along use, scene editing and save/reload/backup before merge and release."
+  ],
+  "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions.",
+  "repository_projection": {
+    "source_filename": "Jems_Gem_Pal_Character_References_v1.json",
+    "source_revision": 1,
+    "source_sha256": "2045930545e62eb3894019271a152ed3c0e92e69c4f1699a660dfe033b16e5fd",
+    "scope": "Exact references and per-form states from the source index; original selection text is paraphrased and review-bundle paths are replaced by repository or Library references.",
+    "repository_paths_relative_to": "docs/pals/art",
+    "external_reference_note": "Library URLs retain the source access controls. An external source is not bundled runtime artwork."
+  }
+}

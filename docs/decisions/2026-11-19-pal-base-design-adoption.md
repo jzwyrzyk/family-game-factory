@@ -1,6 +1,6 @@
 # Approved Gem Pal base-design adoption
 
-**Status:** Accepted for the six displayed base designs; growth work paused.
+**Status:** Accepted for the six displayed base designs. The historical growth pause below is superseded by the later [form-selection decision](2026-11-19-pal-form-reconciliation.md); the original base approval remains in effect.
 **Recorded:** November 19, 2026 (America/New_York).
 **Decision source/date:** The owner's November 19, 2026 art-review follow-up approved S, T, U, V, W and X for adoption and explicitly asked to wait on growth while that approach changes in another conversation. This record paraphrases that direction; it does not reproduce a private transcript or infer the other conversation's replacement design.
 

@@ -1,5 +1,8 @@
 # jems delivery state
 
+## PR56 Mind Your Jems illustrated arcade — new integration candidate
+The reconstructed PR56 is being integrated over the latest merged main, retaining Creation, Rewards, parent progress, problem solving, brand, and archetype work. Its illustrated local-only gameplay, keyboard/touch mining, separate session scores, ready handoff, and short-phone footer feedback remain independently testable. The feature is **not merged or deployed**. Exact updated-head CI, screenshot/storyboard review and current-main compatibility must pass before merge; this does not authorize any model, private worker, or child data activation.
+
 ## PR64 formative problem-solving — merged
 
 **Merge observed:** `2026-11-19T17:31:14Z` (`November 19, 2026, 12:31:14 p.m. America/New_York`). Under the owner’s November 19 authorization to merge once ready, [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64) merged into `main` as `09e43beb4405526117493ab27688b076136078f4`.

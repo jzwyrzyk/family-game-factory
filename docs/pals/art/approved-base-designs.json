@@ -1,9 +1,9 @@
 {
   "schema": "jems.pals.approved-base-designs.v1",
-  "registry_revision": 1,
+  "registry_revision": 2,
   "recorded_date": "2026-11-19",
   "timezone": "America/New_York",
-  "scope": "Approved base designs S-X and the 22-design selected roster; artwork records only.",
+  "scope": "Approved base designs S-X and the 22-design roster; current per-form selection is maintained separately in character-references.json.",
   "decision_record": "../../decisions/2026-11-19-pal-base-design-adoption.md",
   "source_catalog": {
     "catalog_id": "jems-gem-pal-design-catalog",
@@ -23,17 +23,19 @@
     "by": "owner",
     "date": "2026-11-19",
     "scope": "Six displayed base designs S-X at art revision 2.",
-    "decision_summary": "Adopt the six base designs; pause growth work while its approach is reconsidered."
+    "decision_summary": "Adopt the six base designs; pause growth work while its approach is reconsidered.",
+    "scope_note": "This block records the original base-adoption decision; its growth pause was subsequently superseded."
   },
   "workstream_status": {
     "base_designs_s_x": "approved",
-    "growth": "paused",
-    "replacement_growth_approach": null,
+    "growth": "review_resumed_with_per_form_selection",
+    "replacement_growth_approach": "Meaningful changes to anatomy, gem function and character capability or purpose; current form selection and exact-reference resolution are separate.",
     "runtime_binding": "unassigned",
     "collection_policy": "not_defined_by_this_record",
     "individual_game_assets": "pending",
     "expressions": "pending",
-    "animation_rigs": "pending"
+    "animation_rigs": "pending",
+    "growth_reference_index": "character-references.json"
   },
   "selected_roster_count": 22,
   "prior_selected_summary_count": 16,
@@ -377,7 +379,7 @@
       "production_asset_ref": null,
       "expression_set_ref": null,
       "animation_rig_ref": null,
-      "growth_work_status": "paused",
+      "growth_work_status": "in_review",
       "growth_forms": [],
       "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
       "implementation_status": {
@@ -387,7 +389,13 @@
         "animation_rig": "pending",
         "application_mapping": "unassigned",
         "in_game_verification": "pending"
-      }
+      },
+      "growth_reference_index": {
+        "path": "character-references.json",
+        "character_key": "expansion-2026-11-19/S",
+        "form": "mature"
+      },
+      "growth_forms_note": "This base-only specification does not duplicate mature-form records; consult growth_reference_index."
     },
     {
       "species_id": "GP-S020",
@@ -453,7 +461,7 @@
       "production_asset_ref": null,
       "expression_set_ref": null,
       "animation_rig_ref": null,
-      "growth_work_status": "paused",
+      "growth_work_status": "selected_exact_asset_pending",
       "growth_forms": [],
       "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
       "implementation_status": {
@@ -463,7 +471,13 @@
         "animation_rig": "pending",
         "application_mapping": "unassigned",
         "in_game_verification": "pending"
-      }
+      },
+      "growth_reference_index": {
+        "path": "character-references.json",
+        "character_key": "expansion-2026-11-19/T",
+        "form": "mature"
+      },
+      "growth_forms_note": "This base-only specification does not duplicate mature-form records; consult growth_reference_index."
     },
     {
       "species_id": "GP-S021",
@@ -529,7 +543,7 @@
       "production_asset_ref": null,
       "expression_set_ref": null,
       "animation_rig_ref": null,
-      "growth_work_status": "paused",
+      "growth_work_status": "approved_art_reference",
       "growth_forms": [],
       "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
       "implementation_status": {
@@ -539,7 +553,13 @@
         "animation_rig": "pending",
         "application_mapping": "unassigned",
         "in_game_verification": "pending"
-      }
+      },
+      "growth_reference_index": {
+        "path": "character-references.json",
+        "character_key": "expansion-2026-11-19/U",
+        "form": "mature"
+      },
+      "growth_forms_note": "This base-only specification does not duplicate mature-form records; consult growth_reference_index."
     },
     {
       "species_id": "GP-S022",
@@ -605,7 +625,7 @@
       "production_asset_ref": null,
       "expression_set_ref": null,
       "animation_rig_ref": null,
-      "growth_work_status": "paused",
+      "growth_work_status": "approved_art_reference",
       "growth_forms": [],
       "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
       "implementation_status": {
@@ -615,7 +635,13 @@
         "animation_rig": "pending",
         "application_mapping": "unassigned",
         "in_game_verification": "pending"
-      }
+      },
+      "growth_reference_index": {
+        "path": "character-references.json",
+        "character_key": "expansion-2026-11-19/V",
+        "form": "mature"
+      },
+      "growth_forms_note": "This base-only specification does not duplicate mature-form records; consult growth_reference_index."
     },
     {
       "species_id": "GP-S023",
@@ -681,7 +707,7 @@
       "production_asset_ref": null,
       "expression_set_ref": null,
       "animation_rig_ref": null,
-      "growth_work_status": "paused",
+      "growth_work_status": "in_review",
       "growth_forms": [],
       "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
       "implementation_status": {
@@ -691,7 +717,13 @@
         "animation_rig": "pending",
         "application_mapping": "unassigned",
         "in_game_verification": "pending"
-      }
+      },
+      "growth_reference_index": {
+        "path": "character-references.json",
+        "character_key": "expansion-2026-11-19/W",
+        "form": "mature"
+      },
+      "growth_forms_note": "This base-only specification does not duplicate mature-form records; consult growth_reference_index."
     },
     {
       "species_id": "GP-S024",
@@ -757,7 +789,7 @@
       "production_asset_ref": null,
       "expression_set_ref": null,
       "animation_rig_ref": null,
-      "growth_work_status": "paused",
+      "growth_work_status": "approved_art_reference",
       "growth_forms": [],
       "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
       "implementation_status": {
@@ -767,14 +799,22 @@
         "animation_rig": "pending",
         "application_mapping": "unassigned",
         "in_game_verification": "pending"
-      }
+      },
+      "growth_reference_index": {
+        "path": "character-references.json",
+        "character_key": "expansion-2026-11-19/X",
+        "form": "mature"
+      },
+      "growth_forms_note": "This base-only specification does not duplicate mature-form records; consult growth_reference_index."
     }
   ],
   "handoff_requirements": [
-    "Preserve the approved base identity anchors and exact board provenance.",
-    "Prepare isolated production assets separately from these concept boards.",
-    "Reconcile application identities and saved-scene compatibility explicitly.",
-    "Keep growth work paused until the replacement approach is established.",
-    "Keep expression and animation approval separate from base-design approval."
-  ]
+    "Resolve each current character/form reference from character-references.json; an unresolved selected artifact must never be replaced by a similar candidate.",
+    "Prepare isolated production assets and review expression/animation compatibility for the selected form.",
+    "Explicitly reconcile design identities with persistent companion and saved-scene identities; no mapping to Glim, Kip or Riff is implied.",
+    "Resolve visual coverage for the implementation growth stages without silently changing thresholds, collection policy or saved progress.",
+    "Reconcile the companion implementation with current main, then verify collection, growth, creative use, reload, profile isolation and backup behavior."
+  ],
+  "current_character_references": "character-references.json",
+  "later_form_selection_decision": "../../decisions/2026-11-19-pal-form-reconciliation.md"
 }

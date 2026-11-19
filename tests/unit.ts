@@ -59,3 +59,5 @@ import './adult-profile-auth.test';
 import './adult-api.test';
 import './adult-workspace.test';
 import './adult-profile-client.test';
+
+import './mind-your-jems.test';
