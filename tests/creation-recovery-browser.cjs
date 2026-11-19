@@ -23,6 +23,8 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   const ready=()=>page.waitForFunction(()=>window.FG?.creation&&window.FG?.studio&&document.getElementById('creationParentProgress'));
   const pacing=()=>page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture did not save');});
   const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();};
+  const switchProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.locator('#studioProfileMenu summary').click();await page.locator('.profile-choice').nth(index).click();};
+  const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await page.locator('#studioNavScenes').click();await page.locator(`[data-scene="${id}"]`).click();};
   const raw=()=>page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),STATE_KEYS);
   const upload=backup=>page.locator('#importData').setInputFiles({name:'scene-backup-fixture.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});
   const rejected=async(backup,pattern)=>{
@@ -122,9 +124,39 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.equal(await page.locator('#creationTitle').inputValue(),'My backup robot experiment');
     assert.equal(await page.evaluate(()=>FG.creation.export().projects[0].challengeId),'retired-goal');
     checks.push('a retired challenge reopens its preserved scene for free editing without fabricating a goal');
+
+    // Global navigation can retain a recovery draft without creating a revision.
+    // Reopening that draft must require the explicit Resume / Use saved decision.
+    await page.locator('#creationBack').click();await page.locator('#creationChallengeMode').click();
+    await page.locator('[data-challenge="robot-route"]').click();await page.locator('[data-add-block="say"]').click();
+    const unfinishedId=await page.evaluate(()=>FG.creation.scene().id);await reopenUnfinished(unfinishedId);
+    assert.equal(await page.locator('#creationRecovery').isVisible(),true);
+    const untouched=await page.evaluate(()=>FG.creation.export());
+    assert.deepEqual(untouched.drafts.find(draft=>draft.projectId===unfinishedId).scene.programs[0].actions.map(action=>action.type),['say']);
+    assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions),[]);
+    for(const selector of ['[data-add-block="move"]','#creationKeep','#creationCheck','#creationRun','#creationStep','#creationReset','#creationAddActor']){
+      await page.locator(selector).click();assert.match(await page.locator('#creationStatus').textContent(),/Resume my draft.*Use saved version/);
+      assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched,'Unresolved recovery survives '+selector);
+      assert.equal(await page.evaluate(()=>FG.learning.active),false);assert.equal(await page.evaluate(()=>FG.creation.snapshot().status),'idle');
+    }
+    assert.equal(await page.locator('#creationUndo').isDisabled(),true);assert.equal(await page.locator('#creationRedo').isDisabled(),true);
+    await page.locator('#creationMore summary').click();
+    for(const selector of ['#creationCopy','#creationHistory']){await page.locator(selector).click();assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched);}
+    await page.locator('#creationMore summary').click();
+    await page.locator('#creationResumeDraft').click();
+    assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say']);
+    await page.locator('[data-add-block="move"]').click();await page.locator('#creationKeep').click();
+    assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move']);
+    await page.locator('[data-add-block="wait"]').click();await reopenUnfinished(unfinishedId);
+    assert.equal(await page.locator('#creationRecovery').isVisible(),true);await page.locator('#creationDiscardDraft').click();
+    assert.equal(await page.evaluate(id=>FG.creation.export().drafts.some(draft=>draft.projectId===id),unfinishedId),false);
+    assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move']);
+    await page.locator('[data-add-block="jump"]').click();
+    assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move','jump']);
+    checks.push('unresolved recovery blocks edits, Keep, checks, playback, copy and history until explicit Resume or Use saved; both choices preserve their selected content');
     assert.deepEqual(errors,[],'No unhandled browser errors');assert.deepEqual(paidRequests,[],'No generation or coach provider requests');
     fs.writeFileSync('test-results/creation-recovery-browser-results.json',JSON.stringify({passed:checks.length,checks,errors,paidRequests},null,2)+'\n');
-    console.log('PASS creation backup recovery browser: '+checks.length+' journeys; corrupt export, invalid input, atomic rollback, valid recovery, hint retention, legacy replacement and retired goals');
+    console.log('PASS creation backup recovery browser: '+checks.length+' journeys; corrupt export, invalid input, atomic rollback, valid recovery, hint retention, legacy replacement, retired goals and explicit draft recovery');
   }catch(error){
     await page.screenshot({path:'test-results/creation-recovery-failure.png',fullPage:true}).catch(()=>{});
     throw error;

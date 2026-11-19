@@ -905,7 +905,8 @@ export async function installStudio(){
  const scenesNav=el('button','','✦ Create & code') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
  const scenesEntry=el('button','studio-scene-entry') as HTMLButtonElement;scenesEntry.id='studioScenes';scenesEntry.type='button';
  scenesEntry.innerHTML='<img src="./jems-blocks.svg" alt=""><span><strong>Make your imagination move</strong><small>Tell a story with blocks, or watch a scene and rebuild it your way.</small></span><b aria-hidden="true">→</b>';
- scenesEntry.onclick=()=>creation.open();$('studioContinue').after(scenesEntry);
+ // Keep a complete ready-to-play choice in the first mobile viewport.
+ scenesEntry.onclick=()=>creation.open();$('studioFavoritesSection').after(scenesEntry);
  const sceneButton=el('button','studio-button','✦ Animate & code') as HTMLButtonElement;sceneButton.id='studioMakeScene';sceneButton.type='button';
  $('studioHelp').after(sceneButton);
  sceneButton.onclick=()=>act(async()=>{

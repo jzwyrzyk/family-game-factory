@@ -6,9 +6,9 @@
 
 **Branch:** `feature/jems-creation-lab-20261119`.
 
-**Disposition:** development for a new draft PR; no merge, deployment, provider activation, or private-worker source change.
+**Disposition:** [PR #62](https://github.com/jzwyrzyk/family-game-factory/pull/62), merge preparation; no merge, deployment, provider activation, or private-worker source change.
 
-The [feature contract](README.md) describes source behavior. [ADR0006](../decisions/0006-creation-and-rebuild-practice.md) records the owner direction. The final implementation candidate is `b7e8ec0302b5fdfc89917c97282e5f5823e2a7af`. Build, the 61 creation tests, both creation browser suites, 296 existing unit tests, 31 Studio unit tests, existing Studio browser journeys and the exact-base/head documentation check passed on that candidate. The later evidence commit changes only documentation, screenshots and review metadata. The learning integration suite passed during development before that final candidate; it is recorded separately from exact-candidate evidence. Remote CI belongs to the actual PR head.
+The [feature contract](README.md) describes source behavior. [ADR0006](../decisions/0006-creation-and-rebuild-practice.md) records the owner direction. The initial local implementation candidate is `b7e8ec0302b5fdfc89917c97282e5f5823e2a7af`. Build, the 61 creation tests, both creation browser suites, 296 existing unit tests, 31 Studio unit tests, existing Studio browser journeys and the exact-base/head documentation check passed on that candidate. Its later evidence commit changes only documentation, screenshots and review metadata; the resulting tree was published as `f44061fb842380a260f3ca178e6d61f4d5f22a5f`. The learning integration suite passed during initial development before that candidate; it is recorded separately from exact-candidate evidence. The merge-hardening record below supersedes the initial candidate for readiness. Remote CI belongs to the actual PR head.
 
 ## Local checks and evidence
 
@@ -57,7 +57,7 @@ Old generated games continue to validate without a companion manifest. The authe
 - Physical tablet/browser accessibility and usability review, including prolonged sessions and recording support, remain release acceptance work. Touch emulation is scoped software evidence.
 - No live model request, deployment or private-worker pin update occurred. Shipping the generation path would require the normal coordinated frontend/gateway/preview/worker release process.
 
-## Final candidate record
+## Initial candidate record
 
 Final build and creation checks: **PASS**, implementation `b7e8ec0302b5fdfc89917c97282e5f5823e2a7af`. The browser journey also verifies that a direct tap on a completed scene opens a newly due host checkpoint, and subsequent Play, Step and target controls preserve that same activity.
 
@@ -68,3 +68,29 @@ Final build and creation checks: **PASS**, implementation `b7e8ec0302b5fdfc89917
 - [Conditional scene, touch tablet](evidence/condition-tablet.png).
 
 CI results should be read at the exact PR head; earlier local or historical records do not replace failing current checks. No actual-device, live-provider, merge or deployment claim follows from this record.
+
+## Merge preparation after the initial PR head
+
+At initial published head `f44061fb842380a260f3ca178e6d61f4d5f22a5f`, GitHub passed [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44471614344), [Game Intelligence contracts](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44471614347), [visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44471614328), and [trusted-family security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44471614333). In [Arcade journeys run 44471614364](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44471614364), browser, learning and inactive private-coach image jobs passed. The creative job passed creation contracts, creation desktop/tablet/recovery journeys and coach checks, then failed the existing child mobile first-viewport assertion. The initial head was therefore **not ready to merge**.
+
+The focused merge review produced these corrections:
+
+| Reproduced issue | Correction and regression evidence |
+| --- | --- |
+| The added home card put the first mobile game at y=654 with height=201 in an 844-pixel viewport. | Place the card after the starter shelf, retaining global Create & code navigation. The existing desktop/mobile child journey and build-continuity suite then passed. |
+| Reopening an unfinished scene after global navigation and profile switching allowed a new edit to replace the sole recovery draft. | Require Resume my draft or Use saved version before changes, checks, playback, Keep, copy or history. The eighth recovery-browser journey preserves the exact original data through blocked actions and exercises both choices. |
+| A scene could pass validation before assisted attribution, exceed the limit after attribution, and fail its next validation; character count also undercounted Unicode bytes. | Apply attribution before the 32,000-byte UTF-8 check. Focused cases cover stable repeated validation, attribution overflow and multibyte text. |
+| A 28,000-byte source plus a valid companion produced more than 50,000 bytes and caused the unchanged sandbox worker to exit before testing. | Hold the companion in trusted host state and send executable fields only. Verify the compiled source, reject injected companion/source substitutions, then restore the original manifest. Worker stdin/resource limits and runtime archives remain unchanged. |
+| Optional companion overhead made previously admitted 8 KB rule-driven builds, 7 KB repairs, and 6.5 KB physical-game bases exceed the existing 24,000 input bound. | Select the game-only request before key access when optional companion overhead exceeds the input or remaining-spend allowance. Keep the entire game/intent/repair context, count schema bytes, make one selected call, and deny requests that still exceed the unchanged caps. |
+
+The provider and Docker transport regressions use explicit stubs; they do not claim a paid generation or real container launch. Final local candidate and new-head CI evidence are recorded below and in PR #62. The original CI failure remains part of this record.
+
+### Verified local hardening candidate
+
+The local implementation candidate is **`6f5177eff1943c8b6d094162771d35faf17b86d8`**. The production build, **72/72 creation tests**, **296/296 existing unit tests**, desktop and touch-emulated tablet authoring journeys, and **eight recovery journeys** passed against its application changes. The focused budget/pilot/preflight run passed 22 tests (including the eight budget tests already included in the creation total). The existing child-journey/build-continuity suite passed after the mobile card fix, before the final creation-recovery/server changes; final-head CI supplies the complete combined regression gate. Documentation and diff checks passed.
+
+- [Hardening check record](evidence/merge-hardening-results.json).
+- [Updated creation browser result](evidence/merge-creation-browser-results.json).
+- [Updated recovery browser result](evidence/merge-creation-recovery-results.json).
+
+A later evidence-only commit adds this record without changing application/test behavior. The connected GitHub publication may have a different commit ID; PR #62 records the exact matching tree and its new-head CI. All candidate-specific failures and earlier results above retain their original scope.

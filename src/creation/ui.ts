@@ -70,7 +70,7 @@ export function installCreationStudio(host: Host) {
   let scene: CreationProject | null = null, entryId = '', revisionId = '', sceneOwner = '', selectedActor = '', selectedProgram = '';
   let sourceSessionId = '', challengeId: string | null = null, hintUsed = false, targetMode = false, visible = false;
   let engine: SceneEngine | null = null, frame = 0, last = 0, checkpointTimer: ReturnType<typeof setInterval> | undefined;
-  let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false;
+  let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false, recoveryPending = false;
   type Recording = { recorder: MediaRecorder; stream: MediaStream; chunks: Blob[]; owner: string; title: string; cancelled: boolean; timer?: ReturnType<typeof setTimeout> };
   let recording: Recording | null = null;
   let targetInputs = 0;
@@ -78,7 +78,8 @@ export function installCreationStudio(host: Host) {
   const isCurrent = () => visible && sceneOwner === owner() && !!scene;
   const act = (fn: () => unknown) => { try { return fn(); } catch (error) { status((error as Error).message, true); } };
   function locked() { if (!FG.learning.active) return false; FG.learning.focus?.(); status('Finish your learning activity, or choose My Games to leave.'); return true; }
-  function assertEditing() { if (!isCurrent()) throw Error('Reopen your scene in your own profile.'); if (locked()) throw Error('Your learning activity is still open.'); }
+  const recoveryMessage = 'Choose “Resume my draft” or “Use saved version” before changing this scene.';
+  function assertEditing(options: { resolvingRecovery?: boolean } = {}) { if (!isCurrent()) throw Error('Reopen your scene in your own profile.'); if (locked()) throw Error('Your learning activity is still open.'); if (recoveryPending && !options.resolvingRecovery) throw Error(recoveryMessage); }
   function freshEngine() { if (!scene) return; engine = new SceneEngine(scene); targetMode = false; $('creationTargetBadge').hidden = true; $('creationPreviewLabel').textContent = 'YOUR STAGE'; paint(); }
   function stop(clearRecording = true) { cancelAnimationFrame(frame); frame = 0; last = 0; engine?.pause(); if (clearRecording) cancelRecording(); $<HTMLButtonElement>('creationPause').disabled = true; }
   function paint() {
@@ -112,6 +113,7 @@ export function installCreationStudio(host: Host) {
   function animate() { cancelAnimationFrame(frame); last = 0; frame = requestAnimationFrame(loop); }
   function learningThen(action: () => void) {
     if (locked() || !isCurrent()) return;
+    if (recoveryPending) { status(recoveryMessage, true); return; }
     const target = $('creationLearning'), beforeOwner = sceneOwner, beforeId = entryId;
     const done = () => { target.hidden = true; if (isCurrent() && beforeOwner === owner() && beforeId === entryId) action(); };
     const asked = FG.learning.checkpoint(target, { gameId: 'creation', projectId: entryId, versionId: revisionId }, done, { onLeave: () => host.home() });
@@ -132,6 +134,7 @@ export function installCreationStudio(host: Host) {
   function updateUndo() { $<HTMLButtonElement>('creationUndo').disabled = !undo.length; $<HTMLButtonElement>('creationRedo').disabled = !redo.length; }
   function saveVersion() {
     if (!scene || !dirty) return;
+    if (recoveryPending) throw Error(recoveryMessage);
     const revision = store().save(entryId, sceneOwner, scene, revisionId); revisionId = revision.id; dirty = false;
     $('creationSaveState').textContent = 'Version saved · ready to keep';
   }
@@ -141,9 +144,9 @@ export function installCreationStudio(host: Host) {
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
     selectedActor = scene.actors[0]?.id || ''; selectedProgram = scene.programs.find(p => p.actorId === selectedActor)?.id || '';
     sourceSessionId = scene.provenance?.sourceSessionId || '';
-    challengeId = loaded.project.challengeId && getCreationChallenge(loaded.project.challengeId) ? loaded.project.challengeId : null; hintUsed = !!loaded.project.hintUsed; targetMode = false; undo = []; redo = []; dirty = false; insert = null;
+    challengeId = loaded.project.challengeId && getCreationChallenge(loaded.project.challengeId) ? loaded.project.challengeId : null; hintUsed = !!loaded.project.hintUsed; targetMode = false; undo = []; redo = []; dirty = false; insert = null; recoveryPending = !!loaded.draft;
     $('creationShelf').hidden = true; $('creationWorkspace').hidden = false; $('creationVersions').hidden = true; $('creationFeedback').hidden = true;
-    $('creationRecovery').hidden = !loaded.draft;
+    $('creationRecovery').hidden = !recoveryPending;
     $('creationHeading').textContent = 'Your imagination, in motion.'; $('creationSubtitle').textContent = 'Choose a character. Give it some blocks. Press play.';
     $('creationSaveState').textContent = loaded.project.keptId === revisionId ? 'Your kept version' : 'Saved on this device';
     if (loaded.project.challengeId && !challengeId) status('This scene’s original challenge is no longer available. You can still edit and keep your scene.');
@@ -153,7 +156,7 @@ export function installCreationStudio(host: Host) {
   function enter() { if (!host.enter()) return false; visible = true; page.classList.remove('hidden'); startCheckpointTimer(); return true; }
   function open(id?: string) { act(() => { if (!enter()) return; if (id) loadScene(id); else shelf(); }); }
   function shelf(mode: 'free' | 'challenge' = 'free') {
-    if (locked()) return; saveVersion(); stop(); scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = '';
+    if (locked()) return; saveVersion(); stop(); scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
     $('creationHeading').textContent = 'Little blocks. Big possibilities.'; $('creationSubtitle').textContent = 'Make a story move. Give a character an idea. See what happens.';
     $('creationFreeShelf').hidden = mode !== 'free'; $('creationChallengeShelf').hidden = mode !== 'challenge';
@@ -223,7 +226,7 @@ export function installCreationStudio(host: Host) {
     feedback.append(node('span', 'creation-eyebrow', result.passed ? 'YOUR IDEA WORKS' : 'A NEW THING TO NOTICE'), node('h2', '', result.passed ? 'You made it happen!' : 'Let’s look a little closer.'), node('p', '', result.feedback));
     const list = node('ul'); result.checks.forEach(check => list.append(node('li', check.passed ? 'is-pass' : '', (check.passed ? '✓ ' : '○ ') + check.feedback))); feedback.append(list);
     feedback.append(node('small', '', hintUsed ? 'You explored this scene with a hint. Your next idea is still yours.' : 'This records what your scene did on this challenge.'));
-    if (result.passed) { const remix = node('button', 'creation-button', 'Make it my own →'); remix.onclick = () => act(() => { const copy = store().create(sceneOwner, { ...clone(scene!), id: uid(), title: (scene!.title + ' · my story').slice(0, 60), provenance: { createdBy: 'child', sourceKind: 'creation', sourceProjectId: entryId, sourceRevisionId: revisionId } }); loadScene(copy.id); }); feedback.append(remix); }
+    if (result.passed) { const remix = node('button', 'creation-button', 'Make it my own →'); remix.onclick = () => act(() => { assertEditing(); saveVersion(); const copy = store().create(sceneOwner, { ...clone(scene!), id: uid(), title: (scene!.title + ' · my story').slice(0, 60), provenance: { createdBy: 'child', sourceKind: 'creation', sourceProjectId: entryId, sourceRevisionId: revisionId } }); loadScene(copy.id); }); feedback.append(remix); }
     freshEngine(); feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   function currentProgram() { return scene?.programs.find(p => p.id === selectedProgram && p.actorId === selectedActor); }
@@ -426,8 +429,8 @@ export function installCreationStudio(host: Host) {
     const program = { id: uid(), actorId: selectedActor, trigger, actions: [] }; project.programs.push(program); selectedProgram = program.id; insert = null;
   }));
   $('creationRun').onclick = () => act(() => run());
-  $('creationPause').onclick = () => act(() => { if (locked() || !engine) return; if (engine.snapshot().status === 'paused') { engine.resume(); animate(); $('creationPause').textContent = 'Ⅱ Pause'; } else { stop(false); $('creationPause').textContent = '▶ Resume'; } paint(); });
-  $('creationReset').onclick = () => act(() => { if (locked()) return; stop(); freshEngine(); $('creationPause').textContent = 'Ⅱ Pause'; });
+  $('creationPause').onclick = () => act(() => { assertEditing(); if (!engine) return; if (engine.snapshot().status === 'paused') { engine.resume(); animate(); $('creationPause').textContent = 'Ⅱ Pause'; } else { stop(false); $('creationPause').textContent = '▶ Resume'; } paint(); });
+  $('creationReset').onclick = () => act(() => { assertEditing(); stop(); freshEngine(); $('creationPause').textContent = 'Ⅱ Pause'; });
   $('creationStep').onclick = () => act(() => { assertEditing(); learningThen(() => { stop(); if (targetMode || !engine) freshEngine(); if (engine!.snapshot().status === 'idle') engine!.start(); engine!.pause(); engine!.step(100); $('creationPause').textContent = '▶ Resume'; paint(); }); });
   $('creationUndo').onclick = () => act(() => { assertEditing(); if (!undo.length) return; const previous = undo.at(-1)!; store().autosave(entryId, sceneOwner, previous, revisionId); stop(); redo.push(clone(scene!)); scene = undo.pop()!; dirty = true; freshEngine(); renderEditor(); });
   $('creationRedo').onclick = () => act(() => { assertEditing(); if (!redo.length) return; const next = redo.at(-1)!; store().autosave(entryId, sceneOwner, next, revisionId); stop(); undo.push(clone(scene!)); scene = redo.pop()!; dirty = true; freshEngine(); renderEditor(); });
@@ -435,21 +438,21 @@ export function installCreationStudio(host: Host) {
   $('creationCopy').onclick = () => act(() => { assertEditing(); saveVersion(); const copied = store().copy(entryId, sceneOwner, scene!.title + ' copy'); loadScene(copied.id); });
   $('creationDownload').onclick = () => act(() => { assertEditing(); download(new Blob([JSON.stringify(scene, null, 2)], { type: 'application/json' }), 'jems-scene.json'); });
   $('creationVideo').onclick = () => act(() => { if (recording) { if (recording.recorder.state !== 'inactive') recording.recorder.stop(); return; } run(true); });
-  $('creationImportButton').onclick = () => { if (!locked()) $<HTMLInputElement>('creationImport').click(); };
+  $('creationImportButton').onclick = () => act(() => { assertEditing(); $<HTMLInputElement>('creationImport').click(); });
   $('creationImport').onchange = async () => {
     const input = $<HTMLInputElement>('creationImport'), file = input.files?.[0], capturedOwner = owner(); if (!file) return;
-    try { if (file.size > 500000) throw Error('This scene file is too large.'); const imported = validateCreationProject(JSON.parse(await file.text())); if (owner() !== capturedOwner || !visible) return; const project = store().create(owner(), { ...imported, id: uid(), provenance: { ...imported.provenance, createdBy: 'assisted' } }); loadScene(project.id); status('Your scene file is open as a new project.'); } catch (error) { status((error as Error).message, true); } finally { input.value = ''; }
+    try { assertEditing(); if (file.size > 500000) throw Error('This scene file is too large.'); const imported = validateCreationProject(JSON.parse(await file.text())); if (owner() !== capturedOwner || !visible) return; assertEditing(); const project = store().create(owner(), { ...imported, id: uid(), provenance: { ...imported.provenance, createdBy: 'assisted' } }); loadScene(project.id); status('Your scene file is open as a new project.'); } catch (error) { status((error as Error).message, true); } finally { input.value = ''; }
   };
   $('creationDelete').onclick = () => act(() => { assertEditing(); if (!confirm('Delete this scene and all of its versions from this device?')) return; store().remove(entryId, sceneOwner); dirty = false; scene = null; shelf(); });
   $('creationHistory').onclick = () => act(() => {
     assertEditing(); saveVersion(); $('creationVersions').hidden = false; const box = $('creationVersionList'); box.replaceChildren();
     const kept = store().get(entryId, sceneOwner).keptId;
-    store().history(entryId, sceneOwner).forEach((revision, index) => { const b = node('button', 'creation-button', `Version ${index + 1}${revision.id === kept ? ' · kept' : ''}${revision.id === revisionId ? ' · current' : ''}`); b.onclick = () => act(() => { store().checkout(entryId, sceneOwner, revision.id); loadScene(entryId); }); box.append(b); });
+    store().history(entryId, sceneOwner).forEach((revision, index) => { const b = node('button', 'creation-button', `Version ${index + 1}${revision.id === kept ? ' · kept' : ''}${revision.id === revisionId ? ' · current' : ''}`); b.onclick = () => act(() => { assertEditing(); store().checkout(entryId, sceneOwner, revision.id); loadScene(entryId); }); box.append(b); });
     $('creationVersions').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   });
   $('creationCloseHistory').onclick = () => { $('creationVersions').hidden = true; };
-  $('creationResumeDraft').onclick = () => act(() => { assertEditing(); const loaded = store().load(entryId, sceneOwner); if (!loaded.draft) return; scene = clone(loaded.draft.scene); dirty = true; $('creationRecovery').hidden = true; $('creationSaveState').textContent = 'Recovered draft · ready to keep'; freshEngine(); renderEditor(); });
-  $('creationDiscardDraft').onclick = () => act(() => { assertEditing(); store().discardDraft(entryId, sceneOwner); $('creationRecovery').hidden = true; });
+  $('creationResumeDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); const loaded = store().load(entryId, sceneOwner); if (!loaded.draft) { loadScene(entryId); return; } scene = clone(loaded.draft.scene); dirty = true; recoveryPending = false; $('creationRecovery').hidden = true; $('creationSaveState').textContent = 'Recovered draft · ready to keep'; status('Your draft is ready to continue.'); freshEngine(); renderEditor(); });
+  $('creationDiscardDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); store().discardDraft(entryId, sceneOwner); recoveryPending = false; $('creationRecovery').hidden = true; status('Your saved version is ready to continue.'); freshEngine(); renderEditor(); });
   $('creationAddActor').onclick = () => act(() => { assertEditing(); $<HTMLDialogElement>('creationActorDialog').showModal(); });
   $('creationCloseActor').onclick = () => $<HTMLDialogElement>('creationActorDialog').close();
   for (const asset of CREATION_ASSETS) {
@@ -460,6 +463,7 @@ export function installCreationStudio(host: Host) {
   const canvas = $<HTMLCanvasElement>('creationCanvas');
   canvas.onpointerdown = event => {
     if (!isCurrent() || locked() || targetMode) return; const point = stage.point(event), id = stage.hit(point.x, point.y); if (!id) return;
+    if (recoveryPending) { status(recoveryMessage, true); return; }
     if (engine?.snapshot().status === 'running' || engine?.snapshot().status === 'completed') { act(() => learningThen(() => { engine!.resume(); engine!.tap(id); animate(); })); return; }
     selectedActor = id; selectedProgram = scene!.programs.find(p => p.actorId === id)?.id || ''; insert = null; renderEditor(); paint();
     if (!challengeId) { drag = { id, ...point, moved: false }; canvas.setPointerCapture(event.pointerId); }
@@ -471,7 +475,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-page', event => { if ((event as CustomEvent).detail !== 'creation') leave(); });
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return; try { saveVersion(); stop(); } catch (error) { event.preventDefault(); status((error as Error).message, true); } });
   window.addEventListener('factory-profile', () => {
-    leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; sourceSessionId = ''; stage.clear();
+    leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; recoveryPending = false; sourceSessionId = ''; stage.clear();
     for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });

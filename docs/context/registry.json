@@ -84,10 +84,10 @@
         "src/adult-pilot/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:12:40.496Z",
-      "sourceDigest": "4b46f0abc6b43a80238076951f0c645e33e2b926e4a1255e1689342939133abc",
+      "reviewedAt": "2026-11-19T06:38:52.962Z",
+      "sourceDigest": "771e3baa167788cc7782df81aefe762fe25b8ecb948c69c9718ffd65b94c934a",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the new Create & code route, supported game-to-scene continuity, paused host interactions, profile cleanup, tablet menu anchoring and complete family backup/recovery integration."
+      "reviewReason": "Preserved a complete playable game in the initial mobile viewport by placing the new scene card after the starter shelf; documented the entry ordering and retained global creation navigation."
     },
     {
       "id": "creation",
@@ -103,10 +103,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "89ca33c9383490f9ad1fc49933d55f2ae4914b8ba74d0056ad2b1a6d80c2593a",
-      "reviewedAt": "2026-11-19T06:12:41.830Z",
+      "sourceDigest": "181b97b4403362a435201345e4aaa23b250cc1f0b83745ab111e35cfa0de6c45",
+      "reviewedAt": "2026-11-19T06:38:53.564Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed all scene modules and focused/browser tests; documented the real bounded action language, reusable assets, source continuity, observable challenges, assistance history, recovery and honest video/companion limitations."
+      "reviewReason": "Documented explicit draft recovery before mutations, corrected the early-cheer observation window, and added normalized UTF-8 companion limits, trusted-host sandbox transport and optional budget fallback with focused regressions."
     },
     {
       "id": "games",
@@ -196,10 +196,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:12:43.577Z",
-      "sourceDigest": "e2012f73519552393e7f2b46a5832fc4f8b6a31b938faabb0c43c1d4838e53ab",
+      "reviewedAt": "2026-11-19T06:38:54.088Z",
+      "sourceDigest": "2e2b0acbd58069653241667657ab809068e81b057d378ce3d87c57bdc466bff2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed nullable strict provider companion schema, assisted attribution, publication binding and budget accounting; architecture and feature contract state optional data companions without arbitrary source translation or live provider claims."
+      "reviewReason": "Reviewed source-only sandbox attestation with host-held companion data and pre-key selection of one game-only request when optional companion overhead exceeds existing input or remaining-spend caps; no limits, runtime archives or provider activation changed."
     },
     {
       "id": "coach",
@@ -267,10 +267,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:12:45.012Z",
-      "sourceDigest": "2bacb7fc94b1ffed34c0ded3652d3094d47684796492472383c0284c30b93eb1",
+      "reviewedAt": "2026-11-19T06:38:54.566Z",
+      "sourceDigest": "3be7fe98ecd944f9abcbbd14870ccef724e9d246efd1e16702809df97f04d177",
       "reviewOutcome": "updated",
-      "reviewReason": "Added meaningful engine, behavioral, storage, generated-companion, real UI and recovery checks; recorded passing local results and distinguished synthetic transport, touch emulation, container dependency checks and unverified child/live acceptance."
+      "reviewReason": "Recorded the original GitHub mobile regression and concrete recovery, normalization, sandbox-payload and optional-budget counterexamples; 72 creation and 296 existing unit checks plus desktop/tablet authoring and eight recovery journeys pass, with stub/provider/device boundaries retained."
     },
     {
       "id": "delivery",
@@ -292,10 +292,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T06:16:25.103Z",
-      "sourceDigest": "fddf8f709ffd563e2377d61238ebf22c9f0f12b05da17408802e80e0da5529d0",
+      "reviewedAt": "2026-11-19T06:39:53.269Z",
+      "sourceDigest": "bcef53b147fc2126cddaa045d727100e44e9cc3870f151cd86e25e4742668c73",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact implementation candidate b7e8ec0 and its passing scoped build, creation/recovery, existing Studio/unit and documentation checks; retained separate CI, actual-device, provider and deployment evidence boundaries."
+      "reviewReason": "Recorded local hardening candidate 6f5177e with passing scoped build, 72 creation checks, 296 existing units, editor journeys and eight recovery cases; retained original failed CI and separate final-head CI/release boundaries."
     },
     {
       "id": "context",

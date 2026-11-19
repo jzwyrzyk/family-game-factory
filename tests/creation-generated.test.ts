@@ -5,7 +5,8 @@ import { createServer } from 'node:http';
 import { validateGenerated,validateCompiled,hash,type GeneratedGame } from '../server/agent/generated';
 import { OpenAIResponsesAgent,type AgentApproval } from '../server/agent/openai';
 import { hopper } from '../server/testing/generated-fixtures';
-import { createStarterProject } from '../src/creation/projects';
+import { createStarterProject,validateGeneratedCreationManifest } from '../src/creation/projects';
+import { DockerArtifactGate } from '../server/sandbox/docker-gate';
 import { MemoryRepository } from '../server/pipeline/repository';
 import { JobService } from '../server/pipeline/service';
 import { apiHandler } from '../server/pipeline/http';
@@ -17,6 +18,11 @@ import type { VerifiedSession } from '../server/contracts/api';
 const companion=()=>createStarterProject('dragon');
 const candidate=()=>validateGenerated({...hopper,creationManifest:companion()});
 const compiled=(game:GeneratedGame):GeneratedGame=>({...game,compiled:{code:'fixture-compiled-only',sourceHash:hash(game.source),codeHash:hash('fixture-compiled-only'),tests:{desktop:true,mobile:true,replay:true,isolation:true}}});
+const longCompanion=(count:number,text='a'.repeat(150))=>{
+  const scene=companion();
+  scene.programs=[{id:'story',actorId:'dragon',trigger:{type:'start'},actions:Array.from({length:count},(_,i)=>({id:`line-${i}`,type:'say' as const,text,durationMs:100}))}];
+  return scene;
+};
 
 test('generated companion is optional, data-only, asset-bound and always attributed as assisted',()=>{
   assert.deepEqual(validateGenerated(hopper),hopper);
@@ -38,6 +44,57 @@ test('test publication cannot replace or drop a reviewed companion manifest',()=
   assert.throws(()=>validateCompiled(g,changed),/ATTESTATION/);
   const dropped=compiled(g);delete dropped.creationManifest;
   assert.throws(()=>validateCompiled(g,dropped),/ATTESTATION/);
+});
+
+test('companion byte limits include normalized attribution and remain stable across repeated validation',()=>{
+  const accepted=validateGeneratedCreationManifest(longCompanion(138));
+  assert.ok(Buffer.byteLength(JSON.stringify(accepted))<=32_000);
+  assert.deepEqual(validateGeneratedCreationManifest(accepted),accepted);
+  const attributionOverflow=longCompanion(139);
+  assert.ok(Buffer.byteLength(JSON.stringify(attributionOverflow))<32_000);
+  assert.throws(()=>validateGeneratedCreationManifest(attributionOverflow),/too large/);
+  const unicodeOverflow=longCompanion(100,'🐉'.repeat(75));
+  assert.ok(JSON.stringify(unicodeOverflow).length<32_000);
+  assert.ok(Buffer.byteLength(JSON.stringify(unicodeOverflow))>32_000);
+  assert.throws(()=>validateGeneratedCreationManifest(unicodeOverflow),/too large/);
+});
+
+test('sandbox receives source only and trusted publication retains a large companion unchanged',async()=>{
+  const source=hopper.source+'\n/*'+'x'.repeat(28_000-Buffer.byteLength(hopper.source)-5)+'*/';
+  const game=validateGenerated({...hopper,source,creationManifest:longCompanion(100)});
+  const expected=structuredClone(game.creationManifest);
+  assert.ok(Buffer.byteLength(JSON.stringify(game))>50_000,'reproduces the former sandbox stdin overflow');
+  const gate=new DockerArtifactGate({image:'sha256:'+'a'.repeat(64),timeoutMs:1000,memoryMb:512,cpus:1});
+  let executions=0;
+  Object.assign(gate,{execute:async(_args:string[],input?:string)=>{
+    if(input===undefined)return '';
+    executions++;
+    assert.ok(Buffer.byteLength(input)<50_000);
+    const sourceOnly=JSON.parse(input);
+    assert.equal(Object.hasOwn(sourceOnly,'creationManifest'),false);
+    assert.equal(Object.hasOwn(sourceOnly,'compiled'),false);
+    assert.equal(sourceOnly.source,source);
+    return JSON.stringify({ok:true,game:compiled(sourceOnly)});
+  }});
+  const tested=await gate.test(game);
+  assert.ok(tested);assert.equal(executions,1);
+  assert.deepEqual(tested.creationManifest,expected);
+  assert.deepEqual(validateCompiled(game,tested).creationManifest,expected);
+});
+
+test('sandbox cannot inject a companion or replace source while the host restores trusted scene data',async()=>{
+  const game=candidate();
+  for(const replacement of ['companion','source'] as const){
+    const gate=new DockerArtifactGate({image:'sha256:'+'a'.repeat(64),timeoutMs:1000,memoryMb:512,cpus:1});
+    Object.assign(gate,{execute:async(_args:string[],input?:string)=>{
+      if(input===undefined)return '';
+      const sourceOnly=JSON.parse(input),reply=compiled(sourceOnly);
+      if(replacement==='companion')reply.creationManifest=companion();
+      else reply.source+='\n// changed by sandbox';
+      return JSON.stringify({ok:true,game:reply});
+    }});
+    await assert.rejects(gate.test(game),/ATTESTATION/);
+  }
 });
 
 test('existing generation pipeline retains the validated companion through immutable publication and fork',async()=>{

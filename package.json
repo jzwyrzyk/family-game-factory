@@ -37,7 +37,7 @@
     "docs:check": "node scripts/check-docs.mjs check",
     "docs:review": "node scripts/check-docs.mjs refresh",
     "test:docs": "node --test scripts/tests/check-docs.test.mjs",
-    "test:creation": "node --import tsx --test tests/creation-engine.test.ts tests/creation-challenges.test.ts tests/creation-storage.test.ts tests/creation-generated.test.ts",
+    "test:creation": "node --import tsx --test tests/creation-engine.test.ts tests/creation-challenges.test.ts tests/creation-storage.test.ts tests/creation-generated.test.ts tests/creation-generation-budget.test.ts",
     "test:creation-browser": "node tests/creation-browser.cjs && node tests/creation-recovery-browser.cjs"
   },
   "devDependencies": {

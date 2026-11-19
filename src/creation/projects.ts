@@ -51,10 +51,12 @@ export function validateEditableProject(input: unknown): CreationProject {
 /** Model output cannot attest that the child authored its blocks or its provenance. */
 export function validateGeneratedCreationManifest(input:unknown):CreationProject {
   const scene=validateEditableProject(input);
-  if(JSON.stringify(scene).length>32_000)throw Error('The editable companion scene is too large.');
   const mark=(blocks:CreationBlock[])=>{for(const block of blocks){block.origin='assisted';if(block.type==='repeat')mark(block.actions);if(block.type==='if'){mark(block.then);if(block.else)mark(block.else);}}};
   for(const program of scene.programs)mark(program.actions);
   scene.provenance={createdBy:'assisted'};
+  // Bound the normalized wire representation, including attribution, so a
+  // returned scene is safe to validate again at publication and import.
+  if(new TextEncoder().encode(JSON.stringify(scene)).byteLength>32_000)throw Error('The editable companion scene is too large.');
   return scene;
 }
 

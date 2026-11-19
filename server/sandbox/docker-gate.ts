@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { isGeneratedGame,validateCompiled,type GeneratedGame } from '../agent/generated';
+import { isGeneratedGame,validateGenerated,validateCompiled,type GeneratedGame } from '../agent/generated';
 import type { PlayableGame } from '../pipeline/types';
 import type {FunctionalGameContract} from '../quality/functional-game-contract';
 export interface SandboxOptions {image:string;socket?:string;timeoutMs:number;memoryMb:number;cpus:number}
@@ -17,7 +17,20 @@ export class DockerArtifactGate {
   });
  }
  async test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract}):Promise<GeneratedGame|void>{
-  if(!isGeneratedGame(game))throw Error('DECLARATIVE_GATE_REQUIRED');const name='factory-test-'+randomUUID();
-  try{const raw=await this.execute(sandboxArguments(this.config,name),JSON.stringify(context?.independentIntentPlan?{game:{...game,compiled:undefined},independentIntentPlan:context.independentIntentPlan}:{...game,compiled:undefined}),this.config.timeoutMs,context?.signal);const result=JSON.parse(raw);if(!result.ok)throw Error('PLAYTEST_FAILED:'+String(result.diagnostics).slice(0,1500));return validateCompiled(game,result.game);}finally{await this.execute(['--host='+(this.config.socket||'unix:///var/run/docker.sock'),'rm','-f',name],undefined,5000).catch(()=>{});}
+  if(!isGeneratedGame(game))throw Error('DECLARATIVE_GATE_REQUIRED');
+  const {compiled:_priorCompiled,...candidate}=game;
+  const {creationManifest,...sandboxGame}=validateGenerated(candidate);
+  const name='factory-test-'+randomUUID();
+  // The sandbox tests executable source only. Keep the validated companion in
+  // trusted host state instead of consuming its bounded stdin with scene data.
+  try{
+   const input=context?.independentIntentPlan?{game:sandboxGame,independentIntentPlan:context.independentIntentPlan}:sandboxGame;
+   const raw=await this.execute(sandboxArguments(this.config,name),JSON.stringify(input),this.config.timeoutMs,context?.signal);
+   const result=JSON.parse(raw);if(!result.ok)throw Error('PLAYTEST_FAILED:'+String(result.diagnostics).slice(0,1500));
+   // This also rejects a companion injected by the sandbox. Only the original
+   // host-validated scene can accompany the unchanged, attested source.
+   const tested=validateCompiled(sandboxGame,result.game);
+   return {...tested,...(creationManifest?{creationManifest}:{})};
+  }finally{await this.execute(['--host='+(this.config.socket||'unix:///var/run/docker.sock'),'rm','-f',name],undefined,5000).catch(()=>{});}
  }
 }
