@@ -54,7 +54,7 @@ export function assessAssembly(proposal:GameProposal):AssemblyAssessment {
  if(engine==='rules'&&essential.some(id=>mechanicById.get(id)!.engine==='physics-2d'))return done('review-required',a.id,essential,missing,['REQUIRES_PHYSICAL_SIMULATION'],['A rules-only shortcut would change a required mechanic.']);
  if(proposal.existing){
   const b=proposal.existing;
-  if(typeof b.baseRevisionId!=='string'||!/^[-\\w]{1,100}$/.test(b.baseRevisionId)||!b.config)return done('review-required',a.id,essential,missing,['SAVED_REVISION_REQUIRED'],['Do not migrate or overwrite revisions.']);
+  if(typeof b.baseRevisionId!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(b.baseRevisionId)||!b.config)return done('review-required',a.id,essential,missing,['SAVED_REVISION_REQUIRED'],['Do not migrate or overwrite revisions.']);
   // The real existing manifest validator is authoritative.
   let native;
   try{native=inspectNative(b.game,b.config);}catch{return done('review-required',a.id,essential,missing,['INVALID_NATIVE_REVISION'],['Keep the saved working game intact.']);}
