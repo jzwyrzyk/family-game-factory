@@ -33,6 +33,6 @@ CI runs this browser integration as a separate mandatory Arcade Journeys step, i
 
 ## Scope and completion
 
-O6 is complete only if strict build, entire unit suite, actual browser failure→repair→retest integration, independent O5 checks, baseline Arcade/creative/learning and security regression checks pass on the exact reviewed source. PR #43 has a changing-main merge conflict, to be handled during O9 integration. No merge, deployment, paid call or worker pin is authorized here.
+O6 is complete only if strict build, entire unit suite, actual browser failure→repair→retest integration, independent O5 checks, baseline Arcade/creative/learning and security regression checks pass on the exact reviewed source. PR #43's code has been reconciled against the merged #36/#42 main tree, subject to exact-head full CI review. No deployment, paid provider call or production worker pin is authorized by the documentation or code reconciliation.
 
-Next: O7, full child Create→Play→Modify→Compare→Keep→Return with math/English, child-led coaching/voice, drawing and device/reconnect/failure cases. Reliability precedes first-shot visual delight.
+O7 now contains fixture-backed cross-vertical browser journeys. Real device/voice, parent-approved model traffic, unknown games and production rollout remain unverified. Next: O8 reliability/holdout benchmarking and O9 security-reviewed deployment. Reliability precedes first-shot visual delight.

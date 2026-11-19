@@ -1,6 +1,6 @@
 # Jems Game Intelligence Engine — Design Standard v1
 
-**Status: research; draft; not a production release gate.** Established 2026-11-18 after the Bubble Gum Builders, Robot Route Lab and Junkyard Rally design review. The initial implementation is a bounded advisory preflight in server/quality/game-intelligence.ts and a modification to private generation instructions; it is not an automatic gameplay evaluator or proof of fun.
+**Status: merge-candidate research implementation; not a production activation or universal game-quality certification.** Established 2026-11-18 after the Bubble Gum Builders, Robot Route Lab and Junkyard Rally design review. The original v1 advisory preflight has expanded within PR #43 into source-backed intent, gameplay-form advice, authored working-game contracts, optional independent sandbox/browser probes and a bounded repair/retest path. No fixture-based evidence proves that arbitrary AI-generated games work or that children enjoy them. See [current objective status and proof boundaries](objective-roadmap.md) and [merge handoff](merge-handoff.md).
 
 ## Problem statement
 
@@ -62,14 +62,14 @@ These are **design standards**, not evidence that the current production builds 
 | Gate | Responsible question | Proof type | Current disposition |
 | --- | --- | --- | --- |
 | G0: Existing security and authorization | May Jems build or preview safely at all? | Owner policy, isolation, cost, learning enforcement | Existing mandatory controls |
-| G1: Contract capture | What exact experience did the child ask for? | Verbatim-source design brief, explicit essential moments | Future |
-| G2: Form selection | Is the gameplay architecture appropriate? | Independent dimensions, physics necessity, rationale, alternatives | **Advisory v1 implemented** |
+| G1: Contract capture | What exact experience did the child ask for? | Verbatim-source design brief, explicit essential moments | Source-grounded heuristic implemented; semantic accuracy unverified |
+| G2: Form selection | Is the gameplay architecture appropriate? | Independent dimensions, physics necessity, rationale, alternatives | Advisory integrated in private generation source; no production worker repin |
 | G3: Technical gate | Does the output compile, play, pause/replay, meet constraints? | Sandbox attestation, browser tests, trusted host | Existing infrastructure |
-| G4: Independent behavioral playtest | Do actions and payoffs actually happen in play? | Isolated GUI tests, screenshots, event/state traces | Future R&D |
+| G4: Independent behavioral playtest | Do actions and payoffs actually happen in play? | Isolated GUI tests, screenshots, event/state traces | Authored positive/negative browser fixtures and optional internal-only plans; arbitrary games unverified |
 | G5: Human child UX and engagement | Is the game understandable and satisfying? | Observed play + direct child feedback, parental consent | Future research |
 | G6: Approved version | Is it okay to keep or publish this version? | Child Keep choice, existing parent/production policy | Existing release process |
 
-Research v1 adds only a bounded G2 advisory and an **offline evidence ledger**. It does not certify games as enjoyable, trigger automatic repair or replace any existing trusted gates.
+The first research slice added only G2 advice and an offline evidence ledger. The current PR adds source-grounded contracts, authored independent browser checks, and the existing coordinator's bounded repair/retest extension for explicitly vetted plans. This does **not** automatically certify arbitrary games, judge enjoyment, or replace the established authorization, sandbox, learning and trusted-device gates.
 
 ## Quality dimensions — separate, never a fake composite score
 
@@ -89,7 +89,7 @@ Each axis requires a declared observation: pass, fail, or not tested, with its m
 ## Current technical integration
 
 - The original child idea is still provided unaltered to the existing authenticated generation request.
-- The local game-form preflight sends an **advisory** 2D/3D, interaction and physics recommendation together with design questions. It makes **zero additional paid calls**.
+- The private generation preflight sends source-backed **advisory** 2D/3D, interaction and physics recommendations plus unresolved workability criteria in the existing model call; it makes **zero additional paid calls**. Its new implementation is not active in the pinned production worker until separately reviewed.
 - For rule-driven ideas, the private agent is not saturated with physics-body and joint API details; it gets concise rule-driven instructions instead. For explicit physics or revision of an existing physical game, it still receives the complete bounded physics interface.
 - The provider output JSON schema, compiled artifact format, canvas runtime and its immutable version, isolation, required learning host, owner budget and revision mechanics remain unchanged.
 - The code neither inspects existing curated game packages nor changes how they run. Do not merge this PR to "fix" today's Bubble Gum game; follow PR #40's real UX acceptance.
@@ -97,7 +97,7 @@ Each axis requires a declared observation: pass, fail, or not tested, with its m
 
 ## Six-stage development path
 
-**R1 — This PR: gameplay-form foundation.** Advisory recommendation, generator prompt de-biasing, automated regressions, neutral rubric, no production activation. Evaluate against baseline generation with the same ideas, model, budgets, settings and device cases.
+**R1 — Initial gameplay-form foundation in this PR.** Advisory recommendation, generator prompt de-biasing, automated regressions, neutral rubric, no production activation. Evaluate against baseline generation with the same ideas, model, budgets, settings and device cases.
 
 **R2 — Intent compiler.** Derive a small source-traceable experience contract (roles, verbs, mechanics, state transition, goal/free-play, payoff, prohibitions). Use bounded model reasoning after explicit provider/budget approval, distinguish child quotes from model proposals, and retain corrections. Do not profile the child's personality or emotions.
 
