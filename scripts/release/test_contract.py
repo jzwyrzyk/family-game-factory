@@ -117,6 +117,22 @@ class ReleaseContractTests(unittest.TestCase):
             self.assertEqual(json.loads(plan.read_text())["status"], "READY_FOR_PAGES_ONLY")
 
 
+    def test_opt_in_automatic_pages_restricts_changes_to_static_presentation(self):
+        valid = ["public/jems-logo.svg", "src/brand/jems.css", "src/style.css",
+                 "src/studio/style.css", "index.html", "docs/release/README.md"]
+        result = release.automatic_pages_scope(valid)
+        self.assertEqual(result["status"], "PRESENTATION_ONLY_AUTODEPLOY_APPROVED")
+        self.assertFalse(result["backendChangesAllowed"])
+        self.assertEqual(result["fileCount"], len(valid))
+        for unsafe in ("server/gateway.ts", "src/studio/ui.ts", "src/builder/session.ts",
+                       "package-lock.json", "src/learning/policy.ts",
+                       ".github/workflows/pages.yml", "scripts/deployment/build.py",
+                       "public/new-game.js", "../../.env"):
+            with self.subTest(path=unsafe), self.assertRaises(release.ReleaseError):
+                release.automatic_pages_scope(["docs/brand/README.md", unsafe])
+        with self.assertRaises(release.ReleaseError):
+            release.automatic_pages_scope([])
+
     def test_release_workflow_keeps_cloud_mutation_and_provider_secrets_out(self):
         root = Path(__file__).resolve().parents[2]
         workflow = (root / ".github/workflows/jems-release.yml").read_text()
@@ -127,6 +143,9 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertIn("run: npm test", workflow)
         self.assertIn("scripts/release/contract.py precheck", workflow)
         self.assertIn("scripts/release/contract.py verify", workflow)
+        self.assertIn("scripts/release/contract.py auto-scope", workflow)
+        self.assertIn("tests/release-live-browser.cjs", workflow)
+        self.assertIn("node --check tests/release-live-browser.cjs", workflow)
         self.assertIn("actions/deploy-pages@v4", workflow)
         self.assertIn("group: jems-pages-publish", workflow)
         self.assertIn("group: jems-pages-publish", legacy)
