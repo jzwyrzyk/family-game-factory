@@ -5,12 +5,13 @@ import type {TrustedDevice,FamilyParentAuth} from '../trusted-devices';
 import type {Invitation} from '../sessions';
 import type {ActionExecution} from '../actions/coordinator';
 import type { GeneratedGame } from '../agent/generated';
+import type {FunctionalGameContract} from '../quality/functional-game-contract';
 export type JobStatus = 'draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface StarGame { kind:'star-catcher-v1'; target:number; seconds:number }
 export type PlayableGame = StarGame | GeneratedGame;
 export type CandidateArtifact = {format:'declarative-v1';game:StarGame}|{format:'generated-source-v1';game:GeneratedGame};
 export interface AgentInput {
-  gameManifest:{id:string;allowedMechanics:readonly string[]}; baseRevision:{id:string;game?:PlayableGame;config?:Record<string,number|boolean>};
+  gameManifest:{id:string;allowedMechanics:readonly string[]}; baseRevision:{id:string;game?:PlayableGame;config?:Record<string,number|boolean>;sourceGame?:string;projectId?:string};
   childIntent:string; allowedCapabilities:readonly string[]; budget:{maxUnits:number;timeoutMs:number}; signal:AbortSignal;
 }
 export interface AgentAdapter {
@@ -23,6 +24,12 @@ export interface AgentAdapter {
 export interface BuildRequest { gameId:string; baseRevisionId:string|null; prompt:string; clientRequestId:string; retryOf?:string }
 export interface Job extends BuildRequest {
  execution?:ActionExecution;
+  /** Internal-only, independently authored and source-validated O5 probe;
+   * BuildRequest rejects this field from clients, so it is never user-supplied.
+   * Disabled for ordinary public submissions unless a trusted server process
+   * explicitly attaches an approved contract.
+   */
+  independentIntentPlan?:FunctionalGameContract;
   id:string;familyId:string;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
   maxUnits:number;usedUnits:number;attempts?:number;phase?:string;revisionId?:string;errorCode?:string;retryCount:number;
 }

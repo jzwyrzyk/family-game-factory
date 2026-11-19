@@ -1,3 +1,10 @@
+import './intent-repair.test';
+import './intent-worker-binding.test';
+import './private-generation-preflight.test';
+import './working-game-contract.test';
+import './game-form.test';
+import './child-intent.test';
+import './game-intelligence.test';
 import './factory.test';
 import './backend-contracts.test';
 import './pipeline.test';

@@ -1,4 +1,9 @@
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
+import {privateGenerationPreflight} from '../quality/private-generation-preflight';
+import {draftChildIntentContract} from '../quality/child-intent';
+import {chooseGameForm} from '../quality/game-form';
+import {validateFunctionalGameContract,type FunctionalGameContract} from '../quality/functional-game-contract';
+import {safeRepairDiagnostic,safeFinalRepairCode} from '../quality/repair-diagnostics';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import {assertActiveTrustedDevice} from '../trusted-devices';
@@ -16,7 +21,7 @@ export function validateBuildRequest(value:unknown):BuildRequest{
 }
 const month=()=>new Date().toISOString().slice(0,7);
 function audit(state:PipelineState,job:Job,status:JobStatus,code?:string){if(!transitions[job.status].includes(status))throw Error('INVALID_TRANSITION');job.status=status;const event:AuditEvent={jobId:job.id,familyId:job.familyId,status,at:new Date().toISOString()};if(code)event.code=code;state.audit.push(event);}
-export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal}):Promise<GeneratedGame|void> }
+export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract}):Promise<GeneratedGame|void> }
 export class JobService {
  private controllers=new Map<string,AbortController>();
  constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
@@ -44,7 +49,20 @@ export class JobService {
    assertActiveTrustedDevice(s,session);
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId);
    if(existing){if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
-   if(r.baseRevisionId){const base=s.revisions.find(x=>x.id===r.baseRevisionId);if(!base)throw Error('NOT_FOUND');requireFamily(session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
+   if(r.baseRevisionId){if(!base)throw Error('NOT_FOUND');requireFamily(session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   // O4: reject unsupported or contradictory forms BEFORE reserving an
+   // allowance or acknowledging an asynchronous paid build. This uses only
+   // server-owned, family-authorized revision data; the private worker
+   // independently repeats the same check before reading the model key.
+   if(this.agent.kind==='metered-api'){
+    privateGenerationPreflight({
+      gameManifest:{id:r.gameId,allowedMechanics:[]},
+      baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config,sourceGame:base?.sourceGame,projectId:base?.projectId},
+      childIntent:r.prompt,allowedCapabilities:[],
+      budget:{maxUnits:0,timeoutMs:0},signal:new AbortController().signal
+    });
+   }
    let retryCount=0;if(r.retryOf){const prior=s.jobs.find(j=>j.id===r.retryOf);if(!prior)throw Error('NOT_FOUND');requireFamily(session,prior);if(prior.status!=='failed'||prior.gameId!==r.gameId||prior.prompt!==r.prompt||prior.baseRevisionId!==r.baseRevisionId||prior.retryCount>=this.options.maxRetries)throw Error('RETRY_LIMIT');retryCount=prior.retryCount+1;}
    const recent=s.audit.filter(e=>e.familyId===session.familyId&&e.status==='queued'&&Date.parse(e.at)>Date.now()-60000);if(recent.length>=10)throw Error('RATE_LIMIT');
    let ledger=s.ledgers[session.familyId];if(!ledger||ledger.month!==month())ledger=s.ledgers[session.familyId]={allowance:0,used:0,reserved:ledger?.reserved||0,paidEnabled:false,month:month()};
@@ -62,21 +80,33 @@ export class JobService {
   try{
    const state=await this.repo.snapshot(),base=state.revisions.find(r=>r.id===start.baseRevisionId);
    let previous:GeneratedGame|undefined,diagnostics='',used=0,testedGame:PlayableGame|undefined;
+   // The local fallback must enforce the same independently sourced plan as
+   // the private Actions coordinator; no browser-supplied contract is trusted.
+   let independentIntentPlan:FunctionalGameContract|undefined;
+   if(start.independentIntentPlan){
+    if(start.baseRevisionId!==null)throw Error('INTENT_PLAN_REVISION_UNSUPPORTED');
+    const intent=draftChildIntentContract(start.prompt);
+    independentIntentPlan=validateFunctionalGameContract(start.independentIntentPlan,intent,chooseGameForm(intent));
+   }
    const maximum=Math.min(2,Math.max(0,this.options.maxRepairAttempts??2));
    for(let attempt=0;attempt<=maximum;attempt++){
-    const input:AgentInput={gameManifest:{id:start.gameId,allowedMechanics:['declarative-star-catcher','generated-module-v1','generated-module-v2']},baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config},childIntent:start.prompt,allowedCapabilities:['declarative-star-catcher','generated-module-v1','generated-module-v2'],budget:{maxUnits:start.maxUnits-used,timeoutMs:this.options.timeoutMs},signal:controller.signal};
+    const input:AgentInput={gameManifest:{id:start.gameId,allowedMechanics:['declarative-star-catcher','generated-module-v1','generated-module-v2']},baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config,sourceGame:base?.sourceGame,projectId:base?.projectId},childIntent:start.prompt,allowedCapabilities:['declarative-star-catcher','generated-module-v1','generated-module-v2'],budget:{maxUnits:start.maxUnits-used,timeoutMs:this.options.timeoutMs},signal:controller.signal};
     await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(!['building','testing'].includes(job.status))throw Error('CANCELLED');if(job.status==='testing')audit(s,job,'building');job.phase=attempt?'repairing':'generating';job.attempts=attempt+1;return true;});
     const result=await Promise.race([attempt&&previous&&this.agent.repair?this.agent.repair(input,previous,diagnostics):this.agent.generate(input),deadline]);
     if(!Number.isInteger(result.usageUnits)||result.usageUnits<0||result.usageUnits>input.budget.maxUnits)throw Error('BUDGET_EXCEEDED');used+=result.usageUnits;
     const game=validateArtifact(result.candidate);
     const testing=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='building')return false;job.usedUnits=used;job.phase='testing';audit(s,job,'testing');return true;});if(!testing)return;
     try{
-     const built=await Promise.race([this.gate.test(game,{signal:controller.signal}),deadline]);
+     const built=await Promise.race([this.gate.test(game,{signal:controller.signal,independentIntentPlan}),deadline]);
      testedGame=isGeneratedGame(game)?validateCompiled(game,built as GeneratedGame):game;
+     if(independentIntentPlan && (testedGame as GeneratedGame).compiled?.tests?.intent!==true)
+      throw Error('INTENT_ATTESTATION_REQUIRED');
      break;
     }catch(error){
-     if(!isGeneratedGame(game)||!this.agent.repair||attempt>=maximum||controller.signal.aborted)throw error;
-     previous=game;diagnostics=String((error as Error).message).slice(0,1500);
+     if(!isGeneratedGame(game)||!this.agent.repair||controller.signal.aborted)throw error;
+     if(attempt>=maximum)throw Error(safeFinalRepairCode((error as Error).message,independentIntentPlan));
+     previous=game;
+     diagnostics=safeRepairDiagnostic((error as Error).message,independentIntentPlan).feedback;
     }
    }
    if(!testedGame)throw Error('REPAIR_EXHAUSTED');
