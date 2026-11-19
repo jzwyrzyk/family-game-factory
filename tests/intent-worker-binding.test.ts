@@ -8,8 +8,10 @@ import {chooseGameForm} from '../server/quality/game-form';
 import {createFunctionalGameContract} from '../server/quality/functional-game-contract';
 import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
 import type {AgentApproval} from '../server/agent/openai';
+import {productionFixture} from './quality-pipeline-fixtures';
 
 const idea='Drag three bubble gum stickers onto a rocket, then press Launch to blast off.';
+const production=productionFixture(stickerLaunchFixture,idea);
 const req={gameId:'new',baseRevisionId:null,prompt:idea,clientRequestId:'intent-probe-1'};
 const intent=draftChildIntentContract(idea);
 const form=chooseGameForm(intent);
@@ -61,15 +63,15 @@ test('O5 private test claim binds source-verified plan and refuses a false inten
  const gen=identity('generate','run-1'),testing=identity('test','run-1');
  await coordinator.claim(job.jobId,0,'generate',gen);
  await coordinator.report(job.jobId,0,'generate',gen,{
-  candidate:{format:'generated-source-v1',game:stickerLaunchFixture},usageUnits:1
+  candidate:{format:'generated-source-v1',game:production},usageUnits:1
  });
  const task=await coordinator.claim(job.jobId,0,'test',testing);
- assert.ok('game' in task,'claim must return the test-stage game, not generate-stage input');
- if(!('game' in task))throw Error('INTENT_WRONG_STAGE');
+ assert.ok('game' in task&&'independentIntentPlan'in task,'claim must return the test-stage game and independent plan');
+ if(!('game' in task)||!('independentIntentPlan'in task))throw Error('INTENT_WRONG_STAGE');
  assert.deepEqual(task.independentIntentPlan,spec);
- assert.deepEqual(task.game,stickerLaunchFixture);
+ assert.deepEqual(task.game,production);
  await assert.rejects(coordinator.report(job.jobId,0,'test',testing,{
-  ok:true,game:{...stickerLaunchFixture,compiled:{
+  ok:true,game:{...production,compiled:{
    code:'fake',sourceHash:'fake',codeHash:'fake',
    tests:{desktop:true,mobile:true,replay:true,isolation:true}
   }}
@@ -100,7 +102,7 @@ test('O5 a source-tampered plan fails closed before a private test-stage claim',
  const gen=identity('generate','run-2'),testing=identity('test','run-2');
  await coordinator.claim(job.jobId,0,'generate',gen);
  await coordinator.report(job.jobId,0,'generate',gen,{
-  candidate:{format:'generated-source-v1',game:stickerLaunchFixture},usageUnits:1
+  candidate:{format:'generated-source-v1',game:production},usageUnits:1
  });
  await assert.rejects(coordinator.claim(job.jobId,0,'test',testing),/WORKING_GAME_CONTRACT_SCHEMA/);
  const state=await repo.snapshot(),current=state.jobs.find(j=>j.id===job.jobId)!;

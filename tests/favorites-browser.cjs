@@ -13,8 +13,8 @@ const {start}=require('./browser-server.cjs');
    try{
     await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);
     const favorites=page.locator('#studioStarters [data-starter]');
-    assert.equal(await favorites.count(),6,'six distinct playable favorites');
-    assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon','gum','hill','moon','robot']);
+    assert.equal(await favorites.count(),7,'seven distinct playable favorites');
+    assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon','factory','gum','hill','moon','robot']);
     assert.equal((await page.locator('#studioStarterTitle').textContent()).trim(),'Ready to Play jems','favorites shelf uses the approved child-facing heading');
     await page.click('[data-starter="moon"]');await page.waitForSelector('.favorite-moon .favorite-canvas');
     await page.locator('.favorite-moon .favorite-canvas').focus();
@@ -51,7 +51,7 @@ const {start}=require('./browser-server.cjs');
     await page.evaluate(()=>FG.runtime.resume());
     await page.waitForFunction(()=>FG.runtime.snapshot().state.position.y<4,{timeout:9000});
     assert.deepEqual(errors,[],device+' native favorites have no page errors');
-    console.log('PASS '+device+': six playable favorites, moon movement, robot route, safe checkpoints');
+    console.log('PASS '+device+': seven playable favorites, moon movement, robot route, safe checkpoints');
    }finally{await context.close();}
   }
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

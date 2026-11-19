@@ -1,5 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {fixturePlanProposal,fixtureModuleReply,fixtureProviderResponse} from '../server/testing/presentation-quality-fixtures';
 import {
   generationDesignBrief,recommendGameForm,reviewGameEvidence,QUALITY_AXES,
   type GameQualityEvidence,type GameFormAdvice
@@ -78,14 +79,16 @@ test('quality evidence is a coverage and failure ledger, not a fabricated fun sc
 
 test('the private agent supplies a design brief and removes unnecessary physics API instructions',async()=>{
  const {OpenAIResponsesAgent}=await import('../server/agent/openai');
- const {hopper}=await import('../server/testing/generated-fixtures');
+ const {stickerLaunchFixture}=await import('../server/testing/working-game-fixtures');
  const requests:any[]=[];
  const agent=new OpenAIResponsesAgent(
   {enabled:true,approvalId:'fixture-only',model:'game-intelligence-unit-test',inputUsdPerMillion:1,outputUsdPerMillion:1,maxInputTokens:64000,maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)},
   ()=> 'not-real-unit-test-provider-key',
   (async(_url,init)=>{
-    requests.push(JSON.parse(String(init?.body)));
-    return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(hopper)}]}],usage:{input_tokens:100,output_tokens:250}}));
+    const req=JSON.parse(String(init?.body));
+    if(req.text.format.name==='family_game_plan')return fixtureProviderResponse(fixturePlanProposal(req));
+    requests.push(req);
+    return fixtureProviderResponse(fixtureModuleReply(stickerLaunchFixture),100,250);
   }) as typeof fetch
  );
  const base={gameManifest:{id:'new',allowedMechanics:['generated-module-v2']},baseRevision:{id:'new'},

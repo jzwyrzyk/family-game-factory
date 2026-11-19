@@ -4,6 +4,8 @@ const {renderGenerated}=require('./preview.cjs');
 const {runtimeBundle}=require('./bundle-v2.cjs');
 const {playtestV2}=require('./playtest-v2.cjs');
 const {playtestIntentV2}=require('./intent-playtest-v2.cjs');
+const {collectQualityEvidence}=require('./quality-capture.cjs');
+const {assetPackHash,validateAssetPack}=require('../agent/game-assets.cjs');
 const hash=s=>createHash('sha256').update(s).digest('hex');
 const {validateSource}=require('./source-validator.cjs');
 // V1 samples held controls every 50 ms. A zero-duration click followed by moving
@@ -35,13 +37,15 @@ async function pressV1Control(page,frame,control){
   }finally{await page.mouse.up();}
  }
 }
-async function main(game,independentIntentPlan){
+async function main(game,independentIntentPlan,captureQuality=false){
  validateSource(game);const v2=game.kind==='generated-module-v2';
+ if(game.assets)validateAssetPack(game.assets);
  if(independentIntentPlan&&!v2)throw Error('INTENT_PLAN_REQUIRES_V2');
  const result=await esbuild.build({stdin:{contents:game.source,loader:'ts',sourcefile:'game.ts'},bundle:false,write:false,format:'iife',globalName:'GameModule',platform:'browser',target:'es2020',logLevel:'silent'});const code=result.outputFiles[0].text;if(code.length>100000)throw Error('OUTPUT_TOO_LARGE');
  const compiled={code,sourceHash:hash(game.source),codeHash:hash(code),tests:{desktop:false,mobile:false,replay:false,isolation:false}},tested={...game,compiled};
+ if(game.assets)compiled.assetsHash=assetPackHash(game.assets);
  if(v2){const runtime=runtimeBundle();compiled.runtimeVersion=runtime.version;compiled.runtimeHash=runtime.hash;Object.assign(compiled.tests,{input:false,resources:false,pause:false});}
- let independentIntentPasses=0;
+ let independentIntentPasses=0,qualityEvidence;
  const browser=await chromium.launch({executablePath:process.env.WORKER_BROWSER_PATH||undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--disable-background-networking']});
  try{
   for(const [device,viewport]of [['desktop',{width:1000,height:800}],['mobile',{width:375,height:812}]]){
@@ -77,17 +81,18 @@ async function main(game,independentIntentPlan){
     compiled.tests[device]=true;compiled.tests.replay=true;compiled.tests.isolation=true;
    }finally{await context.close();}
   }
+  if(captureQuality)qualityEvidence=await collectQualityEvidence(browser,tested);
  }finally{await browser.close();}
  if(independentIntentPlan){
   if(independentIntentPasses!==2)throw Error('INTENT_ATTESTATION_REQUIRED');
   compiled.tests.intent=true;
  }
- return tested;
+ return {game:tested,...(qualityEvidence?{qualityEvidence}:{})};
 }
-if(require.main===module){let input='';process.stdin.on('data',c=>{input+=c;if(Buffer.byteLength(input)>50000)process.exit(2)});process.stdin.on('end',()=>{
+if(require.main===module){let input='';process.stdin.on('data',c=>{input+=c;if(Buffer.byteLength(input)>4*1024*1024)process.exit(2)});process.stdin.on('end',()=>{
  const value=JSON.parse(input);
- const withPlan=value&&Object.hasOwn(value,'independentIntentPlan');
+ const withPlan=value&&Object.hasOwn(value,'game');
  const game=withPlan?value.game:value;
  const plan=withPlan?value.independentIntentPlan:undefined;
- main(game,plan).then(game=>process.stdout.write(JSON.stringify({ok:true,game}))).catch(e=>{const errors=e.errors?.map(x=>x.text).join('; ')||e.message;process.stdout.write(JSON.stringify({ok:false,diagnostics:String(errors).slice(0,1500)}));});});}
+ main(game,plan,withPlan&&value.captureQuality===true).then(result=>process.stdout.write(JSON.stringify({ok:true,...result}))).catch(e=>{const errors=e.errors?.map(x=>x.text).join('; ')||e.message;process.stdout.write(JSON.stringify({ok:false,diagnostics:String(errors).slice(0,1500)}));});});}
 module.exports={pressV1Control};

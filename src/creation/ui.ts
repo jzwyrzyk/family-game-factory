@@ -486,13 +486,15 @@ export function installCreationStudio(host: Host) {
   const api = {
     open,
     fromStudio(session: StudioSession, revision?: SourceRevision, manifest?: unknown) {
+      // The caller still owns the visible Studio surface until entry succeeds.
+      // Unsupported sources and unreadable collections must report there.
+      const project = createProjectFromStudio(session, revision, manifest);
+      const existing = store().list(owner()).find(entry => {
+        const source = store().load(entry.id, owner()).scene.provenance;
+        return source?.sourceSessionId === session.id && source?.sourceProjectId === project.provenance?.sourceProjectId && source?.sourceRevisionId === project.provenance?.sourceRevisionId;
+      });
+      if (!enter()) return;
       return act(() => {
-        const project = createProjectFromStudio(session, revision, manifest);
-        const existing = store().list(owner()).find(entry => {
-          const source = store().load(entry.id, owner()).scene.provenance;
-          return source?.sourceSessionId === session.id && source?.sourceProjectId === project.provenance?.sourceProjectId && source?.sourceRevisionId === project.provenance?.sourceRevisionId;
-        });
-        if (!enter()) return;
         const saved = existing || store().create(owner(), project); sourceSessionId = session.id; loadScene(saved.id);
       });
     },

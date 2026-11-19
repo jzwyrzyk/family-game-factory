@@ -43,7 +43,7 @@ export function buildProgressCopy(job:BuildView|undefined, sending:boolean, unce
  switch(job.status){
   case 'queued':return {title:'Your idea reached the workshop!',description:'Your build was accepted and is waiting to start.',phase:'queued' as const};
   case 'building':return {title:'jems is building your game!',description:job.phase==='repairing'?'The workshop is repairing a test version.':'Your new game is being created in the workshop.',phase:'building' as const};
-  case 'testing':return {title:'Testing your game!',description:job.phase==='repairing'?'The workshop is checking a repair.':'The workshop is checking your playable version.',phase:'testing' as const};
+  case 'testing':return {title:job.phase==='reviewing'?'Trying your game!':'Testing your game!',description:job.phase==='reviewing'?'Checking how it looks and plays.':job.phase==='repairing'?'The workshop is checking a repair.':'The workshop is checking your playable version.',phase:'testing' as const};
   case 'ready':return {title:'Your new game is ready! ✨',description:'You can try the preview. Your original game is safe.',phase:'ready' as const};
   case 'failed':return {title:'That build needs help',description:'The game was not completed. Your idea and last working version are safe.',phase:'failed' as const};
   case 'cancelled':return {title:'Build cancelled',description:'Your original game and idea are safe.',phase:'cancelled' as const};

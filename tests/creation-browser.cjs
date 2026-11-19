@@ -64,6 +64,22 @@ const {start}=require('./browser-server.cjs');
         await noOverflow();
         await page.screenshot({path:`test-results/creation-shelf-${device}.png`,fullPage:true});
 
+        // A playable native game is not automatically an editable scene adapter.
+        // Errors must stay visible in the Studio that still owns this interaction.
+        for(const unsupported of ['factory','hill']){
+          await activate('#creationHome');await activate(`[data-starter="${unsupported}"]`);
+          if(!await page.locator('#studioMakeScene').isVisible())await activate('#studioChange');
+          const nativeBefore=await page.evaluate(()=>({games:localStorage.getItem('family-game-factory-workspace-v2'),scenes:FG.creation.export()}));
+          await activate('#studioMakeScene');
+          await page.waitForFunction(()=>document.getElementById('studioStatus').textContent.includes('does not include an editable scene yet'));
+          assert.equal(await page.locator('#studioStatus').isVisible(),true,`${unsupported}: unavailable feedback stays in the current Studio`);
+          assert.equal(await page.locator('#page-creation').isVisible(),false,`${unsupported}: no invented import or scene transition`);
+          assert.deepEqual(await page.evaluate(()=>({games:localStorage.getItem('family-game-factory-workspace-v2'),scenes:FG.creation.export()})),nativeBefore,`${unsupported}: source versions and scene storage remain unchanged`);
+          await activate('#studioNavScenes');
+          assert.equal(await page.locator('#creationFreeShelf').isVisible(),true,'Independent free creation remains available');
+          assert.equal(await page.locator('[data-creation-starter]').count(),4);
+        }
+
         // Carry real saved-game characters and provenance into a scene, then return.
         await activate('#creationHome');await activate('[data-starter="dragon"]');
         const gameSession=await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(session=>session.game==='dragon'));
@@ -284,7 +300,7 @@ const {start}=require('./browser-server.cjs');
         assert.deepEqual(paidRequests,[],'Local creation never requests a model or paid build');
         assert.deepEqual(errors,[],'No unhandled production UI errors');
         results.push({device,viewport,touchEmulated:touch,status:'passed',paidRequests:0,pageErrors:0,
-          verified:['saved-game source continuity','same-source scene reopen','UI-authored blocks','reorder and undo','nested repeat and condition branches','play/pause/step','Keep/reload','editable file export','real canvas video export','profile isolation','target separation','behavioral challenge feedback','persistent hint history','event taps','variable boundary behavior','learning checkpoint guard','profile-scoped progress','overflow']});
+          verified:['honest unsupported native-source feedback','saved-game source continuity','same-source scene reopen','UI-authored blocks','reorder and undo','nested repeat and condition branches','play/pause/step','Keep/reload','editable file export','real canvas video export','profile isolation','target separation','behavioral challenge feedback','persistent hint history','event taps','variable boundary behavior','learning checkpoint guard','profile-scoped progress','overflow']});
         console.log(`PASS ${device}: production Creation Studio UI, real block edits and playback, saved ownership, target reconstruction, tap behavior and learning guard`);
       } catch(error) {
         await page.screenshot({path:`test-results/creation-failure-${device}.png`,fullPage:true}).catch(()=>{});

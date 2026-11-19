@@ -71,6 +71,12 @@ jobs:
       - name: Generated worker security
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/generated-worker-security.ts
+      - name: Approved artwork and archived runtime compatibility
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:generated-art
+      - name: Actual normal-motion review captures and input receipts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:quality-capture
       - name: Restored games
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/restored-games.cjs

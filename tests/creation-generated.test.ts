@@ -5,6 +5,14 @@ import { createServer } from 'node:http';
 import { validateGenerated,validateCompiled,hash,type GeneratedGame } from '../server/agent/generated';
 import { OpenAIResponsesAgent,type AgentApproval } from '../server/agent/openai';
 import { hopper } from '../server/testing/generated-fixtures';
+import { stickerLaunchFixture } from '../server/testing/working-game-fixtures';
+import { fixturePlanProposal,fixtureModuleReply,syntheticQualityEvidence,syntheticQualityReview } from '../server/testing/presentation-quality-fixtures';
+import { productionFixture,compiledPipelineFixture } from './quality-pipeline-fixtures';
+import { pixelPack } from './generated-art-fixtures';
+import { validateQualityEvidence } from '../server/quality/game-quality';
+import { draftChildIntentContract } from '../server/quality/child-intent';
+import { chooseGameForm } from '../server/quality/game-form';
+import { createFunctionalGameContract } from '../server/quality/functional-game-contract';
 import { createStarterProject,validateGeneratedCreationManifest } from '../src/creation/projects';
 import { DockerArtifactGate } from '../server/sandbox/docker-gate';
 import { MemoryRepository } from '../server/pipeline/repository';
@@ -18,6 +26,8 @@ import type { VerifiedSession } from '../server/contracts/api';
 const companion=()=>createStarterProject('dragon');
 const candidate=()=>validateGenerated({...hopper,creationManifest:companion()});
 const compiled=(game:GeneratedGame):GeneratedGame=>({...game,compiled:{code:'fixture-compiled-only',sourceHash:hash(game.source),codeHash:hash('fixture-compiled-only'),tests:{desktop:true,mobile:true,replay:true,isolation:true}}});
+const qualityIdea='Make a pixel game: drag three stickers onto a rocket, then press Launch to blast off.';
+const qualityCandidate=()=>validateGenerated({...productionFixture(stickerLaunchFixture,qualityIdea),assets:pixelPack(),creationManifest:companion()});
 const longCompanion=(count:number,text='a'.repeat(150))=>{
   const scene=companion();
   scene.programs=[{id:'story',actorId:'dragon',trigger:{type:'start'},actions:Array.from({length:count},(_,i)=>({id:`line-${i}`,type:'say' as const,text,durationMs:100}))}];
@@ -36,6 +46,19 @@ test('generated companion is optional, data-only, asset-bound and always attribu
   assert.throws(()=>validateGenerated({...hopper,creationManifest:{...scene,source:'not allowed'}}),/Unknown field/);
   assert.throws(()=>validateGenerated({...hopper,creationManifest:{...scene,actors:[{...scene.actors[0],assetId:'unreviewed-asset'}]}}));
   assert.throws(()=>validateGenerated({...hopper,creationManifest:{...scene,actors:[{...scene.actors[0],url:'https://example.invalid/image.png'}]}}),/Unknown field/);
+});
+
+test('v2 candidates validate companion, raster assets, production plan and ordinary playthrough together',()=>{
+  const game=qualityCandidate();
+  assert.deepEqual(validateGenerated(game),game);
+  assert.equal(game.assets?.assets.length,1);
+  assert.equal(game.productionPlan?.presentationStyle,'pixel');
+  assert.ok(game.playthrough?.length);
+  assert.equal(game.creationManifest?.provenance?.createdBy,'assisted');
+  assert.throws(()=>validateGenerated({...game,assets:{...game.assets,style:'illustrated'}}),/ASSET_STYLE_MISMATCH/);
+  assert.throws(()=>validateGenerated({...game,assets:{...game.assets,assets:[{...game.assets!.assets[0],sha256:'0'.repeat(64)}]}}),/ASSET_/);
+  assert.throws(()=>validateGenerated({...game,productionPlan:{...game.productionPlan,requestHash:'not-a-hash'}}),/PRODUCTION_PLAN/);
+  assert.throws(()=>validateGenerated({...game,playthrough:[{type:'win'}]}),/PLAYTHROUGH/);
 });
 
 test('test publication cannot replace or drop a reviewed companion manifest',()=>{
@@ -70,7 +93,8 @@ test('sandbox receives source only and trusted publication retains a large compa
     if(input===undefined)return '';
     executions++;
     assert.ok(Buffer.byteLength(input)<50_000);
-    const sourceOnly=JSON.parse(input);
+    const request=JSON.parse(input),sourceOnly=request.game;
+    assert.equal(request.captureQuality,false);
     assert.equal(Object.hasOwn(sourceOnly,'creationManifest'),false);
     assert.equal(Object.hasOwn(sourceOnly,'compiled'),false);
     assert.equal(sourceOnly.source,source);
@@ -88,13 +112,93 @@ test('sandbox cannot inject a companion or replace source while the host restore
     const gate=new DockerArtifactGate({image:'sha256:'+'a'.repeat(64),timeoutMs:1000,memoryMb:512,cpus:1});
     Object.assign(gate,{execute:async(_args:string[],input?:string)=>{
       if(input===undefined)return '';
-      const sourceOnly=JSON.parse(input),reply=compiled(sourceOnly);
+      const sourceOnly=JSON.parse(input).game,reply=compiled(sourceOnly);
       if(replacement==='companion')reply.creationManifest=companion();
       else reply.source+='\n// changed by sandbox';
       return JSON.stringify({ok:true,game:reply});
     }});
     await assert.rejects(gate.test(game),/ATTESTATION/);
   }
+});
+
+test('quality capture retains game assets, plan, playthrough and independent probes while the companion stays host-held',async()=>{
+  const game=qualityCandidate(),intent=draftChildIntentContract(qualityIdea);
+  const independentIntentPlan=createFunctionalGameContract(intent,chooseGameForm(intent),[{id:'launch',quote:'press Launch'}],[{
+    id:'launch-input',covers:['launch'],deterministicReplay:true,actions:[{kind:'press',button:'action'}],
+    checkpoints:[{after:1,outcome:'playing',observations:[{kind:'visible',key:'rocket'}]}],
+  }]);
+  const gate=new DockerArtifactGate({image:'sha256:'+'a'.repeat(64),timeoutMs:1000,memoryMb:512,cpus:1});
+  Object.assign(gate,{execute:async(_args:string[],input?:string)=>{
+    if(input===undefined)return '';
+    const request=JSON.parse(input),sourceOnly=request.game;
+    assert.equal(request.captureQuality,true);
+    assert.deepEqual(request.independentIntentPlan,independentIntentPlan);
+    assert.equal(Object.hasOwn(sourceOnly,'creationManifest'),false);
+    assert.deepEqual(sourceOnly.assets,game.assets);
+    assert.deepEqual(sourceOnly.productionPlan,game.productionPlan);
+    assert.deepEqual(sourceOnly.playthrough,game.playthrough);
+    const tested=compiledPipelineFixture(sourceOnly,true);
+    return JSON.stringify({ok:true,game:tested,qualityEvidence:syntheticQualityEvidence(tested)});
+  }});
+  const tested=await gate.test(game,{captureQuality:true,independentIntentPlan});
+  assert.ok(tested?.qualityEvidence);
+  assert.deepEqual(validateCompiled(game,tested).creationManifest,game.creationManifest);
+  assert.deepEqual(validateQualityEvidence(tested,tested.qualityEvidence),tested.qualityEvidence);
+  assert.equal(tested.compiled?.tests.intent,true);
+});
+
+test('quality capture rejects changed game bindings and stale evidence before restoring the companion',async()=>{
+  const game=qualityCandidate();
+  for(const change of ['assets','plan','playthrough','evidence'] as const){
+    const gate=new DockerArtifactGate({image:'sha256:'+'a'.repeat(64),timeoutMs:1000,memoryMb:512,cpus:1});
+    Object.assign(gate,{execute:async(_args:string[],input?:string)=>{
+      if(input===undefined)return '';
+      const reply=compiledPipelineFixture(JSON.parse(input).game),evidence=syntheticQualityEvidence(reply);
+      if(change==='assets')reply.assets!.assets[0].role='object';
+      else if(change==='plan')reply.productionPlan!.payoff='A different payoff';
+      else if(change==='playthrough')reply.playthrough![0].frames=59;
+      else evidence.artifactHash='0'.repeat(64);
+      return JSON.stringify({ok:true,game:reply,qualityEvidence:evidence});
+    }});
+    await assert.rejects(gate.test(game,{captureQuality:true}),/ATTESTATION_REQUIRED|QUALITY_EVIDENCE_BINDING/);
+  }
+});
+
+test('mandatory quality review publishes the tested game and its unchanged companion together',async()=>{
+  const repo=new MemoryRepository(),game=qualityCandidate();
+  const session:VerifiedSession={subject:'quality-fixture',familyId:'family-creation-quality',role:'parent',expiresAt:Date.now()+60000};
+  let captures=0,reviews=0;
+  const gate=new DockerArtifactGate({image:'sha256:'+'a'.repeat(64),timeoutMs:1000,memoryMb:512,cpus:1});
+  Object.assign(gate,{execute:async(_args:string[],input?:string)=>{
+    if(input===undefined)return '';
+    const request=JSON.parse(input);assert.equal(request.captureQuality,true);
+    assert.equal(Object.hasOwn(request.game,'creationManifest'),false);captures++;
+    const tested=compiledPipelineFixture(request.game);
+    return JSON.stringify({ok:true,game:tested,qualityEvidence:syntheticQualityEvidence(tested)});
+  }});
+  const service=new JobService(repo,{kind:'metered-api',available:true,
+    generate:async()=>({candidate:{format:'generated-source-v1',game},usageUnits:11}),
+    review:async(_input,tested,evidence)=>{
+      reviews++;
+      assert.deepEqual(tested.creationManifest,game.creationManifest);
+      assert.deepEqual(tested.assets,game.assets);
+      assert.deepEqual(tested.productionPlan,game.productionPlan);
+      assert.deepEqual(tested.playthrough,game.playthrough);
+      return {review:syntheticQualityReview(tested,evidence),usageUnits:7};
+    },
+  },gate,{allowMock:false,maxUnits:1000,timeoutMs:10000,maxRetries:1});
+  await service.setAllowance(session,10000,true);
+  const job=await service.submit(session,{gameId:'new',baseRevisionId:null,prompt:qualityIdea,clientRequestId:'creation-quality-publication'});
+  await service.run(job.jobId);
+  const ready=await service.get(session,job.jobId);assert.equal(ready.status,'ready');
+  assert.equal(captures,1);assert.equal(reviews,1);
+  const published=(await service.revision(session,ready.revisionId!)).game as GeneratedGame;
+  assert.deepEqual(published.creationManifest,game.creationManifest);
+  assert.deepEqual(published.assets,game.assets);
+  assert.deepEqual(published.productionPlan,game.productionPlan);
+  assert.deepEqual(published.playthrough,game.playthrough);
+  assert.equal(published.compiled?.quality?.verdict,'pass');
+  assert.equal(Object.hasOwn(published,'qualityEvidence'),false);
 });
 
 test('existing generation pipeline retains the validated companion through immutable publication and fork',async()=>{
@@ -160,12 +264,17 @@ test('provider transport offers a nullable closed companion schema and bounds it
   let requests=0;
   const agent=new OpenAIResponsesAgent(approval,()=> 'synthetic-provider-key-not-real',async(_url,init)=>{
     requests++;const body=JSON.parse(String(init?.body)),schema=body.text.format.schema;
+    if(body.text.format.name==='family_game_plan')return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(fixturePlanProposal(body))}]}],usage:{input_tokens:100,output_tokens:100}}),{status:200});
+    assert.equal(body.text.format.name,'family_game_module');
     assert.ok(schema.properties.creationManifest.anyOf.some((s:any)=>s.type==='null'));
     assert.equal(schema.properties.creationManifest.anyOf[0].additionalProperties,false);
     assert.ok(schema.$defs.creationBlock);assert.match(body.instructions,/separate editable scene/);
-    return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({...hopper,creationManifest:companion()})}]}],usage:{input_tokens:100,output_tokens:100}}),{status:200});
+    return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({...fixtureModuleReply(stickerLaunchFixture),creationManifest:companion()})}]}],usage:{input_tokens:100,output_tokens:100}}),{status:200});
   });
   const input={gameManifest:{id:'new',allowedMechanics:['generated-module-v2']},baseRevision:{id:'new'},childIntent:'Make a dragon dance when tapped',allowedCapabilities:['generated-module-v2'],budget:{maxUnits:100000,timeoutMs:1000},signal:new AbortController().signal};
-  const result=await agent.generate(input);assert.equal((result.candidate.game as GeneratedGame).creationManifest?.schema,'jems.creation.v1');assert.equal(requests,1);
-  await assert.rejects(agent.generate({...input,budget:{...input.budget,maxUnits:100}}),/SPENDING_CUTOFF/);assert.equal(requests,1);
+  const result=await agent.generate(input);assert.equal((result.candidate.game as GeneratedGame).creationManifest?.schema,'jems.creation.v1');assert.equal(requests,2);
+  assert.ok((result.candidate.game as GeneratedGame).productionPlan);
+  assert.ok((result.candidate.game as GeneratedGame).assets);
+  assert.ok((result.candidate.game as GeneratedGame).playthrough);
+  await assert.rejects(agent.generate({...input,budget:{...input.budget,maxUnits:100}}),/SPENDING_CUTOFF/);assert.equal(requests,2);
 });

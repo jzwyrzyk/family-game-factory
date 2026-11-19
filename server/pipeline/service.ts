@@ -4,6 +4,8 @@ import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract,type FunctionalGameContract} from '../quality/functional-game-contract';
 import {safeRepairDiagnostic,safeFinalRepairCode} from '../quality/repair-diagnostics';
+import {needsCurrentQuality,applyCurrentQualityPolicy,requireProductionCandidate,type QualityTestedGame} from '../quality/quality-policy';
+import {validateQualityEvidence,requireQualityPass,type GameQualityEvidence} from '../quality/game-quality';
 import { randomUUID,createHash } from 'node:crypto';
 import { requireFamily,type VerifiedSession } from '../contracts/api';
 import {assertActiveTrustedDevice} from '../trusted-devices';
@@ -24,15 +26,16 @@ export function validateBuildRequest(value:unknown):BuildRequest{
 }
 const month=()=>new Date().toISOString().slice(0,7);
 function audit(state:PipelineState,job:Job,status:JobStatus,code?:string){if(!transitions[job.status].includes(status))throw Error('INVALID_TRANSITION');job.status=status;const event:AuditEvent={jobId:job.id,familyId:job.familyId,status,at:new Date().toISOString()};if(code)event.code=code;state.audit.push(event);}
-export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract}):Promise<GeneratedGame|void> }
+export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract;captureQuality?:boolean}):Promise<QualityTestedGame|void> }
 export class JobService {
  private controllers=new Map<string,AbortController>();
  constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean;adultPilotMode?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
  private async authorized(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),job=state.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(state,session,job);return job;}
  private requireJobPermission(state:PipelineState,job:Job){
-  if(this.options.adultPilotMode||job.adultPilotDeviceId||job.adultPilotSessionId){
+  if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(state,job.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
+  if(this.options.adultPilotMode||job.adultPilotDeviceId||job.adultPilotSessionId||job.adultPilotProfileId){
    if(!this.options.adultPilotMode||!adultPilotJobAllowed(state,job))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
-  }else if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(state,job.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
+  }
  }
  /** Read-only, family-authorized availability. This is NOT evidence that a job started. */
  async readiness(session:VerifiedSession):Promise<{available:boolean;reason:'READY'|'UNAVAILABLE'|'ALLOWANCE_REQUIRED'}>{
@@ -92,19 +95,20 @@ export class JobService {
    let ledger=s.ledgers[session.familyId];if(!ledger||ledger.month!==month())ledger=s.ledgers[session.familyId]={allowance:0,used:0,reserved:ledger?.reserved||0,paidEnabled:false,month:month()};
    const maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
    if(maxUnits&&(!ledger.paidEnabled||ledger.used+ledger.reserved+maxUnits>ledger.allowance))throw Error('SPENDING_CUTOFF');
-   ledger.reserved+=maxUnits;const job:Job={...r,...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
+   const qualityRequired=this.agent.kind==='metered-api'&&!this.agent.testFixture&&needsCurrentQuality(base?.game)?'game-quality-v1' as const:undefined;
+   ledger.reserved+=maxUnits;const job:Job={...r,...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
   });
  }
  async get(session:VerifiedSession,id:string){const j=await this.authorized(session,id);return {jobId:j.id,status:j.status,revisionId:j.revisionId,errorCode:j.errorCode,adapter:j.adapter,phase:j.phase,attempts:j.attempts};}
  async retry(session:VerifiedSession,id:string,clientRequestId:string){const j=await this.authorized(session,id);return this.submit(session,{gameId:j.gameId,baseRevisionId:j.baseRevisionId,prompt:j.prompt,clientRequestId,retryOf:j.id});}
- async cancel(session:VerifiedSession,id:string){const result=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(s,session,job);if(['queued','building','testing'].includes(job.status)){audit(s,job,'cancelled');s.ledgers[job.familyId].reserved-=job.maxUnits;job.usedUnits=job.maxUnits;s.ledgers[job.familyId].used+=job.maxUnits;}return {jobId:id,status:job.status};});this.controllers.get(id)?.abort();return result;}
+ async cancel(session:VerifiedSession,id:string){const result=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(s,session,job);if(['queued','building','testing'].includes(job.status)){audit(s,job,'cancelled');s.ledgers[job.familyId].reserved-=job.maxUnits;job.usedUnits=job.maxUnits;s.ledgers[job.familyId].used+=job.maxUnits;if(job.execution){delete job.execution.candidate;delete job.execution.qualityEvidence;}}return {jobId:id,status:job.status};});this.controllers.get(id)?.abort();return result;}
  async run(id:string){
-  const start=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job||job.status!=='queued')return null;audit(s,job,'building');return job;});if(!start)return;
+  const start=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job||job.status!=='queued')return null;applyCurrentQualityPolicy(job,s.revisions.find(r=>r.id===job.baseRevisionId)?.game);audit(s,job,'building');return job;});if(!start)return;
   const controller=new AbortController();this.controllers.set(id,controller);let timeout:ReturnType<typeof setTimeout>|undefined;const deadline=new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{reject(Error('BUILD_TIMEOUT'));controller.abort();},this.options.timeoutMs);controller.signal.addEventListener('abort',()=>reject(Error('CANCELLED')),{once:true});});
   try{
    const state=await this.repo.snapshot(),base=state.revisions.find(r=>r.id===start.baseRevisionId);
    this.requireJobPermission(state,start);
-   let previous:GeneratedGame|undefined,diagnostics='',used=0,testedGame:PlayableGame|undefined;
+   let previous:GeneratedGame|undefined,previousEvidence:GameQualityEvidence|undefined,diagnostics='',used=0,testedGame:PlayableGame|undefined;
    // The local fallback must enforce the same independently sourced plan as
    // the private Actions coordinator; no browser-supplied contract is trusted.
    let independentIntentPlan:FunctionalGameContract|undefined;
@@ -117,20 +121,38 @@ export class JobService {
    for(let attempt=0;attempt<=maximum;attempt++){
     const input:AgentInput={gameManifest:{id:start.gameId,allowedMechanics:['declarative-star-catcher','generated-module-v1','generated-module-v2']},baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config,sourceGame:base?.sourceGame,projectId:base?.projectId},childIntent:start.prompt,allowedCapabilities:['declarative-star-catcher','generated-module-v1','generated-module-v2'],budget:{maxUnits:start.maxUnits-used,timeoutMs:this.options.timeoutMs},signal:controller.signal};
     await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(!['building','testing'].includes(job.status))throw Error('CANCELLED');this.requireJobPermission(s,job);if(job.status==='testing')audit(s,job,'building');job.phase=attempt?'repairing':'generating';job.attempts=attempt+1;return true;});
-    const result=await Promise.race([attempt&&previous&&this.agent.repair?this.agent.repair(input,previous,diagnostics):this.agent.generate(input),deadline]);
+    const result=await Promise.race([attempt&&previous&&this.agent.repair?this.agent.repair(input,previous,diagnostics,{qualityEvidence:previousEvidence}):this.agent.generate(input),deadline]);
     if(!Number.isInteger(result.usageUnits)||result.usageUnits<0||result.usageUnits>input.budget.maxUnits)throw Error('BUDGET_EXCEEDED');used+=result.usageUnits;
-    const game=validateArtifact(result.candidate);
-    const testing=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='building')return false;job.usedUnits=used;job.phase='testing';audit(s,job,'testing');return true;});if(!testing)return;
+    const game=validateArtifact(result.candidate);requireProductionCandidate(start,game);
+    const testing=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='building')return false;this.requireJobPermission(s,job);job.usedUnits=used;job.phase='testing';audit(s,job,'testing');return true;});if(!testing)return;
+    let attemptedGame=game,evidence:GameQualityEvidence|undefined,reviewStarted=false;
     try{
-     const built=await Promise.race([this.gate.test(game,{signal:controller.signal,independentIntentPlan}),deadline]);
-     testedGame=isGeneratedGame(game)?validateCompiled(game,built as GeneratedGame):game;
-     if(independentIntentPlan && (testedGame as GeneratedGame).compiled?.tests?.intent!==true)
+     const built=await Promise.race([this.gate.test(game,{signal:controller.signal,independentIntentPlan,captureQuality:!!start.qualityRequired}),deadline]);
+     attemptedGame=isGeneratedGame(game)?validateCompiled(game,built as GeneratedGame):game;
+     if(independentIntentPlan && (attemptedGame as GeneratedGame).compiled?.tests?.intent!==true)
       throw Error('INTENT_ATTESTATION_REQUIRED');
+     if(start.qualityRequired){
+      if(!isGeneratedGame(attemptedGame)||!this.agent.review)throw Error('QUALITY_REVIEW_REQUIRED');
+      evidence=validateQualityEvidence(attemptedGame,built?.qualityEvidence);
+      await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='testing')throw Error('CANCELLED');this.requireJobPermission(s,job);job.phase='reviewing';return true;});
+      reviewStarted=true;
+      const result=await Promise.race([this.agent.review({...input,budget:{...input.budget,maxUnits:start.maxUnits-used}},attemptedGame,evidence),deadline]);
+      if(!Number.isInteger(result.usageUnits)||result.usageUnits<0||result.usageUnits>start.maxUnits-used)throw Error('BUDGET_EXCEEDED');
+      used+=result.usageUnits;
+      await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(job.status!=='testing')throw Error('CANCELLED');this.requireJobPermission(s,job);job.usedUnits=used;return true;});
+      const review=requireQualityPass(attemptedGame,evidence,result.review);
+      attemptedGame={...attemptedGame,compiled:{...attemptedGame.compiled!,quality:review}};
+     }
+     testedGame=attemptedGame;
      break;
     }catch(error){
      if(!isGeneratedGame(game)||!this.agent.repair||controller.signal.aborted)throw error;
+     if(/^(?:ADULT_PILOT_ACCESS_REQUIRED|GUARDIAN_CONSENT_REQUIRED)$/.test((error as Error).message))throw error;
+     // An uncertain paid review request is never automatically repeated. A
+     // completed, source-bound rejection is eligible for the bounded repair.
+     if(reviewStarted&&!/^QUALITY_REVIEW_FAILED:/.test((error as Error).message))throw error;
      if(attempt>=maximum)throw Error(safeFinalRepairCode((error as Error).message,independentIntentPlan));
-     previous=game;
+     previous=isGeneratedGame(attemptedGame)?attemptedGame:game;previousEvidence=evidence;
      diagnostics=safeRepairDiagnostic((error as Error).message,independentIntentPlan).feedback;
     }
    }
@@ -138,7 +160,7 @@ export class JobService {
    await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;
     this.requireJobPermission(s,job);
     if(job.status!=='testing')return false;const revision:BuiltRevision={id:uuid(),familyId:job.familyId,parentId:job.baseRevisionId,projectId:base?.projectId||uuid(),game:testedGame!,adapter:job.adapter,...(job.adultPilotProfileId?{adultPilotProfileId:job.adultPilotProfileId}:{})};s.revisions.push(revision);job.revisionId=revision.id;job.usedUnits=used;job.phase='ready';const ledger=s.ledgers[job.familyId];ledger.reserved-=job.maxUnits;ledger.used+=job.usedUnits;audit(s,job,'ready');return true;});
-  }catch(err){await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(['building','testing'].includes(job.status)){job.errorCode=(err as Error).message;const ledger=s.ledgers[job.familyId];ledger.reserved-=job.maxUnits;ledger.used+=job.maxUnits;job.usedUnits=job.maxUnits;audit(s,job,'failed',job.errorCode);}return true;});}
+  }catch(err){await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id)!;if(['building','testing'].includes(job.status)){job.errorCode=(err as Error).message;job.phase='failed';const ledger=s.ledgers[job.familyId];ledger.reserved-=job.maxUnits;ledger.used+=job.maxUnits;job.usedUnits=job.maxUnits;if(job.execution){delete job.execution.candidate;delete job.execution.qualityEvidence;}audit(s,job,'failed',job.errorCode);}return true;});}
   finally{if(timeout)clearTimeout(timeout);this.controllers.delete(id);}
  }
  async revision(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),r=state.revisions.find(r=>r.id===id&&r.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(state,session,r);return r;}
@@ -146,5 +168,5 @@ export class JobService {
  async keep(session:VerifiedSession,id:string){await this.repo.transaction(s=>{const r=s.revisions.find(r=>r.id===id&&r.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(s,session,r);s.active[r.projectId]=id;return true;});return {revisionId:id};}
  async undo(session:VerifiedSession,id:string){const r=await this.revision(session,id);if(!r.parentId)throw Error('NO_PREVIOUS_VERSION');const parent=await this.revision(session,r.parentId);await this.keep(session,parent.id);return {revisionId:parent.id};}
  async list(session:VerifiedSession){requireFamily(session,{id:'list',familyId:session.familyId});const s=await this.repo.snapshot();assertActiveTrustedDevice(s,session);if((session.adultSessionId||session.adultProfileId)&&!adultPilotAllowed(s,session))throw Error('FORBIDDEN');return s.revisions.filter(r=>r.familyId===session.familyId&&r.adultPilotProfileId===session.adultProfileId&&s.active[r.projectId]===r.id);}
- async recover(){return this.repo.transaction(s=>{for(const j of s.jobs)if(['building','testing'].includes(j.status)){const l=s.ledgers[j.familyId];l.reserved-=j.maxUnits;l.used+=j.maxUnits;j.usedUnits=j.maxUnits;j.errorCode='WORKER_RESTARTED';audit(s,j,'failed','WORKER_RESTARTED');}return s.jobs.filter(j=>j.status==='queued').map(j=>j.id);});}
+ async recover(){return this.repo.transaction(s=>{for(const j of s.jobs)if(['building','testing'].includes(j.status)){const l=s.ledgers[j.familyId];l.reserved-=j.maxUnits;l.used+=j.maxUnits;j.usedUnits=j.maxUnits;j.errorCode='WORKER_RESTARTED';j.phase='failed';if(j.execution){delete j.execution.candidate;delete j.execution.qualityEvidence;}audit(s,j,'failed','WORKER_RESTARTED');}return s.jobs.filter(j=>j.status==='queued').map(j=>j.id);});}
 }
