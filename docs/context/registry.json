@@ -269,10 +269,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T05:05:37.165Z",
-      "sourceDigest": "5eefc2d6c0352d7eecb579f95980918d4db1101405494dc91ac13026874a9402",
+      "reviewedAt": "2026-11-19T06:00:00.000Z",
+      "sourceDigest": "de1fcc2dcebca054980a237aef0e40a9161522acd391e7413b8de4cd9f27cdc2",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified that GitHub-created runtime and main-integration commits have the same trees as the locally tested sources; updated their exact source identities in the delivery ledger without changing deployment, activation or final-CI claims."
+      "reviewReason": "Reviewed the real successful us-east5 coach Cloud Build and repaired false rejection of GCP-supplied read-only step timing/status metadata. Recorded the observed immutable image handoff and recovery, while preserving exact source, executable command, IAM, source pin, service isolation and approval gates."
     },
     {
       "id": "context",
