@@ -1,7 +1,7 @@
 # Jems Archetype Engine — Gold-Standard Design Charter v1
 Status: architecture + first headless reuse experiment, **not production-enabled**.
 Established 2026-11-18 from the Jems archetype research and child-led creation objectives.
-Branch: research/archetype-library-v1-20261118. Do not merge to fix an existing game or turn on paid AI.
+Source merged from [PR48](https://github.com/jzwyrzyk/family-game-factory/pull/48) into public `main` as `34b5306786c89f94a8f1824b5ded9800a22504e3`. This remains an offline research foundation; it does not activate paid AI, add a production composition engine or change existing child game behavior.
 
 ## Product thesis and non-negotiable promise
 A child should be able to imagine a game, receive a working version, experiment and return
