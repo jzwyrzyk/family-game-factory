@@ -73,10 +73,10 @@
         "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:11:19.252Z",
-      "sourceDigest": "d0b245961eb731660d5ce79869dec477be7821ac145b9fe690c8ec330e3baf34",
+      "reviewedAt": "2026-11-19T15:18:10.026Z",
+      "sourceDigest": "eb505c8ebc8e31c0011a06436d8bad2cbc8d792fd5d0d0d7ab77b49fb3502e6f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the accepted companion engagement and deferred-art policy, and reconciled the Rewards contract header with its published PR67 dependency after the approved branding merge; learning and maker criteria remain separate."
+      "reviewReason": "Reconciled PR66 handbook coverage and current Rewards PR67 documentation with the companion policy; documented the three decorative gems now used by Pals while leaving unused artwork and optional sound accurately labeled."
     },
     {
       "id": "experience",
@@ -375,10 +375,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:13:48.064Z",
-      "sourceDigest": "77d6221195032228d2d3955f9bf1083a202241dfced5081f01f936e9503a0368",
+      "reviewedAt": "2026-11-19T15:18:10.540Z",
+      "sourceDigest": "be97378b7c41c35874c219d5b71966e4284eecb5c7c84badee05e3783308baea",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded draft PR68 publication on Rewards PR67, the exact published implementation and equal Git tree, and the documentation-only receipt; local passing checks remain distinct from pending hosted CI and undeployed application status."
+      "reviewReason": "Reconciled the rewards branch documentation update e9dd62a into draft PR68, preserving PR66 release receipts and resolving shared review fingerprints without runtime changes; local checks and pending hosted CI remain explicitly separate."
     },
     {
       "id": "context",

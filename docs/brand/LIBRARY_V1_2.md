@@ -1,6 +1,6 @@
 # Approved Jems brand library v1.2
 
-**Status:** Owner-approved visual direction, being integrated with PR57 on current main, preserving its Creation Studio, quality and adult/guardian contracts. Approval of the artwork is distinct from application validation and deployment. [ADR0009](../decisions/0009-approved-brand-library-v1-2.md) records the decision; [delivery state](../../DELIVERY-STATE.md) records the candidate and its evidence.
+**Status:** Core application integration merged through [PR57](https://github.com/jzwyrzyk/family-game-factory/pull/57) as `c6576c16e005ae58ce8c706801414be4d864242e`, November 19, 2026, preserving Creation Studio, quality and adult/guardian contracts. All four final PR workflows and current-source local acceptance passed. The coverage table below distinguishes active features from packaged-only assets; deployment is separate. [ADR0009](../decisions/0009-approved-brand-library-v1-2.md) records the decision; [delivery state](../../DELIVERY-STATE.md) records the exact source, checks and merge receipt.
 
 ## One identity and one rank-art mapping
 
@@ -38,6 +38,20 @@ Preserve the entire face, held gem, tools, outfit and shoes. Do not stretch the 
 The [asset integration map](art-library/README.md) and [registry](art-library/assets.json) record actual paths, source/derivative hashes and geometry. The adjacent identity, Journey-source, font and token records preserve lineage. The app reuses the native Journey atlases rather than shipping duplicate PNG crops. Asset counts in the review library therefore do not equal runtime file counts.
 
 The logo's lowercase wordmark, angled white wrench, facets, tagline and single four-point wordmark sparkle remain intact. The removed motif is the specific cluster of three short rays above the gem. Authentic maker-prop glints and the Master star remain allowed. Earlier source-guide images are historical evidence, not authority to restore the removed rays. Controlled revision and owner acceptance do not retroactively certify that the traced SVG was an original vector master.
+
+## Handbook coverage in this application
+
+The 39-page `Jems_Art_and_Brand_Handbook_v1_2.pdf` contains both application design guidance and a reusable asset collection. Its 19-surface matrix is library coverage, not evidence that every illustrated example has become a working application screen (pages 36 and 39). The following records source integration; validation and deployment remain in [delivery state](../../DELIVERY-STATE.md).
+
+| Handbook area | Application coverage |
+| --- | --- |
+| Identity, palette and typography (pages 3–7) | The approved SVG identity, existing palette and local Nunito/Inter fonts are consumed by the app. `src/studio/ui.ts` imports the shared brand styles and `src/brand/art-library.css`. |
+| Workshop, first idea and contextual Gem helper (pages 8–10, 20, 23–25) | Five new illustrations are used: `hero_workshop`, `spot_first_idea`, and the think/celebrate/recover helper poses. Studio renders the first two directly; its real progress phase selects the helper treatment in `art-library.css`. |
+| Maker choice, four outfits, Journey and achievements (pages 11–18) | `journey.ts`, Studio and `delight.ts` connect the original Spark/Nova frames to the selected maker and saved making evidence. The shared rank-thumbnail renderer serves the chooser, Journey cards, home progress summary and earned popups. |
+| Functional SVG icons (page 28) | All 32 icons and their sprite are packaged in `public/jems-art/icons/`. Existing application actions and navigation do not yet consume that set; their existing symbols and emoji remain. Packaging is not a completed icon migration. |
+| Additional illustrations and covers (pages 9–10, 16, 19, 23) | Wave/rest poses, saved/reconnect/work-in-progress spots, the maker ensemble, the unused gold decorative gem and the Mind Your Jems/GemBots covers remain available for reuse. The separate [Jem Pals](../pals/README.md) extension now uses the blue, mint and coral gem tokens as provisional collection portraits and scene assets. `tools/offline-build.ts` keeps these optional assets out of eager installation downloads. Cover art does not install those games or merge PR56; existing Gem Factory gameplay has its separate implementation. |
+| Parent panels and composed interface examples (pages 20–27, 31) | Existing controls and parent/learning screens retain their behavior and share the brand styles. The PDF's illustrative parent panel is not an additional implemented dashboard, and the component-contract inventory does not establish that every demonstration has an application adapter. |
+| Optional sound (page 32) | The four handbook WAV samples are not imported or connected by this integration. The artwork update adds no sound preference or automatic audio. |
 
 ## Interface styles and states
 
