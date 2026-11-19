@@ -1,3 +1,4 @@
+.jems-builder-progress[hidden],.jems-gem-status[hidden]{display:none!important}
 /* Earned gem art: compact, expressive, never a gameplay overlay. */
 .jems-gem-shape{display:inline-block;flex:none;width:22px;height:23px;vertical-align:middle;
  clip-path:polygon(22% 8%,73% 3%,96% 36%,78% 89%,39% 100%,5% 66%,0 31%);
