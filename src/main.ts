@@ -28,3 +28,6 @@ installQualityCards();
 import {installStudio} from "./studio/ui";
 import {installStudioHostNavigation} from "./studio/host-navigation";
 void installStudio().then(installStudioHostNavigation);
+
+import {installParentDashboard} from './parent/ui';
+installParentDashboard();

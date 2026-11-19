@@ -62,6 +62,10 @@ Keep Math and Language Arts evidence distinct. Preserve independent responses, h
 
 Computational thinking and active problem solving are intended opportunities, not automatically validated scores. Engineering tests, game performance, clicks and session length do not prove mastery, intelligence, emotions or learning gains. Product thresholds require calibration and appropriate real-use evidence before stronger claims. See [Math](docs/adaptive-math/README.md), [Language Arts](docs/adaptive-language/README.md) and [coaching evidence boundaries](docs/design-coach/GOLD_STANDARD.md).
 
+### Parent reporting follows the evidence
+
+The [parent area](docs/parent-progress/README.md) should help a parent see what happened, inspect the supporting example, and choose a useful next step. Keep Math, Language Arts, Computational Thinking and Problem Solving distinct. Clearly separate recent retained records from accumulated skill history, and observed task performance from standards coverage or validated assessment results. Unknown evidence is not a deficit; recorded help is context for teaching. Explain connections to familiar products and frameworks without converting scores or implying an overall grade level. Recommendations and exports must remain profile-specific and grounded in existing records. See the [parent reporting decision](docs/decisions/2026-11-19-parent-evidence-reporting.md).
+
 ## 7. The experience must work across devices and retain its identity
 
 Tablet/touch use and desktop/keyboard/mouse use are first-class product targets. Controls, layouts, voice recovery, focus, pause/resume and saved versions need evidence on the intended devices. A desktop screenshot or simulated mobile viewport does not establish actual tablet reliability. Preserve readable text, accessible targets, keyboard operation and reduced-motion behavior.

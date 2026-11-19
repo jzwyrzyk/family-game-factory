@@ -62,6 +62,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
   try{
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning&&window.FG?.factory);
     await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+    await page.locator('[data-parent-tab="settings"]').click();
     assert.deepEqual(await page.locator('#parentGrade option').evaluateAll(nodes=>nodes.map(n=>(n as HTMLOptionElement).value)),['1','2','3','4']);
     assert.equal(await page.locator('#parentRate').getAttribute('min'),'1');
     for(const grade of [1,2,3,4]){

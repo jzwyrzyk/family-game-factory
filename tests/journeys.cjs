@@ -56,7 +56,7 @@ const fs = require('node:fs');
  const recovered=await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id),labAttempt.attemptId);
  assert.equal(recovered.correct,true);assert.equal(recovered.independent,false);assert.equal(recovered.answers.length,2);
  // Parent settings and v1 restore retain original progress and ideas.
- await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();await page.selectOption('#parentGrade','3');await page.selectOption('#parentFocus','div');await page.click('#saveParent');assert.equal(await page.evaluate(()=>FG.store.current().grade),3);assert.equal(await page.evaluate(()=>FG.store.current().focus),'div');const backup=await page.evaluate(()=>JSON.stringify(FG.store.data));await page.evaluate(raw=>FG.store.restore(raw),backup);
+ await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();await page.locator('[data-parent-tab="settings"]').click();await page.selectOption('#parentGrade','3');await page.selectOption('#parentFocus','div');await page.click('#saveParent');assert.equal(await page.evaluate(()=>FG.store.current().grade),3);assert.equal(await page.evaluate(()=>FG.store.current().focus),'div');const backup=await page.evaluate(()=>JSON.stringify(FG.store.data));await page.evaluate(raw=>FG.store.restore(raw),backup);
  await page.reload();assert.equal(await page.evaluate(()=>FG.store.current().stats.gum.played),9);assert.equal(await page.evaluate(()=>FG.store.data.feedback.length),2);
  assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).answers[0].correct,labAttempt.attemptId),false,'The actual wrong response survives reload and restore');
  // Profile-specific remixes; legacy v1 backups without new fields still load.

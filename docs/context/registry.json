@@ -22,7 +22,9 @@
     "docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md",
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
-    "docs/decisions/0007-creation-and-rebuild-practice.md"
+    "docs/decisions/0007-creation-and-rebuild-practice.md",
+    "docs/parent-progress/README.md",
+    "docs/parent-progress/RESEARCH.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -86,10 +88,10 @@
         "src/adult-pilot/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:48.744Z",
-      "sourceDigest": "b54da7165c9d2186fb1e97f275a099ec4bc64a4172132de3a4baac403315cdb4",
+      "reviewedAt": "2026-11-19T14:52:29.265Z",
+      "sourceDigest": "0b1511c17500501860cd69c9563a3e39018f6994049739f7be56c000fc9d1d87",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Gem Factory first-card and Creation entrances: the scene card stays after the playable shelf; unsupported Animate and code errors now stay visible in Studio. Desktop/tablet creation and mobile child-entry checks preserve source versions and profile boundaries."
+      "reviewReason": "Reviewed the new parent route, copied report reads, preserved settings and family backup handlers, and family/adult profile event refresh. Canonical doctrine, architecture and parent feature contract now describe these boundaries."
     },
     {
       "id": "creation",
@@ -105,10 +107,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3621e272a397fb56794fe0362ce7ac4463ae573a2590880d3103072f66a62f57",
-      "reviewedAt": "2026-11-19T12:52:54.972Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Audited the sole Check my scene evaluation/attempt call site, persisted goal/version/time/hint fields, last-five profile observations and fixed challenge selection. Clarified that cross-subject reasoning inference and adaptive computational practice are not implemented; recorded the confirmed merge without changing source behavior."
+      "sourceDigest": "10c3746e45402bb430ca64b1fa65de7a6e2b1ba9be0900b0fe7addc705396ef8",
+      "reviewedAt": "2026-11-19T14:52:29.799Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the existing creation recovery browser helper now selects the Settings tab before using the preserved backup controls. Scene records, behavioral checks, revision ownership and creation storage source are unchanged."
     },
     {
       "id": "games",
@@ -270,10 +272,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:52.984Z",
-      "sourceDigest": "259c764251cb5be70a689f35ed5ee6b90fac2069990fc0248ecbee61225c2060",
+      "reviewedAt": "2026-11-19T14:52:30.251Z",
+      "sourceDigest": "89d4ed92a1de9098e125cf20db73c590e7f913181e9ed9f04aa51f1cd627ed30",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 77 creation and 354 existing unit passes, focused combined quality/asset/companion and nine budget regressions, production desktop/tablet authoring and eight recovery journeys. Kept earlier failed and green CI scoped to their original heads; no live provider or actual-device claim."
+      "reviewReason": "Added 13 deterministic reporting tests and a production-dist parent journey for responsive layouts, source examples, private export, read-only snapshots, settings persistence and family/adult transitions. Recorded local successes and the local browser environment failure separately from pending hosted evidence."
     },
     {
       "id": "delivery",
@@ -295,10 +297,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:12:38.899Z",
-      "sourceDigest": "a99be4656635d84bf76deb99654afe3bd6a5c6a34eadee67f26b0c97ac28280e",
+      "reviewedAt": "2026-11-19T14:52:30.641Z",
+      "sourceDigest": "c8174bc193d023f78dc0f914e8ba417ed9399e0e091a2060c928af58a5444814",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged PR58 final-head checks, owner-only Gem Factory publication and rollback against PR63, then reconciled PR61 and PR62 on current main. Verified distinct private worker main/PR13/PR14 source pins and the latest manual Pages workflow. Source integration, site-specific publication and CI do not establish general production activation, real devices, or child learning results."
+      "reviewReason": "Added a read-only CI workflow for parent-reporting checks and synthetic screenshots, with no deployment or provider activation. Updated package test routing and the branch verification ledger while retaining earlier release receipts."
     },
     {
       "id": "context",
@@ -319,10 +321,28 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:54.226Z",
-      "sourceDigest": "32c4eb525a0f2896d0b6ed8db2dcd17490c757913460a76e56f169a6083a4b0f",
+      "reviewedAt": "2026-11-19T14:52:31.544Z",
+      "sourceDigest": "94d5ed0db4d3faf049edd394e1a1800613c81c2229dfa60c79413d61f1649007",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged both document routes and required references. Renumbered the unmerged Creation decision to ADR0007, preserving merged quality ADR0006, and retained creation, Gem Factory and presentation-quality coverage and local links."
+      "reviewReason": "Registered the new parent-reporting source and test family with canonical and feature references, added required parent contract and research documents, and linked the dated reporting decision from the documentation indexes."
+    },
+    {
+      "id": "parent-reporting",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/parent-progress/*.md",
+        "docs/decisions/2026-11-19-parent-evidence-reporting.md"
+      ],
+      "sources": [
+        "src/parent/**",
+        "tests/parent-dashboard*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "5962650ae3ea3a4094b98cc18e8f5889c0f73cb160c0e3e81651ba34974f38eb",
+      "reviewedAt": "2026-11-19T14:52:31.127Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed copied selected-profile snapshots, all four separate domains, retained date windows, exact supporting examples, unknown assistance, comparable task pairs, calendar bins and local summary downloads. Parent contract, primary-source research and decision record match the implementation and stated limits."
     }
   ]
 }

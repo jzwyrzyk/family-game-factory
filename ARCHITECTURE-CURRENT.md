@@ -10,6 +10,10 @@ This is a map of the **implemented source architecture**, not an assertion that 
 
 ## System boundaries
 
+### Parent reporting feature branch
+
+`feature/jems-parent-progress-20261119` starts from main `eebeebeb8896554bd3619029d8ca80d4b06b2f2b`. Its `src/parent/` area adds read-only deterministic reporting over copies of the selected profile's Math and Language records and the validated Creation workspace. The reporting model owns no learner scores or persistent child-data store. The parent UI reuses the existing parent route, settings, backup handlers and guardian/device controls. The optional problem-solving capability is read through `FG.problemSolvingEvidence` when present; unavailable evidence is disclosed. This source section is not a merge, deployment, cross-device account or assessment-validation receipt. See the [feature contract](docs/parent-progress/README.md), [research](docs/parent-progress/RESEARCH.md) and [decision](docs/decisions/2026-11-19-parent-evidence-reporting.md).
+
 Jems is a TypeScript/Vite browser application with local curated play, revisions and learning. Remote generation uses an authenticated gateway, durable private state, a separate private GitHub Actions worker and an isolated preview origin. Conversational inference and short speech transcription use a separate private service; they do not generate games or dispatch builds.
 
 The temporary adult development profile uses this same browser site. Selecting it performs the authenticated switch and makes the approved AI tools available; no separate frontend or second activation control is required. A local profile label is not authorization. The server checks a trusted device, its operator-issued adult permit and a recent adult session for every privileged request. Child profiles and the adult workspace remain separate. See [ADR0005](docs/decisions/0005-temporary-adult-profile.md) for the accepted scope and removal condition.
