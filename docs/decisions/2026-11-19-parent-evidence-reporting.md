@@ -1,6 +1,6 @@
 # Parent reporting grounded in observable work
 
-**Status:** Accepted for development; implementation choices remain reviewable in the feature PR.
+**Status:** Accepted; implementation merged in [PR65](https://github.com/jzwyrzyk/family-game-factory/pull/65) as `864bee8f9427bce4a8dc0e7df5495e576fd3bcdc` on November 19, 2026. [Delivery state](../../DELIVERY-STATE.md#pr65-parent-reporting--merged) records source integration separately from deployment.
 **Recorded:** November 19, 2026 (America/New_York).
 **Decision source:** The owner's November 19 request to research and benchmark clear parent reporting, including IXL, then develop the holistic parent area for progress, opportunities and improvement. This continues the accepted Math, Language Arts and Creation Studio evidence boundaries.
 
