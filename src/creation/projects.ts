@@ -16,6 +16,8 @@ export interface CreationAsset {
   readonly color?: string;
   readonly emoji?: string;
   readonly sourceGame?: 'dragon' | 'buckets' | 'robot';
+  /** A reusable scene asset is not evidence of collection ownership. */
+  readonly palId?: 'glim' | 'kip' | 'riff';
 }
 
 /** Only these bundled resources may be addressed by a saved or generated scene. */
@@ -33,6 +35,11 @@ export const CREATION_ASSETS: readonly CreationAsset[] = Object.freeze([
   {id:'robot', label:'Route robot', kind:'vector', shape:'robot', color:'#f5a67c', sourceGame:'robot'},
   {id:'gem', label:'Gem', kind:'vector', shape:'gem', color:'#37cbb1'},
   {id:'star', label:'Route star', kind:'emoji', emoji:'⭐', sourceGame:'robot'},
+  // Existing approved gems are temporary character tokens. Final Pal artwork
+  // can replace these mappings without changing saved scene identities.
+  {id:'pal-glim', label:'Glim', kind:'image', url:'./jems-art/gem_blue.webp', palId:'glim'},
+  {id:'pal-kip', label:'Kip', kind:'image', url:'./jems-art/gem_mint.webp', palId:'kip'},
+  {id:'pal-riff', label:'Riff', kind:'image', url:'./jems-art/gem_coral.webp', palId:'riff'},
 ].map(asset=>Object.freeze(asset)) as CreationAsset[]);
 
 export function creationAsset(id: string): CreationAsset | undefined {

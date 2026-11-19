@@ -29,7 +29,9 @@
     "docs/creation-studio/ACCEPTANCE.md",
     "docs/decisions/0007-creation-and-rebuild-practice.md",
     "docs/rewards/README.md",
-    "docs/decisions/0010-lifetime-gems-and-shared-rewards.md"
+    "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
+    "docs/pals/README.md",
+    "docs/decisions/0012-pals-from-earned-activity.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -51,7 +53,9 @@
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
     "docs/creation-studio/*.md",
     "docs/rewards/*.md",
-    "docs/rewards/previews/*.md"
+    "docs/rewards/previews/*.md",
+    "docs/pals/*.md",
+    "docs/pals/previews/*.md"
   ],
   "areas": [
     {
@@ -65,13 +69,14 @@
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
         "docs/brand/*.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:06:45.785Z",
-      "sourceDigest": "0d6a8d054f2b647bdec45ddc9518e8f6aa456f75c47062ed2d588262d4d8b7cc",
+      "reviewedAt": "2026-11-19T15:11:19.252Z",
+      "sourceDigest": "d0b245961eb731660d5ce79869dec477be7821ac145b9fe690c8ec330e3baf34",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the accepted rewards policy after PR57 merged to main; the Rewards contract now targets main directly, with no change to maker evidence, assistance, nonspendable gems, no backfill or excluded companions."
+      "reviewReason": "Recorded the accepted companion engagement and deferred-art policy, and reconciled the Rewards contract header with its published PR67 dependency after the approved branding merge; learning and maker criteria remain separate."
     },
     {
       "id": "experience",
@@ -88,7 +93,8 @@
         "docs/brand/achievement-art/README.md",
         "docs/brand/art-library/README.md",
         "docs/brand/art-library/licenses/README.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/pals/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -108,10 +114,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:58:16.183Z",
-      "sourceDigest": "4b1815a2334d1a1317b33487021c3a8d69077b33881ecfdb81e6fea3c8819a5c",
+      "reviewedAt": "2026-11-19T15:02:15.282Z",
+      "sourceDigest": "6d70f6affbdc0cd15b05f73898315989ddb24e3c6e991e08aafc212a9cda21bb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the final Studio/legacy integration and memory-only adult exit after writer release; architecture documents that cleanup while every durable source write, profile entry and selection stays guarded. Homepage and desktop/mobile adult handover preserve isolated workspaces and require fresh authorization."
+      "reviewReason": "Reviewed Studio navigation, profile guards, host hint delegation, parent preferences, existing-brand tokens and child creation shortcuts; documented the isolated Pal store and coordinated family restore while preserving current adult cleanup."
     },
     {
       "id": "creation",
@@ -120,7 +126,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/creation-studio/*.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/pals/*.md"
       ],
       "sources": [
         "src/creation/**",
@@ -128,10 +135,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "863c3525c14fefb6dbf8f40b234055c6e46a719a7176c6ea1e575d9dbb4eb493",
-      "reviewedAt": "2026-11-19T14:50:00.982Z",
+      "sourceDigest": "0356a833a8c91fa3231870fc947ba27a1d6ab29bb3af50bd058d4af1bed27dd3",
+      "reviewedAt": "2026-11-19T15:02:16.300Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented passed challenge outboxes keyed once per owner and challenge, hint-neutral rewards, atomic source saves, writer maintenance checks and retryable acknowledgement; verified all 77 Creation contracts and 8 recovery journeys retain drafts, versions and exact rollback."
+      "reviewReason": "Documented stable Pal scene assets, starter-attributed jump/dance/speech programs, owned collection shortcuts, preserved free-scene actors and drafts, challenge exclusions and creative imports without collection entitlement."
     },
     {
       "id": "rewards",
@@ -140,7 +147,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/rewards/*.md",
         "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
-        "docs/brand/GEM_PROGRESS.md"
+        "docs/brand/GEM_PROGRESS.md",
+        "docs/pals/*.md"
       ],
       "sources": [
         "src/rewards/**",
@@ -149,10 +157,30 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a661fee7caa8b8ccbbe539d86f08fc2190e0c346f8b0472abe582a7bf81609d7",
-      "reviewedAt": "2026-11-19T15:06:46.476Z",
+      "sourceDigest": "963297f5910c4053c0086b110f46bb6872deff5d1a6ab26b5803abacc2eb7bcd",
+      "reviewedAt": "2026-11-19T15:11:19.831Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the feature scope to inherit approved artwork and maker ranks from main c6576c16 after the verified PR57 merge. Runtime, reward rules, outboxes, ledger and recovery remain unchanged; volatile publication and review status belongs only in delivery state."
+      "reviewReason": "Documented companion consumption, shared notices and dual-store backup rollback; reconciled the published PR67 dependency without changing reward amounts, source eligibility or the validated receipt bridge."
+    },
+    {
+      "id": "pals",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/pals/*.md",
+        "docs/decisions/0012-pals-from-earned-activity.md",
+        "docs/pals/previews/*.md"
+      ],
+      "sources": [
+        "src/pals/**",
+        "tests/pals*",
+        "docs/pals/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "86b57d2c2439d2923001c77aae0e7ed874f2dd3c4a896ba90d40b6cb910f7a1b",
+      "reviewedAt": "2026-11-19T15:03:50.280Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed final Pal code and queue fixes against the contract, coordinated dual-store rollback and actual editable scenes; added final production screenshots that separate five UI-earned learning completions from synthetic higher-stage receipt fixtures."
     },
     {
       "id": "games",
@@ -312,7 +340,9 @@
         "docs/brand/GEM_PROGRESS.md",
         "docs/brand/achievement-art/README.md",
         "docs/brand/LIBRARY_V1_2.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/pals/*.md",
+        "docs/pals/previews/*.md"
       ],
       "sources": [
         "tests/**",
@@ -320,10 +350,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:58:18.654Z",
-      "sourceDigest": "d02fbefd299549e59cd011662be9fadc108e54bdc475689f226c19ba4cfa2a7f",
+      "reviewedAt": "2026-11-19T15:03:50.760Z",
+      "sourceDigest": "7421d8f149e74e6f830ceb29e900d5027d0bb4554ec4d604b31514ce4463c7a7",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed both final compatibility test adaptations without suppressed errors: homepage preserves legacy/alias navigation through writer handover; desktop/mobile adult tests retain explicit authorization and privacy assertions. Documented passing outcomes alongside 54 rewards, 8 creation-recovery and actual-app evidence."
+      "reviewReason": "Recorded runtime candidate ef62e3b with 42 Pal, 54 rewards, 77 creation and 28 maker checks, plus five component and seven built-app groups; documented test-only image decoding waits and explicit fixture versus UI-earned progress in review captures."
     },
     {
       "id": "delivery",
@@ -345,10 +375,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:06:47.246Z",
-      "sourceDigest": "15174ad40e5407284b2bc20ebdc15a9b29ad01ffdfed8f76846236d0f348b326",
+      "reviewedAt": "2026-11-19T15:11:20.302Z",
+      "sourceDigest": "622b141e4d21c269791e390ac6666022db3f20cae59c7f47bb4b32837d3b7527",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified PR57 squash merge c6576c16 at 10:02 a.m. America/New_York, exact approved-tree equality with 14888715, direct-main rewards targeting and local reconciliation ecb12d51 matching reviewed candidate 10404ed. Preserved historical local pins and kept rewards publication, hosted CI and deployment pending."
+      "reviewReason": "Recorded published Rewards PR67 at 4d76e1e as the companion draft base after branding merged; retained exact local runtime and browser evidence, explicit fixture labels, and separate publication, CI, artwork and deployment states."
     },
     {
       "id": "context",
@@ -369,10 +399,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:50:03.758Z",
-      "sourceDigest": "79681121551de7834547fa836c0d89ebc365ab0c1c82309da3e66817257f0839",
+      "reviewedAt": "2026-11-19T15:03:52.279Z",
+      "sourceDigest": "106d752eef1915081465345e5454ec310cacc70b573db1ef9857269511f893ab",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the Rewards contract and ADR0010 to canonical indexes and source routing, included scoped preview evidence and links, and documented the parent workflow diagnostic as read-only output rather than an approval or automatic fingerprint refresh."
+      "reviewReason": "Added the Pal feature and accepted decision to canonical navigation, routed src/pals and tests/pals to explicit review ownership, and registered the companion contract and screenshot evidence for local link checking."
     }
   ]
 }

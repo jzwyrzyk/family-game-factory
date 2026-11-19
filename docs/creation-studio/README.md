@@ -75,6 +75,14 @@ The home entrance follows the Ready to Play game shelf so a complete playable ch
 
 The target preview is a separate project. Watching it does not insert its program into the child's editable scene. Practice deliberately exposes the goal and optional hint; these are public learning activities, not protected assessment items.
 
+### Owned Pal playgrounds and free-scene insertion
+
+The [My Pals extension](../pals/README.md) in this change adds owned-companion starter cards and **Add your Pal** to free creation; its integration status is separate from the original Creation Studio release above. A Pal starter is a real editable scene: its start greeting and tap-triggered jump, dance and joke run in the existing interpreter. The tap script is selected for editing; Play and Keep remain explicit. [The Pal scene adapter](../../src/pals/creation.ts) supplies `starter` provenance rather than independent coding credit, and uses the existing approved blue, mint and coral gem artwork while final character art is developed separately.
+
+Adding a Pal gives it an independent actor/script identity and preserves the scene's existing actors, programs and pinned source references. Draft recovery, source-writing guards, local capacity limits and owner checks remain in force. The UI offers only the current profile's owned Pals, rechecking ownership when used. Pal tools are absent from rebuild challenges, and the insertion handler rejects a challenge; children can add a Pal to the free **Make it my own** copy after completing the exercise.
+
+The public scene asset IDs are `pal-glim`, `pal-kip` and `pal-riff`. A validated imported scene can retain these assets without owning the associated collectible. Scene JSON and creative backups never grant collection ownership, adventures or gems. Starting or editing a Pal scene makes no provider request, starts no automatic build and awards no progress merely for inserting or playing the supplied blocks. This is local playable-scene use, not automatic insertion into every native/generated game's mechanics. [Pal creation tests](../../tests/pals-creation.test.ts) cover behavior, preservation and this creative-content boundary.
+
 ### Exact current behavioral probes
 
 The evaluator creates fresh bounded engine runs and samples snapshots every **50 ms**. Position checks generally allow **14 stage units**. Required original actors/assets and starting positions must remain present, and other scene landmarks must stay visible in place during the observation. The route, bounce, and cheer programs must finish within their windows; a correct prefix followed by unfinished instructions is insufficient. A final pose alone does not establish the demonstrated route or event response.

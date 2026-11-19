@@ -163,6 +163,12 @@ jobs:
       - name: Rewards layout, earning and persistence journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:rewards-browser
+      - name: Collectible Pals, recovery and scene contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:pals
+      - name: Companion collection and playable creation journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:pals-browser
       - name: Editable creation contracts and behavioral challenges
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation

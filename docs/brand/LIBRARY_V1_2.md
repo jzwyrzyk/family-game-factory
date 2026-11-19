@@ -6,6 +6,8 @@
 
 Use the supplied current SVG identity, the logo-aligned **Gem companion**, the endorsed factory artwork and the original **Spark/Nova** makers. The Gem companion is the faceted helper; Spark and Nova are the two human maker choices. The legacy `character_spark_*` helper filenames do not rename the human Spark.
 
+The separate [Jem Pals collection](../pals/README.md) uses existing blue, mint and coral gem tokens as explicitly provisional functional artwork for Glim, Kip and Riff. These are neither the Gem helper nor maker-rank replacements. Its growth rings and scene behaviors demonstrate the system; final character designs, expressions, evolution art and animation sheets await the owner's separate artistic-development review. This implementation does not modify the approved assets.
+
 The primary rank thumbnail is the selected maker in the exact original outfit for that level, holding its original gem. Journey, progress cards and earned popups resolve the same maker/level pair. When no choice is saved, both choices receive equal treatment; a rendered default must not silently persist a preference. An explicit future-stage preview may change the pictured outfit but keeps the actual earned level visible. The chooser follows that explicit preview while saving only the cosmetic maker choice.
 
 | Rank | Original held prop | Primary artwork |
