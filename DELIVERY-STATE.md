@@ -151,6 +151,34 @@ Removing raw screenshots from active job state is not physical erasure from the
 existing content-addressed object store. Child-uploaded art and an art-library UI
 remain a separate future task.
 
+## Child-facing Gem Factory interaction revision
+
+The owner's subsequent request updates the existing
+[private Gem Factory Site](https://jems-gem-factory-play.beigecoconut32.chatgpt.site)
+(`appgprj_6afe77f999c88191ad29de2fc463a5a8`) with a simpler native game interface.
+This source work continues the prepared PR58 baseline
+`7e7fb257e2554b5d106e403e8f491df55c260898`. It does not relabel the earlier
+`17bb4f6` Site deployment or the 351-test integration receipt as verification of
+the new interface.
+
+The updated [feature contract](docs/brand/GEM_FACTORY.md) specifies clickable
+physical Order/Return buckets, one candidate in flight, repeating gem patterns
+with an exact next answer, actions on the illustrated cutter and polisher, and
+three wrapping papers that remain visible on shipped gifts. The extra console,
+right-hand instructions, stage names and separate Drop/recovery buttons are
+removed. Host learning, profile ownership and the existing progress schema are
+preserved. This native game revision does not alter generation/review policy or
+activate provider services.
+
+| Check | Observed scope / remaining work |
+| --- | --- |
+| Focused source checks | Final TypeScript and Vite production build passed. The pattern/simulation suites passed 6/6 checks. The updated browser contract passes JavaScript syntax and patch checks; it has not been executed as a full browser suite for this revision. |
+| Interactive desktop Site play | CUA verified one complete gift: incorrectly sending Sapphire to Order gently offered the same candidate again; Return advanced to Ruby; Order with Ruby unlocked the actual cutter. Holding and Enter advanced polishing. All three paper choices changed the gift, and the shipped striped gift remained in the completed-gift display at 1/3 with coins awarded. |
+| Trusted learning handoff | The host's timed Math prompts paused play and returned to the game during that interactive session. This is integration evidence, not a learning-gain or child-usability claim. |
+| Responsive interactive play | A 390 px browser frame completed sorting, cutter and keyboard polishing, selected star paper and shipped its gift; 66 × 73 px paper controls and the gift stayed within the viewport. The camera brought each active station into view. An 820 px frame was visually checked after shipping, including automatic focus-loss pause and normal resume. These are browser frames, not actual mobile hardware. |
+| Complete-day and persistence coverage | The updated CI contract retains touch cancellation, complete-day learning, next-day progression and profile/persistence checks. This revision did not re-execute that full browser contract; an assertion in a test file is not a passing result. Earlier successful runs retain their original scope. |
+| Publication and exact revision | The actual new captures are linked from the feature contract. PR58 records the final public source/tree and the separate Site publication receipt once issued; the earlier successful Site receipt above remains historical. This source entry alone does not assert a new publication. |
+
 ## How to record the next state
 
 For each changed claim, record **what**, **which repository/commit/image/service**, **environment and audience**, **observation time**, **source link**, **observed result**, and **remaining uncertainty**. For a deployment include the prior working revision/rollback reference. For a test include whether it used fixtures, synthetic real-provider inputs, actual devices, or observed people. Keep private operational/consent evidence in its approved private location and link a safe reference; never copy secrets or child content here.

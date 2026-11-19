@@ -1,7 +1,7 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
   factory: {version:1,id:'factory',name:'Gem Factory',mechanics:[
-    {key:'orderSize',label:'Gems in each order',type:'number',default:3,min:2,max:5,step:1},
+    {key:'orderSize',label:'Gifts per day',type:'number',default:3,min:2,max:5,step:1},
     {key:'cutterSpeed',label:'Cutting speed',type:'number',default:1,min:0.5,max:1.5,step:0.25},
     {key:'sparkleBoost',label:'Extra sparkles',type:'boolean',default:false},
   ]},
