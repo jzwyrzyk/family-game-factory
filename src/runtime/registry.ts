@@ -6,6 +6,7 @@ import StickerBuilder from '../games/sticker-builder';
 import Hill from '../games/quality-hill';
 import MoonDonutDash from '../games/moon-donut-dash';
 import RobotRoute from '../games/robot-route';
+import GemFactory from '../games/gem-factory';
 import '../quality/quality.css';
 import Builder from '../games/builder.js';
 import Buckets from '../games/buckets.js';
@@ -15,6 +16,7 @@ import { createLifecycle } from './lifecycle';
 import type { GameId, GamePlugin, GameContext, GameLifecycle, Difficulty, Mechanics, PlayOutcome } from './types';
 
 export const plugins: Record<GameId, GamePlugin> = {
+  factory: {manifest:manifests.factory,mount:(target,context)=>new GemFactory(target,context)},
   moon: {manifest:manifests.moon,mount:(target,context)=>new MoonDonutDash(target,context)},
   robot: {manifest:manifests.robot,mount:(target,context)=>new RobotRoute(target,context)},
   gum: {manifest: manifests.gum, mount: (target, context) => context.config.qualityVersion === 2 ? new StickerBuilder(target, context) : context.config.qualityVersion === 1 ? new QualityBuilder(target, context) : new (context.config.originalRules ? Construction : Builder)(target, context)},
@@ -23,6 +25,7 @@ export const plugins: Record<GameId, GamePlugin> = {
   hill: {manifest: manifests.hill, mount: (target, context) => new Hill(target, context)},
 };
 const details = {
+  factory: {type:'SPARKLE WORKSHOP',instructions:'Sort, cut and polish colorful gems. Pack each order with a little sparkle!',controls:'Tap a matching gem · Time your cut · Rub or hold to polish · Pack your order'},
   moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
   robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route that leads your robot to the star.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},
   gum: { type: 'BUILD & DISCOVER', instructions: 'Build a silly machine. Watch it move. Try your next idea.', controls: 'Choose a sticker and a bubble, or drag a sticker onto the machine · Make it GO!' },

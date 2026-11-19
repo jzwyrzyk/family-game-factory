@@ -64,6 +64,12 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
     else if(/^make meteors (?:faster|more frequent)$/.test(text))patch.meteorRate=Number(current.meteorRate)+0.25;
     else if(/^(?:add|turn on) (?:a |the )?(?:bounce pads?|trampolines?)$/.test(text))patch.bouncePads=true;
     else if(/^(?:remove|turn off|hide) (?:the )?(?:bounce pads?|trampolines?)$/.test(text))patch.bouncePads=false;
+  } else if(game==='factory'){
+    if((match=text.match(/^(?:(?:give me|use|make|pack) )?(\d+) gems?(?: (?:in |per |for )?(?:each |an? )?order)?$/)))patch.orderSize=Number(match[1]);
+    else if(/^make (?:the )?cutter faster$/.test(text))patch.cutterSpeed=Number(current.cutterSpeed)+0.25;
+    else if(/^make (?:the )?cutter slower$/.test(text))patch.cutterSpeed=Number(current.cutterSpeed)-0.25;
+    else if(/^(?:add|show|turn on) (?:extra |more )?sparkles$/.test(text))patch.sparkleBoost=true;
+    else if(/^(?:remove|hide|turn off) (?:extra )?sparkles$/.test(text))patch.sparkleBoost=false;
   } else if(game==='robot'){
     if(/^make (?:the )?robot faster$/.test(text))patch.robotSpeed=Number(current.robotSpeed)+0.25;
     else if(/^make (?:the )?robot slower$/.test(text))patch.robotSpeed=Number(current.robotSpeed)-0.25;
@@ -83,6 +89,7 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
   } catch (err) { return { kind: 'invalid', message: (err as Error).message + ' Your last working version is safe.' }; }
 }
 export const examples: Record<GameId, string[]> = {
+  factory: ['Make the cutter slower','Add extra sparkles','Pack 4 gems per order','Make the cutter faster and add extra sparkles'],
   moon: ['Give me 8 donuts','Add bounce pads','Make moon gravity lower','Add bounce pads and make meteors faster'],
   robot: ['Make robot faster','Add portals','Show my path','Add portals and make robot slower'],
   buckets: ['Give me four buckets', 'Show the safe bucket', 'Make the splash last 1 second', 'Hide the safe bucket', 'Make it slower'],

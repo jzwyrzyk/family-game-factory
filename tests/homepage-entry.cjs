@@ -22,7 +22,7 @@ const {start}=require('./browser-server.cjs');
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
    assert.equal(await page.locator('#page-studio-library').isVisible(),true,'the normal URL opens Studio');
    assert.equal(await page.locator('#page-home').isVisible(),false,'the old wizard is not the homepage');
-   assert.equal(await page.locator('#studioStarters [data-starter]').count(),6,'six playable favorites');
+   assert.equal(await page.locator('#studioStarters [data-starter]').count(),7,'seven playable favorites');
    assert.equal((await page.locator('#studioLibraryTitle').textContent()).replace(/\s+/g,' ').trim(),'What jems will you make today?');
    assert.equal(await page.locator('#studioStarterTitle').textContent(),'Ready to Play jems');
    assert.equal(await page.locator('#studioSavedTitle').textContent(),'My jems');
@@ -88,7 +88,7 @@ const {start}=require('./browser-server.cjs');
    await page.click('#studioGameMath');
    assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
    await page.click('#studioNavHome');
-   assert.equal(await page.locator('#studioStarters [data-starter]').count(),6,'favorites stay available after play');
+   assert.equal(await page.locator('#studioStarters [data-starter]').count(),7,'favorites stay available after play');
    assert.deepEqual(errors,[],'no browser runtime errors');
    await context.close();
   }
@@ -103,6 +103,6 @@ const {start}=require('./browser-server.cjs');
   await alias.waitForFunction(()=>window.FG?.studio);
   assert.equal(await alias.locator('#page-studio-library').isVisible(),true,'review alias remains compatible');
   await context.close();
-  console.log('PASS Studio homepage: default entry, six games, large CTA, honest builder state, saved drafts, legacy escape and responsive layout');
+  console.log('PASS Studio homepage: default entry, seven games, large CTA, honest builder state, saved drafts, legacy escape and responsive layout');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});
