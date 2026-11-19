@@ -60,11 +60,11 @@ export function validateSecureFormBank(form,bank){
   for(const item of bank.items){
     const slot=slots.get(item.slotId);if(!slot||seen.has(item.slotId)||item.format!==slot.format||!clean(item.prompt)||!clean(item.version))fail("invalid private item or duplicate");seen.add(item.slotId);
     if(["closed_choice","audio_choice"].includes(item.format)){
-      const opts=item.options;if(!Array.isArray(opts)||opts.length<2||opts.length>6||!uniq(opts.map(x=>x.id))||opts.some(x=>!clean(x.id)||!clean(x.label)))fail("invalid choice options");
+      const opts=item.options;if(!Array.isArray(opts)||opts.length<2||opts.length>6||!uniq(opts.map(x=>x.id))||!uniq(opts.map(x=>norm(x.label)))||opts.some(x=>!clean(x.id)||!clean(x.label)))fail("invalid choice options");
       if(!opts.some(x=>x.id===item.correctOptionId))fail("correct option not found");
       if(item.format==="audio_choice"&&(!clean(item.audioAssetId)||item.transcriptVisible===true))fail("audio missing or transcript exposed");
     }else if(item.format==="numeric"){
-      if(!parseRational(item.correctValue))fail("invalid numeric key");
+      if(!numericValue(item,item.correctValue))fail("invalid numeric key");
       if(item.unitMode&&!["none","optional","required"].includes(item.unitMode))fail("unknown unit policy");
     }else if(item.format==="short_text"){
       if(!Array.isArray(item.acceptedAnswers)||!item.acceptedAnswers.length||item.acceptedAnswers.some(x=>!clean(x)))fail("missing accepted text");
@@ -87,11 +87,12 @@ export function childFacingItem(form,bank,itemId){
 const abs=x=>x<0n?-x:x;
 export function parseRational(s){
   if(typeof s!=="string"||s.length>80)return null;s=clean(s).replace(/,/g,"");let n,d;
-  const mix=/^(-?\d+)\s+(\d+)\/(\d+)$/.exec(s),frac=/^(-?\d+)\/(\d+)$/.exec(s),dec=/^(-?\d+)(?:\.(\d+))?$/.exec(s);
+  const mix=/^(-?\d+)\s+(\d+)\/(\d+)$/.exec(s),frac=/^(-?\d+)\/(\d+)$/.exec(s),dec=/^(-?\d+)(?:\.(\d+))?$/.exec(s),leading=/^(-?)\.(\d+)$/.exec(s);
   try{
-    if(mix){const w=BigInt(mix[1]),p=BigInt(mix[2]);d=BigInt(mix[3]);if(d===0n||p>=d)return null;n=(w<0n?-1n:1n)*(abs(w)*d+p);}
+    if(mix){const w=BigInt(mix[1]),p=BigInt(mix[2]);d=BigInt(mix[3]);if(d===0n||p>=d)return null;n=(mix[1].startsWith("-")?-1n:1n)*(abs(w)*d+p);}
     else if(frac){n=BigInt(frac[1]);d=BigInt(frac[2]);if(d===0n)return null;}
-    else if(dec){const w=BigInt(dec[1]),p=dec[2]||"";d=10n**BigInt(p.length);n=w*d+(w<0n?-1n:1n)*BigInt(p||"0");}
+    else if(dec){const w=BigInt(dec[1]),p=dec[2]||"";d=10n**BigInt(p.length);n=w*d+(dec[1].startsWith("-")?-1n:1n)*BigInt(p||"0");}
+    else if(leading){const p=leading[2];d=10n**BigInt(p.length);n=(leading[1]==="-"?-1n:1n)*BigInt(p);}
     else return null;
     return {n,d};
   }catch{return null;}
@@ -103,6 +104,7 @@ function numericValue(item,value){
     if(s.toLowerCase().endsWith(" "+u.toLowerCase())){unit=u;s=s.slice(0,s.length-u.length).trim();break;}
   }
   if(item.unitMode==="required"&&!unit)return null;
+  if((item.unitMode||"none")==="none"&&unit)return null;
   if(!unit && /[a-z°]/i.test(s))return null;
   return parseRational(s);
 }
