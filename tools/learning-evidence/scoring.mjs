@@ -44,11 +44,16 @@ export function scoreItem(item, response) {
   if (!ALLOWED_HELP.has(response.assistance)) fail("assistance status required");
   const base = { itemId:item.id, domain:item.domain, grade:item.grade, formId:item.formId, strand:item.strand, maxPoints:item.maxPoints };
   if (response.status === "technical_invalid") return {...base, validity:"technical_invalid", points:null};
-  if (response.status === "skipped" || typeof response.firstResponse !== "string" || !response.firstResponse.trim())
+  const hasIndependentResponse = response.firstResponse !== null && response.firstResponse !== undefined &&
+    (typeof response.firstResponse !== "string" || Boolean(response.firstResponse.trim())) &&
+    (!Array.isArray(response.firstResponse) || response.firstResponse.length > 0) &&
+    (typeof response.firstResponse !== "object" || Array.isArray(response.firstResponse) || Object.keys(response.firstResponse).length > 0);
+  if (response.status === "skipped" || !hasIndependentResponse)
     return {...base, validity:"missing", points:null};
   if (!["none","neutral_instructions"].includes(response.assistance))
     return {...base, validity:"assisted", points:null};
   if (item.kind === "objective") {
+    if (typeof response.firstResponse !== "string") return {...base, validity:"technical_invalid", points:null};
     return {...base, validity:"scorable", points:item.acceptedAnswers.map(clean).includes(clean(response.firstResponse)) ? 1 : 0};
   }
   const marks = response.rubricMarks;
