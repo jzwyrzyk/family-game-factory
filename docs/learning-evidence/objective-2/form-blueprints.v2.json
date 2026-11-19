@@ -10719,7 +10719,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 44,
-      "possiblePoints": 79,
+      "possiblePoints": 65,
       "slots": [
         {
           "id": "ELA-3-A-READING-RL-01",
@@ -11097,13 +11097,13 @@
           "standardIds": [
             "L.3.1"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-3-A-WRITING-L-02",
@@ -11129,7 +11129,7 @@
           "standardIds": [
             "L.3.3"
           ],
-          "format": "closed_choice",
+          "format": "short_text",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -11161,13 +11161,13 @@
           "standardIds": [
             "L.3.5"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-3-A-LISTENING-SL-01",
@@ -11438,7 +11438,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 44,
-      "possiblePoints": 79,
+      "possiblePoints": 65,
       "slots": [
         {
           "id": "ELA-3-B-READING-RL-01",
@@ -11816,13 +11816,13 @@
           "standardIds": [
             "L.3.6"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-3-B-WRITING-L-02",
@@ -11848,7 +11848,7 @@
           "standardIds": [
             "L.3.2"
           ],
-          "format": "closed_choice",
+          "format": "short_text",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -11880,13 +11880,13 @@
           "standardIds": [
             "L.3.4"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-3-B-LISTENING-SL-01",
@@ -12157,7 +12157,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 44,
-      "possiblePoints": 79,
+      "possiblePoints": 65,
       "slots": [
         {
           "id": "ELA-3-C-READING-RL-01",
@@ -12535,13 +12535,13 @@
           "standardIds": [
             "L.3.5"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-3-C-WRITING-L-02",
@@ -12567,7 +12567,7 @@
           "standardIds": [
             "L.3.1"
           ],
-          "format": "closed_choice",
+          "format": "short_text",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -12599,13 +12599,13 @@
           "standardIds": [
             "L.3.3"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-3-C-LISTENING-SL-01",
@@ -12876,7 +12876,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 44,
-      "possiblePoints": 79,
+      "possiblePoints": 65,
       "slots": [
         {
           "id": "ELA-4-A-READING-RL-01",
@@ -13254,13 +13254,13 @@
           "standardIds": [
             "L.4.1"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-4-A-WRITING-L-02",
@@ -13286,7 +13286,7 @@
           "standardIds": [
             "L.4.3"
           ],
-          "format": "closed_choice",
+          "format": "short_text",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -13318,13 +13318,13 @@
           "standardIds": [
             "L.4.5"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-4-A-LISTENING-SL-01",
@@ -13595,7 +13595,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 44,
-      "possiblePoints": 79,
+      "possiblePoints": 65,
       "slots": [
         {
           "id": "ELA-4-B-READING-RL-01",
@@ -13973,13 +13973,13 @@
           "standardIds": [
             "L.4.6"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-4-B-WRITING-L-02",
@@ -14005,7 +14005,7 @@
           "standardIds": [
             "L.4.2"
           ],
-          "format": "closed_choice",
+          "format": "short_text",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -14037,13 +14037,13 @@
           "standardIds": [
             "L.4.4"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-4-B-LISTENING-SL-01",
@@ -14314,7 +14314,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 44,
-      "possiblePoints": 79,
+      "possiblePoints": 65,
       "slots": [
         {
           "id": "ELA-4-C-READING-RL-01",
@@ -14692,13 +14692,13 @@
           "standardIds": [
             "L.4.5"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-4-C-WRITING-L-02",
@@ -14724,7 +14724,7 @@
           "standardIds": [
             "L.4.1"
           ],
-          "format": "closed_choice",
+          "format": "short_text",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -14756,13 +14756,13 @@
           "standardIds": [
             "L.4.3"
           ],
-          "format": "human_rubric",
-          "points": 8,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "ELA-4-C-LISTENING-SL-01",
