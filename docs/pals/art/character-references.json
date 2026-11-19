@@ -1,9 +1,32 @@
 {
   "reference_index_id": "jems-gem-pals-character-references",
-  "revision": 1,
+  "revision": 2,
   "date": "2026-11-19",
   "timezone": "America/New_York",
   "scope": "Reconciled design references and user selections; not a declaration that every mature artwork or application stage is complete.",
+  "growth_form_policy": {
+    "decision_date": "2026-11-19",
+    "stage_count": 2,
+    "stages": [
+      {
+        "stage": 1,
+        "name": "Base",
+        "form_key": "base",
+        "artwork": "approved original base"
+      },
+      {
+        "stage": 2,
+        "name": "Grown",
+        "form_key": "mature",
+        "artwork": "individually selected evolved form, if reviewed"
+      }
+    ],
+    "intermediate_visual_stage": null,
+    "applies_to": "22 roster entries, 23 individual profiles; the F1 Navi / F2 Mote source relationship remains unchanged",
+    "progression_threshold": "Not decided by this artwork decision; existing PR68 uses a separate three-state model and must be reconciled before merge",
+    "runtime_mapping_status": "design_stage_to_form_mapping_only; application IDs, earned-state transitions and asset bindings not implemented",
+    "saved_data_policy": "Preserve committed activity receipts, per-Pal adventure counts, ownership, selections and backups. Derive displayed form without resetting history."
+  },
   "counts": {
     "roster_entries": 22,
     "individual_character_profiles": 23,
@@ -23,7 +46,7 @@
     "Base identity anchors constrain base edits; mature architecture may deliberately change. Do not overwrite base specifications.",
     "F is one roster entry containing F1 Navi and F2 Mote. Do not invent acquisition, ownership or runtime mapping semantics.",
     "Single-character mature production profiles contain one character. Multi-character source boards are references, not final isolated assets.",
-    "Do not invent a middle form or bind base/mature to runtime stages implicitly.",
+    "Only two visual growth stages exist now: Stage 1 Base (forms.base), Stage 2 Grown (forms.mature). No Bright/middle art. The existing three-state runtime implementation must be aligned separately without overwriting saved data.",
     "Retain superseded artwork and reasons; do not delete revision history."
   ],
   "set_aside": [
@@ -1371,7 +1394,7 @@
   "next_steps": [
     "Recover the exact selected Chimi and Navi portraits and unresolved latest mature profiles; assemble the complete visual roster.",
     "Review any still-unapproved mature forms individually.",
-    "Resolve artwork coverage for the existing three-stage runtime without inventing intermediate forms or changing reward thresholds.",
+    "Replace the existing three-stage PR68 presentation/derived growth model with a two-stage Base to Grown contract before merge. Decide and test the earned-adventure transition separately; do not invent a middle form or silently change rewards.",
     "Prepare isolated assets, scale/grounding conventions, face regions and clear anatomy/attachment views for each selected form.",
     "Verify expressions and movement against those exact forms, then implement stage-aware artwork lookup and full roster mapping.",
     "Check collection, growth, take-along use, scene editing and save/reload/backup before merge and release."
