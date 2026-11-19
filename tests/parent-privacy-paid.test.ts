@@ -68,7 +68,10 @@ test('private worker refuses revoked parent consent at claim and report; never p
  const claimed=await coordinator.claim(ack.jobId,0,'generate',gen);
  assert.equal(claimed.input?.childIntent,'Build a rocket that flies');
  await revokeParentPrivacyChoice(repo,parent);
- await assert.rejects(coordinator.claim(ack.jobId,0,'generate',identity('generate','second-worker-run')),/GUARDIAN_CONSENT_REQUIRED/);
+ await assert.rejects(coordinator.claim(ack.jobId,0,'generate',identity('generate','second-worker-run')),/WORKER_CLAIM_REJECTED/,
+  'a different run ID is rejected before the consent check');
+ await assert.rejects(coordinator.claim(ack.jobId,0,'generate',gen),/GUARDIAN_CONSENT_REQUIRED/,
+  'even the existing authorized worker cannot continue after revocation');
  await coordinator.report(ack.jobId,0,'generate',gen,{errorCode:'PROVIDER_FAILED'});
  const state=await repo.snapshot();
  const job=state.jobs.find(x=>x.id===ack.jobId);
