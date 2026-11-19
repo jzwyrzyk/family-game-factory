@@ -81,8 +81,11 @@ test("human response scoring needs two blind raters; no auto-score for essay",()
 
 test("full-form scoring never declares proficiency or growth and refuses contaminated samples",()=>{
  const ratings=[{raterId:"one",marks:{strategy:2}},{raterId:"two",marks:{strategy:2}}];
- const rs=[resp("NUM","0.75"),resp("CHOICE","b"),resp("HUMAN","A drawing",{ratings})];
- const good=scoreSecureForm(form,bank,rs);
+ const rs=[resp("NUM","0.75"),resp("CHOICE","b"),resp("HUMAN","A drawing")];
+ const trustedRatings={HUMAN:{trustedServerSource:true,ratings}};
+ assert.equal(scoreSecureForm(form,bank,rs).points,null); // child cannot submit its own rating
+ assert.equal(scoreSecureForm(form,bank,[...rs.slice(0,2),resp("HUMAN","A drawing",{ratings})]).points,null); // forged child ratings ignored
+ const good=scoreSecureForm(form,bank,rs,trustedRatings);
  assert.equal(good.status,"raw_score_only");
  assert.equal(good.points,3);
  assert.equal(good.possible,4);
@@ -90,7 +93,7 @@ test("full-form scoring never declares proficiency or growth and refuses contami
  assert.equal(good.schoolProficiencyClaimAllowed,false);
  assert.equal(good.notNormed,true);
  assert.equal(scoreSecureForm(form,bank,rs.slice(0,2)).points,null);
- assert.equal(scoreSecureForm(form,bank,[...rs.slice(0,2),resp("HUMAN","A drawing",{assistance:"ai_help",ratings})]).points,null);
+ assert.equal(scoreSecureForm(form,bank,[...rs.slice(0,2),resp("HUMAN","A drawing",{assistance:"ai_help",ratings})],trustedRatings).points,null);
 });
 
 test("rubric formats separate Math reasoning, ELA writing, and ELA research",()=>{
