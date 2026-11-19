@@ -26,7 +26,7 @@ async function main(){
   new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace);
  if(args.has('--revoke')){
   await revokeAdultPilot(repo,config.familyId,deviceId);
-  console.log('Adult private pilot permit revoked for selected trusted device.');
+  console.log('Adult development profile permit and sessions revoked for selected trusted device.');
   return;
  }
  const receipt=process.env.FACTORY_ADULT_PILOT_OWNER_RECEIPT||'';
@@ -35,7 +35,7 @@ async function main(){
  const r=await grantAdultPilot(repo,{familyId:config.familyId,deviceId,receipt,
   operatorConfirmedAdult:true,expiresAt:Date.now()+days*86400000});
  console.log('One adult pilot device authorized until '+new Date(r.expiresAt).toISOString()+
-  '. This does NOT verify cloud host access or enable any provider.');
+  '. Select the Adult profile on the existing site and unlock with the adult passphrase. This does NOT enable any provider.');
 }
 if(process.argv.some(x=>/[/\\]adult-pilot-owner\.(?:ts|mjs)$/.test(x)))
  void main().catch(()=>{console.error('Adult pilot approval unavailable; no private values printed.');process.exitCode=1;});

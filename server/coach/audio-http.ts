@@ -22,10 +22,10 @@ export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:st
    res.setHeader('Access-Control-Allow-Origin',config.appOrigin);
    res.setHeader('Access-Control-Allow-Credentials','true');res.setHeader('Vary','Origin');
    if(req.method==='OPTIONS'){
-    res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Request,X-Factory-Audio-Id');
+    res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Adult-Session,X-Factory-Request,X-Factory-Audio-Id');
     res.setHeader('Access-Control-Allow-Methods','GET,POST');res.writeHead(204);res.end();return;
    }
-   const session=await verifyBrowserSession(repo,req.headers.cookie,config.sessionKey);
+   const session=await verifyBrowserSession(repo,req.headers.cookie,config.sessionKey,Date.now(),req.headers['x-factory-adult-session']);
    const path=new URL(req.url||'','http://gateway').pathname;
    if(path==='/v1/coach/audio/status'&&req.method==='GET'){
     const available=await service.familyAvailable(session);
@@ -51,9 +51,9 @@ export function speechHttpHandler(service:CoachAudioService,config:{appOrigin:st
    send(200,result);
   }catch(err){
    const code=(err as Error).message;
-   const permitted=['AUDIO_UNAVAILABLE','UNAUTHENTICATED','FORBIDDEN','INVALID_AUDIO',
+   const permitted=['AUDIO_UNAVAILABLE','UNAUTHENTICATED','FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','INVALID_AUDIO',
     'AUDIO_NO_SPEECH','RATE_LIMIT','AUDIO_REQUEST_EXISTS','SPENDING_CUTOFF'];
-   send(code==='UNAUTHENTICATED'?401:code==='FORBIDDEN'?403:
+   send(code==='UNAUTHENTICATED'?401:code==='FORBIDDEN'||code==='ADULT_PILOT_ACCESS_REQUIRED'?403:
     code==='AUDIO_UNAVAILABLE'?503:code==='RATE_LIMIT'?429:400,
     {errorCode:permitted.includes(code)?code:'AUDIO_UNAVAILABLE'});
   }

@@ -1,7 +1,7 @@
 import type {CoachReceipt} from '../coach/service';
 import type {FamilyCoachConsent} from '../coach/consent';
 import type {ParentPrivacyChoice} from '../privacy/parent-consent';
-import type {AdultPilotPermit} from '../adult-pilot';
+import type {AdultPilotPermit,AdultPilotSession} from '../adult-pilot';
 import type {AudioReceipt} from '../coach/speech';
 import type {TrustedDevice,FamilyParentAuth} from '../trusted-devices';
 import type {Invitation} from '../sessions';
@@ -33,11 +33,14 @@ export interface Job extends BuildRequest {
    */
   independentIntentPlan?:FunctionalGameContract;
   adultPilotDeviceId?:string;
+  /** Internal authorization and audience; never accepted in a BuildRequest. */
+  adultPilotSessionId?:string;
+  adultPilotProfileId?:string;
   id:string;familyId:string;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
   maxUnits:number;usedUnits:number;attempts?:number;phase?:string;revisionId?:string;errorCode?:string;retryCount:number;
 }
-export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;adapter?:string }
+export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;adapter?:string;adultPilotProfileId?:string }
 export interface AuditEvent { jobId:string;familyId:string;status:JobStatus;at:string;code?:string }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
-export interface PipelineState { parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
+export interface PipelineState { parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
 export interface Repository { transaction<T>(update:(state:PipelineState)=>T):Promise<T>; snapshot():Promise<PipelineState> }

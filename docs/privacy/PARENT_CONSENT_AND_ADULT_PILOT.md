@@ -1,40 +1,41 @@
-# Jems parent privacy and adult-only release — implementation handoff
+# Jems parent privacy and temporary adult development profile
 
-**Status: engineering draft; no legal certification, external guardian verification, provider ZDR, cloud activation or school authorization established by this change.**
+This change adds a temporary authenticated adult development profile to the existing Jems website alongside ordinary child profiles. Once deployed and configured, switching to Adult (development) activates approved AI tools after the existing passphrase unlock. It needs neither another site nor a separate activation button. See [the adult release guide](../adult-pilot/VOICE_RELEASE_AND_UAT.md) for the session contract and deployment steps.
 
-## Parent experience: what is implemented
+## Parent choices in Grown-ups
 
-The Grown-ups → Connected family workshop area uses the existing trusted-device enrollment, parent passphrase and short-lived parent unlock. Only that unlocked parent session can access `/v1/devices/privacy` and `/v1/devices/privacy/revoke`; it is not exposed through the child design/chat composer.
+The Connected family workshop uses trusted-device enrollment, the parent passphrase and a short parent-management unlock. Only that unlocked parent session can access `/v1/devices/privacy` and `/v1/devices/privacy/revoke`. Adult developer authorization and verified guardian consent are separate records; neither creates the other.
 
-The notice clearly distinguishes OpenAI's separately-approved **Zero Data Retention at the provider** from Jems' own saved game, learning, local notebook, Firestore receipt and backup records. The parent opts into three separate scopes: generated games, conversational coaching, and remote Google Cloud speech. Two affirmative checks record review of the notice and claim of parent/guardian status; neither is **verifiable parental consent by itself**.
+The parent independently chooses generated games, conversational coaching and remote Google Cloud speech. The notice distinguishes provider Zero Data Retention from Jems' saved games, learning data, local notebook, server records and backups. Acknowledging the notice and affirming guardianship creates a **pending** choice.
 
-The POST creates an immutable server-side pending record with exact notice version, family, trusted device, requested scopes, time, expiry (90 days maximum), and UUID. No raw ID/payment/guardian information is stored. A changed choice immediately revokes the family's previous model/audio consent rather than preserving an older, broader grant. Withdrawal sets revocation and removes active coach/audio consent; provider availability must be rechecked for each request. Same-family access, Origin/CSRF, signed parent cookie, device revocation and input schemas are enforced.
+Each choice records the exact notice, family, trusted device, guardian session subject, boolean scopes, request time, maximum 90-day expiry and UUID. Changing scopes immediately revokes older permission. Withdrawal revokes the family's records and removes active coach/audio consent. Same-family access, exact Origin/CSRF, signed parent cookie, live-device checks and strict input schemas protect the routes.
 
-After independently verifying the parent through a legally sufficient process, a trusted operator can use `npm run setup:parent-privacy-verify -- --confirm-external-verification` with private `FACTORY_PRIVATE_CONFIG`, `FACTORY_PARENT_CHOICE_ID` and `FACTORY_EXTERNAL_GUARDIAN_RECEIPT` set in a secure terminal. This marks that **specific pending choice** verified and adds the existing family coach consent scope, with a hash of the off-platform reference. It cannot create approval without a pending parent selection or an active trusted device. It does not and cannot validate real guardianship on its own.
+## Completing external verification
 
-## What does not yet count as legally compliant child launch
+After independently completing the required guardian check for that exact choice, the trusted operator runs:
 
-The in-app notice is an **engineering draft**, not a finalized operator legal notice. Before any child-directed public rollout, a qualified privacy review must supply the operator's actual contact details and effective-date notice, precise data and provider categories, direct-to-parent delivery, supported VPC method, limits on necessary data, third-party disclosures, parent access/erasure process, account-deletion/backup schedule, incident handling and records of consent withdrawal.
+```sh
+npm run setup:parent-privacy-verify -- --confirm-external-verification
+```
 
-**Implemented in the production gateway path:** verified notice-bound generation authorization is required at builder readiness, paid JobService submission, local run, private Actions dispatch/claim/report and final Ready promotion. The gateway similarly requires the notice-bound conversation and remoteSpeech scope when using coach and audio (in addition to legacy global ZDR/provider/price/safeguards flags). Existing fixture-only service constructors remain unmodified unless their explicit `requireVerifiedParentPrivacy` option is set. The legacy operator consent route alone no longer satisfies the production gateway, because the new parent notice scope is required too. Provider approval, externally sufficient VPC, data deletion, school rules and child safety remain external/legal gates. Do not use an adult-only pilot to silently bypass those conditions.
+Provide `FACTORY_PRIVATE_CONFIG`, `FACTORY_PARENT_CHOICE_ID` and `FACTORY_EXTERNAL_GUARDIAN_RECEIPT` through the secured operator environment. The parent-only pending status includes the exact choice UUID to use for `FACTORY_PARENT_CHOICE_ID`; this reference is not a receipt or credential. The command stores only the SHA-256 digest of the external reference and activates the chosen scopes. It does not independently validate real guardianship.
 
-OpenAI under-18 API guidance requires appropriate safeguarding and ZDR before processing under-13 personal data; `store:false` alone is not approved ZDR. The actual OpenAI API organization and every applicable project/endpoint, and Google STT data logging/data processing terms, need independent operator verification. Avoid telling parents “we store no data.”
+The verifier refuses an old notice, expired/revoked/replaced choice, reused receipt, inactive device, malformed scopes or incomplete prior verification. Runtime checks require complete evidence and sensible request/verification/expiry order. A restored timestamp without its receipt cannot authorize paid processing or display verified status. A fresh current-notice choice is needed when earlier evidence is unusable.
 
-## Adult-only private pilot: separate approval path
+The production child gateway requires this current choice alongside provider, privacy, safeguards, price and budget approvals. It checks generation before paid submission and through worker completion; conversation/speech require their respective scopes before and after provider work. Fixtures explicitly omitting `requireVerifiedParentPrivacy` do not describe production child policy.
 
-An adult-only pilot may use genuinely adult test prompts and recording data without under-13 parental VPC; however, **it needs a real private adult access boundary**. A public child-directed GitHub Pages origin is not made adult-only by a checkbox or a claim in the release notes.
+## Adult development on the same frontend
 
-Recommended staging: authenticated owner-only domain or identity-aware ingress restricted to known adults, explicit adult tester enrollment, separate adult-scoped provider approval/budget, versioned audit/retention notice and verified no child profiles/content or public access. Do not set `FACTORY_COACH_ZDR_VERIFIED=true` without actual ZDR approval. Adult-pilot code must have a distinct audience policy and cannot reuse the child consent flag as evidence; keep the child coach and remote speech off until that boundary is implemented and tested.
+The rollout requires `FACTORY_ADULT_PILOT_MODE`, `FACTORY_ADULT_PILOT_OWNER_APPROVED` and `FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED`. The existing public frontend origin is supported. A private frontend hostname is no longer required; model credentials and execution remain in the dedicated private backend.
 
-Safe first testing path: local/on-device speech (if supported) and browser keyboard dictation, synthetic coach tests and adult-only API model samples after normal provider authorization. Remote Google STT requires separate provider/data-processing permissions even for adults.
+An operator permit makes a known adult's enrolled device eligible. The profile switch creates a separate, revocable session lasting at most 60 minutes. API requests need its HttpOnly cookie, tab-specific in-memory proof, matching trusted device and current permit. Local names, another tab's cookie or silent family-session renewal do not create adult authority. Switching to a child clears adult access and UI context. Reload/new tab starts locked. Adult local notebooks/games remain in a separate device-bound workspace and do not adopt child conversations or drafts.
 
-## Operator release evidence
+Adult mode restricts remote AI to that authorization while child profiles retain local behavior. It does not set child consent or provider ZDR flags to true. Model, speech, budget, worker isolation and private routing approvals still apply. Disabling the temporary mode restores the child consent policy with its existing fail-closed approvals.
 
-1. Review this PR and exact-head CI, privacy Http/negative cases and parent UI browser behavior.
-2. Record the parent notice/legal reviewer and externally verified VPC provider or process (no secrets in GitHub).
-3. Preserve Firestore family/device/history state through compatible deploy; run invalid/expired/mismatched-parent tests on staging.
-4. Record real model ZDR status (if available) separately; never derive it from parental permission.
-5. Pilot adult isolation first on a private domain with authenticated access; update production generator/preview/coach only after appropriate image, private worker and provider gates.
-6. For future children, require independent privacy/security review, school agreement if applicable, full deletion policy and supervised real-device acceptance.
+## Evidence outside this source change
 
-**External references:** [FTC 16 CFR Part 312](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312), [OpenAI Under-18 guidance](https://developers.openai.com/api/docs/guides/safety-checks/under-18-api-guidance), [OpenAI API data controls](https://developers.openai.com/api/docs/guides/your-data), [Google Cloud Speech-to-Text data logging](https://cloud.google.com/speech-to-text/docs/data-logging).
+Before processing child data, complete the operator's actual notice/contact information, direct parent delivery, appropriate external verification process, data/provider inventory, access/erasure and backup policy, withdrawal handling and applicable provider approvals. This form is not a legal certification. Provider ZDR is independently verified; a request option such as `store:false` does not establish approval.
+
+Before an adult production test, deploy compatible source/image pins and approved model/speech configuration, verify authenticated profile switching and cross-profile isolation on the existing site, complete a bounded provider smoke and test microphones on real Android/iOS devices. Merge and fixture CI do not perform these steps.
+
+Reference material for operator review: [FTC 16 CFR Part 312](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312), [OpenAI Under-18 API guidance](https://developers.openai.com/api/docs/guides/safety-checks/under-18-api-guidance), [OpenAI API data controls](https://developers.openai.com/api/docs/guides/your-data), [Google Cloud Speech-to-Text data logging](https://cloud.google.com/speech-to-text/docs/data-logging).

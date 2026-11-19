@@ -9,6 +9,7 @@ import {
  submitParentPrivacyChoice,verifiedParentScope
 } from '../server/privacy/parent-consent';
 import {signSession} from '../server/pipeline/auth';
+import type {PipelineState} from '../server/pipeline/types';
 const familyId='privacy-family',origin='https://jems.example';
 const signing='privacy-testing-signature-material-12345';
 const invitation='a'.repeat(43),parentPassphrase='my private parent passphrase';
@@ -63,6 +64,7 @@ test('privacy: only a freshly unlocked trusted parent can submit a bounded reque
   assert.match(choice.choiceId,/^[0-9a-f-]{36}$/);
   const status=await (await send('/v1/devices/privacy','GET',undefined,parent)).json();
   assert.equal(status.status,'pending');
+  assert.equal(status.choiceId,choice.choiceId,'parent can reference the exact pending choice for external verification');
   assert.deepEqual(status.scopes,scopes);
   assert.equal(status.externalVerificationRequired,true);
   const state=await repo.snapshot();
@@ -124,5 +126,65 @@ test('privacy: forged non-parent sessions cannot write consent or use an old par
   const id=(await valid.json()).choiceId;
   await repo.transaction(s=>{s.parentPrivacyChoices![0].expiresAt=Date.now()-1;return true;});
   assert.equal(await recordExternalGuardianVerification(repo,{familyId,choiceId:id,receipt:'expired-receipt-0001',verifiedByOwner:true}).then(()=>false).catch(()=>true),true);
+ });
+});
+test('privacy: stored timestamps alone cannot authorize scopes or report verified consent',async()=>{
+ await withGateway(async({repo,send,connect})=>{
+  const {parent}=await connect();
+  const p=await (await send('/v1/devices/privacy','POST',body,parent)).json();
+  await recordExternalGuardianVerification(repo,{familyId,choiceId:p.choiceId,
+   receipt:'complete-receipt-record-123',verifiedByOwner:true});
+  const valid=await repo.snapshot(),now=Date.now();
+  assert.equal(verifiedParentScope(valid,familyId,'generation',now),true);
+  assert.equal(privacyStatus(valid,familyId,now).status,'verified');
+  const cases:[string,(s:PipelineState)=>void][]=[
+   ['missing receipt',s=>{delete s.parentPrivacyChoices![0].verificationReceiptHash;}],
+   ['malformed receipt',s=>{s.parentPrivacyChoices![0].verificationReceiptHash='not-a-verification';}],
+   ['future verification',s=>{s.parentPrivacyChoices![0].verifiedAt=now+10000;}],
+   ['verification predates choice',s=>{s.parentPrivacyChoices![0].verifiedAt=s.parentPrivacyChoices![0].requestedAt-1;}],
+   ['future choice',s=>{s.parentPrivacyChoices![0].requestedAt=now+10000;}],
+   ['overlong lifetime',s=>{s.parentPrivacyChoices![0].expiresAt=s.parentPrivacyChoices![0].requestedAt+91*86400000;}],
+   ['stale notice',s=>{Object.assign(s.parentPrivacyChoices![0],{noticeVersion:'jems-parent-privacy-obsolete'});}],
+   ['unrecognized scope',s=>{Object.assign(s.parentPrivacyChoices![0].scopes,{otherService:true});}],
+   ['nonboolean scope',s=>{Object.assign(s.parentPrivacyChoices![0].scopes,{generation:'true'});}],
+   ['revoked record',s=>{s.parentPrivacyChoices![0].revokedAt=0;}],
+   ['revoked device',s=>{s.devices![0].revokedAt=0;}],
+   ['expired device',s=>{s.devices![0].expiresAt=now;}],
+   ['idle device',s=>{s.devices![0].lastSeenAt=now-90*86400000;}],
+   ['missing device',s=>{s.devices=[];}]
+  ];
+  for(const [label,change] of cases){
+   const state=structuredClone(valid);change(state);
+   for(const scope of ['generation','conversation','remoteSpeech'] as const)
+    assert.equal(verifiedParentScope(state,familyId,scope,now),false,label+' must fail closed');
+   const status=privacyStatus(state,familyId,now);
+   assert.notEqual(status.status,'verified',label+' must not show verified to a parent');
+   assert.equal(status.externalVerificationRequired,true,label);
+  }
+ });
+});
+test('privacy: an operator cannot revive stale, malformed or already partly verified pending evidence',async()=>{
+ await withGateway(async({repo,send,connect})=>{
+  const {parent}=await connect();
+  const p=await (await send('/v1/devices/privacy','POST',body,parent)).json();
+  const pending=structuredClone((await repo.snapshot()).parentPrivacyChoices![0]);
+  const cases:[string,(s:PipelineState)=>void][]=[
+   ['old notice',s=>{Object.assign(s.parentPrivacyChoices![0],{noticeVersion:'jems-parent-privacy-obsolete'});}],
+   ['future choice',s=>{s.parentPrivacyChoices![0].requestedAt=Date.now()+60000;}],
+   ['overlong choice',s=>{s.parentPrivacyChoices![0].expiresAt=pending.requestedAt+91*86400000;}],
+   ['empty scopes',s=>{s.parentPrivacyChoices![0].scopes={generation:false,conversation:false,remoteSpeech:false};}],
+   ['missing guardian',s=>{s.parentPrivacyChoices![0].guardianSubject='';}],
+   ['partial receipt',s=>{s.parentPrivacyChoices![0].verificationReceiptHash='a'.repeat(64);}],
+   ['revocation at epoch',s=>{s.parentPrivacyChoices![0].revokedAt=0;}]
+  ];
+  for(const [label,change] of cases){
+   await repo.transaction(s=>{s.parentPrivacyChoices=[structuredClone(pending)];change(s);return true;});
+   await assert.rejects(recordExternalGuardianVerification(repo,{familyId,choiceId:p.choiceId,
+    receipt:'operator-current-review-123',verifiedByOwner:true}),/PARENT_CONSENT_NOT_PENDING/,label);
+   assert.equal(verifiedParentScope(await repo.snapshot(),familyId,'generation'),false,label);
+   assert.deepEqual((await repo.snapshot()).coachConsent,[],label);
+  }
+  await assert.rejects(recordExternalGuardianVerification(repo,{familyId,choiceId:p.choiceId,
+   receipt:'operator-current-review-123',verifiedByOwner:'true' as unknown as boolean}),/EXTERNAL_VERIFICATION_REQUIRED/);
  });
 });

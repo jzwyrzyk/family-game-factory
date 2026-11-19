@@ -4,6 +4,7 @@ import { examples, interpret, type Intent } from './interpreter';
 import { RevisionStore, type Revision, migrateWorkspace } from './workspace';
 import { DesignCoach } from './coach';
 import { installRemixFallback } from './remix-routing';
+import {profileStorage} from '../adult-pilot/storage';
 import type { GameId, PlayOutcome, Mechanics } from '../runtime/types';
 const FG = (window as any).FG;
 const $ = <T extends HTMLElement = HTMLElement>(id:string) => document.getElementById(id) as T;
@@ -30,7 +31,7 @@ export function initLiveRemix() {
   const returnButton=document.createElement('button');returnButton.className='btn secondary';returnButton.id='returnLive';returnButton.textContent='🧪 Back to Live Remix';returnButton.hidden=true;returnButton.onclick=()=>FG.app.page('feedback');$('page-game').querySelector('.game-bottom')!.append(returnButton);
   const played=document.createElement('p');played.id='playedVersion';played.className='notice';played.hidden=true;$('page-game').querySelector('.game-topline')!.after(played);
   let store:RevisionStore;
-  try{store=new RevisionStore(localStorage);}catch(err){$('liveStatus').textContent=`Could not open your remix workspace: ${(err as Error).message} Your data has not been replaced. Original games still work.`;host.querySelectorAll('button,input,select').forEach(el=>(el as HTMLButtonElement).disabled=true);return;}
+  try{store=new RevisionStore(profileStorage(localStorage));}catch(err){$('liveStatus').textContent=`Could not open your remix workspace: ${(err as Error).message} Your data has not been replaced. Original games still work.`;host.querySelectorAll('button,input,select').forEach(el=>(el as HTMLButtonElement).disabled=true);return;}
   let active:string|null=null,pending:Extract<Intent,{kind:'supported'}>|null=null, pendingPrompt='';
   let currentPlay:{game:GameId;stateKey:string;config:Mechanics;owner:string}|null=null;
   const coach=new DesignCoach();
@@ -112,7 +113,7 @@ export function initLiveRemix() {
     if(detail.prompt){const intent=interpret(project().game,revision().config,detail.prompt);if(intent.kind==='supported'){pending=intent;pendingPrompt=detail.prompt;applyPending();}else $('liveIntent').textContent=intent.message;}
     else $('livePrompt').focus();
   }));
-  window.addEventListener('factory-profile',()=>{$<HTMLInputElement>('livePrompt').value='';$<HTMLInputElement>('coachAnswer').value='';active=null;clearPending();coach.reset();guarded(render);});
+  window.addEventListener('factory-profile',()=>{store=new RevisionStore(profileStorage(localStorage));$<HTMLInputElement>('livePrompt').value='';$<HTMLInputElement>('coachAnswer').value='';active=null;clearPending();coach.reset();guarded(render);});
   window.addEventListener('factory-page',(event)=>{const page=(event as CustomEvent<string>).detail;if(page==='feedback'||page==='creations')guarded(render);if(page==='home'){$('returnLive').hidden=true;$('playedVersion').hidden=true;}});
   // Keep new data in the parent's existing JSON backup without changing the progress schema/key.
   FG.factory={exportWorkspace:()=>store.snapshot(),validateWorkspace:migrateWorkspace,restoreWorkspace:(data:unknown)=>{store.restore(JSON.stringify(data));active=null;clearPending();coach.reset();render();}};

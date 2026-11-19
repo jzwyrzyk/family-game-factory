@@ -27,19 +27,30 @@ export function installParentPrivacy(client:BuilderClient,container:HTMLElement)
    <button class="btn primary" type="submit">Submit choices for verification</button>
   </form>
   <button class="btn secondary" type="button" id="privacyRevoke" hidden>Withdraw permissions</button>
+  <details><summary>Clear temporary server conversation records</summary>
+   <p>This deletes cached AI replies and speech usage receipts for this family on the server. Local notebooks, saved games, billing totals, backups and provider records are separate. Clear a local conversation from that game’s Chat options.</p>
+   <button class="btn secondary" type="button" id="privacyErase">Clear temporary server records</button>
+  </details>
+  <p id="privacyChoiceReference" hidden></p>
   <p role="status" aria-live="polite" id="builderPrivacyStatus">Unlock Parent Controls to review permissions.</p>`;
  container.append(root);
  const $=<T extends HTMLElement>(id:string)=>root.querySelector<T>('#'+id)!;
  const status=$<HTMLElement>('builderPrivacyStatus');
  const checkbox=(id:string)=>$<HTMLInputElement>(id);
+ let generation=0;
  async function show(){
+  const at=++generation;
   const data=await client.api('/v1/devices/privacy');
+  if(at!==generation)return;
   root.hidden=false;
   const state=String(data.status||'unavailable');
   checkbox('privacyGeneration').checked=!!data.scopes?.generation;
   checkbox('privacyConversation').checked=!!data.scopes?.conversation;
   checkbox('privacySpeech').checked=!!data.scopes?.remoteSpeech;
   $<HTMLButtonElement>('privacyRevoke').hidden=!['verified','pending'].includes(state);
+  const reference=$<HTMLElement>('privacyChoiceReference');
+  reference.hidden=!['pending','verified'].includes(state)||typeof data.choiceId!=='string'||!/^[a-f0-9-]{36}$/i.test(data.choiceId);
+  reference.textContent=reference.hidden?'':'Request reference: '+data.choiceId+'. Keep this with your guardian verification.';
   status.textContent=state==='verified'?'Guardian verification recorded. Provider and product approvals are still separate.':
    state==='pending'?'Choices stored, awaiting separate guardian verification. No AI or audio service enabled.':
    state==='revoked'?'Permission withdrawn. Child processing remains blocked.':
@@ -47,12 +58,15 @@ export function installParentPrivacy(client:BuilderClient,container:HTMLElement)
    'No permissions recorded. Choose the services you would like reviewed.';
  }
  function hide(){
+  ++generation;
   root.hidden=true;
   checkbox('privacyGuardian').checked=false;
   checkbox('privacyProvider').checked=false;
+  $<HTMLElement>('privacyChoiceReference').textContent='';
  }
  $<HTMLFormElement>('builderPrivacyForm').onsubmit=e=>{
   e.preventDefault();
+  const at=generation;
   void (async()=>{
    status.textContent='Saving request…';
    try{
@@ -64,17 +78,29 @@ export function installParentPrivacy(client:BuilderClient,container:HTMLElement)
       conversation:checkbox('privacyConversation').checked,
       remoteSpeech:checkbox('privacySpeech').checked}
     });
+    if(at!==generation)return;
     if(response.status!=='pending')throw Error('PRIVACY_STATUS_INVALID');
     checkbox('privacyGuardian').checked=false;
     checkbox('privacyProvider').checked=false;
     await show();
-   }catch{status.textContent='Could not store consent choices. Nothing was activated.';}
+   }catch{if(at===generation)status.textContent='Could not store consent choices. Nothing was activated.';}
   })();
  };
  $<HTMLButtonElement>('privacyRevoke').onclick=()=>{
   if(!confirm('Withdraw these AI and remote speech permissions?'))return;
-  void client.api('/v1/devices/privacy/revoke',{}).then(()=>show())
-   .catch(()=>{status.textContent='Withdrawal could not be confirmed. Contact the owner before further child processing.';});
+  const at=generation;
+  void client.api('/v1/devices/privacy/revoke',{}).then(()=>{if(at===generation)return show();})
+   .catch(()=>{if(at===generation)status.textContent='Withdrawal could not be confirmed. Contact the owner before further child processing.';});
+ };
+ $<HTMLButtonElement>('privacyErase').onclick=()=>{
+  if(!confirm('Clear this family’s temporary server AI replies and speech receipts? Local notebooks and saved games will remain.'))return;
+  const at=generation,button=$<HTMLButtonElement>('privacyErase');button.disabled=true;
+  void client.api('/v1/devices/privacy/erase',{confirm:true}).then(data=>{
+   if(at!==generation)return;
+   if(!Number.isSafeInteger(data.erased)||data.erased<0)throw Error('INVALID_ERASURE');
+   status.textContent=`Cleared ${data.erased} temporary server records. Local notebooks, saved games and billing totals remain.`;
+  }).catch(()=>{if(at===generation)status.textContent='Server deletion could not be confirmed. Unlock Parent Controls and try again.';})
+   .finally(()=>{button.disabled=false;});
  };
  return {show,hide};
 }

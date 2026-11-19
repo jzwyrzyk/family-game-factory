@@ -1,49 +1,75 @@
-# Jems adult-only private pilot — protected generation, coach and remote voice
+# Jems temporary adult development profile — AI on the current site
 
-**Release status: proposed code; no cloud/provider access, ZDR approval or production activation is established by this file.**
+**Code integration; deployment and paid-provider acceptance are separate.** This feature uses the existing Jems frontend, gateway, preview service and private AI execution. It does not need another website or an adult-only frontend hostname.
 
-## Why a separate pilot path exists
+## The profile switch is the activation
 
-The product is designed for children. OpenAI's under-18 guidance and FTC COPPA rules still apply if it processes children's data. For genuinely adult-generated test data, under-13 verifiable parental consent is not required. Do **not** mark `FACTORY_COACH_ZDR_VERIFIED=true` or `FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED=true` without evidence.
+1. On the current Jems site, choose **Adult (development)** from the profile menu.
+2. When locked, enter the existing parent passphrase as part of that switch. The server checks the trusted device and its operator-issued adult permit.
+3. A successful switch opens the adult workspace and enables the configured AI conversation, generated-game and private speech capabilities immediately. There is no second activation button. Missing providers or exhausted allowance still produce an honest unavailable state.
+4. Switch to a child profile or lock the adult profile to remove this tab's adult access immediately and request server revocation. The session also ends after an absolute maximum of 60 minutes; ordinary trusted-device renewal does not extend it. Returning to adult mode requires a new passphrase unlock.
 
-This implementation adds a separately named **ADULT private pilot** policy. It is not active by default. It requires (a) a private, adult-only hosted app origin, not the existing public GitHub Pages children's site, (b) explicit operator/provider/privacy acceptance, (c) a currently authorized trusted device with an owner-stored, short-lived adult tester receipt, and (d) existing account, spend, dedicated Cloud Run IAM, origin, CSRF and sandbox security.
+The adult local profile, notebook and game workspace persist in their own device-bound namespace. Child drafts/history are not copied into the adult AI context. Switching profiles clears the current conversation, microphone capture and outstanding UI callbacks before the other workspace opens. The session proof exists only in memory, so a reload or new tab starts locked. Local profile labels and preferences never grant server access.
 
-## Explicit adult audience controls
+This is a temporary development feature. Its feature flag and separate module allow it to be disabled and later removed while preserving the normal profile selector and guardian-consent flow.
 
-Environment switches on the **existing keyless gateway and separately approved dedicated private coach service**:
-- `FACTORY_ADULT_PILOT_MODE=true` (default false)
-- `FACTORY_ADULT_PILOT_OWNER_APPROVED=true` after owner accepts adult-only scope and permitted test data
-- `FACTORY_ADULT_PILOT_PRIVATE_HOST_VERIFIED=true` **only after** a separately reviewed private host/access-control configuration is proven
+## Configuration on the existing services
 
-The gateway rejects pilot mode if those approvals are incomplete or `appOrigin` is a `github.io` URL. These operator flags are an auditable assertion of restricted hosting, not a replacement for inspecting the actual identity-aware proxy or Cloud Run access restrictions. A public Pages link is not private merely because a server flag says it is.
+| Setting | Meaning |
+| --- | --- |
+| `FACTORY_ADULT_PILOT_MODE=true` | Select the temporary adult-only policy for remote AI admission; default is false. |
+| `FACTORY_ADULT_PILOT_OWNER_APPROVED=true` | Owner has approved named adult testing, permitted adult test content and spending. |
+| `FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED=true` | The authenticated profile switch and child/adult isolation have been reviewed for this deployment. |
 
-A trusted owner machine enrolls one explicit adult device via `npm run setup:adult-pilot -- --confirm-adult-owner-review`, reading `FACTORY_ADULT_PILOT_DEVICE_ID`, `FACTORY_ADULT_PILOT_OWNER_RECEIPT` and `FACTORY_PRIVATE_CONFIG` from secured operator context; optional `FACTORY_ADULT_PILOT_DAYS=7` (1–14 days). The device must already have been enrolled through the existing trusted family-device mechanism; the operator manually verifies that the named tester is an adult. The adult-permit record stores only family/device ID, expiry and SHA-256 of the external audit reference, **not a reusable token or an identity document**.
+Apply the adult settings to the existing keyless gateway and dedicated private coach runtime. `FACTORY_ADULT_PILOT_PRIVATE_HOST_VERIFIED` is obsolete and does not grant access. The current public GitHub Pages origin is supported, with the normal exact-Origin, credentialed CORS and CSRF checks. Every privileged API request independently proves adult authorization; the profile-access flag is a deployment review record, not a user credential.
 
-To revoke: `FACTORY_ADULT_PILOT_DEVICE_ID=... npm run setup:adult-pilot -- --revoke` on the trusted owner machine. Device revocation is also effective. A different device, a legacy signed session without trusted device, an expired permit or a child-family parent role cannot reach the adult pilot. Same-session checks re-run **before** paid model/STT admission and **after** the provider returns; previously cached replies cannot bypass revocation. Private worker claim, dispatch and ready/report checks reject jobs whose recorded adult device is no longer authorized.
+Remote AI is adult-only while this mode is enabled. Child profiles keep their local experience and do not inherit paid privileges from a trusted family device or an adult session in another tab. Turning adult mode off returns the backend to the existing guardian-consent policy; it does not approve any child service.
 
-## Provider and privacy gates that still apply to ADULT data
+## Enrollment and session contract
 
-For model-backed conversation, retain `FACTORY_COACH_APPROVED`, `FACTORY_COACH_PRIVACY_APPROVED`, `FACTORY_COACH_SAFEGUARDS_APPROVED`, `FACTORY_COACH_PRIVATE_EXECUTION_APPROVED`, exact model/snapshot, reviewed token prices and per-family spend caps, and a separate new scoped `FACTORY_COACH_PRIVATE_OPENAI_API_KEY` only in the IAM-protected service. Adult mode does **not** assert OpenAI ZDR, so false `FACTORY_COACH_ZDR_VERIFIED` is acceptable solely in the adult-isolated mode; normal child mode still requires true verified ZDR.
+The trusted owner first enrolls the device through the existing family-device setup, independently reviews the named adult tester, then runs:
 
-For remote Google STT, also retain `FACTORY_COACH_AUDIO_APPROVED`, `FACTORY_COACH_AUDIO_PRIVACY_APPROVED`, `FACTORY_COACH_AUDIO_PROVIDER_VERIFIED`, approved project/region, `roles/speech.client` restricted to the coach service account, disabled data logging opt-in, reviewed prices/limits and parent/local microphone browser permissions. In adult pilot mode `FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED` is not the adult authorization mechanism; the owner adult device permit is. No recording begins automatically, each short audio clip fills an editable draft, and a separate Send action triggers conversation.
+```sh
+npm run setup:adult-pilot -- --confirm-adult-owner-review
+```
 
-The unrelated **AI generation worker** retains its existing private tag, approval, cost, WIF/gVisor isolation, replay, idempotency and trusted-device controls. When adult pilot mode is enabled in the gateway, remote job admission and worker dispatch/claim/report require a matching authorized adult device. Jobs created before the adult pilot gate cannot silently continue under its new rules.
+The command reads `FACTORY_PRIVATE_CONFIG`, `FACTORY_ADULT_PILOT_DEVICE_ID` and `FACTORY_ADULT_PILOT_OWNER_RECEIPT` from the secured operator environment. Optional `FACTORY_ADULT_PILOT_DAYS` defaults to 7 and permits 1–14 days. The server stores the SHA-256 digest of the external audit reference, family/device binding and expiry. Keep identity documents, passphrases, credentials and raw receipts out of GitHub.
 
-## What must be proven before calling this production
+An operator permit makes the device eligible for the adult profile. The passphrase switch creates a separate server-recorded privilege session with a maximum lifetime of 60 minutes, bounded by the current permit/device authorization. API verification requires both the HttpOnly `factory_adult` cookie and a separate `X-Factory-Adult-Session` proof held only in that tab's memory. A child tab sharing the cookie jar has no matching proof. Neither item works without the matching trusted family session and live grant.
 
-1. Actual restricted hosting: private same-site app origin behind verified adult-only access control; never use public `jzwyrzyk.github.io` as an adult-private origin.
-2. The owner has reviewed OpenAI API data controls for ADULT content and current Speech-to-Text V2 region, terms, data logging, IAM and rates. Do not conflate this with pending ZDR for children.
-3. A named adult's already-enrolled trusted device is bound to a short-lived operator receipt; rejected/revoked/expired/fake devices tested with real signed sessions, not only fake role claims.
-4. Compatible existing gateway, preview and private coach images: no secret in app/gateway/runner; identity token audience checked; Cloud Run private route verified; stable rollback.
-5. Approved private worker exact full source SHA, pinned OCI gVisor image and no-egress test; no manual dev branch or mutable-main worker checkout.
-6. Real adult Chrome/Android and Safari/iPadOS testing: short speech (Finish → editable transcript → explicit Send), denied microphone/offline/unsupported browser, typed fallback, no auto-build, repeated conversations, app switch, revocation during request, math/language interruptions, one complete game build → real sandbox test → repair → Play → Keep → reload. Log only opaque IDs and timings; no transcripts.
-7. One bounded synthetic paid-provider smoke followed by adult-generated test content, with explicit owner authorization and hard budget cap. Record model vs speech spend separately.
+The API exposes:
 
-### Known limitations
+- `GET /v1/sessions/status` for pilot availability and authenticated session state.
+- `POST /v1/sessions/adult/unlock` with `parentPassphrase` for the profile switch; existing passphrase throttling applies.
+- `POST /v1/sessions/adult/lock` to revoke the privilege session and clear its cookie.
 
-- This PR cannot deploy GCP resources or verify the owner’s live project from GitHub alone.
-- An operator-controlled "adult" record is an owner permission, not legal age verification; the hosting boundary must be independently tested.
-- Existing Jems public/local game content remains child-directed; this PR is **not** a legal exemption for making a public child-directed app available to children.
-- `store:false` for OpenAI requests does not establish that ZDR has been granted.
-- The standalone parent-consent work is in PR #52 for eventual child release; this adult-only track must not be merged over or weaken that contract.
-- Final code merge is not a live cutover or proof of actual model/STT reliability.
+Device revocation, permit expiry/revocation/replacement, session expiry and a confirmed server lock invalidate further paid requests. Family-session refresh never recreates adult privilege. Admission, cached responses, provider completion and asynchronous worker dispatch/claim/report use the live authorization policy. An external call already underway may incur usage; server revocation prevents its result from admitting further work or becoming a newly published game. If the connection is lost during a profile switch, the tab still discards its proof and stops sending adult requests, but the server grant may remain until its absolute expiry. An already-running job remains isolated to the adult workspace.
+
+To revoke the device's adult eligibility from the trusted owner machine, use the same private configuration and device ID:
+
+```sh
+npm run setup:adult-pilot -- --revoke
+```
+
+## Provider, budget and backend requirements
+
+Conversation still requires `FACTORY_COACH_APPROVED`, `FACTORY_COACH_PRIVACY_APPROVED`, `FACTORY_COACH_SAFEGUARDS_APPROVED`, `FACTORY_COACH_PRIVATE_EXECUTION_APPROVED`, an approved model/snapshot, current reviewed token prices, per-family allowance and the dedicated `FACTORY_COACH_PRIVATE_OPENAI_API_KEY` in the IAM-protected private service. Browser and gateway remain keyless. Adult mode does not assert that provider Zero Data Retention is approved; normal child mode retains its separate verified-ZDR requirement.
+
+Remote Google speech still requires `FACTORY_COACH_AUDIO_APPROVED`, `FACTORY_COACH_AUDIO_PRIVACY_APPROVED`, `FACTORY_COACH_AUDIO_PROVIDER_VERIFIED`, approved project/region, restricted Speech IAM, reviewed data-logging configuration and prices, and browser microphone permission. Adult authority is the permit plus recent session; it is not a fabricated value for `FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED`. Recording starts only on request. **Finish → editable transcript → Send** remains the flow.
+
+Game generation retains private worker source/image pins, WIF identities, gVisor isolation, replay/idempotency controls, approvals and spend reservation. Jobs retain their adult authorization binding so later dispatch and completion cannot borrow an unrelated session. Adult-generated games are separated from child access, including reads and previews. Model, speech and infrastructure spending are reviewed separately.
+
+## Acceptance on the existing site
+
+1. Run build, unit/security and relevant browser suites at the exact PR commit. Verify child local journeys and parent consent still work.
+2. Prove the deployed profile switch: valid unlock enables AI; wrong passphrase, forged profile/proof, missing permit, child tab, device mismatch, expiry, lock and revoked permit do not. Exercise family-session renewal and another tab while adult mode is active.
+3. Verify adult work starts separately from child drafts/history. Switch profiles during recording, coaching, generation and preview; late results must not enter the next profile.
+4. Use compatible gateway/preview/private-coach images, exact private worker source SHA and pinned gVisor image, correct IAM identity/audience and private backend routing. Retain tested rollback images/configuration.
+5. Test real Chrome/Android and Safari/iPadOS microphones: grant/deny, offline/unsupported fallback, short speech, repeated recording, app switch, explicit Send and expiry/revocation during a request.
+6. With the approved allowance, run one bounded synthetic provider smoke followed by adult-created content. Complete conversation → build → sandbox test/repair → Play → Keep → reload. Record opaque request IDs and usage totals without transcripts or credentials.
+
+CI demonstrates source behavior with fixtures; it does not establish a deployed provider connection or real-device microphone reliability. The existing site still includes children's experiences. The development profile authorizes named adult development requests and does not confer guardian verification, child provider approval or legal certification.
+
+## Disable and remove
+
+Disable `FACTORY_ADULT_PILOT_MODE` on the gateway and private runtime. Refresh the site, confirm the adult entry disappears and new adult unlocks/paid calls are denied, then stop outstanding adult development jobs. Do not change child approval flags during this rollback. After development ends, remove the dedicated adult profile/session module and permit-specific branches while retaining ordinary profiles, parent consent and trusted-device security tests. Local adult development records should be removed according to the chosen test-data retention policy.

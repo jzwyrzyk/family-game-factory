@@ -25,9 +25,10 @@ const {chromium}=require('playwright');
      if(path==='/v1/devices/privacy'&&body===undefined)return window.__data;
      if(path==='/v1/devices/privacy'&&body){
       if(!body.guardianAffirmed||!body.providerAcknowledged)throw Error('invalid');
-      window.__data={status:'pending',scopes:body.scopes};
+      window.__data={status:'pending',choiceId:'12345678-1234-4123-8123-123456789abc',scopes:body.scopes};
       return {status:'pending'};
      }
+     if(path==='/v1/devices/privacy/erase'){if(body.confirm!==true)throw Error('Missing confirmation');return {erased:3};}
      if(path==='/v1/devices/privacy/revoke'){window.__data={status:'revoked',scopes:window.__data.scopes};return {status:'revoked'};}
      throw Error('Unexpected API route');
     }};
@@ -36,7 +37,7 @@ const {chromium}=require('playwright');
    assert.equal(await page.locator('#builderPrivacyPanel').isVisible(),false,'hidden before parent unlock');
    await page.evaluate(()=>window.__panel.show());
    assert.equal(await page.locator('#builderPrivacyPanel').isVisible(),true);
-   assert.match(await page.locator('#builderPrivacyPanel details').textContent(),/Zero Data Retention/);
+   assert.match(await page.locator('#builderPrivacyPanel details').first().textContent(),/Zero Data Retention/);
    await page.locator('#privacyGeneration').check();
    await page.locator('#privacyConversation').check();
    await page.locator('#privacyGuardian').check();
@@ -51,11 +52,18 @@ const {chromium}=require('playwright');
    await page.waitForFunction(()=>document.querySelector('#builderPrivacyStatus')?.textContent?.includes('awaiting separate guardian verification'));
    assert.match(await page.locator('#builderPrivacyStatus').innerText(),/awaiting separate guardian verification/);
    assert.equal(await page.locator('#privacyGuardian').isChecked(),false);
+   assert.match(await page.locator('#privacyChoiceReference').textContent(),/Request reference: 12345678-1234-4123-8123-123456789abc/);
    page.once('dialog',dialog=>void dialog.accept());
    await page.getByRole('button',{name:'Withdraw permissions'}).click();
    await page.waitForFunction(()=>window.__data.status==='revoked');
    await page.waitForFunction(()=>document.querySelector('#builderPrivacyStatus')?.textContent?.includes('withdrawn'));
    assert.match(await page.locator('#builderPrivacyStatus').innerText(),/withdrawn/i);
+   await page.getByText('Clear temporary server conversation records',{exact:true}).click();
+   page.once('dialog',dialog=>void dialog.accept());
+   await page.click('#privacyErase');
+   await page.waitForFunction(()=>document.getElementById('builderPrivacyStatus').textContent.includes('Cleared 3 temporary server records'));
+   assert.match(await page.locator('#builderPrivacyStatus').textContent(),/Local notebooks, saved games and billing totals remain/);
+   assert.deepEqual(await page.evaluate(()=>window.__calls.find(x=>x.path==='/v1/devices/privacy/erase').body),{confirm:true});
    await page.evaluate(()=>window.__panel.hide());
    assert.equal(await page.locator('#builderPrivacyPanel').isVisible(),false);
    assert.deepEqual(errors,[],'no JavaScript errors on '+device.name);

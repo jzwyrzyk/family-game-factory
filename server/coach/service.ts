@@ -4,7 +4,7 @@ import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotConfigured,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
-import type {Repository} from '../pipeline/types';
+import type {Repository,PipelineState} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 export interface CoachConfig {
  enabled:boolean;privacyApproved:boolean;moderationApproved:boolean;zdrVerified:boolean;privateExecutionApproved:boolean;model:string;
@@ -31,6 +31,13 @@ export function approved(c:CoachConfig):boolean {
 export class CoachService {
  constructor(private repo:Repository,private config:CoachConfig,private provider?:CoachProvider){}
  available(){return approved(this.config)&&!!this.provider;}
+ private permitted(state:PipelineState,session:VerifiedSession,now=Date.now()):boolean{
+  try{assertActiveTrustedDevice(state,session,now);}catch{return false;}
+  if(this.config.adultPilot?.enabled===true)return adultPilotAllowed(state,session,now);
+  if(session.adultSessionId||session.adultProfileId)return false;
+  return allowedCoachFamily(state,session,'model',now)&&
+   (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'conversation',now));
+ }
  /** Configured isn't enough: the production bridge must answer an authenticated
   * no-inference probe before the UI claims it is reachable. Fixture providers
   * without a probe preserve existing contract tests, never production claims.
@@ -40,12 +47,11 @@ export class CoachService {
   try{
    const state=await this.repo.snapshot(),ledger=state.ledgers[session.familyId];
    const month=new Date().toISOString().slice(0,7);
-   const permitted=this.config.adultPilot?.enabled===true?adultPilotAllowed(state,session):
-    allowedCoachFamily(state,session,'model')&&
-    (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'conversation'));
+   const permitted=this.permitted(state,session);
    if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)return false;
-   return this.provider?.readiness?await this.provider.readiness(AbortSignal.timeout(3000)):true;
+   if(this.provider?.readiness&&!await this.provider.readiness(AbortSignal.timeout(3000)))return false;
+   return this.permitted(await this.repo.snapshot(),session);
   }catch{return false;}
  }
  /** Parent-authenticated erasure of completed coach content. Usage and security
@@ -55,6 +61,7 @@ export class CoachService {
  async eraseFamilyReceipts(session:VerifiedSession):Promise<{erased:number}>{
   if(!session||session.expiresAt<=Date.now()||session.role!=='parent')throw Error('FORBIDDEN');
   return this.repo.transaction(state=>{
+   assertActiveTrustedDevice(state,session);
    if((state.coachReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running')||
       (state.audioReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running'))
     throw Error('COACH_REQUEST_EXISTS');
@@ -73,40 +80,48 @@ export class CoachService {
   if(serialized.length>this.config.maxInputChars)throw Error('INVALID_REQUEST');
   // Defense in depth, not a privacy guarantee or replacement for approved ZDR/minor safeguards.
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
-  const hash=createHash('sha256').update(serialized).digest('hex'),now=Date.now(),month=new Date(now).toISOString().slice(0,7);
+  const hash=createHash('sha256').update(serialized).digest('hex');
+  // Never reuse a child's cache entry in an adult session, or revive a reply
+  // admitted by an adult session that was subsequently locked.
+  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
   const reservation=await this.repo.transaction(state=>{
+   // Firestore may wait or retry the transaction; use admission time, not request time.
+   const now=Date.now(),month=new Date(now).toISOString().slice(0,7);
    // #42 device revocation must win atomically before a funded model call.
    assertActiveTrustedDevice(state,session,now);
-   if(!(this.config.adultPilot?.enabled===true?adultPilotAllowed(state,session,now):
-       allowedCoachFamily(state,session,'model',now)&&
-       (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'conversation',now))))
+   if(!this.available()||!this.permitted(state,session,now))
     throw Error('COACH_UNAVAILABLE');
    state.coachReceipts=(state.coachReceipts||[]).filter(r=>r.state==='running'||r.at>=now-COACH_RECEIPT_TTL_MS);
    const list=state.coachReceipts;
-   const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject);
+   const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===subject);
    if(old){if(old.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');if(old.state==='ready')return {cached:old.reply!};throw Error('COACH_REQUEST_EXISTS');}
    if(list.filter(x=>x.familyId===session.familyId&&x.at>now-60000).length>=10)throw Error('RATE_LIMIT');
    if(list.length>=500)throw Error('COACH_HISTORY_FULL');
    const ledger=state.ledgers[session.familyId];if(!ledger?.paidEnabled||ledger.month!==month||ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
-   ledger.reserved+=this.config.maxTurnMicroUsd;list.push({id:input.requestId,familyId:session.familyId,subject:session.subject,hash,month,reserved:this.config.maxTurnMicroUsd,at:now,state:'running'});
+   ledger.reserved+=this.config.maxTurnMicroUsd;list.push({id:input.requestId,familyId:session.familyId,subject,hash,month,reserved:this.config.maxTurnMicroUsd,at:now,state:'running'});
    return {cached:null};
   });
   if(reservation.cached)return {reply:reservation.cached,mode:'model'};
-  let usage=this.config.maxTurnMicroUsd,reply:CoachReply|undefined;
+  let usage=this.config.maxTurnMicroUsd,candidate:CoachReply|undefined,failure:unknown;
   try{
    const result=await this.provider!.complete(context,AbortSignal.timeout(25000));
    if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0||result.usedMicroUsd>this.config.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
-   usage=result.usedMicroUsd;reply=validateCoachReply(result.reply,context);
-   const latest=await this.repo.snapshot();
-   assertActiveTrustedDevice(latest,session);
-   if(!(this.config.adultPilot?.enabled===true?adultPilotAllowed(latest,session):
-       allowedCoachFamily(latest,session,'model')&&
-       (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(latest,session.familyId,'conversation')))){
-    reply=undefined;throw Error('COACH_UNAVAILABLE');
-   }
-   return {reply,mode:'model'};
-  }finally{
-   await this.repo.transaction(state=>{const r=state.coachReceipts!.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===session.subject)!;const ledger=state.ledgers[session.familyId];if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=usage;}r.state=reply?'ready':'failed';if(reply)r.reply=reply;state.audit.push({jobId:'coach-'+randomUUID(),familyId:session.familyId,status:reply?'ready':'failed',at:new Date().toISOString(),code:'COACH_TURN'});return true;});
-  }
+   usage=result.usedMicroUsd;candidate=validateCoachReply(result.reply,context);
+  }catch(error){failure=error;}
+  // The permission check and cache publication share a transaction. A device
+  // revocation or profile lock while the provider runs must leave no reply.
+  const reply=await this.repo.transaction(state=>{
+   const r=state.coachReceipts?.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===subject);
+   if(!r)throw Error('COACH_UNAVAILABLE');
+   const ledger=state.ledgers[session.familyId];
+   if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=usage;}
+   const result=!failure&&candidate&&this.permitted(state,session)?candidate:null;
+   r.state=result?'ready':'failed';if(result)r.reply=result;else delete r.reply;
+   state.audit.push({jobId:'coach-'+randomUUID(),familyId:session.familyId,status:result?'ready':'failed',at:new Date().toISOString(),code:'COACH_TURN'});
+   return result;
+  });
+  if(failure)throw failure;
+  if(!reply)throw Error('COACH_UNAVAILABLE');
+  return {reply,mode:'model'};
  }
 }

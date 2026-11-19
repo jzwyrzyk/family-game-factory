@@ -8,6 +8,8 @@ import type {VerifiedSession} from './contracts/api';
 import type {Repository,PipelineState} from './pipeline/types';
 import {signSession,verifySession} from './pipeline/auth';
 import {privacyStatus,submitParentPrivacyChoice,revokeParentPrivacyChoice} from './privacy/parent-consent';
+import {adultPilotConfigured,adultPilotEligible,adultPilotProfileId,adultPilotCookieSession,authenticateAdultPilotSession,
+ beginAdultPilotSession,type AdultPilotFlags} from './adult-pilot';
 
 export interface TrustedDevice {
  id:string;familyId:string;name:string;secretHash:string;rotation:number;
@@ -25,22 +27,41 @@ const hmac=(key:string,value:string)=>createHmac('sha256',key).update(value).dig
 const equal=(left:string,right:string)=>/^[0-9a-f]{64}$/.test(left)&&/^[0-9a-f]{64}$/.test(right)&&timingSafeEqual(Buffer.from(left,'hex'),Buffer.from(right,'hex'));
 const passwordHash=(passphrase:string,salt:string)=>scryptSync(passphrase,Buffer.from(salt,'hex'),32,{N:16384,r:8,p:1}).toString('hex');
 const passphraseOk=(value:unknown):value is string=>typeof value==='string'&&value.length>=12&&value.length<=128;
+/** Return false, rather than throwing, for a mismatch so the transaction saves
+ * its shared lockout counter. Adult profile switching uses the same throttle. */
+function checkParentPassphrase(auth:FamilyParentAuth|undefined,passphrase:string,now:number){
+ if(!auth)throw Error('INVALID_PARENT_ACCESS');
+ if(auth.lockedUntil>now)throw Error('PARENT_LOCKED');
+ if(!equal(auth.digest,passwordHash(passphrase,auth.salt))){
+  auth.failedAttempts++;
+  if(auth.failedAttempts>=5){auth.lockedUntil=now+15*60000;auth.failedAttempts=0;}
+  return false;
+ }
+ auth.failedAttempts=0;auth.lockedUntil=0;return true;
+}
 export function cookieValue(raw:string|undefined,name:string){
  return raw?.split(';').map(x=>x.trim()).find(x=>x.startsWith(name+'='))?.slice(name.length+1);
 }
 function deviceLive(device:TrustedDevice,now:number){
- return !device.revokedAt&&device.expiresAt>now&&device.lastSeenAt+DEVICE_IDLE>now;
+ return device.revokedAt===undefined&&device.expiresAt>now&&device.lastSeenAt+DEVICE_IDLE>now;
 }
 export function assertActiveTrustedDevice(state:Pick<PipelineState,'devices'>,session:VerifiedSession,now=Date.now()){
  if(!session.deviceId)return; // Old seven-day sessions remain valid only until their own expiry.
  const device=state.devices?.find(d=>d.id===session.deviceId&&d.familyId===session.familyId);
  if(!device||!deviceLive(device,now))throw Error('UNAUTHENTICATED');
 }
-export async function verifyBrowserSession(repo:Repository|undefined,rawCookie:string|undefined,key:string,now=Date.now()):Promise<VerifiedSession>{
- const session=verifySession(cookieValue(rawCookie,'factory_session'),key,now);
+export async function verifyBrowserSession(repo:Repository|undefined,rawCookie:string|undefined,key:string,
+ now=Date.now(),adultProof:string|string[]|undefined=undefined):Promise<VerifiedSession>{
+ const {adultSessionId:_ignoredId,adultProfileId:_ignoredProfile,...session}=
+  verifySession(cookieValue(rawCookie,'factory_session'),key,now);
+ let state:PipelineState|undefined;
  if(session.deviceId){
   if(!repo)throw Error('UNAUTHENTICATED');
-  assertActiveTrustedDevice(await repo.snapshot(),session,now);
+  state=await repo.snapshot();assertActiveTrustedDevice(state,session,now);
+ }
+ if(adultProof!==undefined){
+  if(!state)throw Error('ADULT_PILOT_ACCESS_REQUIRED');
+  return authenticateAdultPilotSession(state,session,cookieValue(rawCookie,'factory_adult'),adultProof,now);
  }
  return session;
 }
@@ -56,7 +77,8 @@ const parentCookie=(familyId:string,deviceId:string,sessionKey:string,now:number
 const rotatedSecret=(key:string,deviceId:string,sequence:number,secret:string)=>
  hmac(key,'jems-device-rotation-v1\n'+deviceId+'\n'+sequence+'\n'+secret);
 
-export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;familyId:string;sessionKey:string}){
+export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;familyId:string;sessionKey:string;
+ adultPilot?:AdultPilotFlags;eraseCoachReceipts?:(session:VerifiedSession)=>Promise<unknown>}){
  return async(request:IncomingMessage,response:ServerResponse)=>{
   const cors={'Access-Control-Allow-Origin':config.appOrigin,'Access-Control-Allow-Credentials':'true','Vary':'Origin','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
   const reply=(status:number,value:unknown,cookies?:string[])=>{
@@ -78,7 +100,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
    if(request.headers.origin&&request.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
    if(request.method!=='GET'&&request.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
    if(request.method==='OPTIONS'){
-    response.writeHead(204,{...cors,'Access-Control-Allow-Headers':'Content-Type,X-Factory-Request','Access-Control-Allow-Methods':'GET,POST'});
+    response.writeHead(204,{...cors,'Access-Control-Allow-Headers':'Content-Type,X-Factory-Request,X-Factory-Adult-Session','Access-Control-Allow-Methods':'GET,POST'});
     response.end();return;
    }
    if(path==='/v1/sessions/enroll'&&request.method==='POST'){
@@ -93,13 +115,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
      if(!invitation)throw Error('INVALID_INVITATION');
      const existing=state.parentAuth?.[config.familyId];
      if(existing){
-      if(existing.lockedUntil>now)throw Error('PARENT_LOCKED');
-      if(!equal(existing.digest,passwordHash(passphrase,existing.salt))){
-       existing.failedAttempts++;
-       if(existing.failedAttempts>=5){existing.lockedUntil=now+15*60000;existing.failedAttempts=0;}
-       return null; // Persist failed attempts; throwing inside a transaction would roll them back.
-      }
-      existing.failedAttempts=0;existing.lockedUntil=0;
+      if(!checkParentPassphrase(existing,passphrase,now))return null;
      }else{
       state.parentAuth??={};
       state.parentAuth[config.familyId]={salt,digest:passwordHash(passphrase,salt),failedAttempts:0,lockedUntil:0};
@@ -153,7 +169,63 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
     const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
     if(session.familyId!==config.familyId)throw Error('UNAUTHENTICATED');
     const state=await repo.snapshot(),device=state.devices?.find(d=>d.id===session.deviceId&&d.familyId===config.familyId);
-    reply(200,{connected:true,trusted:!!device,deviceName:device?.name||null,expiresAt:session.expiresAt});
+    const enabled=!!config.adultPilot&&adultPilotConfigured(config.adultPilot);
+    const eligible=enabled&&adultPilotEligible(state,session,now);
+    let adult:VerifiedSession|undefined;
+    if(eligible&&request.headers['x-factory-adult-session']!==undefined){
+     try{adult=authenticateAdultPilotSession(state,session,cookieValue(request.headers.cookie,'factory_adult'),
+      request.headers['x-factory-adult-session'],now);}catch{ /* Report inactive; do not elevate from a cookie alone. */ }
+    }
+    reply(200,{connected:true,trusted:!!device,deviceName:device?.name||null,expiresAt:session.expiresAt,
+     adultPilot:{enabled,eligible,active:!!adult,profileId:eligible?adultPilotProfileId(session.deviceId!):null,
+      expiresAt:adult?.expiresAt??null}});
+    return;
+   }
+   if(path==='/v1/sessions/adult/unlock'&&request.method==='POST'){
+    const input=await readBody();expectKeys(input,['parentPassphrase']);
+    if(!config.adultPilot||!adultPilotConfigured(config.adultPilot))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
+    if(!passphraseOk(input.parentPassphrase))throw Error('INVALID_PARENT_ACCESS');
+    const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
+    if(!session.deviceId||session.role!=='designer'||session.familyId!==config.familyId)throw Error('UNAUTHENTICATED');
+    const passphrase=input.parentPassphrase;
+    const opened=await repo.transaction(state=>{
+     assertActiveTrustedDevice(state,session,now);
+     if(!adultPilotEligible(state,session,now))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
+     if(!checkParentPassphrase(state.parentAuth?.[config.familyId],passphrase,now))return null;
+     return beginAdultPilotSession(state,session,now);
+    });
+    if(!opened)throw Error('INVALID_PARENT_ACCESS');
+    reply(200,{active:true,profileId:opened.grant.profileId,sessionToken:opened.sessionToken,expiresAt:opened.grant.expiresAt},
+     [secureCookie('factory_adult',opened.cookieValue,(opened.grant.expiresAt-now)/1000)]);
+    return;
+   }
+   if(path==='/v1/sessions/adult/lock'&&request.method==='POST'){
+    const input=await readBody();expectKeys(input,[]);
+    let clearCookie:boolean;
+    try{
+     clearCookie=await repo.transaction(state=>{
+      const raw=cookieValue(request.headers.cookie,'factory_adult');
+      const grant=adultPilotCookieSession(state,raw,now);
+      if(!grant)return true;
+      if(grant.familyId!==config.familyId)return false;
+      // Logout only reduces privilege. Accept its exact cookie+proof even if
+      // the ordinary family access token expired while this tab was open.
+      try{authenticateAdultPilotSession(state,{familyId:grant.familyId,deviceId:grant.deviceId,
+       role:'designer',subject:'family-adult',expiresAt:grant.expiresAt},raw,
+       request.headers['x-factory-adult-session'],now);}catch(error){
+       if((error as Error).message==='ADULT_PILOT_ACCESS_REQUIRED')return false;
+       throw error;
+      }
+      grant.revokedAt=now;return true;
+     });
+    }catch{
+     // With no authoritative state, do not overwrite a potentially newer
+     // shared cookie. The caller has already dropped its in-memory proof.
+     reply(503,{errorCode:'SERVICE_UNAVAILABLE'});return;
+    }
+    // An old tab can send its stale proof with the browser's newer cookie.
+    // Keep that unmatched active cookie; a child tab lacks its matching proof.
+    reply(200,{active:false},clearCookie?[noCookie('factory_adult')]:undefined);
     return;
    }
    if(path==='/v1/devices/disconnect'&&request.method==='POST'){
@@ -167,7 +239,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
      if(!device||!deviceLive(device,now))throw Error('UNAUTHENTICATED');
      device.revokedAt=now;return true;
     });
-    reply(200,{disconnected:true},[noCookie('factory_session'),noCookie('factory_device'),noCookie('factory_parent','/v1/devices')]);
+    reply(200,{disconnected:true},[noCookie('factory_session'),noCookie('factory_device'),noCookie('factory_parent','/v1/devices'),noCookie('factory_adult')]);
     return;
    }
    if(path==='/v1/devices/unlock'&&request.method==='POST'){
@@ -177,20 +249,14 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
     if(!session.deviceId||session.familyId!==config.familyId)throw Error('UNAUTHENTICATED');
     const passphrase=input.parentPassphrase;
     const allowed=await repo.transaction(state=>{
-     const current=state.parentAuth?.[config.familyId];if(!current)throw Error('INVALID_PARENT_ACCESS');
-     if(current.lockedUntil>now)throw Error('PARENT_LOCKED');
-     if(!equal(current.digest,passwordHash(passphrase,current.salt))){
-      current.failedAttempts++;
-      if(current.failedAttempts>=5){current.lockedUntil=now+15*60000;current.failedAttempts=0;}
-      return false;
-     }
-     current.failedAttempts=0;current.lockedUntil=0;return true;
+     assertActiveTrustedDevice(state,session,now);
+     return checkParentPassphrase(state.parentAuth?.[config.familyId],passphrase,now);
     });
     if(!allowed)throw Error('INVALID_PARENT_ACCESS');
     reply(200,{unlocked:true,expiresAt:now+PARENT_ACCESS},[parentCookie(config.familyId,session.deviceId,config.sessionKey,now)]);
     return;
    }
-   if((path==='/v1/devices/privacy'||path==='/v1/devices/privacy/revoke')&&
+   if((path==='/v1/devices/privacy'||path==='/v1/devices/privacy/revoke'||path==='/v1/devices/privacy/erase')&&
       (request.method==='GET'||request.method==='POST')){
     const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
     const parent=verifySession(cookieValue(request.headers.cookie,'factory_parent'),config.sessionKey,now);
@@ -207,6 +273,12 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
     if(path==='/v1/devices/privacy/revoke'&&request.method==='POST'){
      const input=await readBody();expectKeys(input,[]);
      reply(200,await revokeParentPrivacyChoice(repo,parent,now));return;
+    }
+    if(path==='/v1/devices/privacy/erase'&&request.method==='POST'){
+     const input=await readBody();expectKeys(input,['confirm']);
+     if(input.confirm!==true)throw Error('INVALID_REQUEST');
+     if(!config.eraseCoachReceipts)throw Error('SERVICE_UNAVAILABLE');
+     reply(200,await config.eraseCoachReceipts(parent));return;
     }
     reply(404,{errorCode:'NOT_FOUND'});return;
    }
@@ -243,17 +315,17 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
       device.revokedAt=now;return true;
      });
      reply(200,{revoked:true},input.deviceId===session.deviceId?
-      [noCookie('factory_session'),noCookie('factory_device'),noCookie('factory_parent','/v1/devices')]:undefined);
+      [noCookie('factory_session'),noCookie('factory_device'),noCookie('factory_parent','/v1/devices'),noCookie('factory_adult')]:undefined);
      return;
     }
    }
    reply(404,{errorCode:'NOT_FOUND'});
   }catch(error){
    const reason=(error as Error).message;
-   const status=reason==='UNAUTHENTICATED'?401:reason==='INVALID_INVITATION'||reason==='INVALID_PARENT_ACCESS'||reason==='FORBIDDEN'?403:
+   const status=reason==='UNAUTHENTICATED'?401:reason==='INVALID_INVITATION'||reason==='INVALID_PARENT_ACCESS'||reason==='FORBIDDEN'||reason==='ADULT_PILOT_ACCESS_REQUIRED'?403:
     reason==='PARENT_LOCKED'||reason==='DEVICE_LIMIT'||reason==='INVITE_LIMIT'||reason==='PRIVACY_RECORD_LIMIT'?429:
     reason==='INVALID_REQUEST'||reason==='INVALID_PRIVACY_CHOICE'?400:503;
-   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','PRIVACY_RECORD_LIMIT','INVALID_REQUEST','INVALID_PRIVACY_CHOICE','PARENT_UNLOCK_REQUIRED'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
+   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','PRIVACY_RECORD_LIMIT','INVALID_REQUEST','INVALID_PRIVACY_CHOICE','PARENT_UNLOCK_REQUIRED'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
   }
  };
 }

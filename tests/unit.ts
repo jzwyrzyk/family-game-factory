@@ -48,3 +48,8 @@ import './parent-privacy.test';
 import './parent-privacy-paid.test';
 
 import './adult-pilot.test';
+import './adult-profile-auth.test';
+
+import './adult-api.test';
+import './adult-workspace.test';
+import './adult-profile-client.test';
