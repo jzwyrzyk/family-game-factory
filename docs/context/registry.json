@@ -437,10 +437,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T22:50:18.991Z",
-      "sourceDigest": "5230309a670b20a92cca18f23afaa614ad31cc7d19730762b1d60bc1fd834a68",
+      "reviewedAt": "2026-11-19T23:04:57.424Z",
+      "sourceDigest": "bc2628185547f3b9691a605206bdce3a22026c872305542b990fbb15db428ce8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed both service source allowlists and selected-source COPY preflight, historical rollback support, and the scoped real-image packaging workflow. Updated release evidence for merged PR48/PR56, eight passing baseline checks, observed old Pages source and remaining authenticated cloud rollout. Preserved the existing Adult pilot, private worker boundary and unknown live acceptance.",
+      "reviewReason": "Recorded observed PR75 merge b6e160b9 and exact tree equality to tested head1da59b588, all15 latest-attempt jobs, successful staged-image Docker checks and source archive identity. Preserved the initial readiness-phase visual failure, single unchanged-head retry and issue76, closed superseded PR73, froze the corrected release source and retained the unshipped production boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
