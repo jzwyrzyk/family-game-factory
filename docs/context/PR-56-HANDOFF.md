@@ -1,6 +1,6 @@
 # PR #56 — bounded recovery handoff
 
-Observed: 2026-11-19T08:01:54-05:00. Updated through Batch 2B: recovery and two-file reconciliation are complete; source delivery is blocked by unavailable workspace access. No game changes, tests, merge or deployment were performed.
+Observed: 2026-11-19T08:01:54-05:00. Updated through the resumed Batch 2 transfer: recovery and reconciliation are complete, and the exact illustrated source tree is now delivered to PR56. Final visual/gameplay/integration acceptance remains open. No game changes, tests, merge or deployment were performed.
 
 ## Full-overhaul objective — unchanged
 
@@ -20,9 +20,9 @@ Completion requires all of the following, with remaining gaps explicitly recorde
 - Repository: jzwyrzyk/family-game-factory.
 - PR: https://github.com/jzwyrzyk/family-game-factory/pull/56 — open, unmerged, non-draft; API reports mergeable=false.
 - PR branch: feature/mind-your-jems-wait-arcade.
-- PR head: 319b2df2d3e689162d7a49a2916cecfccbe562de.
+- Current verified PR head: a75cac86f905714e3e69677db8836b53a04a4a06. Previous rough-game head: 319b2df2d3e689162d7a49a2916cecfccbe562de.
 - PR metadata base SHA: 493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7. Current main was not separately refreshed in this bounded batch.
-- The live PR changed-file list has 10 paths and no illustrated assets under public/art/mind-your-jems/. A remote branch search for pr56 returned no matches.
+- The original 10-file PR lacked the illustrated assets. The resumed transfer now exposes the recovered source tree through the verified PR head; GitHub reports 38 changed files. Earlier branch-search observations are historical.
 - This handoff is saved on a separate documentation branch. Its commit is not the recovered game commit and does not advance PR #56.
 
 ## Verified local source
@@ -34,7 +34,7 @@ Completion requires all of the following, with remaining gaps explicitly recorde
 - Worktree status: clean.
 - Live PR head is an ancestor of the recovery commit: True.
 - The older pr56-complete checkout has four unstaged modifications. Its game CSS and game TypeScript match the clean recovery baseline byte for byte. Its Studio UI and browser test differ; their intent was reconciled in Batch 2; the clean recovery includes the older changes plus the composer visibility fix. Do not discard either version. The appendix preserves all four changes as a patch against ab68a88c15a5691239c0031ff97a3660ceca347c.
-- Local code/assets are present and committed in the recovery checkout; remote delivery of this recovered tree is not established. Preserve these checkouts until Batch 2 verifies the upload.
+- Local code/assets remain committed in the recovery checkout. Remote delivery is now verified at a75cac86f905714e3e69677db8836b53a04a4a06, with the identical source tree 0f546922b72c55887959cbf37e2e3ff293ea0e47. Keep the existing checkouts as recovery copies.
 
 | Copy | Branch | Commit | Working tree |
 | --- | --- | --- | --- |
@@ -88,15 +88,23 @@ An individual artwork-blob read returned a binary UTF-8 decoding error; this is 
 
 Immediate resume condition: a working execution connection to the saved source/manifest is needed. Resume the transfer procedure below once accessible; do not repeat the completed four-copy inventory or two-file reconciliation. Verify which individual blobs already exist before needlessly re-uploading them. The full-overhaul objective above remains outstanding.
 
-## Next action — resume Batch 2B transfer when workspace is accessible
+## Resumed Batch 2 result — illustrated source delivered
 
-Continue source delivery using the connected GitHub Git-data tools. Do not repeat recovery or the two-file comparison. Recheck the PR head before changing its branch. Read the prepared transfer manifest below; upload binary blobs using create_blob(base64), verifying returned SHA against the manifest. Record completed uploads at the batch boundary. Once all referenced blobs exist, create_tree using base_tree plus tree_elements, require the resulting tree SHA to equal source_tree, create a commit with the live PR head as parent (also preserve the recovery version's already-merged main ancestry using a verified additional parent when needed), then update_ref without force and with expected_sha. Verify the PR head and remote tree. Do not claim the new connector-created commit is the original local commit; the verified tree equality establishes source identity. Main reconciliation and final merge-readiness checks remain later work unless required for safe delivery.
+- The workspace became accessible again. The canonical recovery checkout remained clean at f4ed3f9517d2cd443d71d2ae809ce966c72859af.
+- All 97 UTF-8 and 16 binary transfer payloads matched the recorded Git blob hashes and source content. Both the original PR head and integrated main commit 079978f3034e007e8bbad1f43571aaa7867b5098 are ancestors of the recovery source.
+- Created the complete remote tree using the 113-path delta and already-available binary object hashes. GitHub returned exactly 0f546922b72c55887959cbf37e2e3ff293ea0e47, matching the local recovery tree. This full-tree equality also covers unchanged files omitted from the delta.
+- Created remote commit a75cac86f905714e3e69677db8836b53a04a4a06, with parents 319b2df2d3e689162d7a49a2916cecfccbe562de and 079978f3034e007e8bbad1f43571aaa7867b5098. This preserves the integrated main ancestry; the new commit SHA differs from the local recovery SHA while the complete source tree is identical.
+- Advanced feature/mind-your-jems-wait-arcade without force, guarded by expected previous head 319b2df2d3e689162d7a49a2916cecfccbe562de. Re-read PR56 and verified head a75cac86f905714e3e69677db8836b53a04a4a06; it remains open and unmerged.
+- GitHub currently reports mergeable=false. Current-main reconciliation and final readiness remain open; do not describe the PR as ready to merge yet.
+- No art regeneration, new game edit, build/test run, browser review, merge or deployment was performed during this transfer. Prior local test reports remain historical.
 
-The current budget is at most 10 substantive operations plus up to 3 checkpoint operations. If the binary transfer takes multiple batches, stop at the budget with the list of completed SHAs. Preserve local checkouts until remote source delivery is verified. Do not start visual refinement, merge or deploy.
+## Next action — Batch 3: actual visual acceptance only
 
-Transfer manifest: `/workspace/scratch/aea40a32bfc7/pr56-transfer/manifest.json`. It contains exact UTF-8 tree content and the binary blob SHA, size and base64 file for each binary. The files are local preparation, not proof of remote delivery. If lost, regenerate from the source commit and original PR head above.
+Start from the delivered PR commit a75cac86f905714e3e69677db8836b53a04a4a06. Read the illustrated feature contract and approved reference storyboard, run the recovered game, and compare actual desktop/phone screenshots with that reference. Identify and address one bounded group of visible defects if needed. Keep existing source, artwork, profile boundaries and Studio behavior intact. Save the captures and precise remaining gaps. Do not repeat recovery, file reconciliation or transfer.
 
-- Prepared delta: 113 paths, including 16 binary blobs totaling 11,614,089 bytes.
+Use at most 10 substantive operations plus up to 3 checkpoint operations. End the batch with a final response; do not automatically begin Batch 4. If starting the app or a repair exceeds the budget, checkpoint that concrete state and stop.
+
+Remaining acceptance batches: 3 illustrated scene/art; 4 responsive layout and controls; 5 mining/banking/warning/grab/shake/gem-loss loop; 6 Studio entry/ready/return/recovery; 7 current-main integration and exact-commit merge readiness. The full-overhaul objective above still applies. No merge or deployment is authorized by this transfer checkpoint.
 
 ## Preserved uncommitted changes
 
