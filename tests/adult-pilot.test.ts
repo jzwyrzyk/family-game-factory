@@ -34,7 +34,7 @@ const speechConfig:SpeechConfig={
 };
 const context={message:'Make my spaceship bounce',mode:'discuss' as const,game:'new',plan:{},
  rules:'',friction:'',helpLevel:0,support:'brief' as const,conversation:[],observations:[],tests:[]};
-const reply={move:'listen',text:'What would you like to make bounce?',question:'A ball or a rocket?',
+const reply={move:'listen',text:'You can make a moving toy.',question:'A ball or a rocket?',
  suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
 test('adult pilot is off by default and NEVER fabricates a child ZDR or consent claim',()=>{
  assert.deepEqual(adultPilotFlags({}),{enabled:false,ownerApproved:false,restrictedHostVerified:false});
