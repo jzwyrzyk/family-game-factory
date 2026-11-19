@@ -45,7 +45,7 @@ Report score and (n=16) separately by grade and subconstruct (4 items/strand is 
 1. Grade 1 sequence: Robot must move **right, right, down** from the top left to a star drawn two squares right and one square down. Which three move cards work? Key: R, R, D (equivalent routes accepted only if goal and obstacle rules permit).
 2. Grade 2 pattern: “The robot repeats *up, right, up, right*. What is move 7?” Key: up.
 3. Grade 3 conditional trace: “If the light is red, stop; otherwise move one square. Red, green, green: how many squares?” Key: 2. This is 1 rule and 3 inputs, not a language comprehension test.
-4. Grade 4 debugging: “A program intends to visit (1,0) then (1,1) from (0,0). Instructions: right, right, up. Which single step should change?” Key: second right -> a nonmovement/other valid sequence must be specified. **Authoring caution:** this example has no single-edit repair under the original three-command length if all three commands must be directional moves; reject it as an item. Its presence demonstrates the need for mechanical item-oracle testing.
+4. Grade 4 debugging: “A robot starts at (0,0). Its goal is (2,1). Three commands say right, up, down. Which one command must change to reach the goal?” Key: third command down -> right (path right, up, right). The item oracle must verify there is a unique valid one-command correction.
 
 ## Validation and governance
 - Check external construct alignment with independent CT/CS educator; run response-process interviews; trial psychometric properties on multiple grades.
