@@ -246,10 +246,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:17:18.881Z",
-      "sourceDigest": "0764330a0eb1d0f0de52e6494635691ceb2d2e361fed74bfc6e179f1a24acb93",
+      "reviewedAt": "2026-11-19T20:26:04.542Z",
+      "sourceDigest": "b60026d028b7e65892f3e661df13ed1544ded45c543da90f6383b8b3135c77c6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed original Mind Your Jems art and local gameplay against the current app and newly merged PR48's design-only archetype modules. Routed the seven previously unmapped archetype modules and the design charter; no claim of installed playable archetypes or changed runtime is made."
+      "reviewReason": "Reviewed ready-state feedback relocation for both compact portrait and landscape, preserving warning hints and art clearance. Includes newly registered design-only archetype paths."
     },
     {
       "id": "learning",
@@ -395,10 +395,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:12:55.026Z",
-      "sourceDigest": "05824b800911721c3affe036b0eccb12795d2796ada19d2eb0562ab4e89def82",
+      "reviewedAt": "2026-11-19T20:26:04.542Z",
+      "sourceDigest": "75c5bf3398bbdad44ba9f5df80872cb29a2537e2e5da884cd71075e8d8bd47dd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
+      "reviewReason": "Reviewed compact portrait/landscape browser regressions and existing source-bound screenshot fidelity, with no relaxation of real gameplay, touch, learning, owner or security checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
