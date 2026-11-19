@@ -35,7 +35,8 @@
     "docs/problem-solving/README.md",
     "docs/problem-solving/BENCHMARKS.md",
     "docs/problem-solving/IMPLEMENTATION.md",
-    "docs/decisions/0011-formative-problem-solving-evidence.md"
+    "docs/decisions/0011-formative-problem-solving-evidence.md",
+    "docs/archetypes/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -58,7 +59,8 @@
     "docs/creation-studio/*.md",
     "docs/rewards/*.md",
     "docs/rewards/previews/*.md",
-    "docs/problem-solving/*.md"
+    "docs/problem-solving/*.md",
+    "docs/archetypes/*.md"
   ],
   "areas": [
     {
@@ -296,7 +298,8 @@
         "docs/assignment-005/*.md",
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/archetypes/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -305,13 +308,14 @@
         "server/quality/**",
         "server/sandbox/**",
         "server/testing/**",
-        "docs/game-intelligence/*.md"
+        "docs/game-intelligence/*.md",
+        "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:51.403Z",
-      "sourceDigest": "7f85771c47f30cc46436ae0c61338e56c7df2e0ecf3a47e9e179fdd8a5fed79d",
+      "reviewedAt": "2026-11-19T20:16:54.788Z",
+      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled conflicting generation and Docker paths with merged planning/art/review. Both request modes retain plan, playthrough, approved art and required repair captures; companion remains host-held and unchanged through attestation/publication. Existing quality runtime and resource/spending caps are preserved."
+      "reviewReason": "Reviewed the already-merged research-only archetype library against the existing game-generation and private worker contracts. Headless mechanics and archetype catalog are never installed as playable new engines or activated by this release."
     },
     {
       "id": "coach",
@@ -376,7 +380,8 @@
         "docs/brand/GEM_PROGRESS.md",
         "docs/brand/achievement-art/README.md",
         "docs/brand/LIBRARY_V1_2.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/archetypes/*.md"
       ],
       "sources": [
         "tests/**",
@@ -384,10 +389,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:57.416Z",
-      "sourceDigest": "59b3d84b558f2c11a98816df2602cdcafc562d9543db387b218e33e34fadebc1",
+      "reviewedAt": "2026-11-19T20:16:54.791Z",
+      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated parent, rewards, APS and brand browser assertions without removing existing gates; recorded 354 core units,32APS,57rewards,17parent,28maker,31Studio,18docs and asset results with source and environment limits.",
+      "reviewReason": "Reviewed added archetype contract and diversity tests, which assert safe refusal and compatibility with six native games. These are headless test outcomes and do not establish new production playable engines or child learning claims.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -425,10 +430,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T17:45:00.000Z",
-      "sourceDigest": "e4b1f93009089136ed0c8211ab63bd078615817966d4c709aba1800e5d40bd96",
+      "reviewedAt": "2026-11-19T20:16:54.791Z",
+      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the compatibility of manual reviewed-source Pages publication with the latest main problem-solving and delivery-architecture changes. Verified the exact source fingerprint from hosted documentation CI. Publishing remains manual, pinned to merged 079978f with known URLs, independently tested from the active default-branch workflow.",
+      "reviewReason": "Reviewed PR48 merge receipt and the static Pages release gate: latest successful source pin is 079978f while public main includes newer local features. Recorded this distinction; no backend pin or production activation is changed in this documentation-only fix.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -472,10 +477,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:58.183Z",
-      "sourceDigest": "6ab68bc6dd3433faaa7a012982d33dc46ed51c2cca2251c516193c5c861056cc",
+      "reviewedAt": "2026-11-19T20:16:54.791Z",
+      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged current parent and rewards registry routes with the formative feature; preserved required canonical documents and renumbered APS decision0011 because main owns lifetime-rewards decision0010.",
+      "reviewReason": "Added the already-merged archetype source family to canonical generation routing, documented its research-only scope and linked its contract. Existing source coverage, integration review and source fingerprint enforcement remain active.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

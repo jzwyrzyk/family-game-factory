@@ -1,5 +1,12 @@
 # jems delivery state
 
+## November 19 — PR48 archetype R&D source merge and pending production release
+
+[PR #48](https://github.com/jzwyrzyk/family-game-factory/pull/48) merged into public main as [`34b5306786c89f94a8f1824b5ded9800a22504e3`](https://github.com/jzwyrzyk/family-game-factory/commit/34b5306786c89f94a8f1824b5ded9800a22504e3). The 22 research archetypes, 77 proposed mechanics, 88 design patterns and headless logic are not production-enabled game engines or a paid builder change. This follow-up registers the newly merged paths in the canonical documentation reviewer; it does not merge any unfinished feature PRs.
+
+The most recent successful [manual pinned-source Pages release](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44583607482) published `079978f3034e007e8bbad1f43571aaa7867b5098` (as independently shown in its build log), despite the newer main source. The owner requested a separate coordinated release of previously merged app features. Before reporting it live, verify exact merged-source checks, existing Cloud Run compatibility and static site configuration, dispatch the reviewed Pages workflow, and confirm the external source marker and protected Adult pilot behavior. No deployment, paid model, model identity or guardian/child approval change occurs in this documentation patch.
+
+
 ## PR64 formative problem-solving — merged
 
 **Merge observed:** `2026-11-19T17:31:14Z` (`November 19, 2026, 12:31:14 p.m. America/New_York`). Under the owner’s November 19 authorization to merge once ready, [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64) merged into `main` as `09e43beb4405526117493ab27688b076136078f4`.
