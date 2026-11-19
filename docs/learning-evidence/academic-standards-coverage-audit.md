@@ -6,6 +6,8 @@
 1. [Full machine-readable standards crosswalk](michigan-grades-1-4-standard-crosswalk.json): **455 official-style codes** (including 189 lettered children), their parent-child links, grade, strand, official reference URL and exact/current Jems practice-tag evidence. Not published full standards text.
 2. [Educator-review queue](primary-standard-review-queue.csv): **266 primary standards**, children, corresponding Jems skills, flagged gaps, next action, review priority and empty sign-off fields.
 3. [Original 121-skill audit](current-practice-inventory.csv): per-unit Jems practice skill references.
+3a. [Source content modality footprint](practice-content-footprint.csv): all 73 math generator cases and all 192 authored ELA items, including formats and actual passage word counts.
+3b. [Targeted false-positive tag / partial alignment review](standard-tag-fidelity-risks.md): cases where an existing tag likely exceeds what the question actually demonstrates.
 4. [Tests](../../tests/learning-evidence-crosswalk.test.mjs): fail on unknown standard tags, missing child parents, subject/grade misalignment, silently changed skill inventory, and unvalidated claims.
 5. Research provenance, source permissions and later test blueprint in this directory. This is **not** a secure assessment item bank.
 
@@ -58,6 +60,8 @@
 | Speaking & Listening (SL) | 24 | **0** | **24** |
 | Language (L) | 23 | 12 | 11 |
 | **Total** | **166** | **26** | **140** |
+
+**Confirmed actual item-bank profile:** 192 ELA items, 178 multiple choice, 4 unscored creative prompts, and 44 unique passage items with text length 9–27 words. See [content-level source audit](standard-tag-fidelity-risks.md). Those short passages cannot substantiate full grade-level reading complexity.
 
 **Critical ELA gaps:**
 - Grades 1–4: *authentic connected-text comprehension*, not just a short isolated passage and multiple choice. `RL.1.10`–`RL.4.10`, `RI.1.10`–`RI.4.10` reading-complexity benchmarks are not directly tagged.
