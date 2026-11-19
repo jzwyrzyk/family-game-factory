@@ -4,6 +4,8 @@ This is a map of the **implemented source architecture**, not an assertion that 
 
 **Reviewed source:** this feature starts from verified `main` [`079978f3034e007e8bbad1f43571aaa7867b5098`](https://github.com/jzwyrzyk/family-game-factory/commit/079978f3034e007e8bbad1f43571aaa7867b5098), the merge of [PR55](https://github.com/jzwyrzyk/family-game-factory/pull/55). It includes the previously reviewed trusted devices, private coach/dictation, Game Intelligence, canonical documentation, and same-site adult/guardian-consent integration. The Creation Studio additions below describe `feature/jems-creation-lab-20261119`; they are not a deployment claim. The linked paths follow the branch being read; reconcile with its actual commit before making changes. Historical live observations retain their dates in the delivery ledger.
 
+**Latest main integration:** merge preparation also includes `8b915b26e1f4be4b1523b6803cb6549d228f3e83` ([PR61](https://github.com/jzwyrzyk/family-game-factory/pull/61)). Its private-coach build verifier ignores explicit read-only execution metadata while preserving exact executable-step checks. The Creation Studio application changes and runtime boundaries are unchanged by that integration.
+
 ## System boundaries
 
 Jems is a TypeScript/Vite browser application with local curated play, revisions and learning. Remote generation uses an authenticated gateway, durable private state, a separate private GitHub Actions worker and an isolated preview origin. Conversational inference and short speech transcription use a separate private service; they do not generate games or dispatch builds.

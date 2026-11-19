@@ -292,10 +292,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T06:39:53.269Z",
-      "sourceDigest": "bcef53b147fc2126cddaa045d727100e44e9cc3870f151cd86e25e4742668c73",
+      "reviewedAt": "2026-11-19T06:43:19.293Z",
+      "sourceDigest": "27c1d673fc6e5fd745f5c64f10fa6754fec3bf9764238ef874aeef2984acaea7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded local hardening candidate 6f5177e with passing scoped build, 72 creation checks, 296 existing units, editor journeys and eight recovery cases; retained original failed CI and separate final-head CI/release boundaries."
+      "reviewReason": "Integrated main8b915b2 and PR61 coach verifier: reviewed read-only execution metadata exclusions, exact executable-step comparison and preserved image-recovery evidence alongside Creation Studio hardening; combined source fingerprint retains both changes without deployment or paid activation."
     },
     {
       "id": "context",

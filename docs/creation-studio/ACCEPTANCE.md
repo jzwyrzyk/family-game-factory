@@ -94,3 +94,7 @@ The local implementation candidate is **`6f5177eff1943c8b6d094162771d35faf17b86d
 - [Updated recovery browser result](evidence/merge-creation-recovery-results.json).
 
 A later evidence-only commit adds this record without changing application/test behavior. The connected GitHub publication may have a different commit ID; PR #62 records the exact matching tree and its new-head CI. All candidate-specific failures and earlier results above retain their original scope.
+
+### Integration with the latest main
+
+During merge preparation, main advanced to **`8b915b26e1f4be4b1523b6803cb6549d228f3e83`**, merging PR61. This branch retains its private-coach build-verification correction, focused regression and dated image-recovery document. Only the documentation review registry conflicted; the resolution preserves Creation Studio routing/reviews and refreshes the delivery fingerprint against both sets of source changes. No Creation Studio application or test file changed during this main integration. The eight focused private-coach deployment tests pass after integration, including rejection of unexpected executable settings. Final PR-head CI must include this combined tree.
