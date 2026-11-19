@@ -17,7 +17,9 @@ export interface MechanicDefinition {
 }
 export interface ArchetypeDefinition {
   readonly id:string;readonly title:string;readonly family:Family;readonly input:Input;
-  readonly engine:Engine;readonly loop:string;readonly coreMechanics:readonly string[];
+  readonly engine:Engine;readonly loop:string;
+  /** Examples of common rules, NOT mandatory features for every child or variant. */
+  readonly coreMechanics:readonly string[];
   readonly nativeExample?:GameId;
 }
 
