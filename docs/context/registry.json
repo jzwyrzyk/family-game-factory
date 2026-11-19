@@ -272,10 +272,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T06:35:42.196Z",
-      "sourceDigest": "8913995482f80982357364fa610a80a35dbf952eb6779b07a3b60c98182a4e8b",
+      "reviewedAt": "2026-11-19T06:43:05.613Z",
+      "sourceDigest": "e5a5506bdf87652b062fccfbb538d7c12e92a2f153faa29488b21e44df0a374a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the current-head hosted moving-button failure, its minimal product fix, approved mascot source and executed visual/build scope; current merge and publication receipts remain tracked on PR58."
+      "reviewReason": "Preserved PR61 coach build verification, tests and recovery evidence while recording the exact owner-only mascot Site publication, rollback reference and scoped e3136cd Gem Factory CI pass; integrated-head checks and merge remain pending."
     },
     {
       "id": "context",

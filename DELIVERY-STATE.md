@@ -200,6 +200,36 @@ whether that journey now passes; earlier 6-test and 351-test receipts retain
 their own source scopes. PR58 records current-head checks and the exact Site
 publication/merge receipt as each completes.
 
+### Observed mascot publication and main integration
+
+At `2026-11-19T06:40:30.277655Z`, the existing owner-only Gem Factory Site
+successfully published application source
+`e3136cd640828a1393195a60bbea2b21c3c3cd81`, tree
+`e42e8350b4b014eab80b04fdb5b7681611ee4ae5`. The Site source is
+`6a885aedb83b898076bbc32803b94756b92d9762`, version
+`appgprj_6afe77f999c88191ad29de2fc463a5a8~appgver_1deedbc3601c819197f7bad26cefa138`,
+deployment `appgdep_6afe99d7295881918a3c89baf4fb91f9` (**succeeded**).
+The preceding working Site source `b7129647b7950d17bd66b5cb9f1116f2d4958f82`,
+deployment `appgdep_6afe959dde7c81919928264b984c30e8` (version 3), is the rollback
+reference. The published page retained its ChatGPT sign-in gate; the
+[actual companion screenshot](docs/brand/screenshots/gem-factory-gem-companion.jpg)
+comes from the matching local Site preview. No provider service was activated.
+
+The [dedicated Gem Factory hosted job](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44473444324/job/135388193976)
+passed on `e3136cd`: desktop, tablet, phone and reduced-motion journeys covered
+direct bucket routing/recovery, next-in-pattern answers, all wrapping designs,
+pause/cancel, learning checkpoints and profile separation. This supersedes the
+unexecuted/failed browser status above only for this exact source and suite;
+other final-head checks and the merge remain separate observations.
+
+During the merge preparation, main advanced to
+`8b915b26e1f4be4b1523b6803cb6549d228f3e83` through [PR61](https://github.com/jzwyrzyk/family-game-factory/pull/61).
+The integration preserves its private-coach Cloud Build verification correction,
+tests and image-recovery record. The only conflict was the delivery review
+record, which was reconciled against the combined sources. This integration
+changes no Gem Factory gameplay or artwork; the final integrated PR head must
+still pass its hosted checks before merging.
+
 ## How to record the next state
 
 For each changed claim, record **what**, **which repository/commit/image/service**, **environment and audience**, **observation time**, **source link**, **observed result**, and **remaining uncertainty**. For a deployment include the prior working revision/rollback reference. For a test include whether it used fixtures, synthetic real-provider inputs, actual devices, or observed people. Keep private operational/consent evidence in its approved private location and link a safe reference; never copy secrets or child content here.
