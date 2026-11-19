@@ -1,10 +1,11 @@
 import './style.css';
 import { captureParentSnapshot, type ParentSnapshot } from './snapshot';
 import type { ParentEvidence, ParentOpportunity, ParentRange, ParentSkillRow, ParentSubjectId, ParentSubjectReport } from './model';
+import { hasRecordedSupport } from './model';
 
 type Tab = 'overview' | 'skills' | 'evidence' | 'school' | 'settings';
 const labels: Record<ParentSubjectId, string> = { math: 'Math', language: 'Language Arts', creation: 'Computational Thinking', 'problem-solving': 'Problem Solving' };
-const symbols: Record<ParentSubjectId, string> = { math: '＋', language: 'Aa', creation: '{ }', 'problem-solving': '↗' };
+const symbols: Record<ParentSubjectId, string> = { math: '+', language: 'Aa', creation: '{ }', 'problem-solving': '↗' };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, cls = '', text = '') => {
   const n = document.createElement(tag); n.className = cls; if (text) n.textContent = text; return n;
 };
@@ -37,7 +38,7 @@ export function installParentDashboard() {
   const heading = node('header', 'pd-hero');
   const heroCopy = node('div', 'pd-hero-copy');
   heroCopy.append(node('div', 'pd-eyebrow', 'JEMS FOR GROWN-UPS'), node('h1', '', 'Small discoveries. Real progress.'), node('p', '', 'See what they tried, how they did it, and what could help next.'));
-  const art = node('img', 'pd-companion'); art.src = './jems-gem-companion.png'; art.alt = ''; art.width = 130; art.height = 130;
+  const art = node('img', 'pd-companion'); art.src = './jems-art/character_spark_wave.webp'; art.alt = ''; art.width = 130; art.height = 130; art.loading = 'lazy'; art.decoding = 'async';
   heading.append(heroCopy, art); shell.append(heading);
   const toolbar = node('div', 'pd-toolbar');
   const childLabel = node('label', 'pd-select-label'); childLabel.append(node('span', '', 'Learner'));
@@ -131,7 +132,7 @@ export function installParentDashboard() {
     for (const domain of data.subjects) {
       const card = button('', () => chooseSubject(domain.id), `pd-domain-card pd-${domain.id}`); card.dataset.parentSubject = domain.id; card.dataset.parentDomain = domain.id;
       card.append(node('span', 'pd-domain-icon', symbols[domain.id]), node('h3', '', labels[domain.id]));
-      if (!domain.available) { card.append(node('strong', 'pd-domain-value pd-domain-unavailable', 'Not connected'), node('p', '', 'This build does not yet supply this evidence.')); }
+      if (!domain.available) { card.append(node('strong', 'pd-domain-value pd-domain-unavailable', domain.availability === 'read-error' ? 'Records unavailable' : 'Not connected'), node('p', '', domain.availability === 'read-error' ? 'Saved records could not be read. See the report notice for recovery options.' : 'This build does not yet supply this evidence.')); }
       else if (!domain.period.records) { card.append(node('strong', 'pd-domain-value pd-domain-unavailable', 'Ready to explore'), node('p', '', 'No retained observations in this period.')); }
       else {
         const count = domain.id === 'problem-solving' ? domain.period.records : domain.period.completed;
@@ -225,7 +226,7 @@ export function installParentDashboard() {
     select.value = value; select.onchange = () => onChange(select.value); return select;
   }
   function renderSkills(panel: HTMLElement) {
-    panel.append(titleBlock('Skills & progress', 'Skill descriptions stay separate from this period’s activity. Open a skill to inspect its evidence.'));
+    panel.append(titleBlock('Skills & progress', 'Math and Language Arts skill status: all recorded practice. Activity counts: selected period. Creation and Problem Solving status: selected-period observations.'));
     const filters = node('div', 'pd-filters');
     const domain = subjectSelector(subject, true, (value: ParentSubjectId | 'all') => { subject = value; render(); }); domain.setAttribute('aria-label', 'Filter skills by learning area');
     const state = node('select'); state.setAttribute('aria-label', 'Filter skills by evidence');
@@ -242,9 +243,9 @@ export function installParentDashboard() {
     const domains = snapshot!.dashboard.subjects.filter(d => subject === 'all' || d.id === subject);
     let total = 0;
     for (const domain of domains) {
-      const matching = domain.skills.filter(skill => (!query || skill.title.toLowerCase().includes(query.toLowerCase())) && (skillFilter === 'all' || skillFilter === 'observed' && skill.period.records > 0 || skillFilter === 'unobserved' && !skill.period.records || skillFilter === 'review' && skill.reviewDue || skillFilter === 'uncertain' && skill.period.unknownAttribution > 0 || skillFilter === 'support' && (skill.subject === 'creation' ? skill.period.withHint > 0 : skill.subject === 'problem-solving' ? skill.period.withContentHelp > 0 : skill.period.supported > 0)));
+      const matching = domain.skills.filter(skill => (!query || skill.title.toLowerCase().includes(query.toLowerCase())) && (skillFilter === 'all' || skillFilter === 'observed' && skill.period.records > 0 || skillFilter === 'unobserved' && !skill.period.records || skillFilter === 'review' && skill.reviewDue || skillFilter === 'uncertain' && skill.period.unknownAttribution > 0 || skillFilter === 'support' && hasRecordedSupport(skill)));
       const section = node('section', `pd-skill-section pd-${domain.id}`); section.append(titleBlock(labels[domain.id]));
-      if (!domain.available) { section.append(empty('Not connected in this build', 'This learning area will show evidence when its reviewed observation source is connected.')); rows.append(section); continue; }
+      if (!domain.available) { section.append(domain.availability === 'read-error' ? empty('Could not read saved records', 'This is a reporting problem, not a learner result. Existing data has not been changed. Open Settings to review backup and recovery options.') : empty('Not connected in this build', 'This learning area will show evidence when its reviewed observation source is connected.')); rows.append(section); continue; }
       if (!matching.length) continue;
       for (const skill of matching) { section.append(skillCard(skill)); total++; }
       rows.append(section);
@@ -333,7 +334,7 @@ export function installParentDashboard() {
     const captured = snapshot!;
     const lines = ['JEMS · PARENT CONVERSATION SUMMARY', captured.name, `${periodLabel()} · Generated ${date(captured.dashboard.through)}`, '', 'LOCAL FORMATIVE OBSERVATIONS', 'These are Jems task observations, not a standardized score, school grade, diagnosis, or comparison with other children.', 'Only retained dated records are included. Each subject uses its own activity rules.', '', ...captured.warnings.map(warning => 'REPORT NOTICE: ' + warning), ...captured.dashboard.notes.map(note => 'RECORD LIMIT: ' + note), ''];
     for (const domain of captured.dashboard.subjects) {
-      lines.push(labels[domain.id], !domain.available ? 'Not connected in this build.' : domain.id === 'problem-solving' ? `${domain.period.records} reviewed observations; ${domain.period.completed} matched the task rule; ${domain.period.noContentHelp} with no content help recorded; ${domain.period.withContentHelp} with content help recorded; ${domain.period.unknownAttribution} with unknown attribution. These are task observations, not mastery.` : domain.id === 'creation' ? `${domain.period.records} scene/version checks; ${domain.period.completed} matched; ${domain.period.matchedWithoutHint} matches without a recorded hint; ${domain.period.matchedWithHint} matches with a hint. A scene match is not an independent ability score.` : `${domain.period.records} retained records; ${domain.period.completed} completed; ${domain.period.independent} independent completions; ${domain.period.supported} completed with recorded support.`, '');
+      lines.push(labels[domain.id], !domain.available ? domain.availability === 'read-error' ? 'Saved records could not be read. No learner performance result is inferred.' : 'Not connected in this build.' : domain.id === 'problem-solving' ? `${domain.period.records} reviewed observations; ${domain.period.completed} matched the task rule; ${domain.period.noContentHelp} with no content help recorded; ${domain.period.withContentHelp} with content help recorded; ${domain.period.unknownAttribution} with unknown attribution. These are task observations, not mastery.` : domain.id === 'creation' ? `${domain.period.records} scene/version checks; ${domain.period.completed} matched; ${domain.period.matchedWithoutHint} matches without a recorded hint; ${domain.period.matchedWithHint} matches with a hint. A scene match is not an independent ability score.` : `${domain.period.records} retained records; ${domain.period.completed} completed; ${domain.period.independent} independent completions; ${domain.period.supported} completed with recorded support.`, '');
     }
     lines.push('EXAMPLES TO DISCUSS');
     for (const item of captured.dashboard.evidence.slice(0, 12)) lines.push(`${date(item.at)} · ${labels[item.subject]} · ${item.skillTitle}`, item.observation, `Task: ${item.prompt.slice(0, 2000)}`, `First response: ${item.firstResponse?.slice(0, 1000) ?? 'Not recorded'}`, `Final response: ${item.finalResponse?.slice(0, 1000) ?? 'Not recorded'}`, `Support: ${item.support.join('; ') || 'No support recorded; help outside Jems is unknown.'}`, `Source: ${[item.context.source, item.context.gameId, item.context.projectId, item.context.revisionId, item.context.itemId].filter(Boolean).join(' / ') || 'Local activity'}`, ...(item.provenance ? [`Authorship: ${item.provenance.authorship}; help: ${item.provenance.support}; elicitation: ${item.provenance.elicitation}`, `Task family: ${item.context.taskFamily ?? 'Unknown'}; version: ${item.context.taskVersion ?? 'Unknown'}; exposure: ${item.context.exposure ?? 'Unknown'}; first attempt: ${String(item.context.firstAttempt ?? 'Unknown')}`] : []), '');

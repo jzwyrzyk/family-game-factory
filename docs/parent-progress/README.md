@@ -3,7 +3,11 @@
 **Feature contract — November 19, 2026.** This describes the parent-area source on
 `feature/jems-parent-progress-20261119`, not a production deployment or validated
 learning outcome. [Delivery state](../../DELIVERY-STATE.md) owns release evidence.
-The [research and comparison record](RESEARCH.md) explains the design choices.
+The [research and comparison record](RESEARCH.md) explains the design choices;
+the [implementation ledger](IMPLEMENTATION.md) records verification and limitations.
+The current integration includes main `c6576c16e005ae58ce8c706801414be4d864242e`
+with approved brand library v1.2 and PR57's cosmetic maker journey. Maker levels
+remain separate from the learning evidence described here.
 
 ## Purpose and boundaries
 
@@ -31,6 +35,10 @@ page is not a new access-control boundary; existing family/device controls apply
 The active profile owns every view. Switching profiles must clear old content and
 invalidate stale actions before another profile's evidence appears. Empty and
 unavailable states explain what has not been recorded without calling it weakness.
+An absent optional provider displays **Not connected**; a failed or malformed
+read displays **Records unavailable**, with a recovery notice. Failed sources
+contribute no results. Other readable areas remain available, and reporting does
+not overwrite the saved data that could not be read.
 
 ## Sources of evidence
 
@@ -81,6 +89,10 @@ assessment cut scores. Preserve first and final responses separately. Open writi
 shown solutions, skipped/interrupted activities, and missing responses must not
 silently become wrong answers. Keep read-aloud visible rather than describing all
 support as a hint; its meaning depends on the skill being observed.
+The **With recorded support** filter includes hints, retries, worked examples,
+and read-aloud even when the activity was not completed. This does not award a
+completion. Unknown Problem Solving support/authorship has its own filter and
+is not silently classified as either recorded help or independent performance.
 
 ## Date ranges, history, and charts
 
@@ -116,11 +128,12 @@ remain the recovery path for family data.
 
 ## Acceptance and follow-up
 
-The focused [model suite](../../tests/parent-dashboard.test.ts) passed **13/13**
-tests on this working tree on November 19, 2026. It covers response/help timing,
+The focused [model suite](../../tests/parent-dashboard.test.ts) passed **16/16**
+tests on this integration working tree on November 19, 2026. It covers response/help timing,
 completion semantics, calendar filters, owner isolation, repeated scene checks,
 missing and legacy evidence, optional Problem Solving provenance, recommendation
-traceability, and comparable-example selection. This is deterministic fixture
+traceability, comparable-example selection, unfinished support filtering, and
+the distinction between source absence and read failure. This is deterministic fixture
 evidence, not an assessment-validation study or final-head release receipt.
 
 Verify owner isolation, profile-switch clearing, retained-window versus cumulative

@@ -12,6 +12,18 @@ const STATE_KEY='family-game-factory-state-v1';
 const tabs=(page:Page,id:string)=>page.locator(`[data-parent-tab="${id}"]`);
 const visibleText=(page:Page)=>page.locator('#parentDashboard').innerText();
 const noOverflow=async(page:Page,label:string)=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,label+' stays within viewport');
+async function readableText(page:Page,selector:string) {
+  const samples=await page.locator(selector).evaluateAll(elements=>elements.map(element=>{
+    const rgb=(color:string)=>color.match(/[\d.]+/g)!.map(Number);
+    let background:Element|null=element,fill=[255,255,255,1];
+    while(background){const value=rgb(getComputedStyle(background).backgroundColor);if((value[3]??1)>0){fill=value;break;}background=background.parentElement;}
+    const light=(color:number[])=>color.slice(0,3).map(value=>{const channel=value/255;return channel<=0.04045?channel/12.92:Math.pow((channel+0.055)/1.055,2.4)}).reduce((sum,value,index)=>sum+value*[0.2126,0.7152,0.0722][index],0);
+    const ink=light(rgb(getComputedStyle(element).color)),paper=light(fill);
+    return {text:element.textContent?.slice(0,80),contrast:(Math.max(ink,paper)+0.05)/(Math.min(ink,paper)+0.05)};
+  }));
+  assert.ok(samples.length,selector+' is present');
+  for(const sample of samples)assert.ok(sample.contrast>=4.5,`${selector}: readable text contrast for ${sample.text} (observed ${sample.contrast.toFixed(2)})`);
+}
 async function demoLabel(page:Page) {
   await page.evaluate(()=>{
     if(document.getElementById('parentDemoLabel'))return;
@@ -46,10 +58,12 @@ async function main() {
     assert.equal(await tabs(emptyPage,'skills').getAttribute('aria-selected'),'true','keyboard tabs work');
     await emptyContext.close();results.push('empty histories, read-only reporting and keyboard tabs');
 
-    for(const [device,viewport] of [['desktop',{width:1440,height:1080}],['tablet',{width:820,height:1180}],['phone',{width:390,height:844}]] as const) {
+    for(const [device,viewport] of [['desktop',{width:1440,height:1080}],['tablet',{width:820,height:1180}],['phone',{width:390,height:844}],['small-phone',{width:320,height:800}]] as const) {
       const fixture=parentDashboardFixture();
       const context=await browser.newContext({viewport,hasTouch:device!=='desktop',reducedMotion:'reduce',acceptDownloads:true});
       await context.addInitScript(({state,creation,key,stateKey})=>{
+        // Seed only the app. Sandboxed game frames intentionally cannot access storage.
+        if(window !== window.top)return;
         if(!localStorage.getItem(stateKey))localStorage.setItem(stateKey,JSON.stringify(state));
         if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(creation));
       },{...fixture,key:CREATION_KEY,stateKey:STATE_KEY});
@@ -65,12 +79,20 @@ async function main() {
         assert.match(await page.locator('[data-parent-domain="math"]').innerText(),/24/);
         assert.match(await page.locator('[data-parent-domain="creation"]').innerText(),/1/,'identical scene checks count once');
         assert.doesNotMatch(await visibleText(page),/PRIVATE SIBLING SCENE/);
+        await readableText(page,'.pd-comparable-date');
+        await readableText(page,'#parentPanel-overview .pd-evidence-copy > strong');
         await noOverflow(page,device+' overview');await demoLabel(page);
+        await page.locator('.pd-companion').evaluate(async image=>{await (image as HTMLImageElement).decode();});
         await page.screenshot({path:`test-results/parent-dashboard/parent-overview-${device}.png`,fullPage:true});
+        if(device==='desktop'){await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'test-results/parent-dashboard/parent-overview-desktop-top.png'});}
         await page.locator('#parentReportRange').selectOption('7');
         assert.doesNotMatch(await page.locator('[data-parent-domain="math"]').innerText(),/24/,'date range changes counts');
         await page.locator('#parentReportRange').selectOption('all');
         assert.match(await page.locator('[data-parent-domain="math"]').innerText(),/24/);
+        await tabs(page,'skills').click();
+        await readableText(page,'.pd-skill-summary strong');
+        await noOverflow(page,device+' skills');
+        if(device==='desktop')await page.screenshot({path:'test-results/parent-dashboard/parent-skills-desktop.png',fullPage:true});
         await tabs(page,'evidence').click();
         await page.getByRole('combobox',{name:'Filter evidence by learning area'}).selectOption('creation');
         assert.equal(await page.locator('#parentPanel-evidence [data-evidence-id]').count(),2,'all repeated checks remain inspectable');
@@ -89,6 +111,7 @@ async function main() {
         await tabs(page,'school').click();
         assert.match(await page.locator('#parentPanel-school').innerText(),/SmartScore/);
         assert.match(await page.locator('#parentPanel-school').innerText(),/not convert/);
+        await readableText(page,'.pd-comparison th');
         await noOverflow(page,device+' school connections');
         if(device==='desktop')await page.screenshot({path:'test-results/parent-dashboard/parent-school-desktop.png',fullPage:true});
         const downloadPending=page.waitForEvent('download');await page.locator('#parentDownloadSummary').click();
@@ -122,6 +145,10 @@ async function main() {
         assert.match(await visibleText(page),/Demo Explorer Edited/);
         assert.deepEqual(errors,[]);assert.deepEqual(paid,[]);
         results.push(`${device}: filters, actual examples, repeated-check deduplication, school connections, private export, settings, sibling separation and reload`);
+      } catch(error) {
+        await page.screenshot({path:`test-results/parent-dashboard/failure-${device}.png`,fullPage:true}).catch(()=>{});
+        writeFileSync(`test-results/parent-dashboard/failure-${device}.json`,JSON.stringify({device,error:String(error),pageErrors:errors,paidRequests:paid},null,2));
+        throw error;
       } finally {await context.close();}
     }
     writeFileSync('test-results/parent-dashboard-browser.json',JSON.stringify({scope:'synthetic production-dist browser checks',results},null,2));

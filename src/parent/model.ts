@@ -9,6 +9,8 @@ import { CREATION_CHALLENGES, getCreationChallenge } from '../creation/challenge
 
 export type ParentRange = 7 | 30 | 90 | 'all';
 export type ParentSubjectId = 'math' | 'language' | 'creation' | 'problem-solving';
+export type ParentUnavailableReason = 'not-connected' | 'read-error';
+export type ParentAvailability = 'available' | ParentUnavailableReason;
 export interface ParentLearningSnapshot<T> {
   /** The profile that supplied BOTH the report and retained attempts. */
   ownerId: string;
@@ -25,6 +27,8 @@ export interface ParentDashboardInput {
   creation?: CreationWorkspace;
   /** Optional trusted bridge. Its versioned records are checked again here. */
   problemSolving?: { ownerId: string; episodes: readonly unknown[]; discarded?: number };
+  /** Preserve absence versus read failure; a failed source contributes no results. */
+  unavailable?: Partial<Record<ParentSubjectId, ParentUnavailableReason>>;
 }
 export interface ParentPeriodCounts {
   records: number;
@@ -125,6 +129,7 @@ export interface ParentSubjectReport {
   id: ParentSubjectId;
   title: string;
   available: boolean;
+  availability: ParentAvailability;
   period: ParentPeriodCounts;
   /** All selected records including repeated identical scene checks. */
   historyRecords: number;
@@ -149,6 +154,14 @@ export interface ParentExamplePair {
   subject: 'math' | 'language'; skillId: string; title: string;
   earlierId: string; laterId: string; earlierAt: number; laterAt: number;
   form: string; tier: number; conditionNote: string;
+}
+
+/** Recorded help/correction can matter even when an activity was not completed. */
+export function hasRecordedSupport(skill: Pick<ParentSkillRow, 'subject' | 'period'>): boolean {
+  const counts = skill.period;
+  if (skill.subject === 'creation') return counts.withHint > 0;
+  if (skill.subject === 'problem-solving') return counts.withContentHelp > 0;
+  return counts.supported + counts.withHint + counts.readAloud + counts.shown + counts.retries > 0;
 }
 
 const TITLES: Record<ParentSubjectId, string> = {
@@ -484,16 +497,22 @@ export function buildParentDashboard(input: ParentDashboardInput): ParentDashboa
   const start = new Date(now); start.setHours(0, 0, 0, 0);
   if (range !== 'all') start.setDate(start.getDate() - range + 1);
   const from = range === 'all' ? null : start.getTime();
+  const mathSource = input.unavailable?.math ? undefined : input.math;
+  const languageSource = input.unavailable?.language ? undefined : input.language;
+  const creationSource = input.unavailable?.creation ? undefined : input.creation;
+  const problemSource = input.unavailable?.['problem-solving'] ? undefined : input.problemSolving;
   const allEvidence = [
-    ...practiceEvidence('math', input.math?.attempts ?? [], now),
-    ...practiceEvidence('language', input.language?.attempts ?? [], now),
-    ...creationEvidence(input.creation, input.ownerId, now),
-    ...problemEvidence(input.problemSolving, input.ownerId, now),
+    ...practiceEvidence('math', mathSource?.attempts ?? [], now),
+    ...practiceEvidence('language', languageSource?.attempts ?? [], now),
+    ...creationEvidence(creationSource, input.ownerId, now),
+    ...problemEvidence(problemSource, input.ownerId, now),
   ].sort((a, b) => b.at - a.at || a.id.localeCompare(b.id));
   const evidence = allEvidence.filter(e => from === null || e.at >= from);
   const subjects = (Object.keys(TITLES) as ParentSubjectId[]).map(id => {
     const rows = evidence.filter(e => e.subject === id), overview = id === 'creation' ? distinctChecks(rows) : rows;
-    const snapshot = id === 'math' ? input.math : id === 'language' ? input.language : null;
+    const snapshot = id === 'math' ? mathSource : id === 'language' ? languageSource : null;
+    const availability: ParentAvailability = input.unavailable?.[id] ??
+      (snapshot || id === 'creation' && creationSource || id === 'problem-solving' && problemSource ? 'available' : 'not-connected');
     const notices = id === 'math' || id === 'language'
       ? ['Date-filtered counts use retained detailed activities (up to 120 per subject). Older skill summaries may remain after detailed records expire.',
         'First-response results and eventual completion are different. A retry, hint, or read-aloud remains visible.',
@@ -502,10 +521,11 @@ export function buildParentDashboard(input: ParentDashboardInput): ParentDashboa
         'No hint recorded does not prove unaided authorship. These checks do not establish general coding mastery.']
         : ['Only completed structured activities contribute skill observations. Source context, interrupted work, and technical failures do not count as wrong.',
           'No content help recorded includes access support; help outside the app may not be recorded. These are not standardized scores.'];
-    if (id === 'problem-solving' && !input.problemSolving) notices.unshift('The problem-solving evidence provider is not connected in this build. No performance result is inferred.');
-    if (id === 'problem-solving' && input.problemSolving && Number.isSafeInteger(input.problemSolving.discarded) && input.problemSolving.discarded! > 0) notices.push(`${input.problemSolving.discarded} older middle records were removed by the existing retention limit.`);
+    if (availability === 'read-error') notices.unshift('Saved records could not be read. No performance result is inferred; existing data has not been changed.');
+    else if (id === 'problem-solving' && availability === 'not-connected') notices.unshift('The problem-solving evidence provider is not connected in this build. No performance result is inferred.');
+    if (id === 'problem-solving' && problemSource && Number.isSafeInteger(problemSource.discarded) && problemSource.discarded! > 0) notices.push(`${problemSource.discarded} older middle records were removed by the existing retention limit.`);
     return {
-      id, title: TITLES[id], available: !!(snapshot || id === 'creation' && input.creation || id === 'problem-solving' && input.problemSolving),
+      id, title: TITLES[id], available: availability === 'available', availability,
       period: countEvidence(overview), historyRecords: rows.length, collapsedChecks: id === 'creation' ? rows.length - overview.length : 0,
       latestAt: rows[0]?.at ?? null,
       skills: id === 'math' || id === 'language' ? learningSkills(id, snapshot?.report, rows, now) : observedSkills(id, overview),

@@ -32,6 +32,10 @@ jobs:
           node-version: '22'
       - name: Exercise documentation failure paths
         run: node --test scripts/tests/check-docs.test.mjs
+      - name: Print deterministic review digests for inspected areas
+        if: ${{ !cancelled() }}
+        run: |
+          node --input-type=module -e 'import {sourceDigest} from "./scripts/check-docs.mjs"; import {readFileSync} from "node:fs"; const r=JSON.parse(readFileSync("docs/context/registry.json","utf8")); for (const a of r.areas) console.log("DOC_SOURCE_DIGEST",a.id,sourceDigest(process.cwd(),a));'
       - name: Check reference integrity and reviewed source
         if: ${{ !cancelled() }}
         run: node scripts/check-docs.mjs check --report test-results/documentation-context.md

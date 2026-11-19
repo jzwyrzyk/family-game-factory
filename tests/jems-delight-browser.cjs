@@ -1,5 +1,6 @@
 /* jems joy layer contract: durable idea, color zones and respectful motion. */
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
+const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
 (async()=>{
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
@@ -16,7 +17,7 @@ const {start}=require('./browser-server.cjs');
   }
   await page.locator('#studioNew').click();
   assert.equal(await page.locator('.jems-empty-workbench').count(),1);
-  assert.ok(await page.locator('.jems-empty-workbench').evaluate(img=>img.complete&&img.naturalWidth>0));
+  assert.ok(await page.locator('.jems-empty-workbench').evaluate(async img=>{await img.decode();return img.complete&&img.naturalWidth>0;}));
   assert.deepEqual(await page.evaluate(()=>window.__jemsMilestones),[],'opening blank canvas is not an accomplishment');
   await page.locator('#studioPrompt').fill('A cat drives a donut spaceship around the moon');
   await page.locator('#studioTalk').click();
@@ -48,6 +49,28 @@ const {start}=require('./browser-server.cjs');
   assert.equal(await p.locator('.jems-delight-toast').evaluate(e=>getComputedStyle(e).animationName),'none');
   await p.evaluate(()=>window.dispatchEvent(new CustomEvent('jems:milestone',{detail:{kind:'unsupported'}})));
   assert.equal(await p.locator('.jems-delight-toast').count(),1,'unsupported events ignored');
+  const evidence=await p.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()));
+  await p.evaluate(()=>window.dispatchEvent(new CustomEvent('jems:milestone',{detail:{kind:'gem-cut',character:'nova',level:4}})));
+  assert.equal(await p.locator('.jems-delight-toast .jems-rank-thumbnail').getAttribute('data-character'),'nova');
+  assert.equal(await p.locator('.jems-delight-toast .jems-character-art').getAttribute('data-level'),'4','a project event respects the maker’s current earned outfit');
+  assert.equal(await p.locator('.jems-delight-toast .jems-gem-art').count(),0,'progress celebration uses the human rank thumbnail');
+  assert.equal(await p.locator('.jems-delight-toast').evaluate(e=>getComputedStyle(e).pointerEvents),'none','rank artwork never intercepts play controls');
+  await p.evaluate(()=>window.dispatchEvent(new CustomEvent('jems:milestone',{detail:{kind:'builder-master',character:'spark',level:4}})));
+  await p.evaluate(()=>document.fonts.ready);
+  const mobilePopup=await p.locator('.jems-delight-toast').evaluate(toast=>({
+   left:toast.getBoundingClientRect().left,right:toast.getBoundingClientRect().right,
+   tile:toast.querySelector('.jems-rank-thumbnail').getBoundingClientRect().width,
+   fits:toast.querySelector('.jems-delight-copy').scrollWidth<=toast.querySelector('.jems-delight-copy').clientWidth+1,
+   font:getComputedStyle(toast.querySelector('strong')).fontFamily
+  }));
+  assert.ok(mobilePopup.left>=0&&mobilePopup.right<=390&&mobilePopup.fits,'rank popup and text fit the 390px viewport');
+  assert.equal(Math.round(mobilePopup.tile),96,'mobile popup keeps the approved 96px full-figure tile');
+  assert.match(mobilePopup.font,/Nunito/,'rank title uses the approved rounded brand font');
+  fs.mkdirSync('test-results',{recursive:true});
+  await p.screenshot({path:'test-results/jems-rank-popup-mobile.png'});
+  assert.equal(await p.evaluate(()=>JSON.stringify(FG.studio.exportNotebook())),evidence,'rendering a celebration cannot award or persist progress');
+  await p.evaluate(()=>window.dispatchEvent(new Event('factory-profile')));
+  assert.equal(await p.locator('#jems-delight-host').evaluate(host=>host.childElementCount),0,'changing profile clears the previous maker celebration');
   assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
   await reduced.close();
   console.log('PASS jems joy: illustrated favorites, actual first saved idea, no spam, English accent, reduced motion');

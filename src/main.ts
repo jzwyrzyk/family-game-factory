@@ -13,6 +13,7 @@ void initBuilder().then(installAdultProfile);
 
 import {installJemsDelight} from './brand/delight';
 import './brand/delight.css';
+import './brand/journey.css';
 installJemsDelight();
 
 import {installOffline} from './offline';

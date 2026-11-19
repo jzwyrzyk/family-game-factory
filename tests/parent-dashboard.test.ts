@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildParentDashboard, type ParentDashboardInput } from '../src/parent/model';
+import { buildParentDashboard, hasRecordedSupport, type ParentDashboardInput } from '../src/parent/model';
+import { captureParentSnapshot } from '../src/parent/snapshot';
 import { beginAttempt, ensureLearning, finishAttempt, report, submitAnswer, useHint, recordLegacyOutcome } from '../src/learning/engine';
 import { generateItem } from '../src/learning/content';
 import { beginLanguageAttempt, ensureLanguage, finishLanguageAttempt, recordLanguageReadAloud, reportLanguage, submitLanguageAnswer } from '../src/language/engine';
@@ -209,4 +210,60 @@ test('same-day repetition and a different latest format do not manufacture compa
   const visual = generateItem('g3-multiply', { factId: 'mul:8x7', representation: 'visual', random: () => 0.2 });
   const a = beginAttempt(p, visual, { now: NOW - 1500 }); submitAnswer(p, a.id, String(visual.answer), NOW - 1000);
   assert.equal(buildParentDashboard(snap(p)).comparisons.length, 0, 'do not pick an older favorable latest result just to create a pair');
+});
+
+test('recorded-support filter includes unfinished hints, worked examples and read-aloud without awarding completion', () => {
+  const p = learner(), hinted = beginAttempt(p, item(), { now: NOW - 5000 });
+  useHint(p, hinted.id, 1, NOW - 4900); finishAttempt(p, hinted.id, 'interrupted', NOW - 4800);
+  math(p, NOW - 4000, 'shown');
+  const languageItem = generateLanguageItem('g2-cause-effect', { random: () => 0.3 });
+  const read = beginLanguageAttempt(p, languageItem, { now: NOW - 2000 });
+  recordLanguageReadAloud(p, read.id, NOW - 1900); finishLanguageAttempt(p, read.id, 'interrupted', NOW - 1800);
+  const result = buildParentDashboard(snap(p));
+  const mathSkill = result.subjects.find(s => s.id === 'math')!.skills.find(s => s.id === 'g3-multiply')!;
+  const languageSkill = result.subjects.find(s => s.id === 'language')!.skills.find(s => s.id === 'g2-cause-effect')!;
+  assert.equal(mathSkill.period.completed, 0); assert.equal(mathSkill.period.supported, 0);
+  assert.equal(mathSkill.period.withHint, 1); assert.equal(mathSkill.period.shown, 1);
+  assert.equal(languageSkill.period.completed, 0); assert.equal(languageSkill.period.readAloud, 1);
+  assert.equal(hasRecordedSupport(mathSkill), true); assert.equal(hasRecordedSupport(languageSkill), true);
+  const unknown = episode('unknown-help'); unknown.observations[0].support = 'unknown';
+  const ps = buildParentDashboard({ ownerId: 'child-a', now: NOW, problemSolving: { ownerId: 'child-a', episodes: [unknown] } });
+  assert.equal(hasRecordedSupport(ps.subjects.find(s => s.id === 'problem-solving')!.skills.find(s => s.id === 'plan_test')!), false, 'unknown help remains separate from recorded help');
+});
+
+test('source absence and read failure retain distinct typed reasons and failed sources contribute no results', () => {
+  const p = learner(); math(p, NOW - 5000);
+  const input = snap(p), absent = buildParentDashboard(input);
+  assert.equal(absent.subjects.find(s => s.id === 'math')!.availability, 'available');
+  assert.equal(absent.subjects.find(s => s.id === 'problem-solving')!.availability, 'not-connected');
+  const failed = buildParentDashboard({ ...input, creation: workspace(), problemSolving: { ownerId: 'child-a', episodes: [episode()] }, unavailable: { math: 'read-error', creation: 'read-error', 'problem-solving': 'read-error' } });
+  for (const id of ['math', 'creation', 'problem-solving']) {
+    const domain = failed.subjects.find(s => s.id === id)!;
+    assert.equal(domain.availability, 'read-error'); assert.equal(domain.available, false);
+    assert.equal(domain.period.records, 0); assert.equal(failed.evidence.some(e => e.subject === id), false);
+    assert.match(domain.notices[0], /could not be read/);
+    assert.ok(!domain.notices.some(note => note.includes('not connected')));
+  }
+});
+
+test('snapshot preserves storage and adapter read failures separately from an absent provider', () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  const p = learner(), before = JSON.stringify(p);
+  const FG = { store: { current: () => p }, problemSolvingEvidence: { list() { throw Error('Synthetic source failure'); } } };
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem() { throw Error('Synthetic storage failure'); } } });
+  try {
+    const failed = captureParentSnapshot(FG, 30, NOW);
+    assert.equal(failed.dashboard.subjects.find(s => s.id === 'creation')!.availability, 'read-error');
+    assert.equal(failed.dashboard.subjects.find(s => s.id === 'problem-solving')!.availability, 'read-error');
+    assert.equal(failed.warnings.length, 2);
+    const absent = captureParentSnapshot({ store: FG.store }, 30, NOW);
+    assert.equal(absent.dashboard.subjects.find(s => s.id === 'problem-solving')!.availability, 'not-connected');
+    const malformed = captureParentSnapshot({ store: FG.store, problemSolvingEvidence: { list: () => null } }, 30, NOW);
+    assert.equal(malformed.dashboard.subjects.find(s => s.id === 'problem-solving')!.availability, 'read-error');
+    assert.equal(malformed.dashboard.subjects.find(s => s.id === 'math')!.available, true);
+    assert.equal(JSON.stringify(p), before, 'report reads must not initialize the live learner');
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor);
+    else Reflect.deleteProperty(globalThis, 'localStorage');
+  }
 });
