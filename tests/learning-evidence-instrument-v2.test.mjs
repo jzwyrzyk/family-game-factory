@@ -42,11 +42,13 @@ test("secure bank validation and key redaction are required for delivery",()=>{
 });
 
 test("exact rational numeric scoring accepts equivalent fractions and decimals",()=>{
- for(const [value,expected] of [["0.75",1],["6/8",1],[".75",null],["3/4",1],["1 1/2",0],["0.5",0]]){
+ for(const [value,expected] of [["0.75",1],["6/8",1],[".75",1],["3/4",1],["1 1/2",0],["0.5",0]]){
   const r=score(numericSlot,bank.items[0],resp("NUM",value));
   assert.equal(r.points,expected===null?null:expected,value);
  }
  assert.equal(parseRational("1 1/2").n.toString(),"3");
+ assert.equal(parseRational("-0.5").n.toString(),"-5");
+ assert.equal(parseRational("-.5").n.toString(),"-5");
  assert.equal(parseRational("3/0"),null);
  assert.equal(parseRational("1e8"),null);
 });
