@@ -63,10 +63,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T12:57:24.202Z",
-      "sourceDigest": "d24e39014dffd1394fd967dc06d6d7dc52c160b4968ac1a7165a66f550f32f44",
-      "reviewOutcome": "updated",
-      "reviewReason": "Preserved current Creation Studio and adult/guardian doctrine while integrating approved ray-free identity, original four-rank maker portraits and brand library v1.2; earning and learning semantics remain unchanged."
+      "reviewedAt": "2026-11-19T15:03:30.676Z",
+      "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
     },
     {
       "id": "experience",
@@ -315,10 +315,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:39:49.831Z",
-      "sourceDigest": "f11b89808e6e8b82b00edb653f7da9476a706df106543c55072e1062512804ce",
+      "reviewedAt": "2026-11-19T15:03:31.282Z",
+      "sourceDigest": "42ab7a524f224769708b9edccb6edf6dc032f3bafb77f653546230103c2660bd",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved latest main eebeebeb and PR63 release receipts, PR58 hosted results, PR62 measurement limits and private worker14 status without duplicate capability rows. Reviewed the retained CI diagnostic as read-only source-digest output. Recorded current merge authorization separately from pending exact-candidate browser/CI and merge evidence; earlier launcher failures, smoke success and historical suite results retain their scopes."
+      "reviewReason": "Recorded observed PR57 merge c6576c16 at 2026-11-19T15:02:05Z, exact tree equality to tested source1488871/local879c93e, all four final hosted workflows, scoped local acceptance and the source-only release boundary. Preserved earlier receipts as historical and documented actual handbook coverage."
     },
     {
       "id": "context",
