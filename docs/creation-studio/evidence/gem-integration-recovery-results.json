@@ -1,0 +1,20 @@
+{
+  "sourceImplementationCommit": "0fc798d8e2131d9ffc1ee42afc1b248d3e04f489",
+  "matchingLocalImplementationCommit": "5c4717224b08004256706ae79498c24524b752de",
+  "matchingImplementationTree": "d5afceaaab0563711f91227cc56230e9190be9ee",
+  "mainIntegrated": "02bdb58d17d5687e39ab20bd884f02a18007ede5",
+  "productionBundle": "index-cszUlGZq.js",
+  "passed": 8,
+  "checks": [
+    "actual parent export includes scenes, immutable versions, Keep, source state and supported checks",
+    "provided null, false, unsupported schema and unknown artwork are rejected before any family write",
+    "corrupt scene bytes remain exportable and a recovery-only file cannot overwrite valid family data",
+    "a creation quota failure rolls back family, game and notebook writes and restores original corrupt scene bytes",
+    "a valid parent backup repairs corrupt current storage and retains hint history across reload and later checks",
+    "legacy family replacement without creation data clears old scenes and observations",
+    "a retired challenge reopens its preserved scene for free editing without fabricating a goal",
+    "unresolved recovery blocks edits, Keep, checks, playback, copy and history until explicit Resume or Use saved; both choices preserve their selected content"
+  ],
+  "errors": [],
+  "paidRequests": []
+}

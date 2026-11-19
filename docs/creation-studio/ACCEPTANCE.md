@@ -115,3 +115,10 @@ The semantic merge preserves the new generation contract rather than selecting e
 The combined application build and TypeScript check pass with production bundle **`index-cszUlGZq.js`**. **77 creation tests** and **354 existing unit tests** pass. A focused generation run passes 40 tests (nine budget, fourteen presentation, three illustrations, six pilot and eight preflight; these overlap the larger totals). Thirteen creation-generated checks include real raster bytes with synthetic quality captures, mutation/stale-binding rejection and companion retention through mandatory quality review. They use stubs and do not claim paid generation or a real container launch.
 
 The production Creation browser suite passes 19 listed checks in each of desktop 1440×1080 and touch-emulated tablet 820×1180, with reduced motion. The eight grouped recovery journeys pass. Both preserve zero unhandled page errors and zero paid requests. Source identity, browser results and any additional child/native-game observations are recorded in the integration evidence files and PR62's exact-head checks. Actual devices, live providers, child enjoyment and educational benefit remain outside these results.
+
+
+**Verified combined implementation:** [`0fc798d8e2131d9ffc1ee42afc1b248d3e04f489`](https://github.com/jzwyrzyk/family-game-factory/commit/0fc798d8e2131d9ffc1ee42afc1b248d3e04f489), whose complete tree `d5afceaaab0563711f91227cc56230e9190be9ee` matches local implementation `5c4717224b08004256706ae79498c24524b752de`. The existing child journey/build-continuity suite passes on desktop/mobile, and Gem Factory passes desktop/tablet/phone plus reduced-motion play. The evidence commit changes documentation/results only; source and test behavior remain identical. Final-head CI is recorded on PR62, separately from these local observations.
+
+- [Combined integration result](evidence/gem-integration-results.json).
+- [Desktop/tablet authoring result](evidence/gem-integration-browser-results.json).
+- [Recovery result](evidence/gem-integration-recovery-results.json).
