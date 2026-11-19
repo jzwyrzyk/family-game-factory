@@ -7,7 +7,7 @@ import type {GameId,Mechanics} from '../runtime/types';
 import {archetypeById,mechanicById,type Engine} from './catalog';
 import {inspectNative,nativeLinks} from './native';
 
-export type AssemblyRoute='existing-native-interpreter'|'prototype-only'|'generation-required'|'review-required'|'unsupported';
+export type AssemblyRoute='existing-native-interpreter'|'generation-required'|'review-required'|'unsupported';
 export interface GameProposal {
  /** Preserve original wording. Never replace it with a template-generated storyline. */
  readonly originalIdea:string;
@@ -72,7 +72,12 @@ export function assessAssembly(proposal:GameProposal):AssemblyAssessment {
   ]);
  }
  // A logic-level shared prototype is NOT a browser game or safe deployable artifact.
- if(missing.length===0)return done('prototype-only',a.id,essential,missing,[],['Verified logic-level primitives still need a renderer, input, gameplay tests and release gates.']);
+ // Headless component availability is NOT a playable game, even if every
+ // child-requested mechanic matches a prototype. A real renderer, controls,
+ // collision/event integration, objectives and sandbox attestation are absent.
+ if(missing.length===0)return done('generation-required',a.id,essential,missing,['HEADLESS_ONLY_NO_PLAYABLE_ASSEMBLY'],[
+  'All named behaviors are headless prototypes only; use the existing authorized generation path until a playable composed runtime is independently verified.'
+ ]);
  return done('generation-required',a.id,essential,missing,[],[
   'Catalog matching does not equal implementability. Queue the existing secure generator only after its ordinary authorization and budget checks.',
   'No inferred engine or template may replace required child-authored actions or payoff.'
