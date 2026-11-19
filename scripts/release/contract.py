@@ -109,6 +109,30 @@ def release_plan(operation, source_sha, reviewed_sha, main_sha, gateway="", prev
     }
 
 
+def automatic_pages_scope(changed_files):
+    """Only previously reviewed presentation-only changes may auto-publish to Pages.
+
+    Any backend/API/worker/learning/code changes require the separately
+    supervised full-stack release lane, even if the gateway is healthy.
+    """
+    names=[name.strip() for name in changed_files if name.strip()]
+    if not names:
+        raise ReleaseError("No changed paths found; automatic release scope cannot be verified")
+    allowed={"index.html","src/style.css","src/studio/style.css","public/manifest.webmanifest"}
+    art_extensions=(".svg",".png",".webp",".jpg",".jpeg")
+    for name in names:
+        if name.startswith("/") or ".." in name.split("/") or "\\" in name:
+            raise ReleaseError("Unsafe changed file path")
+        if (name in allowed or name.startswith("docs/") or
+                (name.startswith("public/") and name.endswith(art_extensions)) or
+                (name.startswith("src/brand/") and name.endswith(".css"))):
+            continue
+        raise ReleaseError("Automatic Pages release is presentation-only; code or backend change requires a supervised release")
+    return {"schema":1,"status":"PRESENTATION_ONLY_AUTODEPLOY_APPROVED",
+            "fileCount":len(names),"backendChangesAllowed":False,
+            "paidModelActivationAuthorized":False}
+
+
 class RejectRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         raise ReleaseError("Production probe refused an HTTP redirect")
@@ -189,10 +213,10 @@ def write_evidence(path, payload):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for command in ("plan", "stamp", "precheck", "verify"):
+    for command in ("plan", "stamp", "precheck", "verify", "auto-scope"):
         p = sub.add_parser(command)
         p.add_argument("--output", required=True)
-        if command != "precheck":
+        if command not in ("precheck", "auto-scope"):
             p.add_argument("--source-sha", required=True)
         if command in ("plan", "precheck", "verify"):
             p.add_argument("--gateway-origin", default="")
@@ -208,6 +232,8 @@ def main(argv=None):
     if args.command == "plan":
         result = release_plan(args.operation, args.source_sha, args.reviewed_sha,
                               args.main_sha, args.gateway_origin, args.preview_origin)
+    elif args.command == "auto-scope":
+        result = automatic_pages_scope(sys.stdin.read().splitlines())
     elif args.command == "stamp":
         result = {"schema": 1, "sourceSha": checked_sha(args.source_sha), "releaseType": "pages-only"}
     elif args.command == "precheck":
