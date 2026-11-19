@@ -1,0 +1,35 @@
+name: Mind Your Jems browser screenshots
+on:
+  push:
+    branches: [feature/mind-your-jems-wait-arcade]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mind-your-jems-shots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - run: npm run build
+      - name: Capture gameplay on desktop, tablet and mobile
+        run: node tests/mind-your-jems-browser.cjs
+      - name: Upload actual browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-your-jems-browser-screenshots
+          path: test-results/mind-your-jems-*.png
+          if-no-files-found: warn
