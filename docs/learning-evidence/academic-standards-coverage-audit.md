@@ -7,6 +7,7 @@
 2. [Educator-review queue](primary-standard-review-queue.csv): **266 primary standards**, children, corresponding Jems skills, flagged gaps, next action, review priority and empty sign-off fields.
 3. [Original 121-skill audit](current-practice-inventory.csv): per-unit Jems practice skill references.
 3a. [Source content modality footprint](practice-content-footprint.csv): all 73 math generator cases and all 192 authored ELA items, including formats and actual passage word counts.
+3aa. [Source-level exemplar review sheet](skill-to-question-review-evidence.csv): all 121 practice skills with exact source paths and line numbers, sample question expressions or authored questions and scoring nature. Reviewer evidence starter, not expert sign-off.
 3b. [Targeted false-positive tag / partial alignment review](standard-tag-fidelity-risks.md): cases where an existing tag likely exceeds what the question actually demonstrates.
 4. [Tests](../../tests/learning-evidence-crosswalk.test.mjs): fail on unknown standard tags, missing child parents, subject/grade misalignment, silently changed skill inventory, and unvalidated claims.
 5. Research provenance, source permissions and later test blueprint in this directory. This is **not** a secure assessment item bank.
