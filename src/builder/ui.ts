@@ -1,6 +1,7 @@
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest } from '../learning/policy';
 import { BuilderClient,validateBuilderConfig,type RequestChange,type JobView,type BuilderConfig } from './client';
+import {installParentPrivacy} from './privacy';
 import type { LearningMode } from '../learning/types';
 const FG=(window as any).FG;
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
@@ -93,6 +94,7 @@ export async function initBuilder(){
   '<button type="button" class="btn secondary" id="builderIssueInvite" hidden>Invite another family device</button>'+ 
   '<div id="builderNewInvitation" role="status"></div><div id="builderDeviceList" aria-live="polite"></div></div>';
  $('page-parent').querySelector('.panel')!.append(connection);
+ const privacy=installParentPrivacy(client,$('page-parent'));
  async function connectionStatus(){
   if(config.mode!=='remote'){$('builderConnectForm').hidden=true;$('builderTrustedControls').hidden=true;$('connectionStatus').textContent='The private game workshop has not been configured on this website. Your local games are still available.';return false;}
   try{
@@ -187,7 +189,7 @@ export async function initBuilder(){
   void (async()=>{try{
     await client.api('/v1/devices/unlock',{parentPassphrase:$<HTMLInputElement>('builderParentUnlockPassphrase').value});
     $<HTMLInputElement>('builderParentUnlockPassphrase').value='';
-    await showDevices();$('connectionStatus').textContent='You can now manage trusted family devices.';
+    await showDevices();await privacy.show();$('connectionStatus').textContent='You can now manage trusted devices and permissions.';
    }catch{$('connectionStatus').textContent='Parent access was not verified. Check your passphrase or temporary lock.';}})();
  };
  $('builderDisconnect').onclick=()=>{
@@ -196,6 +198,7 @@ export async function initBuilder(){
    .catch(()=>$('connectionStatus').textContent='Could not disconnect this device. Please try again.');
  };
  window.addEventListener('factory-page',event=>{
+  privacy.hide();
   if((event as CustomEvent<string>).detail==='parent'){void connectionStatus();return;}
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
@@ -204,6 +207,7 @@ export async function initBuilder(){
    $<HTMLInputElement>(id).value='';
  });
  window.addEventListener('factory-profile',()=>{
+  privacy.hide();
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
   $<HTMLButtonElement>('builderDisconnect').hidden=true;

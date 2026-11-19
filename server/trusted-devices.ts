@@ -7,6 +7,7 @@ import type {IncomingMessage,ServerResponse} from 'node:http';
 import type {VerifiedSession} from './contracts/api';
 import type {Repository,PipelineState} from './pipeline/types';
 import {signSession,verifySession} from './pipeline/auth';
+import {privacyStatus,submitParentPrivacyChoice,revokeParentPrivacyChoice} from './privacy/parent-consent';
 
 export interface TrustedDevice {
  id:string;familyId:string;name:string;secretHash:string;rotation:number;
@@ -189,6 +190,26 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
     reply(200,{unlocked:true,expiresAt:now+PARENT_ACCESS},[parentCookie(config.familyId,session.deviceId,config.sessionKey,now)]);
     return;
    }
+   if((path==='/v1/devices/privacy'||path==='/v1/devices/privacy/revoke')&&
+      (request.method==='GET'||request.method==='POST')){
+    const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
+    const parent=verifySession(cookieValue(request.headers.cookie,'factory_parent'),config.sessionKey,now);
+    if(!session.deviceId||session.familyId!==config.familyId||
+       parent.role!=='parent'||parent.familyId!==session.familyId||
+       parent.deviceId!==session.deviceId||parent.expiresAt<=now)throw Error('FORBIDDEN');
+    if(path==='/v1/devices/privacy'&&request.method==='GET'){
+     reply(200,privacyStatus(await repo.snapshot(),session.familyId,now));return;
+    }
+    if(path==='/v1/devices/privacy'&&request.method==='POST'){
+     const input=await readBody();
+     reply(200,await submitParentPrivacyChoice(repo,parent,input,now));return;
+    }
+    if(path==='/v1/devices/privacy/revoke'&&request.method==='POST'){
+     const input=await readBody();expectKeys(input,[]);
+     reply(200,await revokeParentPrivacyChoice(repo,parent,now));return;
+    }
+    reply(404,{errorCode:'NOT_FOUND'});return;
+   }
    if((path==='/v1/devices'||path==='/v1/devices/revoke'||path==='/v1/devices/invite')&&
       (request.method==='GET'||request.method==='POST')){
     const session=await verifyBrowserSession(repo,request.headers.cookie,config.sessionKey,now);
@@ -230,8 +251,9 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
   }catch(error){
    const reason=(error as Error).message;
    const status=reason==='UNAUTHENTICATED'?401:reason==='INVALID_INVITATION'||reason==='INVALID_PARENT_ACCESS'||reason==='FORBIDDEN'?403:
-    reason==='PARENT_LOCKED'||reason==='DEVICE_LIMIT'||reason==='INVITE_LIMIT'?429:reason==='INVALID_REQUEST'?400:503;
-   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','INVALID_REQUEST'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
+    reason==='PARENT_LOCKED'||reason==='DEVICE_LIMIT'||reason==='INVITE_LIMIT'||reason==='PRIVACY_RECORD_LIMIT'?429:
+    reason==='INVALID_REQUEST'||reason==='INVALID_PRIVACY_CHOICE'?400:503;
+   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','PRIVACY_RECORD_LIMIT','INVALID_REQUEST','INVALID_PRIVACY_CHOICE','PARENT_UNLOCK_REQUIRED'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
   }
  };
 }
