@@ -6,6 +6,7 @@ import type {Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 import {allowedCoachFamily} from './consent';
 import {verifiedParentScope} from '../privacy/parent-consent';
+import {adultPilotAllowed,adultPilotConfigured,adultPilotFlags,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
@@ -16,7 +17,7 @@ export interface AudioReceipt {
 }
 export interface SpeechConfig {
  approved:boolean;privacyApproved:boolean;providerApproved:boolean;parentConsentApproved:boolean;
- requireVerifiedParentPrivacy?:boolean;
+ requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
  projectId:string;maxMicroUsd:number;pricesReviewedAt:string;
 }
 export function audioMime(raw:string):AudioMime|null {
@@ -35,6 +36,7 @@ export function validateAudio(bytes:Uint8Array,contentType:string):AudioMime {
 }
 export function speechConfig(env:NodeJS.ProcessEnv):SpeechConfig{
  return {
+  adultPilot:adultPilotFlags(env),
   approved:env.FACTORY_COACH_AUDIO_APPROVED==='true',
   privacyApproved:env.FACTORY_COACH_AUDIO_PRIVACY_APPROVED==='true',
   providerApproved:env.FACTORY_COACH_AUDIO_PROVIDER_VERIFIED==='true',
@@ -46,7 +48,8 @@ export function speechConfig(env:NodeJS.ProcessEnv):SpeechConfig{
 }
 export function speechApproved(config:SpeechConfig):boolean {
  const at=Date.parse(config.pricesReviewedAt),now=Date.now();
- return config.approved&&config.privacyApproved&&config.providerApproved&&config.parentConsentApproved&&
+ return config.approved&&config.privacyApproved&&config.providerApproved&&
+  (config.adultPilot?.enabled===true?adultPilotConfigured(config.adultPilot):config.parentConsentApproved)&&
   /^[a-z][a-z0-9-]{4,62}$/.test(config.projectId)&&
   Number.isSafeInteger(config.maxMicroUsd)&&config.maxMicroUsd>=1000&&config.maxMicroUsd<=100000&&
   Number.isFinite(at)&&at<=now&&at>now-31*86400000;
@@ -66,8 +69,10 @@ export class CoachAudioService {
   const state=await this.repo.snapshot(),month=new Date().toISOString().slice(0,7);
   const ledger=state.ledgers[session.familyId];
   try{assertActiveTrustedDevice(state,session);}catch{return false;}
-  if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'remoteSpeech'))||
-   !allowedCoachFamily(state,session,'audio')||!ledger?.paidEnabled||ledger.month!==month||
+  const permitted=this.config.adultPilot?.enabled===true?adultPilotAllowed(state,session):
+   allowedCoachFamily(state,session,'audio')&&
+   (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'remoteSpeech'));
+  if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)return false;
   if(this.provider.readiness){
    try{return await this.provider.readiness(AbortSignal.timeout(9000));}catch{return false;}
@@ -83,8 +88,10 @@ export class CoachAudioService {
   await this.repo.transaction(state=>{
    // A device revoked between the HTTP check and spending admission is denied.
    assertActiveTrustedDevice(state,session,now);
-   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(state,session.familyId,'remoteSpeech',now))||
-     !allowedCoachFamily(state,session,'audio',now))throw Error('AUDIO_UNAVAILABLE');
+   if(!(this.config.adultPilot?.enabled===true?adultPilotAllowed(state,session,now):
+       allowedCoachFamily(state,session,'audio',now)&&
+       (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'remoteSpeech',now))))
+    throw Error('AUDIO_UNAVAILABLE');
    state.audioReceipts=(state.audioReceipts||[]).filter(x=>x.state==='running'||x.at>=now-86400000);
    const receipts=state.audioReceipts;
    if(receipts.some(x=>x.id===id))throw Error('AUDIO_REQUEST_EXISTS');
@@ -107,8 +114,10 @@ export class CoachAudioService {
    // Consent may have been revoked while a provider request was running.
    const latest=await this.repo.snapshot();
    assertActiveTrustedDevice(latest,session);
-   if((this.config.requireVerifiedParentPrivacy&&!verifiedParentScope(latest,session.familyId,'remoteSpeech'))||
-      !allowedCoachFamily(latest,session,'audio'))throw Error('AUDIO_UNAVAILABLE');
+   if(!(this.config.adultPilot?.enabled===true?adultPilotAllowed(latest,session):
+       allowedCoachFamily(latest,session,'audio')&&
+       (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(latest,session.familyId,'remoteSpeech'))))
+    throw Error('AUDIO_UNAVAILABLE');
    successful=true;return {text};
   }finally{
    await this.repo.transaction(state=>{

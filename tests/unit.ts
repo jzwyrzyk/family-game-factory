@@ -46,3 +46,5 @@ import './session-client.test';
 import './parent-privacy.test';
 
 import './parent-privacy-paid.test';
+
+import './adult-pilot.test';
