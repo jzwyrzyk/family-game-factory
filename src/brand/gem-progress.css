@@ -1,0 +1,24 @@
+/* Earned gem art: compact, expressive, never a gameplay overlay. */
+.jems-gem-shape{display:inline-block;flex:none;width:22px;height:23px;vertical-align:middle;
+ clip-path:polygon(22% 8%,73% 3%,96% 36%,78% 89%,39% 100%,5% 66%,0 31%);
+ background:linear-gradient(145deg,#a2b9d5 0 40%,#7390b3 41% 70%,#d7e5f0 71%);
+ border:1px solid #567da2;filter:drop-shadow(0 2px 2px #0B1E3B26)}
+.jems-gem-shape.is-cut{clip-path:polygon(25% 0,78% 0,100% 35%,64% 100%,30% 100%,0 35%);
+ background:conic-gradient(from 40deg,#8B5CF6,#c8a6ff,#2E6BFF,#7bb5ff,#8B5CF6)}
+.jems-gem-shape.is-polished{clip-path:polygon(24% 0,76% 0,100% 32%,50% 100%,0 32%);
+ background:conic-gradient(from 35deg,#22D3A6,#92ffe0,#2E6BFF,#d6b5ff,#8B5CF6,#22D3A6);
+ filter:drop-shadow(0 2px 4px #2E6BFF66)}
+.jems-gem-status{display:inline-flex;align-items:center;gap:5px;max-width:100%;font-size:12px;font-weight:750;
+ color:#0B1E3B}
+.jems-builder-progress{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:12px 14px;
+ border:1px solid #d9ccfc;border-radius:15px;background:linear-gradient(105deg,#fff7ee,#f2edff)}
+.jems-builder-progress .jems-builder-copy{display:flex;flex-direction:column;gap:2px;flex:1 1 210px;min-width:0}
+.jems-builder-progress .jems-builder-copy strong{font-size:15px;color:#0B1E3B}
+.jems-builder-progress .jems-builder-copy small{font-size:12px;color:#374c70}
+.jems-builder-progress .jems-builder-steps{display:flex;gap:4px;align-items:center;white-space:nowrap}
+.jems-builder-progress .jems-builder-steps .jems-gem-shape{width:19px;height:21px}
+.jems-builder-progress .jems-builder-steps .jems-gem-shape:not(.is-earned){filter:grayscale(1);opacity:.30}
+.studio-saved-open .jems-gem-status{margin-top:5px;align-self:flex-start}
+.studio-version .jems-gem-status{margin-left:8px}
+@media(max-width:650px){.jems-builder-progress{padding:10px 12px}.studio-version .jems-gem-status{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.jems-gem-shape{transition:none!important}}
