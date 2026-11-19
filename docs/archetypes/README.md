@@ -24,6 +24,12 @@ unsupported by today's generated v2 runtime; 2D visual tricks are not true 3D.
 - `src/archetypes/catalog.ts`: exactly **22** hypothesis archetypes and **77** mechanic
   records; each has a small description, likely controls/simulation and a maturity label.
   Most records are only catalogued and are **not** executable components.
+- `src/archetypes/play-patterns.ts`: **88 authored design-only play patterns**, four
+  distinct player-action/goal profiles for each engine family. This breadth
+  is not equivalent to 88 executable, independently tested games.
+- `src/archetypes/diversity.ts`: read-only, structural comparison of player
+  actions, goals, challenge, pacing and gameplay rules. A reskin does not count
+  as gameplay novelty; a child-requested reskin remains allowed.
 - `src/archetypes/native.ts`: read-only bridge to six real curated games and their
   actual numeric/boolean manifest fields. Existing engines, save schemas and learning
   hosts remain authoritative; a similar genre does not make the game a template.
@@ -33,12 +39,13 @@ unsupported by today's generated v2 runtime; 2D visual tricks are not true 3D.
 - `src/archetypes/prototype.ts`: small shared **headless logic** proof for collision
   pickup, growth, shield reflection and damage across three different scenes.
   There is no rendered/touch gameplay or general assembly engine in this prototype.
+- `tests/archetype-diversity.test.ts`: prevent genre pigeonholing, reskin-as-new-game false positives, forced novelty and pattern collapse.
 - `tests/archetypes.test.ts`: unit checks for catalog drift, exact native boundaries,
   unsupported 3D, unmet actions, and deterministic cross-game behavior.
 - `.github/workflows/archetype-research.yml`: independent typecheck + tests without
   modifying the existing pipeline or the in-flight PR #43.
 
-**NOT built here:** 22 functioning engines, general sprite/layout generation, a
+**NOT built here:** 22 functioning engines or 88 finished game variations, general sprite/layout generation, a
 production-ready composed-game artifact, real child telemetry, a capability store,
 cross-game build UI, paid model calls, trained models, a proved 80% coverage result
 or a new trusted worker release.
@@ -144,8 +151,10 @@ intent-fidelity coverage, reliable playable completion, and end-to-end latency.
    remaining dozens of components. Use measured demand, not a guessed Pareto curve.
 
 ## Related implementation guidance
-See [INTEGRATION.md](INTEGRATION.md) for component interfaces, current-to-future
-routes, saved revisions, security and learning boundaries, [EVALUATION.md](EVALUATION.md)
+See [CREATIVE_DIVERSITY.md](CREATIVE_DIVERSITY.md) for creative differentiation,
+reskin/repeated-loop guardrails and three-level gameplay testing;
+[INTEGRATION.md](INTEGRATION.md) for component interfaces, current-to-future
+routes, saved revisions, security and learning boundaries; [EVALUATION.md](EVALUATION.md)
 for acceptance and 80/20 protocol, and [ROADMAP.md](ROADMAP.md) for implementation
 waves and defensible sequencing.
 
