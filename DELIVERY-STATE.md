@@ -1,18 +1,18 @@
 # jems delivery state
 
-**Original source/status observation:** November 18, 2026, 11:17 p.m. America/New_York (`2026-11-19T04:17:31Z`). **Scoped source update:** PR55's merge into main was observed at `2026-11-19T05:30:38Z`, at `079978f3034e007e8bbad1f43571aaa7867b5098`. Earlier PR55 integration evidence and the separately timed quality/playtest observations below retain their original scopes. Other operational observations were not silently refreshed. This is a dated evidence ledger, not a live dashboard. Refresh affected entries before a release or current-status answer. See the [maintenance rules](docs/context/MAINTENANCE.md).
+**Original source/status observation:** November 18, 2026, 11:17 p.m. America/New_York (`2026-11-19T04:17:31Z`). **Latest scoped source update:** PR58's merge into main was observed November 19 at 1:53 a.m. America/New_York (`2026-11-19T06:53:56Z`), at `02bdb58d17d5687e39ab20bd884f02a18007ede5`. The earlier PR55 merge observation (`2026-11-19T05:30:38Z`, source `079978f3034e007e8bbad1f43571aaa7867b5098`) and separately timed quality/playtest observations below retain their original scopes. Other operational observations were not silently refreshed. This is a dated evidence ledger, not a live dashboard. Refresh affected entries before a release or current-status answer. See the [maintenance rules](docs/context/MAINTENANCE.md).
 
 ## Current intent and evidence boundary
 
 The current owner-directed release focus is a **temporary adult development profile on the existing Jems website**. Switching to that authenticated profile must activate the approved AI tools directly; the owner rejected another site and a separate activation step. [ADR0005](docs/decisions/0005-temporary-adult-profile.md) records that November 18 direction and the requirement to remove the feature after development. The approved **Speak → transcribe → editable draft → explicit Send → reply** flow and separate Build action remain intact. Parent consent collection/storage is integrated for eventual child use; adult testing is not evidence that child permission or provider privacy requirements have been fulfilled. Other future features do not automatically enter this release, and existing authorization does not require repeated approval.
 
-The original documentation observation used GitHub source, PR metadata and workflow history. The quality-upgrade draft below adds scoped local implementation and browser evidence; it does not refresh unrelated live-service entries. No live Cloud Run inventory, provider configuration, paid request or actual-device session was inspected. Accordingly, live activation and end-to-end acceptance remain **unverified here**, rather than asserted enabled or disabled. The approved code path and the current production path can differ.
+The original documentation observation used GitHub source, PR metadata and workflow history. The historical quality-upgrade observations below add scoped local implementation and browser evidence; the [final PR58 receipt](#observed-pr58-merge-and-final-head-checks) records subsequent source integration and hosted checks. Neither refreshes unrelated live-service entries. No live Cloud Run inventory, provider configuration, paid request or actual-device session was inspected. Accordingly, live activation and end-to-end acceptance remain **unverified here**, rather than asserted enabled or disabled. The approved code path and the current production path can differ.
 
 ## Release layers
 
 | Layer | Observed evidence | What the evidence establishes / does not establish |
 | --- | --- | --- |
-| Public application source | `main` at [`079978f3034e007e8bbad1f43571aaa7867b5098`](https://github.com/jzwyrzyk/family-game-factory/commit/079978f3034e007e8bbad1f43571aaa7867b5098), observed `2026-11-19T05:30:38Z`; merge commit records PR55 at `2026-11-19T05:28:33Z` | Includes the merged adult-profile/consent integration, documentation maintenance (#59), trusted devices, private coach/speech and Game Intelligence. This advances the earlier `1c86ccdf` source observation; it does not identify or activate every deployed service. |
+| Public application source | `main` at [`02bdb58d17d5687e39ab20bd884f02a18007ede5`](https://github.com/jzwyrzyk/family-game-factory/commit/02bdb58d17d5687e39ab20bd884f02a18007ede5), observed `2026-11-19T06:53:56Z`; [PR58](https://github.com/jzwyrzyk/family-game-factory/pull/58) merged at `2026-11-19T06:53:47Z` | Integrates Gem Factory, its approved Gem companion and the style-diverse quality path with prior main `8b915b26e1f4be4b1523b6803cb6549d228f3e83`, preserving PR55's adult/consent integration and PR61's private-coach build verification correction. All 12 latest PR jobs passed on head `11147800f13c8572e60497a7b7133359dedd34cd`. This is source integration, not proof of main-app publication or private provider activation. |
 | Adult profile and consent integration | [PR55](https://github.com/jzwyrzyk/family-game-factory/pull/55) **merged** as `079978f3034e007e8bbad1f43571aaa7867b5098`; earlier implementation review `1f7200ed8c05ccc438fc59a46b9b4666aa69926c`, integration candidate `93fb5dbda7dde55af06885d4af0400919f654ebc` | Same-site authenticated switch, isolated adult workspace, grant-bound API/worker/preview access and current-notice parent consent are integrated source behavior. Merge is not deployment, provider activation or actual-device acceptance. Earlier local evidence is preserved below without being relabeled as a new combined quality-branch run. |
 | Latest successful Pages workflow observed | [Run 44221693458](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44221693458), source `a8f6011226a396f3c060ba2fcaf697c1314b98f0`, started November 17 at 9:13 p.m. America/New_York (`2026-11-18T02:13:49Z`) | Successful workflow deployment evidence for the PR35-era frontend. The workflow history was checked; live browser/API behavior was not re-tested. Later main merges are not proved published by this run. |
 | Private worker source | `main` at [`21203a6dcedc19fb18e23795cd9377b20f5f81e3`](https://github.com/family-game-factory-lab/family-game-factory-worker/commit/21203a6dcedc19fb18e23795cd9377b20f5f81e3) | The private workflow repository has its own release lifecycle. It is not advanced by a public application merge. |
@@ -58,7 +58,11 @@ This is an index of observed open work, not an automatic merge or shipping queue
 | [PR23 drawing engine](https://github.com/jzwyrzyk/family-game-factory/pull/23) | Open draft, outside the immediate voice release focus. Preserve drawings/provenance while evaluating later integration. |
 | [PR29 safety policy](https://github.com/jzwyrzyk/family-game-factory/pull/29), [PR31 alternate conversation stack](https://github.com/jzwyrzyk/family-game-factory/pull/31) | Open drafts with overlap/supersession concerns. PR36 incorporated selected speech work; it did not approve merging an alternate provider architecture wholesale. |
 
-## Gem Factory and style-diverse quality draft
+## Historical Gem Factory and style-diverse quality draft
+
+The draft and local-test observations in this section retain their original
+source and time scopes. The completed merge and final-head hosted results are
+recorded in the [subsequent receipt](#observed-pr58-merge-and-final-head-checks).
 
 **Scoped observation:** `2026-11-19T05:15:28Z`. Owner-directed work is prepared in
 [PR58](https://github.com/jzwyrzyk/family-game-factory/pull/58), originally based
@@ -151,7 +155,11 @@ Removing raw screenshots from active job state is not physical erasure from the
 existing content-addressed object store. Child-uploaded art and an art-library UI
 remain a separate future task.
 
-## Child-facing Gem Factory interaction revision
+## Historical child-facing Gem Factory interaction revision
+
+These pre-merge observations preserve their original limits. The later mascot
+publication and final-head browser results below supersede only their matching
+publication and gameplay status; they do not rewrite the earlier evidence.
 
 The owner's subsequent request updates the existing
 [private Gem Factory Site](https://jems-gem-factory-play.beigecoconut32.chatgpt.site)
@@ -227,8 +235,41 @@ During the merge preparation, main advanced to
 The integration preserves its private-coach Cloud Build verification correction,
 tests and image-recovery record. The only conflict was the delivery review
 record, which was reconciled against the combined sources. This integration
-changes no Gem Factory gameplay or artwork; the final integrated PR head must
-still pass its hosted checks before merging.
+changes no Gem Factory gameplay or artwork. At this preparation observation,
+final integrated-head checks and merge were still pending; their completed
+receipt follows.
+
+### Observed PR58 merge and final-head checks
+
+**Scoped observation:** `2026-11-19T06:53:56Z`. GitHub reports
+[PR58](https://github.com/jzwyrzyk/family-game-factory/pull/58) closed and merged
+at `2026-11-19T06:53:47Z`, with merge commit
+[`02bdb58d17d5687e39ab20bd884f02a18007ede5`](https://github.com/jzwyrzyk/family-game-factory/commit/02bdb58d17d5687e39ab20bd884f02a18007ede5).
+Its final head was `11147800f13c8572e60497a7b7133359dedd34cd`, integrating
+premerge main `8b915b26e1f4be4b1523b6803cb6549d228f3e83`. All **12 latest PR
+jobs passed** on that exact head before the merge:
+
+| Hosted check group | Observed result and exact evidence |
+| --- | --- |
+| Arcade journeys | All four jobs passed: browser, learning, creative and private-coach image. [Run 44474240315](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44474240315) finished at `2026-11-19T06:52:53Z`. |
+| Full visual review | All five jobs passed: Gem Factory, screenshots, Studio, brand and joy. [Run 44474240435](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44474240435) includes the [Gem Factory journey](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44474240435/job/135390796598). |
+| Documentation references | Passed in the latest [run 44474408574](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44474408574). |
+| Game Intelligence contracts | Passed in [run 44474240394](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44474240394). |
+| Trusted-device security | Passed in [run 44474240297](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44474240297). |
+
+These are hosted source, fixture, image-build and browser-emulation checks. They
+establish the named final-head journeys, including the repaired ordinary gift
+click; they are not actual-device, observed-child or live-provider acceptance.
+Earlier failed runs remain recorded above with their original identities.
+
+The successful owner-only Site publication above remains the current native
+Gem Factory delivery receipt: its app source is `e3136cd640828a1393195a60bbea2b21c3c3cd81`,
+and its artwork and gameplay are unchanged in the integrated head. The public
+merge does not prove publication of the main application or activation of
+private generation services. Companion [worker PR14](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/14)
+remains separately coordinated; no worker merge, provider activation or paid
+acceptance is asserted by this receipt. The exact Site version, deployment time,
+audience and rollback reference above are preserved.
 
 ## How to record the next state
 

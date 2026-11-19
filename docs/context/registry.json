@@ -272,10 +272,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T06:43:05.613Z",
-      "sourceDigest": "e5a5506bdf87652b062fccfbb538d7c12e92a2f153faa29488b21e44df0a374a",
+      "reviewedAt": "2026-11-19T06:55:12.782Z",
+      "sourceDigest": "d25a12d50bef18be3f24fd3a827cea49ffd2da5f922481596850213907e8fe59",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved PR61 coach build verification, tests and recovery evidence while recording the exact owner-only mascot Site publication, rollback reference and scoped e3136cd Gem Factory CI pass; integrated-head checks and merge remain pending."
+      "reviewReason": "Recorded PR58 merge commit and observation time, all 12 latest passing jobs on the exact integrated head, and the connection to the existing owner-only mascot Site receipt and rollback reference. Preserved historical failures, PR55/PR61 evidence, and separate main-app, worker and provider activation boundaries."
     },
     {
       "id": "context",
