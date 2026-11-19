@@ -9,6 +9,8 @@ export type JourneyState = {
   character: JourneyCharacter | null;
   polishedCount: number;
   nextAction?: string;
+  /** Label for the host's current next-step action, independent of outfit previews. */
+  primaryActionLabel?: string;
 };
 export type JourneyAtlas = { src: string; columns?: number; rows?: number; frameAspectRatio?: number };
 export type JourneyArtwork = {
@@ -20,6 +22,8 @@ export type JourneyArtwork = {
 export type GemJourneyOptions = {
   onBack: () => void;
   onCreate: () => void;
+  /** Resolve the current owner's unfinished work at click time; defaults to creation. */
+  onPrimaryAction?: (ownerId: string) => void;
   /** Resolve only after the cosmetic choice was durably saved for this owner. */
   onChooseCharacter: (character: JourneyCharacter, ownerId: string) => void | Promise<void>;
   artwork?: Partial<JourneyArtwork>;
@@ -148,7 +152,11 @@ export function installGemJourney(options: GemJourneyOptions) {
   const create = button('jems-journey-primary', 'Make a jem', 'jemsJourneyCreate');
   const createArrow = createIcon('arrow', 'jems-journey-arrow');
   create.append(createArrow);
-  create.addEventListener('click', () => options.onCreate());
+  create.addEventListener('click', () => {
+    if (disposed || !state.ownerId) return;
+    if (options.onPrimaryAction) options.onPrimaryAction(state.ownerId);
+    else options.onCreate();
+  });
   const returnCurrent = button('jems-journey-current', '', 'jemsJourneyCurrent');
   setIconLabel(returnCurrent, 'arrow', 'Back to my level', 'jems-icon--back');
   returnCurrent.addEventListener('click', () => { previewLevel = Math.max(1, state.level) as 1 | 2 | 3 | 4; renderView(); });
@@ -283,7 +291,7 @@ export function installGemJourney(options: GemJourneyOptions) {
     subtitle.textContent = previewing ? entry.action : state.level === 0 ? 'Every great jem starts with you.' : entry.reward;
     next.hidden = previewing || state.level === 4;
     nextText.textContent = state.nextAction || (state.level === 3 ? `${Math.min(3, state.polishedCount)} of 3 projects polished.` : LEVELS[Math.min(3, state.level)].action);
-    create.firstChild!.textContent = state.level === 4 ? 'Make something new' : 'Make a jem';
+    create.firstChild!.textContent = (options.onPrimaryAction && state.primaryActionLabel?.trim()) || (state.level === 4 ? 'Make something new' : 'Make a jem');
     returnCurrent.hidden = !previewing;
     setIconLabel(change, 'edit', state.character ? 'Change character' : 'Choose character');
 

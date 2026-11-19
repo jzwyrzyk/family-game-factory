@@ -23,6 +23,7 @@
 .creation-mode-switch{display:flex;gap:5px;padding:5px;background:#EAE6F3;border:1px solid #E3DDEE;border-radius:14px;width:max-content;margin:24px auto 35px}
 .creation-mode-switch button{border:0;border-radius:10px;min-height:44px;padding:10px 25px;background:transparent;color:#6F647E;font-weight:750!important;font-size:13px!important}
 .creation-mode-switch button[aria-pressed=true]{background:#FFF;color:#6945A6;box-shadow:0 2px 6px #42365B10}
+.creation-shelf-tools{display:flex;justify-content:flex-end;margin-top:-18px}
 .creation-shelf-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:23px 0 17px}
 .creation-shelf-heading h2{font-size:22px;margin:0 0 7px;letter-spacing:-.45px}
 .creation-shelf-heading p{font-size:13px;color:var(--creation-muted);margin:0;line-height:1.5}
@@ -41,10 +42,11 @@
 .creation-saved-card{display:flex;align-items:center;gap:13px;border:1px solid #E2DEEA;background:#FFF;border-radius:15px;padding:13px;text-align:left}
 .creation-saved-card>span:nth-child(2){display:grid;gap:6px;min-width:0}.creation-saved-card strong{font-size:13px;color:#35435A;overflow-wrap:anywhere}.creation-saved-card small{font-size:10px;color:#7F8798}.creation-saved-arrow{color:#9B82C1;margin-left:auto;font-size:20px}
 .creation-challenge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.creation-challenge-choice{display:flex;flex-direction:column;gap:8px;min-width:0}.creation-challenge-choice>.creation-challenge-card{flex:1;width:100%}.creation-challenge-choice>.creation-button{align-self:flex-start}
 .creation-challenge-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:25px;border:1px solid #E4DEEC;background:white;border-radius:20px;box-shadow:0 5px 20px #43335E06}
 .creation-challenge-card:hover{border-color:#BA9DDD;background:#FEFCFF}
 .creation-challenge-stamp{display:grid;place-items:center;width:56px;height:56px;border-radius:17px;font-size:27px;color:#537EB1;background:#E6F2FF;margin-bottom:22px}
-.creation-challenge-card:nth-child(2) .creation-challenge-stamp{background:#F4E6FF;color:#9D65B5}.creation-challenge-card:nth-child(3) .creation-challenge-stamp{background:#E5F7EC;color:#539A79}.creation-challenge-card:nth-child(4) .creation-challenge-stamp{background:#FFF0D5;color:#BC8D3C}.creation-challenge-card:nth-child(5) .creation-challenge-stamp{background:#FFE9E5;color:#CA7A67}
+.creation-challenge-choice:nth-child(2) .creation-challenge-stamp{background:#F4E6FF;color:#9D65B5}.creation-challenge-choice:nth-child(3) .creation-challenge-stamp{background:#E5F7EC;color:#539A79}.creation-challenge-choice:nth-child(4) .creation-challenge-stamp{background:#FFF0D5;color:#BC8D3C}.creation-challenge-choice:nth-child(5) .creation-challenge-stamp{background:#FFE9E5;color:#CA7A67}
 .creation-challenge-card>small{font-size:9px;color:#9A89AB;font-weight:850;letter-spacing:1.2px;margin-bottom:9px}.creation-challenge-card>strong{font-family:var(--jems-round);font-size:20px;color:#314057;letter-spacing:-.5px}
 .creation-challenge-card>p{font-size:12px;color:#718096;line-height:1.7;margin:12px 0;flex:1}.creation-challenge-concepts{font-size:10px;color:#91829F}.creation-challenge-card>b{font-size:11px;color:#7950B6;margin-top:23px}
 .creation-project-bar{display:flex;align-items:center;gap:12px;padding:13px 0 16px;border-top:1px solid #E9E4EF;margin-top:23px}

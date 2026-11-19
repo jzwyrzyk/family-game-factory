@@ -160,7 +160,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     }
     assert.equal(await page.locator('#creationUndo').isDisabled(),true);assert.equal(await page.locator('#creationRedo').isDisabled(),true);
     await page.locator('#creationMore summary').click();
-    for(const selector of ['#creationCopy','#creationHistory']){await page.locator(selector).click();assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched);}
+    for(const selector of ['#creationCopy','#creationHistory','#creationImportButton']){await page.locator(selector).click();assert.match(await page.locator('#creationStatus').textContent(),/Resume my draft.*Use saved version/);assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched);}
     await page.locator('#creationMore summary').click();
     await page.locator('#creationResumeDraft').click();
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say']);
@@ -172,7 +172,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move']);
     await page.locator('[data-add-block="jump"]').click();
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move','jump']);
-    checks.push('unresolved recovery blocks edits, Keep, checks, playback, copy and history until explicit Resume or Use saved; both choices preserve their selected content');
+    checks.push('unresolved recovery blocks edits, Keep, checks, playback, copy, import and history until explicit Resume or Use saved; both choices preserve their selected content');
     assert.deepEqual(errors,[],'No unhandled browser errors');assert.deepEqual(paidRequests,[],'No generation or coach provider requests');
     fs.writeFileSync('test-results/creation-recovery-browser-results.json',JSON.stringify({passed:checks.length,checks,errors,paidRequests},null,2)+'\n');
     console.log('PASS creation backup recovery browser: '+checks.length+' journeys; corrupt export, invalid input, atomic rollback, valid recovery, hint retention, legacy replacement, retired goals and explicit draft recovery');

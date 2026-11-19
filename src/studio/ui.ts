@@ -30,7 +30,7 @@ import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
 import { installProblemSolvingPractice } from '../problem-solving/ui';
 import {installRewards, notifyRewardSourceSaved} from '../rewards/service';
-import {createRewardsPage, createRewardsWidget, createRewardCelebration} from '../rewards/ui';
+import {createRewardsPage, createRewardsWidget, createRewardCelebration, type RewardsActivity} from '../rewards/ui';
 import {type RewardGrant} from '../rewards/model';
 import {rewardSourceWritable} from '../rewards/write-guard';
 
@@ -47,7 +47,15 @@ const isRealAdapter=(adapter:string|undefined)=>adapter==='metered-api'||adapter
 /** Studio is the primary child homepage; ?arcade=1 is the reversible legacy route. */
 export async function installStudio(){
  const entry=new URLSearchParams(location.search);
- if(entry.get('arcade')==='1'||entry.get('studio')==='0')return;
+ if(entry.get('arcade')==='1'||entry.get('studio')==='0'){
+  const currentUrl=new URL(location.href);
+  if(entry.get('arcade')==='1')currentUrl.searchParams.delete('arcade');
+  if(entry.get('studio')==='0')currentUrl.searchParams.delete('studio');
+  const notice=el('div','notice studio-legacy-return');
+  const link=el('a','btn secondary','Open current Jems') as HTMLAnchorElement;
+  link.id='jemsCurrentExperience';link.href=currentUrl.href;
+  notice.append(link);document.querySelector('main')!.prepend(notice);return;
+ }
  const FG=(window as any).FG;
  if(!FG?.app||!FG?.store)return;
  const rewards=installRewards();
@@ -167,6 +175,14 @@ export async function installStudio(){
  const homeCharacterLink=el('button','jems-home-journey','Choose your maker') as HTMLButtonElement;
  homeCharacterLink.type='button';homeCharacterLink.id='studioHomeCharacter';
  library.querySelector('.studio-home-action')!.append(homeCharacterLink);
+ const libraryTools=el('div','studio-library-tools');
+ const savedIdeas=iconEl('button','studio-button','grid','Saved ideas & drawings') as HTMLButtonElement;
+ savedIdeas.id='studioSavedIdeas';savedIdeas.type='button';savedIdeas.onclick=()=>act(openSavedIdeas);
+ libraryTools.append(savedIdeas);library.querySelector('#studioContinue')!.after(libraryTools);
+ const collectionBack=iconEl('button','studio-button','arrow','My Games','jems-icon--back') as HTMLButtonElement;
+ collectionBack.id='studioCollectionBack';collectionBack.type='button';collectionBack.onclick=()=>act(home);
+ $('page-creations').querySelector('.page-head')!.prepend(collectionBack);
+ const collectionTitle=$('page-creations').querySelector('h1')!;collectionTitle.tabIndex=-1;
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
  learningChoice.innerHTML='<div class="studio-learning-copy"><strong id="studioLearningTitle">Learning adventure</strong><small id="studioLearningNote"></small></div><div class="learning-subject-switch" role="group" aria-label="Choose practice subject"><button type="button" id="studioSubjectMath" aria-pressed="true">Math</button><button type="button" id="studioSubjectLanguage" aria-pressed="false">English</button></div>';
@@ -194,6 +210,14 @@ export async function installStudio(){
  const globalStatus=el('div','studio-status');globalStatus.id='studioGlobalStatus';globalStatus.setAttribute('role','status');globalStatus.setAttribute('aria-live','polite');globalStatus.setAttribute('aria-atomic','true');document.querySelector('main')!.prepend(globalStatus);
  const journey=installGemJourney({
   onBack:()=>act(home),onCreate:()=>act(newIdea),
+  onPrimaryAction:ownerId=>act(async()=>{
+   if(ownerId!==owner())return;
+   if(guardMath())return;
+   const target=journeyContinuation();
+   if(!target){newIdea();return;}
+   await open(target.id,false);
+   if(owner()===ownerId&&activeId===target.id&&route==='studio')setTab(gemStage(target)==='cut'?'versions':'talk');
+  }),
   onChooseCharacter:(character,ownerId)=>{
    if(ownerId!==owner())throw Error('Choose a maker for the current player.');
    notebook.setAvatar(ownerId,character);
@@ -203,8 +227,8 @@ export async function installStudio(){
  document.querySelector('main')!.append(journey.element);
  function rewardJourney(){const progress=builderJourney(notebook.list(owner()),owner());return {ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction};}
  const rewardsPage=createRewardsPage({
-  state:{...rewards.state,journey:rewardJourney()},onBack:()=>act(home),onOpenJourney:()=>act(()=>openJourney()),
-  onPlay:()=>act(()=>{if(guardMath())return;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';}),
+  state:{...rewards.state,journey:rewardJourney()},onBack:()=>act(home),onOpenJourney:()=>act(()=>openJourney(!notebook.avatar(owner()))),
+  onPlay:()=>act(()=>openPractice()),onActivity:activity=>act(()=>openRewardActivity(activity)),
   onCreate:()=>act(newIdea),onRetry:()=>{void rewards.refresh().catch(()=>{});}
  });
  document.querySelector('main')!.append(rewardsPage.element);
@@ -357,7 +381,11 @@ export async function installStudio(){
  }
  function renderJourney(){
   const progress=levelForOwner();
-  journey.render({ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction});
+  journey.render({ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction,primaryActionLabel:journeyContinuation()?'Continue my jem':'Make a jem'});
+ }
+ function journeyContinuation(){
+  const sessions=notebook.list(owner()).filter(s=>!s.archived&&!busy(s));
+  return sessions.find(s=>gemStage(s)==='cut')||sessions.find(s=>gemStage(s)==='rough')||null;
  }
  function hideJourney(){journey.closeCharacterPicker(false);journey.element.hidden=true;journey.element.classList.add('hidden');}
  function openJourney(choose=false){
@@ -487,6 +515,20 @@ export async function installStudio(){
    try{FG.learning.setSubject(subject);refreshLearningChoice();if(route==='studio')$('studioStatus').textContent='';else globalStatus.textContent='';}
    catch(error){globalStatus.textContent=(error as Error).message;}
  }
+ function openPractice(subject?:'math'|'language'){
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();
+  // The existing learning host enforces the grown-up's allowed subject choices.
+  if(subject&&FG.learning.subject!==subject)FG.learning.setSubject(subject);
+  refreshLearningChoice();hideJourney();disposeGame();FG.app.page('lab');route='other';
+ }
+ function openRewardActivity(activity:RewardsActivity){
+  if(activity==='making'){newIdea();return;}
+  if(activity==='coding'){
+   if(FG.creation?.openChallenges)FG.creation.openChallenges();else status('Create & code is still opening. Try again in a moment.');
+   return;
+  }
+  openPractice(activity);
+ }
  async function refreshServiceReadiness(){
   if(remote.mode!=='remote')return;
   const actor=owner(),at=epoch;
@@ -597,6 +639,11 @@ export async function installStudio(){
   });installQualityCards();updateCreationNote();
  }
  function home(){stopSpeech();flushDraft();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView($('studioLibraryTitle'));}
+ function openSavedIdeas(){
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();
+  $<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('creations');route='other';
+  document.body.classList.remove('studio-designing');setActiveNav('studioNavHome');focusView(collectionTitle);
+ }
  function start(game:GameId){
   const existing=notebook.list(owner()).find(s=>s.game===game&&s.playOnly);if(existing)return open(existing.id);
   const p=games.create(owner(),game,`My ${names[game]}`,defaults(game,FG.store.current().remixes?.[game]||'classic'));
@@ -636,6 +683,8 @@ export async function installStudio(){
   if(!activeId)return;const s=current(),working=s.projectId?games.revision(s.projectId,s.owner):null;refreshShelf();
   refreshGameSubject();FG.learning.modeControl($('studioMathMode'),s.id);$('studioTitle').textContent=s.name;$('studioStorage').textContent=s.remoteId||s.candidate?.remoteId?'Private family game · local conversation':'Saved on this device';
   renderGemBadge(s);
+  const sceneAction=$('studioMakeScene');
+  if(sceneAction)setIconLabel(sceneAction,'grid',s.remoteId||s.candidate?.remoteId||['dragon','buckets','robot'].includes(s.game)&&s.projectId?'Animate & code':'Start a separate scene');
   const n=s.projectId?games.history(s.projectId,s.owner).findIndex(r=>r.id===working?.id)+1:0;
   $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · version ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
   $('studioPreviewNotice').hidden=showing==='working';
@@ -992,7 +1041,8 @@ export async function installStudio(){
  document.addEventListener('click',event=>{
   const target=(event.target as Element)?.closest<HTMLElement>('button,[data-page],[data-game]');if(!target||target.closest('#page-studio')||target.closest('#page-studio-library')||target.closest('.studio-nav'))return;
   if(target.classList.contains('profile-choice')){try{flushDraft();}catch(error){event.preventDefault();event.stopImmediatePropagation();status((error as Error).message,true);}return;}
-  if(target.id==='homeBtn'||target.id==='resultHome'||target.dataset.page==='home'||target.dataset.page==='creations'){event.preventDefault();event.stopImmediatePropagation();act(home);}
+  if(target.dataset.page==='creations'){event.preventDefault();event.stopImmediatePropagation();act(openSavedIdeas);}
+  else if(target.id==='homeBtn'||target.id==='resultHome'||target.dataset.page==='home'){event.preventDefault();event.stopImmediatePropagation();act(home);}
   else if(target.dataset.page==='create'){event.preventDefault();event.stopImmediatePropagation();act(newIdea);}
   else if(target.dataset.page==='feedback'||target.id==='improveThis'||target.id==='returnLive'){event.preventDefault();event.stopImmediatePropagation();act(()=>{if(activeId){showStudio();setTab('talk');$('studioPrompt').focus();}else home();});}
   else if(target.dataset.game){event.preventDefault();event.stopImmediatePropagation();act(()=>start(target.dataset.game as GameId));}
@@ -1023,7 +1073,7 @@ export async function installStudio(){
   const s=current();
   if(saving){status('Let this version finish saving before clearing chat.',true);return;}
   if(busy(s)||s.pendingExperiment){status('Finish or cancel this build before clearing chat.',true);return;}
-  if(!confirm('Clear this chat and its design notes on this device? Your saved game versions and any remote copies will remain.'))return;
+  if(!confirm('Clear this chat and its design notes on this device? Removing making evidence can lower your maker level and change your outfit. Your lifetime gems, saved game versions and any remote copies will remain.'))return;
   stopSpeech();coaching?.reset();chatOptions.open=false;
   notebook.clearConversation(s.id,s.owner);
   updateProfile();
@@ -1177,14 +1227,15 @@ export async function installStudio(){
    status('Opening the editable scene included with this game…');
    const response=await clientFor(s).creationManifest(remoteId);
    if(owner()!==capturedOwner||epoch!==capturedEpoch||route!=='studio'||activeId!==s.id)return;
-   if(!response.manifest)throw Error('This game does not include an editable scene yet. Choose Create & code to start a scene with available characters.');
+   if(!response.manifest){creation.open();globalStatus.textContent='This game has no editable scene. Choose a starter for a separate scene. Your game stays saved.';return;}
    creation.fromStudio({...s,projectId:response.projectId,remoteId:response.revisionId},undefined,response.manifest);return;
   }
-  if(!s.projectId)throw Error('Choose a starting game, or open Create & code to make a scene.');
+  if(!s.projectId||!['dragon','buckets','robot'].includes(s.game)){creation.open();return;}
   const revision=games.revision(s.projectId,s.owner,showing==='history'&&viewedRevisionId?viewedRevisionId:undefined);
   if(showing==='candidate'&&s.candidate?.config)throw Error('Keep this game version first, then use Animate & code to carry that version into a scene.');
   creation.fromStudio(s,revision);
  });
+ if(activeId)render();
  window.addEventListener('factory-page',event=>{hideJourney();const destination=(event as CustomEvent).detail;if(destination!=='creation')document.body.classList.remove('creation-open');if(destination==='lab')setActiveNav('studioNavPowers');else if(destination==='parent')setActiveNav(null);});
  if(new URLSearchParams(location.search).get('creation')==='1')creation.open();
  if(new URLSearchParams(location.search).get('problem-solving')==='1')practice.open();

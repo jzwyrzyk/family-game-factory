@@ -75,6 +75,10 @@ Free creation offers Dragon, Buckets, Robot, and blank starters, actor placement
 
 The home entrance follows the Ready to Play game shelf so a complete playable choice remains in the first mobile viewport. The global **Create & code** navigation remains directly available.
 
+**My scenes** appears below both **Make your own** and **Rebuild a scene**, so stories and saved challenge attempts remain reachable without remembering the mode that created them. A challenge card opens the current player's most recently active scene for that challenge; saved edits, recoverable drafts and recorded checks determine recency. **Start a new scene** is a separate action that preserves earlier attempts. Returning to a challenge or changing tabs does not create a duplicate or grant a reward. The trusted host can call `FG.creation.openChallenges()` to enter the challenge shelf through the same learning and navigation guards as the main entrance.
+
+**Open a scene file** is available directly on the shelf as well as in the editor's **More scene tools** menu. It validates the scene and bundled asset catalogue, then creates one new owner-scoped project with assisted import provenance; no throwaway project is required. Importing from an editor saves a pending ordinary revision without choosing Keep. Unresolved recovery still requires **Resume my draft** or **Use saved version** first, and a late file read cannot open after the player or visible Creation view changes.
+
 The target preview is a separate project. Watching it does not insert its program into the child's editable scene. Practice deliberately exposes the goal and optional hint; these are public learning activities, not protected assessment items.
 
 ### Exact current behavioral probes
@@ -111,6 +115,8 @@ Supported browsers can record the scene canvas for up to 15 seconds and download
 
 `createProjectFromStudio(session, revision, manifest)` has an explicit manifest import path. A supplied scene is validated against the same language and bundled asset allowlist, receives a fresh scene identity, and retains source references. Without a valid manifest, an unsupported/generated game must explain that it has no editable scene rather than pretending its JavaScript was translated.
 
+For native games without a scene adapter, the game toolbar offers **Start a separate scene** and opens the free-creation shelf. It does not create a scene or modify the source game before the child selects a starter. Dragon, Buckets and Robot retain **Animate & code** and their source-linked scenes. A generated game is checked for its actual companion manifest; an absent manifest opens the separate-scene shelf with an explicit explanation.
+
 A generator's optional companion scene is a separate data artifact, not executable authority and not proof that its actions reproduce the source game. The branch implements this transport through the existing private generator and accepted revision path:
 
 - [generated.ts](../../server/agent/generated.ts) accepts optional `GeneratedGame.creationManifest`; a null/absent value remains compatible with older games. Its validator strips invented source provenance and attributes the whole supplied program to assisted creation, then enforces a **32,000-byte UTF-8 limit on the normalized scene**. An accepted manifest can be validated repeatedly without attribution making it exceed the limit. Test publication must retain the same reviewed manifest rather than replacing or dropping it.
@@ -138,4 +144,4 @@ The accepted longer-term direction is a more continuous project model across gam
 
 ## Branding and creator navigation integration (PR57)
 
-The five main destinations include both Create and Create & code alongside My journey. Leaving a visible scene for the chat creator saves a pending scene version without choosing Keep, then uses the normal page transition to stop scene playback, recording and the checkpoint clock. An active learning checkpoint blocks this navigation before a blank chat project can be created. Scene ownership, saved versions and backup records remain unchanged. The production-browser suite covers running scene → Create → My journey, stopped simulation, scene reopening and draft preservation.
+The main destinations include both Create and Create & code alongside My journey. Leaving a visible scene for the chat creator saves a pending scene version without choosing Keep, then uses the normal page transition to stop scene playback, recording and the checkpoint clock. An active learning checkpoint blocks this navigation before a blank chat project can be created. Scene ownership, saved versions and backup records remain unchanged. The production-browser suite covers running scene → Create → My journey, stopped simulation, scene reopening, draft preservation, direct shelf import, shared saved-scene discovery, explicit challenge continuation/new attempts and profile isolation.
