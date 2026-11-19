@@ -33,7 +33,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 34,
-      "possiblePoints": 41,
+      "possiblePoints": 39,
       "slots": [
         {
           "id": "MATH-1-A-OA-OA-01",
@@ -91,13 +91,13 @@
           "standardIds": [
             "1.OA.B.4"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-A-OA-OA-05",
@@ -123,13 +123,13 @@
           "standardIds": [
             "1.OA.C.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-A-OA-OA-07",
@@ -155,13 +155,13 @@
           "standardIds": [
             "1.OA.D.8"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-A-OA-OA-09",
@@ -267,7 +267,7 @@
           "standardIds": [
             "1.NBT.B.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -283,7 +283,7 @@
           "standardIds": [
             "1.NBT.B.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -299,22 +299,6 @@
           "standardIds": [
             "1.NBT.C.4"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
-          "accessibility": "neutral-directions-permitted",
-          "itemContentStatus": "secure_bank_required",
-          "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
-        },
-        {
-          "id": "MATH-1-A-NBT-NBT-05",
-          "claim": "nbt",
-          "strand": "NBT",
-          "grade": 1,
-          "standardIds": [
-            "1.NBT.C.5"
-          ],
           "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
@@ -324,6 +308,22 @@
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
+          "id": "MATH-1-A-NBT-NBT-05",
+          "claim": "nbt",
+          "strand": "NBT",
+          "grade": 1,
+          "standardIds": [
+            "1.NBT.C.5"
+          ],
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
+          "accessibility": "neutral-directions-permitted",
+          "itemContentStatus": "secure_bank_required",
+          "source": "original-Jems-item-authoring-pending",
+          "scoringGuideId": "MATH-REASONING-0-2"
+        },
+        {
           "id": "MATH-1-A-NBT-NBT-06",
           "claim": "nbt",
           "strand": "NBT",
@@ -331,7 +331,7 @@
           "standardIds": [
             "1.NBT.C.6"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -363,13 +363,13 @@
           "standardIds": [
             "1.NBT.B.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-A-NBT-NBT-09",
@@ -379,7 +379,7 @@
           "standardIds": [
             "1.NBT.B.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -411,13 +411,13 @@
           "standardIds": [
             "1.MD.A.2"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-A-MD-MD-03",
@@ -427,7 +427,7 @@
           "standardIds": [
             "1.MD.B.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -443,13 +443,13 @@
           "standardIds": [
             "1.MD.C.4"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-A-MD-MD-05",
@@ -459,7 +459,7 @@
           "standardIds": [
             "1.MD.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -475,7 +475,7 @@
           "standardIds": [
             "1.MD.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -507,13 +507,13 @@
           "standardIds": [
             "1.G.A.1"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-A-G-G-02",
@@ -539,7 +539,7 @@
           "standardIds": [
             "1.G.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -555,13 +555,13 @@
           "standardIds": [
             "1.G.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-A-G-G-05",
@@ -592,7 +592,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 34,
-      "possiblePoints": 41,
+      "possiblePoints": 39,
       "slots": [
         {
           "id": "MATH-1-B-OA-OA-01",
@@ -650,13 +650,13 @@
           "standardIds": [
             "1.OA.B.3"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-B-OA-OA-05",
@@ -682,13 +682,13 @@
           "standardIds": [
             "1.OA.C.5"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-B-OA-OA-07",
@@ -714,13 +714,13 @@
           "standardIds": [
             "1.OA.D.7"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-B-OA-OA-09",
@@ -826,7 +826,7 @@
           "standardIds": [
             "1.NBT.B.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -842,7 +842,7 @@
           "standardIds": [
             "1.NBT.C.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -858,22 +858,6 @@
           "standardIds": [
             "1.NBT.C.5"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
-          "accessibility": "neutral-directions-permitted",
-          "itemContentStatus": "secure_bank_required",
-          "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
-        },
-        {
-          "id": "MATH-1-B-NBT-NBT-05",
-          "claim": "nbt",
-          "strand": "NBT",
-          "grade": 1,
-          "standardIds": [
-            "1.NBT.C.6"
-          ],
           "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
@@ -883,6 +867,22 @@
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
+          "id": "MATH-1-B-NBT-NBT-05",
+          "claim": "nbt",
+          "strand": "NBT",
+          "grade": 1,
+          "standardIds": [
+            "1.NBT.C.6"
+          ],
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
+          "accessibility": "neutral-directions-permitted",
+          "itemContentStatus": "secure_bank_required",
+          "source": "original-Jems-item-authoring-pending",
+          "scoringGuideId": "MATH-REASONING-0-2"
+        },
+        {
           "id": "MATH-1-B-NBT-NBT-06",
           "claim": "nbt",
           "strand": "NBT",
@@ -890,7 +890,7 @@
           "standardIds": [
             "1.NBT.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -922,13 +922,13 @@
           "standardIds": [
             "1.NBT.B.3"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-B-NBT-NBT-09",
@@ -938,7 +938,7 @@
           "standardIds": [
             "1.NBT.C.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -970,13 +970,13 @@
           "standardIds": [
             "1.MD.A.1"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-B-MD-MD-03",
@@ -986,7 +986,7 @@
           "standardIds": [
             "1.MD.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1002,13 +1002,13 @@
           "standardIds": [
             "1.MD.B.3"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-B-MD-MD-05",
@@ -1018,7 +1018,7 @@
           "standardIds": [
             "1.MD.C.4"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1034,7 +1034,7 @@
           "standardIds": [
             "1.MD.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1066,13 +1066,13 @@
           "standardIds": [
             "1.G.A.2"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-B-G-G-02",
@@ -1098,7 +1098,7 @@
           "standardIds": [
             "1.G.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1114,13 +1114,13 @@
           "standardIds": [
             "1.G.A.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-B-G-G-05",
@@ -1151,7 +1151,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 34,
-      "possiblePoints": 41,
+      "possiblePoints": 39,
       "slots": [
         {
           "id": "MATH-1-C-OA-OA-01",
@@ -1209,13 +1209,13 @@
           "standardIds": [
             "1.OA.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-C-OA-OA-05",
@@ -1241,13 +1241,13 @@
           "standardIds": [
             "1.OA.B.3"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-C-OA-OA-07",
@@ -1273,13 +1273,13 @@
           "standardIds": [
             "1.OA.C.5"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-C-OA-OA-09",
@@ -1385,7 +1385,7 @@
           "standardIds": [
             "1.NBT.B.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1401,7 +1401,7 @@
           "standardIds": [
             "1.NBT.C.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1417,22 +1417,6 @@
           "standardIds": [
             "1.NBT.C.5"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
-          "accessibility": "neutral-directions-permitted",
-          "itemContentStatus": "secure_bank_required",
-          "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
-        },
-        {
-          "id": "MATH-1-C-NBT-NBT-05",
-          "claim": "nbt",
-          "strand": "NBT",
-          "grade": 1,
-          "standardIds": [
-            "1.NBT.C.6"
-          ],
           "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
@@ -1442,6 +1426,22 @@
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
+          "id": "MATH-1-C-NBT-NBT-05",
+          "claim": "nbt",
+          "strand": "NBT",
+          "grade": 1,
+          "standardIds": [
+            "1.NBT.C.6"
+          ],
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
+          "accessibility": "neutral-directions-permitted",
+          "itemContentStatus": "secure_bank_required",
+          "source": "original-Jems-item-authoring-pending",
+          "scoringGuideId": "MATH-REASONING-0-2"
+        },
+        {
           "id": "MATH-1-C-NBT-NBT-06",
           "claim": "nbt",
           "strand": "NBT",
@@ -1449,7 +1449,7 @@
           "standardIds": [
             "1.NBT.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1481,13 +1481,13 @@
           "standardIds": [
             "1.NBT.B.3"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-C-NBT-NBT-09",
@@ -1497,7 +1497,7 @@
           "standardIds": [
             "1.NBT.C.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1529,13 +1529,13 @@
           "standardIds": [
             "1.MD.B.3"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-C-MD-MD-03",
@@ -1545,7 +1545,7 @@
           "standardIds": [
             "1.MD.C.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1561,13 +1561,13 @@
           "standardIds": [
             "1.MD.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-C-MD-MD-05",
@@ -1577,7 +1577,7 @@
           "standardIds": [
             "1.MD.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1593,7 +1593,7 @@
           "standardIds": [
             "1.MD.B.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1625,13 +1625,13 @@
           "standardIds": [
             "1.G.A.2"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-1-C-G-G-02",
@@ -1657,7 +1657,7 @@
           "standardIds": [
             "1.G.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1673,13 +1673,13 @@
           "standardIds": [
             "1.G.A.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-1-C-G-G-05",
@@ -1710,7 +1710,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 44,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-2-A-OA-OA-01",
@@ -1768,13 +1768,13 @@
           "standardIds": [
             "2.OA.C.4"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-OA-OA-05",
@@ -1800,13 +1800,13 @@
           "standardIds": [
             "2.NBT.A.1"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-A-NBT-NBT-02",
@@ -1832,7 +1832,7 @@
           "standardIds": [
             "2.NBT.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1848,13 +1848,13 @@
           "standardIds": [
             "2.NBT.A.4"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-NBT-NBT-05",
@@ -1880,7 +1880,7 @@
           "standardIds": [
             "2.NBT.B.6"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1896,22 +1896,6 @@
           "standardIds": [
             "2.NBT.B.7"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "neutral-directions-permitted",
-          "itemContentStatus": "secure_bank_required",
-          "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
-        },
-        {
-          "id": "MATH-2-A-NBT-NBT-08",
-          "claim": "nbt",
-          "strand": "NBT",
-          "grade": 2,
-          "standardIds": [
-            "2.NBT.B.8"
-          ],
           "format": "human_rubric",
           "points": 2,
           "responseModality": "written-or-diagrammatic",
@@ -1921,6 +1905,22 @@
           "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
+          "id": "MATH-2-A-NBT-NBT-08",
+          "claim": "nbt",
+          "strand": "NBT",
+          "grade": 2,
+          "standardIds": [
+            "2.NBT.B.8"
+          ],
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
+          "accessibility": "neutral-directions-permitted",
+          "itemContentStatus": "secure_bank_required",
+          "source": "original-Jems-item-authoring-pending",
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+        },
+        {
           "id": "MATH-2-A-NBT-NBT-09",
           "claim": "nbt",
           "strand": "NBT",
@@ -1928,7 +1928,7 @@
           "standardIds": [
             "2.NBT.B.9"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1944,7 +1944,7 @@
           "standardIds": [
             "2.NBT.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -1992,13 +1992,13 @@
           "standardIds": [
             "2.MD.A.3"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-A-MD-MD-04",
@@ -2008,13 +2008,13 @@
           "standardIds": [
             "2.MD.A.4"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-MD-MD-05",
@@ -2072,13 +2072,13 @@
           "standardIds": [
             "2.MD.C.8"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-MD-MD-09",
@@ -2088,13 +2088,13 @@
           "standardIds": [
             "2.MD.D.9"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-A-MD-MD-10",
@@ -2136,13 +2136,13 @@
           "standardIds": [
             "2.MD.A.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-MD-MD-13",
@@ -2184,13 +2184,13 @@
           "standardIds": [
             "2.MD.B.5"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-A-MD-MD-16",
@@ -2200,13 +2200,13 @@
           "standardIds": [
             "2.MD.B.6"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-G-G-01",
@@ -2232,7 +2232,7 @@
           "standardIds": [
             "2.G.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2248,7 +2248,7 @@
           "standardIds": [
             "2.G.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2264,13 +2264,13 @@
           "standardIds": [
             "2.G.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-A-G-G-05",
@@ -2280,13 +2280,13 @@
           "standardIds": [
             "2.G.A.2"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         }
       ]
     },
@@ -2301,7 +2301,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 44,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-2-B-OA-OA-01",
@@ -2359,13 +2359,13 @@
           "standardIds": [
             "2.OA.C.3"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-OA-OA-05",
@@ -2391,13 +2391,13 @@
           "standardIds": [
             "2.NBT.B.8"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-B-NBT-NBT-02",
@@ -2423,7 +2423,7 @@
           "standardIds": [
             "2.NBT.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2439,13 +2439,13 @@
           "standardIds": [
             "2.NBT.A.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-NBT-NBT-05",
@@ -2471,7 +2471,7 @@
           "standardIds": [
             "2.NBT.A.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2487,22 +2487,6 @@
           "standardIds": [
             "2.NBT.B.5"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "neutral-directions-permitted",
-          "itemContentStatus": "secure_bank_required",
-          "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
-        },
-        {
-          "id": "MATH-2-B-NBT-NBT-08",
-          "claim": "nbt",
-          "strand": "NBT",
-          "grade": 2,
-          "standardIds": [
-            "2.NBT.B.6"
-          ],
           "format": "human_rubric",
           "points": 2,
           "responseModality": "written-or-diagrammatic",
@@ -2512,6 +2496,22 @@
           "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
+          "id": "MATH-2-B-NBT-NBT-08",
+          "claim": "nbt",
+          "strand": "NBT",
+          "grade": 2,
+          "standardIds": [
+            "2.NBT.B.6"
+          ],
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
+          "accessibility": "neutral-directions-permitted",
+          "itemContentStatus": "secure_bank_required",
+          "source": "original-Jems-item-authoring-pending",
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+        },
+        {
           "id": "MATH-2-B-NBT-NBT-09",
           "claim": "nbt",
           "strand": "NBT",
@@ -2519,7 +2519,7 @@
           "standardIds": [
             "2.NBT.B.7"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2535,7 +2535,7 @@
           "standardIds": [
             "2.NBT.B.8"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2583,13 +2583,13 @@
           "standardIds": [
             "2.MD.D.10"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-B-MD-MD-04",
@@ -2599,13 +2599,13 @@
           "standardIds": [
             "2.MD.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-MD-MD-05",
@@ -2663,13 +2663,13 @@
           "standardIds": [
             "2.MD.B.5"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-MD-MD-09",
@@ -2679,13 +2679,13 @@
           "standardIds": [
             "2.MD.B.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-B-MD-MD-10",
@@ -2727,13 +2727,13 @@
           "standardIds": [
             "2.MD.D.9"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-MD-MD-13",
@@ -2775,13 +2775,13 @@
           "standardIds": [
             "2.MD.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-B-MD-MD-16",
@@ -2791,13 +2791,13 @@
           "standardIds": [
             "2.MD.A.3"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-G-G-01",
@@ -2823,7 +2823,7 @@
           "standardIds": [
             "2.G.A.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2839,7 +2839,7 @@
           "standardIds": [
             "2.G.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -2855,13 +2855,13 @@
           "standardIds": [
             "2.G.A.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-B-G-G-05",
@@ -2871,13 +2871,13 @@
           "standardIds": [
             "2.G.A.3"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         }
       ]
     },
@@ -2892,7 +2892,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 44,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-2-C-OA-OA-01",
@@ -2950,13 +2950,13 @@
           "standardIds": [
             "2.OA.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-OA-OA-05",
@@ -2982,13 +2982,13 @@
           "standardIds": [
             "2.NBT.B.5"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-C-NBT-NBT-02",
@@ -3014,7 +3014,7 @@
           "standardIds": [
             "2.NBT.B.7"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3030,13 +3030,13 @@
           "standardIds": [
             "2.NBT.B.8"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-NBT-NBT-05",
@@ -3062,7 +3062,7 @@
           "standardIds": [
             "2.NBT.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3078,22 +3078,6 @@
           "standardIds": [
             "2.NBT.A.2"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "neutral-directions-permitted",
-          "itemContentStatus": "secure_bank_required",
-          "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
-        },
-        {
-          "id": "MATH-2-C-NBT-NBT-08",
-          "claim": "nbt",
-          "strand": "NBT",
-          "grade": 2,
-          "standardIds": [
-            "2.NBT.A.3"
-          ],
           "format": "human_rubric",
           "points": 2,
           "responseModality": "written-or-diagrammatic",
@@ -3103,6 +3087,22 @@
           "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
+          "id": "MATH-2-C-NBT-NBT-08",
+          "claim": "nbt",
+          "strand": "NBT",
+          "grade": 2,
+          "standardIds": [
+            "2.NBT.A.3"
+          ],
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
+          "accessibility": "neutral-directions-permitted",
+          "itemContentStatus": "secure_bank_required",
+          "source": "original-Jems-item-authoring-pending",
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+        },
+        {
           "id": "MATH-2-C-NBT-NBT-09",
           "claim": "nbt",
           "strand": "NBT",
@@ -3110,7 +3110,7 @@
           "standardIds": [
             "2.NBT.A.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3126,7 +3126,7 @@
           "standardIds": [
             "2.NBT.B.5"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3174,13 +3174,13 @@
           "standardIds": [
             "2.MD.B.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-C-MD-MD-04",
@@ -3190,13 +3190,13 @@
           "standardIds": [
             "2.MD.C.7"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-MD-MD-05",
@@ -3254,13 +3254,13 @@
           "standardIds": [
             "2.MD.A.1"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-MD-MD-09",
@@ -3270,13 +3270,13 @@
           "standardIds": [
             "2.MD.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-C-MD-MD-10",
@@ -3318,13 +3318,13 @@
           "standardIds": [
             "2.MD.B.5"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "numeric",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-MD-MD-13",
@@ -3366,13 +3366,13 @@
           "standardIds": [
             "2.MD.C.8"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-2-C-MD-MD-16",
@@ -3382,13 +3382,13 @@
           "standardIds": [
             "2.MD.D.9"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-G-G-01",
@@ -3414,7 +3414,7 @@
           "standardIds": [
             "2.G.A.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3430,7 +3430,7 @@
           "standardIds": [
             "2.G.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3446,13 +3446,13 @@
           "standardIds": [
             "2.G.A.2"
           ],
-          "format": "human_rubric",
-          "points": 2,
-          "responseModality": "written-or-diagrammatic",
+          "format": "closed_choice",
+          "points": 1,
+          "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "MATH-REASONING-0-2"
+          "scoringGuideId": "OBJECTIVE-EXACT-v2"
         },
         {
           "id": "MATH-2-C-G-G-05",
@@ -3462,13 +3462,13 @@
           "standardIds": [
             "2.G.A.3"
           ],
-          "format": "closed_choice",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         }
       ]
     },
@@ -3483,7 +3483,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 36,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-3-A-CONCEPTS-OA-01",
@@ -3605,7 +3605,7 @@
           "standardIds": [
             "3.NBT.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3621,7 +3621,7 @@
           "standardIds": [
             "3.NBT.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3637,7 +3637,7 @@
           "standardIds": [
             "3.NBT.A.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3765,7 +3765,7 @@
           "standardIds": [
             "3.G.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3781,7 +3781,7 @@
           "standardIds": [
             "3.G.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -3797,13 +3797,13 @@
           "standardIds": [
             "3.OA.D.8"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-A-PROBLEMSOLVING-OA-02",
@@ -3861,13 +3861,13 @@
           "standardIds": [
             "3.OA.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-A-REASONING-OA-02",
@@ -3893,13 +3893,13 @@
           "standardIds": [
             "3.NBT.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-A-REASONING-NF-01",
@@ -3925,13 +3925,13 @@
           "standardIds": [
             "3.NF.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-A-REASONING-MD-01",
@@ -3957,13 +3957,13 @@
           "standardIds": [
             "3.MD.C.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-A-REASONING-G-01",
@@ -3989,13 +3989,13 @@
           "standardIds": [
             "3.OA.A.3"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-A-MODELING-NF-01",
@@ -4074,7 +4074,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 36,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-3-B-CONCEPTS-OA-01",
@@ -4196,7 +4196,7 @@
           "standardIds": [
             "3.NBT.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4212,7 +4212,7 @@
           "standardIds": [
             "3.NBT.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4228,7 +4228,7 @@
           "standardIds": [
             "3.NBT.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4356,7 +4356,7 @@
           "standardIds": [
             "3.G.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4372,7 +4372,7 @@
           "standardIds": [
             "3.G.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4388,13 +4388,13 @@
           "standardIds": [
             "3.OA.B.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-B-PROBLEMSOLVING-OA-02",
@@ -4452,13 +4452,13 @@
           "standardIds": [
             "3.OA.D.8"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-B-REASONING-OA-02",
@@ -4484,13 +4484,13 @@
           "standardIds": [
             "3.NBT.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-B-REASONING-NF-01",
@@ -4516,13 +4516,13 @@
           "standardIds": [
             "3.NF.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-B-REASONING-MD-01",
@@ -4548,13 +4548,13 @@
           "standardIds": [
             "3.MD.C.5"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-B-REASONING-G-01",
@@ -4580,13 +4580,13 @@
           "standardIds": [
             "3.OA.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-B-MODELING-NF-01",
@@ -4665,7 +4665,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 36,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-3-C-CONCEPTS-OA-01",
@@ -4787,7 +4787,7 @@
           "standardIds": [
             "3.NBT.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4803,7 +4803,7 @@
           "standardIds": [
             "3.NBT.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4819,7 +4819,7 @@
           "standardIds": [
             "3.NBT.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4947,7 +4947,7 @@
           "standardIds": [
             "3.G.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4963,7 +4963,7 @@
           "standardIds": [
             "3.G.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -4979,13 +4979,13 @@
           "standardIds": [
             "3.OA.A.3"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-C-PROBLEMSOLVING-OA-02",
@@ -5043,13 +5043,13 @@
           "standardIds": [
             "3.OA.B.5"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-C-REASONING-OA-02",
@@ -5075,13 +5075,13 @@
           "standardIds": [
             "3.NBT.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-C-REASONING-NF-01",
@@ -5107,13 +5107,13 @@
           "standardIds": [
             "3.NF.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-C-REASONING-MD-01",
@@ -5139,13 +5139,13 @@
           "standardIds": [
             "3.MD.B.3"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-C-REASONING-G-01",
@@ -5171,13 +5171,13 @@
           "standardIds": [
             "3.OA.C.7"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-3-C-MODELING-NF-01",
@@ -5256,7 +5256,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 36,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-4-A-CONCEPTS-OA-01",
@@ -5346,7 +5346,7 @@
           "standardIds": [
             "4.NBT.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5362,7 +5362,7 @@
           "standardIds": [
             "4.NBT.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5378,7 +5378,7 @@
           "standardIds": [
             "4.NBT.A.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5394,7 +5394,7 @@
           "standardIds": [
             "4.NBT.B.4"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5410,7 +5410,7 @@
           "standardIds": [
             "4.NBT.B.5"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5506,7 +5506,7 @@
           "standardIds": [
             "4.MD.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5522,7 +5522,7 @@
           "standardIds": [
             "4.MD.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5538,7 +5538,7 @@
           "standardIds": [
             "4.MD.A.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5570,13 +5570,13 @@
           "standardIds": [
             "4.OA.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-A-PROBLEMSOLVING-NBT-01",
@@ -5634,13 +5634,13 @@
           "standardIds": [
             "4.OA.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-A-REASONING-OA-02",
@@ -5666,13 +5666,13 @@
           "standardIds": [
             "4.NBT.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-A-REASONING-NF-01",
@@ -5698,13 +5698,13 @@
           "standardIds": [
             "4.NF.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-A-REASONING-MD-01",
@@ -5730,13 +5730,13 @@
           "standardIds": [
             "4.MD.C.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-A-REASONING-G-01",
@@ -5762,13 +5762,13 @@
           "standardIds": [
             "4.OA.B.4"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-A-MODELING-NF-01",
@@ -5847,7 +5847,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 36,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-4-B-CONCEPTS-OA-01",
@@ -5937,7 +5937,7 @@
           "standardIds": [
             "4.NBT.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5953,7 +5953,7 @@
           "standardIds": [
             "4.NBT.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5969,7 +5969,7 @@
           "standardIds": [
             "4.NBT.B.4"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -5985,7 +5985,7 @@
           "standardIds": [
             "4.NBT.B.5"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6001,7 +6001,7 @@
           "standardIds": [
             "4.NBT.B.6"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6097,7 +6097,7 @@
           "standardIds": [
             "4.MD.A.1"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6113,7 +6113,7 @@
           "standardIds": [
             "4.MD.A.2"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6129,7 +6129,7 @@
           "standardIds": [
             "4.MD.A.3"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6161,13 +6161,13 @@
           "standardIds": [
             "4.OA.A.3"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-B-PROBLEMSOLVING-NBT-01",
@@ -6225,13 +6225,13 @@
           "standardIds": [
             "4.OA.B.4"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-B-REASONING-OA-02",
@@ -6257,13 +6257,13 @@
           "standardIds": [
             "4.NBT.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-B-REASONING-NF-01",
@@ -6289,13 +6289,13 @@
           "standardIds": [
             "4.NF.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-B-REASONING-MD-01",
@@ -6321,13 +6321,13 @@
           "standardIds": [
             "4.MD.C.6"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-B-REASONING-G-01",
@@ -6353,13 +6353,13 @@
           "standardIds": [
             "4.OA.A.1"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-B-MODELING-NF-01",
@@ -6438,7 +6438,7 @@
         "notTimeLimitedForScoring": true
       },
       "totalItems": 36,
-      "possiblePoints": 36,
+      "possiblePoints": 42,
       "slots": [
         {
           "id": "MATH-4-C-CONCEPTS-OA-01",
@@ -6528,7 +6528,7 @@
           "standardIds": [
             "4.NBT.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6544,7 +6544,7 @@
           "standardIds": [
             "4.NBT.A.3"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6560,7 +6560,7 @@
           "standardIds": [
             "4.NBT.B.4"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6576,7 +6576,7 @@
           "standardIds": [
             "4.NBT.B.5"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6592,7 +6592,7 @@
           "standardIds": [
             "4.NBT.B.6"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6688,7 +6688,7 @@
           "standardIds": [
             "4.MD.C.7"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6704,7 +6704,7 @@
           "standardIds": [
             "4.MD.A.1"
           ],
-          "format": "numeric",
+          "format": "closed_choice",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6720,7 +6720,7 @@
           "standardIds": [
             "4.MD.A.2"
           ],
-          "format": "closed_choice",
+          "format": "numeric",
           "points": 1,
           "responseModality": "touch-or-keyboard",
           "accessibility": "neutral-directions-permitted",
@@ -6752,13 +6752,13 @@
           "standardIds": [
             "4.OA.B.4"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-C-PROBLEMSOLVING-NBT-01",
@@ -6816,13 +6816,13 @@
           "standardIds": [
             "4.OA.C.5"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-C-REASONING-OA-02",
@@ -6848,13 +6848,13 @@
           "standardIds": [
             "4.NBT.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-C-REASONING-NF-01",
@@ -6880,13 +6880,13 @@
           "standardIds": [
             "4.NF.C.7"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-C-REASONING-MD-01",
@@ -6912,13 +6912,13 @@
           "standardIds": [
             "4.MD.C.5"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-C-REASONING-G-01",
@@ -6944,13 +6944,13 @@
           "standardIds": [
             "4.OA.A.2"
           ],
-          "format": "numeric",
-          "points": 1,
-          "responseModality": "touch-or-keyboard",
+          "format": "human_rubric",
+          "points": 2,
+          "responseModality": "written-or-diagrammatic",
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "OBJECTIVE-EXACT-v2"
+          "scoringGuideId": "MATH-REASONING-0-2"
         },
         {
           "id": "MATH-4-C-MODELING-NF-01",
@@ -11179,8 +11179,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11195,8 +11195,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11211,8 +11211,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11227,8 +11227,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11243,8 +11243,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11259,8 +11259,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11275,8 +11275,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11291,8 +11291,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11407,7 +11407,7 @@
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "ELA-RESEARCH-4x0-2"
         },
         {
           "id": "ELA-3-A-RESEARCH-W-05",
@@ -11898,8 +11898,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11914,8 +11914,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11930,8 +11930,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11946,8 +11946,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11962,8 +11962,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11978,8 +11978,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -11994,8 +11994,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12010,8 +12010,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12126,7 +12126,7 @@
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "ELA-RESEARCH-4x0-2"
         },
         {
           "id": "ELA-3-B-RESEARCH-W-05",
@@ -12617,8 +12617,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12633,8 +12633,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12649,8 +12649,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12665,8 +12665,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12681,8 +12681,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12697,8 +12697,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12713,8 +12713,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12729,8 +12729,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -12845,7 +12845,7 @@
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "ELA-RESEARCH-4x0-2"
         },
         {
           "id": "ELA-3-C-RESEARCH-W-05",
@@ -13336,8 +13336,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13352,8 +13352,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13368,8 +13368,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13384,8 +13384,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13400,8 +13400,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13416,8 +13416,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13432,8 +13432,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13448,8 +13448,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -13564,7 +13564,7 @@
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "ELA-RESEARCH-4x0-2"
         },
         {
           "id": "ELA-4-A-RESEARCH-W-05",
@@ -14055,8 +14055,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14071,8 +14071,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14087,8 +14087,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14103,8 +14103,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14119,8 +14119,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14135,8 +14135,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14151,8 +14151,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14167,8 +14167,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14283,7 +14283,7 @@
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "ELA-RESEARCH-4x0-2"
         },
         {
           "id": "ELA-4-B-RESEARCH-W-05",
@@ -14774,8 +14774,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14790,8 +14790,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14806,8 +14806,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14822,8 +14822,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14838,8 +14838,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14854,8 +14854,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14870,8 +14870,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -14886,8 +14886,8 @@
           ],
           "format": "audio_choice",
           "points": 1,
-          "responseModality": "touch-or-keyboard",
-          "accessibility": "audio-stimulus-required",
+          "responseModality": "audio-first-response",
+          "accessibility": "original-stimulus-audio-no-text-transcript",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
           "scoringGuideId": "OBJECTIVE-EXACT-v2"
@@ -15002,7 +15002,7 @@
           "accessibility": "neutral-directions-permitted",
           "itemContentStatus": "secure_bank_required",
           "source": "original-Jems-item-authoring-pending",
-          "scoringGuideId": "ELA-WRITING-4x0-2"
+          "scoringGuideId": "ELA-RESEARCH-4x0-2"
         },
         {
           "id": "ELA-4-C-RESEARCH-W-05",
