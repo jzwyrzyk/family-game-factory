@@ -56,7 +56,10 @@ The workflow will:
    working LOCAL Moon favorite. Fail on JS exceptions, missing site assets, or
    any attempt to send a paid job/coach POST. Capture screenshots and machine-
    readable smoke evidence; no parent credentials or child data are required.
-8. Store evidence. Report PAGES_AND_PUBLIC_HEALTH_VERIFIED only when all pass.
+8. Store separate HTTP and browser evidence, then produce a final
+   PAGES_BROWSER_VERIFIED verdict **only after both pass and agree** on the
+   deployed site. The final file stays absent on failures; publishing a static
+   site does not prove an authenticated build or paid AI output.
 
 This **does not** deploy backend images or prove paid provider inference works.
 The legacy manual pages.yml stays available as an emergency **publication
@@ -158,6 +161,7 @@ no credentials need to be pasted into ChatGPT.
 | CODE_MERGED | Commit in main | Deployment |
 | READ_ONLY_PLAN | Source reviewed; blockers recorded | Any mutation |
 | PAGES_AND_PUBLIC_HEALTH_VERIFIED | Exact static site and public health | Live paid AI, authenticated game play |
+| PAGES_BROWSER_VERIFIED | Published site, service health, real desktop/mobile browser boot and local favorite | Backend deployment, authenticated AI, child UAT |
 | BACKEND_AND_PAGES_VERIFIED | Future immutable Cloud Run and Pages check | Paid provider response |
 | PAID_AI_VERIFIED | Future real receipt and playable paid build | Family UAT |
 | FAMILY_UAT_ACCEPTED | Real child/parent device tests | Public rollout/legal approval |
