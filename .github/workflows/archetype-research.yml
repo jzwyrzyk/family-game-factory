@@ -1,0 +1,30 @@
+name: Jems archetype library research
+on:
+  pull_request:
+    paths:
+      - 'src/archetypes/**'
+      - 'tests/archetypes.test.ts'
+      - 'docs/archetypes/**'
+      - '.github/workflows/archetype-research.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/archetypes/**'
+      - 'tests/archetypes.test.ts'
+      - 'docs/archetypes/**'
+jobs:
+  catalog-and-reuse:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Typecheck entire application and research files
+        run: npm run typecheck
+      - name: Archetype inventory, safety and shared-rules tests
+        run: node --import tsx --test tests/archetypes.test.ts
