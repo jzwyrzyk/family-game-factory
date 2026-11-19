@@ -4,6 +4,7 @@ import {archetypes,mechanics,archetypeById,mechanicById,validateArchetypeCatalog
 import {inspectNative,validateNativeLinks} from '../src/archetypes/native';
 import {assessAssembly} from '../src/archetypes/assessment';
 import {makePrototype,collide,type PrototypeRecipe} from '../src/archetypes/prototype';
+import {compilePrototypeRecipe,portablePrototypeContracts} from '../src/archetypes/portable';
 import {defaults} from '../src/runtime/manifests';
 
 test('the 22-family inventory has unique, resolved mechanics and truthful maturity',()=>{
@@ -110,4 +111,18 @@ test('prototype rejects unknown code-like behaviors, broken owners, duplicate ac
  let state=makePrototype(good);
  state=collide(state,'shot','hero');assert.equal(state.phase,'playing');assert.equal(state.actors.hero.hp,2);
  assert.throws(()=>collide(state,'shot','unknown'));
+});
+
+test('portable prototype compiler pins exact versions and validates composition roles and dependencies',()=>{
+ assert.equal(portablePrototypeContracts.length,4);
+ const rocket=reflectRecipe('mirror-test','projectile-defense','hero','dragon','shield','shot');
+ const compiled=compilePrototypeRecipe(rocket);
+ assert.equal(compiled.schema,'headless-prototype-assembly-v1');
+ assert.equal(compiled.modulePins['reflect-projectile'],'headless-v1');
+ assert.equal(compiled.approvedForBrowser,false);
+ assert.equal(compiled.approvedForProduction,false);
+ assert.throws(()=>compilePrototypeRecipe({...rocket,actors:rocket.actors.filter(a=>a.role!=='shield')}),/PORTABLE_ROLE_MISSING/);
+ const cat:PrototypeRecipe={id:'cat-test',archetypeId:'endless-runner',goal:'collect-all',mechanics:['grow-on-collect'],actors:[{id:'cat',role:'avatar'},{id:'donut',role:'collectible'}]};
+ assert.throws(()=>compilePrototypeRecipe(cat),/PORTABLE_DEPENDENCY_MISSING/);
+ assert.throws(()=>compilePrototypeRecipe({...rocket,mechanics:['fire-projectile' as any]}),/PORTABLE_COMPONENT_UNVERIFIED/);
 });
