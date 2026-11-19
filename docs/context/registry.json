@@ -68,10 +68,10 @@
         "docs/rewards/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:06:45.785Z",
-      "sourceDigest": "0d6a8d054f2b647bdec45ddc9518e8f6aa456f75c47062ed2d588262d4d8b7cc",
+      "reviewedAt": "2026-11-19T15:12:29.851Z",
+      "sourceDigest": "1ee70fd779bc05e8a18f3979c6104befe7bd5d222af6de93275a2c928c7b61be",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the accepted rewards policy after PR57 merged to main; the Rewards contract now targets main directly, with no change to maker evidence, assistance, nonspendable gems, no backfill or excluded companions."
+      "reviewReason": "Reconciled PR66 handbook coverage with the existing Rewards doctrine and ADR0010: active identity, fonts, workshop/helper art and maker ranks remain distinct from packaged optional icons/artwork, unactivated sound and illustrative future screens. No reward eligibility, learning claim or companion scope changes."
     },
     {
       "id": "experience",
@@ -345,10 +345,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:06:47.246Z",
-      "sourceDigest": "15174ad40e5407284b2bc20ebdc15a9b29ad01ffdfed8f76846236d0f348b326",
+      "reviewedAt": "2026-11-19T15:12:30.473Z",
+      "sourceDigest": "c694891962ed7a0fb24c698abbc1be7aba6cf0d4b915c2b346abcbec1ddf47a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified PR57 squash merge c6576c16 at 10:02 a.m. America/New_York, exact approved-tree equality with 14888715, direct-main rewards targeting and local reconciliation ecb12d51 matching reviewed candidate 10404ed. Preserved historical local pins and kept rewards publication, hosted CI and deployment pending."
+      "reviewReason": "Preserved PR66 official PR57 merge receipt, exact four hosted workflow links, local and visual acceptance, and handbook coverage alongside the PR67 publication and exact-tree receipt. Recorded main 7fa7ff2 as documentation-only reconciliation; no runtime changes or new rewards CI success are claimed."
     },
     {
       "id": "context",
