@@ -59,10 +59,10 @@
         "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:49:13.587Z",
-      "sourceDigest": "8fa6b79d9de778a760b04f8a78b70399f9b736aae1de115880915dc02283f9b1",
+      "reviewedAt": "2026-11-19T15:03:13.737Z",
+      "sourceDigest": "0881c64c60bfc7c76804a7ff848d4f0fb8dfcf5e1e0635eb52dd14c795e77c83",
       "reviewOutcome": "updated",
-      "reviewReason": "Kept six dimensions separate from subject achievement, limited the launch to three prompted practice dimensions, and documented that standards mapping and deterministic rules do not establish general ability or improvement."
+      "reviewReason": "Recorded initial PR64 CI and screenshot evidence with the failed Math test-control step preserved; formative claims, standards boundaries and independent research scope remain explicit."
     },
     {
       "id": "experience",
@@ -173,10 +173,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4cb09b3a320a91a60422869e67886c85a8298a37ee9cb1c2c820659e3576bb10",
-      "reviewedAt": "2026-11-19T14:48:29.745Z",
+      "sourceDigest": "3cf89ecd82463b0b3a6dd9eed43deb16c1b08af5a799d29c192035109a38f488",
+      "reviewedAt": "2026-11-19T15:03:13.886Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the versioned episode schema, source adapters, first-response aggregation, practice oracle, stale-draft invalidation and parent labels against the new feature contract; software and educational acceptance remain separate."
+      "reviewReason": "Reviewed inline reuse of the approved robot artwork, visible goal marker, parent-action contrast and public Math answer-mode test control; acceptance record now links the exact initial CI runs and preserves unresolved later gates."
     },
     {
       "id": "services",
@@ -295,10 +295,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:49:16.424Z",
-      "sourceDigest": "0fb98cd39ff99553f44c94776d788cb6cd3d017b46c4980f64cbf55a2594eb4e",
+      "reviewedAt": "2026-11-19T15:03:14.075Z",
+      "sourceDigest": "8cb162277ad006feb5c8f4c3577b4b1d629f94788f5f3aa9283785dbf0b9f860",
       "reviewOutcome": "updated",
-      "reviewReason": "Added evidence, storage, authored-practice, adapter and desktop-touch browser checks. Documented passing local units and build separately from browser suites blocked by local process sockets; no visual or child validation claim."
+      "reviewReason": "Reviewed the browser journey correction to select Write an answer and assertions for robot and goal visibility; exact initial failure and subsequent-candidate gate are documented without carrying forward a pass."
     },
     {
       "id": "delivery",
@@ -320,10 +320,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:49:17.135Z",
-      "sourceDigest": "aab69a223ca51a184e89a936c1a175d1a8035ced99dd844f2dbfd51e9cb0767c",
+      "reviewedAt": "2026-11-19T15:03:14.333Z",
+      "sourceDigest": "cca4943079235552372d453ac01b027ec44aefbb336b848a9c774ccc80aec747",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved the latest PR63 delivery receipts and recorded this unmerged source candidate. Added the two problem-solving validation steps to ordinary CI without changing Pages deployment, providers or worker pins."
+      "reviewReason": "Linked draft PR64 and its initial source SHA, passing scoped CI and failed browser step; preserved separate merge, deployment, benchmark and learning-validation boundaries."
     },
     {
       "id": "context",

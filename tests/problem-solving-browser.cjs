@@ -43,6 +43,9 @@ const KEY='family-game-factory-problem-solving-v1';
     await pick(1);await activate('#studioNavProblemSolving');assert.equal(await page.locator('[data-ps-task="robot-stop-g3-4"]').count(),1);assert.equal((await saved()).length,0);
     await pick(0);await activate('#studioNavProblemSolving');await activate('[data-ps-task="robot-stop-g1-2"]');assert.equal(await phase(),'test');
     await activate('[data-ps-choice="smaller-steps"]');assert.equal(await phase(),'result');await overflow();
+    const rover=await page.locator('.ps-rover svg').boundingBox(),gem=await page.locator('.ps-track-gem').boundingBox(),goal=await page.locator('.ps-track-spot.is-goal').boundingBox(),world=await page.locator('.ps-robot-world').boundingBox();
+    assert.ok(rover&&rover.width>=40&&rover.height>=50,device+': visible robot character');
+    assert.ok(gem&&goal&&world&&gem.y>=goal.y+goal.height-1&&gem.y+gem.height<=world.y+world.height+1,device+': goal gem remains visible below its tile');
     await page.screenshot({path:`test-results/problem-solving-result-${device}.png`,fullPage:true});
     await activate('#psObserve');await activate('[data-ps-choice="at-gem"]');
     await activate('[data-ps-choice="old-plan"]');assert.equal(await phase(),'finished');
@@ -68,7 +71,11 @@ const KEY='family-game-factory-problem-solving-v1';
       const choices=page.locator('.math-activity:visible [data-value]'),values=await choices.evaluateAll(nodes=>nodes.map(n=>n.dataset.value));
       const index=values.indexOf(String(item.answer));assert.ok(index>=0);await activate(choices.nth(index));
     }
-    else{await page.locator('.math-activity:visible .math-answer-input').fill(String(item.answer));await activate(page.locator('.math-activity:visible').getByRole('button',{name:'Check answer',exact:true}));}
+    else{
+      const activity=page.locator('.math-activity:visible'),write=activity.getByRole('button',{name:'Write an answer',exact:true});
+      if(await write.isVisible())await activate(write);
+      await activity.locator('.math-answer-input').fill(String(item.answer));await activate(activity.getByRole('button',{name:'Check answer',exact:true}));
+    }
     await page.waitForFunction(()=>!FG.learning.active);
     assert.equal((await saved()).filter(e=>e.source==='math').length,1);
     assert.ok((await saved()).filter(e=>e.source==='math').every(e=>e.kind==='context-only'&&e.observations.length===0));

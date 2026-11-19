@@ -131,7 +131,10 @@ export function installProblemSolvingPractice(host: Host) {
       const length = Math.max(scene.target, task.initial.kind === 'robot' ? task.initial.steps * task.initial.stride : 0, scene.steps * scene.stride) + 1;
       const track = node('div', 'ps-track'); track.style.setProperty('--ps-spaces', String(length));
       for (let i = 0; i < length; i++) { const spot = node('div', 'ps-track-spot', String(i)); if (i === scene.target) { spot.classList.add('is-goal'); spot.append(node('span', 'ps-track-gem', '◆')); } track.append(spot); }
-      const rover = node('span', 'ps-rover'); rover.append(image('./jems-world-robot.svg'));
+      const rover = node('span', 'ps-rover');
+      // Reuse the robot from jems-world-robot.svg directly: every trial renders
+      // synchronously, without an offscreen image crop or another decode.
+      rover.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="125 0 240 230" aria-hidden="true" focusable="false"><g transform="translate(157 25)"><rect x="0" y="35" width="177" height="148" rx="39" fill="#2D7BFF"/><rect x="18" y="53" width="141" height="113" rx="27" fill="#FFF7EE"/><circle cx="62" cy="100" r="14" fill="#0B1D4D"/><circle cx="119" cy="100" r="14" fill="#0B1D4D"/><path d="M65 129q27 25 55 0" stroke="#34D7B3" stroke-width="10" stroke-linecap="round" fill="none"/><rect x="80" y="0" width="16" height="39" rx="7" fill="#0B1D4D"/><circle cx="89" cy="1" r="16" fill="#FFC828"/><rect x="-23" y="86" width="28" height="54" rx="11" fill="#8A4DFF"/><rect x="172" y="86" width="28" height="54" rx="11" fill="#8A4DFF"/></g></svg>`;
       const end = trial ? scene.steps * scene.stride : 0;
       rover.style.left = `${(end + .5) / length * 100}%`;
       landscape.append(track, rover); stage.append(landscape);

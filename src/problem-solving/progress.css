@@ -11,4 +11,5 @@
 .ps-observation summary,.ps-source-context summary { cursor: pointer; font-weight: 650; line-height: 1.5; }
 .ps-observation li { margin-block: 10px; line-height: 1.5; }
 .ps-evidence-panel .fine { line-height: 1.55; }
+.ps-evidence-panel .text-btn { color: #5b447e; min-height: 44px; padding: 10px 8px; text-decoration: underline; }
 @media(max-width: 600px) { .ps-evidence-table th,.ps-evidence-table td { padding: 9px; } .ps-evidence-table { font-size: .82rem; } }

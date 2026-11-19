@@ -1,6 +1,6 @@
 # Problem-solving implementation and acceptance
 
-**Status:** first source implementation candidate on `feature/jems-problem-solving-evidence-20261119`. This document describes the contract under implementation; the acceptance table records what has actually been checked. It does not claim merged, deployed or child-validated behavior.
+**Status:** first source implementation candidate in [draft PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64), branch `feature/jems-problem-solving-evidence-20261119`. This document describes the contract under implementation; the acceptance table records the scoped evidence below. The PR tracks subsequent candidate checks. It does not claim merged, deployed or child-validated behavior.
 
 ## Components
 
@@ -57,14 +57,18 @@ Source activities own their own save contract. An optional observer records only
 
 ## Acceptance evidence
 
+**Initial published candidate:** `6d1b2d6769c11900266fcfc8aed095e460e021f1`, tree `d2f197785c3cc7c4820a2c622f38ae2922b4b246`, against main `eebeebeb8896554bd3619029d8ca80d4b06b2f2b`. On November 19, 2026, [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301428), [family security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301796), and all five [visual-review jobs](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301785) passed. The visual artifact's synthetic merge `833a3da779b6484b5a13b968b086d2b4dd39954f` has the same tree as that candidate. Desktop/mobile host screens and desktop practice screenshots were inspected.
+
+The initial [learning job](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44548301433/job/135644803311) passed existing Math/English/pacing checks and all 28 focused problem-solving tests. Its new browser journey passed desktop practice/resume/profile/support/report steps, then failed because the test filled Math's numeric input while the existing **Build an answer** view had it hidden. The subsequent patch selects **Write an answer** through the public control. Screenshot review also prompted an inline version of the existing robot artwork, an unobscured goal marker and improved parent-action contrast. Those corrections require their own candidate CI; the first run is not relabeled as a full journey pass. The PR's exact-head checks and review record carry later results.
+
 | Check | Required observation | Status |
 | --- | --- | --- |
-| Model/store | Reject unsupported and cross-profile data; preserve immutable records/draft prefixes; deduplicate; bound retention; recover corrupt originals | Checked by the 28 focused problem-solving tests; exact-head CI pending |
-| Deterministic tasks | Validate each accepted choice and meaningful alternate; preserve first response and subsequent support; cover both age bands | Checked by the 28 focused problem-solving tests; exact-head CI pending |
-| Source integration | Only observed trusted events; no raw transcript duplication, retrospective ability scoring or generated-code grading authority | Checked by the 28 focused problem-solving tests; exact-head CI pending |
-| Family data | Old backup compatibility; new backup round trip; profile/reset/deletion coverage; write-failure and invalid-import recovery | Store/adapter failure, recovery, isolation and deletion tests pass. Full UI round trip is in the browser suite; CI pending. |
-| Browser journey | Optional entry/exit, keyboard/touch controls, resume, profile switch, support and clear report wording | Desktop/touch suite authored. Local Chromium cannot open its process socket; unrestricted execution was rejected by automatic approval policy. Cloud browser cannot reach the isolated preview. CI pending; no claimed visual or child acceptance. |
-| Existing contracts | Production build/typecheck, affected learning/Creation/Studio regression and documentation review | Build/typecheck, core unit suite, 77 Creation contracts, 31 Studio units and 18 documentation checker tests passed locally. Existing learning UI/browser regressions await CI because Chromium is blocked locally. Final documentation review recorded in registry. |
+| Model/store | Reject unsupported and cross-profile data; preserve immutable records/draft prefixes; deduplicate; bound retention; recover corrupt originals | Included in the 28 focused tests, passing locally and on the initial published candidate above |
+| Deterministic tasks | Validate each accepted choice and meaningful alternate; preserve first response and subsequent support; cover both age bands | Included in the 28 focused tests, passing locally and on the initial published candidate above |
+| Source integration | Only observed trusted events; no raw transcript duplication, retrospective ability scoring or generated-code grading authority | Included in the 28 focused tests, passing locally and on the initial published candidate above |
+| Family data | Old backup compatibility; new backup round trip; profile/reset/deletion coverage; write-failure and invalid-import recovery | Store/adapter failure, recovery, isolation and deletion tests pass. The initial browser failure occurred before the full UI backup round trip. See subsequent PR checks. |
+| Browser journey | Optional entry/exit, keyboard/touch controls, resume, profile switch, support and clear report wording | Initial desktop practice steps passed before the Math test-control failure above; full desktop/touch completion remains a separate gate. Local Chromium cannot open its process socket, automatic approval rejected unrestricted execution, and the cloud browser cannot reach the isolated preview. Use hosted CI evidence; no child acceptance is claimed. |
+| Existing contracts | Production build/typecheck, affected learning/Creation/Studio regression and documentation review | Build/typecheck, core unit suite, 77 Creation contracts, 31 Studio units and 18 documentation checker tests passed locally. Initial published CI passed existing learning checks and the separately linked documentation, security and visual runs. Review fingerprints are recorded in the registry. |
 | Educational interpretation | Educator task review, child response-process interviews, support/modality fairness and task comparability | Not established by software tests |
 
 Record the exact candidate and outcomes when available; do not carry PR62's passing tests forward as proof of this changed branch. The implementation author must inspect the final source before updating review fingerprints.
