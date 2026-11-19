@@ -60,7 +60,8 @@
     "docs/rewards/*.md",
     "docs/rewards/previews/*.md",
     "docs/problem-solving/*.md",
-    "docs/mind-your-jems/*.md"
+    "docs/mind-your-jems/*.md",
+    "docs/archetypes/*.md"
   ],
   "areas": [
     {
@@ -78,8 +79,8 @@
         "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:35:58.554Z",
-      "sourceDigest": "739719ca9db700bc390ce05ea7817cda037391bb4149643873e347021f63b74b",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "c2d0e02afdcc7f466138ffaa4f224c43a02646df8a4f670621a9b71d35001ddd",
       "reviewOutcome": "unchanged",
       "reviewReason": "Reviewed the source-only merge receipt and final acceptance update. Product doctrine, educational claim limits, reward policy and formative feature scope are unchanged; only implementation and delivery history now record observed facts.",
       "reviewHistory": [
@@ -143,8 +144,8 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:05:30.434Z",
-      "sourceDigest": "e4c5b5c0505ea1a2f21fe7ddb1fe8c09e3091ac123078d35e4faa57a0d2c3099",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "6e2d2ac1a561182eab94cdb92571beb3102ded2e8d108f9429b19da20f555b27",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
       "reviewHistory": [
@@ -229,7 +230,8 @@
         "docs/GAME-QUALITY.md",
         "docs/game-quality/*.md",
         "docs/brand/GEM_FACTORY.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/archetypes/*.md"
       ],
       "sources": [
         "src/games/**",
@@ -240,13 +242,14 @@
         "docs/game-quality/*.md",
         "docs/mind-your-jems/**",
         "public/art/mind-your-jems/**",
-        "public/fonts/fredoka/**"
+        "public/fonts/fredoka/**",
+        "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:05:30.434Z",
-      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "beaf9747497d3b79797f76190cb9a4d1a49599c56576088a0c19a16a28af6180",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits."
+      "reviewReason": "Reviewed original Mind Your Jems art and local gameplay against the current app and newly merged PR48's design-only archetype modules. Routed the seven previously unmapped archetype modules and the design charter; no claim of installed playable archetypes or changed runtime is made."
     },
     {
       "id": "learning",
@@ -392,8 +395,8 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:05:30.434Z",
-      "sourceDigest": "59b3d84b558f2c11a98816df2602cdcafc562d9543db387b218e33e34fadebc1",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "05824b800911721c3affe036b0eccb12795d2796ada19d2eb0562ab4e89def82",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
       "reviewHistory": [
@@ -434,8 +437,8 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T20:05:30.434Z",
-      "sourceDigest": "e4b1f93009089136ed0c8211ab63bd078615817966d4c709aba1800e5d40bd96",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "428cc4845753095a35f32db5afb509eac8c536214812e9ae629c9915122835d4",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
       "reviewHistory": [
@@ -481,10 +484,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:05:30.434Z",
-      "sourceDigest": "6ab68bc6dd3433faaa7a012982d33dc46ed51c2cca2251c516193c5c861056cc",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "800116f4b4036637dbbb97305f1f1b253c0394b37462af6476793bf187e9800a",
       "reviewOutcome": "updated",
-      "reviewReason": "Covered optional artwork, typography, arcade source, tests and feature documents without dropping any existing brand, research, parent, problem-solving or release requirements.",
+      "reviewReason": "Mapped the new illustrated game source, approved assets, font, tests, and newly integrated PR48 archetype research files; preserved existing independent learning, privacy, brand, Rewards and parent-reporting scopes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
