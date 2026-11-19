@@ -40,3 +40,9 @@
  .myj-arcade[data-ready=true] .myj-notice{display:none}
  .myj-arcade[data-ready=true] .myj-tips-feedback{color:#5c279b;font-weight:600}
 }
+
+/* On shallow landscape phones, ready-state toasts also move into footer hints. */
+@media(max-height:600px) and (orientation:landscape){
+ .myj-arcade[data-ready=true] .myj-notice{display:none}
+ .myj-arcade[data-ready=true] .myj-tips-feedback{color:#5c279b;font-weight:600}
+}

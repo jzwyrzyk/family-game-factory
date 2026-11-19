@@ -193,9 +193,9 @@ async function exercise(journey,device,review){
  assert.equal(await journey.score('loose'),0);
  await geometry(journey,device,review);
  await capture('ready-playing');
- if(device.name==='mobile-small'){
-  assert.equal(await arcade.locator('.myj-notice-visible').count(),0,'short-phone ready art is unobstructed');
-  assert.match(await arcade.locator('[data-myj="tips"]').innerText(),/safe|cart/i,'short-phone banking feedback appears in footer');
+ if(['mobile-small','mobile-landscape','mobile-landscape-small'].includes(device.name)){
+  assert.equal(await arcade.locator('.myj-notice-visible').count(),0,'compact ready-state art is unobstructed');
+  assert.match(await arcade.locator('[data-myj="tips"]').innerText(),/safe|cart/i,'compact banking feedback appears in footer');
  }
  await journey.activate(arcade.locator('[data-myj="play-ready"]'));
  // The newly attached sandbox frame has its own animation frames and preview

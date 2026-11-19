@@ -82,4 +82,4 @@ This is a feature PR. Passing tests and updating the artwork do not merge or dep
 
 ### Short-phone ready feedback
 
-At 360×640 portrait, short-lived banking notices use the existing footer hints rather than obscuring the rock's eyes and crystals. Play and scores remain visible, and ready handoff remains explicit. The browser suite asserts footer feedback and illustrated-scene clearance.
+On 360×640 portrait and shallow landscape phones, short-lived ready-state banking notices use the existing footer hints rather than obscuring the rock's eyes and crystals. Play and scores remain visible, and ready handoff remains explicit. The browser suite asserts footer feedback and illustrated-scene clearance.

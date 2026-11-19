@@ -137,8 +137,10 @@ export function createMindYourJems():WaitArcade {
   function notice(message:string,duration=2800){
     const alert=el('[data-myj="alert"]'),tips=el('[data-myj="tips"]');
     // Short portrait phones move ready-state messages into the footer.
-    const compactReady=dialog.dataset.ready==='true'&&
-      window.matchMedia('(max-width:600px) and (max-height:720px) and (orientation:portrait)').matches;
+    const compactReady=dialog.dataset.ready==='true'&&(
+      window.matchMedia('(max-width:600px) and (max-height:720px) and (orientation:portrait)').matches||
+      window.matchMedia('(max-height:600px) and (orientation:landscape)').matches
+    );
     const footerFeedback=compactReady&&!!message;
     alert.textContent=footerFeedback?'':message;
     alert.classList.toggle('myj-notice-visible',!!message&&!footerFeedback);
