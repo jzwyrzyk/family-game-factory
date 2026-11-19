@@ -7,7 +7,7 @@
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "test:unit": "node --import tsx tests/unit.ts",
-    "test:learning-evidence": "node --test tests/learning-evidence-scoring.test.mjs tests/learning-evidence-crosswalk.test.mjs tests/learning-evidence-content.test.mjs",
+    "test:learning-evidence": "node --test tests/learning-evidence-scoring.test.mjs tests/learning-evidence-crosswalk.test.mjs tests/learning-evidence-content.test.mjs tests/learning-evidence-instrument-v2.test.mjs tests/learning-evidence-full-bank-v2.test.mjs",
     "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts",
     "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser",
