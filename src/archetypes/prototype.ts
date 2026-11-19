@@ -56,7 +56,7 @@ export function collide(state:PrototypeState,firstId:string,secondId:string):Pro
  const findPair=(one:ActorRole,two:ActorRole):[ActorState,ActorState]|null=>
   first.role===one&&second.role===two?[first,second]:first.role===two&&second.role===one?[second,first]:null;
  const events:string[]=[];
- let phase=state.phase;
+ let phase:PrototypeState['phase']=state.phase;
  const reflected=findPair('shield','projectile');
  if(reflected&&has(state,'reflect-projectile')){
   const [shield,shot]=reflected;
