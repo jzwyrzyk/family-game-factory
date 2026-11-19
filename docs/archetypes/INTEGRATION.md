@@ -24,9 +24,15 @@ credentials. The first architecture must integrate into them, not run beside the
    - **Review/unsupported**: clear, child-friendly explanation; original saved.
 6. **Build and verify:** objective tests for inputs -> state changes -> visible payoff,
    touch/keyboard, frame stability, retry, learning, security and resource budgets.
-7. **Play/compare:** existing Studio preview, revision DAG, candidate/Keep/Undo/Fork;
+7. **Creative differentiation QA (staged):** compare actual player actions,
+   challenges, goals and required mechanics with a relevant *authorized*
+   previous game when the child requests a genuinely different one. A reskin
+   is not automatically new gameplay, but intentional reskins/edits remain
+   allowed. The research implementation is **design-only**; independent
+   browser traces and child observation are still necessary.
+8. **Play/compare:** existing Studio preview, revision DAG, candidate/Keep/Undo/Fork;
    never overwrite a current working game or auto-Keep an AI-generated result.
-8. **Record evidence:** collect consent-appropriate behavioral evidence; do not equate
+9. **Record evidence:** collect consent-appropriate behavioral evidence; do not equate
    LLM opinions, compile success, or play counts with verified child delight.
 
 ## 2. Concrete source integration (after PR #43)
@@ -164,7 +170,26 @@ G4: Resource budgets, no runaway frames, device performance, accessibility.
 G5: Isolation, auth, privacy, consent, worker immutable hash, rejection of
     untrusted capabilities and safe failure.
 G6: Preserved saves, learning host evidence, alternate revisions, rollback.
-G7: Child intent traceability and, separately, human observation for enjoyment.
+G7: Source-backed child intent and observed differentiation across real gameplay;\n    static diversity signatures are not proof of different play.\nG7b: Human observation of enjoyment and perceived repetition, with consent.
 G8: Metered production canary, cost and latency evidence, owner release approval.
 
 A passing G0–G2 headless test does **not** satisfy G3–G8.
+
+## 8. Anti-pigeonholing: preserve child-authored mechanics
+An archetype's `coreMechanics` field is an **illustrative reference set**,
+not an executable mandatory recipe or a substitute for the child's wording.
+The 88 `playPatterns` use independently authored mechanic selections,
+with only truly shared shell mechanics added. An assembly assessment includes
+only the explicitly **requested** essential mechanics and never injects every
+example mechanic listed under the broad archetype.
+
+The new tests caught a genuine design flaw: a projectile-defense archery
+pattern had unintentionally inherited shield-reflection merely because the
+family examples contained that mechanic. The implementation now treats
+bow aiming and shield reflection as separate play-pattern capabilities.
+
+Do not insert random rules merely to meet a diversity threshold. The
+comparison is advisory and `proposedOnly=true`; downstream runtime work must
+join source-backed PR #43 child intent, sandbox play evidence and valid
+Keep/Undo before any production claim. See [CREATIVE_DIVERSITY.md](CREATIVE_DIVERSITY.md)
+for first-play trace rules, edit/reskin exceptions and child experience research.
