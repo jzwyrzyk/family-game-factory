@@ -73,7 +73,7 @@ async function currentNavigation(page,id){
    // original maker portraits at phone widths, including narrow 320px screens.
    if(label==='mobile'){
     const destinations=[
-     ['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','✦ Create & code'],
+     ['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],
      ['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPowers','My Powers']
     ];
     for(const phoneWidth of [390,320]){
