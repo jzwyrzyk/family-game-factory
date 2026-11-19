@@ -320,10 +320,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:58:18.654Z",
-      "sourceDigest": "d02fbefd299549e59cd011662be9fadc108e54bdc475689f226c19ba4cfa2a7f",
+      "reviewedAt": "2026-11-19T15:36:33.691Z",
+      "sourceDigest": "651582da5a2001a919f2bf17bd9157001a0e9ed5ef96a2fe45fd25f418b0c14a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed both final compatibility test adaptations without suppressed errors: homepage preserves legacy/alias navigation through writer handover; desktop/mobile adult tests retain explicit authorization and privacy assertions. Documented passing outcomes alongside 54 rewards, 8 creation-recovery and actual-app evidence."
+      "reviewReason": "Reviewed exact six-destination phone layout and Live Remix restore/reload replacement assertions, unchanged reward counts, preserved privacy/quota gates, and real-frame default/remixed splash duration checks. Both complete targeted suites pass locally; no gameplay, reward or learning policy changed."
     },
     {
       "id": "delivery",
@@ -345,10 +345,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:12:30.473Z",
-      "sourceDigest": "c694891962ed7a0fb24c698abbc1be7aba6cf0d4b915c2b346abcbec1ddf47a4",
+      "reviewedAt": "2026-11-19T15:36:34.544Z",
+      "sourceDigest": "778a54e88e86ee8414d170098b95ade420f4e047a5885c74385c1bd2115d63cd",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved PR66 official PR57 merge receipt, exact four hosted workflow links, local and visual acceptance, and handbook coverage alongside the PR67 publication and exact-tree receipt. Recorded main 7fa7ff2 as documentation-only reconciliation; no runtime changes or new rewards CI success are claimed."
+      "reviewReason": "Recorded exact e9dd62 hosted results, the two compatibility failures, local brand/Live Remix corrections and full passing desktop/mobile/native follow-up. Preserved initial failures and timing-test limitations; current application runtime is unchanged and the next published-head CI remains pending."
     },
     {
       "id": "context",

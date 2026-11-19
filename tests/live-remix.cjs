@@ -25,7 +25,7 @@ const {start}=require('./browser-server.cjs');
     await page.fill('#livePrompt',prompt);await page.click('#livePromptForm button[type=submit]');await page.waitForSelector('#page-game:not(.hidden)');
     const state=await snapshot();assert.equal(state.config[key],expected);assert.equal(state.state[key],expected);assert.equal(state.state.bucketCount,state.config.bucketCount);
 
-    const began=Date.now();await round();if(key==='splashMs')assert.ok(Date.now()-began<5000,'splash duration must really change');
+    await round(); // The configured splash animation is timed deterministically below.
     if(i===0)assert.match(await page.textContent('#coachEvidence'),/More buckets might be harder.*not proof/);
     await page.click('#coachSkip');assert.equal(await page.locator('#coachForm').isVisible(),false);
   }
@@ -44,10 +44,30 @@ const {start}=require('./browser-server.cjs');
   assert.match(await page.textContent('#builderStatus'),/Needs builder.*No job was queued/);assert.deepEqual(jobRequests,[]);
   await page.fill('#forkName',`Donut Splash ${device}`);await page.click('#liveForkForm button[type=submit]');await page.reload();await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await nav('🎨 My Creations');await page.getByRole('button',{name:`🎮 Donut Splash ${device}`,exact:true}).click();assert.match(await page.textContent('#liveMechanics'),/Number of buckets: 5/);await page.click('#livePlay');assert.equal((await snapshot()).state.bucketCount,5);await page.click('#returnLive');
   const after=await page.evaluate(()=>JSON.stringify({skills:FG.store.current().skills,focus:FG.store.current().focus,age:FG.store.current().age,intensity:FG.store.current().intensity}));assert.equal(after,original);
-  // Parent export/restore includes the new workspace, while an old backup keeps it intact.
+  // Full backups round-trip exactly. A missing optional domain replaces it with
+  // an empty workspace, and restores finish by reloading fresh in-memory state.
   await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();const downloadPromise=page.waitForEvent('download');await page.click('#exportData');const download=await downloadPromise,backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.equal(backup.factoryWorkspace.version,2);const workspaceBefore=JSON.stringify(backup.factoryWorkspace);
-  await page.setInputFiles('#importData',{name:'combined.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});await page.waitForFunction(()=>document.getElementById('importData').value==='');assert.equal(await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace())),workspaceBefore);
-  delete backup.factoryWorkspace;await page.setInputFiles('#importData',{name:'old-v1.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});await page.waitForFunction(()=>document.getElementById('importData').value==='');assert.equal(await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace())),workspaceBefore);await nav('🎛️ Remix');
+  const rewardCounts=()=>page.evaluate(async()=>{const summary=await FG.rewards.refresh();return {gems:summary.lifetimeGems,grants:summary.totalGrants};});
+  const rewardsBefore=await rewardCounts();
+  const importBackup=async(name,value)=>{
+   await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+   await Promise.all([
+    page.waitForNavigation({waitUntil:'load'}),
+    page.setInputFiles('#importData',{name,mimeType:'application/json',buffer:Buffer.from(JSON.stringify(value))})
+   ]);
+   await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);
+  };
+  await importBackup('combined.json',backup);
+  assert.equal(await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace())),workspaceBefore);
+  assert.deepEqual(await rewardCounts(),rewardsBefore,'restoring saved work cannot mint phantom rewards');
+  const oldBackup=structuredClone(backup);delete oldBackup.factoryWorkspace;
+  await importBackup('old-v1.json',oldBackup);
+  assert.deepEqual(await page.evaluate(()=>FG.factory.exportWorkspace()),{version:2,projects:[],revisions:[],plays:[]},'a missing workspace domain is replaced with an empty workspace');
+  assert.deepEqual(await rewardCounts(),rewardsBefore,'missing-domain replacement cannot create reward grants');
+  await importBackup('combined-again.json',backup);
+  assert.equal(await page.evaluate(()=>JSON.stringify(FG.factory.exportWorkspace())),workspaceBefore,'restore the complete workspace before testing its privacy and quota behavior');
+  assert.deepEqual(await rewardCounts(),rewardsBefore,'repeated restoration cannot duplicate rewards');
+  await nav('🎛️ Remix');
   // Saved fork is private to the active pseudonymous profile on this browser.
   await page.locator('.profile-choice').nth(1).click();assert.equal(await page.locator('#liveEditor').isVisible(),false);await page.locator('.profile-choice').first().click();assert.equal(await page.locator('#liveEditor').isVisible(),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
@@ -136,7 +156,53 @@ const {start}=require('./browser-server.cjs');
    await activity.getByRole('button',{name:'Check answer',exact:true}).click();
   }
  };
+ // Measure the matching native remix adapter, not intro clicks or editor travel.
+ // original-buckets.js scales only the drop by 1900/splashMs; a dirty drop has a
+ // 3.42s animation threshold. Choose that outcome through the real arrow control
+ // so both configurations measure the same drop, after the fixed suspense.
+ const measureSplashDrop=async(splashMs)=>{
+  const state=await pluginPage.evaluate(()=>FG.runtime.snapshot());
+  assert.equal(state.config.originalRules,true);
+  assert.equal(state.config.splashMs,splashMs);assert.equal(state.state.splashMs,splashMs);
+  for(let step=0;step<3;step++){
+   const mode=await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode);
+   if(!['title','hero','intro'].includes(mode))break;
+   await pluginPage.locator('#go').click();
+  }
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'play');
+  if(await pluginPage.evaluate(()=>{const s=FG.runtime.snapshot().state;return s.selection===s.safe;}))await pluginPage.locator('#right').click();
+  assert.equal(await pluginPage.evaluate(()=>{const s=FG.runtime.snapshot().state;return s.selection!==s.safe;}),true,'both timing samples use a real non-safe bucket choice');
+  await pluginPage.locator('#go').click();
+  assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),'suspense');
+  const advanceTo=async(mode,limit)=>{
+   let elapsed=0;
+   while(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode)!==mode&&elapsed<limit){await pluginPage.clock.runFor(100);elapsed+=100;}
+   assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.mode),mode,`${splashMs}ms config must reach ${mode} through bounded real animation frames`);
+   return elapsed;
+  };
+  await advanceTo('drop',3000);
+  const dropMs=await advanceTo('result',4000);
+  const needsMath=await pluginPage.evaluate(()=>FG.math.canAsk(FG.store.current()));
+  await pluginPage.locator('#go').click();
+  await pluginPage.waitForSelector('#stage-overlay .math-activity, #stage-overlay #resultNext',{timeout:5000});
+  assert.equal(await pluginPage.evaluate(()=>FG.learning.active),needsMath,'timing samples still respect the shared learning checkpoint policy');
+  if(needsMath){await answerNative(true);await pluginPage.clock.runFor(500);}
+  await pluginPage.waitForSelector('#resultNext');
+  assert.equal(await pluginPage.evaluate(()=>FG.learning.active),false,'finish required practice before leaving the timing round');
+  await pluginPage.click('#returnLive');
+  return dropMs;
+ };
+ await pluginPage.evaluate(()=>FG.learning.setMode('buckets','checkpoint'));
+ await pluginPage.selectOption('#liveGame','buckets');await pluginPage.click('#newLiveGame');await pluginPage.click('#livePlay');
+ const defaultDrop=await measureSplashDrop(1900);
+ await pluginPage.fill('#livePrompt','Make the splash last 0.4 seconds');await pluginPage.click('#livePromptForm button[type=submit]');
+ const fasterDrop=await measureSplashDrop(400);
+ assert.ok(defaultDrop>=3000&&defaultDrop<=3600,`default dirty drop should take about 3.42s of animation time, measured ${defaultDrop}ms`);
+ assert.ok(fasterDrop>=500&&fasterDrop<=900,`400ms configuration should scale the dirty drop to about 720ms, measured ${fasterDrop}ms`);
+ assert.ok(fasterDrop*3<defaultDrop,'the real 400ms remix must animate over three times faster than the default 1900ms drop');
+ console.log(`PASS native splash timing: default 1900ms config = ${defaultDrop}ms drop; remixed 400ms config = ${fasterDrop}ms drop; real result and learning checkpoints retained`);
  await pluginPage.evaluate(()=>{Math.random=()=>0;FG.store.changeProfile({rate:8,punish:true});FG.learning.setMode('buckets','checkpoint');FG.app.openGame('buckets',{config:{originalRules:true,bucketCount:3,revealSafe:false,splashMs:400}})});
+ await advanceNativeBudget(); // Apply the existing rate-8 pacing policy before its challenge sequence.
  await nativeRound('Original Challenge incorrect');await answerNative(false);await pluginPage.waitForSelector('#resultNext');assert.match(await pluginPage.textContent('#resultNext'),/Retry/);
  await pluginPage.click('#resultNext');assert.equal(await pluginPage.evaluate(()=>FG.runtime.snapshot().state.level),1);
  await advanceNativeBudget(); // Respect spacing while the retry is still on its intro screen.

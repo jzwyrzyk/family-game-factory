@@ -32,9 +32,13 @@ const fs=require('node:fs');
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
-   // Keep the five current destinations tappable and hero copy clear of the
+   // Keep all six destinations tappable in balanced rows and hero copy clear of the
    // original maker portraits at phone widths, including narrow 320px screens.
    if(label==='mobile'){
+    const destinations=[
+     ['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','✦ Create & code'],
+     ['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPowers','My Powers']
+    ];
     for(const phoneWidth of [390,320]){
      await page.setViewportSize({width:phoneWidth,height});
      await page.evaluate(()=>document.fonts.ready);
@@ -43,11 +47,20 @@ const fs=require('node:fs');
       const action=rect('.studio-home-action'),characters=rect('.jems-home-characters');
       return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,
        overlap:action.left<characters.right&&action.right>characters.left&&action.top<characters.bottom&&action.bottom>characters.top,
-       buttons:[...document.querySelectorAll('.studio-nav button')].map(button=>({height:button.getBoundingClientRect().height,top:button.getBoundingClientRect().top,fits:button.scrollWidth<=button.clientWidth+1}))};
+       buttons:[...document.querySelectorAll('.studio-nav button')].map(button=>{
+        const box=button.getBoundingClientRect();
+        return {id:button.id,label:button.textContent.trim(),height:box.height,top:box.top,bottom:box.bottom,left:box.left,right:box.right,fits:button.scrollWidth<=button.clientWidth+1};
+       })};
      });
-     assert.equal(layout.buttons.length,5,'all current navigation destinations remain available');
+     assert.equal(layout.buttons.length,6,'all six navigation destinations remain available');
+     assert.deepEqual(layout.buttons.map(button=>[button.id,button.label]),destinations,'navigation preserves every original destination and includes My rewards');
      assert.ok(layout.buttons.every(button=>button.height>=44&&button.fits),'navigation labels fit touch-sized buttons');
-     assert.ok(layout.buttons.every(button=>Math.abs(button.top-layout.buttons[0].top)<2),'the five destinations share one row');
+     for(const row of [layout.buttons.slice(0,3),layout.buttons.slice(3)]){
+      assert.ok(row.every(button=>Math.abs(button.top-row[0].top)<2),'each mobile navigation row contains three destinations');
+      assert.ok(row.slice(1).every((button,index)=>button.left>=row[index].right-1),'navigation controls cannot overlap within a row');
+     }
+     assert.ok(layout.buttons[3].top>=Math.max(...layout.buttons.slice(0,3).map(button=>button.bottom)),'the two navigation rows do not overlap');
+     assert.ok([0,1,2].every(column=>Math.abs(layout.buttons[column].left-layout.buttons[column+3].left)<2),'both navigation rows use the same three columns');
      assert.equal(layout.overlap,false,'maker artwork cannot cover home actions or service status');
      assert.ok(layout.scrollWidth<=layout.width+2,'narrow home does not scroll horizontally');
      await page.screenshot({path:'test-results/jems-brand-home-'+phoneWidth+'.png',fullPage:false});
