@@ -377,10 +377,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "bb542408b35bf0dda8b3fb7093edc30278e8b161f8b40f2010fa2f5f62adc619",
+      "reviewedAt": "2026-11-19T16:41:11.000Z",
+      "sourceDigest": "980c0066e5fa01ef3362c5dc31a9fe10d47f663336bb00a43ae7a6a0efbcd631",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR69 icon and control-state tests together with rewards browser, mobile navigation, parent Settings, backup import and Creation recovery regressions. Combined-head CI is required before merge.",
+      "reviewReason": "Reviewed final PR69 approved-icon test correction with six navigation destinations, responsive geometry, parent reporting, safe restore and existing rewards assertions. All unchanged test contracts are retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
