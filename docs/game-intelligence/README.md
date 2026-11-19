@@ -1,6 +1,8 @@
 # Jems Game Intelligence Engine — Design Standard v1
 
-**Status: merge-candidate research implementation; not a production activation or universal game-quality certification.** Established 2026-11-18 after the Bubble Gum Builders, Robot Route Lab and Junkyard Rally design review. The original v1 advisory preflight has expanded within PR #43 into source-backed intent, gameplay-form advice, authored working-game contracts, optional independent sandbox/browser probes and a bounded repair/retest path. No fixture-based evidence proves that arbitrary AI-generated games work or that children enjoy them. See [current objective status and proof boundaries](objective-roadmap.md) and [merge handoff](merge-handoff.md).
+**Source state:** [PR #43](https://github.com/jzwyrzyk/family-game-factory/pull/43) merged as [`493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`](https://github.com/jzwyrzyk/family-game-factory/commit/493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7). This document preserves the 2026-11-18 design standard and research rationale, including the original development path below. References to "this PR" describe that work, not a still-open merge candidate. See [Delivery state](../../DELIVERY-STATE.md) for current release evidence; merging is not production activation or universal game-quality certification.
+
+The original v1 advisory preflight expanded within PR #43 into source-backed intent, gameplay-form advice, authored working-game contracts, optional independent sandbox/browser probes and a bounded repair/retest path. No fixture-based evidence proves that arbitrary AI-generated games work or that children enjoy them. See [current objective status and proof boundaries](objective-roadmap.md) and [merge handoff](merge-handoff.md).
 
 ## Problem statement
 
@@ -55,7 +57,7 @@ Passing #3 does not establish #1, #2 or #4.
 | Wobbly stack / catapult | Balance or launch; weight, force and contacts determine motion | 2D side view | 2D rigid-body | Scripted "physics" that does not react to player changes |
 | True 3D free-flight game | Navigate in three axes and use perspective | Requires real 3D (not currently supported) | Depends on request | Presenting 2D as if it fulfills genuine depth |
 
-These are **design standards**, not evidence that the current production builds already meet them. Bubble Gum Builders' default is being addressed by separate PR #40; old versions must be preserved.
+These are **design standards**, not evidence that the current production builds already meet them. The new Bubble Gum Builders sticker default was merged separately in [PR #40](https://github.com/jzwyrzyk/family-game-factory/pull/40); old saved versions remain distinct. Current deployment evidence belongs in [Delivery state](../../DELIVERY-STATE.md).
 
 ## Evidence gate architecture
 

@@ -1,5 +1,7 @@
 # Factory 2.0 audit and gaps (Issues #3 and #4)
 
+> **Historical audit.** The baseline and pending items below belong to their named assignments; later implementations may supersede them. Use [delivery state](../DELIVERY-STATE.md) and [current architecture](../ARCHITECTURE-CURRENT.md) for current evidence rather than treating this as the active backlog.
+
 Audit base: `518a68b` on `feature/factory-v2-foundation` (includes v0.3 and its passing CI fix). Baseline `npm test` passed before edits. No cloud resources were found or provisioned. The repository had one HTML file containing UI, storage, adaptive math, three game constructors and a parent-mediated idea/GitHub handoff; one Playwright regression script; no runtime/plugin contract, game revisions, live interpreter, design coach or backend.
 
 ## Assignment 001 baseline (historical)

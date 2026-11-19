@@ -1,6 +1,6 @@
 # jems trusted family devices — P0 session continuity
 
-**Status: draft.** No cloud deployment, payment activation, IAM change or domain switch has been made. This change is for the existing private family workshop, not public-child consent or proof of live AI generation.
+**Source status:** [PR42](https://github.com/jzwyrzyk/family-game-factory/pull/42) is merged. The behavioral/security contract below remains relevant; its original premerge checklist is historical. [DELIVERY-STATE.md](../../DELIVERY-STATE.md) owns current deployment, activation and device evidence. Trusted-device integration is not public-child consent or proof of live AI generation.
 
 ## Behavior
 

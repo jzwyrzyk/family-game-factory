@@ -1,4 +1,7 @@
 # jems — web identity and product implementation
+
+> **Brand contract with historical review notes.** PR #33/#34 draft, merge and release wording below records those reviews. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current integration and deployment evidence. Preserve the documented visual identity and asset-certification limits; code merge is not proof of final master-art approval.
+
 The selected public-facing brand is **jems** (lowercase), with a faceted **gem and central wrench** mark. The brand is intended for children who invent, reason, solve, make and play; parents should see confident STEM/creative problem-solving, not an AI toy that designs everything for the child.
 
 ## Approved color system

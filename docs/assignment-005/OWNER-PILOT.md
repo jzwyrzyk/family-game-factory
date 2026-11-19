@@ -1,5 +1,7 @@
 # Assignment 005: owner-only real-AI pilot handoff
 
+> **Historical pilot handoff.** Pins, draft states and operational restrictions below describe Assignment 005. Current approved scope and evidence are recorded in [delivery state](../../DELIVERY-STATE.md). The old blanket Cloud Run model-key prohibition is superseded only for the separate coach-only service approved in [PR36](https://github.com/jzwyrzyk/family-game-factory/pull/36); the generation key and keyless gateway/preview boundary remain unchanged. See [current architecture](../../ARCHITECTURE-CURRENT.md).
+
 Companion reviews: [application PR #22](https://github.com/jzwyrzyk/family-game-factory/pull/22) and [private worker PR #11](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/11). Both remain draft. Nothing here authorizes a merge, publication, cloud operation, credential/permission change, deployment, or paid request.
 
 ## Release identity and what is implemented
