@@ -1,11 +1,11 @@
 import {beginLanguageAttempt,finishLanguageAttempt,recordLanguageReadAloud,saveCreativeDraft,
-  selectLanguageItem,submitLanguageAnswer,useLanguageHint} from './engine';
+  selectLanguageItem,submitLanguageAnswer,useLanguageHint,type LanguageAttempt} from './engine';
 import type {LanguageContext,LanguageItem,LanguageProfile,LanguageResult} from './types';
 import type {LearningMode} from '../learning/types';
 
 export interface LanguageActivityOptions {
   profile:LanguageProfile;context?:LanguageContext;item?:LanguageItem;mode?:LearningMode;
-  onComplete(result:LanguageResult):void;onSave():void;onLeave?:()=>void;legacyIds?:boolean;
+  onComplete(result:LanguageResult):void;onSave(attempt:LanguageAttempt):void;onLeave?:()=>void;legacyIds?:boolean;
 }
 let sequence=0;
 const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls?:string,text?:string):HTMLElementTagNameMap[K]=>{
@@ -88,7 +88,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   on(root,'keydown',event=>event.stopPropagation());
   on(root,'keyup',event=>event.stopPropagation());
   function save() {
-    try { const result=options.onSave() as unknown;if(result===false)saving.hidden=false; }
+    try { const result=options.onSave(attempt) as unknown;if(result===false)saving.hidden=false; }
     catch {saving.hidden=false;}
   }
   save();

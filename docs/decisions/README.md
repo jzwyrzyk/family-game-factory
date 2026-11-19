@@ -13,6 +13,7 @@ These records explain durable choices without turning chat history into another 
 | [0005](0005-temporary-adult-profile.md) | Activate temporary development AI through an authenticated adult profile on the existing site | Accepted for temporary development | Owner's November 18, 2026 same-site/profile-switch direction; PR55 integration |
 | [0006](0006-style-diverse-playable-quality.md) | Require presentation and playable quality across distinct art styles | Accepted | Owner's Gem Factory follow-up: improve the real pipeline without uniform-looking games; child art uploads deferred |
 | [0007](0007-creation-and-rebuild-practice.md) | Share editable scenes and actions between free creation and behavior-based rebuild practice | Accepted for development | Owner's November 19, 2026 request to implement a separate integrated page in a new PR |
+| [0008](0008-formative-problem-solving-evidence.md) | Combine background activity context with optional structured reasoning observations, preserving assistance and missingness | Accepted for development | Owner's November 19, 2026 post-PR62 review and authorization to correct research assumptions and begin holistic implementation |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 

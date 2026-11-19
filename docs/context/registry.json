@@ -22,7 +22,11 @@
     "docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md",
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
-    "docs/decisions/0007-creation-and-rebuild-practice.md"
+    "docs/decisions/0007-creation-and-rebuild-practice.md",
+    "docs/problem-solving/README.md",
+    "docs/problem-solving/BENCHMARKS.md",
+    "docs/problem-solving/IMPLEMENTATION.md",
+    "docs/decisions/0008-formative-problem-solving-evidence.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -37,7 +41,8 @@
     "docs/privacy/*.md",
     "docs/brand/GEM_FACTORY.md",
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
-    "docs/creation-studio/*.md"
+    "docs/creation-studio/*.md",
+    "docs/problem-solving/*.md"
   ],
   "areas": [
     {
@@ -50,13 +55,14 @@
         "docs/design-coach/GOLD_STANDARD.md",
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
-        "docs/brand/*.md"
+        "docs/brand/*.md",
+        "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:47.934Z",
-      "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+      "reviewedAt": "2026-11-19T14:49:13.587Z",
+      "sourceDigest": "8fa6b79d9de778a760b04f8a78b70399f9b736aae1de115880915dc02283f9b1",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
+      "reviewReason": "Kept six dimensions separate from subject achievement, limited the launch to three prompted practice dimensions, and documented that standards mapping and deterministic rules do not establish general ability or improvement."
     },
     {
       "id": "experience",
@@ -65,6 +71,7 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
+        "docs/problem-solving/*.md",
         "docs/homepage/*.md",
         "docs/brand/*.md",
         "docs/adult-pilot/*.md",
@@ -86,10 +93,10 @@
         "src/adult-pilot/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:48.744Z",
-      "sourceDigest": "b54da7165c9d2186fb1e97f275a099ec4bc64a4172132de3a4baac403315cdb4",
+      "reviewedAt": "2026-11-19T14:49:14.248Z",
+      "sourceDigest": "848e57d36983ae62292a3fd0b48b5bd38581511900d4391e5e243cf9e310a4e6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Gem Factory first-card and Creation entrances: the scene card stays after the playable shelf; unsupported Animate and code errors now stay visible in Studio. Desktop/tablet creation and mobile child-entry checks preserve source versions and profile boundaries."
+      "reviewReason": "Reviewed the guarded Try an idea entrances, current-profile report rendering, per-action draft saves, cross-tab invalidation, and backup integration. Existing games, required learning and explicit Keep retain their original authority."
     },
     {
       "id": "creation",
@@ -105,10 +112,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3621e272a397fb56794fe0362ce7ac4463ae573a2590880d3103072f66a62f57",
-      "reviewedAt": "2026-11-19T12:52:54.972Z",
+      "sourceDigest": "b1725edc3e44c2f19782436cb474683bf10ca55de20470f80afc9cfd49c5bd03",
+      "reviewedAt": "2026-11-19T14:49:15.103Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Audited the sole Check my scene evaluation/attempt call site, persisted goal/version/time/hint fields, last-five profile observations and fixed challenge selection. Clarified that cross-subject reasoning inference and adaptive computational practice are not implemented; recorded the confirmed merge without changing source behavior."
+      "reviewReason": "Added context publication only after a saved scene check and source-linked removal after deletion; documented that a scene result and recorded hint history do not independently score reasoning."
     },
     {
       "id": "games",
@@ -148,10 +155,28 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.211Z",
-      "sourceDigest": "8b49aa409e5ccb46e9d5e510feed52240415b85cfa5f4e5bfd55516d85e4a033",
+      "reviewedAt": "2026-11-19T14:49:15.755Z",
+      "sourceDigest": "ca37f0b25da53d2fa7f89829d5fe95b5620205667a6dc1e94c4883bda5598662",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed subject-specific host contracts and current Math and Language sources against the canonical learning principles; separated independent and assisted evidence from unproven learning efficacy."
+      "reviewReason": "Reviewed the new onSave attempt payload in both activity hosts and source events after successful persistence. Math and English scoring, selection, help, checkpoints and mastery states retain their existing contracts."
+    },
+    {
+      "id": "problem-solving",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/problem-solving/*.md",
+        "docs/decisions/0008-formative-problem-solving-evidence.md"
+      ],
+      "sources": [
+        "src/problem-solving/**",
+        "tests/problem-solving-*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "4cb09b3a320a91a60422869e67886c85a8298a37ee9cb1c2c820659e3576bb10",
+      "reviewedAt": "2026-11-19T14:48:29.745Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the versioned episode schema, source adapters, first-response aggregation, practice oracle, stale-draft invalidation and parent labels against the new feature contract; software and educational acceptance remain separate."
     },
     {
       "id": "services",
@@ -270,10 +295,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:52.984Z",
-      "sourceDigest": "259c764251cb5be70a689f35ed5ee6b90fac2069990fc0248ecbee61225c2060",
+      "reviewedAt": "2026-11-19T14:49:16.424Z",
+      "sourceDigest": "0fb98cd39ff99553f44c94776d788cb6cd3d017b46c4980f64cbf55a2594eb4e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 77 creation and 354 existing unit passes, focused combined quality/asset/companion and nine budget regressions, production desktop/tablet authoring and eight recovery journeys. Kept earlier failed and green CI scoped to their original heads; no live provider or actual-device claim."
+      "reviewReason": "Added evidence, storage, authored-practice, adapter and desktop-touch browser checks. Documented passing local units and build separately from browser suites blocked by local process sockets; no visual or child validation claim."
     },
     {
       "id": "delivery",
@@ -295,10 +320,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:12:38.899Z",
-      "sourceDigest": "a99be4656635d84bf76deb99654afe3bd6a5c6a34eadee67f26b0c97ac28280e",
+      "reviewedAt": "2026-11-19T14:49:17.135Z",
+      "sourceDigest": "aab69a223ca51a184e89a936c1a175d1a8035ced99dd844f2dbfd51e9cb0767c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged PR58 final-head checks, owner-only Gem Factory publication and rollback against PR63, then reconciled PR61 and PR62 on current main. Verified distinct private worker main/PR13/PR14 source pins and the latest manual Pages workflow. Source integration, site-specific publication and CI do not establish general production activation, real devices, or child learning results."
+      "reviewReason": "Preserved the latest PR63 delivery receipts and recorded this unmerged source candidate. Added the two problem-solving validation steps to ordinary CI without changing Pages deployment, providers or worker pins."
     },
     {
       "id": "context",
@@ -319,10 +344,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:54.226Z",
-      "sourceDigest": "32c4eb525a0f2896d0b6ed8db2dcd17490c757913460a76e56f169a6083a4b0f",
+      "reviewedAt": "2026-11-19T14:49:17.804Z",
+      "sourceDigest": "6642ca551a41202c74bc5ba14f7cccab17e50d2b6718b051f41d8abcf0c66afe",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged both document routes and required references. Renumbered the unmerged Creation decision to ADR0007, preserving merged quality ADR0006, and retained creation, Gem Factory and presentation-quality coverage and local links."
+      "reviewReason": "Reviewed the dedicated problem-solving source and test area, new required feature and decision documents, canonical links, and product-experience routing. Updated maintenance guidance without weakening existing coverage or review rules."
     }
   ]
 }

@@ -145,7 +145,20 @@ function bind(){document.querySelectorAll('[data-page]').forEach(b=>b.addEventLi
  $('remixGame').onchange=loadRemix;$('remixDifficulty').onchange=describeRemix;
  $('playRemix').onclick=()=>{const p=FG.store.current(),before=p.remixes;p.remixes={...p.remixes,[$('remixGame').value]:$('remixDifficulty').value};if(!FG.store.save()){p.remixes=before;$('remixStatus').textContent='Could not save your remix. Please try again.';return}gameOpen($('remixGame').value)};
  $('copyFeedback').onclick=async()=>{const data=FG.store.data.feedback;if(!data.length){alert('Save an idea first.');return}const txt=FG.bridge.developmentBrief(data);try{await navigator.clipboard.writeText(txt);alert('Copied! Paste into your ChatGPT game development conversation.')}catch(e){window.prompt('Copy these ideas:',txt)}};
- $('exportData').onclick=()=>download(FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:FG.factory?.exportWorkspace()},null,2),'family-game-factory-progress.json');$('importData').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;if(!confirm('Replace the current profiles, learning progress and ideas with the imported backup?'))return;try{const raw=await file.text(),backup=JSON.parse(raw);if(backup.factoryWorkspace)FG.factory?.validateWorkspace(backup.factoryWorkspace);FG.store.restore(raw);if(backup.factoryWorkspace)FG.factory?.restoreWorkspace(backup.factoryWorkspace);profiles();loadParent();$('storageRecovery')?.remove();alert('Progress restored successfully.')}catch(err){alert('Could not restore backup: '+err.message)}finally{e.target.value=''}};
+ $('exportData').onclick=()=>download(FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:FG.factory?.exportWorkspace(),...FG.problemSolvingEvidence?.backup()},null,2),'family-game-factory-progress.json');
+ $('importData').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{
+  if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');
+  if(file.size>20_000_000)throw Error('That backup is too large.');
+  const raw=await file.text(),backup=JSON.parse(raw),evidence=FG.problemSolvingEvidence;
+  if(backup.factoryWorkspace)FG.factory?.validateWorkspace(backup.factoryWorkspace);
+  if(Object.hasOwn(backup,'factoryProblemSolvingRecoveryRaw'))throw Error('This backup preserves damaged problem-solving data for recovery. Restore a compatible backup.');
+  const importedEvidence=evidence?(Object.hasOwn(backup,'factoryProblemSolving')?evidence.validate(backup.factoryProblemSolving):evidence.empty()):null;
+  if(!confirm('Replace the current profiles, learning progress and ideas with the imported backup?'))return;
+  const prior=JSON.stringify(FG.store.data),oldWorkspace=FG.factory?.exportWorkspace(),oldEvidence=evidence?.rawSnapshot();
+  try{FG.store.restore(raw);if(backup.factoryWorkspace)FG.factory?.restoreWorkspace(backup.factoryWorkspace);if(evidence)evidence.restore(importedEvidence);}
+  catch(error){FG.store.restore(prior);if(oldWorkspace)FG.factory?.restoreWorkspace(oldWorkspace);if(evidence)evidence.restoreRawSnapshot(oldEvidence);throw error;}
+  profiles();loadParent();$('storageRecovery')?.remove();alert('Progress restored successfully.');
+ }catch(err){alert('Could not restore backup: '+err.message)}finally{e.target.value=''}};
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{bind();profiles();page('home')});else{bind();profiles();page('home')}
 FG.app={page,openGame:gameOpen,refreshProfiles:profiles};

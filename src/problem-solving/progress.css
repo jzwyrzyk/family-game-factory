@@ -1,0 +1,14 @@
+.ps-evidence-panel { margin-block-start: 24px; }
+.ps-evidence-panel h3 { margin-block: 26px 10px; }
+.ps-evidence-panel h4 { margin-block: 14px 8px; }
+.ps-table-wrap { overflow-x: auto; max-width: 100%; margin-block: 14px; }
+.ps-evidence-table { width: 100%; border-collapse: collapse; font-size: .92rem; text-align: left; }
+.ps-evidence-table caption { text-align: left; font-weight: 700; padding: 0 0 12px; }
+.ps-evidence-table th,.ps-evidence-table td { padding: 12px; border-bottom: 1px solid #dce4ed; vertical-align: top; }
+.ps-evidence-table thead th { background: #edf4fa; color: #243e57; }
+.ps-evidence-table tbody th { min-width: 125px; }
+.ps-observation,.ps-source-context { margin-block: 10px; padding: 14px 16px; border: 1px solid #dce4ed; border-radius: 14px; background: #fff; }
+.ps-observation summary,.ps-source-context summary { cursor: pointer; font-weight: 650; line-height: 1.5; }
+.ps-observation li { margin-block: 10px; line-height: 1.5; }
+.ps-evidence-panel .fine { line-height: 1.55; }
+@media(max-width: 600px) { .ps-evidence-table th,.ps-evidence-table td { padding: 9px; } .ps-evidence-table { font-size: .82rem; } }

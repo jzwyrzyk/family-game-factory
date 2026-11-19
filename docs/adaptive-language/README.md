@@ -10,6 +10,8 @@ The initial implementation contains **48 supplemental language skill units (12 p
 
 **Honest scope:** 48 units do not amount to IXL-equivalent complete curriculum coverage, a calibrated reading assessment, diagnosed reading ability, or demonstrated educational gains. Engineering tests are necessary, not a substitute for literacy specialist review or actual child practice.
 
+The [formative problem-solving feature](../problem-solving/README.md) can observe newly completed Language Arts activities as subject context. It does not grade creative writing or convert language correctness into a general reasoning result. This engine's read-aloud flag remains relevant to reading evidence; neutral spoken directions in a separate APS task do not automatically disqualify reasoning. Optional reasoning practice does not replace required Language Arts checkpoints.
+
 ## Child journey
 
 A child invents or selects a game as before. The selected educational subject travels with the child, not the game or its version. At a safe game checkpoint, the trusted host pauses the same simulation, clears held inputs, and presents a compact Language Arts activity with large touch targets. A child may choose an answer, construct a word with tiles, rearrange sentence tiles, revise a sentence, read a short passage, or write an imaginative response. Longer creative-writing tasks are reserved for My Powers or completed-round checkpoints, never an active-play interruption. A worked explanation and three graduated hints make recovery supportive rather than punitive. The game then resumes the same state. Child-generated games cannot supply a correct answer, award proficiency, or bypass the host.

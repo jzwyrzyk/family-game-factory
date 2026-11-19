@@ -4,6 +4,10 @@ import './learning/bootstrap';
 import './legacy/bridge.js';
 import './runtime/registry';
 import './legacy/ui.js';
+import {installProblemSolvingEvidence} from './problem-solving/bridge';
+import {installProblemSolvingProgress} from './problem-solving/progress';
+installProblemSolvingEvidence();
+installProblemSolvingProgress();
 import { initLiveRemix } from './factory/ui';
 initLiveRemix();
 

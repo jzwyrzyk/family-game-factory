@@ -22,6 +22,7 @@ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
+import { installProblemSolvingPractice } from '../problem-solving/ui';
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
@@ -808,8 +809,22 @@ export async function installStudio(){
  window.addEventListener('beforeunload',event=>{stopSpeech();try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(activeId)act(render);}});
  // Existing progress backups gain an explicitly versioned optional notebook. Old backups remain valid.
- const exportButton=$('exportData');exportButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();act(()=>{if(!FG.store.recoveryRaw){flushDraft();creation.flush();}const data=FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:games.export(),factoryStudio:notebook.read(),...creation.backup()},null,2);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a') as HTMLAnchorElement;a.href=url;a.download='family-game-factory-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});},true);
- const importInput=$<HTMLInputElement>('importData');importInput.addEventListener('change',event=>{event.stopImmediatePropagation();const file=importInput.files?.[0];if(!file)return;act(async()=>{try{if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');if(file.size>20_000_000)throw Error('That backup is too large.');const data=JSON.parse(await file.text());if(data.factoryStudio)validateNotebook(data.factoryStudio);if(data.factoryWorkspace)FG.factory.validateWorkspace(data.factoryWorkspace);if(Object.hasOwn(data,'factoryCreationRecoveryRaw'))throw Error('This backup preserves damaged scene data for recovery. Restore a compatible scene backup before replacing family data.');const importedCreation=Object.hasOwn(data,'factoryCreation')?creation.validate(data.factoryCreation):{schema:'jems.creation.workspace.v1',projects:[],revisions:[],drafts:[],attempts:[]};if(!confirm('Restore this backup? Current progress will be replaced.'))return;const prior=JSON.stringify(FG.store.data),oldWorkspace=games.export(),oldNotebook=notebook.read(),oldCreation=creation.rawSnapshot();try{FG.store.restore(JSON.stringify(data));if(data.factoryWorkspace)FG.factory.restoreWorkspace(data.factoryWorkspace);if(data.factoryStudio)notebook.restore(data.factoryStudio);creation.restore(importedCreation);}catch(error){FG.store.restore(prior);FG.factory.restoreWorkspace(oldWorkspace);notebook.restore(oldNotebook);creation.restoreRawSnapshot(oldCreation);throw error;}location.reload();}finally{importInput.value='';}});},true);
+ const exportButton=$('exportData');exportButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();act(()=>{if(!FG.store.recoveryRaw){flushDraft();creation.flush();}const data=FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:games.export(),factoryStudio:notebook.read(),...creation.backup(),...FG.problemSolvingEvidence.backup()},null,2);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a') as HTMLAnchorElement;a.href=url;a.download='family-game-factory-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});},true);
+ const importInput=$<HTMLInputElement>('importData');importInput.addEventListener('change',event=>{event.stopImmediatePropagation();const file=importInput.files?.[0];if(!file)return;act(async()=>{try{
+  if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');
+  if(file.size>20_000_000)throw Error('That backup is too large.');
+  const data=JSON.parse(await file.text()),evidence=FG.problemSolvingEvidence;
+  if(data.factoryStudio)validateNotebook(data.factoryStudio);if(data.factoryWorkspace)FG.factory.validateWorkspace(data.factoryWorkspace);
+  if(Object.hasOwn(data,'factoryCreationRecoveryRaw'))throw Error('This backup preserves damaged scene data for recovery. Restore a compatible scene backup before replacing family data.');
+  if(Object.hasOwn(data,'factoryProblemSolvingRecoveryRaw'))throw Error('This backup preserves damaged problem-solving data for recovery. Restore a compatible backup before replacing family data.');
+  const importedCreation=Object.hasOwn(data,'factoryCreation')?creation.validate(data.factoryCreation):{schema:'jems.creation.workspace.v1',projects:[],revisions:[],drafts:[],attempts:[]};
+  const importedEvidence=Object.hasOwn(data,'factoryProblemSolving')?evidence.validate(data.factoryProblemSolving):evidence.empty();
+  if(!confirm('Restore this backup? Current progress will be replaced.'))return;
+  const prior=JSON.stringify(FG.store.data),oldWorkspace=games.export(),oldNotebook=notebook.read(),oldCreation=creation.rawSnapshot(),oldEvidence=evidence.rawSnapshot();
+  try{FG.store.restore(JSON.stringify(data));if(data.factoryWorkspace)FG.factory.restoreWorkspace(data.factoryWorkspace);if(data.factoryStudio)notebook.restore(data.factoryStudio);creation.restore(importedCreation);evidence.restore(importedEvidence);}
+  catch(error){FG.store.restore(prior);FG.factory.restoreWorkspace(oldWorkspace);notebook.restore(oldNotebook);creation.restoreRawSnapshot(oldCreation);evidence.restoreRawSnapshot(oldEvidence);throw error;}
+  location.reload();
+ }finally{importInput.value='';}});},true);
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
   onCoachReply:text=>voice?.reply(text),
   onCoachState:state=>{coachConnection=state;if(activeId)render();},
@@ -908,6 +923,16 @@ export async function installStudio(){
  scenesEntry.innerHTML='<img src="./jems-blocks.svg" alt=""><span><strong>Make your imagination move</strong><small>Tell a story with blocks, or watch a scene and rebuild it your way.</small></span><b aria-hidden="true">→</b>';
  // Keep a complete ready-to-play choice in the first mobile viewport.
  scenesEntry.onclick=()=>creation.open();$('studioFavoritesSection').after(scenesEntry);
+ const practice=installProblemSolvingPractice({
+  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();creation.flush();disposeGame();FG.app.page('problem-solving');route='other';document.body.classList.remove('studio-designing','creation-open');nav.querySelectorAll('button').forEach(button=>button.classList.toggle('active',button.id==='studioNavProblemSolving'));return true;},
+  home,
+ });
+ const practiceNav=el('button','','✧ Try an idea') as HTMLButtonElement;practiceNav.id='studioNavProblemSolving';practiceNav.type='button';practiceNav.onclick=()=>practice.open();scenesNav.after(practiceNav);
+ const practiceEntry=el('button','studio-scene-entry') as HTMLButtonElement;practiceEntry.id='studioProblemSolving';practiceEntry.type='button';
+ practiceEntry.innerHTML='<img src="./jems-workbench.svg" alt=""><span><strong>Try an idea</strong><small>Make a guess, try a little test, and choose what to change.</small></span><b aria-hidden="true">→</b>';
+ practiceEntry.onclick=()=>practice.open();scenesEntry.after(practiceEntry);
+ const scenePractice=el('button','creation-button creation-quiet','Try a little experiment →') as HTMLButtonElement;scenePractice.id='creationTryIdea';scenePractice.type='button';scenePractice.onclick=()=>practice.open();$('creationSubtitle').after(scenePractice);
+ window.dispatchEvent(new CustomEvent('factory-problem-solving-updated',{detail:{owner:owner()}}));
  const sceneButton=el('button','studio-button','✦ Animate & code') as HTMLButtonElement;sceneButton.id='studioMakeScene';sceneButton.type='button';
  $('studioHelp').after(sceneButton);
  sceneButton.onclick=()=>act(async()=>{
@@ -927,4 +952,5 @@ export async function installStudio(){
  });
  window.addEventListener('factory-page',event=>{if((event as CustomEvent).detail!=='creation')document.body.classList.remove('creation-open');});
  if(new URLSearchParams(location.search).get('creation')==='1')creation.open();
+ if(new URLSearchParams(location.search).get('problem-solving')==='1')practice.open();
 }

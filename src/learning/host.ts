@@ -9,6 +9,9 @@ import './insights.css';
 import { SKILLS } from './curriculum';
 import { MODE_LABELS, LANGUAGE_MODE_LABELS, LEARNING_MODES, modeFor, setMode, interpretMathRequest, interpretLearningRequest } from './policy';
 import type { LearnerProfile, LearningContext, LearningMode } from './types';
+import type { Attempt } from './engine';
+import type { LanguageAttempt } from '../language/engine';
+import { publishSourceEvidence } from '../problem-solving/signals';
 
 const stateNames: Record<string,string> = {
   'not-enough-evidence':'Still discovering', 'learning-with-support':'Learning with help',
@@ -65,7 +68,17 @@ export function installLearningHost() {
     window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:true}));
     try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
-      onSave:()=>{if(!FG.store.save()){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}} options.onSave?.();},
+      onSave:(attempt:Attempt|LanguageAttempt)=>{
+        const saved=FG.store.save();
+        if(!saved){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}}
+        else if(attempt&&attempt.outcome!=='open'&&profile.id===FG.store.current().id){
+          // Record only a real, newly saved source observation. Correctness remains
+          // subject evidence; it is never promoted to a problem-solving score.
+          if(subjectFor(profile)==='language')publishSourceEvidence({kind:'language',owner:String(profile.id),attempt:attempt as LanguageAttempt});
+          else publishSourceEvidence({kind:'math',owner:String(profile.id),attempt:attempt as Attempt});
+        }
+        options.onSave?.();
+      },
       onComplete:(result:any)=>{
         if(own!==generation||activeOwner!==FG.store.current().id)return;
         active=null;activeOwner='';activeBudget=null;

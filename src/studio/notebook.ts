@@ -1,6 +1,7 @@
 import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
 import { isGameId } from '../runtime/manifests';
 import type { GameId } from '../runtime/types';
+import { publishSourceEvidence } from '../problem-solving/signals';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -68,7 +69,10 @@ export class StudioNotebook {
     return this.write(n=>{const s:StudioSession={id:crypto.randomUUID(),owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
-    return this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');fn(s);s.updated=new Date().toISOString();return s;});
+    let before:StudioSession|undefined;
+    const after=this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');before=copy(s);fn(s);s.updated=new Date().toISOString();return s;});
+    if(before)publishSourceEvidence({kind:'studio',before,after});
+    return after;
   }
   select(id:string,owner:string) {this.get(id,owner);this.write(n=>{n.active[owner]=id;return true;});}
   message(id:string,owner:string,role:Message['role'],text:string) {
@@ -79,12 +83,14 @@ export class StudioNotebook {
    * deletion of remote artifacts or backups; the interface must say so.
    */
   clearConversation(id:string,owner:string):StudioSession {
-    return this.update(id,owner,s=>{
+    const result=this.update(id,owner,s=>{
       if(s.job&&['queued','building','testing'].includes(s.job.status)||s.pendingExperiment)
         throw Error('Finish or cancel the current build before clearing this chat.');
       s.messages=[];s.draft='';s.hypothesis='';s.reflection=false;
       s.design=freshDesign();
     });
+    publishSourceEvidence({kind:'clear-studio',owner,sessionId:id});
+    return result;
   }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
     const source=this.get(id,owner);
