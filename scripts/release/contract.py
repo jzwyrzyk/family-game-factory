@@ -254,7 +254,7 @@ def main(argv=None):
     for command in ("plan", "stamp", "precheck", "verify", "auto-scope", "finalize"):
         p = sub.add_parser(command)
         p.add_argument("--output", required=True)
-        if command not in ("precheck", "auto-scope"):
+        if command not in ("precheck", "auto-scope", "finalize"):
             p.add_argument("--source-sha", required=True)
         if command in ("plan", "precheck", "verify"):
             p.add_argument("--gateway-origin", default="")
