@@ -1,3 +1,4 @@
+import './brand/icons.css';
 import './legacy/store.js';
 import './adult-pilot/style.css';
 import './learning/bootstrap';

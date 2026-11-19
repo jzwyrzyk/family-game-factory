@@ -61,7 +61,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>void d.accept());
   try{
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning&&window.FG?.factory);
-    await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+    await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
     assert.deepEqual(await page.locator('#parentGrade option').evaluateAll(nodes=>nodes.map(n=>(n as HTMLOptionElement).value)),['1','2','3','4']);
     assert.equal(await page.locator('#parentRate').getAttribute('min'),'1');
     for(const grade of [1,2,3,4]){
@@ -76,7 +76,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.screenshot({path:`test-results/math-settings-${name}.png`,fullPage:true});
 
     // A real Math Lab item, including a first error, help request, and abandoned activity.
-    await nav(page,'⚡ My Powers');await activity(page).waitFor({state:'visible'});
+    await nav(page,'My Powers');await activity(page).waitFor({state:'visible'});
     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
     await submitWritten(page,first,wrongAnswer(first));
     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});
@@ -88,7 +88,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await activity(page).locator('[data-action="hint"]').click();
     const hinted=(await attempts(page)).find((a:any)=>a.id===firstId);assert.equal(hinted.hintLevel,1);
     await page.screenshot({path:`test-results/math-lab-help-${name}.png`,fullPage:true});
-    await nav(page,'🎮 Play');
+    await nav(page,'Play');
     const ended=(await attempts(page)).find((a:any)=>a.id===firstId);
     assert.equal(ended.outcome,'interrupted');assert.equal(ended.answers.length,1);assert.equal(ended.hintEvents.length,1);
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
@@ -98,9 +98,9 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
 
     // Both profiles practice through the real UI; neither child's history is copied or cleared.
     const ownerHistory=JSON.stringify((await profile(page)).learning);
-    await page.locator('.profile-choice').nth(1).click();await nav(page,'⚡ My Powers');
+    await page.locator('.profile-choice').nth(1).click();await nav(page,'My Powers');
     const otherOwner=(await profile(page)).id;assert.notEqual(otherOwner,owner);
-    await submitWritten(page,await activeItem(page));await page.waitForSelector('#lab-next');await nav(page,'🎮 Play');
+    await submitWritten(page,await activeItem(page));await page.waitForSelector('#lab-next');await nav(page,'Play');
     const otherHistory=JSON.stringify((await profile(page)).learning);
     const originalHistory=await page.evaluate(id=>JSON.stringify(window.FG.store.data.profiles.find((p:any)=>p.id===id).learning),owner);
     assert.equal(originalHistory,ownerHistory,'the second child cannot mutate the first child’s evidence');
@@ -135,7 +135,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),false,'one child shares one pacing budget');
 
     // The child may change the math format in a real remix, without removing math.
-    await nav(page,'🎛️ Remix');await page.selectOption('#liveGame','gum');await page.click('#newLiveGame');
+    await nav(page,'Remix');await page.selectOption('#liveGame','gum');await page.click('#newLiveGame');
     const projectId=await page.locator('#liveProjects').inputValue();
     const beforeRemix=await attempts(page),workspaceBefore=await page.evaluate(()=>JSON.stringify(window.FG.factory.exportWorkspace()));
     await page.fill('#livePrompt','Put math inside the game');await page.click('#livePromptForm button[type=submit]');
@@ -157,7 +157,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     assert.equal(await page.evaluate(id=>JSON.stringify(window.FG.store.data.profiles.find((p:any)=>p.id===id).learning),otherOwner),otherHistory);
 
     // A fixed curriculum item gives an inspectable fraction construction in the production host.
-    await nav(page,'⚡ My Powers');
+    await nav(page,'My Powers');
     const fraction=generateItem('g3-unit-fraction',{random:()=>.55,representation:'visual'});
     await page.evaluate(item=>{
       const w=window as any;w.fractionResult=null;
@@ -310,7 +310,7 @@ async function qualityNativeJourney(browser:Browser,base:string,device:typeof de
     await page.clock.install();await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);
     await page.evaluate(()=>{window.FG.store.changeProfile({grade:2,focus:'adaptive',rate:1,punish:false});window.FG.app.openGame('hill');});
     const hill=page.locator('.quality-hill'),state=()=>page.evaluate(()=>window.FG.runtime.snapshot().state);
-    await hill.getByRole('button',{name:'Let’s drive →',exact:true}).click();
+    await hill.getByRole('button',{name:'Let’s drive',exact:true}).click();
     await page.keyboard.down('ArrowRight');await page.clock.runFor(12_000);await page.keyboard.up('ArrowRight');
     await page.waitForFunction(()=>window.FG.learning.active);const before=await state();
     assert.equal(before.mode,'result');assert.equal(before.status,'won');assert.equal(before.hostPaused,true);

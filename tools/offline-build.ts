@@ -6,7 +6,8 @@ export function offlineBuild():Plugin{return {name:'reviewed-offline-shell',clos
  // Ship the reusable library without downloading every unused cover and pose on
  // first visit. Current UI art remains in the offline shell; optional static art
  // is cached only when requested. The allowlist never includes private APIs.
- const coreArt=new Set(['hero_workshop','spot_first_idea','character_spark_think','character_spark_celebrate','character_spark_recover'].map(id=>'jems-art/'+id+'.webp'));
+ const coreArt=new Set(['hero_workshop','spot_first_idea','character_spark_wave','character_spark_think','character_spark_rest','character_spark_celebrate','character_spark_recover','spot_work_in_progress','spot_reconnect','spot_safe_storage'].map(id=>'jems-art/'+id+'.webp'));
+ coreArt.add('jems-art/icons/jems-icons.svg');
  const precache=list.filter(f=>!f.startsWith('jems-art/')||coreArt.has(f));
  fs.writeFileSync(path.join(dir,'sw.js'),`const paths=${JSON.stringify(list)},precachePaths=${JSON.stringify(precache)},version=${JSON.stringify(version)};
 const prefix='family-arcade:'+new URL(self.registration.scope).pathname+':',key=prefix+version;

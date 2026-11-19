@@ -63,10 +63,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:03:30.676Z",
-      "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+      "reviewedAt": "2026-11-19T15:32:39.544Z",
+      "sourceDigest": "edbcdfb154db579bee01c7eaae1be83dda956a72f1aac1059f98413c83b08678",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
+      "reviewReason": "Brand completion and keyboard hero rendering apply the accepted supplied-art contract without changing child authorship, Send Build Keep, earning policy, learning, privacy or product scope."
     },
     {
       "id": "experience",
@@ -102,10 +102,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:39:48.683Z",
-      "sourceDigest": "47de8040f2678b39938d4658261da388a415397262aecebbe18709a2d7d29bc9",
+      "reviewedAt": "2026-11-19T15:32:40.086Z",
+      "sourceDigest": "fc8ace23b1c782bb93cf9fed38a73157771ef916817a9c4a908528edb2dd7607",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the complete recovered v1.2 source against current main and the published PR57 branch. The only new runtime reconciliation closes the Journey picker and hides Journey on entering Creation; existing scene exit, save-without-Keep, learning guards, owner boundaries and five-tab mobile layout remain intact. Canonical architecture and delivery scope now describe this combined behavior."
+      "reviewReason": "Documented shared SVG controls, truthful state art and voice/navigation labels, active offline assets, and the hero-only synchronous decode that fixes blank keyboard-entry artwork. Exact assets and persisted data contracts are preserved."
     },
     {
       "id": "creation",
@@ -121,10 +121,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "79550dae3c5cd44758f0fabef07732504db741af6b4f907af6eee6a8dc923ff6",
-      "reviewedAt": "2026-11-19T12:58:08.260Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit scene exit when navigating to chat Create or My journey: guard learning, preserve pending scene version without Keep, and stop hidden playback. Added regression cases while retaining current scene evidence, adapters and backup schema."
+      "sourceDigest": "23db9d50cc7c0519c1979489d224bd4431905a6716677e6591f1c260d3a9d3f8",
+      "reviewedAt": "2026-11-19T15:26:28.745Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed Creation UI and responsive controls: supplied icons, 44px secondary targets, truthful video labels and retained keyboard focus on Pause Resume. Scene editing, explicit Check and Keep, autosave, learning records and authoring contracts remain unchanged; shared surface behavior is documented in architecture and brand guidance."
     },
     {
       "id": "games",
@@ -144,10 +144,10 @@
         "docs/game-quality/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:41.812Z",
-      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
+      "reviewedAt": "2026-11-19T15:26:28.894Z",
+      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed registered playable-game control diffs including native shadow roots: supplied SVGs replace action glyphs, dynamic pause and audio labels remain truthful, and existing handlers/data-key/pointer behavior remain intact. Physics, scoring, game artwork, robot command notation and learning callbacks are unchanged."
     },
     {
       "id": "learning",
@@ -164,10 +164,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.211Z",
-      "sourceDigest": "8b49aa409e5ccb46e9d5e510feed52240415b85cfa5f4e5bfd55516d85e4a033",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed subject-specific host contracts and current Math and Language sources against the canonical learning principles; separated independent and assisted evidence from unproven learning efficacy."
+      "reviewedAt": "2026-11-19T15:26:29.186Z",
+      "sourceDigest": "a5459e9518e24d1db636dd0d070070203421d45acb1c56f871820f842bf1d517",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Language activity changes are decorative support/control icons and their changing text labels. Question stimuli, hints, scoring, read-aloud support, evidence recording and completion policy are unchanged; routed browser fixtures now serve the real local sprite."
     },
     {
       "id": "services",
@@ -264,10 +264,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "3806ee61659d06b10c5db3ff0b9c58d26009b0bd15e57bd8b6329cff61386f64",
-      "reviewedAt": "2026-11-19T07:03:52.307Z",
+      "sourceDigest": "7e6053d4cdf072d667b7f6331f3ceffa818f5b4837c432831629feacf523c9a8",
+      "reviewedAt": "2026-11-19T15:26:29.336Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Relative to merged main, the OpenAPI addition is only a read-only scene route through service.revision. Inspected same-family/device/adult-audience enforcement and tests for cross-profile and revoked-grant denial; the quality stage retains main's original-grant and consent policy."
+      "reviewReason": "Adult and parent privacy changes render supplied icons on existing headings/actions. Unlock, consent submission, pending external verification, revocation, data isolation and endpoint contracts are untouched; the isolated privacy browser fixture now uses an HTTP origin."
     },
     {
       "id": "validation",
@@ -290,10 +290,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T12:57:25.107Z",
-      "sourceDigest": "b0158a975de90f442c7cdcf1d9695661013a090eaa92179d0365fe58f26a2f50",
+      "reviewedAt": "2026-11-19T15:32:40.481Z",
+      "sourceDigest": "0933fe5fa2c84641cd514068dc51cd5491aaa6f0da7e9ef3021079afbbb449c0",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved all current main CI jobs; added brand asset verifier, narrow phone layout and scene-to-Create/Journey regressions alongside existing illustrated progression, offline and saved-state checks. Local build/nonbrowser results recorded separately from pending CI browser evidence."
+      "reviewReason": "Recorded current-source local acceptance and expanded existing tests for icon paths and accessibility, API-driven state art, offline loading, keyboard hero rendering and Creation focus. Existing control-name selectors and routed isolated fixtures reflect the actual application; behavior checks remain intact."
     },
     {
       "id": "delivery",
@@ -315,10 +315,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:03:31.282Z",
-      "sourceDigest": "42ab7a524f224769708b9edccb6edf6dc032f3bafb77f653546230103c2660bd",
+      "reviewedAt": "2026-11-19T15:32:40.744Z",
+      "sourceDigest": "6d83b952df4a162a483608f5cb9c0d6bdb15ad6440e7c993727e84fa7a21eb14",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded observed PR57 merge c6576c16 at 2026-11-19T15:02:05Z, exact tree equality to tested source1488871/local879c93e, all four final hosted workflows, scoped local acceptance and the source-only release boundary. Preserved earlier receipts as historical and documented actual handbook coverage."
+      "reviewReason": "Recorded current local branding verification and its source base, the focused rendering/focus fixes and remaining published-CI/native-game gate. Prior PR57 evidence remains historical; merge and production deployment are separate observations."
     },
     {
       "id": "context",

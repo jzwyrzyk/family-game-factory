@@ -5,6 +5,7 @@
 const assert=require('node:assert/strict');
 const {build}=require('esbuild');
 const {chromium}=require('playwright');
+const {readFileSync}=require('node:fs');
 
 (async()=>{
  const bundle=await build({entryPoints:['src/builder/privacy.ts'],bundle:true,platform:'browser',
@@ -15,7 +16,13 @@ const {chromium}=require('playwright');
    {name:'mobile',viewport:{width:390,height:844}}]){
    const page=await browser.newPage({viewport:device.viewport,hasTouch:device.name==='mobile'});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
-   await page.setContent('<main><section id="parent"></section></main>');
+   await page.route('http://jems.test/**',route=>{
+    const sprite=new URL(route.request().url()).pathname==='/jems-art/icons/jems-icons.svg';
+    return route.fulfill({contentType:sprite?'image/svg+xml':'text/html',body:sprite?
+     readFileSync('public/jems-art/icons/jems-icons.svg','utf8'):
+     '<style>'+readFileSync('src/brand/icons.css','utf8')+'</style><main><section id="parent"></section></main>'});
+   });
+   await page.goto('http://jems.test/');
    await page.addScriptTag({content:bundle.outputFiles[0].text});
    await page.evaluate(()=>{
     window.__data={status:'not-requested',scopes:{generation:false,conversation:false,remoteSpeech:false}};

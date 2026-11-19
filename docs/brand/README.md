@@ -26,6 +26,7 @@ Avoid using pastel colors as small text on white. Maintain readable navy text on
 - The [illustrated making journey](GEM_PROGRESS.md), cosmetic character picker and saved-progress popups; source and release status remain scoped to [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57).
 - Parent Controls, My Powers, Math/Language Arts checkpoints, error/success notices, profile controls and optional offline update notification.
 - PWA manifest, icon, document title/metadata and original legacy Arcade escape route.
+- The shared approved SVG sprite supplies functional icons across existing host and game controls, with text labels, keyboard focus and dynamic states preserved. All five Gem companion poses and saved/build/reconnect spots follow the real state map in the library contract.
 - Product messaging: **Create. Solve. Build. Play. Grow.** Child creates/decides; jems is a helper. **Send to jems** sends a typed message; **Speak** is the microphone action.
 - CSS lives in `src/brand/jems.css`; existing physics and learning logic, isolation, storage keys and privacy gates remain unchanged.
 

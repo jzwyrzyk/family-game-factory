@@ -57,6 +57,12 @@ The gateway's existing coordinator owns dispatch, retries and acceptance. New re
 | Coach and speech | [Coach service](server/coach/service.ts), [speech service](server/coach/speech.ts), [private bridge](server/coach/private-bridge.ts), and [private executor](server/coach/private-executor.ts) enforce separate consent, identity, budgets and provider availability. The [approved input contract](docs/issue-28/PUSH_TO_TALK_MVP.md) is Speak → transcribe → edit → explicit Send; Build remains separate. |
 | Deployment tooling | [Deployment scripts](scripts/deployment/) build and configure gateway, preview and private coach; [Pages workflow](.github/workflows/pages.yml) publishes the browser build through manual dispatch. Their presence is not deployment evidence. |
 
+## Functional icon and state-art adapters
+
+The shared [icon adapter](src/brand/icons.ts) resolves the unchanged approved SVG sprite against `document.baseURI`; [icon styles](src/brand/icons.css) are imported once by the host. Studio, Creation, Journey, legacy/live-remix, parent/adult/privacy, learning support, offline and playable-game controls consume it. SVGs are decorative; visible labels and dynamic accessible names carry meaning. Existing game art, profile avatars, counting stimuli and code/direction notation retain their original content. The adapter changes presentation only and creates no persistent state.
+
+Studio binds all five Gem companion poses and saved/work-in-progress/reconnect spots to existing conversation, saved collection and job states. The [coverage/state table](docs/brand/LIBRARY_V1_2.md#interface-styles-and-states) specifies the mapping. Speech adapters expose optional host render callbacks without changing capture, consent, cancellation or Send behavior. The offline build precaches ten active artwork files and the shared sprite; unused covers and editorial art retain the strict same-origin, cache-on-request policy. Future game covers and the handbook's composed parent examples do not create features.
+
 ## Contracts to consult before changing an API
 
 The executable route composition is [gateway.ts](server/gateway.ts), with request/response behavior in the handlers below. [openapi.json](server/openapi.json) describes the job/revision/worker API and the adult-profile, session-status, parent-unlock and privacy routes added by this integration. It remains **incomplete for coach, speech and other trusted-device routes**. Do not infer route absence from that schema, or treat proposed [legacy contracts](server/contracts/api.ts) as implemented endpoints.
