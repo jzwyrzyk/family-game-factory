@@ -44,11 +44,14 @@ export function assessAssembly(proposal:GameProposal):AssemblyAssessment {
   (proposal.simulation!==undefined&&!['rules','physics-2d'].includes(proposal.simulation)))throw Error('ARCHETYPE_PROPOSAL_INVALID');
  const a=archetypeById.get(proposal.archetypeId);
  if(!a)return done('review-required',proposal.archetypeId,[],[],['UNKNOWN_ARCHETYPE'],['Preserve the original idea and ask the generator to consider a novel game form.']);
- const essential=unique([...a.coreMechanics,...proposal.requestedMechanics]);
+ // An archetype's reference mechanics are examples, never mandatory child intent.
+ // Inheriting those would force a bow game to reflect spells, among other failures.
+ const essential=unique(proposal.requestedMechanics);
  const unknown=essential.filter(id=>!mechanicById.has(id));
  if(unknown.length)return done('review-required',a.id,essential,unknown,['UNKNOWN_MECHANIC'],['Never omit unfamiliar requested actions silently.']);
  const missing=essential.filter(id=>mechanicById.get(id)!.maturity!=='shared-prototype');
  if(proposal.view==='true-3d')return done('unsupported',a.id,essential,missing,['TRUE_3D_NOT_SUPPORTED'],['Do not quietly convert essential spatial depth to 2D.']);
+ if(essential.length===0)return done('review-required',a.id,essential,missing,['ESSENTIAL_MECHANICS_UNSPECIFIED'],['A genre label is not a game specification. Preserve original wording and resolve the required action and payoff.']);
  const engine:Engine=proposal.simulation||(a.engine==='either'?'rules':a.engine);
  if(a.engine!=='either'&&a.engine!==engine)return done('review-required',a.id,essential,missing,['GAME_FORM_ENGINE_CONFLICT'],['Reassess the essential physical cause and effect, not the nouns in the theme.']);
  if(engine==='rules'&&essential.some(id=>mechanicById.get(id)!.engine==='physics-2d'))return done('review-required',a.id,essential,missing,['REQUIRES_PHYSICAL_SIMULATION'],['A rules-only shortcut would change a required mechanic.']);
