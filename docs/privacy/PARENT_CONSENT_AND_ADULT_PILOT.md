@@ -18,7 +18,7 @@ After independently completing the required guardian check for that exact choice
 npm run setup:parent-privacy-verify -- --confirm-external-verification
 ```
 
-Provide `FACTORY_PRIVATE_CONFIG`, `FACTORY_PARENT_CHOICE_ID` and `FACTORY_EXTERNAL_GUARDIAN_RECEIPT` through the secured operator environment. The parent-only pending status includes the exact choice UUID to use for `FACTORY_PARENT_CHOICE_ID`; this reference is not a receipt or credential. The command stores only the SHA-256 digest of the external reference and activates the chosen scopes. It does not independently validate real guardianship.
+Provide `FACTORY_PRIVATE_CONFIG`, `FACTORY_PARENT_CHOICE_ID` and `FACTORY_EXTERNAL_GUARDIAN_RECEIPT` through the secured operator environment. The parent-only pending status includes the exact choice UUID to use for `FACTORY_PARENT_CHOICE_ID`; this reference is not a receipt or credential. Both this verifier and adult-permit setup reuse the existing configured workspace and optional `artifactBucket`, including its externalized game artifacts. The command stores only the SHA-256 digest of the external reference and activates the chosen scopes. It does not independently validate real guardianship.
 
 The verifier refuses an old notice, expired/revoked/replaced choice, reused receipt, inactive device, malformed scopes or incomplete prior verification. Runtime checks require complete evidence and sensible request/verification/expiry order. A restored timestamp without its receipt cannot authorize paid processing or display verified status. A fresh current-notice choice is needed when earlier evidence is unusable.
 

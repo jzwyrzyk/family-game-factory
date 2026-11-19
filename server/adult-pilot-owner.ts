@@ -6,6 +6,7 @@ import {readFile} from 'node:fs/promises';
 import {Firestore} from '@google-cloud/firestore';
 import {FirestoreRepository} from './pipeline/firestore';
 import {FileRepository} from './pipeline/repository';
+import {GcsPrivateArtifacts} from './storage/artifacts';
 import {grantAdultPilot,revokeAdultPilot} from './adult-pilot';
 async function main(){
  if(process.env.GITHUB_ACTIONS||process.env.K_SERVICE||!process.env.FACTORY_PRIVATE_CONFIG)
@@ -15,7 +16,7 @@ async function main(){
   (args.has('--confirm-adult-owner-review')===args.has('--revoke')))
   throw Error('OWNER_APPROVAL_COMMAND_REQUIRED');
  const config=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as{
-  familyId:string;workspace:string;projectId?:string;localFile?:string
+  familyId:string;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string
  };
  if(!config||!/^[A-Za-z0-9_-]{1,100}$/.test(config.familyId)||
   !/^[A-Za-z0-9_-]{1,100}$/.test(config.workspace)||
@@ -23,7 +24,8 @@ async function main(){
  const deviceId=process.env.FACTORY_ADULT_PILOT_DEVICE_ID||'';
  if(!/^[0-9a-f-]{36}$/.test(deviceId))throw Error('ADULT_PILOT_DEVICE_ID_REQUIRED');
  const repo=config.localFile?await FileRepository.open(config.localFile):
-  new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace);
+  new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,
+   config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
  if(args.has('--revoke')){
   await revokeAdultPilot(repo,config.familyId,deviceId);
   console.log('Adult development profile permit and sessions revoked for selected trusted device.');

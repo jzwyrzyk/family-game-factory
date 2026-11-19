@@ -33,7 +33,9 @@ The trusted owner first enrolls the device through the existing family-device se
 npm run setup:adult-pilot -- --confirm-adult-owner-review
 ```
 
-The command reads `FACTORY_PRIVATE_CONFIG`, `FACTORY_ADULT_PILOT_DEVICE_ID` and `FACTORY_ADULT_PILOT_OWNER_RECEIPT` from the secured operator environment. Optional `FACTORY_ADULT_PILOT_DAYS` defaults to 7 and permits 1–14 days. The server stores the SHA-256 digest of the external audit reference, family/device binding and expiry. Keep identity documents, passphrases, credentials and raw receipts out of GitHub.
+For the exact `FACTORY_ADULT_PILOT_DEVICE_ID`, unlock Parent Controls and inspect the authenticated `GET /v1/devices` response: use the server `id` on the entry marked `current: true` for this device. Approved private datastore tooling is another source. Device names are display labels; do not guess an ID from a name or a local profile.
+
+The command reads `FACTORY_PRIVATE_CONFIG`, `FACTORY_ADULT_PILOT_DEVICE_ID` and `FACTORY_ADULT_PILOT_OWNER_RECEIPT` from the secured operator environment. Optional `FACTORY_ADULT_PILOT_DAYS` defaults to 7 and permits 1–14 days. Both adult-permit setup and guardian verification reuse the configured workspace and optional `artifactBucket`, so existing externally stored game artifacts remain readable during their transactions. The server stores the SHA-256 digest of the external audit reference, family/device binding and expiry. Keep identity documents, passphrases, credentials and raw receipts out of GitHub.
 
 An operator permit makes the device eligible for the adult profile. The passphrase switch creates a separate server-recorded privilege session with a maximum lifetime of 60 minutes, bounded by the current permit/device authorization. API verification requires both the HttpOnly `factory_adult` cookie and a separate `X-Factory-Adult-Session` proof held only in that tab's memory. A child tab sharing the cookie jar has no matching proof. Neither item works without the matching trusted family session and live grant.
 

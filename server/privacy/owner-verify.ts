@@ -5,6 +5,7 @@ import {readFile} from 'node:fs/promises';
 import {Firestore} from '@google-cloud/firestore';
 import {FirestoreRepository} from '../pipeline/firestore';
 import {FileRepository} from '../pipeline/repository';
+import {GcsPrivateArtifacts} from '../storage/artifacts';
 import {recordExternalGuardianVerification} from './parent-consent';
 async function main(){
  if(process.env.GITHUB_ACTIONS||process.env.K_SERVICE||!process.env.FACTORY_PRIVATE_CONFIG||
@@ -15,13 +16,14 @@ async function main(){
  if(!/^[0-9a-f-]{36}$/.test(id)||!/^[\w-]{12,120}$/.test(receipt))
   throw Error('REVIEWED_CHOICE_AND_RECEIPT_REQUIRED');
  const c=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as {
-  familyId:string;workspace:string;projectId?:string;localFile?:string
+  familyId:string;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string
  };
  if(!c||!/^[A-Za-z0-9_-]{1,100}$/.test(c.familyId)||
   !/^[A-Za-z0-9_-]{1,100}$/.test(c.workspace)||
   (!c.localFile&&!c.projectId))throw Error('PRIVATE_FAMILY_CONFIG_REQUIRED');
  const repo=c.localFile?await FileRepository.open(c.localFile):
-  new FirestoreRepository(new Firestore({projectId:c.projectId}),c.workspace);
+  new FirestoreRepository(new Firestore({projectId:c.projectId}),c.workspace,
+   c.artifactBucket?new GcsPrivateArtifacts(c.artifactBucket,c.workspace):undefined);
  const result=await recordExternalGuardianVerification(repo,{
   familyId:c.familyId,choiceId:id,receipt,verifiedByOwner:true
  });

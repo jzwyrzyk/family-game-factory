@@ -15,7 +15,11 @@
     "docs/README.md",
     "docs/decisions/README.md",
     "docs/context/MAINTENANCE.md",
-    "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
+    "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md",
+    "docs/decisions/0005-temporary-adult-profile.md",
+    "docs/adult-pilot/VOICE_RELEASE_AND_UAT.md",
+    "docs/privacy/ADULT_CHILD_RELEASE_INTEGRATION.md",
+    "docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -25,7 +29,9 @@
     "DELIVERY-STATE.md",
     "docs/README.md",
     "docs/decisions/*.md",
-    "docs/context/*.md"
+    "docs/context/*.md",
+    "docs/adult-pilot/*.md",
+    "docs/privacy/*.md"
   ],
   "areas": [
     {
@@ -41,10 +47,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.073Z",
+      "reviewedAt": "2026-11-19T04:58:40.304Z",
       "sourceDigest": "3fc6119f41312ecb1004a0c799d212f6f72981ca700102b9626b45c2dc312ee9",
       "reviewOutcome": "updated",
-      "reviewReason": "Consolidated the existing coaching, child journey, continuity and brand standards into the product doctrine and sourced decision records; implementation and efficacy claims remain separate."
+      "reviewReason": "Recorded the owner-directed temporary adult profile on the existing site in doctrine and ADR0005; explicit Send, Build, Keep, child authorship and learning principles remain unchanged."
     },
     {
       "id": "experience",
@@ -54,7 +60,10 @@
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
         "docs/homepage/*.md",
-        "docs/brand/*.md"
+        "docs/brand/*.md",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md",
+        "docs/decisions/0005-temporary-adult-profile.md"
       ],
       "sources": [
         "src/main.ts",
@@ -67,13 +76,14 @@
         "src/assets/**",
         "src/brand/**",
         "public/**",
-        "index.html"
+        "index.html",
+        "src/adult-pilot/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.114Z",
-      "sourceDigest": "0c995d3b2dd92f82533c502ce7ff14470d4752cc32b494a3e783cd00ee42a1aa",
+      "reviewedAt": "2026-11-19T04:58:40.746Z",
+      "sourceDigest": "2063cc4ca289c97f69b25b13f4eb22c2b21abe950ca771b06c2d6278edec7093",
       "reviewOutcome": "updated",
-      "reviewReason": "Mapped Studio, local revisions, remote builder state and device-specific browser stores in the architecture; corrected the README default route and preserved explicit Keep and recovery intent."
+      "reviewReason": "Reviewed profile switching, pre-switch draft saving, tab-only credentials, cancellation and dynamic storage adapters; documented separate persisted adult workspaces and locked reload behavior without changing child local journeys."
     },
     {
       "id": "games",
@@ -122,7 +132,9 @@
       "documents": [
         "ARCHITECTURE-CURRENT.md",
         "docs/auth/*.md",
-        "server/README.md"
+        "server/README.md",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md"
       ],
       "sources": [
         "server/*.ts",
@@ -131,13 +143,14 @@
         "server/openapi.json",
         "server/contracts/**",
         "server/storage/**",
-        "docs/auth/*.md"
+        "docs/auth/*.md",
+        "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.231Z",
-      "sourceDigest": "9cf9229a21f2de1980ef5ba0401e5e004628785156ff0bb752e82f8335ce739b",
+      "reviewedAt": "2026-11-19T05:01:20.277Z",
+      "sourceDigest": "5ea2d8417a675367d445304cda7783f07f79ebb06a8afe4ae5e2f37af0efb0a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Mapped implemented gateway routes, trusted-device session checks, transactional revocation and private preview storage; documented that source schemas and deployment evidence have distinct limits."
+      "reviewReason": "Reviewed same-site gateway routing, derived adult identity, parent unlock/privacy/erasure and signed preview audience checks against the expanded OpenAPI contracts; documented live grant requirements and owner commands reusing the configured workspace/artifact bucket."
     },
     {
       "id": "generation",
@@ -146,7 +159,9 @@
         "docs/game-intelligence/*.md",
         "docs/assignment-004/*.md",
         "docs/assignment-005/*.md",
-        "docs/assignment-006/*.md"
+        "docs/assignment-006/*.md",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -158,10 +173,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.254Z",
-      "sourceDigest": "4e8693bb821b147f5ba20f413778d57d7a1893375736e79dd7f298a048f16760",
+      "reviewedAt": "2026-11-19T04:58:41.173Z",
+      "sourceDigest": "d69702009d7ebc0fa8a11cb99dd40e1fc92a709fe4bb36473dd091738a319a8c",
       "reviewOutcome": "updated",
-      "reviewReason": "Mapped the existing coordinator, sandbox and Game Intelligence integration without inventing another pipeline; documented authored-probe coverage, independent worker pins and bounded repair evidence."
+      "reviewReason": "Reviewed audience-scoped seeds, duplicate request IDs, reads and version actions plus original-grant dispatch, claim, report and publication checks; architecture now records those boundaries while preserving worker pins, sandbox isolation and explicit Keep."
     },
     {
       "id": "coach",
@@ -169,7 +184,9 @@
         "ARCHITECTURE-CURRENT.md",
         "PRODUCT-DOCTRINE.md",
         "docs/design-coach/*.md",
-        "docs/issue-28/*.md"
+        "docs/issue-28/*.md",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md"
       ],
       "sources": [
         "server/coach/**",
@@ -178,10 +195,37 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.282Z",
-      "sourceDigest": "4d453474f42784336808ce1c7c0477c3f5e43d209c7d7eb8a733b9087e619832",
+      "reviewedAt": "2026-11-19T04:58:41.634Z",
+      "sourceDigest": "7a33091bda1bde4683c4d99aabbd3d09b5889e127864a6bc73e0c63d2ae571cc",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the private coach exception and explicit speech composer with the source handlers and release contracts; preserved keyless gateway boundaries, revocation checks and separate Send and Build actions."
+      "reviewReason": "Reviewed adult versus guardian permission paths, fresh transaction-time admission, grant-specific reply caches and atomic model/speech completion checks; documented unchanged explicit voice flow and private provider credential boundaries."
+    },
+    {
+      "id": "adult-privacy",
+      "documents": [
+        "ARCHITECTURE-CURRENT.md",
+        "DELIVERY-STATE.md",
+        "docs/decisions/0005-temporary-adult-profile.md",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md"
+      ],
+      "sources": [
+        "src/adult-pilot/**",
+        "src/builder/privacy.ts",
+        "server/adult-pilot*.ts",
+        "server/privacy/**",
+        "server/trusted-devices.ts",
+        "server/openapi.json",
+        "tests/adult-*",
+        "tests/parent-privacy*",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md"
+      ],
+      "reviewAfterDays": 14,
+      "sourceDigest": "3e6125a693df6bbe8435f83e6a1e2aa49d18b0b3d0175783d9fc9a9a0c5051ee",
+      "reviewedAt": "2026-11-19T05:01:21.223Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the authenticated profile switch, cookie plus tab proof, fixed expiry, isolated adult storage/jobs and current-notice parent evidence with their negative tests; recorded the accepted temporary one-site decision, exact operator IDs, artifact-store reuse and removal limits."
     },
     {
       "id": "validation",
@@ -191,17 +235,19 @@
         "docs/evidence/README.md",
         "docs/game-quality/*.md",
         "docs/game-intelligence/*.md",
-        "docs/context/MAINTENANCE.md"
+        "docs/context/MAINTENANCE.md",
+        "docs/adult-pilot/*.md",
+        "docs/privacy/*.md"
       ],
       "sources": [
         "tests/**",
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.319Z",
-      "sourceDigest": "19d07acceace6d7da8ac5e5e2f644858e5049aa64d2341d22ab1c44d3f9fbb7b",
+      "reviewedAt": "2026-11-19T04:58:42.419Z",
+      "sourceDigest": "8bf3a35525756223cbd9cc1facd18ff2f8312c6357116dcb0569ee214e39229d",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the existing test and evidence entry points and their scope; fixture and browser regression success remain separate from provider, actual-device, child-experience and learning acceptance."
+      "reviewReason": "Reviewed adult authorization, cross-tab client and browser cases, workspace and worker publication tests, parent consent negatives and preview HTTP coverage; delivery evidence records scoped fixture passes while final-head CI and real-provider/device acceptance remain pending."
     },
     {
       "id": "delivery",
@@ -223,10 +269,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T04:27:59.379Z",
-      "sourceDigest": "8bf8192ef050d31181e653f503afbde42cb98f2903983cebbdd532d09aeb8c3f",
+      "reviewedAt": "2026-11-19T05:05:37.165Z",
+      "sourceDigest": "5eefc2d6c0352d7eecb579f95980918d4db1101405494dc91ac13026874a9402",
       "reviewOutcome": "updated",
-      "reviewReason": "Added a dated GitHub evidence ledger separating merged source, observed Pages workflow, private worker proposal and unverified live services; introduced the read-only documentation workflow without changing deployment gates."
+      "reviewReason": "Verified that GitHub-created runtime and main-integration commits have the same trees as the locally tested sources; updated their exact source identities in the delivery ledger without changing deployment, activation or final-CI claims."
     },
     {
       "id": "context",
@@ -247,10 +293,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.406Z",
-      "sourceDigest": "a9da30a6754f03c3cf11823041ab4dab6e2fe9308a4794fbf82910fea29a96d3",
+      "reviewedAt": "2026-11-19T04:58:43.727Z",
+      "sourceDigest": "26afe785176272d83041ae803848b9d6f8d007cc05d0f7e41164e7c9ec901f09",
       "reviewOutcome": "updated",
-      "reviewReason": "Established the canonical entry points, PR template, source routing and mandatory normalized policy review; verified explicit per-area review, prospective-merge drift, deletion, self-reference and local-link failure paths."
+      "reviewReason": "Added explicit source routing and required/link-checked adult and privacy contracts, indexed ADR0005 and the new feature entry; inspected registry policy so new profile modules and consent tests cannot escape documentation impact checks."
     }
   ]
 }
