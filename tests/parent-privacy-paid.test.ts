@@ -66,7 +66,7 @@ test('private worker refuses revoked parent consent at claim and report; never p
  await coordinator.tick();
  const gen=identity('generate','first-worker-run');
  const claimed=await coordinator.claim(ack.jobId,0,'generate',gen);
- assert.equal(claimed.input.childIntent,'Build a rocket that flies');
+ assert.equal(claimed.input?.childIntent,'Build a rocket that flies');
  await revokeParentPrivacyChoice(repo,parent);
  await assert.rejects(coordinator.claim(ack.jobId,0,'generate',identity('generate','second-worker-run')),/GUARDIAN_CONSENT_REQUIRED/);
  await coordinator.report(ack.jobId,0,'generate',gen,{errorCode:'PROVIDER_FAILED'});
