@@ -425,10 +425,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T17:17:57.801Z",
-      "sourceDigest": "d484dff651c6cddb1446826c1e278684dea598dbda55cd385003c92ff836dbbd",
+      "reviewedAt": "2026-11-19T17:34:00.000Z",
+      "sourceDigest": "71b02332850d02fbf019192902de725eef5a39197d433ef4796611f5abeb7485",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified merged main28c18cda and upstream PR65,PR69,PR67 metadata; recorded user authorization to merge PR64 after current checks while retaining historical results and separate deployment/research boundaries.",
+      "reviewReason": "Reviewed pinned manual Pages workflow reconciliation on current main and verified the exact delivery source fingerprint emitted by hosted documentation CI. Source SHA and production origins are explicit and immutable; this records release routing without deploying new application code, backend revisions, or authorizing paid requests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
