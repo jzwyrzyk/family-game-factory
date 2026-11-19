@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Release input, provenance and safety regression tests
         run: python3 -m unittest discover -s scripts/release -p 'test_*.py' -v
+      - name: Ensure production browser smoke is syntactically valid
+        run: node --check tests/release-live-browser.cjs
       - name: Verify default read-only operation produces evidence without credentials
         run: |
           python3 scripts/release/contract.py plan \
