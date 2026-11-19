@@ -600,7 +600,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.8"
+            "1.OA.C.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -616,7 +616,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.1"
+            "1.OA.D.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -632,7 +632,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.2"
+            "1.OA.D.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -648,7 +648,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.B.3"
+            "1.OA.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -664,7 +664,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.B.4"
+            "1.OA.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -680,7 +680,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.C.5"
+            "1.OA.B.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -696,7 +696,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.C.6"
+            "1.OA.B.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -712,7 +712,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.7"
+            "1.OA.C.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -728,7 +728,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.8"
+            "1.OA.C.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -744,7 +744,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.1"
+            "1.OA.D.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -760,7 +760,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.2"
+            "1.OA.D.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -776,7 +776,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.B.3"
+            "1.OA.A.1"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -792,7 +792,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.B.4"
+            "1.OA.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -808,7 +808,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.2"
+            "1.NBT.C.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -824,7 +824,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.3"
+            "1.NBT.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -840,7 +840,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.4"
+            "1.NBT.C.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -856,7 +856,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.5"
+            "1.NBT.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -872,7 +872,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.6"
+            "1.NBT.B.2"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -888,7 +888,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.A.1"
+            "1.NBT.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -904,7 +904,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.2"
+            "1.NBT.C.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -920,7 +920,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.3"
+            "1.NBT.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -936,7 +936,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.4"
+            "1.NBT.C.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1064,7 +1064,7 @@
           "strand": "G",
           "grade": 1,
           "standardIds": [
-            "1.G.A.2"
+            "1.G.A.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -1080,7 +1080,7 @@
           "strand": "G",
           "grade": 1,
           "standardIds": [
-            "1.G.A.3"
+            "1.G.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1096,7 +1096,7 @@
           "strand": "G",
           "grade": 1,
           "standardIds": [
-            "1.G.A.1"
+            "1.G.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1112,7 +1112,7 @@
           "strand": "G",
           "grade": 1,
           "standardIds": [
-            "1.G.A.2"
+            "1.G.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -1128,7 +1128,7 @@
           "strand": "G",
           "grade": 1,
           "standardIds": [
-            "1.G.A.3"
+            "1.G.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1159,7 +1159,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.C.6"
+            "1.OA.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1175,7 +1175,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.7"
+            "1.OA.B.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1191,7 +1191,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.8"
+            "1.OA.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -1207,7 +1207,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.1"
+            "1.OA.C.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1223,7 +1223,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.2"
+            "1.OA.D.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1239,7 +1239,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.B.3"
+            "1.OA.D.8"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -1255,7 +1255,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.B.4"
+            "1.OA.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1271,7 +1271,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.C.5"
+            "1.OA.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1287,7 +1287,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.C.6"
+            "1.OA.B.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -1303,7 +1303,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.7"
+            "1.OA.B.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1319,7 +1319,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.D.8"
+            "1.OA.C.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1335,7 +1335,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.1"
+            "1.OA.C.6"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -1351,7 +1351,7 @@
           "strand": "OA",
           "grade": 1,
           "standardIds": [
-            "1.OA.A.2"
+            "1.OA.D.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1367,7 +1367,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.2"
+            "1.NBT.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1383,7 +1383,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.3"
+            "1.NBT.B.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -1399,7 +1399,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.4"
+            "1.NBT.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1415,7 +1415,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.5"
+            "1.NBT.C.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1431,7 +1431,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.6"
+            "1.NBT.C.5"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -1447,7 +1447,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.A.1"
+            "1.NBT.C.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1463,7 +1463,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.2"
+            "1.NBT.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1479,7 +1479,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.B.3"
+            "1.NBT.B.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -1495,7 +1495,7 @@
           "strand": "NBT",
           "grade": 1,
           "standardIds": [
-            "1.NBT.C.4"
+            "1.NBT.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1511,7 +1511,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.A.2"
+            "1.MD.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1527,7 +1527,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.B.3"
+            "1.MD.C.4"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -1543,7 +1543,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.C.4"
+            "1.MD.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1559,7 +1559,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.A.1"
+            "1.MD.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1575,7 +1575,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.A.2"
+            "1.MD.B.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -1591,7 +1591,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.B.3"
+            "1.MD.C.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -1607,7 +1607,7 @@
           "strand": "MD",
           "grade": 1,
           "standardIds": [
-            "1.MD.C.4"
+            "1.MD.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2309,7 +2309,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.C.4"
+            "2.OA.B.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2325,7 +2325,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.A.1"
+            "2.OA.C.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2341,7 +2341,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.B.2"
+            "2.OA.C.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -2357,7 +2357,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.C.3"
+            "2.OA.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2373,7 +2373,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.C.4"
+            "2.OA.B.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2389,7 +2389,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.8"
+            "2.NBT.A.2"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2405,7 +2405,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.9"
+            "2.NBT.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2421,7 +2421,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.1"
+            "2.NBT.A.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2437,7 +2437,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.2"
+            "2.NBT.B.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -2453,7 +2453,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.3"
+            "2.NBT.B.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2469,7 +2469,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.4"
+            "2.NBT.B.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2485,7 +2485,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.5"
+            "2.NBT.B.8"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2501,7 +2501,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.6"
+            "2.NBT.B.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2517,7 +2517,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.7"
+            "2.NBT.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2533,7 +2533,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.8"
+            "2.NBT.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -2549,7 +2549,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.8"
+            "2.MD.C.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2565,7 +2565,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.9"
+            "2.MD.C.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2581,7 +2581,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.10"
+            "2.MD.D.9"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2597,7 +2597,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.1"
+            "2.MD.D.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2613,7 +2613,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.2"
+            "2.MD.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2629,7 +2629,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.3"
+            "2.MD.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -2645,7 +2645,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.4"
+            "2.MD.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2661,7 +2661,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.B.5"
+            "2.MD.A.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2677,7 +2677,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.B.6"
+            "2.MD.B.5"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2693,7 +2693,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.7"
+            "2.MD.B.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2709,7 +2709,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.8"
+            "2.MD.C.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2725,7 +2725,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.9"
+            "2.MD.C.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -2741,7 +2741,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.10"
+            "2.MD.D.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2757,7 +2757,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.1"
+            "2.MD.D.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2773,7 +2773,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.2"
+            "2.MD.A.1"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2789,7 +2789,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.3"
+            "2.MD.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2805,7 +2805,7 @@
           "strand": "G",
           "grade": 2,
           "standardIds": [
-            "2.G.A.2"
+            "2.G.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2821,7 +2821,7 @@
           "strand": "G",
           "grade": 2,
           "standardIds": [
-            "2.G.A.3"
+            "2.G.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -2837,7 +2837,7 @@
           "strand": "G",
           "grade": 2,
           "standardIds": [
-            "2.G.A.1"
+            "2.G.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2853,7 +2853,7 @@
           "strand": "G",
           "grade": 2,
           "standardIds": [
-            "2.G.A.2"
+            "2.G.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2869,7 +2869,7 @@
           "strand": "G",
           "grade": 2,
           "standardIds": [
-            "2.G.A.3"
+            "2.G.A.1"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2900,7 +2900,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.B.2"
+            "2.OA.C.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2916,7 +2916,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.C.3"
+            "2.OA.C.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2932,7 +2932,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.C.4"
+            "2.OA.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -2948,7 +2948,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.A.1"
+            "2.OA.B.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2964,7 +2964,7 @@
           "strand": "OA",
           "grade": 2,
           "standardIds": [
-            "2.OA.B.2"
+            "2.OA.C.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -2980,7 +2980,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.5"
+            "2.NBT.A.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -2996,7 +2996,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.6"
+            "2.NBT.A.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3012,7 +3012,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.7"
+            "2.NBT.B.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3028,7 +3028,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.8"
+            "2.NBT.B.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -3044,7 +3044,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.9"
+            "2.NBT.B.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3060,7 +3060,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.1"
+            "2.NBT.B.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3076,7 +3076,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.2"
+            "2.NBT.B.9"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -3092,7 +3092,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.3"
+            "2.NBT.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3108,7 +3108,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.A.4"
+            "2.NBT.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3124,7 +3124,7 @@
           "strand": "NBT",
           "grade": 2,
           "standardIds": [
-            "2.NBT.B.5"
+            "2.NBT.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -3140,7 +3140,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.4"
+            "2.MD.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3156,7 +3156,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.B.5"
+            "2.MD.A.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3172,7 +3172,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.B.6"
+            "2.MD.B.5"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -3188,7 +3188,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.7"
+            "2.MD.B.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3204,7 +3204,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.8"
+            "2.MD.C.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3220,7 +3220,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.9"
+            "2.MD.C.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -3236,7 +3236,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.10"
+            "2.MD.D.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3252,7 +3252,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.1"
+            "2.MD.D.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3268,7 +3268,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.2"
+            "2.MD.A.1"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -3284,7 +3284,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.3"
+            "2.MD.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3300,7 +3300,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.A.4"
+            "2.MD.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3316,7 +3316,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.B.5"
+            "2.MD.A.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -3332,7 +3332,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.B.6"
+            "2.MD.B.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3348,7 +3348,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.7"
+            "2.MD.B.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -3364,7 +3364,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.C.8"
+            "2.MD.C.7"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -3380,7 +3380,7 @@
           "strand": "MD",
           "grade": 2,
           "standardIds": [
-            "2.MD.D.9"
+            "2.MD.C.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4082,7 +4082,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.D.8"
+            "3.OA.A.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4098,7 +4098,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.D.9"
+            "3.OA.B.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -4114,7 +4114,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.1"
+            "3.OA.B.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4130,7 +4130,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.2"
+            "3.OA.C.7"
           ],
           "format": "numeric",
           "points": 1,
@@ -4146,7 +4146,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.3"
+            "3.OA.D.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4162,7 +4162,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.4"
+            "3.OA.D.9"
           ],
           "format": "numeric",
           "points": 1,
@@ -4178,7 +4178,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.B.5"
+            "3.OA.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4242,7 +4242,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.2"
+            "3.NF.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4258,7 +4258,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.3"
+            "3.NF.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4274,7 +4274,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.1"
+            "3.NF.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4290,7 +4290,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.2"
+            "3.NF.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -4306,7 +4306,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.D.8"
+            "3.MD.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4322,7 +4322,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.A.1"
+            "3.MD.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -4338,7 +4338,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.A.2"
+            "3.MD.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4354,7 +4354,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.2"
+            "3.G.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4370,7 +4370,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.1"
+            "3.G.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4386,7 +4386,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.B.6"
+            "3.OA.A.2"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -4402,7 +4402,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.C.7"
+            "3.OA.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -4418,7 +4418,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.3"
+            "3.NF.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4434,7 +4434,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.B.3"
+            "3.MD.B.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -4450,7 +4450,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.D.8"
+            "3.OA.A.4"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -4466,7 +4466,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.D.9"
+            "3.OA.B.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -4498,7 +4498,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.1"
+            "3.NF.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -4514,7 +4514,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.2"
+            "3.NF.A.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -4530,7 +4530,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.B.4"
+            "3.MD.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -4546,7 +4546,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.C.5"
+            "3.MD.C.6"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -4562,7 +4562,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.2"
+            "3.G.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4578,7 +4578,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.1"
+            "3.OA.B.6"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -4594,7 +4594,7 @@
           "strand": "NF",
           "grade": 3,
           "standardIds": [
-            "3.NF.A.3"
+            "3.NF.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4610,7 +4610,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.C.6"
+            "3.MD.C.7"
           ],
           "format": "numeric",
           "points": 1,
@@ -4626,7 +4626,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.C.7"
+            "3.MD.D.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -4642,7 +4642,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.1"
+            "3.G.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -4673,7 +4673,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.B.5"
+            "3.OA.C.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4689,7 +4689,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.B.6"
+            "3.OA.D.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -4705,7 +4705,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.C.7"
+            "3.OA.D.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4721,7 +4721,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.D.8"
+            "3.OA.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4737,7 +4737,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.D.9"
+            "3.OA.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4753,7 +4753,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.1"
+            "3.OA.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -4769,7 +4769,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.2"
+            "3.OA.A.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4785,7 +4785,7 @@
           "strand": "NBT",
           "grade": 3,
           "standardIds": [
-            "3.NBT.A.2"
+            "3.NBT.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -4801,7 +4801,7 @@
           "strand": "NBT",
           "grade": 3,
           "standardIds": [
-            "3.NBT.A.3"
+            "3.NBT.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4817,7 +4817,7 @@
           "strand": "NBT",
           "grade": 3,
           "standardIds": [
-            "3.NBT.A.1"
+            "3.NBT.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -4897,7 +4897,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.C.6"
+            "3.MD.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4913,7 +4913,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.C.7"
+            "3.MD.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -4929,7 +4929,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.D.8"
+            "3.MD.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4945,7 +4945,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.2"
+            "3.G.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -4961,7 +4961,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.1"
+            "3.G.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -4977,7 +4977,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.3"
+            "3.OA.B.5"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -4993,7 +4993,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.A.4"
+            "3.OA.B.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -5025,7 +5025,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.A.1"
+            "3.MD.B.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -5041,7 +5041,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.B.5"
+            "3.OA.C.7"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -5057,7 +5057,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.B.6"
+            "3.OA.D.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -5073,7 +5073,7 @@
           "strand": "NBT",
           "grade": 3,
           "standardIds": [
-            "3.NBT.A.2"
+            "3.NBT.A.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -5121,7 +5121,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.A.2"
+            "3.MD.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -5137,7 +5137,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.B.3"
+            "3.MD.C.6"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -5153,7 +5153,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.2"
+            "3.G.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -5169,7 +5169,7 @@
           "strand": "OA",
           "grade": 3,
           "standardIds": [
-            "3.OA.C.7"
+            "3.OA.D.9"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -5201,7 +5201,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.B.4"
+            "3.MD.C.7"
           ],
           "format": "numeric",
           "points": 1,
@@ -5217,7 +5217,7 @@
           "strand": "MD",
           "grade": 3,
           "standardIds": [
-            "3.MD.C.5"
+            "3.MD.D.8"
           ],
           "format": "numeric",
           "points": 1,
@@ -5233,7 +5233,7 @@
           "strand": "G",
           "grade": 3,
           "standardIds": [
-            "3.G.A.1"
+            "3.G.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -5855,7 +5855,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.A.3"
+            "4.OA.C.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -5871,7 +5871,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.B.4"
+            "4.OA.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -5887,7 +5887,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.C.5"
+            "4.OA.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -5903,7 +5903,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.A.1"
+            "4.OA.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -5919,7 +5919,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.A.2"
+            "4.OA.B.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6015,7 +6015,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.1"
+            "4.NF.B.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6031,7 +6031,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.2"
+            "4.NF.B.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -6047,7 +6047,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.B.3"
+            "4.NF.C.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6063,7 +6063,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.B.4"
+            "4.NF.C.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -6079,7 +6079,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.5"
+            "4.NF.C.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6095,7 +6095,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.1"
+            "4.MD.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6111,7 +6111,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.2"
+            "4.MD.A.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6127,7 +6127,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.3"
+            "4.MD.B.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -6143,7 +6143,7 @@
           "strand": "G",
           "grade": 4,
           "standardIds": [
-            "4.G.A.2"
+            "4.G.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6159,7 +6159,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.A.3"
+            "4.OA.C.5"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6191,7 +6191,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.6"
+            "4.NF.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -6207,7 +6207,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.B.4"
+            "4.MD.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -6223,7 +6223,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.B.4"
+            "4.OA.A.1"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6239,7 +6239,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.C.5"
+            "4.OA.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6271,7 +6271,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.7"
+            "4.NF.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6287,7 +6287,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.1"
+            "4.NF.B.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6303,7 +6303,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.5"
+            "4.MD.C.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -6319,7 +6319,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.6"
+            "4.MD.C.7"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6335,7 +6335,7 @@
           "strand": "G",
           "grade": 4,
           "standardIds": [
-            "4.G.A.3"
+            "4.G.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6351,7 +6351,7 @@
           "strand": "OA",
           "grade": 4,
           "standardIds": [
-            "4.OA.A.1"
+            "4.OA.A.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6367,7 +6367,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.2"
+            "4.NF.B.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -6383,7 +6383,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.7"
+            "4.MD.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -6399,7 +6399,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.1"
+            "4.MD.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6415,7 +6415,7 @@
           "strand": "G",
           "grade": 4,
           "standardIds": [
-            "4.G.A.1"
+            "4.G.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -6526,7 +6526,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.A.2"
+            "4.NBT.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -6542,7 +6542,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.A.3"
+            "4.NBT.B.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6558,7 +6558,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.B.4"
+            "4.NBT.B.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -6574,7 +6574,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.B.5"
+            "4.NBT.B.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6590,7 +6590,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.B.6"
+            "4.NBT.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -6606,7 +6606,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.7"
+            "4.NF.C.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6622,7 +6622,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.1"
+            "4.NF.C.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -6638,7 +6638,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.2"
+            "4.NF.C.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6654,7 +6654,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.B.3"
+            "4.NF.A.1"
           ],
           "format": "numeric",
           "points": 1,
@@ -6670,7 +6670,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.B.4"
+            "4.NF.A.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6686,7 +6686,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.7"
+            "4.MD.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -6702,7 +6702,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.1"
+            "4.MD.B.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6718,7 +6718,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.2"
+            "4.MD.C.5"
           ],
           "format": "numeric",
           "points": 1,
@@ -6734,7 +6734,7 @@
           "strand": "G",
           "grade": 4,
           "standardIds": [
-            "4.G.A.2"
+            "4.G.A.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -6766,7 +6766,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.A.1"
+            "4.NBT.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6782,7 +6782,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.5"
+            "4.NF.B.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -6798,7 +6798,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.A.3"
+            "4.MD.C.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -6846,7 +6846,7 @@
           "strand": "NBT",
           "grade": 4,
           "standardIds": [
-            "4.NBT.A.2"
+            "4.NBT.A.3"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6862,7 +6862,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.6"
+            "4.NF.B.4"
           ],
           "format": "numeric",
           "points": 1,
@@ -6878,7 +6878,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.C.7"
+            "4.NF.C.5"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6894,7 +6894,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.B.4"
+            "4.MD.C.7"
           ],
           "format": "numeric",
           "points": 1,
@@ -6910,7 +6910,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.5"
+            "4.MD.A.1"
           ],
           "format": "human_rubric",
           "points": 2,
@@ -6926,7 +6926,7 @@
           "strand": "G",
           "grade": 4,
           "standardIds": [
-            "4.G.A.3"
+            "4.G.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6958,7 +6958,7 @@
           "strand": "NF",
           "grade": 4,
           "standardIds": [
-            "4.NF.A.1"
+            "4.NF.C.6"
           ],
           "format": "numeric",
           "points": 1,
@@ -6974,7 +6974,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.6"
+            "4.MD.A.2"
           ],
           "format": "numeric",
           "points": 1,
@@ -6990,7 +6990,7 @@
           "strand": "MD",
           "grade": 4,
           "standardIds": [
-            "4.MD.C.7"
+            "4.MD.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -7006,7 +7006,7 @@
           "strand": "G",
           "grade": 4,
           "standardIds": [
-            "4.G.A.1"
+            "4.G.A.3"
           ],
           "format": "numeric",
           "points": 1,
@@ -7628,7 +7628,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.9"
+            "RL.1.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7644,7 +7644,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.10"
+            "RL.1.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7660,7 +7660,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.1"
+            "RL.1.10"
           ],
           "format": "short_text",
           "points": 1,
@@ -7676,7 +7676,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.2"
+            "RL.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7692,7 +7692,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.3"
+            "RL.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7708,7 +7708,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.4"
+            "RL.1.3"
           ],
           "format": "short_text",
           "points": 1,
@@ -7724,7 +7724,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.8"
+            "RI.1.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7740,7 +7740,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.9"
+            "RI.1.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7756,7 +7756,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.10"
+            "RI.1.9"
           ],
           "format": "short_text",
           "points": 1,
@@ -7772,7 +7772,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.1"
+            "RI.1.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7788,7 +7788,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.2"
+            "RI.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7804,7 +7804,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.3"
+            "RI.1.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -7820,7 +7820,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.4"
+            "RF.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7836,7 +7836,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.1"
+            "RF.1.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7852,7 +7852,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.2"
+            "RF.1.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -7868,7 +7868,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.3"
+            "RF.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7884,7 +7884,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.4"
+            "RF.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7900,7 +7900,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.1"
+            "RF.1.3"
           ],
           "format": "short_text",
           "points": 1,
@@ -7916,7 +7916,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.2"
+            "RF.1.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7932,7 +7932,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.3"
+            "RF.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7948,7 +7948,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.4"
+            "RF.1.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -7964,7 +7964,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.1"
+            "W.1.8"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -7980,7 +7980,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.2"
+            "W.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -7996,7 +7996,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.3"
+            "W.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8012,7 +8012,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.5"
+            "W.1.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8028,7 +8028,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.6"
+            "W.1.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8044,7 +8044,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.7"
+            "W.1.6"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -8060,7 +8060,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.4"
+            "L.1.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8076,7 +8076,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.5"
+            "L.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8092,7 +8092,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.6"
+            "L.1.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -8108,7 +8108,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.1"
+            "L.1.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8124,7 +8124,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.2"
+            "L.1.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8140,7 +8140,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.4"
+            "L.1.6"
           ],
           "format": "short_text",
           "points": 1,
@@ -8156,7 +8156,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.5"
+            "L.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8172,7 +8172,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.6"
+            "L.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8188,7 +8188,7 @@
           "strand": "L",
           "grade": 1,
           "standardIds": [
-            "L.1.1"
+            "L.1.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -8219,7 +8219,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.5"
+            "RL.1.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8235,7 +8235,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.6"
+            "RL.1.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8251,7 +8251,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.7"
+            "RL.1.6"
           ],
           "format": "short_text",
           "points": 1,
@@ -8267,7 +8267,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.9"
+            "RL.1.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8283,7 +8283,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.10"
+            "RL.1.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8299,7 +8299,7 @@
           "strand": "RL",
           "grade": 1,
           "standardIds": [
-            "RL.1.1"
+            "RL.1.10"
           ],
           "format": "short_text",
           "points": 1,
@@ -8315,7 +8315,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.4"
+            "RI.1.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8331,7 +8331,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.5"
+            "RI.1.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8347,7 +8347,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.6"
+            "RI.1.5"
           ],
           "format": "short_text",
           "points": 1,
@@ -8363,7 +8363,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.7"
+            "RI.1.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8379,7 +8379,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.8"
+            "RI.1.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8395,7 +8395,7 @@
           "strand": "RI",
           "grade": 1,
           "standardIds": [
-            "RI.1.9"
+            "RI.1.8"
           ],
           "format": "short_text",
           "points": 1,
@@ -8411,7 +8411,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.2"
+            "RF.1.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8427,7 +8427,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.3"
+            "RF.1.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8443,7 +8443,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.4"
+            "RF.1.1"
           ],
           "format": "short_text",
           "points": 1,
@@ -8459,7 +8459,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.1"
+            "RF.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8475,7 +8475,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.2"
+            "RF.1.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8491,7 +8491,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.3"
+            "RF.1.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -8507,7 +8507,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.4"
+            "RF.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8523,7 +8523,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.1"
+            "RF.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8539,7 +8539,7 @@
           "strand": "RF",
           "grade": 1,
           "standardIds": [
-            "RF.1.2"
+            "RF.1.3"
           ],
           "format": "short_text",
           "points": 1,
@@ -8555,7 +8555,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.8"
+            "W.1.7"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -8571,7 +8571,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.1"
+            "W.1.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8587,7 +8587,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.2"
+            "W.1.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8603,7 +8603,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.3"
+            "W.1.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8619,7 +8619,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.5"
+            "W.1.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -8635,7 +8635,7 @@
           "strand": "W",
           "grade": 1,
           "standardIds": [
-            "W.1.6"
+            "W.1.5"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -9561,7 +9561,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.8"
+            "RI.2.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9577,7 +9577,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.9"
+            "RI.2.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9593,7 +9593,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.10"
+            "RI.2.1"
           ],
           "format": "short_text",
           "points": 1,
@@ -9609,7 +9609,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.1"
+            "RI.2.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9625,7 +9625,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.2"
+            "RI.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9641,7 +9641,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.3"
+            "RI.2.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -9657,7 +9657,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.4"
+            "RI.2.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9673,7 +9673,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.5"
+            "RI.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9689,7 +9689,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.4"
+            "RF.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9705,7 +9705,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.3"
+            "RF.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9721,7 +9721,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.4"
+            "RF.2.3"
           ],
           "format": "short_text",
           "points": 1,
@@ -9737,7 +9737,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.3"
+            "RF.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9753,7 +9753,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.4"
+            "RF.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9769,7 +9769,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.3"
+            "RF.2.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -9785,7 +9785,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.1"
+            "W.2.2"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -9801,7 +9801,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.2"
+            "W.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9817,7 +9817,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.3"
+            "W.2.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9833,7 +9833,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.5"
+            "W.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9849,7 +9849,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.6"
+            "W.2.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9865,7 +9865,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.7"
+            "W.2.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9881,7 +9881,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.8"
+            "W.2.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9897,7 +9897,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.1"
+            "W.2.2"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -9913,7 +9913,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.2"
+            "L.2.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9929,7 +9929,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.3"
+            "L.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9945,7 +9945,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.4"
+            "L.2.1"
           ],
           "format": "short_text",
           "points": 1,
@@ -9961,7 +9961,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.5"
+            "L.2.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9977,7 +9977,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.6"
+            "L.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -9993,7 +9993,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.1"
+            "L.2.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -10009,7 +10009,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.2"
+            "L.2.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10025,7 +10025,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.3"
+            "L.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10041,7 +10041,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.4"
+            "L.2.1"
           ],
           "format": "short_text",
           "points": 1,
@@ -10057,7 +10057,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.5"
+            "L.2.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10088,7 +10088,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.5"
+            "RL.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10104,7 +10104,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.6"
+            "RL.2.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10120,7 +10120,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.7"
+            "RL.2.9"
           ],
           "format": "short_text",
           "points": 1,
@@ -10136,7 +10136,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.9"
+            "RL.2.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10152,7 +10152,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.10"
+            "RL.2.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10168,7 +10168,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.1"
+            "RL.2.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -10184,7 +10184,7 @@
           "strand": "RL",
           "grade": 2,
           "standardIds": [
-            "RL.2.2"
+            "RL.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10200,7 +10200,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.4"
+            "RI.2.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10216,7 +10216,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.5"
+            "RI.2.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10232,7 +10232,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.6"
+            "RI.2.9"
           ],
           "format": "short_text",
           "points": 1,
@@ -10248,7 +10248,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.7"
+            "RI.2.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10264,7 +10264,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.8"
+            "RI.2.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10280,7 +10280,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.9"
+            "RI.2.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -10296,7 +10296,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.10"
+            "RI.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10312,7 +10312,7 @@
           "strand": "RI",
           "grade": 2,
           "standardIds": [
-            "RI.2.1"
+            "RI.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10328,7 +10328,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.4"
+            "RF.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10344,7 +10344,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.3"
+            "RF.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10360,7 +10360,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.4"
+            "RF.2.3"
           ],
           "format": "short_text",
           "points": 1,
@@ -10376,7 +10376,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.3"
+            "RF.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10392,7 +10392,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.4"
+            "RF.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10408,7 +10408,7 @@
           "strand": "RF",
           "grade": 2,
           "standardIds": [
-            "RF.2.3"
+            "RF.2.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -10424,7 +10424,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.8"
+            "W.2.3"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -10440,7 +10440,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.1"
+            "W.2.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10456,7 +10456,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.2"
+            "W.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10472,7 +10472,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.3"
+            "W.2.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10488,7 +10488,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.5"
+            "W.2.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10504,7 +10504,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.6"
+            "W.2.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10520,7 +10520,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.7"
+            "W.2.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10536,7 +10536,7 @@
           "strand": "W",
           "grade": 2,
           "standardIds": [
-            "W.2.8"
+            "W.2.3"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -10552,7 +10552,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.2"
+            "L.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10568,7 +10568,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.3"
+            "L.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10584,7 +10584,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.4"
+            "L.2.5"
           ],
           "format": "short_text",
           "points": 1,
@@ -10600,7 +10600,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.5"
+            "L.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10616,7 +10616,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.6"
+            "L.2.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10632,7 +10632,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.1"
+            "L.2.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -10648,7 +10648,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.2"
+            "L.2.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10664,7 +10664,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.3"
+            "L.2.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -10680,7 +10680,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.4"
+            "L.2.5"
           ],
           "format": "short_text",
           "points": 1,
@@ -10696,7 +10696,7 @@
           "strand": "L",
           "grade": 2,
           "standardIds": [
-            "L.2.5"
+            "L.2.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11558,7 +11558,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.8"
+            "RI.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11574,7 +11574,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.9"
+            "RI.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11590,7 +11590,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.10"
+            "RI.3.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -11606,7 +11606,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.1"
+            "RI.3.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11622,7 +11622,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.2"
+            "RI.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11638,7 +11638,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.3"
+            "RI.3.7"
           ],
           "format": "short_text",
           "points": 1,
@@ -11654,7 +11654,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.4"
+            "RI.3.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11670,7 +11670,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.5"
+            "RI.3.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11686,7 +11686,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.8"
+            "W.3.5"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -11702,7 +11702,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.10"
+            "W.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11718,7 +11718,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.1"
+            "W.3.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11734,7 +11734,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.2"
+            "W.3.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11750,7 +11750,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.3"
+            "W.3.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11766,7 +11766,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.4"
+            "W.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11782,7 +11782,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.5"
+            "W.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11798,7 +11798,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.6"
+            "W.3.3"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -11814,7 +11814,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.2"
+            "L.3.6"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -11830,7 +11830,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.3"
+            "L.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11846,7 +11846,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.4"
+            "L.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11862,7 +11862,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.5"
+            "L.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -11878,7 +11878,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.6"
+            "L.3.4"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -11894,7 +11894,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.2"
+            "SL.3.3"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -11910,7 +11910,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.3"
+            "SL.3.4"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -11926,7 +11926,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.4"
+            "SL.3.5"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -11942,7 +11942,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.5"
+            "SL.3.6"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -11958,7 +11958,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.6"
+            "SL.3.1"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -11974,7 +11974,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.1"
+            "SL.3.2"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -11990,7 +11990,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.2"
+            "SL.3.3"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12006,7 +12006,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.3"
+            "SL.3.4"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12022,7 +12022,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.6"
+            "RI.3.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12038,7 +12038,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.7"
+            "RI.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12054,7 +12054,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.8"
+            "RI.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12070,7 +12070,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.7"
+            "W.3.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12086,7 +12086,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.8"
+            "W.3.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12102,7 +12102,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.10"
+            "W.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12118,7 +12118,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.1"
+            "W.3.7"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -12134,7 +12134,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.2"
+            "W.3.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12165,7 +12165,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.5"
+            "RL.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12181,7 +12181,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.6"
+            "RL.3.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12197,7 +12197,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.7"
+            "RL.3.9"
           ],
           "format": "short_text",
           "points": 1,
@@ -12213,7 +12213,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.9"
+            "RL.3.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12229,7 +12229,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.10"
+            "RL.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12245,7 +12245,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.1"
+            "RL.3.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -12261,7 +12261,7 @@
           "strand": "RL",
           "grade": 3,
           "standardIds": [
-            "RL.3.2"
+            "RL.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12277,7 +12277,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.4"
+            "RI.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12293,7 +12293,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.5"
+            "RI.3.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12309,7 +12309,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.6"
+            "RI.3.5"
           ],
           "format": "short_text",
           "points": 1,
@@ -12325,7 +12325,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.7"
+            "RI.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12341,7 +12341,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.8"
+            "RI.3.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12357,7 +12357,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.9"
+            "RI.3.8"
           ],
           "format": "short_text",
           "points": 1,
@@ -12373,7 +12373,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.10"
+            "RI.3.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12389,7 +12389,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.1"
+            "RI.3.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12405,7 +12405,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.5"
+            "W.3.10"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -12421,7 +12421,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.6"
+            "W.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12437,7 +12437,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.7"
+            "W.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12453,7 +12453,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.8"
+            "W.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12469,7 +12469,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.10"
+            "W.3.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12485,7 +12485,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.1"
+            "W.3.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12501,7 +12501,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.2"
+            "W.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12517,7 +12517,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.3"
+            "W.3.7"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -12533,7 +12533,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.2"
+            "L.3.5"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -12549,7 +12549,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.3"
+            "L.3.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12565,7 +12565,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.4"
+            "L.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12581,7 +12581,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.5"
+            "L.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12597,7 +12597,7 @@
           "strand": "L",
           "grade": 3,
           "standardIds": [
-            "L.3.6"
+            "L.3.3"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -12613,7 +12613,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.2"
+            "SL.3.5"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12629,7 +12629,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.3"
+            "SL.3.6"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12645,7 +12645,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.4"
+            "SL.3.1"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12661,7 +12661,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.5"
+            "SL.3.2"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12677,7 +12677,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.6"
+            "SL.3.3"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12693,7 +12693,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.1"
+            "SL.3.4"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12709,7 +12709,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.2"
+            "SL.3.5"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12725,7 +12725,7 @@
           "strand": "SL",
           "grade": 3,
           "standardIds": [
-            "SL.3.3"
+            "SL.3.6"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -12741,7 +12741,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.2"
+            "RI.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12757,7 +12757,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.3"
+            "RI.3.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12773,7 +12773,7 @@
           "strand": "RI",
           "grade": 3,
           "standardIds": [
-            "RI.3.4"
+            "RI.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12789,7 +12789,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.4"
+            "W.3.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12805,7 +12805,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.5"
+            "W.3.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12821,7 +12821,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.6"
+            "W.3.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -12837,7 +12837,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.7"
+            "W.3.2"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -12853,7 +12853,7 @@
           "strand": "W",
           "grade": 3,
           "standardIds": [
-            "W.3.8"
+            "W.3.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13715,7 +13715,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.8"
+            "RI.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13731,7 +13731,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.9"
+            "RI.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13747,7 +13747,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.10"
+            "RI.4.4"
           ],
           "format": "short_text",
           "points": 1,
@@ -13763,7 +13763,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.1"
+            "RI.4.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13779,7 +13779,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.2"
+            "RI.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13795,7 +13795,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.3"
+            "RI.4.7"
           ],
           "format": "short_text",
           "points": 1,
@@ -13811,7 +13811,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.4"
+            "RI.4.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13827,7 +13827,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.5"
+            "RI.4.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13843,7 +13843,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.8"
+            "W.4.4"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -13859,7 +13859,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.9"
+            "W.4.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13875,7 +13875,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.10"
+            "W.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13891,7 +13891,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.1"
+            "W.4.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13907,7 +13907,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.2"
+            "W.4.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13923,7 +13923,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.3"
+            "W.4.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13939,7 +13939,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.4"
+            "W.4.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -13955,7 +13955,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.5"
+            "W.4.1"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -13971,7 +13971,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.2"
+            "L.4.6"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -13987,7 +13987,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.3"
+            "L.4.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14003,7 +14003,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.4"
+            "L.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14019,7 +14019,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.5"
+            "L.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14035,7 +14035,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.6"
+            "L.4.4"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -14051,7 +14051,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.2"
+            "SL.4.3"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14067,7 +14067,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.3"
+            "SL.4.4"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14083,7 +14083,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.4"
+            "SL.4.5"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14099,7 +14099,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.5"
+            "SL.4.6"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14115,7 +14115,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.6"
+            "SL.4.1"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14131,7 +14131,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.1"
+            "SL.4.2"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14147,7 +14147,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.2"
+            "SL.4.3"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14163,7 +14163,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.3"
+            "SL.4.4"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14179,7 +14179,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.6"
+            "RI.4.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14195,7 +14195,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.7"
+            "RI.4.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14211,7 +14211,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.8"
+            "RI.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14227,7 +14227,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.6"
+            "W.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14243,7 +14243,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.7"
+            "W.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14259,7 +14259,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.8"
+            "W.4.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14275,7 +14275,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.9"
+            "W.4.5"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -14291,7 +14291,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.10"
+            "W.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14322,7 +14322,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.5"
+            "RL.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14338,7 +14338,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.6"
+            "RL.4.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14354,7 +14354,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.7"
+            "RL.4.9"
           ],
           "format": "short_text",
           "points": 1,
@@ -14370,7 +14370,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.9"
+            "RL.4.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14386,7 +14386,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.10"
+            "RL.4.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14402,7 +14402,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.1"
+            "RL.4.2"
           ],
           "format": "short_text",
           "points": 1,
@@ -14418,7 +14418,7 @@
           "strand": "RL",
           "grade": 4,
           "standardIds": [
-            "RL.4.2"
+            "RL.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14434,7 +14434,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.4"
+            "RI.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14450,7 +14450,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.5"
+            "RI.4.4"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14466,7 +14466,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.6"
+            "RI.4.5"
           ],
           "format": "short_text",
           "points": 1,
@@ -14482,7 +14482,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.7"
+            "RI.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14498,7 +14498,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.8"
+            "RI.4.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14514,7 +14514,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.9"
+            "RI.4.8"
           ],
           "format": "short_text",
           "points": 1,
@@ -14530,7 +14530,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.10"
+            "RI.4.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14546,7 +14546,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.1"
+            "RI.4.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14562,7 +14562,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.4"
+            "W.4.7"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -14578,7 +14578,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.5"
+            "W.4.8"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14594,7 +14594,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.6"
+            "W.4.9"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14610,7 +14610,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.7"
+            "W.4.10"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14626,7 +14626,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.8"
+            "W.4.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14642,7 +14642,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.9"
+            "W.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14658,7 +14658,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.10"
+            "W.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14674,7 +14674,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.1"
+            "W.4.4"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -14690,7 +14690,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.2"
+            "L.4.5"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -14706,7 +14706,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.3"
+            "L.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14722,7 +14722,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.4"
+            "L.4.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14738,7 +14738,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.5"
+            "L.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14754,7 +14754,7 @@
           "strand": "L",
           "grade": 4,
           "standardIds": [
-            "L.4.6"
+            "L.4.3"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -14770,7 +14770,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.2"
+            "SL.4.5"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14786,7 +14786,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.3"
+            "SL.4.6"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14802,7 +14802,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.4"
+            "SL.4.1"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14818,7 +14818,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.5"
+            "SL.4.2"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14834,7 +14834,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.6"
+            "SL.4.3"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14850,7 +14850,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.1"
+            "SL.4.4"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14866,7 +14866,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.2"
+            "SL.4.5"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14882,7 +14882,7 @@
           "strand": "SL",
           "grade": 4,
           "standardIds": [
-            "SL.4.3"
+            "SL.4.6"
           ],
           "format": "audio_choice",
           "points": 1,
@@ -14898,7 +14898,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.2"
+            "RI.4.1"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14914,7 +14914,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.3"
+            "RI.4.2"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14930,7 +14930,7 @@
           "strand": "RI",
           "grade": 4,
           "standardIds": [
-            "RI.4.4"
+            "RI.4.3"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14946,7 +14946,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.2"
+            "W.4.5"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14962,7 +14962,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.3"
+            "W.4.6"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14978,7 +14978,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.4"
+            "W.4.7"
           ],
           "format": "closed_choice",
           "points": 1,
@@ -14994,7 +14994,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.5"
+            "W.4.8"
           ],
           "format": "human_rubric",
           "points": 8,
@@ -15010,7 +15010,7 @@
           "strand": "W",
           "grade": 4,
           "standardIds": [
-            "W.4.6"
+            "W.4.9"
           ],
           "format": "closed_choice",
           "points": 1,
