@@ -102,7 +102,7 @@ export function installProblemSolvingPractice(host: Host) {
     $('psHeading').textContent = 'Try an idea.'; $('psSubtitle').textContent = 'Wonder a little. Try something. See what changes.';
     const body = $('psBody'); body.replaceChildren();
     const intro = node('div', 'ps-shelf-intro');
-    intro.append(image('./jems-gem-companion.png', 'ps-companion'), node('p', '', 'A small adventure for your next big idea. Pick one to begin.'));
+    intro.append(image('./jems-art/character_spark_wave.webp', 'ps-companion'), node('p', '', 'A small adventure for your next big idea. Pick one to begin.'));
     body.append(intro);
     const cards = node('div', 'ps-cards');
     for (const task of practiceTasksForGrade(Number(FG.store.current().grade) || 1)) {
@@ -228,7 +228,7 @@ export function installProblemSolvingPractice(host: Host) {
     grid.append(stage, panel); body.append(grid, node('p', 'ps-saved-note', 'Your place is saved. You can leave and come back.'));
     if (focus) heading.focus({ preventScroll: true });
   }
-  function close() { stopSpeech(); visible = false; revisionRetry = false; }
+  function close() { stopSpeech(); visible = false; revisionRetry = false; page.classList.add('hidden'); }
   function open(id?: string) {
     act(() => {
       if (!host.enter()) return;
@@ -245,7 +245,7 @@ export function installProblemSolvingPractice(host: Host) {
   window.addEventListener('factory-profile-before-change', stopSpeech);
   window.addEventListener('factory-profile', () => {
     const wasVisible = visible; close(); active = null; $('psBody').replaceChildren(); status('');
-    if (wasVisible) act(() => { activeOwner = owner(); visible = true; renderShelf(); });
+    if (wasVisible) open();
   });
   function refreshAfterExternalChange(force = false) {
     if (!isCurrent()) return;

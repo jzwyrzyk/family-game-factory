@@ -12,7 +12,8 @@ import { beginLanguageAttempt, submitLanguageAnswer, useLanguageHint, recordLang
 import type { LearnerProfile } from '../src/learning/types';
 import { CreationStore } from '../src/creation/storage';
 import { createChallengeStarter, evaluateChallenge } from '../src/creation/challenges';
-import { StudioNotebook, type StudioSession } from '../src/studio/notebook';
+import { StudioNotebook, validateNotebook } from '../src/studio/notebook';
+import { builderJourney, gemStage } from '../src/brand/gem-progress';
 import { setAdultWorkspace } from '../src/adult-pilot/storage';
 
 class MemoryStorage implements Storage {
@@ -164,6 +165,75 @@ test('host bridge deduplicates unchanged scene versions and keeps evidence save 
     owner = 'child-two'; assert.deepEqual(api.list(), []);
     publishSourceEvidence({kind: 'creation', owner: 'child-one', attempt, result}); assert.deepEqual(api.list(), []);
     owner = 'child-one'; publishSourceEvidence({kind: 'clear-creation', owner, projectId: entry.id}); assert.deepEqual(api.list(), []);
+  } finally {
+    installEvidenceReceiver(() => {})();
+    if (priorWindow) Object.defineProperty(globalThis, 'window', priorWindow); else delete (globalThis as any).window;
+    if (priorStorage) Object.defineProperty(globalThis, 'localStorage', priorStorage); else delete (globalThis as any).localStorage;
+  }
+});
+
+test('cosmetic journey, avatar, verified keep and backup paths never manufacture APS evidence', () => {
+  const priorWindow = Object.getOwnPropertyDescriptor(globalThis, 'window'), priorStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  const storage = new MemoryStorage(), sourceStorage = new MemoryStorage(), owner = 'child-one';
+  const bus = new EventTarget(), host = {FG: {store: {current: () => ({id: owner})}}, dispatchEvent: bus.dispatchEvent.bind(bus)};
+  Object.defineProperty(globalThis, 'window', {configurable: true, writable: true, value: host});
+  Object.defineProperty(globalThis, 'localStorage', {configurable: true, writable: true, value: storage});
+  try {
+    const api = installProblemSolvingEvidence(), notebook = new StudioNotebook(sourceStorage);
+    const local = notebook.create(owner, 'buckets', 'Local idea', 'local-project');
+    notebook.setAvatar(owner, 'spark');
+    assert.deepEqual(api.list(), []);
+    const localTest = notebook.saveExperiment(local.id, owner, {id: 'local-test', baseId: 'local-base', config: {bucketCount: 4}, prompt: 'PRIVATE_LOCAL_PROMPT', summary: 'A saved test'});
+    notebook.observe(local.id, owner, 'PRIVATE_LOCAL_REFLECTION', 'child', localTest.id);
+    assert.equal(api.list().length, 2);
+    const beforeKeep = api.list();
+    notebook.keepExperiment(local.id, owner, localTest.id, {kind: 'local', baseId: 'local-base', revisionId: 'local-kept'});
+    assert.equal(gemStage(notebook.get(local.id, owner)), 'polished');
+    assert.deepEqual(api.list(), beforeKeep, 'A cosmetic making milestone cannot add a reasoning observation');
+
+    const remote = notebook.create(owner, 'new', 'Remote idea');
+    const remoteTest = notebook.saveExperiment(remote.id, owner, {id: 'remote-test', baseId: 'remote-base', remoteId: 'remote-kept', prompt: 'PRIVATE_REMOTE_PROMPT', summary: 'A remote test'});
+    notebook.observe(remote.id, owner, 'PRIVATE_REMOTE_REFLECTION', 'child', remoteTest.id);
+    assert.equal(gemStage(notebook.get(remote.id, owner)), 'rough');
+    const beforeVerify = api.list();
+    notebook.verifyRemoteExperiment(remote.id, owner, remoteTest.id);
+    assert.equal(gemStage(notebook.get(remote.id, owner)), 'cut');
+    notebook.keepExperiment(remote.id, owner, remoteTest.id, {kind: 'remote', baseId: 'remote-base', revisionId: 'remote-kept'});
+    assert.equal(gemStage(notebook.get(remote.id, owner)), 'polished');
+    assert.deepEqual(api.list(), beforeVerify, 'Real-playability verification and Keep do not establish reasoning quality');
+
+    notebook.verifyRemoteExperiment(remote.id, owner, remoteTest.id);
+    notebook.keepExperiment(remote.id, owner, remoteTest.id, {kind: 'remote', baseId: 'remote-base', revisionId: 'remote-kept'});
+    notebook.setAvatar(owner, 'nova');
+    notebook.archive(local.id, owner);
+    for (let i = 0; i < 3; i++) assert.equal(builderJourney(notebook.list(owner), owner).polishedCount, 2);
+    assert.deepEqual(api.list(), beforeVerify, 'Reload, rendering, archives and repeated callbacks cannot award more evidence');
+    contextualOnly(api.list());
+    assert.equal(JSON.stringify(api.list()).includes('PRIVATE_'), false);
+
+    const backup = {factoryStudio: notebook.read(), ...api.backup()};
+    validateNotebook(backup.factoryStudio); api.validate(backup.factoryProblemSolving);
+    const restored = new StudioNotebook(new MemoryStorage()); restored.restore(backup.factoryStudio);
+    assert.equal(restored.avatar(owner), 'nova');
+    assert.equal(builderJourney(restored.list(owner), owner).polishedCount, 2);
+    assert.deepEqual(api.list(), beforeVerify, 'Restoring notebook history does not replay source events');
+    api.restore(backup.factoryProblemSolving);
+    assert.deepEqual(api.list(), beforeVerify, 'Evidence backup restores original records without deriving scores from the notebook');
+
+    sourceStorage.fail = true;
+    assert.throws(() => notebook.clearConversation(local.id, owner), /Could not save/);
+    assert.deepEqual(api.list(), beforeVerify, 'A failed source clear cannot erase its observation records');
+    assert.equal(gemStage(notebook.get(local.id, owner)), 'polished');
+    sourceStorage.fail = false;
+    notebook.clearConversation(local.id, owner);
+    assert.equal(api.list().length, 2);
+    assert.ok(api.list().every((record: ProblemSolvingEpisode) => record.sessionId === remote.id));
+    assert.equal(builderJourney(notebook.list(owner), owner).polishedCount, 1);
+    notebook.clearConversation(remote.id, owner);
+    assert.deepEqual(api.list(), []);
+    assert.equal(builderJourney(notebook.list(owner), owner).polishedCount, 0);
+    assert.equal(notebook.avatar(owner), 'nova', 'Clearing source evidence does not delete the cosmetic choice');
+    assert.equal(api.warning(), null);
   } finally {
     installEvidenceReceiver(() => {})();
     if (priorWindow) Object.defineProperty(globalThis, 'window', priorWindow); else delete (globalThis as any).window;

@@ -2,18 +2,24 @@
 .jems-delight-host{position:fixed;inset:0;pointer-events:none;z-index:70;contain:layout style}
 .jems-delight-toast{position:fixed;bottom:clamp(18px,5vh,46px);left:50%;transform:translateX(-50%);
   display:flex;align-items:center;gap:10px;max-width:min(92vw,350px);min-height:48px;
-  padding:9px 15px;background:#FFFDFB;color:#0B1D4D;border:1px solid #CAB4EF;border-radius:999px;
-  box-shadow:0 8px 28px #0B1D4D20;font:800 14px/1.35 system-ui,sans-serif;
+  padding:9px 15px;background:#FFFDFB;color:#0B1E3B;border:1px solid #CAB4EF;border-radius:999px;
+  box-shadow:0 8px 28px #0B1E3B20;font:800 14px/1.35 var(--jems-body,system-ui),sans-serif;
   animation:jems-toast-in .34s cubic-bezier(.2,.9,.2,1) both}
 .jems-delight-toast img{width:30px;height:30px;object-fit:contain;flex:none}
+.jems-delight-toast.has-rank-thumbnail{min-width:min(340px,90vw);max-width:min(92vw,380px);min-height:112px;gap:12px;padding:8px 17px 8px 8px;border-radius:24px;background:#fffdfb;border:1px solid #e3d9fb;box-shadow:0 12px 42px #4b2b8728}
+.jems-delight-toast>.jems-rank-thumbnail{--jems-rank-size:96px;border-radius:20px}
+.jems-delight-copy{display:flex;flex-direction:column;gap:2px;flex:1}
+.jems-delight-copy small{font-size:11px;line-height:1.4;font-weight:750;color:#6945a3}
+.jems-delight-copy strong{font-size:15px;line-height:1.35;font-weight:850}
+.jems-delight-toast.is-level-up .jems-delight-copy strong{font-family:var(--jems-round,system-ui);font-size:21px;line-height:1.15;letter-spacing:-.5px}
 .jems-delight-sparks{position:fixed;width:0;height:0;pointer-events:none}
 .jems-delight-piece{position:absolute;left:-8px;top:-8px;width:18px;height:18px;
   opacity:0;animation:jems-facet-pop 1.1s cubic-bezier(.14,.8,.3,1) both}
 .jems-delight-piece.is-facet{clip-path:polygon(50% 0,100% 33%,83% 85%,50% 100%,17% 85%,0 33%)}
 .jems-delight-piece.is-spark{clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
-.jems-delight-blue{background:#2D7BFF}.jems-delight-gold{background:#FFC828}
-.jems-delight-mint{background:#34D7B3}.jems-delight-purple{background:#8A4DFF}
-.jems-delight-coral{background:#FF6B7A}
+.jems-delight-blue{background:#2E6BFF}.jems-delight-gold{background:#FFC24D}
+.jems-delight-mint{background:#22D3A6}.jems-delight-purple{background:#8B5CF6}
+.jems-delight-coral{background:#FF5E7A}
 @keyframes jems-facet-pop{
   0%{opacity:0;transform:translate(0,0) scale(.2) rotate(0)}
   22%{opacity:1}73%{opacity:1}

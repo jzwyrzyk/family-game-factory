@@ -21,6 +21,7 @@ const KEY='family-game-factory-problem-solving-v1';
    const phase=()=>page.locator('#page-problem-solving').getAttribute('data-phase');
    const saved=()=>page.evaluate(()=>FG.problemSolvingEvidence.list());
    const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,device+': no page overflow');
+   const onlyPage=async id=>assert.deepEqual(await page.locator('main > .page:visible').evaluateAll(nodes=>nodes.map(node=>node.id)),[id],device+': one active destination');
    const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));};
    const parent=()=>activate(page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}));
    const fault=()=>page.evaluate(()=>{window.psSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k.endsWith('family-game-factory-problem-solving-v1'))throw new DOMException('Fixture quota','QuotaExceededError');return window.psSetItem.call(this,k,v);};});
@@ -29,6 +30,28 @@ const KEY='family-game-factory-problem-solving-v1';
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?problem-solving=1`);
     await page.waitForSelector('#page-problem-solving:not(.hidden)');
     assert.equal(await page.locator('[data-ps-task]').count(),3);await overflow();
+    // Journey and practice share the approved shell without retaining a hidden
+    // native modal or awarding cosmetic progress for navigation.
+    const notebookBefore=await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()));
+    await activate('#studioNavJourney');await onlyPage('page-jems-journey');
+    await activate('#jemsChangeCharacter');assert.equal(await page.locator('#jemsCharacterDialog').evaluate(dialog=>dialog.open),true);
+    // A native modal correctly blocks outside clicks. Exercise the public route
+    // API to verify that an external destination request closes that top layer.
+    await page.evaluate(()=>FG.problemSolving.open());await onlyPage('page-problem-solving');
+    assert.equal(await page.locator('#jemsCharacterDialog').evaluate(dialog=>dialog.open),false);
+    await activate('#studioNavJourney');await onlyPage('page-jems-journey');
+    await activate('#studioNavScenes');await onlyPage('page-creation');
+    await activate('#studioNavProblemSolving');await onlyPage('page-problem-solving');
+    assert.equal(await page.evaluate(()=>document.body.classList.contains('creation-open')),false);
+    assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook())),notebookBefore,'navigation cannot earn or rewrite making evidence');
+    if(device==='touch'){
+      await page.setViewportSize({width:320,height:740});await overflow();
+      const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
+      assert.equal(buttons.length,6);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'six destinations use two mobile rows');
+      assert.ok(buttons.every(button=>button.width>=44&&button.height>=44&&button.x>=0&&button.x+button.width<=320),'mobile navigation keeps complete touch targets');
+      await page.screenshot({path:'test-results/problem-solving-navigation-320.png',fullPage:true});
+      await page.setViewportSize(viewport);await overflow();
+    }
     await page.screenshot({path:`test-results/problem-solving-shelf-${device}.png`,fullPage:true});
     await activate('[data-ps-task="robot-stop-g1-2"]');assert.equal(await phase(),'predict');
     const beforeFault=await page.evaluate(key=>localStorage.getItem(key),KEY);await fault();
@@ -65,7 +88,12 @@ const KEY='family-game-factory-problem-solving-v1';
     // Existing learning controls still own their source score, and the new route cannot skip an open question.
     await activate('#studioNavPowers');if(await page.locator('#lab-next').isVisible())await activate('#lab-next');
     await page.waitForSelector('.math-activity');assert.equal(await page.evaluate(()=>FG.learning.active),true);
-    await activate('#studioNavProblemSolving');assert.equal(await page.locator('#page-problem-solving').isVisible(),false);
+    const attemptId=await page.evaluate(()=>FG.learning.activeAttemptId);
+    for(const destination of ['#studioNavJourney','#studioNavProblemSolving','#studioNavScenes','#studioNavCreate','#studioNavPowers']){
+      await activate(destination);await onlyPage('page-lab');
+      assert.equal(await page.evaluate(()=>FG.learning.active),true,destination+': keeps the active learning activity');
+      assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attemptId,destination+': preserves the same answer opportunity');
+    }
     const item=await page.evaluate(()=>FG.learning.activeItem);
     if(item.answerKind==='choice'){
       const choices=page.locator('.math-activity:visible [data-value]'),values=await choices.evaluateAll(nodes=>nodes.map(n=>n.dataset.value));

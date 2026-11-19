@@ -47,6 +47,9 @@ jobs:
       - name: Unit and contract checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:unit
+      - name: Earned gem progress contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-progress
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
@@ -157,6 +160,9 @@ jobs:
       - name: Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:studio
+      - name: Illustrated gem journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-journey
       - name: Editable creation contracts and behavioral challenges
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation

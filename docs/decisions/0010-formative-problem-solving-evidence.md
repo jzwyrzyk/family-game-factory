@@ -1,4 +1,4 @@
-# 0008 — Background problem-solving observations with structured practice
+# 0010 — Background problem-solving observations with structured practice
 
 **Status:** Accepted for development. Implementation, merge, deployment and educational validity remain separate.
 

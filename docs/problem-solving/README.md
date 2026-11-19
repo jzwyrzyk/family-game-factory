@@ -65,5 +65,9 @@ Storage is bounded and discloses when older middle records have been discarded. 
 
 - [Implementation and acceptance](IMPLEMENTATION.md): data, source boundaries, persistence, tests and remaining work.
 - [Standards and assessment comparisons](BENCHMARKS.md): primary sources and claim limits.
-- [Accepted decision](../decisions/0008-formative-problem-solving-evidence.md): why the background layer and structured opportunities are combined.
+- [Accepted decision](../decisions/0010-formative-problem-solving-evidence.md): why the background layer and structured opportunities are combined.
 - [Math](../adaptive-math/README.md), [Language Arts](../adaptive-language/README.md), [Creation Studio](../creation-studio/README.md) and [design coaching](../design-coach/GOLD_STANDARD.md): source evidence remains subject to its original contract.
+
+## Integration with the making journey
+
+The PR57 visual library and **My journey** remain the shared host experience. **Try an idea** is an optional destination, with the same profile selection and active-learning guard. Changing destinations dismisses the maker picker and preserves saved Creation/practice work. Cosmetic maker progress and reasoning observations keep different criteria: a character choice, displayed rank or kept game does not establish a reasoning skill, and practice results do not award a maker rank.

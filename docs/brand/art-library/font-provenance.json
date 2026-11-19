@@ -1,0 +1,131 @@
+{
+  "source_repository": "google/fonts",
+  "observed_main_sha": "5bd87dfc525c8a0d1d8529d3684716e00c3fc59a",
+  "files": [
+    {
+      "file": "Nunito-Variable.ttf",
+      "source_repository": "google/fonts",
+      "source_path": "ofl/nunito/Nunito[wght].ttf",
+      "source_git_blob_sha": "2ec1f4b0676c83ef33049db87b311171699e9192",
+      "sha256": "bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207",
+      "exact_source_bytes": true,
+      "bytes": 276932,
+      "source_url": "https://github.com/google/fonts/blob/main/ofl/nunito/Nunito[wght].ttf",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Nunito-OFL.txt",
+      "source_repository": "google/fonts",
+      "source_path": "ofl/nunito/OFL.txt",
+      "source_git_blob_sha": "c8210f08ca3cece05b4f7baa428afe8e1abe3293",
+      "sha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+      "exact_source_bytes": true,
+      "bytes": 4385,
+      "source_url": "https://github.com/google/fonts/blob/main/ofl/nunito/OFL.txt",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-Variable.ttf",
+      "source_repository": "google/fonts",
+      "source_path": "ofl/inter/Inter[opsz,wght].ttf",
+      "source_git_blob_sha": "047c92f6e2212473dc436020afed689527076d44",
+      "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+      "exact_source_bytes": true,
+      "bytes": 876576,
+      "source_url": "https://github.com/google/fonts/blob/main/ofl/inter/Inter[opsz,wght].ttf",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-OFL.txt",
+      "source_repository": "google/fonts",
+      "source_path": "ofl/inter/OFL.txt",
+      "source_git_blob_sha": "21f6aff961064c2e429f570995e446bcdd555422",
+      "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+      "exact_source_bytes": true,
+      "bytes": 4377,
+      "source_url": "https://github.com/google/fonts/blob/main/ofl/inter/OFL.txt",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-400.ttf",
+      "source_file": "Inter-Variable.ttf",
+      "sha256": "0719ff7fdbd44cc618c89b6554d80a0b384ff0fa17e44077f1cb9c3aa9869cd4",
+      "bytes": 341396,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-500.ttf",
+      "source_file": "Inter-Variable.ttf",
+      "sha256": "1c653acf996d97aa7f793f9978b13ab78e4bafa50fa6a10c456050a4e9ada681",
+      "bytes": 341984,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-600.ttf",
+      "source_file": "Inter-Variable.ttf",
+      "sha256": "29ef15dea574362b2e33f2bb2b002a13951fd6c831a79a1cc5702f531dfdc1b6",
+      "bytes": 342660,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-700.ttf",
+      "source_file": "Inter-Variable.ttf",
+      "sha256": "a257ade7ed5937e4ca834e0fe297ebd8c6efcdb43c3a2abbe05faec7773acfd0",
+      "bytes": 343104,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Inter-Variable.woff",
+      "source_file": "Inter-Variable.ttf",
+      "sha256": "37d2e353f3e5319546d56e204139cb152fb12670a84c6bdbfa292cdb0045a938",
+      "bytes": 457780,
+      "exact_source_bytes": false,
+      "derivation": "FontTools variable-font WOFF packaging",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Nunito-700.ttf",
+      "source_file": "Nunito-Variable.ttf",
+      "sha256": "15de3c57894c7b4b2817724ea542ee707a1b65cfb0e7364f142e7560921b2312",
+      "bytes": 132360,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Nunito-800.ttf",
+      "source_file": "Nunito-Variable.ttf",
+      "sha256": "8e601e583f0c2e27274a9e515eb6bac8f23b0a84c955a6760bf2bb90ca38efb6",
+      "bytes": 132252,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Nunito-900.ttf",
+      "source_file": "Nunito-Variable.ttf",
+      "sha256": "2b501cbe6b88d7bf84384c6fbad96cd64150359c33f156da702414e9efa54292",
+      "bytes": 132216,
+      "exact_source_bytes": false,
+      "derivation": "FontTools static instantiation of the variable font; Inter optical size 14",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "file": "Nunito-Variable.woff",
+      "source_file": "Nunito-Variable.ttf",
+      "sha256": "b9bec62acd0055c9c26cbd42eff917274d65600c6e391935f4ea9d358593d229",
+      "bytes": 127260,
+      "exact_source_bytes": false,
+      "derivation": "FontTools variable-font WOFF packaging",
+      "license": "SIL Open Font License 1.1"
+    }
+  ]
+}
