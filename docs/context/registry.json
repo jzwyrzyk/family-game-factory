@@ -226,10 +226,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T05:22:26.306Z",
-      "sourceDigest": "fcff6c3a81f06cf5bb4bf7cfc8dd59aff32d30c3b6b6a5b3c8b8587ec73fbbae",
+      "reviewedAt": "2026-11-19T05:27:55.241Z",
+      "sourceDigest": "7a68166b5a6900e91e786a55bcab9f4550743de2bed815acf33b1e34e92464a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current main, draft PR58 scope, companion worker requirements and new browser CI checks; source, private playtest, activation, device evidence and provider calibration remain separate claims."
+      "reviewReason": "Recorded the successful owner-private physics playtest with exact app and Site commits and deployment receipt; local 275-test and browser evidence are distinct from final-head hosted CI and unactivated generation services."
     },
     {
       "id": "context",

@@ -64,8 +64,25 @@ activation of the adult voice pilot above.
 | Private worker integration | Requires a separate companion draft stacked on [worker PR13](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/13), with the exact final public source pin, a rebuilt immutable sandbox image and a separate GitHub-hosted `factory-quality` job. Keyless isolated test captures evidence; hosted review does not execute generated code. The companion's 145 offline tests passed. No live worker settings changed. |
 
 The updated [private Gem Factory playtest](https://jems-gem-factory-play.beigecoconut32.chatgpt.site)
-will be recorded with its saved source/deployment receipt when publication succeeds;
-the main application and generation services have not been deployed by this work.
+was published successfully at `2026-11-19T05:27:15Z`, with owner-only access
+preserved. Its exact app build is public source
+`17bb4f6850c9c8b012dfef28d023e1e1fce6f2cc` (clean tree
+`fbe1299a89b5fcd28a2ef84143a586417cdfe130`); the separately tracked preview wrapper
+and packaged source are Site commit `d77afcd5a6ae6279d633d363a03cd58893874c3d`.
+Deployment receipt: `appgdep_6afe88ad1db4819194b10a5f0a5ca007`, status
+`succeeded`. The published JavaScript/CSS and artwork bytes were checked against
+the verified app build. The existing full-page wrapper and actual required
+learning host remain; no model provider is configured in the private playtest.
+The main application and generation services have not been deployed by this work.
+
+The final source verification passed **275/275 unit checks**, TypeScript,
+production build and documentation checks. Actual capture fixtures passed pixel
+and illustrated desktop/touch sessions at 600 ticks. The existing worker rejected
+a broken launch and verified its repair, including real captures, before a
+clearly synthetic bound reviewer allowed Ready. The full desktop/mobile Actions
+Create/Edit/Keep/Compare/Undo/Fork/Reload journey also passed. These are local
+source/browser fixtures. Hosted CI status is recorded on PR58 and must be
+checked for its final head; it is not implied complete by these local results.
 
 **Remaining before generation activation:** final coordinated worker/source/image
 pins; appropriate approved multimodal input/spending limits and optional image
