@@ -315,10 +315,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:14:05.779Z",
-      "sourceDigest": "59b78128da56737d0a6f0f2abb2526f1ad6a1491b6c33da6e6d1acd14d848603",
-      "reviewOutcome": "updated",
-      "reviewReason": "Merged making-progress and problem-solving CI suites without removing existing gates; new browser checks cover modal cleanup, one destination, narrow touch targets and exact active-attempt preservation."
+      "reviewedAt": "2026-11-19T15:21:50.320Z",
+      "sourceDigest": "193603fb796a67585944c5bda4f5163d5ddfcf7294ea55d4abc814948886798b",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Updated only the brand browser contract from five single-row destinations to the documented six destinations in two mobile rows; retained exact destination IDs, 44px targets, text fit, viewport bounds and hero separation. Combined application source and documented behavior are unchanged."
     },
     {
       "id": "delivery",
