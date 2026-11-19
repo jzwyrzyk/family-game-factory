@@ -65,10 +65,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:03:30.676Z",
-      "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "edbcdfb154db579bee01c7eaae1be83dda956a72f1aac1059f98413c83b08678",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy.",
+      "reviewReason": "Final brand icon and asset wiring preserves the approved Jems child-first product doctrine, maker stages, learning evidence and privacy principles after integrating PR65.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -127,10 +127,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:08:24.446Z",
-      "sourceDigest": "2b1586dc33bd25f52137e3adb5f1eb10d80a4e398f91ff46f5e729b9d8c6543e",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "79ff2d1c9bf803d73dd3d3aef9306075b47e539c6fc96a12818a22d574adc537",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the integrated parent route against approved brand v1.2 and maker journey source. Parent reports use shared fonts, semantic colors and the current companion while preserving Settings, profile events and original family controls; architecture records the new integration base.",
+      "reviewReason": "Integrated supplied functional icons, state artwork, keyboard focus and preserved Jems navigation with PR65's evidence-first parent reporting. Reviewed all changed host and presentation code.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -162,10 +162,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5c914c861d90fb128e8d2d598a4a2a2cad3cbb40587ef7a3f82e1671b8e13c2b",
-      "reviewedAt": "2026-11-19T15:08:24.948Z",
+      "sourceDigest": "14aa3ac7fce93f6320ef2c84452b68eea2f60ba7876a5d56f8ee472f518fea86",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Combined main retains its reviewed Creation and Journey navigation and assertions. The parent change only selects Settings before existing recovery controls; scene storage, checked revisions, child ownership and challenge behavior remain unchanged.",
+      "reviewReason": "Reviewed new icon labels, Pause/Resume focus and Creation recovery's accessible hint assertion; scene semantics, authoring, storage and learning callbacks remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -201,10 +201,10 @@
         "docs/game-quality/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:41.812Z",
-      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed new action icons and existing native game controls including Gem Factory, driving and construction; original physics, content, scores, evidence and runtime remain unchanged."
     },
     {
       "id": "learning",
@@ -221,10 +221,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.211Z",
-      "sourceDigest": "8b49aa409e5ccb46e9d5e510feed52240415b85cfa5f4e5bfd55516d85e4a033",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed subject-specific host contracts and current Math and Language sources against the canonical learning principles; separated independent and assisted evidence from unproven learning efficacy."
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "a5459e9518e24d1db636dd0d070070203421d45acb1c56f871820f842bf1d517",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Updated navigation symbols and test selectors without changing mathematical or language questions, scoring, hints, pacing, saved evidence or child profiles."
     },
     {
       "id": "services",
@@ -321,10 +321,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "3806ee61659d06b10c5db3ff0b9c58d26009b0bd15e57bd8b6329cff61386f64",
-      "reviewedAt": "2026-11-19T07:03:52.307Z",
+      "sourceDigest": "7e6053d4cdf072d667b7f6331f3ceffa818f5b4837c432831629feacf523c9a8",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Relative to merged main, the OpenAPI addition is only a read-only scene route through service.revision. Inspected same-family/device/adult-audience enforcement and tests for cross-profile and revoked-grant denial; the quality stage retains main's original-grant and consent policy."
+      "reviewReason": "Parent dashboard PR65 is preserved in the merged tree; the branding updates change visible control symbols without changing device trust, adult grants or guardian consent."
     },
     {
       "id": "validation",
@@ -347,10 +347,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:18:56.944Z",
-      "sourceDigest": "e54bb2445cf937b69d6033dc625e4bd968a2345768e476b91ff724728be90ad0",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "bb542408b35bf0dda8b3fb7093edc30278e8b161f8b40f2010fa2f5f62adc619",
       "reviewOutcome": "updated",
-      "reviewReason": "Added geometry checks after actual screenshot review exposed overlapping phone report controls despite a passing page-width check. Tests now require separated control/date boxes, readable mobile select sizes and observed-first Skills defaults that preserve later filter choices.",
+      "reviewReason": "Reviewed exact source reconciliation and the Creation recovery accessibility assertion, preserving its restored hint test. Verified the parent dashboard, quality, learning and brand contracts remain registered.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -388,10 +388,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:57:06.701Z",
-      "sourceDigest": "e31d0714638304191b2c7d51e5fa744f6b6bbdfcb5f6a1808de7422de4f131bd",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "1c566a03ed1c628cd0a6ff033eea9ad2f8f2efd903fad9d7da68701385880e21",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the observed PR65 merge at 864bee8 on November 19 at 15:53:45 UTC, its complete-tree equality to tested final head d308216, all five passing final-head workflows and the source-only release boundary. Inspected the focused receipt and parent dispositions; preserved earlier failures, captures, run identities and unrelated feature records.",
+      "reviewReason": "Recorded the verified source candidate and prior fixture-failure resolution, plus merging the PR65 parent dashboard into the branding branch. Exact CI results remain gated before source merge.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -435,10 +435,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:08:25.696Z",
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
       "sourceDigest": "63831be7901fee77d0d2ce23f5ceb89e70d1a2398e6163a32f533fa2c6530e43",
-      "reviewOutcome": "updated",
-      "reviewReason": "Resolved the documentation merge by preserving parent reporting and approved brand and maker-journey references, all thirteen routed areas and both historical receipts. Current combined-source review records replace no historical evidence.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the merged documentation routes and PR65 parent reporting registration; no source policy or document routing changes arise from the branding implementation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

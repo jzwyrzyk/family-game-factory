@@ -40,7 +40,7 @@ const {start}=require('./browser-server.cjs');
    assert.ok(overflow.width<=overflow.view+2,'no horizontal overflow: '+JSON.stringify(overflow));
    assert.ok((await page.locator('.jems-brand-logo').boundingBox()).height>=45,'the jems logo is prominent in the compact header');
    await page.screenshot({path:'test-results/homepage-'+device+'.png',fullPage:true});
-   await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+   await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
    await page.locator('[data-parent-tab="settings"]').click();
    await page.selectOption('#parentSubject','both');
    await page.click('#saveParent');

@@ -26,6 +26,8 @@ export interface StudioVoiceOptions {
   microphone:HTMLButtonElement;installPack:HTMLButtonElement;hearReply:HTMLButtonElement;
   status:HTMLElement;scope:()=>string;canListen:()=>boolean;
   onTranscript:(text:string)=>void|Promise<void>;
+  /** The host owns visual branding; the voice adapter supplies truthful labels. */
+  renderMicrophone?:(state:'idle'|'recording'|'finishing',label:string)=>void;
 }
 export function installStudioVoice(ui:StudioVoiceOptions){
  let recognition:RecognitionLike|null=null;
@@ -34,7 +36,9 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  const getCtor=():RecognitionCtor|undefined=>(window as any).SpeechRecognition||(window as any).webkitSpeechRecognition;
  const announce=(message:string)=>{ui.status.textContent=message;};
  const buttons=()=>{
-  ui.microphone.textContent=listening?(finishing?'Cancel transcription':'■ Finish speaking'):'🎙 Speak';
+  const state=listening?(finishing?'finishing':'recording'):'idle';
+  const label=state==='idle'?'Speak':state==='recording'?'Finish speaking':'Cancel transcription';
+  if(ui.renderMicrophone)ui.renderMicrophone(state,label);else ui.microphone.textContent=label;
   // A stalled browser speech session must still have an accessible cancel action.
   ui.microphone.disabled=false;
   ui.microphone.setAttribute('aria-pressed',String(listening));

@@ -2,6 +2,34 @@ const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const fs=require('node:fs');
+async function approvedIcons(page,basePath){
+ const icons=await page.locator('svg.jems-icon').evaluateAll(elements=>elements.map(icon=>({
+  name:icon.dataset.jemsIcon,hidden:icon.getAttribute('aria-hidden'),focusable:icon.getAttribute('focusable'),
+  tabIndex:icon.getAttribute('tabindex'),href:icon.querySelector('use')?.getAttribute('href'),
+  width:icon.getAttribute('width'),height:icon.getAttribute('height')
+ })));
+ assert.ok(icons.length>5,'existing controls use the shared approved icon set');
+ const sprite=new URL(basePath+'jems-art/icons/jems-icons.svg',page.url()).href;
+ for(const icon of icons){
+  assert.equal(icon.href,sprite+'#jems-'+icon.name,'sprite reference respects the current hosting base');
+  assert.equal(icon.hidden,'true','decorative icons do not duplicate the control name');
+  assert.equal(icon.focusable,'false','the control owns keyboard focus');
+  assert.equal(icon.tabIndex,null,'icons never add tab stops');
+  assert.equal(icon.width,'24');assert.equal(icon.height,'24');
+ }
+ const symbols=await page.evaluate(async url=>{
+  const response=await fetch(url);if(!response.ok)throw Error('Icon sprite unavailable');
+  const doc=new DOMParser().parseFromString(await response.text(),'image/svg+xml');
+  return [...doc.querySelectorAll('symbol')].map(symbol=>symbol.id);
+ },sprite);
+ assert.ok(icons.every(icon=>symbols.includes('jems-'+icon.name)),'every used symbol exists in the supplied sprite');
+ await page.waitForFunction(()=>[...document.querySelectorAll('button svg.jems-icon')].some(icon=>{
+  const rect=icon.getBoundingClientRect();return rect.width>0&&rect.height>0&&icon.getBBox().width>0;
+ }));
+}
+async function currentNavigation(page,id){
+ assert.deepEqual(await page.locator('.studio-nav [aria-current="page"]').evaluateAll(elements=>elements.map(element=>element.id)),[id],'only the actual destination is marked current');
+}
 /** Visual contract for jems. No model calls, paid APIs or child data are used. */
 (async()=>{
  const server=start();
@@ -24,6 +52,15 @@ const fs=require('node:fs');
    page.on('pageerror',e=>errors.push((e.stack||e.message)));await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
    console.log('jems brand '+label+': Studio booted');
+   await approvedIcons(page,'/arcade/');
+   await currentNavigation(page,'studioNavHome');
+   for(const [id,name] of [['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],['studioNavJourney','My journey'],['studioNavPowers','My Powers']]){
+    assert.equal(await page.locator('.studio-nav').getByRole('button',{name,exact:true}).getAttribute('id'),id,'navigation keeps its visible accessible label');
+   }
+   await page.locator('#studioNavHome').focus();await page.keyboard.press('Tab');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'studioNavCreate','Tab moves between controls without stopping on their SVGs');
+   const focus=await page.locator('#studioNavCreate').evaluate(element=>({visible:element.matches(':focus-visible'),width:parseFloat(getComputedStyle(element).outlineWidth),style:getComputedStyle(element).outlineStyle}));
+   assert.ok(focus.visible&&focus.width>0&&focus.style!=='none','keyboard users retain a visible focus indicator');
    const logo=page.locator('img.jems-brand-logo');
    assert.equal(await logo.count(),1);
    assert.equal(await logo.getAttribute('alt'),'jems');
@@ -98,27 +135,47 @@ const fs=require('node:fs');
 
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'no horizontal overflow');
    await page.screenshot({path:'test-results/jems-home-'+label+'.png',fullPage:false});
-   await page.locator('#studioNew').click();
+   await page.locator('#studioNavCreate').focus();await page.keyboard.press('Enter');
    assert.equal(await page.locator('#page-studio').isVisible(),true);
+   await currentNavigation(page,'studioNavCreate');
    const approvedArt=await page.evaluate(async()=>{
     const images=[...document.querySelectorAll('#studioCreationHero > img, .jems-empty-workbench, .jems-helper-mark')];
     await Promise.all(images.map(img=>img.decode()));
     const fonts=await Promise.all([document.fonts.load('800 24px Nunito'),document.fonts.load('500 15px Inter')]);
+    await document.fonts.ready;
+    // Async image decode can finish before Chromium commits the newly visible
+    // picture. Capture a rendered frame, rather than accepting a blank art slot.
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     return {images:images.map(img=>({src:img.getAttribute('src'),loaded:img.naturalWidth>0,alt:img.alt})),fonts:fonts.map(f=>f.length)};
    });
    assert.deepEqual(approvedArt.images.map(img=>img.src).sort(),[
-    './jems-art/character_spark_think.webp','./jems-art/hero_workshop.webp','./jems-art/spot_first_idea.webp'
+    './jems-art/character_spark_rest.webp','./jems-art/character_spark_think.webp','./jems-art/character_spark_wave.webp','./jems-art/hero_workshop.webp','./jems-art/spot_first_idea.webp'
    ],'approved factory, companion and empty-state art load under the deployed subpath');
    assert.ok(approvedArt.images.every(img=>img.loaded&&img.alt===''),'supporting artwork stays decorative beside live text');
    assert.ok(approvedArt.fonts.every(count=>count>0),'both licensed local interface fonts load');
+   assert.equal(await page.locator('#studioCreationHero > img').evaluate(img=>{
+    const r=img.getBoundingClientRect(),style=getComputedStyle(img);
+    return r.width>0&&r.height>0&&style.visibility==='visible'&&style.opacity==='1'&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===img;
+   }),true,'the decoded hero stays visible and unobscured');
    assert.match(await page.locator('#studioTalk').innerText(),/Send to jems/,'text composer clearly sends');
    assert.match(await page.locator('#studioMic').innerText(),/Speak/,'microphone has a separate voice affordance');
    assert.equal(await page.locator('#studioTalk').getAttribute('aria-label'),'Send your written message to jems');
    assert.match(await page.locator('#studioMic').getAttribute('aria-label')||'',/microphone/);
+   assert.equal(await page.locator('.jems-helper-mark:visible').getAttribute('data-helper-pose'),'wave','idle conversation welcomes without pretending to think');
+   assert.equal(await page.getByRole('button',{name:'Send your written message to jems',exact:true}).getAttribute('id'),'studioTalk');
+   assert.equal(await page.locator('#studioTalk svg').getAttribute('data-jems-icon'),'send');
+   const sendColor=await page.locator('#studioTalk').evaluate(button=>({label:getComputedStyle(button).color,icon:getComputedStyle(button.querySelector('svg')).color}));
+   assert.equal(sendColor.icon,sendColor.label,'the approved icon inherits the accessible control colour');
    assert.equal(await page.locator('#studioPrompt').isVisible(),true);
    await page.screenshot({path:'test-results/jems-studio-'+label+'.png',fullPage:false});
    await page.locator('#studioNavHome').click();
+   await currentNavigation(page,'studioNavHome');
+   assert.equal(await page.locator('#studioSavedSection .jems-saved-art').isVisible(),true,'a real saved notebook can use collection art');
+   assert.equal(await page.locator('#studioSavedSection .jems-saved-art').getAttribute('alt'),'');
+   await page.locator('#studioNavJourney').click();await currentNavigation(page,'studioNavJourney');
+   await page.locator('#studioNavScenes').click();await currentNavigation(page,'studioNavScenes');
    await page.locator('#studioNavPowers').click();
+   await currentNavigation(page,'studioNavPowers');
    assert.equal(await page.locator('#page-lab').isVisible(),true);
    const mathHead=page.locator('#page-lab .math-activity h2');
    if(await mathHead.count())assert.equal(await mathHead.first().evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)','Math question must stay readable on dark lesson');
@@ -127,6 +184,7 @@ const fs=require('node:fs');
    console.log('jems brand '+label+': learning screen verified');
    await page.locator('footer [data-page="parent"]').click();
    assert.equal(await page.locator('#page-parent').isVisible(),true);
+   assert.equal(await page.locator('.studio-nav [aria-current="page"]').count(),0,'a parent page does not leave a child destination falsely current');
    await page.screenshot({path:'test-results/jems-parent-overview-'+label+'.png',fullPage:false});
    await page.locator('[data-parent-tab="settings"]').click();
    const parentLabel=await page.locator('#page-parent label[for="parentNickname"]').evaluate(e=>getComputedStyle(e).color);
@@ -151,11 +209,17 @@ const fs=require('node:fs');
   assert.equal(await legacy.locator('.jems-brand-logo').count(),1);
   assert.equal(await legacy.locator('.jems-brand-logo').evaluate(img=>img.complete&&img.naturalWidth>0),true);
   assert.equal(await legacy.locator('#page-home').isVisible(),true);
+  await approvedIcons(legacy,'/arcade/');
   const legacyText=await legacy.locator('.hero p').evaluate(e=>getComputedStyle(e).color);
   assert.equal(legacyText,'rgb(69, 85, 116)','Legacy hero body text must be readable on light surfaces');
   const legacyAction=await legacy.locator('.hero .btn.ghost').evaluate(e=>getComputedStyle(e).color);
   assert.equal(legacyAction,'rgb(82, 44, 157)','Legacy secondary action must not use old white-on-white styling');
   await legacy.close();
-  console.log('PASS jems brand contract: logo, palette, navigation, Send vs Speak, 6 games, parents, learning, mobile and legacy Arcade');
+  const root=await browser.newPage();
+  await root.goto(new URL('/',base).href);await root.waitForFunction(()=>window.FG?.studio);
+  await approvedIcons(root,'/');
+  await currentNavigation(root,'studioNavHome');
+  await root.close();
+  console.log('PASS jems brand contract: logo, palette, navigation, Send vs Speak, 7 games, parents, learning, mobile and legacy Arcade');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});

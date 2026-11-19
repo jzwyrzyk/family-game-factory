@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
   await page.waitForFunction(()=>window.FG?.app&&window.FG?.learning?.version===2);
 
   // Multiplication is available only when the parent has selected grade 3+.
-  await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+  await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
   await page.locator('[data-parent-tab="settings"]').click();
   assert.equal(await page.locator('#parentFacts').isDisabled(),true);
   await page.selectOption('#parentGrade','3');

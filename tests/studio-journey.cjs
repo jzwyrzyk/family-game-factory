@@ -78,7 +78,7 @@ const {start}=require('./browser-server.cjs');
   await page.getByRole('button',{name:/Test machine/}).click();
   await page.waitForFunction(()=>FG.runtime.snapshot().state.simulation?.status==='won',null,{timeout:15000});
   assert.equal((await notebook()).sessions.some(s=>s.reflection),false,'physics success alone does not force reflection');
-  await page.getByRole('button',{name:'Finish challenge →',exact:true}).click();
+  await page.getByRole('button',{name:'Finish challenge',exact:true}).click();
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.reflection));
   await talk();assert.match(await page.textContent('#studioMessages'),/fun or tricky/);
   await page.click('#studioReflectAnswer');await page.fill('#studioPrompt','I liked seeing my rocket stay together.');await page.click('#studioSend');

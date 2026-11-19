@@ -36,7 +36,7 @@ const {start}=require('./browser-server.cjs');
    await root.getByRole('button',{name:'Put a sticker on Window'}).click();
    assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.stickersPlaced),2);
    // Undo restores the previous in-progress artwork without clearing the save.
-   await root.getByRole('button',{name:'↶ Undo'}).click();
+   await root.getByRole('button',{name:'Undo'}).click();
    assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.stickersPlaced),1);
    await root.getByRole('button',{name:'Select Happy flower'}).click();
    await root.getByRole('button',{name:'Put a sticker on Window'}).click();

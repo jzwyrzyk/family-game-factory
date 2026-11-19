@@ -103,7 +103,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.deepEqual(await page.evaluate(()=>FG.creation.export()),backup.factoryCreation);
     assert.equal(await page.evaluate(()=>Object.hasOwn(FG.store.data,'factoryCreation')||Object.hasOwn(FG.store.data,'factoryCreationRecoveryRaw')),false);
     await pacing();await page.locator(`[data-scene="${projectId}"]`).click();
-    assert.equal(await page.locator('#creationHint').textContent(),'See my hint again');
+    assert.equal(await page.getByRole('button',{name:'See my hint again',exact:true}).count(),1);
     await page.locator('#creationCheck').click();await page.waitForFunction(()=>FG.creation.export().attempts.length===2);
     assert.ok((await page.evaluate(()=>FG.creation.export().attempts)).every(attempt=>attempt.hintUsed));
     await parent();assert.equal(await page.locator('#creationParentProgress li').count(),2);
