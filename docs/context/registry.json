@@ -19,7 +19,10 @@
     "docs/decisions/0005-temporary-adult-profile.md",
     "docs/adult-pilot/VOICE_RELEASE_AND_UAT.md",
     "docs/privacy/ADULT_CHILD_RELEASE_INTEGRATION.md",
-    "docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md"
+    "docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md",
+    "docs/creation-studio/README.md",
+    "docs/creation-studio/ACCEPTANCE.md",
+    "docs/decisions/0007-creation-and-rebuild-practice.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -33,7 +36,8 @@
     "docs/adult-pilot/*.md",
     "docs/privacy/*.md",
     "docs/brand/GEM_FACTORY.md",
-    "docs/game-intelligence/PRESENTATION-QUALITY.md"
+    "docs/game-intelligence/PRESENTATION-QUALITY.md",
+    "docs/creation-studio/*.md"
   ],
   "areas": [
     {
@@ -49,10 +53,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:40.825Z",
+      "reviewedAt": "2026-11-19T07:03:47.934Z",
       "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The existing doctrine already requires approved brand assets and stable touch/mouse controls; this exact mascot reuse and stationary gift hit area preserve those principles without changing learning or data policy."
+      "reviewOutcome": "updated",
+      "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
     },
     {
       "id": "experience",
@@ -82,10 +86,29 @@
         "src/adult-pilot/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:41.331Z",
-      "sourceDigest": "0c9dece5935e0943f1c6c8282ab1158e3d2f953e06a622fb88254dea868aede6",
+      "reviewedAt": "2026-11-19T07:03:48.744Z",
+      "sourceDigest": "b54da7165c9d2186fb1e97f275a099ec4bc64a4172132de3a4baac403315cdb4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-selected Gem companion master, exact checksum, accessible name and current visual capture; the existing factory layout and child-facing flow retain their approved structure."
+      "reviewReason": "Reviewed the combined Gem Factory first-card and Creation entrances: the scene card stays after the playable shelf; unsupported Animate and code errors now stay visible in Studio. Desktop/tablet creation and mobile child-entry checks preserve source versions and profile boundaries."
+    },
+    {
+      "id": "creation",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/creation-studio/*.md",
+        "docs/decisions/0007-creation-and-rebuild-practice.md"
+      ],
+      "sources": [
+        "src/creation/**",
+        "server/agent/creation-schema.ts",
+        "tests/creation-*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "3621e272a397fb56794fe0362ce7ac4463ae573a2590880d3103072f66a62f57",
+      "reviewedAt": "2026-11-19T07:03:49.561Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the combined art/plan/playthrough/companion contract, host-held scene transport, mandatory quality review and source-generation-only budget fallback. Added combined binding and two-device evidence regressions without expanding curated adapter scope."
     },
     {
       "id": "games",
@@ -150,10 +173,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:37:47.262Z",
-      "sourceDigest": "35526cac3ad91c031c7cf595e87ab9207cf83bbfd8b80177ff18e2dbc9b96a23",
+      "reviewedAt": "2026-11-19T07:03:50.701Z",
+      "sourceDigest": "993d1bc5ede9a3befd153f0c288c33901280d9cc60e39b879035c0aa119f8183",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed bounded private capture storage and the Reviewing API phase against source and storage round-trip tests; preserved the merged same-site adult identity, preview audience and guardian-consent service contracts."
+      "reviewReason": "Reviewed the authenticated read-only companion endpoint and gateway/preview COPY inputs against merged quality artifacts. It returns bounded scene data through the existing revision audience check with no-store, while approved game art and private capture storage retain main's contracts."
     },
     {
       "id": "generation",
@@ -176,10 +199,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:37:47.469Z",
-      "sourceDigest": "9207b6988875e0fee11060b83a8ddb630e2bc4145cd5a8371bd71aa29cebb99e",
+      "reviewedAt": "2026-11-19T07:03:51.403Z",
+      "sourceDigest": "7f85771c47f30cc46436ae0c61338e56c7df2e0ecf3a47e9e179fdd8a5fed79d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed request-bound style/gameplay plans, separately approved art, real capture, four-axis review and bounded repair across local and private worker paths; documented original-grant/current-consent checks at evidence release and publication, audience preservation and no paid repair after permission loss."
+      "reviewReason": "Reconciled conflicting generation and Docker paths with merged planning/art/review. Both request modes retain plan, playthrough, approved art and required repair captures; companion remains host-held and unchanged through attestation/publication. Existing quality runtime and resource/spending caps are preserved."
     },
     {
       "id": "coach",
@@ -225,10 +248,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "a0bc50d64bd56ea7e5aaaa8fb1130668777f32cd6bfa9e685279de9a555b348b",
-      "reviewedAt": "2026-11-19T05:37:47.838Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the quality stage with the merged adult/guardian contracts; reviewed new lock, expiry, original-grant replacement, duplicate-report and audience assertions across review claims and completion. The combined suite passes without weakening permission or settlement requirements."
+      "sourceDigest": "3806ee61659d06b10c5db3ff0b9c58d26009b0bd15e57bd8b6329cff61386f64",
+      "reviewedAt": "2026-11-19T07:03:52.307Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Relative to merged main, the OpenAPI addition is only a read-only scene route through service.revision. Inspected same-family/device/adult-audience enforcement and tests for cross-profile and revoked-grant denial; the quality stage retains main's original-grant and consent policy."
     },
     {
       "id": "validation",
@@ -247,10 +270,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:19:32.018Z",
-      "sourceDigest": "10dafaec46a9b51e50b4e3228d1ce22ffc6980db45dfabd4e2386c80a86ae45e",
+      "reviewedAt": "2026-11-19T07:03:52.984Z",
+      "sourceDigest": "259c764251cb5be70a689f35ed5ee6b90fac2069990fc0248ecbee61225c2060",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded six executed pattern and simulation checks, final TypeScript and build success, scoped interactive desktop and phone-frame gifts, and clearly separated the updated but unexecuted full browser contract."
+      "reviewReason": "Recorded 77 creation and 354 existing unit passes, focused combined quality/asset/companion and nine budget regressions, production desktop/tablet authoring and eight recovery journeys. Kept earlier failed and green CI scoped to their original heads; no live provider or actual-device claim."
     },
     {
       "id": "delivery",
@@ -272,10 +295,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T06:43:05.613Z",
-      "sourceDigest": "e5a5506bdf87652b062fccfbb538d7c12e92a2f153faa29488b21e44df0a374a",
+      "reviewedAt": "2026-11-19T07:06:35.895Z",
+      "sourceDigest": "b53bdc00db688545929715f76ef969f269dbf30f641588e378f04130f50a2771",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved PR61 coach build verification, tests and recovery evidence while recording the exact owner-only mascot Site publication, rollback reference and scoped e3136cd Gem Factory CI pass; integrated-head checks and merge remain pending."
+      "reviewReason": "Recorded the verified combined implementation 0fc798d8 and matching local tree, with 77 creation and 354 existing unit passes, production authoring/recovery, child continuity and native Gem Factory journeys. Preserved prior CI and release scopes; final-head CI remains separate, with no deployment or paid activation."
     },
     {
       "id": "context",
@@ -296,10 +319,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:37:49.952Z",
-      "sourceDigest": "168d27e8eefa6b78f286ac5cd5d42d994f9750c9fd9f227b22c5dbc2e5f727d3",
+      "reviewedAt": "2026-11-19T07:03:54.226Z",
+      "sourceDigest": "32c4eb525a0f2896d0b6ed8db2dcd17490c757913460a76e56f169a6083a4b0f",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved main adult/privacy routing and required documents, added explicit Gem Factory and presentation-quality links, and indexed quality ADR0006 without replacing adult ADR0005; inspected registry coverage and review rules."
+      "reviewReason": "Merged both document routes and required references. Renumbered the unmerged Creation decision to ADR0007, preserving merged quality ADR0006, and retained creation, Gem Factory and presentation-quality coverage and local links."
     }
   ]
 }

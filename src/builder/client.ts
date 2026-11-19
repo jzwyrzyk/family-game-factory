@@ -1,9 +1,12 @@
 import {familyFetch} from './session';
+import type {CreationProject} from '../creation/model';
+import {validateGeneratedCreationManifest} from '../creation/projects';
 export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
 export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number}
 export interface Preview {revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
+export interface CreationManifestResponse {revisionId:string;projectId:string;manifest:CreationProject|null}
 const loopback=(url:URL)=>['127.0.0.1','localhost','[::1]'].includes(url.hostname);
 export function validateBuilderConfig(input:unknown):BuilderConfig {
  const config=input as BuilderConfig;if(!config||config.version!==1||!['unavailable','remote'].includes(config.mode))throw Error('BUILDER_UNAVAILABLE');if(config.mode==='unavailable')return {version:1,mode:'unavailable'};
@@ -52,6 +55,13 @@ export class BuilderClient {
   if(token===this.generation){this.last=response;this.update(response);}return response as JobView;
  }
  disconnect(){++this.generation;this.last=null;this.request=null;}
+ async creationManifest(revisionId:string):Promise<CreationManifestResponse>{
+  if(!/^[\w-]{1,100}$/.test(revisionId))throw Error('INVALID_REVISION');
+  const token=this.generation,data=await this.api('/v1/revisions/'+encodeURIComponent(revisionId)+'/creation');
+  if(token!==this.generation)throw Error('PROFILE_CHANGED');
+  if(!data||data.revisionId!==revisionId||typeof data.projectId!=='string'||!/^[\w-]{1,100}$/.test(data.projectId)||['__proto__','constructor','prototype'].includes(data.projectId)||!Object.hasOwn(data,'manifest'))throw Error('INVALID_CREATION_MANIFEST');
+  return {revisionId,projectId:data.projectId,manifest:data.manifest===null?null:validateGeneratedCreationManifest(data.manifest)};
+ }
  async preview(revisionId:string):Promise<Preview>{
   if(!/^[\w-]{1,100}$/.test(revisionId))throw Error('UNSAFE_PREVIEW');
   const data=await this.api('/v1/revisions/'+encodeURIComponent(revisionId)+'/preview');const url=new URL(data.url);
