@@ -85,10 +85,10 @@
         "docs/pals/art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T23:01:27.041Z",
-      "sourceDigest": "da99fb29c4cbb6d9cfd2c736eed7a4c29deda12d0ed83c57a43867d8335c80b6",
+      "reviewedAt": "2026-11-19T23:15:36.000Z",
+      "sourceDigest": "2e7b16c70c52eade2f4c068c2f1c7eecfa585b47ca99b521b73b44c33095110b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the 22-entry and 23-profile character reference index, recorded exact U/V/X selections and unresolved Chimi/Navi references, preserved approved bases and superseded history, and replaced the historical blanket growth pause without changing runtime policy.",
+      "reviewReason": "Reviewed owner decision for exactly two visible Pal forms (Base and Grown), cross-checked selected U/V/X and unresolved Chimi/Navi references, updated form index, design record and product doctrine. No intermediate art, runtime threshold change or saved collection migration is authorized; PR68 needs two-state logic and tests before merge.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -122,6 +122,12 @@
           "sourceDigest": "c2d0e02afdcc7f466138ffaa4f224c43a02646df8a4f670621a9b71d35001ddd",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed the source-only merge receipt and final acceptance update. Product doctrine, educational claim limits, reward policy and formative feature scope are unchanged; only implementation and delivery history now record observed facts."
+        },
+        {
+          "reviewedAt": "2026-11-19T23:01:27.041Z",
+          "sourceDigest": "da99fb29c4cbb6d9cfd2c736eed7a4c29deda12d0ed83c57a43867d8335c80b6",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled the 22-entry and 23-profile character reference index, recorded exact U/V/X selections and unresolved Chimi/Navi references, preserved approved bases and superseded history, and replaced the historical blanket growth pause without changing runtime policy."
         }
       ]
     },
