@@ -15,6 +15,8 @@ The clarity follow-up makes the time scope explicit above the skill list: Math/L
 
 The main integration retains the new brand/provenance references, original maker artwork, cosmetic progression, and Creation/Journey navigation contracts. Parent observations do not consume maker rank or reinterpret it as educational attainment. The combined candidate needs its own browser evidence; PR57's earlier checks do not establish parent-dashboard acceptance.
 
+The first complete hosted journey passed on `f550cb5706380f5ab84a20c741327ada1e150354` ([run 44552394554](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44552394554)). Visual review then caught overlapping phone controls and crowded chart labels despite the width assertion passing. The corrected mobile layout stacks its controls; new geometry assertions check actual overlap and readable selector sizes. Skills now foreground observed work when records exist, retaining the full catalog as an explicit choice. The corrected candidate requires its own run and screenshots.
+
 ## Verification ledger
 
 | Check | Result and limit |

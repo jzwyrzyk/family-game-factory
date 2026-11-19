@@ -12,6 +12,16 @@ const STATE_KEY='family-game-factory-state-v1';
 const tabs=(page:Page,id:string)=>page.locator(`[data-parent-tab="${id}"]`);
 const visibleText=(page:Page)=>page.locator('#parentDashboard').innerText();
 const noOverflow=async(page:Page,label:string)=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,label+' stays within viewport');
+async function separateControls(page:Page,selector:string,label:string) {
+  const controls=page.locator(selector).filter({hasText:/\S/}),boxes=[];
+  for(let index=0;index<await controls.count();index++){const box=await controls.nth(index).boundingBox();if(box)boxes.push(box);}
+  assert.ok(boxes.length>=2,label+' has visible controls');
+  for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){
+    const a=boxes[i],b=boxes[j];
+    const horizontal=Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x),vertical=Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y);
+    assert.ok(horizontal<=1||vertical<=1,`${label}: items ${i+1} and ${j+1} do not overlap`);
+  }
+}
 async function readableText(page:Page,selector:string) {
   const rgb=(color:string)=>color.match(/[\d.]+/g)!.map(Number);
   const light=(color:number[])=>color.slice(0,3).map(value=>{const channel=value/255;return channel<=0.04045?channel/12.92:Math.pow((channel+0.055)/1.055,2.4)}).reduce((sum,value,index)=>sum+value*[0.2126,0.7152,0.0722][index],0);
@@ -80,6 +90,9 @@ async function main() {
         assert.doesNotMatch(await visibleText(page),/PRIVATE SIBLING SCENE/);
         await readableText(page,'.pd-comparable-date');
         await readableText(page,'#parentPanel-overview .pd-evidence-copy > strong');
+        await separateControls(page,'.pd-toolbar > *',device+' report controls');
+        await separateControls(page,'.pd-chart-label',device+' chart dates');
+        if(viewport.width<=600){for(const id of ['parentReportLearner','parentReportRange']){const box=await page.locator('#'+id).boundingBox();assert.ok(box&&box.width>=160&&box.height>=44,device+' readable '+id);}}
         await noOverflow(page,device+' overview');await demoLabel(page);
         await page.locator('.pd-companion').evaluate(async image=>{await (image as HTMLImageElement).decode();});
         await page.screenshot({path:`test-results/parent-dashboard/parent-overview-${device}.png`,fullPage:true});
@@ -89,6 +102,12 @@ async function main() {
         await page.locator('#parentReportRange').selectOption('all');
         assert.match(await page.locator('[data-parent-domain="math"]').innerText(),/24/);
         await tabs(page,'skills').click();
+        const skillState=page.getByRole('combobox',{name:'Filter skills by evidence'});
+        assert.equal(await skillState.inputValue(),'observed','skills initially foreground actual observations');
+        assert.ok(await page.locator('#parentPanel-skills [data-parent-skill]').count()<12,'unobserved catalog does not crowd the initial evidence view');
+        await skillState.selectOption('all');await page.locator('#parentReportRange').selectOption('7');
+        assert.equal(await skillState.inputValue(),'all','date refresh preserves the parent’s selected skill filter');
+        await skillState.selectOption('observed');await page.locator('#parentReportRange').selectOption('all');
         await readableText(page,'.pd-skill-summary strong');
         await noOverflow(page,device+' skills');
         if(device==='desktop')await page.screenshot({path:'test-results/parent-dashboard/parent-skills-desktop.png',fullPage:true});

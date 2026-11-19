@@ -32,6 +32,8 @@ page is not a new access-control boundary; existing family/device controls apply
 | School connections | How Jems relates to familiar products and educational frameworks | Related content is not complete curriculum coverage, grade placement, or score equivalence. |
 | Settings | Existing learning preferences and family/privacy/backup controls | Reuse current controls; changing a filter does not change the child's learning plan. |
 
+Skills initially foreground observed work when the selected period contains evidence, with the full catalog available through All skills. Empty histories start with the catalog. Entering a domain makes the same choice for that domain; ordinary refreshes preserve the parent's chosen filter. On narrow screens, learner and period selectors each have a full-width row.
+
 The active profile owns every view. Switching profiles must clear old content and
 invalidate stale actions before another profile's evidence appears. Empty and
 unavailable states explain what has not been recorded without calling it weakness.

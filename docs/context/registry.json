@@ -347,10 +347,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:12:10.976Z",
-      "sourceDigest": "f3fad1e1d9f21bfb3d97c9ba3e0f58e6445c4399ce6253f0b3904a849f855bde",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the parent browser contrast helper changed after its TypeScript serialization failure. It still samples actual computed styles and enforces the same contrast threshold; every existing application and browser assertion is retained.",
+      "reviewedAt": "2026-11-19T15:18:56.944Z",
+      "sourceDigest": "e54bb2445cf937b69d6033dc625e4bd968a2345768e476b91ff724728be90ad0",
+      "reviewOutcome": "updated",
+      "reviewReason": "Added geometry checks after actual screenshot review exposed overlapping phone report controls despite a passing page-width check. Tests now require separated control/date boxes, readable mobile select sizes and observed-first Skills defaults that preserve later filter choices.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -469,10 +469,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ed52328b42cc2b95f1557b9f3bf69ca5112b51c8e7b3c48daa055b3f270b1b56",
-      "reviewedAt": "2026-11-19T15:11:22.978Z",
+      "sourceDigest": "2584e349c630a4e692acd5b529fb889247b12dbb72af45c16709576a8564d3a6",
+      "reviewedAt": "2026-11-19T15:18:57.172Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the hosted contrast-helper serialization failure and moved color calculations into the test process while retaining browser style sampling and every contrast assertion. The implementation ledger records this harness correction without inferring a product or browser pass."
+      "reviewReason": "Reviewed the phone toolbar grid, noncolliding chart labels and evidence-first Skills entry after inspecting the completed synthetic captures. Documented the new navigation defaults and prior visual findings; numeric evidence rules and current-profile behavior remain unchanged."
     }
   ]
 }

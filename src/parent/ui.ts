@@ -88,18 +88,21 @@ export function installParentDashboard() {
   function message(text: string) { status.textContent = text; status.hidden = !text; }
   function openTab(tab: Tab) { selectedTab = tab; render(); }
   function showEvidence(skill: string, domain: ParentSubjectId, id = '', ids: string[] = []) { subject = domain; evidenceSkill = skill; evidenceId = id; evidenceIds = [...ids]; evidenceSource = 'all'; evidenceLimit = 30; openTab('evidence'); panels.get('evidence')?.scrollIntoView({ block: 'start', behavior: 'auto' }); }
-  function chooseSubject(id: ParentSubjectId) { subject = id; skillFilter = 'all'; query = ''; openTab('skills'); }
+  function defaultSkillFilter(data: ParentSnapshot, area: ParentSubjectId | 'all' = 'all') {
+    return data.dashboard.subjects.some(domain => (area === 'all' || domain.id === area) && domain.period.records > 0) ? 'observed' : 'all';
+  }
+  function chooseSubject(id: ParentSubjectId) { if (!snapshot || !current()) return; subject = id; skillFilter = defaultSkillFilter(snapshot, id); query = ''; openTab('skills'); }
   childSelect.onchange = () => {
     const id = childSelect.value; if (id === String(FG.store.current().id)) return;
     if (!FG.store.choose(id)) { refresh(); return; }
     FG.app.refreshProfiles(); window.dispatchEvent(new Event('factory-profile')); FG.app.page('parent');
   };
   rangeSelect.onchange = () => { range = rangeSelect.value === 'all' ? 'all' : Number(rangeSelect.value) as ParentRange; evidenceLimit = 30; refresh(); };
-  function resetFilters() { subject = 'all'; skillFilter = 'all'; query = ''; evidenceSkill = ''; evidenceId = ''; evidenceIds = []; evidenceSource = 'all'; evidenceLimit = 30; }
+  function resetFilters(data: ParentSnapshot) { subject = 'all'; skillFilter = defaultSkillFilter(data); query = ''; evidenceSkill = ''; evidenceId = ''; evidenceIds = []; evidenceSource = 'all'; evidenceLimit = 30; }
   function refresh() {
     try {
       const next = captureParentSnapshot(FG, range);
-      if (next.ownerId !== owner) { owner = next.ownerId; resetFilters(); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(); }
+      if (next.ownerId !== owner) { owner = next.ownerId; resetFilters(next); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(); }
       snapshot = next; download.disabled = false;
       childSelect.replaceChildren();
       const profiles = FG.store.familyProfiles();
@@ -191,12 +194,16 @@ export function installParentDashboard() {
     const chart = node('div', 'pd-chart'); chart.setAttribute('role', 'img');
     chart.setAttribute('aria-label', `${labels[domain.id]} completions by calendar period, including zero-record days. ` + buckets.map(b => `${date(b.at)}${b.at !== b.last ? ' through ' + date(b.last) : ''}: ${b.independent} independent, ${b.supported} supported`).join('; '));
     const max = Math.max(1, ...buckets.map(d => d.independent + d.supported));
+    const labelEvery = Math.ceil(buckets.length / 6), lastLabelIndex = buckets.length - 1;
     for (const [index, bucket] of buckets.entries()) {
       const column = node('div', 'pd-chart-column'); column.title = `${date(bucket.at)}${bucket.at !== bucket.last ? ' – ' + date(bucket.last) : ''}: ${bucket.independent} independent, ${bucket.supported} with support`;
       const stack = node('div', 'pd-chart-stack');
       const helped = node('span', 'pd-chart-supported'); helped.style.height = `${bucket.supported / max * 135}px`;
       const independent = node('span', 'pd-chart-independent'); independent.style.height = `${bucket.independent / max * 135}px`;
-      stack.append(helped, independent); column.append(stack, node('span', 'pd-chart-label', index % Math.ceil(buckets.length / 6) === 0 || index === buckets.length - 1 ? new Date(bucket.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''));
+      // Reserve one normal label interval before the final date; a forced final
+      // label must not crowd an adjacent regular label on narrow screens.
+      const showLabel = index === lastLabelIndex || index % labelEvery === 0 && lastLabelIndex - index >= labelEvery;
+      stack.append(helped, independent); column.append(stack, node('span', 'pd-chart-label', showLabel ? new Date(bucket.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''));
       chart.append(column);
     }
     const legend = node('div', 'pd-legend'); legend.append(node('span', 'pd-legend-independent', domain.id === 'creation' ? 'No recorded hint' : 'Independent'), node('span', 'pd-legend-supported', 'With support'));
