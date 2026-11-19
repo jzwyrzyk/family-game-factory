@@ -1,0 +1,36 @@
+name: Jems archetype library and creative differentiation
+on:
+  pull_request:
+    paths:
+      - 'src/archetypes/**'
+      - 'tests/archetypes.test.ts'
+      - 'tests/archetype-diversity.test.ts'
+      - 'docs/archetypes/**'
+      - '.github/workflows/archetype-research.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/archetypes/**'
+      - 'tests/archetypes.test.ts'
+      - 'tests/archetype-diversity.test.ts'
+      - 'docs/archetypes/**'
+jobs:
+  catalog-and-reuse:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Typecheck whole application and research source
+        run: npm run typecheck
+      - name: Baseline production bundle regression
+        run: npm run build
+      - name: Existing application unit regression suite
+        run: npm run test:unit
+      - name: Archetype, portability and diversity acceptance tests
+        run: node --import tsx --test tests/archetypes.test.ts tests/archetype-diversity.test.ts
