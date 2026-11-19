@@ -57,7 +57,7 @@ test('a real local edit yields an immutable preview, NEVER automatic Keep',()=>{
   assert.equal(decision.persisted,false);
   assert.equal(decision.verified,'schema-and-local-interpreter');
   assert.equal(config.enginePower,1);
-  assert.ok(decision.after.enginePower>config.enginePower);
+  assert.ok(Number(decision.after.enginePower)>Number(config.enginePower));
   assert.deepEqual(decision.changes.map(x=>x.key),['enginePower']);
   const applied=validatePreviewAgainstCurrent(decision,{game:'hill',revisionId:'rev-1',config});
   assert.equal(applied.enginePower,decision.after.enginePower);
