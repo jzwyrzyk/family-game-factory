@@ -103,13 +103,10 @@ const rows:readonly Row[]=[
  ["nurture-management","seed-garden","Seed garden","grow","resources","grow","staged",["collect-item","resource-economy"],"A planted garden produces a harvest to collect"],
  ["nurture-management","village-builder","Village builder","build","construction","create","self-paced",["snap-assemble","resource-economy"],"Placed and connected buildings form a village"],
 ];
-export const playPatterns:readonly PlayPattern[]=Object.freeze(rows.map(([archetypeId,slug,title,verb,challenge,goal,pace,extras,payoff])=>{
- const archetype=archetypeById.get(archetypeId);
- if(!archetype)throw Error('PLAY_PATTERN_ARCHETYPE_MISSING_'+archetypeId);
  // Only mechanics genuinely common to EVERY editorial variant may be supplied
  // by the shared shell. Do not inherit example-only archetype mechanics
  // (e.g. a bow shot must not inherit dragon shield-reflection).
- const sharedShell:Readonly<Record<string,readonly string[]>>={
+const sharedShell:Readonly<Record<string,readonly string[]>>=Object.freeze({
   'platformer':['move-horizontal','platform-jump','collision'],
   'endless-runner':['runner-scroll'],
   'side-driving':['drive-throttle','terrain-hills'],
@@ -132,7 +129,11 @@ export const playPatterns:readonly PlayPattern[]=Object.freeze(rows.map(([archet
   'choice-discovery':[],
   'interactive-adventure':[],
   'nurture-management':[]
- };
+});
+
+export const playPatterns:readonly PlayPattern[]=Object.freeze(rows.map(([archetypeId,slug,title,verb,challenge,goal,pace,extras,payoff])=>{
+ const archetype=archetypeById.get(archetypeId);
+ if(!archetype)throw Error('PLAY_PATTERN_ARCHETYPE_MISSING_'+archetypeId);
  const allMechanics=[...new Set([...(sharedShell[archetypeId]??[]),...extras])];
  const signature:ExperienceSignature=Object.freeze({
   archetypeId,verb,control:archetype.input as Input,challenge,goal,pace,
