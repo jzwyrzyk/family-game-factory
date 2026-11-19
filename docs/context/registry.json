@@ -246,8 +246,8 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:12:55.026Z",
-      "sourceDigest": "beaf9747497d3b79797f76190cb9a4d1a49599c56576088a0c19a16a28af6180",
+      "reviewedAt": "2026-11-19T20:17:18.881Z",
+      "sourceDigest": "0764330a0eb1d0f0de52e6494635691ceb2d2e361fed74bfc6e179f1a24acb93",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed original Mind Your Jems art and local gameplay against the current app and newly merged PR48's design-only archetype modules. Routed the seven previously unmapped archetype modules and the design charter; no claim of installed playable archetypes or changed runtime is made."
     },
@@ -484,8 +484,8 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:12:55.026Z",
-      "sourceDigest": "800116f4b4036637dbbb97305f1f1b253c0394b37462af6476793bf187e9800a",
+      "reviewedAt": "2026-11-19T20:17:18.881Z",
+      "sourceDigest": "a47a6d61c57e945533d5c4066702005a4a1764d693d5b4967ac591a7e13bec40",
       "reviewOutcome": "updated",
       "reviewReason": "Mapped the new illustrated game source, approved assets, font, tests, and newly integrated PR48 archetype research files; preserved existing independent learning, privacy, brand, Rewards and parent-reporting scopes.",
       "reviewHistory": [
