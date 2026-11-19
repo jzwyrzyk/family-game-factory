@@ -1,3 +1,5 @@
+import {createIcon,setIconLabel} from './icons';
+
 /** Art choices are cosmetic. They are never gender, ability or learner records. */
 export type JourneyCharacter = 'spark' | 'nova';
 export type JourneyLevel = 0 | 1 | 2 | 3 | 4;
@@ -115,7 +117,8 @@ export function installGemJourney(options: GemJourneyOptions) {
   element.style.setProperty('--journey-world', `url(${JSON.stringify(assetUrl(artwork.background))})`);
 
   const toolbar = node('div', 'jems-journey-toolbar');
-  const back = button('jems-journey-back', '← My jems', 'jemsJourneyBack');
+  const back = button('jems-journey-back', '', 'jemsJourneyBack');
+  setIconLabel(back, 'arrow', 'My jems', 'jems-icon--back');
   back.addEventListener('click', () => options.onBack());
   const heading = node('h1', '', 'My journey');
   heading.id = 'jemsJourneyTitle';
@@ -143,11 +146,11 @@ export function installGemJourney(options: GemJourneyOptions) {
   nextText.id = 'jemsJourneyNextAction';
   next.append(nextLabel, nextText);
   const create = button('jems-journey-primary', 'Make a jem', 'jemsJourneyCreate');
-  const createArrow = node('span', 'jems-journey-arrow', '→');
-  createArrow.setAttribute('aria-hidden', 'true');
+  const createArrow = createIcon('arrow', 'jems-journey-arrow');
   create.append(createArrow);
   create.addEventListener('click', () => options.onCreate());
-  const returnCurrent = button('jems-journey-current', 'Back to my level', 'jemsJourneyCurrent');
+  const returnCurrent = button('jems-journey-current', '', 'jemsJourneyCurrent');
+  setIconLabel(returnCurrent, 'arrow', 'Back to my level', 'jems-icon--back');
   returnCurrent.addEventListener('click', () => { previewLevel = Math.max(1, state.level) as 1 | 2 | 3 | 4; renderView(); });
   heroCopy.append(levelLabel, title, subtitle, next, create, returnCurrent);
 
@@ -199,7 +202,8 @@ export function installGemJourney(options: GemJourneyOptions) {
   const dialogTop = node('div', 'jems-character-top');
   const dialogHeading = node('h2', '', 'Choose your maker');
   dialogHeading.id = 'jemsCharacterTitle';
-  const cancel = button('jems-character-close', '×', 'jemsCharacterCancel');
+  const cancel = button('jems-character-close', '', 'jemsCharacterCancel');
+  cancel.append(createIcon('close'));
   cancel.setAttribute('aria-label', 'Close character choices');
   cancel.addEventListener('click', () => closeCharacterPicker());
   dialogTop.append(dialogHeading, cancel);
@@ -281,7 +285,7 @@ export function installGemJourney(options: GemJourneyOptions) {
     nextText.textContent = state.nextAction || (state.level === 3 ? `${Math.min(3, state.polishedCount)} of 3 projects polished.` : LEVELS[Math.min(3, state.level)].action);
     create.firstChild!.textContent = state.level === 4 ? 'Make something new' : 'Make a jem';
     returnCurrent.hidden = !previewing;
-    change.textContent = state.character ? 'Change character' : 'Choose character';
+    setIconLabel(change, 'edit', state.character ? 'Change character' : 'Choose character');
 
     characters.replaceChildren();
     characters.dataset.character = state.character ?? 'both';
@@ -303,7 +307,8 @@ export function installGemJourney(options: GemJourneyOptions) {
       if (state.level === card.level) card.card.setAttribute('aria-current', 'step');
       else card.card.removeAttribute('aria-current');
       const status = earned ? (state.level === card.level ? 'Your level' : 'Reached') : state.level + 1 === card.level ? 'Next' : 'To come';
-      card.status.textContent = earned ? '✓ ' + status : status;
+      if (earned) setIconLabel(card.status, 'check', status);
+      else card.status.textContent = status;
       card.card.setAttribute('aria-label', `Level ${card.level}, ${card.name}, ${status}. Preview this level.`);
       card.illustration.replaceChildren(createJourneyRankThumbnail(state.character, card.level, artwork));
     }

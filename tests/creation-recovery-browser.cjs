@@ -14,18 +14,31 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']})
     .catch(async error=>{await new Promise(resolve=>server.close(resolve));throw error;});
   const context=await browser.newContext({viewport:{width:1360,height:1000},reducedMotion:'reduce',acceptDownloads:true});
-  const page=await context.newPage(),errors=[],paidRequests=[],checks=[];
+  const page=await context.newPage(),errors=[],paidRequests=[],checks=[],dialogs=[];
   page.setDefaultTimeout(12000);page.on('pageerror',error=>errors.push(error.message));
-  page.on('dialog',dialog=>dialog.accept());
+  page.on('dialog',dialog=>{dialogs.push({type:dialog.type(),message:dialog.message()});return dialog.accept();});
+  await context.addInitScript(()=>{
+    window.recoveryRewardToasts=[];
+    new MutationObserver(records=>{for(const record of records)for(const added of record.addedNodes){
+      if(!(added instanceof Element))continue;
+      if(added.matches('.jems-rewards-toast'))window.recoveryRewardToasts.push(added.textContent);
+      for(const toast of added.querySelectorAll('.jems-rewards-toast'))window.recoveryRewardToasts.push(toast.textContent);
+    }}).observe(document,{childList:true,subtree:true});
+  });
   page.on('request',request=>{if(request.method()==='POST'&&/\/v1\/(jobs|coach)(\/|$)|api\.openai\.com/.test(request.url()))paidRequests.push(request.url());});
   await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
   fs.mkdirSync('test-results',{recursive:true});
   const ready=()=>page.waitForFunction(()=>window.FG?.creation&&window.FG?.studio&&document.getElementById('creationParentProgress'));
   const pacing=()=>page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture did not save');});
-  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();};
+  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();await page.locator('[data-parent-tab="settings"]').click();};
   const switchProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.locator('#studioProfileMenu summary').click();await page.locator('.profile-choice').nth(index).click();};
   const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await page.locator('#studioNavScenes').click();await page.locator(`[data-scene="${id}"]`).click();};
   const raw=()=>page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),STATE_KEYS);
+  const ledger=()=>page.evaluate(()=>new Promise((resolve,reject)=>{
+    const opened=indexedDB.open('family-game-factory-rewards-v1',1);opened.onerror=()=>reject(opened.error);
+    opened.onsuccess=()=>{const database=opened.result,transaction=database.transaction('workspaces','readonly'),request=transaction.objectStore('workspaces').get('family-game-factory-rewards-v1');let value=null;
+      request.onsuccess=()=>{value=request.result??null;};transaction.oncomplete=()=>{database.close();resolve(value);};transaction.onerror=transaction.onabort=()=>{database.close();reject(transaction.error);};};
+  }));
   const upload=backup=>page.locator('#importData').setInputFiles({name:'scene-backup-fixture.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});
   const rejected=async(backup,pattern)=>{
     await upload(backup);await page.waitForFunction(()=>document.getElementById('importData').files.length===0);
@@ -81,29 +94,35 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     replacement.factoryStudio.sessions[0].name='Incoming notebook';
     const incoming=replacement.factoryCreation.projects[0];incoming.title='Incoming scene';
     replacement.factoryCreation.revisions.find(revision=>revision.id===incoming.headId).scene.title=incoming.title;
-    // Existing parent reports initialize empty learning records in memory. Rollback
-    // restores that current application state, which may be more normalized than raw legacy bytes.
-    const priorFamily=await page.evaluate(()=>structuredClone(FG.store.data));
+    // The coordinated transaction rolls back the exact saved source bytes and
+    // ledger, then reloads so no cached store can overwrite the recovered state.
+    const priorFamily=await page.evaluate(()=>structuredClone(FG.store.data)),priorLedger=await ledger(),dialogStart=dialogs.length;
+    let quotaFailures=0;await page.exposeFunction('__recordCreationQuotaFailure',()=>{quotaFailures++;});
     await page.evaluate(key=>{
       const original=Storage.prototype.setItem;window.__quotaFixture={original,failures:0};
       Storage.prototype.setItem=function(name,value){
-        if(this===localStorage&&name===key&&window.__quotaFixture.failures===0){window.__quotaFixture.failures++;throw new DOMException('Synthetic quota failure','QuotaExceededError');}
+        if(this===localStorage&&name===key&&window.__quotaFixture.failures===0){window.__quotaFixture.failures++;void window.__recordCreationQuotaFailure();throw new DOMException('Synthetic quota failure','QuotaExceededError');}
         return original.call(this,name,value);
       };
     },CREATION_KEY);
-    await rejected(replacement,/Could not save this creation/i);
-    assert.equal(await page.evaluate(()=>window.__quotaFixture.failures),1);
-    await page.evaluate(()=>{Storage.prototype.setItem=window.__quotaFixture.original;delete window.__quotaFixture;});
+    const reloaded=page.waitForNavigation({waitUntil:'load'});await upload(replacement);await reloaded;await ready();
+    assert.equal(quotaFailures,1,'The actual creation persistence failure was observed before the document reloaded');
+    assert.ok(dialogs.slice(dialogStart).some(dialog=>dialog.type==='alert'&&/Could not save this creation/i.test(dialog.message)),'The rollback outcome is shown before automatic recovery reload');
+    assert.equal(dialogs.slice(dialogStart).some(dialog=>/restored successfully/i.test(dialog.message)),false,'A failed replacement never claims success');
     const rolledBack=await raw();assert.equal(rolledBack[CREATION_KEY],damaged,'Rollback preserves the exact original corrupt bytes');
+    assert.deepEqual(rolledBack,preserved,'Rollback preserves every source string, including the family learning state');
+    assert.deepEqual(await ledger(),priorLedger,'Rollback preserves the exact prior reward ledger');
+    assert.deepEqual(await page.evaluate(()=>window.recoveryRewardToasts),[],'Recovery cannot replay earned rewards');
+    assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-reward-backup-journal-v1')),null,'The new document clears the completed rollback marker');
+    await parent();
     assert.deepEqual(await page.evaluate(()=>FG.store.data),priorFamily,'Rollback restores the current family and learning state');
-    for(const key of STATE_KEYS.filter(key=>key!==CREATION_KEY&&key!=='family-game-factory-state-v1'))assert.deepEqual(JSON.parse(rolledBack[key]),JSON.parse(preserved[key]),'Rollback restores '+key);
-    checks.push('a creation quota failure rolls back family, game and notebook writes and restores original corrupt scene bytes');
+    checks.push('a creation quota failure rolls back exact family, game, notebook, corrupt scene bytes and reward ledger, then reloads without success or reward replay');
 
     await restore(backup);
     assert.deepEqual(await page.evaluate(()=>FG.creation.export()),backup.factoryCreation);
     assert.equal(await page.evaluate(()=>Object.hasOwn(FG.store.data,'factoryCreation')||Object.hasOwn(FG.store.data,'factoryCreationRecoveryRaw')),false);
     await pacing();await page.locator(`[data-scene="${projectId}"]`).click();
-    assert.equal(await page.locator('#creationHint').textContent(),'See my hint again');
+    assert.equal(await page.getByRole('button',{name:'See my hint again',exact:true}).count(),1);
     await page.locator('#creationCheck').click();await page.waitForFunction(()=>FG.creation.export().attempts.length===2);
     assert.ok((await page.evaluate(()=>FG.creation.export().attempts)).every(attempt=>attempt.hintUsed));
     await parent();assert.equal(await page.locator('#creationParentProgress li').count(),2);

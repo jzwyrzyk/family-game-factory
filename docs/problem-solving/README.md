@@ -41,7 +41,7 @@ The reasoning practice is optional and can be left without losing access to game
 
 Each family first records a prediction without awarding an APS result for prediction accuracy. Matching a supplied result or choosing a suitable revision is a narrow prompted observation. The current task does not establish why the child chose it, an independently devised experiment or a causal explanation.
 
-The child entrance is **Try an idea**, also addressable with `?problem-solving=1`. My Powers and Parent Controls provide the selected profile's observation view alongside the existing learning and scene reports.
+The child entrance is **Try an idea**, also addressable with `?problem-solving=1`. My Powers provides the selected profile's child observation view. The existing parent dashboard includes the same source in Overview, Skills & progress and Evidence journal; its Settings tab keeps the selected-profile clear action and family backup controls.
 
 The flow preserves first decisions before teaching feedback. A wrong prediction followed by a useful, child-authored revision is legitimate evidence of revision. Planned test results are information the child is meant to use. A coach or hint supplying the next strategy is different and must remain visible in the evidence.
 
@@ -57,7 +57,7 @@ Independent assessment remains the separate [PR54 research track](https://github
 
 ## Persistence and privacy boundary
 
-Evidence is local to the browser and profile, including the existing adult workspace namespace. The feature adds no model call, external transcript analysis, cloud ingestion or new provider capability. Records carry short trusted facts and references, not a duplicate conversation archive or psychological profile. Backup, restore, deletion and invalid-data recovery must cover the new store together with existing family data.
+Evidence is local to the browser and profile, including the existing adult workspace namespace. The feature adds no model call, external transcript analysis, cloud ingestion or new provider capability. Records carry short trusted facts and references, not a duplicate conversation archive or psychological profile. The shared family backup coordinator covers this fifth source together with existing family data and rewards. It validates schema and family ownership before mutation, journals exact originals, restores them after failure and invalidates open drafts after replacement. Legacy backups without this section restore an empty observation workspace; legacy four-source recovery journals restore only the keys they originally captured.
 
 Storage is bounded and discloses when older middle records have been discarded. Saving or restoring must not silently erase valid data. Failure of an optional background observation must not turn an already saved game or answer into a failure; the evidence surface must report its own inability to save.
 
@@ -65,9 +65,11 @@ Storage is bounded and discloses when older middle records have been discarded. 
 
 - [Implementation and acceptance](IMPLEMENTATION.md): data, source boundaries, persistence, tests and remaining work.
 - [Standards and assessment comparisons](BENCHMARKS.md): primary sources and claim limits.
-- [Accepted decision](../decisions/0010-formative-problem-solving-evidence.md): why the background layer and structured opportunities are combined.
+- [Accepted decision](../decisions/0011-formative-problem-solving-evidence.md): why the background layer and structured opportunities are combined.
 - [Math](../adaptive-math/README.md), [Language Arts](../adaptive-language/README.md), [Creation Studio](../creation-studio/README.md) and [design coaching](../design-coach/GOLD_STANDARD.md): source evidence remains subject to its original contract.
 
 ## Integration with the making journey
 
 The PR57 visual library and **My journey** remain the shared host experience. **Try an idea** is an optional destination, with the same profile selection and active-learning guard. Changing destinations dismisses the maker picker and preserves saved Creation/practice work. Cosmetic maker progress and reasoning observations keep different criteria: a character choice, displayed rank or kept game does not establish a reasoning skill, and practice results do not award a maker rank.
+
+The same guarded shell also includes **My rewards**. Seven destinations use two rows on narrow screens. APS does not change the accepted lifetime gem schedule or mint a new practice award. Successful subject/Creation/Studio saves preserve their reward outbox before the optional APS observer runs, and an observer failure cannot undo that saved work or its reward eligibility.

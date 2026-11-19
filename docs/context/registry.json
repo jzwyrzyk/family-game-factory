@@ -28,10 +28,14 @@
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
     "docs/decisions/0007-creation-and-rebuild-practice.md",
+    "docs/parent-progress/README.md",
+    "docs/parent-progress/RESEARCH.md",
+    "docs/rewards/README.md",
+    "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
     "docs/problem-solving/README.md",
     "docs/problem-solving/BENCHMARKS.md",
     "docs/problem-solving/IMPLEMENTATION.md",
-    "docs/decisions/0010-formative-problem-solving-evidence.md"
+    "docs/decisions/0011-formative-problem-solving-evidence.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -52,6 +56,8 @@
     "docs/brand/GEM_FACTORY.md",
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
     "docs/creation-studio/*.md",
+    "docs/rewards/*.md",
+    "docs/rewards/previews/*.md",
     "docs/problem-solving/*.md"
   ],
   "areas": [
@@ -66,13 +72,37 @@
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
         "docs/brand/*.md",
+        "docs/rewards/*.md",
         "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:16:36.817Z",
-      "sourceDigest": "7176a1a82c50d5b3a5a39c9d1161fb06d2879dba477611a8f94c134892615ad6",
+      "reviewedAt": "2026-11-19T17:17:54.308Z",
+      "sourceDigest": "ded2f74df901adc83f7c4cee3e4da10d5e85ba0b09929174f5ce182907f02739",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved PR66 handbook coverage and clarified the approved wave companion now used by optional practice; product scope still separates formative observations, cosmetic ranks and independent benchmark research."
+      "reviewReason": "Reviewed integrated parent, rewards and formative feature scope; documented no new APS award, no global thinking score, and separation of context from structured observations.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T07:03:47.934Z",
+          "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
+        },
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:24.202Z",
+          "sourceDigest": "d24e39014dffd1394fd967dc06d6d7dc52c160b4968ac1a7165a66f550f32f44",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved current Creation Studio and adult/guardian doctrine while integrating approved ray-free identity, original four-rank maker portraits and brand library v1.2; earning and learning semantics remain unchanged."
+        },
+        {
+          "sourceCommit": "7fa7ff252e277bd9610a11afeca8bf8f1ae13715",
+          "reviewedAt": "2026-11-19T15:03:30.676Z",
+          "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
+        }
+      ]
     },
     {
       "id": "experience",
@@ -81,7 +111,6 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
-        "docs/problem-solving/*.md",
         "docs/homepage/*.md",
         "docs/brand/*.md",
         "docs/adult-pilot/*.md",
@@ -89,7 +118,9 @@
         "docs/decisions/0005-temporary-adult-profile.md",
         "docs/brand/achievement-art/README.md",
         "docs/brand/art-library/README.md",
-        "docs/brand/art-library/licenses/README.md"
+        "docs/brand/art-library/licenses/README.md",
+        "docs/rewards/*.md",
+        "docs/problem-solving/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -109,10 +140,26 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:16:37.075Z",
-      "sourceDigest": "fa4321e6b7f695eec0b46a85a35de0a0ea3d55dbcd6622ab02e4dbbbd5be17b8",
+      "reviewedAt": "2026-11-19T17:17:54.748Z",
+      "sourceDigest": "e4c5b5c0505ea1a2f21fe7ddb1fe8c09e3091ac123078d35e4faa57a0d2c3099",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed combined brand and practice navigation, picker dismissal, profile-safe close/reopen and same-attempt learning guards; documented reuse of approved wave art without changing maker selection or earning rules."
+      "reviewReason": "Reviewed seven SVG destinations and same-attempt guards against current branding and Rewards; documented native parent placement, picker cleanup, resumed drafts and two-row phone navigation.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T14:39:48.683Z",
+          "sourceDigest": "47de8040f2678b39938d4658261da388a415397262aecebbe18709a2d7d29bc9",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the complete recovered v1.2 source against current main and the published PR57 branch. The only new runtime reconciliation closes the Journey picker and hides Journey on entering Creation; existing scene exit, save-without-Keep, learning guards, owner boundaries and five-tab mobile layout remain intact. Canonical architecture and delivery scope now describe this combined behavior."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:29.265Z",
+          "sourceDigest": "0b1511c17500501860cd69c9563a3e39018f6994049739f7be56c000fc9d1d87",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the new parent route, copied report reads, preserved settings and family backup handlers, and family/adult profile event refresh. Canonical doctrine, architecture and parent feature contract now describe these boundaries."
+        }
+      ]
     },
     {
       "id": "creation",
@@ -120,7 +167,8 @@
         "PRODUCT-DOCTRINE.md",
         "ARCHITECTURE-CURRENT.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/0007-creation-and-rebuild-practice.md"
+        "docs/decisions/0007-creation-and-rebuild-practice.md",
+        "docs/rewards/*.md"
       ],
       "sources": [
         "src/creation/**",
@@ -128,10 +176,47 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e405da3553eba97d0f38e74572a88df034a42e4a27b94524b01cc3382b90368b",
-      "reviewedAt": "2026-11-19T15:14:05.449Z",
+      "sourceDigest": "89a27c985cde7960261edec936eb714189786fe7b5b7b32be5fcf771d74390dc",
+      "reviewedAt": "2026-11-19T17:17:55.432Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved merged PR57 scene-exit/recovery tests and PR64 saved-check context hooks; Creation drafts flush on Journey/practice entry, while scene results remain specific observations rather than general reasoning scores."
+      "reviewReason": "Reviewed saved-attempt and delete hooks: the durable Creation attempt retains its reward outbox before optional APS context publication; scene mechanics, hints and challenge criteria remain unchanged.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:58:08.260Z",
+          "sourceDigest": "79550dae3c5cd44758f0fabef07732504db741af6b4f907af6eee6a8dc923ff6",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented explicit scene exit when navigating to chat Create or My journey: guard learning, preserve pending scene version without Keep, and stop hidden playback. Added regression cases while retaining current scene evidence, adapters and backup schema."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:29.799Z",
+          "sourceDigest": "10c3746e45402bb430ca64b1fa65de7a6e2b1ba9be0900b0fe7addc705396ef8",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Only the existing creation recovery browser helper now selects the Settings tab before using the preserved backup controls. Scene records, behavioral checks, revision ownership and creation storage source are unchanged."
+        }
+      ]
+    },
+    {
+      "id": "rewards",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/rewards/*.md",
+        "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
+        "docs/brand/GEM_PROGRESS.md"
+      ],
+      "sources": [
+        "src/rewards/**",
+        "tests/rewards*",
+        "docs/rewards/*.md",
+        "docs/rewards/previews/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "c049e7a955b7779e23e883b2bc543e6854e8b7a9c9f8a39661303da1635177cb",
+      "reviewedAt": "2026-11-19T17:17:55.879Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed five-source journaled replacement and recovery, legacy four-source journals, owner checks, exact rollback and maintenance guards; documented that APS changes no award policy or lifetime count."
     },
     {
       "id": "games",
@@ -151,10 +236,10 @@
         "docs/game-quality/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:41.812Z",
-      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
+      "reviewedAt": "2026-11-19T16:10:25.520Z",
+      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed new action icons and existing native game controls including Gem Factory, driving and construction; original physics, content, scores, evidence and runtime remain unchanged."
     },
     {
       "id": "learning",
@@ -162,7 +247,8 @@
         "PRODUCT-DOCTRINE.md",
         "ARCHITECTURE-CURRENT.md",
         "docs/adaptive-math/*.md",
-        "docs/adaptive-language/*.md"
+        "docs/adaptive-language/*.md",
+        "docs/rewards/*.md"
       ],
       "sources": [
         "src/learning/**",
@@ -171,28 +257,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:49:15.755Z",
-      "sourceDigest": "ca37f0b25da53d2fa7f89829d5fe95b5620205667a6dc1e94c4883bda5598662",
+      "reviewedAt": "2026-11-19T17:17:56.207Z",
+      "sourceDigest": "2798174cf2197341b90d2bc4a3abf04136091e44948aa2b40550c7542dbd44d5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new onSave attempt payload in both activity hosts and source events after successful persistence. Math and English scoring, selection, help, checkpoints and mastery states retain their existing contracts."
-    },
-    {
-      "id": "problem-solving",
-      "documents": [
-        "PRODUCT-DOCTRINE.md",
-        "ARCHITECTURE-CURRENT.md",
-        "docs/problem-solving/*.md",
-        "docs/decisions/0010-formative-problem-solving-evidence.md"
-      ],
-      "sources": [
-        "src/problem-solving/**",
-        "tests/problem-solving-*"
-      ],
-      "reviewAfterDays": 30,
-      "sourceDigest": "57606ae927edcea06daece9728f4d827cf83eafc34857f6cbbcb8c42196bd85c",
-      "reviewedAt": "2026-11-19T15:14:05.592Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed merged host lifecycle, approved practice companion and combined cosmetic-evidence regression; documented 29 focused tests and separated earlier browser acceptance from the combined-brand candidate."
+      "reviewReason": "Reviewed production host save ordering with Math and English attempts; optional context is emitted only after durable attempt and reward outbox, preserving subject evidence and existing earning eligibility on observer failure."
     },
     {
       "id": "services",
@@ -289,10 +357,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "3806ee61659d06b10c5db3ff0b9c58d26009b0bd15e57bd8b6329cff61386f64",
-      "reviewedAt": "2026-11-19T07:03:52.307Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Relative to merged main, the OpenAPI addition is only a read-only scene route through service.revision. Inspected same-family/device/adult-audience enforcement and tests for cross-profile and revoked-grant denial; the quality stage retains main's original-grant and consent policy."
+      "sourceDigest": "153f9fd6ed825e3bfb85cb4768ccb433bc6cb4e0e21b93877925e4fd9d398043",
+      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed brand control changes alongside family/adult reward namespaces and parent Settings backup controls; no guardian scope, device trust or paid provider permission changes."
     },
     {
       "id": "validation",
@@ -307,7 +375,8 @@
         "docs/privacy/*.md",
         "docs/brand/GEM_PROGRESS.md",
         "docs/brand/achievement-art/README.md",
-        "docs/brand/LIBRARY_V1_2.md"
+        "docs/brand/LIBRARY_V1_2.md",
+        "docs/rewards/*.md"
       ],
       "sources": [
         "tests/**",
@@ -315,10 +384,26 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:21:50.320Z",
-      "sourceDigest": "193603fb796a67585944c5bda4f5163d5ddfcf7294ea55d4abc814948886798b",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Updated only the brand browser contract from five single-row destinations to the documented six destinations in two mobile rows; retained exact destination IDs, 44px targets, text fit, viewport bounds and hero separation. Combined application source and documented behavior are unchanged."
+      "reviewedAt": "2026-11-19T17:17:57.416Z",
+      "sourceDigest": "59b3d84b558f2c11a98816df2602cdcafc562d9543db387b218e33e34fadebc1",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed integrated parent, rewards, APS and brand browser assertions without removing existing gates; recorded 354 core units,32APS,57rewards,17parent,28maker,31Studio,18docs and asset results with source and environment limits.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:25.107Z",
+          "sourceDigest": "b0158a975de90f442c7cdcf1d9695661013a090eaa92179d0365fe58f26a2f50",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved all current main CI jobs; added brand asset verifier, narrow phone layout and scene-to-Create/Journey regressions alongside existing illustrated progression, offline and saved-state checks. Local build/nonbrowser results recorded separately from pending CI browser evidence."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:57:15.605Z",
+          "sourceDigest": "321ed825245f691048c66461c2c2de27bc7a590027be5da16de2264590f73874",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added browser assertions that unscored saved writing and exact checked scene titles remain inspectable even without a first scored response; synthetic fixture grade scope now includes the existing reviewed writing activity."
+        }
+      ]
     },
     {
       "id": "delivery",
@@ -340,10 +425,33 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:16:37.518Z",
-      "sourceDigest": "91746745524e98c8f34af4f803eb58482c525754e05b0b7aec199a41611faa56",
+      "reviewedAt": "2026-11-19T17:17:57.801Z",
+      "sourceDigest": "d484dff651c6cddb1446826c1e278684dea598dbda55cd385003c92ff836dbbd",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated main7fa7ff25 and its PR66 source-only PR57 receipt while preserving earlier candidate evidence; PR64 combined runtime awaits its own hosted browser checks and does not claim deployment or benchmark validation."
+      "reviewReason": "Verified merged main28c18cda and upstream PR65,PR69,PR67 metadata; recorded user authorization to merge PR64 after current checks while retaining historical results and separate deployment/research boundaries.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T14:39:49.831Z",
+          "sourceDigest": "f11b89808e6e8b82b00edb653f7da9476a706df106543c55072e1062512804ce",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved latest main eebeebeb and PR63 release receipts, PR58 hosted results, PR62 measurement limits and private worker14 status without duplicate capability rows. Reviewed the retained CI diagnostic as read-only source-digest output. Recorded current merge authorization separately from pending exact-candidate browser/CI and merge evidence; earlier launcher failures, smoke success and historical suite results retain their scopes."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:57:16.414Z",
+          "sourceDigest": "68b357798b8b050a58b0e9198bd8c6925c02cd4a7152d8b7a0d9916dbfec2039",
+          "reviewOutcome": "updated",
+          "reviewReason": "Pinned the dedicated parent job to the same Ubuntu 24.04 and browser install pattern as existing successful repository journeys after the new latest runner resolved to unsupported Ubuntu 26.04. Recorded the setup failure without treating it as application evidence."
+        },
+        {
+          "sourceCommit": "7fa7ff252e277bd9610a11afeca8bf8f1ae13715",
+          "reviewedAt": "2026-11-19T15:03:31.282Z",
+          "sourceDigest": "42ab7a524f224769708b9edccb6edf6dc032f3bafb77f653546230103c2660bd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded observed PR57 merge c6576c16 at 2026-11-19T15:02:05Z, exact tree equality to tested source1488871/local879c93e, all four final hosted workflows, scoped local acceptance and the source-only release boundary. Preserved earlier receipts as historical and documented actual handbook coverage."
+        }
+      ]
     },
     {
       "id": "context",
@@ -364,10 +472,62 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:14:06.120Z",
-      "sourceDigest": "cd583109945066db721aa38896e953646038214d2b01cbc0c0dc24fac087d203",
+      "reviewedAt": "2026-11-19T17:17:58.183Z",
+      "sourceDigest": "6ab68bc6dd3433faaa7a012982d33dc46ed51c2cca2251c516193c5c861056cc",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged both documentation registries and required entry points, retained brand asset/test routes, and renumbered the new problem-solving decision0010 to preserve merged decisions0008 and0009."
+      "reviewReason": "Merged current parent and rewards registry routes with the formative feature; preserved required canonical documents and renumbered APS decision0011 because main owns lifetime-rewards decision0010.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:25.915Z",
+          "sourceDigest": "9314eb35617cf99993071c8e0b9111cc38031e901cd52beb55f9d81e002bf67c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Resolved ADR collisions by preserving main decisions 0006/0007 and renumbering unpublished brand decisions 0008/0009; routed asset contracts and preserved all canonical links and current-main registry areas."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:31.544Z",
+          "sourceDigest": "94d5ed0db4d3faf049edd394e1a1800613c81c2229dfa60c79413d61f1649007",
+          "reviewOutcome": "updated",
+          "reviewReason": "Registered the new parent-reporting source and test family with canonical and feature references, added required parent contract and research documents, and linked the dated reporting decision from the documentation indexes."
+        }
+      ]
+    },
+    {
+      "id": "parent-reporting",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/parent-progress/*.md",
+        "docs/decisions/2026-11-19-parent-evidence-reporting.md"
+      ],
+      "sources": [
+        "src/parent/**",
+        "tests/parent-dashboard*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
+      "reviewedAt": "2026-11-19T17:17:56.552Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states."
+    },
+    {
+      "id": "problem-solving",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/problem-solving/*.md",
+        "docs/decisions/0011-formative-problem-solving-evidence.md"
+      ],
+      "sources": [
+        "src/problem-solving/**",
+        "tests/problem-solving-*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "3670012075fbf05ffe4eb33752061ab8e1490ec3092ea83bf175907971a77419",
+      "reviewedAt": "2026-11-19T17:17:56.960Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed shared writer guard, five-source backup, child-view and native-parent integration, deterministic tasks and new failure regressions; documented current local evidence and pending exact-head browser acceptance."
     }
   ]
 }

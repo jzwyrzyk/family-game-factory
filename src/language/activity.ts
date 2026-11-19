@@ -1,3 +1,4 @@
+import {setIconLabel,type IconName} from '../brand/icons';
 import {beginLanguageAttempt,finishLanguageAttempt,recordLanguageReadAloud,saveCreativeDraft,
   selectLanguageItem,submitLanguageAnswer,useLanguageHint,type LanguageAttempt} from './engine';
 import type {LanguageContext,LanguageItem,LanguageProfile,LanguageResult} from './types';
@@ -11,7 +12,7 @@ let sequence=0;
 const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls?:string,text?:string):HTMLElementTagNameMap[K]=>{
   const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;
 };
-const button=(text:string,cls?:string)=>{const b=make('button',cls,text);b.type='button';return b;};
+const button=(text:string,cls?:string,icon?:IconName,iconClass='')=>{const b=make('button',cls,text);b.type='button';if(icon)setIconLabel(b,icon,text,iconClass);return b;};
 const purposeLabel=(purpose?:string)=>purpose==='review'?'MEMORY QUEST':purpose==='prerequisite'?'BUILD A FOUNDATION':
   purpose==='confidence'?'YOU KNOW THIS ONE':'LANGUAGE QUEST';
 /** Only the host may mount an educational opportunity or record credit. */
@@ -35,7 +36,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     'Think it through. Help is always here if you need it.');
   if(options.onLeave){
     const top=make('div','language-topbar');
-    const leave=button('← Back to Games','language-leave');leave.dataset.action='leave-game';
+    const leave=button('Back to Games','language-leave','arrow','jems-icon--back');leave.dataset.action='leave-game';
     on(leave,'click',()=>{if(!disposed&&!done)options.onLeave?.();});
     top.append(leave);root.append(top);
   }
@@ -43,11 +44,12 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   if(item.passage){
     const story=make('section','language-passage');
     story.setAttribute('aria-label','Read this passage');
-    story.append(make('p','language-passage-label','📖 READ THE CLUE'),make('p','language-story-text',item.passage));
+    const passageLabel=make('p','language-passage-label');setIconLabel(passageLabel,'book','READ THE CLUE');
+    story.append(passageLabel,make('p','language-story-text',item.passage));
     root.append(story);
   }
   const support=make('div','language-reading-row');
-  const readBtn=button('🔊 Read this to me','language-secondary');
+  const readBtn=button('Read this to me','language-secondary','volume');
   readBtn.dataset.action='read-aloud';
   const speechAvailable=typeof window.speechSynthesis!=='undefined'&&typeof window.SpeechSynthesisUtterance!=='undefined';
   if(speechAvailable) {
@@ -74,9 +76,9 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
   root.append(feedback);
   const helpControls=make('div','language-help-controls');
-  const hintButton=button('💡 A little hint','language-secondary');
+  const hintButton=button('A little hint','language-secondary','help');
   hintButton.dataset.action='hint';
-  const showButton=button('Show an example','language-secondary');
+  const showButton=button('Show an example','language-secondary','book');
   showButton.dataset.action='show-solution';helpControls.append(hintButton,showButton);root.append(helpControls);
   const hintPanel=make('section','language-hint');hintPanel.hidden=true;
   const hintTitle=make('h3');hintTitle.id=prefix+'-hint-title';hintTitle.tabIndex=-1;
@@ -110,7 +112,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     if(disposed||done||locked)return;
     hintDepth=4;useLanguageHint(options.profile,attempt.id,4);save();
     hintPanel.hidden=false;hintTitle.textContent='Here is how to solve it';hintText.textContent=item.explanation;
-    const go=button('Continue my game ✨','language-primary');go.dataset.action='continue-supported';
+    const go=button('Continue my game','language-primary','play');go.dataset.action='continue-supported';
     on(go,'click',()=>complete('shown',false));hintPanel.replaceChildren(hintTitle,hintText,go);
     hintButton.disabled=true;showButton.disabled=true;
     feedback.dataset.state='support';feedback.textContent='You explored this idea. You can try a new one another time.';
@@ -122,7 +124,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     hintDepth++;useLanguageHint(options.profile,attempt.id,hintDepth);save();
     hintPanel.hidden=false;hintTitle.textContent='Hint '+hintDepth+' of 3';
     hintText.textContent=item.hints[hintDepth-1];hintPanel.replaceChildren(hintTitle,hintText);
-    hintButton.textContent=hintDepth>=3?'Show how':'Another hint';
+    setIconLabel(hintButton,'help',hintDepth>=3?'Show how':'Another hint');
     if(explicit)focus(hintTitle);
   }
   on(hintButton,'click',()=>hint());
@@ -133,7 +135,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Choose an answer first.';return;}
     if(result.correct){
       locked=true;feedback.dataset.state='correct';
-      feedback.textContent=result.attempt.independent?'✨ You figured it out!':'✨ Nice work exploring that with help!';
+      setIconLabel(feedback,'check',result.attempt.independent?'You figured it out!':'Nice work exploring that with help!');
       root.querySelectorAll<HTMLButtonElement|HTMLInputElement|HTMLTextAreaElement>('button,input,textarea').forEach(n=>n.disabled=true);
       timer=setTimeout(()=>complete('completed',result.attempt.independent),650);
       return;
@@ -175,8 +177,8 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
       clear.disabled=locked||selected.length===0;
     }
     const controls=make('div','language-tile-actions');
-    const undo=button('↶ Undo last','language-secondary'),clear=button('Clear','language-secondary');
-    const check=button('Check my '+(sentence?'sentence':'word'),'language-primary');
+    const undo=button('Undo last','language-secondary','undo'),clear=button('Clear','language-secondary','close');
+    const check=button('Check my '+(sentence?'sentence':'word'),'language-primary','check');
     check.dataset.action='check-tiles';
     on(undo,'click',()=>{selected.pop();redraw();});
     on(clear,'click',()=>{selected.length=0;redraw();});
@@ -188,7 +190,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const field=make('input','language-edit-input');field.id=prefix+'-edit';field.type='text';
     field.autocomplete='off';field.maxLength=200;field.setAttribute('aria-describedby',feedback.id);
     label.htmlFor=field.id;
-    const check=button('Check my sentence','language-primary');check.type='submit';
+    const check=button('Check my sentence','language-primary','check');check.type='submit';
     on(form,'submit',ev=>{ev.preventDefault();submit(field.value);});
     form.append(label,field,check);work.append(form);
   } else if(item.kind==='creative'){
@@ -198,7 +200,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const field=make('textarea','language-creative-input');field.id=prefix+'-write';
     field.maxLength=1200;field.rows=5;label.htmlFor=field.id;
     const note=make('p','language-creative-note','You are the author. There is no automatic score for imagination or writing quality.');
-    const go=button('Save my writing and keep playing ✨','language-primary');go.type='submit';
+    const go=button('Save my writing and keep playing','language-primary','save');go.type='submit';
     on(form,'submit',ev=>{
       ev.preventDefault();
       const result=saveCreativeDraft(options.profile,attempt.id,field.value);

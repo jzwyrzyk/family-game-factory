@@ -1,0 +1,10 @@
+{
+  "scope": "synthetic production-dist browser checks",
+  "results": [
+    "empty histories, read-only reporting and keyboard tabs",
+    "desktop: filters, actual examples, repeated-check deduplication, school connections, private export, settings, sibling separation and reload",
+    "tablet: filters, actual examples, repeated-check deduplication, school connections, private export, settings, sibling separation and reload",
+    "phone: filters, actual examples, repeated-check deduplication, school connections, private export, settings, sibling separation and reload",
+    "small-phone: filters, actual examples, repeated-check deduplication, school connections, private export, settings, sibling separation and reload"
+  ]
+}

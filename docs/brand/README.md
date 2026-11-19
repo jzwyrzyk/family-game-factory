@@ -26,6 +26,7 @@ Avoid using pastel colors as small text on white. Maintain readable navy text on
 - The [illustrated making journey](GEM_PROGRESS.md), cosmetic character picker and saved-progress popups; source and release status remain scoped to [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57).
 - Parent Controls, My Powers, Math/Language Arts checkpoints, error/success notices, profile controls and optional offline update notification.
 - PWA manifest, icon, document title/metadata and original legacy Arcade escape route.
+- The shared approved SVG sprite supplies functional icons across existing host and game controls, with text labels, keyboard focus and dynamic states preserved. All five Gem companion poses and saved/build/reconnect spots follow the real state map in the library contract.
 - Product messaging: **Create. Solve. Build. Play. Grow.** Child creates/decides; jems is a helper. **Send to jems** sends a typed message; **Speak** is the microphone action.
 - CSS lives in `src/brand/jems.css`; existing physics and learning logic, isolation, storage keys and privacy gates remain unchanged.
 
@@ -56,6 +57,7 @@ Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac**
 | Six Factory Favorites | Distinct game art, quiet white frames, lilac hover/focus, readable Ink metadata | Low |
 | Saved projects, versions, background builds | Mint continuity border, gentle facets, Ink build shelf, accessible statuses | Low |
 | Making journey and character choice | Bright white page, four evolving character/gem stages, short labels and truthful earned/preview states | Illustrated hero; restrained controls and popup |
+| Shared Rewards | Approved gem art and exact selected-maker thumbnail, lifetime gem total, readable next milestone and earning actions | Calm white/lilac page; compact nonblocking earned-gem popup; see the [Rewards contract](../rewards/README.md) |
 | Conversation/voice | Quiet Gem companion states, subtle lilac child bubbles and mint reflections; separate Send and Speak | Low |
 | Math/Language Arts/My Powers | Blue or mint frame accents; purple selected controls; do not decorate the question text | Minimal |
 | Grown-up controls, backups, privacy | Calm cream/white panels and clear focus/contrast, no cartoon takeover | Minimal |

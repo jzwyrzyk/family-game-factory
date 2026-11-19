@@ -1,6 +1,8 @@
 /** Local immutable creation history. Autosave is recovery, never an implicit Keep. */
 import type { CreationProject } from './model';
 import { validateEditableProject } from './projects';
+import { createRewardFact, enqueueRewardFact, rewardFactId, validateRewardOutbox, type RewardFact } from '../rewards/model';
+import { assertRewardSourceWritable } from '../rewards/write-guard';
 
 export const CREATION_KEY='family-game-factory-creation-v1';
 export const CREATION_LIMITS=Object.freeze({projects:40,revisions:400,drafts:40,attempts:500,characters:2_000_000});
@@ -17,6 +19,7 @@ export interface CreationAttempt {
 }
 export interface CreationWorkspace {
   schema:'jems.creation.workspace.v1';projects:CreationEntry[];revisions:CreationRevision[];drafts:CreationDraft[];attempts:CreationAttempt[];
+  rewardOutbox?:RewardFact[];
 }
 export interface LoadedCreation {project:CreationEntry;revision:CreationRevision;scene:CreationProject;draft:CreationDraft|null}
 const fresh=():CreationWorkspace=>({schema:'jems.creation.workspace.v1',projects:[],revisions:[],drafts:[],attempts:[]});
@@ -38,7 +41,7 @@ function checkSize(value:unknown):string {
 
 /** Validate complete graph and allowlisted assets before modifying any browser storage. */
 export function validateCreationWorkspace(value:unknown):CreationWorkspace {
-  if(!object(value,['schema','projects','revisions','drafts','attempts'])||value.schema!=='jems.creation.workspace.v1')invalid();
+  if(!object(value,['schema','projects','revisions','drafts','attempts','rewardOutbox'])||value.schema!=='jems.creation.workspace.v1')invalid();
   const data=value as unknown as CreationWorkspace;
   for(const field of ['projects','revisions','drafts','attempts'] as const){
     if(!Array.isArray(data[field])||data[field].length>CREATION_LIMITS[field])invalid();
@@ -74,6 +77,10 @@ export function validateCreationWorkspace(value:unknown):CreationWorkspace {
     if(!object(a,['id','projectId','revisionId','challengeId','passed','hintUsed','checkedAt'])||!ident(a.id)||attempts.has(a.id)||!projects.has(a.projectId)||revisions.get(a.revisionId)?.projectId!==a.projectId||!ident(a.challengeId)||projects.get(a.projectId)?.challengeId!==a.challengeId||typeof a.passed!=='boolean'||typeof a.hintUsed!=='boolean'||!date(a.checkedAt))invalid();
     attempts.add(a.id);
   }
+  if(data.rewardOutbox!==undefined){
+    const facts=validateRewardOutbox(data.rewardOutbox);
+    if(facts.some(fact=>fact.kind!=='scene.challenge'||!data.projects.some(p=>p.owner===fact.owner)))invalid();
+  }
   checkSize(data);return clone(data);
 }
 
@@ -95,10 +102,12 @@ export class CreationStore {
     this.scope(owner);const p=data.projects.find(p=>p.id===id&&p.owner===owner);if(!p)throw Error('Choose a creation in your own profile.');return p;
   }
   private persist(data:CreationWorkspace){
+    assertRewardSourceWritable();
     const checked=validateCreationWorkspace(data),raw=checkSize(checked);
     try{this.storage.setItem(CREATION_KEY,raw);}catch{throw Error('Could not save this creation on this device. Your last saved version is safe. Export a backup before freeing browser space.');}
   }
   private write<T>(fn:(data:CreationWorkspace)=>T):T {
+    assertRewardSourceWritable();
     // Each synchronous transaction sees the latest tab/workspace state.
     const data=this.read(),result=fn(data);this.persist(data);return clone(result);
   }
@@ -180,12 +189,19 @@ export class CreationStore {
       const hintUsed=!!(p.hintUsed||result.hintUsed||data.attempts.some(a=>a.projectId===id&&a.hintUsed));
       if(hintUsed)p.hintUsed=true;
       const attempt:CreationAttempt={id:uid(),projectId:id,revisionId:p.headId,challengeId:p.challengeId,passed:result.passed,hintUsed,checkedAt:now()};
-      data.attempts.push(attempt);return attempt;});
+      data.attempts.push(attempt);
+      if(attempt.passed)data.rewardOutbox=enqueueRewardFact(data.rewardOutbox??[],createRewardFact({owner,kind:'scene.challenge',sourceId:attempt.challengeId,occurredAt:attempt.checkedAt}));
+      return attempt;});
   }
-  remove(id:string,owner:string):void {this.write(data=>{this.entry(data,id,owner);data.projects=data.projects.filter(p=>p.id!==id);data.revisions=data.revisions.filter(r=>r.projectId!==id);data.drafts=data.drafts.filter(d=>d.projectId!==id);data.attempts=data.attempts.filter(a=>a.projectId!==id);return true;});}
-  removeOwner(owner:string):void {this.write(data=>{this.scope(owner);const ids=new Set(data.projects.filter(p=>p.owner===owner).map(p=>p.id));data.projects=data.projects.filter(p=>p.owner!==owner);data.revisions=data.revisions.filter(r=>!ids.has(r.projectId));data.drafts=data.drafts.filter(d=>!ids.has(d.projectId));data.attempts=data.attempts.filter(a=>!ids.has(a.projectId));return true;});}
+  remove(id:string,owner:string):void {this.write(data=>{this.entry(data,id,owner);data.projects=data.projects.filter(p=>p.id!==id);data.revisions=data.revisions.filter(r=>r.projectId!==id);data.drafts=data.drafts.filter(d=>d.projectId!==id);data.attempts=data.attempts.filter(a=>a.projectId!==id);if(data.rewardOutbox&&!data.projects.some(p=>p.owner===owner))data.rewardOutbox=data.rewardOutbox.filter(fact=>fact.owner!==owner);return true;});}
+  removeOwner(owner:string):void {this.write(data=>{this.scope(owner);const ids=new Set(data.projects.filter(p=>p.owner===owner).map(p=>p.id));data.projects=data.projects.filter(p=>p.owner!==owner);data.revisions=data.revisions.filter(r=>!ids.has(r.projectId));data.drafts=data.drafts.filter(d=>!ids.has(d.projectId));data.attempts=data.attempts.filter(a=>!ids.has(a.projectId));if(data.rewardOutbox)data.rewardOutbox=data.rewardOutbox.filter(fact=>fact.owner!==owner);return true;});}
+  pendingRewards(owner:string):RewardFact[] {this.scope(owner);return (this.read().rewardOutbox??[]).filter(fact=>fact.owner===owner);}
+  acknowledgeRewards(owner:string,factIds:string[]):void {
+    this.scope(owner);if(!Array.isArray(factIds)||!factIds.every(id=>typeof id==='string'))throw Error('Invalid reward acknowledgment.');
+    const ids=new Set(factIds);this.write(data=>{this.scope(owner);data.rewardOutbox=(data.rewardOutbox??[]).filter(fact=>fact.owner!==owner||!ids.has(rewardFactId(fact)));return true;});
+  }
   /** Parent backup restore is explicit and all-or-nothing for this independent key. */
-  restore(value:unknown):void {this.persist(validateCreationWorkspace(value));}
+  restore(value:unknown):void {assertRewardSourceWritable();this.persist(validateCreationWorkspace(value));}
   /** Only used from the existing explicit profile/family reset flow. Corrupt originals stay recoverable. */
   reset():void {this.read();this.persist(fresh());}
 }

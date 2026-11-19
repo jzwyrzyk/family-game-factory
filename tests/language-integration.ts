@@ -42,7 +42,8 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
       window.FG.math.record(p,q,true,false,Date.now(),1);
       window.FG.store.save();
     });
-    await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+    await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
+    await page.locator('[data-parent-tab="settings"]').click();
     // Parent reports may legitimately initialize the empty legacy math-v2 record.
     // Compare after initial parent view, before any subject edit, to test actual preservation.
     const oldMath=await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null));
@@ -64,7 +65,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     await page.screenshot({path:'test-results/language-parent-'+name+'.png',fullPage:true});
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
-    await page.getByRole('button',{name:'⚡ My Powers',exact:true}).click();
+    await page.getByRole('button',{name:'My Powers',exact:true}).click();
     await active(page).waitFor({state:'visible'});
     const item=await page.evaluate(()=>window.FG.learning.activeItem);
     assert.equal(item.source,'reviewed-local');
@@ -73,7 +74,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await active(page).locator('.language-passage').isVisible(),true);
     await answer(page);
     assert.equal((await saved(page)).language.totals.presentations,1);
-    await page.getByRole('button',{name:'🎮 Play',exact:true}).click();
+    await page.getByRole('button',{name:'Play',exact:true}).click();
     assert.equal((await saved(page)).language.attempts[0].context.gameId,'language-lab');
     await page.clock.install();
     await page.evaluate(()=>{
@@ -140,7 +141,8 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(exited.answers.length,0);
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),true,
       'An unanswered exit cannot consume a ten-minute checkpoint and create a learning-free game');
-    await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+    await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
+    await page.locator('[data-parent-tab="settings"]').click();
     await page.selectOption('#parentSubject','math');
     await page.click('#saveParent');
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
@@ -155,7 +157,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
     // This production regression exercises the explicit ?arcade=1 legacy rollback.
     // Studio's homepage toggle is covered separately by homepage-entry.cjs.
-    await page.getByRole('button',{name:'⚡ My Powers',exact:true}).click();
+    await page.getByRole('button',{name:'My Powers',exact:true}).click();
     assert.equal(await page.evaluate(()=>window.FG.learning.active),false);
     await page.click('#labSubjectLanguage');
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
@@ -163,7 +165,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
     assert.equal((await saved(page)).allowSubjectSwitch,true);
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language','selection survives refresh');
-    await page.getByRole('button',{name:'⚡ My Powers',exact:true}).click();
+    await page.getByRole('button',{name:'My Powers',exact:true}).click();
     assert.equal(await page.evaluate(()=>window.FG.learning.active),false,'Both allows choice before beginning a question');
     assert.equal(await page.locator('#labSubjectLanguage').getAttribute('aria-pressed'),'true');
     await page.click('#lab-next');

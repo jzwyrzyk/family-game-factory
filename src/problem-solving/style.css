@@ -3,9 +3,11 @@
 #page-problem-solving button{font:inherit;cursor:pointer;touch-action:manipulation}
 #page-problem-solving button:focus-visible,#page-problem-solving h2:focus-visible{outline:3px solid #195fd0;outline-offset:4px}
 #page-problem-solving button:disabled{cursor:default;opacity:.6}
-/* The approved Journey shell has five entries; this feature adds a sixth. */
-@media(max-width:1100px){body.studio-review .site-header.studio-practice-navigation{flex-wrap:wrap}body.studio-review .studio-practice-navigation .studio-header-tools{margin-left:auto;order:1}body.studio-review .studio-practice-navigation .studio-nav-has-practice{order:2;flex-basis:100%;justify-content:center}}
-@media(max-width:650px){body.studio-review .site-header .studio-nav.studio-nav-has-practice{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* Seven destinations share a full navigation row, with two rows on phones. */
+body.studio-review .site-header.studio-practice-navigation{flex-wrap:wrap}
+body.studio-review .studio-practice-navigation .studio-header-tools{margin-left:auto;order:1}
+body.studio-review .studio-practice-navigation .studio-nav-has-practice{order:2;flex-basis:100%;justify-content:center}
+@media(max-width:760px){body.studio-review .site-header .studio-nav.studio-nav-has-practice{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .ps-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;margin:10px 0 16px}
 .ps-eyebrow{font-size:11px;letter-spacing:1.3px;color:#69547e;font-weight:800;display:block;line-height:1.5}
 .ps-heading h1{font-family:var(--jems-round,inherit);font-size:clamp(30px,4vw,44px);letter-spacing:-1.4px;line-height:1.12;margin:9px 0 10px;color:var(--ps-ink)}

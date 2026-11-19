@@ -1,6 +1,7 @@
 import { adultStorageKey, profileStorage } from '../adult-pilot/storage';
 import { PROBLEM_SOLVING_EPISODE_SCHEMA, PROBLEM_SOLVING_KEY, type ProblemSolvingDraft, type ProblemSolvingEpisode, type EvidenceSupport } from './model';
 import { ProblemSolvingStore } from './storage';
+import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import { assertPracticeContinuation, evaluatePracticeChoice, getPracticeTask, practiceTasksForGrade, runPracticeScene, runPracticeTest, runPracticeRevision, validatePracticeDraft, type PracticeChoice, type PracticePhase, type PracticeScene, type PracticeTask, type PracticeTrial } from './practice';
 import './style.css';
 
@@ -9,7 +10,7 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', tex
   const el = document.createElement(tag); el.className = className; el.textContent = text; return el;
 };
 const image = (src: string, className = '') => { const img = node('img', className); img.src = src; img.alt = ''; return img; };
-const button = (label: string, className = 'ps-button') => { const b = node('button', className, label); b.type = 'button'; return b; };
+const button = (label: string, className = 'ps-button', icon?: IconName, iconClass = '') => { const b = node('button', className, label); b.type = 'button'; if (icon) setIconLabel(b, icon, label, iconClass); return b; };
 const iso = () => new Date().toISOString();
 const uid = () => crypto.randomUUID();
 const clone = <T>(value: T): T => structuredClone(value);
@@ -19,7 +20,7 @@ export function installProblemSolvingPractice(host: Host) {
   const owner = () => String(FG.store.current().id);
   const store = () => new ProblemSolvingStore(profileStorage(localStorage), owner);
   const page = node('section', 'page hidden'); page.id = 'page-problem-solving';
-  page.innerHTML = `<header class="ps-heading"><div><span class="ps-eyebrow">THE jems IDEA WORKSHOP</span><h1 id="psHeading" tabindex="-1">Try an idea.</h1><p id="psSubtitle">Wonder a little. Try something. See what changes.</p></div><button type="button" class="ps-button ps-home" id="psHome">← My Games</button></header><div id="psStatus" class="ps-status" role="status" aria-live="polite"></div><div id="psBody"></div>`;
+  page.innerHTML = `<header class="ps-heading"><div><span class="ps-eyebrow">THE jems IDEA WORKSHOP</span><h1 id="psHeading" tabindex="-1">Try an idea.</h1><p id="psSubtitle">Wonder a little. Try something. See what changes.</p></div><button type="button" class="ps-button ps-home" id="psHome">${iconMarkup('arrow', 'jems-icon--back')} My Games</button></header><div id="psStatus" class="ps-status" role="status" aria-live="polite"></div><div id="psBody"></div>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   let active: ProblemSolvingDraft | null = null, visible = false, activeOwner = '', revisionRetry = false;
@@ -108,7 +109,8 @@ export function installProblemSolvingPractice(host: Host) {
     for (const task of practiceTasksForGrade(Number(FG.store.current().grade) || 1)) {
       const draft = store().draft(owner(), task.id), card = button('', 'ps-card'); card.dataset.psTask = task.id;
       card.append(image(task.thumbnail, 'ps-card-art'));
-      const copy = node('span', 'ps-card-copy'); copy.append(node('strong', '', task.title), node('span', '', task.invitation), node('b', '', draft ? 'Continue my idea →' : 'Let’s try →'));
+      const copy = node('span', 'ps-card-copy'), action = node('b', '', draft ? 'Continue my idea ' : 'Let’s try '); action.append(createIcon('arrow'));
+      copy.append(node('strong', '', task.title), node('span', '', task.invitation), action);
       card.append(copy); card.onclick = () => act(() => start(task)); cards.append(card);
     }
     body.append(cards, node('p', 'ps-saved-note', 'Your experiments save on this device. Leave whenever you like and come back to your idea.'));
@@ -116,10 +118,11 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function makeChoice(choice: PracticeChoice, phase: PracticePhase) {
     const b = button('', 'ps-choice'); b.dataset.psChoice = choice.id;
-    const icon = node('span', 'ps-choice-icon', choice.icon || '→'); icon.setAttribute('aria-hidden', 'true');
+    const icon = node('span', 'ps-choice-icon', choice.icon || ''); if (!choice.icon) icon.append(createIcon('arrow')); icon.setAttribute('aria-hidden', 'true');
     const copy = node('span', 'ps-choice-copy'); copy.append(node('strong', '', choice.label));
     if (choice.detail) copy.append(node('small', '', choice.detail));
-    b.append(icon, copy, node('span', 'ps-choice-arrow', '→')); b.onclick = () => act(() => choose(phase, choice.id)); return b;
+    const arrow = node('span', 'ps-choice-arrow'); arrow.append(createIcon('arrow'));
+    b.append(icon, copy, arrow); b.onclick = () => act(() => choose(phase, choice.id)); return b;
   }
   function renderScene(scene: PracticeScene, trial?: PracticeTrial) {
     const stage = node('figure', 'ps-stage ps-stage-' + scene.kind); stage.setAttribute('role', 'img');
@@ -177,7 +180,7 @@ export function installProblemSolvingPractice(host: Host) {
     speech = utterance; window.speechSynthesis.speak(utterance);
   }
   function toolsFor(phase: PracticePhase, copy: string) {
-    const tools = node('div', 'ps-support'), hint = button('A little hint', 'ps-text-button'), hear = button('Hear this', 'ps-text-button');
+    const tools = node('div', 'ps-support'), hint = button('A little hint', 'ps-text-button', 'help'), hear = button('Hear this', 'ps-text-button', 'volume');
     hint.id = 'psHint'; hear.id = 'psHear';
     const hintText = node('p', 'ps-hint'); hintText.id = 'psHintText'; hintText.hidden = true;
     hint.onclick = () => act(() => { assertCurrent(); addSupport('hint', phase); hintText.hidden = false; hintText.textContent = taskNow().hints[phase]; });
@@ -189,7 +192,7 @@ export function installProblemSolvingPractice(host: Host) {
     const task = taskNow(), phase = phaseNow(); page.dataset.phase = phase;
     $('psHeading').textContent = task.title; $('psSubtitle').textContent = task.goal; status('');
     const body = $('psBody'); body.replaceChildren();
-    const top = node('div', 'ps-work-top'), back = button('← My ideas', 'ps-text-button'); back.id = 'psBack';
+    const top = node('div', 'ps-work-top'), back = button('My ideas', 'ps-text-button', 'arrow', 'jems-icon--back'); back.id = 'psBack';
     back.onclick = () => act(() => { assertCurrent(); renderShelf(); });
     const path = node('ol', 'ps-progress'); path.setAttribute('aria-label', 'Your experiment');
     const current = phase === 'predict' ? 0 : phase === 'test' || phase === 'result' ? 1 : phase === 'interpret' ? 2 : 3;
@@ -207,14 +210,14 @@ export function installProblemSolvingPractice(host: Host) {
     if (phase === 'result') {
       heading.textContent = 'Look what happened.'; panel.append(node('span', 'ps-eyebrow', 'YOUR TEST'), heading,
         node('p', 'ps-result-copy', testTrial!.description), node('p', 'ps-quiet-copy', 'A surprise can give you a new idea.'));
-      const next = button('I’ve noticed something →', 'ps-button ps-primary'); next.id = 'psObserve'; next.onclick = () => act(moveToInterpret); panel.append(next);
+      const next = button('I’ve noticed something', 'ps-button ps-primary', 'arrow'); next.id = 'psObserve'; next.onclick = () => act(moveToInterpret); panel.append(next);
     } else if (phase === 'finished') {
       heading.textContent = revisionTrial!.reachedGoal ? 'Your plan worked here.' : 'There’s another idea to try.';
       panel.append(node('span', 'ps-eyebrow', 'YOUR NEXT PLAN'), heading, node('p', 'ps-result-copy', revisionTrial!.description));
       const actions = node('div', 'ps-finish-actions');
-      const done = button('Save my experiment →', 'ps-button ps-primary'); done.id = 'psFinish'; done.onclick = () => act(complete); actions.append(done);
+      const done = button('Save my experiment', 'ps-button ps-primary', 'save'); done.id = 'psFinish'; done.onclick = () => act(complete); actions.append(done);
       const revisions = active.episode.observations.filter(item => item.responseId?.startsWith('revise:')).length;
-      if (revisions < 3) { const again = button('Try a different plan', 'ps-button'); again.id = 'psReviseAgain'; again.onclick = () => act(() => { assertCurrent(); revisionRetry = true; renderActive(true); }); actions.append(again); }
+      if (revisions < 3) { const again = button('Try a different plan', 'ps-button', 'retry'); again.id = 'psReviseAgain'; again.onclick = () => act(() => { assertCurrent(); revisionRetry = true; renderActive(true); }); actions.append(again); }
       panel.append(actions, node('p', 'ps-quiet-copy', 'You tried an idea and saw what happened. Keep exploring whenever you like.'));
     } else {
       const definition = phase === 'predict' ? task.prediction : phase === 'test' ? task.test : phase === 'interpret' ? task.interpretation : task.revision;

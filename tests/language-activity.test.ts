@@ -7,7 +7,8 @@ import {generateLanguageItem} from '../src/language/content';
 import type {LanguageItem} from '../src/language/types';
 
 let browser:Browser,bundle:string;
-const styles=readFileSync('src/language/activity.css','utf8');
+const styles=readFileSync('src/language/activity.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8');
+const iconSprite=readFileSync('public/jems-art/icons/jems-icons.svg','utf8');
 before(async()=>{
   mkdirSync('test-results',{recursive:true});
   const built=await build({entryPoints:['src/language/activity.ts'],bundle:true,format:'iife',globalName:'ELATest',platform:'browser',write:false});
@@ -17,7 +18,13 @@ before(async()=>{
 after(async()=>{await browser?.close();});
 async function mount(item:LanguageItem,viewport:{width:number;height:number}={width:390,height:844},offset=0,hints=false){
   const page=await browser.newPage({viewport,hasTouch:viewport.width<500,reducedMotion:'reduce'});
-  await page.setContent('<style>html{scroll-behavior:smooth}body{margin:0;font-family:system-ui;background:#16374a}*{box-sizing:border-box}'+styles+'</style><header style="height:'+offset+'px"></header><main id="mount"></main>');
+  // The real app supplies its icon sprite from the same origin as the page.
+  await page.route('http://jems.test/**',route=>{
+    const sprite=new URL(route.request().url()).pathname==='/jems-art/icons/jems-icons.svg';
+    return route.fulfill({contentType:sprite?'image/svg+xml':'text/html',body:sprite?iconSprite:
+      '<style>html{scroll-behavior:smooth}body{margin:0;font-family:system-ui;background:#16374a}*{box-sizing:border-box}'+styles+'</style><header style="height:'+offset+'px"></header><main id="mount"></main>'});
+  });
+  await page.goto('http://jems.test/');
   await page.addScriptTag({content:bundle});
   await page.evaluate(({item,hints})=>{
     const w=window as any;w.profile={id:'child',age:9,grade:4,skills:{},learningSubject:'language',hints};
@@ -64,7 +71,7 @@ test('letter tiles allow undo and checked construction',async()=>{
   try{
     assert.equal(item.kind,'word-tiles');
     await page.locator('.language-tile:not([disabled])').first().click();
-    await page.getByRole('button',{name:'↶ Undo last'}).click();
+    await page.getByRole('button',{name:'Undo last'}).click();
     assert.equal(await page.locator('.language-built').textContent(),'Your word will appear here');
     for(const char of item.answer!.split('')){
       const available=page.locator('.language-tile:not([disabled])');

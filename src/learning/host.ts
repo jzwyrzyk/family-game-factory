@@ -1,5 +1,7 @@
 import {mountLanguageActivity} from '../language/activity';
-import {celebrateJem} from '../brand/delight';
+import {stageLearningReward} from '../rewards/integration';
+import {notifyRewardSourceSaved} from '../rewards/service';
+import {assertRewardSourceWritable} from '../rewards/write-guard';
 import {LANGUAGE_SKILLS} from '../language/curriculum';
 import {reportLanguage,selectLanguageItem,ensureLanguage} from '../language/engine';
 import { mountMathActivity } from './activity';
@@ -29,8 +31,6 @@ export function installLearningHost() {
   type BudgetReceipt={profile:LearnerProfile;attemptId:string;at:number;subject:'math'|'language'};
   let activeBudget:BudgetReceipt|null=null;
   const seen=new Set<string>();
-  // In-memory, per-child/per-subject celebration cadence. Never learning evidence.
-  const independentSuccesses=new Map<string,number>();
   function didParticipate(receipt:BudgetReceipt) {
     const state=receipt.subject==='language'?receipt.profile.language:receipt.profile.learning;
     const attempts=(state as any)?.attempts;
@@ -63,19 +63,32 @@ export function installLearningHost() {
     window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));
   }
   function mount(target:HTMLElement, options:any) {
+    assertRewardSourceWritable();
     if(FG.store.loadError)throw Error(FG.store.loadError);
-    dispose();const own=++generation,profile=options.profile||FG.store.current();activeOwner=profile.id||'';
+    dispose();const own=++generation,profile=options.profile||FG.store.current(),subject=subjectFor(profile);activeOwner=profile.id||'';
     window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:true}));
     try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
       onSave:(attempt:Attempt|LanguageAttempt)=>{
-        const saved=FG.store.save();
-        if(!saved){target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}}
-        else if(attempt&&attempt.outcome!=='open'&&profile.id===FG.store.current().id){
-          // Record only a real, newly saved source observation. Correctness remains
-          // subject evidence; it is never promoted to a problem-solving score.
-          if(subjectFor(profile)==='language')publishSourceEvidence({kind:'language',owner:String(profile.id),attempt:attempt as LanguageAttempt});
-          else publishSourceEvidence({kind:'math',owner:String(profile.id),attempt:attempt as Attempt});
+        if(profile.id!==FG.store.current().id)return;
+        assertRewardSourceWritable();
+        const attemptId=attempt?.id||target.querySelector<HTMLElement>('[data-attempt-id]')?.dataset.attemptId||'';
+        let pending=false;
+        try{pending=!!stageLearningReward(profile,subject,attemptId);}catch(error){
+          target.dataset.saveFailed='true';throw error;
+        }
+        if(!FG.store.save()){
+          target.dataset.saveFailed='true';let warning=target.querySelector('.learning-save-warning');
+          if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}
+        }else{
+          delete target.dataset.saveFailed;target.querySelector('.learning-save-warning')?.remove();
+          if(attempt&&attempt.outcome!=='open'){
+            // The attempt and reward outbox are now durable. The optional
+            // observer cannot change subject results or prevent reward delivery.
+            if(subject==='language')publishSourceEvidence({kind:'language',owner:String(profile.id),attempt:attempt as LanguageAttempt});
+            else publishSourceEvidence({kind:'math',owner:String(profile.id),attempt:attempt as Attempt});
+          }
+          if(pending)notifyRewardSourceSaved(String(profile.id));
         }
         options.onSave?.();
       },
@@ -83,12 +96,6 @@ export function installLearningHost() {
         if(own!==generation||activeOwner!==FG.store.current().id)return;
         active=null;activeOwner='';activeBudget=null;
         window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));
-        // First truly completed independent practice, then every fifth. Not every answer.
-        if(result?.outcome==='completed'&&result.independent===true&&!target.dataset.saveFailed){
-          const key=String(profile.id)+':'+subjectFor(profile);
-          const count=(independentSuccesses.get(key)||0)+1;independentSuccesses.set(key,count);
-          if(count===1||count%5===0)celebrateJem('practice','labLearningAdventure');
-        }
         options.onComplete(result);
       },
     });}catch(error){active=null;activeOwner='';generation++;window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:false}));throw error;}

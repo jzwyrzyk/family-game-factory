@@ -1,3 +1,4 @@
+import {createIcon,setIconLabel,type IconName} from '../brand/icons';
 import type { GameContext, GameInstance } from '../runtime/types';
 import { PARTS, PART_LIST, type PartKind } from '../quality/parts';
 import { validateBlueprint, cloneBlueprint, starterBlueprint, addPart, removePart, connectParts, rebindConnections, type Blueprint } from '../quality/blueprint';
@@ -124,7 +125,8 @@ export default class QualityBuilder implements GameInstance {
         this.musicButton.setAttribute('aria-label', 'Toggle music');
         this.effectsButton = this.button('Sound', 'q-chip', () => { void this.audio.unlock(); this.audio.setEffects(!this.audio.settings.effects); this.updateAudio(); });
         this.effectsButton.setAttribute('aria-label', 'Toggle sound effects');
-        this.pauseButton = this.button('Ⅱ', 'q-chip', () => this.togglePause());
+        this.pauseButton = this.button('', 'q-chip', () => this.togglePause());
+        this.pauseButton.append(createIcon('pause'));
         this.pauseButton.setAttribute('aria-label', 'Pause game');
         tools.append(this.musicButton, this.effectsButton, this.pauseButton);
         top.append(heading, tools);
@@ -163,25 +165,25 @@ export default class QualityBuilder implements GameInstance {
         this.piecePicker.setAttribute('role', 'group');
         this.piecePicker.setAttribute('aria-label', 'Choose a part of your machine');
         this.piecePickerLabel.setAttribute('aria-live', 'polite');
-        this.previousPieceButton = this.button('◀ Previous', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(-1); this.canvas.focus({ preventScroll: true }); });
-        this.nextPieceButton = this.button('Next ▶', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(1); this.canvas.focus({ preventScroll: true }); });
+        this.previousPieceButton = this.button('Previous', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(-1); this.canvas.focus({ preventScroll: true }); }, 'arrow', 'jems-icon--back');
+        this.nextPieceButton = this.button('Next', 'q-chip q-piece-step', () => { if (this.hostPaused) return; this.cyclePart(1); this.canvas.focus({ preventScroll: true }); }, 'arrow');
         this.previousPieceButton.setAttribute('aria-label', 'Previous piece');
         this.nextPieceButton.setAttribute('aria-label', 'Next piece');
         this.piecePicker.append(this.previousPieceButton, this.piecePickerLabel, this.nextPieceButton);
         this.piecePicker.hidden = true;
-        this.rotateButton = this.button('↻ Rotate', 'q-button', () => this.rotate());
+        this.rotateButton = this.button('Rotate', 'q-button', () => this.rotate(), 'retry');
         this.rotateButton.setAttribute('aria-label', 'Rotate selected part');
-        this.glueButton = this.button('● Gum', 'q-button', () => this.beginJoin());
+        this.glueButton = this.button('Gum', 'q-button', () => this.beginJoin(), 'add');
         this.glueButton.setAttribute('aria-label', 'Connect selected part with gum');
         this.detachButton = this.button('Unstick', 'q-button', () => this.detach());
         this.detachButton.setAttribute('aria-label', 'Detach selected part');
         this.removeButton = this.button('Remove', 'q-button', () => this.remove());
         this.removeButton.setAttribute('aria-label', 'Remove selected part');
-        this.undoButton = this.button('↶ Undo', 'q-button', () => this.undo());
+        this.undoButton = this.button('Undo', 'q-button', () => this.undo(), 'undo');
         this.editActions.append(this.rotateButton, this.glueButton, this.detachButton, this.removeButton, this.undoButton);
-        this.testButton = this.button('Test machine  ▶', 'q-button q-primary', () => this.test());
+        this.testButton = this.button('Test machine', 'q-button q-primary', () => this.test(), 'play');
         this.testButton.dataset.action = 'test';
-        const boost = this.button('Hold to boost ↑', 'q-button q-orange', () => { });
+        const boost = this.button('Hold to boost', 'q-button q-orange', () => { }, 'arrow', 'jems-icon--up');
         boost.setAttribute('aria-label', 'Hold to boost');
         boost.onpointerdown = e => { if (this.hostPaused || this.clock.paused || this.mode !== 'run')
             return; e.preventDefault(); boost.setPointerCapture(e.pointerId); this.pointerAction = true; void this.audio.unlock(); };
@@ -193,7 +195,7 @@ export default class QualityBuilder implements GameInstance {
         boost.onkeyup = () => { this.pointerAction = false; };
         boost.onblur = () => { this.pointerAction = false; };
         const back = this.button('Change my machine', 'q-button', () => this.edit());
-        const retry = this.button('↻ Try again', 'q-button', () => this.test());
+        const retry = this.button('Try again', 'q-button', () => this.test(), 'retry');
         this.runActions.append(back, retry, boost);
         this.runActions.hidden = true;
         toolbar.append(this.editActions, this.runActions, this.testButton);
@@ -233,7 +235,7 @@ export default class QualityBuilder implements GameInstance {
         this.refresh();
         this.message(this.lastMessage);
     }
-    private button(text: string, classes: string, action: () => void) { const b = el('button', classes, text); b.type = 'button'; b.onclick = action; return b; }
+    private button(text: string, classes: string, action: () => void, icon?: IconName, iconClass='') { const b = el('button', classes, text); b.type = 'button'; if(icon)setIconLabel(b,icon,text,iconClass); b.onclick = action; return b; }
     private load(value: unknown) {
         const s = value as Save;
         if (!s || s.schema !== 'quality-construction-v1' || !missionValues().some(m => m.id === s.mission))
@@ -298,7 +300,7 @@ export default class QualityBuilder implements GameInstance {
         for (const b of [this.rotateButton, this.glueButton, this.detachButton, this.removeButton])
             b.disabled = !this.selected || !building || this.storageBlocked;
         this.glueButton.setAttribute('aria-pressed', String(this.joining));
-        this.glueButton.textContent = this.joining ? 'Tap another part…' : '● Gum';
+        setIconLabel(this.glueButton,'add',this.joining ? 'Tap another part…' : 'Gum');
         this.undoButton.disabled = !this.history.length || !building || this.storageBlocked;
         this.testButton.disabled = !this.blueprint.parts.length || this.storageBlocked;
         const selectable = this.blueprint.parts.filter(p => !this.joining || p.id !== this.selected);
@@ -315,7 +317,7 @@ export default class QualityBuilder implements GameInstance {
         this.canvas.dataset.partCount = String(this.blueprint.parts.length);
         this.clock?.invalidate();
     }
-    private updateAudio() { this.musicButton.setAttribute('aria-pressed', String(this.audio.settings.music)); this.effectsButton.setAttribute('aria-pressed', String(this.audio.settings.effects)); this.musicButton.textContent = this.audio.settings.music ? '♫' : '♫ off'; this.effectsButton.textContent = this.audio.settings.effects ? '◖))' : '◖ off'; }
+    private updateAudio() { this.musicButton.setAttribute('aria-pressed', String(this.audio.settings.music)); this.effectsButton.setAttribute('aria-pressed', String(this.audio.settings.effects)); setIconLabel(this.musicButton,'music',this.audio.settings.music ? 'Music' : 'Music off'); setIconLabel(this.effectsButton,'volume',this.audio.settings.effects ? 'Sound' : 'Sound off'); }
     private resize() {
         const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
         const normalHeight = w < 600 ? Math.max(260, w * .69) : Math.min(610, w * .54);
@@ -551,7 +553,7 @@ export default class QualityBuilder implements GameInstance {
         this.action = this.pointerAction = false;
         this.manualPause = false;
         this.clock?.resume('user');
-        this.pauseButton.textContent = 'Ⅱ';
+        this.pauseButton.replaceChildren(createIcon('pause'));
         this.pauseButton.setAttribute('aria-label', 'Pause game');
         this.result.hidden = true;
         this.particles = [];
@@ -565,7 +567,7 @@ export default class QualityBuilder implements GameInstance {
         this.message(this.friendlyError(e));
         this.refresh();
     } }
-    private edit() { if (this.hostPaused) return; this.hostFinished = false; this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); this.canvas.focus({ preventScroll: true }); }
+    private edit() { if (this.hostPaused) return; this.hostFinished = false; this.cancelDrag(); this.simulation?.dispose(); this.simulation = undefined; this.scene = this.previous = undefined; this.mode = 'build'; this.action = this.pointerAction = false; this.result.hidden = true; this.particles = []; this.audio.setMotor(0); this.audio.setScene('build'); this.manualPause = false; this.clock?.resume('user'); this.pauseButton.replaceChildren(createIcon('pause')); this.pauseButton.setAttribute('aria-label', 'Pause game'); this.refresh(); this.message('Your original machine is ready to change.'); this.canvas.focus({ preventScroll: true }); }
     private update(dt: number) {
         if (this.mode === 'run' && this.simulation) {
             this.previous = this.scene;
@@ -613,12 +615,13 @@ export default class QualityBuilder implements GameInstance {
         this.audio.setScene(won ? 'win' : 'build');
         this.audio.play(won ? 'win' : 'fail');
         this.message(reason || 'What would you like to try next?');
-        this.result.replaceChildren(el('div', 'q-result-icon', won ? '✦' : '↻'), el('h3', '', won ? 'Your idea worked!' : 'Another idea to try?'), el('p', '', reason || 'Change a part, move a connection, or give it another go.'));
+        const resultIcon=el('div','q-result-icon');resultIcon.append(createIcon(won?'check':'retry'));
+        this.result.replaceChildren(resultIcon, el('h3', '', won ? 'Your idea worked!' : 'Another idea to try?'), el('p', '', reason || 'Change a part, move a connection, or give it another go.'));
         const actions = el('div', 'q-result-actions');
         actions.append(this.button('Change my machine', 'q-button q-primary', () => this.edit()), this.button('Try again', 'q-button', () => this.test()));
         if (won && this.mission !== 'free')
-            actions.append(this.button('Finish challenge →', 'q-button q-orange', () => { if (this.hostFinished)
-                return; this.hostFinished = true; this.pause(); this.context.finish({ won: true, level: Math.max(1, missionValues().filter(m => m.id !== 'free').findIndex(m => m.id === this.mission) + 1), title: 'Your machine made it!', description: reason }); }));
+            actions.append(this.button('Finish challenge', 'q-button q-orange', () => { if (this.hostFinished)
+                return; this.hostFinished = true; this.pause(); this.context.finish({ won: true, level: Math.max(1, missionValues().filter(m => m.id !== 'free').findIndex(m => m.id === this.mission) + 1), title: 'Your machine made it!', description: reason }); }, 'arrow'));
         this.result.append(actions);
         this.result.hidden = false;
         this.refresh();
@@ -762,7 +765,7 @@ export default class QualityBuilder implements GameInstance {
         if (this.hostPaused) return;
         this.manualPause = !this.manualPause;
         if (this.manualPause) this.clock.pause('user'); else this.clock.resume('user');
-        this.pauseButton.textContent = this.manualPause ? '▶' : 'Ⅱ';
+        this.pauseButton.replaceChildren(createIcon(this.manualPause ? 'play' : 'pause'));
         this.pauseButton.setAttribute('aria-label', this.manualPause ? 'Resume game' : 'Pause game');
     }
     isPlaying() { return !this.disposed && !this.hostFinished && !this.hostPaused && !this.clock.paused && this.mode !== 'result'; }

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test, afterEach } from 'node:test';
 import { profileStorage, setAdultWorkspace } from '../src/adult-pilot/storage';
 import { ProblemSolvingStore } from '../src/problem-solving/storage';
+import { setRewardSourceMaintenance } from '../src/rewards/write-guard';
 import {
   PROBLEM_SOLVING_EPISODE_SCHEMA, PROBLEM_SOLVING_KEY, PROBLEM_SOLVING_LIMITS,
   copyEvidence, emptyProblemSolvingWorkspace, validateProblemSolvingWorkspace,
@@ -27,7 +28,22 @@ function episode(id = 'one', owner = 'child-one'): ProblemSolvingEpisode {
     startedAt: start, completedAt: '2026-11-19T12:01:00.000Z', observations: [observation()]};
 }
 function draft(id = 'one', owner = 'child-one') { const input = episode(id, owner); delete input.completedAt; return {episode: input, stepIndex: 1}; }
-afterEach(() => setAdultWorkspace(null));
+afterEach(() => { setAdultWorkspace(null); setRewardSourceMaintenance(false); });
+
+test('coordinated backup maintenance blocks evidence writes and stale recovery without changing saved records', () => {
+  const storage = new MemoryStorage(), store = new ProblemSolvingStore(storage);
+  store.record(episode('saved')); store.saveDraft(draft('pending')); const before = store.rawSnapshot();
+  setRewardSourceMaintenance(true);
+  for (const write of [() => store.record(episode('late')), () => store.saveDraft(draft('later')),
+    () => store.record(episode('pending')), () => store.discardDraft('child-one', 'pending'),
+    () => store.removeOwner('child-one'), () => store.removeSource('child-one', 'studio', 'session-one'),
+    () => store.restore(emptyProblemSolvingWorkspace()), () => store.reset(), () => store.restoreRawSnapshot(before)]) {
+    assert.throws(write, /restoring saved progress/); assert.equal(storage.getItem(PROBLEM_SOLVING_KEY), before);
+  }
+  assert.equal(store.list('child-one').length, 1); assert.ok(store.draft('child-one'));
+  setRewardSourceMaintenance(false); store.record(episode('pending'));
+  assert.equal(store.list('child-one').length, 2); assert.equal(store.draft('child-one'), null);
+});
 
 test('an unchanged recheck is idempotent, while conflicting replacement cannot erase first evidence', () => {
   const storage = new MemoryStorage(), store = new ProblemSolvingStore(storage), first = episode();

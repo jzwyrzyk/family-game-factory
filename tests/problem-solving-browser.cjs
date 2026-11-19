@@ -23,13 +23,14 @@ const KEY='family-game-factory-problem-solving-v1';
    const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,device+': no page overflow');
    const onlyPage=async id=>assert.deepEqual(await page.locator('main > .page:visible').evaluateAll(nodes=>nodes.map(node=>node.id)),[id],device+': one active destination');
    const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));};
-   const parent=()=>activate(page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}));
+   const parent=()=>activate(page.getByRole('button',{name:'Grown-ups',exact:true}));
    const fault=()=>page.evaluate(()=>{window.psSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k.endsWith('family-game-factory-problem-solving-v1'))throw new DOMException('Fixture quota','QuotaExceededError');return window.psSetItem.call(this,k,v);};});
    const unfault=()=>page.evaluate(()=>{Storage.prototype.setItem=window.psSetItem;delete window.psSetItem;});
    try{
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?problem-solving=1`);
     await page.waitForSelector('#page-problem-solving:not(.hidden)');
     assert.equal(await page.locator('[data-ps-task]').count(),3);await overflow();
+    const rewardsBefore=await page.evaluate(async()=>(await FG.rewards.summary()).lifetimeGems);
     // Journey and practice share the approved shell without retaining a hidden
     // native modal or awarding cosmetic progress for navigation.
     const notebookBefore=await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()));
@@ -39,6 +40,9 @@ const KEY='family-game-factory-problem-solving-v1';
     // API to verify that an external destination request closes that top layer.
     await page.evaluate(()=>FG.problemSolving.open());await onlyPage('page-problem-solving');
     assert.equal(await page.locator('#jemsCharacterDialog').evaluate(dialog=>dialog.open),false);
+    assert.equal(await page.locator('#studioNavProblemSolving').getAttribute('aria-current'),'page');
+    await activate('#studioNavRewards');await onlyPage('page-jems-rewards');
+    assert.equal(await page.locator('#studioNavRewards').getAttribute('aria-current'),'page');
     await activate('#studioNavJourney');await onlyPage('page-jems-journey');
     await activate('#studioNavScenes');await onlyPage('page-creation');
     await activate('#studioNavProblemSolving');await onlyPage('page-problem-solving');
@@ -47,7 +51,7 @@ const KEY='family-game-factory-problem-solving-v1';
     if(device==='touch'){
       await page.setViewportSize({width:320,height:740});await overflow();
       const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
-      assert.equal(buttons.length,6);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'six destinations use two mobile rows');
+      assert.equal(buttons.length,7);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'seven destinations use two mobile rows');
       assert.ok(buttons.every(button=>button.width>=44&&button.height>=44&&button.x>=0&&button.x+button.width<=320),'mobile navigation keeps complete touch targets');
       await page.screenshot({path:'test-results/problem-solving-navigation-320.png',fullPage:true});
       await page.setViewportSize(viewport);await overflow();
@@ -59,6 +63,8 @@ const KEY='family-game-factory-problem-solving-v1';
     assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),beforeFault);await unfault();
     // An incorrect guess is retained as context, without denying later reasoning opportunities.
     await activate('[data-ps-choice="at-gem"]');assert.equal(await phase(),'test');
+    await activate('#studioNavRewards');await onlyPage('page-jems-rewards');
+    await activate('#studioNavProblemSolving');await activate('[data-ps-task="robot-stop-g1-2"]');assert.equal(await phase(),'test','Rewards navigation preserves the saved experiment');
     await page.reload();await page.waitForSelector('[data-ps-task="robot-stop-g1-2"]');
     assert.match(await page.locator('[data-ps-task="robot-stop-g1-2"]').textContent(),/Continue/);
     await activate('[data-ps-task="robot-stop-g1-2"]');assert.equal(await phase(),'test');
@@ -80,16 +86,28 @@ const KEY='family-game-factory-problem-solving-v1';
     assert.equal(first.task.exposure,'first-seen');
     await activate('[data-ps-task="robot-stop-g1-2"]');await activate('[data-ps-choice="past-gem"]');await activate('#psHint');await activate('[data-ps-choice="smaller-steps"]');await activate('#psObserve');await activate('[data-ps-choice="at-gem"]');await activate('[data-ps-choice="small-steps"]');await activate('#psFinish');
     assert.equal((await saved())[1].task.exposure,'repeat');
-    await parent();await page.waitForSelector('#problemSolvingParentProgress');
-    assert.match(await page.locator('#problemSolvingParentProgress').textContent(),/Not sampled by a completed activity/);
-    assert.match(await page.locator('#problemSolvingParentProgress').textContent(),/not a standardized score/);
+    assert.equal(await page.evaluate(async()=>(await FG.rewards.refresh()).lifetimeGems),rewardsBefore,'formative observations do not silently create a new reward policy');
+    await parent();await page.waitForSelector('#parentDashboard');
+    await activate('#parentTab-skills');await page.getByRole('combobox',{name:'Filter skills by learning area',exact:true}).selectOption('problem-solving');
+    await page.getByRole('combobox',{name:'Filter skills by evidence',exact:true}).selectOption('all');
+    assert.equal(await page.locator('#parentPanel-skills [data-parent-skill]').count(),6,'the native report keeps all six problem-solving dimensions');
+    for(const skill of ['define_problem','compare_options','transfer'])assert.match(await page.locator(`[data-parent-skill="${skill}"]`).textContent(),/Not observed in this period/,'an unsampled dimension is not a failure');
+    assert.match(await page.locator('#parentPanel-skills').textContent(),/not aptitude or mastery scores/);
+    await activate('#parentTab-evidence');await page.getByRole('combobox',{name:'Filter evidence by learning area',exact:true}).selectOption('problem-solving');
+    assert.match(await page.locator('#problemSolvingEvidenceNote').textContent(),/not standardized scores/);
+    assert.equal(await page.locator('#parentPanel-evidence .pd-evidence').count(),6,'the journal retains the first scored decision per skill and episode');
+    const firstRevision=page.locator(`[data-evidence-id="problem-solving:${first.id}:revise"]`);
+    await activate(firstRevision.locator('summary'));assert.match(await firstRevision.innerText(),/Another approach to explore/);
+    const provenance=await firstRevision.locator('.pd-provenance').evaluate(list=>Object.fromEntries([...list.querySelectorAll('dt')].map(label=>[label.textContent,label.nextElementSibling.textContent])));
+    assert.equal(provenance.Authorship,'learner');assert.equal(provenance['Help type'],'none-observed','later hinted revision does not rewrite the earlier observation');
+    assert.match(await page.locator('#parentPanel-evidence').textContent(),/Strategy help recorded/);
     await overflow();await page.screenshot({path:`test-results/problem-solving-parent-${device}.png`,fullPage:true});
 
     // Existing learning controls still own their source score, and the new route cannot skip an open question.
     await activate('#studioNavPowers');if(await page.locator('#lab-next').isVisible())await activate('#lab-next');
     await page.waitForSelector('.math-activity');assert.equal(await page.evaluate(()=>FG.learning.active),true);
     const attemptId=await page.evaluate(()=>FG.learning.activeAttemptId);
-    for(const destination of ['#studioNavJourney','#studioNavProblemSolving','#studioNavScenes','#studioNavCreate','#studioNavPowers']){
+    for(const destination of ['#studioNavJourney','#studioNavRewards','#jemsRewardsWidget','#studioNavProblemSolving','#studioNavScenes','#studioNavCreate','#studioNavPowers']){
       await activate(destination);await onlyPage('page-lab');
       assert.equal(await page.evaluate(()=>FG.learning.active),true,destination+': keeps the active learning activity');
       assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attemptId,destination+': preserves the same answer opportunity');
@@ -115,17 +133,24 @@ const KEY='family-game-factory-problem-solving-v1';
     await activate('#creationCheck');assert.equal((await saved()).filter(e=>e.source==='creation').length,1);
 
     // Existing family backup includes the evidence key and restores it transactionally.
-    await parent();const downloadWait=page.waitForEvent('download');await activate('#exportData');const download=await downloadWait,backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));
+    await parent();await activate('#parentTab-settings');const downloadWait=page.waitForEvent('download');await activate('#exportData');const download=await downloadWait,backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));
     assert.equal(backup.factoryProblemSolving.schema,'jems.problem-solving.workspace.v1');
+    assert.equal(backup.factoryRewards.schema,'jems.rewards.backup.v1','one family backup preserves both observations and shared rewards');
+    const backedUpGems=await page.evaluate(async()=>(await FG.rewards.summary()).lifetimeGems);
     const beforeRestore=await page.evaluate(key=>localStorage.getItem(key),KEY);
     const corrupt={...backup,factoryProblemSolving:{schema:'future'}};
     await page.locator('#importData').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(corrupt))});
     await page.waitForFunction(()=>!document.getElementById('importData').value);assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),beforeRestore);
     await activate('#clearProblemSolving');assert.equal((await saved()).length,0);
+    assert.equal(await page.evaluate(async()=>(await FG.rewards.summary()).lifetimeGems),backedUpGems,'clearing observations does not erase engagement rewards');
     const navigation=page.waitForNavigation();await page.locator('#importData').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});await navigation;
     await page.waitForFunction(()=>FG.problemSolvingEvidence&&FG.studio);assert.equal((await saved()).length,backup.factoryProblemSolving.episodes.length);
+    assert.equal(await page.evaluate(async()=>(await FG.rewards.summary()).lifetimeGems),backedUpGems);
     assert.equal(await page.evaluate(()=>Object.hasOwn(FG.store.data,'factoryProblemSolving')),false,'no duplicated ledger in profile blob');
-    await pick(1);await parent();assert.equal((await saved()).length,0);assert.doesNotMatch(await page.locator('#problemSolvingParentProgress').textContent(),/Earliest retained activity/);
+    await pick(1);await parent();assert.equal((await saved()).length,0);
+    await activate('#parentTab-evidence');await page.getByRole('combobox',{name:'Filter evidence by learning area',exact:true}).selectOption('problem-solving');
+    assert.equal(await page.locator('#parentPanel-evidence .pd-evidence').count(),0,'the native journal never shows another learner’s observations');
+    assert.match(await page.locator('#parentPanel-evidence').textContent(),/No examples in this view yet/);
     assert.deepEqual(errors,[]);assert.deepEqual(paid,[]);results.push({device,status:'passed',episodes:backup.factoryProblemSolving.episodes.length});
    }finally{await context.close();}
   }

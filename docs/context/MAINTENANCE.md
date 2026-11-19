@@ -52,7 +52,7 @@ An **updated** review for an impacted area must have an applicable document chan
 
 [Documentation workflow](../../.github/workflows/documentation.yml) runs on pull requests, pushes to main, a weekly schedule and manual dispatch. It checks canonical file/link integrity, source coverage, content fingerprints and review records. It warns when an area has not been reviewed within its declared interval; routine age warnings do not block unrelated development. Content mismatches or invalid required records fail the check.
 
-The workflow uses a read-only token, does not execute a deployment, call a model, auto-refresh review records or write new claims to main. Its report explains what needs attention. It does not prove that prose is correct, that an external service is healthy, or that an accepted idea was implemented faithfully.
+The workflow uses a read-only token, does not execute a deployment, call a model, auto-refresh review records or write new claims to main. It prints deterministic source digests as diagnostics; printing a digest does not record or approve a semantic review. Its report explains what needs attention. It does not prove that prose is correct, that an external service is healthy, or that an accepted idea was implemented faithfully.
 
 A check that runs is distinct from a repository rule requiring it before merge. Branch protection/rulesets were not changed by this PR. The current branch-protection observation is not a guarantee about future settings. Reviewers should treat failed documentation checks as unresolved work; repository administrators can make the named check required through their normal rules process.
 

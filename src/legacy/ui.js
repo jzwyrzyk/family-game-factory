@@ -1,4 +1,5 @@
 /* UI orchestration: game/learning engines remain independent. */
+import {createIcon,iconMarkup,setIconLabel} from '../brand/icons';
 (function(){
 'use strict';
 const FG=window.FG;
@@ -26,7 +27,7 @@ function safeCheckpoint(kind){
   if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;
   const overlay=overlayHtml('<div id="native-learning-activity" class="modal-card"></div>');
   try{if(!FG.learning.checkpoint(overlay.firstElementChild,{...learningContext,opportunity:'mid-play'},complete,{roundId:token,legacyIds:true,onLeave:()=>page('home')}))complete();}
-  catch{const box=overlay.firstElementChild;box.replaceChildren();const title=document.createElement('h2'),copy=document.createElement('p'),retry=document.createElement('button');title.textContent='Your game is paused';copy.textContent='A learning activity could not open. Try again, or leave this game and ask a grown-up for help.';retry.className='btn primary';retry.textContent='Try learning again';retry.onclick=open;box.append(title,copy,retry);retry.focus();}
+  catch{const box=overlay.firstElementChild;box.replaceChildren();const title=document.createElement('h2'),copy=document.createElement('p'),retry=document.createElement('button');title.textContent='Your game is paused';copy.textContent='A learning activity could not open. Try again, or leave this game and ask a grown-up for help.';retry.className='btn primary';setIconLabel(retry,'retry','Try learning again');retry.onclick=open;box.append(title,copy,retry);retry.focus();}
  };
  open();return true;
 }
@@ -55,7 +56,7 @@ function finish(game,result){
  if(!asked)showResult(result,true);
 }
 function showResult(result,mathFirstTry){if(!activeGame)return;const p=FG.store.current();const penalty=!!p.punish&&p.learningSubject!=='language'&&!mathFirstTry&&result.won;const won=!!result.won&&!penalty;FG.store.recordGame(activeGameId,won,result.level);let txt=penalty?'Math challenge missed on the first try. Parent challenge mode means repeating this level.':result.description;
- const el=overlayHtml(`<div class="modal-card"><div class="big-icon">${won?'🏆':'💛'}</div><div class="eyebrow">${won?'LEVEL CLEARED':'TRY AGAIN'}</div><h2 id="native-result-title" tabindex="-1">${escapeHtml(penalty?'One more try!':result.title)}</h2><p>${escapeHtml(txt||'')}</p><div class="modal-actions"><button class="btn primary" id="resultNext">${won?'Next level →':'🔁 Retry level'}</button><button class="btn secondary" id="resultHome">🏠 Arcade</button></div></div>`);
+ const el=overlayHtml(`<div class="modal-card"><div class="big-icon" aria-hidden="true">${iconMarkup(won?'check':'star')}</div><div class="eyebrow">${won?'LEVEL CLEARED':'TRY AGAIN'}</div><h2 id="native-result-title" tabindex="-1">${escapeHtml(penalty?'One more try!':result.title)}</h2><p>${escapeHtml(txt||'')}</p><div class="modal-actions"><button class="btn primary" id="resultNext">${iconMarkup(won?'arrow':'retry')} ${won?'Next level':'Retry level'}</button><button class="btn secondary" id="resultHome">${iconMarkup('home')} Arcade</button></div></div>`);
  $('resultNext').addEventListener('click',()=>{dismiss();if(won)activeGame.next();else if(typeof activeGame.retry==='function')activeGame.retry();else activeGame.restart()});$('resultHome').addEventListener('click',()=>page('home'));$('native-result-title').focus();
 }
 function renderLabSubjectPicker(){
@@ -75,7 +76,7 @@ function loadLab(){
  if(FG.store.loadError){$('lab-question').textContent=FG.store.loadError;$('lab-controls').replaceChildren();return}
  if(FG.store.current().allowSubjectSwitch){
    $('lab-question').textContent='Pick your learning adventure, then start practicing.';
-   const button=document.createElement('button');button.id='lab-next';button.className='btn primary';button.textContent='Start practicing →';button.onclick=nextLab;
+   const button=document.createElement('button');button.id='lab-next';button.className='btn primary';setIconLabel(button,'play','Start practicing');button.onclick=nextLab;
    $('lab-controls').replaceChildren(button);return;
  }
  nextLab();
@@ -84,7 +85,7 @@ function renderLabReport(){FG.learning.renderReport($('skill-report'),FG.store.c
 function nextLab(){
  $('lab-controls').replaceChildren();
  FG.learning.mount($('lab-question'),{profile:FG.store.current(),context:{gameId:FG.learning.subject==='language'?'language-lab':'math-lab',projectId:FG.learning.subject==='language'?'language-lab':'math-lab',mode:'both',opportunity:'practice'},mode:'both',legacyIds:false,onSave:renderLabReport,onComplete:()=>{
-   renderLabReport();renderLabSubjectPicker();const b=document.createElement('button');b.id='lab-next';b.className='btn primary';b.textContent='Try another →';b.onclick=nextLab;$('lab-controls').replaceChildren(b);b.focus();
+   renderLabReport();renderLabSubjectPicker();const b=document.createElement('button');b.id='lab-next';b.className='btn primary';setIconLabel(b,'retry','Try another');b.onclick=nextLab;$('lab-controls').replaceChildren(b);b.focus();
  }});renderLabSubjectPicker();
 }
 function renderFeedback(){const box=$('feedbackList');box.replaceChildren();const list=FG.store.data.feedback;
@@ -107,7 +108,8 @@ function populateSkills(){
 }
 function loadParent(){
  const p=FG.store.current();$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
- populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(p);$('parentStats').after($('copyFeedback'));$('copyFeedback').textContent='📋 Copy saved game ideas for a developer';
+ populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(JSON.parse(JSON.stringify(p)));$('parentStats').after($('copyFeedback'));setIconLabel($('copyFeedback'),'book','Copy saved game ideas for a developer');
+ FG.parentDashboard?.refresh();
 }
 function renderParentReports(p){
  const target=$('parentStats');target.replaceChildren();
@@ -135,31 +137,29 @@ function designCard(){return ['My game: '+$('inventIdea').value.trim(),'Players:
 function showWizard(){document.querySelectorAll('[data-step]').forEach(el=>el.hidden=Number(el.dataset.step)!==wizardStep);$('wizardProgress').textContent=`Step ${wizardStep+1} of 3 · ${['Dream','Choose','Save'][wizardStep]}`;$('wizardBack').hidden=wizardStep===0;$('wizardNext').hidden=wizardStep===2;$('wizardSave').hidden=wizardStep!==2;$('ideaPreview').textContent=designCard();const legend=document.querySelector(`[data-step="${wizardStep}"] legend`);legend.tabIndex=-1;legend.focus()}
 function loadRemix(){$('remixDifficulty').value=FG.store.current().remixes?.[$('remixGame').value]||'classic';$('remixStatus').textContent='';describeRemix()}
 function describeRemix(){const descriptions={gum:{gentle:'Stronger gum and gentler gravity help your invention hold together.',classic:'Build, test and change your machine.',stretch:'Stretchier gum makes balance matter more.'},hill:{gentle:'Gentler acceleration and grippy tires.',classic:'Find your rhythm over the hills.',stretch:'More motor power and less tire grip.'},buckets:{gentle:'A star shows the safe bucket. Follow the clue!',classic:'Pick a bucket and see what happens!',stretch:'Four buckets and only one keeps you dry!'},dragon:{gentle:'More time between fireballs and a wider shield.',classic:'The original dragon adventure.',stretch:'More frequent fireballs and a smaller shield.'}};$('remixDescription').textContent=descriptions[$('remixGame').value][$('remixDifficulty').value]}
-function bind(){document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>gameOpen(b.dataset.game)));$('homeBtn').onclick=()=>page('home');$('playFeatured').onclick=()=>gameOpen('gum');$('exitGame').onclick=()=>page('home');$('improveThis').onclick=()=>{if(activeGameId)window.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:activeGameId}}))};$('gameHelp').onclick=()=>alert(FG.games[activeGameId]?.controls||'Use the controls shown in the game');
- if(FG.store.loadError){const notice=document.createElement('section');notice.id='storageRecovery';notice.className='panel learning-save-warning';notice.setAttribute('role','alert');const message=document.createElement('p');message.textContent=FG.store.loadError;const exportButton=document.createElement('button');exportButton.className='btn secondary';exportButton.textContent='Save original progress for recovery';exportButton.onclick=()=>download(FG.store.recoveryRaw,'family-game-factory-recovery.json');notice.append(message,exportButton);document.querySelector('main').prepend(notice);}
+function bind(){
+ // Static page declarations use the same approved sprite as dynamic controls.
+ document.querySelectorAll('[data-brand-icon]').forEach(target=>{
+  const icon=createIcon(target.dataset.brandIcon,target.dataset.brandIconClass||'');
+  if(target.dataset.brandIconPosition==='after')target.append(document.createTextNode(' '),icon);
+  else target.prepend(icon,...(target.childNodes.length?[document.createTextNode(' ')]:[]));
+ });
+ document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>gameOpen(b.dataset.game)));$('homeBtn').onclick=()=>page('home');$('playFeatured').onclick=()=>gameOpen('gum');$('exitGame').onclick=()=>page('home');$('improveThis').onclick=()=>{if(activeGameId)window.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:activeGameId}}))};$('gameHelp').onclick=()=>alert(FG.games[activeGameId]?.controls||'Use the controls shown in the game');
+ if(FG.store.loadError){const notice=document.createElement('section');notice.id='storageRecovery';notice.className='panel learning-save-warning';notice.setAttribute('role','alert');const message=document.createElement('p');message.textContent=FG.store.loadError;const exportButton=document.createElement('button');exportButton.className='btn secondary';setIconLabel(exportButton,'download','Save original progress for recovery');exportButton.onclick=()=>download(FG.store.recoveryRaw,'family-game-factory-recovery.json');notice.append(message,exportButton);document.querySelector('main').prepend(notice);}
  $('labSubjectMath').onclick=()=>selectLabSubject('math');$('labSubjectLanguage').onclick=()=>selectLabSubject('language');
  $('parentGrade').onchange=populateSkills;$('parentSubject').onchange=populateSkills;$('parentRate').oninput=e=>$('parentRateValue').textContent=e.target.value;$('saveParent').onclick=saveParent;
- $('feedbackForm').onsubmit=e=>{e.preventDefault();const worked=FG.store.addFeedback({game:$('feedbackGame').value,type:$('feedbackType').value,idea:$('feedbackText').value});if(!worked)$('feedbackStatus').textContent='Could not save. Keep your idea here and try again.';if(worked){$('feedbackText').value='';$('feedbackStatus').textContent='💡 Saved! Find it in My Creations.'}};
+ $('feedbackForm').onsubmit=e=>{e.preventDefault();const worked=FG.store.addFeedback({game:$('feedbackGame').value,type:$('feedbackType').value,idea:$('feedbackText').value});if(!worked)$('feedbackStatus').textContent='Could not save. Keep your idea here and try again.';if(worked){$('feedbackText').value='';setIconLabel($('feedbackStatus'),'check','Saved! Find it in My Creations.')}};
  $('inventForm').onsubmit=e=>{e.preventDefault();if(wizardStep!==2)return;const worked=FG.store.addFeedback({game:'new',type:'new game design',idea:designCard()});if(worked){$('inventForm').reset();wizardStep=0;showWizard();page('creations')}else $('createStatus').textContent='Your idea could not be saved. Keep it here and try again.'};
  $('wizardNext').onclick=()=>{if(wizardStep===0&&!$('inventIdea').reportValidity())return;wizardStep=Math.min(2,wizardStep+1);showWizard()};$('wizardBack').onclick=()=>{wizardStep=Math.max(0,wizardStep-1);showWizard()};showWizard();
  $('remixGame').onchange=loadRemix;$('remixDifficulty').onchange=describeRemix;
  $('playRemix').onclick=()=>{const p=FG.store.current(),before=p.remixes;p.remixes={...p.remixes,[$('remixGame').value]:$('remixDifficulty').value};if(!FG.store.save()){p.remixes=before;$('remixStatus').textContent='Could not save your remix. Please try again.';return}gameOpen($('remixGame').value)};
  $('copyFeedback').onclick=async()=>{const data=FG.store.data.feedback;if(!data.length){alert('Save an idea first.');return}const txt=FG.bridge.developmentBrief(data);try{await navigator.clipboard.writeText(txt);alert('Copied! Paste into your ChatGPT game development conversation.')}catch(e){window.prompt('Copy these ideas:',txt)}};
- $('exportData').onclick=()=>download(FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:FG.factory?.exportWorkspace(),...FG.problemSolvingEvidence?.backup()},null,2),'family-game-factory-progress.json');
- $('importData').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{
-  if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');
-  if(file.size>20_000_000)throw Error('That backup is too large.');
-  const raw=await file.text(),backup=JSON.parse(raw),evidence=FG.problemSolvingEvidence;
-  if(backup.factoryWorkspace)FG.factory?.validateWorkspace(backup.factoryWorkspace);
-  if(Object.hasOwn(backup,'factoryProblemSolvingRecoveryRaw'))throw Error('This backup preserves damaged problem-solving data for recovery. Restore a compatible backup.');
-  const importedEvidence=evidence?(Object.hasOwn(backup,'factoryProblemSolving')?evidence.validate(backup.factoryProblemSolving):evidence.empty()):null;
-  if(!confirm('Replace the current profiles, learning progress and ideas with the imported backup?'))return;
-  const prior=JSON.stringify(FG.store.data),oldWorkspace=FG.factory?.exportWorkspace(),oldEvidence=evidence?.rawSnapshot();
-  try{FG.store.restore(raw);if(backup.factoryWorkspace)FG.factory?.restoreWorkspace(backup.factoryWorkspace);if(evidence)evidence.restore(importedEvidence);}
-  catch(error){FG.store.restore(prior);if(oldWorkspace)FG.factory?.restoreWorkspace(oldWorkspace);if(evidence)evidence.restoreRawSnapshot(oldEvidence);throw error;}
-  profiles();loadParent();$('storageRecovery')?.remove();alert('Progress restored successfully.');
- }catch(err){alert('Could not restore backup: '+err.message)}finally{e.target.value=''}};
+ // The shared backup coordinator installs these controls after writer-lock and
+ // startup recovery checks. It owns all source replacement and rollback.
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{bind();profiles();page('home')});else{bind();profiles();page('home')}
 FG.app={page,openGame:gameOpen,refreshProfiles:profiles};
+// Adult entry/expiry uses the profile event without the family chooser's callback.
+// Refresh original controls as well as reports so no prior learner's values remain.
+window.addEventListener('factory-profile',loadParent);
 })();

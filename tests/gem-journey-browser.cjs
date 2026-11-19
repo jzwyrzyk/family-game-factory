@@ -32,7 +32,10 @@ function visualFixture(){
  notebook.setAvatar('player1','spark');
  for(const title of ['Sky garden','Silly workshop','Crystal trail'])polishedFixture(notebook,'player2',title);
  notebook.setAvatar('player2','nova');
- return validateNotebook(notebook.read());
+ // This is historical source evidence, without a new pending reward handoff.
+ // Production-created pending facts are exercised by the real workflow below.
+ const historical=notebook.read();delete historical.rewardOutbox;
+ return validateNotebook(historical);
 }
 
 (async()=>{
@@ -49,6 +52,19 @@ function visualFixture(){
    if(window.top!==window)return;
    window.__jemsMilestones=[];
    window.addEventListener('jems:milestone',event=>window.__jemsMilestones.push(event.detail));
+   window.__jemsRewardPopups=[];
+   const seen=new WeakSet();
+   const recordPopup=element=>{
+    if(!element.matches('.jems-rewards-toast')||seen.has(element))return;
+    seen.add(element);
+    window.__jemsRewardPopups.push({kind:'reward-popup',level:Number(element.dataset.makerLevel)||0,rewardIds:JSON.parse(element.dataset.rewardIds||'[]')});
+   };
+   new MutationObserver(records=>{
+    for(const record of records)for(const added of record.addedNodes){
+     if(!(added instanceof Element))continue;
+     recordPopup(added);added.querySelectorAll('.jems-rewards-toast').forEach(recordPopup);
+    }
+   }).observe(document,{childList:true,subtree:true});
    if(fixture&&!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(fixture));
   },{key:STUDIO_KEY,fixture});
   const page=await context.newPage(),errors=[],network=[];
@@ -87,8 +103,9 @@ function visualFixture(){
   await page.locator('.profile-choice').nth(index).click();
  };
  const more=async page=>{if(!await page.locator('#studioMore').evaluate(element=>element.open))await page.click('#studioMore summary');};
- const events=page=>page.evaluate(()=>window.__jemsMilestones);
- const levelEventCount=async(page,level)=>(await events(page)).filter(event=>event.kind.startsWith('builder-')&&event.level===level).length;
+ const events=page=>page.evaluate(()=>[...window.__jemsMilestones,...window.__jemsRewardPopups]);
+ const levelEventCount=async(page,level)=>(await events(page)).filter(event=>event.kind==='reward-popup'&&event.rewardIds.includes(`maker.milestone:level%3A${level}`)).length;
+ const waitForLevelPopup=(page,level)=>page.waitForFunction(level=>window.__jemsRewardPopups.some(popup=>popup.rewardIds.includes(`maker.milestone:level%3A${level}`)),level);
  const noOverflow=async page=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'layout fits the viewport without horizontal scrolling');
  const assertRankThumbnail=async(locator,character,level)=>{
   const actual=await locator.evaluate(tile=>({
@@ -246,19 +263,22 @@ function visualFixture(){
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'cut');
    assert.equal(session.design.observations.filter(observation=>observation.source==='child'&&observation.experimentId===testId).length,1);
+   await waitForLevelPopup(page,2);
    assert.equal(await levelEventCount(page,2),1,'one cut-level popup for a durable linked reflection');
    await page.click('#studioKeep');
    await page.waitForFunction(id=>FG.studio.exportNotebook().sessions.some(session=>session.keptExperiments?.some(kept=>kept.experimentId===id)),testId);
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'polished');
    assert.ok(session.keptExperiments.some(kept=>kept.experimentId===testId&&kept.baseId===baseId));
+   await waitForLevelPopup(page,3);
    assert.equal(await levelEventCount(page,3),1,'one polished-level popup for the exact verified keep');
-   await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),null,3);
-   assert.equal(await page.locator('.jems-delight-toast .jems-gem-art').count(),0,'unselected makers use the two original outfits, never a gem-only reward');
-   assert.equal(await page.locator('#jems-delight-host').evaluate(element=>getComputedStyle(element).pointerEvents),'none');
-   assert.equal(await page.locator('.jems-delight-toast').getAttribute('aria-live'),'polite');
+   const polishedPopup=page.locator('.jems-rewards-toast[data-maker-level="3"]');
+   await assertRankThumbnail(polishedPopup.locator('.jems-rank-thumbnail'),null,3);
+   assert.equal(await polishedPopup.locator('.jems-gem-art').count(),0,'unselected makers use the two original outfits, never a gem-only reward');
+   assert.equal(await page.locator('.jems-rewards-toast-host').evaluate(element=>getComputedStyle(element).pointerEvents),'none');
+   assert.equal(await polishedPopup.getAttribute('aria-live'),'polite');
    assert.equal(await page.locator('.jems-delight-sparks').count(),0);
-   assert.equal(await page.locator('.jems-delight-toast').evaluate(element=>getComputedStyle(element).animationName),'none');
+   assert.equal(await polishedPopup.evaluate(element=>getComputedStyle(element).animationName),'none');
    await page.click('#studioChange');await page.fill('#studioPrompt','An idea to try when I come back');
    await openJourney(page);await assertLevel(page,3);
    assert.equal((await notebook(page)).sessions.find(session=>session.game==='gum').draft,'An idea to try when I come back','opening the journey flushes the unfinished draft');
@@ -289,13 +309,14 @@ function visualFixture(){
    await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),'nova',3);
    assert.equal(await page.locator('.jems-delight-toast').getAttribute('data-kind'),'gem-cut','a second project Cut event keeps the already earned Polisher outfit');
    await page.click('#studioCloseVersions');await page.click('#studioKeep');
-   await page.waitForFunction(()=>window.__jemsMilestones.some(event=>event.level===4));
-   assert.equal(await levelEventCount(page,4),1,'the third distinct polished project earns one Gem Master event');
+   await waitForLevelPopup(page,4);
+   assert.equal(await levelEventCount(page,4),1,'the third distinct polished project shows one committed Gem Master popup');
    assert.equal((await earned(page)).level,4);
-   await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),'nova',4);
-   assert.equal(await page.locator('.jems-delight-toast .jems-rank-thumbnail').evaluate(tile=>Math.round(tile.getBoundingClientRect().width)),96,'the approved compact popup tile is 96px');
+   const masterPopup=page.locator('.jems-rewards-toast[data-maker-level="4"]');
+   await assertRankThumbnail(masterPopup.locator('.jems-rank-thumbnail'),'nova',4);
+   assert.equal(await masterPopup.locator('.jems-rank-thumbnail').evaluate(tile=>Math.round(tile.getBoundingClientRect().width)),96,'the approved compact popup tile is 96px');
    await openJourney(page);await assertLevel(page,4);
-   await page.locator('.jems-delight-toast').screenshot({path:'test-results/jems-gem-master-toast.png'});
+   await masterPopup.screenshot({path:'test-results/jems-gem-master-toast.png'});
    await page.screenshot({path:'test-results/jems-journey-master-popup.png',fullPage:true});
    await preview(page,'jems-journey-master-preview');
    assert.equal(await levelEventCount(page,4),1);

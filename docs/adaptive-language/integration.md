@@ -12,6 +12,8 @@ Every successful or incorrect submitted answer is saved immediately. A hint even
 
 ## Actual game lifecycle
 
+The separate [lifetime rewards layer](../rewards/README.md) stages 2 engagement gems for a completed closed-answer activity or a nonempty saved writing exploration. Supported and independent completions receive the same amount; the original hint/read-aloud flags and unscored-writing interpretation remain intact. Staging occurs at the live source-save boundary, with a durable outbox and idempotent ledger projection. Shown, unanswered and wrong-only activities do not qualify, and reading/restoring old attempts does not mint rewards.
+
 The host checks whether a child is eligible for a learning opportunity and whether the native game can pause safely. While the task is open, the simulation stops, input and held keys are cleared and the game mount is inert. A game resumes at its existing state and elapsed-time model when the host confirms conclusion. An explicit worked example allows supportive continuation; an unscored writing response is a finished learning opportunity but never independently correct. Original Challenge consequences apply to Math-only optional parent challenge, not ELA open writing.
 
 Games with no mid-play pause can use existing round boundaries. The host must never fake a safe pause, invent a lost level or bypass the activity.

@@ -7,17 +7,23 @@ import { profileStorage } from '../adult-pilot/storage';
 import { CreationStage } from './stage';
 import type { StudioSession } from '../studio/notebook';
 import { publishSourceEvidence } from '../problem-solving/signals';
+import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
+import {rewardSourceWritable} from '../rewards/write-guard';
 import './style.css';
 
 type Host = {
   enter(): boolean;
   home(): void;
   openGame(sessionId: string): void | Promise<void>;
+  onRewardSourceSaved?(owner: string): void;
 };
 type SourceRevision = Parameters<typeof createProjectFromStudio>[1];
 type Insert = { programId: string; blockId?: string; branch?: 'actions' | 'then' | 'else' };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = '') => {
   const element = document.createElement(tag); element.className = className; element.textContent = text; return element;
+};
+const iconNode = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, icon: IconName, text: string, iconClass = '') => {
+  const element = node(tag, className); setIconLabel(element, icon, text, iconClass); return element;
 };
 const clone = <T>(value: T): T => structuredClone(value);
 const uid = () => crypto.randomUUID();
@@ -41,30 +47,30 @@ export function installCreationStudio(host: Host) {
   const store = () => new CreationStore(profileStorage(localStorage), owner);
   const page = node('section', 'page hidden'); page.id = 'page-creation';
   page.innerHTML = `
-    <header class="creation-heading"><div><span class="creation-eyebrow">THE jems CREATION STUDIO</span><h1 id="creationHeading" tabindex="-1">Little blocks. Big possibilities.</h1><p id="creationSubtitle">Make a story move. Give a character an idea. See what happens.</p></div><button class="creation-button" id="creationHome">← My Games</button></header>
+    <header class="creation-heading"><div><span class="creation-eyebrow">THE jems CREATION STUDIO</span><h1 id="creationHeading" tabindex="-1">Little blocks. Big possibilities.</h1><p id="creationSubtitle">Make a story move. Give a character an idea. See what happens.</p></div><button class="creation-button" id="creationHome">${iconMarkup('arrow', 'jems-icon--back')} My Games</button></header>
     <div id="creationStatus" class="creation-status" role="status" aria-live="polite"></div>
     <div id="creationShelf">
-      <div class="creation-mode-switch" role="group" aria-label="Choose how to create"><button id="creationFreeMode" aria-pressed="true">✦ Make your own</button><button id="creationChallengeMode" aria-pressed="false">◎ Rebuild a scene</button></div>
+      <div class="creation-mode-switch" role="group" aria-label="Choose how to create"><button id="creationFreeMode" aria-pressed="true">${iconMarkup('star')} Make your own</button><button id="creationChallengeMode" aria-pressed="false">${iconMarkup('grid')} Rebuild a scene</button></div>
       <section id="creationFreeShelf"><div class="creation-shelf-heading"><div><h2>Your next adventure starts here</h2><p>Choose a world. You’re the director.</p></div><span class="creation-small-pill">MOVE · TALK · DANCE · PLAY</span></div><div id="creationStarters" class="creation-starters"></div><section id="creationSavedSection"><div class="creation-shelf-heading"><h2>My scenes</h2><p>Pick up where your imagination left off.</p></div><div id="creationSaved" class="creation-saved-grid"></div></section></section>
       <section id="creationChallengeShelf" hidden><div class="creation-shelf-heading"><div><h2>Watch it. Wonder. Make it happen.</h2><p>Rebuild the scene your way. Different blocks can tell the same story.</p></div><span class="creation-small-pill">SMALL CHALLENGES · REAL IDEAS</span></div><div id="creationChallenges" class="creation-challenge-grid"></div></section>
     </div>
     <div id="creationWorkspace" hidden>
-      <div class="creation-project-bar"><button id="creationBack" class="creation-button creation-quiet">← My scenes</button><label class="creation-title-label"><span class="creation-sr">Scene title</span><input id="creationTitle" maxlength="80" aria-label="Scene title"></label><span id="creationSaveState" class="creation-save-state">Saved on this device</span><div class="creation-version-actions"><button id="creationUndo" class="creation-button" title="Undo last edit">↶ <span>Undo</span></button><button id="creationRedo" class="creation-button" title="Redo last edit">↷ <span>Redo</span></button><button id="creationKeep" class="creation-button creation-primary">Keep this version</button><details class="creation-more" id="creationMore"><summary aria-label="More scene tools">•••</summary><div><button id="creationCopy">Make a copy</button><button id="creationDownload">Download editable scene</button><button id="creationImportButton">Open scene file</button><input id="creationImport" type="file" accept="application/json,.json" hidden><button id="creationVideo">Save a video</button><button id="creationHistory">See saved versions</button><button id="creationDelete">Delete this scene</button></div></details></div></div>
+      <div class="creation-project-bar"><button id="creationBack" class="creation-button creation-quiet">${iconMarkup('arrow', 'jems-icon--back')} My scenes</button><label class="creation-title-label"><span class="creation-sr">Scene title</span><input id="creationTitle" maxlength="80" aria-label="Scene title"></label><span id="creationSaveState" class="creation-save-state">Saved on this device</span><div class="creation-version-actions"><button id="creationUndo" class="creation-button" title="Undo last edit">${iconMarkup('undo')} <span>Undo</span></button><button id="creationRedo" class="creation-button" title="Redo last edit">${iconMarkup('undo', 'jems-icon--mirror')} <span>Redo</span></button><button id="creationKeep" class="creation-button creation-primary">${iconMarkup('check')} Keep this version</button><details class="creation-more" id="creationMore"><summary aria-label="More scene tools">${iconMarkup('menu')}</summary><div><button id="creationCopy">${iconMarkup('add')} Make a copy</button><button id="creationDownload">${iconMarkup('download')} Download editable scene</button><button id="creationImportButton">${iconMarkup('book')} Open scene file</button><input id="creationImport" type="file" accept="application/json,.json" hidden><button id="creationVideo">${iconMarkup('download')} Save a video</button><button id="creationHistory">${iconMarkup('clock')} See saved versions</button><button id="creationDelete">${iconMarkup('trash')} Delete this scene</button></div></details></div></div>
       <div id="creationSource" class="creation-source" hidden></div>
-      <div id="creationRecovery" class="creation-recovery" hidden><span>You have unfinished changes saved on this device.</span><button id="creationResumeDraft" class="creation-button">Resume my draft</button><button id="creationDiscardDraft" class="creation-button">Use saved version</button></div>
+      <div id="creationRecovery" class="creation-recovery" hidden><span>You have unfinished changes saved on this device.</span><button id="creationResumeDraft" class="creation-button">${iconMarkup('edit')} Resume my draft</button><button id="creationDiscardDraft" class="creation-button">${iconMarkup('undo')} Use saved version</button></div>
       <section id="creationChallengeBrief" class="creation-challenge-brief" hidden></section>
       <div class="creation-workspace-grid">
         <div class="creation-stage-column">
-          <section class="creation-stage-card" aria-label="Scene preview"><div class="creation-stage-heading"><span id="creationPreviewLabel">YOUR STAGE</span><span id="creationClock">0.0 s</span></div><div class="creation-canvas-wrap"><canvas id="creationCanvas" width="800" height="450" tabindex="0" aria-label="Your scene. Select a character to edit it. Use the character buttons to trigger taps." role="img"></canvas><div id="creationLearning" class="creation-learning" hidden></div><div id="creationTargetBadge" class="creation-target-badge" hidden>Watching the goal · your blocks are safe</div></div><div class="creation-playbar"><button id="creationRun" class="creation-button creation-play">▶ Play my scene</button><button id="creationPause" class="creation-button" disabled>Ⅱ Pause</button><button id="creationStep" class="creation-button" aria-label="Advance the scene by one tenth of a second">▹ Step</button><button id="creationReset" class="creation-button" aria-label="Reset scene to its beginning">↺ Reset</button><span id="creationRunStatus">Ready for your ideas</span></div></section>
-          <section class="creation-cast-card"><div class="creation-section-label"><h2>Characters & things</h2><button id="creationAddActor" class="creation-button creation-quiet">＋ Add</button></div><div id="creationActors" class="creation-actors" role="group" aria-label="Choose a character"></div><div id="creationActorSettings" class="creation-actor-settings"></div><div class="creation-setting-row"><label>World <select id="creationBackground"><option value="meadow">Sunny meadow</option><option value="sky">Cloud country</option><option value="night">Starry night</option><option value="workshop">Dream workshop</option></select></label><span id="creationPositionHelp">Drag a character to set its starting spot.</span></div><div id="creationVariables" class="creation-variables"></div></section>
+          <section class="creation-stage-card" aria-label="Scene preview"><div class="creation-stage-heading"><span id="creationPreviewLabel">YOUR STAGE</span><span id="creationClock">0.0 s</span></div><div class="creation-canvas-wrap"><canvas id="creationCanvas" width="800" height="450" tabindex="0" aria-label="Your scene. Select a character to edit it. Use the character buttons to trigger taps." role="img"></canvas><div id="creationLearning" class="creation-learning" hidden></div><div id="creationTargetBadge" class="creation-target-badge" hidden>Watching the goal · your blocks are safe</div></div><div class="creation-playbar"><button id="creationRun" class="creation-button creation-play">${iconMarkup('play')} Play my scene</button><button id="creationPause" class="creation-button" disabled>${iconMarkup('pause')} Pause</button><button id="creationStep" class="creation-button" aria-label="Advance the scene by one tenth of a second">${iconMarkup('chevron')} Step</button><button id="creationReset" class="creation-button" aria-label="Reset scene to its beginning">${iconMarkup('retry')} Reset</button><span id="creationRunStatus">Ready for your ideas</span></div></section>
+          <section class="creation-cast-card"><div class="creation-section-label"><h2>Characters & things</h2><button id="creationAddActor" class="creation-button creation-quiet">${iconMarkup('add')} Add</button></div><div id="creationActors" class="creation-actors" role="group" aria-label="Choose a character"></div><div id="creationActorSettings" class="creation-actor-settings"></div><div class="creation-setting-row"><label>World <select id="creationBackground"><option value="meadow">Sunny meadow</option><option value="sky">Cloud country</option><option value="night">Starry night</option><option value="workshop">Dream workshop</option></select></label><span id="creationPositionHelp">Drag a character to set its starting spot.</span></div><div id="creationVariables" class="creation-variables"></div></section>
           <section id="creationFeedback" class="creation-feedback" aria-live="polite" hidden></section>
           <p class="creation-footnote">Your scene saves on this device. You choose which version to keep.</p>
         </div>
-        <section class="creation-code-card" aria-label="Scene blocks"><div class="creation-code-heading"><div><span class="creation-eyebrow">MAKE SOMETHING HAPPEN</span><h2 id="creationCodeTitle">My character’s blocks</h2></div><span class="creation-code-badge" aria-hidden="true">{ }</span></div><div class="creation-script-row"><label>Script <select id="creationScript" aria-label="Choose a script"></select></label><button id="creationAddScript" class="creation-button creation-quiet">＋ Script</button></div><div id="creationTrigger" class="creation-trigger"></div><div class="creation-block-editor"><aside class="creation-palette" aria-label="Add a block"><h3>Pick a block</h3><div id="creationPalette"></div></aside><div class="creation-sequence"><div id="creationBlocks" class="creation-blocks"></div><p class="creation-code-tip">Add blocks with a tap. Use ↑ ↓ to put them in order.</p></div></div></section>
+        <section class="creation-code-card" aria-label="Scene blocks"><div class="creation-code-heading"><div><span class="creation-eyebrow">MAKE SOMETHING HAPPEN</span><h2 id="creationCodeTitle">My character’s blocks</h2></div><span class="creation-code-badge" aria-hidden="true">{ }</span></div><div class="creation-script-row"><label>Script <select id="creationScript" aria-label="Choose a script"></select></label><button id="creationAddScript" class="creation-button creation-quiet">${iconMarkup('add')} Script</button></div><div id="creationTrigger" class="creation-trigger"></div><div class="creation-block-editor"><aside class="creation-palette" aria-label="Add a block"><h3>Pick a block</h3><div id="creationPalette"></div></aside><div class="creation-sequence"><div id="creationBlocks" class="creation-blocks"></div><p class="creation-code-tip">Add blocks with a tap. Use ↑ ↓ to put them in order.</p></div></div></section>
       </div>
-      <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">Close</button></div><div id="creationVersionList"></div></section>
+      <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><div><span class="creation-eyebrow">EVERY STORY NEEDS A CAST</span><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2></div><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">×</button></div><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><div><span class="creation-eyebrow">EVERY STORY NEEDS A CAST</span><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2></div><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'));
@@ -93,7 +99,7 @@ export function installCreationStudio(host: Host) {
     const summary = snapshot.actors.filter(a => a.visible).map(a => `${a.name} at ${Math.round(a.x)}, ${Math.round(a.y)}${a.speech ? ', says ' + a.speech : ''}`).join('. ');
     $('creationCanvas').setAttribute('aria-label', (targetMode ? 'Goal scene. ' : 'Your scene. ') + summary + '. ' + Object.entries(snapshot.variables).map(([name, value]) => name + ': ' + value).join(', '));
     $<HTMLButtonElement>('creationPause').disabled = snapshot.status !== 'running' && snapshot.status !== 'paused';
-    $('creationPause').textContent = snapshot.status === 'paused' ? '▶ Resume' : 'Ⅱ Pause';
+    setIconLabel($('creationPause'), snapshot.status === 'paused' ? 'play' : 'pause', snapshot.status === 'paused' ? 'Resume' : 'Pause');
   }
   function loop(time: number) {
     if (!isCurrent() || !engine || FG.learning.active) { stop(); return; }
@@ -182,7 +188,7 @@ export function installCreationStudio(host: Host) {
     ] as const) {
       const button = node('button', 'creation-starter creation-starter-' + kind); button.type = 'button'; button.dataset.creationStarter = kind;
       const image = node('img'); image.src = src; image.alt = '';
-      const info = node('span', 'creation-starter-copy'); info.append(node('strong', '', name), node('span', '', copy), node('b', '', 'Make a scene  →'));
+      const info = node('span', 'creation-starter-copy'); info.append(node('strong', '', name), node('span', '', copy), iconNode('b', '', 'arrow', 'Make a scene'));
       button.append(image, info); button.onclick = () => act(() => create(kind)); starters.append(button);
     }
     const saved = $('creationSaved'); saved.replaceChildren();
@@ -190,22 +196,22 @@ export function installCreationStudio(host: Host) {
       const loaded = store().load(project.id, owner()); const button = node('button', 'creation-saved-card'); button.type = 'button'; button.dataset.scene = project.id;
       const thumb = art(loaded.scene.actors[0]?.assetId || 'gem');
       const copy = node('span'); copy.append(node('strong', '', project.title), node('small', '', project.challengeId ? 'Scene challenge · continue' : loaded.draft ? 'Unfinished ideas saved' : project.keptId ? 'A scene you kept' : 'Your work in progress'));
-      button.append(thumb, copy, node('span', 'creation-saved-arrow', '→')); button.onclick = () => act(() => loadScene(project.id)); saved.append(button);
+      button.append(thumb, copy, createIcon('arrow', 'creation-saved-arrow')); button.onclick = () => act(() => loadScene(project.id)); saved.append(button);
     }
     $('creationSavedSection').hidden = !saved.childElementCount;
     const challenges = $('creationChallenges'); challenges.replaceChildren();
     CREATION_CHALLENGES.forEach((item, index) => {
       const button = node('button', 'creation-challenge-card'); button.type = 'button'; button.dataset.challenge = item.id;
       const stamp = node('span', 'creation-challenge-stamp', ['↗', '↻', '☝', '✦', '⑂'][index] || '◎');
-      button.append(stamp, node('small', '', 'SCENE ' + String(index + 1).padStart(2, '0')), node('strong', '', item.title), node('p', '', item.brief), node('span', 'creation-challenge-concepts', item.concepts.join(' · ')), node('b', '', 'Watch & rebuild →'));
+      button.append(stamp, node('small', '', 'SCENE ' + String(index + 1).padStart(2, '0')), node('strong', '', item.title), node('p', '', item.brief), node('span', 'creation-challenge-concepts', item.concepts.join(' · ')), iconNode('b', '', 'arrow', 'Watch & rebuild'));
       button.onclick = () => act(() => challenge(item.id)); challenges.append(button);
     });
   }
   function renderSource() {
     const box = $('creationSource'); box.replaceChildren(); const provenance = scene?.provenance;
     box.hidden = !provenance?.sourceProjectId; if (box.hidden) return;
-    box.append(node('span', '', '✦ A new scene from your game · linked to the version you chose'));
-    if (sourceSessionId) { const button = node('button', 'creation-text-button', 'Back to my game →'); button.onclick = () => act(() => { saveVersion(); stop(); void host.openGame(sourceSessionId); }); box.append(button); }
+    box.append(iconNode('span', '', 'star', 'A new scene from your game · linked to the version you chose'));
+    if (sourceSessionId) { const button = iconNode('button', 'creation-text-button', 'arrow', 'Back to my game'); button.onclick = () => act(() => { saveVersion(); stop(); void host.openGame(sourceSessionId); }); box.append(button); }
   }
   function renderBrief() {
     const box = $('creationChallengeBrief'); box.replaceChildren(); box.hidden = !challengeId; if (!challengeId) return;
@@ -214,9 +220,9 @@ export function installCreationStudio(host: Host) {
     const list = node('ul'); goal.requirements.forEach(requirement => list.append(node('li', '', requirement))); copy.append(list);
     const testing = node('details', 'creation-test-description'); testing.append(node('summary', '', 'What does the scene check look for?'), node('p', '', goal.testDescription)); copy.append(testing);
     const controls = node('div', 'creation-goal-actions');
-    const watch = node('button', 'creation-button', '▷ Watch the goal'); watch.id = 'creationWatchTarget'; watch.onclick = () => act(() => { assertEditing(); learningThen(() => { stop(); engine = new SceneEngine(createChallengeTarget(challengeId!)); engine.start(); targetInputs = 0; targetMode = true; $('creationTargetBadge').hidden = false; $('creationPreviewLabel').textContent = 'THE SCENE TO REBUILD'; animate(); }); });
-    const check = node('button', 'creation-button creation-primary', 'Check my scene'); check.id = 'creationCheck'; check.onclick = () => act(() => learningThen(checkChallenge));
-    const hint = node('button', 'creation-text-button', hintUsed ? 'See my hint again' : 'A little hint?'); hint.id = 'creationHint'; hint.onclick = () => act(() => { assertEditing(); store().markHintUsed(entryId, sceneOwner); hintUsed = true; const text = node('p', 'creation-hint', goal.hint); hint.replaceWith(text); });
+    const watch = iconNode('button', 'creation-button', 'play', 'Watch the goal'); watch.id = 'creationWatchTarget'; watch.onclick = () => act(() => { assertEditing(); learningThen(() => { stop(); engine = new SceneEngine(createChallengeTarget(challengeId!)); engine.start(); targetInputs = 0; targetMode = true; $('creationTargetBadge').hidden = false; $('creationPreviewLabel').textContent = 'THE SCENE TO REBUILD'; animate(); }); });
+    const check = iconNode('button', 'creation-button creation-primary', 'check', 'Check my scene'); check.id = 'creationCheck'; check.onclick = () => act(() => learningThen(checkChallenge));
+    const hint = iconNode('button', 'creation-text-button', 'help', hintUsed ? 'See my hint again' : 'A little hint?'); hint.id = 'creationHint'; hint.onclick = () => act(() => { assertEditing(); store().markHintUsed(entryId, sceneOwner); hintUsed = true; const text = node('p', 'creation-hint', goal.hint); hint.replaceWith(text); });
     controls.append(watch, check, hint); box.append(copy, controls);
   }
   function checkChallenge() {
@@ -224,11 +230,16 @@ export function installCreationStudio(host: Host) {
     const result = evaluateChallenge(challengeId, scene!);
     const attempt=store().recordAttempt(entryId, sceneOwner, revisionId, { challengeId, passed: result.passed, hintUsed });
     publishSourceEvidence({kind:'creation',owner:sceneOwner,attempt,result});
+    host.onRewardSourceSaved?.(sceneOwner);
     const feedback = $('creationFeedback'); feedback.hidden = false; feedback.replaceChildren(); feedback.classList.toggle('is-success', result.passed);
     feedback.append(node('span', 'creation-eyebrow', result.passed ? 'YOUR IDEA WORKS' : 'A NEW THING TO NOTICE'), node('h2', '', result.passed ? 'You made it happen!' : 'Let’s look a little closer.'), node('p', '', result.feedback));
-    const list = node('ul'); result.checks.forEach(check => list.append(node('li', check.passed ? 'is-pass' : '', (check.passed ? '✓ ' : '○ ') + check.feedback))); feedback.append(list);
+    const list = node('ul'); result.checks.forEach(check => {
+      const item = node('li', check.passed ? 'is-pass' : '');
+      item.append(createIcon(check.passed ? 'check' : 'help'), node('span', 'creation-sr', check.passed ? 'Passed: ' : 'Not yet: '), document.createTextNode(' ' + check.feedback));
+      list.append(item);
+    }); feedback.append(list);
     feedback.append(node('small', '', hintUsed ? 'You explored this scene with a hint. Your next idea is still yours.' : 'This records what your scene did on this challenge.'));
-    if (result.passed) { const remix = node('button', 'creation-button', 'Make it my own →'); remix.onclick = () => act(() => { assertEditing(); saveVersion(); const copy = store().create(sceneOwner, { ...clone(scene!), id: uid(), title: (scene!.title + ' · my story').slice(0, 60), provenance: { createdBy: 'child', sourceKind: 'creation', sourceProjectId: entryId, sourceRevisionId: revisionId } }); loadScene(copy.id); }); feedback.append(remix); }
+    if (result.passed) { const remix = iconNode('button', 'creation-button', 'edit', 'Make it my own'); remix.onclick = () => act(() => { assertEditing(); saveVersion(); const copy = store().create(sceneOwner, { ...clone(scene!), id: uid(), title: (scene!.title + ' · my story').slice(0, 60), provenance: { createdBy: 'child', sourceKind: 'creation', sourceProjectId: entryId, sourceRevisionId: revisionId } }); loadScene(copy.id); }); feedback.append(remix); }
     freshEngine(); feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   function currentProgram() { return scene?.programs.find(p => p.id === selectedProgram && p.actorId === selectedActor); }
@@ -289,9 +300,9 @@ export function installCreationStudio(host: Host) {
     const box = $('creationActorSettings'); box.replaceChildren(); const actor = scene!.actors.find(a => a.id === selectedActor); if (!actor) return;
     const set = (key: string, value: string | number) => mutation(project => Object.assign(project.actors.find(a => a.id === actor.id)!, { [key]: value }));
     box.append(input('Name', actor.name, value => set('name', value.trim() || 'My character'), { maxLength: 40 }), input('Start x', actor.x, value => set('x', +value), { min: 0, max: scene!.width }), input('Start y', actor.y, value => set('y', +value), { min: 0, max: scene!.height }), input('Size', actor.size || 100, value => set('size', +value), { min: 20, max: 240 }));
-    const remove = node('button', 'creation-text-button', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
+    const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
     remove.onclick = () => act(() => mutation(project => { project.actors = project.actors.filter(a => a.id !== actor.id); project.programs = project.programs.filter(p => p.actorId !== actor.id); selectedActor = project.actors[0].id; selectedProgram = project.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; })); box.append(remove);
-    const tap = node('button', 'creation-button creation-quiet', '☝ Try tap'); tap.id = 'creationTapActor'; tap.setAttribute('aria-label', 'Tap ' + actor.name);
+    const tap = iconNode('button', 'creation-button creation-quiet', 'play', 'Try tap'); tap.id = 'creationTapActor'; tap.setAttribute('aria-label', 'Tap ' + actor.name);
     tap.onclick = () => act(() => learningThen(() => { if (targetMode || !engine) freshEngine(); if (engine!.snapshot().status === 'idle') engine!.start(); engine!.resume(); engine!.tap(actor.id); animate(); })); box.append(tap);
     box.querySelectorAll<HTMLInputElement>('input').forEach(field => { if (challengeId && field.getAttribute('aria-label') !== 'Name') field.disabled = true; });
     $('creationPositionHelp').textContent = challengeId ? 'The starting scene stays the same. Change what happens with blocks.' : 'Drag a character to set its starting spot.';
@@ -301,7 +312,7 @@ export function installCreationStudio(host: Host) {
     const details = node('details'); const summary = node('summary', '', 'Numbers in this scene'); details.append(summary);
     const row = node('div', 'creation-variable-row');
     for (const [key, value] of Object.entries(scene.variables)) row.append(input(key, value, raw => mutation(project => { project.variables[key] = +raw; }), { min: -999, max: 999 }));
-    const add = node('button', 'creation-button creation-quiet', '＋ Number'); add.onclick = () => act(() => { const name = prompt('What will you count? Use a short name, like gems or points.', 'points')?.trim(); if (!name) return; if (!/^[a-zA-Z][a-zA-Z0-9_]{0,29}$/.test(name)) throw Error('Use a name starting with a letter, with letters, numbers or underscores.'); mutation(project => { project.variables[name] = 0; }); }); row.append(add); details.append(row); box.append(details);
+    const add = iconNode('button', 'creation-button creation-quiet', 'add', 'Number'); add.onclick = () => act(() => { const name = prompt('What will you count? Use a short name, like gems or points.', 'points')?.trim(); if (!name) return; if (!/^[a-zA-Z][a-zA-Z0-9_]{0,29}$/.test(name)) throw Error('Use a name starting with a letter, with letters, numbers or underscores.'); mutation(project => { project.variables[name] = 0; }); }); row.append(add); details.append(row); box.append(details);
   }
   function renderPrograms() {
     const programs = scene!.programs.filter(p => p.actorId === selectedActor), select = $<HTMLSelectElement>('creationScript'); select.replaceChildren();
@@ -314,7 +325,7 @@ export function installCreationStudio(host: Host) {
     trigger.append(node('span', 'creation-trigger-flag', '⚑'));
     trigger.append(choice('When', program.trigger.type, [['start', 'I press play'], ['tap', 'this character is tapped'], ['event', 'a signal arrives']], value => mutation(project => { const p = project.programs.find(p => p.id === selectedProgram)!; p.trigger = value === 'event' ? { type: 'event', name: 'go' } : { type: value as 'start' | 'tap' }; })));
     if (program.trigger.type === 'event') trigger.append(input('Signal name', program.trigger.name, value => mutation(project => { project.programs.find(p => p.id === selectedProgram)!.trigger = { type: 'event', name: value.trim() || 'go' }; }), { maxLength: 40 }));
-    if (programs.length > 1) { const remove = node('button', 'creation-text-button', 'Remove script'); remove.onclick = () => act(() => mutation(project => { project.programs = project.programs.filter(p => p.id !== selectedProgram); selectedProgram = ''; insert = null; })); trigger.append(remove); }
+    if (programs.length > 1) { const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove script'); remove.onclick = () => act(() => mutation(project => { project.programs = project.programs.filter(p => p.id !== selectedProgram); selectedProgram = ''; insert = null; })); trigger.append(remove); }
     if (!insert || insert.programId !== selectedProgram) insert = { programId: selectedProgram };
     $('creationBlocks').replaceChildren(renderBlocks(program.actions, { programId: selectedProgram }));
   }
@@ -328,8 +339,8 @@ export function installCreationStudio(host: Host) {
       card.addEventListener('drop', event => { event.preventDefault(); event.stopPropagation(); const moved = event.dataTransfer?.getData('application/x-jems-block'); if (moved && moved !== block.id) act(() => mutation(project => { const from = findBlock(project, moved), to = findBlock(project, block.id); if (from.list !== to.list) throw Error('Use the nested “add here” spaces to build groups. Reorder blocks inside their own group.'); from.list.splice(from.index, 1); const next = from.list.findIndex(b => b.id === block.id); from.list.splice(next, 0, from.block); })); });
       const head = node('div', 'creation-block-head'); head.append(node('span', 'creation-block-name', metadata.icon + ' ' + metadata.label));
       const controls = node('span', 'creation-block-tools');
-      for (const [label, icon, direction] of [['Move block up', '↑', -1], ['Move block down', '↓', 1]] as const) { const b = node('button', '', icon); b.type = 'button'; b.setAttribute('aria-label', label); b.disabled = index + direction < 0 || index + direction >= blocks.length; b.onclick = () => act(() => mutation(project => { const found = findBlock(project, block.id); const other = found.index + direction; [found.list[found.index], found.list[other]] = [found.list[other], found.list[found.index]]; })); controls.append(b); }
-      const remove = node('button', '', '×'); remove.type = 'button'; remove.setAttribute('aria-label', 'Remove ' + metadata.label + ' block'); remove.onclick = () => act(() => mutation(project => { const found = findBlock(project, block.id); found.list.splice(found.index, 1); insert = address; })); controls.append(remove); head.append(controls); card.append(head);
+      for (const [label, iconClass, direction] of [['Move block up', 'jems-icon--up', -1], ['Move block down', 'jems-icon--down', 1]] as const) { const b = node('button'); b.append(createIcon('arrow', iconClass)); b.type = 'button'; b.setAttribute('aria-label', label); b.disabled = index + direction < 0 || index + direction >= blocks.length; b.onclick = () => act(() => mutation(project => { const found = findBlock(project, block.id); const other = found.index + direction; [found.list[found.index], found.list[other]] = [found.list[other], found.list[found.index]]; })); controls.append(b); }
+      const remove = node('button'); remove.append(createIcon('close')); remove.type = 'button'; remove.setAttribute('aria-label', 'Remove ' + metadata.label + ' block'); remove.onclick = () => act(() => mutation(project => { const found = findBlock(project, block.id); found.list.splice(found.index, 1); insert = address; })); controls.append(remove); head.append(controls); card.append(head);
       const fields = node('div', 'creation-block-fields');
       const update = (key: string, value: unknown) => mutation(project => {
         if (key === 'variable' && typeof value === 'string' && !Object.hasOwn(project.variables, value)) project.variables[value] = 0;
@@ -365,7 +376,7 @@ export function installCreationStudio(host: Host) {
       else if (block.type === 'if') { card.append(node('span', 'creation-branch-label', 'THEN'), renderBlocks(block.then, { programId: selectedProgram, blockId: block.id, branch: 'then' }), node('span', 'creation-branch-label', 'OTHERWISE'), renderBlocks(block.else || [], { programId: selectedProgram, blockId: block.id, branch: 'else' })); }
       list.append(card);
     });
-    const destination = node('button', 'creation-insert', blocks.length ? '＋ Add the next block here' : '＋ Choose a block to put here'); destination.type = 'button';
+    const destination = iconNode('button', 'creation-insert', 'add', blocks.length ? 'Add the next block here' : 'Choose a block to put here'); destination.type = 'button';
     const selected = JSON.stringify(insert) === JSON.stringify(address); destination.setAttribute('aria-pressed', String(selected));
     destination.onclick = () => { insert = address; renderPrograms(); }; list.append(destination); return list;
   }
@@ -386,7 +397,7 @@ export function installCreationStudio(host: Host) {
   function cancelRecording() {
     const current = recording; if (!current) return; current.cancelled = true; recording = null;
     clearTimeout(current.timer); if (current.recorder.state !== 'inactive') current.recorder.stop();
-    current.stream.getTracks().forEach(track => track.stop()); $('creationVideo').textContent = 'Save a video';
+    current.stream.getTracks().forEach(track => track.stop()); setIconLabel($('creationVideo'), 'download', 'Save a video');
   }
   function beginRecording() {
     const canvas = $<HTMLCanvasElement>('creationCanvas');
@@ -402,10 +413,10 @@ export function installCreationStudio(host: Host) {
         clearTimeout(current.timer); current.stream.getTracks().forEach(track => track.stop());
         const permitted = !current.cancelled && current.owner === owner() && visible;
         if (permitted && current.chunks.length) { download(new Blob(current.chunks, { type: mimeType }), current.title.replace(/[^a-z0-9]+/gi, '-').slice(0, 60) + (mimeType.includes('mp4') ? '.mp4' : '.webm')); status('Your scene video is ready. Speech bubbles are included; this recording has no audio.'); }
-        current.chunks = []; if (recording === current) { recording = null; $('creationVideo').textContent = 'Save a video'; }
+        current.chunks = []; if (recording === current) { recording = null; setIconLabel($('creationVideo'), 'download', 'Save a video'); }
       };
-      current.recorder.onerror = () => { current.cancelled = true; clearTimeout(current.timer); current.stream.getTracks().forEach(track => track.stop()); if (recording === current) recording = null; status('The video could not be recorded. Your editable scene is still saved.', true); };
-      current.recorder.start(); $('creationVideo').textContent = 'Stop & save video'; status('Recording up to 15 seconds. Tap a character to trigger its script. Choose “Stop & save video” when you’re ready.');
+      current.recorder.onerror = () => { current.cancelled = true; clearTimeout(current.timer); current.stream.getTracks().forEach(track => track.stop()); if (recording === current) { recording = null; setIconLabel($('creationVideo'), 'download', 'Save a video'); } status('The video could not be recorded. Your editable scene is still saved.', true); };
+      current.recorder.start(); setIconLabel($('creationVideo'), 'stop', 'Stop & save video'); status('Recording up to 15 seconds. Tap a character to trigger its script. Choose “Stop & save video” when you’re ready.');
       current.timer = setTimeout(() => { if (current.recorder.state === 'recording') current.recorder.stop(); }, 15000);
     } catch (error) { stream.getTracks().forEach(track => track.stop()); recording = null; throw error; }
   }
@@ -431,9 +442,16 @@ export function installCreationStudio(host: Host) {
     const program = { id: uid(), actorId: selectedActor, trigger, actions: [] }; project.programs.push(program); selectedProgram = program.id; insert = null;
   }));
   $('creationRun').onclick = () => act(() => run());
-  $('creationPause').onclick = () => act(() => { assertEditing(); if (!engine) return; if (engine.snapshot().status === 'paused') { engine.resume(); animate(); $('creationPause').textContent = 'Ⅱ Pause'; } else { stop(false); $('creationPause').textContent = '▶ Resume'; } paint(); });
-  $('creationReset').onclick = () => act(() => { assertEditing(); stop(); freshEngine(); $('creationPause').textContent = 'Ⅱ Pause'; });
-  $('creationStep').onclick = () => act(() => { assertEditing(); learningThen(() => { stop(); if (targetMode || !engine) freshEngine(); if (engine!.snapshot().status === 'idle') engine!.start(); engine!.pause(); engine!.step(100); $('creationPause').textContent = '▶ Resume'; paint(); }); });
+  $('creationPause').onclick = () => act(() => {
+    assertEditing(); if (!engine) return;
+    const button = $<HTMLButtonElement>('creationPause'), hadFocus = document.activeElement === button;
+    if (engine.snapshot().status === 'paused') { engine.resume(); animate(); } else stop(false);
+    paint();
+    // stop() temporarily disables this control; keep keyboard focus on Resume.
+    if (hadFocus && !button.disabled) button.focus({ preventScroll: true });
+  });
+  $('creationReset').onclick = () => act(() => { assertEditing(); stop(); freshEngine(); setIconLabel($('creationPause'), 'pause', 'Pause'); });
+  $('creationStep').onclick = () => act(() => { assertEditing(); learningThen(() => { stop(); if (targetMode || !engine) freshEngine(); if (engine!.snapshot().status === 'idle') engine!.start(); engine!.pause(); engine!.step(100); setIconLabel($('creationPause'), 'play', 'Resume'); paint(); }); });
   $('creationUndo').onclick = () => act(() => { assertEditing(); if (!undo.length) return; const previous = undo.at(-1)!; store().autosave(entryId, sceneOwner, previous, revisionId); stop(); redo.push(clone(scene!)); scene = undo.pop()!; dirty = true; freshEngine(); renderEditor(); });
   $('creationRedo').onclick = () => act(() => { assertEditing(); if (!redo.length) return; const next = redo.at(-1)!; store().autosave(entryId, sceneOwner, next, revisionId); stop(); undo.push(clone(scene!)); scene = redo.pop()!; dirty = true; freshEngine(); renderEditor(); });
   $('creationKeep').onclick = () => act(() => { assertEditing(); saveVersion(); store().keep(entryId, sceneOwner, revisionId); $('creationSaveState').textContent = 'Your kept version'; status('This version is yours to keep. You can keep experimenting.'); });
@@ -481,7 +499,7 @@ export function installCreationStudio(host: Host) {
     for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
-  window.addEventListener('beforeunload', event => { if (!visible) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });
+  window.addEventListener('beforeunload', event => { if (!visible||!rewardSourceWritable()) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });
   window.addEventListener('pagehide', () => stop());
   window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { stop(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
@@ -501,6 +519,8 @@ export function installCreationStudio(host: Host) {
       });
     },
     export: () => store().read(), validate: validateCreationWorkspace,
+    pendingRewards: (owner: string) => store().pendingRewards(owner),
+    acknowledgeRewards: (owner: string, ids: string[]) => store().acknowledgeRewards(owner, ids),
     backup: () => {
       const current = store();
       try { return { factoryCreation: current.read() }; }

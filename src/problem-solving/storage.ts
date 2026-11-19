@@ -4,6 +4,7 @@ import {
   isProblemSolvingId, validateProblemSolvingDraft, validateProblemSolvingEpisode, validateProblemSolvingWorkspace,
   type ProblemSolvingDraft, type ProblemSolvingEpisode, type ProblemSolvingStoragePort, type ProblemSolvingWorkspace,
 } from './model';
+import { assertRewardSourceWritable } from '../rewards/write-guard';
 
 export { PROBLEM_SOLVING_KEY, PROBLEM_SOLVING_LIMITS, validateProblemSolvingWorkspace } from './model';
 export type { ProblemSolvingStoragePort } from './model';
@@ -68,6 +69,7 @@ export class ProblemSolvingStore {
   }
   /** Roll back only bytes captured by this instance in the same active profile. Not a backup import API. */
   restoreRawSnapshot(raw: string | null): void {
+    assertRewardSourceWritable();
     const index = this.snapshots.findIndex(s => s.raw === raw && s.owner === this.currentOwner?.());
     if (index < 0) throw Error('Use an original problem-solving snapshot from this profile for recovery.');
     if (raw === null) {
@@ -79,6 +81,7 @@ export class ProblemSolvingStore {
     this.snapshots.splice(index, 1);
   }
   private persist(data: ProblemSolvingWorkspace, owner?: string): void {
+    assertRewardSourceWritable();
     const checked = validateProblemSolvingWorkspace(data), raw = JSON.stringify(checked);
     if (owner !== undefined) this.scope(owner);
     try { this.storage.setItem(PROBLEM_SOLVING_KEY, raw); }

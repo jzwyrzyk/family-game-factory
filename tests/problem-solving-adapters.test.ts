@@ -15,6 +15,10 @@ import { createChallengeStarter, evaluateChallenge } from '../src/creation/chall
 import { StudioNotebook, validateNotebook } from '../src/studio/notebook';
 import { builderJourney, gemStage } from '../src/brand/gem-progress';
 import { setAdultWorkspace } from '../src/adult-pilot/storage';
+import { ProblemSolvingStore } from '../src/problem-solving/storage';
+import { rewardFactId } from '../src/rewards/model';
+import { build } from 'esbuild';
+import { runInNewContext } from 'node:vm';
 
 class MemoryStorage implements Storage {
   data = new Map<string, string>(); fail = false;
@@ -83,6 +87,54 @@ test('actual English hint/read-aloud outcomes remain English evidence, with no r
   assert.equal(adaptSourceEvidence({kind: 'language', owner: p.id!, attempt: skipped})[0].status, 'interrupted');
 });
 
+test('the learning host commits the attempt and reward fact before optional APS delivery, and rejects stale or paused writes', async () => {
+  // Isolate presentation mounting only; use the production host, reward staging,
+  // write guard and observer dispatch with actual Math/English engine attempts.
+  const output = await build({stdin: {contents: "export { installLearningHost } from './src/learning/host'; export { installEvidenceReceiver } from './src/problem-solving/signals'; export { setRewardSourceMaintenance } from './src/rewards/write-guard';", resolveDir: process.cwd(), loader: 'ts'},
+    bundle: true, write: false, platform: 'browser', format: 'iife', globalName: 'HostEvidenceTest', loader: {'.css': 'empty'},
+    plugins: [{name: 'learning-presentation-test-port', setup(builder) {
+      builder.onResolve({filter: /^(\.\/activity|\.\.\/language\/activity)$/}, args => args.importer.endsWith('/learning/host.ts') ? {path: args.path, namespace: 'activity-port'} : undefined);
+      builder.onLoad({filter: /.*/, namespace: 'activity-port'}, () => ({contents: 'export function mountMathActivity(target,options){window.activityOptions=options;return {dispose(){},focus(){return true},attemptId:"presentation-test"};} export const mountLanguageActivity=mountMathActivity;'}));
+      builder.onResolve({filter: /rewards\/service$/}, args => args.importer.endsWith('/learning/host.ts') ? {path: 'reward-notification', namespace: 'notification-port'} : undefined);
+      builder.onLoad({filter: /.*/, namespace: 'notification-port'}, () => ({contents: 'export function notifyRewardSourceSaved(owner){window.rewardNotifications.push(owner);}'}));
+    }}]});
+  let current = profile(), canSave = false, saves = 0, saved: LearnerProfile | null = null, warning: any = null;
+  const signals: SourceEvidenceSignal[] = [], durable: boolean[] = [];
+  const host: any = {rewardNotifications: [], dispatchEvent: () => true, addEventListener() {}, FG: {store: {
+    current: () => current, save: () => { saves++; if (canSave) saved = JSON.parse(JSON.stringify(current)); return canSave; },
+  }}};
+  const target = {dataset: {} as Record<string,string>, querySelector: (selector: string) => selector === '.learning-save-warning' ? warning : null, append: (node: unknown) => { warning = node; }};
+  const context: any = {window: host, crypto: globalThis.crypto, CustomEvent, console, document: {createElement: () => ({setAttribute() {}, remove() { warning = null; }})}};
+  runInNewContext(output.outputFiles[0].text, context);
+  context.HostEvidenceTest.installLearningHost();
+  context.HostEvidenceTest.installEvidenceReceiver((signal: SourceEvidenceSignal) => {
+    signals.push(signal); durable.push(!!saved?.rewardOutbox?.length);
+    throw Error('Optional observation storage is unavailable');
+  });
+  const math = beginAttempt(current, generateItem('g3-multiply', {factId: 'mul:8x7', random: () => 0}), {now: at});
+  submitAnswer(current, math.id, '56', at + 1000);
+  host.FG.learning.mount(target, {profile: current, onComplete() {}});
+  host.activityOptions.onSave(math);
+  assert.equal(target.dataset.saveFailed, 'true'); assert.equal(signals.length, 0); assert.equal(host.rewardNotifications.length, 0); assert.equal(saved, null);
+  canSave = true; assert.doesNotThrow(() => host.activityOptions.onSave(math));
+  assert.equal(target.dataset.saveFailed, undefined); assert.equal(warning, null);
+  assert.equal(signals.length, 1); assert.equal(signals[0].kind, 'math'); assert.deepEqual(durable, [true]);
+  assert.deepEqual([...host.rewardNotifications], ['child-one']); contextualOnly(adaptSourceEvidence(signals[0]));
+  const savedCount = saves; current = {...profile(), id: 'child-two', learningSubject: 'language'};
+  host.activityOptions.onSave(math); assert.equal(saves, savedCount); assert.equal(signals.length, 1);
+
+  const language = beginLanguageAttempt(current, generateLanguageItem('g3-inference', {tier: 0, random: () => 0}), {now: at + 2000});
+  submitLanguageAnswer(current, language.id, language.item.answer!, at + 3000); finishLanguageAttempt(current, language.id, 'completed', at + 3500);
+  host.FG.learning.mount(target, {profile: current, onComplete() {}});
+  context.HostEvidenceTest.setRewardSourceMaintenance(true);
+  assert.throws(() => host.activityOptions.onSave(language), /restoring saved progress/);
+  assert.equal(current.rewardOutbox, undefined); assert.equal(saves, savedCount);
+  context.HostEvidenceTest.setRewardSourceMaintenance(false);
+  assert.doesNotThrow(() => host.activityOptions.onSave(language));
+  assert.equal(signals.length, 2); assert.equal(signals[1].kind, 'language'); assert.deepEqual(durable, [true, true]);
+  assert.deepEqual([...host.rewardNotifications], ['child-one', 'child-two']); contextualOnly(adaptSourceEvidence(signals[1]));
+});
+
 test('Creation rechecks share an evidence identity until the checked saved version changes', () => {
   const storage = new MemoryStorage(), creations = new CreationStore(storage), scene = createChallengeStarter('robot-route');
   const entry = creations.create('child-one', scene, {challengeId: 'robot-route'});
@@ -141,6 +193,49 @@ test('reading, restoring and ordinary chat do not backfill events; failed observ
   let delivered = 0; installEvidenceReceiver(() => delivered++); storage.fail = true;
   assert.throws(() => notebook.message(session.id, session.owner, 'child', 'A failed source save'), /Could not save/);
   assert.equal(delivered, 0);
+});
+
+test('Studio commits its reward outbox before optional APS delivery and preserves both lifecycles through failures', () => {
+  const source = new MemoryStorage(), observations = new MemoryStorage(), evidence = new ProblemSolvingStore(observations);
+  let rewardNotifications = 0, delivered = 0;
+  const rewardDurability: boolean[] = [], sourceDurability: boolean[] = [];
+  const notebook = new StudioNotebook(source, owner => {
+    rewardNotifications++;
+    rewardDurability.push(new StudioNotebook(source).pendingRewards(owner).length > 0);
+    throw Error('Reward projection is temporarily unavailable');
+  });
+  const session = notebook.create('child-one', 'buckets', 'A private game', 'saved-project');
+  installEvidenceReceiver(signal => {
+    delivered++;
+    if (signal.kind === 'studio') sourceDurability.push(JSON.stringify(notebook.get(session.id, session.owner)) === JSON.stringify(signal.after));
+    for (const record of adaptSourceEvidence(signal)) evidence.record(record);
+  });
+  observations.fail = true;
+  assert.doesNotThrow(() => notebook.saveExperiment(session.id, session.owner, {id: 'saved-test', baseId: 'saved-base', config: {bucketCount: 4}, prompt: 'PRIVATE_REQUEST', summary: 'A test'}));
+  assert.equal(rewardNotifications, 1); assert.equal(delivered, 1);
+  assert.equal(notebook.pendingRewards(session.owner).length, 1, 'The durable reward fact survives projection and observer failures');
+  assert.deepEqual(evidence.list(session.owner), []);
+  observations.fail = false;
+  notebook.observe(session.id, session.owner, 'PRIVATE_REFLECTION', 'child', 'saved-test');
+  assert.equal(rewardNotifications, 2); assert.equal(evidence.list(session.owner).length, 1, 'A later action does not backfill a missing earlier observation');
+  const records = evidence.list(session.owner);
+  notebook.keepExperiment(session.id, session.owner, 'saved-test', {kind: 'local', baseId: 'saved-base', revisionId: 'saved-kept', contentChanged: true});
+  assert.ok(notebook.pendingRewards(session.owner).some(fact => fact.kind === 'game.developed'));
+  assert.deepEqual(evidence.list(session.owner), records, 'A verified development receipt does not become APS evidence');
+  contextualOnly(records); assert.equal(JSON.stringify(records).includes('PRIVATE_'), false);
+
+  const beforeSource = notebook.read(), beforeDelivery = delivered;
+  source.fail = true;
+  assert.throws(() => notebook.saveExperiment(session.id, session.owner, {id: 'failed-test', baseId: 'saved-kept', config: {bucketCount: 5}, prompt: 'Another test', summary: 'Five buckets'}), /Could not save/);
+  source.fail = false;
+  assert.deepEqual(notebook.read(), beforeSource); assert.equal(delivered, beforeDelivery);
+  assert.deepEqual(evidence.list(session.owner), records, 'Failed source persistence does not create observations');
+  const facts = notebook.pendingRewards(session.owner);
+  notebook.acknowledgeRewards(session.owner, facts.map(rewardFactId));
+  assert.deepEqual(notebook.pendingRewards(session.owner), []);
+  assert.deepEqual(evidence.list(session.owner), records, 'Reward acknowledgment cannot consume reasoning history');
+  assert.ok(rewardDurability.length > 0 && rewardDurability.every(Boolean), 'Reward notifications follow durable source commits');
+  assert.ok(sourceDurability.length > 0 && sourceDurability.every(Boolean), 'APS deliveries follow durable source commits');
 });
 
 test('host bridge deduplicates unchanged scene versions and keeps evidence save failure separate from original work', () => {
