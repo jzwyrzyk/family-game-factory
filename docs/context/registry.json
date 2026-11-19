@@ -419,9 +419,9 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-19T16:55:00.000Z",
-      "sourceDigest": "38ddebb5e4482a1e2cfbb1dcb70679a18764ae88e928277adb45f01774cc7bc2",
+      "sourceDigest": "c04e8c99772bc7d3b6b737d8482753b2d8627268e009fa34f8d78b011920f557",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the existing manual Pages workflow and newer-main drift risk; it now requires an exact already merged source SHA, both pinned production origins, full checkout tests and a public source receipt. The Adult pilot release remains tied to PR55 source and separate from newer main features; no cloud or Pages rollout occurs in this change.",
+      "reviewReason": "Reviewed immutable manual Pages release inputs and known Jems origins; committed the deterministic delivery source digest emitted by exact-PR hosted documentation CI after validating the workflow and release runbook. This is still a source-only release-control change, not a live Pages deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
