@@ -1,14 +1,18 @@
 /** Non-blocking, brand-specific celebrations for real accomplishments only.
  * No scores, child names, attention telemetry, rewards, network calls or persisted badges. */
-export type JemMilestone = 'idea' | 'playable' | 'kept' | 'copied' | 'practice';
+export type JemMilestone = 'idea' | 'playable' | 'kept' | 'copied' | 'practice' | 'gem-cut' | 'gem-polished' | 'builder-cut' | 'builder-polished';
 const messages:Record<JemMilestone,string> = {
   idea: 'Your idea is saved!',
   playable: 'Your new game test is ready!',
   kept: 'You made this version yours!',
   copied: 'Your new jem is saved!',
-  practice: 'You worked it out!'
+  practice: 'You worked it out!',
+  'gem-cut': 'A new facet! You tested your idea.',
+  'gem-polished': 'Your jem shines! You kept an improvement.',
+  'builder-cut': 'Builder Level 2: Gem Cutter!',
+  'builder-polished': 'Builder Level 3: Gem Polisher!'
 };
-const names:readonly JemMilestone[] = ['idea','playable','kept','copied','practice'];
+const names:readonly JemMilestone[] = ['idea','playable','kept','copied','practice','gem-cut','gem-polished','builder-cut','builder-polished'];
 /** Call only after the underlying user action is verified and durably saved. */
 export function celebrateJem(kind:JemMilestone,anchorId?:string):void {
   window.dispatchEvent(new CustomEvent('jems:milestone',{detail:{kind,anchorId}}));
