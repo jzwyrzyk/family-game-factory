@@ -13,16 +13,15 @@ const tabs=(page:Page,id:string)=>page.locator(`[data-parent-tab="${id}"]`);
 const visibleText=(page:Page)=>page.locator('#parentDashboard').innerText();
 const noOverflow=async(page:Page,label:string)=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,label+' stays within viewport');
 async function readableText(page:Page,selector:string) {
+  const rgb=(color:string)=>color.match(/[\d.]+/g)!.map(Number);
+  const light=(color:number[])=>color.slice(0,3).map(value=>{const channel=value/255;return channel<=0.04045?channel/12.92:Math.pow((channel+0.055)/1.055,2.4)}).reduce((sum,value,index)=>sum+value*[0.2126,0.7152,0.0722][index],0);
   const samples=await page.locator(selector).evaluateAll(elements=>elements.map(element=>{
-    const rgb=(color:string)=>color.match(/[\d.]+/g)!.map(Number);
-    let background:Element|null=element,fill=[255,255,255,1];
-    while(background){const value=rgb(getComputedStyle(background).backgroundColor);if((value[3]??1)>0){fill=value;break;}background=background.parentElement;}
-    const light=(color:number[])=>color.slice(0,3).map(value=>{const channel=value/255;return channel<=0.04045?channel/12.92:Math.pow((channel+0.055)/1.055,2.4)}).reduce((sum,value,index)=>sum+value*[0.2126,0.7152,0.0722][index],0);
-    const ink=light(rgb(getComputedStyle(element).color)),paper=light(fill);
-    return {text:element.textContent?.slice(0,80),contrast:(Math.max(ink,paper)+0.05)/(Math.min(ink,paper)+0.05)};
+    let background:Element|null=element,fill='rgb(255, 255, 255)';
+    while(background){const value=getComputedStyle(background).backgroundColor;const channels=value.match(/[\d.]+/g)!.map(Number);if((channels[3]??1)>0){fill=value;break;}background=background.parentElement;}
+    return {text:element.textContent?.slice(0,80),color:getComputedStyle(element).color,background:fill};
   }));
   assert.ok(samples.length,selector+' is present');
-  for(const sample of samples)assert.ok(sample.contrast>=4.5,`${selector}: readable text contrast for ${sample.text} (observed ${sample.contrast.toFixed(2)})`);
+  for(const sample of samples){const ink=light(rgb(sample.color)),paper=light(rgb(sample.background)),contrast=(Math.max(ink,paper)+0.05)/(Math.min(ink,paper)+0.05);assert.ok(contrast>=4.5,`${selector}: readable text contrast for ${sample.text} (observed ${contrast.toFixed(2)})`);}
 }
 async function demoLabel(page:Page) {
   await page.evaluate(()=>{
