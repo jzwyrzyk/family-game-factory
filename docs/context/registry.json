@@ -35,7 +35,8 @@
     "docs/problem-solving/README.md",
     "docs/problem-solving/BENCHMARKS.md",
     "docs/problem-solving/IMPLEMENTATION.md",
-    "docs/decisions/0011-formative-problem-solving-evidence.md"
+    "docs/decisions/0011-formative-problem-solving-evidence.md",
+    "docs/mind-your-jems/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -58,7 +59,9 @@
     "docs/creation-studio/*.md",
     "docs/rewards/*.md",
     "docs/rewards/previews/*.md",
-    "docs/problem-solving/*.md"
+    "docs/problem-solving/*.md",
+    "docs/mind-your-jems/*.md",
+    "docs/archetypes/*.md"
   ],
   "areas": [
     {
@@ -76,8 +79,8 @@
         "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:35:58.554Z",
-      "sourceDigest": "739719ca9db700bc390ce05ea7817cda037391bb4149643873e347021f63b74b",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "c2d0e02afdcc7f466138ffaa4f224c43a02646df8a4f670621a9b71d35001ddd",
       "reviewOutcome": "unchanged",
       "reviewReason": "Reviewed the source-only merge receipt and final acceptance update. Product doctrine, educational claim limits, reward policy and formative feature scope are unchanged; only implementation and delivery history now record observed facts.",
       "reviewHistory": [
@@ -120,7 +123,8 @@
         "docs/brand/art-library/README.md",
         "docs/brand/art-library/licenses/README.md",
         "docs/rewards/*.md",
-        "docs/problem-solving/*.md"
+        "docs/problem-solving/*.md",
+        "docs/mind-your-jems/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -140,10 +144,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:54.748Z",
-      "sourceDigest": "e4c5b5c0505ea1a2f21fe7ddb1fe8c09e3091ac123078d35e4faa57a0d2c3099",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "6e2d2ac1a561182eab94cdb92571beb3102ded2e8d108f9429b19da20f555b27",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed seven SVG destinations and same-attempt guards against current branding and Rewards; documented native parent placement, picker cleanup, resumed drafts and two-row phone navigation.",
+      "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -225,7 +229,9 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/GAME-QUALITY.md",
         "docs/game-quality/*.md",
-        "docs/brand/GEM_FACTORY.md"
+        "docs/brand/GEM_FACTORY.md",
+        "docs/mind-your-jems/*.md",
+        "docs/archetypes/*.md"
       ],
       "sources": [
         "src/games/**",
@@ -233,13 +239,17 @@
         "src/quality/**",
         "scripts/build-generated-runtime.cjs",
         "docs/GAME-QUALITY.md",
-        "docs/game-quality/*.md"
+        "docs/game-quality/*.md",
+        "docs/mind-your-jems/**",
+        "public/art/mind-your-jems/**",
+        "public/fonts/fredoka/**",
+        "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:10:25.520Z",
-      "sourceDigest": "8515ece09d5307673d90055c842a81a0d8017f6cc684a5fd7f767183402a355d",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed new action icons and existing native game controls including Gem Factory, driving and construction; original physics, content, scores, evidence and runtime remain unchanged."
+      "reviewedAt": "2026-11-19T20:26:04.542Z",
+      "sourceDigest": "b60026d028b7e65892f3e661df13ed1544ded45c543da90f6383b8b3135c77c6",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed ready-state feedback relocation for both compact portrait and landscape, preserving warning hints and art clearance. Includes newly registered design-only archetype paths."
     },
     {
       "id": "learning",
@@ -376,7 +386,8 @@
         "docs/brand/GEM_PROGRESS.md",
         "docs/brand/achievement-art/README.md",
         "docs/brand/LIBRARY_V1_2.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/mind-your-jems/*.md"
       ],
       "sources": [
         "tests/**",
@@ -384,10 +395,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:57.416Z",
-      "sourceDigest": "59b3d84b558f2c11a98816df2602cdcafc562d9543db387b218e33e34fadebc1",
+      "reviewedAt": "2026-11-19T20:26:04.542Z",
+      "sourceDigest": "75c5bf3398bbdad44ba9f5df80872cb29a2537e2e5da884cd71075e8d8bd47dd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated parent, rewards, APS and brand browser assertions without removing existing gates; recorded 354 core units,32APS,57rewards,17parent,28maker,31Studio,18docs and asset results with source and environment limits.",
+      "reviewReason": "Reviewed compact portrait/landscape browser regressions and existing source-bound screenshot fidelity, with no relaxation of real gameplay, touch, learning, owner or security checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -411,7 +422,8 @@
         "DELIVERY-STATE.md",
         "ARCHITECTURE-CURRENT.md",
         "docs/context/MAINTENANCE.md",
-        "docs/assignment-006/*.md"
+        "docs/assignment-006/*.md",
+        "docs/mind-your-jems/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -425,10 +437,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T17:45:00.000Z",
-      "sourceDigest": "e4b1f93009089136ed0c8211ab63bd078615817966d4c709aba1800e5d40bd96",
+      "reviewedAt": "2026-11-19T20:12:55.026Z",
+      "sourceDigest": "428cc4845753095a35f32db5afb509eac8c536214812e9ae629c9915122835d4",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the compatibility of manual reviewed-source Pages publication with the latest main problem-solving and delivery-architecture changes. Verified the exact source fingerprint from hosted documentation CI. Publishing remains manual, pinned to merged 079978f with known URLs, independently tested from the active default-branch workflow.",
+      "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -472,10 +484,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:58.183Z",
-      "sourceDigest": "6ab68bc6dd3433faaa7a012982d33dc46ed51c2cca2251c516193c5c861056cc",
+      "reviewedAt": "2026-11-19T20:17:18.881Z",
+      "sourceDigest": "a47a6d61c57e945533d5c4066702005a4a1764d693d5b4967ac591a7e13bec40",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged current parent and rewards registry routes with the formative feature; preserved required canonical documents and renumbered APS decision0011 because main owns lifetime-rewards decision0010.",
+      "reviewReason": "Mapped the new illustrated game source, approved assets, font, tests, and newly integrated PR48 archetype research files; preserved existing independent learning, privacy, brand, Rewards and parent-reporting scopes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -18,6 +18,8 @@ The selected public-facing brand is **jems** (lowercase), with a faceted **gem a
 
 Avoid using pastel colors as small text on white. Maintain readable navy text on mint, gold, coral, and Cloud. The approved v1.2 interface uses locally bundled, licensed **Nunito** for rounded headings and **Inter** for body/interface text, with system fallbacks and retained OFL notices. The logo remains its supplied outlined artwork and is never typeset in either font. The earlier guide's “Poppins Rounded” label did not supply an installable font; it is not the current interface font contract.
 
+The optional [Mind Your Jems arcade](../mind-your-jems/README.md) keeps the approved outlined jems logo while using locally licensed Fredoka for game-specific typography. Its layered character/world artwork must be reviewed against the approved storyboard and real browser output before accepting baselines.
+
 ## Logo
 `public/jems-mark.svg` and `public/jems-logo.svg` retain the supplied faceted gem/wrench layout and traced lowercase wordmark. The current approved revision removes only the specific three short rays above the gem; the single four-point wordmark sparkle, open-ended white wrench, facets, tagline and palette remain intact. Copy the current supplied variants exactly at their existing URLs, with the [identity lineage](art-library/identity/revision-manifest.json). These SVGs originated as reconstructed/traced implementations of raster references; the controlled edit does not change that provenance. Never regenerate, typeset, stretch, skew, recolor, filter or add shadows to the logo.
 
