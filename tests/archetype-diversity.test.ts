@@ -127,3 +127,20 @@ test('each play pattern selects its own mechanic mix instead of inheriting every
  const hill=get('side-driving/egg-courier');
  assert.ok(hill.mechanics.includes('drive-throttle'),'editorial driving patterns keep the actual vehicle control');
 });
+
+test('same-family play patterns cannot collapse into mere art, reward-text or timing variations',()=>{
+ let comparisons=0;let distinct=0;let minor=0;
+ for(const archetype of archetypes){
+  const variants=playPatterns.filter(p=>p.archetypeId===archetype.id);
+  for(let i=0;i<variants.length;i++)for(let j=i+1;j<variants.length;j++){
+   const check=reviewDiversity(variants[i].signature,variants[j].signature,'different-game');
+   comparisons++;
+   assert.notEqual(check.comparison,'cosmetic-only',
+    'same-family patterns must not differ only in art: '+variants[i].id+' versus '+variants[j].id);
+   if(check.comparison==='different-gameplay-candidate')distinct++;else minor++;
+  }
+ }
+ assert.equal(comparisons,22*6);
+ assert.ok(distinct>minor,'the editorial catalog must emphasize substantial, not tiny, differences');
+ // No numeric novelty score or observed-child delight is manufactured by these counts.
+});
