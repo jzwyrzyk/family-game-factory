@@ -418,10 +418,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "937ca2b4841e64ece7d0dc89d4935dcae4436b52277b726c85d39449f8ba9b1a",
+      "reviewedAt": "2026-11-19T16:55:00.000Z",
+      "sourceDigest": "38ddebb5e4482a1e2cfbb1dcb70679a18764ae88e928277adb45f01774cc7bc2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled main PR69 branding completion, merged PR65 parent reporting and PR67 rewards integration, retaining exact prior CI evidence and a separate source-merge versus production boundary.",
+      "reviewReason": "Reviewed the existing manual Pages workflow and newer-main drift risk; it now requires an exact already merged source SHA, both pinned production origins, full checkout tests and a public source receipt. The Adult pilot release remains tied to PR55 source and separate from newer main features; no cloud or Pages rollout occurs in this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
