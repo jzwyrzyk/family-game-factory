@@ -11,7 +11,7 @@ void initBuilder();
 
 import {installJemsDelight} from './brand/delight';
 import './brand/delight.css';
-import './brand/gem-progress.css';
+import './brand/journey.css';
 installJemsDelight();
 
 import {installOffline} from './offline';

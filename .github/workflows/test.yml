@@ -148,6 +148,9 @@ jobs:
       - name: Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:studio
+      - name: Illustrated gem journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-journey
       - name: Design coach checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:coach

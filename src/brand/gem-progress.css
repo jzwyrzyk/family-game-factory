@@ -1,25 +1,86 @@
+
 .jems-builder-progress[hidden],.jems-gem-status[hidden]{display:none!important}
-/* Earned gem art: compact, expressive, never a gameplay overlay. */
-.jems-gem-shape{display:inline-block;flex:none;width:22px;height:23px;vertical-align:middle;
- clip-path:polygon(22% 8%,73% 3%,96% 36%,78% 89%,39% 100%,5% 66%,0 31%);
- background:linear-gradient(145deg,#a2b9d5 0 40%,#7390b3 41% 70%,#d7e5f0 71%);
- border:1px solid #567da2;filter:drop-shadow(0 2px 2px #0B1E3B26)}
-.jems-gem-shape.is-cut{clip-path:polygon(25% 0,78% 0,100% 35%,64% 100%,30% 100%,0 35%);
- background:conic-gradient(from 40deg,#8B5CF6,#c8a6ff,#2E6BFF,#7bb5ff,#8B5CF6)}
-.jems-gem-shape.is-polished{clip-path:polygon(24% 0,76% 0,100% 32%,50% 100%,0 32%);
- background:conic-gradient(from 35deg,#22D3A6,#92ffe0,#2E6BFF,#d6b5ff,#8B5CF6,#22D3A6);
- filter:drop-shadow(0 2px 4px #2E6BFF66)}
-.jems-gem-status{display:inline-flex;align-items:center;gap:5px;max-width:100%;font-size:12px;font-weight:750;
- color:#0B1E3B}
-.jems-builder-progress{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:12px 14px;
- border:1px solid #d9ccfc;border-radius:15px;background:linear-gradient(105deg,#fff7ee,#f2edff)}
-.jems-builder-progress .jems-builder-copy{display:flex;flex-direction:column;gap:2px;flex:1 1 210px;min-width:0}
-.jems-builder-progress .jems-builder-copy strong{font-size:15px;color:#0B1E3B}
-.jems-builder-progress .jems-builder-copy small{font-size:12px;color:#374c70}
-.jems-builder-progress .jems-builder-steps{display:flex;gap:4px;align-items:center;white-space:nowrap}
-.jems-builder-progress .jems-builder-steps .jems-gem-shape{width:19px;height:21px}
-.jems-builder-progress .jems-builder-steps .jems-gem-shape:not(.is-earned){filter:grayscale(1);opacity:.30}
+.jems-gem-status{display:inline-flex;align-items:center;gap:5px;max-width:100%;font-size:12px;font-weight:750;color:#0B1E3B}
+.jems-gem-status .jems-gem-art{width:25px}
 .studio-saved-open .jems-gem-status{margin-top:5px;align-self:flex-start}
 .studio-version .jems-gem-status{margin-left:8px}
-@media(max-width:650px){.jems-builder-progress{padding:10px 12px}.studio-version .jems-gem-status{font-size:11px}}
-@media(prefers-reduced-motion:reduce){.jems-gem-shape{transition:none!important}}
+.jems-builder-progress{margin:0 0 18px}
+.jems-builder-open{display:flex;align-items:center;gap:14px;width:100%;min-height:100px;padding:5px 22px 5px 14px;border:1px solid #e0d5f4;border-radius:23px;background:linear-gradient(100deg,#fff,#faf7ff);box-shadow:0 7px 24px #4d328308;color:#0b1e3b;text-align:left;cursor:pointer}
+.jems-builder-open:hover{border-color:#a77bdd;box-shadow:0 8px 26px #6c46a815}
+.jems-builder-open:focus-visible,.jems-home-journey:focus-visible{outline:3px solid #7136c9;outline-offset:4px}
+.jems-builder-open>.jems-character-art{width:69px;flex:none}
+.jems-builder-open>.jems-gem-art{width:61px;flex:none}
+.jems-builder-copy{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.jems-builder-copy small{font-size:12px;line-height:1.4;color:#775b98;font-weight:700}
+.jems-builder-copy strong{font:850 22px/1.2 var(--jems-round,system-ui);letter-spacing:-.6px;color:#0b1e3b}
+.jems-builder-steps{display:flex;align-items:center;gap:9px}
+.jems-builder-steps .jems-gem-art{width:48px}
+.jems-builder-steps .jems-gem-art:not(.is-earned){opacity:.28;filter:saturate(.3)}
+.jems-builder-arrow{font-size:26px;margin-left:10px;color:#7d50b8}
+#studioProfileSummary{display:flex;align-items:center;gap:7px}
+#studioProfileSummary .jems-character-art{width:28px;flex:none}
+#studioProfileSummary>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#studioProfileSummary::after{flex:none}
+/* The home uses the same finished character and workshop art as My journey. */
+body.studio-review #page-studio-library .studio-home-hero{position:relative;isolation:isolate;overflow:hidden;min-height:320px;padding:38px 42px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;border:1px solid #e7def5;border-radius:28px;background:linear-gradient(120deg,#fff 45%,#fcf9ff);gap:22px}
+body.studio-review #page-studio-library .studio-home-hero::before{content:'';display:block;position:absolute;inset:0;width:auto;height:auto;border:0;border-radius:0;transform:none;z-index:-1;background-image:linear-gradient(90deg,#fff 8%,#ffffffee 30%,#ffffff00 68%),var(--journey-world);background-position:center,right center;background-size:cover;opacity:.92;pointer-events:none;animation:none}
+body.studio-review #page-studio-library .studio-home-hero::after{display:none}
+body.studio-review #page-studio-library .studio-home-intro,body.studio-review #page-studio-library .studio-home-action{position:relative;z-index:2;width:52%;max-width:540px}
+body.studio-review #page-studio-library .studio-home-intro h1{font-size:clamp(29px,3.5vw,47px);line-height:1.08;max-width:440px;margin:0;letter-spacing:-1.7px}
+body.studio-review #page-studio-library .studio-home-intro p{margin:14px 0 0;font-size:15px;color:#52627e}
+body.studio-review #page-studio-library .studio-home-action{display:flex;align-items:center;flex-wrap:wrap;gap:6px 20px}
+body.studio-review #page-studio-library .studio-make-tile{display:flex;width:auto;max-width:100%;min-height:57px;padding:12px 17px;gap:10px;border-radius:15px}
+body.studio-review #page-studio-library .studio-make-tile .studio-make-icon{display:none}
+body.studio-review #page-studio-library .studio-make-tile .studio-make-copy strong{font-size:16px}
+body.studio-review #page-studio-library .studio-make-tile small{display:none}
+body.studio-review #page-studio-library .studio-hero-sparkles{display:none}
+body.studio-review #page-studio-library .studio-creation-note:empty{display:none}
+body.studio-review #page-studio-library .studio-home-action .studio-creation-note{order:3;flex-basis:100%;margin:0;font-size:11px}
+.jems-home-journey{background:none;border:0;padding:10px 0;min-height:44px;font-size:13px;line-height:1.3;font-weight:750;color:#5f3b96;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.jems-home-characters{position:absolute;z-index:1;bottom:0;right:3%;width:40%;height:100%;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.jems-home-characters>.jems-character-art{width:245px;max-width:100%;flex:none;filter:drop-shadow(0 12px 10px #6e3f8f18)}
+.jems-home-characters.is-pair{right:1%;width:47%}
+.jems-home-characters.is-pair>.jems-character-art{width:225px;max-width:58%;margin-inline:-4%}
+.jems-home-characters.is-pair>.jems-character-art:first-child{transform:translateY(-5px)}
+@media(max-width:900px){
+ body.studio-review #page-studio-library .studio-home-hero{padding:29px;min-height:300px}
+ body.studio-review #page-studio-library .studio-home-intro,body.studio-review #page-studio-library .studio-home-action{width:55%}
+ .jems-home-characters>.jems-character-art{width:210px}
+ .jems-home-characters.is-pair>.jems-character-art{width:180px}
+ .jems-builder-steps{gap:4px}.jems-builder-steps .jems-gem-art{width:38px}
+}
+@media(max-width:930px){
+ body.studio-review .site-header .studio-header-tools{margin-left:auto;order:1}
+ body.studio-review .site-header .studio-nav{order:2;flex-basis:100%;justify-content:center}
+}
+@media(max-width:650px){
+ body.studio-review .site-header .studio-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;gap:3px}
+ body.studio-review .site-header .studio-nav button{font-size:11px;padding:9px 2px;white-space:nowrap}
+ body.studio-review #page-studio-library .studio-home-hero{padding:25px 22px 0;min-height:370px;justify-content:flex-start;gap:16px;border-radius:23px}
+ body.studio-review #page-studio-library .studio-home-intro{width:100%;max-width:310px}
+ body.studio-review #page-studio-library .studio-home-intro h1{font-size:32px;max-width:300px;letter-spacing:-1.2px}
+ body.studio-review #page-studio-library .studio-home-intro p{font-size:12px;margin-top:10px;max-width:260px}
+ body.studio-review #page-studio-library .studio-home-action{width:57%;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+ body.studio-review #page-studio-library .studio-make-tile{min-height:47px;padding:10px 12px}
+ body.studio-review #page-studio-library .studio-make-tile .studio-make-copy strong{font-size:13px}
+ body.studio-review #page-studio-library .studio-make-arrow{font-size:19px}
+ body.studio-review #page-studio-library .studio-home-action .studio-creation-note{font-size:10px;max-width:170px}
+ body.studio-review #page-studio-library .studio-home-hero::before{background-image:linear-gradient(180deg,#fff 2%,#ffffffb5 35%,transparent 75%),var(--journey-world);background-position:center,right bottom}
+ .jems-home-characters{height:auto;bottom:0;right:1%;width:44%}
+ .jems-home-characters>.jems-character-art{width:164px}
+ .jems-home-characters.is-pair{right:-2%;width:53%}
+ .jems-home-characters.is-pair>.jems-character-art{max-width:60%;width:124px;margin-inline:-5%}
+ .jems-home-journey{font-size:11px;max-width:130px}
+ .jems-builder-open{gap:10px;padding:6px 12px;min-height:85px;border-radius:19px}
+ .jems-builder-open>.jems-character-art{width:53px}.jems-builder-open>.jems-gem-art{width:44px}
+ .jems-builder-copy strong{font-size:18px}.jems-builder-copy small{font-size:10px}
+ .jems-builder-steps{gap:0}.jems-builder-steps .jems-gem-art{width:23px}
+ .jems-builder-arrow{font-size:22px;margin-left:0}
+ .studio-version .jems-gem-status{font-size:11px}
+}
+@media(max-width:360px){
+ .jems-builder-open{gap:7px}.jems-builder-copy strong{font-size:16px}.jems-builder-steps .jems-gem-art{width:19px}
+ body.studio-review #page-studio-library .studio-home-hero{min-height:360px;padding-inline:18px}
+ body.studio-review #page-studio-library .studio-home-intro h1{font-size:29px}
+ body.studio-review #page-studio-library .studio-home-action{width:61%}
+}

@@ -70,7 +70,7 @@ const fs=require('node:fs');
     game:!!document.getElementById('studioGameMath')
   }));
   assert.match(visual.hero,/gradient/i,'the brighter jems hero retains a calm surface gradient');
-  assert.ok(visual.workbench.includes('jems-workbench.svg'),'approved invention artwork reaches the homepage, not only logo');
+  assert.ok(visual.workbench.includes('jems-journey/background.webp'),'the illustrated workshop world reaches the homepage');
   assert.match(visual.button,/gradient/i,'child create action uses accessible on-brand gradient');
   assert.ok(visual.learning&&visual.game,'brand merge retained latest Math/English selector');
 

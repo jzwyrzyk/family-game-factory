@@ -7,6 +7,11 @@ export interface StoragePort { getItem(key: string): string | null; setItem(key:
 export type Message = { id: string; role: 'child' | 'helper' | 'reflection'; text: string; at: string };
 export type Candidate = { id: string; baseId: string | null; config?: Record<string, number | boolean>; remoteId?: string; prompt: string; summary: string };
 export type PendingJob = { id: string; api: string; status: 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled'; revisionId?:string; phase?:string };
+/** A cosmetic choice, not a gender or a fact about the player. */
+export type BuilderAvatar = 'spark' | 'nova';
+/** Written only after the underlying revision service confirms this exact keep. */
+export type KeptExperiment = {experimentId:string; revisionId:string; baseId:string; kind:'local'|'remote'; at:string};
+export type KeptExperimentInput = Pick<KeptExperiment,'revisionId'|'kind'> & {baseId:string|null};
 export interface StudioSession {
   id: string; owner: string; name: string; game: GameId | 'new';
   projectId: string | null; remoteId: string | null; remoteKind?: string;
@@ -15,8 +20,9 @@ export interface StudioSession {
   design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
   archived?:boolean; resumeDismissed?:boolean;
+  keptExperiments?:KeptExperiment[]; verifiedRemoteExperiments?:string[];
 }
-export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string> }
+export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar> }
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
 const safeText = (x: unknown, max: number): x is string => typeof x === 'string' && x.length <= max;
@@ -24,6 +30,8 @@ const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(
 export function validateNotebook(input: unknown): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
+  if(Object.keys(n).some(k=>!['version','sessions','active','avatars'].includes(k)))throw Error('Unknown studio data; not restored.');
+  if(n.avatars!==undefined&&(!n.avatars||typeof n.avatars!=='object'||Array.isArray(n.avatars)||Object.keys(n.avatars).length>80||!Object.entries(n.avatars).every(([owner,choice])=>ident(owner)&&(choice==='spark'||choice==='nova'))))throw Error('Invalid builder character choice.');
   const ids = new Set<string>();
   for (const s of n.sessions) {
     if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
@@ -37,6 +45,15 @@ export function validateNotebook(input: unknown): Notebook {
     }
     if(s.design!==undefined)validateDesign(s.design);
     if(s.experiments!==undefined)validateExperiments(s.experiments);
+    if(s.verifiedRemoteExperiments!==undefined&&(!Array.isArray(s.verifiedRemoteExperiments)||s.verifiedRemoteExperiments.length>100||new Set(s.verifiedRemoteExperiments).size!==s.verifiedRemoteExperiments.length||!s.verifiedRemoteExperiments.every(id=>ident(id)&&s.experiments?.some(e=>e.id===id&&!!e.candidate.remoteId))))throw Error('Invalid verified experiment.');
+    if(s.keptExperiments!==undefined){
+      if(!Array.isArray(s.keptExperiments)||s.keptExperiments.length>100||new Set(s.keptExperiments.map(k=>k?.experimentId)).size!==s.keptExperiments.length||new Set(s.keptExperiments.map(k=>k?.revisionId)).size!==s.keptExperiments.length)throw Error('Invalid kept experiment.');
+      for(const kept of s.keptExperiments){
+        const test=s.experiments?.find(e=>e.id===kept?.experimentId);
+        if(!kept||Object.keys(kept).some(k=>!['experimentId','revisionId','baseId','kind','at'].includes(k))||!ident(kept.experimentId)||!ident(kept.revisionId)||!ident(kept.baseId)||kept.baseId===kept.revisionId||!['local','remote'].includes(kept.kind)||!safeText(kept.at,40)||!Number.isFinite(Date.parse(kept.at))||!test||test.baseId!==kept.baseId||test.candidate.baseId!==kept.baseId)throw Error('Invalid kept experiment.');
+        if(kept.kind==='remote'?test.candidate.remoteId!==kept.revisionId||!s.verifiedRemoteExperiments?.includes(test.id):!s.projectId||!test.candidate.config)throw Error('Kept version does not match its experiment.');
+      }
+    }
     if(s.selectedTest!==undefined&&s.selectedTest!==null&&!s.experiments?.some(e=>e.id===s.selectedTest))throw Error('Unknown selected test.');
     if(s.playOnly!==undefined&&typeof s.playOnly!=='boolean')throw Error('Invalid play-only state.');
     if((s.archived!==undefined&&typeof s.archived!=='boolean')||(s.resumeDismissed!==undefined&&typeof s.resumeDismissed!=='boolean'))throw Error('Invalid home visibility state.');
@@ -45,7 +62,7 @@ export function validateNotebook(input: unknown): Notebook {
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   return copy(n);
 }
@@ -59,6 +76,14 @@ export class StudioNotebook {
     return copy(result);
   }
   list(owner:string):StudioSession[] {return this.read().sessions.filter(s=>s.owner===owner).sort((a,b)=>b.updated.localeCompare(a.updated));}
+  avatar(owner:string):BuilderAvatar|null {
+    if(!ident(owner))throw Error('Invalid player.');
+    return this.read().avatars?.[owner]??null;
+  }
+  setAvatar(owner:string,choice:BuilderAvatar|null):BuilderAvatar|null {
+    if(!ident(owner)||choice!==null&&choice!=='spark'&&choice!=='nova')throw Error('Choose one of the two builder characters.');
+    return this.write(n=>{n.avatars={...n.avatars};if(choice===null)delete n.avatars[owner];else n.avatars[owner]=choice;return choice;});
+  }
   get(id:string,owner:string):StudioSession {const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return s;}
   last(owner:string):StudioSession|null {const n=this.read(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?s:null;}
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
@@ -84,6 +109,9 @@ export class StudioNotebook {
         throw Error('Finish or cancel the current build before clearing this chat.');
       s.messages=[];s.draft='';s.hypothesis='';s.reflection=false;
       s.design=freshDesign();
+      // Keep receipts belong to this erased making history, not a shadow badge store.
+      // Saved test prompts/notes and game versions retain their existing semantics.
+      delete s.keptExperiments;
     });
   }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
@@ -92,11 +120,36 @@ export class StudioNotebook {
     // Prior observations remain truthful history. Their old tests are not on the new shelf,
     // so keep the text, author/source, identifiers and dates while detaching those links.
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
-    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
-  saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true):Experiment {
+  saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true,verifiedRemote=false):Experiment {
     let result:Experiment;
-    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);if(select){s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;}s.playOnly=false;s.resumeDismissed=false;});return result!;
+    this.update(id,owner,s=>{s.experiments ||= [];result=experiment(candidate,s.experiments!,parents,depth,origin,s.hypothesis);s.experiments!.push(result);if(verifiedRemote&&candidate.remoteId){s.verifiedRemoteExperiments ||= [];s.verifiedRemoteExperiments.push(result.id);}if(select){s.selectedTest=result.id;s.candidate=copy(candidate);s.undone=null;}s.playOnly=false;s.resumeDismissed=false;});return result!;
+  }
+  /** Call only after a real (not mock) remote preview/build is verified. */
+  verifyRemoteExperiment(id:string,owner:string,testId:string):StudioSession {
+    return this.update(id,owner,s=>{const test=s.experiments?.find(e=>e.id===testId);if(!test?.candidate.remoteId)throw Error('Choose a saved remote experiment.');s.verifiedRemoteExperiments ||= [];if(!s.verifiedRemoteExperiments.includes(testId))s.verifiedRemoteExperiments.push(testId);});
+  }
+  /** Complete the notebook side of a successful, exact-test keep atomically.
+   * A first remote build has no prior base, so it stays a valid working game
+   * without pretending to be a tested improvement. Unknown/mock remote tests
+   * can still be kept by their existing workflow but never award progress.
+   */
+  keepExperiment(id:string,owner:string,testId:string,receipt:KeptExperimentInput):StudioSession {
+    return this.update(id,owner,s=>{
+      const test=s.experiments?.find(e=>e.id===testId);
+      if(!test||!receipt||!ident(receipt.revisionId)||!['local','remote'].includes(receipt.kind)||receipt.baseId!==test.candidate.baseId||receipt.baseId!==test.baseId||receipt.baseId!==null&&!ident(receipt.baseId))throw Error('Kept version does not match its experiment.');
+      if(receipt.kind==='remote'?test.candidate.remoteId!==receipt.revisionId:!s.projectId||!test.candidate.config)throw Error('Kept version does not match its experiment.');
+      if(receipt.revisionId===receipt.baseId)throw Error('Keep a new version of this experiment.');
+      if(receipt.kind==='remote')s.remoteId=receipt.revisionId;
+      s.candidate=null;s.undone=null;
+      const verified=receipt.kind==='local'||s.verifiedRemoteExperiments?.includes(test.id);
+      if(receipt.baseId!==null&&verified){
+        s.keptExperiments ||= [];
+        // Repeating a keep does not create extra project or milestone credit.
+        if(!s.keptExperiments.some(k=>k.experimentId===test.id))s.keptExperiments.push({...receipt,baseId:receipt.baseId,experimentId:test.id,at:new Date().toISOString()});
+      }
+    });
   }
   selectExperiment(id:string,owner:string,testId:string):Experiment {
     const e=this.get(id,owner).experiments?.find(e=>e.id===testId);if(!e)throw Error('Choose one of this project’s tests.');
