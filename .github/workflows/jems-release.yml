@@ -136,34 +136,24 @@ jobs:
         with:
           name: jems-release-backend-health
           path: release-evidence/backend-health.json
-  pages_deploy:
+  pages_build:
     needs: [plan, pages_quality, pages_precheck]
-    concurrency:
-      group: jems-pages-publish
-      cancel-in-progress: false
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 18
     permissions:
       contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    outputs:
-      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Refuse stale source before publication
+      - name: Refuse stale source before constructing production artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
-          test "$MAIN_SHA" = "$GITHUB_SHA" || { echo 'Main moved; not publishing stale code.' >&2; exit 1; }
+          test "$MAIN_SHA" = "$GITHUB_SHA" || { echo 'Main moved; not building stale production artifact.' >&2; exit 1; }
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -182,13 +172,33 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+  pages_deploy:
+    needs: [plan, pages_build]
+    concurrency:
+      group: jems-pages-publish
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # The privileged job only validates the exact source identity, then
+      # publishes the already built artifact. Never run npm or build scripts
+      # with pages:write / id-token:write permissions.
       - name: Final main-head lease check immediately before Pages publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
-          test "$MAIN_SHA" = "$GITHUB_SHA" || { echo 'Main advanced while building; refuse stale Pages artifact.' >&2; exit 1; }
+          test "$MAIN_SHA" = "$GITHUB_SHA" || { echo 'Main advanced; refuse stale Pages artifact.' >&2; exit 1; }
       - id: deployment
         uses: actions/deploy-pages@v4
   pages_verify:
