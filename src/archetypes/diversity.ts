@@ -41,7 +41,9 @@ const challenges:readonly Challenge[]=['hazard','enemy','terrain','precision','t
 const goals:readonly Goal[]=['reach','collect','survive','defeat','protect','score','solve','create','discover','deliver','care','grow','manage','perform'];
 const paces:readonly Pace[]=['continuous','timed','turn-based','self-paced','staged'];
 const controls:readonly Input[]=['tap','keyboard','drag','grid','steer','timed','choice'];
-const nonCosmetic=(ids:readonly string[])=>ids.filter(id=>mechanicById.get(id)!.system!=='presentation');
+/** Only non-interactive embellishments are discounted: rhythm/dialogue/clues can be real mechanics. */
+const cosmeticOnly=new Set(['sound-effect','celebration','launch-animation']);
+const nonCosmetic=(ids:readonly string[])=>ids.filter(id=>!cosmeticOnly.has(id));
 export function validateExperienceSignature(value:ExperienceSignature):void {
  if(!value||!archetypeById.has(value.archetypeId)||
   !verbs.includes(value.verb)||!controls.includes(value.control)||!challenges.includes(value.challenge)||
