@@ -1,0 +1,32 @@
+name: Jems edit intelligence bounded-preview acceptance
+on:
+  pull_request:
+    paths:
+      - 'src/edit-intelligence/**'
+      - 'tests/edit-intelligence.test.ts'
+      - 'docs/edit-intelligence/**'
+      - '.github/workflows/edit-intelligence.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/edit-intelligence/**'
+      - 'tests/edit-intelligence.test.ts'
+      - 'docs/edit-intelligence/**'
+jobs:
+  edit-preview-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Typecheck and bundle regression
+        run: npm run build
+      - name: Existing unit regression
+        run: npm run test:unit
+      - name: Archetype and bounded edit contracts
+        run: node --import tsx --test tests/archetypes.test.ts tests/edit-intelligence.test.ts
