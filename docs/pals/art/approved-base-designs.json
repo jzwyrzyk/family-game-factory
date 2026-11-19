@@ -1,0 +1,780 @@
+{
+  "schema": "jems.pals.approved-base-designs.v1",
+  "registry_revision": 1,
+  "recorded_date": "2026-11-19",
+  "timezone": "America/New_York",
+  "scope": "Approved base designs S-X and the 22-design selected roster; artwork records only.",
+  "decision_record": "../../decisions/2026-11-19-pal-base-design-adoption.md",
+  "source_catalog": {
+    "catalog_id": "jems-gem-pal-design-catalog",
+    "catalog_revision": 2,
+    "filename": "Jems_Gem_Pal_Catalog_v1.json",
+    "sha256": "f6443d8ad7e7622f46f03ca5220c8a768966c752ac90e0cc366ea46d34927d90",
+    "import_scope": "Selected roster summaries and six approved base specifications; archived growth proposals excluded."
+  },
+  "identity_policy": {
+    "species_ids": "GP-S019 through GP-S024 remain design-catalog identities.",
+    "review_aliases": "Board-scoped letters, not application IDs.",
+    "display_names": "Editable labels, not immutable identity.",
+    "prior_species_ids": "Unassigned here; preserve canonical identities when the original records are reconciled.",
+    "runtime_mapping": "Unassigned; do not infer replacement of Glim, Kip or Riff."
+  },
+  "approval": {
+    "by": "owner",
+    "date": "2026-11-19",
+    "scope": "Six displayed base designs S-X at art revision 2.",
+    "decision_summary": "Adopt the six base designs; pause growth work while its approach is reconsidered."
+  },
+  "workstream_status": {
+    "base_designs_s_x": "approved",
+    "growth": "paused",
+    "replacement_growth_approach": null,
+    "runtime_binding": "unassigned",
+    "collection_policy": "not_defined_by_this_record",
+    "individual_game_assets": "pending",
+    "expressions": "pending",
+    "animation_rigs": "pending"
+  },
+  "selected_roster_count": 22,
+  "prior_selected_summary_count": 16,
+  "new_approved_base_count": 6,
+  "selected_roster": [
+    {
+      "alias": "A",
+      "display_name": "Luma",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "backlight",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "B",
+      "display_name": "Nook",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "gem nursery",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "D",
+      "display_name": "Mizzle",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "dew gardener",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "E",
+      "display_name": "Tumble",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "tail-gem balancer",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "F",
+      "display_name": "Navi and Mote",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "floating gem partnership",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "G",
+      "display_name": "Sivo",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "sieve hands",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "H",
+      "display_name": "Furl",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "matched gem wings",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "I",
+      "display_name": "Tessit",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "tile-stamping feet",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "K",
+      "display_name": "Flick",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "seed collector",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "L",
+      "display_name": "Clasp",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "hook-gem climber",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "M",
+      "display_name": "Skiff",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "ski-like gem foot",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "N",
+      "display_name": "Peep",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "magnifying gem eye",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "O",
+      "display_name": "Weft",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "gem loom ring",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "P",
+      "display_name": "Cache",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "geode storage",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "Q",
+      "display_name": "Brim",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "shade canopy",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "R",
+      "display_name": "Wink",
+      "species_id": null,
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "role": "signal-tail gems",
+      "approved_art_reference": null,
+      "app_mapping": null
+    },
+    {
+      "alias": "S",
+      "display_name": "Poff",
+      "species_id": "GP-S019",
+      "board_id": "new-pals-2026-11-19-01",
+      "record_kind": "approved_base_design_record",
+      "approved_art_reference": "boards/pals-s-u-r2.png",
+      "app_mapping": null
+    },
+    {
+      "alias": "T",
+      "display_name": "Chimi",
+      "species_id": "GP-S020",
+      "board_id": "new-pals-2026-11-19-01",
+      "record_kind": "approved_base_design_record",
+      "approved_art_reference": "boards/pals-s-u-r2.png",
+      "app_mapping": null
+    },
+    {
+      "alias": "U",
+      "display_name": "Pleeko",
+      "species_id": "GP-S021",
+      "board_id": "new-pals-2026-11-19-01",
+      "record_kind": "approved_base_design_record",
+      "approved_art_reference": "boards/pals-s-u-r2.png",
+      "app_mapping": null
+    },
+    {
+      "alias": "V",
+      "display_name": "Talli",
+      "species_id": "GP-S022",
+      "board_id": "new-pals-2026-11-19-02",
+      "record_kind": "approved_base_design_record",
+      "approved_art_reference": "boards/pals-v-x-r2.png",
+      "app_mapping": null
+    },
+    {
+      "alias": "W",
+      "display_name": "Zippa",
+      "species_id": "GP-S023",
+      "board_id": "new-pals-2026-11-19-02",
+      "record_kind": "approved_base_design_record",
+      "approved_art_reference": "boards/pals-v-x-r2.png",
+      "app_mapping": null
+    },
+    {
+      "alias": "X",
+      "display_name": "Whorl",
+      "species_id": "GP-S024",
+      "board_id": "new-pals-2026-11-19-02",
+      "record_kind": "approved_base_design_record",
+      "approved_art_reference": "boards/pals-v-x-r2.png",
+      "app_mapping": null
+    }
+  ],
+  "set_aside_summaries": [
+    {
+      "alias": "C",
+      "display_name": "Tollo",
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "selection_status": "set_aside"
+    },
+    {
+      "alias": "J",
+      "display_name": "Pock",
+      "board_id": "first-round-2026-11-19",
+      "record_kind": "prior_selection_summary",
+      "selection_status": "set_aside"
+    }
+  ],
+  "boards": [
+    {
+      "board_id": "new-pals-2026-11-19-01",
+      "art_revision": 2,
+      "status": "approved_base_designs",
+      "path": "boards/pals-s-u-r2.png",
+      "subjects": [
+        "GP-S019",
+        "GP-S020",
+        "GP-S021"
+      ],
+      "source_filename": "exec-6bf89f8e-4cab-4612-a717-72fe4f2502e0.png",
+      "sha256": "c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49",
+      "bytes": 1899161,
+      "width_px": 2172,
+      "height_px": 724,
+      "format": "png",
+      "copy_method": "byte_for_byte",
+      "asset_kind": "multi_character_concept_board",
+      "production_asset": false
+    },
+    {
+      "board_id": "new-pals-2026-11-19-02",
+      "art_revision": 2,
+      "status": "approved_base_designs",
+      "path": "boards/pals-v-x-r2.png",
+      "subjects": [
+        "GP-S022",
+        "GP-S023",
+        "GP-S024"
+      ],
+      "source_filename": "exec-502786e3-f3b4-434e-aab0-31ae868e7174.png",
+      "sha256": "47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9",
+      "bytes": 1915988,
+      "width_px": 1755,
+      "height_px": 896,
+      "format": "png",
+      "copy_method": "byte_for_byte",
+      "asset_kind": "multi_character_concept_board",
+      "production_asset": false
+    }
+  ],
+  "new_base_designs": [
+    {
+      "species_id": "GP-S019",
+      "alias": "S",
+      "display_name": "Poff",
+      "spec_revision": 1,
+      "art_revision": 2,
+      "variant_id": "default",
+      "story": "Poff guides light objects with careful little puffs from its gem valves; it sometimes announces a mighty breeze before it has taken a full breath.",
+      "body_plan": "Low, wide concertina torso with smooth front face, two broad feet and two small hands.",
+      "locomotion": "Squash, expand and shuffle.",
+      "gem_mechanism": {
+        "arrangement": "Two prominent shoulder valve gems",
+        "count_intent": 2,
+        "size": "large",
+        "material": "translucent violet faceted crystal",
+        "attachment": "Visible pale mineral shoulder sockets",
+        "function": "Channel and aim gentle air currents",
+        "removal_test": "Puffs lose directional control"
+      },
+      "palette": {
+        "body": "pale mint",
+        "gems": "violet",
+        "accent": "warm cream"
+      },
+      "identity_anchors": [
+        "Wide pleated torso",
+        "Two separate shoulder valves",
+        "Front-facing oval face",
+        "Broad planted feet"
+      ],
+      "closest": [
+        "A/Luma",
+        "C/Tollo"
+      ],
+      "difference": "Compression and air routing distinguish the body and action from the existing light and sound roles.",
+      "sample_game_action": "A puff gesture that can visually nudge a light prop in a separately implemented game.",
+      "risk": "Pleats must remain conspicuous; do not collapse the body to a generic round mascot.",
+      "review_alias": {
+        "board_id": "new-pals-2026-11-19-01",
+        "label": "S"
+      },
+      "review_status": {
+        "brief_review": "completed",
+        "render_review": "Concept-board visual review complete; final targeted corrections inspected.",
+        "human_approval": "approved_base_design_only",
+        "small_size_review": "not_performed",
+        "multi_view_anatomy_review": "not_performed"
+      },
+      "status": "approved",
+      "approval_scope": "base_design_only",
+      "current_form": "base",
+      "approval": {
+        "by": "owner",
+        "date": "2026-11-19",
+        "art_revision": 2,
+        "spec_revision": 1,
+        "scope": "Displayed base concept design"
+      },
+      "approved_art_reference": "boards/pals-s-u-r2.png",
+      "approved_board_sha256": "c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49",
+      "app_mapping": null,
+      "production_asset_ref": null,
+      "expression_set_ref": null,
+      "animation_rig_ref": null,
+      "growth_work_status": "paused",
+      "growth_forms": [],
+      "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
+      "implementation_status": {
+        "base_concept": "approved",
+        "individual_game_asset": "pending",
+        "expressions": "pending",
+        "animation_rig": "pending",
+        "application_mapping": "unassigned",
+        "in_game_verification": "pending"
+      }
+    },
+    {
+      "species_id": "GP-S020",
+      "alias": "T",
+      "display_name": "Chimi",
+      "spec_revision": 1,
+      "art_revision": 2,
+      "variant_id": "default",
+      "story": "Chimi arranges little tunes on its back-gem comb; when it plays the wrong note, it proudly decides that the song needed a surprise.",
+      "body_plan": "Sideways lilac crescent with a small face at its low front end, two feet and two short arms.",
+      "locomotion": "Rocking steps; gentle body sway while playing.",
+      "gem_mechanism": {
+        "arrangement": "A graduated exposed comb along the back",
+        "count_intent": 5,
+        "size": "mixed lengths",
+        "material": "translucent amber and coral crystal",
+        "attachment": "Individual visible mineral root sockets and clear gaps",
+        "function": "Produce distinguishable notes in an arranged sequence",
+        "removal_test": "The creature cannot sound its characteristic tune"
+      },
+      "palette": {
+        "body": "lilac",
+        "gems": "amber and coral",
+        "accent": "cream"
+      },
+      "identity_anchors": [
+        "Sideways crescent body",
+        "Five separated graduated tines",
+        "Face below the comb at front",
+        "Playing rather than listening gesture"
+      ],
+      "closest": [
+        "C/Tollo",
+        "A/Luma"
+      ],
+      "difference": "A crescent musical performer with accessible graduated tines; Tollo is an echo listener.",
+      "sample_game_action": "Play a short tune or provide a rhythmic visual cue; no claim of measuring musical ability.",
+      "risk": "Avoid a spiky animal silhouette or redundant ear-shaped listening gems.",
+      "review_alias": {
+        "board_id": "new-pals-2026-11-19-01",
+        "label": "T"
+      },
+      "review_status": {
+        "brief_review": "completed",
+        "render_review": "Concept-board visual review complete; final targeted corrections inspected.",
+        "human_approval": "approved_base_design_only",
+        "small_size_review": "not_performed",
+        "multi_view_anatomy_review": "not_performed"
+      },
+      "status": "approved",
+      "approval_scope": "base_design_only",
+      "current_form": "base",
+      "approval": {
+        "by": "owner",
+        "date": "2026-11-19",
+        "art_revision": 2,
+        "spec_revision": 1,
+        "scope": "Displayed base concept design"
+      },
+      "approved_art_reference": "boards/pals-s-u-r2.png",
+      "approved_board_sha256": "c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49",
+      "app_mapping": null,
+      "production_asset_ref": null,
+      "expression_set_ref": null,
+      "animation_rig_ref": null,
+      "growth_work_status": "paused",
+      "growth_forms": [],
+      "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
+      "implementation_status": {
+        "base_concept": "approved",
+        "individual_game_asset": "pending",
+        "expressions": "pending",
+        "animation_rig": "pending",
+        "application_mapping": "unassigned",
+        "in_game_verification": "pending"
+      }
+    },
+    {
+      "species_id": "GP-S021",
+      "alias": "U",
+      "display_name": "Pleeko",
+      "spec_revision": 1,
+      "art_revision": 2,
+      "variant_id": "default",
+      "story": "Pleeko unfolds its little back into helpful steps; it is usually the smallest creature to volunteer for the tallest job.",
+      "body_plan": "Peach low wedge with a connected folded mantle, a small front face and four compact supporting feet.",
+      "locomotion": "Low steps and controlled unfolding.",
+      "gem_mechanism": {
+        "arrangement": "Three hinge gems at connected step bends",
+        "count_intent": 3,
+        "size": "medium",
+        "material": "translucent emerald crystal",
+        "attachment": "Visible mineral sockets joining thick organic folds",
+        "function": "Hold the mantle in stable stepped configurations",
+        "removal_test": "The unfolded structure cannot hold its intended step arrangement"
+      },
+      "palette": {
+        "body": "peach",
+        "gems": "emerald",
+        "accent": "warm cream"
+      },
+      "identity_anchors": [
+        "Low wedge silhouette",
+        "Face at front of connected body",
+        "Three visible hinge locations",
+        "A step motif remains visible at rest"
+      ],
+      "closest": [
+        "Q/Brim",
+        "L/Clasp"
+      ],
+      "difference": "The body unfolds into connected steps; it is not a sunshade or a grasping climber.",
+      "sample_game_action": "An unfolding-step animation; any climbable platform needs a separately specified game mechanic.",
+      "risk": "Do not turn the mantle into furniture, a canopy or decorative wings.",
+      "review_alias": {
+        "board_id": "new-pals-2026-11-19-01",
+        "label": "U"
+      },
+      "review_status": {
+        "brief_review": "completed",
+        "render_review": "Concept-board visual review complete; final targeted corrections inspected.",
+        "human_approval": "approved_base_design_only",
+        "small_size_review": "not_performed",
+        "multi_view_anatomy_review": "not_performed"
+      },
+      "status": "approved",
+      "approval_scope": "base_design_only",
+      "current_form": "base",
+      "approval": {
+        "by": "owner",
+        "date": "2026-11-19",
+        "art_revision": 2,
+        "spec_revision": 1,
+        "scope": "Displayed base concept design"
+      },
+      "approved_art_reference": "boards/pals-s-u-r2.png",
+      "approved_board_sha256": "c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49",
+      "app_mapping": null,
+      "production_asset_ref": null,
+      "expression_set_ref": null,
+      "animation_rig_ref": null,
+      "growth_work_status": "paused",
+      "growth_forms": [],
+      "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
+      "implementation_status": {
+        "base_concept": "approved",
+        "individual_game_asset": "pending",
+        "expressions": "pending",
+        "animation_rig": "pending",
+        "application_mapping": "unassigned",
+        "in_game_verification": "pending"
+      }
+    },
+    {
+      "species_id": "GP-S022",
+      "alias": "V",
+      "display_name": "Talli",
+      "spec_revision": 1,
+      "art_revision": 2,
+      "variant_id": "default",
+      "story": "Talli unrolls its flat tail to compare how far things are apart; every measurement seems to need one tiny bit more reaching.",
+      "body_plan": "Low sky-blue front body with a large open curled body-loop and a broad continuous flat tail.",
+      "locomotion": "Anchor, unroll and recoil, supported by small front feet.",
+      "gem_mechanism": {
+        "arrangement": "One terminal wedge on the extended tail",
+        "count_intent": 1,
+        "size": "large",
+        "material": "translucent coral-red crystal",
+        "attachment": "Pale mineral terminal socket",
+        "function": "Anchor the far endpoint for reach and distance comparison",
+        "removal_test": "The far end cannot hold a stable reference"
+      },
+      "palette": {
+        "body": "sky blue",
+        "gems": "coral red",
+        "accent": "lavender spacing dashes"
+      },
+      "identity_anchors": [
+        "Open body-loop",
+        "Broad flat uncoiling tail",
+        "Single terminal gem",
+        "Face stays on the low front body"
+      ],
+      "closest": [
+        "E/Tumble",
+        "M/Skiff"
+      ],
+      "difference": "An extending flat ribbon measures reach; its gem does not function as a hanging counterweight or ski.",
+      "sample_game_action": "Extend to compare two distances visually; exact in-game measurement requires deterministic game logic.",
+      "risk": "Avoid snail shells, eye stalks, round snake tails and unsupported literal tape-measure casings.",
+      "review_alias": {
+        "board_id": "new-pals-2026-11-19-02",
+        "label": "V"
+      },
+      "review_status": {
+        "brief_review": "completed",
+        "render_review": "Concept-board visual review complete; final targeted corrections inspected.",
+        "human_approval": "approved_base_design_only",
+        "small_size_review": "not_performed",
+        "multi_view_anatomy_review": "not_performed"
+      },
+      "status": "approved",
+      "approval_scope": "base_design_only",
+      "current_form": "base",
+      "approval": {
+        "by": "owner",
+        "date": "2026-11-19",
+        "art_revision": 2,
+        "spec_revision": 1,
+        "scope": "Displayed base concept design"
+      },
+      "approved_art_reference": "boards/pals-v-x-r2.png",
+      "approved_board_sha256": "47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9",
+      "app_mapping": null,
+      "production_asset_ref": null,
+      "expression_set_ref": null,
+      "animation_rig_ref": null,
+      "growth_work_status": "paused",
+      "growth_forms": [],
+      "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
+      "implementation_status": {
+        "base_concept": "approved",
+        "individual_game_asset": "pending",
+        "expressions": "pending",
+        "animation_rig": "pending",
+        "application_mapping": "unassigned",
+        "in_game_verification": "pending"
+      }
+    },
+    {
+      "species_id": "GP-S023",
+      "alias": "W",
+      "display_name": "Zippa",
+      "spec_revision": 1,
+      "art_revision": 2,
+      "variant_id": "default",
+      "story": "Zippa lines up loose edges with paired rows of gem teeth; it is immensely proud of the final little click.",
+      "body_plan": "Upright magenta twin mantle lobes around one central body, friendly face high above the seam and two small feet.",
+      "locomotion": "Short shuffles with mantle edges drawing inward.",
+      "gem_mechanism": {
+        "arrangement": "Two matching exposed rows along mantle edges",
+        "count_intent": 16,
+        "size": "many small",
+        "material": "golden faceted crystal",
+        "attachment": "Individual pale sockets, well away from the mouth",
+        "function": "A central guiding groove brings matched rows together to join a short edge",
+        "removal_test": "The edge loses its matching interlock"
+      },
+      "palette": {
+        "body": "magenta",
+        "gems": "golden amber",
+        "accent": "warm cream"
+      },
+      "identity_anchors": [
+        "Twin mantle lobes",
+        "Paired gem rows",
+        "Visible Y-shaped joining path",
+        "Face separate from the seam"
+      ],
+      "closest": [
+        "O/Weft",
+        "L/Clasp"
+      ],
+      "difference": "Paired interlocking rows and a guiding path replace weaving, thread and hooks.",
+      "sample_game_action": "A short joining animation or matching-edge puzzle; no new crafting system is assumed.",
+      "risk": "Mechanism needs a close-up and movement study; avoid zipper mouths or gemstone teeth that appear to be skin bumps.",
+      "review_alias": {
+        "board_id": "new-pals-2026-11-19-02",
+        "label": "W"
+      },
+      "review_status": {
+        "brief_review": "completed",
+        "render_review": "Concept-board visual review complete; final targeted corrections inspected.",
+        "human_approval": "approved_base_design_only",
+        "small_size_review": "not_performed",
+        "multi_view_anatomy_review": "not_performed"
+      },
+      "status": "approved",
+      "approval_scope": "base_design_only",
+      "current_form": "base",
+      "approval": {
+        "by": "owner",
+        "date": "2026-11-19",
+        "art_revision": 2,
+        "spec_revision": 1,
+        "scope": "Displayed base concept design"
+      },
+      "approved_art_reference": "boards/pals-v-x-r2.png",
+      "approved_board_sha256": "47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9",
+      "app_mapping": null,
+      "production_asset_ref": null,
+      "expression_set_ref": null,
+      "animation_rig_ref": null,
+      "growth_work_status": "paused",
+      "growth_forms": [],
+      "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
+      "implementation_status": {
+        "base_concept": "approved",
+        "individual_game_asset": "pending",
+        "expressions": "pending",
+        "animation_rig": "pending",
+        "application_mapping": "unassigned",
+        "in_game_verification": "pending"
+      }
+    },
+    {
+      "species_id": "GP-S024",
+      "alias": "X",
+      "display_name": "Whorl",
+      "spec_revision": 1,
+      "art_revision": 2,
+      "variant_id": "default",
+      "story": "Whorl keeps a thoughtful little face while its gem spins enthusiastically; it is very good at helping a wobbly situation settle down.",
+      "body_plan": "Small aqua front body and two stabilizing feet with one integrated open hoop ridge behind the head.",
+      "locomotion": "Planted stance, leaning and supported rolling motions.",
+      "gem_mechanism": {
+        "arrangement": "One central lentil-shaped rotor inside an open hoop",
+        "count_intent": 1,
+        "size": "large",
+        "material": "translucent sapphire crystal",
+        "attachment": "A visible short mineral axle supported on both sides",
+        "function": "Provide a fictional rotational stabilizing action",
+        "removal_test": "The distinctive spinning and stabilizing action disappears"
+      },
+      "palette": {
+        "body": "aquamarine",
+        "gems": "sapphire blue",
+        "accent": "warm cream"
+      },
+      "identity_anchors": [
+        "Open back hoop with negative space",
+        "One supported central rotor",
+        "Stable face on solid front body",
+        "Two broad feet"
+      ],
+      "closest": [
+        "E/Tumble",
+        "F/Navi and Mote"
+      ],
+      "difference": "A supported rotating gem distinguishes it from a tail counterweight and an independent floating partner.",
+      "sample_game_action": "A spinning-gem animation or wobble-settling effect; it is not a physics-validated mechanism.",
+      "risk": "Highest anatomy risk; preserve a creature body, obvious supports and clear separation between face and rotor.",
+      "review_alias": {
+        "board_id": "new-pals-2026-11-19-02",
+        "label": "X"
+      },
+      "review_status": {
+        "brief_review": "completed",
+        "render_review": "Concept-board visual review complete; final targeted corrections inspected.",
+        "human_approval": "approved_base_design_only",
+        "small_size_review": "not_performed",
+        "multi_view_anatomy_review": "not_performed"
+      },
+      "status": "approved",
+      "approval_scope": "base_design_only",
+      "current_form": "base",
+      "approval": {
+        "by": "owner",
+        "date": "2026-11-19",
+        "art_revision": 2,
+        "spec_revision": 1,
+        "scope": "Displayed base concept design"
+      },
+      "approved_art_reference": "boards/pals-v-x-r2.png",
+      "approved_board_sha256": "47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9",
+      "app_mapping": null,
+      "production_asset_ref": null,
+      "expression_set_ref": null,
+      "animation_rig_ref": null,
+      "growth_work_status": "paused",
+      "growth_forms": [],
+      "gameplay_status": "fictional design affordance; runtime behavior not implemented by this design pack",
+      "implementation_status": {
+        "base_concept": "approved",
+        "individual_game_asset": "pending",
+        "expressions": "pending",
+        "animation_rig": "pending",
+        "application_mapping": "unassigned",
+        "in_game_verification": "pending"
+      }
+    }
+  ],
+  "handoff_requirements": [
+    "Preserve the approved base identity anchors and exact board provenance.",
+    "Prepare isolated production assets separately from these concept boards.",
+    "Reconcile application identities and saved-scene compatibility explicitly.",
+    "Keep growth work paused until the replacement approach is established.",
+    "Keep expression and animation approval separate from base-design approval."
+  ]
+}
