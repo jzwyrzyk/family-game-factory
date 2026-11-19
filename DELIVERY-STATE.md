@@ -179,6 +179,27 @@ activate provider services.
 | Complete-day and persistence coverage | The updated CI contract retains touch cancellation, complete-day learning, next-day progression and profile/persistence checks. This revision did not re-execute that full browser contract; an assertion in a test file is not a passing result. Earlier successful runs retain their original scope. |
 | Publication and exact revision | The actual new captures are linked from the feature contract. PR58 records the final public source/tree and the separate Site publication receipt once issued; the earlier successful Site receipt above remains historical. This source entry alone does not assert a new publication. |
 
+## Approved Gem companion and merge follow-up
+
+The owner selected the new Jems Gem companion for the factory and requested
+merging next. `public/jems-gem-companion.png` copies the approved welcome pose
+from Jems Brand Library v1.2 without changing image bytes. Its exact source and
+checksum are recorded in the Gem Factory contract. The old robot is no longer
+used by the playable game; its existing fixture asset is preserved. Final
+TypeScript and production build passed. The live local preview decoded the exact
+1254 × 1254 master; an actual screenshot records its visual placement beside
+the hint. This scoped visual check does not replace the hosted gameplay suite.
+
+The current-head check inspection also found one concrete interaction failure
+in both the dedicated Gem Factory and nested Studio CI journeys at `23c8190`:
+the gift button bobbed continuously, so an ordinary click could not wait for a
+stable target. The fix moves that animation to the inner gift artwork while
+keeping the actual button stationary. It does not force input or disable motion
+to make the test pass. The hosted result for the follow-up commit must establish
+whether that journey now passes; earlier 6-test and 351-test receipts retain
+their own source scopes. PR58 records current-head checks and the exact Site
+publication/merge receipt as each completes.
+
 ## How to record the next state
 
 For each changed claim, record **what**, **which repository/commit/image/service**, **environment and audience**, **observation time**, **source link**, **observed result**, and **remaining uncertainty**. For a deployment include the prior working revision/rollback reference. For a test include whether it used fixtures, synthetic real-provider inputs, actual devices, or observed people. Keep private operational/consent evidence in its approved private location and link a safe reference; never copy secrets or child content here.

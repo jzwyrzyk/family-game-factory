@@ -66,9 +66,15 @@ call, new achievement database, or new child data field.
 
 ## Artwork
 
-`public/gem-factory-workshop.webp` and `public/gem-factory-helper.webp` were
-created with the built-in image-generation tool for this game. They are local
-assets (about 311 KB combined), not external image dependencies. SVG game pieces
+`public/gem-factory-workshop.webp` is the generated workshop backdrop. The
+current helper is `public/jems-gem-companion.png`, copied byte-for-byte from the
+owner-selected Jems Brand Library v1.2 welcome pose
+(`art/character_spark_wave.png`, SHA-256
+`0ee72973597493499b251fde68134bb03e91184f761fc271ef0cc131b2fef001`).
+It is the faceted blue/violet/coral Gem companion with mint boots, distinct from
+the human maker characters. The approved face, silhouette and transparency are
+preserved; its full body is contained and anchored to the workshop floor. Both
+assets are served locally, without external image dependencies. SVG game pieces
 remain crisp and preserve distinct heart, diamond, hexagon, crystal, and star
 silhouettes. All order labels, controls, live gems, animation, and rewards are
 functional UI drawn above the backdrop.
@@ -79,9 +85,12 @@ bunting, crystal shelves, substantial mint hopper, coral cutter, lilac/turquoise
 polisher and a ribboned gift station. Empty continuous teal conveyor, bright
 Jems palette, no baked-in text or UI, no industrial grime.
 
-Helper prompt direction: a lovable mint robot with large navy eyes, rosy cheeks,
-amethyst crystal hat, golden goggles and coral tool belt, waving on transparency,
-with soft dimensional casual-game shading.
+The previous `gem-factory-helper.webp` robot remains only as a versioned asset
+used by renderer/provider fixtures; it is no longer displayed by Gem Factory.
+The new helper reuses the approved artwork and adds no new animation rig.
+
+The wrapped gift keeps a stationary button target. Only its inner artwork bobs,
+so normal mouse/touch activation remains stable while the visual cue moves.
 
 ## Verification
 
@@ -114,10 +123,18 @@ also supports pixel, flat 2D, dimensional and realistic games without copying
 this room, palette or mascot into every game. Child-uploaded artwork remains a
 separate future task.
 
-## Current interactive captures
+## Current Gem companion
 
-These screenshots were captured from the actual revised native game in the Site
-preview. Desktop play completed a gift, including a deliberately wrong bucket,
+The actual Site preview loaded the exact 1254 × 1254 transparent master and
+was visually checked with the new helper anchored beside the existing hint.
+
+![Gem Factory with the approved faceted Jems Gem companion](screenshots/gem-factory-gem-companion.jpg)
+
+## Earlier direct-on-line gameplay captures
+
+These screenshots were captured from the direct-on-line revision before the
+subsequent Gem companion swap. They show actual gameplay, but the robot visible
+in these historical captures is no longer the current helper. Desktop play completed a gift, including a deliberately wrong bucket,
 automatic retry, correct next-pattern selection, cutter, held/keyboard polish,
 all three paper previews and a shipped striped gift. A 390 px browser frame
 completed the same route and shipped a star-wrapped gift. The existing host's

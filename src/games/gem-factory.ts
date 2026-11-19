@@ -130,7 +130,7 @@ export default class GemFactory implements GameInstance {
       <div class="gf-world"><div class="gf-room"><img class="gf-backdrop" src="./gem-factory-workshop.webp" alt=""><div class="gf-belt-motion" aria-hidden="true"></div><div class="gf-machine-glow" aria-hidden="true"></div><div class="gf-live-gem" aria-hidden="true"></div><div class="gf-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><section class="gf-line" aria-label="Factory line"></section></div>
       <div class="gf-hud"><div class="gf-day"><strong></strong></div><div class="gf-wallet"><span class="gf-coin" aria-hidden="true">✦</span><strong>0</strong></div></div>
       <section class="gf-order" aria-label="Gem pattern"></section><div class="gf-progress" aria-label="Gifts packed"></div>
-      <div class="gf-helper"><img src="./gem-factory-helper.webp" alt="Pip, your cheerful robot helper"><p class="gf-helper-hint" aria-hidden="true"></p></div>
+      <div class="gf-helper"><img src="./jems-gem-companion.png" alt="Your cheerful Jems gem companion"><p class="gf-helper-hint" aria-hidden="true"></p></div>
       <div class="gf-effects" aria-hidden="true"></div><div class="gf-pause-overlay" hidden><div class="gf-pause-card"><span class="gf-pause-gem" aria-hidden="true">✦</span><h3>Tea break!</h3><p>Your gems can wait.</p><button type="button" class="gf-primary" data-action="resume">Let's play</button></div></div></div><p class="gf-screen-reader" role="status" aria-live="polite"></p>`;
     this.world = this.root.querySelector('.gf-world')!;
     this.console = this.root.querySelector('.gf-line')!;
