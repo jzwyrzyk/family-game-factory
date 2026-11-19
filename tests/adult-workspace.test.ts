@@ -1,13 +1,15 @@
-/** Authorization and workspace regression tests. All generation/sandbox
- * responses below are authored fixtures, not evidence of a paid provider call. */
+/** Authorization and workspace regression tests. Generation, attestations,
+ * captures and reviewer replies below are explicitly synthetic fixtures,
+ * not evidence of a paid provider call or observed visual/gameplay quality. */
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {JobService} from '../server/pipeline/service';
 import {ActionCoordinator} from '../server/actions/coordinator';
 import {grantAdultPilot,beginAdultPilotSession,authenticateAdultPilotSession} from '../server/adult-pilot';
-import {hash,type GeneratedGame} from '../server/agent/generated';
-import {hopper} from '../server/testing/generated-fixtures';
+import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
+import {syntheticQualityEvidence,syntheticQualityReview} from '../server/testing/presentation-quality-fixtures';
+import {productionFixture,compiledPipelineFixture,testedPipelineFixture} from './quality-pipeline-fixtures';
 import {defaults} from '../src/runtime/manifests';
 import type {VerifiedSession} from '../server/contracts/api';
 import type {AgentAdapter} from '../server/pipeline/types';
@@ -26,13 +28,14 @@ const gate={test:async()=>{}};
 const approval:AgentApproval={enabled:true,approvalId:'auth-fixture-only',model:'fixture',
  inputUsdPerMillion:1,outputUsdPerMillion:1,maxInputTokens:64000,maxOutputTokens:4000,
  priceReviewedOn:new Date().toISOString().slice(0,10)};
-const identity=(stage:'generate'|'test',runId='adult-auth-worker')=>({
+const identity=(stage:'generate'|'test'|'review',runId='adult-auth-worker')=>({
  stage,runId,repositoryId:'42',sha:'a'.repeat(40)
 });
-const generated={candidate:{format:'generated-source-v1' as const,game:hopper},usageUnits:1};
-const compiled:GeneratedGame={...hopper,compiled:{code:'fixture-only-compiled-code',
- sourceHash:hash(hopper.source),codeHash:hash('fixture-only-compiled-code'),
- tests:{desktop:true,mobile:true,replay:true,isolation:true}}};
+const game=productionFixture(stickerLaunchFixture,prompt);
+const generated={candidate:{format:'generated-source-v1' as const,game},usageUnits:1};
+const compiled=compiledPipelineFixture(game),qualityEvidence=syntheticQualityEvidence(compiled);
+const testReport={ok:true,game:compiled,qualityEvidence};
+const reviewReport={review:syntheticQualityReview(compiled,qualityEvidence),usageUnits:1};
 async function unlock(repo:MemoryRepository,session:VerifiedSession){
  const credentials=await repo.transaction(s=>beginAdultPilotSession(s,session));
  return authenticateAdultPilotSession(await repo.snapshot(),session,credentials.cookieValue,credentials.sessionToken);
@@ -152,25 +155,36 @@ async function assertNoPublication(repo:MemoryRepository,jobId:string){
  assert.equal(job.status,'failed');assert.equal(job.errorCode,'ADULT_PILOT_ACCESS_REQUIRED');
  assert.equal(state.revisions.length,0);assert.deepEqual(state.active,{});
  assert.equal(state.ledgers[familyId].reserved,0);
+ assert.equal(state.ledgers[familyId].used,100,'uncertain denied work settles its original reservation once');
+ assert.equal(job.execution?.candidate,undefined);assert.equal(job.execution?.qualityEvidence,undefined);
 }
 for(const reason of ['lock','expiry'] as const){
- for(const boundary of ['dispatch','generate claim','generate report','test claim','test report'] as const){
+ for(const boundary of ['dispatch','generate claim','generate report','test claim','test report','review claim','review report'] as const){
   test(`adult worker: ${reason} prevents ${boundary} and Ready publication`,async()=>{
    const {repo,adult,coordinator,dispatches,jobId}=await workerFixture();
-   const gen=identity('generate'),tester=identity('test');
+   const gen=identity('generate'),tester=identity('test'),reviewer=identity('review');
    if(boundary!=='dispatch')await coordinator.tick();
    if(!['dispatch','generate claim'].includes(boundary))await coordinator.claim(jobId,0,'generate',gen);
-   if(['test claim','test report'].includes(boundary))await coordinator.report(jobId,0,'generate',gen,generated);
-   if(boundary==='test report')await coordinator.claim(jobId,0,'test',tester);
+   if(['test claim','test report','review claim','review report'].includes(boundary))await coordinator.report(jobId,0,'generate',gen,generated);
+   if(['test report','review claim','review report'].includes(boundary))await coordinator.claim(jobId,0,'test',tester);
+   if(['review claim','review report'].includes(boundary)){
+    await coordinator.report(jobId,0,'test',tester,testReport);
+    assert.deepEqual((await repo.snapshot()).jobs.find(j=>j.id===jobId)?.execution?.qualityEvidence,qualityEvidence);
+   }
+   if(boundary==='review report')await coordinator.claim(jobId,0,'review',reviewer);
    await invalidate(repo,adult,reason);
    if(boundary==='dispatch'){await coordinator.tick();assert.equal(dispatches.length,0);}
-   else if(boundary==='generate claim'||boundary==='test claim'){
-    await assert.rejects(coordinator.claim(jobId,0,boundary==='generate claim'?'generate':'test',
-     boundary==='generate claim'?gen:tester),/ADULT_PILOT_ACCESS_REQUIRED/);
+   else if(boundary==='generate claim'||boundary==='test claim'||boundary==='review claim'){
+    const stage=boundary==='generate claim'?'generate':boundary==='test claim'?'test':'review';
+    await assert.rejects(coordinator.claim(jobId,0,stage,identity(stage)),/ADULT_PILOT_ACCESS_REQUIRED/);
     await coordinator.tick();
-   }else await coordinator.report(jobId,0,boundary==='generate report'?'generate':'test',
-    boundary==='generate report'?gen:tester,boundary==='generate report'?generated:{ok:true,game:compiled});
+   }else{
+    const stage=boundary==='generate report'?'generate':boundary==='test report'?'test':'review';
+    await coordinator.report(jobId,0,stage,identity(stage),stage==='generate'?generated:stage==='test'?testReport:reviewReport);
+   }
    await assertNoPublication(repo,jobId);
+   await coordinator.tick();await assertNoPublication(repo,jobId);
+   if(boundary==='review report')await assert.rejects(coordinator.report(jobId,0,'review',reviewer,reviewReport),/WORKER_REPORT_REJECTED/);
   });
  }
 }
@@ -193,27 +207,39 @@ test('adult worker: a successful private worker publication retains its adult pr
  await coordinator.claim(jobId,0,'generate',gen);
  await coordinator.report(jobId,0,'generate',gen,generated);
  await coordinator.claim(jobId,0,'test',tester);
- await coordinator.report(jobId,0,'test',tester,{ok:true,game:compiled});
+ await coordinator.report(jobId,0,'test',tester,testReport);
+ assert.equal((await service.get(adult,jobId)).phase,'reviewing');assert.equal((await repo.snapshot()).revisions.length,0);
+ await coordinator.claim(jobId,0,'review',identity('review'));await coordinator.report(jobId,0,'review',identity('review'),reviewReport);
  const status=await service.get(adult,jobId);assert.equal(status.status,'ready');assert.ok(status.revisionId);
  const revision=await service.revision(adult,status.revisionId);
  assert.equal(revision.adultPilotProfileId,adult.adultProfileId);
+ assert.equal((await repo.snapshot()).active[revision.projectId],undefined,'review never auto-Keeps');
  await service.keep(adult,revision.id);
  assert.equal((await service.list(adult)).length,1);
  assert.deepEqual(await childService.list(child),[]);
  await assert.rejects(childService.revision(child,revision.id),/FORBIDDEN/);
- assert.equal((await repo.snapshot()).ledgers[familyId].used,1);
+ assert.equal((await repo.snapshot()).ledgers[familyId].used,2);
 });
-test('adult worker: an active replacement session cannot publish a result admitted by the old session',async()=>{
+for(const boundary of ['test','review'] as const)test(`adult worker: a replacement session cannot publish the old session's ${boundary} result`,async()=>{
  const {repo,child,adult,service,coordinator,jobId}=await workerFixture();
  const gen=identity('generate'),tester=identity('test');
  await coordinator.claim(jobId,0,'generate',gen);
  await coordinator.report(jobId,0,'generate',gen,generated);
  await coordinator.claim(jobId,0,'test',tester);
+ if(boundary==='review'){await coordinator.report(jobId,0,'test',tester,testReport);await coordinator.claim(jobId,0,'review',identity('review'));}
  const fresh=await unlock(repo,child);
  assert.notEqual(fresh.adultSessionId,adult.adultSessionId);
  assert.equal((await service.readiness(fresh)).available,true,'the new adult session itself is authorized');
- await coordinator.report(jobId,0,'test',tester,{ok:true,game:compiled});
+ await coordinator.report(jobId,0,boundary,identity(boundary),boundary==='test'?testReport:reviewReport);
  await assertNoPublication(repo,jobId);
+});
+test('adult worker: an idempotent technical report cannot retain review evidence after the original grant is revoked',async()=>{
+ const {repo,adult,coordinator,jobId}=await workerFixture();
+ await coordinator.claim(jobId,0,'generate',identity('generate'));await coordinator.report(jobId,0,'generate',identity('generate'),generated);
+ await coordinator.claim(jobId,0,'test',identity('test'));await coordinator.report(jobId,0,'test',identity('test'),testReport);
+ await invalidate(repo,adult,'lock');await coordinator.report(jobId,0,'test',identity('test'),testReport);
+ await assertNoPublication(repo,jobId);await coordinator.report(jobId,0,'test',identity('test'),testReport);await assertNoPublication(repo,jobId);
+ await assert.rejects(coordinator.claim(jobId,0,'review',identity('review')),/WORKER_CLAIM_REJECTED/);
 });
 test('adult worker: disabling the feature denies old jobs at dispatch, claim and report',async()=>{
  for(const stage of ['dispatch','claim','report'] as const){
@@ -237,7 +263,7 @@ test('adult local runner: revocation during a provider call cannot publish; disa
  const {repo,adult}=await fixture();
  const adapter:AgentAdapter={kind:'metered-api',available:true,generate:async()=>{
   await invalidate(repo,adult,'lock');
-  return {candidate:{format:'declarative-v1',game:{kind:'star-catcher-v1',target:4,seconds:20}},usageUnits:1};
+  return generated;
  }};
  const service=new JobService(repo,adapter,gate,{...options,maxUnits:100,adultPilotMode:true});
  const ack=await service.submit(adult,request('provider-revoked'));
@@ -248,4 +274,26 @@ test('adult local runner: revocation during a provider call cannot publish; disa
  const queued=await enabled.submit(f.adult,request('queued-before-disable'));
  const disabled=new JobService(f.repo,otherAdapter,gate,{...options,maxUnits:100,adultPilotMode:false});
  await disabled.run(queued.jobId);await assertNoPublication(f.repo,queued.jobId);assert.equal(called,0);
+});
+test('adult local runner: revocation during sandbox capture prevents releasing images to a reviewer',async()=>{
+ const {repo,adult}=await fixture();let reviews=0,repairs=0;
+ const adapter:AgentAdapter={kind:'metered-api',available:true,generate:async()=>generated,
+  repair:async()=>{repairs++;return generated;},review:async()=>{reviews++;return reviewReport;}};
+ const service=new JobService(repo,adapter,{test:async()=>{await invalidate(repo,adult,'lock');return testedPipelineFixture(game);}},{...options,allowMock:false,maxUnits:100,adultPilotMode:true});
+ const ack=await service.submit(adult,request('capture-revoked'));await service.run(ack.jobId);
+ assert.equal(reviews,0);assert.equal(repairs,0);await assertNoPublication(repo,ack.jobId);
+});
+for(const reason of ['lock','expiry','replacement'] as const)test(`adult local runner: ${reason} during review withholds publication and settles once`,async()=>{
+ const {repo,adult,child}=await fixture();let reviews=0,repairs=0;
+ const adapter:AgentAdapter={kind:'metered-api',available:true,generate:async()=>generated,
+  repair:async()=>{repairs++;return generated;},review:async()=>{
+   reviews++;assert.equal((await repo.snapshot()).jobs[0].phase,'reviewing');
+   if(reason==='replacement'){const fresh=await unlock(repo,child);assert.notEqual(fresh.adultSessionId,adult.adultSessionId);}
+   else await invalidate(repo,adult,reason);
+   return reviewReport;
+  }};
+ const service=new JobService(repo,adapter,{test:async()=>testedPipelineFixture(game)},{...options,allowMock:false,maxUnits:100,adultPilotMode:true});
+ const ack=await service.submit(adult,request('review-'+reason));await service.run(ack.jobId);
+ assert.equal(reviews,1);assert.equal(repairs,0);await assertNoPublication(repo,ack.jobId);
+ await service.run(ack.jobId);await assertNoPublication(repo,ack.jobId);assert.equal(reviews,1);
 });

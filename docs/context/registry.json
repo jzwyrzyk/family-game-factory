@@ -31,7 +31,9 @@
     "docs/decisions/*.md",
     "docs/context/*.md",
     "docs/adult-pilot/*.md",
-    "docs/privacy/*.md"
+    "docs/privacy/*.md",
+    "docs/brand/GEM_FACTORY.md",
+    "docs/game-intelligence/PRESENTATION-QUALITY.md"
   ],
   "areas": [
     {
@@ -47,10 +49,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:58:40.304Z",
-      "sourceDigest": "3fc6119f41312ecb1004a0c799d212f6f72981ca700102b9626b45c2dc312ee9",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-directed temporary adult profile on the existing site in doctrine and ADR0005; explicit Send, Build, Keep, child authorship and learning principles remain unchanged."
+      "reviewedAt": "2026-11-19T06:35:40.825Z",
+      "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing doctrine already requires approved brand assets and stable touch/mouse controls; this exact mascot reuse and stationary gift hit area preserve those principles without changing learning or data policy."
     },
     {
       "id": "experience",
@@ -80,10 +82,10 @@
         "src/adult-pilot/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:58:40.746Z",
-      "sourceDigest": "2063cc4ca289c97f69b25b13f4eb22c2b21abe950ca771b06c2d6278edec7093",
+      "reviewedAt": "2026-11-19T06:35:41.331Z",
+      "sourceDigest": "0c9dece5935e0943f1c6c8282ab1158e3d2f953e06a622fb88254dea868aede6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed profile switching, pre-switch draft saving, tab-only credentials, cancellation and dynamic storage adapters; documented separate persisted adult workspaces and locked reload behavior without changing child local journeys."
+      "reviewReason": "Recorded the owner-selected Gem companion master, exact checksum, accessible name and current visual capture; the existing factory layout and child-facing flow retain their approved structure."
     },
     {
       "id": "games",
@@ -91,7 +93,8 @@
         "PRODUCT-DOCTRINE.md",
         "ARCHITECTURE-CURRENT.md",
         "docs/GAME-QUALITY.md",
-        "docs/game-quality/*.md"
+        "docs/game-quality/*.md",
+        "docs/brand/GEM_FACTORY.md"
       ],
       "sources": [
         "src/games/**",
@@ -102,10 +105,10 @@
         "docs/game-quality/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:27:59.178Z",
-      "sourceDigest": "d2e76f07cefa44fe4fcc030de890cddcd0d2033daf80f4400ddb38025efb0cbf",
+      "reviewedAt": "2026-11-19T06:35:41.812Z",
+      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified runtime manifests and selection preserve saved physical and original games while new Bubble Gum uses stickers; documented game-form choice, runtime compatibility and the limits of gameplay evidence."
+      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
     },
     {
       "id": "learning",
@@ -147,10 +150,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:01:20.277Z",
-      "sourceDigest": "5ea2d8417a675367d445304cda7783f07f79ebb06a8afe4ae5e2f37af0efb0a0",
+      "reviewedAt": "2026-11-19T05:37:47.262Z",
+      "sourceDigest": "35526cac3ad91c031c7cf595e87ab9207cf83bbfd8b80177ff18e2dbc9b96a23",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed same-site gateway routing, derived adult identity, parent unlock/privacy/erasure and signed preview audience checks against the expanded OpenAPI contracts; documented live grant requirements and owner commands reusing the configured workspace/artifact bucket."
+      "reviewReason": "Reviewed bounded private capture storage and the Reviewing API phase against source and storage round-trip tests; preserved the merged same-site adult identity, preview audience and guardian-consent service contracts."
     },
     {
       "id": "generation",
@@ -173,10 +176,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:58:41.173Z",
-      "sourceDigest": "d69702009d7ebc0fa8a11cb99dd40e1fc92a709fe4bb36473dd091738a319a8c",
+      "reviewedAt": "2026-11-19T05:37:47.469Z",
+      "sourceDigest": "9207b6988875e0fee11060b83a8ddb630e2bc4145cd5a8371bd71aa29cebb99e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed audience-scoped seeds, duplicate request IDs, reads and version actions plus original-grant dispatch, claim, report and publication checks; architecture now records those boundaries while preserving worker pins, sandbox isolation and explicit Keep."
+      "reviewReason": "Reviewed request-bound style/gameplay plans, separately approved art, real capture, four-axis review and bounded repair across local and private worker paths; documented original-grant/current-consent checks at evidence release and publication, audience preservation and no paid repair after permission loss."
     },
     {
       "id": "coach",
@@ -222,10 +225,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "f365dca67c80347ced2643d51235478aadafd1dd133ab663ce6c30ae33fc78a5",
-      "reviewedAt": "2026-11-19T05:15:31.019Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the model and speech late-result assertions against the adult grant and guardian privacy contracts. Distinguishing revoked-device authentication failure from a locked adult capability leaves fixed session expiry, separate child consent, withheld results and usage settlement unchanged; existing feature documentation remains accurate."
+      "sourceDigest": "a0bc50d64bd56ea7e5aaaa8fb1130668777f32cd6bfa9e685279de9a555b348b",
+      "reviewedAt": "2026-11-19T05:37:47.838Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reconciled the quality stage with the merged adult/guardian contracts; reviewed new lock, expiry, original-grant replacement, duplicate-report and audience assertions across review claims and completion. The combined suite passes without weakening permission or settlement requirements."
     },
     {
       "id": "validation",
@@ -244,10 +247,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:15:30.288Z",
-      "sourceDigest": "6724cf6b51f58cea3884e83947828ed3568ec46bdf5520ab71c63d782fa01d28",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the late-completion test adjustment: device revocation must report UNAUTHENTICATED while adult profile lock remains unavailable; both model and speech still assert failed receipts, withheld content and settled usage. This preserves the existing acceptance contract and does not turn the separate local intent-run failure or fixture evidence into a production claim."
+      "reviewedAt": "2026-11-19T06:19:32.018Z",
+      "sourceDigest": "10dafaec46a9b51e50b4e3228d1ce22ffc6980db45dfabd4e2386c80a86ae45e",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded six executed pattern and simulation checks, final TypeScript and build success, scoped interactive desktop and phone-frame gifts, and clearly separated the updated but unexecuted full browser contract."
     },
     {
       "id": "delivery",
@@ -269,10 +272,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T06:00:00.000Z",
-      "sourceDigest": "de1fcc2dcebca054980a237aef0e40a9161522acd391e7413b8de4cd9f27cdc2",
+      "reviewedAt": "2026-11-19T06:43:05.613Z",
+      "sourceDigest": "e5a5506bdf87652b062fccfbb538d7c12e92a2f153faa29488b21e44df0a374a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the real successful us-east5 coach Cloud Build and repaired false rejection of GCP-supplied read-only step timing/status metadata. Recorded the observed immutable image handoff and recovery, while preserving exact source, executable command, IAM, source pin, service isolation and approval gates."
+      "reviewReason": "Preserved PR61 coach build verification, tests and recovery evidence while recording the exact owner-only mascot Site publication, rollback reference and scoped e3136cd Gem Factory CI pass; integrated-head checks and merge remain pending."
     },
     {
       "id": "context",
@@ -293,10 +296,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T04:58:43.727Z",
-      "sourceDigest": "26afe785176272d83041ae803848b9d6f8d007cc05d0f7e41164e7c9ec901f09",
+      "reviewedAt": "2026-11-19T05:37:49.952Z",
+      "sourceDigest": "168d27e8eefa6b78f286ac5cd5d42d994f9750c9fd9f227b22c5dbc2e5f727d3",
       "reviewOutcome": "updated",
-      "reviewReason": "Added explicit source routing and required/link-checked adult and privacy contracts, indexed ADR0005 and the new feature entry; inspected registry policy so new profile modules and consent tests cannot escape documentation impact checks."
+      "reviewReason": "Preserved main adult/privacy routing and required documents, added explicit Gem Factory and presentation-quality links, and indexed quality ADR0006 without replacing adult ADR0005; inspected registry coverage and review rules."
     }
   ]
 }

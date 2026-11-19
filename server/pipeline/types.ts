@@ -8,6 +8,7 @@ import type {Invitation} from '../sessions';
 import type {ActionExecution} from '../actions/coordinator';
 import type { GeneratedGame } from '../agent/generated';
 import type {FunctionalGameContract} from '../quality/functional-game-contract';
+import type {GameQualityEvidence,GameQualityReview} from '../quality/game-quality';
 export type JobStatus = 'draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface StarGame { kind:'star-catcher-v1'; target:number; seconds:number }
 export type PlayableGame = StarGame | GeneratedGame;
@@ -20,11 +21,14 @@ export interface AgentAdapter {
   available:boolean;
   readonly testFixture?:boolean;
   kind:'local-rule'|'mock'|'codex-subscription'|'metered-api';
-  repair?(input:AgentInput,previous:GeneratedGame,diagnostics:string):Promise<{candidate:CandidateArtifact;usageUnits:number}>;
+  repair?(input:AgentInput,previous:GeneratedGame,diagnostics:string,context?:{qualityEvidence?:GameQualityEvidence}):Promise<{candidate:CandidateArtifact;usageUnits:number}>;
+  review?(input:AgentInput,game:GeneratedGame,evidence:GameQualityEvidence):Promise<{review:GameQualityReview;usageUnits:number}>;
   generate(input:AgentInput):Promise<{candidate:CandidateArtifact;usageUnits:number}>;
 }
 export interface BuildRequest { gameId:string; baseRevisionId:string|null; prompt:string; clientRequestId:string; retryOf?:string }
 export interface Job extends BuildRequest {
+ /** Server-owned acceptance policy. Public submissions cannot set or disable it. */
+ qualityRequired?:'game-quality-v1';
  execution?:ActionExecution;
   /** Internal-only, independently authored and source-validated O5 probe;
    * BuildRequest rejects this field from clients, so it is never user-supplied.

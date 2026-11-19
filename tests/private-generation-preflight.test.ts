@@ -15,6 +15,8 @@ import {hash,isGeneratedGame,type GeneratedGame,validateCompiled} from '../serve
 import {validateSource} from '../server/sandbox/source-validator.cjs';
 import {defaults} from '../src/runtime/manifests';
 import type {AgentInput} from '../server/pipeline/types';
+import {assetPackHash} from '../server/agent/game-assets';
+import {fixturePlanProposal,fixtureModuleReply,fixtureProviderResponse,syntheticQualityEvidence,syntheticReviewAnswer} from '../server/testing/presentation-quality-fixtures';
 const idea='Drag three bubble gum stickers onto a rocket, then press Launch to blast off.';
 const approval:AgentApproval={
   enabled:true,approvalId:'synthetic-only',model:'fixture-contract-2026',reasoningEffort:'low',
@@ -30,7 +32,7 @@ function input(childIntent:string,baseRevision:AgentInput['baseRevision']={id:'n
 }
 function fixtureResponse(fixture:GeneratedGame){
  return new Response(JSON.stringify({status:'completed',output:[{content:[
-  {type:'output_text',text:JSON.stringify(fixture)}
+  {type:'output_text',text:JSON.stringify(fixtureModuleReply(fixture))}
  ]}],usage:{input_tokens:500,output_tokens:1000}}));
 }
 test('O4: canonical private preflight retains O1 literal evidence and O2 form; O3 checks remain NOT TESTED',()=>{
@@ -56,14 +58,14 @@ test('O4: canonical private preflight retains O1 literal evidence and O2 form; O
  }
  assert.ok(!JSON.stringify(plan.brief).includes('fun-approved'));
 });
-test('O4: model sees real physical instructions only when needed and does not get unnecessary provider calls',async()=>{
+test('O4: planned generation sees real physical instructions only when needed',async()=>{
  const seen:any[]=[];let keyReads=0;
  const adapter=new OpenAIResponsesAgent(approval,()=>{keyReads++;return 'synthetic-unit-provider-key-not-a-secret';},
-  (async(_url,init)=>{seen.push(JSON.parse(String(init?.body)));return fixtureResponse(stickerLaunchFixture);}) as typeof fetch);
+  (async(_url,init)=>{const req=JSON.parse(String(init?.body));if(req.text.format.name==='family_game_plan')return fixtureProviderResponse(fixturePlanProposal(req));seen.push(req);return fixtureResponse(stickerLaunchFixture);}) as typeof fetch);
  await adapter.generate(input(idea));
  await adapter.generate(input('Drive a car over bumpy hills with working suspension.'));
  assert.equal(seen.length,2);
- assert.equal(keyReads,2);
+ assert.equal(keyReads,4,'each new build plans before writing source');
  const [sticker,hill]=seen;
  for(const req of seen){
   assert.equal(req.store,false);
@@ -124,7 +126,7 @@ test('O4: native seed provenance preserves hill/gum physics and legacy gum rules
 test('O4: a failed unrequested physics candidate cannot hijack an ordinary rule-driven repair',async()=>{
  const calls:any[]=[];
  const adapter=new OpenAIResponsesAgent(approval,()=> 'synthetic-unit-provider-key-not-a-secret',
-  (async(_url,init)=>{calls.push(JSON.parse(String(init?.body)));return fixtureResponse(stickerLaunchFixture);}) as typeof fetch);
+  (async(_url,init)=>{const req=JSON.parse(String(init?.body));if(req.text.format.name==='family_game_plan')return fixtureProviderResponse(fixturePlanProposal(req));calls.push(req);return fixtureResponse(stickerLaunchFixture);}) as typeof fetch);
  await adapter.repair(input('Make a moon construction game'),physicalWorkshop,'The unneeded physics behavior is unstable');
  assert.equal(calls.length,1);
  assert.equal(JSON.parse(calls[0].input).gameDesignPreflight.form.simulation,'rule-driven');
@@ -145,7 +147,7 @@ function fixtureCompiled(game:GeneratedGame):GeneratedGame{
  const rt=runtimeBundle();
  const tested={...game,compiled:{
   code,sourceHash:hash(game.source),codeHash:hash(code),
-  runtimeVersion:rt.version,runtimeHash:rt.hash,
+  runtimeVersion:rt.version,runtimeHash:rt.hash,assetsHash:assetPackHash(game.assets),
   tests:{desktop:true,mobile:true,replay:true,isolation:true,input:true,resources:true,pause:true}
  }};
  return validateCompiled(game,tested);
@@ -162,14 +164,18 @@ test('O4: existing JobService makes fixture-backed Create → Playable Revision 
   if(!approvedSources.has(g.source))throw Error('O4_AUTHORED_FIXTURE_ONLY');
   const code=transformSync(g.source,{loader:'ts',format:'iife',globalName:'GameModule'}).code;
   validateSource(g);const rt=runtimeBundle();
-  return validateCompiled(g,{...g,compiled:{code,sourceHash:hash(g.source),codeHash:hash(code),
-    runtimeVersion:rt.version,runtimeHash:rt.hash,
+  const tested=validateCompiled(g,{...g,compiled:{code,sourceHash:hash(g.source),codeHash:hash(code),
+    runtimeVersion:rt.version,runtimeHash:rt.hash,assetsHash:assetPackHash(g.assets),
     tests:{desktop:true,mobile:true,replay:true,isolation:true,input:true,resources:true,pause:true}}});
+  return {...tested,qualityEvidence:syntheticQualityEvidence(tested)};
  }};
  let providerRequests=0;
  const adapter=new OpenAIResponsesAgent(approval,()=> 'synthetic-unit-provider-key-not-a-secret',
   (async(_url,init)=>{
-    const req=JSON.parse(String(init?.body));seen.push(JSON.parse(req.input));providerRequests++;
+    const req=JSON.parse(String(init?.body));
+    if(req.text.format.name==='family_game_plan')return fixtureProviderResponse(fixturePlanProposal(req));
+    if(req.text.format.name==='family_game_quality')return fixtureProviderResponse(syntheticReviewAnswer());
+    seen.push(JSON.parse(req.input));providerRequests++;
     return fixtureResponse(providerRequests===1?stickerLaunchFixture:revised);
   }) as typeof fetch);
  const parent={subject:'fixture-parent',familyId:'fixture-family',role:'parent' as const,expiresAt:Date.now()+60000};

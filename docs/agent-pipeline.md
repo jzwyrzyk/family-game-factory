@@ -1,10 +1,32 @@
-# One-button builder scaffold (Issue #4)
+# Private builder pipeline
 
-Historical Assignment 001 baseline. Assignment 002 source generation, Actions execution and current operational limits are documented in [the updated pipeline](assignment-002/README.md).
+The canonical queued-build API is `/v1/jobs`. The current source architecture is described in [ARCHITECTURE-CURRENT.md](../ARCHITECTURE-CURRENT.md), with dated deployment/activation evidence in [DELIVERY-STATE.md](../DELIVERY-STATE.md). The [Assignment 002 contract](assignment-002/README.md) records the move from the original declarative scaffold to isolated source generation. The historical Assignment 001 description is retained below for provenance; its capability and deployment statements are not a current system inventory.
+
+## Current generated-game route
+
+The current branch adds [presentation and playable quality](game-intelligence/PRESENTATION-QUALITY.md) to the existing service and private Actions coordinator. It supports distinct pixel, flat 2D, illustrated, dimensional and realistic art treatments, with presentation selected independently of the game's interaction and simulation. This is implemented source awaiting its separately identified release integration, not an assertion of activation.
+
+1. Explicit Build submits the original request and verified base through authenticated, transactional admission. A server-owned policy marks new real metered games and current v2 revisions as requiring quality review. It also upgrades missing flags on older queued real jobs; public request data cannot opt out.
+2. Private generation creates a bound production plan, reuses approved artwork or produces optional explicitly approved raster art, and then writes v2 source with a bounded ordinary-input playthrough suggestion. Planning is an additional model call. New image production is separately approved and budgeted; code-native artwork does not need that feature enabled.
+3. The credential-free isolated test stage compiles and validates the exact candidate, exercises its actual controls, checks lifecycle/isolation and captures desktop plus touch-tablet evidence. The generator's suggested path contains no privileged callbacks or success assertions. Independently authored intent probes remain a separate gate when supplied.
+4. A separate private hosted review request examines actual images and input receipts against the original request. Visual, intent, gameplay and input must each pass, with capture citations and exact artifact/evidence binding. Review neither receives nor executes source. Failed or unobserved required behavior cannot become Ready.
+5. The existing loop repairs bounded findings and re-runs acceptance, with an initial attempt plus at most two repairs. Usage is charged within the job allowance; uncertain paid requests are not automatically replayed. Only a valid complete pass creates a Ready revision. Keep remains the child's explicit choice.
+
+The public job status remains `draft → queued → building → testing → ready`, with failed/cancelled terminals. Review is the `reviewing` phase of `testing`, not a separate client-invented success state. Actions uses authenticated `generate`, `test` and `review` stages, tied to the expected job/attempt/workflow identity. A compatible private workflow, public source pin and sandbox/runtime image must be reviewed together before release.
+
+Existing generated v1 revisions retain their legacy repair and preview contract; new real games cannot return v1 to bypass current acceptance. Older immutable v2 archives still open saved games. New assets use a bounded `game-assets-v1` pack and the new `quality-runtime-v2.1.0` renderer. A distinct illustration is a renderable asset, not evidence of complete gameplay. Uploading a child's artwork or creating an art-library browser remains later work.
+
+Raw screenshot evidence is removed from live job state after success, cancellation, failure or recovery; accepted revisions keep compact bound review metadata and game assets. Previously externalized private objects are not physically erased by that cleanup. The content-addressed store has no GC/delete API; deployment retention and deletion verification remain explicit work. The [detailed quality contract](game-intelligence/PRESENTATION-QUALITY.md) owns exact image, evidence, callback, spending and persistence limits.
+
+Local supported edits still use the existing instant path. The learning host, family/device authorization, explicit Keep/Undo/Fork, immutable versions and preview isolation remain unchanged responsibilities. Fixture/browser tests establish their named behavior, not real-provider yield, human-calibrated taste, actual-device reliability, child enjoyment or learning. No provider, image model or release audience is activated by this documentation or source change.
+
+## Historical Assignment 001 scaffold
+
+The rest of this document records the original one-button scaffold. In particular, its statements that candidates were declarative-only, code modules were unsupported, or no backend was provisioned describe that historical baseline. Consult the current contracts and delivery ledger above for later source capabilities and live-state evidence.
 
 The default static configuration is **unavailable**. Supported local changes run instantly with **Try It**, without a queue, model, adult approval or GitHub step. Unsupported requests say “Needs builder”; no job ID/status is fabricated. The new-game Create input also has Try It; its existing wizard can still save a private idea without claiming it is playable. Development/GitHub/copy-brief controls are restricted to the parent page.
 
-## Implemented reference pipeline
+### Implemented reference pipeline at that baseline
 
 - `server/openapi.json`: versioned private job, revision, preview, keep/undo and catalog contracts. `/v1/jobs` is the canonical queued-build API from the newer Issue #4 contract; the older charter `/v1/generations` declarations remain proposed types, not a second active endpoint.
 - `server/pipeline/auth.ts`: HMAC-signed session verification, expiration and role/family scope. A trusted parent-managed identity provider must issue these HttpOnly Secure SameSite host-only cookies; there is deliberately no anonymous session-minting endpoint. Origin allowlist, JSON-only POST and custom CSRF header are enforced by the HTTP adapter. Session/preview signing keys stay server-side.
@@ -17,7 +39,7 @@ The default static configuration is **unavailable**. Supported local changes run
 - Private preview requires an authorized revision lookup, then a short-lived signed capability bound to artifact/family/expiry. Preview uses a distinct hostname, strict CSP (`default-src 'none'`, hashed script, `connect-src 'none'`), no camera/microphone/location, and sandbox `allow-scripts` **without** `allow-same-origin`. The renderer contains no user code or network/storage API. Parent UI validates frame source, nonce and artifact ID before accepting narrow outcome messages. Preview URLs/capabilities are not stored in localStorage or the public repository.
 - Children can play, keep, request a revision, retry a failed job, cancel, undo a kept change and reopen a kept game after reload from the private family catalog. No personal credential is embedded in the Vite build. Local game/math/profile saves continue to use their original separate stores.
 
-## Scope and operational limits
+### Scope and operational limits at that baseline
 
 No backend, cloud project, database, bucket, queue, paid agent or identity provider is provisioned or running for users. A static Pages deployment stays fully functional for local remixes. A production deployment must provide an explicitly configured HTTPS API and a preview on a different hostname, verified family provisioning and credentials, funded quotas and an isolated worker. The browser loads only nonsecret endpoint configuration from `factory-config.json`; default is unavailable. Test fixtures override this file on a localhost server and label the mock visibly.
 

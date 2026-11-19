@@ -22,8 +22,8 @@ test('honest interpreter accepts bounded child language, rejects mixed/novel ins
  assert.equal(interpret('buckets',defaults('buckets'),'Give me 99 buckets').kind,'invalid');assert.equal(interpret('buckets',defaults('buckets'),'Give me three buckets').kind,'unchanged');
  assert.equal(interpret('gum',physicsGum(),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
 });
-test('six native game manifests and transactional composed changes stay bounded',()=>{
- assert.equal(Object.keys(manifests).length,6);
+test('seven native game manifests and transactional composed changes stay bounded',()=>{
+ assert.equal(Object.keys(manifests).length,7);
  assert.equal(defaults('moon').donutGoal,6);assert.equal(defaults('robot','gentle').robotSpeed,.75);
  assert.throws(()=>validateConfig('moon',{...defaults('moon'),meteorRate:5}));
  assert.throws(()=>validateConfig('robot',{...defaults('robot'),script:true}));
@@ -39,6 +39,18 @@ test('six native game manifests and transactional composed changes stay bounded'
  assert.equal(portal.kind,'supported');if(portal.kind==='supported')assert.equal(portal.config.portalEnabled,true);
  const robot=interpret('robot',defaults('robot'),'Make robot faster and hide my path');
  assert.equal(robot.kind,'supported');if(robot.kind==='supported'){assert.equal(robot.config.robotSpeed,1.25);assert.equal(robot.config.showTrail,false);}
+});
+test('Gem Factory presets and remixes stay within playable settings',()=>{
+ assert.deepEqual(defaults('factory'),{orderSize:3,cutterSpeed:1,sparkleBoost:false});
+ assert.deepEqual(defaults('factory','gentle'),{orderSize:2,cutterSpeed:.75,sparkleBoost:false});
+ assert.deepEqual(defaults('factory','stretch'),{orderSize:5,cutterSpeed:1.25,sparkleBoost:false});
+ const change=interpret('factory',defaults('factory'),'Pack 4 gems per order and add extra sparkles');
+ assert.equal(change.kind,'supported');if(change.kind==='supported'){assert.equal(change.config.orderSize,4);assert.equal(change.config.sparkleBoost,true);}
+ const slower=interpret('factory',defaults('factory'),'Make the cutter slower');
+ assert.equal(slower.kind,'supported');if(slower.kind==='supported')assert.equal(slower.config.cutterSpeed,.75);
+ assert.equal(interpret('factory',defaults('factory'),'Pack 99 gems per order').kind,'invalid');
+ assert.equal(interpret('factory',defaults('factory'),'Turn off learning').kind,'generation-needed');
+ assert.throws(()=>validateConfig('factory',{...defaults('factory'),cutterSpeed:0}));
 });
 test('background build polling slows down rather than querying every quarter-second',()=>{
  assert.equal(buildPollDelay(0),1000);
