@@ -5,6 +5,8 @@
 **Recorded:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`).
 **Decision source:** [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57) and its [making-journey contract](../brand/GEM_PROGRESS.md). The request is paraphrased here; the exact original request timestamp is not independently recorded in the repository. This decision does not approve a deployment or certify educational efficacy.
 
+**Later additive decision:** [ADR0010](0010-lifetime-gems-and-shared-rewards.md) adds a separate lifetime engagement-gem ledger. The rank derivation, original four stages and evidence-deletion behavior below remain authoritative for the making journey; this record's no-economy statement describes its original scope.
+
 ## Context
 
 The owner requested refinement toward the bright white illustrated reference: developed character art, visual evolution with level, two character choices without gender labels, a dedicated level page, short text and popups. The existing rough/cut/polished progression was to remain, with a fourth overall level named **Gem Master**. The making story must preserve the child's authorship and explicit Keep decision described in [ADR 0001](0001-child-led-creation.md).

@@ -50,6 +50,9 @@ jobs:
       - name: Earned gem progress contracts
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:gem-progress
+      - name: Lifetime rewards and durable source integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:rewards
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
@@ -157,6 +160,9 @@ jobs:
       - name: Illustrated gem journey
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:gem-journey
+      - name: Rewards layout, earning and persistence journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:rewards-browser
       - name: Editable creation contracts and behavioral challenges
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation

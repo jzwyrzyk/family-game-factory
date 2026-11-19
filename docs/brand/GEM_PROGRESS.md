@@ -4,6 +4,8 @@ This is the detailed feature contract for [PR #57](https://github.com/jzwyrzyk/f
 
 **Current visual refinement:** the owner-approved [library v1.2](LIBRARY_V1_2.md) uses the chosen maker's exact original outfit frame as primary rank art across this page, rank cards and earned popups. The [visual decision](../decisions/0009-approved-brand-library-v1-2.md) replaces framed medal presentation without changing any evidence rule below.
 
+**Additive rewards extension:** [ADR0010](../decisions/0010-lifetime-gems-and-shared-rewards.md) and the [Rewards contract](../rewards/README.md) add a separate nonspendable lifetime gem total. A new saved maker-level transition can earn a one-time gem bonus. Gem totals do not determine the rank described here; its current evidence and erasure rules remain intact.
+
 ## Design intent
 
 Use the **bright white reference** as the visual direction: generous white space, soft lilac accents, richly illustrated child inventors, and tactile gemstones. The art should carry the story. Keep the interface cheerful, legible, and short enough to understand without reading a reward explanation.
@@ -12,7 +14,7 @@ Each child can choose one of two equally capable characters, **Spark** or **Nova
 
 The dedicated **My journey** page is always available from navigation. The home **My jems** area provides a compact link back to it. The page shows the current earned level, the character at that stage, a short next step, and all four stages. Future artwork can be explored, but a preview must be labeled and must leave the actual earned level visible.
 
-This extends the existing verified celebration layer from PR #33. It adds no points, spendable currency, streaks, rankings, daily pressure, child comparisons, or academic proficiency claim. **Gem Master** means the child has completed the saved making cycle in three different projects. Learning evidence and game scores stay independent.
+The original PR57 scope extends the existing verified celebration layer from PR #33 without a separate points economy. The later Rewards extension is documented above. Neither maker rank nor that extension introduces spendable currency, streaks, rankings, daily pressure, child comparisons, or an academic proficiency claim. **Gem Master** means the child has completed the saved making cycle in three different projects. Learning evidence and game scores stay independent.
 
 ## Four levels, three kinds of project evidence
 

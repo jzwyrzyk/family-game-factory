@@ -6,12 +6,14 @@ import { CREATION_CHALLENGES, getCreationChallenge, createChallengeStarter, crea
 import { profileStorage } from '../adult-pilot/storage';
 import { CreationStage } from './stage';
 import type { StudioSession } from '../studio/notebook';
+import {rewardSourceWritable} from '../rewards/write-guard';
 import './style.css';
 
 type Host = {
   enter(): boolean;
   home(): void;
   openGame(sessionId: string): void | Promise<void>;
+  onRewardSourceSaved?(owner: string): void;
 };
 type SourceRevision = Parameters<typeof createProjectFromStudio>[1];
 type Insert = { programId: string; blockId?: string; branch?: 'actions' | 'then' | 'else' };
@@ -222,6 +224,7 @@ export function installCreationStudio(host: Host) {
     assertEditing(); if (!challengeId) return; stop(); saveVersion();
     const result = evaluateChallenge(challengeId, scene!);
     store().recordAttempt(entryId, sceneOwner, revisionId, { challengeId, passed: result.passed, hintUsed });
+    host.onRewardSourceSaved?.(sceneOwner);
     const feedback = $('creationFeedback'); feedback.hidden = false; feedback.replaceChildren(); feedback.classList.toggle('is-success', result.passed);
     feedback.append(node('span', 'creation-eyebrow', result.passed ? 'YOUR IDEA WORKS' : 'A NEW THING TO NOTICE'), node('h2', '', result.passed ? 'You made it happen!' : 'Let’s look a little closer.'), node('p', '', result.feedback));
     const list = node('ul'); result.checks.forEach(check => list.append(node('li', check.passed ? 'is-pass' : '', (check.passed ? '✓ ' : '○ ') + check.feedback))); feedback.append(list);
@@ -479,7 +482,7 @@ export function installCreationStudio(host: Host) {
     for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
-  window.addEventListener('beforeunload', event => { if (!visible) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });
+  window.addEventListener('beforeunload', event => { if (!visible||!rewardSourceWritable()) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });
   window.addEventListener('pagehide', () => stop());
   window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { stop(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
@@ -499,6 +502,8 @@ export function installCreationStudio(host: Host) {
       });
     },
     export: () => store().read(), validate: validateCreationWorkspace,
+    pendingRewards: (owner: string) => store().pendingRewards(owner),
+    acknowledgeRewards: (owner: string, ids: string[]) => store().acknowledgeRewards(owner, ids),
     backup: () => {
       const current = store();
       try { return { factoryCreation: current.read() }; }

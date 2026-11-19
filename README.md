@@ -41,6 +41,10 @@ Read the [implementation and release limitations](docs/child-continuity/README.m
 
 The grades 1–4 learning implementation is documented in [Adaptive Math v1](docs/adaptive-math/README.md), with a [73-unit coverage catalog](docs/adaptive-math/curriculum.md), [game integration contracts](docs/adaptive-math/integration.md), and [acceptance evidence](docs/adaptive-math/acceptance.md). It shares learning across games, keeps math enabled, separates independent and assisted work, and supports checkpoints and mathematical answer construction. The integrated Studio and original arcade use the host learning services. [Language Arts](docs/adaptive-language/README.md) has its own curriculum and evidence. The parent-selected subject and learning difficulty remain separate from game difficulty.
 
+## Lifetime gems and Rewards
+
+The shared [Rewards experience](docs/rewards/README.md) connects saved learning activities, scene challenges, qualifying developed games and milestones to a nonspendable lifetime gem total. Its page and compact entry show the next gem milestone, how to earn and recent saved grants alongside the existing evidence-based maker rank. Supported work earns the same activity reward; gems do not measure proficiency or buy a maker rank. Durable source outboxes and a local IndexedDB ledger provide retry-safe grants, owner isolation and explicit backup/reset behavior. The existing synchronous sources use one writing tab per origin. Companions, collectible inventory, spending, stores and cloud synchronization are separate work.
+
 ## Game Quality v1
 
 The [Game Quality standard](docs/GAME-QUALITY.md) defines the physical-play implementation. The [validation report](docs/game-quality/VALIDATION.md) records source pins, tests, screenshots, measurements, and remaining release checks. New Bubble Gum Builders games use the three-target sticker workshop introduced in [PR40](https://github.com/jzwyrzyk/family-game-factory/pull/40). Saved physical-v1 games retain the real construction simulation, and saved v0 games retain their earlier engine. Junkyard Rally adds wheel suspension, terrain, throttle/brake, three trails, and handling changes saved as experiments. Both use local toy artwork, music and effects; gameplay makes no model requests.
@@ -79,6 +83,8 @@ Each local Try saves an immutable private version on this browser; Keep pins a v
 **Factory Favorites** includes six games and retains saved earlier engines and presets. **Create** still saves new game ideas. **My Powers** retains the adaptive math practice. Grown-ups can use the footer for settings and JSON backups. There is no secure local parental login or cross-device sync.
 
 ## Storage and backups
+
+Lifetime reward receipts use the separate local IndexedDB database `family-game-factory-rewards-v1`; family/adult namespaces and each owner's grants remain isolated. Family backups carry rewards and pending source outboxes. Legacy backups restore an empty reward history, and corrupted reward data remains available for explicit recovery. See the [reward persistence contract](docs/rewards/README.md#backup-restore-and-deletion).
 
 - Existing `family-game-factory-state-v1` math/profile/idea data remains compatible and is not migrated away or cleared.
 - New private workspace key: `family-game-factory-workspace-v2`. A versioned pre-release v1 game-list fixture migrates to the revision DAG; corrupt/unknown data is left intact and an error is shown. Original arcade play remains available.

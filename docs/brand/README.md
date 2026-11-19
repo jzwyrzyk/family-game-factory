@@ -56,6 +56,7 @@ Use **Ink** for readable copy, **Cloud/white** for most surfaces, **Soft Lilac**
 | Six Factory Favorites | Distinct game art, quiet white frames, lilac hover/focus, readable Ink metadata | Low |
 | Saved projects, versions, background builds | Mint continuity border, gentle facets, Ink build shelf, accessible statuses | Low |
 | Making journey and character choice | Bright white page, four evolving character/gem stages, short labels and truthful earned/preview states | Illustrated hero; restrained controls and popup |
+| Shared Rewards | Approved gem art and exact selected-maker thumbnail, lifetime gem total, readable next milestone and earning actions | Calm white/lilac page; compact nonblocking earned-gem popup; see the [Rewards contract](../rewards/README.md) |
 | Conversation/voice | Quiet Gem companion states, subtle lilac child bubbles and mint reflections; separate Send and Speak | Low |
 | Math/Language Arts/My Powers | Blue or mint frame accents; purple selected controls; do not decorate the question text | Minimal |
 | Grown-up controls, backups, privacy | Calm cream/white panels and clear focus/contrast, no cartoon takeover | Minimal |

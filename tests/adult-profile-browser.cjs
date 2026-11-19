@@ -11,8 +11,9 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{
   for(const [device,viewport] of [['desktop',{width:1400,height:1000}],['mobile',{width:390,height:844}]]){
-   const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await ctx.newPage(),errors=[],calls=[];
-   page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push(error.message));
+   const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),errors=[],calls=[];
+   let page=await ctx.newPage();
+   page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push('Primary tab: '+(error.stack||error.message)));
    let enabled=true,grant=false,holdReply=false,releaseReply,holdUnlock=false,releaseUnlock,ttl=3_600_000;
    await ctx.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:'https://adult-api.test',previewOrigin:'https://adult-preview.test'})}));
    await ctx.route('https://adult-api.test/**',async route=>{
@@ -56,9 +57,12 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    assert.equal(await page.locator('#adultProfileBanner').isVisible(),true);
    assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),0,'adult starts with a separate notebook');
    assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1')),familyBefore);
-   const second=await ctx.newPage();await second.goto(url);await second.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
+   const second=await ctx.newPage();second.setDefaultTimeout(10000);second.on('pageerror',error=>errors.push('Second tab: '+(error.stack||error.message)));
+   await second.goto(url);await second.locator('#jemsWriterNotice').waitFor({state:'visible'});
+   assert.equal(await second.evaluate(()=>Boolean(window.FG?.studio||window.FG?.builder)),false,'a second tab pauses before installing writable workspaces');
+   assert.equal(await second.locator('main').evaluate(element=>Boolean(element.closest('[inert]'))),true);
    assert.equal(await second.evaluate(()=>FG.store.current().id),'player1','another tab does not inherit an adult profile');
-   assert.equal(await second.locator('#adultProfileBanner').isVisible(),false);await second.close();
+   assert.equal(await second.locator('#adultProfileBanner').isVisible(),false);
    await page.click('#studioNavCreate');await page.fill('#studioPrompt','An adult test game with floating islands');await page.click('#studioTalk');
    await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Connected AI coach'));
    const sent=calls.filter(c=>c.path==='/v1/coach'&&c.method==='POST').at(-1);
@@ -81,6 +85,16 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    assert.doesNotMatch(await page.textContent('#studioMessages'),/adult test idea/);
    await page.locator('#studioLibrary .studio-saved-open').first().click();assert.match(await page.inputValue('#studioPrompt'),/CHILD NOTEBOOK SENTINEL/);
    await unlock();assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),1,'adult work persists only in its separate workspace');
+   // Keep the same browser context and its saved family/adult workspaces. A tab
+   // taking over from an authorized adult still needs its own explicit unlock.
+   await page.close();
+   await Promise.all([second.waitForNavigation({waitUntil:'load'}),second.click('#jemsWriterRetry')]);
+   page=second;await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
+   await page.waitForSelector('#adultProfileChoice',{state:'attached'});
+   assert.equal(await page.evaluate(()=>FG.store.current().id),'player1','resuming the other tab does not inherit adult authorization');
+   assert.equal(await page.locator('#adultProfileBanner').isVisible(),false);
+   assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1')),familyBefore);
+   await unlock();assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),1,'explicit authorization reopens only the adult notebook');
    await page.reload();await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
    assert.equal(await page.evaluate(()=>FG.store.current().id),'player1','reload never restores adult authorization');
    assert.equal(await page.locator('#adultProfileBanner').isVisible(),false);
