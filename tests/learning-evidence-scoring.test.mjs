@@ -27,6 +27,7 @@ test("rubric scores must be complete and bound to max",()=>{
   const base={itemId:rubric.id,status:"answered",firstResponse:"Compare two trials",assistance:"none"};
   assert.equal(scoreItem(rubric,{...base,rubricMarks:{define:2,evidence:3}}).points,5);
   assert.equal(scoreItem(rubric,base).validity,"scoring_pending");
+  assert.equal(scoreItem(rubric,{...base,firstResponse:{selectedDesign:"bridgeB",tests:[1,2]},rubricMarks:{define:2,evidence:3}}).points,5); // touch-first APS response
   assert.throws(()=>scoreItem(rubric,{...base,rubricMarks:{define:4,evidence:2}}),/out of range/);
   assert.throws(()=>scoreItem(rubric,{...base,rubricMarks:{define:2}}),/incomplete/);
 });
