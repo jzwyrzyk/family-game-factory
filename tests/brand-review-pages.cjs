@@ -26,7 +26,7 @@ async function pages(device,viewport){
  p.setDefaultTimeout(14000);p.on('dialog',d=>void d.accept());
  try{
   await p.goto(base);await p.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
-  assert.equal(await p.locator('#studioStarters [data-starter]').count(),6);
+  assert.equal(await p.locator('#studioStarters [data-starter]').count(),7);
   await shot(p,device,'01-studio-home');
   await p.locator('#studioNew').click();await p.locator('#page-studio').waitFor({state:'visible'});
   await p.locator('#studioCreationHero').waitFor({state:'visible'});
@@ -53,6 +53,7 @@ async function pages(device,viewport){
   await shot(p,device,'08-my-powers-math');
   await p.locator('footer [data-page="parent"]').click();await p.locator('#page-parent').waitFor({state:'visible'});
   await shot(p,device,'09-parent-controls');
+  await p.locator('[data-parent-tab="settings"]').click();
   await p.locator('#parentSubject').selectOption('both');await p.locator('#saveParent').click();
   assert.equal(await p.locator('#parentSubject').inputValue(),'both');
   await shot(p,device,'10-parent-both-subjects');

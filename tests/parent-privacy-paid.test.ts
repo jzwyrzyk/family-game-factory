@@ -8,6 +8,10 @@ import {CoachAudioService,type SpeechConfig} from '../server/coach/speech';
 import {PARENT_PRIVACY_NOTICE_VERSION,submitParentPrivacyChoice,recordExternalGuardianVerification,revokeParentPrivacyChoice,verifiedParentScope} from '../server/privacy/parent-consent';
 import type {VerifiedSession} from '../server/contracts/api';
 import type {AgentApproval} from '../server/agent/openai';
+import type {AgentAdapter} from '../server/pipeline/types';
+import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
+import {syntheticQualityEvidence,syntheticQualityReview} from '../server/testing/presentation-quality-fixtures';
+import {productionFixture,compiledPipelineFixture,testedPipelineFixture} from './quality-pipeline-fixtures';
 
 const familyId='child-parent-release',deviceId='11111111-2222-3333-4444-555555555555';
 const parent:VerifiedSession={subject:'verified-parent',role:'parent',familyId,deviceId,expiresAt:Date.now()+3600000};
@@ -40,7 +44,7 @@ function jobService(repo:MemoryRepository){
 const approval:AgentApproval={enabled:true,approvalId:'fixture',model:'fixture-model',
  inputUsdPerMillion:1,outputUsdPerMillion:1,maxInputTokens:64000,
  maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)};
-const identity=(stage:'generate'|'test',runId:string)=>({stage,runId,repositoryId:'42',sha:'a'.repeat(40)});
+const identity=(stage:'generate'|'test'|'review',runId:string)=>({stage,runId,repositoryId:'42',sha:'a'.repeat(40)});
 test('parent verified generation scope is mandatory before every new paid build',async()=>{
  const repo=await fixture(),service=jobService(repo);
  assert.equal((await service.readiness(child)).available,false);
@@ -78,6 +82,50 @@ test('private worker refuses revoked parent consent at claim and report; never p
  assert.equal(job?.status,'failed');
  assert.equal(job?.errorCode,'GUARDIAN_CONSENT_REQUIRED');
  assert.equal(state.revisions.length,0);
+});
+// Synthetic source, technical attestation, captures and reviewer reply establish
+// consent enforcement only. They are not evidence of game or visual quality.
+const qualityGame=productionFixture(stickerLaunchFixture,build('quality-fixture').prompt);
+const generated={candidate:{format:'generated-source-v1' as const,game:qualityGame},usageUnits:1};
+const compiled=compiledPipelineFixture(qualityGame),qualityEvidence=syntheticQualityEvidence(compiled);
+const reviewed={review:syntheticQualityReview(compiled,qualityEvidence),usageUnits:1};
+for(const boundary of ['review claim','review report'] as const)for(const reason of ['withdrawal','expiry'] as const){
+ test(`parent ${reason} blocks ${boundary}, withholds screenshots/publication and settles once`,async()=>{
+  const repo=await fixture(),service=jobService(repo);await verify(repo);
+  const ack=await service.submit(child,build('quality-'+boundary.replace(' ','-')+'-'+reason));
+  const coordinator=new ActionCoordinator(repo,{dispatch:async()=>{}},approval,900000,true),run='consent-quality-worker';
+  await coordinator.enqueue(ack.jobId);await coordinator.claim(ack.jobId,0,'generate',identity('generate',run));
+  await coordinator.report(ack.jobId,0,'generate',identity('generate',run),generated);
+  await coordinator.claim(ack.jobId,0,'test',identity('test',run));
+  await coordinator.report(ack.jobId,0,'test',identity('test',run),{ok:true,game:compiled,qualityEvidence});
+  assert.equal((await service.get(child,ack.jobId)).phase,'reviewing');assert.equal((await repo.snapshot()).revisions.length,0);
+  if(boundary==='review report'){
+   const task=await coordinator.claim(ack.jobId,0,'review',identity('review',run));assert.ok('qualityEvidence'in task);assert.deepEqual(task.qualityEvidence,qualityEvidence);
+  }
+  if(reason==='withdrawal')await revokeParentPrivacyChoice(repo,parent);
+  else await repo.transaction(s=>{s.parentPrivacyChoices!.at(-1)!.expiresAt=Date.now()-1;return true;});
+  if(boundary==='review claim'){
+   await assert.rejects(coordinator.claim(ack.jobId,0,'review',identity('review',run)),/GUARDIAN_CONSENT_REQUIRED/);
+   await coordinator.tick();
+  }else await coordinator.report(ack.jobId,0,'review',identity('review',run),reviewed);
+  for(let repeat=0;repeat<2;repeat++){
+   const s=await repo.snapshot(),job=s.jobs.find(j=>j.id===ack.jobId)!;
+   assert.equal(job.status,'failed');assert.equal(job.errorCode,'GUARDIAN_CONSENT_REQUIRED');assert.equal(job.execution?.candidate,undefined);assert.equal(job.execution?.qualityEvidence,undefined);
+   assert.equal(s.revisions.length,0);assert.deepEqual(s.active,{});assert.equal(s.ledgers[familyId].reserved,0);assert.equal(s.ledgers[familyId].used,100);
+   await coordinator.tick();
+  }
+  if(boundary==='review report')await assert.rejects(coordinator.report(ack.jobId,0,'review',identity('review',run),reviewed),/WORKER_REPORT_REJECTED/);
+ });
+}
+for(const boundary of ['sandbox capture','review'] as const)test(`local parent withdrawal during ${boundary} cannot release further evidence or publish`,async()=>{
+ const repo=await fixture();await verify(repo);let reviews=0,repairs=0;
+ const agent:AgentAdapter={kind:'metered-api',available:true,generate:async()=>generated,
+  repair:async()=>{repairs++;return generated;},review:async()=>{reviews++;await revokeParentPrivacyChoice(repo,parent);return reviewed;}};
+ const service=new JobService(repo,agent,{test:async()=>{if(boundary==='sandbox capture')await revokeParentPrivacyChoice(repo,parent);return testedPipelineFixture(qualityGame);}},{allowMock:false,maxUnits:100,timeoutMs:60000,maxRetries:2,requireVerifiedParentPrivacy:true});
+ const ack=await service.submit(child,build('local-'+boundary.replace(' ','-')));await service.run(ack.jobId);
+ assert.equal(reviews,boundary==='review'?1:0);assert.equal(repairs,0);
+ const s=await repo.snapshot(),job=s.jobs.find(j=>j.id===ack.jobId)!;assert.equal(job.status,'failed');assert.equal(job.errorCode,'GUARDIAN_CONSENT_REQUIRED');assert.equal(job.execution?.qualityEvidence,undefined);assert.equal(s.revisions.length,0);assert.equal(s.ledgers[familyId].reserved,0);assert.equal(s.ledgers[familyId].used,100);
+ await service.run(ack.jobId);assert.equal((await repo.snapshot()).ledgers[familyId].used,100);
 });
 test('child coach and remote audio require the new notice as well as legacy model/audio consent',async()=>{
  const repo=await fixture();

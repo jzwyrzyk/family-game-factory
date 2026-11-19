@@ -3,11 +3,18 @@ export function offlineBuild():Plugin{return {name:'reviewed-offline-shell',clos
  const dir='dist';const files=(base:string):string[]=>fs.readdirSync(path.join(dir,base),{withFileTypes:true}).flatMap(f=>f.isDirectory()?files(path.join(base,f.name)):[path.join(base,f.name)]);
  const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const dirty=!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim();fs.writeFileSync(path.join(dir,'build-info.json'),JSON.stringify({sha,dirty}));
  const list=files('').filter(f=>!['sw.js','factory-config.json'].includes(f)).sort();const hash=createHash('sha256');for(const f of list)hash.update(f).update(fs.readFileSync(path.join(dir,f)));const version=hash.digest('hex');
- fs.writeFileSync(path.join(dir,'sw.js'),`const paths=${JSON.stringify(list)},version=${JSON.stringify(version)};
+ // Ship the reusable library without downloading every unused cover and pose on
+ // first visit. Current UI art remains in the offline shell; optional static art
+ // is cached only when requested. The allowlist never includes private APIs.
+ const coreArt=new Set(['hero_workshop','spot_first_idea','character_spark_wave','character_spark_think','character_spark_rest','character_spark_celebrate','character_spark_recover','spot_work_in_progress','spot_reconnect','spot_safe_storage'].map(id=>'jems-art/'+id+'.webp'));
+ coreArt.add('jems-art/icons/jems-icons.svg');
+ const precache=list.filter(f=>!f.startsWith('jems-art/')||coreArt.has(f));
+ fs.writeFileSync(path.join(dir,'sw.js'),`const paths=${JSON.stringify(list)},precachePaths=${JSON.stringify(precache)},version=${JSON.stringify(version)};
 const prefix='family-arcade:'+new URL(self.registration.scope).pathname+':',key=prefix+version;
 const urls=paths.map(p=>new URL(p,self.registration.scope).href);
-self.addEventListener('install',event=>event.waitUntil(caches.open(key).then(c=>c.addAll(urls))));
+const precacheUrls=precachePaths.map(p=>new URL(p,self.registration.scope).href);
+self.addEventListener('install',event=>event.waitUntil(caches.open(key).then(c=>c.addAll(precacheUrls))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(prefix)&&k!==key).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('message',e=>{if(e.data?.type==='ACTIVATE_REVIEWED_UPDATE')self.skipWaiting()});
-self.addEventListener('fetch',event=>{const r=event.request;if(r.method!=='GET')return;const u=new URL(r.url);if(u.origin!==self.location.origin)return;const target=r.mode==='navigate'&&u.href.startsWith(self.registration.scope)?new URL('index.html',self.registration.scope).href:r.url;if(!urls.includes(target))return;event.respondWith(caches.open(key).then(async c=>(await c.match(target))||fetch(r)));});`);
+self.addEventListener('fetch',event=>{const r=event.request;if(r.method!=='GET')return;const u=new URL(r.url);if(u.origin!==self.location.origin)return;const target=r.mode==='navigate'&&u.href.startsWith(self.registration.scope)?new URL('index.html',self.registration.scope).href:r.url;if(!urls.includes(target))return;event.respondWith(caches.open(key).then(async c=>{const cached=await c.match(target);if(cached)return cached;const response=await fetch(r);if(response.ok)await c.put(target,response.clone());return response;}));});`);
 }}}

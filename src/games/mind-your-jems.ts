@@ -128,9 +128,22 @@ export function createMindYourJems():WaitArcade {
       });
     }catch{/* Optional sound never prevents playing. */}
   }
+  const defaultTips=el('[data-myj="tips"]').textContent||'';
   function notice(message:string,duration=2800){
-    const alert=el('[data-myj="alert"]');alert.textContent=message;alert.classList.toggle('myj-notice-visible',!!message);
-    cancelTimer(noticeTimer);noticeTimer=later(()=>{alert.textContent='';alert.classList.remove('myj-notice-visible');},duration);
+    const alert=el('[data-myj="alert"]'),tips=el('[data-myj="tips"]');
+    // Short portrait phones move ready-state messages into the footer.
+    const compactReady=dialog.dataset.ready==='true'&&
+      window.matchMedia('(max-width:600px) and (max-height:720px) and (orientation:portrait)').matches;
+    const footerFeedback=compactReady&&!!message;
+    alert.textContent=footerFeedback?'':message;
+    alert.classList.toggle('myj-notice-visible',!!message&&!footerFeedback);
+    tips.textContent=footerFeedback?message:defaultTips;
+    tips.classList.toggle('myj-tips-feedback',footerFeedback);
+    cancelTimer(noticeTimer);
+    noticeTimer=later(()=>{
+      alert.textContent='';alert.classList.remove('myj-notice-visible');
+      tips.textContent=defaultTips;tips.classList.remove('myj-tips-feedback');
+    },duration);
   }
   function setPose(next:typeof pose,duration=0){
     cancelTimer(poseTimer);pose=next;draw();

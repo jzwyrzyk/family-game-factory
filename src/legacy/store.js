@@ -3,6 +3,9 @@ import { profileGrade, validateLearning } from '../learning/engine';
 import {validateLanguage} from '../language/engine';
 import {LANGUAGE_SKILLS} from '../language/curriculum';
 import {adultStorageKey,setAdultWorkspace} from '../adult-pilot/storage';
+import {validateLearningRewardOutbox} from '../rewards/integration';
+import {validateRewardOutbox,rewardFactId} from '../rewards/model';
+import {assertRewardSourceWritable} from '../rewards/write-guard';
 (function () {
 'use strict';
 const FG = window.FG = window.FG || {};
@@ -16,7 +19,7 @@ const empty = () => ({version:1,activeProfile:'player1',profiles:JSON.parse(JSON
 function validate(value,checkLearning=true){
  if (!value || value.version!==1 || !Array.isArray(value.profiles) || !Array.isArray(value.feedback)) return false;
  if(value.profiles.length<1 || value.profiles.length>6 || value.feedback.length>1000) return false;
- return value.profiles.every(p=> p&&typeof p.id==='string' && typeof p.name==='string' && typeof p.skills==='object' && p.skills!==null && !Array.isArray(p.skills) && typeof p.stats==='object' && p.stats!==null && (p.grade===undefined||[1,2,3,4].includes(p.grade)) && (p.learningSubject===undefined||['math','language'].includes(p.learningSubject)) && (p.allowSubjectSwitch===undefined||typeof p.allowSubjectSwitch==='boolean') && (!checkLearning||(validateLearning(p.learning)&&validateLanguage(p.language))));
+ return value.profiles.every(p=> p&&typeof p.id==='string' && typeof p.name==='string' && typeof p.skills==='object' && p.skills!==null && !Array.isArray(p.skills) && typeof p.stats==='object' && p.stats!==null && (p.grade===undefined||[1,2,3,4].includes(p.grade)) && (p.learningSubject===undefined||['math','language'].includes(p.learningSubject)) && (p.allowSubjectSwitch===undefined||typeof p.allowSubjectSwitch==='boolean') && validateLearningRewardOutbox(p) && (!checkLearning||(validateLearning(p.learning)&&validateLanguage(p.language))));
 }
 function normalize(value){for(const p of value.profiles){p.grade=profileGrade(p);p.learningSubject=p.learningSubject==='language'?'language':'math';p.allowSubjectSwitch=p.allowSubjectSwitch===true;p.languageFocus=Array.isArray(p.languageFocus)?p.languageFocus.filter(id=>typeof id==='string'&&LANGUAGE_SKILLS.some(s=>s.id===id)).slice(0,12):[];p.rate=Math.max(1,Math.min(8,Number(p.rate)||3));p.mathModes=Object.fromEntries(Object.entries(p.mathModes||{}).filter(([k,v])=>/^[\w:-]{1,160}$/.test(k)&&!['__proto__','constructor','prototype'].includes(k)&&['checkpoint','interaction','both'].includes(v)));p.skillFocus=Array.isArray(p.skillFocus)?p.skillFocus.filter(v=>typeof v==='string'&&/^g[1-4]-[a-z0-9-]+$/.test(v)).slice(0,12):[];}return value;}
 let loadError=null,recoveryRaw=null;
@@ -35,11 +38,16 @@ function load(){
  }
 }
 let data = load(),familyData=null,adultProfileId=null;
-function persist(){if(loadError)return false;try{localStorage.setItem(adultStorageKey(KEY),JSON.stringify(data));return true}catch(e){console.warn('Local saving unavailable',e);return false}}
+function persist(){if(loadError)return false;try{assertRewardSourceWritable();localStorage.setItem(adultStorageKey(KEY),JSON.stringify(data));return true}catch(e){console.warn('Local saving unavailable',e);return false}}
+function pendingRewards(owner){if(loadError)throw Error(loadError);const raw=localStorage.getItem(adultStorageKey(KEY));if(!raw)return [];const saved=JSON.parse(raw);if(!validate(saved))throw Error('Saved learning rewards need recovery.');const p=saved.profiles.find(profile=>profile.id===owner);return p?validateRewardOutbox(p.rewardOutbox):[];}
+function acknowledgeRewards(owner,ids){assertRewardSourceWritable();const p=data.profiles.find(profile=>profile.id===owner);if(!p)throw Error('Choose the player who earned these rewards.');const prior=p.rewardOutbox;const removed=new Set(ids),next=validateRewardOutbox(prior).filter(fact=>!removed.has(rewardFactId(fact)));if(next.length===validateRewardOutbox(prior).length)return;p.rewardOutbox=next;if(!persist()){p.rewardOutbox=prior;throw Error('The reward was saved, but its activity receipt still needs a retry.');}}
 function current(){return data.profiles.find(p=>p.id===data.activeProfile)||data.profiles[0]}
 function familyProfiles(){return (familyData||data).profiles;}
+// Authorization cleanup changes memory only and must remain possible after a tab
+// releases saving ownership. Every durable source write is still guarded.
 function leaveAdultProfile(){if(!adultProfileId)return;data=familyData;familyData=null;adultProfileId=null;setAdultWorkspace(null);}
 function enterAdultProfile(id){
+ assertRewardSourceWritable();
  if(!/^adult:[a-f0-9-]{36}$/i.test(id)||loadError)throw Error('Adult profile could not open.');
  const raw=localStorage.getItem(adultStorageKey(KEY,id));
  const next=raw?JSON.parse(raw):{version:1,activeProfile:id,profiles:[{...JSON.parse(JSON.stringify(profiles[0])),id,name:'Adult',icon:'🛠️',age:18,grade:4,learningSubject:'math',allowSubjectSwitch:true}],feedback:[],createdAt:Date.now()};
@@ -47,7 +55,7 @@ function enterAdultProfile(id){
  if(!familyData)familyData=data;
  data=normalize(next);adultProfileId=id;setAdultWorkspace(id);
 }
-function choose(id){
+function choose(id){assertRewardSourceWritable();
  const family=familyData||data;
  if(!family.profiles.some(p=>p.id===id))return false;
  if(!window.dispatchEvent(new CustomEvent('factory-profile-before-change',{cancelable:true,detail:{profileId:id}})))return false;
@@ -70,6 +78,7 @@ function choosePracticeSubject(subject){
 }
 function addFeedback({game,type,idea}){const t=String(idea||'').trim();if(t.length<5)return false;const previous=data.feedback.slice();data.feedback.unshift({id:Date.now()+'-'+Math.random().toString(36).slice(2,5),game:String(game).slice(0,30),type:String(type).slice(0,30),idea:t.slice(0,1500),profile:current().id,createdAt:new Date().toISOString()});data.feedback=data.feedback.slice(0,200);if(!persist()){data.feedback=previous;return false}return true}
 function recordGame(game,won,level){const p=current();const s=p.stats[game] ||= {played:0,wins:0,bestLevel:0};s.played++;if(won)s.wins++;if(won)s.bestLevel=Math.max(s.bestLevel,Number(level)||1);persist()}
-function restore(raw){if(adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');const value=JSON.parse(raw);if(!validate(value,false))throw Error('Not a valid Family Game Factory v1 backup');for(const p of value.profiles)if(!validateLearning(p.learning)||!validateLanguage(p.language))throw Error('Learning history in this backup is invalid or unsupported. Existing progress is unchanged.');normalize(value);delete value.factoryWorkspace;value.feedback=value.feedback.slice(0,200);try{localStorage.setItem(KEY,JSON.stringify(value))}catch(_){throw Error('Could not restore progress on this device. Existing progress is unchanged.')}data=value;loadError=null;recoveryRaw=null}
-FG.store={get data(){return data},get adultProfileId(){return adultProfileId},get loadError(){return loadError},get recoveryRaw(){return recoveryRaw},current,choose,familyProfiles,enterAdultProfile,leaveAdultProfile,changeProfile,choosePracticeSubject,addFeedback,recordGame,save:persist,restore,reset:()=>{if(adultProfileId)throw Error('Switch to a family profile before resetting family data.');if(loadError)throw Error('Export the preserved progress or restore a compatible backup before resetting.');data=empty();persist()}};
+function validateBackup(raw){const value=JSON.parse(raw);if(!validate(value,false))throw Error('Not a valid Family Game Factory v1 backup');if(new Set(value.profiles.map(p=>p.id)).size!==value.profiles.length)throw Error('This backup repeats a player.');for(const p of value.profiles)if(!validateLearning(p.learning)||!validateLanguage(p.language))throw Error('Learning history in this backup is invalid or unsupported. Existing progress is unchanged.');return normalize(value);}
+function restore(raw){assertRewardSourceWritable();if(adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');const value=validateBackup(raw);delete value.factoryWorkspace;delete value.factoryStudio;delete value.factoryCreation;delete value.factoryCreationRecoveryRaw;delete value.factoryProblemSolving;delete value.factoryProblemSolvingRecoveryRaw;delete value.factoryRewards;delete value.factoryRewardsRecovery;value.feedback=value.feedback.slice(0,200);try{localStorage.setItem(KEY,JSON.stringify(value))}catch(_){throw Error('Could not restore progress on this device. Existing progress is unchanged.')}data=value;loadError=null;recoveryRaw=null}
+FG.store={get data(){return data},get adultProfileId(){return adultProfileId},get loadError(){return loadError},get recoveryRaw(){return recoveryRaw},current,choose,familyProfiles,enterAdultProfile,leaveAdultProfile,changeProfile,choosePracticeSubject,addFeedback,recordGame,pendingRewards,acknowledgeRewards,validateBackup,emptyBackup:()=>normalize(empty()),save:persist,restore,reset:()=>{assertRewardSourceWritable();if(adultProfileId)throw Error('Switch to a family profile before resetting family data.');if(loadError)throw Error('Export the preserved progress or restore a compatible backup before resetting.');const prior=data;data=empty();if(!persist()){data=prior;throw Error('Progress could not be reset. Your saved data is still here.');}}};
 })();

@@ -11,9 +11,12 @@ import {apiHandler,previewHandler} from '../server/pipeline/http';
 import {signSession} from '../server/pipeline/auth';
 import {verifyBrowserSession} from '../server/trusted-devices';
 import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
+import {isGeneratedGame} from '../server/agent/generated';
+import type {AgentAdapter,AgentInput} from '../server/pipeline/types';
 import {FixtureOnlyGate} from '../server/testing/fixture-gate';
 import {hopper,painter} from '../server/testing/generated-fixtures';
 import {v2FirstGame,v2RevisedGame} from '../server/testing/v2-journey-fixtures';
+import {fixturePlanProposal,fixtureModuleReply,fixtureProviderResponse} from '../server/testing/presentation-quality-fixtures';
 import type {MathItem} from '../src/learning/types';
 import {verifyV1InputOrdering} from './generated-v1-input-browser';
 const listen=(s:Server,host?:string)=>new Promise<number>(r=>s.listen(0,host,()=>r((s.address() as {port:number}).port)));
@@ -115,28 +118,43 @@ async function playV2Marble(page:Page,frame:FrameLocator,device:string):Promise<
 async function main(){
  const approval:AgentApproval={enabled:true,approvalId:'test-fixture-not-live',model:'gpt-5.4-mini',inputUsdPerMillion:.75,outputUsdPerMillion:4.5,maxInputTokens:64000,maxOutputTokens:4000,priceReviewedOn:new Date().toISOString().slice(0,10)};
  const repo=new MemoryRepository(),parent={subject:'test-owner',familyId:'test-family',role:'parent' as const,expiresAt:Date.now()+600000};const service=new JobService(repo,{kind:'metered-api',testFixture:true,available:true,generate:async()=>{throw Error('external only')}},{test:async()=>{throw Error('external only')}},{allowMock:true,maxUnits:120000,timeoutMs:60000,maxRetries:2});await service.setAllowance(parent,5000000,true);
- let run=100,failFirst=true,paused=false;const dispatches:{id:string;attempt:number}[]=[];
+ let run=100,failFirst=true,paused=false,legacyFixtureCalls=0;const dispatches:{id:string;attempt:number}[]=[],providerSchemas:string[]=[];
  // Keep the mocked workflow observable without logging credentials, source, or unbounded browser output.
  const startedAt=Date.now(),harnessTrace:{jobId:string;attempt:number;phase:string;elapsedMs:number;diagnostics?:string}[]=[];
  function trace(jobId:string,attempt:number,phase:string,diagnostics?:string){harnessTrace.push({jobId,attempt,phase,elapsedMs:Date.now()-startedAt,...(diagnostics?{diagnostics:diagnostics.slice(0,600)}:{})});if(harnessTrace.length>80)harnessTrace.shift();}
- const provider=new OpenAIResponsesAgent(approval,()=> 'fixture-only-not-a-real-key',(async(url,options)=>{assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(String(options?.body)),request=JSON.parse(body.input);
+ // The original v1 Create/Keep/Undo fixtures intentionally use a declared mock
+ // adapter. A real new-game provider may no longer downgrade to v1; its separate
+ // v2 path below still exercises the real planning/source transport contract.
+ const legacyReply=async(input:AgentInput)=>{
+  legacyFixtureCalls++;const fixture=input.childIntent.toLowerCase().includes('paint')?painter:hopper;
+  const game=failFirst?{...fixture,source:'export function createGame(){ invalid syntax ! }'}:fixture;failFirst=false;
+  return {candidate:{format:'generated-source-v1' as const,game},usageUnits:0};
+ };
+ const legacyProvider:AgentAdapter={kind:'mock',testFixture:true,available:true,generate:legacyReply,repair:async input=>legacyReply(input)};
+ const provider=new OpenAIResponsesAgent(approval,()=> 'fixture-only-not-a-real-key',(async(url,options)=>{assert.equal(url,'https://api.openai.com/v1/responses');assert.equal(options?.redirect,'error');const body=JSON.parse(String(options?.body)),request=JSON.parse(body.input);providerSchemas.push(body.text.format.name);
   // O4 must reach the EXISTING fixture-backed Actions/preview/browser journey.
   // These are proposed requirements, never claimed as verified gameplay.
   assert.equal(body.store,false);
+  assert.equal(body.text.format.strict,true);
   assert.equal(request.gameDesignPreflight.status,'PROPOSED_NOT_CHILD_CONFIRMED');
   assert.equal(request.gameDesignPreflight.intentVersion,'jems-child-intent-v1');
   assert.equal(request.gameDesignPreflight.form.version,'jems-game-form-v2');
   assert.equal(request.gameDesignPreflight.workability.status,'NOT_TESTED');
   assert.ok(request.gameDesignPreflight.workability.mandatoryChecks.some((check:string)=>check.includes('visible')));
   assert.ok(request.gameDesignPreflight.sourceEvidence.every((f:any)=>request.idea.slice(f.start,f.end)===f.quote));
-  const v2=request.idea.toLowerCase().includes('marble');
-  const fixture=v2?(request.idea.toLowerCase().includes('faster')?v2RevisedGame:v2FirstGame):request.idea.toLowerCase().includes('paint')?painter:hopper;
-  const game=(failFirst||request.idea.toLowerCase().includes('break this marble game'))?
+  assert.ok(request.idea.toLowerCase().includes('marble'),'the real new-game adapter fixture always returns v2');
+  if(body.text.format.name==='family_game_plan')return fixtureProviderResponse(fixturePlanProposal(body));
+  assert.equal(body.text.format.name,'family_game_module');assert.equal(request.productionPlan.version,'game-production-plan-v1');assert.deepEqual(request.approvedAssetMetadata,[]);
+  const fixture=request.idea.toLowerCase().includes('faster')?v2RevisedGame:v2FirstGame;
+  const game=request.idea.toLowerCase().includes('break this marble game')?
     {...fixture,source:'export function createGame(){ invalid syntax ! }'}:fixture;
-  failFirst=false;return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(game)}]}],usage:{input_tokens:100,output_tokens:600}}));}) as typeof fetch);
+  return fixtureProviderResponse({...fixtureModuleReply(game),playthrough:[{type:'hold',control:'right',frames:60},{type:'tap',x:360,y:200,frames:30}]});}) as typeof fetch);
  const coordinator=new ActionCoordinator(repo,{dispatch:async(id,attempt)=>{dispatches.push({id,attempt});trace(id,attempt,paused?'dispatch-paused':'dispatch');if(paused)return;const identity={runId:String(++run),repositoryId:'42',sha:'a'.repeat(40),stage:'generate' as const};setImmediate(()=>{void(async()=>{
   trace(id,attempt,'claim-generate');const task:any=await coordinator.claim(id,attempt,'generate',identity),input={...task.input,signal:new AbortController().signal};
-  trace(id,attempt,'provider');const result=attempt?await provider.repair(input,task.previous,task.diagnostics):await provider.generate(input);
+  assert.equal((await repo.snapshot()).jobs.find(j=>j.id===id)?.adapter,'mock','this browser journey is explicitly a keyless fixture, never a paid quality evaluation');
+  const useV2=input.childIntent.toLowerCase().includes('marble')||(isGeneratedGame(input.baseRevision.game)&&input.baseRevision.game.kind==='generated-module-v2');
+  trace(id,attempt,useV2?'provider-v2':'legacy-mock');const selected=useV2?provider:legacyProvider;
+  const result=attempt?await selected.repair!(input,task.previous,task.diagnostics):await selected.generate(input);
   trace(id,attempt,'report-generate');await coordinator.report(id,attempt,'generate',identity,result);const tester={...identity,stage:'test' as const};
   trace(id,attempt,'claim-test');const candidate:any=await coordinator.claim(id,attempt,'test',tester);trace(id,attempt,'fixture-gate');
   try{const game=await new FixtureOnlyGate().test(candidate.game);trace(id,attempt,'test-passed');await coordinator.report(id,attempt,'test',tester,{ok:true,game});}
@@ -168,7 +186,7 @@ async function main(){
   page.on('response',r=>{const path=new URL(r.url()).pathname;if(path.startsWith('/v1/')&&(r.request().method()==='POST'||r.status()>=400))recordApi({method:r.request().method(),path,status:r.status()});});
   page.on('requestfailed',r=>{const path=new URL(r.url()).pathname;if(path.startsWith('/v1/'))recordApi({method:r.method(),path,error:r.failure()?.errorText.slice(0,200)});});
   try{
-  await context.addCookies([{name:'factory_session',value:signSession(deviceActor,config.sessionKey),url:config.appOrigin,httpOnly:true,sameSite:'Strict'}]);await page.goto(config.appOrigin+'/arcade/?arcade=1');await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.fill('#inventIdea','Make a moon hopper with a gate to jump through');
+  await context.addCookies([{name:'factory_session',value:signSession(deviceActor,config.sessionKey),url:config.appOrigin,httpOnly:true,sameSite:'Strict'}]);await page.goto(config.appOrigin+'/arcade/?arcade=1');await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'Create',exact:true}).click();await page.fill('#inventIdea','Make a moon hopper with a gate to jump through');
   const buildStartedAt=Date.now();
   const [submitted]=await Promise.all([page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs',{timeout:10000}),page.click('#createTry')]);
   const acknowledgement=await submitted.json();assert.equal(submitted.status(),202,`Initial ${device} submission failed: ${acknowledgement.errorCode||submitted.status()}`);assert.equal(acknowledgement.status,'queued');
@@ -191,14 +209,14 @@ async function main(){
   }
   await page.click('#undoBuild');await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await page.fill('#builtGameName','My generated '+device);await page.click('#forkBuildForm button[type=submit]');await page.getByText('Saved as a new builder game. Your original version is unchanged.',{exact:true}).waitFor();
   // Reload while an acknowledged job waits in the durable dispatcher; no prompt or credential is stored in the browser.
-  paused=true;await page.fill('#reviseBuildPrompt','Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.reload();await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.click('#cancelBuild');await page.getByText('Build cancelled. Your current game is safe.',{exact:true}).waitFor();paused=false;
-  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();await page.getByRole('button',{name:'🌟 My generated '+device,exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<2;i++){await frame.locator('#game').click({position:{x:70+i*55,y:80}});await page.waitForTimeout(100);}mkdirSync('test-results',{recursive:true});await page.locator('#generatedPreview').screenshot({path:`test-results/assignment-002-${device}.png`});
+  paused=true;await page.fill('#reviseBuildPrompt','Make a rainbow paint trail again');await page.click('#reviseBuildForm button[type=submit]');await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.reload();await page.waitForFunction(()=>window.FG?.builder);await page.getByRole('navigation').getByRole('button',{name:'Create',exact:true}).click();await page.getByText('Your request is in the builder queue.',{exact:true}).waitFor();await page.click('#cancelBuild');await page.getByText('Build cancelled. Your current game is safe.',{exact:true}).waitFor();paused=false;
+  await page.getByRole('navigation').getByRole('button',{name:'My Creations',exact:true}).click();await page.getByRole('button',{name:'My generated '+device,exact:true}).click();await frame.getByRole('heading',{name:'Rainbow Trail',exact:true}).waitFor();await frame.getByRole('button',{name:'Play!',exact:true}).click();for(let i=0;i<2;i++){await frame.locator('#game').click({position:{x:70+i*55,y:80}});await page.waitForTimeout(100);}mkdirSync('test-results',{recursive:true});await page.locator('#generatedPreview').screenshot({path:`test-results/assignment-002-${device}.png`});
   // O7: modern generated-module-v2 Create→Play→Edit→Compare→Keep→Return.
   // Existing old v1 fixtures above remain required; this is a separate,
   // exact-source-allowlisted journey through the same authenticated Actions
   // and private preview/learning host, NOT a real paid model generation.
   failFirst=false;
-  await page.getByRole('navigation').getByRole('button',{name:'✨ Create',exact:true}).click();
+  await page.getByRole('navigation').getByRole('button',{name:'Create',exact:true}).click();
   await page.fill('#inventIdea','Make a marble game where I press Right to move the marble and tap to win.');
   const [marbleResponse]=await Promise.all([
    page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/v1/jobs'),
@@ -269,22 +287,22 @@ async function main(){
    'failed build must not alter learning performance');
 
   await page.reload();await page.waitForFunction(()=>window.FG?.builder);
-  await page.getByRole('navigation').getByRole('button',{name:'🎨 My Creations',exact:true}).click();
-  await page.getByRole('button',{name:'🌟 Faster Marble Playground',exact:true}).click();
+  await page.getByRole('navigation').getByRole('button',{name:'My Creations',exact:true}).click();
+  await page.getByRole('button',{name:'Faster Marble Playground',exact:true}).click();
   await frame.getByRole('heading',{name:'Faster Marble Playground',exact:true}).waitFor({timeout:15000});
   const returnedDistance=await playV2Marble(page,frame,device);
   assert.ok(returnedDistance>45,'saved v2 game must remain playable after reload');
   assert.equal((await service.list(deviceActor)).some(r=>r.id===fasterId),true);
   console.log('PASS O7 '+device+
    ': v2 Create→real play+learning→Keep→faster observed edit→Compare→Keep→bad edit recovery→reload→play');
-  assert.deepEqual(errors,[]);console.log(`PASS Assignment 002 ${device}: website → authenticated gateway → mocked Actions → real adapter transport fixture → source compile/test/repair → private worker preview → five playable revisions/keep/undo/fork/reload/cancel`);
+  assert.deepEqual(errors,[]);console.log(`PASS Assignment 002 ${device}: website → authenticated gateway → mocked Actions → explicit legacy mock and real v2 planning/source transport fixtures → source compile/test/repair → private worker preview → five playable revisions/keep/undo/fork/reload/cancel. No model-quality claim.`);
   }catch(error){
    const state=await repo.snapshot(),now=Date.now();
    const diagnostic={device,elapsedMs:now-startedAt,paused,sessionRemainingMs:deviceActor.expiresAt-now,builderStatus:await page.locator('#builderStatus').textContent({timeout:1000}).catch(()=>'<unavailable>'),builderMode:await page.locator('#builderMode').textContent({timeout:1000}).catch(()=>'<unavailable>'),errors,apiEvents,ledger:state.ledgers[deviceActor.familyId],jobs:state.jobs.filter(j=>j.familyId===deviceActor.familyId).slice(-8).map(j=>({id:j.id,status:j.status,phase:j.phase,errorCode:j.errorCode,attempts:j.attempts,usedUnits:j.usedUnits,execution:j.execution&&{attempt:j.execution.attempt,stage:j.execution.stage,dispatchPending:j.execution.dispatchPending,runId:j.execution.runId,queuedMsAgo:j.execution.queuedAt&&now-j.execution.queuedAt,claimedMsAgo:j.execution.claimAt&&now-j.execution.claimAt,diagnostics:j.execution.diagnostics?.slice(0,600)}})),trace:harnessTrace.slice(-32)};
    console.error('Actions E2E failure diagnostics:',JSON.stringify(diagnostic));mkdirSync('test-results',{recursive:true});writeFileSync(`test-results/assignment-002-${device}-failure.json`,JSON.stringify(diagnostic,null,2));await page.screenshot({path:`test-results/assignment-002-${device}-failure.png`,fullPage:true,timeout:5000}).catch(()=>{});throw error;
   }finally{paused=false;await context.close();}
  }
- assert.ok(dispatches.every(d=>Object.keys(d).sort().join(',')==='attempt,id'));const state=await repo.snapshot();assert.ok(state.audit.some(e=>e.code==='AUTOMATIC_REPAIR'));assert.ok(state.revisions.some(r=>r.game?.kind==='generated-module-v1'));
+ assert.ok(dispatches.every(d=>Object.keys(d).sort().join(',')==='attempt,id'));const state=await repo.snapshot();assert.ok(state.audit.some(e=>e.code==='AUTOMATIC_REPAIR'));assert.ok(state.revisions.some(r=>r.game?.kind==='generated-module-v1'));assert.ok(legacyFixtureCalls>0);assert.ok(providerSchemas.includes('family_game_plan'));assert.ok(providerSchemas.includes('family_game_module'));assert.ok(providerSchemas.every(name=>['family_game_plan','family_game_module'].includes(name)));
  }finally{await browser.close();await new Promise<void>(r=>server.close(()=>r()));await new Promise<void>(r=>preview.close(()=>r()));}
 }
 void main().catch(e=>{console.error(e);process.exitCode=1});

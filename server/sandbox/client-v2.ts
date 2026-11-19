@@ -2,10 +2,12 @@
 import {drawPart,drawWorkshopBackground,drawLandscape} from '../../src/quality/art';
 import {copyCommands,copyOutcome,finite,type DrawCommand as Command} from './frame-v2';
 const SOUNDS=new Set(['attach','snap','impact','bounce','success','boost','pickup']);
-export function startClient(config:{worker:string;channel:string;artifactId:string;controls:string[];auditTicks?:number}){
+type ClientAsset={id:string;mime:'image/png'|'image/webp';data:string;width:number;height:number;sampling:'pixelated'|'smooth'};
+export function startClient(config:{worker:string;channel:string;artifactId:string;controls:string[];auditTicks?:number;assets?:ClientAsset[]}){
  const canvas=document.getElementById('game') as HTMLCanvasElement,ctx=canvas.getContext('2d')!,status=document.getElementById('status')!,score=document.getElementById('score')!,pauseButton=document.getElementById('pause') as HTMLButtonElement;
  const STEP=1000/60;let worker:Worker|null=null,raf=0,watch:ReturnType<typeof setInterval>|undefined,started=false,paused=false,ended=false,busy=false,lastTick=0,lastReply=0,accumulator=0,frames=0,changed=0,inputs=0,previous:Command[]=[],current:Command[]=[],signature='',updated=0,cam={x:0,y:0,zoom:1},beforeCam={...cam},ticks=0;
  let connected=false,learningPaused=false,userPaused=false,roundId=0,checkpointId=0,activeSeconds=0;
+ const assets=config.assets||[],assetIds=new Set(assets.map(asset=>asset.id)),images=new Map<string,{image:HTMLImageElement;sampling:'pixelated'|'smooth'}>();let assetsReady=assets.length===0;
  const pressed=new Set<string>(),pulses=new Set<string>();let tap:null|{x:number;y:number}=null,pointer={x:0,y:0,down:false,pressed:false,released:false};let audio:AudioContext|null=null,effects=true,musicOn=false,musicMode='off',musicTimer:ReturnType<typeof setInterval>|undefined,notes=0,voices=0;const voicesSet=new Set<OscillatorNode>(),musicVoices=new Set<OscillatorNode>();
  const report=(event:string,extra={})=>parent.postMessage({type:'factory-preview',channel:config.channel,artifactId:config.artifactId,event,roundId,...extra},'*');
  function suspendAudio(){if(audio&&audio.state!=='closed')void audio.suspend().catch(()=>{});}
@@ -19,10 +21,10 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
  function stop(keepCurrentEffects=false){cancelAnimationFrame(raf);if(watch)clearInterval(watch);worker?.terminate();worker=null;busy=false;resetInput();quiet(keepCurrentEffects);}
  function fail(){stop();ended=true;status.textContent='This version stopped safely. You can replay or try a change.';status.dataset.state='error';report('preview-failed');}
  function controls(){
-  (document.getElementById('start') as HTMLButtonElement).disabled=learningPaused;
-  (document.getElementById('replay') as HTMLButtonElement).disabled=learningPaused;
+  (document.getElementById('start') as HTMLButtonElement).disabled=learningPaused||!assetsReady;
+  (document.getElementById('replay') as HTMLButtonElement).disabled=learningPaused||!assetsReady;
   pauseButton.disabled=learningPaused||!started||ended;
-  canvas.setAttribute('aria-disabled',String(learningPaused));canvas.dataset.learningPaused=String(learningPaused);
+  canvas.setAttribute('aria-disabled',String(learningPaused||!assetsReady));canvas.dataset.learningPaused=String(learningPaused);canvas.dataset.assetsReady=String(assetsReady);
  }
  function syncPause(){
   paused=userPaused||learningPaused;accumulator=0;lastTick=performance.now();resetInput();controls();
@@ -35,7 +37,7 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
  addEventListener('message',event=>{
   const data=event.data;
   if(event.source!==parent||!data||data.type!=='factory-learning'||data.channel!==config.channel||data.artifactId!==config.artifactId)return;
-  if(data.action==='connect'){connected=true;report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});return;}
+  if(data.action==='connect'){connected=true;if(assetsReady)report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});return;}
   if(!connected)return;
   if(data.action==='pause')setLearningPaused(true);
   if(data.action==='resume'){setLearningPaused(false);if(data.focus===true&&!document.hidden){const target=ended?document.getElementById('replay'):paused?pauseButton:canvas;target?.focus({preventScroll:true});}}
@@ -45,7 +47,7 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
   const out=copyOutcome(message.outcome);if(!frames&&out.status!=='playing')throw Error('START_MUST_PLAY');
   const p=message.presentation;finite(p.bodies,0,40);finite(p.joints,0,60);finite(p.ticks,0,10000000);if(p.ticks<ticks)throw Error('TICK_ORDER');ticks=p.ticks;if(config.auditTicks&&ticks>config.auditTicks)throw Error('AUDIT_TICK_LIMIT');
   const camera=p.camera;finite(camera.x,-4000,4000);finite(camera.y,-4000,4000);finite(camera.zoom,.5,2);beforeCam=cam;cam={...camera};
-  const next=copyCommands(message.commands);const nextSignature=JSON.stringify(next);if(nextSignature!==signature)changed++;signature=nextSignature;if(config.auditTicks){canvas.dataset.snapshot=signature;canvas.dataset.camera=JSON.stringify(cam);if(!frames)canvas.dataset.initial=signature;}previous=current.length?current:next;current=next;updated=performance.now();frames++;
+  const next=copyCommands(message.commands,assetIds);const nextSignature=JSON.stringify(next);if(nextSignature!==signature)changed++;signature=nextSignature;if(config.auditTicks){canvas.dataset.snapshot=signature;canvas.dataset.camera=JSON.stringify(cam);if(!frames)canvas.dataset.initial=signature;}previous=current.length?current:next;current=next;updated=performance.now();frames++;
   canvas.dataset.frames=String(frames);canvas.dataset.changed=String(changed);canvas.dataset.inputs=String(inputs);canvas.dataset.ticks=String(ticks);canvas.dataset.bodies=String(p.bodies);canvas.dataset.joints=String(p.joints);score.textContent='Score: '+out.score;status.dataset.state=out.status;
   for(const s of p.sounds){if(!s||!SOUNDS.has(s.id))throw Error('SOUND_NOT_APPROVED');finite(s.volume,0,1);finite(s.pitch,.5,2);if(!paused)sound(s.id,s.volume,s.pitch);}
   if(p.music!==undefined){if(!['play','build','off'].includes(p.music))throw Error('MUSIC_NOT_APPROVED');if(musicMode!==p.music){musicMode=p.music;music();}}
@@ -55,9 +57,10 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
  function draw(alpha:number){const prior=new Map(previous.filter(c=>c.key).map(c=>[c.key,c]));ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,720,400);ctx.fillStyle='#eaf5ef';ctx.fillRect(0,0,720,400);const camera={x:beforeCam.x+(cam.x-beforeCam.x)*alpha,y:beforeCam.y+(cam.y-beforeCam.y)*alpha,zoom:beforeCam.zoom+(cam.zoom-beforeCam.zoom)*alpha};for(const raw of current){let c=raw;const old=c.key&&prior.get(c.key);if(old&&old.type===c.type){c={...c};for(const key of ['x','y','x2','y2'])if(typeof old[key]==='number'&&typeof c[key]==='number')c[key]=old[key]+(c[key]-old[key])*alpha;if(typeof old.angle==='number'&&typeof c.angle==='number'){const delta=Math.atan2(Math.sin(c.angle-old.angle),Math.cos(c.angle-old.angle));c.angle=old.angle+delta*alpha;}}
    ctx.save();if(c.type==='background'){if(c.style==='workshop')drawWorkshopBackground(ctx,720,400,0);else drawLandscape(ctx,720,400,camera.x,0);ctx.restore();continue;}
    if(!c.screen){ctx.scale(camera.zoom,camera.zoom);ctx.translate(-camera.x,-camera.y);}if(c.type==='sprite'){ctx.translate(c.x,c.y);ctx.rotate(c.angle||0);if(c.spriteId==='star'){ctx.fillStyle='#ffce5b';ctx.beginPath();for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,r=(i%2?.45:1)*c.width/2;const x=Math.cos(a)*r,y=Math.sin(a)*r;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.closePath();ctx.fill();}else if(c.spriteId==='hero'){drawPart(ctx,'capsule',c.width,c.height,{});}else drawPart(ctx,c.spriteId,c.width,c.height,{power:c.power||0,time:ticks/60});}
+   else if(c.type==='image'){const asset=images.get(c.assetId)!;ctx.translate(c.x,c.y);ctx.rotate(c.angle||0);ctx.imageSmoothingEnabled=asset.sampling!=='pixelated';ctx.drawImage(asset.image,-c.width/2,-c.height/2,c.width,c.height);}
    else{ctx.fillStyle=c.color;ctx.strokeStyle=c.color;if(c.type==='rect'){ctx.translate(c.x,c.y);ctx.rotate(c.angle||0);ctx.fillRect(0,0,c.width,c.height);}else if(c.type==='circle'){ctx.beginPath();ctx.arc(c.x,c.y,c.radius,0,Math.PI*2);ctx.fill();}else if(c.type==='line'){ctx.lineWidth=c.width;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(c.x2,c.y2);ctx.stroke();}else if(c.type==='text'){ctx.font='600 '+c.size+'px system-ui';ctx.fillText(c.text,c.x,c.y);}}ctx.restore();}}
  function loop(now:number){if(!worker||ended)return;raf=requestAnimationFrame(loop);if(paused||document.hidden){lastTick=now;return;}const elapsed=Math.min(100,Math.max(0,now-lastTick));lastTick=now;accumulator=Math.min(STEP*4,accumulator+elapsed);if(config.auditTicks&&ticks===config.auditTicks){draw(1);return;}if(!busy&&accumulator>=STEP){const steps=Math.min(4,Math.floor(accumulator/STEP),config.auditTicks?config.auditTicks-ticks:4);accumulator-=steps*STEP;if(connected&&activeSeconds>=90){activeSeconds=0;setLearningPaused(true);report('math-checkpoint',{checkpointId:++checkpointId});return;}activeSeconds+=steps/60;busy=true;worker.postMessage({type:'tick',steps,input:{pressed:[...new Set([...pressed,...pulses])],tap,pointer:{...pointer}}});pulses.clear();tap=null;pointer.pressed=pointer.released=false;}draw(Math.min(1,(now-updated)/STEP));}
- function start(){if(learningPaused)return;stop();if(roundId>=1_000_000){fail();return;}roundId++;checkpointId=0;activeSeconds=0;started=true;ended=paused=userPaused=busy=false;frames=changed=inputs=ticks=0;signature='';current=[];previous=[];cam={x:0,y:0,zoom:1};beforeCam={...cam};accumulator=0;status.textContent='Let’s play!';status.dataset.state='playing';pauseButton.textContent='Pause';pauseButton.disabled=false;canvas.dataset.paused='false';controls();delete canvas.dataset.auditComplete;delete canvas.dataset.snapshot;delete canvas.dataset.frames;delete canvas.dataset.ticks;delete canvas.dataset.initial;canvas.focus({preventScroll:true});
+ function start(){if(learningPaused||!assetsReady)return;stop();if(roundId>=1_000_000){fail();return;}roundId++;checkpointId=0;activeSeconds=0;started=true;ended=paused=userPaused=busy=false;frames=changed=inputs=ticks=0;signature='';current=[];previous=[];cam={x:0,y:0,zoom:1};beforeCam={...cam};accumulator=0;status.textContent='Let’s play!';status.dataset.state='playing';pauseButton.textContent='Pause';pauseButton.disabled=false;canvas.dataset.paused='false';controls();delete canvas.dataset.auditComplete;delete canvas.dataset.snapshot;delete canvas.dataset.frames;delete canvas.dataset.ticks;delete canvas.dataset.initial;canvas.focus({preventScroll:true});
   try{if(!audio||audio.state==='closed')audio=new AudioContext();resumeAudio();}catch{audio=null;}
   const url=URL.createObjectURL(new Blob([config.worker],{type:'text/javascript'}));worker=new Worker(url);URL.revokeObjectURL(url);lastTick=lastReply=performance.now();let messages=0,period=lastReply;
   worker.onmessage=e=>{const now=performance.now();if(now-period>1000){messages=0;period=now;}if(++messages>120){fail();return;}lastReply=now;busy=false;try{receive(e.data);}catch{fail();}};worker.onerror=fail;worker.postMessage({type:'start'});busy=true;raf=requestAnimationFrame(loop);watch=setInterval(()=>{if(!paused&&!document.hidden&&!(config.auditTicks&&ticks===config.auditTicks)&&performance.now()-lastReply>1000)fail();},100);music();}
@@ -69,5 +72,17 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
  for(const b of document.querySelectorAll<HTMLButtonElement>('[data-control]')){const key=b.dataset.control!;b.style.touchAction='none';b.style.userSelect='none';b.onpointerdown=e=>{if(!started||ended||paused)return;e.preventDefault();b.setPointerCapture(e.pointerId);pressed.add(key);pulses.add(key);inputs++;};b.onpointerup=b.onpointercancel=()=>pressed.delete(key);b.onkeydown=e=>{if(!started||ended||paused)return;if(['Space','Enter'].includes(e.code)){e.preventDefault();pressed.add(key);pulses.add(key);inputs++;}};b.onkeyup=()=>pressed.delete(key);}
  addEventListener('blur',()=>setPaused(true));document.addEventListener('visibilitychange',()=>{if(document.hidden)setPaused(true);});addEventListener('pagehide',()=>{stop();if(audio&&audio.state!=='closed')void audio.close().catch(()=>{});});
  const musicButton=document.getElementById('music')!,effectsButton=document.getElementById('effects')!;musicButton.onclick=()=>{musicOn=!musicOn;musicButton.textContent='Music: '+(musicOn?'on':'off');musicButton.setAttribute('aria-pressed',String(musicOn));if(musicOn&&!paused&&!ended)resumeAudio();music();};effectsButton.onclick=()=>{effects=!effects;if(!effects)for(const voice of voicesSet)if(!musicVoices.has(voice))try{voice.stop();}catch{};effectsButton.textContent='Sounds: '+(effects?'on':'off');effectsButton.setAttribute('aria-pressed',String(effects));};
- controls();report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});
+ controls();
+ if(assetsReady)report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});
+ else{
+  status.textContent='Preparing your artwork…';status.dataset.state='loading';
+  // Raster bytes come from the hash-validated server pack, never from draw commands or URLs.
+  void Promise.all(assets.map(asset=>new Promise<void>((resolve,reject)=>{
+   const image=new Image(),timer=setTimeout(()=>{image.onload=image.onerror=null;image.removeAttribute('src');reject(Error('ARTWORK_LOAD_TIMEOUT'));},8000);
+   image.decoding='async';
+   image.onload=()=>{void image.decode().then(()=>{clearTimeout(timer);if(image.naturalWidth!==asset.width||image.naturalHeight!==asset.height){reject(Error('ARTWORK_DIMENSIONS_CHANGED'));return;}images.set(asset.id,{image,sampling:asset.sampling});resolve();},()=>{clearTimeout(timer);reject(Error('ARTWORK_DECODE_FAILED'));});};
+   image.onerror=()=>{clearTimeout(timer);reject(Error('ARTWORK_DECODE_FAILED'));};
+   image.src='data:'+asset.mime+';base64,'+asset.data;
+  }))).then(()=>{assetsReady=true;controls();status.dataset.state='idle';status.textContent='Ready when you are.';report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});}).catch(()=>{images.clear();assetsReady=false;fail();controls();status.textContent='The artwork could not load. Please try a change or reload.';});
+ }
 }

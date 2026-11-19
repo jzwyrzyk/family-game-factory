@@ -23,6 +23,12 @@ The normal website route enters the child's **Studio library**, not the separate
 
 The [child journey standard](docs/child-journey/README.md) combines the grades 1–4 learning service, physical games, and child-owned Studio. It adds play-first navigation, repeatable help, protected math focus, explicit ready previews, and durable ideas through asynchronous replies and save failures. [Acceptance](docs/child-journey/acceptance.md) distinguishes automated evidence from educator, child and actual-device review. Live release status belongs in [delivery state](DELIVERY-STATE.md).
 
+## Create & code
+
+The separate **Create & code** page (`?creation=1`) combines free scene creation with **Rebuild a scene** practice. Children move, jump, speak through bubbles, dance, repeat actions, branch on conditions, and respond to taps or signals using editable blocks. The same stage and interpreter power both modes. Five open challenges check actual trajectories, order, repetition, event responses, and conditional behavior; equivalent programs can succeed.
+
+**Animate & code** carries a saved Dragon, Buckets, or Robot game into a new scene pinned to that source version, with its reviewed artwork and supported settings. New generated games may include a validated optional companion scene; older generated source is not automatically converted. Scenes have profile-separated drafts, immutable versions, explicit Keep, backups, editable JSON export, and supported silent video export. Host Math/Language checkpoints still apply. Read the [feature contract and limitations](docs/creation-studio/README.md) and [accepted decision](docs/decisions/0007-creation-and-rebuild-practice.md).
+
 ## Child continuity and six Factory Favorites
 
 In the integrated Studio, **Factory Favorites** now lists six distinct native games: Bubble Gum Builders, Junkyard Rally, Splash or Pass, Dragon Island Rescue, Moon Donut Dash, and Robot Route Lab. New Moon/Robot play supports native safe math pause/resume, and device-local mission/route recovery. Remote build availability depends on the configured service, authenticated session and server-side gates; a URL alone does not establish readiness.
@@ -34,6 +40,10 @@ Read the [implementation and release limitations](docs/child-continuity/README.m
 ## Adaptive learning
 
 The grades 1–4 learning implementation is documented in [Adaptive Math v1](docs/adaptive-math/README.md), with a [73-unit coverage catalog](docs/adaptive-math/curriculum.md), [game integration contracts](docs/adaptive-math/integration.md), and [acceptance evidence](docs/adaptive-math/acceptance.md). It shares learning across games, keeps math enabled, separates independent and assisted work, and supports checkpoints and mathematical answer construction. The integrated Studio and original arcade use the host learning services. [Language Arts](docs/adaptive-language/README.md) has its own curriculum and evidence. The parent-selected subject and learning difficulty remain separate from game difficulty.
+
+## Lifetime gems and Rewards
+
+The shared [Rewards experience](docs/rewards/README.md) connects saved learning activities, scene challenges, qualifying developed games and milestones to a nonspendable lifetime gem total. Its page and compact entry show the next gem milestone, how to earn and recent saved grants alongside the existing evidence-based maker rank. Supported work earns the same activity reward; gems do not measure proficiency or buy a maker rank. Durable source outboxes and a local IndexedDB ledger provide retry-safe grants, owner isolation and explicit backup/reset behavior. The existing synchronous sources use one writing tab per origin. Companions, collectible inventory, spending, stores and cloud synchronization are separate work.
 
 ## Game Quality v1
 
@@ -73,6 +83,8 @@ Each local Try saves an immutable private version on this browser; Keep pins a v
 **Factory Favorites** includes six games and retains saved earlier engines and presets. **Create** still saves new game ideas. **My Powers** retains the adaptive math practice. Grown-ups can use the footer for settings and JSON backups. There is no secure local parental login or cross-device sync.
 
 ## Storage and backups
+
+Lifetime reward receipts use the separate local IndexedDB database `family-game-factory-rewards-v1`; family/adult namespaces and each owner's grants remain isolated. Family backups carry rewards and pending source outboxes. Legacy backups restore an empty reward history, and corrupted reward data remains available for explicit recovery. See the [reward persistence contract](docs/rewards/README.md#backup-restore-and-deletion).
 
 - Existing `family-game-factory-state-v1` math/profile/idea data remains compatible and is not migrated away or cleared.
 - New private workspace key: `family-game-factory-workspace-v2`. A versioned pre-release v1 game-list fixture migrates to the revision DAG; corrupt/unknown data is left intact and an error is shown. Original arcade play remains available.

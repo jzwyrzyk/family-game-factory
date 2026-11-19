@@ -79,3 +79,7 @@ The illustrated rebuild was recovered from local work after the remote PR remain
 ## Release boundary
 
 This is a feature PR. Passing tests and updating the artwork do not merge or deploy it. Production release follows the existing repository release process.
+
+### Short-phone ready feedback
+
+At 360×640 portrait, short-lived banking notices use the existing footer hints rather than obscuring the rock's eyes and crystals. Play and scores remain visible, and ready handoff remains explicit. The browser suite asserts footer feedback and illustrated-scene clearance.

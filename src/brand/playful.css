@@ -59,6 +59,7 @@ body.studio-review .studio-starter.buckets{--jems-world-color:#A93657;--jems-wor
 body.studio-review .studio-starter.dragon{--jems-world-color:#723DCE;--jems-world-light:#EEE1FF}
 body.studio-review .studio-starter.moon{--jems-world-color:#255BC2;--jems-world-light:#E0E9FF}
 body.studio-review .studio-starter.robot{--jems-world-color:#07877E;--jems-world-light:#D4F8F0}
+body.studio-review .studio-starter.factory{--jems-world-color:#7350C3;--jems-world-light:#F1E4FF}
 body.studio-review #page-studio-library .studio-starter{
  border-color:#D9D9EB;box-shadow:0 6px 19px #0B1E3B0F;
  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;

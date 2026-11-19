@@ -1,0 +1,1243 @@
+{
+  "version": "1.2.0",
+  "date": "2026-11-19",
+  "approved_library": "jems_brand_library_v1_2",
+  "purpose": "Local application assets from the owner-approved visual library; no runtime image generation or external host.",
+  "identity_revision": "identity/revision-manifest.json",
+  "historical_identity_source": "identity/provenance.json",
+  "journey_provenance": "journey-source-provenance.json",
+  "font_provenance": "font-provenance.json",
+  "art_generation_provenance": "generation-provenance.json",
+  "summary": {
+    "public_files": 71,
+    "illustration_derivatives": 17,
+    "native_frame_exports_reused": 13,
+    "functional_icons": 32,
+    "icon_sprites": 1,
+    "identity_variants": 9,
+    "patterns": 4,
+    "fonts": 2,
+    "font_licenses": 2,
+    "new_illustration_bytes": 15284672,
+    "source_illustration_png_bytes": 23843910,
+    "existing_journey_bytes": 1521154,
+    "font_bytes": 585040,
+    "core_five_illustration_bytes": 3956252,
+    "optional_illustration_bytes": 11328420
+  },
+  "files": [
+    {
+      "kind": "identity",
+      "path": "public/arcade-icon.svg",
+      "url": "arcade-icon.svg",
+      "source_library_path": "identity/arcade-icon.svg",
+      "sha256": "dcf92c3e92ee11c82f58a6884f9530612168cf07867a81c0d84fab7234e38021",
+      "bytes": 2488,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "font-license",
+      "path": "public/fonts/jems/Inter-OFL.txt",
+      "url": "fonts/jems/Inter-OFL.txt",
+      "source_library_path": "fonts/Inter-OFL.txt",
+      "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+      "bytes": 4377,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "font",
+      "path": "public/fonts/jems/Inter-Variable.woff",
+      "url": "fonts/jems/Inter-Variable.woff",
+      "source_library_path": "fonts/Inter-Variable.woff",
+      "sha256": "37d2e353f3e5319546d56e204139cb152fb12670a84c6bdbfa292cdb0045a938",
+      "bytes": 457780,
+      "exact_source_bytes": true,
+      "variable_axes": [
+        {
+          "axis": "opsz",
+          "min": 14.0,
+          "default": 14.0,
+          "max": 32.0
+        },
+        {
+          "axis": "wght",
+          "min": 100.0,
+          "default": 400.0,
+          "max": 900.0
+        }
+      ]
+    },
+    {
+      "kind": "font-license",
+      "path": "public/fonts/jems/Nunito-OFL.txt",
+      "url": "fonts/jems/Nunito-OFL.txt",
+      "source_library_path": "fonts/Nunito-OFL.txt",
+      "sha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+      "bytes": 4385,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "font",
+      "path": "public/fonts/jems/Nunito-Variable.woff",
+      "url": "fonts/jems/Nunito-Variable.woff",
+      "source_library_path": "fonts/Nunito-Variable.woff",
+      "sha256": "b9bec62acd0055c9c26cbd42eff917274d65600c6e391935f4ea9d358593d229",
+      "bytes": 127260,
+      "exact_source_bytes": true,
+      "variable_axes": [
+        {
+          "axis": "wght",
+          "min": 200.0,
+          "default": 200.0,
+          "max": 1000.0
+        }
+      ]
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-app-icon.svg",
+      "url": "jems-app-icon.svg",
+      "source_library_path": "identity/jems-app-icon.svg",
+      "sha256": "bf70291498f98aafef6d6e469f615b9758f76881c04080e199f21959af79177f",
+      "bytes": 2665,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "character_spark_celebrate",
+      "path": "public/jems-art/character_spark_celebrate.webp",
+      "url": "jems-art/character_spark_celebrate.webp",
+      "source_library_path": "art/character_spark_celebrate.png",
+      "source_sha256": "f6b2c74022b266ffd5408ec3ea4579d6aff91d9e98fe21e3e87349fec313a9e5",
+      "source_bytes": 945902,
+      "sha256": "9c5a1defc7d9c7a6c028205ec453439901d490cb873b30fd9ebf33520a88b00d",
+      "bytes": 577092,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "c172ce391359211c58b75784c829d3d6a6ec43650e786338744e9f41319647ce",
+      "derivative_decoded_rgba_sha256": "c172ce391359211c58b75784c829d3d6a6ec43650e786338744e9f41319647ce",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "character_spark_recover",
+      "path": "public/jems-art/character_spark_recover.webp",
+      "url": "jems-art/character_spark_recover.webp",
+      "source_library_path": "art/character_spark_recover.png",
+      "source_sha256": "d1e42f7c475d23f1fe798d5dbfcff62497a081cefd9e617e7394aed52968339c",
+      "source_bytes": 988086,
+      "sha256": "425dccff1e682fa7255337edc4645217ef8ad9abbd63dcc44e5e83a835136cae",
+      "bytes": 597302,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "5bf448cc21010c2f48145042e1ff54341f9cc84b5d519e3d801634d1757ddeae",
+      "derivative_decoded_rgba_sha256": "5bf448cc21010c2f48145042e1ff54341f9cc84b5d519e3d801634d1757ddeae",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "character_spark_rest",
+      "path": "public/jems-art/character_spark_rest.webp",
+      "url": "jems-art/character_spark_rest.webp",
+      "source_library_path": "art/character_spark_rest.png",
+      "source_sha256": "7175f8f97728f3e70b56181d9e4a8154c5cfe62c8b61a4f2993333cd3dc55316",
+      "source_bytes": 977229,
+      "sha256": "de4a99e9a4ed700a5c83032f6462121db728b7e84af9d46ea97495ded0d87292",
+      "bytes": 584966,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "6b182fe797be49395926e8b5d1de7e6032844c6c52655c409179c8e235730135",
+      "derivative_decoded_rgba_sha256": "6b182fe797be49395926e8b5d1de7e6032844c6c52655c409179c8e235730135",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "character_spark_think",
+      "path": "public/jems-art/character_spark_think.webp",
+      "url": "jems-art/character_spark_think.webp",
+      "source_library_path": "art/character_spark_think.png",
+      "source_sha256": "417d9d6425b725962694a46a5ea5886657ee267e8b101041d33e453591b8793a",
+      "source_bytes": 1007890,
+      "sha256": "5ee04c045aedada35385e42aa3a03fc6b394b24c39d7754bb0b423f8d3cbbd5c",
+      "bytes": 624650,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "67fa3b1995636facad8ee4449330418c0b120b7e78fb99e706e2f0a7dc568ac0",
+      "derivative_decoded_rgba_sha256": "67fa3b1995636facad8ee4449330418c0b120b7e78fb99e706e2f0a7dc568ac0",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "character_spark_wave",
+      "path": "public/jems-art/character_spark_wave.webp",
+      "url": "jems-art/character_spark_wave.webp",
+      "source_library_path": "art/character_spark_wave.png",
+      "source_sha256": "0ee72973597493499b251fde68134bb03e91184f761fc271ef0cc131b2fef001",
+      "source_bytes": 1094313,
+      "sha256": "370ba0c14c0328bbf0c890a4a555fe922e611b756740f910487df8e84fb46ce9",
+      "bytes": 711006,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "27853cfc3e04588342a45320d574e2f97a345460775ef0ff816eee5c89d4fd31",
+      "derivative_decoded_rgba_sha256": "27853cfc3e04588342a45320d574e2f97a345460775ef0ff816eee5c89d4fd31",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "gem_blue",
+      "path": "public/jems-art/gem_blue.webp",
+      "url": "jems-art/gem_blue.webp",
+      "source_library_path": "art/gem_blue.png",
+      "source_sha256": "494ac8723168f9afabc07d88ff1c2c400feca0887584b532e317b29cfa8ff6af",
+      "source_bytes": 1462480,
+      "sha256": "9909167ab5efe83d02f34a4caa2c8edc8e2179a07eec517d585e74cf00fc7ccd",
+      "bytes": 864288,
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "decoded_rgba_sha256": "390c0cef3e7a73c6ee32af8f29c6c0485b25b8b856ef913801c49c975b48ccf6",
+      "derivative_decoded_rgba_sha256": "390c0cef3e7a73c6ee32af8f29c6c0485b25b8b856ef913801c49c975b48ccf6",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "gem_coral",
+      "path": "public/jems-art/gem_coral.webp",
+      "url": "jems-art/gem_coral.webp",
+      "source_library_path": "art/gem_coral.png",
+      "source_sha256": "d716564f28e19dbf77ae48e992ba0c29a489f110dcc1039c9fb831365b986db4",
+      "source_bytes": 908596,
+      "sha256": "e6739ccfe866733dd2beefc47d8d8d961f1e8fb1a50c54ce027d4f3d663cc970",
+      "bytes": 519722,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "7b3d2205beae4f90bd6960c29e337d02176d02a0d66cf1397adc38c762340eef",
+      "derivative_decoded_rgba_sha256": "7b3d2205beae4f90bd6960c29e337d02176d02a0d66cf1397adc38c762340eef",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "gem_gold",
+      "path": "public/jems-art/gem_gold.webp",
+      "url": "jems-art/gem_gold.webp",
+      "source_library_path": "art/gem_gold.png",
+      "source_sha256": "1f0e1b59bde361049ec39952d6d407e76119fe743793a5419267c0f49586c90a",
+      "source_bytes": 936923,
+      "sha256": "eeb11136d86692133d3155c29f036db537f702f1e94e64ff6d0db9cbd9a05c75",
+      "bytes": 561408,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "c9522a1c12e3703c7902e94e8cc07fa1a62a37831a8da04e41d2020bbd743fff",
+      "derivative_decoded_rgba_sha256": "c9522a1c12e3703c7902e94e8cc07fa1a62a37831a8da04e41d2020bbd743fff",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "gem_mint",
+      "path": "public/jems-art/gem_mint.webp",
+      "url": "jems-art/gem_mint.webp",
+      "source_library_path": "art/gem_mint.png",
+      "source_sha256": "466aeebde475ba75233e5bca2d1f5a80787c3bfe9452416e4e1ea9c7330554c2",
+      "source_bytes": 1011088,
+      "sha256": "49f0d0a03ec9e602b5ecfca143a88c33a2d3383c804cff32a6646ba4da7618b5",
+      "bytes": 549884,
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "decoded_rgba_sha256": "b3a3691d7797277152ca99ca34868f1f1f62265730a41f862e54ffd33ccdb4b4",
+      "derivative_decoded_rgba_sha256": "b3a3691d7797277152ca99ca34868f1f1f62265730a41f862e54ffd33ccdb4b4",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "hero_gembots",
+      "path": "public/jems-art/hero_gembots.webp",
+      "url": "jems-art/hero_gembots.webp",
+      "source_library_path": "art/hero_gembots.png",
+      "source_sha256": "db48bd0bef038f2569fb7334e4edb1c2fb7cd09edebacdb5ad362d439c1a7345",
+      "source_bytes": 1886447,
+      "sha256": "e28f3d7db09fc1d94198d1d758e2c6f76d8c00ba97bcbf23a52699af19e011d7",
+      "bytes": 1385960,
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "decoded_rgba_sha256": "f27b71acedf44fb30d062476300da7dccf128eee09ec2438231d35a611d99b84",
+      "derivative_decoded_rgba_sha256": "f27b71acedf44fb30d062476300da7dccf128eee09ec2438231d35a611d99b84",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "hero_mind_your_jems",
+      "path": "public/jems-art/hero_mind_your_jems.webp",
+      "url": "jems-art/hero_mind_your_jems.webp",
+      "source_library_path": "art/hero_mind_your_jems.png",
+      "source_sha256": "f14804b28d41a4e1e972eb54189328b8b1324ed07299d11a7c97a74b238e2629",
+      "source_bytes": 2293038,
+      "sha256": "3fa2b73ea6dce22415ea3b06538b1a7fc1f2a76582aa45d9e005c9744e051cb5",
+      "bytes": 1735602,
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "decoded_rgba_sha256": "48eacbba9b86e1df7590274d81c74ae5a13e171249f69fe331692c689059af70",
+      "derivative_decoded_rgba_sha256": "48eacbba9b86e1df7590274d81c74ae5a13e171249f69fe331692c689059af70",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "hero_workshop",
+      "path": "public/jems-art/hero_workshop.webp",
+      "url": "jems-art/hero_workshop.webp",
+      "source_library_path": "art/hero_workshop.png",
+      "source_sha256": "6329154bd3f34bd4b6c99e9358f2228341c057f2d0fe27f43141eb5a9e4dfe68",
+      "source_bytes": 1835068,
+      "sha256": "3c3b646ac99ebddb670bc8e1b5b6f0069e6769344f5f9bc12923fa2547a27bad",
+      "bytes": 1249710,
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "decoded_rgba_sha256": "5e060a9db5d48c4c4e4d5fb7a683c039b3004c148a0eb282dfdf352b8348925f",
+      "derivative_decoded_rgba_sha256": "5e060a9db5d48c4c4e4d5fb7a683c039b3004c148a0eb282dfdf352b8348925f",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/add.svg",
+      "url": "jems-art/icons/add.svg",
+      "source_library_path": "system/icons/add.svg",
+      "sha256": "7f57ef4c3491084327dd29b2ca825790382e8c014f74c2f3a33e7ce9370c7c40",
+      "bytes": 193,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/alert.svg",
+      "url": "jems-art/icons/alert.svg",
+      "source_library_path": "system/icons/alert.svg",
+      "sha256": "ca154090965d4cd2631bcc87e9f64ab9facaaa69736aa1cad487387b10d185a2",
+      "bytes": 220,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/arrow.svg",
+      "url": "jems-art/icons/arrow.svg",
+      "source_library_path": "system/icons/arrow.svg",
+      "sha256": "d41d9d9cefbe83f0f67d66bc80471672164c8d839d178e43127d05a87df25976",
+      "bytes": 198,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/book.svg",
+      "url": "jems-art/icons/book.svg",
+      "source_library_path": "system/icons/book.svg",
+      "sha256": "3730e369402b8c56d93de37c5d39a571b149c3bd3f8519ed9271a60f431a2fe3",
+      "bytes": 250,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/chart.svg",
+      "url": "jems-art/icons/chart.svg",
+      "source_library_path": "system/icons/chart.svg",
+      "sha256": "00cb6e1af303464a82c6d8b95d7b78e6f29bdd6ffbf39426ed5e9c0f88c75612",
+      "bytes": 211,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/check.svg",
+      "url": "jems-art/icons/check.svg",
+      "source_library_path": "system/icons/check.svg",
+      "sha256": "831a42c6fa0a6f31d136abdcd5b8f99afc55e58b31374643793046e83d85f56c",
+      "bytes": 191,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/chevron.svg",
+      "url": "jems-art/icons/chevron.svg",
+      "source_library_path": "system/icons/chevron.svg",
+      "sha256": "d17f74d6ba6ded285896962c47596888400edb76ea947257b8ea51b9852efcc4",
+      "bytes": 189,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/clock.svg",
+      "url": "jems-art/icons/clock.svg",
+      "source_library_path": "system/icons/clock.svg",
+      "sha256": "8fa86ecefb5ca2bcb8e8da31e967ec6b490f232550bc97244e181ebacf4059bf",
+      "bytes": 219,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/close.svg",
+      "url": "jems-art/icons/close.svg",
+      "source_library_path": "system/icons/close.svg",
+      "sha256": "f3a8f8e11395930640692b144fd143d54ab1722db097b10b4039375150443919",
+      "bytes": 197,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/download.svg",
+      "url": "jems-art/icons/download.svg",
+      "source_library_path": "system/icons/download.svg",
+      "sha256": "5ad854a53614cdccafe86ace82683b56471f4ba3a830de4644f219c3fca95728",
+      "bytes": 211,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/edit.svg",
+      "url": "jems-art/icons/edit.svg",
+      "source_library_path": "system/icons/edit.svg",
+      "sha256": "6e5c875068c3fbaca8093b8c14bf63c228299ac7d1901dc6e2a5956820531722",
+      "bytes": 238,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/grid.svg",
+      "url": "jems-art/icons/grid.svg",
+      "source_library_path": "system/icons/grid.svg",
+      "sha256": "f32999b4726a426ad341c4bec4a7e218f0286b253b937c157816876def08fb60",
+      "bytes": 357,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/help.svg",
+      "url": "jems-art/icons/help.svg",
+      "source_library_path": "system/icons/help.svg",
+      "sha256": "7e634358780d2a75443a9e0361c191acbbdf1a618b0ee560c0bd5420aecda315",
+      "bytes": 257,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/home.svg",
+      "url": "jems-art/icons/home.svg",
+      "source_library_path": "system/icons/home.svg",
+      "sha256": "ae33c1ed2bcf17d669ce0e74fef76f6bce36c2701464d0968e0904db94e1da1f",
+      "bytes": 234,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon-sprite",
+      "path": "public/jems-art/icons/jems-icons.svg",
+      "url": "jems-art/icons/jems-icons.svg",
+      "source_library_path": "system/jems-icons.svg",
+      "sha256": "791196fcce7aae7aeffcedfa65682ffa403ec267ddc57fdc7ff0acafc31267f0",
+      "bytes": 7246,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/lock.svg",
+      "url": "jems-art/icons/lock.svg",
+      "source_library_path": "system/icons/lock.svg",
+      "sha256": "a2074640566d6a5476f8dc01b895b0af502c192bd39055e71f13943bb9c80d03",
+      "bytes": 258,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/menu.svg",
+      "url": "jems-art/icons/menu.svg",
+      "source_library_path": "system/icons/menu.svg",
+      "sha256": "093f6cdde0063bfbfd6321378e1864d381ec3714059bd3c200296f9c6a030f4a",
+      "bytes": 200,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/mic.svg",
+      "url": "jems-art/icons/mic.svg",
+      "source_library_path": "system/icons/mic.svg",
+      "sha256": "3c1426ae90676bbeea92dd3576fb42234bc8b657e9e07c5d1dd5305b7ec9398c",
+      "bytes": 265,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/music.svg",
+      "url": "jems-art/icons/music.svg",
+      "source_library_path": "system/icons/music.svg",
+      "sha256": "5d8785a87b40e197f181e4c74232b7893b85e617f7e472983f72d363359ee4f7",
+      "bytes": 298,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/parent.svg",
+      "url": "jems-art/icons/parent.svg",
+      "source_library_path": "system/icons/parent.svg",
+      "sha256": "3543c9b8612ef4b49a993b7034f78c23a15f601de7e0612ac178ed8849c2b0cd",
+      "bytes": 301,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/pause.svg",
+      "url": "jems-art/icons/pause.svg",
+      "source_library_path": "system/icons/pause.svg",
+      "sha256": "e42f8374c88dd4f071dc51c5546651b2fe5506f4c5dc9de9c7f66712958151d2",
+      "bytes": 262,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/play.svg",
+      "url": "jems-art/icons/play.svg",
+      "source_library_path": "system/icons/play.svg",
+      "sha256": "373aa6a0f37a8ef8d7ddf8891a23caace34d8f2458fa7f1feb86ef559702fe8f",
+      "bytes": 192,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/retry.svg",
+      "url": "jems-art/icons/retry.svg",
+      "source_library_path": "system/icons/retry.svg",
+      "sha256": "9b090859d974d1a53318e610bffe345f0631ca5674999249fa8cad4dea0e326b",
+      "bytes": 211,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/save.svg",
+      "url": "jems-art/icons/save.svg",
+      "source_library_path": "system/icons/save.svg",
+      "sha256": "333833ed4a61aac787b32aeef7b44367203b20c1f183fd8b4cdf955563fd994f",
+      "bytes": 246,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/search.svg",
+      "url": "jems-art/icons/search.svg",
+      "source_library_path": "system/icons/search.svg",
+      "sha256": "b134c0b70fa8a49613172bfa36eb25aee86de3150f39eb522b953624d4d748f3",
+      "bytes": 224,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/send.svg",
+      "url": "jems-art/icons/send.svg",
+      "source_library_path": "system/icons/send.svg",
+      "sha256": "1837f60967a39e72502d8bbc687e6a8e05337127663fafd85ae5a0bd0804675d",
+      "bytes": 216,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/settings.svg",
+      "url": "jems-art/icons/settings.svg",
+      "source_library_path": "system/icons/settings.svg",
+      "sha256": "439615c77432b9e0991cdcb7c64a0cebb9f1d7cd435d98e50cf35fee20c1c8eb",
+      "bytes": 406,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/shield.svg",
+      "url": "jems-art/icons/shield.svg",
+      "source_library_path": "system/icons/shield.svg",
+      "sha256": "cf313026e3db9af9e580c682b9f70ee16ee7ce01090863a3972d79ef50d11aff",
+      "bytes": 240,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/star.svg",
+      "url": "jems-art/icons/star.svg",
+      "source_library_path": "system/icons/star.svg",
+      "sha256": "85f70c521e16f3e9ab08227830fea628839599147e6c3f0c7fa091d17eec0a8d",
+      "bytes": 251,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/stop.svg",
+      "url": "jems-art/icons/stop.svg",
+      "source_library_path": "system/icons/stop.svg",
+      "sha256": "2babebbf1e6ad0209522b8814af25cffa27e079257d3500a32e7476e02421524",
+      "bytes": 214,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/trash.svg",
+      "url": "jems-art/icons/trash.svg",
+      "source_library_path": "system/icons/trash.svg",
+      "sha256": "a0eada2445209ee667391e7bd6ea127dcc15f0abfc629dbc10aecf6bcccba3a6",
+      "bytes": 227,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/undo.svg",
+      "url": "jems-art/icons/undo.svg",
+      "source_library_path": "system/icons/undo.svg",
+      "sha256": "0b17e762ccc6e86e53df17d671828fd9da864bc7a76c3389798bdb6f6ab7c442",
+      "bytes": 204,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "icon",
+      "path": "public/jems-art/icons/volume.svg",
+      "url": "jems-art/icons/volume.svg",
+      "source_library_path": "system/icons/volume.svg",
+      "sha256": "b117b1fb61e7bcaa7559d4940b0f174b94f6d29b5f3f3f13f6cbf76a62d5f358",
+      "bytes": 239,
+      "exact_source_bytes": true
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "makers_together",
+      "path": "public/jems-art/makers_together.webp",
+      "url": "jems-art/makers_together.webp",
+      "source_library_path": "art/makers_together.png",
+      "source_sha256": "990c43c5547804182687fe4b0f56df41b48a3ba8aa13e8c620b9b0fe9c665591",
+      "source_bytes": 2261254,
+      "sha256": "9e2bcb838e26a89370e1ddebbbf48aa0a983eea65d1195c66c884768ca960457",
+      "bytes": 1478532,
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "decoded_rgba_sha256": "70600516e5096f0dbe2ed518b3ded1b063f2a506d6e004233b1661acf52b901a",
+      "derivative_decoded_rgba_sha256": "70600516e5096f0dbe2ed518b3ded1b063f2a506d6e004233b1661acf52b901a",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "spot_first_idea",
+      "path": "public/jems-art/spot_first_idea.webp",
+      "url": "jems-art/spot_first_idea.webp",
+      "source_library_path": "art/spot_first_idea.png",
+      "source_sha256": "70b14edfc6fab82d684f948feb5914a1f075fda3bdfb744d02e892de53bb4c23",
+      "source_bytes": 1471181,
+      "sha256": "8f05e4c38b5851d1e6054511a55264f5c2a64607b6ff8f34143e64a487639666",
+      "bytes": 907498,
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "decoded_rgba_sha256": "25b41da9075608ae1e6985ea3f482a6fe9a709c5dbaec2c1f1d99d12bbda21a3",
+      "derivative_decoded_rgba_sha256": "25b41da9075608ae1e6985ea3f482a6fe9a709c5dbaec2c1f1d99d12bbda21a3",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "spot_reconnect",
+      "path": "public/jems-art/spot_reconnect.webp",
+      "url": "jems-art/spot_reconnect.webp",
+      "source_library_path": "art/spot_reconnect.png",
+      "source_sha256": "2b093d98fb475412496915c3be9bad413612dcae964a7ee7b8a316cfe0b98ea6",
+      "source_bytes": 1639822,
+      "sha256": "3498b0f6378cfec077e3ec74ea52c414b81c710ea1b0e0b4ccb5e1d6424ea464",
+      "bytes": 1016152,
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "decoded_rgba_sha256": "dc9473ea57b57cb5ecc6248101f9c0ecd45d66cbba6104e6c803cf76cd278342",
+      "derivative_decoded_rgba_sha256": "dc9473ea57b57cb5ecc6248101f9c0ecd45d66cbba6104e6c803cf76cd278342",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "spot_safe_storage",
+      "path": "public/jems-art/spot_safe_storage.webp",
+      "url": "jems-art/spot_safe_storage.webp",
+      "source_library_path": "art/spot_safe_storage.png",
+      "source_sha256": "f5abedc4f567e2f946186769d6f1c53923903ca256a6231dc590e8c9256c8edf",
+      "source_bytes": 1569574,
+      "sha256": "915a3ffda75bb546b93fecd102f51a5f341fb5d4b479c4c90a24ef2b80e03712",
+      "bytes": 956356,
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "decoded_rgba_sha256": "dbaa4d6b064173d9b4e45aaccf22a719911bdd8bcdf87baf3b81ef2ae5e3a1bc",
+      "derivative_decoded_rgba_sha256": "dbaa4d6b064173d9b4e45aaccf22a719911bdd8bcdf87baf3b81ef2ae5e3a1bc",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "illustration",
+      "asset_id": "spot_work_in_progress",
+      "path": "public/jems-art/spot_work_in_progress.webp",
+      "url": "jems-art/spot_work_in_progress.webp",
+      "source_library_path": "art/spot_work_in_progress.png",
+      "source_sha256": "29bab6a90097a377c19b7ed6f8e0d34b858d1bd7aea04776070fb542811dad44",
+      "source_bytes": 1555019,
+      "sha256": "584f4259a2efc81c8332e0bdc1206e86e6f2cf5f5fc56908819ac58bf2494b83",
+      "bytes": 964544,
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "decoded_rgba_sha256": "96312fb4e5f162869d6578430d4896511d9fbab78d8b829a10def779f857a82c",
+      "derivative_decoded_rgba_sha256": "96312fb4e5f162869d6578430d4896511d9fbab78d8b829a10def779f857a82c",
+      "pixel_equivalence": "all decoded RGBA bytes identical to approved PNG; no resampling",
+      "encoding": {
+        "format": "WebP",
+        "lossless": true,
+        "quality": 100,
+        "method": 6,
+        "exact": true,
+        "pillow": "13.0.0",
+        "libwebp": "1.6.0"
+      }
+    },
+    {
+      "kind": "pattern",
+      "path": "public/jems-clouds.svg",
+      "url": "jems-clouds.svg",
+      "source_library_path": "patterns/jems-clouds.svg",
+      "sha256": "b7b71365120d64b4458a55a7b6e4b52521486e98771b5e8696b59d550ff6fb0e",
+      "bytes": 494,
+      "exact_source_bytes": true,
+      "changed_from_checkout": false
+    },
+    {
+      "kind": "pattern",
+      "path": "public/jems-facets-pattern.svg",
+      "url": "jems-facets-pattern.svg",
+      "source_library_path": "patterns/jems-facets-pattern.svg",
+      "sha256": "86814491dab9c2f03ebb738db14d35cc674f60cc07562dd2cc9202aa62d04283",
+      "bytes": 664,
+      "exact_source_bytes": true,
+      "changed_from_checkout": false
+    },
+    {
+      "kind": "journey-background",
+      "path": "public/jems-journey/background.webp",
+      "url": "jems-journey/background.webp",
+      "sha256": "1b1460063ff8d1d3c353b0952731f3a73059c500800d3118ba558fd76300be84",
+      "bytes": 220302,
+      "width": 1774,
+      "height": 887,
+      "alpha": false,
+      "unchanged_existing_asset": true,
+      "source_commit": "b12a2a523b872591b98bdd47afabbc485f8ebad3",
+      "source_git_blob_sha": "258e711b7046c80be48bfcb61199a654ade518fc"
+    },
+    {
+      "kind": "journey-atlas",
+      "path": "public/jems-journey/characters-nova.webp",
+      "url": "jems-journey/characters-nova.webp",
+      "sha256": "ea9cef9ed711727c6ef946835b4679193959b46a711ac277f4fe3579ef119458",
+      "bytes": 490808,
+      "width": 2172,
+      "height": 724,
+      "alpha": true,
+      "unchanged_existing_asset": true,
+      "source_commit": "b12a2a523b872591b98bdd47afabbc485f8ebad3",
+      "source_git_blob_sha": "648fcbbfed7c49eed588135a8dc8e50b94779ce5"
+    },
+    {
+      "kind": "journey-atlas",
+      "path": "public/jems-journey/characters-spark.webp",
+      "url": "jems-journey/characters-spark.webp",
+      "sha256": "1e4b6df769edb7f552050d6cbede494a4adacdb45d9e202a4f825e472f1828ac",
+      "bytes": 408768,
+      "width": 2172,
+      "height": 724,
+      "alpha": true,
+      "unchanged_existing_asset": true,
+      "source_commit": "b12a2a523b872591b98bdd47afabbc485f8ebad3",
+      "source_git_blob_sha": "1a43cb6bbf56d2fbcc5a659765cc2b753e1bf665"
+    },
+    {
+      "kind": "journey-atlas",
+      "path": "public/jems-journey/gems.webp",
+      "url": "jems-journey/gems.webp",
+      "sha256": "c4200528c270872c0709380874d6a867fa2da12777548b1f650da6cfc66d30a2",
+      "bytes": 401276,
+      "width": 2172,
+      "height": 724,
+      "alpha": true,
+      "unchanged_existing_asset": true,
+      "source_commit": "b12a2a523b872591b98bdd47afabbc485f8ebad3",
+      "source_git_blob_sha": "58686b43dfcff2c0ff140d2e0be3d075d674247a"
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-logo.svg",
+      "url": "jems-logo.svg",
+      "source_library_path": "identity/jems-logo.svg",
+      "sha256": "c95e2765a954eb1c71d61af0d72dfe877f3ddb85974b94555f4bd1e9651d00a7",
+      "bytes": 6232,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-mark-inverse.svg",
+      "url": "jems-mark-inverse.svg",
+      "source_library_path": "identity/jems-mark-inverse.svg",
+      "sha256": "3df782a4926663467ac643d6ddc38040a5b673904f6b333fc3720f74c1e5c8ed",
+      "bytes": 1250,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-mark-monochrome.svg",
+      "url": "jems-mark-monochrome.svg",
+      "source_library_path": "identity/jems-mark-monochrome.svg",
+      "sha256": "2844d2177edac660d15984ef35f03341bc252f7385824b8ed3dbb0b0d143982a",
+      "bytes": 1200,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-mark.svg",
+      "url": "jems-mark.svg",
+      "source_library_path": "identity/jems-mark.svg",
+      "sha256": "dcf92c3e92ee11c82f58a6884f9530612168cf07867a81c0d84fab7234e38021",
+      "bytes": 2488,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-mono.svg",
+      "url": "jems-mono.svg",
+      "source_library_path": "identity/jems-mono.svg",
+      "sha256": "6286feac237996dd40e52b5aa6472110b7e3334abca493ac4a4aeeea8e4382a2",
+      "bytes": 4937,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "pattern",
+      "path": "public/jems-pattern.svg",
+      "url": "jems-pattern.svg",
+      "source_library_path": "patterns/jems-pattern.svg",
+      "sha256": "02327b55948efed1650904cdae77c7a5ce1736191743677858b51641a1689b4d",
+      "bytes": 835,
+      "exact_source_bytes": true,
+      "changed_from_checkout": false
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-reversed.svg",
+      "url": "jems-reversed.svg",
+      "source_library_path": "identity/jems-reversed.svg",
+      "sha256": "c6c085d7142f478e5da04a030351401ae7a480d7cd059de02c4c68ea0fe0b416",
+      "bytes": 4989,
+      "exact_source_bytes": true,
+      "changed_from_checkout": true
+    },
+    {
+      "kind": "pattern",
+      "path": "public/jems-sparks.svg",
+      "url": "jems-sparks.svg",
+      "source_library_path": "patterns/jems-sparks.svg",
+      "sha256": "3c352ca9156e437954fe6b6bf5ad41c8576ca50c4fc10d2f41540f045134eaaf",
+      "bytes": 422,
+      "exact_source_bytes": true,
+      "changed_from_checkout": false
+    },
+    {
+      "kind": "identity",
+      "path": "public/jems-wordmark.svg",
+      "url": "jems-wordmark.svg",
+      "source_library_path": "identity/jems-wordmark.svg",
+      "sha256": "d6116f5c7cdfd0392634c36345596d4d8207f5b9e35b4d5873d8e994d8f9a7e0",
+      "bytes": 2014,
+      "exact_source_bytes": true,
+      "changed_from_checkout": false
+    }
+  ],
+  "journey_frames": [
+    {
+      "asset_id": "maker_spark_1",
+      "url": "jems-journey/characters-spark.webp",
+      "crop_xyxy": [
+        0,
+        0,
+        543,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "9162814548f9552766e7c6d0013ae72bf1a2e3b2791abaf3d6c31bf9f24a263e",
+      "character": "Spark",
+      "level": 1,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_spark_2",
+      "url": "jems-journey/characters-spark.webp",
+      "crop_xyxy": [
+        543,
+        0,
+        1086,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "5fcf0d62a4c54310a62949a2b91c72c56ff1303bedb0708af86d79d3eb05d948",
+      "character": "Spark",
+      "level": 2,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_spark_3",
+      "url": "jems-journey/characters-spark.webp",
+      "crop_xyxy": [
+        1086,
+        0,
+        1629,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "4ba8f7cfe2689f900d1a740120398d5d87b8cb5a562459a19ccb0ffa16165802",
+      "character": "Spark",
+      "level": 3,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_spark_4",
+      "url": "jems-journey/characters-spark.webp",
+      "crop_xyxy": [
+        1629,
+        0,
+        2172,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "31d147bfcb70c88ae3d5575e026b6fe6d7f01ed96a61e2f85127c6a76198bd52",
+      "character": "Spark",
+      "level": 4,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_nova_1",
+      "url": "jems-journey/characters-nova.webp",
+      "crop_xyxy": [
+        0,
+        0,
+        543,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "c0ec062112aec6dadb7a5dc2c7133e3a569ab4e132d1ff2fa391c02e0c892ded",
+      "character": "Nova",
+      "level": 1,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_nova_2",
+      "url": "jems-journey/characters-nova.webp",
+      "crop_xyxy": [
+        543,
+        0,
+        1086,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "c9dceac21eadc2efd32a0574c2ca5983ca7ede95ba1f0eff6845aba03a78624f",
+      "character": "Nova",
+      "level": 2,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_nova_3",
+      "url": "jems-journey/characters-nova.webp",
+      "crop_xyxy": [
+        1086,
+        0,
+        1629,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "a4050571ea5b46b5a942086b355b499340fd11e6f25bc6090fee376e3746abbc",
+      "character": "Nova",
+      "level": 3,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "maker_nova_4",
+      "url": "jems-journey/characters-nova.webp",
+      "crop_xyxy": [
+        1629,
+        0,
+        2172,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "b59afd67344d224daa0c62cfc16d74edc5cf6baed94e659e7e506ae15f31043e",
+      "character": "Nova",
+      "level": 4,
+      "purpose": "selected human at exact rank"
+    },
+    {
+      "asset_id": "journey_background",
+      "url": "jems-journey/background.webp",
+      "crop_xyxy": null,
+      "width": 1774,
+      "height": 887,
+      "frame_aspect_ratio": 2,
+      "source_library_png_sha256": "6315453a870514dae37926e17c2115d9b1988ce53fa3f3217527cc158ab2ff09",
+      "character": null,
+      "level": null,
+      "purpose": "decorative journey world"
+    },
+    {
+      "asset_id": "gem_rough",
+      "url": "jems-journey/gems.webp",
+      "crop_xyxy": [
+        0,
+        0,
+        543,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "2ed73973804efe021c84c951a2452ec112675b4f980d6d3bed6a81b2f7a7b187",
+      "character": null,
+      "level": 1,
+      "purpose": "secondary progress marker"
+    },
+    {
+      "asset_id": "gem_cut",
+      "url": "jems-journey/gems.webp",
+      "crop_xyxy": [
+        543,
+        0,
+        1086,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "dee824c6f6637ebab30ff3472e74c92a24540b956620344400c677485e9d0805",
+      "character": null,
+      "level": 2,
+      "purpose": "secondary progress marker"
+    },
+    {
+      "asset_id": "gem_polished_rainbow",
+      "url": "jems-journey/gems.webp",
+      "crop_xyxy": [
+        1086,
+        0,
+        1629,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "4f51d398ccbac1500d44cacaaecc79d83f79f69cef88a844beb5a173c4133a1e",
+      "character": null,
+      "level": 3,
+      "purpose": "secondary progress marker"
+    },
+    {
+      "asset_id": "gem_master",
+      "url": "jems-journey/gems.webp",
+      "crop_xyxy": [
+        1629,
+        0,
+        2172,
+        724
+      ],
+      "width": 543,
+      "height": 724,
+      "frame_aspect_ratio": 0.75,
+      "source_library_png_sha256": "85bd98a69d6adc35b407b82c9f2d4d36ab8d87c4b111740eabfdde9c669a2698",
+      "character": null,
+      "level": 4,
+      "purpose": "secondary progress marker"
+    }
+  ],
+  "retired_asset_ids": [
+    "badge_builder",
+    "banner_celebration",
+    "badge_gem_maker",
+    "badge_gem_cutter",
+    "badge_gem_polisher",
+    "badge_gem_master",
+    "gem_master_brand"
+  ],
+  "integration_notes": [
+    "Use new URL(path, document.baseURI) or the application base URL; do not hard-code root-relative paths.",
+    "Character identity and rank artwork use the existing Spark/Nova atlases. Small gemstone frames are secondary progress only.",
+    "Three factory covers are reusable artwork, not evidence that corresponding game implementations are installed.",
+    "The five legacy character_spark_* filenames are Gem companion poses, not the human maker Spark.",
+    "All new WebP files retain exact source PNG RGBA pixels; full source PNGs remain in the approved external library rather than this repository."
+  ]
+}

@@ -1,3 +1,4 @@
+import {setIconLabel,type IconName} from '../brand/icons';
 import type {GameContext,GameInstance} from '../runtime/types';
 
 /** Curated original logic game: children author the route, the game never supplies a solution. */
@@ -38,13 +39,13 @@ export default class RobotRoute implements GameInstance {
    const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';
    b.dataset.direction=direction;b.addEventListener('click',()=>this.add(direction),{signal:this.abort.signal});controls.append(b);
   }
-  const action=(label:string,fn:()=>void)=>{
-   const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';
+  const action=(label:string,fn:()=>void,icon:IconName)=>{
+   const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';setIconLabel(b,icon,label);
    b.addEventListener('click',fn,{signal:this.abort.signal});actions.append(b);return b;
   };
-  const run=action('▶ Run my plan',()=>this.run());run.classList.add('favorite-control-primary');
-  action('↶ Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();this.save();}});
-  action('↺ Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();this.save();}});
+  const run=action('Run my plan',()=>this.run(),'play');run.classList.add('favorite-control-primary');
+  action('Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();this.save();}},'undo');
+  action('Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();this.save();}},'close');
   this.canvas.addEventListener('keydown',e=>{const direction:Record<string,Direction>={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};if(direction[e.key]){e.preventDefault();this.add(direction[e.key]);}},{signal:this.abort.signal});
   this.root.append(title,subtitle,this.hud,this.canvas,this.instructions,controls,this.commands,actions);target.replaceChildren(this.root);
   this.reset();

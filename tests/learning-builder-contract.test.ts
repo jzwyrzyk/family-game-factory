@@ -54,14 +54,30 @@ async function uiHarness() {
     bundledUI = result.outputFiles[0].text;
   }
   const nodes = new Map<string, any>(), listeners = new Map<string, Function[]>(), saved = new Map<string, string>();
+  class TextNode {
+    readonly nodeType = 3;
+    constructor(public data: string) {}
+    get textContent() { return this.data; }
+    set textContent(value: string) { this.data = value; }
+  }
   class Element {
-    private name = ''; hidden = false; children: any[] = []; style: any = {}; value = ''; textContent = ''; innerHTML = ''; src?: string;
+    private name = ''; private attributes = new Map<string, string>();
+    readonly nodeType = 1; childNodes: (Element | TextNode)[] = []; dataset: Record<string, string> = {};
+    hidden = false; style: any = {}; value = ''; innerHTML = ''; src?: string;
     onclick?: Function; onsubmit?: Function;
+    constructor(public localName = 'div', public namespaceURI = 'http://www.w3.org/1999/xhtml') {}
     set id(value: string) { this.name = value; nodes.set(value, this); } get id() { return this.name; }
+    get children() { return this.childNodes.filter(child => child instanceof Element); }
+    get firstChild() { return this.childNodes[0] || null; }
+    get lastChild() { return this.childNodes.at(-1) || null; }
+    get textContent(): string { return this.childNodes.map(child => child.textContent).join(''); }
+    set textContent(value: string) { this.replaceChildren(...(value ? [new TextNode(value)] : [])); }
     querySelector() { return new Element(); } after() {} before() {}
-    append(...children: any[]) { this.children.push(...children); }
-    replaceChildren(...children: any[]) { this.children = children; }
-    setAttribute() {} removeAttribute(name: string) { if (name === 'src') delete this.src; }
+    append(...children: (Element | TextNode | string)[]) { this.childNodes.push(...children.map(child => typeof child === 'string' ? new TextNode(child) : child)); }
+    replaceChildren(...children: (Element | TextNode | string)[]) { this.childNodes = []; this.append(...children); }
+    setAttribute(name: string, value: string) { this.attributes.set(name, value); }
+    getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+    removeAttribute(name: string) { this.attributes.delete(name); if (name === 'src') delete this.src; }
     reportValidity() { return true; }
   }
   const node = (id: string) => { if (!nodes.has(id)) { const e = new Element(); e.id = id; } return nodes.get(id); };
@@ -76,7 +92,9 @@ async function uiHarness() {
     setMode: (key: string, mode: string) => { active.mathModes = { ...active.mathModes, [key]: mode }; }, modeControl() {},
   }, app: { page: (page: string) => emit('factory-page', page) } };
   const window: any = { FG, mounts: [], disposals: 0, addEventListener: (type: string, listener: Function) => listeners.set(type, [...listeners.get(type) || [], listener]) };
-  const document: any = { baseURI: 'https://app.example/', createElement: () => new Element(), getElementById: node, querySelector: () => ({ id: 'page-create' }) };
+  const document: any = { baseURI: 'https://app.example/', createElement: (name: string) => new Element(name),
+    createElementNS: (namespace: string, name: string) => new Element(name, namespace), createTextNode: (text: string) => new TextNode(text),
+    getElementById: node, querySelector: () => ({ id: 'page-create' }) };
   const fetch = async (input: any) => {
     const url = new URL(String(input)), path = url.pathname;
     requests.push(path);

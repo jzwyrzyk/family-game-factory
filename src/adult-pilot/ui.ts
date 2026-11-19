@@ -1,3 +1,4 @@
+import {iconMarkup,setIconLabel} from '../brand/icons';
 import {BuilderClient,type BuilderConfig} from '../builder/client';
 import {activateAdultSession,adultRequestSession,adultSessionVersion,clearAdultSession,onAdultSessionEnded,type AdultProfileSession} from './session';
 
@@ -12,13 +13,16 @@ export function installAdultProfile(config:BuilderConfig){
  const dialog=document.createElement('dialog');dialog.id='adultProfileDialog';dialog.className='adult-profile-dialog';dialog.setAttribute('aria-labelledby','adultProfileTitle');
  dialog.innerHTML='<form id="adultProfileForm"><h2 id="adultProfileTitle">Switch to Adult</h2><p>AI conversation, game building and private dictation activate in this development profile. Use your own test ideas; family notebooks stay separate.</p><label for="adultProfilePassphrase">Parent passphrase</label><input id="adultProfilePassphrase" type="password" autocomplete="current-password" minlength="12" maxlength="128" required><p id="adultProfileStatus" role="status" aria-live="polite"></p><div class="adult-profile-actions"><button type="button" id="adultProfileCancel" class="btn secondary">Cancel</button><button type="submit" id="adultProfileSubmit" class="btn primary">Switch to Adult</button></div></form>';
  const banner=document.createElement('section');banner.id='adultProfileBanner';banner.className='adult-profile-banner';banner.hidden=true;banner.setAttribute('aria-label','Adult development profile');
- banner.innerHTML='<div><strong>🛠️ Adult development profile</strong><p id="adultProfileTools" role="status" aria-live="polite">Checking AI tools…</p><small id="adultProfileExpiry"></small></div><button type="button" class="btn secondary" id="adultProfileExit">Exit Adult profile</button>';
+ banner.innerHTML=`<div><strong>${iconMarkup('settings')} Adult development profile</strong><p id="adultProfileTools" role="status" aria-live="polite">Checking AI tools…</p><small id="adultProfileExpiry"></small></div><button type="button" class="btn secondary" id="adultProfileExit">Exit Adult profile</button>`;
  document.body.append(dialog);document.querySelector('main')?.prepend(banner);
  const input=dialog.querySelector<HTMLInputElement>('#adultProfilePassphrase')!,status=dialog.querySelector<HTMLElement>('#adultProfileStatus')!;
  const submit=dialog.querySelector<HTMLButtonElement>('#adultProfileSubmit')!;
+ setIconLabel(dialog.querySelector<HTMLButtonElement>('#adultProfileCancel')!,'close','Cancel');
+ setIconLabel(submit,'parent','Switch to Adult');
+ setIconLabel(banner.querySelector<HTMLButtonElement>('#adultProfileExit')!,'lock','Exit Adult profile');
  const tools=banner.querySelector<HTMLElement>('#adultProfileTools')!;
  function renderChoice(){
-  button.hidden=!enabled;button.textContent='🛠️ Adult (development)';
+  button.hidden=!enabled;setIconLabel(button,'settings','Adult (development)');
   const active=!!adultRequestSession(base);button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
   if(enabled)document.getElementById('profile-choices')?.append(button);else button.remove();
   banner.hidden=!active;

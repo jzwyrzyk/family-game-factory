@@ -23,7 +23,7 @@ const {start}=require('./browser-server.cjs');
   const talk=async()=>{await page.click('#studioChange');};
   const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore summary');};
   const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
-  assert.equal(await page.locator('#studioStarters [data-starter]').count(),6);
+  assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
   await page.click('[data-starter="gum"]');
   // This suite exercises the preserved physical builder; newly created games
@@ -78,7 +78,7 @@ const {start}=require('./browser-server.cjs');
   await page.getByRole('button',{name:/Test machine/}).click();
   await page.waitForFunction(()=>FG.runtime.snapshot().state.simulation?.status==='won',null,{timeout:15000});
   assert.equal((await notebook()).sessions.some(s=>s.reflection),false,'physics success alone does not force reflection');
-  await page.getByRole('button',{name:'Finish challenge →',exact:true}).click();
+  await page.getByRole('button',{name:'Finish challenge',exact:true}).click();
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.reflection));
   await talk();assert.match(await page.textContent('#studioMessages'),/fun or tricky/);
   await page.click('#studioReflectAnswer');await page.fill('#studioPrompt','I liked seeing my rocket stay together.');await page.click('#studioSend');

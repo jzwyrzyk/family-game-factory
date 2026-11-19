@@ -43,6 +43,12 @@ import './language-engine.test';
 import './trusted-devices.test';
 import './session-client.test';
 
+import './generated-art.test';
+import './illustrations.test';
+import './presentation-quality.test';
+import './quality-pipeline.test';
+import './gem-factory-physics.test';
+import './gem-factory-pattern.test';
 import './parent-privacy.test';
 
 import './parent-privacy-paid.test';

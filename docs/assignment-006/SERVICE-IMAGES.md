@@ -77,3 +77,33 @@ Review/release the compatible website only after backend verification. Preserve 
 `npm run test:deployment` covers offline plans, exact source requirements, real Git staging with dirty/untracked/private fixtures, both images in one build, read-only preflight/recovery, inherited IAM rejection, bounded polling, credential-safe diagnostics and failed/partial/unverified digest rejection. Existing sandbox/deployment contracts are preserved. The normal full PR CI runs the application, Math/Language Arts, creative/generated/mobile and security journeys; exact head/run identifiers are recorded on the draft PR. Offline CI is not a claim of successful live publication.
 
 References: [user-managed build identity](https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts), [gcloud builds submit](https://docs.cloud.google.com/sdk/gcloud/reference/builds/submit), [Cloud Build access](https://docs.cloud.google.com/build/docs/securing-builds/configure-access-to-resources).
+
+
+## 2026-11-19 — Private coach build verification recovery
+
+The first owner-authorized private coach image publication from merged source `079978f3034e007e8bbad1f43571aaa7867b5098` completed **SUCCESS** in `us-east5`, build ID `384444d1-4555-4b22-9b48-1f1c53e33c4f`. The initial offline verifier incorrectly compared Google Cloud-generated `BuildStep` execution metadata (`status`, `timing`, `pullTiming`) as if it were planned executable configuration. The approved image list, source SHA/tag, build-service identity and actual Docker command all matched.
+
+The verifier now ignores only explicit read-only Cloud Build step execution metadata, while continuing to fail closed on any change to the executable steps, including extra `entrypoint`, environment, secrets, scripts or volumes. The successful publication produced immutable reference:
+
+```text
+us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/coach@sha256:99fe827da073d131470dcbe2a9c5c272fb0873289dc17531353f6a24314de278
+```
+
+An already-successful build must **not** be resubmitted when verification fails. Use the original build ID and exact reviewed source SHA with `build_coach.py --build-id BUILD_UUID` after the verifier correction. Recovery must independently confirm the Artifact Registry digest. Image publication does not imply Cloud Run deployment, private gateway reachability, model credentials, approvals, or paid AI activation.
+
+## 2026-11-19 — Manually publish the pinned Adult pilot frontend
+
+The production gateway, preview and private-coach images for the supervised Adult-only Jems pilot were built from merged public source `079978f3034e007e8bbad1f43571aaa7867b5098`. **Newer main commits intentionally remain unshipped** until their own release approval. The existing Pages workflow therefore requires a manually entered, immutable 40-character `source_sha`, verifies the commit is already merged into the triggering `main` history, and checks out exactly that source for tests and the public build. Only the reviewed production gateway and preview origins may be published; missing/empty origins fail rather than disconnecting the existing site. The built `dist/jems-release.json` includes the reviewed source SHA for post-deployment inspection.
+
+Once the compatible gateway/preview revisions are checked and deliberately serving, use the existing manual workflow (no automatic main-push deployment):
+
+```sh
+gh workflow run pages.yml --repo jzwyrzyk/family-game-factory --ref main \
+  -f source_sha=079978f3034e007e8bbad1f43571aaa7867b5098 \
+  -f gateway_origin=https://factory-gateway-ola734esta-ul.a.run.app \
+  -f preview_origin=https://factory-preview-ola734esta-ul.a.run.app
+```
+
+Before and after publication, retain the old Pages artifact/deployment ID and prior Cloud Run traffic splits for rollback. Require the selected source SHA's full test suite to pass and inspect the live `/family-game-factory/jems-release.json` and `factory-config.json`. Confirm the actual browser shows the Adult (development) selector and trusted-device enrollment. Initial API checks may be unavailable until the device is enrolled and granted an Adult permit. Do not claim paid inference, reliable iOS microphone capture or private worker generation from a successful Pages publication alone.
+
+This release workflow is still manual and deploys **only the public static website**; it does not modify Cloud Run, Secret Manager, Firestore, provider credentials, allowance, worker pins, or the private coach.

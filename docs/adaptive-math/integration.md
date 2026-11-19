@@ -17,6 +17,8 @@ flowchart TD
 
 ## Core service
 
+The separate [lifetime rewards layer](../rewards/README.md) can stage a typed engagement receipt for a live, completed host activity immediately before its successful source save. It gives the same 2 gems for independent and supported/corrected completion. It does not change selection, assistance evidence, grade boundaries or learning reports. Shown, unanswered and wrong-only activities do not qualify; old attempt history is not backfilled. Durable pending facts are projected into the scoped reward ledger, then acknowledged; generated games cannot choose the grant.
+
 `src/learning/types.ts` is the canonical contract. `engine.ts` exports the deterministic functions used by the host and tests:
 
 - `ensureLearning(profile, now)` validates/migrates supported state without discarding an unsupported record.

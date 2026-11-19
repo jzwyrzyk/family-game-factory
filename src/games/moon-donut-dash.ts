@@ -1,3 +1,4 @@
+import {setIconLabel} from '../brand/icons';
 import type {GameContext,GameInstance} from '../runtime/types';
 
 /** Curated original game. Fully local: no assets, model calls or timers outside this instance. */
@@ -27,14 +28,15 @@ export default class MoonDonutDash implements GameInstance {
   const title=make('h2','favorite-title','🌙 Moon Donut Dash');
   const caption=make('p','favorite-subtitle','Run, jump, collect and dodge on the moon!');
   const controls=make('div','favorite-controls');
-  for(const [action,label] of [['left','◀ Left'],['jump','↑ Jump'],['right','Right ▶']]){
+  for(const [action,label] of [['left','Left'],['jump','Jump'],['right','Right']]){
    const button=make('button','favorite-control',label) as HTMLButtonElement;button.type='button';
+   setIconLabel(button,'arrow',label,action==='left'?'jems-icon--back':action==='jump'?'jems-icon--up':'');
    button.dataset.action=action;button.setAttribute('aria-label',action==='jump'?'Jump':action==='left'?'Move left':'Move right');
    button.addEventListener('pointerdown',e=>{if(this.ended||this.hostPaused)return;button.setPointerCapture(e.pointerId);this.heldPointers.set(e.pointerId,action);if(action==='jump')this.jump();},{signal:this.abort.signal});
    for(const event of ['pointerup','pointercancel','lostpointercapture'] as const)button.addEventListener(event,e=>{this.heldPointers.delete((e as PointerEvent).pointerId);},{signal:this.abort.signal});
    controls.append(button);
   }
-  const restart=make('button','favorite-control','↺ Restart') as HTMLButtonElement;restart.type='button';restart.addEventListener('click',()=>this.restart(),{signal:this.abort.signal});controls.append(restart);
+  const restart=make('button','favorite-control') as HTMLButtonElement;restart.type='button';setIconLabel(restart,'retry','Restart');restart.addEventListener('click',()=>this.restart(),{signal:this.abort.signal});controls.append(restart);
   this.root.append(title,caption,this.hud,this.canvas,controls,this.note);target.replaceChildren(this.root);
   window.addEventListener('keydown',e=>{if(this.hostPaused||this.ended||!/^(ArrowLeft|ArrowRight|ArrowUp| |a|d|w)$/i.test(e.key)||/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName))return;e.preventDefault();this.pressed.add(e.key.toLowerCase());if(e.key===' '||e.key==='ArrowUp'||e.key.toLowerCase()==='w')this.jump();},{signal:this.abort.signal});
   window.addEventListener('keyup',e=>this.pressed.delete(e.key.toLowerCase()),{signal:this.abort.signal});

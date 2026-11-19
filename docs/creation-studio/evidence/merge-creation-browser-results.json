@@ -1,0 +1,70 @@
+{
+  "runtime": "production-dist",
+  "realChildrenTested": false,
+  "realTabletTested": false,
+  "results": [
+    {
+      "device": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1080
+      },
+      "touchEmulated": false,
+      "status": "passed",
+      "paidRequests": 0,
+      "pageErrors": 0,
+      "verified": [
+        "saved-game source continuity",
+        "same-source scene reopen",
+        "UI-authored blocks",
+        "reorder and undo",
+        "nested repeat and condition branches",
+        "play/pause/step",
+        "Keep/reload",
+        "editable file export",
+        "real canvas video export",
+        "profile isolation",
+        "target separation",
+        "behavioral challenge feedback",
+        "persistent hint history",
+        "event taps",
+        "variable boundary behavior",
+        "learning checkpoint guard",
+        "profile-scoped progress",
+        "overflow"
+      ]
+    },
+    {
+      "device": "tablet",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "touchEmulated": true,
+      "status": "passed",
+      "paidRequests": 0,
+      "pageErrors": 0,
+      "verified": [
+        "saved-game source continuity",
+        "same-source scene reopen",
+        "UI-authored blocks",
+        "reorder and undo",
+        "nested repeat and condition branches",
+        "play/pause/step",
+        "Keep/reload",
+        "editable file export",
+        "real canvas video export",
+        "profile isolation",
+        "target separation",
+        "behavioral challenge feedback",
+        "persistent hint history",
+        "event taps",
+        "variable boundary behavior",
+        "learning checkpoint guard",
+        "profile-scoped progress",
+        "overflow"
+      ]
+    }
+  ],
+  "localImplementationCommit": "6f5177eff1943c8b6d094162771d35faf17b86d8"
+}

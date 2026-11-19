@@ -79,3 +79,26 @@ jobs:
         run: npm run build
       - name: Test earned celebrations and Math-English accents
         run: node tests/jems-delight-browser.cjs
+  gem-factory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build the playable workshop
+        run: npm run build
+      - name: Play desktop, tablet and phone orders through the learning host
+        run: npm run test:gem-factory
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gem-factory-gameplay
+          path: test-results/gem-factory/
+          if-no-files-found: warn
