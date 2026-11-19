@@ -6,6 +6,7 @@
 Children should be able to create and improve enjoyable games without waiting for assessment. The learning layer must demonstrate independent academic competence *outside* the game, transfer and retention, and eventually incremental benefit versus a comparison group. The immediate phase designs a standards-grounded assessment and evidence system; a later consented controlled pilot tests effectiveness. Never infer intelligence, academic-grade placement, broad creativity, or causal gains from game telemetry alone.
 
 ## Contents
+- [Current practice coverage audit (73 math, 48 ELA)](coverage-gap-audit.md) and [121-skill machine-readable inventory](current-practice-inventory.csv)
 - [Mathematics benchmark, tests and scoring](mathematics.md)
 - [English / Language Arts benchmark, tests and scoring](language-arts.md)
 - [Computational Thinking benchmark, tests and scoring](computational-thinking.md)
@@ -13,6 +14,7 @@ Children should be able to create and improve enjoyable games without waiting fo
 - [Shared administration, measurement and data contract](assessment-scoring.md)
 - [Assumptions, permissions, evidence hierarchy, launch gates](assumptions-and-licensing.md)
 - [Original public **demonstration** items and rubrics](sample-items.md) — these **cannot** be used as secure scored assessment items after publication.
+- [Isolated deterministic scoring prototype](../../tools/learning-evidence/scoring.mjs) and [invariant tests](../../tests/learning-evidence-scoring.test.mjs): run with `node --test tests/learning-evidence-scoring.test.mjs`; no app integration, score norms, persistence or protected item bank.
 
 ## Official anchors and precedence
 | Layer | Mathematics | ELA | CT | APS |
