@@ -51,11 +51,22 @@ The workflow will:
 5. Embed a public jems-release.json marker with the exact source SHA.
 6. Fetch the published release marker and factory-config.json and verify both
    match the approved SHA and exact service origins; recheck both health endpoints.
-7. Store evidence. Report PAGES_AND_PUBLIC_HEALTH_VERIFIED only when all pass.
+7. Open the actual deployed website in fresh desktop/mobile Chromium contexts:
+   require Jems Studio startup, six favorites, approved logo/assets and one
+   working LOCAL Moon favorite. Fail on JS exceptions, missing site assets, or
+   any attempt to send a paid job/coach POST. Capture screenshots and machine-
+   readable smoke evidence; no parent credentials or child data are required.
+8. Store evidence. Report PAGES_AND_PUBLIC_HEALTH_VERIFIED only when all pass.
 
 This **does not** deploy backend images or prove paid provider inference works.
-The legacy manual pages.yml stays available as a fallback and rollback path.
-Avoid running both Pages release workflows at once.
+The legacy manual pages.yml stays available as an emergency **publication
+fallback**, but it builds the current main source and therefore is NOT a
+version rollback. A proper code rollback requires a reviewed revert to a
+known-good main state, rerunning validation, and republishing—or a separately
+implemented immutable prior-artifact restore. Record the previous reviewed
+release SHA and its known-good service origins before publishing. Both Pages
+deployment paths share a concurrency group; avoid intentionally launching
+competing releases.
 
 ### Optional Pages auto-release on each merge
 
@@ -65,10 +76,16 @@ GitHub repository **Actions variables**:
 - JEMS_PREVIEW_ORIGIN: reviewed separate HTTPS preview URL
 - JEMS_AUTODEPLOY_PAGES: literal true (only after explicit owner opt-in)
 
-Then each main push runs the tested Pages-only release automatically. Until that
-opt-in, main pushes generate plans only. Configure github-pages environment
-reviewers if another approval step is desired. Automatic Pages does not
-authorize automatic paid inference or cloud admin privileges.
+With that opt-in, ONLY commits containing presentation-only changes
+(reviewed static images/brand CSS, HTML, manifest or documentation) can
+publish automatically. The controller fails closed when a change includes
+server endpoints, Studio/build JavaScript, dependencies, release workflow,
+learning logic or other application code. These require a coordinated
+backend/frontend release under Stage 2.
+
+Until the opt-in, main pushes generate plans only. Configure github-pages
+environment reviewers if another approval step is desired. Automatic Pages
+does not authorize automatic paid inference or cloud admin privileges.
 
 ## Stage 2 — full backend deployment (next integration PR)
 
