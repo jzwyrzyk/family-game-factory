@@ -60,7 +60,7 @@ export function validateSecureFormBank(form,bank){
   for(const item of bank.items){
     const slot=slots.get(item.slotId);if(!slot||seen.has(item.slotId)||item.format!==slot.format||!clean(item.prompt)||!clean(item.version))fail("invalid private item or duplicate");seen.add(item.slotId);
     if(["closed_choice","audio_choice"].includes(item.format)){
-      const opts=item.options;if(!Array.isArray(opts)||opts.length<2||opts.length>6||!uniq(opts.map(x=>x.id))||!uniq(opts.map(x=>norm(x.label)))||opts.some(x=>!clean(x.id)||!clean(x.label)))fail("invalid choice options");
+      const opts=item.options;if(!Array.isArray(opts)||opts.length<2||opts.length>6||!uniq(opts.map(x=>x.id))||!uniq(opts.map(x=>clean(x.label).toLocaleLowerCase("en-US")))||opts.some(x=>!clean(x.id)||!clean(x.label)))fail("invalid choice options");
       if(!opts.some(x=>x.id===item.correctOptionId))fail("correct option not found");
       if(item.format==="audio_choice"&&(!clean(item.audioAssetId)||item.transcriptVisible===true))fail("audio missing or transcript exposed");
     }else if(item.format==="numeric"){
