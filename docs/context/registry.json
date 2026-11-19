@@ -128,7 +128,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T16:10:25.520Z",
-      "sourceDigest": "79ff2d1c9bf803d73dd3aef9306075b47e539c6fc96a12818a22d574adc537",
+      "sourceDigest": "79ff2d1c9bf803d73dd3d3aef9306075b47e539c6fc96a12818a22d574adc537",
       "reviewOutcome": "updated",
       "reviewReason": "Integrated supplied functional icons, state artwork, keyboard focus and preserved Jems navigation with PR65's evidence-first parent reporting. Reviewed all changed host and presentation code.",
       "reviewHistory": [
