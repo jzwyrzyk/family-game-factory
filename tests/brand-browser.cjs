@@ -54,7 +54,7 @@ async function currentNavigation(page,id){
    console.log('jems brand '+label+': Studio booted');
    await approvedIcons(page,'/arcade/');
    await currentNavigation(page,'studioNavHome');
-   for(const [id,name] of [['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],['studioNavJourney','My journey'],['studioNavPowers','My Powers']]){
+   for(const [id,name] of [['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],['studioNavProblemSolving','Try an idea'],['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPowers','My Powers']]){
     assert.equal(await page.locator('.studio-nav').getByRole('button',{name,exact:true}).getAttribute('id'),id,'navigation keeps its visible accessible label');
    }
    await page.locator('#studioNavHome').focus();await page.keyboard.press('Tab');
@@ -69,12 +69,12 @@ async function currentNavigation(page,id){
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
-   // Keep all six destinations tappable in balanced rows and hero copy clear of the
+   // Keep all seven destinations tappable in two rows and hero copy clear of the
    // original maker portraits at phone widths, including narrow 320px screens.
    if(label==='mobile'){
     const destinations=[
      ['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],
-     ['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPowers','My Powers']
+     ['studioNavProblemSolving','Try an idea'],['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPowers','My Powers']
     ];
     for(const phoneWidth of [390,320]){
      await page.setViewportSize({width:phoneWidth,height});
@@ -86,18 +86,19 @@ async function currentNavigation(page,id){
        overlap:action.left<characters.right&&action.right>characters.left&&action.top<characters.bottom&&action.bottom>characters.top,
        buttons:[...document.querySelectorAll('.studio-nav button')].map(button=>{
         const box=button.getBoundingClientRect();
-        return {id:button.id,label:button.textContent.trim(),height:box.height,top:box.top,bottom:box.bottom,left:box.left,right:box.right,fits:button.scrollWidth<=button.clientWidth+1};
+        return {id:button.id,label:button.textContent.trim(),height:box.height,width:box.width,top:box.top,bottom:box.bottom,left:box.left,right:box.right,fits:button.scrollWidth<=button.clientWidth+1};
        })};
      });
-     assert.equal(layout.buttons.length,6,'all six navigation destinations remain available');
-     assert.deepEqual(layout.buttons.map(button=>[button.id,button.label]),destinations,'navigation preserves every original destination and includes My rewards');
-     assert.ok(layout.buttons.every(button=>button.height>=44&&button.fits),'navigation labels fit touch-sized buttons');
-     for(const row of [layout.buttons.slice(0,3),layout.buttons.slice(3)]){
-      assert.ok(row.every(button=>Math.abs(button.top-row[0].top)<2),'each mobile navigation row contains three destinations');
+     assert.equal(layout.buttons.length,7,'all seven navigation destinations remain available');
+     assert.deepEqual(layout.buttons.map(button=>[button.id,button.label]),destinations,'navigation preserves every destination including Try an idea and My rewards');
+     assert.ok(layout.buttons.every(button=>button.height>=44&&button.width>=44&&button.fits),'navigation labels fit touch-sized buttons');
+     for(const row of [layout.buttons.slice(0,4),layout.buttons.slice(4)]){
+      assert.ok(row.every(button=>Math.abs(button.top-row[0].top)<2),'the first four and final three destinations align in separate mobile rows');
       assert.ok(row.slice(1).every((button,index)=>button.left>=row[index].right-1),'navigation controls cannot overlap within a row');
      }
-     assert.ok(layout.buttons[3].top>=Math.max(...layout.buttons.slice(0,3).map(button=>button.bottom)),'the two navigation rows do not overlap');
-     assert.ok([0,1,2].every(column=>Math.abs(layout.buttons[column].left-layout.buttons[column+3].left)<2),'both navigation rows use the same three columns');
+     assert.ok(layout.buttons[4].top>=Math.max(...layout.buttons.slice(0,4).map(button=>button.bottom)),'the two navigation rows do not overlap');
+     assert.ok([0,1,2].every(column=>Math.abs(layout.buttons[column].left-layout.buttons[column+4].left)<2),'the final three destinations align to the first three columns');
+     assert.ok(layout.buttons.every(button=>button.left>=0&&button.right<=layout.width+1),'complete navigation targets fit the phone viewport');
      assert.equal(layout.overlap,false,'maker artwork cannot cover home actions or service status');
      assert.ok(layout.scrollWidth<=layout.width+2,'narrow home does not scroll horizontally');
      await page.screenshot({path:'test-results/jems-brand-home-'+phoneWidth+'.png',fullPage:false});
@@ -186,6 +187,8 @@ async function currentNavigation(page,id){
    assert.equal(await page.locator('#studioSavedSection .jems-saved-art').isVisible(),true,'a real saved notebook can use collection art');
    assert.equal(await page.locator('#studioSavedSection .jems-saved-art').getAttribute('alt'),'');
    await page.locator('#studioNavJourney').click();await currentNavigation(page,'studioNavJourney');
+   await page.locator('#studioNavRewards').click();await currentNavigation(page,'studioNavRewards');
+   await page.locator('#studioNavProblemSolving').click();await currentNavigation(page,'studioNavProblemSolving');
    await page.locator('#studioNavScenes').click();await currentNavigation(page,'studioNavScenes');
    await page.locator('#studioNavPowers').click();
    await currentNavigation(page,'studioNavPowers');

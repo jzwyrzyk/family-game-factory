@@ -7,6 +7,7 @@ import {chromium, type Page} from 'playwright';
 import {start} from './browser-server.cjs';
 import {parentDashboardFixture} from './parent-dashboard-fixture';
 import {CREATION_KEY} from '../src/creation/storage';
+import {PROBLEM_SOLVING_KEY} from '../src/problem-solving/model';
 
 const STATE_KEY='family-game-factory-state-v1';
 const tabs=(page:Page,id:string)=>page.locator(`[data-parent-tab="${id}"]`);
@@ -61,7 +62,8 @@ async function main() {
     await emptyPage.locator('footer [data-page="parent"]').click();
     assert.equal(await emptyPage.locator('[data-parent-domain]').count(),4);
     assert.match(await visibleText(emptyPage),/No retained observations|first discoveries/);
-    assert.match(await visibleText(emptyPage),/Not connected/);
+    assert.match(await emptyPage.locator('[data-parent-domain="problem-solving"]').innerText(),/Ready to explore/);
+    assert.doesNotMatch(await emptyPage.locator('[data-parent-domain="problem-solving"]').innerText(),/Not connected/);
     assert.equal(await emptyPage.evaluate(()=>JSON.stringify(window.FG.store.current())),before,'opening a report is read-only even for an empty profile');
     await tabs(emptyPage,'overview').focus();await emptyPage.keyboard.press('ArrowRight');
     assert.equal(await tabs(emptyPage,'skills').getAttribute('aria-selected'),'true','keyboard tabs work');
@@ -70,12 +72,13 @@ async function main() {
     for(const [device,viewport] of [['desktop',{width:1440,height:1080}],['tablet',{width:820,height:1180}],['phone',{width:390,height:844}],['small-phone',{width:320,height:800}]] as const) {
       const fixture=parentDashboardFixture();
       const context=await browser.newContext({viewport,hasTouch:device!=='desktop',reducedMotion:'reduce',acceptDownloads:true});
-      await context.addInitScript(({state,creation,key,stateKey})=>{
+      await context.addInitScript(({state,creation,problemSolving,key,stateKey,problemSolvingKey})=>{
         // Seed only the app. Sandboxed game frames intentionally cannot access storage.
         if(window !== window.top)return;
         if(!localStorage.getItem(stateKey))localStorage.setItem(stateKey,JSON.stringify(state));
         if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(creation));
-      },{...fixture,key:CREATION_KEY,stateKey:STATE_KEY});
+        if(!localStorage.getItem(problemSolvingKey))localStorage.setItem(problemSolvingKey,JSON.stringify(problemSolving));
+      },{...fixture,key:CREATION_KEY,stateKey:STATE_KEY,problemSolvingKey:PROBLEM_SOLVING_KEY});
       const page=await context.newPage(),errors:string[]=[],paid:string[]=[];
       page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dialog=>void dialog.accept());
       page.on('request',request=>{if(request.method()==='POST'&&/\/v1\/(jobs|coach)(\/|$)|api\.openai\.com/.test(request.url()))paid.push(request.url());});
@@ -83,10 +86,14 @@ async function main() {
       try {
         await page.goto(base);await page.waitForFunction(()=>window.FG?.parentDashboard&&window.FG?.creation&&window.FG?.studio);
         const storedBefore=await page.evaluate(key=>localStorage.getItem(key),STATE_KEY);
+        const evidenceBefore=await page.evaluate(key=>localStorage.getItem(key),PROBLEM_SOLVING_KEY);
         await page.locator('footer [data-page="parent"]').click();
         await page.locator('[data-parent-domain="math"]').waitFor({state:'visible'});
         assert.match(await page.locator('[data-parent-domain="math"]').innerText(),/24/);
         assert.match(await page.locator('[data-parent-domain="creation"]').innerText(),/1/,'identical scene checks count once');
+        assert.match(await page.locator('[data-parent-domain="problem-solving"]').innerText(),/3\s+structured practice decisions/);
+        assert.match(await page.locator('[data-parent-domain="problem-solving"]').innerText(),/1 separate unscored activity records/);
+        assert.equal(await page.locator('#problemSolvingParentProgress').count(),0,'APS has one native parent report');
         assert.doesNotMatch(await visibleText(page),/PRIVATE SIBLING SCENE/);
         await readableText(page,'.pd-comparable-date');
         await readableText(page,'#parentPanel-overview .pd-evidence-copy > strong');
@@ -126,6 +133,14 @@ async function main() {
         await page.getByRole('combobox',{name:'Filter evidence by learning area'}).selectOption('math');
         await page.locator('#parentPanel-evidence [data-evidence-id] summary').first().click();
         assert.match(await page.locator('#parentPanel-evidence').innerText(),/What was asked/);
+        await page.getByRole('combobox',{name:'Filter evidence by learning area'}).selectOption('problem-solving');
+        assert.equal(await page.locator('#parentPanel-evidence [data-evidence-id]').count(),4,'three structured decisions and one separate source record');
+        assert.match(await page.locator('#problemSolvingEvidenceNote').innerText(),/Math: 1/);
+        assert.match(await page.locator('#problemSolvingEvidenceNote').innerText(),/not standardized scores/);
+        await page.locator('#parentPanel-evidence [data-evidence-id$=":revise"] summary').click();
+        assert.match(await page.locator('#parentPanel-evidence').innerText(),/Authorship\s+learner/);
+        assert.match(await page.locator('#parentPanel-evidence').innerText(),/Help type\s+strategy/);
+        await noOverflow(page,device+' problem-solving evidence');
         await tabs(page,'school').click();
         assert.match(await page.locator('#parentPanel-school').innerText(),/SmartScore/);
         assert.match(await page.locator('#parentPanel-school').innerText(),/not convert/);
@@ -137,15 +152,20 @@ async function main() {
         const summary=readFileSync(downloadPath,'utf8');
         assert.match(summary,/Demo Explorer/);assert.match(summary,/Task:/);assert.match(summary,/not a standardized score/);
         assert.doesNotMatch(summary,/Demo Sibling|PRIVATE SIBLING SCENE/,'export stays within current learner');
+        assert.match(summary,/3 structured practice decisions/);assert.match(summary,/Unscored source records · math: 1/);
         assert.equal(await page.evaluate(key=>localStorage.getItem(key),STATE_KEY),storedBefore,'report/filter/export does not mutate the learner');
+        assert.equal(await page.evaluate(key=>localStorage.getItem(key),PROBLEM_SOLVING_KEY),evidenceBefore,'APS reporting and export are read-only');
         // Existing family controls remain live, including persistence and a separate sibling.
         await tabs(page,'settings').click();
+        assert.equal(await page.locator('#clearProblemSolving').count(),1,'one profile-scoped APS clear control');
         await page.locator('#parentNickname').fill('Demo Explorer Edited');await page.locator('#saveParent').click();
         assert.equal(await page.evaluate(()=>window.FG.store.current().name),'Demo Explorer Edited');
         await page.locator('#parentReportLearner').selectOption('player2');
         await tabs(page,'overview').click();
         assert.match(await visibleText(page),/Demo Sibling/);assert.doesNotMatch(await visibleText(page),/Demo: Dance on a click/);
         assert.match(await page.locator('[data-parent-domain="math"]').innerText(),/No retained observations/);
+        assert.match(await page.locator('[data-parent-domain="problem-solving"]').innerText(),/No retained observations/);
+        assert.doesNotMatch(await visibleText(page),/Demo: Test where the robot stops/);
         await tabs(page,'evidence').click();assert.match(await page.locator('#parentPanel-evidence').innerText(),/PRIVATE SIBLING SCENE|Robot/);
         await page.locator('#parentReportLearner').selectOption('player1');await tabs(page,'overview').click();
         if(device==='desktop'){

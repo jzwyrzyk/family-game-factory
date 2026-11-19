@@ -50,7 +50,7 @@ not overwrite the saved data that could not be read.
 | Math | [Learning engine](../../src/learning/engine.ts), [insights](../../src/learning/insights.ts), retained attempts | First response, independent/supported completion, form, hint/retry history, due review, and existing evidence state. |
 | Language Arts | [Language engine](../../src/language/engine.ts), retained attempts | Language-skill observations with reading support, objective responses, and open expression kept distinct. |
 | Computational Thinking | [Creation workspace](../../src/creation/storage.ts), [authored challenges](../../src/creation/challenges.ts) | Whether a particular saved scene/version matched a stated behavior, with recorded hint use. |
-| Problem Solving | Optional host adapter for the separately developed Problem Solving feature | Only that feature's reviewed observations; absence remains unavailable, never a fabricated score. |
+| Problem Solving | Validated host adapter for the Problem Solving observation ledger | Only that feature's reviewed observations; absence remains unavailable, never a fabricated score. |
 
 The [snapshot adapter](../../src/parent/snapshot.ts) normalizes a copy, so opening
 the report does not initialize or save learner state. The
@@ -60,17 +60,24 @@ same selected owner. Creation joins only that owner's projects and revisions.
 Repeated checks of the same scene/version/goal remain inspectable in history but
 are collapsed for overview counts; repeated clicks do not become new examples.
 
-### Optional Problem Solving integration
+### Problem Solving integration
 
-The concurrent Problem Solving feature was not merged into this branch's base.
-Its parent adapter is optional: consume `FG.problemSolvingEvidence.list()` when available, show
-an honest unavailable state otherwise, and do not import its unfinished scoring
-or create a parallel store. Confirm the adapter's profile identity, report shape,
-and error behavior when integrating that feature. Schema-v1 episodes retain
-authorship, support, elicitation, task version, and exposure; context-only,
-interrupted, technical-invalid, and unobserved work contributes no skill result.
-Ordinary game completion and
-scene passes do not substitute for useful-test, interpretation, or revision evidence.
+The shared source in this integration is `FG.problemSolvingEvidence.list()`. The
+adapter uses the canonical schema validator and filters to the selected owner.
+An absent provider remains **Not connected**; failed reads or malformed data
+remain **Records unavailable**. Reading the report creates no parallel ledger and
+never repairs or overwrites damaged source data.
+
+Schema-v1 episodes retain authorship, support, elicitation, task version and
+exposure. Only authored practice may supply structured observations. The first
+relevant response for each skill in a completed episode supplies the descriptive
+result; context-only, interrupted, technical-invalid and unobserved work produces
+no skill result. Overview and the journal distinguish retained source context
+from task-decision observations, including when only context is available.
+Ordinary game completion and scene passes do not substitute for useful-test,
+interpretation or revision evidence. The report is part of the existing parent
+dashboard; its Settings tab retains observation clearing and coordinated family
+backup controls. My Powers keeps the separate child-facing observation view.
 
 ## Evidence language
 

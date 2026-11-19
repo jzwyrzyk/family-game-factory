@@ -132,6 +132,12 @@ jobs:
       - name: Learning persistence and pacing
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/learning-repair.cjs
+      - name: Problem-solving evidence and authored practice
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:problem-solving
+      - name: Problem-solving desktop and touch journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:problem-solving-browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:

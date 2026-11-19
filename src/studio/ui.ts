@@ -27,6 +27,7 @@ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
+import { installProblemSolvingPractice } from '../problem-solving/ui';
 import {installRewards, notifyRewardSourceSaved} from '../rewards/service';
 import {createRewardsPage, createRewardsWidget, createRewardCelebration} from '../rewards/ui';
 import {type RewardGrant} from '../rewards/model';
@@ -196,7 +197,7 @@ export async function installStudio(){
  function rewardJourney(){const progress=builderJourney(notebook.list(owner()),owner());return {ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction};}
  const rewardsPage=createRewardsPage({
   state:{...rewards.state,journey:rewardJourney()},onBack:()=>act(home),onOpenJourney:()=>act(()=>openJourney()),
-  onPlay:()=>act(()=>{stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';}),
+  onPlay:()=>act(()=>{if(guardMath())return;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';}),
   onCreate:()=>act(newIdea),onRetry:()=>{void rewards.refresh().catch(()=>{});}
  });
  document.querySelector('main')!.append(rewardsPage.element);
@@ -222,10 +223,10 @@ export async function installStudio(){
   },180);
  });
  function openRewards(){
-  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();disposeGame();FG.app.page('home');
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));
   route='rewards';globalStatus.textContent='';renderRewards();rewardsPage.show();
-  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.id==='studioNavRewards'));
+  setActiveNav('studioNavRewards');
   window.scrollTo(0,0);void rewards.refresh().catch(()=>{});
  }
  rewards.setOpen(()=>act(openRewards));
@@ -321,7 +322,7 @@ export async function installStudio(){
  }
  function hideJourney(){journey.closeCharacterPicker(false);journey.element.hidden=true;journey.element.classList.add('hidden');}
  function openJourney(choose=false){
-  if(guardMath())return;stopSpeech();flushDraft();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));
   journey.element.hidden=false;journey.element.classList.remove('hidden');route='journey';globalStatus.textContent='';renderJourney();
   setActiveNav('studioNavJourney');
@@ -390,7 +391,7 @@ export async function installStudio(){
   return true;
  }
  function showStudio(){
-  hideJourney();
+  hideJourney();rewardsPage.hide();FG.problemSolving?.close();
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));page.classList.remove('hidden');route='studio';
   setActiveNav(activeId&&current().game==='new'?'studioNavCreate':'studioNavHome');globalStatus.textContent='';
  }
@@ -563,9 +564,9 @@ export async function installStudio(){
   const s=notebook.create(owner(),game,p.name,p.id);notebook.update(s.id,s.owner,x=>{x.playOnly=true;});message(s,'helper','Play first. When you want to test an idea, your original game stays safe.');return open(s.id);
  }
  function leaveCreationForStudio(){
+  if(guardMath())return false;
   const creationPage=document.getElementById('page-creation');
   if(!creationPage||creationPage.classList.contains('hidden'))return true;
-  if(guardMath())return false;
   // Save the scene before changing Studio selection. The normal page event
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
@@ -965,7 +966,7 @@ export async function installStudio(){
  $('studioNavRewards').onclick=()=>act(openRewards);
  $('studioSubjectMath').onclick=()=>chooseLearningSubject('math');$('studioSubjectLanguage').onclick=()=>chooseLearningSubject('language');
  $('studioGameMath').onclick=()=>chooseLearningSubject('math');$('studioGameLanguage').onclick=()=>chooseLearningSubject('language');
- $('studioNavPowers').onclick=()=>act(()=>{stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';});
+ $('studioNavPowers').onclick=()=>act(()=>{if(guardMath())return;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';});
  $('studioPlay').onclick=()=>act(playViewed);$('studioKeep').onclick=()=>act(keep);$('studioUndo').onclick=()=>act(undo);
  $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;});await playCandidate();return;}if(!s.projectId)return;games.redo(s.owner,s.projectId);await playWorking();});
  $('studioCompare').onclick=()=>act(()=>{if(setTab('versions'))$<HTMLDetailsElement>('studioMore').open=false;});$('studioCloseVersions').onclick=()=>act(()=>{setTab('game');focusView($('studioReturnToPlay')||$('studioPlay'));});$('studioBackWorking').onclick=()=>act(playWorking);
@@ -1109,7 +1110,19 @@ export async function installStudio(){
  scenesEntry.innerHTML='<img src="./jems-blocks.svg" alt=""><span><strong>Make your imagination move</strong><small>Tell a story with blocks, or watch a scene and rebuild it your way.</small></span><b aria-hidden="true">→</b>';
  // Keep a complete ready-to-play choice in the first mobile viewport.
  scenesEntry.onclick=()=>creation.open();$('studioFavoritesSection').after(scenesEntry);
- scenesEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));
+ const practice=installProblemSolvingPractice({
+  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();creation.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('problem-solving');route='other';document.body.classList.remove('studio-designing','creation-open');setActiveNav('studioNavProblemSolving');return true;},
+  home,
+ });
+ const practiceNav=iconEl('button','','help','Try an idea') as HTMLButtonElement;practiceNav.id='studioNavProblemSolving';practiceNav.type='button';practiceNav.onclick=()=>practice.open();scenesNav.after(practiceNav);
+ nav.classList.add('studio-nav-has-practice');document.querySelector('.site-header')!.classList.add('studio-practice-navigation');
+ const practiceEntry=el('button','studio-scene-entry') as HTMLButtonElement;practiceEntry.id='studioProblemSolving';practiceEntry.type='button';
+ practiceEntry.innerHTML='<img src="./jems-workbench.svg" alt=""><span><strong>Try an idea</strong><small>Make a guess, try a little test, and choose what to change.</small></span><b aria-hidden="true">→</b>';
+ practiceEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));
+ practiceEntry.onclick=()=>practice.open();scenesEntry.after(practiceEntry);
+ const scenePractice=iconEl('button','creation-button creation-quiet','arrow','Try a little experiment') as HTMLButtonElement;scenePractice.id='creationTryIdea';scenePractice.type='button';scenePractice.onclick=()=>practice.open();$('creationSubtitle').after(scenePractice);
+ window.dispatchEvent(new CustomEvent('factory-problem-solving-updated',{detail:{owner:owner()}}));
+  scenesEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));
  const sceneButton=iconEl('button','studio-button','grid','Animate & code') as HTMLButtonElement;sceneButton.id='studioMakeScene';sceneButton.type='button';
  $('studioHelp').after(sceneButton);
  sceneButton.onclick=()=>act(async()=>{
@@ -1127,6 +1140,7 @@ export async function installStudio(){
   if(showing==='candidate'&&s.candidate?.config)throw Error('Keep this game version first, then use Animate & code to carry that version into a scene.');
   creation.fromStudio(s,revision);
  });
- window.addEventListener('factory-page',event=>{const destination=(event as CustomEvent).detail;if(destination!=='creation')document.body.classList.remove('creation-open');if(destination==='lab')setActiveNav('studioNavPowers');else if(destination==='parent')setActiveNav(null);});
+ window.addEventListener('factory-page',event=>{hideJourney();const destination=(event as CustomEvent).detail;if(destination!=='creation')document.body.classList.remove('creation-open');if(destination==='lab')setActiveNav('studioNavPowers');else if(destination==='parent')setActiveNav(null);});
  if(new URLSearchParams(location.search).get('creation')==='1')creation.open();
+ if(new URLSearchParams(location.search).get('problem-solving')==='1')practice.open();
 }

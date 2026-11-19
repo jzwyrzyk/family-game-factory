@@ -143,7 +143,7 @@ test('optional problem-solving adapter is versioned, owner-scoped, unscored for 
   supported.observations[0].support = 'strategy'; unknown.observations[0].authorship = 'unknown';
   first.observations[0].outcome = 'not-yet';
   first.observations.push({ ...first.observations[0], id: 'second-response', outcome: 'demonstrated' });
-  const context = { ...episode('context'), kind: 'context-only' };
+  const context = { ...episode('context'), source: 'math', kind: 'context-only', observations: [] };
   const technical = { ...episode('technical'), status: 'technical-invalid' };
   const interrupted = { ...episode('interrupted'), status: 'interrupted' };
   const sibling = { ...episode('sibling'), owner: 'sibling' };
@@ -157,6 +157,7 @@ test('optional problem-solving adapter is versioned, owner-scoped, unscored for 
   assert.equal(ps.period.noContentHelp, 1); assert.equal(ps.period.withContentHelp, 1); assert.equal(ps.period.unknownAttribution, 1);
   assert.equal(ps.period.independent, 0); assert.equal(ps.period.incorrect, 0);
   assert.equal(result.evidence.filter(e => e.contextOnly).length, 3);
+  assert.equal(ps.contextRecords, 3); assert.deepEqual(ps.contextBySource, { math: 1, practice: 2 });
   assert.equal(result.evidence.find(e => e.id.endsWith('episode-a:plan_test'))!.outcome, 'not-yet');
   assert.ok(!result.evidence.some(e => /sibling|future|new-schema/.test(e.id)));
   assert.match(ps.notices.at(-1)!, /7 older middle/);
@@ -168,6 +169,20 @@ test('unobserved or invalid problem-solving observations do not become failed op
   const result = buildParentDashboard({ ownerId: 'child-a', now: NOW, problemSolving: { ownerId: 'child-a', episodes: [a, b] } });
   const ps = result.subjects.find(s => s.id === 'problem-solving')!;
   assert.equal(ps.period.records, 0); assert.ok(ps.skills.every(s => s.state === 'not-observed'));
+  assert.equal(ps.contextRecords, 1, 'unobserved work remains context, not a failed opportunity');
+});
+
+test('canonical problem-solving validation prevents source-context promotion and invalid partial scoring', () => {
+  const foreignSource = { ...episode('forged-source'), source: 'math' };
+  const partial = episode('partial'); partial.observations.push({ ...partial.observations[0], id: 'broken', support: 'invented' });
+  const duplicateObservation = episode('duplicate-step'); duplicateObservation.observations.push({ ...duplicateObservation.observations[0] });
+  const context = { ...episode('source-context'), source: 'studio', kind: 'context-only', observations: [], context: 'A prediction was recorded. No reasoning quality was inferred.' };
+  const result = buildParentDashboard({ ownerId: 'child-a', now: NOW, problemSolving: { ownerId: 'child-a', episodes: [foreignSource, partial, duplicateObservation, context] } });
+  const ps = result.subjects.find(s => s.id === 'problem-solving')!;
+  assert.equal(ps.period.records, 0); assert.equal(ps.period.completed, 0);
+  assert.equal(ps.contextRecords, 1); assert.deepEqual(ps.contextBySource, { studio: 1 });
+  assert.equal(result.evidence.length, 1); assert.equal(result.evidence[0].contextOnly, true);
+  assert.equal(result.opportunities.length, 0);
 });
 
 test('recommendations link the evidence that caused them, not an unrelated recent success', () => {
@@ -261,6 +276,15 @@ test('snapshot preserves storage and adapter read failures separately from an ab
     const malformed = captureParentSnapshot({ store: FG.store, problemSolvingEvidence: { list: () => null } }, 30, NOW);
     assert.equal(malformed.dashboard.subjects.find(s => s.id === 'problem-solving')!.availability, 'read-error');
     assert.equal(malformed.dashboard.subjects.find(s => s.id === 'math')!.available, true);
+    for (const episodes of [[{ ...episode(), source: 'math' }], [episode(), { ...episode(), owner: 'sibling' }], [episode(), episode()]]) {
+      const invalid = captureParentSnapshot({ store: FG.store, problemSolvingEvidence: { list: () => episodes } }, 30, NOW);
+      assert.equal(invalid.dashboard.subjects.find(s => s.id === 'problem-solving')!.availability, 'read-error');
+      assert.equal(invalid.dashboard.evidence.some(item => item.subject === 'problem-solving'), false);
+      assert.equal(invalid.dashboard.subjects.find(s => s.id === 'math')!.available, true);
+    }
+    const valid = captureParentSnapshot({ store: FG.store, problemSolvingEvidence: { list: () => [episode()], retention: () => ({ discarded: 2 }) } }, 30, NOW);
+    assert.equal(valid.dashboard.subjects.find(s => s.id === 'problem-solving')!.period.records, 1);
+    assert.match(valid.dashboard.subjects.find(s => s.id === 'problem-solving')!.notices.at(-1)!, /2 older middle/);
     assert.equal(JSON.stringify(p), before, 'report reads must not initialize the live learner');
   } finally {
     if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor);

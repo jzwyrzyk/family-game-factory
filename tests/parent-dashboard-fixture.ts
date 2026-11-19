@@ -6,6 +6,7 @@ import {beginLanguageAttempt, submitLanguageAnswer, useLanguageHint, finishLangu
 import type {LearnerProfile} from '../src/learning/types';
 import {CreationStore} from '../src/creation/storage';
 import {createChallengeTarget} from '../src/creation/challenges';
+import {emptyProblemSolvingWorkspace, validateProblemSolvingEpisode} from '../src/problem-solving/model';
 
 const DAY = 86_400_000;
 export function parentDashboardFixture(now = Date.now()) {
@@ -56,5 +57,18 @@ export function parentDashboardFixture(now = Date.now()) {
   for(const r of workspace.revisions)r.createdAt=new Date(now-3*DAY).toISOString();
   workspace.attempts.forEach((a,i)=>{a.checkedAt=new Date(now-2*DAY+i*1000).toISOString();});
   const other={id:'player2',name:'Demo Sibling',icon:'🚀',grade:2,age:7,focus:'adaptive',intensity:'gentle',rate:3,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSubject:'math',allowSubjectSwitch:false};
-  return {state:{version:1,activeProfile:'player1',profiles:[profile,other],feedback:[],createdAt:now-30*DAY},creation:workspace};
+  const problemSolving=emptyProblemSolvingWorkspace(),at=now-DAY;
+  const practice=validateProblemSolvingEpisode({schema:'jems.problem-solving.episode.v1',id:'demo-aps',owner:'player1',sessionId:'demo-session',source:'practice',kind:'structured-practice',
+    startedAt:new Date(at).toISOString(),completedAt:new Date(at+5000).toISOString(),status:'completed',
+    task:{id:'demo-robot',family:'robot-stop',version:'v1',label:'Demo: Test where the robot stops',demand:'Compare one changed step count',exposure:'first-seen',firstAttempt:true},
+    observations:[
+      {id:'demo-plan',skill:'plan_test',outcome:'demonstrated',authorship:'learner',support:'none-observed',elicitation:'prompted',observedAt:new Date(at+1000).toISOString(),note:'Chose a relevant change to compare.'},
+      {id:'demo-result',skill:'interpret_evidence',outcome:'not-yet',authorship:'learner',support:'none-observed',elicitation:'prompted',observedAt:new Date(at+2000).toISOString(),note:'The selected explanation did not match this result.'},
+      {id:'demo-revise',skill:'revise',outcome:'demonstrated',authorship:'learner',support:'strategy',elicitation:'prompted',observedAt:new Date(at+3000).toISOString(),note:'Selected a revision after opening a strategy hint.'},
+    ]});
+  const source=validateProblemSolvingEpisode({...practice,id:'demo-aps-context',source:'math',kind:'context-only',observations:[],
+    task:{...practice.task,id:'demo-math-source',family:'math-source',label:'Demo: Math activity context',exposure:'unknown',firstAttempt:false},
+    context:'A Math activity was completed. This source record does not infer general problem-solving skill.'});
+  problemSolving.episodes.push(practice,source);
+  return {state:{version:1,activeProfile:'player1',profiles:[profile,other],feedback:[],createdAt:now-30*DAY},creation:workspace,problemSolving};
 }

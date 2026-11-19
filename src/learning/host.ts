@@ -11,6 +11,9 @@ import './insights.css';
 import { SKILLS } from './curriculum';
 import { MODE_LABELS, LANGUAGE_MODE_LABELS, LEARNING_MODES, modeFor, setMode, interpretMathRequest, interpretLearningRequest } from './policy';
 import type { LearnerProfile, LearningContext, LearningMode } from './types';
+import type { Attempt } from './engine';
+import type { LanguageAttempt } from '../language/engine';
+import { publishSourceEvidence } from '../problem-solving/signals';
 
 const stateNames: Record<string,string> = {
   'not-enough-evidence':'Still discovering', 'learning-with-support':'Learning with help',
@@ -66,9 +69,10 @@ export function installLearningHost() {
     window.dispatchEvent(new CustomEvent('factory-learning-active',{detail:true}));
     try{active=(subjectFor(profile)==='language'?mountLanguageActivity:mountMathActivity)(target,{
       ...options,profile,context:{sessionId,...options.context},
-      onSave:()=>{
+      onSave:(attempt:Attempt|LanguageAttempt)=>{
         if(profile.id!==FG.store.current().id)return;
-        const attemptId=target.querySelector<HTMLElement>('[data-attempt-id]')?.dataset.attemptId||'';
+        assertRewardSourceWritable();
+        const attemptId=attempt?.id||target.querySelector<HTMLElement>('[data-attempt-id]')?.dataset.attemptId||'';
         let pending=false;
         try{pending=!!stageLearningReward(profile,subject,attemptId);}catch(error){
           target.dataset.saveFailed='true';throw error;
@@ -78,6 +82,12 @@ export function installLearningHost() {
           if(!warning){warning=create('p','Progress could not be saved. Keep this page open and ask a grown-up to export it.','learning-save-warning');warning.setAttribute('role','alert');target.append(warning);}
         }else{
           delete target.dataset.saveFailed;target.querySelector('.learning-save-warning')?.remove();
+          if(attempt&&attempt.outcome!=='open'){
+            // The attempt and reward outbox are now durable. The optional
+            // observer cannot change subject results or prevent reward delivery.
+            if(subject==='language')publishSourceEvidence({kind:'language',owner:String(profile.id),attempt:attempt as LanguageAttempt});
+            else publishSourceEvidence({kind:'math',owner:String(profile.id),attempt:attempt as Attempt});
+          }
           if(pending)notifyRewardSourceSaved(String(profile.id));
         }
         options.onSave?.();

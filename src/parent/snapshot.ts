@@ -2,6 +2,7 @@ import { report, type Attempt } from '../learning/engine';
 import { reportLanguage, type LanguageAttempt } from '../language/engine';
 import { CreationStore } from '../creation/storage';
 import { profileStorage } from '../adult-pilot/storage';
+import { PROBLEM_SOLVING_LIMITS, validateProblemSolvingEpisode } from '../problem-solving/model';
 import { buildParentDashboard, type ParentDashboard, type ParentDashboardInput, type ParentRange } from './model';
 
 export interface ParentSnapshot {
@@ -33,8 +34,15 @@ export function captureParentSnapshot(FG: any, range: ParentRange = 30, now = Da
   if (FG.problemSolvingEvidence?.list) {
     try {
       const episodes = JSON.parse(JSON.stringify(FG.problemSolvingEvidence.list()));
-      if (!Array.isArray(episodes)) throw Error('Unsupported problem-solving source shape.');
+      if (!Array.isArray(episodes) || episodes.length > PROBLEM_SOLVING_LIMITS.episodesPerOwner) throw Error('Unsupported problem-solving source shape.');
+      const ids = new Set<string>();
+      for (const raw of episodes) {
+        const episode = validateProblemSolvingEpisode(raw);
+        if (episode.owner !== ownerId || ids.has(episode.id)) throw Error('Unsupported problem-solving owner or duplicate record.');
+        ids.add(episode.id);
+      }
       const retention = FG.problemSolvingEvidence.retention?.();
+      if (retention?.discarded !== undefined && (!Number.isSafeInteger(retention.discarded) || retention.discarded < 0)) throw Error('Unsupported retention count.');
       input.problemSolving = { ownerId, episodes, discarded: typeof retention?.discarded === 'number' ? retention.discarded : undefined };
       const warning = FG.problemSolvingEvidence.warning?.();
       if (warning) warnings.push(String(warning));

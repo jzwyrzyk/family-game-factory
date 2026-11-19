@@ -6,6 +6,7 @@ import { CREATION_CHALLENGES, getCreationChallenge, createChallengeStarter, crea
 import { profileStorage } from '../adult-pilot/storage';
 import { CreationStage } from './stage';
 import type { StudioSession } from '../studio/notebook';
+import { publishSourceEvidence } from '../problem-solving/signals';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import {rewardSourceWritable} from '../rewards/write-guard';
 import './style.css';
@@ -227,7 +228,8 @@ export function installCreationStudio(host: Host) {
   function checkChallenge() {
     assertEditing(); if (!challengeId) return; stop(); saveVersion();
     const result = evaluateChallenge(challengeId, scene!);
-    store().recordAttempt(entryId, sceneOwner, revisionId, { challengeId, passed: result.passed, hintUsed });
+    const attempt=store().recordAttempt(entryId, sceneOwner, revisionId, { challengeId, passed: result.passed, hintUsed });
+    publishSourceEvidence({kind:'creation',owner:sceneOwner,attempt,result});
     host.onRewardSourceSaved?.(sceneOwner);
     const feedback = $('creationFeedback'); feedback.hidden = false; feedback.replaceChildren(); feedback.classList.toggle('is-success', result.passed);
     feedback.append(node('span', 'creation-eyebrow', result.passed ? 'YOUR IDEA WORKS' : 'A NEW THING TO NOTICE'), node('h2', '', result.passed ? 'You made it happen!' : 'Let’s look a little closer.'), node('p', '', result.feedback));
@@ -461,7 +463,7 @@ export function installCreationStudio(host: Host) {
     const input = $<HTMLInputElement>('creationImport'), file = input.files?.[0], capturedOwner = owner(); if (!file) return;
     try { assertEditing(); if (file.size > 500000) throw Error('This scene file is too large.'); const imported = validateCreationProject(JSON.parse(await file.text())); if (owner() !== capturedOwner || !visible) return; assertEditing(); const project = store().create(owner(), { ...imported, id: uid(), provenance: { ...imported.provenance, createdBy: 'assisted' } }); loadScene(project.id); status('Your scene file is open as a new project.'); } catch (error) { status((error as Error).message, true); } finally { input.value = ''; }
   };
-  $('creationDelete').onclick = () => act(() => { assertEditing(); if (!confirm('Delete this scene and all of its versions from this device?')) return; store().remove(entryId, sceneOwner); dirty = false; scene = null; shelf(); });
+  $('creationDelete').onclick = () => act(() => { assertEditing(); if (!confirm('Delete this scene and all of its versions from this device?')) return; store().remove(entryId, sceneOwner); publishSourceEvidence({kind:'clear-creation',owner:sceneOwner,projectId:entryId}); dirty = false; scene = null; shelf(); });
   $('creationHistory').onclick = () => act(() => {
     assertEditing(); saveVersion(); $('creationVersions').hidden = false; const box = $('creationVersionList'); box.replaceChildren();
     const kept = store().get(entryId, sceneOwner).keptId;

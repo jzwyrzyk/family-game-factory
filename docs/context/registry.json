@@ -31,7 +31,11 @@
     "docs/parent-progress/README.md",
     "docs/parent-progress/RESEARCH.md",
     "docs/rewards/README.md",
-    "docs/decisions/0010-lifetime-gems-and-shared-rewards.md"
+    "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
+    "docs/problem-solving/README.md",
+    "docs/problem-solving/BENCHMARKS.md",
+    "docs/problem-solving/IMPLEMENTATION.md",
+    "docs/decisions/0011-formative-problem-solving-evidence.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -53,7 +57,8 @@
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
     "docs/creation-studio/*.md",
     "docs/rewards/*.md",
-    "docs/rewards/previews/*.md"
+    "docs/rewards/previews/*.md",
+    "docs/problem-solving/*.md"
   ],
   "areas": [
     {
@@ -67,13 +72,14 @@
         "docs/child-journey/*.md",
         "docs/child-continuity/*.md",
         "docs/brand/*.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "5dc811558e7477b4f532268d93cf93a2ad04e58d0c097e1836e5680079128ca6",
+      "reviewedAt": "2026-11-19T17:17:54.308Z",
+      "sourceDigest": "ded2f74df901adc83f7c4cee3e4da10d5e85ba0b09929174f5ce182907f02739",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed combined PR69 brand fidelity and shared rewards against child-first product doctrine; gem engagement totals do not imply mastery, and selected-maker stages retain actual making evidence.",
+      "reviewReason": "Reviewed integrated parent, rewards and formative feature scope; documented no new APS award, no global thinking score, and separation of context from structured observations.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -113,7 +119,8 @@
         "docs/brand/achievement-art/README.md",
         "docs/brand/art-library/README.md",
         "docs/brand/art-library/licenses/README.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/problem-solving/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -133,10 +140,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "a7612fa77aa6955a8f5e5850c4141aac2def945d967c43a4ab39e01d1b7fc2b0",
+      "reviewedAt": "2026-11-19T17:17:54.748Z",
+      "sourceDigest": "e4c5b5c0505ea1a2f21fe7ddb1fe8c09e3091ac123078d35e4faa57a0d2c3099",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged approved icon/illustration system with six Studio destinations, parent reporting, rewards header and page, startup recovery and adult profile separation. Icons preserve visible text and focus.",
+      "reviewReason": "Reviewed seven SVG destinations and same-attempt guards against current branding and Rewards; documented native parent placement, picker cleanup, resumed drafts and two-row phone navigation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -169,10 +176,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "18551456e30a018289e905956747875bda5f607a05d39e29e3954d8c1c920763",
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "89a27c985cde7960261edec936eb714189786fe7b5b7b32be5fcf771d74390dc",
+      "reviewedAt": "2026-11-19T17:17:55.432Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed newly styled Creation controls and saved challenge reward outboxes; source-backed checks remain deterministic and assistance evidence and prior scene versions remain distinct.",
+      "reviewReason": "Reviewed saved-attempt and delete hooks: the durable Creation attempt retains its reward outbox before optional APS context publication; scene mechanics, hints and challenge criteria remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -206,10 +213,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2574e4028f85c672b1d6964c59230fdde10b7647f8909ef547a9cbc53ed3f6b3",
-      "reviewedAt": "2026-11-19T15:06:46.476Z",
+      "sourceDigest": "c049e7a955b7779e23e883b2bc543e6854e8b7a9c9f8a39661303da1635177cb",
+      "reviewedAt": "2026-11-19T17:17:55.879Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the feature scope to inherit approved artwork and maker ranks from main c6576c16 after the verified PR57 merge. Runtime, reward rules, outboxes, ledger and recovery remain unchanged; volatile publication and review status belongs only in delivery state."
+      "reviewReason": "Reviewed five-source journaled replacement and recovery, legacy four-source journals, owner checks, exact rollback and maintenance guards; documented that APS changes no award policy or lifetime count."
     },
     {
       "id": "games",
@@ -250,10 +257,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "0fa2e61490e09dc8544b0b8abbcf2f244bb3db786fb6cf7df1e4509ec59dea2e",
+      "reviewedAt": "2026-11-19T17:17:56.207Z",
+      "sourceDigest": "2798174cf2197341b90d2bc4a3abf04136091e44948aa2b40550c7542dbd44d5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed approved brand navigation and Math/Language engagement grants with parent reporting; assistance, correctness and retained evidence keep their established independent meanings."
+      "reviewReason": "Reviewed production host save ordering with Math and English attempts; optional context is emitted only after durable attempt and reward outbox, preserving subject evidence and existing earning eligibility on observer failure."
     },
     {
       "id": "services",
@@ -377,10 +384,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:41:11.000Z",
-      "sourceDigest": "980c0066e5fa01ef3362c5dc31a9fe10d47f663336bb00a43ae7a6a0efbcd631",
+      "reviewedAt": "2026-11-19T17:17:57.416Z",
+      "sourceDigest": "59b3d84b558f2c11a98816df2602cdcafc562d9543db387b218e33e34fadebc1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final PR69 approved-icon test correction with six navigation destinations, responsive geometry, parent reporting, safe restore and existing rewards assertions. All unchanged test contracts are retained.",
+      "reviewReason": "Reviewed integrated parent, rewards, APS and brand browser assertions without removing existing gates; recorded 354 core units,32APS,57rewards,17parent,28maker,31Studio,18docs and asset results with source and environment limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -418,10 +425,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "937ca2b4841e64ece7d0dc89d4935dcae4436b52277b726c85d39449f8ba9b1a",
+      "reviewedAt": "2026-11-19T17:17:57.801Z",
+      "sourceDigest": "d484dff651c6cddb1446826c1e278684dea598dbda55cd385003c92ff836dbbd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled main PR69 branding completion, merged PR65 parent reporting and PR67 rewards integration, retaining exact prior CI evidence and a separate source-merge versus production boundary.",
+      "reviewReason": "Verified merged main28c18cda and upstream PR65,PR69,PR67 metadata; recorded user authorization to merge PR64 after current checks while retaining historical results and separate deployment/research boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -465,10 +472,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "sourceDigest": "06b37abc321b9d2e1c4648c0dac5df29ae39e23e0555ff344d6d9e5ed1ab7615",
+      "reviewedAt": "2026-11-19T17:17:58.183Z",
+      "sourceDigest": "6ab68bc6dd3433faaa7a012982d33dc46ed51c2cca2251c516193c5c861056cc",
       "reviewOutcome": "updated",
-      "reviewReason": "Combined the PR69 brand-reconciliation review and parent evidence registry with the independent Rewards area, its explicit policy/document routes, and preserved historical source review receipts.",
+      "reviewReason": "Merged current parent and rewards registry routes with the formative feature; preserved required canonical documents and renumbered APS decision0011 because main owns lifetime-rewards decision0010.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -499,10 +506,28 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2584e349c630a4e692acd5b529fb889247b12dbb72af45c16709576a8564d3a6",
-      "reviewedAt": "2026-11-19T15:18:57.172Z",
+      "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
+      "reviewedAt": "2026-11-19T17:17:56.552Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the phone toolbar grid, noncolliding chart labels and evidence-first Skills entry after inspecting the completed synthetic captures. Documented the new navigation defaults and prior visual findings; numeric evidence rules and current-profile behavior remain unchanged."
+      "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states."
+    },
+    {
+      "id": "problem-solving",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/problem-solving/*.md",
+        "docs/decisions/0011-formative-problem-solving-evidence.md"
+      ],
+      "sources": [
+        "src/problem-solving/**",
+        "tests/problem-solving-*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "3670012075fbf05ffe4eb33752061ab8e1490ec3092ea83bf175907971a77419",
+      "reviewedAt": "2026-11-19T17:17:56.960Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed shared writer guard, five-source backup, child-view and native-parent integration, deterministic tasks and new failure regressions; documented current local evidence and pending exact-head browser acceptance."
     }
   ]
 }

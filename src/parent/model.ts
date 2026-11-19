@@ -6,6 +6,7 @@ import type { CreationWorkspace } from '../creation/storage';
 import { getSkill } from '../learning/curriculum';
 import { getLanguageSkill } from '../language/curriculum';
 import { CREATION_CHALLENGES, getCreationChallenge } from '../creation/challenges';
+import { APS_SKILL_LABELS, validateProblemSolvingEpisode } from '../problem-solving/model';
 
 export type ParentRange = 7 | 30 | 90 | 'all';
 export type ParentSubjectId = 'math' | 'language' | 'creation' | 'problem-solving';
@@ -133,6 +134,9 @@ export interface ParentSubjectReport {
   period: ParentPeriodCounts;
   /** All selected records including repeated identical scene checks. */
   historyRecords: number;
+  /** Unscored source/interruption records, separate from structured decisions. */
+  contextRecords: number;
+  contextBySource: Record<string, number>;
   collapsedChecks: number;
   latestAt: number | null;
   skills: ParentSkillRow[];
@@ -167,10 +171,7 @@ export function hasRecordedSupport(skill: Pick<ParentSkillRow, 'subject' | 'peri
 const TITLES: Record<ParentSubjectId, string> = {
   math: 'Math', language: 'Language Arts', creation: 'Computational Thinking', 'problem-solving': 'Problem Solving',
 };
-const PS_LABELS: Record<string, string> = {
-  define_problem: 'Define the problem', compare_options: 'Compare ideas', plan_test: 'Plan a test',
-  interpret_evidence: 'Use the result', revise: 'Revise an idea', transfer: 'Try in a new situation',
-};
+const PS_LABELS: Record<string, string> = APS_SKILL_LABELS;
 const STATES: Record<string, string> = {
   'not-enough-evidence': 'Not enough evidence yet', discovering: 'Not enough evidence yet',
   'learning-with-support': 'Practising with support', independent: 'Observed independently in practice',
@@ -336,25 +337,22 @@ function creationEvidence(workspace: CreationWorkspace | undefined, owner: strin
 function problemEvidence(snapshot: ParentDashboardInput['problemSolving'], owner: string, now: number): ParentEvidence[] {
   if (!snapshot) return [];
   const seen = new Set<string>(), records: ParentEvidence[] = [];
-  for (const raw of snapshot.episodes) {
-    if (!object(raw) || raw.schema !== 'jems.problem-solving.episode.v1' || raw.owner !== owner
-      || !string(raw.id, 160) || seen.has(raw.id) || !object(raw.task) || !string(raw.task.id, 160)
-      || !string(raw.sessionId, 160) || !raw.sessionId || !['math', 'language', 'creation', 'studio', 'practice'].includes(raw.source)
-      || !string(raw.task.family, 160) || !raw.task.family || !string(raw.task.label, 240) || !string(raw.task.version, 100)
-      || !['first-seen', 'repeat', 'unknown'].includes(raw.task.exposure) || typeof raw.task.firstAttempt !== 'boolean'
-      || !Array.isArray(raw.observations) || raw.observations.length > 24
-      || !['structured-practice', 'context-only'].includes(raw.kind)) continue;
+  for (const value of snapshot.episodes) {
+    let raw;
+    try { raw = validateProblemSolvingEpisode(value); } catch { continue; }
+    if (raw.owner !== owner || seen.has(raw.id)) continue;
     const start = dateStamp(raw.startedAt, now), finish = dateStamp(raw.completedAt, now);
     if (start === null || finish === null || finish < start) continue;
     if (raw.status !== undefined && !['completed', 'interrupted', 'technical-invalid'].includes(raw.status)) continue;
     seen.add(raw.id);
-    const contextOnly = raw.kind === 'context-only' || ['interrupted', 'technical-invalid'].includes(raw.status);
+    const contextOnly = raw.kind === 'context-only' || raw.status === 'interrupted' || raw.status === 'technical-invalid'
+      || raw.observations.every(observation => observation.outcome === 'unobserved');
     if (contextOnly) {
       records.push({
         id: `problem-solving:${raw.id}`, subject: 'problem-solving', skillId: 'source-context', skillTitle: 'Activity context',
         standards: [], at: finish, prompt: raw.task.label, firstResponse: null, finalResponse: null,
-        firstCorrect: null, firstUnaided: false, outcome: raw.status === 'interrupted' ? 'interrupted' : raw.status === 'technical-invalid' ? 'technical-invalid' : 'context-only',
-        outcomeLabel: raw.status === 'technical-invalid' ? 'Technical issue; no skill result' : raw.status === 'interrupted' ? 'Interrupted; no skill result' : 'Context only; unscored',
+        firstCorrect: null, firstUnaided: false, outcome: raw.status === 'interrupted' ? 'interrupted' : raw.status === 'technical-invalid' ? 'technical-invalid' : raw.kind === 'context-only' ? 'context-only' : 'unobserved',
+        outcomeLabel: raw.status === 'technical-invalid' ? 'Technical issue; no skill result' : raw.status === 'interrupted' ? 'Interrupted; no skill result' : raw.kind === 'context-only' ? 'Context only; unscored' : 'No scored decision recorded',
         completed: false, independent: false, support: ['No skill result inferred'], hintUsed: false, readAloud: false,
         retried: false, observation: clean(raw.context) || 'This activity supplies context, not a scored problem-solving observation.',
         context: { itemId: raw.task.id, source: raw.source, taskFamily: raw.task.family,
@@ -520,13 +518,18 @@ export function buildParentDashboard(input: ParentDashboardInput): ParentDashboa
       : id === 'creation' ? ['Repeated checks of the same saved version and goal count once in the summary; each check remains in the evidence list.',
         'No hint recorded does not prove unaided authorship. These checks do not establish general coding mastery.']
         : ['Only completed structured activities contribute skill observations. Source context, interrupted work, and technical failures do not count as wrong.',
-          'No content help recorded includes access support; help outside the app may not be recorded. These are not standardized scores.'];
+          'No content help recorded includes access support; help outside the app may not be recorded. These are not standardized scores.',
+          'The first scored response for each skill is retained; a later retry does not replace it. Revising an idea is a separate decision. The current activities sample planning a test, using a result, and revising an idea.'];
     if (availability === 'read-error') notices.unshift('Saved records could not be read. No performance result is inferred; existing data has not been changed.');
     else if (id === 'problem-solving' && availability === 'not-connected') notices.unshift('The problem-solving evidence provider is not connected in this build. No performance result is inferred.');
     if (id === 'problem-solving' && problemSource && Number.isSafeInteger(problemSource.discarded) && problemSource.discarded! > 0) notices.push(`${problemSource.discarded} older middle records were removed by the existing retention limit.`);
+    const contextRows = rows.filter(row => row.contextOnly);
+    const contextBySource: Record<string, number> = {};
+    for (const row of contextRows) { const source = row.context.source || 'unknown'; contextBySource[source] = (contextBySource[source] || 0) + 1; }
     return {
       id, title: TITLES[id], available: availability === 'available', availability,
       period: countEvidence(overview), historyRecords: rows.length, collapsedChecks: id === 'creation' ? rows.length - overview.length : 0,
+      contextRecords: contextRows.length, contextBySource,
       latestAt: rows[0]?.at ?? null,
       skills: id === 'math' || id === 'language' ? learningSkills(id, snapshot?.report, rows, now) : observedSkills(id, overview),
       trend: trendFor(overview), notices,

@@ -154,7 +154,8 @@ function bind(){
  $('remixGame').onchange=loadRemix;$('remixDifficulty').onchange=describeRemix;
  $('playRemix').onclick=()=>{const p=FG.store.current(),before=p.remixes;p.remixes={...p.remixes,[$('remixGame').value]:$('remixDifficulty').value};if(!FG.store.save()){p.remixes=before;$('remixStatus').textContent='Could not save your remix. Please try again.';return}gameOpen($('remixGame').value)};
  $('copyFeedback').onclick=async()=>{const data=FG.store.data.feedback;if(!data.length){alert('Save an idea first.');return}const txt=FG.bridge.developmentBrief(data);try{await navigator.clipboard.writeText(txt);alert('Copied! Paste into your ChatGPT game development conversation.')}catch(e){window.prompt('Copy these ideas:',txt)}};
- $('exportData').onclick=()=>download(FG.store.recoveryRaw||JSON.stringify({...FG.store.data,factoryWorkspace:FG.factory?.exportWorkspace()},null,2),'family-game-factory-progress.json');$('importData').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;if(!confirm('Replace the current profiles, learning progress and ideas with the imported backup?'))return;try{const raw=await file.text(),backup=JSON.parse(raw);if(backup.factoryWorkspace)FG.factory?.validateWorkspace(backup.factoryWorkspace);FG.store.restore(raw);if(backup.factoryWorkspace)FG.factory?.restoreWorkspace(backup.factoryWorkspace);profiles();loadParent();$('storageRecovery')?.remove();alert('Progress restored successfully.')}catch(err){alert('Could not restore backup: '+err.message)}finally{e.target.value=''}};
+ // The shared backup coordinator installs these controls after writer-lock and
+ // startup recovery checks. It owns all source replacement and rollback.
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{bind();profiles();page('home')});else{bind();profiles();page('home')}
 FG.app={page,openGame:gameOpen,refreshProfiles:profiles};
