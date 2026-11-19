@@ -47,8 +47,12 @@ The workflow will:
 1. Refuse stale or unreviewed commit SHA and incomplete/malformed origins.
 2. Run npm test, Playwright and visual evidence at that exact source commit.
 3. Probe the existing gateway and preview /health endpoints without paid calls.
-4. Publish the matching site through the github-pages environment.
-5. Embed a public jems-release.json marker with the exact source SHA.
+4. In an **unprivileged** build job, construct and upload the tested Pages
+   artifact. Only a separate protected deployment job receives pages:write
+   and id-token:write; it cannot run npm installs or app build scripts.
+5. Publish the matching artifact through the github-pages environment after
+   a final main-head lease check. Embed a public jems-release.json marker
+   with the exact source SHA.
 6. Fetch the published release marker and factory-config.json and verify both
    match the approved SHA and exact service origins; recheck both health endpoints.
 7. Open the actual deployed website in fresh desktop/mobile Chromium contexts:
