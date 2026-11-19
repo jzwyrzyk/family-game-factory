@@ -1,5 +1,7 @@
 # Issue #28 — real conversational AI: architecture and release gate
 
+> **Status reconciliation:** [PR36](https://github.com/jzwyrzyk/family-game-factory/pull/36) is merged. Draft/inactive-branch wording below describes the original review stage, not an inventory of current live services. The dedicated private-coach architecture remains the contract; [delivery state](../../DELIVERY-STATE.md) owns current audience, release scope and observed operational evidence.
+
 **Status: implementation in draft PR #36; NO paid/live activation.**
 PR #35 has already been merged. The child-facing conversation composer, voice input,
 design history, one-question game plan, play/build separation and local edits are in main.

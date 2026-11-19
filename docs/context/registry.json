@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "coverageExcludes": [
+    "*.md",
+    "**/*.md",
+    "docs/**",
+    "references/**"
+  ],
+  "requiredDocuments": [
+    "README.md",
+    "AGENTS.md",
+    "PRODUCT-DOCTRINE.md",
+    "ARCHITECTURE-CURRENT.md",
+    "DELIVERY-STATE.md",
+    "docs/README.md",
+    "docs/decisions/README.md",
+    "docs/context/MAINTENANCE.md",
+    "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
+  ],
+  "linkCheckPatterns": [
+    "README.md",
+    "AGENTS.md",
+    "PRODUCT-DOCTRINE.md",
+    "ARCHITECTURE-CURRENT.md",
+    "DELIVERY-STATE.md",
+    "docs/README.md",
+    "docs/decisions/*.md",
+    "docs/context/*.md"
+  ],
+  "areas": [
+    {
+      "id": "product",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "docs/decisions/*.md"
+      ],
+      "sources": [
+        "docs/design-coach/GOLD_STANDARD.md",
+        "docs/child-journey/*.md",
+        "docs/child-continuity/*.md",
+        "docs/brand/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.073Z",
+      "sourceDigest": "3fc6119f41312ecb1004a0c799d212f6f72981ca700102b9626b45c2dc312ee9",
+      "reviewOutcome": "updated",
+      "reviewReason": "Consolidated the existing coaching, child journey, continuity and brand standards into the product doctrine and sourced decision records; implementation and efficacy claims remain separate."
+    },
+    {
+      "id": "experience",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/child-journey/*.md",
+        "docs/child-continuity/*.md",
+        "docs/homepage/*.md",
+        "docs/brand/*.md"
+      ],
+      "sources": [
+        "src/main.ts",
+        "src/style.css",
+        "src/offline.ts",
+        "src/legacy/**",
+        "src/studio/**",
+        "src/factory/**",
+        "src/builder/**",
+        "src/assets/**",
+        "src/brand/**",
+        "public/**",
+        "index.html"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.114Z",
+      "sourceDigest": "0c995d3b2dd92f82533c502ce7ff14470d4752cc32b494a3e783cd00ee42a1aa",
+      "reviewOutcome": "updated",
+      "reviewReason": "Mapped Studio, local revisions, remote builder state and device-specific browser stores in the architecture; corrected the README default route and preserved explicit Keep and recovery intent."
+    },
+    {
+      "id": "games",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/GAME-QUALITY.md",
+        "docs/game-quality/*.md"
+      ],
+      "sources": [
+        "src/games/**",
+        "src/runtime/**",
+        "src/quality/**",
+        "scripts/build-generated-runtime.cjs",
+        "docs/GAME-QUALITY.md",
+        "docs/game-quality/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.178Z",
+      "sourceDigest": "d2e76f07cefa44fe4fcc030de890cddcd0d2033daf80f4400ddb38025efb0cbf",
+      "reviewOutcome": "updated",
+      "reviewReason": "Verified runtime manifests and selection preserve saved physical and original games while new Bubble Gum uses stickers; documented game-form choice, runtime compatibility and the limits of gameplay evidence."
+    },
+    {
+      "id": "learning",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/adaptive-math/*.md",
+        "docs/adaptive-language/*.md"
+      ],
+      "sources": [
+        "src/learning/**",
+        "src/language/**",
+        "docs/adaptive-math/*.md",
+        "docs/adaptive-language/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.211Z",
+      "sourceDigest": "8b49aa409e5ccb46e9d5e510feed52240415b85cfa5f4e5bfd55516d85e4a033",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed subject-specific host contracts and current Math and Language sources against the canonical learning principles; separated independent and assisted evidence from unproven learning efficacy."
+    },
+    {
+      "id": "services",
+      "documents": [
+        "ARCHITECTURE-CURRENT.md",
+        "docs/auth/*.md",
+        "server/README.md"
+      ],
+      "sources": [
+        "server/*.ts",
+        "server/Dockerfile.gateway",
+        "server/Dockerfile.preview",
+        "server/openapi.json",
+        "server/contracts/**",
+        "server/storage/**",
+        "docs/auth/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.231Z",
+      "sourceDigest": "9cf9229a21f2de1980ef5ba0401e5e004628785156ff0bb752e82f8335ce739b",
+      "reviewOutcome": "updated",
+      "reviewReason": "Mapped implemented gateway routes, trusted-device session checks, transactional revocation and private preview storage; documented that source schemas and deployment evidence have distinct limits."
+    },
+    {
+      "id": "generation",
+      "documents": [
+        "ARCHITECTURE-CURRENT.md",
+        "docs/game-intelligence/*.md",
+        "docs/assignment-004/*.md",
+        "docs/assignment-005/*.md",
+        "docs/assignment-006/*.md"
+      ],
+      "sources": [
+        "server/actions/**",
+        "server/agent/**",
+        "server/pipeline/**",
+        "server/quality/**",
+        "server/sandbox/**",
+        "server/testing/**",
+        "docs/game-intelligence/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.254Z",
+      "sourceDigest": "4e8693bb821b147f5ba20f413778d57d7a1893375736e79dd7f298a048f16760",
+      "reviewOutcome": "updated",
+      "reviewReason": "Mapped the existing coordinator, sandbox and Game Intelligence integration without inventing another pipeline; documented authored-probe coverage, independent worker pins and bounded repair evidence."
+    },
+    {
+      "id": "coach",
+      "documents": [
+        "ARCHITECTURE-CURRENT.md",
+        "PRODUCT-DOCTRINE.md",
+        "docs/design-coach/*.md",
+        "docs/issue-28/*.md"
+      ],
+      "sources": [
+        "server/coach/**",
+        "server/Dockerfile.coach",
+        "docs/design-coach/*.md",
+        "docs/issue-28/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.282Z",
+      "sourceDigest": "4d453474f42784336808ce1c7c0477c3f5e43d209c7d7eb8a733b9087e619832",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reconciled the private coach exception and explicit speech composer with the source handlers and release contracts; preserved keyless gateway boundaries, revocation checks and separate Send and Build actions."
+    },
+    {
+      "id": "validation",
+      "documents": [
+        "ARCHITECTURE-CURRENT.md",
+        "DELIVERY-STATE.md",
+        "docs/evidence/README.md",
+        "docs/game-quality/*.md",
+        "docs/game-intelligence/*.md",
+        "docs/context/MAINTENANCE.md"
+      ],
+      "sources": [
+        "tests/**",
+        "tools/**"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.319Z",
+      "sourceDigest": "19d07acceace6d7da8ac5e5e2f644858e5049aa64d2341d22ab1c44d3f9fbb7b",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the existing test and evidence entry points and their scope; fixture and browser regression success remain separate from provider, actual-device, child-experience and learning acceptance."
+    },
+    {
+      "id": "delivery",
+      "documents": [
+        "DELIVERY-STATE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/context/MAINTENANCE.md",
+        "docs/assignment-006/*.md"
+      ],
+      "sources": [
+        ".github/workflows/**",
+        "scripts/deployment/**",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "vite.config.ts",
+        ".dockerignore",
+        ".gitignore",
+        "DELIVERY-STATE.md"
+      ],
+      "reviewAfterDays": 7,
+      "reviewedAt": "2026-11-19T04:27:59.379Z",
+      "sourceDigest": "8bf8192ef050d31181e653f503afbde42cb98f2903983cebbdd532d09aeb8c3f",
+      "reviewOutcome": "updated",
+      "reviewReason": "Added a dated GitHub evidence ledger separating merged source, observed Pages workflow, private worker proposal and unverified live services; introduced the read-only documentation workflow without changing deployment gates."
+    },
+    {
+      "id": "context",
+      "documents": [
+        "README.md",
+        "AGENTS.md",
+        "docs/README.md",
+        "docs/context/*.md",
+        ".github/PULL_REQUEST_TEMPLATE.md"
+      ],
+      "sources": [
+        "scripts/check-docs.mjs",
+        "scripts/tests/**",
+        ".github/PULL_REQUEST_TEMPLATE.md",
+        "README.md",
+        "AGENTS.md",
+        "docs/context/MAINTENANCE.md",
+        "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-19T04:27:59.406Z",
+      "sourceDigest": "a9da30a6754f03c3cf11823041ab4dab6e2fe9308a4794fbf82910fea29a96d3",
+      "reviewOutcome": "updated",
+      "reviewReason": "Established the canonical entry points, PR template, source routing and mandatory normalized policy review; verified explicit per-area review, prospective-merge drift, deletion, self-reference and local-link failure paths."
+    }
+  ]
+}

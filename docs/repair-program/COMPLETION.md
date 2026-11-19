@@ -1,5 +1,7 @@
 # Issue 7 completion ledger
 
+> **Historical completion snapshot.** “Current live,” PR states and evidence below refer to this repair-program report when written. See [delivery state](../../DELIVERY-STATE.md) for the latest recorded release inventory and observation time.
+
 Issue #7 remains **PARTIAL**. This ledger supersedes earlier provisional batch notes. States below apply only to the named, tested subset; they do not close the full acceptance gate in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 ## Approved production release

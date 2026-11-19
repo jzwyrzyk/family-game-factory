@@ -1,5 +1,7 @@
 # Adaptive Math v1 — grades 1–4
 
+> **Feature contract with historical implementation status.** References below to draft PRs, opt-in Studio and pending release describe the original review. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current integration and release evidence. The learning model, scope limits and recorded acceptance evidence remain relevant; this banner does not claim educational validation.
+
 ## What this change delivers
 
 A shared, deterministic learning service now connects the original games, local remixes, the Studio draft, generated previews, and My Powers. It adjusts the next activity using the child's actual practice history; game scores and game difficulty never establish mathematical proficiency.

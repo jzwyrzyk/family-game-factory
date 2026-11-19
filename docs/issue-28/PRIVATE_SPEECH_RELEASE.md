@@ -1,5 +1,5 @@
 # PR #36 — private, turn-based conversation + tablet dictation release
-**State: implementation branch only; not merged or activated.**
+**Source state:** [PR #36](https://github.com/jzwyrzyk/family-game-factory/pull/36) merged as [`a00ecb5d2be16dc07dde082e4bc1852e44330e50`](https://github.com/jzwyrzyk/family-game-factory/commit/a00ecb5d2be16dc07dde082e4bc1852e44330e50), then integrated with Game Intelligence in #43. This is a release contract, not live activation evidence. See [Delivery state](../../DELIVERY-STATE.md) for current authorized pilot scope, component deployments and remaining verification; the child-use conditions below must not be mistaken for evidence that they are already satisfied.
 
 ## Product contract
 The child **presses Speak**, records one short thought, **finishes**, checks or edits the transcription, then **presses Send to jems**. A normal text AI reply appears; **Hear reply** is an optional explicit click. A different **Build / Try a change** action is required before generation. There is no live two-way microphone, automatic listening, automatic speech playback, automatic Send, or auto-build. A typed message uses the same chat and privacy policy.
@@ -36,10 +36,11 @@ The child **presses Speak**, records one short thought, **finishes**, checks or 
 - Measure turnaround, errors, timeouts, real account charges, model reply quality and whether children understand the Send/Build distinction. Do not infer enjoyment from fixture tests.
 
 ## Production rollout and rollback
-1. Merge #42 and finish #43 functional acceptance first, then reconcile #36 against current main, including #29 if enabled. Run full exact-head checks after integration. Keep #31 unmerged until its compatible speech work is accounted for.
+1. The source merge order was #42 → #36 → #43; all three are included in the reviewed application baseline. For the next release, reconcile any later changes against current main and re-run the affected integrated checks. Account for required #29 safeguards and selectively ported #31 speech work without introducing a competing model architecture. Operational acceptance remains separate from these completed source merges.
 2. Deploy compatible gateway and private service images *inactive* first. Confirm identity/network/auth and disable switches. Never enable AI or speech just by setting a public static URL.
 3. With recorded approvals, permit a narrowly funded synthetic parent/operator smoke, check real browser cookies and rollback, then explicitly authorize supervised family pilot. Deploy frontend after backend and inspect real runtime configuration.
 4. To stop: disable model/audio flags at private service and gateway, revoke family consent, remove the private service origin from private gateway config, and restore known-good Cloud Run/Pages revisions as necessary. Preserve game/version and learning data; note historical provider invoicing/metadata cannot always be erased immediately.
 
-## Current operational blockers
-**No live GCP inspection, authorized child-data consent evidence, API ZDR proof, real model/STT calls, actual iOS/Android test, private network service deployment, or final merge-main integration has been verified from this GitHub session.** No one should call PR #36 ready for live child production until those gates pass.
+## Operational evidence boundary
+
+The original PR's evidence did not establish live GCP configuration, child-data consent, API ZDR, real model/STT calls, actual iOS/Android acceptance or a working private network deployment. Source integration is now merged. Consult [Delivery state](../../DELIVERY-STATE.md) for newer evidence rather than treating this historical evidence limit as a fresh inspection. Claims of live child readiness require the applicable completed operational gates.
