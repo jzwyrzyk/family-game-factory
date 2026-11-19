@@ -1,5 +1,7 @@
 # Child continuity & six Factory Favorites — implementation review
 
+> **Historical implementation review.** Draft/merge/deployment statements below describe the original PR #25 review and are not current release state. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current evidence and [PRODUCT-DOCTRINE.md](../../PRODUCT-DOCTRINE.md) for the durable behavior principles. Historical acceptance evidence is retained unchanged.
+
 **Status:** draft PR #25, not merged or deployed. This batch does not enable paid AI, authorize cloud work, publish a child project, or relax security/learning controls.
 
 ## Decision and product promise

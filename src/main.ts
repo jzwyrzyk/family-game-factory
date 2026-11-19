@@ -1,4 +1,5 @@
 import './legacy/store.js';
+import './adult-pilot/style.css';
 import './learning/bootstrap';
 import './legacy/bridge.js';
 import './runtime/registry';
@@ -7,7 +8,8 @@ import { initLiveRemix } from './factory/ui';
 initLiveRemix();
 
 import { initBuilder } from './builder/ui';
-void initBuilder();
+import {installAdultProfile} from './adult-pilot/ui';
+void initBuilder().then(installAdultProfile);
 
 import {installJemsDelight} from './brand/delight';
 import './brand/delight.css';

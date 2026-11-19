@@ -1,5 +1,7 @@
 # Game Quality v1: the implementation standard
 
+> **Scope: physical-v1 and generated-runtime quality contract.** [PR40](https://github.com/jzwyrzyk/family-game-factory/pull/40) made the sticker workshop the default for newly created Bubble Gum games. Saved physical-v1 and older engines remain supported. The physical implementation/evidence below is retained for that scope; it is not a claim that legacy physics issues are fixed or that this is the new-game default. See [product doctrine](../PRODUCT-DOCTRINE.md) and [delivery state](../DELIVERY-STATE.md).
+
 ## Product commitment
 
 The [validation review](game-quality/VALIDATION.md) records source pins, browser evidence, screenshots, measurements, and the remaining release gates for this implementation.

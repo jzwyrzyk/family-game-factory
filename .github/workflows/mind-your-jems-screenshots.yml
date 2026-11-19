@@ -1,14 +1,28 @@
-name: Mind Your Jems browser screenshots
+name: Mind Your Jems art and gameplay review
 on:
-  push:
-    branches: [feature/mind-your-jems-wait-arcade]
+  pull_request:
+    paths:
+      - 'src/games/mind-your-jems*'
+      - 'src/studio/ui.ts'
+      - 'src/**/*.css'
+      - 'public/art/mind-your-jems/**'
+      - 'public/fonts/**'
+      - 'public/jems*.svg'
+      - 'tests/mind-your-jems*'
+      - 'tests/visual/mind-your-jems/**'
+      - 'tests/browser-server.cjs'
+      - '.github/workflows/**'
+      - 'index.html'
+      - 'vite.config.ts'
+      - 'tools/offline-build.ts'
+      - 'package*.json'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: mind-your-jems-shots-${{ github.ref }}
+  group: mind-your-jems-shots-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,14 +36,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install chromium
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - name: Capture gameplay on desktop, tablet and mobile
+      - name: Check gameplay, responsive art and approved visual baselines
         run: node tests/mind-your-jems-browser.cjs
-      - name: Upload actual browser screenshots
+        env:
+          MYJ_VISUAL_COMPARE: '1'
+          MYJ_CAPTURE_VIDEO: '1'
+      - name: Upload actual browser evidence and regression differences
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mind-your-jems-browser-screenshots
-          path: test-results/mind-your-jems-*.png
-          if-no-files-found: warn
+          path: test-results/mind-your-jems/
+          if-no-files-found: error
+          retention-days: 14

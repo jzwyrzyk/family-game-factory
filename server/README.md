@@ -1,4 +1,10 @@
-# Managed backend contracts — not a deployed backend
+# Backend documentation
+
+Start with [Current architecture](../ARCHITECTURE-CURRENT.md), [Delivery state](../DELIVERY-STATE.md), and the executable [gateway](gateway.ts)/[HTTP handlers](pipeline/http.ts). The backend now includes the job pipeline, trusted devices, private coach/speech, deployment tooling and generated-game isolation. A source checkout alone does not establish current live deployment or activation.
+
+The original contract snapshot below is retained as historical rationale. Its statements about an unimplemented backend, missing deployment scripts and proposed endpoints describe that early assignment; **they are not current status or a complete API specification**. The implemented generation API is `/v1/jobs`, not the proposed `/v1/generations`. [openapi.json](openapi.json) covers jobs/revisions/worker operations but still needs reconciliation with newer coach/speech/device routes.
+
+## Historical snapshot — managed backend contracts
 
 `contracts/api.ts` defines versioned Cloud Run boundary types, tenant authorization and parent release gates, strict generation input validation, job transitions, private Firestore/Cloud Storage ports, atomic budget reservations, isolated-worker and server-only AI provider interfaces. The unconfigured adapter fails explicitly. These files are not imported by the browser and contain no cloud credentials, SDK initialization or mock generation success.
 

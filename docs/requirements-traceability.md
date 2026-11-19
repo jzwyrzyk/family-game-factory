@@ -1,5 +1,7 @@
 # Requirements traceability — Issues #3/#4 / Assignment 001
 
+> **Historical assignment ledger.** This records Assignment 001 and its explicit later appendices. It is not the current feature or production inventory. Start with [documentation map](README.md), [current architecture](../ARCHITECTURE-CURRENT.md) and [delivery state](../DELIVERY-STATE.md).
+
 Scope: charter phases 1–2 plus a local phase 3 vertical slice. “Implemented” means exercised code, not a design-only promise. Production cloud, arbitrary AI generation and full original-game fidelity remain open; see [gap analysis](gap-analysis.md).
 
 | Requirement | Implementation/evidence | Status |

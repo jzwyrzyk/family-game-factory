@@ -1,5 +1,7 @@
 # Adaptive Language Arts v1 — Family Game Factory
 
+> **Feature contract with historical implementation status.** Draft-branch and release wording below belongs to the original review. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current integration and release evidence. The subject boundaries, evidence rules and validation limits remain relevant; a later merge does not establish curriculum completeness or learning gains.
+
 ## The product
 
 Language Arts is a second **host-owned learning engine** for Grades 1–4. A grown-up chooses **Math** or **Language Arts** for each child; both subjects require learning checkpoints in games. There is **no Off / creative-play-only option**. The existing Math 73-unit system, player profiles, game versions, trusted worker protocol, and cross-game question budget remain in place.

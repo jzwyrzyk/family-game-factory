@@ -1,4 +1,7 @@
 # jems — web identity and product implementation
+
+> **Brand contract with historical review notes.** PR #33/#34 draft, merge and release wording below records those reviews. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current integration and deployment evidence. Preserve the documented visual identity and asset-certification limits; code merge is not proof of final master-art approval.
+
 The selected public-facing brand is **jems** (lowercase), with a faceted **gem and central wrench** mark. The brand is intended for children who invent, reason, solve, make and play; parents should see confident STEM/creative problem-solving, not an AI toy that designs everything for the child.
 
 ## Approved color system
@@ -14,6 +17,8 @@ The selected public-facing brand is **jems** (lowercase), with a faceted **gem a
 | Soft Lilac | `#E6D8FF` | surfaces, secondary emphasis |
 
 Avoid using pastel colors as small text on white. Maintain readable navy text on mint, gold, coral, and cloud. The approved style guide calls the display family “Poppins Rounded (Bold)”, but the supplied portfolio did not include an installable licensed font. The **logo wordmark is outlined from the approved reference**; ordinary headings use a rounded system fallback rather than downloading unlicensed fonts. Interface text uses an Inter-like system stack.
+
+The optional [Mind Your Jems arcade](../mind-your-jems/README.md) uses locally bundled Fredoka for its game title, counters and controls. Its SIL Open Font License ships in `public/fonts/fredoka/OFL.txt`. This game-specific type treatment preserves the existing outlined logo and does not replace the main application's typography. The arcade's illustrated layers and responsive compositions are reviewed against its approved storyboard before screenshot baselines are accepted.
 
 ## Logo
 `public/jems-mark.svg` and `public/jems-logo.svg` are scalable SVG implementations of the *approved* faceted-gem/wrench layout. The approved brand portfolio is raster artwork, so the mark is an independently reconstructed faceted SVG with an **open-ended white wrench** (not a keyhole) and the lowercase wordmark is an SVG vector trace of the approved board. Logo, standalone wordmark and inverse variants are scalable; visual owner approval is still required before certification as final production masters. Never stretch, skew, recolor or apply shadows to the logo.

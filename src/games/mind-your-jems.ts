@@ -1,16 +1,15 @@
 import './mind-your-jems.css';
 import {BAG_CAPACITY,newMineState,moveMine,type MineAction,type MineState} from './mind-your-jems-rules';
 
-/**
- * A local-only, prebuilt mini-game. It never calls the builder, stores child data,
- * fabricates generation progress, or changes a saved project.
- */
-export type WorkshopStatus = 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled';
+/** Prebuilt, local play. Artwork ships with the app; scores never leave this session. */
+export type WorkshopStatus = 'queued'|'building'|'testing'|'ready'|'failed'|'cancelled'|'reconnecting';
 export type ArcadeLaunch = {
   projectName:string;
   status:WorkshopStatus;
   isReady:boolean;
   onPlayReady:()=>void;
+  onBackToStudio?:()=>void;
+  onClose?:()=>void;
 };
 export type WaitArcade = {
   open:(launch:ArcadeLaunch)=>void;
@@ -19,207 +18,269 @@ export type WaitArcade = {
   isOpen:()=>boolean;
 };
 
-const gemShapes = [
-  {x:31,y:28,color:'pink',value:1},{x:42,y:19,color:'blue',value:1},
-  {x:53,y:22,color:'purple',value:1},{x:65,y:25,color:'gold',value:3},
-  {x:73,y:35,color:'mint',value:1},{x:39,y:36,color:'gold',value:3}
+const ART='./art/mind-your-jems/';
+const gemShapes=[
+  {x:39,y:18,frame:1,value:1,label:'Pink'},
+  {x:52,y:14,frame:0,value:1,label:'Blue'},
+  {x:66,y:20,frame:2,value:1,label:'Purple'},
+  {x:76,y:28,frame:3,value:3,label:'Golden'},
+  {x:57,y:26,frame:4,value:1,label:'Mint'},
+  {x:44,y:29,frame:5,value:3,label:'Sunset'}
 ] as const;
-const gemIcon = '<svg viewBox="0 0 90 100" aria-hidden="true"><path d="M17 25 36 6h30l18 19-8 45-31 25L12 69Z" fill="currentColor"/><path d="m17 25 28 10 21-29M45 35l31 35M45 35 12 69M45 35l-1 60M84 25 45 35" fill="none" stroke="#fff" stroke-width="4" stroke-opacity=".55"/><path d="m17 25 19-19 9 29-33 34Z" fill="#fff" opacity=".18"/><path d="m45 35 21-29 18 19-8 45Z" fill="#fff" opacity=".26"/></svg>';
-const artwork = [
-'<svg class="myj-world" viewBox="0 0 1000 570" aria-hidden="true">',
-'<defs>',
-'<linearGradient id="myj-sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#75cbff"/><stop offset="1" stop-color="#e3d3ff"/></linearGradient>',
-'<linearGradient id="myj-stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5a6ee"/><stop offset=".45" stop-color="#a278c7"/><stop offset="1" stop-color="#6557af"/></linearGradient>',
-'<linearGradient id="myj-tuft" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#ffa3de"/><stop offset="1" stop-color="#fa448b"/></linearGradient>',
-'<linearGradient id="myj-mint" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#9bfce1"/><stop offset="1" stop-color="#05caa2"/></linearGradient>',
-'<linearGradient id="myj-crystal" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#b7f8ff"/><stop offset=".55" stop-color="#8f45ff"/><stop offset="1" stop-color="#ff4faa"/></linearGradient>',
-'<filter id="myj-depth" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#3b217d" flood-opacity=".25"/></filter>',
-'</defs>',
-'<path fill="url(#myj-sky)" d="M0 0h1000v570H0z"/>',
-'<g fill="#fff" opacity=".75"><ellipse cx="150" cy="145" rx="135" ry="35"/><ellipse cx="170" cy="120" rx="65" ry="46"/><ellipse cx="850" cy="120" rx="120" ry="32"/><ellipse cx="815" cy="99" rx="52" ry="35"/></g>',
-'<path fill="#b0abf9" opacity=".5" d="m0 345 132-100 130 90 145-85 130 120 143-105 130 60 120-115 100 130v230H0Z"/>',
-'<path fill="#75c9ba" opacity=".55" d="M0 405c110-70 210 55 330-20s245-12 355 14 215-35 315-10v181H0Z"/>',
-'<path fill="#5040a0" opacity=".26" d="M0 508c165-45 270 26 440-18 215-57 383-30 560 12v68H0Z"/>',
-'<g class="myj-head" filter="url(#myj-depth)">',
-'<ellipse cx="510" cy="534" rx="358" ry="306" fill="#574f96" opacity=".35"/>',
-'<path d="M182 575C171 378 295 220 472 221c215-30 375 107 372 354Z" fill="url(#myj-stone)" stroke="#745da3" stroke-width="9"/>',
-'<path d="M264 425c-16-126 93-215 194-195M682 281c77 25 115 91 129 161" fill="none" stroke="#e8c7f0" stroke-width="13" opacity=".38" stroke-linecap="round"/>',
-'<g fill="#9f75c2" opacity=".45"><circle cx="290" cy="380" r="13"/><circle cx="746" cy="402" r="18"/><circle cx="373" cy="257" r="11"/><circle cx="631" cy="263" r="9"/><circle cx="686" cy="474" r="8"/></g>',
-'<path d="M322 310c-30-64-78-61-107-96 68 19 103 3 137 20-31-38-38-83-25-106 24 59 80 63 83 144Z" fill="url(#myj-tuft)" stroke="#d84798" stroke-width="8" stroke-linejoin="round"/>',
-'<path d="M687 278c14-70 70-78 98-139-4 71-12 101-34 120 42-19 71-12 98-36-16 68-66 92-127 110Z" fill="url(#myj-mint)" stroke="#08ae9c" stroke-width="8" stroke-linejoin="round"/>',
-'<path d="M326 412q63-54 124-12M580 402q65-44 120 18" fill="none" stroke="#4c327b" stroke-width="18" stroke-linecap="round"/>',
-'<g class="myj-eyes"><ellipse cx="401" cy="482" rx="88" ry="90" fill="#fff9ff"/><ellipse cx="626" cy="482" rx="88" ry="90" fill="#fff9ff"/></g>',
-'<g class="myj-pupils"><ellipse cx="425" cy="475" rx="32" ry="47" fill="#3d3979"/><ellipse cx="601" cy="475" rx="32" ry="47" fill="#3d3979"/><circle cx="437" cy="457" r="12" fill="#fff"/><circle cx="612" cy="457" r="12" fill="#fff"/></g>',
-'<ellipse cx="314" cy="546" rx="52" ry="23" fill="#ff8eb7" opacity=".75"/><ellipse cx="719" cy="548" rx="52" ry="23" fill="#ff8eb7" opacity=".75"/>',
-'<path d="M494 536q19-17 41 0" fill="none" stroke="#9b6397" stroke-width="12" stroke-linecap="round"/>',
-'<path d="M452 561q65 32 125 0" fill="none" stroke="#583374" stroke-width="9" stroke-linecap="round"/>',
-'</g>',
-'<g class="myj-ladder" stroke="#8f4b2e" stroke-width="13" stroke-linecap="round"><path d="m278 539 94-252m-43 262 92-251" fill="none"/><path d="m286 513 51 9m-40-49 53 7m-38-51 54 8m-36-51 55 7m-38-50 55 5m-38-49 55 8" stroke="#ffc46a" stroke-width="12"/></g>',
-'<g class="myj-miner" transform="translate(359 276)">',
-'<path d="M-7 55 9 65l-13 22M18 56l22 11 10 18" fill="none" stroke="#573660" stroke-width="14" stroke-linecap="round"/>',
-'<path d="M-4 16Q8 0 34 16l1 40-42 8Z" fill="#2e6bff" stroke="#143eaa" stroke-width="5"/>',
-'<rect x="-21" y="24" width="17" height="30" rx="7" fill="#ff4c83"/><circle cx="-14" cy="38" r="4" fill="#ffe86d"/>',
-'<path d="m29 28 31-20" stroke="#f4ae76" stroke-width="12" stroke-linecap="round"/>',
-'<path d="m57 9 19-16" stroke="#7c4b37" stroke-width="8" stroke-linecap="round"/>',
-'<path d="m59-5 30-12 1 16-34 7Z" fill="#54ccff" stroke="#1750b4" stroke-width="4"/>',
-'<circle cx="15" cy="-5" r="26" fill="#ffd2a1" stroke="#c6815d" stroke-width="4"/>',
-'<path d="M-13-16q-5-37 29-37 39 0 29 36Z" fill="#ffc43c" stroke="#d88013" stroke-width="5"/>',
-'<rect x="-20" y="-21" width="71" height="12" rx="6" fill="#ffdb57" stroke="#d88013" stroke-width="3"/>',
-'<circle cx="31" cy="-43" r="11" fill="#fff8cb" stroke="#dc9e2e" stroke-width="5"/>',
-'<circle cx="9" cy="-6" r="3" fill="#3e2c65"/><circle cx="26" cy="-6" r="3" fill="#3e2c65"/>',
-'<path d="M12 6q8 10 16 0" fill="none" stroke="#b05f5e" stroke-width="4" stroke-linecap="round"/>',
-'</g>',
-'<g transform="translate(830 396)"><ellipse rx="137" ry="21" fill="#2e346d" opacity=".2"/><rect x="-110" y="-53" width="213" height="77" rx="19" fill="#7c32ed" stroke="#3e298a" stroke-width="9"/><path d="M-110-31h213l-27 58H-85Z" fill="#bd62ff"/><path d="M-123-64H114v25h-237Z" fill="#ffc43c" stroke="#ad6b25" stroke-width="8"/><circle cx="-60" cy="34" r="23" fill="#393777" stroke="#d8b1ff" stroke-width="9"/><circle cx="62" cy="34" r="23" fill="#393777" stroke="#d8b1ff" stroke-width="9"/><path d="m-18-27 15-17 22 4 11 18-24 24Z" fill="url(#myj-crystal)" stroke="#f4eaff" stroke-width="5"/></g>',
-'<g fill="#ffce39"><path d="m815 180 9 24 24 9-24 9-9 24-9-24-24-9 24-9Z"/><path d="m176 251 6 15 15 6-15 6-6 15-6-15-15-6 15-6Z"/></g>',
-'</svg>'
-].join('');
-
-const html = [
-'<div class="myj-shell">',
-'<header class="myj-header"><img class="myj-logo" src="./jems-logo.svg" alt="jems · The Game Factory">',
-'<span class="myj-wait-pill">🎮 Play while you wait</span>',
-'<span class="myj-build-status" role="status" aria-live="polite"></span>',
-'<button class="myj-close" type="button" aria-label="Close mini-game">✕</button></header>',
-'<div class="myj-main">',
-'<div class="myj-title"><span class="myj-kicker">THE LITTLE GAME WITH BIG IDEAS</span><h2 id="myjTitle">Mind Your <em>Jems!</em></h2><p>Mine ideas. Bank Jems. Hold on!</p></div>',
-'<div class="myj-score" aria-label="Gem scores"><span>💎 Banked <b data-myj="banked">0</b></span><span>✨ Loose <b data-myj="loose">0</b>/8</span></div>',
-'<div class="myj-stage">',artwork,
-'<div class="myj-deposited" aria-hidden="true">💎💜💎</div>',
-'<div class="myj-gems">',
-...gemShapes.map((g,i)=>'<button type="button" class="myj-gem myj-'+g.color+'" data-crystal="'+i+'" style="--gx:'+g.x+'%;--gy:'+g.y+'%" aria-label="Mine '+(g.value===3?'rare three-Jem':'one-Jem')+' crystal">'+gemIcon+'</button>'),
-'</div>',
-'<div class="myj-bag" aria-label="Your carrying bag">🎒 <strong data-myj="bag">0 / 8</strong></div>',
-'<div class="myj-alert" data-myj="alert" role="status" aria-live="polite"></div>',
-'<button type="button" class="myj-cart-hit" data-myj="bank-cart" aria-label="Bank the Jems you are carrying"><span>⬇ Deposit here</span></button>',
-'</div>',
-'<div class="myj-actions"><button class="myj-action myj-action-bank" data-myj="bank" type="button">🛒 Bank my Jems <span>→</span></button>',
-'<button class="myj-action myj-action-grab" data-myj="grab" type="button" disabled>✊ Grab the hair!</button></div>',
-'<p class="myj-tips" data-myj="tips">Tap colorful crystals to mine. Bank your Jems before the head shakes!</p>',
-'<div class="myj-ready" data-myj="ready" hidden><span>🌟 Your real game is ready!</span><button type="button" data-myj="play-ready">▶ Play my game</button></div>',
-'</main><footer class="myj-footer"><span>💡 Your Jems score is just for fun. Your build keeps running separately.</span><button class="myj-exit" type="button">Back to my game</button></footer>',
-'</div>'
+const icon=(name:'close'|'arrow'|'spark'|'grip'|'cart'|'sound'|'muted')=>{
+  const paths={
+    close:'<path d="m7 7 10 10M17 7 7 17"/>',
+    arrow:'<path d="M4 12h15m-6-6 6 6-6 6"/>',
+    spark:'<path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>',
+    grip:'<path d="M8 13V7a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v7-4a2 2 0 0 1 4 0v7c0 5-3 7-7 7-3 0-5-2-7-5l-3-4a2 2 0 0 1 3-3l2 3Z"/>',
+    cart:'<path d="M3 5h2l2 11h12l2-8H6M9 20h.01M18 20h.01"/>',
+    sound:'<path d="M4 9h4l5-4v14l-5-4H4ZM17 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/>',
+    muted:'<path d="M4 9h4l5-4v14l-5-4H4Zm13 0 5 6m0-6-5 6"/>'
+  };
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths[name]+'</svg>';
+};
+function sprite(file:string,frame:number,cols=4,rows=2,extra=''){
+  return '<span class="myj-sprite '+extra+'" style="--cols:'+cols+';--rows:'+rows+';--sx:'+(frame%cols)+';--sy:'+Math.floor(frame/cols)+'" aria-hidden="true"><img src="'+ART+file+'" alt="" loading="lazy" draggable="false"></span>';
+}
+const html=[
+ '<div class="myj-shell">',
+ '<header class="myj-header"><img class="myj-logo" src="./jems-logo.svg" alt="jems · The Game Factory" draggable="false">',
+ '<span class="myj-wait-pill">'+icon('spark')+'<span>Play while you wait</span></span>',
+ '<span class="myj-build"><span class="myj-build-dot" aria-hidden="true"></span><span class="myj-build-status" role="status" aria-live="polite"></span></span>',
+ '<button class="myj-icon-button myj-sound" type="button" aria-label="Turn on game sounds" aria-pressed="false">'+icon('muted')+'</button>',
+ '<button class="myj-icon-button myj-close" type="button" aria-label="Close mini-game">'+icon('close')+'</button></header>',
+ '<div class="myj-main">',
+ '<div class="myj-stage" role="group" aria-label="Mine crystals on the friendly idea mountain">',
+ '<img class="myj-sky" src="'+ART+'scene-sky.webp" alt="" loading="lazy" draggable="false">',
+ '<div class="myj-sunshine" aria-hidden="true"></div>',
+ '<div class="myj-title"><h2 id="myjTitle"><span>Mind Your</span><em>Jems!</em></h2><span class="myj-title-spark" aria-hidden="true">✦</span></div>',
+ '<div class="myj-score" aria-label="Your Jems"><div class="myj-score-banked">'+sprite('props-atlas.webp',2)+'<span>Banked<strong data-myj="banked">0</strong></span></div><div class="myj-score-loose">'+sprite('props-atlas.webp',1)+'<span>In your bag<strong><b data-myj="loose">0</b><small> / 8</small></strong></span></div></div>',
+ '<div class="myj-head-anchor"><div class="myj-head-motion">',
+ '<div class="myj-rock" data-expression="idle">'+sprite('rock-expressions.webp',0,2,2)+'</div>',
+ '<div class="myj-ladder">'+sprite('props-atlas.webp',7)+'</div>',
+ '<div class="myj-miner-anchor"><div class="myj-miner" data-pose="idle">'+sprite('miner-poses.webp',0,2,2)+'</div></div>',
+ '<div class="myj-gems">',
+ ...gemShapes.map((g,i)=>'<button class="myj-gem" type="button" data-crystal="'+i+'" style="--gx:'+g.x+'%;--gy:'+g.y+'%;--gem-tilt:'+(i%2?-8:7)+'deg" aria-label="Mine '+(g.value===3?'rare three-Jem':'one-Jem')+' crystal: '+g.label+'">'+sprite('props-atlas.webp',g.frame)+'<span class="myj-gem-glint" aria-hidden="true">✦</span>'+(g.value===3?'<span class="myj-gem-value" aria-hidden="true">+3</span>':'')+'</button>'),
+ '</div></div></div>',
+ '<div class="myj-speech" data-myj="speech" aria-hidden="true"><span>Ooh, a<br><strong>BIG idea!</strong></span></div>',
+ '<button class="myj-cart-hit" data-myj="bank-cart" type="button" aria-label="Bank the Jems you are carrying">'+sprite('cart-empty.webp',0,1,1)+'<img class="myj-cart-brand" src="./jems-mark.svg" alt="" aria-hidden="true" draggable="false"><span class="myj-cart-pile" aria-hidden="true"></span><span class="myj-cart-label">Bank Jems '+icon('arrow')+'</span></button>',
+ '<div class="myj-notice" data-myj="alert" role="status" aria-live="polite" aria-atomic="true"></div>',
+ '<div class="myj-effects" aria-hidden="true"></div>',
+ '<div class="myj-loading" role="status"><span class="myj-loader-gem">'+sprite('props-atlas.webp',0)+'</span><strong data-myj="loading-copy">Opening the crystal garden…</strong><button type="button" data-myj="retry-art" hidden>Try again</button></div>',
+ '</div>',
+ '<div class="myj-controls">',
+ '<div class="myj-mission"><span class="myj-mission-icon" aria-hidden="true">✦</span><div><strong data-myj="mission">Let’s bank 25 Jems!</strong><div class="myj-goal-track" role="progressbar" aria-label="Jems banked toward the next star" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><span></span></div></div></div>',
+ '<div class="myj-actions"><button class="myj-action myj-action-bank" data-myj="bank" type="button">'+icon('cart')+'<span>Bank my Jems</span>'+icon('arrow')+'</button><button class="myj-action myj-action-grab" data-myj="grab" type="button" hidden>'+icon('grip')+'<span>Grab on!</span></button></div>',
+ '<button class="myj-help-toggle" type="button" aria-label="How to play Mind Your Jems" aria-expanded="false" aria-controls="myjHelp">?</button>',
+ '<p class="myj-tips" id="myjInstructions" data-myj="tips">Tap crystals to mine. Bank your Jems before a big idea shakes them loose!</p>',
+ '<div class="myj-help" id="myjHelp" hidden><strong>A little mining adventure</strong><p>Tap a crystal to collect Jems. Golden and sunset crystals give you 3. Your bag holds 8.</p><p>Bank your Jems in the cart to keep them safe. When the mountain has a BIG idea, grab the hair! Loose Jems still fly away.</p><p>Use Tab and Enter on a keyboard. Your other game keeps building while you play.</p><button type="button" data-myj="help-done">Let’s play</button></div>',
+ '</div>',
+ '<div class="myj-ready" data-myj="ready" hidden><span class="myj-ready-star" aria-hidden="true">★</span><span><strong>Your game is ready!</strong><small>Finish your turn, or jump in.</small></span><button type="button" data-myj="play-ready">Play my game '+icon('arrow')+'</button></div>',
+ '<div class="myj-build-problem" hidden><span></span><button class="myj-exit" type="button">Back to Studio '+icon('arrow')+'</button></div>',
+ '</div></div>'
 ].join('');
 
 export function createMindYourJems():WaitArcade {
   const dialog=document.createElement('dialog');
-  dialog.className='myj-arcade';dialog.setAttribute('aria-labelledby','myjTitle');
-  dialog.innerHTML=html;document.body.append(dialog);
+  dialog.className='myj-arcade';
+  dialog.setAttribute('aria-labelledby','myjTitle');
+  dialog.setAttribute('aria-describedby','myjInstructions');
+  dialog.innerHTML=html;
+  document.body.append(dialog);
   const el=<T extends Element=HTMLElement>(selector:string)=>dialog.querySelector<T>(selector)!;
   const btn=(selector:string)=>el<HTMLButtonElement>(selector);
-  const bank=btn('[data-myj="bank"]'),grab=btn('[data-myj="grab"]');
-  const readyButton=btn('[data-myj="play-ready"]');
+  const bank=btn('[data-myj="bank"]'),grab=btn('[data-myj="grab"]'),cart=btn('[data-myj="bank-cart"]');
   const crystals=Array.from(dialog.querySelectorAll<HTMLButtonElement>('[data-crystal]'));
-  let state:MineState=newMineState();
-  let current:ArcadeLaunch|null=null;
+  const stage=el('.myj-stage'),miner=el('.myj-miner'),rock=el('.myj-rock');
   const timers=new Set<number>();
+  let state:MineState=newMineState(),current:ArcadeLaunch|null=null;
+  let session=0,noticeTimer=0,poseTimer=0,shakeTimer=0;
+  let pose:'idle'|'mining'|'holding'|'slipping'|'celebrate'='idle';
+  let assets:'idle'|'loading'|'ready'|'failed'='idle';
+  let artworkPromise:Promise<void>|null=null,bodyOverflow='';
+  let soundOn=false,audioContext:AudioContext|null=null;
+  const activeTones=new Set<OscillatorNode>();
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   const later=(fn:()=>void,delay:number)=>{
-    const id=window.setTimeout(()=>{timers.delete(id);if(dialog.open)fn();},delay);
+    const at=session;
+    const id=window.setTimeout(()=>{timers.delete(id);if(at===session&&dialog.open&&!document.hidden)fn();},delay);
     timers.add(id);return id;
   };
-  const cancelTimers=()=>{for(const id of timers)clearTimeout(id);timers.clear();};
-  let noticeTimeout=0;
-  function notice(msg:string){
-    const alert=el('[data-myj="alert"]');alert.textContent=msg;
-    clearTimeout(noticeTimeout);
-    noticeTimeout=window.setTimeout(()=>{if(alert.textContent===msg)alert.textContent='';},3200);
+  function cancelTimer(id:number){clearTimeout(id);timers.delete(id);}
+  function clearEffects(){el('.myj-effects').replaceChildren();crystals.forEach(c=>c.classList.remove('myj-picked'));cart.classList.remove('myj-banked');}
+  function cancelTimers(){timers.forEach(id=>clearTimeout(id));timers.clear();noticeTimer=poseTimer=shakeTimer=0;clearEffects();}
+  function stopSound(){
+    activeTones.forEach(tone=>{try{tone.stop();}catch{/* Already ended. */}});activeTones.clear();
+    const context=audioContext;audioContext=null;if(context)void context.close().catch(()=>{});
+  }
+  function sound(kind:'mine'|'bank'|'warn'|'ready'){
+    if(!soundOn||document.hidden)return;
+    try{
+      audioContext??=new AudioContext();void audioContext.resume().catch(()=>{});
+      const notes={mine:[660,880],bank:[523,659,784],warn:[392,440],ready:[523,659,784,1047]}[kind];
+      notes.forEach((frequency,i)=>{
+        const oscillator=audioContext!.createOscillator(),gain=audioContext!.createGain();
+        const at=audioContext!.currentTime+i*.075;
+        oscillator.type='sine';oscillator.frequency.value=frequency;gain.gain.setValueAtTime(0,at);
+        gain.gain.linearRampToValueAtTime(.045,at+.01);gain.gain.exponentialRampToValueAtTime(.001,at+.16);
+        activeTones.add(oscillator);oscillator.onended=()=>{activeTones.delete(oscillator);oscillator.disconnect();gain.disconnect();};
+        oscillator.connect(gain);gain.connect(audioContext!.destination);oscillator.start(at);oscillator.stop(at+.18);
+      });
+    }catch{/* Optional sound never prevents playing. */}
+  }
+  function notice(message:string,duration=2800){
+    const alert=el('[data-myj="alert"]');alert.textContent=message;alert.classList.toggle('myj-notice-visible',!!message);
+    cancelTimer(noticeTimer);noticeTimer=later(()=>{alert.textContent='';alert.classList.remove('myj-notice-visible');},duration);
+  }
+  function setPose(next:typeof pose,duration=0){
+    cancelTimer(poseTimer);pose=next;draw();
+    if(duration)poseTimer=later(()=>{pose='idle';draw();},duration);
   }
   function draw(){
-    el('[data-myj="banked"]').textContent=String(state.banked);
-    el('[data-myj="loose"]').textContent=String(state.loose);
-    el('[data-myj="bag"]').textContent=state.loose+' / '+BAG_CAPACITY;
-    bank.disabled=state.loose===0||state.phase==='shaking';
-    grab.disabled=state.phase!=='warning'||state.holding;
-    grab.textContent=state.holding?'✅ Holding tight!':'✊ Grab the hair!';
-    dialog.classList.toggle('myj-is-warning',state.phase==='warning');
-    dialog.classList.toggle('myj-is-shaking',state.phase==='shaking');
-    el('[data-myj="tips"]').textContent=state.phase==='warning'?
-      'Big idea incoming! Bank loose Jems now, then grab the hair!':
-      state.phase==='shaking'?'Wheeeee! Only banked Jems stay safe!':
-      state.loose===BAG_CAPACITY?'Bag full! Bank your Jems before mining more.':
-      'Tap colorful crystals to mine. Bank your Jems before the head shakes!';
-    for(const crystal of crystals)crystal.disabled=state.phase==='shaking'||state.loose>=BAG_CAPACITY;
+    dialog.dataset.phase=state.phase;dialog.dataset.holding=String(state.holding);dialog.dataset.assets=assets;
+    dialog.classList.toggle('myj-is-warning',state.phase==='warning');dialog.classList.toggle('myj-is-shaking',state.phase==='shaking');
+    stage.setAttribute('aria-busy',String(assets==='loading'));
+    el('[data-myj="banked"]').textContent=String(state.banked);el('[data-myj="loose"]').textContent=String(state.loose);
+    const busy=assets!=='ready'||state.phase==='shaking'||!help.hidden;
+    bank.disabled=busy||state.loose===0;cart.disabled=bank.disabled;
+    grab.hidden=state.phase==='mining';grab.disabled=assets!=='ready'||state.phase!=='warning'||state.holding;
+    grab.querySelector('span')!.textContent=state.holding?'Holding tight!':'Grab on!';
+    for(const crystal of crystals)crystal.disabled=busy||state.loose>=BAG_CAPACITY;
+    const actualPose=state.phase==='shaking'?(state.holding?'holding':'slipping'):state.holding?'holding':pose;
+    miner.dataset.pose=actualPose;
+    rock.dataset.expression=state.phase!=='mining'?'warning':pose==='celebrate'?'happy':state.shakes?'recovery':'idle';
+    const target=(Math.floor(state.banked/25)+1)*25,progress=state.banked%25;
+    el('[data-myj="mission"]').textContent=state.banked>=25?'Star '+Math.floor(state.banked/25)+' earned! Next: '+target:'Let’s bank 25 Jems!';
+    el('.myj-goal-track').setAttribute('aria-valuenow',String(progress));
+    el<HTMLElement>('.myj-goal-track span').style.width=(progress/25*100)+'%';
+    const pile=el('.myj-cart-pile'),desired=Math.min(6,Math.ceil(state.banked/4));
+    if(pile.childElementCount!==desired){pile.innerHTML=Array.from({length:desired},(_,i)=>sprite('props-atlas.webp',i)).join('');}
+    el('[data-myj="tips"]').textContent=state.phase==='warning'?'Big idea coming! Bank your bag, then grab on!':
+      state.phase==='shaking'?(state.holding?'Nice grip! Your banked Jems are safe.':'Wheee! Banked Jems stay safe.'):state.loose===BAG_CAPACITY?'Bag full! Tap the cart to bank your Jems.':
+      'Tap crystals to mine. Bank your Jems before a big idea shakes them loose!';
+    el('.myj-loading').hidden=assets==='ready';
+    el('[data-myj="loading-copy"]').textContent=assets==='failed'?'The artwork needs another try.':'Opening the crystal garden…';
+    btn('[data-myj="retry-art"]').hidden=assets!=='failed';
   }
-  function move(action:MineAction){
-    const before=state;state=moveMine(state,action);draw();
-    return before!==state;
+  function move(action:MineAction){const before=state;state=moveMine(state,action);draw();return before!==state;}
+  function particle(from:DOMRect,to:DOMRect,frame:number,delay=0){
+    if(reduced.matches)return;
+    const bounds=stage.getBoundingClientRect();
+    const item=document.createElement('span');item.className='myj-flying-gem';item.innerHTML=sprite('props-atlas.webp',frame);
+    item.style.left=(from.x+from.width/2-bounds.x)+'px';item.style.top=(from.y+from.height/2-bounds.y)+'px';
+    item.style.setProperty('--fly-x',(to.x+to.width/2-from.x-from.width/2)+'px');
+    item.style.setProperty('--fly-y',(to.y+to.height/2-from.y-from.height/2)+'px');item.style.animationDelay=delay+'ms';
+    el('.myj-effects').append(item);later(()=>item.remove(),delay+900);
   }
   function nextShake(){
-    if(!dialog.open||document.hidden)return;
-    later(()=>{
+    cancelTimer(shakeTimer);
+    if(!dialog.open||document.hidden||assets!=='ready'||!help.hidden)return;
+    shakeTimer=later(()=>{
       if(!move({type:'warn'}))return;
-      notice('💡 Ooh, a BIG idea! Grab on!');
-      later(()=>{
-        const dropped=state.loose,held=state.holding;
-        if(!move({type:'shake'}))return;
-        for(let i=0;i<Math.min(dropped,8);i++){
-          const p=document.createElement('span');p.className='myj-flying-gem';p.textContent=['💎','💜','✨'][i%3];
-          p.style.setProperty('--fly-x',(i-4)*35+'px');
-          p.style.setProperty('--fly-y',(-100-(i%3)*55)+'px');
-          el('.myj-stage').append(p);later(()=>p.remove(),1300);
-        }
-        notice(dropped?(held?'You held on! '+dropped+' loose Jems flew away.':'Whoooops! '+dropped+' loose Jems flew away!'):(held?'Nice grip! All banked Jems are safe!':'Big shake! Your banked Jems are safe!'));
-        later(()=>{move({type:'settle'});nextShake();},1250);
+      pose='idle';draw();sound('warn');notice('Ooh, a BIG idea! Bank, then grab on!',3600);
+      shakeTimer=later(()=>{
+        const dropped=state.loose,held=state.holding;if(!move({type:'shake'}))return;
+        const from=el('.myj-head-anchor').getBoundingClientRect(),bounds=stage.getBoundingClientRect();
+        for(let i=0;i<dropped;i++)particle(new DOMRect(from.x+from.width*.45,from.y+from.height*.2,20,20),new DOMRect(bounds.x+(i%2?1.1:-.1)*bounds.width,bounds.bottom+70,20,20),i%6,i*35);
+        notice(dropped?(held?'You held on! '+dropped+' loose Jems flew away.':'Whoops! '+dropped+' loose Jems flew away.'):'All banked Jems are safe!',2200);
+        shakeTimer=later(()=>{move({type:'settle'});pose='idle';draw();nextShake();},1250);
       },3600);
     },11000+Math.random()*7000);
   }
+  function prepareArtwork(){
+    if(assets==='ready')return Promise.resolve();
+    if(artworkPromise)return artworkPromise;
+    assets='loading';draw();
+    const images=Array.from(dialog.querySelectorAll<HTMLImageElement>('img'));
+    images.forEach(img=>{img.loading='eager';});
+    artworkPromise=Promise.all(images.map(img=>img.decode())).then(()=>{assets='ready';}).catch(()=>{assets='failed';}).finally(()=>{artworkPromise=null;if(dialog.open){draw();if(assets==='ready')nextShake();}});
+    return artworkPromise;
+  }
   function update(status:WorkshopStatus,isReady:boolean){
     if(!current)return;
-    current={...current,status,isReady};
-    const messages:Record<WorkshopStatus,string>={
-      queued:'Your game is queued',building:'Your game is building',testing:'Jems is testing your game',
-      ready:isReady?'Your game is ready!':'Checking your game preview',
-      failed:'Your build needs help',cancelled:'Build was cancelled'
-    };
-    el('.myj-build-status').textContent=messages[status];
-    el<HTMLElement>('[data-myj="ready"]').hidden=!isReady;
-    readyButton.hidden=!isReady;
-    if(isReady)notice('🎉 Your game is ready! You can jump over whenever you want.');
+    const becameReady=!current.isReady&&isReady;
+    current={...current,status,isReady};dialog.dataset.build=status;dialog.dataset.ready=String(isReady);
+    const copy:Record<WorkshopStatus,string>={queued:'Your game is in the queue',building:'Your game is building',testing:'Testing your game',ready:isReady?'Your game is ready!':'Checking your game',failed:'Your build needs a hand',cancelled:'Your build was cancelled',reconnecting:'Reconnecting to your build'};
+    el('.myj-build-status').textContent=copy[status];
+    el('[data-myj="ready"]').hidden=!isReady;
+    const problem=el('.myj-build-problem');problem.hidden=status!=='failed'&&status!=='cancelled';
+    problem.querySelector('span')!.textContent=status==='failed'?'Your other game needs a hand. You can keep mining.':'Your other build was cancelled. You can keep mining.';
+    if(becameReady){setPose('celebrate',2100);sound('ready');notice('');}
   }
   function stop(){
-    cancelTimers();clearTimeout(noticeTimeout);dialog.querySelectorAll('.myj-flying-gem').forEach(n=>n.remove());
-    state=newMineState();current=null;
+    ++session;cancelTimers();stopSound();
+    pose='idle';state=newMineState();current=null;dialog.classList.remove('myj-is-warning','myj-is-shaking','myj-is-paused');
+    document.body.style.overflow=bodyOverflow;
   }
-  function close(){if(dialog.open)dialog.close();else stop();}
-  dialog.addEventListener('close',stop);
-  dialog.querySelectorAll<HTMLButtonElement>('.myj-close,.myj-exit').forEach(b=>b.addEventListener('click',close));
+  function close(){
+    if(!dialog.open)return;
+    const onClose=current?.onClose;stop();dialog.close();onClose?.();
+  }
+  // Cleanup is synchronous. A delayed native close event cannot reset a reopened session.
+  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+  dialog.addEventListener('close',()=>{if(!dialog.open&&current){const onClose=current.onClose;stop();onClose?.();}});
+  btn('.myj-close').addEventListener('click',close);
+  btn('.myj-exit').addEventListener('click',()=>{
+    const callback=current?.onBackToStudio;
+    close();callback?.();
+  });
   bank.addEventListener('click',()=>{
-    const count=state.loose;const before=state.banked;
-    if(move({type:'bank'}))notice(state.banked>=25&&Math.floor(before/25)<Math.floor(state.banked/25)?
-      '🌟 Idea power! '+state.banked+' Jems banked! Keep mining!':'💎 '+count+' Jems are safe in the minecart!');
+    const count=state.loose,before=state.banked;if(!move({type:'bank'}))return;
+    const from=el('.myj-score-loose').getBoundingClientRect(),to=cart.getBoundingClientRect();
+    for(let i=0;i<Math.min(count,8);i++)particle(from,to,i%6,i*55);
+    cart.classList.remove('myj-banked');void cart.offsetWidth;cart.classList.add('myj-banked');later(()=>cart.classList.remove('myj-banked'),700);
+    sound('bank');setPose('celebrate',1100);
+    const milestone=Math.floor(state.banked/25)>Math.floor(before/25);
+    notice(milestone?'Brilliant! '+state.banked+' Jems banked. You earned a star!':'+'+count+' safe in the cart!',2300);
   });
-  btn('[data-myj="bank-cart"]').addEventListener('click',()=>bank.click());
-  grab.addEventListener('click',()=>{
-    if(move({type:'grab'}))notice('✊ Hanging on tight! Banked Jems stay safe.');
-  });
+  cart.addEventListener('click',()=>bank.click());
+  grab.addEventListener('click',()=>{if(move({type:'grab'})){setPose('holding');notice('Holding tight! Banked Jems stay safe.',1800);}});
   crystals.forEach((crystal,i)=>crystal.addEventListener('click',()=>{
-    const value=gemShapes[i].value;
-    if(!move({type:'mine',value}))return;
-    crystal.classList.remove('myj-picked');void crystal.offsetWidth;crystal.classList.add('myj-picked');
-    later(()=>crystal.classList.remove('myj-picked'),380);
-    if(value===3)notice('✨ Rare idea Jem! +3');
-    else if(state.loose===BAG_CAPACITY)notice('🎒 Bag full! Bank those Jems!');
+    const value=gemShapes[i].value,before=state.loose;if(!move({type:'mine',value}))return;
+    const earned=state.loose-before;setPose('mining',420);sound('mine');
+    crystal.classList.remove('myj-picked');void crystal.offsetWidth;crystal.classList.add('myj-picked');later(()=>crystal.classList.remove('myj-picked'),420);
+    particle(crystal.getBoundingClientRect(),el('.myj-score-loose').getBoundingClientRect(),gemShapes[i].frame);
+    if(state.loose===BAG_CAPACITY)notice('Bag full! Time to bank your Jems.');
+    else if(earned===3)notice('A brilliant find! +3 Jems',1400);
   }));
-  readyButton.addEventListener('click',()=>{const callback=current?.isReady?current.onPlayReady:null;if(callback){close();callback();}});
+  btn('[data-myj="play-ready"]').addEventListener('click',()=>{const callback=current?.isReady?current.onPlayReady:null;if(callback){close();callback();}});
+  btn('[data-myj="retry-art"]').addEventListener('click',()=>{dialog.querySelectorAll<HTMLImageElement>('img').forEach(img=>{if(!img.naturalWidth)img.src=img.src;});void prepareArtwork();});
+  const help=el('#myjHelp'),helpToggle=btn('.myj-help-toggle');
+  function setHelp(open:boolean){
+    help.hidden=!open;helpToggle.setAttribute('aria-expanded',String(open));stage.inert=open;
+    if(open){
+      cancelTimers();stopSound();pose='idle';
+      if(state.phase==='warning')state={...state,phase:'mining',holding:false};
+      else if(state.phase==='shaking')state=moveMine(state,{type:'settle'});
+      el('[data-myj="alert"]').textContent='';el('[data-myj="alert"]').classList.remove('myj-notice-visible');
+      btn('[data-myj="help-done"]').focus();
+    }else{helpToggle.focus();nextShake();}
+    draw();
+  }
+  helpToggle.addEventListener('click',()=>setHelp(help.hidden));btn('[data-myj="help-done"]').addEventListener('click',()=>setHelp(false));
+  btn('.myj-sound').addEventListener('click',()=>{
+    soundOn=!soundOn;const button=btn('.myj-sound');button.setAttribute('aria-pressed',String(soundOn));button.setAttribute('aria-label',soundOn?'Mute game sounds':'Turn on game sounds');button.innerHTML=icon(soundOn?'sound':'muted');
+    if(soundOn)sound('mine');else stopSound();
+  });
   document.addEventListener('visibilitychange',()=>{
     if(!dialog.open)return;
+    dialog.classList.toggle('myj-is-paused',document.hidden);
     if(document.hidden){
-      cancelTimers();
-      // A background tab cannot surprise a child with a loss on return.
-      if(state.phase==='warning'){state={...state,phase:'mining',holding:false};draw();}
-      if(state.phase==='shaking')move({type:'settle'});
-    }else nextShake();
+      cancelTimers();pose='idle';stopSound();
+      if(state.phase==='warning')state={...state,phase:'mining',holding:false};
+      else if(state.phase==='shaking')state=moveMine(state,{type:'settle'});
+      el('[data-myj="alert"]').textContent='';el('[data-myj="alert"]').classList.remove('myj-notice-visible');draw();
+    }else{nextShake();notice('Welcome back! Your banked Jems are safe.',1800);}
   });
   return {
     open(launch){
-      if(dialog.open){current=launch;update(launch.status,launch.isReady);return;}
-      stop();current=launch;state=newMineState();draw();
-      el('[data-myj="alert"]').textContent='';
-      dialog.classList.remove('myj-is-warning','myj-is-shaking');
-      dialog.showModal();update(launch.status,launch.isReady);
-      notice('💎 Tap a glowing crystal to mine your first Jem!');
-      nextShake();
-      btn('.myj-close').focus();
-    },
-    update,close,isOpen:()=>dialog.open
+      if(dialog.open){current={...launch,isReady:current?.isReady??false};update(launch.status,launch.isReady);return;}
+      ++session;cancelTimers();bodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+      current={...launch,isReady:false};state=newMineState();pose='idle';
+      help.hidden=true;stage.inert=false;helpToggle.setAttribute('aria-expanded','false');dialog.classList.remove('myj-is-paused');
+      el('[data-myj="alert"]').textContent='';el('[data-myj="alert"]').classList.remove('myj-notice-visible');draw();
+      dialog.showModal();update(launch.status,launch.isReady);btn('.myj-close').focus({preventScroll:true});
+      if(assets==='ready')nextShake();else void prepareArtwork();
+    },update,close,isOpen:()=>dialog.open
   };
 }
