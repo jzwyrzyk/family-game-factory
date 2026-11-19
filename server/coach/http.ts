@@ -2,8 +2,9 @@ import type {IncomingMessage,ServerResponse} from 'node:http';
 import {verifyBrowserSession} from '../trusted-devices';
 import type {Repository} from '../pipeline/types';
 import {CoachService,type CoachConfig} from './service';
+import {adultPilotFlags} from '../adult-pilot';
 export function coachConfig(env:NodeJS.ProcessEnv):CoachConfig {
- return {enabled:env.FACTORY_COACH_APPROVED==='true',privacyApproved:env.FACTORY_COACH_PRIVACY_APPROVED==='true',moderationApproved:env.FACTORY_COACH_SAFEGUARDS_APPROVED==='true',zdrVerified:env.FACTORY_COACH_ZDR_VERIFIED==='true',privateExecutionApproved:env.FACTORY_COACH_PRIVATE_EXECUTION_APPROVED==='true',model:env.FACTORY_COACH_MODEL||'',maxInputChars:Number(env.FACTORY_COACH_INPUT_CHARS||16000),maxOutputTokens:Number(env.FACTORY_COACH_OUTPUT_TOKENS||800),maxTurnMicroUsd:Number(env.FACTORY_COACH_MAX_MICRO_USD||0),inputMicroUsdPerMillion:Number(env.FACTORY_COACH_INPUT_PRICE||0),outputMicroUsdPerMillion:Number(env.FACTORY_COACH_OUTPUT_PRICE||0),pricesReviewedAt:env.FACTORY_COACH_PRICES_REVIEWED||''};
+ return {adultPilot:adultPilotFlags(env),enabled:env.FACTORY_COACH_APPROVED==='true',privacyApproved:env.FACTORY_COACH_PRIVACY_APPROVED==='true',moderationApproved:env.FACTORY_COACH_SAFEGUARDS_APPROVED==='true',zdrVerified:env.FACTORY_COACH_ZDR_VERIFIED==='true',privateExecutionApproved:env.FACTORY_COACH_PRIVATE_EXECUTION_APPROVED==='true',model:env.FACTORY_COACH_MODEL||'',maxInputChars:Number(env.FACTORY_COACH_INPUT_CHARS||16000),maxOutputTokens:Number(env.FACTORY_COACH_OUTPUT_TOKENS||800),maxTurnMicroUsd:Number(env.FACTORY_COACH_MAX_MICRO_USD||0),inputMicroUsdPerMillion:Number(env.FACTORY_COACH_INPUT_PRICE||0),outputMicroUsdPerMillion:Number(env.FACTORY_COACH_OUTPUT_PRICE||0),pricesReviewedAt:env.FACTORY_COACH_PRICES_REVIEWED||''};
 }
 export function coachHandler(service:CoachService,config:{appOrigin:string;sessionKey:string},repo?:Repository){
  return async(req:IncomingMessage,res:ServerResponse)=>{

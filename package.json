@@ -30,7 +30,8 @@
     "setup:coach-consent": "node --import tsx server/coach/owner-consent.ts",
     "setup:coach-erase": "node --import tsx server/coach/owner-erase.ts",
     "test:intent-playtest": "node --import tsx tests/intent-playtest-browser.ts",
-    "test:intent-repair-browser": "node --import tsx tests/intent-repair-browser.ts"
+    "test:intent-repair-browser": "node --import tsx tests/intent-repair-browser.ts",
+    "setup:adult-pilot": "node --import tsx server/adult-pilot-owner.ts"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",
