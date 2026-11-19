@@ -1,11 +1,12 @@
 # Parent progress
 
-**Feature contract — November 19, 2026.** This describes the parent-area source on
-`feature/jems-parent-progress-20261119`, not a production deployment or validated
-learning outcome. [Delivery state](../../DELIVERY-STATE.md) owns release evidence.
+**Feature contract — November 19, 2026.** The parent-area source is merged in
+[PR65](https://github.com/jzwyrzyk/family-game-factory/pull/65) as `864bee8f9427bce4a8dc0e7df5495e576fd3bcdc`.
+The [merge receipt](../../DELIVERY-STATE.md#pr65-parent-reporting--merged) owns release
+evidence; source integration does not establish deployment or validated learning outcomes.
 The [research and comparison record](RESEARCH.md) explains the design choices;
 the [implementation ledger](IMPLEMENTATION.md) records verification and limitations.
-The current integration includes main `c6576c16e005ae58ce8c706801414be4d864242e`
+The merge preserves prior main `7fa7ff252e277bd9610a11afeca8bf8f1ae13715`
 with approved brand library v1.2 and PR57's cosmetic maker journey. Maker levels
 remain separate from the learning evidence described here.
 
