@@ -57,10 +57,10 @@
         "docs/brand/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:47.934Z",
-      "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+      "reviewedAt": "2026-11-19T14:31:15.000Z",
+      "sourceDigest": "2ea98df4d13060e0a1f66ab5d3b892f6dbb43920a48c0ea5a126ef578781a336",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
+      "reviewReason": "Reviewed product doctrine and actual maker progress evidence so levels remain creative milestones, not academic or general proficiency claims."
     },
     {
       "id": "experience",
@@ -93,10 +93,10 @@
         "docs/brand/achievement-art/*.json"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:48.744Z",
-      "sourceDigest": "b54da7165c9d2186fb1e97f275a099ec4bc64a4172132de3a4baac403315cdb4",
+      "reviewedAt": "2026-11-19T14:31:15.000Z",
+      "sourceDigest": "73275b4b778e1f4057de938495f58072e07185d8d86ddd0fc2c989ad0a22b98e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Gem Factory first-card and Creation entrances: the scene card stays after the playable shelf; unsupported Animate and code errors now stay visible in Studio. Desktop/tablet creation and mobile child-entry checks preserve source versions and profile boundaries."
+      "reviewReason": "Reviewed child home, character choice, profile isolation, creation transitions and five-tab mobile navigation against the existing experience."
     },
     {
       "id": "creation",
@@ -279,10 +279,10 @@
         "tools/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:52.984Z",
-      "sourceDigest": "259c764251cb5be70a689f35ed5ee6b90fac2069990fc0248ecbee61225c2060",
+      "reviewedAt": "2026-11-19T14:31:15.000Z",
+      "sourceDigest": "51754a95ec353f6b2e09d7971d736e4ccf9c70dc39b5debc0593a28ee0c68625",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 77 creation and 354 existing unit passes, focused combined quality/asset/companion and nine budget regressions, production desktop/tablet authoring and eight recovery journeys. Kept earlier failed and green CI scoped to their original heads; no live provider or actual-device claim."
+      "reviewReason": "Reviewed gem evidence contracts, real versus mock tests, artwork acceptance and browser CI coverage while retaining the existing assertions."
     },
     {
       "id": "delivery",
@@ -304,10 +304,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T14:12:38.899Z",
-      "sourceDigest": "a99be4656635d84bf76deb99654afe3bd6a5c6a34eadee67f26b0c97ac28280e",
+      "reviewedAt": "2026-11-19T14:31:15.000Z",
+      "sourceDigest": "8e7c813e25b440fb9f0b629d0f90168a8c9f85ed09fa9fed5ccd4e0d5a2858c0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged PR58 final-head checks, owner-only Gem Factory publication and rollback against PR63, then reconciled PR61 and PR62 on current main. Verified distinct private worker main/PR13/PR14 source pins and the latest manual Pages workflow. Source integration, site-specific publication and CI do not establish general production activation, real devices, or child learning results."
+      "reviewReason": "Recorded integration with merged main, PR63 documentation context and the distinction between branch integration, merge and deployment."
     },
     {
       "id": "context",
@@ -328,10 +328,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:54.226Z",
-      "sourceDigest": "32c4eb525a0f2896d0b6ed8db2dcd17490c757913460a76e56f169a6083a4b0f",
+      "reviewedAt": "2026-11-19T14:31:15.000Z",
+      "sourceDigest": "dce58fc9bde3f9900f0e4e4c97d4323244f4b4b381829b7822440decd74b02c2",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged both document routes and required references. Renumbered the unmerged Creation decision to ADR0007, preserving merged quality ADR0006, and retained creation, Gem Factory and presentation-quality coverage and local links."
+      "reviewReason": "Registered the new gem progress and art documentation and resolved the collision with the existing adult-profile ADR by using ADR0008."
     }
   ]
 }
