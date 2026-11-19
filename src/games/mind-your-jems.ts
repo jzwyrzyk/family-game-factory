@@ -128,7 +128,12 @@ export function createMindYourJems():WaitArcade {
       });
     }catch{/* Optional sound never prevents playing. */}
   }
-  const defaultTips=el('[data-myj="tips"]').textContent||'';
+  function tipsForState():string{
+    return state.phase==='warning'?'Big idea coming! Bank your bag, then grab on!':
+      state.phase==='shaking'?(state.holding?'Nice grip! Your banked Jems are safe.':'Wheee! Banked Jems stay safe.'):
+      state.loose===BAG_CAPACITY?'Bag full! Tap the cart to bank your Jems.':
+      'Tap crystals to mine. Bank your Jems before a big idea shakes them loose!';
+  }
   function notice(message:string,duration=2800){
     const alert=el('[data-myj="alert"]'),tips=el('[data-myj="tips"]');
     // Short portrait phones move ready-state messages into the footer.
@@ -137,12 +142,12 @@ export function createMindYourJems():WaitArcade {
     const footerFeedback=compactReady&&!!message;
     alert.textContent=footerFeedback?'':message;
     alert.classList.toggle('myj-notice-visible',!!message&&!footerFeedback);
-    tips.textContent=footerFeedback?message:defaultTips;
+    tips.textContent=footerFeedback?message:tipsForState();
     tips.classList.toggle('myj-tips-feedback',footerFeedback);
     cancelTimer(noticeTimer);
     noticeTimer=later(()=>{
       alert.textContent='';alert.classList.remove('myj-notice-visible');
-      tips.textContent=defaultTips;tips.classList.remove('myj-tips-feedback');
+      tips.textContent=tipsForState();tips.classList.remove('myj-tips-feedback');
     },duration);
   }
   function setPose(next:typeof pose,duration=0){
@@ -168,9 +173,10 @@ export function createMindYourJems():WaitArcade {
     el<HTMLElement>('.myj-goal-track span').style.width=(progress/25*100)+'%';
     const pile=el('.myj-cart-pile'),desired=Math.min(6,Math.ceil(state.banked/4));
     if(pile.childElementCount!==desired){pile.innerHTML=Array.from({length:desired},(_,i)=>sprite('props-atlas.webp',i)).join('');}
-    el('[data-myj="tips"]').textContent=state.phase==='warning'?'Big idea coming! Bank your bag, then grab on!':
-      state.phase==='shaking'?(state.holding?'Nice grip! Your banked Jems are safe.':'Wheee! Banked Jems stay safe.'):state.loose===BAG_CAPACITY?'Bag full! Tap the cart to bank your Jems.':
-      'Tap crystals to mine. Bank your Jems before a big idea shakes them loose!';
+    // Keep short ready-state feedback until its timer expires. Other notices
+    // must not replace the current contextual instruction.
+    if(!el('[data-myj="tips"]').classList.contains('myj-tips-feedback'))
+      el('[data-myj="tips"]').textContent=tipsForState();
     el('.myj-loading').hidden=assets==='ready';
     el('[data-myj="loading-copy"]').textContent=assets==='failed'?'The artwork needs another try.':'Opening the crystal garden…';
     btn('[data-myj="retry-art"]').hidden=assets!=='failed';
