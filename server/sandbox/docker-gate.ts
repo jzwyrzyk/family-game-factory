@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { isGeneratedGame,validateCompiled,type GeneratedGame } from '../agent/generated';
+import { isGeneratedGame,validateGenerated,validateCompiled,type GeneratedGame } from '../agent/generated';
 import type { PlayableGame } from '../pipeline/types';
 import type {FunctionalGameContract} from '../quality/functional-game-contract';
 import {validateQualityEvidence,type GameQualityEvidence} from '../quality/game-quality';
@@ -18,12 +18,19 @@ export class DockerArtifactGate {
   });
  }
  async test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract;captureQuality?:boolean}):Promise<(GeneratedGame&{qualityEvidence?:GameQualityEvidence})|void>{
-  if(!isGeneratedGame(game))throw Error('DECLARATIVE_GATE_REQUIRED');const name='factory-test-'+randomUUID();
+  if(!isGeneratedGame(game))throw Error('DECLARATIVE_GATE_REQUIRED');
+  const {compiled:_priorCompiled,...candidate}=game;
+  const {creationManifest,...sandboxGame}=validateGenerated(candidate);
+  const name='factory-test-'+randomUUID();
+  // Source, approved assets, plan and ordinary inputs belong to the tested game.
+  // Keep its separate editable companion in trusted host state.
   try{
-   const request={game:{...game,compiled:undefined},...(context?.independentIntentPlan?{independentIntentPlan:context.independentIntentPlan}:{}),captureQuality:context?.captureQuality===true};
+   const request={game:sandboxGame,...(context?.independentIntentPlan?{independentIntentPlan:context.independentIntentPlan}:{}),captureQuality:context?.captureQuality===true};
    const raw=await this.execute(sandboxArguments(this.config,name),JSON.stringify(request),this.config.timeoutMs,context?.signal);
    const result=JSON.parse(raw);if(!result.ok)throw Error('PLAYTEST_FAILED:'+String(result.diagnostics).slice(0,1500));
-   const tested=validateCompiled(game,result.game);
+   // This also rejects a companion injected by the sandbox. Only the original
+   // host-validated scene can accompany the unchanged, attested source.
+   const tested={...validateCompiled(sandboxGame,result.game),...(creationManifest?{creationManifest}:{})};
    return context?.captureQuality?{...tested,qualityEvidence:validateQualityEvidence(tested,result.qualityEvidence)}:tested;
   }finally{await this.execute(['--host='+(this.config.socket||'unix:///var/run/docker.sock'),'rm','-f',name],undefined,5000).catch(()=>{});}
  }

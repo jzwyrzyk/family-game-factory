@@ -1,4 +1,5 @@
 import {isGeneratedGame} from '../agent/generated';
+import {validateGeneratedCreationManifest} from '../../src/creation/projects';
 import {renderGenerated} from '../sandbox/preview.cjs';
 import type { IncomingMessage,ServerResponse } from 'node:http';
 import { createHmac,timingSafeEqual } from 'node:crypto';
@@ -29,6 +30,13 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
    let match=path.match(/^\/v1\/jobs\/([\w-]+)(\/(?:cancel|retry))?$/);
    if(match){if(match[2]==='/retry'&&request.method==='POST'){const input=await body(request),ack=await service.retry(session,match[1],input.clientRequestId);json(response,202,ack);if(config.dispatch)void config.dispatch(ack.jobId).catch(()=>{});else void service.run(ack.jobId).catch(()=>{});return;}if(match[2]==='/cancel'&&request.method==='POST')return json(response,200,await service.cancel(session,match[1]));if(!match[2]&&request.method==='GET'){await service.get(session,match[1]);await config.poll?.();return json(response,200,await service.get(session,match[1]));}}
    if(/^\/v1\/revisions\/[\w-]+$/.test(path)&&request.method==='GET'){const r=await service.revision(session,path.split('/').at(-1)!);return json(response,200,{id:r.id,projectId:r.projectId,parentId:r.parentId,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game,name:r.name});}
+   const creationMatch=path.match(/^\/v1\/revisions\/([\w-]+)\/creation$/);
+   if(creationMatch&&request.method==='GET'){
+    // Reuses the exact family/device/adult audience checks for the saved revision.
+    const r=await service.revision(session,creationMatch[1]);
+    const manifest=isGeneratedGame(r.game)&&r.game.creationManifest?validateGeneratedCreationManifest(r.game.creationManifest):null;
+    return json(response,200,{revisionId:r.id,projectId:r.projectId,manifest});
+   }
    if(path==='/v1/creations'&&request.method==='GET')return json(response,200,(await service.list(session)).map(r=>({...r,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game})));
    match=path.match(/^\/v1\/revisions\/([\w-]+)\/(preview|keep|undo|fork)$/);
    if(match){const id=match[1];if(match[2]==='preview'&&request.method==='GET'){

@@ -382,7 +382,8 @@ body.studio-review > .factory-update-notice{color:#394862}
 .studio-review #page-parent #copyFeedback{margin-top:15px;font-size:13px}
 @media(max-width:930px){
  .studio-review .site-header{justify-content:space-between}
- .studio-header-tools{margin-left:0}
+ /* When navigation wraps, keep the right-anchored player menu on the right. */
+ .studio-header-tools{margin-left:auto}
  .studio-review #page-parent .two-column{grid-template-columns:1fr}
  .studio-review #page-parent .two-column>.panel:nth-child(2){order:-1}
 }

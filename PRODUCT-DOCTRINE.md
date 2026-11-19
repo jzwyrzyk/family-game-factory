@@ -14,6 +14,12 @@ Support tuning, redesigning the interaction and rethinking the objective. An unu
 
 The [owner-approved coaching standard](docs/design-coach/GOLD_STANDARD.md) is the detailed behavioral contract. A software defect is the system's responsibility, not evidence of a child's poor thinking.
 
+### One creation journey: games, scenes, and problem solving
+
+The owner's November 19, 2026 direction adds child-facing computational practice to the creation experience. A child's game characters and ideas can become editable stories, animations, and behavior rules. Free creation and **watch a scene, then rebuild it** practice share meaningful actions; practice should help children gain control of their own creations. Children can start with a game, a story, or a challenge without a compulsory ladder.
+
+Use demonstrated behavior, predictions, experiments, and revisions as specific formative observations. Allow equivalent working programs. An AI-authored scene, copied solution, or hint-supported attempt must not be counted as independent mastery. Critical thinking and computational thinking are intended capabilities, with no global thinking score or validated growth claim implied by this first implementation. [ADR0007](docs/decisions/0007-creation-and-rebuild-practice.md) records the accepted development direction; the [Creation Studio contract](docs/creation-studio/README.md) distinguishes current source adapters from the broader continuous-project vision.
+
 ## 2. Deliver the actual playable experience
 
 The requested player action must produce the intended visible consequence, and the essential payoff must happen. Collection without the requested growth, assembly without the launch, or a changed label without a changed mechanic does not fulfill an idea. Open-ended play can be complete without a manufactured win condition.

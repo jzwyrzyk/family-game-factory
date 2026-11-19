@@ -1,0 +1,94 @@
+{
+  "sourceImplementationCommit": "0fc798d8e2131d9ffc1ee42afc1b248d3e04f489",
+  "matchingLocalImplementationCommit": "5c4717224b08004256706ae79498c24524b752de",
+  "matchingImplementationTree": "d5afceaaab0563711f91227cc56230e9190be9ee",
+  "mainIntegrated": "02bdb58d17d5687e39ab20bd884f02a18007ede5",
+  "productionBundle": "index-cszUlGZq.js",
+  "observedAtUtc": "2026-11-19T07:06:17.169815+00:00",
+  "checks": [
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "includes": "TypeScript and production Vite build; existing large-bundle advisory retained"
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "passed",
+      "scope": "Final combined source and test files"
+    },
+    {
+      "command": "npm run test:creation",
+      "result": "passed",
+      "tests": 77,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:unit",
+      "result": "passed",
+      "tests": 354,
+      "failed": 0
+    },
+    {
+      "command": "node --import tsx --test tests/creation-generation-budget.test.ts tests/presentation-quality.test.ts tests/pilot-release.test.ts tests/private-generation-preflight.test.ts tests/illustrations.test.ts",
+      "result": "passed",
+      "tests": 40,
+      "failed": 0,
+      "countingNote": "Overlaps creation and unit totals; includes nine budget tests"
+    },
+    {
+      "command": "node tests/creation-browser.cjs",
+      "result": "passed",
+      "contexts": [
+        "desktop1440x1080",
+        "touch-emulated tablet820x1180"
+      ],
+      "checksPerContext": 19,
+      "motion": "reduced",
+      "paidRequests": 0,
+      "pageErrors": 0
+    },
+    {
+      "command": "node tests/creation-recovery-browser.cjs",
+      "result": "passed",
+      "groupedJourneys": 8,
+      "paidRequests": 0,
+      "pageErrors": 0
+    },
+    {
+      "command": "npm run test:child-journey",
+      "result": "passed",
+      "contexts": [
+        "desktop",
+        "mobile"
+      ],
+      "scope": "Child first-screen, required learning guards, save/recovery and build continuity"
+    },
+    {
+      "command": "npm run test:gem-factory",
+      "result": "passed",
+      "contexts": [
+        "desktop",
+        "tablet",
+        "phone",
+        "reduced motion"
+      ],
+      "scope": "Native physical sorting, pattern choices, station actions, wrapping, learning and profile separation"
+    },
+    {
+      "command": "npm run docs:check -- --base 02bdb58d17d5687e39ab20bd884f02a18007ede5 --head 5c4717224b08004256706ae79498c24524b752de",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "boundaries": {
+    "providers": "Synthetic transport only; no paid request",
+    "sandbox": "Combined transport/attestation fixture tests; no live container launch in those fixtures",
+    "devices": "Browser desktop and touch/phone emulation, not physical-device acceptance",
+    "children": "No actual children or educational-efficacy study",
+    "delivery": "No merge, deployment, activation or private-worker repin"
+  },
+  "ci": "The final published PR head requires its own CI; earlier aa60b751 green runs remain scoped to main8b915b2."
+}
