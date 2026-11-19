@@ -6,6 +6,8 @@ This is a map of the **implemented source architecture**, not an assertion that 
 
 **Feature addition, November 19, 2026 (America/New_York):** the Creation Studio sections describe `feature/jems-creation-lab-20261119` and [ADR0007](docs/decisions/0007-creation-and-rebuild-practice.md). The merged [style-diverse production and review path](docs/game-intelligence/PRESENTATION-QUALITY.md) follows [ADR0006](docs/decisions/0006-style-diverse-playable-quality.md). These source facts do not establish deployment or provider activation. PR61's private-coach build verifier continues to ignore explicit read-only execution metadata while preserving exact executable-step checks.
 
+**Merge receipt:** [PR62](https://github.com/jzwyrzyk/family-game-factory/pull/62) merged the reviewed Creation Studio implementation into main as [`c4ce21be410e7fccb16922c4711f4c4172edbc7e`](https://github.com/jzwyrzyk/family-game-factory/commit/c4ce21be410e7fccb16922c4711f4c4172edbc7e) on November 19, 2026. Its complete tree matches reviewed head `8e305150b9811479d866bae7e252c59b4045bbbf`. The earlier development/integration description above records how that source was assembled; [delivery state](DELIVERY-STATE.md) records the merge separately from deployment.
+
 ## System boundaries
 
 Jems is a TypeScript/Vite browser application with local curated play, revisions and learning. Remote generation uses an authenticated gateway, durable private state, a separate private GitHub Actions worker and an isolated preview origin. Conversational inference and short speech transcription use a separate private service; they do not generate games or dispatch builds.

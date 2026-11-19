@@ -106,9 +106,9 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "3621e272a397fb56794fe0362ce7ac4463ae573a2590880d3103072f66a62f57",
-      "reviewedAt": "2026-11-19T07:03:49.561Z",
+      "reviewedAt": "2026-11-19T12:52:54.972Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the combined art/plan/playthrough/companion contract, host-held scene transport, mandatory quality review and source-generation-only budget fallback. Added combined binding and two-device evidence regressions without expanding curated adapter scope."
+      "reviewReason": "Audited the sole Check my scene evaluation/attempt call site, persisted goal/version/time/hint fields, last-five profile observations and fixed challenge selection. Clarified that cross-subject reasoning inference and adaptive computational practice are not implemented; recorded the confirmed merge without changing source behavior."
     },
     {
       "id": "games",
@@ -295,10 +295,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T07:06:35.895Z",
-      "sourceDigest": "b53bdc00db688545929715f76ef969f269dbf30f641588e378f04130f50a2771",
+      "reviewedAt": "2026-11-19T12:52:54.551Z",
+      "sourceDigest": "8dcc36e2a3e390d2546c13529a05977bc5156140400030914460f10ad2e2f304",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the verified combined implementation 0fc798d8 and matching local tree, with 77 creation and 354 existing unit passes, production authoring/recovery, child continuity and native Gem Factory journeys. Preserved prior CI and release scopes; final-head CI remains separate, with no deployment or paid activation."
+      "reviewReason": "Recorded the owner-authorized PR62 merge at c4ce21be, exact reviewed-head/tree equality, successful PR workflows and explicit source-versus-deployment limits. Earlier draft and CI observations remain dated history."
     },
     {
       "id": "context",
