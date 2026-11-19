@@ -191,6 +191,19 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertIn("sourceSha", (root / "scripts/release/contract.py").read_text())
         self.assertIn("node --check tests/release-live-browser.cjs", workflow)
         self.assertIn("actions/deploy-pages@v4", workflow)
+        self.assertIn("  pages_build:\n", workflow)
+        self.assertIn("    needs: [plan, pages_build]", workflow)
+        build_job = workflow.split("  pages_build:\n",1)[1].split("  pages_deploy:\n",1)[0]
+        deploy_job = workflow.split("  pages_deploy:\n",1)[1].split("  pages_verify:\n",1)[0]
+        self.assertIn("run: npm run build", build_job)
+        self.assertIn("actions/upload-pages-artifact", build_job)
+        self.assertNotIn("pages: write", build_job)
+        self.assertNotIn("id-token: write", build_job)
+        self.assertIn("pages: write", deploy_job)
+        self.assertIn("id-token: write", deploy_job)
+        self.assertIn("actions/deploy-pages@v4", deploy_job)
+        for dangerous in ("npm ci", "npm run build", "actions/setup-node", "actions/checkout", "scripts/deployment/site-config.ts"):
+            self.assertNotIn(dangerous, deploy_job,"No executable source build in privileged Pages publish step")
         self.assertIn("group: jems-pages-publish", workflow)
         self.assertIn("group: jems-pages-publish", legacy)
         # The only production endpoints come from pre-approved repo variables.
