@@ -127,6 +127,8 @@ const fs=require('node:fs');
    console.log('jems brand '+label+': learning screen verified');
    await page.locator('footer [data-page="parent"]').click();
    assert.equal(await page.locator('#page-parent').isVisible(),true);
+   await page.screenshot({path:'test-results/jems-parent-overview-'+label+'.png',fullPage:false});
+   await page.locator('[data-parent-tab="settings"]').click();
    const parentLabel=await page.locator('#page-parent label[for="parentNickname"]').evaluate(e=>getComputedStyle(e).color);
    assert.equal(parentLabel,'rgb(52, 68, 102)','Parent form labels need strong Ink-on-white contrast');
    const restoreLabel=await page.locator('#page-parent label.upload-button').evaluate(e=>({color:getComputedStyle(e).color,bg:getComputedStyle(e).backgroundColor}));
