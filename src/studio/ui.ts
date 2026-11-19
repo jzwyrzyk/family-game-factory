@@ -2,6 +2,7 @@ import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest, learningFormatLabel, setMode } from '../learning/policy';
 import {installCoaching} from './coaching';
 import {celebrateJem} from '../brand/delight';
+import {createMindYourJems, type WorkshopStatus} from '../games/mind-your-jems';
 import {installStudioVoice} from './voice';
 import {installStudioPrivateSpeech} from './private-speech';
 import {freshDesign} from './design';
@@ -55,6 +56,9 @@ export async function installStudio(){
  const sending=new Set<string>();
  let panel:'game'|'talk'|'versions'='game';
  let pausedForTools=false,viewIntent=0;
+ // Completely separate from the generated game runtime and learning state.
+ const waitArcade=createMindYourJems();
+ let waitProject:{id:string;owner:string}|null=null;
 
  const page=el('section','page hidden');page.id='page-studio';
  page.innerHTML=`<div class="studio-heading"><button type="button" class="studio-back" id="studioHome">← My Games</button><div class="studio-title-wrap"><h1 id="studioTitle" tabindex="-1">Let's make something.</h1></div><span class="studio-storage" id="studioStorage">Saved on this device</span></div>
@@ -94,7 +98,10 @@ export async function installStudio(){
  progressBanner.id='studioBuildProgress';progressBanner.hidden=true;
  progressBanner.setAttribute('role','status');progressBanner.setAttribute('aria-live','polite');
  const progressTitle=el('strong','studio-progress-title'),progressDetails=el('p','studio-progress-detail');
- progressBanner.append(progressTitle,progressDetails);
+ const arcadeButton=el('button','studio-button studio-wait-arcade-button','💎 Play Mind Your Jems!') as HTMLButtonElement;
+ arcadeButton.type='button';arcadeButton.hidden=true;
+ progressBanner.append(progressTitle,progressDetails,arcadeButton);
+ arcadeButton.onclick=()=>{if(activeId)playWhileBuilding(current());};
  page.querySelector('.studio-workspace')!.before(progressBanner);
  progressBanner.append($('studioReady'),$('studioPromptForm').querySelector('.studio-build-controls')!);
  const ideaSparks=el('details','studio-idea-sparks') as HTMLDetailsElement;ideaSparks.id='studioIdeaSparks';
@@ -150,6 +157,25 @@ export async function installStudio(){
  // Background builds are visible on every Studio screen without taking focus.
  const buildShelf=el('aside','studio-build-shelf');buildShelf.id='studioBuildShelf';
  buildShelf.setAttribute('aria-label','Background game builds');buildShelf.hidden=true;globalStatus.after(buildShelf);
+ function playWhileBuilding(s:StudioSession){
+  if(owner()!==s.owner)return;
+  const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
+  // Never label an unacknowledged request a running build.
+  if(!latest.job||(!busy(latest)&&!ready))return;
+  waitProject={id:s.id,owner:s.owner};
+  waitArcade.open({
+   projectName:s.name,status:latest.job.status as WorkshopStatus,
+   isReady:!!ready,
+   onPlayReady:()=>act(async()=>{
+    if(owner()!==s.owner)return;
+    const fresh=notebook.get(s.id,s.owner),candidate=readyExperiment(fresh);
+    if(!candidate?.candidate.remoteId)return;
+    await open(s.id);
+    const newest=notebook.get(s.id,s.owner),selected=readyExperiment(newest);
+    if(selected?.candidate.remoteId)await showRemote(newest,selected.candidate.remoteId,'candidate',selected.id);
+   })
+  });
+ }
  function refreshShelf(){
   const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
@@ -185,6 +211,11 @@ export async function installStudio(){
       }finally{if(owner()===s.owner)refreshShelf();}
      })();
     };controls.append(stop);
+   }
+   if(busy(s)){
+    const mini=el('button','studio-button studio-wait-arcade-button','💎 Mind Your Jems!') as HTMLButtonElement;
+    mini.type='button';mini.setAttribute('aria-label','Play Mind Your Jems while '+s.name+' is building');
+    mini.onclick=()=>playWhileBuilding(s);controls.prepend(mini);
    }
    item.append(copy,controls);items.append(item);
   }
@@ -443,6 +474,7 @@ export async function installStudio(){
   workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
   const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id));
   progressBanner.hidden=!progress;
+  arcadeButton.hidden=!busy(s);
   progressBanner.dataset.phase=progress?.phase||'';
   progressTitle.textContent=progress?.title||'';
   progressDetails.textContent=progress?.description||'';
@@ -593,6 +625,10 @@ export async function installStudio(){
     const pending=prior.pendingExperiment;const c:Candidate={id:crypto.randomUUID(),baseId:pending?.baseId||prior.remoteId,remoteId:job.revisionId,prompt:pending?.prompt||prior.draft,summary:job.adapter==='mock'?'New test-builder preview (mock)':'New AI-built preview'};
     notebook.saveExperiment(captured.id,captured.owner,c,pending?.parents||[],pending?.depth||'redesign',pending?.origin||'child',false);
     notebook.update(captured.id,captured.owner,s=>{s.pendingExperiment=null;});
+  }
+  if(waitProject?.id===captured.id&&waitProject.owner===captured.owner&&waitArcade.isOpen()){
+   const latest=notebook.get(captured.id,captured.owner);
+   if(latest.job)waitArcade.update(latest.job.status as WorkshopStatus,!!readyExperiment(latest));
   }
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){
    status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]||'Your working game is safe.');render();
@@ -789,7 +825,7 @@ export async function installStudio(){
  window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
- window.addEventListener('factory-profile',()=>{stopSpeech();
+ window.addEventListener('factory-profile',()=>{waitArcade.close();waitProject=null;stopSpeech();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   $('studioMessages').replaceChildren();$('coachProposals').replaceChildren();
