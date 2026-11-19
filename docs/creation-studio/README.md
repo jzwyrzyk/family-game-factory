@@ -1,0 +1,126 @@
+# Creation Studio: make scenes and rebuild behavior
+
+**Status:** feature implementation on `feature/jems-creation-lab-20261119`. This document describes source behavior and its acceptance contract; it does not establish merge, deployment, real-device acceptance, or educational efficacy.
+
+**Decision:** [ADR0006 — One creation experience with free scenes and rebuild practice](../decisions/0006-creation-and-rebuild-practice.md). The owner expanded the earlier discussion into an explicit development request during the November 18–19, 2026 session: keep one Jems experience, reuse the child's game characters and ideas, offer editable scenes/actions, and provide a separate practice entrance where children rebuild demonstrated behavior.
+
+## Product purpose and boundaries
+
+The child can create a moving scene, give characters dialogue, and make an interaction respond to taps or messages. **Make your own** and **Rebuild a scene** use the same project language, editor, renderer, and interpreter. Practice therefore teaches actions that remain useful when the child returns to their own creation.
+
+The scene is an owned, recoverable project. A checked challenge is an observation about a particular scene under specified inputs. It is not a general computational-thinking score, critical-thinking score, grade placement, or independent assessment. The [child-owned coaching standard](../design-coach/GOLD_STANDARD.md) still governs meaningful choice, optional reflection, and the difference between an AI suggestion and the child's original idea.
+
+The first source adapters cover the existing Dragon, Buckets, and Robot games. They create a **new editable scene pinned to the selected source game revision**. Dragon artwork comes from the bundled original images; bucket and robot actors use reviewed local vector representations of those games' characters. Selected known source settings inform initial scene behavior. This adapter does not import combat, physics, every game rule, arbitrary generated JavaScript, or a complete original game engine. Returning to the source game preserves it; editing the scene does not silently rewrite it.
+
+## Source map
+
+| File | Responsibility |
+| --- | --- |
+| [model.ts](../../src/creation/model.ts) | Versioned scene schema, block types, references, provenance, and strict structural validation |
+| [engine.ts](../../src/creation/engine.ts) | Deterministic data interpreter, actor state, inputs, timing, execution budgets, and trace |
+| [projects.ts](../../src/creation/projects.ts) | Trusted asset catalogue, starter scenes, source-revision adapters, and generated-manifest import boundary |
+| [stage.ts](../../src/creation/stage.ts) | Canvas rendering and pointer hit testing for the trusted local asset catalogue |
+| [ui.ts](../../src/creation/ui.ts) | Free creation and challenge entrances, actor/script/block editing, playback, local history, learning-host integration, and supported video capture |
+| [storage.ts](../../src/creation/storage.ts) | Owner-scoped projects, immutable revisions, kept pointer, draft recovery, copies, and local practice attempts |
+| [progress.ts](../../src/creation/progress.ts) | Current-profile recent checks in My Powers and Parent Controls, with support history and checked-version identity |
+| [challenges.ts](../../src/creation/challenges.ts) | Public practice targets, separate starter scenes, declared test inputs, and behavioral checks |
+
+These are trusted application modules. They do not give generated code authority over parent-selected learning, profile ownership, remote credentials, the worker, or private previews. The [current architecture](../../ARCHITECTURE-CURRENT.md) retains those existing boundaries.
+
+## The editable project
+
+`jems.creation.v1` stores a title, stage dimensions/background, characters, programs, numeric variables, and optional source provenance. A character has a stable ID, name, asset reference, initial position, size, and visibility. Each program belongs to a character and begins on **Play**, a **tap on that character**, or a **named signal**.
+
+Blocks contain data rather than executable source:
+
+| Family | Supported behavior |
+| --- | --- |
+| Movement | Move to an x/y destination or by a relative distance; jump with a visible arc; dance with a rotation animation |
+| Story | Say text in a speech bubble, wait, show, or hide |
+| Control | Repeat a bounded group; choose an if/otherwise branch |
+| State | Set or change a declared numeric variable |
+| Events | Send a named signal to matching handlers |
+| Conditions | Compare a variable, compare the current character's x/y position, or test contact with another visible character |
+
+There is one matching handler per character/trigger combination. Actors may reuse the same asset ID without sharing position or program state. Block IDs are unique throughout a project, so an execution trace can identify the block the editor highlights.
+
+Validation rejects unknown fields, missing actor or variable references, duplicate IDs, ambiguous absolute/relative moves, nonfinite values, unsupported triggers/actions, excessive nesting, and oversized programs. The asset catalogue adds a separate allowlist check before persistence/import. Saved scenes cannot introduce source code, a remote asset URL, a signed capability, or an arbitrary HTML payload.
+
+Provenance can retain `sourceKind`, `sourceProjectId`, `sourceRevisionId`, `sourceSessionId`, and `sourceGameId`, with the project's creation origin. Blocks can record `child`, `starter`, or `assisted` origin. This is transparent local history, not independently authenticated authorship. Importing a file or adopting a helper's content must not turn it into evidence of unaided child performance.
+
+## Interpreter contract
+
+The interpreter does not use `eval`, random values, browser timers, network requests, or arbitrary game source. It advances on a fixed **10 ms logical tick**; elapsed real time is accumulated so splitting an advance into different browser frame sizes does not change the simulation. A duration that is not a tick multiple completes on the next tick. An omitted move duration is 500 ms.
+
+- `start()` resets the scene to its saved initial state, dispatches start handlers, and processes immediate actions at time zero.
+- `advance(ms)` advances playback while unpaused. Explicit advances continue the clock after all scripts finish; this lets a practice probe schedule a later tap.
+- `pause()` stops playback time. Taps during a pause are not queued for replay when the scene resumes.
+- `step(ms)` deliberately advances a paused scene while retaining its paused state.
+- `tap(actorId)` dispatches that visible character's handler. A completed scene can respond to another tap.
+- `reset()` clears transient effects, variables, trace, and execution counters back to the saved beginning.
+
+Actors execute concurrently. A new trigger for a character replaces that character's current program, clearing its temporary speech/jump/dance effect; it does not create competing motion writers. Named signals are broadcast to matching programs in authored order. Events are handled before the sender proceeds to its next instruction.
+
+Snapshots provide character positions, visibility, speech, rotation in degrees, jump offset, variables, active block IDs, logical time, status, counters, and a bounded trace. **A jump offset is negative upward; the rendered position is `y + jumpOffset`.** The trace includes action starts/completions, inputs, events, interruption, and limit stops. It is an engineering/observation trace, not a learning score.
+
+The current limits are 16 characters, 48 programs, 300 blocks, nesting depth 6, 24 variables, and a repeat count up to 50. Each timed action is at most 10 seconds; a run is bounded by 120 seconds, 4,000 executed instructions, and 256 dispatched events. Repeating messages and deeply repeated zero-duration instructions therefore stop with an explicit reason. A limit stop is a runtime outcome, not evidence of a child's poor reasoning.
+
+## Free creation and practice
+
+Free creation offers Dragon, Buckets, Robot, and blank starters, actor placement, backgrounds, scripts, nested block groups, variables, preview, pause, step, and reset. Blocks can be inserted with a tap and reordered with buttons; drag reordering is an additional input method. Children can keep versions or continue an experiment without promoting it.
+
+The target preview is a separate project. Watching it does not insert its program into the child's editable scene. Practice deliberately exposes the goal and optional hint; these are public learning activities, not protected assessment items.
+
+### Exact current behavioral probes
+
+The evaluator creates fresh bounded engine runs and samples snapshots every **50 ms**. Position checks generally allow **14 stage units**. Required original actors/assets and starting positions must remain present, and other scene landmarks must stay visible in place during the observation. The route, bounce, and cheer programs must finish within their windows; a correct prefix followed by unfinished instructions is insufficient. A final pose alone does not establish the demonstrated route or event response.
+
+| Challenge | Inputs and observation window | What the evaluator checks |
+| --- | --- | --- |
+| Robot's gem route | No taps; 6,000 ms | Travel from `(150,320)` to `(150,120)`, then `(600,120)`, then `(600,320)` in order. Each segment must have visible intermediate motion and the robot must finish at the bucket. |
+| Three dragon bounces | No taps; 5,000 ms | Three visible upward excursions in place, each rising at least 32 units; ground returns and a short rest between excursions; finish on the ground. Both repeated groups and separately written equivalent motion can satisfy the behavior. |
+| One tap, one step | Three runs of 4,600 ms: no taps; taps at 800/2,400 ms; taps at 1,400/3,200 ms | Stay still before taps, move 120 units right per tap with visible motion, finish each response within 750 ms, and avoid extra automatic movement. |
+| Fix the early cheer | No taps; 4,500 ms | Visible travel to the bucket, followed by “Hooray!” at the destination across at least four samples. Feedback asks for 200 ms of visible speech. An early cheer or only the correct final position does not pass. |
+| Ready for three gems | Eight 2,200 ms runs: a no-tap run and a tapped run for each injected `gems` value 0, 2, 3, 5; taps at 700 ms for 0/3 and 1,200 ms for 2/5 | No answer without a tap. Say “More” for 0/2 and “Ready” for 3/5 across at least four samples within 750 ms of the tap; feedback asks for 200 ms of visible speech. Preserve the injected gem count in all runs. |
+
+These probes compare behavior, not a secret exact block sequence, program text, or number of loops. Their finite cases and tolerances are explicit: passing does not prove equivalence for every conceivable input. They support feedback on the stated exercise. They do not establish normed proficiency, transfer to new contexts, or causation of a learning gain.
+
+The result reports `kind: formative`, `source: bounded-scene-runs`, `independentAssessment: false`, and `generalThinkingScore: null`. General assistance is not inferred. The local attempt record stores the checked revision, challenge, outcome, and whether this interface's hint was used; a false hint flag does not establish that no adult, AI, or external help occurred.
+
+## Learning, ownership, and recovery
+
+The existing Math/Language learning host retains subject, grade, checkpoint selection, answer handling, and progress. Scene playback and instructional interactions must honor an active host activity; the interpreter cannot mark the activity correct or dismiss it. [Math integration](../adaptive-math/integration.md) and [Language integration](../adaptive-language/integration.md) remain the relevant learning contracts.
+
+The separate local key is `family-game-factory-creation-v1`, schema `jems.creation.workspace.v1`. Storage keeps owner-scoped project entries, immutable revisions, a separately selected kept revision, recoverable drafts, and bounded attempt records. An autosave protects an experiment; it does not choose a favorite. Editing uses an expected base revision to reject stale writes. A saved source reference cannot be rewritten through an ordinary edit.
+
+Profile changes must stop playback, discard active input/capture callbacks, and prevent a late result from entering another profile. Adult development uses the existing dynamic profile storage namespace. This is local ownership separation, not an encryption or cloud-sync claim. Storage failures and unsupported backups must retain the last valid data and report the problem. Existing family backup/reset integration must include this key explicitly; adding a scene store does not make the original drawings or remote games automatically synchronized.
+
+Supported browsers can record the scene canvas for up to 15 seconds and download a video. This is a local recording of rendered frames, with speech bubbles and no recorded audio. Codec/container support is detected; a fallback editable JSON scene remains available. This is not a promise of offline rendering, audio synthesis, MP4 support on every device, or an identical recording on every browser. Leaving, switching profiles, or cancelling a recording must stop its stream and suppress stale download callbacks.
+
+## Generated-game companion manifests
+
+`createProjectFromStudio(session, revision, manifest)` has an explicit manifest import path. A supplied scene is validated against the same language and bundled asset allowlist, receives a fresh scene identity, and retains source references. Without a valid manifest, an unsupported/generated game must explain that it has no editable scene rather than pretending its JavaScript was translated.
+
+A generator's optional companion scene is a separate data artifact, not executable authority and not proof that its actions reproduce the source game. The branch implements this transport through the existing private generator and accepted revision path:
+
+- [generated.ts](../../server/agent/generated.ts) accepts optional `GeneratedGame.creationManifest`; a null/absent value remains compatible with older games. Its validator strips invented source provenance and attributes the whole supplied program to assisted creation. Test publication must retain the same reviewed manifest rather than replacing or dropping it.
+- [creation-schema.ts](../../server/agent/creation-schema.ts) provides a closed provider schema and the companion instructions used by [openai.ts](../../server/agent/openai.ts). The provider may return null. Its initial subset uses the bundled asset catalogue, an 800×450 stage, and `score`/`counter` variables; local editing supports the broader validated language. This changes the existing generation response, not the separate Send/Build decision.
+- `GET /v1/revisions/:id/creation` in [the existing pipeline handler](../../server/pipeline/http.ts) returns `{revisionId, projectId, manifest}` with `manifest: null` for legacy/noncompanion revisions. It reuses `service.revision` family/device/adult-audience checks and the API's no-store response policy. It does not return source, compiled code, or preview capabilities.
+- [BuilderClient.creationManifest](../../src/builder/client.ts) checks the requested revision, validates the data again, and rejects a late result after disconnection/profile change. The UI must retain its own current-session check before opening the new scene.
+
+The gateway and preview container builds include the trusted scene validators and catalogue dependencies. This does not update an immutable generated-game runtime archive or change the worker's selected application source by itself. No new provider call, browser model key, alternative build route, arbitrary asset URL, or live worker deployment is implied. [Generated-companion tests](../../tests/creation-generated.test.ts) exercise synthetic transport, publication, authorized retrieval, and stale-callback cases; they do not establish that a live provider reliably authors useful companion scenes.
+
+## Verification and future work
+
+Focused validation lives in [engine tests](../../tests/creation-engine.test.ts), [storage tests](../../tests/creation-storage.test.ts), [challenge tests](../../tests/creation-challenges.test.ts), and [generated-companion tests](../../tests/creation-generated.test.ts). The engine cases exercise actual trajectories and timing, event loops and execution bounds, pauses and interruption, reference validation, and immutable snapshots. Challenge cases must include successful alternatives and misleading final-state/order/input cases. Storage cases must include cross-owner denial, stale edits, failed writes, damaged imports, source pins, explicit Keep, and draft recovery.
+
+Run `npm run build`, `npm run test:creation`, `npm run test:creation-browser`, and `npm run docs:check` for a release candidate. The browser command includes both the authoring journey and family recovery checks; [acceptance evidence](ACCEPTANCE.md) distinguishes their observations from release acceptance. Record the exact candidate and results in the normal delivery evidence. Source tests do not establish actual tablet reliability, a real child's enjoyment, secure live provider operation, or educational validity.
+
+The accepted longer-term direction is a more continuous project model across games, scenes, conversation, and visual rules. This first implementation does not include arbitrary code-to-block conversion, two-way editing of every generated game, a multitrack film editor, imported private drawing rigs, a full Scratch-compatible environment, or independent computational-thinking/active-problem-solving assessment. New scene actions and adapters should extend meaningful child control while preserving existing games and source provenance.
+
+## Reference principles
+
+- [Jems child-owned design coaching](../design-coach/GOLD_STANDARD.md): meaningful child decisions, optional reflection, recoverable experiments, and honest learning claims.
+- [Harvard Creative Computing](https://creativecomputing.gse.harvard.edu/guide/): creative projects and computational practices; this reference does not validate the Jems exercises.
+- [Blockly custom blocks](https://docs.blockly.com/guides/create-custom-blocks/overview/), [serialization](https://docs.blockly.com/guides/configure/serialization/), and [execution scope](https://docs.blockly.com/guides/app-integration/run-code/): background for future editor-library decisions. V1 uses Jems action cards and its own bounded interpreter, not Blockly or a Scratch fork.
+- [Scratch editor repository](https://github.com/scratchfoundation/scratch-editor): an example of separate editor, runtime, rendering, and asset components. Do not assume that integrating a visual editor also supplies a Jems game runtime or measurement system.

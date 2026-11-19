@@ -1,6 +1,7 @@
 import type { AgentAdapter,AgentInput,CandidateArtifact } from '../pipeline/types';
 import { privateGenerationPreflight } from '../quality/private-generation-preflight';
 import { isGeneratedGame,validateGenerated,type GeneratedGame } from './generated';
+import { creationManifestDefinitions,creationManifestInstructions,creationManifestSchema } from './creation-schema';
 export interface AgentApproval {
  reasoningEffort?:'low'|'medium';enabled:boolean;approvalId:string;model:string;inputUsdPerMillion:number;outputUsdPerMillion:number;
  maxInputTokens:number;maxOutputTokens:number;priceReviewedOn:string;
@@ -28,8 +29,9 @@ Input: {pressed:string[],tap:null|{x,y},pointer:{x,y,down,pressed,released}}. Co
 ${physicsManual}Draw commands max240,64KB/frame, including at most1 background,80 sprites,40 text labels. All colors #hex, text<=100chars,size8..80. Commands: {type:'background',style:'workshop'|'hills'}; {type:'sprite',key,spriteId,x,y,width,height,angle?,power?}; {type:'rect',key?,x,y,width,height,color,angle?}; {type:'circle',key?,x,y,radius,color}; {type:'line',key?,x,y,x2,y2,width,color}; {type:'text',key?,x,y,text,size,color}. spriteId catalogue IDs plus chassis,hero,star. Sprites center on x,y; rect starts at x,y. Give moving commands stable keys so the host interpolates transforms smoothly. Add screen:true to HUD commands. Keep visible instructions short and scene uncluttered. Combine authored sprites, landscape, expressive motion and material contact with primitives for level geometry.
 api.camera(x,y,zoom=1) sets top-left world view, zoom .5..2. api.sound(id,volume=.5,pitch=1) approved IDs attach,snap,impact,bounce,success,boost,pickup; volume0..1,pitch.5..2. Use events and cooldowns, never sound every tick. Max8 queued cues per rendered reply (up to4 simulation ticks). api.music('off'|'build'|'play') selects a quiet procedural loop; user separately opts in. Host supplies Start/Replay/Pause, focus/visibility pause, responsive controls, audio mute, seeded random, and rendering.
 Security: use pure JavaScript language intrinsics (Math, Array, Object, Number, String, Map, Set, JSON) and plain data plus api only. Every free identifier must be declared locally or be an approved language intrinsic. Ambient browser/worker functions, event registration and handler properties are unavailable. No imports/dependencies, DOM, globals, networking, workers, eval, timers, wall clocks (Date/performance), storage or external assets. Source limit30000 UTF8 bytes, compiled limit100000; trusted engine/art are supplied separately. Do not copy them into source. Do not access host internal variables. The gate tests stable desktop/mobile frames, DIFFERENT input vs idle trajectories, valid terminal states, pause, resource limits, replay, and isolation; it does not demand a win in arbitrary exploratory taps. A scene that only animates without responding fails. Use input to affect the visible game state or an object immediately with a recognizable response. Meaningful goals are still required for challenge modes.
-Legacy v1 repairs only: createGame() without api; dt=.05; input has pressed and tap; rect/circle/text commands only, max100. No sprites/physics/camera/audio/pointer. Existing v1 gate still expects its achievable input-driven win. Do not mix v2 APIs into v1 source. Never include Markdown fences.`;
-const schema={type:'object',additionalProperties:false,required:['kind','title','instructions','source','controls'],properties:{kind:{type:'string',enum:['generated-module-v1','generated-module-v2']},title:{type:'string'},instructions:{type:'string'},source:{type:'string'},controls:{type:'array',items:{type:'string',enum:['left','right','up','down','action']}}}};
+Legacy v1 repairs only: createGame() without api; dt=.05; input has pressed and tap; rect/circle/text commands only, max100. No sprites/physics/camera/audio/pointer. Existing v1 gate still expects its achievable input-driven win. Do not mix v2 APIs into v1 source. Never include Markdown fences.
+${creationManifestInstructions}`;
+const schema={type:'object',additionalProperties:false,required:['kind','title','instructions','source','controls','creationManifest'],properties:{kind:{type:'string',enum:['generated-module-v1','generated-module-v2']},title:{type:'string'},instructions:{type:'string'},source:{type:'string'},controls:{type:'array',items:{type:'string',enum:['left','right','up','down','action']}},creationManifest:{anyOf:[creationManifestSchema,{type:'null'}]}},$defs:creationManifestDefinitions};
 /** Real Responses API transport. Constructed only on the server after explicit owner approval. No subscription claims. */
 export class OpenAIResponsesAgent implements AgentAdapter {
  readonly kind='metered-api' as const;readonly available:boolean;
@@ -43,12 +45,12 @@ export class OpenAIResponsesAgent implements AgentAdapter {
   const preflight=privateGenerationPreflight(input);
   const original=previous||input.baseRevision.game;
   const base=isGeneratedGame(original)?
-    {kind:original.kind,title:original.title,instructions:original.instructions,source:original.source,controls:original.controls}:
+    {kind:original.kind,title:original.title,instructions:original.instructions,source:original.source,controls:original.controls,...(original.creationManifest?{creationManifest:original.creationManifest}:{})}:
     original||input.baseRevision.config||null;
   const data={idea:input.childIntent,base,gameDesignPreflight:preflight.brief,feedback:diagnostics?.slice(0,1500)||null};
   const user=JSON.stringify(data),instructions=generationInstructionsForForm(preflight.instructionsMode!=='rule-driven');
   // UTF-8 bytes + conservative protocol overhead upper-bound input tokens. Never assume caching discounts.
-  const inputBound=Buffer.byteLength(user)+Buffer.byteLength(instructions)+1024;
+  const inputBound=Buffer.byteLength(user)+Buffer.byteLength(instructions)+Buffer.byteLength(JSON.stringify(schema))+1024;
   if(inputBound>this.approval.maxInputTokens)throw Error('INPUT_TOKEN_LIMIT');
   const worst=Math.ceil(inputBound*this.approval.inputUsdPerMillion+this.approval.maxOutputTokens*this.approval.outputUsdPerMillion);
   if(worst>input.budget.maxUnits)throw Error('SPENDING_CUTOFF');

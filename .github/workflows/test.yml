@@ -145,6 +145,12 @@ jobs:
       - name: Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:studio
+      - name: Editable creation contracts and behavioral challenges
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation
+      - name: Creation desktop and touch journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation-browser
       - name: Design coach checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:coach

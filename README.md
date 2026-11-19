@@ -23,6 +23,12 @@ The normal website route enters the child's **Studio library**, not the separate
 
 The [child journey standard](docs/child-journey/README.md) combines the grades 1–4 learning service, physical games, and child-owned Studio. It adds play-first navigation, repeatable help, protected math focus, explicit ready previews, and durable ideas through asynchronous replies and save failures. [Acceptance](docs/child-journey/acceptance.md) distinguishes automated evidence from educator, child and actual-device review. Live release status belongs in [delivery state](DELIVERY-STATE.md).
 
+## Create & code
+
+The separate **Create & code** page (`?creation=1`) combines free scene creation with **Rebuild a scene** practice. Children move, jump, speak through bubbles, dance, repeat actions, branch on conditions, and respond to taps or signals using editable blocks. The same stage and interpreter power both modes. Five open challenges check actual trajectories, order, repetition, event responses, and conditional behavior; equivalent programs can succeed.
+
+**Animate & code** carries a saved Dragon, Buckets, or Robot game into a new scene pinned to that source version, with its reviewed artwork and supported settings. New generated games may include a validated optional companion scene; older generated source is not automatically converted. Scenes have profile-separated drafts, immutable versions, explicit Keep, backups, editable JSON export, and supported silent video export. Host Math/Language checkpoints still apply. Read the [feature contract and limitations](docs/creation-studio/README.md) and [accepted decision](docs/decisions/0006-creation-and-rebuild-practice.md).
+
 ## Child continuity and six Factory Favorites
 
 In the integrated Studio, **Factory Favorites** now lists six distinct native games: Bubble Gum Builders, Junkyard Rally, Splash or Pass, Dragon Island Rescue, Moon Donut Dash, and Robot Route Lab. New Moon/Robot play supports native safe math pause/resume, and device-local mission/route recovery. Remote build availability depends on the configured service, authenticated session and server-side gates; a URL alone does not establish readiness.
