@@ -313,7 +313,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T20:16:54.788Z",
-      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceDigest": "b7950912185255a6110faa831c66d48568c93dd9af89213ce8f5d719687ccfee",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed the already-merged research-only archetype library against the existing game-generation and private worker contracts. Headless mechanics and archetype catalog are never installed as playable new engines or activated by this release."
     },
@@ -390,7 +390,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T20:16:54.791Z",
-      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceDigest": "b93e7cc114e699d85f13e59c63706fbde655686200887e085c102c4ac50fa56b",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed added archetype contract and diversity tests, which assert safe refusal and compatibility with six native games. These are headless test outcomes and do not establish new production playable engines or child learning claims.",
       "reviewHistory": [
@@ -431,7 +431,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-19T20:16:54.791Z",
-      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceDigest": "fc804ee7153125fd0b01559bfe8d41cd3ea5c3fb9b0ae754720d3a59018201eb",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed PR48 merge receipt and the static Pages release gate: latest successful source pin is 079978f while public main includes newer local features. Recorded this distinction; no backend pin or production activation is changed in this documentation-only fix.",
       "reviewHistory": [
@@ -478,7 +478,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-19T20:16:54.791Z",
-      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceDigest": "f035ffd759ad1f99ee13eff56a955b5f0b2101d0192915773ff4ae24b42df1c5",
       "reviewOutcome": "updated",
       "reviewReason": "Added the already-merged archetype source family to canonical generation routing, documented its research-only scope and linked its contract. Existing source coverage, integration review and source fingerprint enforcement remain active.",
       "reviewHistory": [
