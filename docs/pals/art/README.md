@@ -6,6 +6,12 @@ The owner selected the newly shown **U Pleeko, V Talli and X Whorl** mature port
 
 Growth review has resumed. The [later form-selection decision](../../decisions/2026-11-19-pal-form-reconciliation.md) supersedes the earlier pause and preserves specific selections. It does not approve every mature candidate or establish application integration.
 
+## Two growth stages: Base and Grown
+
+The current product decision is **exactly two visible forms per Pal**, not three. **Stage 1 — Base** uses its approved original creature. **Stage 2 — Grown** uses its individually selected, substantially transformed creature. There is **no Bright/intermediate form** to illustrate, approve, or produce in this release. The earlier three-form Luma studies are archival. Approved base images and selected grown images remain independently versioned and retain their full revision history.
+
+This is a **form-count and artwork-mapping decision**, not a new earning threshold or a declaration that all Grown portraits are approved. The existing [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) still derives three levels (New/Bright/Radiant at 0/5/15 adventures). That implementation, its UI and tests **must change to two states before release**; this artwork PR does not silently modify those rules. Preserve saved receipts and adventure counts, ownership, backup formats and current selections while reconciling.
+
 ## Authoritative records
 
 - [character-references.json](character-references.json) is the current character/form index. It separates identity, form, artwork revision, exact-reference resolution, user selection, superseded history and production status. Every selected base source is resolved; mature-reference gaps remain explicit.
