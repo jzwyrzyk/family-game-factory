@@ -1,6 +1,27 @@
 # jems delivery state
 
-## PR64 problem-solving integration — merge authorized, validation pending
+## PR64 formative problem-solving — merged
+
+**Merge observed:** `2026-11-19T17:31:14Z` (`November 19, 2026, 12:31:14 p.m. America/New_York`). Under the owner’s November 19 authorization to merge once ready, [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64) merged into `main` as `09e43beb4405526117493ab27688b076136078f4`.
+
+The tested published head is [`3f316a8a57f5aea86e1d259cd09b9dc5edc4effd`](https://github.com/jzwyrzyk/family-game-factory/commit/3f316a8a57f5aea86e1d259cd09b9dc5edc4effd), complete tree `62893dc035abdf589533de6e4ad9a21dd48f7963`. It integrates prior PR64 head `dd533e3f53046bd25bbcfe7f06257455138d1b48` and main `28c18cdae8bf958ef01f6e622e9c4ef6e2035e5c`, preserving parent reporting, shared branding and lifetime rewards. **Merged-tree verification:** `62893dc035abdf589533de6e4ad9a21dd48f7963 exactly matches the tested head and GitHub synthetic merge 540616a7b32b6a6dcde86d923e9db21059af1cf5`.
+
+| Workflow on the published head | Final result |
+| --- | --- |
+| Parent dashboard | [Passed — 44575939679](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939679) |
+| Documentation context | [Passed — 44575940022](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575940022) |
+| Trusted family-device security | [Passed — 44575939840](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939840) |
+| Full visual review | [Passed — 44575939590](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939590) |
+| Arcade journeys | [Passed — 44575939712](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44575939712) |
+
+Parent desktop and 320px captures from this head were inspected. **Browser and artifact acceptance:** `All Arcade jobs passed, including desktop/touch practice, first-response/support handling, profile isolation, active learning guards, shared backup/restore, lifetime Rewards, Creation and existing game journeys. Practice shelf/result, native parent journal, Home/My Powers, seven-destination navigation at 320px, and actual Rewards desktop/mobile captures were inspected with no blocking defect. Parent, learning, visual and creative artifact ZIP digests matched GitHub metadata`. Successful fixture/browser checks establish only their recorded source and synthetic test scope.
+
+The integrated feature records unscored context from Math, Language Arts, Creation and game development, plus optional authored test/interpret/revise decisions. The existing parent dashboard shows profile-specific task results, recorded help, provenance and separate context counts. APS joins the guarded five-source family backup/recovery flow. No global aptitude score, LLM grading, independent-mastery inference or reward-policy change is introduced.
+
+**Release boundary:** this receipt records source integration only. This task performs no frontend/service deployment, provider activation or private-worker repin. It establishes no physical-device/child acceptance or validated learning improvement. [PR54](https://github.com/jzwyrzyk/family-game-factory/pull/54) remains a separate research/benchmark track; its scoring kernel is not integrated into the child runtime. Earlier PR64 failures, corrections and passing runs retain their exact dated scope.
+
+
+## Earlier PR64 problem-solving integration — preparation
 
 The owner authorized merging [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64) once ready on November 19, 2026. Its previous head `dd533e3f53046bd25bbcfe7f06257455138d1b48` passed all four then-applicable workflows: [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44554077410), [trusted family-device security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44554077435), [full visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44554077572), and [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44554077632). Those results retain their exact source scope.
 
@@ -213,7 +234,7 @@ This is an index of observed open work, not an automatic merge or shipping queue
 | [PR48 archetype foundation](https://github.com/jzwyrzyk/family-game-factory/pull/48) / [Issue49 composition and variety](https://github.com/jzwyrzyk/family-game-factory/issues/49) | Open PR48, not a draft at observation. Research/foundation work and a separate playable-composition/anti-repetition goal; neither label implies production activation or unrestricted coverage. |
 | [PR50 fast-edit intelligence](https://github.com/jzwyrzyk/family-game-factory/pull/50) / [Issue51 Studio integration](https://github.com/jzwyrzyk/family-game-factory/issues/51) | Draft; PR50 is stacked on PR48's branch, not main. Timing/coverage goals are targets until measured. |
 | [PR54 learning evidence](https://github.com/jzwyrzyk/family-game-factory/pull/54) and [stacked PR60](https://github.com/jzwyrzyk/family-game-factory/pull/60) | Both drafts. PR60 targets independent Math/ELA assessment instruments and scoring on PR54's research branch; neither establishes validated learning gains or integrated production assessment. November 19 PR54 documentation corrections clarify missingness, per-step support/iteration, alternate-form assumptions, the research-only human rubric and current references; its kernel is not integrated into the child runtime. Engagement gems add no proficiency claim. |
-| Formative problem-solving feature | [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64), unmerged source work integrating main `28c18cda` (including parent reporting, expanded branding and rewards). Shared background context plus optional structured observations; no runtime adoption of the PR54 benchmark or global thinking score. See the [implementation record](docs/problem-solving/IMPLEMENTATION.md). |
+| Formative problem-solving feature | [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64), merged as `09e43beb4405526117493ab27688b076136078f4` with the exact tested tree. Shared background context plus optional structured observations integrate parent reporting, branding and rewards; no runtime adoption of the PR54 benchmark or global thinking score. See the [implementation record](docs/problem-solving/IMPLEMENTATION.md). |
 | [PR56 Mind Your Jems](https://github.com/jzwyrzyk/family-game-factory/pull/56) | Separate game work, not re-reviewed in this scoped branding integration. Its interaction and visual acceptance remain independent. |
 | [PR57 approved branding and maker journey](https://github.com/jzwyrzyk/family-game-factory/pull/57) | Merged as `c6576c16e005ae58ce8c706801414be4d864242e` at `2026-11-19T15:02:05Z`; source integration and deployment remain distinct. The historical preparation and acceptance entries retain their original scope. |
 | [PR23 drawing engine](https://github.com/jzwyrzyk/family-game-factory/pull/23) | Open draft, outside the immediate voice release focus. Preserve drawings/provenance while evaluating later integration. |

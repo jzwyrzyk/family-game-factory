@@ -76,10 +76,10 @@
         "docs/problem-solving/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:54.308Z",
-      "sourceDigest": "ded2f74df901adc83f7c4cee3e4da10d5e85ba0b09929174f5ce182907f02739",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated parent, rewards and formative feature scope; documented no new APS award, no global thinking score, and separation of context from structured observations.",
+      "reviewedAt": "2026-11-19T17:35:58.554Z",
+      "sourceDigest": "739719ca9db700bc390ce05ea7817cda037391bb4149643873e347021f63b74b",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the source-only merge receipt and final acceptance update. Product doctrine, educational claim limits, reward policy and formative feature scope are unchanged; only implementation and delivery history now record observed facts.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -425,10 +425,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T17:17:57.801Z",
-      "sourceDigest": "d484dff651c6cddb1446826c1e278684dea598dbda55cd385003c92ff836dbbd",
+      "reviewedAt": "2026-11-19T17:32:47.795Z",
+      "sourceDigest": "c2c022d819a28ef57f651e15e568417564b5a067f20560e8daa3ea2e4e6e6613",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified merged main28c18cda and upstream PR65,PR69,PR67 metadata; recorded user authorization to merge PR64 after current checks while retaining historical results and separate deployment/research boundaries.",
+      "reviewReason": "Verified PR64 merged as 09e43beb with tree 62893dc0 matching tested head 3f316a8; recorded five passing workflows, actual desktop/touch artifact review and source-only release boundary while preserving historical candidate receipts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
