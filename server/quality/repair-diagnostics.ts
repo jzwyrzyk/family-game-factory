@@ -10,7 +10,8 @@ import type {FunctionalGameContract,FunctionalCheckpoint,GameObservation} from '
 
 export type RepairCategory=
   'intent-missing'|'input-unresponsive'|'runtime-failed'|
-  'replay-failed'|'syntax-invalid'|'limits-failed'|'test-unverified';
+  'replay-failed'|'syntax-invalid'|'limits-failed'|'test-unverified'|
+  'presentation-failed'|'gameplay-shallow'|'quality-unverified';
 export interface SafeRepairDiagnostic{
   category:RepairCategory;
   code:string;
@@ -45,6 +46,25 @@ const basic='Preserve the child-authored premise, essential actions, and payoff.
 
 export function safeRepairDiagnostic(raw:unknown,plan?:FunctionalGameContract):SafeRepairDiagnostic {
  const input=typeof raw==='string'?raw.slice(0,MAX_INPUT):'';
+ // Only these bounded findings from the independently bound reviewer can
+ // become instructions. Never relay its free text, pixels or raw API body.
+ if(/\b(?:VISUAL_STYLE_MISMATCH|VISUAL_INCOHERENT_ART|VISUAL_UNREADABLE_LAYOUT|VISUAL_PLACEHOLDER_APPEARANCE|VISUAL_OCCLUSION_OR_SCALE)\b/.test(input)){
+  const codes=[...new Set(input.match(/\b(?:VISUAL_STYLE_MISMATCH|VISUAL_INCOHERENT_ART|VISUAL_UNREADABLE_LAYOUT|VISUAL_PLACEHOLDER_APPEARANCE|VISUAL_OCCLUSION_OR_SCALE)\b/g)||[])];
+  return {category:'presentation-failed',code:'GAME_PRESENTATION_FAILED',feedback:'GAME_PRESENTATION_FAILED;FINDINGS='+codes.join(',')+'. Independent review of actual desktop and tablet captures found a presentation defect. Repair the identified style, coherence, composition, scale, occlusion or readability problem. Preserve the requested art family: pixel and flat 2D are valid finished styles. Keep approved characters and working mechanics stable. '+basic,repairable:true};
+ }
+ if(/\b(?:GAMEPLAY_NO_CONSEQUENCE|GAMEPLAY_NO_VARIATION|GAMEPLAY_NO_RECOVERY)\b/.test(input)){
+  const codes=[...new Set(input.match(/\b(?:GAMEPLAY_NO_CONSEQUENCE|GAMEPLAY_NO_VARIATION|GAMEPLAY_NO_RECOVERY)\b/g)||[])];
+  return {category:'gameplay-shallow',code:'GAMEPLAY_DESIGN_FAILED',feedback:'GAMEPLAY_DESIGN_FAILED;FINDINGS='+codes.join(',')+'. Captured play did not demonstrate the required consequential choice/skill, variation/expression or understandable recovery. Improve the actual rules or interactions appropriately for this child request and play mode; additional counters, sequential confirm buttons or a reskin are insufficient. Preserve successful artwork. '+basic,repairable:true};
+ }
+ if(/\b(?:INTENT_ACTION_MISSING|INTENT_PAYOFF_MISSING)\b/.test(input)){
+  return {category:'intent-missing',code:'INTENT_REQUIREMENT_FAILED',feedback:'INTENT_REQUIREMENT_FAILED: Independent captured-play review could not establish the child-requested essential action or visible payoff. Implement and expose the real action and consequence with ordinary input; a label, score or claimed win does not establish it. Preserve successful artwork. '+basic,repairable:true};
+ }
+ if(/\bINPUT_UNCLEAR_OR_INACCESSIBLE\b/.test(input)){
+  return {category:'input-unresponsive',code:'INPUT_PRESENTATION_FAILED',feedback:'INPUT_PRESENTATION_FAILED: Actual desktop/tablet play showed unclear, obscured or unreachable controls or weak action feedback. Repair ordinary touch and keyboard affordances, target size and visible consequence while retaining the intended mechanic. '+basic,repairable:true};
+ }
+ if(/\b(?:QUALITY_EVIDENCE_INCOMPLETE|QUALITY_REVIEW_UNGROUNDED|QUALITY_REVIEW_FAILED)\b/.test(input)){
+  return {category:'quality-unverified',code:'GAME_QUALITY_UNVERIFIED',feedback:'GAME_QUALITY_UNVERIFIED: The captured ordinary-input path did not establish every required visual, gameplay, intent or input criterion. Improve the game or its ordinary exploration path so the real behavior is observable. Never add a test-only fast win, generated assertions or a privileged callback. Keep unknowns honest. '+basic,repairable:true};
+ }
  const match=input.match(/(?:^|[^A-Z])INTENT_PLAYTEST_FAILED:([a-z][a-z0-9-]{0,39}):(\d{1,2})(?!\d)/);
  if(match&&plan){
   const accepted=safeRequirements(plan,match[1],Number(match[2]));
@@ -90,5 +110,6 @@ export function safeRepairDiagnostic(raw:unknown,plan?:FunctionalGameContract):S
 
 /** Stable, source-free error code for user-visible failure state / audit. */
 export function safeFinalRepairCode(raw:unknown,plan?:FunctionalGameContract):string{
+ if(typeof raw==='string'&&/\b(?:QUALITY_REVIEW|GAME_PRESENTATION|GAMEPLAY_DESIGN|GAME_QUALITY|VISUAL_|GAMEPLAY_NO_)/.test(raw))return 'REPAIR_EXHAUSTED_QUALITY';
  return plan?'REPAIR_EXHAUSTED_INTENT':'REPAIR_EXHAUSTED';
 }

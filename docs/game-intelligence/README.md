@@ -1,6 +1,10 @@
 # Jems Game Intelligence Engine — Design Standard v1
 
-**Status: merge-candidate research implementation; not a production activation or universal game-quality certification.** Established 2026-11-18 after the Bubble Gum Builders, Robot Route Lab and Junkyard Rally design review. The original v1 advisory preflight has expanded within PR #43 into source-backed intent, gameplay-form advice, authored working-game contracts, optional independent sandbox/browser probes and a bounded repair/retest path. No fixture-based evidence proves that arbitrary AI-generated games work or that children enjoy them. See [current objective status and proof boundaries](objective-roadmap.md) and [merge handoff](merge-handoff.md).
+**Source state:** [PR #43](https://github.com/jzwyrzyk/family-game-factory/pull/43) merged as [`493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`](https://github.com/jzwyrzyk/family-game-factory/commit/493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7). This document preserves the 2026-11-18 design standard and research rationale, including the original development path below. References to "this PR" describe that work, not a still-open merge candidate. See [Delivery state](../../DELIVERY-STATE.md) for current release evidence; merging is not production activation or universal game-quality certification.
+
+The original v1 advisory preflight expanded within PR #43 into source-backed intent, gameplay-form advice, authored working-game contracts, optional independent sandbox/browser probes and a bounded repair/retest path. No fixture-based evidence proves that arbitrary AI-generated games work or that children enjoy them. See [current objective status and proof boundaries](objective-roadmap.md) and [merge handoff](merge-handoff.md).
+
+**Current draft extension:** [presentation and playable quality](PRESENTATION-QUALITY.md) adds a bound style-aware production plan, optional explicitly approved raster art, actual desktop/tablet capture and mandatory separate review to the real generated-game route. Visual, intent, gameplay and input each need supported passes; a compile or animation response alone cannot make a new real game Ready. This supports pixel, flat 2D, illustrated, dimensional and realistic appearances without requiring Gem Factory's look or loop. [ADR0005](../decisions/0005-style-diverse-playable-quality.md) records the owner direction. Provider activation, human calibration, a held-out multi-style evaluation and child enjoyment remain unverified by this implementation.
 
 ## Problem statement
 
@@ -18,7 +22,7 @@ Passing #3 does not establish #1, #2 or #4.
 
 - **Child authorship wins.** Retain the original request, intended mechanics and characters; preserve previous playable versions. Never silently optimize their creative choices away. The child elects Keep/Use this test, never the model.
 - **The least complicated solution that works.** Start from requested verbs and consequences, not the subject of the game. Being able to model something physically does not mean that modeling it physically helps.
-- **Independent gameplay axes.** Rendering is 2D/3D; interaction is tap/drag/grid/steer/etc.; simulation is scripted/kinematic/rigid-body; style is illustration/animation; play mode is goal-based/open-ended. None of these choices can be inferred from another.
+- **Independent gameplay axes.** Rendering is 2D/3D; interaction is tap/drag/grid/steer/etc.; simulation is scripted/kinematic/rigid-body; presentation may be pixel, flat 2D, illustrated, dimensional or realistic; play mode is goal-based/open-ended. None of these choices can be inferred from another. Equal craft does not require one appearance or feature count.
 - **Physics only for physical causality.** Use the bounded physics engine when weight, real contact, balance, joint strain, inertia, suspension, momentum or gravity materially changes gameplay. A rocket launch, moving robot, bouncing animation, growth and explosion into stars can be rule-driven 2D.
 - **The memorable moment is a requirement.** Assembly without the launch, collection without growth, or puzzle without a visible result is not fidelity to the idea.
 - **Know the product's actual capabilities.** The currently generated runtime is 2D. Do not call an isometric image a genuine 3D simulation. An essential 3-axis requirement is a product capability gap, not permission to quietly change the child's request.
@@ -30,9 +34,9 @@ Passing #3 does not establish #1, #2 or #4.
 
 **Step 1 — Understand the actual play.** Extract player action, desired state change, immediate feedback, objective or free-play affordance, and explicitly requested payoff. Record each item with a quote or a traceable source span. Do not invent an ending.
 
-**Step 2 — Choose interaction.** Prefer simple tappable actions, direct manipulation, visible drag/drop targets, a grid of commands, or steering when those align with the core loop. Validate device target sizes, affordances, readability and interruptions before aesthetics.
+**Step 2 — Choose interaction.** Prefer simple tappable actions, direct manipulation, visible drag/drop targets, a grid of commands, or steering when those align with the core loop. Design device target sizes, affordances, readability and interruptions together with the visual composition; decorative finish cannot compensate for unusable controls.
 
-**Step 3 — Choose presentation.** The baseline is 2D canvas. It may show side-view scenery, top-down worlds, faux depth or cutscene animation. A request for true 3D navigation or camera depth cannot be approved as fulfilled by the current runtime.
+**Step 3 — Choose presentation.** The baseline is 2D canvas. It may show side-view scenery, top-down worlds, faux depth or cutscene animation in the child's requested style. Preserve saved artwork on unrelated rule edits. A realistic appearance does not require true 3D; a request for true 3D navigation or camera depth cannot be approved as fulfilled by the current runtime.
 
 **Step 4 — Choose the simulation.** Default to state machines and animation. Choose real physics only when replacing it with rule-based interaction would invalidate a required cause/effect. If a child explicitly asks for physics, that requirement takes precedence over convenience. An underdetermined request remains uncertain.
 
@@ -55,7 +59,7 @@ Passing #3 does not establish #1, #2 or #4.
 | Wobbly stack / catapult | Balance or launch; weight, force and contacts determine motion | 2D side view | 2D rigid-body | Scripted "physics" that does not react to player changes |
 | True 3D free-flight game | Navigate in three axes and use perspective | Requires real 3D (not currently supported) | Depends on request | Presenting 2D as if it fulfills genuine depth |
 
-These are **design standards**, not evidence that the current production builds already meet them. Bubble Gum Builders' default is being addressed by separate PR #40; old versions must be preserved.
+These are **design standards**, not evidence that the current production builds already meet them. The new Bubble Gum Builders sticker default was merged separately in [PR #40](https://github.com/jzwyrzyk/family-game-factory/pull/40); old saved versions remain distinct. Current deployment evidence belongs in [Delivery state](../../DELIVERY-STATE.md).
 
 ## Evidence gate architecture
 
@@ -63,20 +67,21 @@ These are **design standards**, not evidence that the current production builds 
 | --- | --- | --- | --- |
 | G0: Existing security and authorization | May Jems build or preview safely at all? | Owner policy, isolation, cost, learning enforcement | Existing mandatory controls |
 | G1: Contract capture | What exact experience did the child ask for? | Verbatim-source design brief, explicit essential moments | Source-grounded heuristic implemented; semantic accuracy unverified |
-| G2: Form selection | Is the gameplay architecture appropriate? | Independent dimensions, physics necessity, rationale, alternatives | Advisory integrated in private generation source; no production worker repin |
+| G2: Form and production planning | Is the gameplay architecture and presentation appropriate? | Independent dimensions, physics necessity, bound action/payoff/variation and style proposal | Original advisory preflight plus current structured production plan; the proposal is not proof of fulfillment |
 | G3: Technical gate | Does the output compile, play, pause/replay, meet constraints? | Sandbox attestation, browser tests, trusted host | Existing infrastructure |
-| G4: Independent behavioral playtest | Do actions and payoffs actually happen in play? | Isolated GUI tests, screenshots, event/state traces | Authored positive/negative browser fixtures and optional internal-only plans; arbitrary games unverified |
+| G4a: Captured presentation/playable review | Do observed play and appearance fulfill the request? | Actual desktop/tablet images, ordinary-input receipts, four separate cited judgments | Required in current source for new real games and v2 revisions; model accuracy, held-out yield and deployment remain separately unverified |
+| G4b: Independent authored behavioral playtest | Do specifically tested actions and payoffs happen? | Isolated GUI tests and independently authored event/state expectations | Optional internal-only plans and positive/negative browser fixtures; suggestion-based capture does not replace this oracle |
 | G5: Human child UX and engagement | Is the game understandable and satisfying? | Observed play + direct child feedback, parental consent | Future research |
 | G6: Approved version | Is it okay to keep or publish this version? | Child Keep choice, existing parent/production policy | Existing release process |
 
-The first research slice added only G2 advice and an offline evidence ledger. The current PR adds source-grounded contracts, authored independent browser checks, and the existing coordinator's bounded repair/retest extension for explicitly vetted plans. This does **not** automatically certify arbitrary games, judge enjoyment, or replace the established authorization, sandbox, learning and trusted-device gates.
+The first research slice added only G2 advice and an offline evidence ledger. Merged PR43 added source-grounded contracts, authored independent browser checks and the existing coordinator's bounded repair/retest extension for explicitly vetted plans. The current presentation-quality draft adds G4a to that same route and retains G4b as an independent, more specific claim. It does **not** automatically certify arbitrary games, judge enjoyment, or replace the established authorization, sandbox, learning and trusted-device gates. Existing saved v1 compatibility remains separate from current new-game requirements.
 
 ## Quality dimensions — separate, never a fake composite score
 
 - Idea fidelity: the actual essential mechanics, story and payoff occur.
 - Gameplay-form fit: controls, 2D/3D presentation, physics choice, complexity.
 - Controls and discoverability: child can find and operate the intended action.
-- Visual and audio presentation: readable worlds, playful color, expressive motion, restrained sound, accessible controls and reward signals.
+- Visual and audio presentation: coherent craft in the requested style, readable worlds, expressive motion, restrained sound, accessible controls and reward signals. The current image-based reviewer does not certify audio quality.
 - Challenge and agency: challenge suits the game mode; child can influence, recover, experiment and choose without a forced false win.
 - Playability and recovery: can progress or explore, return, retry, recover.
 - Feedback and payoff: responsive cause/effect and requested memorable moments.
@@ -89,13 +94,18 @@ Each axis requires a declared observation: pass, fail, or not tested, with its m
 ## Current technical integration
 
 - The original child idea is still provided unaltered to the existing authenticated generation request.
-- The private generation preflight sends source-backed **advisory** 2D/3D, interaction and physics recommendations plus unresolved workability criteria in the existing model call; it makes **zero additional paid calls**. Its new implementation is not active in the pinned production worker until separately reviewed.
+- The original private form preflight remains source-backed **advice** on 2D/3D, interaction, physics and unresolved requirements; computing that brief itself adds no model call. The current production path separately adds paid structured planning and captured-evidence review under the existing approved model and job allowance. Novel image production requires a separate explicit allowance.
 - For rule-driven ideas, the private agent is not saturated with physics-body and joint API details; it gets concise rule-driven instructions instead. For explicit physics or revision of an existing physical game, it still receives the complete bounded physics interface.
-- The provider output JSON schema, compiled artifact format, canvas runtime and its immutable version, isolation, required learning host, owner budget and revision mechanics remain unchanged.
-- The code neither inspects existing curated game packages nor changes how they run. Do not merge this PR to "fix" today's Bubble Gum game; follow PR #40's real UX acceptance.
+- New source output supplies a bounded ordinary-input playthrough. The server binds production plans and approved asset packs; the new `quality-runtime-v2.1.0` supports trusted raster rendering and retains earlier saved runtime archives. Code generation cannot fabricate capture evidence or its own acceptance attestation.
+- The existing service/coordinator now requires technical capture and a separate review before Ready for real new games and v2 revisions. All four axes must pass with bound evidence. Repairs use bounded trusted findings and preserve successful art/mechanics within the existing attempt and spending limits. The original independent authored intent checks remain enforced when present.
+- Generated-game quality is distinct from fixes to native curated games. Gem Factory's own physics/gameplay evidence does not establish general generation quality. The learning host, authorization, private execution, immutable revisions and explicit Keep remain mandatory.
 - A classifier based on specific words is NOT sufficiently general. It can under-detect implied physics, over-detect stylistic 3D, or misclassify an unfamiliar game. It is only a hypothesis generator; tests document known examples and counterexamples.
 
-## Six-stage development path
+The [presentation contract](PRESENTATION-QUALITY.md) owns exact schemas, budgets, device/capture limits, compatibility and private evidence-retention caveats. A compatible worker source/image/review stage and explicit provider approvals are release integration requirements; this source description does not inventory live settings. Human-approved reference sets and held-out requests across all five styles have not yet calibrated the reviewer or proved consistent delivery.
+
+## Original six-stage research path
+
+This retains the PR43 research sequence, not a claim that all stages are complete. The current production/capture/review work is described above; its fixture coverage does not complete human calibration or limited-deployment acceptance.
 
 **R1 — Initial gameplay-form foundation in this PR.** Advisory recommendation, generator prompt de-biasing, automated regressions, neutral rubric, no production activation. Evaluate against baseline generation with the same ideas, model, budgets, settings and device cases.
 

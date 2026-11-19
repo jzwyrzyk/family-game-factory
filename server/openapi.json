@@ -891,6 +891,7 @@
             "enum": [
               "generating",
               "testing",
+              "reviewing",
               "repairing",
               "ready",
               "failed"

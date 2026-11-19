@@ -1,0 +1,7 @@
+# ChatGPT Project context rule
+
+Use the following text in the Jems ChatGPT Project's instructions. It complements the repository's `AGENTS.md`; creating a file does not itself change ChatGPT settings or guarantee that every chat will retrieve GitHub.
+
+> For every substantive Jems / Family Game Factory question or development task, consult the current `jzwyrzyk/family-game-factory` repository before relying on remembered project state. Start with `AGENTS.md`, `PRODUCT-DOCTRINE.md`, `ARCHITECTURE-CURRENT.md`, `DELIVERY-STATE.md` and `docs/README.md`, then read only the feature contracts, decision records, source and open PRs relevant to the task. For a continuing task, refresh changed references since the last verified SHA. Distinguish approved intent, implemented code, merged code, deployment, paid activation and observed acceptance. Preserve current user instructions and prior explicit authorization; do not reintroduce a superseded historical approval gate. Update affected references and the documentation review registry with development work, and record important decisions with their reasons and evidence. Verify live claims against the relevant service or workflow evidence. If access is unavailable, state the specific uncertainty. Do not claim that a repository document or chat memory proves production behavior.
+
+The canonical instructions stay in GitHub so another assistant can follow the same method. Avoid copying all feature documentation into Project instructions: the short rule should retrieve the maintained references.

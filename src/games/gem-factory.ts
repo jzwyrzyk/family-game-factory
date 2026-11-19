@@ -1,7 +1,8 @@
 import type { GameContext, GameInstance } from '../runtime/types';
+import { GemSortingSimulation, SORTING_WORLD, type FactoryGemColor } from './gem-factory-physics';
 import './gem-factory.css';
 
-type Color = 'ruby' | 'sapphire' | 'emerald' | 'amethyst' | 'sunshine';
+type Color = FactoryGemColor;
 type Stage = 'pick' | 'cut' | 'polish' | 'pack' | 'ship' | 'done';
 const colors: Record<Color, { name: string; shape: string; light: string; mid: string; dark: string }> = {
   ruby: { name: 'Ruby', shape: 'heart', light: '#ffcae1', mid: '#ff548c', dark: '#bb1f65' },
@@ -69,6 +70,19 @@ export default class GemFactory implements GameInstance {
   private sound = false;
   private audio: AudioContext | null = null;
   private particles: { el: HTMLElement; life: number; duration: number; x: number; y: number; vx: number; vy: number; spin: number }[] = [];
+  private sorter = new GemSortingSimulation();
+  private sortingNodes = new Map<number, HTMLElement>();
+  private recipe: Color[] = [];
+  private filled: boolean[] = [];
+  private feedCursor = 0;
+  private returned: Color[] = [];
+  private sortingMistakes = 0;
+  private sortingRecoveries = 0;
+  private sortingReturns = 0;
+  private sortingBonus = 0;
+  private sortingReadyAt: number | null = null;
+  private sortingHint = '';
+  private lastRelease = -1;
   private readonly orderSize: number;
   private readonly cutterSpeed: number;
   private readonly sparkleBoost: boolean;
@@ -89,7 +103,7 @@ export default class GemFactory implements GameInstance {
       <div class="gf-hud"><div class="gf-day"><span>WORKSHOP</span><strong></strong></div><div class="gf-wallet"><span class="gf-coin" aria-hidden="true">✦</span><strong>0</strong><span class="gf-wallet-label">happy coins</span></div></div>
       <section class="gf-order" aria-label="Current order"></section>
       <div class="gf-progress" aria-label="Gifts packed"></div>
-      <div class="gf-station-signs" aria-hidden="true"><span>Pick</span><span>Cut</span><span>Polish</span><span>Pack</span></div>
+      <div class="gf-station-signs" aria-hidden="true"><span>Sort</span><span>Cut</span><span>Polish</span><span>Pack</span></div>
       <div class="gf-console-wrap"><div class="gf-helper"><img src="./gem-factory-helper.webp" alt="Pip, your cheerful robot helper"><span>Let's make<br>some happy!</span></div><section class="gf-console" aria-label="Gem workbench"></section></div>
       <div class="gf-effects" aria-hidden="true"></div><div class="gf-pause-overlay" hidden><div class="gf-pause-card"><span class="gf-pause-gem">✦</span><h3>Tea break!</h3><p>Your gems can wait.</p><button type="button" class="gf-primary" data-action="resume">Back to the sparkle</button></div></div></div><p class="gf-screen-reader" role="status" aria-live="polite"></p>`;
     this.world = this.root.querySelector('.gf-world')!;
@@ -106,7 +120,7 @@ export default class GemFactory implements GameInstance {
     this.soundButton = this.root.querySelector('[data-action="sound"]')!;
     this.pauseButton = this.root.querySelector('[data-action="pause"]')!;
     target.replaceChildren(this.root);
-    this.listen(); this.render(); this.focusAction('select-gem');
+    this.prepareSorting(); this.listen(); this.render(); this.focusAction('route-order');
     this.raf = requestAnimationFrame(this.loop);
   }
 
@@ -123,7 +137,10 @@ export default class GemFactory implements GameInstance {
       if (action === 'sound') { this.sound = !this.sound; this.soundButton.textContent = this.sound ? '♫' : '♪'; this.soundButton.setAttribute('aria-label', `Turn sound ${this.sound ? 'off' : 'on'}`); this.soundButton.setAttribute('aria-pressed', String(this.sound)); if (this.sound) this.chime([523, 659, 784]); return; }
       if (action === 'pause' || action === 'resume') { this.togglePause(); return; }
       if (!this.active()) return;
-      if (action === 'select-gem') this.choose(b.dataset.color as Color, b);
+      if (action === 'route-order') this.route(-1);
+      if (action === 'route-return') this.route(1);
+      if (action === 'release-gem') this.releaseGem();
+      if (action === 'recover-gem') this.releaseGem(true);
       if (action === 'cut') this.cut();
       if (action === 'polish') this.addPolish(14);
       if (action === 'pack') this.pack();
@@ -147,33 +164,114 @@ export default class GemFactory implements GameInstance {
     this.root.addEventListener('keydown', e => {
       if (e.key === 'Escape') { e.preventDefault(); this.togglePause(); return; }
       if (!this.active() || e.repeat) return;
-      if (/^[1-5]$/.test(e.key) && this.stage === 'pick') {
-        const color = this.palette()[Number(e.key) - 1];
-        const b = this.root.querySelector<HTMLButtonElement>(`[data-color="${color}"]`);
-        if (b) { e.preventDefault(); this.choose(color, b); }
+      if (this.stage === 'pick') {
+        if (e.key === 'ArrowLeft' || e.key === '1') { e.preventDefault(); this.route(-1); }
+        if (e.key === 'ArrowRight' || e.key === '2') { e.preventDefault(); this.route(1); }
+        if (e.key === 'ArrowDown' || e.key === '3') { e.preventDefault(); this.releaseGem(); }
       }
       // Native buttons handle Space and Enter; shortcuts cover non-button game focus.
       if ((e.key === ' ' || e.key === 'Enter') && !(e.target as Element).closest('button')) {
-        e.preventDefault(); if (this.stage === 'cut') this.cut(); else if (this.stage === 'polish') this.addPolish(18); else if (this.stage === 'pack') this.pack();
+        e.preventDefault(); if (this.stage === 'pick') this.releaseGem(); else if (this.stage === 'cut') this.cut(); else if (this.stage === 'polish') this.addPolish(18); else if (this.stage === 'pack') this.pack();
       }
     }, { signal });
     window.addEventListener('blur', () => { this.release(); if (this.active()) this.setUserPause(true); }, { signal });
     document.addEventListener('visibilitychange', () => { this.release(); this.last = 0; if (document.hidden && !this.stopped && this.stage !== 'done') this.setUserPause(true); }, { signal });
   }
   private release() { this.holding = false; this.pointerId = null; this.polishingPointer = null; }
-  private choose(color: Color, button: HTMLElement) {
-    if (this.stage !== 'pick' || !Object.hasOwn(colors, color)) return;
-    if (color !== this.wanted()) {
-      const note = this.console.querySelector('.gf-instruction');
-      if (note) note.textContent = `That's a lovely ${colors[color].name.toLowerCase()}! This order needs the ${colors[this.wanted()].shape}.`;
-      this.announce(`Try the ${colors[this.wanted()].name}, shaped like a ${colors[this.wanted()].shape}.`);
-      button.classList.remove('gf-wiggle'); void button.offsetWidth; button.classList.add('gf-wiggle');
-      this.chime([330, 392]); return;
+  private prepareSorting() {
+    this.sorter.dispose(); this.sorter = new GemSortingSimulation(); this.sortingNodes.clear();
+    const palette = this.palette(), start = palette.indexOf(this.wanted());
+    this.recipe = Array.from({ length: Math.min(3, this.level) }, (_, i) => palette[(start + i) % palette.length]);
+    this.filled = this.recipe.map(() => false); this.feedCursor = this.shipped % 2;
+    this.returned = []; this.sortingMistakes = 0; this.sortingRecoveries = 0; this.sortingReturns = 0; this.sortingBonus = 0;
+    this.sortingReadyAt = null; this.lastRelease = -1;
+    this.sortingHint = this.level === 1 ? 'Tilt the ramp. Roll your gem into the order tray!' : 'Recipe gems go left. Send the others back to the right.';
+  }
+  private supply(): Color[] {
+    const palette = this.palette();
+    return this.recipe.flatMap(c => [c, palette[(palette.indexOf(c) + Math.max(1, this.recipe.length)) % palette.length]]);
+  }
+  private nextGem(): Color { const supply = this.supply(); return supply[this.feedCursor % supply.length]; }
+  private route(direction: -1 | 1) {
+    if (this.stage !== 'pick' || this.sortingReadyAt !== null) return;
+    this.sorter.setDirection(direction); this.updateSortingControls();
+  }
+  private releaseGem(recover = false) {
+    if (this.stage !== 'pick' || this.sortingReadyAt !== null) return;
+    const snapshot = this.sorter.snapshot();
+    if (snapshot.time - this.lastRelease < .3 || (recover && !this.returned.length)) return;
+    const color = recover ? this.returned[0] : this.nextGem();
+    if (this.sorter.release(color) === null) return;
+    if (recover) { this.returned.shift(); this.sortingRecoveries++; } else this.feedCursor++;
+    this.lastRelease = snapshot.time; this.updateSortingControls(); this.chime([440]);
+  }
+  private updateSortingControls() {
+    if (this.stage !== 'pick') return;
+    const state = this.sorter.snapshot(), ready = this.sortingReadyAt !== null;
+    for (const [action, target] of [['route-order', -1], ['route-return', 1]] as const) {
+      const button = this.console.querySelector<HTMLButtonElement>(`[data-action="${action}"]`);
+      button?.setAttribute('aria-pressed', String(state.target === target));
+      if (button) button.disabled = ready;
     }
-    this.selected = color; this.stage = 'cut'; this.cutTime = 0; this.render();
-    this.announce('Lovely pick! Press Cut when the pointer is in the mint stripe.');
-    this.chime([523, 659]); this.focusAction('cut');
-    this.context.emit?.({ type: 'mechanic', name: 'gem-sorted', value: 1 });
+    const feed = this.console.querySelector<HTMLButtonElement>('[data-action="release-gem"]');
+    if (feed) { feed.disabled = ready || state.gems.filter(g => g.state === 'moving').length >= 4; feed.setAttribute('aria-label', `Drop ${colors[this.nextGem()].name} gem`); }
+    const preview = this.console.querySelector('.gf-next-gem');
+    if (preview) preview.innerHTML = gemArt(this.nextGem(), true);
+    const name = this.console.querySelector('.gf-next-name'); if (name) name.textContent = colors[this.nextGem()].name;
+    const recipe = this.console.querySelector('.gf-recipe');
+    if (recipe) recipe.innerHTML = this.recipe.map((color, i) => `<span class="gf-recipe-gem ${this.filled[i] ? 'gf-recipe-filled' : ''}" aria-label="${colors[color].name} ${this.filled[i] ? 'collected' : 'needed'}">${gemArt(color)}<i>${this.filled[i] ? '✓' : ''}</i></span>`).join('');
+    const hint = this.console.querySelector('.gf-sort-hint'); if (hint) hint.textContent = this.sortingHint;
+    const recover = this.console.querySelector<HTMLButtonElement>('[data-action="recover-gem"]');
+    if (recover) { recover.hidden = !this.returned.length; recover.disabled = ready; recover.textContent = `Try ${colors[this.returned[0] || 'ruby'].name} again ↻`; }
+    const returns = this.console.querySelector('.gf-return-gems');
+    if (returns) returns.innerHTML = this.returned.slice(0, 3).map(color => `<i>${gemArt(color, true)}</i>`).join('');
+    const count = this.console.querySelector('.gf-sort-count'); if (count) count.textContent = `${this.filled.filter(Boolean).length}/${this.recipe.length}`;
+  }
+  private animateSorter(delta: number) {
+    this.sorter.step(delta / 1000);
+    const state = this.sorter.snapshot();
+    const ramp = this.console.querySelector<HTMLElement>('.gf-sorting-ramp');
+    if (ramp) ramp.style.transform = `translate(-50%,-50%) rotate(${state.angle}rad)`;
+    const layer = this.console.querySelector<HTMLElement>('.gf-sorting-gems');
+    for (const gem of state.gems) {
+      let element = this.sortingNodes.get(gem.id);
+      if (!element && layer) {
+        element = node('div', 'gf-physical-gem'); element.innerHTML = gemArt(gem.color, true);
+        element.dataset.gemId = String(gem.id); element.dataset.color = gem.color; layer.append(element); this.sortingNodes.set(gem.id, element);
+      }
+      if (element) {
+        element.style.left = `${gem.x / SORTING_WORLD.width * 100}%`; element.style.top = `${gem.y / SORTING_WORLD.height * 100}%`;
+        element.style.transform = `translate(-50%,-50%) rotate(${gem.angle}rad)`; element.classList.toggle('gf-gem-landed', gem.state !== 'moving');
+      }
+    }
+    for (const [id, element] of this.sortingNodes) if (!state.gems.some(g => g.id === id)) { element.remove(); this.sortingNodes.delete(id); }
+    const events = this.sorter.drainEvents();
+    for (const event of events) {
+      if (this.sortingReadyAt !== null) continue;
+      const needed = this.recipe.findIndex((color, i) => color === event.color && !this.filled[i]);
+      if (event.bin === 'order' && needed !== -1) {
+        this.filled[needed] = true; this.sortingHint = `Lovely! ${colors[event.color].name} is in your recipe.`; this.chime([523, 659]);
+        this.context.emit?.({ type: 'mechanic', name: 'gem-sorted', value: this.filled.filter(Boolean).length });
+        if (this.filled.every(Boolean)) {
+          this.sortingBonus = Math.max(0, this.recipe.length * 3 - this.sortingMistakes * 2);
+          this.sortingReadyAt = state.time; this.sortingHint = 'Recipe ready! Off to the cutter…'; this.burst(35, 70, 18);
+        }
+      } else if (event.bin === 'return' && needed === -1) {
+        this.sortingReturns++;
+        this.sortingHint = 'Good sorting! That gem can sparkle in another gift.'; this.chime([440, 523]);
+      } else {
+        this.sortingMistakes++;
+        if (this.returned.length < 8) this.returned.push(event.color);
+        this.sortingHint = needed !== -1 ? 'Your recipe gem is safe! Tilt left and try it again.' : 'Oops, a different gem! Send it to the return tray.';
+        this.chime([330, 392]);
+      }
+      this.announce(this.sortingHint);
+    }
+    if (events.length) this.updateSortingControls();
+    if (this.sortingReadyAt !== null && state.time - this.sortingReadyAt > .55) {
+      this.selected = this.recipe[0]; this.stage = 'cut'; this.cutTime = 0; this.render();
+      this.announce('Beautiful sorting! Press Cut when the pointer is in the mint stripe.'); this.focusAction('cut');
+    }
   }
   private cutterPosition() { return (Math.sin(this.cutTime * Math.PI / 1200 * this.cutterSpeed - Math.PI / 2) + 1) / 2; }
   private cut() {
@@ -200,7 +298,7 @@ export default class GemFactory implements GameInstance {
   }
   private pack() {
     if (this.stage !== 'pack') return;
-    this.stage = 'ship'; this.shipTime = 0; const earned = 15 + this.rating * 5;
+    this.stage = 'ship'; this.shipTime = 0; const earned = 15 + this.rating * 5 + this.sortingBonus;
     this.coins += earned; this.roundCoins += earned; this.shipped++; this.render();
     this.burst(85, 55, 34); this.chime([523, 659, 784, 1047]);
     this.announce(`Packed with love! ${earned} happy coins. ${this.shipped} of ${this.orderSize} gifts ready.`);
@@ -209,11 +307,11 @@ export default class GemFactory implements GameInstance {
   private finishShipping() {
     if (this.shipped >= this.orderSize) {
       this.stage = 'done'; this.render(); this.save();
-      this.context.finish({ won: true, level: this.level, title: 'A box full of happy!', description: `You sorted, cut and polished ${this.orderSize} beautiful gems and earned ${this.roundCoins} happy coins. Ready for another day at the factory?` });
+      this.context.finish({ won: true, level: this.level, title: 'A box full of happy!', description: `You sorted, cut and polished ${this.orderSize} beautiful gifts and earned ${this.roundCoins} happy coins. ${this.level === 1 ? 'Next up: two-gem rainbow recipes!' : this.level === 2 ? 'Next up: three-gem star recipes!' : 'Ready for another day at the factory?'}` });
     } else {
-      this.stage = 'pick'; this.selected = null; this.rating = 0; this.polish = 0; this.render();
-      this.announce(`Next gift! Pick the ${colors[this.wanted()].name.toLowerCase()}, shaped like a ${colors[this.wanted()].shape}.`);
-      this.root.querySelector<HTMLButtonElement>('[data-action="select-gem"]')?.focus({ preventScroll: true });
+      this.stage = 'pick'; this.selected = null; this.rating = 0; this.polish = 0; this.prepareSorting(); this.render();
+      this.announce(`Next gift! Sort ${this.recipe.map(color => colors[color].name).join(' and ')} into the order tray.`);
+      this.focusAction('route-order');
     }
   }
   private focusAction(action: string) { this.root.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)?.focus({ preventScroll: true }); }
@@ -231,24 +329,25 @@ export default class GemFactory implements GameInstance {
     this.progress.setAttribute('aria-label', `${this.shipped} of ${this.orderSize} gifts packed`);
     const color = this.stage === 'ship' || this.stage === 'done' ? this.selected || this.wanted() : this.wanted();
     this.order.dataset.color = color;
-    this.order.innerHTML = `<div class="gf-order-label"><span class="gf-order-dot"></span>${this.stage === 'ship' || this.stage === 'done' ? 'SPECIAL DELIVERY' : `A GIFT FOR ${customers[(this.shipped + this.level - 1) % customers.length].toUpperCase()}`}</div><div class="gf-order-body">${gemArt(color)}<div><strong>${colors[color].name}</strong><span>${this.stage === 'ship' || this.stage === 'done' ? 'Made with a little love' : `Find the ${colors[color].shape}`}</span></div><span class="gf-order-check">${this.stage === 'ship' || this.stage === 'done' ? '✓' : '♡'}</span></div>`;
-    this.liveGem.innerHTML = this.stage === 'ship' || this.stage === 'done' ? `<div class="gf-packed-present">${gift}</div>` : this.selected ? gemArt(this.selected, this.stage === 'cut') : '';
+    this.order.innerHTML = `<div class="gf-order-label"><span class="gf-order-dot"></span>${this.stage === 'ship' || this.stage === 'done' ? 'SPECIAL DELIVERY' : `A GIFT FOR ${customers[(this.shipped + this.level - 1) % customers.length].toUpperCase()}`}</div><div class="gf-order-body">${gemArt(color)}<div><strong>${this.recipe.length > 1 ? 'Rainbow gift' : colors[color].name}</strong><span>${this.stage === 'ship' || this.stage === 'done' ? 'Made with a little love' : this.recipe.length > 1 ? this.recipe.map(c => colors[c].name).join(' + ') : `Find the ${colors[color].shape}`}</span></div><span class="gf-order-check">${this.stage === 'ship' || this.stage === 'done' ? '✓' : '♡'}</span></div>`;
+    this.liveGem.innerHTML = this.stage === 'ship' || this.stage === 'done' ? `<div class="gf-packed-present">${gift}</div>` : this.selected ? this.recipe.length === 1 ? gemArt(this.selected, this.stage === 'cut') : `<div class="gf-live-bundle">${this.recipe.map((c, i) => `<i style="left:${i * 32 - 12}%;top:${i % 2 * 10}%">${gemArt(c, this.stage === 'cut')}</i>`).join('')}</div>` : '';
     this.liveGem.classList.toggle('gf-gem-shining', this.stage === 'pack');
     this.liveGem.style.setProperty('--shine', String(this.polish / 100));
-    const stepper = `<div class="gf-steps">${['Pick', 'Cut', 'Polish', 'Pack'].map((s, i) => `<span class="${i === Math.min(stageIndex, 3) ? 'gf-current-step' : i < stageIndex ? 'gf-finished-step' : ''}"><i>${i < stageIndex ? '✓' : i + 1}</i>${s}</span>`).join('')}</div>`;
+    const stepper = `<div class="gf-steps">${['Sort', 'Cut', 'Polish', 'Pack'].map((s, i) => `<span class="${i === Math.min(stageIndex, 3) ? 'gf-current-step' : i < stageIndex ? 'gf-finished-step' : ''}"><i>${i < stageIndex ? '✓' : i + 1}</i>${s}</span>`).join('')}</div>`;
     let inner = '';
     if (this.stage === 'pick') {
-      inner = `<div class="gf-pick-header"><h3>Every gem starts with you.</h3><p class="gf-instruction">Pick the ${colors[this.wanted()].shape} for this gift.</p></div><div class="gf-gem-choices">${this.palette().map((c, i) => `<button type="button" class="gf-choice" data-action="select-gem" data-color="${c}" aria-label="Pick ${colors[c].name}, ${colors[c].shape}"><span class="gf-choice-gem">${gemArt(c)}</span><span>${colors[c].name}</span><kbd>${i + 1}</kbd></button>`).join('')}</div>`;
+      inner = `<div class="gf-sorting-layout"><div class="gf-sorting-board" aria-hidden="true"><div class="gf-sorter-badge">SPARKLE SORTER <span>✦</span></div><div class="gf-sorting-chute"><i></i></div><div class="gf-ramp-pivot"></div><div class="gf-sorting-ramp"><i></i><i></i><i></i></div><div class="gf-sort-path gf-sort-path-left"><svg viewBox="0 0 24 24"><path d="M18 5 6 18m0-8v8h8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="gf-sort-path gf-sort-path-right"><svg viewBox="0 0 24 24"><path d="m6 5 12 13m-8 0h8v-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="gf-sorting-gems"></div><div class="gf-sort-basket gf-order-basket"><span>♡ ORDER</span><b class="gf-sort-count"></b></div><div class="gf-sort-basket gf-return-basket"><span>↻ RETURN</span><div class="gf-return-gems"></div></div></div><div class="gf-sort-instructions"><h3>${this.level === 1 ? 'Roll a little happiness.' : this.level === 2 ? 'A rainbow recipe!' : 'Three gems. One happy gift.'}</h3><div class="gf-recipe" aria-label="Gems needed for this recipe"></div><div class="gf-next"><span>UP NEXT</span><i class="gf-next-gem"></i><strong class="gf-next-name"></strong></div><div class="gf-sort-controls"><button type="button" class="gf-route-button gf-route-order" data-action="route-order" aria-label="Tilt ramp left to order tray" aria-pressed="true">← Order</button><button type="button" class="gf-primary gf-drop-button" data-action="release-gem">Drop gem <span aria-hidden="true">↓</span></button><button type="button" class="gf-route-button gf-route-return" data-action="route-return" aria-label="Tilt ramp right to return tray" aria-pressed="false">Return →</button></div><p class="gf-sort-hint" role="status"></p><button type="button" class="gf-recover-button" data-action="recover-gem" hidden></button><span class="gf-sort-keyboard">← → tilt · ↓ drop</span></div></div>`;
     } else if (this.stage === 'cut') {
       inner = `<div class="gf-action-copy"><h3>Ready, steady… sparkle!</h3><p class="gf-instruction">Catch the mint stripe for a perfect cut.</p></div><div class="gf-cut-control"><div class="gf-timing-wrap"><span class="gf-timing-hint">NICE</span><div class="gf-timing-track" role="img" aria-label="Moving cut pointer. Aim for the center mint stripe."><span class="gf-good-zone"></span><span class="gf-perfect-zone"></span><i class="gf-cutter-needle"></i></div><span class="gf-timing-hint">PERFECT IN THE MIDDLE</span></div><button type="button" class="gf-primary gf-cut-button" data-action="cut"><span aria-hidden="true">✦</span> Cut gem <kbd>Space</kbd></button></div>`;
     } else if (this.stage === 'polish') {
       inner = `<div class="gf-action-copy"><h3>${this.rating === 3 ? 'Ooh, a perfect cut!' : this.rating === 2 ? 'What a lovely cut!' : 'A little gem of your own!'}</h3><p class="gf-instruction">Rub the gem, or hold the button. Make it shine!</p></div><div class="gf-polish-control"><div class="gf-polish-stone" role="img" aria-label="Rub this ${colors[this.selected!].name.toLowerCase()} to polish it">${gemArt(this.selected!)}</div><div class="gf-polish-meter"><div><span>SPARKLE POWER</span><strong class="gf-polish-percent">0%</strong></div><div class="gf-polish-track" role="progressbar" aria-label="Gem polish" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="gf-polish-fill"></span></div></div><button type="button" class="gf-primary gf-polish-button" data-action="polish"><span aria-hidden="true">✧</span> Hold to polish</button></div>`;
     } else if (this.stage === 'pack') {
-      inner = `<div class="gf-action-copy"><h3>Look at that little beauty!</h3><p class="gf-instruction">One shiny gem. One very happy friend.</p></div><div class="gf-pack-control"><div class="gf-quality-stars" aria-label="${this.rating} of 3 cut stars">${Array.from({ length: 3 }, (_, i) => `<span class="${i < this.rating ? 'gf-star-earned' : ''}">${star}</span>`).join('')}</div><span class="gf-reward">+${15 + this.rating * 5} <span>happy coins</span></span><button type="button" class="gf-primary gf-pack-button" data-action="pack">${gift} Pack with love</button></div>`;
+      inner = `<div class="gf-action-copy"><h3>Look at that little beauty!</h3><p class="gf-instruction">${this.recipe.length > 1 ? `${this.recipe.length} gems in a rainbow gift.` : 'One shiny gem. One very happy friend.'}${this.sortingBonus ? ` +${this.sortingBonus} for careful sorting!` : ''}</p></div><div class="gf-pack-control"><div class="gf-quality-stars" aria-label="${this.rating} of 3 cut stars">${Array.from({ length: 3 }, (_, i) => `<span class="${i < this.rating ? 'gf-star-earned' : ''}">${star}</span>`).join('')}</div><span class="gf-reward">+${15 + this.rating * 5 + this.sortingBonus} <span>happy coins</span></span><button type="button" class="gf-primary gf-pack-button" data-action="pack">${gift} Pack with love</button></div>`;
     } else {
-      inner = `<div class="gf-success"><span class="gf-success-stars">✦ ✧ ✦</span><h3>${this.stage === 'done' ? 'A box full of happy!' : ['Packed with love!', 'You made someone smile!', 'A little sparkle, delivered!'][(this.shipped - 1) % 3]}</h3><p>${this.stage === 'done' ? `${this.orderSize} beautiful gems. All made by you.` : this.shipped < this.orderSize ? 'Here comes your next little gem…' : 'What a wonderful day at the factory.'}</p></div>`;
+      inner = `<div class="gf-success"><span class="gf-success-stars">✦ ✧ ✦</span><h3>${this.stage === 'done' ? 'A box full of happy!' : ['Packed with love!', 'You made someone smile!', 'A little sparkle, delivered!'][(this.shipped - 1) % 3]}</h3><p>${this.stage === 'done' ? `${this.orderSize} beautiful gifts. All made by you.` : this.shipped < this.orderSize ? 'Here comes your next little gem…' : 'What a wonderful day at the factory.'}</p></div>`;
     }
     this.console.innerHTML = stepper + inner;
+    this.sortingNodes.clear(); if (this.stage === 'pick') { this.updateSortingControls(); this.animateSorter(0); }
     this.pauseButton.disabled = this.stage === 'done';
   }
   private setUserPause(paused: boolean) {
@@ -259,7 +358,7 @@ export default class GemFactory implements GameInstance {
     this.pauseButton.textContent = paused ? '▶' : 'Ⅱ';
     this.context.emit?.({ type: paused ? 'pause' : 'resume', name: 'factory-break' });
     if (paused) this.focusAction('resume');
-    else { const action = this.stage === 'pick' ? 'select-gem' : this.stage === 'ship' ? '' : this.stage; if (action) this.focusAction(action); }
+    else { const action = this.stage === 'pick' ? 'route-order' : this.stage === 'ship' ? '' : this.stage; if (action) this.focusAction(action); }
   }
   private togglePause() { if (!this.hostPaused) this.setUserPause(!this.userPaused); }
   private save() {
@@ -292,6 +391,7 @@ export default class GemFactory implements GameInstance {
     if (this.stopped) return;
     const delta = this.last ? Math.min(48, Math.max(0, now - this.last)) : 0; this.last = now;
     if (this.active()) {
+      if (this.stage === 'pick') this.animateSorter(delta);
       if (this.stage === 'cut') {
         this.cutTime += delta;
         const needle = this.console.querySelector<HTMLElement>('.gf-cutter-needle'); if (needle) needle.style.left = `${this.cutterPosition() * 100}%`;
@@ -311,6 +411,7 @@ export default class GemFactory implements GameInstance {
   private reset() {
     if (this.userPaused) { this.userPaused = false; this.context.emit?.({ type: 'resume', name: 'factory-break' }); }
     this.stage = 'pick'; this.shipped = 0; this.roundCoins = 0; this.selected = null; this.rating = 0; this.polish = 0;
+    this.prepareSorting();
     this.hostPaused = false; this.release(); this.last = 0; this.cutTime = 0; this.shipTime = 0;
     this.particles.forEach(p => p.el.remove()); this.particles = []; this.pauseOverlay.hidden = true; this.console.inert = false;
     this.root.classList.remove('gf-paused'); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.render();
@@ -321,10 +422,11 @@ export default class GemFactory implements GameInstance {
   isPlaying() { return !this.stopped && this.stage !== 'done' && !this.hostPaused && !this.userPaused; }
   pause() { if (!this.isPlaying()) return false; this.hostPaused = true; this.release(); this.root.classList.add('gf-paused'); return true; }
   resume() { if (!this.stopped) { this.hostPaused = false; this.last = 0; this.root.classList.toggle('gf-paused', this.userPaused); } }
-  snapshot() { return { stage: this.stage, level: this.level, order: this.wanted(), completed: this.shipped, orderSize: this.orderSize, coins: this.coins, polish: Math.round(this.polish), rating: this.rating, hostPaused: this.hostPaused, userPaused: this.userPaused, holding: this.holding }; }
+  snapshot() { return { stage: this.stage, level: this.level, order: this.wanted(), completed: this.shipped, orderSize: this.orderSize, coins: this.coins, polish: Math.round(this.polish), rating: this.rating, hostPaused: this.hostPaused, userPaused: this.userPaused, holding: this.holding,
+    recipe: [...this.recipe], collected: [...this.filled], nextGem: this.nextGem(), returns: [...this.returned], sortingMistakes: this.sortingMistakes, sortingRecoveries: this.sortingRecoveries, sortingReturns: this.sortingReturns, sortingBonus: this.sortingBonus, sorting: this.sorter.snapshot() }; }
   unmount() {
     // Save completed work, never a half-processed gem or held input.
-    this.save(); this.stopped = true; this.release(); cancelAnimationFrame(this.raf); this.abort.abort();
+    this.save(); this.stopped = true; this.release(); this.sorter.dispose(); cancelAnimationFrame(this.raf); this.abort.abort();
     this.particles.forEach(p => p.el.remove()); this.particles = []; void this.audio?.close().catch(() => {}); this.root.remove();
   }
 }
