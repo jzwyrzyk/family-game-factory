@@ -1,6 +1,6 @@
 # PR #56 — bounded recovery handoff
 
-Observed: 2026-11-19T08:01:54-05:00. This records Batch 1 only; no game changes, tests, merge or deployment were performed.
+Observed: 2026-11-19T08:01:54-05:00. Updated through Batch 2: recovery and two-file reconciliation are complete; source delivery remains blocked. No game changes, tests, merge or deployment were performed.
 
 ## Verified remote state
 
@@ -14,13 +14,13 @@ Observed: 2026-11-19T08:01:54-05:00. This records Batch 1 only; no game changes,
 
 ## Verified local source
 
-- Newest clean recovery baseline (two older dirty files still need reconciliation): `/workspace/scratch/7beeec09c8eb/pr56-recovery`.
+- Canonical clean recovery baseline (older dirty files reconciled in Batch 2): `/workspace/scratch/7beeec09c8eb/pr56-recovery`.
 - Branch: `fix/pr56-batch-1`.
 - Code commit: `f4ed3f9517d2cd443d71d2ae809ce966c72859af`.
 - Code tree: `0f546922b72c55887959cbf37e2e3ff293ea0e47`.
 - Worktree status: clean.
 - Live PR head is an ancestor of the recovery commit: True.
-- The older pr56-complete checkout has four unstaged modifications. Its game CSS and game TypeScript match the clean recovery baseline byte for byte. Its Studio UI and browser test differ; their intent has not been compared. Do not discard either version. The appendix preserves all four changes as a patch against ab68a88c15a5691239c0031ff97a3660ceca347c.
+- The older pr56-complete checkout has four unstaged modifications. Its game CSS and game TypeScript match the clean recovery baseline byte for byte. Its Studio UI and browser test differ; their intent was reconciled in Batch 2; the clean recovery includes the older changes plus the composer visibility fix. Do not discard either version. The appendix preserves all four changes as a patch against ab68a88c15a5691239c0031ff97a3660ceca347c.
 - Local code/assets are present and committed in the recovery checkout; remote delivery of this recovered tree is not established. Preserve these checkouts until Batch 2 verifies the upload.
 
 | Copy | Branch | Commit | Working tree |
@@ -55,13 +55,23 @@ Observed: 2026-11-19T08:01:54-05:00. This records Batch 1 only; no game changes,
 - No build, tests, browser session, screenshot review or CI verification was run. Prior reported passing results remain historical and are not newly certified.
 - There is no identified need to regenerate existing art before inspecting the recovered version. Merge conflicts/main drift still need a bounded reconciliation in the delivery batch.
 
-## Next action — Batch 2 only
+## Batch 2 result — reconciliation complete; delivery blocked
 
-Start from the clean recovery checkout and exact code commit above. First reconcile its src/studio/ui.ts and tests/mind-your-jems-browser.cjs with the preserved older uncommitted changes; do not blindly overwrite either version. Recheck the live PR head and local status, preserve concurrent changes, and deliver the recovered source/assets to the PR branch. Reconcile current main only as needed for safe delivery. Verify the remote source tree and PR head. Do not redesign, merge or deploy.
+- Canonical source remains f4ed3f9517d2cd443d71d2ae809ce966c72859af; its working tree remains clean.
+- Both previously differing files preserve all lines of the older dirty version. The clean recovery adds the guarded selection of the talk tab after opening the owner project, plus browser assertions that the conversation and prompt are visible after failed/cancelled builds. No transplant is needed and no game code was edited.
+- Live PR was rechecked at 319b2df2d3e689162d7a49a2916cecfccbe562de. It remained open and unmerged. GitHub CLI authentication is unavailable.
+- A non-forced, expected-head-guarded update to f4ed3f9 failed with GitHub missing/not_found. Direct git push then failed with unable to get password from user. Neither delivered the recovered implementation.
+- No tests, browser review, merge or deployment were performed.
 
-At most 10 substantive operations, with up to 3 additional checkpoint operations. If publishing or reconciliation exceeds that budget, save the partial state and name the exact blocker. End with a final response; do not begin the next batch.
+## Next action — Batch 2B: bounded transfer only
 
-Remaining batches: 3 scene/art; 4 responsive layout/controls; 5 core mining/banking/shake/grab loop; 6 Studio return/reopen/recovery; 7 exact-commit merge readiness. Each is a separate bounded session; already-complete work needs evidence, not recreation.
+Continue source delivery using the connected GitHub Git-data tools. Do not repeat recovery or the two-file comparison. Recheck the PR head before changing its branch. Read the prepared transfer manifest below; upload binary blobs using create_blob(base64), verifying returned SHA against the manifest. Record completed uploads at the batch boundary. Once all referenced blobs exist, create_tree using base_tree plus tree_elements, require the resulting tree SHA to equal source_tree, create a commit with the live PR head as parent (also preserve the recovery version's already-merged main ancestry using a verified additional parent when needed), then update_ref without force and with expected_sha. Verify the PR head and remote tree. Do not claim the new connector-created commit is the original local commit; the verified tree equality establishes source identity. Main reconciliation and final merge-readiness checks remain later work unless required for safe delivery.
+
+The current budget is at most 10 substantive operations plus up to 3 checkpoint operations. If the binary transfer takes multiple batches, stop at the budget with the list of completed SHAs. Preserve local checkouts until remote source delivery is verified. Do not start visual refinement, merge or deploy.
+
+Transfer manifest: `/workspace/scratch/aea40a32bfc7/pr56-transfer/manifest.json`. It contains exact UTF-8 tree content and the binary blob SHA, size and base64 file for each binary. The files are local preparation, not proof of remote delivery. If lost, regenerate from the source commit and original PR head above.
+
+- Prepared delta: 113 paths, including 16 binary blobs totaling 11,614,089 bytes.
 
 ## Preserved uncommitted changes
 
