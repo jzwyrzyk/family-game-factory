@@ -94,7 +94,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
     const geometry=await page.locator('#stage-overlay').evaluate(el=>{
       const r=el.getBoundingClientRect(),activity=el.querySelector('.language-activity')!.getBoundingClientRect();
-      const text=getComputedStyle(el.querySelector('.language-lead')!).color;
+      const text=getComputedStyle(el.querySelector('.language-question')!).color;
       return {position:getComputedStyle(el).position,top:r.top,left:r.left,width:r.width,height:r.height,
         questWidth:activity.width,questLeft:activity.left,questRight:activity.right,questTop:activity.top,text};
     });
@@ -103,7 +103,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.ok(geometry.width>=viewport.width-2&&geometry.height>=viewport.height-2);
     assert.ok(geometry.questWidth>=Math.min(330,viewport.width-30),'child has usable reading width on mobile');
     assert.ok(geometry.questLeft>=0&&geometry.questRight<=viewport.width+1);
-    assert.ok(!/rgb\(213, 222, 243\)/.test(geometry.text),'text must not inherit pale text from dark modal card');
+    assert.ok(!/rgb\(213, 222, 243\)|rgb\(255, 255, 255\)/.test(geometry.text),'the question must not inherit pale text from a dark result card');
     assert.equal(await page.locator('[data-action="leave-game"]').isVisible(),true,'the child can leave without solving or cheating');
     assert.equal(await game.evaluate(el=>(el as HTMLElement).inert),true);
     await page.keyboard.press('ArrowLeft');

@@ -85,6 +85,8 @@ The [parent area](docs/parent-progress/README.md) should help a parent see what 
 
 ## 7. The experience must work across devices and retain its identity
 
+Follow [Child interface: clear at six](docs/brand/CHILD_INTERFACE.md): remove redundant reading load, keep visible child labels at least 18px and main instructions at 20px, and check foreground/background contrast in the actual composed task and its help/error states. Question screens lead with the actual question; assessment interpretation belongs in parent reporting. Optional reading uses a deliberately chosen warm female local voice with truthful availability and immediate cancellation. Device audio quality remains a separate acceptance check.
+
 Tablet/touch use and desktop/keyboard/mouse use are first-class product targets. Controls, layouts, voice recovery, focus, pause/resume and saved versions need evidence on the intended devices. A desktop screenshot or simulated mobile viewport does not establish actual tablet reliability. Preserve readable text, accessible targets, keyboard operation and reduced-motion behavior.
 
 The brand is lowercase **jems**. Preserve the approved gem/wrench mark and wordmark; use the supplied assets and documented palette rather than inventing a replacement logo. The host's supporting characters, banners and rewards should form a coherent visual family. Child-created game worlds can have distinct styles; host brand consistency must not flatten their creative choices into one house look. Keep learning and grown-up surfaces calm and legible. Do not describe reconstructed assets as certified masters without the required visual review. See [brand standards](docs/brand/README.md) and [journey acceptance](docs/child-journey/acceptance.md).

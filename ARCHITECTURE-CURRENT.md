@@ -123,6 +123,12 @@ The executable route composition is [gateway.ts](server/gateway.ts), with reques
 
 `/v1/jobs` is the implemented generation API. The original charter's `/v1/generations`, interpret and publish endpoints are historical proposals, not alternate working APIs. API changes should update the executable contracts, affected clients/tests and the applicable schema together; the existing schema gap is not permission to enlarge it.
 
+## Learning presentation and optional narration
+
+Native checkpoints mount into `learning-modal-card`, a layout-only host distinct from the dark `modal-card` used for game results. Math retains its dark palette; Language owns its pale card, dark headings and writing labels. Host save warnings own an explicit background and foreground. The activities lead with their actual questions and share the brand's 18px label / 20px body tokens. [The child-interface contract](docs/brand/CHILD_INTERFACE.md) is the design target; its presence does not imply the broader site cleanup has shipped.
+
+The shared [friendly narrator](src/speech/friendly-narrator.ts) supplies Language reading, Studio Hear reply and Idea Workshop directions. It chooses a recognized female local English voice, favors higher-quality named variants, waits for asynchronous voice discovery, and cancels stale pending/active requests. A missing eligible voice receives a short visible notice instead of arbitrary default speech. Language records read-aloud support on playback start. This adds no provider, recording path, endpoint or persistence; browser/device voice quality remains unverified until heard on the actual device.
+
 ## Data ownership and persistence
 
 The separate [Jem Pals contract](docs/pals/README.md) adds local collectible companions to the rewards-enabled application. The catalog, growth projection and transactional store live in `src/pals/`; the trusted host connects them to Studio and Creation. No remote service or generation-worker capability is added by this feature.

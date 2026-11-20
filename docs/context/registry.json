@@ -59,7 +59,10 @@
     "docs/decisions/2026-11-19-pal-form-reconciliation.md",
     "docs/pals/art/characters/brio/README.md",
     "docs/decisions/2026-11-19-brio-art-adoption.md",
-    "docs/decisions/2026-11-20-character-first-navigation.md"
+    "docs/decisions/2026-11-20-character-first-navigation.md",
+    "docs/brand/CHILD_INTERFACE.md",
+    "docs/decisions/2026-11-20-learning-readability-and-narration.md",
+    "docs/brand/previews/learning-readability-20261120/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -111,10 +114,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
-      "sourceDigest": "348cc1f5e023e1ba22c84b5081d3f0f9d09e8d6eb64c878d642f40d881ca32f5",
+      "reviewedAt": "2026-11-20T19:05:56.900Z",
+      "sourceDigest": "a592474519dd7d2cbb9c4298d97ab076395c42176da44f80791c0ab1d23cbe35",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined owner-approved character-first navigation and Art Studio discoverability changes, including local picture actions and preserving actual Save, Build, Keep, reward, learning, privacy and artwork ownership rules.",
+      "reviewReason": "Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -178,7 +181,9 @@
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
         "docs/mind-your-jems/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/brand/CHILD_INTERFACE.md",
+        "docs/decisions/2026-11-20-learning-readability-and-narration.md"
       ],
       "sources": [
         "src/main.ts",
@@ -195,13 +200,14 @@
         "src/adult-pilot/**",
         "docs/brand/achievement-art/README.md",
         "docs/brand/achievement-art/*.json",
-        "docs/brand/art-library/**"
+        "docs/brand/art-library/**",
+        "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
-      "sourceDigest": "b623f2f18eea13951ea0b43f25ec814bfd5f4a28f6b6dae2087e0e257092fa36",
+      "reviewedAt": "2026-11-20T19:05:57.154Z",
+      "sourceDigest": "3522e893d70974d52ef32f24618e7ef2522cdfbb03b33efc8bc4949b8555da58",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated PR88’s early local Art Studio tools and composer picture entry with PR89’s menu, player-bound maker imagery and adult session entry; confirmed distinct guarded routes, draft retention, keyboard/focus and existing generation settings.",
+      "reviewReason": "Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -374,7 +380,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/adaptive-math/*.md",
         "docs/adaptive-language/*.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/brand/CHILD_INTERFACE.md"
       ],
       "sources": [
         "src/learning/**",
@@ -383,10 +390,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:56.207Z",
-      "sourceDigest": "2798174cf2197341b90d2bc4a3abf04136091e44948aa2b40550c7542dbd44d5",
+      "reviewedAt": "2026-11-20T19:05:57.591Z",
+      "sourceDigest": "0d75fe89ba7b485648a6bf2cf1f8e84447401bc98358b793a95ff49bbfd8cfb7",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed production host save ordering with Math and English attempts; optional context is emitted only after durable attempt and reward outbox, preserving subject evidence and existing earning eligibility on observer failure."
+      "reviewReason": "Reviewed question-first Math/Language rendering, 18px controls, 20px task text, disabled instructional text, form labels and recovery colors. Documented playback-start assistance with no credit for unavailable voices; curriculum, grading, subject permissions and checkpoint policy remain unchanged."
     },
     {
       "id": "services",
@@ -456,10 +463,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:15:29.595Z",
-      "sourceDigest": "d242273dcce3a2661255df5b4f9e18e242088778a592c6abe580f54742da8ad9",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed model and speech completion settlement: a revoked trusted device now returns the existing UNAUTHENTICATED error after the failed receipt and usage charge commit atomically. Adult lock still yields capability unavailable; no reply or transcript is published. Architecture and release contracts already describe these authorization and accounting boundaries accurately."
+      "reviewedAt": "2026-11-20T19:05:57.871Z",
+      "sourceDigest": "8939dd9b318ffc535db5f7166ad77a57f5768f8044706ad0536e990891be0643",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the shared recognized local female voice policy for optional Hear reply, delayed discovery, cancellation and unavailable output. Input recording, explicit Send, provider configuration, budgets and existing privacy boundaries are unchanged."
     },
     {
       "id": "adult-privacy",
@@ -529,10 +536,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T18:12:45.000Z",
-      "sourceDigest": "b77009a6ebc7ec937948c16ce00c29aa456552668c35fe0ab2b8987319dfa0bd",
+      "reviewedAt": "2026-11-20T19:05:58.166Z",
+      "sourceDigest": "cfe5911e9ebbfa04a507da0029b6b91fa3b888948760ffcab84a30f3f11cb68d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled combined #88/#89 source checks after a legacy Art Studio test assumed an unselected child could activate Let's create. Updated that test to use actual Nova selection; retained file uploads, draft continuity, isolation, no-POST, and required learner journey coverage. Prior failing hosted check remains recorded.",
+      "reviewReason": "Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -585,10 +592,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T18:12:45.000Z",
-      "sourceDigest": "b6381d06283cc20882272db9cf94dc2f35f7145937523a318214c3b69179933b",
+      "reviewedAt": "2026-11-20T19:05:58.444Z",
+      "sourceDigest": "c6333bb9df99bd909d230aa35bf3196bf7d66eed6875cb87969f99243727e134",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the exact combined #88/#89 merge ancestry and initial Arcade failure in Art Studio's old first-time onboarding fixture, then the narrow test-only correction. Recorded hosted six-workflow evidence, kept frontend/source merge distinct from production publication and actual paid execution.",
+      "reviewReason": "Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -646,10 +653,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:11:54.197Z",
-      "sourceDigest": "abfefb8163da78c1366a0cce7214858f9cbbed63c59ca7640c6aa9688d642f7d",
+      "reviewedAt": "2026-11-20T19:05:58.721Z",
+      "sourceDigest": "3baadae98a9cf0e7015e325454f85ac2f2363ebb89750ff818abaa82ed965e40",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the accepted November20 refinement and linked navigation, owner-scoped imagery and parent access from the documentation map. Existing source globs cover the new modules and tests; no checker rule, exemption or review policy is weakened.",
+      "reviewReason": "Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -712,10 +719,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3a63415513e1f54af3332636d6fd0a25a452c8fa4628df1b3ff7acac66db5217",
-      "reviewedAt": "2026-11-20T17:11:54.336Z",
+      "sourceDigest": "38e06c1fb6f9a642044a3c0a7d48edd5f148b96fb0ceccd5e25783e4dcf33943",
+      "reviewedAt": "2026-11-20T19:05:58.979Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed touch and mouse navigation helper changes plus compact-shell geometry checks. Updated route placement while retaining every task, assistance, response, learning-guard and evidence assertion; no APS algorithm, award or storage changes.",
+      "reviewReason": "Reviewed local female narration with current owner/episode/phase cancellation and access support recorded only on playback start. Sized its speech status/help controls for child readability without changing authored tasks, grading, competence evidence or storage.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

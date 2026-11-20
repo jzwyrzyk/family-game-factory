@@ -30,7 +30,6 @@ function button(text: string, className?: string): HTMLButtonElement {
   const node = el('button', className, text); node.type = 'button'; return node;
 }
 const placeName = (place: number) => ({1000000:'millions',100000:'hundred thousands',10000:'ten thousands',1000:'thousands',100:'hundreds',10:'tens',1:'ones',.1:'tenths',.01:'hundredths'} as Record<number,string>)[place] || String(place);
-const purposeText = (purpose?: string) => purpose === 'confidence' ? 'Something familiar' : purpose === 'review' ? 'Remember and try' : purpose === 'prerequisite' ? 'One useful step' : 'Try a little math';
 
 /**
  * One host-owned learning opportunity. Both input paths submit the same item and
@@ -53,11 +52,10 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   const root = el('section','math-activity'); root.dataset.answerKind = item.answerKind; root.dataset.skillId = item.skillId;
   root.dataset.mode = mode; root.dataset.attemptId = attempt.id; root.dataset.interactionKind = kind;
   root.setAttribute('role','group'); root.setAttribute('aria-labelledby',`${prefix}-question`);
-  const eyebrow = el('div','math-eyebrow',mode === 'interaction' ? 'MATH MISSION' : purposeText(item.purpose).toUpperCase());
   const title = el('h2',undefined,item.question); title.id = `${prefix}-question`; title.tabIndex = -1;
-  const skill = el('p','math-skill',item.skill);
-  const prompt = el('p','math-prompt','Take your time. You can ask for help.');
-  root.append(eyebrow,skill,title,prompt);
+  root.append(title);
+  // Keep the useful format instruction when this item has no construction mode.
+  if(kind==='answer'&&mode==='interaction')root.append(el('p','math-prompt','Write your answer. Hints can help.'));
   if(item.visual)root.append(renderMathVisual(item.visual));
 
   const tabs = el('div','math-mode-tabs'); tabs.setAttribute('role','group'); tabs.setAttribute('aria-label','How would you like to answer?');
@@ -210,10 +208,6 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     });
     const check=button('Use this fraction','math-primary');check.dataset.action='check-interaction';on(check,'click',()=>submit(`${numerator}/${denominator}`));
     mission.append(controls,total,picture,check);interactionArea.append(mission);refresh();
-  } else {
-    // Choice-based spatial items are already mathematical interactions. For a
-    // free-text answer, say what is supported instead of inventing a fake model.
-    if(kind==='answer'&&mode==='interaction')prompt.textContent='This idea uses a written answer. You can still explore the hints.';
   }
   function setPath(interactive:boolean){const usable=kind==='quantity'||kind==='fraction';interactionArea.hidden=!interactive||!usable;answerArea.hidden=interactive&&usable;typeTab.setAttribute('aria-pressed',String(!interactive));buildTab.setAttribute('aria-pressed',String(interactive));}
   on(typeTab,'click',()=>{setPath(false);returnToAnswer();});on(buildTab,'click',()=>{setPath(true);returnToAnswer();});

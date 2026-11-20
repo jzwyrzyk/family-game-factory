@@ -17,7 +17,7 @@ body.studio-review.jems-compact-navigation .site-header .studio-shell-tools {
 body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   min-height: 48px; min-width: 48px; padding: 11px 15px;
-  font-size: 1rem; line-height: 1.3; white-space: nowrap;
+  font-size: var(--jems-child-label, 18px); line-height: 1.3; white-space: nowrap;
 }
 body.studio-review.jems-compact-navigation .studio-menu-toggle.has-current-destination {
   color: #50258c; background: #ede2ff;
@@ -44,16 +44,16 @@ body.studio-review.jems-compact-navigation .studio-menu-dialog[open] {
 .studio-menu-content { overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px max(24px, env(safe-area-inset-bottom)); }
 .studio-menu-group { display: grid; gap: 6px; margin: 0 0 22px; }
 .studio-menu-group:last-child { margin-bottom: 0; }
-.studio-menu-group h3 { margin: 0 0 4px; color: #53338a; font: 800 1rem/1.4 var(--jems-body, system-ui); }
+.studio-menu-group h3 { margin: 0 0 4px; color: #53338a; font: 800 var(--jems-child-label, 18px)/1.4 var(--jems-body, system-ui); }
 body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button {
   display: flex; align-items: center; gap: 12px; width: 100%;
   min-height: 52px; padding: 12px 14px; border: 1px solid transparent;
   border-radius: 14px; background: #f6f4fa; color: #223653;
-  font: 750 1.0625rem/1.4 var(--jems-body, system-ui);
+  font: 750 var(--jems-child-label, 18px)/1.4 var(--jems-body, system-ui);
   text-align: left; justify-content: flex-start; white-space: normal;
 }
 body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #studioNavScenes {
-  font-size: 1.0625rem; padding-inline: 14px;
+  font-size: var(--jems-child-label, 18px); padding-inline: 14px;
 }
 body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button .jems-icon { flex: 0 0 24px; }
 body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button:hover,
@@ -71,7 +71,7 @@ body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #jem
   margin: 5px 0 0; border-color: #d7e4fa; background: #eef5ff;
 }
 body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #jemsRewardsWidget :is(span, strong, small) {
-  font-size: 1rem;
+  font-size: var(--jems-child-label, 18px);
 }
 body.studio-review.jems-compact-navigation .studio-menu-dialog #studioLearningChoice:not([hidden]) {
   display: block; margin: 10px 0 0; padding: 0;
@@ -114,7 +114,7 @@ body.studio-review.jems-compact-navigation.studio-first-visit .studio-menu-dialo
     border-top: 1px solid #d9d3e8; background: #fff; box-shadow: 0 -5px 20px #1424470b;
   }
   body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button {
-    min-height: 52px; padding: 9px 5px; gap: 5px; font-size: 1rem;
+    min-height: 52px; padding: 9px 5px; gap: 5px; font-size: var(--jems-child-label, 18px);
   }
   body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button .jems-icon { width: 22px; height: 22px; }
   /* Work areas keep navigation in the document flow. A fixed app bar must never

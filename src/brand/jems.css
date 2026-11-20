@@ -1,6 +1,8 @@
 /* jems · Universal brand layer — loaded after existing arcade and Studio styles. */
 /* Brand portfolio approved Nov 2026; legacy local data keys are intentionally unchanged. */
 :root {
+ --jems-child-label:18px;
+ --jems-child-body:20px;
  --jems-ink:#0B1E3B; --jems-blue:#2E6BFF; --jems-purple:#8B5CF6;
  --jems-mint:#22D3A6; --jems-gold:#FFC24D; --jems-coral:#FF5E7A;
  --jems-cloud:#FFF7EE; --jems-lilac:#E6D8FF;
@@ -428,8 +430,8 @@ body:not(.studio-review) #page-feedback .live-factory label {color:#344466;}
 
 /* Preserve legible titles in *dark* modal overlays; these are not white panels. */
 .stage-overlay .modal-card,.studio-review .studio-native-game .modal-card {color:#FFFFFF;}
-.stage-overlay .modal-card h2,.stage-overlay .modal-card h3,
-.studio-review .studio-native-game .modal-card h2 {color:#FFFFFF;}
+.stage-overlay .modal-card > h2,.stage-overlay .modal-card > h3,
+.studio-review .studio-native-game .modal-card > h2 {color:#FFFFFF;}
 
 /* Parent restore action uses a pale secondary button rather than dark-on-dark label text. */
 #page-parent .panel label.upload-button.btn.secondary {background:#F2ECFF;color:#513099;border:1px solid #C8B4F1;min-height:44px;}

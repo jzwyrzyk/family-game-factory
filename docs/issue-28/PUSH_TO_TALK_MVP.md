@@ -55,3 +55,7 @@ The source merge order was **#42 → #36 → #43**. These changes are now integr
 6. Track private-worker repinning/image acceptance separately from voice rollout. A frontend or coach deployment does not update generated-game execution. Record each component's deployed identity, actual enabled capabilities and observed journey results in the delivery ledger.
 
 **Merge is not deployment; deploy is not acceptance.** Every final declaration must identify the merged SHA, deployed frontend/gateway/preview/worker/coach revisions, exact approved configuration, and verified real-device evidence.
+
+## Optional output voice refinement — November 20
+
+[The shared child-interface contract](../brand/CHILD_INTERFACE.md) requires warm, upbeat female narration at a natural pace. Browser output now uses `src/speech/friendly-narrator.ts` across Hear reply, Language reading and Idea Workshop directions. It deliberately chooses recognized local female English voices, waits for a delayed voice list and refuses an arbitrary default. Output remains explicit and cancelable; an unavailable voice leaves text and a short notice. This is separate from microphone transcription and introduces no remote service or provider permission. Real-device voice quality still requires listening acceptance.
