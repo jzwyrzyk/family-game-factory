@@ -77,8 +77,8 @@ def check_wif(wif, p):
         'workflow_ref': PRIVATE_REPO+'/.github/workflows/factory-private.yml@refs/heads/main',
         'workflow_sha': p,
     }
-    matches = all(re.search(r'assertion\\.' + name + r'\\s*==\\s*([\\\'"])'
-                            + re.escape(value) + r'\\1', condition)
+    matches = all(re.search(r'assertion\.' + name + r"\s*==\s*['\"]"
+                            + re.escape(value) + r"['\"]", condition)
                   for name, value in exact.items())
     if (wif.get('state') != 'ACTIVE' or not matches
             or '||' in condition or set(ALL_SHAS.findall(condition)) != {p}):
