@@ -1,116 +1,82 @@
 # Gem Pal character and form references
 
-**Partial reference-library integration:** November 20, 2026. Current import does not imply complete character or runtime artwork. **Latest scoped art addition:** November 19, 2026 (America/New_York). **Brio’s compact Base and corrected Grown are owner-approved**, with six new expression candidates in review. The represented index now contains **23 roster entries and 24 individual profiles**; F still comprises F1 Navi and F2 Mote. C Tollo and J Pock remain set aside.
+## Approved core art
 
-Start with [Brio’s selected masters and emotion review](characters/brio/README.md) and the [Brio adoption decision](../../decisions/2026-11-19-brio-art-adoption.md). His folder contains exactly two neutral masters plus Celebrate, Thinking and Encouraging retry for each form. The original PNG bytes are retained.
+**Reconciled November 20, 2026 (America/New_York).** The original **23 individual profiles across 22 roster entries** have approved artwork for both forms: **46 neutral masters plus 138 expressions, 184 images total** in selected package **2.9**. Each form has Neutral, Celebrate, Thinking and Encouraging retry. There are no unresolved current forms or pending core-expression approvals in this original roster.
 
-## Earlier imported roster snapshot
+The [existing character index](character-references.json) remains the authority for identity, selected references, approval scope and history. The [versioned export manifest](../../../public/jems-pals/manifest.json) binds these approved sources to **184 lossless WebP files** under `public/jems-pals/`, version `core-2026-11-20`. Each record includes the full source PNG hash, exported WebP hash, dimensions and form/expression identity. Original pixels, dimensions, alpha and background treatment are retained.
 
-The remainder of the earlier roster review below is retained from PR74 head `d2f344e0e56a274175cbca78ab361783b46d9882`. Its unresolved/reference statuses are dated import evidence, not a new assertion about later owner approvals. This addition preserves those records without substituting images or re-auditing other characters.
+**Brio remains separate:** his two neutral masters are approved and six expressions remain in review. His [profile and image files](characters/brio/README.md), [adoption decision](../../decisions/2026-11-19-brio-art-adoption.md), index member and asset records are unchanged. The complete index therefore still represents **23 roster entries and 24 profiles**. F contains the separate F1 Navi and F2 Mote profiles; C Tollo and J Pock remain set aside.
 
-In that imported snapshot, the owner had selected the newly shown **U Pleeko, V Talli and X Whorl** mature portraits, and preferred **T Chimi and F1 Navi from the other companion artwork conversation**. The exact latest Chimi and Navi files remain unresolved in this record; their selection is recorded without substituting another image. S Poff and W Zippa remain review candidates.
+## Current neutral exports and identity crosswalk
 
-Growth review has resumed. The [later form-selection decision](../../decisions/2026-11-19-pal-form-reconciliation.md) supersedes the earlier pause and preserves specific selections. It does not approve every mature candidate or establish application integration.
+Every original profile below has all three core expressions approved for both forms. The index preserves each established `character_key`; names and export slugs do not replace those identities. Earlier species IDs remain null where unassigned. S–X retain GP-S019 through GP-S024, and Brio retains GP-S025.
 
-## Two growth stages: Base and Grown
+| Alias | Profile / export slug | Species ID | Approved Base | Approved Grown |
+| --- | --- | --- | --- | --- |
+| A | Luma / `luma` | Unassigned | [Base](../../../public/jems-pals/luma/base/neutral-93fde3101e62.webp) | [Grown](../../../public/jems-pals/luma/mature/neutral-6b3ffa07f571.webp) |
+| B | Nook / `nook` | Unassigned | [Base](../../../public/jems-pals/nook/base/neutral-458c3fb0fc44.webp) | [Grown](../../../public/jems-pals/nook/mature/neutral-be860de47216.webp) |
+| D | Mizzle / `mizzle` | Unassigned | [Base](../../../public/jems-pals/mizzle/base/neutral-37e57f8937e6.webp) | [Grown](../../../public/jems-pals/mizzle/mature/neutral-e978474ddffa.webp) |
+| E | Tumble / `tumble` | Unassigned | [Base](../../../public/jems-pals/tumble/base/neutral-a75baf959eda.webp) | [Grown](../../../public/jems-pals/tumble/mature/neutral-8279cc081987.webp) |
+| F1 | Navi / `navi` | Unassigned | [Base](../../../public/jems-pals/navi/base/neutral-f0d1f53e54dd.webp) | [Grown](../../../public/jems-pals/navi/mature/neutral-ed4534b76918.webp) |
+| F2 | Mote / `mote` | Unassigned | [Base](../../../public/jems-pals/mote/base/neutral-4dc984ce0f70.webp) | [Grown](../../../public/jems-pals/mote/mature/neutral-2db6976032b2.webp) |
+| G | Sivo / `sivo` | Unassigned | [Base](../../../public/jems-pals/sivo/base/neutral-b3600e7cc722.webp) | [Grown](../../../public/jems-pals/sivo/mature/neutral-7837cf6380f8.webp) |
+| H | Furl / `furl` | Unassigned | [Base](../../../public/jems-pals/furl/base/neutral-b6ba89248449.webp) | [Grown](../../../public/jems-pals/furl/mature/neutral-c689f2256e41.webp) |
+| I | Tessit / `tessit` | Unassigned | [Base](../../../public/jems-pals/tessit/base/neutral-114b74de9e72.webp) | [Grown](../../../public/jems-pals/tessit/mature/neutral-a50b4cddf9b2.webp) |
+| K | Flick / `flick` | Unassigned | [Base](../../../public/jems-pals/flick/base/neutral-09e10c435dcd.webp) | [Grown](../../../public/jems-pals/flick/mature/neutral-bd0f358d1012.webp) |
+| L | Clasp / `clasp` | Unassigned | [Base](../../../public/jems-pals/clasp/base/neutral-b0b8aba2bb28.webp) | [Grown](../../../public/jems-pals/clasp/mature/neutral-a6c9939e3eed.webp) |
+| M | Skiff / `skiff` | Unassigned | [Base](../../../public/jems-pals/skiff/base/neutral-ff5d636dbdce.webp) | [Grown](../../../public/jems-pals/skiff/mature/neutral-006e15bba0a9.webp) |
+| N | Peep / `peep` | Unassigned | [Base](../../../public/jems-pals/peep/base/neutral-e5fb86581cc8.webp) | [Grown](../../../public/jems-pals/peep/mature/neutral-6afc004481ee.webp) |
+| O | Weft / `weft` | Unassigned | [Base](../../../public/jems-pals/weft/base/neutral-ce8ebc0adae5.webp) | [Grown](../../../public/jems-pals/weft/mature/neutral-d8a6165d9fa1.webp) |
+| P | Cache / `cache` | Unassigned | [Base](../../../public/jems-pals/cache/base/neutral-9dac020556a5.webp) | [Grown](../../../public/jems-pals/cache/mature/neutral-9fffd1f08a0f.webp) |
+| Q | Brim / `brim` | Unassigned | [Base](../../../public/jems-pals/brim/base/neutral-ecfe4d863199.webp) | [Grown](../../../public/jems-pals/brim/mature/neutral-e1deceb1c58f.webp) |
+| R | Wink / `wink` | Unassigned | [Base](../../../public/jems-pals/wink/base/neutral-42c9a2c10602.webp) | [Grown](../../../public/jems-pals/wink/mature/neutral-7c83c99e39f5.webp) |
+| S | Poff / `poff` | GP-S019 | [Base](../../../public/jems-pals/poff/base/neutral-147c13ba7e6c.webp) | [Grown](../../../public/jems-pals/poff/mature/neutral-8504050f12e9.webp) |
+| T | Chimi / `chimi` | GP-S020 | [Base](../../../public/jems-pals/chimi/base/neutral-2dc6024a8f92.webp) | [Grown](../../../public/jems-pals/chimi/mature/neutral-839afb70a7e3.webp) |
+| U | Pleeko / `pleeko` | GP-S021 | [Base](../../../public/jems-pals/pleeko/base/neutral-acf9007b0389.webp) | [Grown](../../../public/jems-pals/pleeko/mature/neutral-3c0b43f73d21.webp) |
+| V | Talli / `talli` | GP-S022 | [Base](../../../public/jems-pals/talli/base/neutral-e86fa909bb99.webp) | [Grown](../../../public/jems-pals/talli/mature/neutral-0785af1c21ae.webp) |
+| W | Zippa / `zippa` | GP-S023 | [Base](../../../public/jems-pals/zippa/base/neutral-b0f8aca344a3.webp) | [Grown](../../../public/jems-pals/zippa/mature/neutral-df295181dbce.webp) |
+| X | Whorl / `whorl` | GP-S024 | [Base](../../../public/jems-pals/whorl/base/neutral-6c3dfbd80b7c.webp) | [Grown](../../../public/jems-pals/whorl/mature/neutral-bcca0e4f1289.webp) |
+| brio | Brio / `brio` | GP-S025 | [Base](characters/brio/initial.png) | [Grown](characters/brio/growth.png) |
 
-The current product decision is **exactly two visible forms per Pal**, not three. **Stage 1 — Base** uses its approved original creature. **Stage 2 — Grown** uses its individually selected, substantially transformed creature. There is **no Bright/intermediate form** to illustrate, approve, or produce in this release. The earlier three-form Luma studies are archival. Approved base images and selected grown images remain independently versioned and retain their full revision history.
+The [manifest](../../../public/jems-pals/manifest.json) lists all core expressions; Brio's [six expression candidates](characters/brio/README.md) retain their separate review status. Runtime manifest bindings use the existing character keys, `base`/`mature` forms and `neutral`, `celebrate`, `thinking`, `encouraging_retry` states. Kit `initial` maps to `base`; kit `growth` maps to `mature`, whose display name is **Grown**.
 
-This is a **form-count and artwork-mapping decision**, not a new earning threshold or a declaration that all Grown portraits are approved. [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) is now merged and derives Base for 0–4 adventures and Grown from five. This reference import does not change that earned-progress policy, saved receipts, ownership or backups. Exact art-to-runtime identity mappings remain unassigned.
+## Selected revisions and production limits
 
-## Authoritative records
+- **Navi Base R2** has one faceless floating violet focus gem above the palms. It governs all three Base R2 expressions. The previous gemless neutral is superseded in form history and is not a second active master. F2 Mote remains a distinct character.
+- **Tumble Base expressions are R4**; their corrected transparent isolation is the approved selection. Other core expression images are R1 except Navi Base R2. The current neutral pointers remain independent of expression revisions.
+- **Poff and Zippa Grown** use the selected less-humanoid R2 concepts. Earlier review candidates remain historical; filenames and board order do not select current art.
+- **Mote Base's neutral source is 125×145 pixels.** Fine-facet fidelity beyond that source resolution remains unverified, and larger-display quality needs handling during production preparation. Its exact neutral and expression approvals are settled; higher-resolution expressions do not recover or replace its neutral source.
+- Source images include both opaque scenes and transparent cutouts. These exports preserve that treatment; a lossless export does not establish universal transparent-sprite readiness, aligned animation anchors or a character rig.
 
-- [character-references.json](character-references.json) is the current character/form index. It separates identity, form, artwork revision, exact-reference resolution, user selection, superseded history and production status. Every selected base source is resolved; mature-reference gaps remain explicit.
-- [approved-base-designs.json](approved-base-designs.json) preserves the six original S-X base specifications, design IDs, protected base anchors and exact board hashes. It links current grown-form status to the character index instead of duplicating a second active growth specification.
-- The [base-adoption decision](../../decisions/2026-11-19-pal-base-design-adoption.md) preserves the original scope and reasoning. Its growth hold is historical.
+Owner approval is complete for the original core set. The expression reviews include creator and independent checks of own-form continuity and the three states at full size and 240-pixel display height. Export integrity, motion/rig compatibility, application behavior and live acceptance have distinct evidence. No new art is generated by this reconciliation.
 
-The earlier imported subset records **three selected exact mature portraits, two selected mature references awaiting their exact image, two accepted growth directions awaiting the latest single-character profile, five exact review candidates and eleven unresolved mature references**. Brio adds one independently approved exact Grown reference and one approved Base; his six emotions have separate in-review states. An unresolved reference does not mean the artwork has never been made. It means this record has not recovered the exact current artifact and must not guess.
+## Two forms and stable application history
 
-The repository contains the two approved S-X base boards, three selected U/V/X grown portraits, and Brio’s eight current PNGs (two approved masters and six expression candidates). Other exact sources retain their Library identifiers, versions, URLs and hashes. Those URLs preserve their source access controls; the files are not bundled runtime assets.
+There are exactly two visible forms: **Base → Grown, one transition**. Keep the index keys `forms.base` and `forms.mature`. Expressions, image revisions and the separate Spark/Nova maker journey do not add an intermediate Pal form.
 
-## Imported character map and Brio addition
+[ADR0013](../../decisions/0013-two-form-pals-and-current-main.md) retains Base at 0–4 adventures and Grown from five. This art update changes no earning threshold, activity receipt, collection entitlement, ownership record or backup. Existing `glim`/`kip`/`riff` identities and `pal-*` scene assets must not be silently reassigned by visual resemblance. Explicit versioned character/form/expression bindings and saved-scene compatibility require their own implementation checks.
 
-Navi is the peach hooded character, and Mote is the distinct violet faceted partner with orange eyes. Keep F1 and F2 separate when assigning images. The selected newest Navi image must be inspected before deciding whether its floating gem is Mote or a non-character spell gem.
+## Retained reference history
 
-| Alias | Character | Base reference | Mature reference status |
-| --- | --- | --- | --- |
-| A | Luma | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-d3903e8b517c8191b2334d4587e20777_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| B | Nook | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-5fbd5cf2fcc48191bd1375e47469f30e_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| D | Mizzle | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-5bff8aebfa3c8191b3729a24575341cb_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| E | Tumble | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-5bff8aebfa3c8191b3729a24575341cb_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| F1 | Navi | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-5bff8aebfa3c8191b3729a24575341cb_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Selected; exact portrait pending |
-| F2 | Mote | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-5bff8aebfa3c8191b3729a24575341cb_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| G | Sivo | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-dd35e40edafc819181887b9cfcc1c9ed_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Direction accepted; current single profile pending |
-| H | Furl | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-75c4fa8f62048191a5bc3a2bb39522d2_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| I | Tessit | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-dd35e40edafc819181887b9cfcc1c9ed_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| K | Flick | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-545e330eb0288191937db57d3f381427_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| L | Clasp | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-545e330eb0288191937db57d3f381427_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| M | Skiff | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-26b870d9a8088191bdef91b77c0860ab_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | [Review candidate; not selected](https://chatgpt.com/library?file_id=libfile_fde3_f-4ae0ae9b02c881919b7f3fb09319309d_64db2735d5688191ad02463aaa0cddc5&account_id=personal) |
-| N | Peep | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-26b870d9a8088191bdef91b77c0860ab_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| O | Weft | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-75c4fa8f62048191a5bc3a2bb39522d2_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Direction accepted; current single profile pending |
-| P | Cache | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-7a33362fd7a48191a44559e777eb015b_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | [Review candidate; not selected](https://chatgpt.com/library?file_id=libfile_fde3_f-976e2a59097c8191a5bf8b287150f5a2_64db2735d5688191ad02463aaa0cddc5&account_id=personal) |
-| Q | Brim | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-7a33362fd7a48191a44559e777eb015b_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | [Review candidate; not selected](https://chatgpt.com/library?file_id=libfile_fde3_f-e829b8466f5c819193162c5e7a311b30_64db2735d5688191ad02463aaa0cddc5&account_id=personal) |
-| R | Wink | [Selected base source](https://chatgpt.com/library?file_id=libfile_fde3_f-7a33362fd7a48191a44559e777eb015b_64db2735d5688191ad02463aaa0cddc5&account_id=personal) | Latest current portrait unresolved |
-| S | Poff | [Selected base source](boards/pals-s-u-r2.png) | [Review candidate; not selected](https://chatgpt.com/library?file_id=libfile_fde3_f-eb99cbb9a7588191a467e6c6efc97e93_64db2735d5688191ad02463aaa0cddc5&account_id=personal) |
-| T | Chimi | [Selected base source](boards/pals-s-u-r2.png) | Selected; exact portrait pending |
-| U | Pleeko | [Selected base source](boards/pals-s-u-r2.png) | [Selected exact portrait](growth-selected/pleeko-u-growth-selected.png) |
-| V | Talli | [Selected base source](boards/pals-v-x-r2.png) | [Selected exact portrait](growth-selected/talli-v-growth-selected.png) |
-| W | Zippa | [Selected base source](boards/pals-v-x-r2.png) | [Review candidate; not selected](https://chatgpt.com/library?file_id=libfile_fde3_f-67f94aa08b108191885ecce2eeeff910_64db2735d5688191ad02463aaa0cddc5&account_id=personal) |
-| X | Whorl | [Selected base source](boards/pals-v-x-r2.png) | [Selected exact portrait](growth-selected/whorl-x-growth-selected.png) |
-| brio (standalone; no board alias) | Brio | [Approved Base](characters/brio/initial.png) | [Approved corrected Grown](characters/brio/growth.png); [six emotions in review](characters/brio/README.md) |
+All 13 PNGs published in PR74 at `aa4ce0c54dcd6f58adb42d57c8eb8f7e729d7465` were already imported byte-for-byte by [PR85](https://github.com/jzwyrzyk/family-game-factory/pull/85). The current [PR90 successor](https://github.com/jzwyrzyk/family-game-factory/pull/90) completes the approved original-roster exports and expression playground from main after PR89; it does not require merging PR74's stale branch. Actual PR disposition and acceptance are recorded in [delivery state](../../../DELIVERY-STATE.md).
 
-The index records a character's region within a source board. A board containing several characters is not an isolated portrait. Review aliases are board-scoped labels, names are editable, and the six S-X species IDs remain GP-S019 through GP-S024. None is an application ID. Earlier canonical species IDs remain unassigned where they were not recovered.
+The earlier import from PR74 head `d2f344e0e56a274175cbca78ab361783b46d9882` recorded selected, in-review and unresolved forms. Those dated states are now preserved in each form's history, while every pre-existing asset record remains unchanged. The current selected pointers above supersede the import's unresolved Chimi/Navi and other original-roster gaps. Historical source boards remain references, not additional active neutral masters.
 
-### Selected base boards
+The [base adoption](../../decisions/2026-11-19-pal-base-design-adoption.md) and [form reconciliation](../../decisions/2026-11-19-pal-form-reconciliation.md) decisions keep their original dated scope. [approved-base-designs.json](approved-base-designs.json) retains the original S–X specifications and protected Base anchors. No historical decision document is rewritten by this reconciliation.
 
-![Approved revision 2 bases S Poff, T Chimi and U Pleeko](boards/pals-s-u-r2.png)
-
-![Approved revision 2 bases V Talli, W Zippa and X Whorl](boards/pals-v-x-r2.png)
-
-### Selected mature portraits
-
-**U Pleeko:** tall articulated peach climber, connected emerald torso hinges and four supporting limbs.
-
-![Selected U Pleeko mature portrait](growth-selected/pleeko-u-growth-selected.png)
-
-**V Talli:** extended blue ribbon body and supporting ribbon limbs, preserving the coral terminal anchor.
-
-![Selected V Talli mature portrait](growth-selected/talli-v-growth-selected.png)
-
-**X Whorl:** open aqua torso, supported sapphire rotor, long balancing limbs and a counterbalancing tail.
-
-![Selected X Whorl mature portrait](growth-selected/whorl-x-growth-selected.png)
-
-The other-chat Chimi selection is the latest correction with short attached arms and paired sound chambers. The Navi selection is the hovering violet-crystal caster with a broad natural hood and curled lower body. Their exact source references are pending. The local Chimi growth study is retained only as superseded history in the external reference index; it must not stand in for the chosen other-chat version.
-
-## Revision and production boundaries
-
-A newer generation does not move a selected pointer. Record the requested change, the selected source revision, preserved identity features, the resulting artifact and its actual review status. A base edit preserves base anchors; a grown form may deliberately change body architecture. Never overwrite a base record with a mature form.
-
-The selected images are concept portraits with backgrounds; the older boards/portraits also contain presentation labels. Brio’s images contain one character and no labels. Isolated transparent assets, small-size readability, multiple anatomy views, expression compatibility and animation anchors remain separate work. Design capabilities describe fictional affordances, not implemented mechanics or verified physical performance.
-
-The approved [brand library v1.2](../../brand/art-library/README.md) remains separate. Its Gem helper and Spark/Nova makers are not reassigned as collectible species. These reference images do not alter its fixed runtime illustration set.
-
-## Application handoff
-
-This art reference tranche is based on main after merged [PR81](https://github.com/jzwyrzyk/family-game-factory/pull/81) and [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68). The two-form companion runtime retains the provisional `glim`, `kip` and `riff` identities, existing gem-token portraits and receipt-based Base/Grown progress. This registry is **not loaded** by that implementation and does not choose runtime identities by visual resemblance.
-
-The chosen character references are concept portraits and multi-character boards, **not game-ready sprites**. Keep runtime art mappings null until single-character form exports and versioned owner-approved identities are implemented and tested.
-
-Next work is to recover exact missing current references, prepare selected isolated form assets, review form-specific expressions and movement, and explicitly bind the roster to persistent application and saved-scene IDs. Preserve earned collections, source attribution, profile boundaries and backup behavior. A shared Navi/Mote design entry does not by itself decide how the application acquires, owns or equips the pair.
-
-When PR68 is reconciled with main, link this entry point from its feature contract at `docs/pals/README.md`. Keep its collection and runtime contract distinct from art review. Verify the complete collection-to-growth-to-creative-scene journey, reload/backup behavior and intended device layouts before claiming integration acceptance. Merge and deployment remain separately evidenced in [delivery state](../../../DELIVERY-STATE.md).
-
-## File integrity
-
-Repository paths below are relative to this directory. These images match the exact selected sources; the reference index also records byte counts and external provenance.
-
-| File | SHA-256 |
+| Retained repository source | SHA-256 |
 | --- | --- |
-| `boards/pals-s-u-r2.png` | `c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49` |
-| `boards/pals-v-x-r2.png` | `47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9` |
-| `growth-selected/pleeko-u-growth-selected.png` | `fa4b7948259ec286aa1cacd6b29d6527b753a803e1674a7b783f0a845e327ab8` |
-| `growth-selected/talli-v-growth-selected.png` | `3918ad275e9761bb0e2b75e55ae27fc01ba5496537e9699378e736d0bc210aee` |
-| `growth-selected/whorl-x-growth-selected.png` | `1f30067a5928d0139e9f2a5fd20c6eafe9a40f4da507de3ae7cf4f88ac510306` |
+| [S–U Base board](boards/pals-s-u-r2.png) | `c998f9ff5b1ed8d85b0059bd3b8d2ebbef76b9c1ceeb194601a14fe9d33f1c49` |
+| [V–X Base board](boards/pals-v-x-r2.png) | `47ac1d9ded0d5b945b3552f66ec5c71b277d79db4e806ca0f8de5413e20f4fc9` |
+| [Earlier selected Pleeko source](growth-selected/pleeko-u-growth-selected.png) | `fa4b7948259ec286aa1cacd6b29d6527b753a803e1674a7b783f0a845e327ab8` |
+| [Earlier selected Talli source](growth-selected/talli-v-growth-selected.png) | `3918ad275e9761bb0e2b75e55ae27fc01ba5496537e9699378e736d0bc210aee` |
+| [Earlier selected Whorl source](growth-selected/whorl-x-growth-selected.png) | `1f30067a5928d0139e9f2a5fd20c6eafe9a40f4da507de3ae7cf4f88ac510306` |
 
-Brio’s eight image hashes and byte sizes are recorded in [character-references.json](character-references.json); his [profile](characters/brio/README.md) links every current asset without duplicating the images.
+The eight Brio PNG hashes and sizes remain in [the index](character-references.json). The approved [brand library](../../brand/art-library/README.md), Gem helper and Spark/Nova makers remain separate from these species.
+
+## Application handoff and acceptance
+
+The [implemented expression playground](../EXPRESSIONS.md) uses the immutable manifest version, exact character key, form and expression together. Its My Pals preview does not assign these species to the existing earned collection. Missing or unsupported expressions should fall back to that form's approved neutral. Preserve full silhouettes, props and contact/hover relationships when displaying or animating these images; align any later derivatives without replacing approved sources silently.
+
+Verify form changes, expression events, a bounded motion pilot, collection/scene use, reload, backup behavior, intended device layouts and reduced motion against the actual implementation. Artwork approval and export validation do not themselves establish those results. The [Pal feature contract](../README.md), [current architecture](../../../ARCHITECTURE-CURRENT.md) and [delivery state](../../../DELIVERY-STATE.md) own the corresponding implementation, merge, deployment and acceptance claims.

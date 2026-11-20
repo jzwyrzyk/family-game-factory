@@ -1,5 +1,17 @@
 # Companion implementation previews
 
+## Approved expression playground — current combined candidate
+
+These captures show the actual production-built **My Pals → Try Pal expressions** surface from the combined PR90 candidate based on merged PR89 main `669df0ef5e73e11c8786b741815ba290c820d326`, using assets **`index-iVs4Asj-.js` / `index-CvQ7lEds.css`**. The desktop and phone images were regenerated from that bundle and visually inspected. Six Pal component groups, eight expression-browser groups and eight integrated application Pal groups passed locally; [delivery state](../../../DELIVERY-STATE.md) records the complete scope and remaining hosted gate.
+
+| Capture | Evidence scope |
+| --- | --- |
+| [Expression playground, desktop](expressions-desktop.png) | A 1440px application viewport, cropped to the actual playground panel. |
+| [Expression playground, phone](expressions-mobile.png) | A 390px application viewport showing contained Navi Grown Encouraging retry art and the character/form/expression controls. |
+
+The selected portrait uses exact approved pixels. Preview controls expose 23 original profiles, Base/Grown and Ready/Celebrate/Think/Try again; they do not collect, equip, grow or award anything. These images do not establish a merged release, creature-to-collection identity mapping, articulated rigs, production deployment or physical-device/child acceptance. The [expression contract](../EXPRESSIONS.md) defines the tested source behavior.
+
+
 ## Current Base/Grown integration
 
 The captures in `two-form/` use production assets **index-CD85vMsh.js / index-C67kjIJc.css** with PR81/current-main integration. The built-app journeys passed on this source, and an independent reviewer inspected desktop/390px collection, scene, failed-save, owner-loading and 320px navigation captures. Historical images below remain unchanged.

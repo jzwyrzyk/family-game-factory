@@ -18,7 +18,7 @@
 
 Use one existing character-reference index. Its established repository path is `docs/pals/art/character-references.json`; this guide does not create a competing `CHARACTER_REGISTRY.json` or copy a stale roster into the method.
 
-As of November 20, 2026, the first selected-art reference tranche is represented at [the canonical index](art/character-references.json) and [visual entry point](art/README.md). It retains owner-selected Base and Grown references with in-review expression states explicitly distinguished. Missing Chimi/Navi exact sources and other forms remain unresolved; the dated imported records are not a claim that all 24 profiles are production-ready.
+As of November 20, 2026, [the canonical index](art/character-references.json) reconciles all **23 original profiles** with approved package **2.9**: **46 neutral masters and 138 expressions**, covering Base and Grown with Celebrate, Thinking and Encouraging retry for each form. The [visual entry point](art/README.md) and [versioned export manifest](../../public/jems-pals/manifest.json) identify the exact current images and lossless WebP derivatives. Earlier selected pointers and unresolved import records remain history. Navi's corrected Base R2 has one faceless floating violet focus gem; its prior gemless reference is superseded. Brio remains a separate 24th profile with two approved neutrals and six expressions in review. The [expression contract](EXPRESSIONS.md) describes the implemented read-only My Pals playground; [delivery state](../../DELIVERY-STATE.md) records its current candidate and validation. Completed art approvals and pixel-preserving exports do not establish earned-collection identity mapping, articulated rigs or live acceptance.
 
 For each task:
 
@@ -52,7 +52,7 @@ The companion runtime [PR68](https://github.com/jzwyrzyk/family-game-factory/pul
 
 ## Keep this method current
 
-Capture feedback with its target, scope, observable failure, corrective delta, selected asset, and downstream impact. Update the applicable guide and established character record in the same scoped PR. Keep local defects local; promote only useful general checks. The [maintenance process](../context/MAINTENANCE.md) and `pal-design` documentation review area cover this method, its thin repository skill, and the established `docs/pals/art/character-references.json` path when that index lands. The future route does not import the draft artwork.
+Capture feedback with its target, scope, observable failure, corrective delta, selected asset, and downstream impact. Update the applicable guide and established character record in the same scoped PR. Keep local defects local; promote only useful general checks. The [maintenance process](../context/MAINTENANCE.md) and `pal-design` documentation review area cover this method, its thin repository skill, and the established `docs/pals/art/character-references.json` path. Keep reference approval, export validation and runtime acceptance separately evidenced.
 
 Repository-aware assistants reach this through [AGENTS.md](../../AGENTS.md). The [ChatGPT Project retrieval rule](../context/CHATGPT-PROJECT-INSTRUCTIONS.md) provides the matching instruction for ordinary chats; a repository file does not change Project settings or force automatic retrieval. A personal ChatGPT skill should retrieve this canonical guide or clearly identify itself as a dated distribution.
 
