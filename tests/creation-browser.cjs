@@ -30,6 +30,9 @@ const {start}=require('./browser-server.cjs');
       await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
       const activate=async target=>{
         const locator=typeof target==='string'?page.locator(target):target;
+        if(typeof target==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(target)&&!await locator.isVisible()){
+          await activate('#studioNavMenu');
+        }
         if(touch)await locator.tap();else await locator.click();
       };
       const set=async(locator,value)=>{await locator.fill(String(value));await locator.press('Tab');};

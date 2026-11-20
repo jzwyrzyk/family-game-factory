@@ -6,7 +6,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,waitForWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,waitForWelcome,completeWelcome,navigate}=require('./studio-entry.cjs');
 
 const NOTEBOOK='family-game-factory-studio-v1';
 const devices=[['desktop',{width:1280,height:900}],['phone',{width:390,height:844}]];
@@ -107,12 +107,20 @@ async function localFirstJourney(browser,url,device,viewport){
   assert.equal(await page.locator('#studioNavHome').isVisible(),false,'the first invitation has one primary path before ordinary navigation appears');
   assert.equal(await page.locator('#studioNavPals').isVisible(),false,'the companion entrance joins ordinary navigation after the first invitation');
   assert.equal(await page.locator('#studioPalsEntry').isVisible(),false,'the companion widget does not compete with the first creation choice');
-  for(const selector of ['#studioWelcomeMake','#studioWelcomeExplore']){
+  assert.equal(await page.locator('#studioWelcomeExplore').count(),0,'onboarding has no competing play-first invitation');
+  assert.equal(await page.locator('#studioWelcomeMake').isDisabled(),true,'choose and durably save a character before continuing');
+  for(const selector of ['#studioWelcomeMake','[data-welcome-character="spark"]','[data-welcome-character="nova"]']){
    const box=await page.locator(selector).boundingBox();
    assert.ok(box&&box.height>=44&&box.width>=44,selector+' is a visible touch target');
    if(selector==='#studioWelcomeMake')assert.ok(box.y>=0&&box.y+box.height<=viewport.height,'the first creation action is visible without scrolling');
   }
   assert.equal((await notebook(page)).sessions.length,0,'simply opening welcome does not create a project');
+  const character=device==='phone'?'nova':'spark';
+  await page.locator(`[data-welcome-character="${character}"]`).click();
+  await page.waitForFunction(()=>!document.getElementById('studioWelcomeMake').disabled);
+  assert.equal((await notebook(page)).avatars.player1,character,'the actual first choice is saved for this owner');
+  assert.equal(await page.locator('#studioWelcome').isVisible(),true,'choosing a character waits for the explicit creation action');
+  assert.equal((await notebook(page)).sessions.length,0,'cosmetic choice does not create a project or call a builder');
   await capture(page,'welcome',device);
   await page.locator('#studioWelcomeMake').focus();await page.keyboard.press('Enter');
   await page.locator('#page-studio').waitFor({state:'visible'});
@@ -141,11 +149,11 @@ async function localFirstJourney(browser,url,device,viewport){
   await page.click('#studioContinuePlaying');
   assert.equal(await page.inputValue('#studioPrompt'),draft,'the next visit resumes the exact idea');
   assert.equal(await page.locator('#studioGuideCard').isVisible(),false,'hint dismissal survives reload');
-  await page.click('#studioJourneyHelp');
+  await navigate(page,'studioJourneyHelp');
   await page.locator('#studioJourneyMap').waitFor({state:'visible'});
   await page.click('#studioGuideReset');
   await page.locator('#studioGuideCard').waitFor({state:'visible'});
-  assert.equal(await page.locator('#studioJourneyHelp').evaluate(node=>document.activeElement===node),true,'closing journey help returns focus to its visible trigger');
+  assert.equal(await page.locator('#studioNavMenu').evaluate(node=>document.activeElement===node),true,'closing journey help returns focus to the visible Menu trigger');
   assert.equal((await current(page)).job,null,'restoring help starts no build');
   assert.equal((await current(page)).keptExperiments?.length||0,0,'help does not invent making evidence');
   assert.equal((await notebook(page)).sessions.length,1,'reading the journey creates no throwaway projects');
@@ -170,7 +178,7 @@ async function localFirstJourney(browser,url,device,viewport){
   assert.equal(await page.locator('#studioContinuePlaying').count(),0,'a sibling does not see another child’s pending idea');
   await exploreWelcome(page);
   await page.reload();await ready(page);
-  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'Explore is remembered for this profile');
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'the saved character and intentional Home choice are remembered for this profile');
   await choosePlayer(page,0);
   assert.equal(await page.locator('#studioWelcome').isVisible(),false,'switching back preserves the first child’s progress');
   await page.click('#studioContinuePlaying');
@@ -277,7 +285,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   });
   await page.route(preview+'/**',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><html><body><h1>First creation transport fixture</h1><p>This is a synthetic game response, not an AI output.</p><button>Play fixture</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='first-artifact';addEventListener('message',event=>{if(event.source===parent&&event.data.type==='factory-learning'&&event.data.channel===channel&&event.data.artifactId===artifactId&&event.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script></body></html>`}));
   await page.goto(url);await ready(page);await page.waitForFunction(()=>FG.studio.mode()==='remote');
-  await page.click('#studioWelcomeMake');
+  await completeWelcome(page);
   await page.fill('#studioPrompt','Make a game where a purple cat jumps to collect donuts on the moon');await page.click('#studioSend');
   await page.waitForFunction(()=>document.getElementById('designPlan')?.open===true);
   await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();
@@ -349,10 +357,21 @@ async function welcomeSaveFailure(browser,url){
  const {context,page,errors,posts}=await prepare(browser,{width:1280,height:900},'desktop');
  try{
   await page.route('**/factory-config.json',unavailable);await page.goto(url);await ready(page);
-  await failWrites(page,true);await page.click('#studioWelcomeExplore');
-  assert.equal(await page.locator('#studioWelcome').isVisible(),true,'failed preference save does not falsely claim a durable dismissal');
-  assert.equal((await notebook(page)).sessions.length,0,'failed preference save creates no work or achievements');
-  await failWrites(page,false);await exploreWelcome(page);
+  await failWrites(page,true);await page.click('[data-welcome-character="nova"]');
+  await page.waitForFunction(()=>document.getElementById('studioWelcomeStatus').textContent.includes('could not be saved'));
+  assert.equal(await page.locator('#studioWelcomeMake').isDisabled(),true,'a failed character save cannot advance onboarding');
+  assert.equal((await notebook(page)).avatars?.player1,undefined,'failed selection does not invent a saved character');
+  assert.equal((await notebook(page)).sessions.length,0,'failed selection creates no work or achievements');
+  await failWrites(page,false);await page.click('[data-welcome-character="nova"]');
+  await page.waitForFunction(()=>!document.getElementById('studioWelcomeMake').disabled);
+  await failWrites(page,true);await page.click('#studioWelcomeMake');
+  await page.waitForFunction(()=>document.getElementById('studioWelcomeStatus').textContent.includes('could not open'));
+  assert.equal(await page.locator('#studioWelcome').isVisible(),true,'failed continuation stays recoverable');
+  assert.equal((await notebook(page)).sessions.length,0);
+  await failWrites(page,false);await page.click('#studioWelcomeMake');
+  await page.locator('#page-studio').waitFor({state:'visible'});
+  assert.equal((await notebook(page)).sessions.length,1,'one successful continuation creates one idea');
+  assert.equal((await notebook(page)).avatars.player1,'nova');
   await page.reload();await ready(page);
   assert.equal(await page.locator('#studioWelcome').isVisible(),false);
   assert.deepEqual(posts,[]);assert.deepEqual(errors,[]);
@@ -373,21 +392,21 @@ async function hintsAcrossModes(browser,url){
   await page.click('[data-challenge="robot-route"]');
   assert.equal(await page.locator('#creationGuide').isVisible(),false,'the same practice tip remains dismissed in the editor');
   const sceneBefore=await page.evaluate(()=>FG.creation.export());
-  await page.click('#studioJourneyHelp');await page.click('#studioGuideReset');
+  await navigate(page,'studioJourneyHelp');await page.click('#studioGuideReset');
   await page.locator('#creationGuide').waitFor({state:'visible'});
   assert.deepEqual(await page.evaluate(()=>FG.creation.export()),sceneBefore,'Show tips again does not edit the program or claim supported/independent evidence');
   await capture(page,'practice-guide','phone');
   await page.click('#creationHome');await exploreWelcome(page);
-  await page.click('#studioNavRewards');
+  await navigate(page,'studioNavRewards');
   await page.locator('#jemsRewardsExplanation').waitFor({state:'visible'});
   assert.match(await page.textContent('#jemsRewardsExplanation'),/gems are not a skill score/,'progress help preserves the distinction between engagement and demonstrated skill');
   const gemsBefore=await page.evaluate(async()=>await FG.rewards.summary());
   await page.click('#jemsRewardsExplanationDismiss');
   assert.deepEqual(await page.evaluate(async()=>await FG.rewards.summary()),gemsBefore,'reading progress guidance cannot earn gems');
   await page.click('#studioNavHome');await page.reload();await ready(page);
-  await page.click('#studioNavRewards');
+  await navigate(page,'studioNavRewards');
   assert.equal(await page.locator('#jemsRewardsExplanation').isVisible(),false,'progress-tip dismissal survives a new visit');
-  await choosePlayer(page,1);await exploreWelcome(page);await page.click('#studioNavRewards');
+  await choosePlayer(page,1);await exploreWelcome(page);await navigate(page,'studioNavRewards');
   assert.equal(await page.locator('#jemsRewardsExplanation').isVisible(),true,'another child has their own progress explanation');
   assert.equal((await page.evaluate(async()=>await FG.rewards.summary())).lifetimeGems,0);
   assert.deepEqual(posts,[]);assert.deepEqual(errors,[]);

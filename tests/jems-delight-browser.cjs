@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 /* jems joy layer contract: durable idea, color zones and respectful motion. */
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -36,10 +36,11 @@ const {start}=require('./browser-server.cjs');
   await page.locator('#parentSubject').selectOption('both');await page.locator('#saveParent').click();
   await page.locator('#studioNavHome').click();
   assert.equal(await page.locator('#studioSubjectLanguage').isDisabled(),false);
+  await page.locator('#studioNavMenu').click();
   await page.locator('#studioSubjectLanguage').click();
   assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
   assert.equal(await page.locator('#studioLearningChoice').evaluate(e=>getComputedStyle(e).borderLeftColor),'rgb(139, 92, 246)');
-  await page.locator('#studioNavPowers').click();
+  await navigate(page,'#studioNavPowers');
   assert.equal(await page.locator('#page-lab .panel').first().evaluate(e=>getComputedStyle(e).borderTopColor),'rgb(139, 92, 246)');
   await ctx.close();
   const reduced=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});

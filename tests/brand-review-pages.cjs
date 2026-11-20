@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 /* jems final premerge screenshot review: real built app, synthetic local browser data. */
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -50,7 +50,7 @@ async function pages(device,viewport){
    await p.locator('[data-starter="'+game+'"]').click();await p.locator('#page-studio').waitFor({state:'visible'});
    await p.waitForTimeout(300);await shot(p,device,num+'-play-'+game);await home(p);
   }
-  await p.locator('#studioNavPowers').click();await p.locator('#page-lab').waitFor({state:'visible'});
+  await navigate(p,'#studioNavPowers');await p.locator('#page-lab').waitFor({state:'visible'});
   await shot(p,device,'08-my-powers-math');
   await p.locator('footer [data-page="parent"]').click();await p.locator('#page-parent').waitFor({state:'visible'});
   await shot(p,device,'09-parent-controls');
@@ -58,9 +58,9 @@ async function pages(device,viewport){
   await p.locator('#parentSubject').selectOption('both');await p.locator('#saveParent').click();
   assert.equal(await p.locator('#parentSubject').inputValue(),'both');
   await shot(p,device,'10-parent-both-subjects');
-  await home(p);await p.locator('#studioSubjectLanguage').click();
+  await home(p);await p.locator('#studioNavMenu').click();await p.locator('#studioSubjectLanguage').click();await p.locator('#studioMenuClose').click();
   assert.equal(await p.evaluate(()=>window.FG.learning.subject),'language');
-  await p.locator('#studioNavPowers').click();await p.locator('#page-lab').waitFor({state:'visible'});
+  await navigate(p,'#studioNavPowers');await p.locator('#page-lab').waitFor({state:'visible'});
   await shot(p,device,'11-my-powers-english');await home(p);
   await shot(p,device,'12-returning-child-home');
  }finally{await ctx.close();}

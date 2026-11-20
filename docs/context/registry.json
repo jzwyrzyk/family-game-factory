@@ -58,7 +58,8 @@
     "docs/decisions/2026-11-19-pal-base-design-adoption.md",
     "docs/decisions/2026-11-19-pal-form-reconciliation.md",
     "docs/pals/art/characters/brio/README.md",
-    "docs/decisions/2026-11-19-brio-art-adoption.md"
+    "docs/decisions/2026-11-19-brio-art-adoption.md",
+    "docs/decisions/2026-11-20-character-first-navigation.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -110,10 +111,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:49:40.000Z",
-      "sourceDigest": "ae7c17d6a7b8a3c1e502963c79a1ac467f831fdaa61b928e2ae138a80991212b",
+      "reviewedAt": "2026-11-20T17:13:27.332Z",
+      "sourceDigest": "9bd43f8ec2d80e7678a96049471981fddee61ee189e25133848f2734a8bd1319",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes.",
+      "reviewReason": "Recorded the owner-approved character-first invitation, selected-human host imagery, compact Menu and permanent private parent access. Preserved explicit Build and Keep, progress and Pal policies, the single-writer boundary and separate provider authorization.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -197,10 +198,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:06:20.191Z",
-      "sourceDigest": "49c2bbdf071814681ed6c9f4378584ced46107e929d63c164639369c6aa27826",
+      "reviewedAt": "2026-11-20T17:11:53.683Z",
+      "sourceDigest": "a335884b8b323a10be9d6bfcc444776a700603d1bdf85d1d0d13d9e4311f983c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Studio and Pal host delta: eight icon destinations, first-welcome hiding, draft/learning guards, parent preferences, owner loading, and shared notices. Updated homepage, first-creation and architecture references; existing Art Studio and exact game returns remain intact.",
+      "reviewReason": "Reviewed the actual navigation adapter, first welcome, owner-bound maker renderer and parent access states. Updated canonical and feature contracts for three primary actions, existing guarded secondary routes, neutral imagery before choice and truthful independent tool availability.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -248,10 +249,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e0a73cebee7e28a95c6383c9d73497e9f85836cd2cc4350107b455c39b89c732",
-      "reviewedAt": "2026-11-20T05:06:21.881Z",
+      "sourceDigest": "b7b8757e9fe3b072f3ee1ffe0ebfad9a5504e4ce3cdea72aba0866c9d517464e",
+      "reviewedAt": "2026-11-20T17:11:53.838Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Pal asset allowlist, scene insertion and refresh handling against current private-art and PR81 source returns. Documented preserved image/rig hashes, actor IDs and exact game revisions, stable token assets, challenge exclusions, explicit Keep and active-picker focus preservation.",
+      "reviewReason": "Reviewed changed Creation browser entry helpers and original scene handlers. Documented Create and code under Menu while preserving draft flush, learning interruption, exact source bindings, private art, recovery and explicit Keep; no engine, storage or generation adapter changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -300,10 +301,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "493e303f89ffcc4763f2486f9cb8eef6db0152fcd69ab96d250040120fb67109",
-      "reviewedAt": "2026-11-20T05:10:52.721Z",
+      "sourceDigest": "d82b9287b8fa647f64410f879a36cfcc300350d2bedfa32fdf030fc338314fb2",
+      "reviewedAt": "2026-11-20T17:16:33.718Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed combined Pals plus APS/guidance backup recovery, captured-domain legacy journals and raw-recovery rejection, with58local contracts and completed full Rewards browser journey. Final test-only change logs the original error before bounded failure capture; it changes no earning, input or assertion. The initial seconds-fill timeout and single unchanged-app rerun remain recorded separately.",
+      "reviewReason": "Reviewed the final Rewards journey including selected Spark opening Journey before explicit Change character, retained legacy My Powers selector and actual Menu clicks. Full application suite passed; documented owner imagery and external storage refresh while grants, assistance, backup and single-writer ownership remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -482,10 +483,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b06116996cbf77a9e1c2d30eb04758a3d73aa09a454e4b0a5e72979bd8378afe",
-      "reviewedAt": "2026-11-20T03:42:03.089Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Browser fixture entry now chooses the real Explore control for fresh family or adult profiles before existing assertions. Identity, authorization, namespace, parent consent and provider source code are unchanged; rewards backup separately validates the new notebook preferences.",
+      "sourceDigest": "dc06770f40ed57b93dd2ff664e65bb30d78dab8a88c0555845f66c69930ca272",
+      "reviewedAt": "2026-11-20T17:11:54.080Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed permanent access entry, bounded owner-aware readiness checks, existing passphrase unlock, cancel/expiry cleanup and guarded connection navigation. Updated disabled-pilot removal wording to distinguish gated profile choice from always-visible help; server flags and grants remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -528,10 +529,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:10:36.845Z",
-      "sourceDigest": "57e4bb966294098357a469c77b250560ccbdbaaa6b4ec172eeb552d33e8ae8c8",
+      "reviewedAt": "2026-11-20T17:16:17.967Z",
+      "sourceDigest": "9d87c89af12959889c88fdf7849b7a4153e97ff0ec56aa2fb6e0d0ace6e1a701",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final combined regression changes, including PR81 named original/cutout tests in both UUID orders, two-form histories, Pals/APS/guidance backup, private-art scene preservation and eight-route navigation. All scoped local suites passed, including376core and full Art/Creation/Rewards; preserved the first seconds-fill timeout and one unchanged-app rerun, with only early/bounded failure diagnostics added. No expectation was weakened; hosted acceptance remains pending.",
+      "reviewReason": "Reviewed all final browser helpers and assertions, including already-selected character entry and the retained legacy-host My Powers selector. Recorded final build acceptance across navigation, first creation, owner imagery, adult access, Rewards, Pals, child/coach, Creation and private art with explicit fixture and device limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -584,10 +585,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T05:10:37.245Z",
-      "sourceDigest": "d93eb824db660cbfbe150f48575992e0657e939eb1cd1a56a42650ba416becaf",
+      "reviewedAt": "2026-11-20T17:16:18.106Z",
+      "sourceDigest": "af9dd507ae056beb9ad6fd70a88d14eec8e267c9f9c5ac96c9b5cd6e37c3334c",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded retained PR68 and published PR81 1b8d7b8 histories, current-main ancestry, merge order, exact application bundle and completed local/independent checks. Preserved original drawing-order failure, Rewards timeout and scoped rerun, browser-environment limitation and historical art evidence. No merge, deployment, selected-art readiness or provider activation is claimed.",
+      "reviewReason": "Recorded current69bd11d base, final application bundle and completed scoped local acceptance, with navigation shell in the required existing test path. Preserved historical delivery receipts, original failures and PR83/87 overlap; new merge, deployment and paid activation remain separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -645,10 +646,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:49:40.000Z",
-      "sourceDigest": "b045d9a38fb821035c878d1c3c49c4d788ab19ff2b8015ae7104ef57bde924be",
+      "reviewedAt": "2026-11-20T17:11:54.197Z",
+      "sourceDigest": "abfefb8163da78c1366a0cce7214858f9cbbed63c59ca7640c6aa9688d642f7d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes.",
+      "reviewReason": "Registered the accepted November20 refinement and linked navigation, owner-scoped imagery and parent access from the documentation map. Existing source globs cover the new modules and tests; no checker rule, exemption or review policy is weakened.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -711,10 +712,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "7fe579855e1fb1b96777020f333a15e8e85d9da57bb7f1c1e552f108f0113f81",
-      "reviewedAt": "2026-11-20T05:06:46.338Z",
+      "sourceDigest": "3a63415513e1f54af3332636d6fd0a25a452c8fa4628df1b3ff7acac66db5217",
+      "reviewedAt": "2026-11-20T17:11:54.336Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the sole APS browser delta: exact navigation count increases from seven to eight for My Pals while unchanged two-row and complete 44px target assertions remain. Updated the current shell contract; independent desktop/touch practice journeys pass with four episodes each. APS scoring, source attribution, assistance, persistence and historical validation receipts remain unchanged.",
+      "reviewReason": "Reviewed touch and mouse navigation helper changes plus compact-shell geometry checks. Updated route placement while retaining every task, assistance, response, learning-guard and evidence assertion; no APS algorithm, award or storage changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -752,10 +753,10 @@
         "docs/pals/art/character-references.json"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "28983766890d1862eeb0afce70439dd00b7df9fce79007142adb9b86e107dd08",
-      "reviewedAt": "2026-11-20T05:49:40.000Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes."
+      "sourceDigest": "fed67752aa5aa82ae59b7d3d3f30942abe95bb6618589365308683b0e194b2a2",
+      "reviewedAt": "2026-11-20T17:11:55.323Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the Pals feature contract adds compact-menu access and distinguishes human-maker choice. Gem Pal design method, selected reference art, Base/Grown identity, expression review and runtime artwork bindings are unchanged."
     },
     {
       "id": "art-studio",
@@ -775,10 +776,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "eca73a5d8ef20efde98e5a0de81cb75a4fff6ada194c3f1e8b43023325ce542f",
-      "reviewedAt": "2026-11-20T04:38:14.270Z",
+      "sourceDigest": "070d60f1ef7b3cbac6f86eaef2671c586524dfee0d1fa2447c9a046acc78428c",
+      "reviewedAt": "2026-11-20T17:11:54.670Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged private-art contract and new first-creation integration tests. Art-only owners retain ordinary home, siblings remain isolated and mixed-source scenes retain both return actions; storage, immutable bindings and portable-art authority are unchanged. Updated current PR23 disposition while retaining its dated evidence.",
+      "reviewReason": "Reviewed private-art browser changes as real Menu clicks to the existing scene handler. Updated the Art Studio entrance contract; original image bytes, immutable game/scene bindings, owner isolation, import/export and deletion guards are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -806,10 +807,10 @@
         "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "36e011b81a42e7b78d51be4c9375581b2ddeb361bc4dbf3d900489f3df0a38a5",
-      "reviewedAt": "2026-11-20T05:49:40.000Z",
+      "sourceDigest": "db4d3ee5efef1e0194f98d933ab783a68bf09c6641c769ebbc329247cf76dfa9",
+      "reviewedAt": "2026-11-20T17:11:55.191Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes."
+      "reviewReason": "Reviewed My Pals and scene-entry test helpers using the actual Menu. Documented unchanged guarded collection access and distinct human choice; no species artwork, earned growth, starter choice, equipment, scene mechanics or backup authority changes."
     }
   ]
 }

@@ -4,7 +4,7 @@
 
 ## The experience
 
-Art Studio is an owned creation space in the current Jems shell. Enter from **My Games → Art Studio**, **Bring your drawing to life**, an idea's **Use my drawing** action, **Create & code → My art & drawings**, the legacy saved collection, or `?art=1`. These are subdestinations of creation; the existing seven primary navigation actions remain intact. Grown-ups can open the selected player's art from the existing backup settings.
+Art Studio is an owned creation space in the current Jems shell. Enter from **Menu → Make → Art Studio**, **My Games → Art Studio**, **Bring your drawing to life**, an idea's **Use my drawing** action, **Create & code → My art & drawings**, the legacy saved collection, or `?art=1`. These remain creation destinations in the compact My Games / Create / Menu shell; entry retains the existing save, owner and learning guards. Grown-ups can open the selected player's art from the existing backup settings.
 
 The [first-creation entry](../child-journey/FIRST-CREATION.md) recognizes saved private art as existing creative work even before a game or scene exists. Its presence check respects the active owner and keeps the ordinary home available when art storage cannot be read; it creates no progress or guidance records.
 

@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 /* Production app reward journey. Grants come only from ordinary host UI actions.
  * FG.rewards is inspected/refreshed, never given invented grants. Adult endpoints
  * are explicit local auth fixtures; this test invokes no paid provider. */
@@ -21,7 +21,7 @@ const ready = page => page.waitForFunction(() => window.FG?.rewards && window.FG
 const noOverflow = async page => assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), 'Application header and Rewards fit the viewport');
 
 async function startMath(page) {
-  await page.click('#studioNavPowers');
+  await navigate(page,'#studioNavPowers');
   if (!await page.evaluate(() => FG.learning.active)) await page.click('#lab-next');
   await activeMath(page).waitFor({ state: 'visible' });
 }
@@ -52,7 +52,7 @@ async function chooseFamily(page, index) {
   await page.waitForFunction(index => FG.store.current().id === `player${index + 1}`, index); await exploreWelcome(page);
 }
 async function openRewards(page) {
-  await page.click('#jemsRewardsWidget');
+  await navigate(page,'#jemsRewardsWidget');
   await page.locator('#page-jems-rewards').waitFor({ state: 'visible' });
   await page.waitForFunction(() => document.getElementById('page-jems-rewards').getAttribute('aria-busy') === 'false');
 }
@@ -144,9 +144,13 @@ async function installAuthFixture(context) {
     for (const width of [1400, 768, 390, 320]) { await page.setViewportSize({ width, height: 1000 }); await noOverflow(page); }
     await page.setViewportSize({ width: 1400, height: 1000 });
 
-    // Rewards starts the maker choice directly and routes each earning action
-    // through the ordinary host without granting credit just for navigation.
+    // The first visit has already saved a character. Rewards opens that owner's
+    // Journey; changing the choice remains an explicit action without credit.
     await page.click('#jemsRewardsMakerAction');
+    await page.locator('#page-jems-journey').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#jemsCharacterDialog').isVisible(), false);
+    assert.equal(await page.evaluate(() => FG.studio.exportNotebook().avatars[FG.store.current().id]), 'spark');
+    await page.click('#jemsChangeCharacter');
     await page.locator('#jemsCharacterDialog').waitFor({ state: 'visible' });
     assert.equal(await page.locator('[data-journey-character]').count(), 2);
     await page.keyboard.press('Escape');
