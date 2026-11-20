@@ -1,5 +1,27 @@
 # jems delivery state
 
+## Gem Pal Studio — merged design method
+
+[PR79](https://github.com/jzwyrzyk/family-game-factory/pull/79) merged on November 19, 2026, at 8:30:11 PM America/New_York (`2026-11-20T01:30:11Z`) as **`eaab21cc6ce0ad8a19d02cd9279fdadf5f597d4f`**, from final head `3b81da980c4c5934582cdd5b1adc66dbc4ead3fa`. The merged tree has no file differences from that tested head; its complete tree is `42001de4d2eb854286956a6c0ddae04da029211c`, equal to the independently reviewed local tree. The canonical entry point is [Gem Pal Studio](docs/pals/STUDIO.md), with design, growth, quality, continuity, prompt and empty-record references. Root agent instructions and the repository skill route future Pal work to this guide.
+
+The final candidate preserved merged [PR78](https://github.com/jzwyrzyk/family-game-factory/pull/78) (`3cf23a866770e4cd22765ba822bcf1c988f60bcf`), including all 25 changed files, its navigation-continuity check, unrelated documentation review records and both documentation-index routes. The shared product review was reconciled against both sources; its previous review is retained in history. **PR78's merge was observed at `2026-11-20T01:06:58Z` (November 19, 8:06:58 p.m. America/New_York), from head `3a08008bffe307c66eca0b4607d781a430893228`.** Its earlier review-candidate disposition below is historical and does not describe its current merge state.
+
+All five workflows passed on the final PR79 head:
+
+| Workflow | Exact result |
+| --- | --- |
+| Documentation context | [Passed — 44652548464](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44652548464) |
+| Trusted-device security | [Passed — 44652548515](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44652548515) |
+| Parent dashboard | [Passed — 44652548465](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44652548465) |
+| Full visual review | [Passed — 44652548452](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44652548452) |
+| Arcade journeys | [All four jobs passed — 44652548487](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44652548487) |
+
+The exact local content-equivalent base/head documentation check passed with 55 registered documents, zero errors and zero review reminders. The existing documentation-checker suite passed all 18 tests. Independent guide and integration reviews found no remaining blocker; the original maintenance finding was fixed by routing the established future character-index path into `pal-design`.
+
+**Preserved first-attempt failures:** earlier head `9ed42b0abeaa8670f9b4169abc5f7b525bf05d49` recorded a [canvas-visibility assertion](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44650405049/job/136003564317) before the separately scheduled first paint was guaranteed, and a [tablet add-count assertion](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44650405049/job/136003564038) that observed one part instead of two after coordinate taps. A timing race is plausible for the first; the second log does not identify which input was missed or why. Its one bounded retry was cancelled by branch concurrency when PR78 was integrated and is not final-source acceptance. Both checks, the subsequent sticker suite and PR78's new navigation test passed on the final integrated head on attempt 1. No failing test, visual baseline or tolerance was weakened for this guide.
+
+**Delivery boundary:** the design method and retrieval instructions are merged. This records two total artistic forms, Base and Grown, while preserving the index's `base` and `mature` keys. It does not establish completion or approval of character artwork, expressions, rigs or runtime integration. Companion runtime [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) and artwork [PR74](https://github.com/jzwyrzyk/family-game-factory/pull/74) remained separate open drafts at this observation. The frozen coordinated-release candidate `b6e160b9ec402d8cf7b728ab3189600628bde640` is preserved; this receipt selects no deployment source, publishes no application or service, activates no provider and does not change ChatGPT Project settings. Hosted fixture/browser results do not establish physical-device or child acceptance.
+
 ## Navigation continuity repairs — review candidate
 
 The owner requested a focused PR for confirmed access and continuation defects before the broader deployed-site journey review. Branch `fix/jems-journey-continuity-20261119` starts from main **`a3b9051822943b095828c3ff06169da1e5f32011`**, after the PR75 packaging merge and PR77 release receipt. This candidate restores the existing saved ideas/drawings page, connects Rewards activity rows to their existing destinations, continues unfinished making projects, makes saved scene challenges resumable, permits direct scene-file opening, and explains existing score/rank behavior. It also corrects unreadable light-panel copy on the restored collection. Existing family idea sharing, private drawings, parent subject restrictions, explicit Keep, reward rules and stored record formats remain intact.

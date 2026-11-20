@@ -455,10 +455,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T23:24:42.984Z",
-      "sourceDigest": "5cc21e8d0597d91dbcb979af11559045366dce889fd1a94f20223aa1a4ad7a78",
+      "reviewedAt": "2026-11-20T01:30:50.441Z",
+      "sourceDigest": "fd447672aab90ceb331b96b8d59cf251b3ad5c82922ebe312737db7d8bb66a74",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the focused review candidate and local evidence against main a3b9051. Added the navigation suite to the creative CI job and standard npm test chain. Reviewed workflow and package diffs: no deployment, provider, image-publish or private-worker-pin changes; the frozen b6e160b release candidate remains separate.",
+      "reviewReason": "Recorded observed PR79 merge eaab21cc, equality to tested head3b81 and all five successful final workflows. Preserved earlier canvas/tablet assertions and superseded retry, recorded actual PR78 merge over its historical candidate receipt, and kept the frozen release source, separate Pal drafts and unverified deployment/physical-device boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
