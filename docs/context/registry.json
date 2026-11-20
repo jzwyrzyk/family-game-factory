@@ -56,7 +56,12 @@
     "docs/decisions/0013-two-form-pals-and-current-main.md",
     "docs/analytics/README.md",
     "docs/analytics/dashboard.md",
-    "docs/decisions/2026-11-19-optional-product-analytics.md"
+    "docs/decisions/2026-11-19-optional-product-analytics.md",
+    "docs/pals/art/README.md",
+    "docs/decisions/2026-11-19-pal-base-design-adoption.md",
+    "docs/decisions/2026-11-19-pal-form-reconciliation.md",
+    "docs/pals/art/characters/brio/README.md",
+    "docs/decisions/2026-11-19-brio-art-adoption.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -95,7 +100,8 @@
       "id": "product",
       "documents": [
         "PRODUCT-DOCTRINE.md",
-        "docs/decisions/*.md"
+        "docs/decisions/*.md",
+        "docs/pals/art/README.md"
       ],
       "sources": [
         "docs/design-coach/GOLD_STANDARD.md",
@@ -828,7 +834,12 @@
         "docs/pals/*.md",
         "skills/gem-pal-studio/SKILL.md",
         "docs/decisions/2026-11-19-gem-pal-studio.md",
-        "docs/decisions/0013-two-form-pals-and-current-main.md"
+        "docs/decisions/0013-two-form-pals-and-current-main.md",
+        "docs/pals/art/README.md",
+        "docs/decisions/2026-11-19-pal-base-design-adoption.md",
+        "docs/decisions/2026-11-19-pal-form-reconciliation.md",
+        "docs/pals/art/characters/brio/README.md",
+        "docs/decisions/2026-11-19-brio-art-adoption.md"
       ],
       "sources": [
         "docs/pals/*.md",
@@ -837,10 +848,19 @@
         "docs/pals/art/character-references.json"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "459726b2615fa61432d7b831f18e6f72d932b845d6121d6551ed83683597f7b6",
-      "reviewedAt": "2026-11-20T05:15:23.348Z",
+      "sourceDigest": "28983766890d1862eeb0afce70439dd00b7df9fce79007142adb9b86e107dd08",
+      "reviewedAt": "2026-11-20T05:49:40.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the complete combined Studio/ADR0013 cross-reference and explicit null character/form mappings without importing or changing selected art. The final Pal contract correction only spells the existing factoryProblemSolvingRecoveryRaw field precisely; two-form art policy, approved references, stable IDs and future versioned-asset boundary remain unchanged."
+      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "f1b96dc9717495a6cf8dd5fc3d4714a96016f2f7",
+          "reviewedAt": "2026-11-20T05:15:23.348Z",
+          "sourceDigest": "459726b2615fa61432d7b831f18e6f72d932b845d6121d6551ed83683597f7b6",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the complete combined Studio/ADR0013 cross-reference and explicit null character/form mappings without importing or changing selected art. The final Pal contract correction only spells the existing factoryProblemSolvingRecoveryRaw field precisely; two-form art policy, approved references, stable IDs and future versioned-asset boundary remain unchanged."
+        }
+      ]
     },
     {
       "id": "art-studio",
@@ -889,7 +909,8 @@
         "docs/pals/*.md",
         "docs/decisions/0012-pals-from-earned-activity.md",
         "docs/pals/previews/*.md",
-        "docs/decisions/0013-two-form-pals-and-current-main.md"
+        "docs/decisions/0013-two-form-pals-and-current-main.md",
+        "docs/pals/art/README.md"
       ],
       "sources": [
         "src/pals/**",
@@ -897,10 +918,19 @@
         "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5d11f1505f4977fc758cd82f274a3a332954366fc290da78fd8897b670f1f688",
-      "reviewedAt": "2026-11-20T05:14:52.748Z",
+      "sourceDigest": "36e011b81a42e7b78d51be4c9375581b2ddeb361bc4dbf3d900489f3df0a38a5",
+      "reviewedAt": "2026-11-20T05:49:40.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Completed independent published-source review of two-form progress, immutable token identities and combined recovery; corrected the contract to name the actual factoryProblemSolvingRecoveryRaw export/validation key. This documentation-only correction changes no runtime, tests, assets, schemas or acceptance results."
+      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "f1b96dc9717495a6cf8dd5fc3d4714a96016f2f7",
+          "reviewedAt": "2026-11-20T05:14:52.748Z",
+          "sourceDigest": "5d11f1505f4977fc758cd82f274a3a332954366fc290da78fd8897b670f1f688",
+          "reviewOutcome": "updated",
+          "reviewReason": "Completed independent published-source review of two-form progress, immutable token identities and combined recovery; corrected the contract to name the actual factoryProblemSolvingRecoveryRaw export/validation key. This documentation-only correction changes no runtime, tests, assets, schemas or acceptance results."
+        }
+      ]
     },
     {
       "id": "analytics",

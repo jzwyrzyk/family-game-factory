@@ -9,6 +9,8 @@
 
 **Companion extension:** November 19, 2026: the owner approved implementation of the separate companion framework, including funny encouragement and easy use in children's games. [ADR0012](docs/decisions/0012-pals-from-earned-activity.md) records the accepted engagement balance. Final character artwork remains a separate owner review.
 
+**Partial Gem Pal art reference integration:** November 20, 2026: the first source-only tranche records selected S–X Base boards, Pleeko/Talli/Whorl Grown portraits and Brio's two approved neutral forms. Brio's six expressions are retained as **in-review** candidates, not owner-approved expressions. The [artwork index](docs/pals/art/README.md) preserves exact sources and outstanding gaps; it does not replace PR68's provisional three-Pal runtime artwork or change growth policy.
+
 **Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
 
 Read [current architecture](ARCHITECTURE-CURRENT.md) for implementation boundaries and [delivery state](DELIVERY-STATE.md) for what is planned, merged, deployed, activated and verified. A past feature document's draft/release wording is not current operational evidence. The [decision index](docs/decisions/README.md) preserves the reasons behind these commitments.
