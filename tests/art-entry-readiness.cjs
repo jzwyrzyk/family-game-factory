@@ -7,7 +7,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,waitForWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,completeWelcome,waitForWelcome}=require('./studio-entry.cjs');
 
 const output=path.resolve('test-results/art-entry-readiness');
 fs.mkdirSync(output,{recursive:true});
@@ -89,7 +89,7 @@ async function delayedConfig(browser,base){
   // Change owners and start writing before the delayed configuration arrives.
   // Its eventual readiness callback must not restore the old owner or entrance.
   await choosePlayer(page,1);
-  if(await page.locator('#studioWelcome').isVisible())await page.locator('#studioWelcomeMake').click();
+  if(await page.locator('#studioWelcome').isVisible())await completeWelcome(page,'nova');
   else await page.locator('#studioNavCreate').click();
   await page.locator('#page-studio').waitFor({state:'visible'});
   assert.equal(await page.locator('#studioUseDrawing').isVisible(),true,'the picture entrance is available in a brand-new idea composer');
