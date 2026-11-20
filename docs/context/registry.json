@@ -44,7 +44,11 @@
     "docs/pals/CONTINUITY.md",
     "docs/pals/PROMPT_RECIPES.md",
     "skills/gem-pal-studio/SKILL.md",
-    "docs/decisions/2026-11-19-gem-pal-studio.md"
+    "docs/decisions/2026-11-19-gem-pal-studio.md",
+    "docs/drawings/ART_STUDIO.md",
+    "docs/drawings/GOLD_STANDARD.md",
+    "docs/drawings/PROGRAM.md",
+    "docs/decisions/2026-11-19-private-art-studio.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -71,7 +75,8 @@
     "docs/mind-your-jems/*.md",
     "docs/archetypes/*.md",
     "docs/pals/*.md",
-    "skills/gem-pal-studio/*.md"
+    "skills/gem-pal-studio/*.md",
+    "docs/drawings/*.md"
   ],
   "areas": [
     {
@@ -87,13 +92,14 @@
         "docs/brand/*.md",
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T01:16:17.200Z",
-      "sourceDigest": "75b29311edbe4e453d7388b30781161b3607d6b7c0f544450bf1ec79210e9565",
+      "reviewedAt": "2026-11-20T03:01:29.268Z",
+      "sourceDigest": "2b74b8ac64d8a5f80eea41e577afb933362153cc194096eb5b41ea084f8d9f5f",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated Gem Pal doctrine and guide over merged PR78. Preserved its restored collection access, navigation, same-project continuation, private drawings, explicit Keep, maker evidence and lifetime reward contracts; added the two artistic forms and purposeful structural growth without altering earning thresholds, runtime delivery or exact-art approval.",
+      "reviewReason": "Reconciled Art Studio evidence with public implementation 6f4cd238 and its exact complete-tree match to local preparation. Retained original per-command test scopes and current private reusable-art behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -162,10 +168,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T00:42:23.714Z",
-      "sourceDigest": "e3a140cb860db24ccb173d850d7d7387c08b62dae35e19718252babb729453df",
+      "reviewedAt": "2026-11-20T02:53:46.287Z",
+      "sourceDigest": "948cd4d31496de87a8597c60f144bf5e1153d27f9839afede9d7cc612a0f2d81",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the confirmed phone first-viewport defect from the collection shortcut, then moved the existing entry after the Ready to Play game shelf. Preserves all seven primary destinations, collection accessibility, profile boundaries and the original playable-first homepage contract.",
+      "reviewReason": "Reviewed the final library label polish and repeated real Art Studio journey; singular part/use text changes no persistence or navigation behavior, and architecture continues to document exact asset bindings, local backup and owner-safe recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -198,10 +204,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "bb9c80603eae9fd973eb540fed3f2edfda1e1ebb2aa4336e43d404647db0243c",
-      "reviewedAt": "2026-11-19T23:24:41.389Z",
+      "sourceDigest": "e06b8d6186a8c58911e04b9e0f32049ab94125a59cc660392389d63bce82a88f",
+      "reviewedAt": "2026-11-20T02:51:25.558Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented saved scenes on both tabs, most-recent owner-scoped challenge continuation, explicit new attempts and direct validated file import with draft, recovery and stale-read guards. Reviewed actual UI and desktop/tablet/recovery regression changes; source schema and Keep rules are unchanged.",
+      "reviewReason": "Reviewed local private-reference parsing, renderer cancellation, exact composite pixels and portable scene imports; updated Creation contracts and acceptance to distinguish local artwork from bundled-only generated manifests and one-actor scenes from articulated physics.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -264,10 +270,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T23:24:42.267Z",
-      "sourceDigest": "11d65db71f1e2e5032c77e750fe0f25c7c1bfb64897f1b2c8622501fe9587c65",
+      "reviewedAt": "2026-11-20T02:51:25.731Z",
+      "sourceDigest": "f7be746d325b6fe720eb05f67cb0182c7d56e4f04057cfd81aa3ce8fa8ed14e4",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the Mind Your Jems copy-only change and updated its feature contract: This round is in-memory scoring, Help explains reset and separation from lifetime gems, and build-wait-only entry remains. Visual comparison, inputs, handoff and recovery passed without baseline or tolerance changes."
+      "reviewReason": "Reviewed native Rally and shared physics changes including original-aspect scaling, full wheel masks, fixed decorations, exact revision selection and missing-art behavior; architecture and drawing contracts describe supported geometry and preserve stock runtime compatibility."
     },
     {
       "id": "learning",
@@ -413,10 +419,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T00:42:23.714Z",
-      "sourceDigest": "b2cd17614edab21251b06e9dac17032543df27341d72ca817582ca822cec7137",
+      "reviewedAt": "2026-11-20T02:51:25.971Z",
+      "sourceDigest": "98e5f93d87d087b4ed977db4b1d0f114fdd45c23a93e0af12f628190e11a1cc9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new phone first-viewport assertion in navigation continuity, preserving the complete playable-card criterion and existing owner, contrast, legacy entry, save and collection checks. The quality-tablet touch fault is separately rerun rather than weakening test thresholds.",
+      "reviewReason": "Reviewed the new source and browser regressions plus existing compatibility results; added scoped evidence and capture checksums covering quota failures, owner/view changes, immutable reuse, image fidelity and explicit limits of synthetic device emulation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -455,10 +461,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T01:30:50.441Z",
-      "sourceDigest": "fd447672aab90ceb331b96b8d59cf251b3ad5c82922ebe312737db7d8bb66a74",
+      "reviewedAt": "2026-11-20T03:01:29.663Z",
+      "sourceDigest": "0f1cc1686b048c2141b491d5228489b138e185fac54d4f2918be8255b31ab53a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded observed PR79 merge eaab21cc, equality to tested head3b81 and all five successful final workflows. Preserved earlier canvas/tablet assertions and superseded retry, recorded actual PR78 merge over its historical candidate receipt, and kept the frozen release source, separate Pal drafts and unverified deployment/physical-device boundaries.",
+      "reviewReason": "Recorded authenticated public implementation 6f4cd238, exact tree c27433f4 and preserved main/original-PR parents. Distinguished local preparation receipts from public source and reserved hosted acceptance for the final PR head.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -502,10 +508,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T00:59:07.305Z",
-      "sourceDigest": "8b82d89552d6e03ae5f9f0f7093cbfc149a234ac31bef51ff2090279cc855d9d",
+      "reviewedAt": "2026-11-20T02:51:26.397Z",
+      "sourceDigest": "c8d4c0f251e818f6cfcc0552e573613e1ac3bdcf038c107fb9492e4ac0673007",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed agent and Project retrieval routes, decision/index links, feedback maintenance and the registry-policy diff. Registered the portable skill, template, canonical guides and exact future character index under pal-design without importing or merging the artwork draft.",
+      "reviewReason": "Reviewed registry policy changes and the new documentation links; added the dedicated art source/test area and required contracts, and documented cross-area review duties in maintenance without weakening existing fingerprint or link checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -577,6 +583,29 @@
       "reviewedAt": "2026-11-20T01:00:12.877Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed the complete Studio guides, two-form record template, exact-reference workflow, quality gates and portable skill; normalized the final doctrine newline. Routed the future character-index path without importing draft artwork or making live approval claims."
+    },
+    {
+      "id": "art-studio",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/drawings/*.md",
+        "docs/creation-studio/*.md",
+        "docs/decisions/2026-11-19-private-art-studio.md"
+      ],
+      "sources": [
+        "src/drawing/**",
+        "src/assets/**",
+        "tests/art-*",
+        "tests/drawing-*",
+        "tests/creation-private-art*",
+        "tests/picture-tools-browser.cjs"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "45c272ca36ecd6386ac752d92507253396a3c3761ea13ba3e6a358f3110bbf9a",
+      "reviewedAt": "2026-11-20T02:53:46.697Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed final source-aspect physics and copy polish with all five art browser suites plus refreshed real UI captures; recorded per-command source identities, exact original/version semantics, recovery tests and remaining actual-device limits."
     }
   ]
 }

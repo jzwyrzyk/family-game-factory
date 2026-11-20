@@ -1,0 +1,119 @@
+{
+  "applicationSource": "27f62030809c0aba9fdf19c1c2230a9d4d704f7e",
+  "applicationSourceTree": "d436079c469911ed61b3602ef7d6ad8c57d4a2eb",
+  "integrationCommit": "252fbefe96af9150ba5144ad74e76f413b9b863c",
+  "parents": {
+    "main": "df63bc2c7644a26a84a7c7e626b682e7c76c493d",
+    "originalDrawingPr": "0f91b52bc162ad8d7fad1211515544f638934e21"
+  },
+  "observedAtUtc": "2026-11-20T02:53:45.831623+00:00",
+  "environment": {
+    "browser": "Playwright 1.56.1 Chromium headless shell",
+    "profileData": "Synthetic local profiles and synthetic canvas drawings; no child data",
+    "basePath": "/arcade/",
+    "devices": "Desktop, emulated touch tablet, 390px and 320px phone viewports; no physical-device claim"
+  },
+  "build": {
+    "index-CWNSmYoa.css": {
+      "sha256": "e5902b9c6deb69a199ba450c5e1642169d430eb13461176062031da7ae2684d6",
+      "bytes": 332674
+    },
+    "index-CjEWLUDv.js": {
+      "sha256": "f5043ebaf211fa560c2f58d090f7e5d9dcb1a6688a4ab226ce3e784360040ff8",
+      "bytes": 1292596
+    }
+  },
+  "finalChecks": [
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "source": "27f62030809c0aba9fdf19c1c2230a9d4d704f7e"
+    },
+    {
+      "command": "npm run test:unit",
+      "result": "passed",
+      "tests": 376,
+      "source": "758239d420912d0c0c41bbe3cb017c4c6b88c885"
+    },
+    {
+      "command": "npm run test:art",
+      "result": "passed",
+      "tests": 24,
+      "source": "758239d420912d0c0c41bbe3cb017c4c6b88c885"
+    },
+    {
+      "command": "npm run test:art-browser",
+      "result": "passed",
+      "suites": 5,
+      "storageContracts": 44,
+      "pictureRecoveryGroups": 4,
+      "postRequests": 0,
+      "pageErrors": 0,
+      "source": "758239d420912d0c0c41bbe3cb017c4c6b88c885"
+    },
+    {
+      "command": "node tests/art-studio-browser.cjs",
+      "result": "passed",
+      "note": "Follow-up capture additionally saves the categorized character as a cutout before scene use; application unchanged.",
+      "source": "27f62030809c0aba9fdf19c1c2230a9d4d704f7e"
+    }
+  ],
+  "compatibilityChecks": [
+    {
+      "command": "npm run test:creation",
+      "result": "passed",
+      "tests": 77
+    },
+    {
+      "command": "npm run test:creation-browser",
+      "result": "passed",
+      "scope": "desktop/tablet authoring and 8 recovery groups"
+    },
+    {
+      "command": "npm run test:navigation-continuity",
+      "result": "passed",
+      "scope": "desktop/phone, failure recovery and legacy return"
+    },
+    {
+      "command": "node tests/private-drawings.cjs",
+      "result": "passed"
+    },
+    {
+      "command": "npm run test:quality",
+      "result": "passed",
+      "scope": "construction, native Rally, tablet orientation, generated controls/containment, drawing engine and sticker builder"
+    }
+  ],
+  "compatibilityScope": "Broader compatibility checks preceded only the final bounded source-aspect refinement. All unit/art contracts and the full art browser command were rerun after that refinement. Hosted final-head CI is recorded separately on PR23.",
+  "captures": {
+    "studio-desktop.png": {
+      "sha256": "f5693ed3aca924e5d4f8dc7777b4c84d6ae46aa181f61eaf70fb7151c4e04ea5",
+      "bytes": 592685
+    },
+    "studio-phone.png": {
+      "sha256": "1abbb8bdb71e561214fd79c2bf038b9a91ea9bf04b5ca06cd0f0daa19ceb3feb",
+      "bytes": 398214
+    },
+    "movement-editor.png": {
+      "sha256": "30836a9868050767662d7e5b4e1740b3c7a993180cd7ee5b23a3a877d441cc25",
+      "bytes": 134796
+    },
+    "rally-car.png": {
+      "sha256": "b48fa329ea9818bdfc5624de80121e158f144d3fd6f735af7869ebaefbd3ccfe",
+      "bytes": 394961
+    },
+    "scene-code-desktop.png": {
+      "sha256": "28628426eec97054591dff93bd90732946fec0eae7c6e208f59f4a6b9935a30c",
+      "bytes": 514929
+    }
+  },
+  "functionalValidationSource": "758239d420912d0c0c41bbe3cb017c4c6b88c885",
+  "publicationScope": "Application differs from functional validation source only in two singular/plural library labels. Build and complete Art Studio UI/capture journey rerun after those copy changes; other recorded checks retain their explicit source scope.",
+  "publishedImplementation": {
+    "commit": "6f4cd238536b9ad7cf663498565b4e46e2b474fe",
+    "tree": "c27433f4902467069b23b268f7814592cd6d79c7",
+    "identicalLocalPreparation": "0d925b241195360e234b576437abefc46b010591",
+    "method": "Authenticated repository connector; returned complete tree matches the reviewed local preparation exactly.",
+    "scope": "Local source IDs above retain their original test scope. Publication receipt changes only evidence and documentation. Final branch head and hosted checks are recorded on PR23."
+  }
+}

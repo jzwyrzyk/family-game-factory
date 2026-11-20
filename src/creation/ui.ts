@@ -1,6 +1,6 @@
 import { SceneEngine, type SceneSnapshot } from './engine';
 import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
-import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject } from './projects';
+import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace } from './storage';
 import { CREATION_CHALLENGES, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge } from './challenges';
 import { profileStorage } from '../adult-pilot/storage';
@@ -9,6 +9,8 @@ import type { StudioSession } from '../studio/notebook';
 import { publishSourceEvidence } from '../problem-solving/signals';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import {rewardSourceWritable} from '../rewards/write-guard';
+import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
+import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import './style.css';
 
 type Host = {
@@ -73,21 +75,42 @@ export function installCreationStudio(host: Host) {
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><div><span class="creation-eyebrow">EVERY STORY NEEDS A CAST</span><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2></div><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><div><span class="creation-eyebrow">EVERY STORY NEEDS A CAST</span><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2></div><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} Art Studio</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Jems characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
-  const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'));
+  const privateArt=new PrivateArtResolver(owner);
+  const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'),privateArt,message=>status(message,true));
   let scene: CreationProject | null = null, entryId = '', revisionId = '', sceneOwner = '', selectedActor = '', selectedProgram = '';
   let sourceSessionId = '', challengeId: string | null = null, hintUsed = false, targetMode = false, visible = false;
   let viewEpoch = 0;
   let engine: SceneEngine | null = null, frame = 0, last = 0, checkpointTimer: ReturnType<typeof setInterval> | undefined;
   let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false, recoveryPending = false;
+  let sceneImportPending=false;
   type Recording = { recorder: MediaRecorder; stream: MediaStream; chunks: Blob[]; owner: string; title: string; cancelled: boolean; timer?: ReturnType<typeof setTimeout> };
   let recording: Recording | null = null;
   let targetInputs = 0;
   const status = (message: string, error = false) => { $('creationStatus').textContent = message; $('creationStatus').classList.toggle('is-error', error); };
   const isCurrent = () => visible && sceneOwner === owner() && !!scene;
   const act = (fn: () => unknown) => { try { return fn(); } catch (error) { status((error as Error).message, true); } };
+  const actAsync=(fn:()=>Promise<unknown>)=>{
+    const capturedOwner=owner(),capturedView=viewEpoch;
+    void fn().catch(error=>{if(capturedOwner===owner()&&capturedView===viewEpoch&&visible)status((error as Error).message,true);});
+  };
+  async function prepareSceneArt(project:CreationProject,current:()=>boolean){
+    const bindings:ResolvedPrivateArt[]=[];
+    for(const id of privateArtReferences(project)){
+      const resolved=await privateArt.load(id);
+      if(!current())throw Error('The player or page changed. Reopen this scene in your own profile.');
+      bindings.push(resolved);
+    }
+    return bindings;
+  }
+  function indexSceneArt(projectId:string,capturedOwner:string,bindings:ResolvedPrivateArt[]){
+    // Retained scene revisions are authoritative for deletion and usage counts.
+    // Secondary indexing happens only after a successful scene write, so quota
+    // failures can never leave an orphan reservation that traps the artwork.
+    for(const resolved of bindings)void registerArtUsage(capturedOwner,{targetId:projectId,targetKind:'scene',drawingId:resolved.drawingId,...(resolved.rigId?{rigId:resolved.rigId}:{})}).catch(()=>{});
+  }
   function locked() { if (!FG.learning.active) return false; FG.learning.focus?.(); status('Finish your learning activity, or choose My Games to leave.'); return true; }
   const recoveryMessage = 'Choose “Resume my draft” or “Use saved version” before changing this scene.';
   function assertEditing(options: { resolvingRecovery?: boolean } = {}) { if (!isCurrent()) throw Error('Reopen your scene in your own profile.'); if (locked()) throw Error('Your learning activity is still open.'); if (recoveryPending && !options.resolvingRecovery) throw Error(recoveryMessage); }
@@ -130,14 +153,26 @@ export function installCreationStudio(host: Host) {
     const asked = FG.learning.checkpoint(target, { gameId: 'creation', projectId: entryId, versionId: revisionId }, done, { onLeave: () => host.home() });
     if (asked) { stop(); target.hidden = false; } else action();
   }
-  function run(record = false) {
+  async function run(record = false) {
     assertEditing(); saveVersion();
+    const capturedOwner=owner(),capturedView=viewEpoch,project=scene!;
+    const references=privateArtReferences(project);
+    if(references.length){
+      $<HTMLButtonElement>('creationRun').disabled=true;$<HTMLButtonElement>('creationVideo').disabled=true;
+      status('Getting your saved artwork ready…');
+      try{await Promise.all(references.map(id=>privateArt.load(id)));}
+      finally{if(capturedOwner===owner()&&capturedView===viewEpoch){$<HTMLButtonElement>('creationRun').disabled=false;$<HTMLButtonElement>('creationVideo').disabled=false;}}
+      if(capturedOwner!==owner()||capturedView!==viewEpoch||!isCurrent())return;
+      status('');
+    }
+    assertEditing();
     learningThen(() => { stop(); freshEngine(); engine!.start(); if (record) beginRecording(); animate(); });
   }
   function mutation(change: (project: CreationProject) => void, rerender = true) {
     assertEditing(); stop();
-    const before = clone(scene!), next = clone(scene!); change(next); validateCreationProject(next);
-    store().autosave(entryId, sceneOwner, next, revisionId);
+    const before = clone(scene!), next = clone(scene!),selectionBefore={selectedActor,selectedProgram,insert};
+    try{change(next); validateCreationProject(next);store().autosave(entryId, sceneOwner, next, revisionId);}
+    catch(error){selectedActor=selectionBefore.selectedActor;selectedProgram=selectionBefore.selectedProgram;insert=selectionBefore.insert;throw error;}
     undo.push(before); if (undo.length > 60) undo.shift(); redo = []; scene = next; dirty = true;
     $('creationSaveState').textContent = 'Draft saved · keep when you’re ready';
     freshEngine(); if (rerender) renderEditor(); updateUndo();
@@ -152,6 +187,7 @@ export function installCreationStudio(host: Host) {
   function loadScene(id: string) {
     const loaded = store().load(id, owner());
     viewEpoch++;
+    privateArt.clear();stage.clear();
     status(''); $<HTMLDetailsElement>('creationMore').open = false;
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
     selectedActor = scene.actors[0]?.id || ''; selectedProgram = scene.programs.find(p => p.actorId === selectedActor)?.id || '';
@@ -161,6 +197,7 @@ export function installCreationStudio(host: Host) {
     $('creationRecovery').hidden = !recoveryPending;
     $('creationHeading').textContent = 'Your imagination, in motion.'; $('creationSubtitle').textContent = 'Choose a character. Give it some blocks. Press play.';
     $('creationSaveState').textContent = loaded.project.keptId === revisionId ? 'Your kept version' : 'Saved on this device';
+    $<HTMLButtonElement>('creationRun').disabled=false;$<HTMLButtonElement>('creationVideo').disabled=false;$<HTMLButtonElement>('creationDownload').disabled=false;
     if (loaded.project.challengeId && !challengeId) status('This scene’s original challenge is no longer available. You can still edit and keep your scene.');
     $<HTMLInputElement>('creationTitle').value = scene.title; freshEngine(); renderEditor(); renderBrief(); renderSource(); updateUndo();
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -170,6 +207,7 @@ export function installCreationStudio(host: Host) {
   function openChallenges() { act(() => { if (!enter()) return; shelf('challenge'); }); }
   function shelf(mode: 'free' | 'challenge' = 'free') {
     if (locked()) return; saveVersion(); stop(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
+    privateArt.clear();stage.clear();
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
     $('creationHeading').textContent = 'Little blocks. Big possibilities.'; $('creationSubtitle').textContent = 'Make a story move. Give a character an idea. See what happens.';
     $('creationFreeShelf').hidden = mode !== 'free'; $('creationChallengeShelf').hidden = mode !== 'challenge';
@@ -191,7 +229,16 @@ export function installCreationStudio(host: Host) {
   }
   function art(assetId: string) {
     const asset = creationAsset(assetId), wrap = node('span', 'creation-actor-art');
-    if (asset?.url) { const img = node('img'); img.src = asset.url; img.alt = ''; wrap.append(img); }
+    if(parsePrivateArtId(assetId)){
+      wrap.textContent='Loading art…';const capturedOwner=owner(),capturedView=viewEpoch;
+      void privateArt.load(assetId).then(resolved=>{
+        if(capturedOwner!==owner()||capturedView!==viewEpoch||!wrap.isConnected)return;
+        const preview=node('canvas');preview.width=preview.height=128;preview.setAttribute('aria-label',resolved.label);
+        const ratio=120/Math.max(resolved.image.width,resolved.image.height),w=resolved.image.width*ratio,h=resolved.image.height*ratio;
+        preview.getContext('2d')!.drawImage(resolved.image,(128-w)/2,(128-h)/2,w,h);
+        preview.style.cssText='width:100%;height:100%;object-fit:contain';wrap.replaceChildren(preview);
+      }).catch(()=>{if(capturedOwner===owner()&&capturedView===viewEpoch&&wrap.isConnected)wrap.textContent='Art unavailable';});
+    }else if (asset?.url) { const img = node('img'); img.src = asset.url; img.alt = ''; wrap.append(img); }
     else { wrap.classList.add('creation-art-' + (asset?.shape || 'gem')); wrap.style.setProperty('--actor-color', asset?.color || '#9473D3'); wrap.textContent = asset?.emoji || (asset?.shape === 'robot' ? '▰' : asset?.shape === 'bucket' ? '◡' : '◆'); }
     return wrap;
   }
@@ -235,6 +282,13 @@ export function installCreationStudio(host: Host) {
   }
   function renderSource() {
     const box = $('creationSource'); box.replaceChildren(); const provenance = scene?.provenance;
+    if(scene&&privateArtReferences(scene).length){
+      box.hidden=false;
+      box.append(iconNode('span','','star','Your art · this scene keeps the exact version you chose'));
+      const artButton=iconNode('button','creation-text-button','edit','Art Studio');
+      artButton.onclick=()=>act(()=>{assertEditing();saveVersion();if(FG.artStudio?.open)FG.artStudio.open();else status('Art Studio is still opening. Try again in a moment.');});
+      box.append(artButton);return;
+    }
     box.hidden = !provenance?.sourceProjectId; if (box.hidden) return;
     box.append(iconNode('span', '', 'star', 'A new scene from your game · linked to the version you chose'));
     if (sourceSessionId) { const button = iconNode('button', 'creation-text-button', 'arrow', 'Back to my game'); button.onclick = () => act(() => { saveVersion(); stop(); void host.openGame(sourceSessionId); }); box.append(button); }
@@ -301,6 +355,7 @@ export function installCreationStudio(host: Host) {
   }
   function renderEditor() {
     if (!scene) return;
+    renderSource();
     $<HTMLInputElement>('creationTitle').value = scene.title; $<HTMLSelectElement>('creationBackground').value = scene.background;
     const cast = $('creationActors'); cast.replaceChildren();
     for (const actor of scene.actors) {
@@ -452,6 +507,7 @@ export function installCreationStudio(host: Host) {
   }
   function leave() {
     if (!visible) return; stop(); clearInterval(checkpointTimer); visible = false; viewEpoch++;
+    privateArt.clear();stage.clear();
     $<HTMLDialogElement>('creationActorDialog').close(); $('creationLearning').hidden = true;
   }
   $('creationHome').onclick = () => act(() => { saveVersion(); host.home(); });
@@ -467,7 +523,7 @@ export function installCreationStudio(host: Host) {
     const trigger = !programs.some(p => p.trigger.type === 'start') ? { type: 'start' as const } : !programs.some(p => p.trigger.type === 'tap') ? { type: 'tap' as const } : { type: 'event' as const, name: 'signal-' + (programs.length + 1) };
     const program = { id: uid(), actorId: selectedActor, trigger, actions: [] }; project.programs.push(program); selectedProgram = program.id; insert = null;
   }));
-  $('creationRun').onclick = () => act(() => run());
+  $('creationRun').onclick = () => actAsync(() => run());
   $('creationPause').onclick = () => act(() => {
     assertEditing(); if (!engine) return;
     const button = $<HTMLButtonElement>('creationPause'), hadFocus = document.activeElement === button;
@@ -482,29 +538,52 @@ export function installCreationStudio(host: Host) {
   $('creationRedo').onclick = () => act(() => { assertEditing(); if (!redo.length) return; const next = redo.at(-1)!; store().autosave(entryId, sceneOwner, next, revisionId); stop(); undo.push(clone(scene!)); scene = redo.pop()!; dirty = true; freshEngine(); renderEditor(); });
   $('creationKeep').onclick = () => act(() => { assertEditing(); saveVersion(); store().keep(entryId, sceneOwner, revisionId); $('creationSaveState').textContent = 'Your kept version'; status('This version is yours to keep. You can keep experimenting.'); });
   $('creationCopy').onclick = () => act(() => { assertEditing(); saveVersion(); const copied = store().copy(entryId, sceneOwner, scene!.title + ' copy'); loadScene(copied.id); });
-  $('creationDownload').onclick = () => act(() => { assertEditing(); download(new Blob([JSON.stringify(scene, null, 2)], { type: 'application/json' }), 'jems-scene.json'); });
-  $('creationVideo').onclick = () => act(() => { if (recording) { if (recording.recorder.state !== 'inactive') recording.recorder.stop(); return; } run(true); });
+  $('creationDownload').onclick = () => actAsync(async () => {
+    assertEditing();const capturedOwner=owner(),capturedView=viewEpoch,copy=clone(scene!);
+    const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent();
+    if(privateArtReferences(copy).length){
+      const button=$<HTMLButtonElement>('creationDownload');button.disabled=true;
+      try{
+        const bundle=await exportSceneArt(capturedOwner,copy,current);if(!current())return;
+        download(new Blob([JSON.stringify(bundle)],{type:'application/json'}),'jems-scene-with-art.json');
+        status('Your editable scene includes its original artwork and exact saved designs. Keep this file private.');
+      }finally{if(current())button.disabled=false;}
+    }else download(new Blob([JSON.stringify(copy, null, 2)], { type: 'application/json' }), 'jems-scene.json');
+  });
+  $('creationVideo').onclick = () => actAsync(async () => { if (recording) { if (recording.recorder.state !== 'inactive') recording.recorder.stop(); return; } await run(true); });
   function assertImportReady() {
     if (scene) { assertEditing(); return; }
     if (!visible) throw Error('Open Create & code before opening a scene file.');
     if (locked()) throw Error('Your learning activity is still open.');
   }
-  const chooseImport = () => act(() => { assertImportReady(); $<HTMLInputElement>('creationImport').click(); });
+  const chooseImport = () => act(() => { assertImportReady();if(sceneImportPending){status('A scene file is still opening. Please wait a moment.');return;} $<HTMLInputElement>('creationImport').click(); });
   $('creationImportButton').onclick = chooseImport;
   $('creationShelfImport').onclick = chooseImport;
   $('creationImport').onchange = async () => {
     const input = $<HTMLInputElement>('creationImport'), file = input.files?.[0], capturedOwner = owner(), capturedView = viewEpoch; if (!file) return;
+    if(sceneImportPending){input.value='';status('A scene file is still opening. Please wait a moment.');return;}
+    sceneImportPending=true;
     try {
-      assertImportReady(); if (file.size > 500000) throw Error('This scene file is too large.');
+      assertImportReady(); if (file.size > ART_LIMITS.bundleBytes) throw Error('Choose a scene and art file smaller than 64 MB.');
       const contents = await file.text();
       if (owner() !== capturedOwner || !visible || viewEpoch !== capturedView) return;
-      const imported = validateEditableProject(JSON.parse(contents));
+      const data=JSON.parse(contents),current=()=>owner()===capturedOwner&&visible&&viewEpoch===capturedView&&!FG.learning.active;
+      const withArt=data?.schema==='jems.scene-art.v1';
+      if(!withArt&&file.size>500000)throw Error('This scene file is too large.');
+      const imported = withArt?await importSceneArt(capturedOwner,data,current):validateEditableProject(data);
+      if(!current())return;
       assertImportReady(); saveVersion();
-      const project = store().create(owner(), { ...imported, id: uid(), provenance: { ...imported.provenance, createdBy: 'assisted' } });
-      loadScene(project.id); status('Your scene file is open as a new project.');
-    } catch (error) { if (owner() === capturedOwner && visible && viewEpoch === capturedView) status((error as Error).message, true); } finally { input.value = ''; }
+      const ready={...imported,id:uid(),provenance:{...imported.provenance,createdBy:'assisted' as const}};
+      const bindings=await prepareSceneArt(ready,current);
+      if(!current())return;
+      let project;
+      try{project=store().create(capturedOwner,ready);}
+      catch(error){if(withArt)throw Error('The artwork was imported into Art Studio, but the scene could not be saved. '+(error as Error).message);throw error;}
+      indexSceneArt(project.id,capturedOwner,bindings);
+      loadScene(project.id); status(withArt?'Your scene and its artwork are open as a new project. Earlier work is unchanged.':'Your scene file is open as a new project.');
+    } catch (error) { if (owner() === capturedOwner && visible && viewEpoch ===capturedView) status((error as Error).message, true); } finally { sceneImportPending=false;input.value = ''; }
   };
-  $('creationDelete').onclick = () => act(() => { assertEditing(); if (!confirm('Delete this scene and all of its versions from this device?')) return; store().remove(entryId, sceneOwner); publishSourceEvidence({kind:'clear-creation',owner:sceneOwner,projectId:entryId}); dirty = false; scene = null; shelf(); });
+  $('creationDelete').onclick = () => act(() => { assertEditing(); if (!confirm('Delete this scene and all of its versions from this device?')) return;const removedId=entryId,removedOwner=sceneOwner; store().remove(removedId, removedOwner); publishSourceEvidence({kind:'clear-creation',owner:removedOwner,projectId:removedId}); dirty = false; scene = null; shelf();void releaseArtUsage(removedOwner,removedId).catch(()=>{}); });
   $('creationHistory').onclick = () => act(() => {
     assertEditing(); saveVersion(); $('creationVersions').hidden = false; const box = $('creationVersionList'); box.replaceChildren();
     const kept = store().get(entryId, sceneOwner).keptId;
@@ -514,7 +593,34 @@ export function installCreationStudio(host: Host) {
   $('creationCloseHistory').onclick = () => { $('creationVersions').hidden = true; };
   $('creationResumeDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); const loaded = store().load(entryId, sceneOwner); if (!loaded.draft) { loadScene(entryId); return; } scene = clone(loaded.draft.scene); dirty = true; recoveryPending = false; $('creationRecovery').hidden = true; $('creationSaveState').textContent = 'Recovered draft · ready to keep'; status('Your draft is ready to continue.'); freshEngine(); renderEditor(); });
   $('creationDiscardDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); store().discardDraft(entryId, sceneOwner); recoveryPending = false; $('creationRecovery').hidden = true; status('Your saved version is ready to continue.'); freshEngine(); renderEditor(); });
-  $('creationAddActor').onclick = () => act(() => { assertEditing(); $<HTMLDialogElement>('creationActorDialog').showModal(); });
+  async function renderPrivateChoices(){
+    const capturedOwner=owner(),capturedView=viewEpoch,dialog=$<HTMLDialogElement>('creationActorDialog');
+    const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent()&&dialog.open;
+    const choices=$('creationPrivateActorChoices'),message=$('creationActorArtStatus');choices.replaceChildren();message.textContent='Opening your art collection…';
+    try{
+      const items=await listArtChoices(capturedOwner,current);if(!current())return;
+      message.textContent=items.length?'Choose an original or a saved cutout. Its artwork stays linked to this exact version.':'Your drawings can join this scene. Add one in Art Studio.';
+      for(const item of items){
+        const choice=node('button','creation-character-choice');choice.type='button';choice.dataset.privateArt=item.assetId;
+        choice.append(art(item.assetId),node('strong','',item.label),node('small','',item.detail));
+        choice.onclick=()=>actAsync(async()=>{
+          assertEditing();choice.disabled=true;
+          try{
+            const resolved=await privateArt.load(item.assetId);if(!current())return;
+            mutation(project=>{
+              const actor={id:uid(),assetId:item.assetId,name:item.label,x:400,y:300,size:140,visible:true};project.actors.push(actor);
+              const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};project.programs.push(program);selectedActor=actor.id;selectedProgram=program.id;insert=null;
+            });
+            indexSceneArt(entryId,capturedOwner,[resolved]);
+            dialog.close();status('Your own art is in the scene. Add blocks to tell it what to do.');
+          }finally{if(current())choice.disabled=false;}
+        });
+        choices.append(choice);
+      }
+    }catch(error){if(current())message.textContent=(error as Error).message;}
+  }
+  $('creationAddActor').onclick = () => act(() => { assertEditing(); $<HTMLDialogElement>('creationActorDialog').showModal();void renderPrivateChoices(); });
+  $('creationOpenArtStudio').onclick=()=>act(()=>{assertEditing();saveVersion();if(FG.artStudio?.open){$<HTMLDialogElement>('creationActorDialog').close();FG.artStudio.open();}else $('creationActorArtStatus').textContent='Art Studio is still opening. Try again in a moment.';});
   $('creationCloseActor').onclick = () => $<HTMLDialogElement>('creationActorDialog').close();
   for (const asset of CREATION_ASSETS) {
     const b = node('button', 'creation-character-choice'); b.type = 'button'; b.append(art(asset.id), node('strong', '', asset.label));
@@ -537,7 +643,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return; try { saveVersion(); stop(); } catch (error) { event.preventDefault(); status((error as Error).message, true); } });
   window.addEventListener('factory-profile', () => {
     leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; recoveryPending = false; sourceSessionId = ''; stage.clear();
-    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList']) $(id).replaceChildren();
+    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
   window.addEventListener('beforeunload', event => { if (!visible||!rewardSourceWritable()) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });
@@ -546,6 +652,26 @@ export function installCreationStudio(host: Host) {
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
   const api = {
     open, openChallenges,
+    async openArt(selection:ArtSelection){
+      if(!enter())return;
+      try{shelf();}catch(error){status((error as Error).message,true);return;}
+      const capturedOwner=owner(),capturedView=viewEpoch,current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&visible&&!FG.learning.active;
+      status('Getting your art ready for a new scene…');
+      try{
+        const choice=await artChoice(capturedOwner,selection,current);await privateArt.load(choice.assetId);if(!current())return;
+        const project=createStarterProject('blank',(choice.label+' adventure').slice(0,60)),actorId=uid();
+        project.actors=[{id:actorId,name:choice.label,assetId:choice.assetId,x:400,y:280,size:180}];
+        project.programs=[
+          {id:uid(),actorId,trigger:{type:'start'},actions:[{id:uid(),type:'jump',height:60,durationMs:800,origin:'starter'}]},
+          {id:uid(),actorId,trigger:{type:'tap'},actions:[{id:uid(),type:'jump',height:80,durationMs:650,origin:'starter'}]},
+        ];
+        project.provenance={createdBy:'child',sourceKind:'art',sourceProjectId:choice.drawingId,sourceRevisionId:choice.rigId||parsePrivateArtId(choice.assetId)!.sha256};
+        const bindings=await prepareSceneArt(project,current);if(!current())return;
+        const saved=store().create(capturedOwner,project);indexSceneArt(saved.id,capturedOwner,bindings);loadScene(saved.id);
+        status('Your art is ready. Try the starter hop, then change the blocks to make it yours. This scene uses the saved artwork as one character.');
+        return saved.id;
+      }catch(error){if(current())status((error as Error).message,true);}
+    },
     fromStudio(session: StudioSession, revision?: SourceRevision, manifest?: unknown) {
       // The caller still owns the visible Studio surface until entry succeeds.
       // Unsupported sources and unreadable collections must report there.

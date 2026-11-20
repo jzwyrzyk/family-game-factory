@@ -38,7 +38,7 @@ export interface SceneProgram {
 }
 export interface CreationProvenance {
   createdBy: CreationOrigin;
-  sourceKind?: 'curated' | 'generated' | 'creation';
+  sourceKind?: 'curated' | 'generated' | 'creation' | 'art';
   sourceProjectId?: string; sourceRevisionId?: string;
   sourceSessionId?: string; sourceGameId?: string;
 }
@@ -53,6 +53,14 @@ export type SceneProject = CreationProject;
 const forbiddenIds = new Set(['__proto__', 'prototype', 'constructor']);
 export const isCreationId = (value: unknown): value is string =>
   typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(value) && !forbiddenIds.has(value);
+/** Only private asset references have the additional hash suffix. The source
+ * ID bound matches portable art restoration; ordinary creation IDs stay capped at 160. */
+export interface PrivateArtReference {kind:'image'|'rig';id:string;sha256:string}
+export function parsePrivateArtId(value:unknown):PrivateArtReference|null {
+  if(typeof value!=='string')return null;
+  const match=/^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(value);
+  return match&&!forbiddenIds.has(match[2])?{kind:match[1] as 'image'|'rig',id:match[2],sha256:match[3]}:null;
+}
 const fail = (message: string): never => { throw new Error(`Creation Lab: ${message}`); };
 function record(value: unknown, allowed: readonly string[], label: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)
@@ -90,7 +98,9 @@ export function validateCreationProject(input: unknown): CreationProject {
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
     const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
-    id(a.id, 'character ID'); id(a.assetId, 'asset reference'); text(a.name, 60, 'character name');
+    id(a.id, 'character ID');
+    if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
+    text(a.name, 60, 'character name');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');
     actorIds.add(a.id);
     number(a.x, 0, p.width, 'character x'); number(a.y, 0, p.height, 'character y');
@@ -181,7 +191,7 @@ export function validateCreationProject(input: unknown): CreationProject {
   if (p.provenance !== undefined) {
     const source = record(p.provenance, ['createdBy','sourceKind','sourceProjectId','sourceRevisionId','sourceSessionId','sourceGameId'], 'source history');
     if (!origins.includes(source.createdBy as string)) fail('Invalid project authorship.');
-    if (source.sourceKind !== undefined && !['curated','generated','creation'].includes(source.sourceKind as string)) fail('Invalid source kind.');
+    if (source.sourceKind !== undefined && !['curated','generated','creation','art'].includes(source.sourceKind as string)) fail('Invalid source kind.');
     for (const field of ['sourceProjectId','sourceRevisionId','sourceSessionId','sourceGameId']) if (source[field] !== undefined) id(source[field], 'source reference');
   }
   return JSON.parse(JSON.stringify(input)) as CreationProject;
