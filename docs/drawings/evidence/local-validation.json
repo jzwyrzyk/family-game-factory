@@ -108,5 +108,12 @@
     }
   },
   "functionalValidationSource": "758239d420912d0c0c41bbe3cb017c4c6b88c885",
-  "publicationScope": "Application differs from functional validation source only in two singular/plural library labels. Build and complete Art Studio UI/capture journey rerun after those copy changes; other recorded checks retain their explicit source scope."
+  "publicationScope": "Application differs from functional validation source only in two singular/plural library labels. Build and complete Art Studio UI/capture journey rerun after those copy changes; other recorded checks retain their explicit source scope.",
+  "publishedImplementation": {
+    "commit": "6f4cd238536b9ad7cf663498565b4e46e2b474fe",
+    "tree": "c27433f4902467069b23b268f7814592cd6d79c7",
+    "identicalLocalPreparation": "0d925b241195360e234b576437abefc46b010591",
+    "method": "Authenticated repository connector; returned complete tree matches the reviewed local preparation exactly.",
+    "scope": "Local source IDs above retain their original test scope. Publication receipt changes only evidence and documentation. Final branch head and hosted checks are recorded on PR23."
+  }
 }
