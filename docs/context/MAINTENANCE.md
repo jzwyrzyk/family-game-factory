@@ -23,6 +23,8 @@ The problem-solving feature has a dedicated review area for its evidence schema,
 
 The Art Studio area similarly routes private drawing storage, picture/movement editing, portable art and the focused integration tests. Changes to native revision bindings and local scene references also require their existing experience, games and Creation reviews. Art evidence and camera/device limitations belong in the feature record; a green local browser run does not establish a website release or cloud storage.
 
+The analytics area routes its strict event schema, separate permission/relay, dashboard definitions and focused tests. Changes to Studio/art bindings, real-play protocol signals, parent Settings and runtime archives also require the existing experience, creation, games, learning, generation and privacy reviews. Live ingestion, exact query execution, consent and release evidence must remain distinct from synthetic analytics tests.
+
 The dependency-free checker reads [registry.json](registry.json). Each area lists the source paths that affect it, documents to review, a content fingerprint and the explicit review outcome/reason. The fingerprint includes path/content changes and routing definitions, so a stale branch cannot silently reuse a review made against different source. It is a change detector, not an assertion that an assistant understands the code.
 
 Changes to the registry's areas, routing, required files, link scope or review intervals also require an explicit **context** review. That review includes the normalized registry policy; review timestamps and outcomes are excluded to avoid hashing the registry into itself. Removing the context area is invalid. Broad source rules in other areas must not include the registry.

@@ -56,6 +56,9 @@ jobs:
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
+      - name: Optional analytics browser integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:analytics-browser
       - name: Arcade journey
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/journeys.cjs

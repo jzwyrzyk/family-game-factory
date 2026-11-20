@@ -6,7 +6,7 @@ type ClientAsset={id:string;mime:'image/png'|'image/webp';data:string;width:numb
 export function startClient(config:{worker:string;channel:string;artifactId:string;controls:string[];auditTicks?:number;assets?:ClientAsset[]}){
  const canvas=document.getElementById('game') as HTMLCanvasElement,ctx=canvas.getContext('2d')!,status=document.getElementById('status')!,score=document.getElementById('score')!,pauseButton=document.getElementById('pause') as HTMLButtonElement;
  const STEP=1000/60;let worker:Worker|null=null,raf=0,watch:ReturnType<typeof setInterval>|undefined,started=false,paused=false,ended=false,busy=false,lastTick=0,lastReply=0,accumulator=0,frames=0,changed=0,inputs=0,previous:Command[]=[],current:Command[]=[],signature='',updated=0,cam={x:0,y:0,zoom:1},beforeCam={...cam},ticks=0;
- let connected=false,learningPaused=false,userPaused=false,roundId=0,checkpointId=0,activeSeconds=0;
+ let connected=false,learningPaused=false,userPaused=false,roundId=0,checkpointId=0,activeSeconds=0,validatedPlayRound=0;
  const assets=config.assets||[],assetIds=new Set(assets.map(asset=>asset.id)),images=new Map<string,{image:HTMLImageElement;sampling:'pixelated'|'smooth'}>();let assetsReady=assets.length===0;
  const pressed=new Set<string>(),pulses=new Set<string>();let tap:null|{x:number;y:number}=null,pointer={x:0,y:0,down:false,pressed:false,released:false};let audio:AudioContext|null=null,effects=true,musicOn=false,musicMode='off',musicTimer:ReturnType<typeof setInterval>|undefined,notes=0,voices=0;const voicesSet=new Set<OscillatorNode>(),musicVoices=new Set<OscillatorNode>();
  const report=(event:string,extra={})=>parent.postMessage({type:'factory-preview',channel:config.channel,artifactId:config.artifactId,event,roundId,...extra},'*');
@@ -37,7 +37,7 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
  addEventListener('message',event=>{
   const data=event.data;
   if(event.source!==parent||!data||data.type!=='factory-learning'||data.channel!==config.channel||data.artifactId!==config.artifactId)return;
-  if(data.action==='connect'){connected=true;if(assetsReady)report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});return;}
+  if(data.action==='connect'){connected=true;if(assetsReady)report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});if(validatedPlayRound===roundId&&roundId>0)report('play-started',{learningProtocol:1});return;}
   if(!connected)return;
   if(data.action==='pause')setLearningPaused(true);
   if(data.action==='resume'){setLearningPaused(false);if(data.focus===true&&!document.hidden){const target=ended?document.getElementById('replay'):paused?pauseButton:canvas;target?.focus({preventScroll:true});}}
@@ -53,6 +53,7 @@ export function startClient(config:{worker:string;channel:string;artifactId:stri
   if(p.music!==undefined){if(!['play','build','off'].includes(p.music))throw Error('MUSIC_NOT_APPROVED');if(musicMode!==p.music){musicMode=p.music;music();}}
   if(config.auditTicks&&(ticks===config.auditTicks||out.status!=='playing'))canvas.dataset.auditComplete='true';
   if(out.status!=='playing'){if(out.status==='won'&&!inputs)throw Error('INPUT_REQUIRED');ended=true;draw(1);stop(true);status.textContent=out.status==='won'?'You did it!':'Try another way!';pauseButton.disabled=true;if(connected)setLearningPaused(true);report('round-complete',{won:out.status==='won',score:out.score});}
+  else if(frames===1){validatedPlayRound=roundId;report('play-started',{learningProtocol:1});}
  }
  function draw(alpha:number){const prior=new Map(previous.filter(c=>c.key).map(c=>[c.key,c]));ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,720,400);ctx.fillStyle='#eaf5ef';ctx.fillRect(0,0,720,400);const camera={x:beforeCam.x+(cam.x-beforeCam.x)*alpha,y:beforeCam.y+(cam.y-beforeCam.y)*alpha,zoom:beforeCam.zoom+(cam.zoom-beforeCam.zoom)*alpha};for(const raw of current){let c=raw;const old=c.key&&prior.get(c.key);if(old&&old.type===c.type){c={...c};for(const key of ['x','y','x2','y2'])if(typeof old[key]==='number'&&typeof c[key]==='number')c[key]=old[key]+(c[key]-old[key])*alpha;if(typeof old.angle==='number'&&typeof c.angle==='number'){const delta=Math.atan2(Math.sin(c.angle-old.angle),Math.cos(c.angle-old.angle));c.angle=old.angle+delta*alpha;}}
    ctx.save();if(c.type==='background'){if(c.style==='workshop')drawWorkshopBackground(ctx,720,400,0);else drawLandscape(ctx,720,400,camera.x,0);ctx.restore();continue;}

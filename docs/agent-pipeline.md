@@ -1,5 +1,7 @@
 # Private builder pipeline
 
+**Analytics runtime extension:** new v2 output now selects immutable `quality-runtime-v2.1.1` (`7f0de54d4c30aa6e026f9bcc29bffd0e911069b70c8b73686a9ecf23ffd58a5c`). It adds a trusted actual-start signal after a validated running frame; presentation commands and learning protocol 1 remain compatible. The v2.1.0 references below describe the retained presentation contract and archive. All previous archives remain unchanged. New-build attestation requires coordinated gateway/preview/private-worker/sandbox rollout; saved old revisions do not gain telemetry. See the [pilot/runtime boundary](analytics/README.md).
+
 The canonical queued-build API is `/v1/jobs`. The current source architecture is described in [ARCHITECTURE-CURRENT.md](../ARCHITECTURE-CURRENT.md), with dated deployment/activation evidence in [DELIVERY-STATE.md](../DELIVERY-STATE.md). The [Assignment 002 contract](assignment-002/README.md) records the move from the original declarative scaffold to isolated source generation. The historical Assignment 001 description is retained below for provenance; its capability and deployment statements are not a current system inventory.
 
 ## Current generated-game route

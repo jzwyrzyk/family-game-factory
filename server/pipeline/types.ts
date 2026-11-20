@@ -1,3 +1,4 @@
+import type {AnalyticsState} from '../analytics/types';
 import type {CoachReceipt} from '../coach/service';
 import type {FamilyCoachConsent} from '../coach/consent';
 import type {ParentPrivacyChoice} from '../privacy/parent-consent';
@@ -46,5 +47,5 @@ export interface Job extends BuildRequest {
 export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;adapter?:string;adultPilotProfileId?:string }
 export interface AuditEvent { jobId:string;familyId:string;status:JobStatus;at:string;code?:string }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
-export interface PipelineState { parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
+export interface PipelineState { analytics?:AnalyticsState; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
 export interface Repository { transaction<T>(update:(state:PipelineState)=>T):Promise<T>; snapshot():Promise<PipelineState> }

@@ -48,7 +48,10 @@
     "docs/drawings/ART_STUDIO.md",
     "docs/drawings/GOLD_STANDARD.md",
     "docs/drawings/PROGRAM.md",
-    "docs/decisions/2026-11-19-private-art-studio.md"
+    "docs/decisions/2026-11-19-private-art-studio.md",
+    "docs/analytics/README.md",
+    "docs/analytics/dashboard.md",
+    "docs/decisions/2026-11-19-optional-product-analytics.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -76,7 +79,8 @@
     "docs/archetypes/*.md",
     "docs/pals/*.md",
     "skills/gem-pal-studio/*.md",
-    "docs/drawings/*.md"
+    "docs/drawings/*.md",
+    "docs/analytics/*.md"
   ],
   "areas": [
     {
@@ -96,10 +100,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:17:14.624Z",
-      "sourceDigest": "2b74b8ac64d8a5f80eea41e577afb933362153cc194096eb5b41ea084f8d9f5f",
+      "reviewedAt": "2026-11-20T04:24:20.996Z",
+      "sourceDigest": "7c292ddef223c197ddbbf48be771a8143314f81bed5da7e110cea77b29a7ad2e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-approved Art Studio merge 20ffb350 with exact tested-tree equality and all eight passing hosted workflows. Product behavior and the local-storage, adapter and acceptance boundaries remain as reviewed.",
+      "reviewReason": "Documented the owner-approved optional PostHog purpose with separate permission and actual-play/original-art distinctions; usage grants no learning, rewards, educational benefit or person-identity claim.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -168,10 +172,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T02:53:46.287Z",
-      "sourceDigest": "948cd4d31496de87a8597c60f144bf5e1153d27f9839afede9d7cc612a0f2d81",
+      "reviewedAt": "2026-11-20T04:24:21.359Z",
+      "sourceDigest": "32b6bd254e5c4ceb64136a05bacff6388d39b2175589ff014435601ae9ce17f8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the final library label polish and repeated real Art Studio journey; singular part/use text changes no persistence or navigation behavior, and architecture continues to document exact asset bindings, local backup and owner-safe recovery.",
+      "reviewReason": "Reviewed primary Studio creation context, exact candidate/remote launch callbacks, native original-art copy bindings and default-off builder privacy configuration. Documented legacy builder exclusion, no backfill, failed-withdrawal pause and source isolation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -204,10 +208,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e06b8d6186a8c58911e04b9e0f32049ab94125a59cc660392389d63bce82a88f",
-      "reviewedAt": "2026-11-20T02:51:25.558Z",
+      "sourceDigest": "36e319e704528a0fb6765dfba54b02928abd0b39c030a51c2db9cee8679c3ab3",
+      "reviewedAt": "2026-11-20T04:24:21.975Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed local private-reference parsing, renderer cancellation, exact composite pixels and portable scene imports; updated Creation contracts and acceptance to distinguish local artwork from bundled-only generated manifests and one-actor scenes from articulated physics.",
+      "reviewReason": "Reviewed saved scene art additions and copies, revision commit boundaries, no imported/restored or unsaved-draft observations, actual engine start and owner races. Updated the Creation contract with optional content-free usage scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -270,10 +274,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T02:51:25.731Z",
-      "sourceDigest": "f7be746d325b6fe720eb05f67cb0182c7d56e4f04057cfd81aa3ce8fa8ed14e4",
+      "reviewedAt": "2026-11-20T04:24:22.427Z",
+      "sourceDigest": "f03dd0cee37f21dde29f1760061bab6eaf7a214fad7ec6dc671eee6bb73c134d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed native Rally and shared physics changes including original-aspect scaling, full wheel masks, fixed decorations, exact revision selection and missing-art behavior; architecture and drawing contracts describe supported geometry and preserve stock runtime compatibility."
+      "reviewReason": "Reviewed Rally Drive signal after art/host gates and the immutable generated runtime addition. Documented real-start versus Ready, archived playback compatibility and coordinated worker/service attestation release."
     },
     {
       "id": "learning",
@@ -291,10 +295,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:56.207Z",
-      "sourceDigest": "2798174cf2197341b90d2bc4a3abf04136091e44948aa2b40550c7542dbd44d5",
+      "reviewedAt": "2026-11-20T04:24:22.789Z",
+      "sourceDigest": "71b8dfc7814c66690292ef38420a2e4e44f7157c3c92bc0c6b252e79de4a96ac",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed production host save ordering with Math and English attempts; optional context is emitted only after durable attempt and reward outbox, preserving subject evidence and existing earning eligibility on observer failure."
+      "reviewReason": "Reviewed additive onPlayStarted host callback with exact iframe/owner/protocol/round guards and observer failure isolation. Architecture records the separate usage purpose; existing host-owned subject, grading and required checkpoint policy remains unchanged."
     },
     {
       "id": "services",
@@ -316,10 +320,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:50.701Z",
-      "sourceDigest": "993d1bc5ede9a3befd153f0c288c33901280d9cc60e39b879035c0aa119f8183",
+      "reviewedAt": "2026-11-20T04:24:23.208Z",
+      "sourceDigest": "e139cb6c03ee97605ce24fe788b9eb5c61eab106102adcac99cb07a2d9b8788e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the authenticated read-only companion endpoint and gateway/preview COPY inputs against merged quality artifacts. It returns bounded scene data through the existing revision audience check with no-store, while approved game art and private capture storage retain main's contracts."
+      "reviewReason": "Reviewed authenticated analytics routes, current consent checks, optional job wrapper field, OpenAPI and Docker/source archive dependencies. Documented server-only configuration, pre-response collector/scheduler drain and no core PostHog latency."
     },
     {
       "id": "generation",
@@ -342,10 +346,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:51.403Z",
-      "sourceDigest": "7f85771c47f30cc46436ae0c61338e56c7df2e0ecf3a47e9e179fdd8a5fed79d",
+      "reviewedAt": "2026-11-20T04:24:23.500Z",
+      "sourceDigest": "1d5abde5187f6cbb362826bf4c778a5dcc5edad7a4aa3d2eae7f1d803fe294e3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled conflicting generation and Docker paths with merged planning/art/review. Both request modes retain plan, playthrough, approved art and required repair captures; companion remains host-held and unchanged through attestation/publication. Existing quality runtime and resource/spending caps are preserved."
+      "reviewReason": "Reviewed repository terminal-state observation, exact accepted-job correlation, trusted first-running-frame signal and immutable v2.1.1 hash. Updated runtime references and mixed-worker rollout limitation; preserved all prior archives and existing build admission."
     },
     {
       "id": "coach",
@@ -391,10 +395,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "153f9fd6ed825e3bfb85cb4768ccb433bc6cb4e0e21b93877925e4fd9d398043",
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
+      "sourceDigest": "c3f80bc3a4fa5deb96406451c7f0bcae4f9e9a98d0a3b20599a45881e6cf4e46",
+      "reviewedAt": "2026-11-20T04:24:23.853Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed brand control changes alongside family/adult reward namespaces and parent Settings backup controls; no guardian scope, device trust or paid provider permission changes."
+      "reviewReason": "Documented independent family analytics guardian verification and exact-session Adult opt-in; reviewed revocation, no cross-unlock inheritance, origin/CSRF/device checks and explicit downstream-erasure limit. AI/speech permission remains separate."
     },
     {
       "id": "validation",
@@ -419,10 +423,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T02:51:25.971Z",
-      "sourceDigest": "98e5f93d87d087b4ed977db4b1d0f114fdd45c23a93e0af12f628190e11a1cc9",
+      "reviewedAt": "2026-11-20T04:24:24.200Z",
+      "sourceDigest": "89a1273896eeea4cfef35581be2ead48548900fbd93e5873e0f7a780f35427e0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new source and browser regressions plus existing compatibility results; added scoped evidence and capture checksums covering quota failures, owner/view changes, immutable reuse, image fidelity and explicit limits of synthetic device emulation.",
+      "reviewReason": "Reviewed 376 existing unit checks, 45 focused client/server/report tests and real browser art, permission, native and generated-start regressions. Recorded synthetic/real-browser scope, supported headless shell and live-service/device evidence limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -461,10 +465,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:17:14.995Z",
-      "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
+      "reviewedAt": "2026-11-20T04:24:24.564Z",
+      "sourceDigest": "714dfca2e1cd93b8517d78b6e5c484ecf04c1bd14e999ced3c83649c20ca3fc6",
       "reviewOutcome": "updated",
-      "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries.",
+      "reviewReason": "Reviewed merged Art Studio main ancestry, false-by-default Pages input, server COPY/archive allowlist and CI test commands. Recorded source-only preparation and coordinated runtime rollout; no deployment, consent mutation or PostHog apply is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -508,10 +512,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T02:51:26.397Z",
-      "sourceDigest": "c8d4c0f251e818f6cfcc0552e573613e1ac3bdcf038c107fb9492e4ac0673007",
+      "reviewedAt": "2026-11-20T04:24:24.896Z",
+      "sourceDigest": "83e5ccd19a220ee1143679f785c39e197ec7fb826a4861855ecb98439392a7f6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed registry policy changes and the new documentation links; added the dedicated art source/test area and required contracts, and documented cross-area review duties in maintenance without weakening existing fingerprint or link checks.",
+      "reviewReason": "Reviewed new analytics area, required documents, link scope and cross-area maintenance instructions; linked the accepted analytics decision and runbook without weakening fingerprint, source coverage or review rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -542,10 +546,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
-      "reviewedAt": "2026-11-19T17:17:56.552Z",
+      "sourceDigest": "2e1b8da3ad5dd0246de96cdac5e7edc79e6b21be6be03e72de5e5d42cad28529",
+      "reviewedAt": "2026-11-20T04:24:25.277Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states."
+      "reviewReason": "Reviewed adoption of the optional analytics panel into existing Grown-ups Settings. Documented separate product permission; local subject evidence, standards comparisons, recommendations and backup semantics remain unchanged."
     },
     {
       "id": "problem-solving",
@@ -602,10 +606,31 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "45c272ca36ecd6386ac752d92507253396a3c3761ea13ba3e6a358f3110bbf9a",
-      "reviewedAt": "2026-11-20T02:53:46.697Z",
+      "sourceDigest": "a81f427a640141332a0e01ccb0c5fda12e93a60cb817937d152aa55e4029c85b",
+      "reviewedAt": "2026-11-20T04:24:25.608Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final source-aspect physics and copy polish with all five art browser suites plus refreshed real UI captures; recorded per-command source identities, exact original/version semantics, recovery tests and remaining actual-device limits."
+      "reviewReason": "Reviewed committed original-save observations, owner-scoped immutable lineage and silent optional failure boundaries. Art contract records no pixel/hash/name export, import/index repair exclusion and per-device attribution."
+    },
+    {
+      "id": "analytics",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "DELIVERY-STATE.md",
+        "docs/analytics/*.md",
+        "docs/decisions/2026-11-19-optional-product-analytics.md"
+      ],
+      "sources": [
+        "src/analytics/**",
+        "server/analytics/**",
+        "scripts/analytics/**",
+        "tests/analytics-*"
+      ],
+      "reviewAfterDays": 14,
+      "sourceDigest": "249016472f0913a8dc6240ae1ff2a2b68289cd1d0db8d76ab212caf92f40d3f1",
+      "reviewedAt": "2026-11-20T04:24:20.626Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed strict schema, per-device HMAC references, exact current choice and Adult grant, committed job/art attribution, bounded collector and SQL bootstrap. Documented default-off setup, true running signals, unknown delivery, exact-revision undercounts and unconnected live project."
     }
   ]
 }

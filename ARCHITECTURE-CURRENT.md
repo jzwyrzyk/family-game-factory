@@ -138,6 +138,16 @@ The executable route composition is [gateway.ts](server/gateway.ts), with reques
 
 Browser stores are device- and origin-specific. Server revisions do not imply automatic synchronization of local profiles, learning or drawings. Any origin migration, deletion, backup or cross-device feature must explicitly cover each store and preserve recovery.
 
+## Optional product analytics
+
+The [PostHog pilot](docs/analytics/README.md) adds a strict optional client in `src/analytics/`, authenticated consent/capture routes and a bounded HMAC relay in `server/analytics/`, with [five aggregate report definitions](docs/analytics/dashboard.md). Both browser and server defaults are off. Family analytics requests require independent verification; Adult opt-in belongs to the exact current grant. Existing AI/speech choices, rewards and local learning reports remain separate authorities. The panel lives in Grown-ups Settings.
+
+The gateway strips optional analytics context before core build validation and binds accepted jobs to the current creation/choice. Its repository wrapper records terminal transitions without network calls in a transaction. A bounded outbox uses current permission checks and deterministic event UUIDs. Collector/scheduler drains happen before their responses end; core game actions never wait for PostHog. The private workspace retains consent evidence, at most 256 pending records, 512 job bindings and 2,048 duplicate receipts with the documented opportunistic age limits. Revocation clears pending/bindings; downstream PostHog history requires operator deletion. No browser analytics storage or content export is introduced.
+
+Routes are `GET /v1/analytics/status`, `POST /v1/analytics/events`, `POST /v1/analytics/adult-choice`, parent-unlocked `GET/POST /v1/devices/analytics`, and `POST /v1/devices/analytics/revoke`. See [OpenAPI](server/openapi.json) and the [runbook](docs/analytics/README.md) for exact authorization and configuration. The public config contains only an optional boolean, never a capture or management credential.
+
+Actual play uses a trusted protocol-1 `play-started` signal, distinct from Ready. New v2 output uses immutable `quality-runtime-v2.1.1`; prior archives remain playable without retroactive telemetry. New-build attestation requires a coordinated gateway/preview/private-worker/sandbox release. Art uses canonical original identity, stable saved-game identity and exact binding/play revisions; restored/imported/index-repair actions do not backfill usage. All observations are best effort, not complete population or learning evidence.
+
 ## Shared rewards, source handoff and concurrency
 
 The [reward schedule](docs/rewards/README.md) grants 2 gems per completed Math/Language activity or saved unscored writing, 8 once per scene challenge, 25 once per qualifying canonical developed project, and 5/10/20/40 once per newly earned maker level. Practice-count bonuses and lifetime gem milestones have deterministic keys. These values express engagement policy; assistance, mastery interpretation and grade selection remain in the existing engines.

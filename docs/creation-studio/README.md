@@ -1,5 +1,7 @@
 # Creation Studio: make scenes and rebuild behavior
 
+**Optional usage observations:** The optional [product analytics pilot](../analytics/README.md) observes explicit art additions only after saved-revision commit, deliberate copies as new games, and play only after successful engine start. Unsaved drafts, restore/import, Step and resumed learning do not become new binding/launch observations. Usage has no role in formative scoring or rewards.
+
 **Status:** merged in [PR62](https://github.com/jzwyrzyk/family-game-factory/pull/62) as [`c4ce21be410e7fccb16922c4711f4c4172edbc7e`](https://github.com/jzwyrzyk/family-game-factory/commit/c4ce21be410e7fccb16922c4711f4c4172edbc7e), November 19, 2026. This document describes source behavior and its acceptance contract; the merge does not establish deployment, real-device acceptance, or educational efficacy.
 
 **Decision:** [ADR0007 — One creation experience with free scenes and rebuild practice](../decisions/0007-creation-and-rebuild-practice.md). The owner expanded the earlier discussion into an explicit development request during the November 18–19, 2026 session: keep one Jems experience, reuse the child's game characters and ideas, offer editable scenes/actions, and provide a separate practice entrance where children rebuild demonstrated behavior.

@@ -187,7 +187,7 @@ export default class QualityHill implements GameInstance {
     if (!ok) this.saveNotice.textContent = 'Could not save on this device. Keep this page open to protect your changes; your earlier saved ride is safe.';
     return ok;
   }
-  private begin(focus=true) { if (this.hostPaused||this.drawingLoading||this.drawingUnavailable) return; if (this.mode === 'result') this.restart(); if (this.mode !== 'ready') return; this.mode = 'drive'; this.clock.resume('user'); void this.audio.unlock(); this.audio.setScene('run'); setIconLabel(this.driveButton,'play','Driving'); this.driveButton.disabled = true; this.hud(); if(focus)this.canvas.focus({ preventScroll: true }); }
+  private begin(focus=true) { if (this.hostPaused||this.drawingLoading||this.drawingUnavailable) return; if (this.mode === 'result') this.restart(); if (this.mode !== 'ready') return; this.mode = 'drive'; this.clock.resume('user'); void this.audio.unlock(); this.audio.setScene('run'); setIconLabel(this.driveButton,'play','Driving'); this.driveButton.disabled = true; this.hud(); if(focus)this.canvas.focus({ preventScroll: true }); this.root.dispatchEvent(new Event('jems-native-play-started',{bubbles:true})); }
   private resize() {
     const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
     const normalHeight = w < 600 ? Math.max(290, w * .75) : w * .54;

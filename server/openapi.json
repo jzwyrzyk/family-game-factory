@@ -880,7 +880,7 @@
             "familySession": []
           }
         ],
-        "description": "Runtime audience policy: with FACTORY_ADULT_PILOT_MODE=true, paid admission requires familySession AND adultCookie AND adultProof, an active owner-enrolled trusted device and its current 60-minute adult grant. With adult mode off, only the family-session path is available and current server-verified guardian generation permission is required. These alternatives are selected by server configuration, not caller role/profile JSON. Existing provider, private worker, budget and quota gates remain required. Admission and asynchronous worker claim/report/Ready publication recheck the applicable permission; adult jobs retain the exact grant that admitted them. Do not automatically replay an uncertain paid POST.",
+        "description": "Runtime audience policy: with FACTORY_ADULT_PILOT_MODE=true, paid admission requires familySession AND adultCookie AND adultProof, an active owner-enrolled trusted device and its current 60-minute adult grant. With adult mode off, only the family-session path is available and current server-verified guardian generation permission is required. These alternatives are selected by server configuration, not caller role/profile JSON. Existing provider, private worker, budget and quota gates remain required. Admission and asynchronous worker claim/report/Ready publication recheck the applicable permission; adult jobs retain the exact grant that admitted them. Do not automatically replay an uncertain paid POST. Optional analytics context is stripped before core validation. Missing, invalid, unavailable or unpermissioned analytics does not fail or authorize a build. Only a newly accepted request can bind its current choice; no historical enrollment or paid retry is introduced.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AllowedOrigin"
@@ -2172,6 +2172,539 @@
         ],
         "description": "Reuses the saved revision family, trusted-device and adult-profile audience checks. Returns manifest:null for old games and games without an authored companion; it never analyzes or executes game JavaScript. A manifest is bounded jems.creation.v1 data, with reviewed local asset IDs only, no source code, external URLs, credentials or private preview capabilities. It is a separate editable companion, not an assertion that game artwork or arbitrary mechanics were translated. All generated blocks are marked assisted. Exact recursive validation is implemented in src/creation/model.ts and src/creation/projects.ts. Responses are no-store."
       }
+    },
+    "/v1/analytics/status": {
+      "get": {
+        "summary": "Read separate analytics availability and current choice",
+        "description": "Requires a live trusted device. An adult proof selects only its exact active grant. AI/speech choices never authorize analytics. Configuration defaults off.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current scope result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid strict event/choice body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked authenticated device.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF, exact adult grant, parent unlock or analytics permission failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded analytics choice capacity reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Optional analytics state unavailable. No success or erasure is claimed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/events": {
+      "post": {
+        "summary": "Queue up to twenty explicit product observations",
+        "description": "Strict allowlist, maximum 24,000-byte JSON. Each event requires its current choice and active device/audience. Server outcomes cannot be claimed by the browser. Generated play resolves the exact authorized retained job, creation, game and revision. One bounded export drain occurs before the response; game actions are separate. No auth renewal or paid action.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Current scope result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsEventsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid strict event/choice body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked authenticated device.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF, exact adult grant, parent unlock or analytics permission failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded analytics choice capacity reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Optional analytics state unavailable. No success or erasure is claimed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyticsEventsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/adult-choice": {
+      "post": {
+        "summary": "Choose optional usage reporting for the current Adult session",
+        "description": "Explicit opt-in is independent of AI permissions and pinned to the exact current adult grant. Replacement/revocation discards pending data/bindings. Existing PostHog history requires operator deletion. A new unlock cannot inherit this choice.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current scope result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsChoiceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid strict event/choice body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked authenticated device.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF, exact adult grant, parent unlock or analytics permission failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded analytics choice capacity reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Optional analytics state unavailable. No success or erasure is claimed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdultAnalyticsChoiceRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/devices/analytics": {
+      "get": {
+        "summary": "Read the family analytics choice",
+        "description": "Requires matching family and exact-device parent unlock. No verification receipt is exposed.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current scope result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid strict event/choice body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked authenticated device.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF, exact adult grant, parent unlock or analytics permission failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded analytics choice capacity reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Optional analytics state unavailable. No success or erasure is claimed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Request separate family analytics permission",
+        "description": "Creates a pending current-notice choice only. Independent operator guardian verification is required; AI or speech consent is insufficient. Expires within 90 days. No browser route can verify it.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current scope result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsChoiceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid strict event/choice body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked authenticated device.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF, exact adult grant, parent unlock or analytics permission failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded analytics choice capacity reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Optional analytics state unavailable. No success or erasure is claimed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FamilyAnalyticsChoiceRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/devices/analytics/revoke": {
+      "post": {
+        "summary": "Withdraw family analytics permission",
+        "description": "Drops pending observations/job bindings and prevents future permissioned collection. Cannot retract an in-flight request or delete already ingested PostHog history.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current scope result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsChoiceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid strict event/choice body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked authenticated device.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF, exact adult grant, parent unlock or analytics permission failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded analytics choice capacity reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Optional analytics state unavailable. No success or erasure is claimed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2252,6 +2785,9 @@
           },
           "retryOf": {
             "type": "string"
+          },
+          "analytics": {
+            "$ref": "#/components/schemas/AnalyticsBuildContext"
           }
         }
       },
@@ -2895,6 +3431,338 @@
           "clientRequestId": {
             "type": "string",
             "pattern": "^[\\w-]{1,100}$"
+          }
+        }
+      },
+      "AnalyticsBuildContext": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "choiceId",
+          "ownerId",
+          "creationId"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "choiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ownerId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "creationId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          }
+        }
+      },
+      "ClientAnalyticsEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "event",
+          "eventId",
+          "choiceId",
+          "ownerId",
+          "creationId"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "event": {
+            "enum": [
+              "jems_journey_started",
+              "jems_game_play_started",
+              "jems_art_saved",
+              "jems_asset_added_to_game",
+              "jems_game_revision_played"
+            ]
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "choiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ownerId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "creationId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "jobId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "gameId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "revisionId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "assetId": {
+            "type": "string",
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_:./-]{0,179}$",
+            "description": "Opaque local reference, never content or a URL. The gateway HMACs all exported references; prototype keys and :// are rejected."
+          },
+          "creationMode": {
+            "enum": [
+              "generated",
+              "native",
+              "scene",
+              "drawing",
+              "upload",
+              "camera"
+            ]
+          },
+          "surface": {
+            "enum": [
+              "home",
+              "studio",
+              "art-studio",
+              "creation-studio",
+              "library",
+              "builder",
+              "journey",
+              "play"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "event": {
+                  "enum": [
+                    "jems_art_saved",
+                    "jems_asset_added_to_game"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "assetId"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "event": {
+                  "enum": [
+                    "jems_game_play_started",
+                    "jems_game_revision_played",
+                    "jems_asset_added_to_game"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "required": [
+                    "gameId"
+                  ]
+                },
+                {
+                  "required": [
+                    "jobId"
+                  ]
+                },
+                {
+                  "required": [
+                    "revisionId"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "AnalyticsStatus": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "permitted",
+          "audience",
+          "noticeVersion",
+          "status",
+          "choiceId",
+          "expiresAt"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "permitted": {
+            "type": "boolean"
+          },
+          "audience": {
+            "enum": [
+              "adult",
+              "child"
+            ]
+          },
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-product-analytics-2026-11-v1"
+          },
+          "status": {
+            "enum": [
+              "disabled",
+              "not-requested",
+              "pending",
+              "enabled",
+              "revoked",
+              "expired"
+            ]
+          },
+          "choiceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "expiresAt": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "externalVerificationRequired": {
+            "type": "boolean"
+          },
+          "downstreamErasure": {
+            "const": "operator-required"
+          }
+        }
+      },
+      "AnalyticsChoiceResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "pending",
+              "enabled",
+              "revoked"
+            ]
+          },
+          "choiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-product-analytics-2026-11-v1"
+          },
+          "expiresAt": {
+            "type": "integer"
+          },
+          "downstreamErasure": {
+            "const": "operator-required"
+          }
+        }
+      },
+      "AnalyticsEventsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ClientAnalyticsEvent"
+            }
+          }
+        }
+      },
+      "AnalyticsEventsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accepted"
+        ],
+        "properties": {
+          "accepted": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20
+          }
+        },
+        "description": "Durably queued observations, not proof of PostHog delivery. Disabled config accepts zero."
+      },
+      "FamilyAnalyticsChoiceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "noticeVersion",
+          "guardianAffirmed",
+          "providerAcknowledged"
+        ],
+        "properties": {
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-product-analytics-2026-11-v1"
+          },
+          "guardianAffirmed": {
+            "const": true
+          },
+          "providerAcknowledged": {
+            "const": true
+          }
+        }
+      },
+      "AdultAnalyticsChoiceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "noticeVersion",
+          "enabled"
+        ],
+        "properties": {
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-product-analytics-2026-11-v1"
+          },
+          "enabled": {
+            "type": "boolean"
           }
         }
       }

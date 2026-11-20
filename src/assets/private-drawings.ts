@@ -2,6 +2,10 @@
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, type ArtGuard, type ArtUsage } from '../drawing/library';
 import type { SavedRig } from '../drawing/store';
 import { adultStorageKey } from '../adult-pilot/storage';
+import { trackAnalytics } from '../analytics/client';
+
+let observationProfileEpoch = 0;
+if (typeof window !== 'undefined') window.addEventListener('factory-profile', () => { observationProfileEpoch++; });
 
 export type DrawingCategory = 'character' | 'vehicle' | 'prop' | 'world' | 'other';
 export const DRAWING_CATEGORIES: readonly DrawingCategory[] = ['character', 'vehicle', 'prop', 'world', 'other'];
@@ -78,9 +82,32 @@ export async function drawing(owner: string, id: string): Promise<Drawing> {
     if (!item || item.owner !== owner) throw Error('Choose a drawing from this profile.'); return item;
   });
 }
+/** Analytics follows immutable source links, never a name, image hash, or rig
+ * version. A broken/cross-owner lineage is omitted rather than guessed. */
+export async function originalDrawingId(owner: string, id: string, current: ArtGuard = () => true): Promise<string> {
+  if (!current()) throw Error('The active artwork changed.');
+  const originals = await drawings(owner);
+  if (!current() || originals.length > ART_LIMITS.drawingsPerOwner) throw Error('The original artwork could not be verified.');
+  const byId = new Map(originals.map(item => [item.id, item]));
+  let item = byId.get(id);
+  const seen = new Set<string>();
+  while (item) {
+    if (seen.has(item.id)) break;
+    seen.add(item.id);
+    if (!item.sourceId) {
+      if (item.sourceSha256) break;
+      return item.id;
+    }
+    const parent = byId.get(item.sourceId);
+    if (!parent || parent.sha256 !== item.sourceSha256) break;
+    item = parent;
+  }
+  throw Error('The original artwork could not be verified.');
+}
 export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard): Promise<Drawing> {
+  const observationEpoch = observationProfileEpoch;
   assertArtWrite(owner, guard); const item = await prepareDrawing(owner, name, file); assertArtWrite(owner, guard);
-  return withArtTransaction(['drawings'], 'readwrite', async transaction => {
+  const saved = await withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), all = await artRequest(store.getAll()) as Drawing[];
     if (sourceId) {
       const source = all.find(original => original.owner === owner && original.id === sourceId);
@@ -89,6 +116,12 @@ export async function saveDrawing(owner: string, name: string, file: Blob, sourc
     }
     checkArtCapacity([...all, item]); assertArtWrite(owner, guard); store.add(item); return item;
   });
+  // The outer transaction has committed. Crops/edits keep the source's first
+  // save; backup import and restore never pass through this observation.
+  try {
+    if (!sourceId && observationEpoch === observationProfileEpoch && (!guard || guard())) trackAnalytics('jems_art_saved', { ownerId: owner, creationId: saved.id, assetId: saved.id });
+  } catch { /* Optional measurement cannot turn a successful save into failure. */ }
+  return saved;
 }
 export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
   assertArtWrite(owner, guard);

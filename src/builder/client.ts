@@ -1,9 +1,10 @@
 import {familyFetch} from './session';
 import type {CreationProject} from '../creation/model';
 import {validateGeneratedCreationManifest} from '../creation/projects';
+import type {AnalyticsBuildContext} from '../analytics/contract';
 export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
-export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
-export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
+export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string;analytics?:{version:1;enabled:true}}
+export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>;analytics?:AnalyticsBuildContext}
 export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number}
 export interface Preview {revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
 export interface CreationManifestResponse {revisionId:string;projectId:string;manifest:CreationProject|null}
@@ -11,7 +12,8 @@ const loopback=(url:URL)=>['127.0.0.1','localhost','[::1]'].includes(url.hostnam
 export function validateBuilderConfig(input:unknown):BuilderConfig {
  const config=input as BuilderConfig;if(!config||config.version!==1||!['unavailable','remote'].includes(config.mode))throw Error('BUILDER_UNAVAILABLE');if(config.mode==='unavailable')return {version:1,mode:'unavailable'};
  const api=new URL(config.apiBaseUrl!),preview=new URL(config.previewOrigin!);if((api.protocol!=='https:'&&!loopback(api))||(preview.protocol!=='https:'&&!loopback(preview))||api.hostname===preview.hostname||api.username||api.password||preview.username||preview.password)throw Error('UNSAFE_BUILDER_CONFIGURATION');
- return {version:1,mode:'remote',apiBaseUrl:api.href.replace(/\/$/,''),previewOrigin:preview.origin};
+ return {version:1,mode:'remote',apiBaseUrl:api.href.replace(/\/$/,''),previewOrigin:preview.origin,
+  ...(config.analytics?.version===1&&config.analytics.enabled===true?{analytics:{version:1 as const,enabled:true as const}}:{})};
 }
 /** Adaptive polling avoids thousands of status reads during a long build. */
 export function buildPollDelay(elapsedMs:number){return elapsedMs<15000?1000:elapsedMs<60000?3000:8000;}
@@ -28,7 +30,7 @@ export class BuilderClient {
   const token=++this.generation,input=this.request!;let baseRevisionId=input.baseRevisionId;
   if(input.config&&baseRevisionId){const base=await this.api('/v1/revisions',{gameId:input.gameId,localRevisionId:baseRevisionId,config:input.config});baseRevisionId=base.revisionId;}
   if(token!==this.generation)return; // Profile changed while registering the starting revision.
-  const acknowledged=await this.api('/v1/jobs',{gameId:input.gameId,baseRevisionId,prompt:input.prompt,clientRequestId:this.requestId,...(this.retryOf?{retryOf:this.retryOf}:{})});
+  const acknowledged=await this.api('/v1/jobs',{gameId:input.gameId,baseRevisionId,prompt:input.prompt,clientRequestId:this.requestId,...(this.retryOf?{retryOf:this.retryOf}:{}),...(input.analytics?{analytics:input.analytics}:{})});
   if(typeof acknowledged.jobId!=='string'||!/^[\w-]{1,100}$/.test(acknowledged.jobId)||!['queued','building','testing','ready','failed','cancelled'].includes(acknowledged.status))throw Error('INVALID_ACKNOWLEDGEMENT');
   if(token!==this.generation)return;this.last=acknowledged;this.update(this.last!);
   const started=Date.now();for(let i=0;i<3600&&token===this.generation&&Date.now()-started<30*60_000;i++){

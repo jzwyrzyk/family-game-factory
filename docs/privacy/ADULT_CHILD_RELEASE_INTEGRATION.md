@@ -1,5 +1,7 @@
 # Jems adult profile and guardian consent — integration review
 
+**Separate product analytics:** the [PostHog pilot](../analytics/README.md) has its own notice/choice and defaults off. The permissions in this document do not authorize analytics. Family analytics remains pending until independent guardian verification; Adult analytics expires with the exact current unlock session. Stop reporting and downstream history deletion are different operations.
+
 This candidate integrates PR #52's parent choices with PR #53's adult pilot on **one existing Jems site**. The temporary adult profile directly activates AI for development. The same frontend keeps ordinary child profiles; privileged requests are authorized by the backend rather than by a hostname or local profile name.
 
 ## Runtime policies

@@ -16,6 +16,11 @@ on:
         description: Existing reviewed production preview HTTPS origin
         required: true
         type: string
+      analytics_enabled:
+        description: Show the separate optional usage-reporting choice (requires configured gateway)
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: read
 concurrency:
@@ -64,6 +69,7 @@ jobs:
         env:
           FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
           FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
+          FACTORY_PUBLIC_ANALYTICS_ENABLED: ${{ inputs.analytics_enabled }}
       - name: Stamp immutable release source
         env:
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
