@@ -166,6 +166,9 @@ jobs:
       - name: Illustrated gem journey
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:gem-journey
+      - name: Saved collections and default navigation continuity
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:navigation-continuity
       - name: Rewards layout, earning and persistence journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:rewards-browser

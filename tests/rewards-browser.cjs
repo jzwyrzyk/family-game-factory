@@ -142,10 +142,43 @@ async function installAuthFixture(context) {
     assert.deepEqual(await page.evaluate(() => window.rewardToastMessages), [], 'Opening rewards cannot earn or replay anything');
     for (const width of [1400, 768, 390, 320]) { await page.setViewportSize({ width, height: 1000 }); await noOverflow(page); }
     await page.setViewportSize({ width: 1400, height: 1000 });
-    await page.click('#jemsRewardsBack');
+
+    // Rewards starts the maker choice directly and routes each earning action
+    // through the ordinary host without granting credit just for navigation.
+    await page.click('#jemsRewardsMakerAction');
+    await page.locator('#jemsCharacterDialog').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('[data-journey-character]').count(), 2);
+    await page.keyboard.press('Escape');
+    await openRewards(page);
+    const sessionsBeforeMaking = await page.evaluate(() => FG.studio.exportNotebook().sessions.length);
+    await page.click('[data-reward-activity="making"]');
+    await page.locator('#page-studio').waitFor({ state: 'visible' });
+    const madeIdea = await page.evaluate(() => {
+      const notebook = FG.studio.exportNotebook();
+      return { count: notebook.sessions.length, session: notebook.sessions.find(session => session.id === notebook.active[FG.store.current().id]) };
+    });
+    assert.equal(madeIdea.count, sessionsBeforeMaking + 1);
+    assert.equal(madeIdea.session.game, 'new', 'Your own game opens a new saved idea');
+    await expectTotal(page, 0);
+
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
+    await page.selectOption('#parentSubject', 'math'); await page.click('#saveParent');
+    await openRewards(page);
+    const lockedSettings = await page.evaluate(() => ({ subject: FG.store.current().learningSubject, switchAllowed: FG.store.current().allowSubjectSwitch }));
+    await page.click('[data-reward-activity="language"]');
+    assert.match(await page.locator('#studioGlobalStatus').textContent(), /grown-up.*enable both subjects/i);
+    assert.equal(await page.locator('#studioGlobalStatus').getAttribute('role'), 'alert');
+    assert.equal(await page.locator('#page-jems-rewards').isVisible(), true, 'A locked subject does not navigate away');
+    assert.deepEqual(await page.evaluate(() => ({ subject: FG.store.current().learningSubject, switchAllowed: FG.store.current().allowSubjectSwitch })), lockedSettings, 'Rewards cannot change the parent subject lock');
+    assert.equal(await page.evaluate(() => FG.learning.subject), 'math');
+    await expectTotal(page, 0);
+    await page.click('[data-reward-activity="math"]');
+    await activeMath(page).waitFor({ state: 'visible' });
+    assert.equal(await page.evaluate(() => FG.learning.subject), 'math', 'The permitted current subject opens even when switching is locked');
+    assert.deepEqual(await page.evaluate(() => ({ subject: FG.store.current().learningSubject, switchAllowed: FG.store.current().allowSubjectSwitch })), lockedSettings);
 
     // Viewing, an accepted wrong response, a hint and a revealed solution are not completion grants.
-    await startMath(page); const shownId = await page.evaluate(() => FG.learning.activeAttemptId);
+    const shownId = await page.evaluate(() => FG.learning.activeAttemptId);
     await answerMath(page, { wrong: true });
     await page.evaluate(() => FG.rewards.refresh()); assert.equal(await total(page), 0);
     await activeMath(page).locator('[data-action="show-solution"]').click();
@@ -182,10 +215,13 @@ async function installAuthFixture(context) {
     await openRewards(page); assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '30');
     await page.click('#jemsRewardsBack');
 
-    // The parent selects English through the ordinary settings; the child completes its real activity.
+    // The parent permits both subjects; the Rewards language route chooses the
+    // exact subject without changing that permission, then earns a real grant.
     await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
-    await page.selectOption('#parentSubject', 'language'); await page.click('#saveParent');
-    await page.click('#studioNavPowers');
+    await page.selectOption('#parentSubject', 'both'); await page.click('#saveParent');
+    await openRewards(page); await page.click('[data-reward-activity="language"]');
+    assert.equal(await page.evaluate(() => FG.learning.subject), 'language');
+    assert.equal(await page.evaluate(() => FG.store.current().allowSubjectSwitch), true);
     if (!await page.evaluate(() => FG.learning.active)) await page.click('#lab-next');
     await page.locator('.language-activity:visible').waitFor();
     await answerLanguage(page); await expectTotal(page, 32);
@@ -218,8 +254,11 @@ async function installAuthFixture(context) {
     await page.setViewportSize({ width: 1400, height: 1000 });
 
     // Solve one actual rebuilt scene using the visible block editor; a repeat check pays no extra.
-    await page.click('#studioNavScenes');
-    await page.click('#creationChallengeMode'); await page.click('[data-challenge="robot-taps"]');
+    await page.click('[data-reward-activity="coding"]');
+    await page.locator('#creationChallengeShelf').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#creationChallengeMode').getAttribute('aria-pressed'), 'true');
+    assert.equal(await page.locator('#creationFreeShelf').isVisible(), false, 'Coding rewards opens challenges directly');
+    await page.click('[data-challenge="robot-taps"]');
     await page.getByRole('combobox', { name: 'When', exact: true }).selectOption('tap');
     await page.click('[data-add-block="move"]');
     const scene = await page.evaluate(() => FG.creation.scene());

@@ -13,18 +13,35 @@ const root = path.resolve(__dirname, '..');
 const script = `
 import { createRewardsPage, createRewardsWidget, createRewardCelebration } from './src/rewards/ui';
 import { emptyRewardsSummary } from './src/rewards/model';
+import { installGemJourney } from './src/brand/journey';
 import './src/brand/art-library.css';
 import './src/brand/journey.css';
 const empty = {summary:emptyRewardsSummary('player1'),journey:{ownerId:'player1',level:0,character:null,polishedCount:0,nextAction:'Save your first idea'}};
 const state = {summary:{...emptyRewardsSummary('player1'),lifetimeGems:135,nextGemMilestone:150,reachedGemMilestones:[50],gemMilestoneFloor:50,gemMilestoneProgress:.85,counts:{math:20,language:10,coding:2,making:1},practiceCount:32,nextPracticeMilestone:{goal:50,progress:32,amount:20},totalGrants:35,recentGrants:[{id:'game-1',kind:'game.developed',domain:'making',amount:25,label:'Your new game is yours',createdAt:'2026-11-19T12:00:00Z'},{id:'math-1',kind:'math.completed',domain:'math',amount:2,label:'Math activity completed',createdAt:'2026-11-19T11:58:00Z'},{id:'coding-1',kind:'scene.challenge',domain:'coding',amount:8,label:'A new coding challenge solved',createdAt:'2026-11-18T12:00:00Z'}]},journey:{ownerId:'player1',level:3,character:'nova',polishedCount:1,nextAction:'Polish 2 more jems'}};
 window.rewardActions=[];
 const act=name=>()=>window.rewardActions.push(name);
-const page=createRewardsPage({state,onBack:act('back'),onOpenJourney:act('journey'),onPlay:act('play'),onCreate:act('create'),onRetry:act('retry')});
+const page=createRewardsPage({state,onBack:act('back'),onOpenJourney:act('journey'),onPlay:act('play'),onCreate:act('create'),onActivity:activity=>window.rewardActions.push('activity:'+activity),onRetry:act('retry')});
 const widget=createRewardsWidget({summary:state.summary,onOpen:act('open')});
 document.querySelector('main').append(page.element);
 document.querySelector('header').append(widget.element);
 page.show();
-window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRewardCelebration({grants:state.summary.recentGrants.slice(0,1),journey:state.journey});Object.assign(toast.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',zIndex:'999'});document.body.append(toast);return toast},emptyToast(){return createRewardCelebration({grants:[],journey:state.journey})}};
+window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRewardCelebration({grants:state.summary.recentGrants.slice(0,1),journey:state.journey});Object.assign(toast.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',zIndex:'999'});document.body.append(toast);return toast},emptyToast(){return createRewardCelebration({grants:[],journey:state.journey})},
+  fallbackActions(){
+    const actions=[];
+    const fallback=createRewardsPage({state,onBack(){},onOpenJourney(){},onPlay:()=>actions.push('play'),onCreate:()=>actions.push('create')});
+    fallback.element.querySelector('[data-reward-activity="math"]').click();
+    fallback.element.querySelector('[data-reward-activity="making"]').click();
+    fallback.dispose();return actions;
+  },
+  showJourney(){
+    page.hide();
+    const journey=installGemJourney({onBack(){},onCreate:act('new-idea'),onChooseCharacter(){},onPrimaryAction:owner=>window.rewardActions.push('continue:'+owner)});
+    document.querySelector('main').append(journey.element);
+    journey.render({...state.journey,primaryActionLabel:'Continue my game'});
+    journey.element.hidden=false;journey.element.classList.remove('hidden');
+    window.rewardsFixture.journey=journey;
+  }
+};
 `;
 
 (async () => {
@@ -81,6 +98,15 @@ window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRew
     await page.locator('#jemsRewardsJourney').click();
     await page.locator('#jemsRewardsWidget').click();
     assert.deepEqual(await page.evaluate(() => window.rewardActions), ['play', 'create', 'journey', 'open']);
+    assert.match(await page.locator('#jemsRewardsExplanation').textContent(), /gems add up.*maker level grows/i);
+    for (const activity of ['math', 'language', 'coding', 'making']) {
+      const action = page.locator(`[data-reward-activity="${activity}"]`);
+      assert.equal(await action.getAttribute('type'), 'button');
+      await action.focus();
+      await page.keyboard.press('Enter');
+      assert.equal(await page.evaluate(() => window.rewardActions.at(-1)), 'activity:' + activity, 'Each earning route requests its own host-owned activity');
+    }
+    assert.deepEqual(await page.evaluate(() => window.rewardsFixture.fallbackActions()), ['play', 'create'], 'Existing hosts retain their play and creation fallbacks');
     await noOverflow();
     await page.screenshot({ path: path.join(destination, 'rewards-ui-desktop.png'), fullPage: true });
 
@@ -99,6 +125,7 @@ window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRew
     await page.evaluate(() => window.rewardsFixture.page.update(window.rewardsFixture.empty));
     assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '0');
     assert.match(await page.locator('#jemsRewardsMakerState').textContent(), /preview/);
+    assert.match(await page.locator('#jemsRewardsMakerAction').textContent(), /Choose your maker/);
     assert.equal(await page.locator('#jemsRewardsMakerArt .jems-character-art').count(), 2, 'No silent default character selection');
     assert.equal(await page.locator('#jemsRewardsRecent').isVisible(), false);
     await page.evaluate(() => window.rewardsFixture.page.update({ ...window.rewardsFixture.empty, loading: true }));
@@ -121,8 +148,19 @@ window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRew
     assert.equal(await page.locator('.jems-rewards-toast').evaluate(element => getComputedStyle(element).animationName), 'none');
     assert.match(await page.locator('.jems-rewards-toast').innerText(), /25 gems/);
     assert.equal(await page.evaluate(() => window.rewardsFixture.emptyToast().hidden), true, 'No empty +0 celebration');
+
+    await page.evaluate(() => window.rewardsFixture.showJourney());
+    assert.match(await page.locator('#jemsJourneyCreate').textContent(), /Continue my game/);
+    await page.locator('[data-journey-level="4"]').click();
+    assert.match(await page.locator('#jemsJourneyCreate').textContent(), /Continue my game/, 'Outfit previews do not replace the current next-step action');
+    await page.locator('#jemsJourneyCreate').focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => window.rewardActions.at(-1)), 'continue:player1');
+    await page.evaluate(() => window.rewardsFixture.journey.render({...window.rewardsFixture.empty.journey,ownerId:'player2',primaryActionLabel:'Start my game'}));
+    await page.locator('#jemsJourneyCreate').click();
+    assert.equal(await page.evaluate(() => window.rewardActions.at(-1)), 'continue:player2', 'The host action receives the current owner after a profile change');
     assert.deepEqual(errors, []);
-    console.log('PASS: Rewards component layout, base-path artwork, keyboard actions, owner-safe loading, reduced motion and nonblocking celebration.');
+    console.log('PASS: Rewards layout, actionable earning routes, contextual journey action, base-path artwork, keyboard actions, owner-safe loading, reduced motion and nonblocking celebration.');
   } finally {
     await browser.close(); server.close();
   }

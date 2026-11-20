@@ -1,9 +1,9 @@
 {
   "reference_index_id": "jems-gem-pals-character-references",
-  "revision": 2,
+  "revision": 3,
   "date": "2026-11-19",
   "timezone": "America/New_York",
-  "scope": "Reconciled design references and user selections; not a declaration that every mature artwork or application stage is complete.",
+  "scope": "Brio's two exact approved neutral masters and six expression candidates added to the established index. Earlier roster records remain the imported dated snapshot, not freshly verified current owner approvals.",
   "growth_form_policy": {
     "decision_date": "2026-11-19",
     "stage_count": 2,
@@ -22,22 +22,24 @@
       }
     ],
     "intermediate_visual_stage": null,
-    "applies_to": "22 roster entries, 23 individual profiles; the F1 Navi / F2 Mote source relationship remains unchanged",
+    "applies_to": "23 roster entries, 24 individual profiles including Brio; the F1 Navi / F2 Mote source relationship remains unchanged.",
     "progression_threshold": "Not decided by this artwork decision; existing PR68 uses a separate three-state model and must be reconciled before merge",
     "runtime_mapping_status": "design_stage_to_form_mapping_only; application IDs, earned-state transitions and asset bindings not implemented",
     "saved_data_policy": "Preserve committed activity receipts, per-Pal adventure counts, ownership, selections and backups. Derive displayed form without resetting history."
   },
   "counts": {
-    "roster_entries": 22,
-    "individual_character_profiles": 23,
-    "base_reference_profiles_resolved": 23,
+    "roster_entries": 23,
+    "individual_character_profiles": 24,
+    "base_reference_profiles_resolved": 24,
     "mature_status_counts": {
       "current_reference_unresolved": 11,
       "selected_exact_asset_pending": 2,
       "approved_direction_profile_pending": 2,
       "in_review": 5,
-      "approved_art_reference": 3
-    }
+      "approved_art_reference": 4
+    },
+    "brio_expression_candidates_in_review": 6,
+    "scope_note": "Counts reflect entries currently represented in this index. Pre-existing records were preserved; this addition does not re-audit the other profiles' later external approvals."
   },
   "reference_rules": [
     "Keep character identity, visual form, art revision, expression set, animation rig and application binding separate.",
@@ -62,7 +64,7 @@
   "assets": {
     "base_A": {
       "asset_id": "base_A",
-      "source_filename": "Luma\u2019s crystal lantern illuminates a stone.png",
+      "source_filename": "Luma’s crystal lantern illuminates a stone.png",
       "library_file_id": "libfile_fde3_f-d3903e8b517c8191b2334d4587e20777_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-d3903e8b517c8191b2334d4587e20777_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -182,7 +184,7 @@
     },
     "base_SU_r2": {
       "asset_id": "base_SU_r2",
-      "source_filename": "U Pleeko\u2019s Four-Legged Revision.png",
+      "source_filename": "U Pleeko’s Four-Legged Revision.png",
       "library_file_id": "libfile_fde3_f-a1995cbd14f4819192819125db414e66_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-a1995cbd14f4819192819125db414e66_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -214,7 +216,7 @@
     },
     "mature_S_this_chat": {
       "asset_id": "mature_S_this_chat",
-      "source_filename": "Mature Poff\u2019s floating crystal bellows.png",
+      "source_filename": "Mature Poff’s floating crystal bellows.png",
       "library_file_id": "libfile_fde3_f-eb99cbb9a7588191a467e6c6efc97e93_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-eb99cbb9a7588191a467e6c6efc97e93_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -244,7 +246,7 @@
     },
     "mature_U_this_chat": {
       "asset_id": "mature_U_this_chat",
-      "source_filename": "U Pleeko\u2019s Emerald-Hinged Ascent.png",
+      "source_filename": "U Pleeko’s Emerald-Hinged Ascent.png",
       "library_file_id": "libfile_fde3_f-6eb59a3579608191a7c6eb7295c878aa_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-6eb59a3579608191a7c6eb7295c878aa_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -260,7 +262,7 @@
     },
     "mature_V_this_chat": {
       "asset_id": "mature_V_this_chat",
-      "source_filename": "Talli\u2019s Ribbon Trail Scout.png",
+      "source_filename": "Talli’s Ribbon Trail Scout.png",
       "library_file_id": "libfile_fde3_f-d3be7cd284748191b467ab401f7165f3_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-d3be7cd284748191b467ab401f7165f3_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -276,7 +278,7 @@
     },
     "mature_W_this_chat": {
       "asset_id": "mature_W_this_chat",
-      "source_filename": "W Zippa\u2019s Four-Legged Canopy.png",
+      "source_filename": "W Zippa’s Four-Legged Canopy.png",
       "library_file_id": "libfile_fde3_f-67f94aa08b108191885ecce2eeeff910_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-67f94aa08b108191885ecce2eeeff910_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -322,7 +324,7 @@
     },
     "mature_P_other_chat": {
       "asset_id": "mature_P_other_chat",
-      "source_filename": "Cache\u2019s radiant seed nursery.png",
+      "source_filename": "Cache’s radiant seed nursery.png",
       "library_file_id": "libfile_fde3_f-976e2a59097c8191a5bf8b287150f5a2_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-976e2a59097c8191a5bf8b287150f5a2_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -337,7 +339,7 @@
     },
     "mature_Q_other_chat": {
       "asset_id": "mature_Q_other_chat",
-      "source_filename": "Brim\u2019s Opal Shade.png",
+      "source_filename": "Brim’s Opal Shade.png",
       "library_file_id": "libfile_fde3_f-e829b8466f5c819193162c5e7a311b30_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-e829b8466f5c819193162c5e7a311b30_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -382,7 +384,7 @@
     },
     "growth_direction_G": {
       "asset_id": "growth_direction_G",
-      "source_filename": "Sivo\u2019s radiant river arch evolution.png",
+      "source_filename": "Sivo’s radiant river arch evolution.png",
       "library_file_id": "libfile_fde3_f-f6ed95891ff08191acd30be7251a6b1d_64db2735d5688191ad02463aaa0cddc5",
       "library_file_version": "0",
       "library_file_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-f6ed95891ff08191acd30be7251a6b1d_64db2735d5688191ad02463aaa0cddc5&account_id=personal",
@@ -409,6 +411,126 @@
       "verification": "Exact local source bytes retained; original references visually inspected.",
       "repository_path": null,
       "reference_location": "library_only"
+    },
+    "brio_base_r1": {
+      "asset_id": "brio_base_r1",
+      "repository_path": "characters/brio/initial.png",
+      "reference_location": "repository",
+      "sha256": "a7324e9903e57f0b70f15d538327c216f2f7a815f5c581e8fc47012027ef14a8",
+      "size_bytes": 1939583,
+      "role": "selected",
+      "form_key": "base",
+      "expression": "neutral",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": null,
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_mature_r1_corrected": {
+      "asset_id": "brio_mature_r1_corrected",
+      "repository_path": "characters/brio/growth.png",
+      "reference_location": "repository",
+      "sha256": "647287b065025110d3ef9ccd590e1694cbd407af4339ba43419df1a96a8a8f9a",
+      "size_bytes": 1931793,
+      "role": "selected",
+      "form_key": "mature",
+      "expression": "neutral",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_base_r1",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_base_celebrate_r1": {
+      "asset_id": "brio_base_celebrate_r1",
+      "repository_path": "characters/brio/emotions/base/celebrate.png",
+      "reference_location": "repository",
+      "sha256": "0615660e4a3822da6bdabd4aa0d255ab7a7d34eb3329bc1e05b853ca4632bb3d",
+      "size_bytes": 1885506,
+      "role": "in_review",
+      "form_key": "base",
+      "expression": "celebrate",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_base_r1",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_base_thinking_r1": {
+      "asset_id": "brio_base_thinking_r1",
+      "repository_path": "characters/brio/emotions/base/thinking.png",
+      "reference_location": "repository",
+      "sha256": "bc009bc7c63dda4cbc8333a61da4885e0334608fb1ae71eda91913b28b27415e",
+      "size_bytes": 1907945,
+      "role": "in_review",
+      "form_key": "base",
+      "expression": "thinking",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_base_r1",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_base_encouraging_retry_r1": {
+      "asset_id": "brio_base_encouraging_retry_r1",
+      "repository_path": "characters/brio/emotions/base/encouraging_retry.png",
+      "reference_location": "repository",
+      "sha256": "026d85cb05e251803dc06927ad6a6dd1af5328d9c7a7061a9d7b3ab6eb16c365",
+      "size_bytes": 1884767,
+      "role": "in_review",
+      "form_key": "base",
+      "expression": "encouraging_retry",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_base_r1",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_mature_celebrate_r1": {
+      "asset_id": "brio_mature_celebrate_r1",
+      "repository_path": "characters/brio/emotions/mature/celebrate.png",
+      "reference_location": "repository",
+      "sha256": "219e56d85c39f26e49390ac475746bd011bd98f1e1da6b9f1f84834e285d4882",
+      "size_bytes": 1889308,
+      "role": "in_review",
+      "form_key": "mature",
+      "expression": "celebrate",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_mature_r1_corrected",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_mature_thinking_r1": {
+      "asset_id": "brio_mature_thinking_r1",
+      "repository_path": "characters/brio/emotions/mature/thinking.png",
+      "reference_location": "repository",
+      "sha256": "213a7198fb309d3282f64db825d0cf874ff59b06d82360cc4932253298d00803",
+      "size_bytes": 1914715,
+      "role": "in_review",
+      "form_key": "mature",
+      "expression": "thinking",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_mature_r1_corrected",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
+    },
+    "brio_mature_encouraging_retry_r1": {
+      "asset_id": "brio_mature_encouraging_retry_r1",
+      "repository_path": "characters/brio/emotions/mature/encouraging_retry.png",
+      "reference_location": "repository",
+      "sha256": "79104b1f02e5aaaa6458fd3dcaea112661baeaacdbba4687ac50608359eb0450",
+      "size_bytes": 1887488,
+      "role": "in_review",
+      "form_key": "mature",
+      "expression": "encouraging_retry",
+      "source_kind": "generated_character_art",
+      "parent_reference_asset_id": "brio_mature_r1_corrected",
+      "verification": "Actual pixels inspected; exact original PNG bytes preserved and SHA-256 verified during import.",
+      "publication_scope": "Concept artwork authorized for this artwork PR; no runtime asset binding.",
+      "recorded_date": "2026-11-19"
     }
   },
   "roster_entries": [
@@ -1389,9 +1511,250 @@
           }
         }
       ]
+    },
+    {
+      "roster_alias": "brio",
+      "display_name": "Brio",
+      "members": [
+        {
+          "character_key": "brio-2026-11-19/brio",
+          "alias": "brio",
+          "display_name": "Brio",
+          "roster_alias": "brio",
+          "board_aliases": [],
+          "species_id": "GP-S025",
+          "application_mapping": null,
+          "profile_path": "characters/brio/README.md",
+          "design": {
+            "inspiration": "Owner-supplied acoustic guitar: plucked vibration, spring tension, resonant curved surfaces, and warm honey/mahogany colors. The private source photograph is not included.",
+            "story": "Brio turns its footsteps into a rhythm and pauses to listen for the next beat.",
+            "useful_action": "Fictional sound-maker: its springing legs excite the edges of its anatomical sounding plates.",
+            "personality_contrast": "A cheerful rhythm perfectionist who cannot cross a room without making a beat.",
+            "family_anchors": [
+              "cinnamon-mahogany matte body",
+              "cream wedge face, underside and curved side/thigh markings",
+              "brown eyes and two curved antennae",
+              "six limbs with oversized folded hind legs",
+              "two amber faceted sound structures rooted in pale mineral collars"
+            ],
+            "nearest_neighbors": [
+              {
+                "name": "Chimi",
+                "distinction": "Six-legged leaper with paired broad sounding plates; not a crescent body with graduated gem tines."
+              },
+              {
+                "name": "Furl",
+                "distinction": "Grounded articulated hopper with acoustic shell plates developing into crescent membrane sails; not a flying upright body with diamond wings."
+              },
+              {
+                "name": "Poff",
+                "distinction": "Leg-excited resonance and spring locomotion; not air valves on a concertina body."
+              }
+            ]
+          },
+          "growth_contract": {
+            "preserve": "Face construction, six-limb plan, antenna pair, cream/cinnamon colors, paired amber sound anatomy and rhythmic personality.",
+            "structural_change": "Compact crouched pod becomes an elongated articulated leaper with raised thorax, tapered curved abdomen and longer spring legs.",
+            "gem_development": "Two solid pick-shaped plates develop into two swept crescent frames with taut translucent inner membranes.",
+            "new_capability": "Proposed fictional sustained rhythm from broader resonating surfaces; not an implemented gameplay ability.",
+            "excluded_directions": [
+              "additional growth stages",
+              "unselected Timbri species",
+              "uncorrected extra-limb Grown attempt"
+            ]
+          },
+          "forms": {
+            "base": {
+              "status": "approved_art_reference",
+              "selected_reference": {
+                "asset_id": "brio_base_r1",
+                "region": "whole image"
+              },
+              "current_review_reference": null,
+              "art_revision": "r1",
+              "display_name": "Base",
+              "identity_note": "Compact six-legged cinnamon hopper; two solid amber pick-shaped sounding plates and oversized folded jumping thighs.",
+              "approval_evidence": {
+                "decision_date": "2026-11-19",
+                "timezone": "America/New_York",
+                "record": "../../decisions/2026-11-19-brio-art-adoption.md",
+                "scope": "Exact neutral master artwork",
+                "summary": "Owner selected the compact Base and the corrected Grown image for inclusion in the shared artwork PR."
+              },
+              "qa": {
+                "result": "Pass",
+                "evidence": "Actual selected pixels inspected for six connected legs, paired gem anatomy, face continuity and a single full-body character."
+              },
+              "expressions": {
+                "celebrate": {
+                  "status": "in_review",
+                  "selected_reference": null,
+                  "current_review_reference": {
+                    "asset_id": "brio_base_celebrate_r1",
+                    "region": "whole image"
+                  },
+                  "parent_reference": {
+                    "asset_id": "brio_base_r1",
+                    "region": "whole image"
+                  },
+                  "art_revision": "r1",
+                  "observable_delta": "Closed joyful eyes, broad open smile, perked antennae; compact crouch retained.",
+                  "qa": {
+                    "result": "Pass",
+                    "scope": "Internal visual QA, not owner approval",
+                    "evidence": "Six legs, two antennae, paired gem roots, face construction, form-specific gem geometry and materials retained; expression visually distinct."
+                  },
+                  "approval_evidence": null,
+                  "application_mapping": null
+                },
+                "thinking": {
+                  "status": "in_review",
+                  "selected_reference": null,
+                  "current_review_reference": {
+                    "asset_id": "brio_base_thinking_r1",
+                    "region": "whole image"
+                  },
+                  "parent_reference": {
+                    "asset_id": "brio_base_r1",
+                    "region": "whole image"
+                  },
+                  "art_revision": "r1",
+                  "observable_delta": "Upward sideways gaze, raised brow, pursed mouth and inward antenna tips.",
+                  "qa": {
+                    "result": "Pass",
+                    "scope": "Internal visual QA, not owner approval",
+                    "evidence": "Six legs, two antennae, paired gem roots, face construction, form-specific gem geometry and materials retained; expression visually distinct."
+                  },
+                  "approval_evidence": null,
+                  "application_mapping": null
+                },
+                "encouraging_retry": {
+                  "status": "in_review",
+                  "selected_reference": null,
+                  "current_review_reference": {
+                    "asset_id": "brio_base_encouraging_retry_r1",
+                    "region": "whole image"
+                  },
+                  "parent_reference": {
+                    "asset_id": "brio_base_r1",
+                    "region": "whole image"
+                  },
+                  "art_revision": "r1",
+                  "observable_delta": "Friendly open eyes, warm open smile and slight welcoming head tilt.",
+                  "qa": {
+                    "result": "Pass",
+                    "scope": "Internal visual QA, not owner approval",
+                    "evidence": "Six legs, two antennae, paired gem roots, face construction, form-specific gem geometry and materials retained; expression visually distinct."
+                  },
+                  "approval_evidence": null,
+                  "application_mapping": null
+                }
+              },
+              "history": []
+            },
+            "mature": {
+              "status": "approved_art_reference",
+              "selected_reference": {
+                "asset_id": "brio_mature_r1_corrected",
+                "region": "whole image"
+              },
+              "current_review_reference": null,
+              "art_revision": "r1-corrected",
+              "display_name": "Grown",
+              "identity_note": "Elongated six-legged hopper; paired swept crescent crystal frames with translucent inner membranes, tapered curved abdomen, and no raised extra limb.",
+              "approval_evidence": {
+                "decision_date": "2026-11-19",
+                "timezone": "America/New_York",
+                "record": "../../decisions/2026-11-19-brio-art-adoption.md",
+                "scope": "Exact neutral master artwork",
+                "summary": "Owner selected the compact Base and the corrected Grown image for inclusion in the shared artwork PR."
+              },
+              "qa": {
+                "result": "Pass",
+                "evidence": "Actual selected pixels inspected for six connected legs, paired gem anatomy, face continuity and a single full-body character."
+              },
+              "expressions": {
+                "celebrate": {
+                  "status": "in_review",
+                  "selected_reference": null,
+                  "current_review_reference": {
+                    "asset_id": "brio_mature_celebrate_r1",
+                    "region": "whole image"
+                  },
+                  "parent_reference": {
+                    "asset_id": "brio_mature_r1_corrected",
+                    "region": "whole image"
+                  },
+                  "art_revision": "r1",
+                  "observable_delta": "Closed joyful eyes, broad open smile and slight proud chin lift; six grounded legs retained.",
+                  "qa": {
+                    "result": "Pass",
+                    "scope": "Internal visual QA, not owner approval",
+                    "evidence": "Six legs, two antennae, paired gem roots, face construction, form-specific gem geometry and materials retained; expression visually distinct."
+                  },
+                  "approval_evidence": null,
+                  "application_mapping": null
+                },
+                "thinking": {
+                  "status": "in_review",
+                  "selected_reference": null,
+                  "current_review_reference": {
+                    "asset_id": "brio_mature_thinking_r1",
+                    "region": "whole image"
+                  },
+                  "parent_reference": {
+                    "asset_id": "brio_mature_r1_corrected",
+                    "region": "whole image"
+                  },
+                  "art_revision": "r1",
+                  "observable_delta": "Pondering upward gaze, a gently raised brow and small rounded thoughtful mouth.",
+                  "qa": {
+                    "result": "Pass",
+                    "scope": "Internal visual QA, not owner approval",
+                    "evidence": "Six legs, two antennae, paired gem roots, face construction, form-specific gem geometry and materials retained; expression visually distinct."
+                  },
+                  "approval_evidence": null,
+                  "application_mapping": null
+                },
+                "encouraging_retry": {
+                  "status": "in_review",
+                  "selected_reference": null,
+                  "current_review_reference": {
+                    "asset_id": "brio_mature_encouraging_retry_r1",
+                    "region": "whole image"
+                  },
+                  "parent_reference": {
+                    "asset_id": "brio_mature_r1_corrected",
+                    "region": "whole image"
+                  },
+                  "art_revision": "r1",
+                  "observable_delta": "Soft brows, attentive friendly gaze and a small reassuring open smile.",
+                  "qa": {
+                    "result": "Pass",
+                    "scope": "Internal visual QA, not owner approval",
+                    "evidence": "Six legs, two antennae, paired gem roots, face construction, form-specific gem geometry and materials retained; expression visually distinct."
+                  },
+                  "approval_evidence": null,
+                  "application_mapping": null
+                }
+              },
+              "history": []
+            }
+          },
+          "asset_pack_policy": "Exactly two selected neutral PNGs plus one current PNG per requested emotion and form. No duplicate neutral, contact-sheet raster, rejected direction or superseded attempt is bundled.",
+          "production": {
+            "isolated_assets": "pending; concept portraits retain ivory backgrounds",
+            "expressions": "six_form_specific_candidates_in_review",
+            "animation_rig": "pending",
+            "runtime_stage_mapping": null,
+            "in_game_verification": "not_verified"
+          }
+        }
+      ]
     }
   ],
   "next_steps": [
+    "Review the six Brio expression candidates; neutral Base and corrected Grown are already owner-approved. Isolated sprites, animation and runtime integration remain separate.",
     "Recover the exact selected Chimi and Navi portraits and unresolved latest mature profiles; assemble the complete visual roster.",
     "Review any still-unapproved mature forms individually.",
     "Replace the existing three-stage PR68 presentation/derived growth model with a two-stage Base to Grown contract before merge. Decide and test the earned-adventure transition separately; do not invent a middle form or silently change rewards.",
@@ -1399,13 +1762,21 @@
     "Verify expressions and movement against those exact forms, then implement stage-aware artwork lookup and full roster mapping.",
     "Check collection, growth, take-along use, scene editing and save/reload/backup before merge and release."
   ],
-  "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions.",
+  "selection_summary": "The owner selected the newly reviewed U Pleeko, V Talli and X Whorl mature forms, preferred the latest corrected T Chimi and F1 Navi forms from the other companion artwork conversation, and requested consistent character references across revisions. A later owner decision selects Brio's compact Base and corrected Grown; six new Brio expressions are recorded separately as in-review candidates.",
   "repository_projection": {
     "source_filename": "Jems_Gem_Pal_Character_References_v1.json",
     "source_revision": 1,
     "source_sha256": "2045930545e62eb3894019271a152ed3c0e92e69c4f1699a660dfe033b16e5fd",
     "scope": "Exact references and per-form states from the source index; original selection text is paraphrased and review-bundle paths are replaced by repository or Library references.",
     "repository_paths_relative_to": "docs/pals/art",
-    "external_reference_note": "Library URLs retain the source access controls. An external source is not bundled runtime artwork."
+    "external_reference_note": "Library URLs retain the source access controls. An external source is not bundled runtime artwork.",
+    "followups": [
+      {
+        "date": "2026-11-19",
+        "character_key": "brio-2026-11-19/brio",
+        "scope": "Two approved neutral masters and six expression candidates added from exact generated PNG bytes; existing records preserved.",
+        "decision": "../../decisions/2026-11-19-brio-art-adoption.md"
+      }
+    ]
   }
 }

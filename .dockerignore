@@ -9,6 +9,9 @@
 !src/runtime/manifests.ts
 !src/studio/
 !src/studio/design.ts
+!src/creation/
+!src/creation/model.ts
+!src/creation/projects.ts
 server/**/node_modules
 server/**/.env*
 server/**/*.pem

@@ -449,3 +449,9 @@ body.studio-review > .factory-update-notice{color:#394862}
 @media(max-width:650px){
  .studio-review .site-header .studio-profile-menu[open] .profile-choices{top:calc(100% + 60px)}
 }
+/* Keep the earlier saved notebook and private drawings reachable from Studio. */
+.studio-library-tools{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.studio-legacy-return{margin-bottom:16px}
+/* Light collection panels need readable copy; the dark idea cards retain their own ink. */
+body.studio-review #page-creations > .panel > p,
+body.studio-review #page-creations #savedRemixes{color:var(--jems-muted)}
