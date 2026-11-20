@@ -419,10 +419,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:37:01.901Z",
-      "sourceDigest": "632b61d3426bb1526e45d3ff7c4431ece324d53f3674ad1f3f9ee592296431ee",
+      "reviewedAt": "2026-11-20T04:50:39.486Z",
+      "sourceDigest": "0d8aa3165a97bb1302ab279590a4fd2e7229f90a6e5789ac3dd28f9d79ed18dd",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the exact main tablet part-count failure, captured 65px tray movement and DIV click, and bounded corrective acceptance in DELIVERY-STATE. The test now uses Playwright real-touch target actionability; all 19 assertion-bearing lines and physical-device evidence limits are preserved.",
+      "reviewReason": "Reviewed both release-check failures and their bounded diagnostics. Tablet input retains all 19 assertion-bearing lines; legacy drawings now exercise both UUID orders with exact asset selection, original dimensions and protected-source retention. DELIVERY-STATE preserves the failed full rehearsal and separate focused acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -461,10 +461,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:37:06.027Z",
-      "sourceDigest": "d59f3866f7021f824ed62639d6ac61f418d99582c03ee1455a176644a53a9b6e",
+      "reviewedAt": "2026-11-20T04:52:24.992Z",
+      "sourceDigest": "22a6659efb0c8f00a3d5625b298102b87b41be88c0be0a9a2ab792baebca4ee0",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the current merged-source release blocker and exact hosted job link, concrete touch-event diagnosis, local focused/full-quality results and the isolated test-only candidate boundary. The original main failure is retained; no draft merge, deployment or provider activation is claimed.",
+      "reviewReason": "Recorded both release-check failures, matching local/hosted drawing evidence, durable two-order acceptance and the pending combined-head hosted gate. Selected source remains blocked; no merge or deployment is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

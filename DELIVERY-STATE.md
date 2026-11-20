@@ -1,6 +1,6 @@
 # jems delivery state
 
-## November 19 merged-source release preparation — tablet check correction
+## November 19 merged-source release preparation — browser check corrections
 
 The selected merged source is **`90743ab2b1da098188db15dc5e40c3dfd799e291`**. Its [main Arcade run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44673626234) records a failed **Physical and generated games** step in [creative job `136080262794`](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44673626234/job/136080262794). The exact log reports `tests/quality-tablet.cjs:40`: one part after two requested additions, where two parts are required. Earlier passing PR evidence does not clear this current-source failure. The other physical-builder, Rally, drawing and generated-runtime suites in that step passed.
 
@@ -16,7 +16,17 @@ The isolated correction changes only the tablet test helper to `locator.tap()`, 
 
 Local execution uses Node **24.22.3**, Playwright **1.56.1** and its supported Chromium **141.0.7390.37** headless shell. Hosted CI remains Node 22 / Ubuntu 24.04. These observations establish the stated synthetic test scope, not actual-family-device or child acceptance.
 
-**Disposition:** local test-only corrective candidate on `fix/tablet-touch-release-20261119`, based on the selected merged source. It is not yet published or merged, and the original release gate remains blocked. No application, service, asset, dependency, build-script or workflow file changes. No website publication, service deployment, traffic change, worker repin or paid activation occurred. A release containing this correction needs its own reviewed source acceptance; it must not be silently substituted into the already-merged release target.
+### Legacy drawing deletion selection
+
+The full local `npm test` rehearsal of the unchanged selected source subsequently exited with failure at `tests/private-drawings.cjs:2:2681`: its deletion check waited for one remaining card after clicking the last card's **Delete drawing** button. Earlier checks through restored games, learning recovery, offline shell and construction touch passed. The rehearsal used the supported Playwright headless shell after an initial environment-specific system-Chromium launch failure; neither attempt is reported as a full-suite pass.
+
+The initial tablet-only PR84 head independently recorded the same failure in [hosted browser job `136087146707`](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44675755776/job/136087146707), **Private drawings**, at `2026-11-20T04:49:03Z`. Its creative, learning and private-coach-image jobs passed, including the corrected tablet step; its other four workflows passed. That failed run is not final-source acceptance and is retained rather than retried unchanged.
+
+The drawing list is returned by IndexedDB in UUID key order, not creation order. The legacy test incorrectly assumed its first card was the original and its last card was the cutout. A bounded diagnostic exercised both valid UUID orders. When the original's UUID sorted first, the last card was the cutout and deletion succeeded. Reversing the two UUIDs made the last card the original, so the existing application guard correctly refused deletion while its cutout still referenced it. Both records remained, with **A saved version, game or scene still uses this artwork** in the status message. Both cases had zero page errors and no POST requests. The observed failure is an incorrect test target; the application's source-retention guard remains intact.
+
+The second isolated correction selects **My robot** and **My robot cutout** by their exact headings for binding, export and deletion. It preserves every prior check, additionally verifies the original's full 40 × 60 dimensions, proves that deleting the referenced original is refused, and then proves that deleting the unused cutout leaves the original available. Both UUID orders are permanent explicit cases in fresh browser contexts, not retries. The revised test ran once and passed both cases, verifying actual stored IDs and derivative references as well as visible outcomes. No runtime ordering, artwork deletion rule, stored data format or product behavior changes.
+
+**Disposition:** [draft PR84](https://github.com/jzwyrzyk/family-game-factory/pull/84), branch `fix/tablet-touch-release-20261119`, contains the separate test-only corrective work based on the selected merged source. Its initial published tablet-only head was `ef1c4ed3cd8796969cb1dc5c86d2a58668bbcb33`; the combined head will require its own hosted acceptance. The original main failure and the full local rehearsal failure are retained. The PR remains unmerged and the selected release gate remains blocked. Only the two browser tests, this delivery record and the documentation review registry change. No application, service, asset, dependency, build-script or workflow file changes. No website publication, service deployment, traffic change, worker repin or paid activation occurred. A release containing these corrections needs its own reviewed source acceptance; it must not be silently substituted into the already-merged release target.
 
 ## PR23 Art Studio — merged
 
