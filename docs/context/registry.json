@@ -90,10 +90,10 @@
         "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T01:00:13.109Z",
-      "sourceDigest": "ac3ed77536a7cabf99813efb77eaa08116df0f9fb1d49b19bb0ec21d9d2af17d",
+      "reviewedAt": "2026-11-20T01:16:17.200Z",
+      "sourceDigest": "75b29311edbe4e453d7388b30781161b3607d6b7c0f544450bf1ec79210e9565",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Gem Pal creative scope and the final whitespace-normalized doctrine against existing brand, maker-rank and rewards contracts. Added purposeful structural growth and two artistic forms while keeping earning thresholds, runtime delivery and exact-art approval separate.",
+      "reviewReason": "Integrated Gem Pal doctrine and guide over merged PR78. Preserved its restored collection access, navigation, same-project continuation, private drawings, explicit Keep, maker evidence and lifetime reward contracts; added the two artistic forms and purposeful structural growth without altering earning thresholds, runtime delivery or exact-art approval.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -115,6 +115,13 @@
           "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
+        },
+        {
+          "sourceCommit": "3cf23a866770e4cd22765ba822bcf1c988f60bcf",
+          "reviewedAt": "2026-11-19T23:24:40.702Z",
+          "sourceDigest": "5525f4f96e6cb9c02cf35e32381d8a6286ab659df44a1f3a6e225b825a5026e2",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed restored collection access, activity links, same-project continuation and score wording against the doctrine. Existing family idea sharing, private drawings, parent learning controls, explicit Keep, maker evidence and lifetime reward policy are unchanged; no new product entitlement or progression rule is introduced."
         }
       ]
     },
@@ -155,10 +162,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:12:55.026Z",
-      "sourceDigest": "6e2d2ac1a561182eab94cdb92571beb3102ded2e8d108f9429b19da20f555b27",
+      "reviewedAt": "2026-11-20T00:42:23.714Z",
+      "sourceDigest": "e3a140cb860db24ccb173d850d7d7387c08b62dae35e19718252babb729453df",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR56 integration, child-visible compact-phone feedback, game-state isolation, and browser-fixture versus live-generation limits.",
+      "reviewReason": "Reviewed the confirmed phone first-viewport defect from the collection shortcut, then moved the existing entry after the Ready to Play game shelf. Preserves all seven primary destinations, collection accessibility, profile boundaries and the original playable-first homepage contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -191,10 +198,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "89a27c985cde7960261edec936eb714189786fe7b5b7b32be5fcf771d74390dc",
-      "reviewedAt": "2026-11-19T17:17:55.432Z",
+      "sourceDigest": "bb9c80603eae9fd973eb540fed3f2edfda1e1ebb2aa4336e43d404647db0243c",
+      "reviewedAt": "2026-11-19T23:24:41.389Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed saved-attempt and delete hooks: the durable Creation attempt retains its reward outbox before optional APS context publication; scene mechanics, hints and challenge criteria remain unchanged.",
+      "reviewReason": "Documented saved scenes on both tabs, most-recent owner-scoped challenge continuation, explicit new attempts and direct validated file import with draft, recovery and stale-read guards. Reviewed actual UI and desktop/tablet/recovery regression changes; source schema and Keep rules are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -228,10 +235,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c049e7a955b7779e23e883b2bc543e6854e8b7a9c9f8a39661303da1635177cb",
-      "reviewedAt": "2026-11-19T17:17:55.879Z",
+      "sourceDigest": "5ce3a2b2d093c434cb667629ba028398816ad02a5b1b6f1a0ec7d824f16cd06a",
+      "reviewedAt": "2026-11-19T23:24:41.916Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed five-source journaled replacement and recovery, legacy four-source journals, owner checks, exact rollback and maintenance guards; documented that APS changes no award policy or lifetime count."
+      "reviewReason": "Documented actionable earning rows, parent-controlled subject routing, direct unset-maker selection and the distinction between lifetime gems and maker evidence. Reviewed component and integrated route assertions; reward receipts, amounts and source eligibility are unchanged."
     },
     {
       "id": "games",
@@ -257,10 +264,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:26:04.542Z",
-      "sourceDigest": "b60026d028b7e65892f3e661df13ed1544ded45c543da90f6383b8b3135c77c6",
+      "reviewedAt": "2026-11-19T23:24:42.267Z",
+      "sourceDigest": "11d65db71f1e2e5032c77e750fe0f25c7c1bfb64897f1b2c8622501fe9587c65",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed ready-state feedback relocation for both compact portrait and landscape, preserving warning hints and art clearance. Includes newly registered design-only archetype paths."
+      "reviewReason": "Reviewed the Mind Your Jems copy-only change and updated its feature contract: This round is in-memory scoring, Help explains reset and separation from lifetime gems, and build-wait-only entry remains. Visual comparison, inputs, handoff and recovery passed without baseline or tolerance changes."
     },
     {
       "id": "learning",
@@ -406,10 +413,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:26:04.542Z",
-      "sourceDigest": "75c5bf3398bbdad44ba9f5df80872cb29a2537e2e5da884cd71075e8d8bd47dd",
+      "reviewedAt": "2026-11-20T00:42:23.714Z",
+      "sourceDigest": "b2cd17614edab21251b06e9dac17032543df27341d72ca817582ca822cec7137",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed compact portrait/landscape browser regressions and existing source-bound screenshot fidelity, with no relaxation of real gameplay, touch, learning, owner or security checks.",
+      "reviewReason": "Reviewed the new phone first-viewport assertion in navigation continuity, preserving the complete playable-card criterion and existing owner, contrast, legacy entry, save and collection checks. The quality-tablet touch fault is separately rerun rather than weakening test thresholds.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -448,10 +455,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T23:04:57.424Z",
-      "sourceDigest": "bc2628185547f3b9691a605206bdce3a22026c872305542b990fbb15db428ce8",
+      "reviewedAt": "2026-11-19T23:24:42.984Z",
+      "sourceDigest": "5cc21e8d0597d91dbcb979af11559045366dce889fd1a94f20223aa1a4ad7a78",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded observed PR75 merge b6e160b9 and exact tree equality to tested head1da59b588, all15 latest-attempt jobs, successful staged-image Docker checks and source archive identity. Preserved the initial readiness-phase visual failure, single unchanged-head retry and issue76, closed superseded PR73, froze the corrected release source and retained the unshipped production boundary.",
+      "reviewReason": "Recorded the focused review candidate and local evidence against main a3b9051. Added the navigation suite to the creative CI job and standard npm test chain. Reviewed workflow and package diffs: no deployment, provider, image-publish or private-worker-pin changes; the frozen b6e160b release candidate remains separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

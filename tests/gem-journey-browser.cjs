@@ -67,12 +67,12 @@ function visualFixture(){
    }).observe(document,{childList:true,subtree:true});
    if(fixture&&!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(fixture));
   },{key:STUDIO_KEY,fixture});
-  const page=await context.newPage(),errors=[],network=[];
+  const page=await context.newPage(),errors=[],network=[],dialogs=[];
   page.on('pageerror',error=>errors.push(error.message));
-  page.on('dialog',dialog=>void dialog.accept());
+  page.on('dialog',dialog=>{dialogs.push({type:dialog.type(),message:dialog.message()});void dialog.accept();});
   page.on('request',request=>{if(request.url().includes('/v1/jobs'))network.push(request.url());});
   await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('studioNavJourney'));
-  return {page,context,errors,network};
+  return {page,context,errors,network,dialogs};
  };
  const openJourney=async page=>{
   await page.click('#studioNavJourney');
@@ -246,7 +246,7 @@ function visualFixture(){
   // Actual creation workflow. Keep must credit the exact reflected experiment;
   // repeated views, reloads and character choices never replay that transition.
   {
-   const {page,context,errors,network}=await newPage();
+   const {page,context,errors,network,dialogs}=await newPage();
    await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture failed');});
    const learning=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
    await page.click('[data-starter="gum"]');
@@ -255,6 +255,16 @@ function visualFixture(){
    let session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'rough');
    const testId=session.candidate.id,baseId=session.candidate.baseId;
+   const existingSessionCount=(await notebook(page)).sessions.length;
+   await openJourney(page);
+   assert.match(await page.locator('#jemsJourneyCreate').textContent(),/Continue my jem/);
+   await page.click('#jemsJourneyCreate');
+   await page.waitForFunction(()=>document.querySelector('#page-studio .studio-workspace').getAttribute('data-mobile-panel')==='talk');
+   assert.equal((await notebook(page)).active.player1,session.id,'A rough next step continues the exact saved project');
+   assert.equal((await notebook(page)).sessions.length,existingSessionCount,'Continuing a rough project creates no new idea');
+   assert.equal((await notebook(page)).sessions.find(saved=>saved.id===session.id).candidate.id,testId);
+   await more(page);await page.click('#studioCompare');
+   await page.getByRole('button',{name:'Play preview',exact:true}).click();
    for(let index=0;index<3;index++){await page.locator('.gum-sticker').nth(index).click();await page.locator('.gum-slot').nth(index).click();}
    await page.click('.gum-launch');
    await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.reflection));
@@ -265,6 +275,12 @@ function visualFixture(){
    assert.equal(session.design.observations.filter(observation=>observation.source==='child'&&observation.experimentId===testId).length,1);
    await waitForLevelPopup(page,2);
    assert.equal(await levelEventCount(page,2),1,'one cut-level popup for a durable linked reflection');
+   await openJourney(page);await page.click('#jemsJourneyCreate');
+   await page.locator('#studioVersions').waitFor({state:'visible'});
+   assert.equal((await notebook(page)).active.player1,session.id,'A cut next step opens the same project’s tests');
+   assert.equal((await notebook(page)).sessions.length,existingSessionCount,'Continuing a cut project creates no new idea');
+   assert.equal(await page.locator('#page-studio .studio-workspace').getAttribute('data-mobile-panel'),'versions');
+   await page.getByRole('button',{name:'Play preview',exact:true}).click();
    await page.click('#studioKeep');
    await page.waitForFunction(id=>FG.studio.exportNotebook().sessions.some(session=>session.keptExperiments?.some(kept=>kept.experimentId===id)),testId);
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
@@ -354,10 +370,16 @@ function visualFixture(){
    assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-level'),'3');
    await page.click('#studioNavHome');await page.locator(`[data-session="${hill.id}"] .studio-saved-open`).click();
    await page.click('#studioChange');
+   const gemsBeforeClear=(await page.evaluate(()=>FG.rewards.summary())).lifetimeGems;
    await page.click('#studioChatOptions summary');await page.click('#studioClearChat');
+   const clearConfirmation=dialogs.filter(dialog=>dialog.type==='confirm').at(-1)?.message||'';
+   assert.match(clearConfirmation,/lower your maker level.*change your outfit/i,'Clear chat explains its visible rank and outfit consequence');
+   assert.match(clearConfirmation,/lifetime gems.*will remain/i,'Clear chat distinguishes retained lifetime rewards');
    const cleared=(await notebook(page)).sessions.find(session=>session.id===hill.id);
    assert.equal(cleared.keptExperiments?.length||0,0);
    assert.ok(cleared.projectId,'working game survives clearing chat');
+   await page.evaluate(()=>FG.rewards.refresh());
+   assert.equal((await page.evaluate(()=>FG.rewards.summary())).lifetimeGems,gemsBeforeClear,'The disclosed lifetime rewards survive clearing chat');
    await openJourney(page);await assertLevel(page,3);
    assert.equal(await levelEventCount(page,4),1);
    assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills)),learning,'cosmetic progression never changes learning records');

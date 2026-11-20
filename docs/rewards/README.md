@@ -88,6 +88,10 @@ Clearing a conversation, archiving a project or removing learning detail does no
 
 [Rewards UI](../../src/rewards/ui.ts) and [styles](../../src/rewards/rewards.css) use the approved Jems identity, existing gem artwork and selected maker thumbnails. The page presents the lifetime total, next milestone, how to earn, recent committed grants and the existing maker rank. The compact entry/widget leads back to that shared page. No new logo, medal, creature collection, shop or companion inventory is introduced.
 
+The four earning rows are keyboard- and touch-accessible buttons for Math, Language, coding challenges and game creation. The optional typed `onActivity` callback hands their destination to the host, which retains learning guards and the parent's subject-selection rules. Hosts without that callback keep the existing practice/creation fallbacks. Opening a route never awards gems. Brief page copy distinguishes lifetime gems from maker levels earned through saved game improvements.
+
+The Journey component accepts a host-supplied `primaryActionLabel` and `onPrimaryAction(ownerId)` so its next-step button can continue the current player's eligible unfinished game. The host resolves that work at activation rather than capturing another player's project. Existing callers retain `onCreate` and the original creation labels; previewing future outfits never changes the current next-step action. These navigation affordances change neither rank evidence nor the rewards schedule.
+
 Celebrations preserve focus and input, use a polite status announcement, have no automatic sound, and respect reduced motion. Page loading and storage failure have explicit states; a pending query never displays another owner's last total. Existing learning guards and scene/game cleanup remain authoritative when navigating to Rewards.
 
 ## Verification and evidence limits
@@ -102,7 +106,7 @@ npm run test:rewards-browser
 - [Core tests](../../tests/rewards.test.ts) cover policy amounts, stable identities, failed-write recovery, atomic-port concurrency, namespaces, milestones, corruption, imports, reset and retained lifetime receipts.
 - [Integration tests](../../tests/rewards-integration.test.ts) exercise actual Math/Language engines, StudioNotebook and CreationStore through saved outboxes and ledger projection. They preserve assisted versus independent learning evidence.
 - [Backup tests](../../tests/rewards-backup.test.ts) cover whole-family preflight, journal failures, interruption recovery, exact rollback, legacy replacement and namespace boundaries.
-- [Component browser checks](../../tests/rewards-ui-browser.cjs) cover responsive layout, local/base-path artwork, keyboard actions, owner-safe states, reduced motion and nonblocking popups. Their illustrated data is a fixture.
+- [Component browser checks](../../tests/rewards-ui-browser.cjs) cover responsive layout, local/base-path artwork, keyboard earning routes and fallback compatibility, contextual Journey actions across previews/profile changes, owner-safe states, reduced motion and nonblocking popups. Their illustrated data is a fixture.
 - [Application browser checks](../../tests/rewards-browser.cjs) cover real source actions, persisted rewards, navigation, recovery, profiles and the source-writing guard in the built application. Exact completed checks belong in delivery evidence, not in this normative list.
 
 The existing Arcade workflow registers these gates and preserves screenshot artifacts. Passing source/fixture/browser checks does not establish actual-device reliability, child engagement, educational efficacy or live-provider behavior. No production activation is implied by this contract.
