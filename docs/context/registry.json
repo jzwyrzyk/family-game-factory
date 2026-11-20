@@ -423,10 +423,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:46:41.432Z",
-      "sourceDigest": "57f8585389485742c1a18f02f1dc4857f4d9b14dd2140b695a82bc42326f13ee",
+      "reviewedAt": "2026-11-20T05:03:24.291Z",
+      "sourceDigest": "13378e0c95444ba8ff42b0753671f43800bc66cc42659c727b7b473aa1fa2860",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed four actual Firestore repository regressions for terminal updates, bounded telemetry, true overcapacity rollback and best-effort admission. All 49 focused analytics/report checks, all 376 unit checks and typecheck passed; updated delivery evidence.",
+      "reviewReason": "Reproduced the hosted private-drawing timeout and reviewed its UUID-order cause. Replaced positional selectors with exact artwork headings; both opposite UUID-order browser cases pass, including protected-original rejection and exact cutout deletion. No application behavior changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -465,10 +465,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:46:42.011Z",
-      "sourceDigest": "fac83f7b810959f7983cb134fae35aaa3ea9e601fe85863dccc7b90ae346ef53",
+      "reviewedAt": "2026-11-20T05:03:25.059Z",
+      "sourceDigest": "f83e95c2a43037086eb3acb9f2ee1444f6fb7525e0a84cc311a59a85971cfc15",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated delivery evidence to 27 server checks and documented the reproduced capacity issue and focused correction. This remains source review only, with no merge, deployment or live PostHog activation.",
+      "reviewReason": "Recorded the capacity-corrected hosted run: seven workflows passed and Arcade failed only at a reproduced positional private-drawing test. Documented the targeted test-only correction and distinguish its final-head hosted results from earlier passing implementation evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
