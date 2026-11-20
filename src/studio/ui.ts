@@ -42,6 +42,8 @@ import {createFirstWelcome, createJourneyOverview} from './first-journey';
 import {createGuideCard, type GuideCard, type GuideHost} from './guide-card';
 import {GUIDE_TIPS, hasMeaningfulCreation, recommendNext, readyGuidedExperiment, type GuideTipId} from './guidance';
 import {CreationStore} from '../creation/storage';
+import {installPals} from '../pals/service';
+import {installPalsInterface} from '../pals/host';
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
@@ -68,6 +70,7 @@ export async function installStudio(){
  const FG=(window as any).FG;
  if(!FG?.app||!FG?.store)return;
  const rewards=installRewards();
+ const pals=installPals(rewards);
  let notebook:StudioNotebook;
  try{notebook=new StudioNotebook(profileStorage(localStorage),notifyRewardSourceSaved);}catch(error){
   const warning=el('p','notice',String((error as Error).message));$('page-home').prepend(warning);return;
@@ -81,7 +84,7 @@ export async function installStudio(){
  const unknownJobs=new Set<string>();
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
- let configReady=false, route:'library'|'studio'|'journey'|'rewards'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
+ let configReady=false, route:'library'|'studio'|'journey'|'rewards'|'pals'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
  let coachConnection:CoachConnection='checking',builderReadiness:BuilderReadiness='checking';
  let saving=false, reflecting=false, lastOutcome:string|null=null,viewedRevisionId:string|null=null,remoteViewedId:string|null=null;
  let coaching:ReturnType<typeof installCoaching>|undefined;
@@ -1379,10 +1382,14 @@ export async function installStudio(){
  if(activeId)render();else updateCreationNote();
  void refreshServiceReadiness();resumeOutstanding();refreshShelf();
  FG.studio={version:1,flushDraft,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
+ let palsInterface:ReturnType<typeof installPalsInterface>;
  const creation=installCreationStudio({
   guidance:guideHost,
   enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('creation');route='other';document.body.classList.remove('studio-designing');document.body.classList.add('creation-open');setActiveNav('studioNavScenes');return true;},
   home,openGame:id=>open(id),onRewardSourceSaved:notifyRewardSourceSaved,
+  ownedPals:()=>pals.state.profile?.owned.map(pal=>pal.id)??[],
+  activePal:()=>pals.state.profile?.activeId??null,
+  openPals:()=>palsInterface.open(),
  });
  const artStudio=installArtStudio({
   enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();creation.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('art-studio');route='other';document.body.classList.remove('studio-designing','creation-open');setActiveNav('studioNavCreate');return true;},
@@ -1439,6 +1446,17 @@ export async function installStudio(){
  window.dispatchEvent(new CustomEvent('factory-problem-solving-updated',{detail:{owner:owner()}}));
   scenesEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));
  const sceneButton=iconEl('button','studio-button','grid','Animate & code') as HTMLButtonElement;sceneButton.id='studioMakeScene';sceneButton.type='button';
+ palsInterface=installPalsInterface({
+  controller:pals,
+  enter:()=>{
+   if(guardMath())return false;
+   stopSpeech();flushDraft();FG.creation?.flush();hideJourney();disposeGame();FG.app.page('home');
+   document.querySelectorAll('main > .page').forEach(element=>element.classList.add('hidden'));
+   route='pals';document.body.classList.remove('studio-designing','creation-open');globalStatus.textContent='';return true;
+  },
+  home:()=>act(home),create:id=>{creation.openWithPal(id);},
+  refreshCreation:()=>creation.refreshPals(),help:()=>{$('studioHelp').click();},
+ });
  $('studioHelp').after(sceneButton);
  sceneButton.onclick=()=>act(async()=>{
   if(guardMath())return;const s=current(),capturedOwner=owner(),capturedEpoch=epoch;

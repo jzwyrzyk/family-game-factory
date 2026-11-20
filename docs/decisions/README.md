@@ -21,6 +21,9 @@ These records explain durable choices without turning chat history into another 
 | [Gem Pal Studio](2026-11-19-gem-pal-studio.md) | Repository-owned character design, two-form growth, exact-reference continuity and quality review | Accepted operating method; art and runtime delivery separate | Owner's reusable-guide request and explicit authorization to create and merge the documentation PR |
 | [First-creation journey](2026-11-19-first-creation-journey.md) | A simple optional creation entry, contextual hints, direct ready-result handoff and purposeful return | Accepted for development; release evidence separate | Owner's first-login journey review and explicit instruction to build the aligned experience with small hints |
 
+| [0012](0012-pals-from-earned-activity.md) | Collectible Pals from shared saved activity, with editable local scenes and separate collection ownership | Accepted for development; original three-stage point superseded by 0013 | Owner companion implementation follow-up; final character artwork remains separate |
+| [0013](0013-two-form-pals-and-current-main.md) | Exactly two Pal forms with earned-progress compatibility and current-main integration | Two forms are owner directed; five-adventure transition is explicit compatibility policy | Owner two-form handoff and request to finish PR81/68 for merge |
+
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
 ## When to record a decision

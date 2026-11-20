@@ -48,7 +48,7 @@ Use small batches and reject weak briefs before rendering. Default exploration l
 
 The current art policy has **two total forms: Base → Grown, one transition**. The four-level Spark/Nova maker journey is a separate system. The artwork policy does not determine unlock prices, adventure thresholds, receipt rules, or saved-data migrations.
 
-At the inspected baseline, companion implementation [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) is a separate draft with older New/Bright/Radiant states. Reconcile its runtime, tests, celebrations, and backups with the approved two-form policy under the implementation workstream; do not infer that this guide changes code or approves any particular numerical threshold. Inspect current source and [delivery state](../../DELIVERY-STATE.md) before making a later status claim.
+The earlier inspected companion implementation [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) used New/Bright/Radiant. Its current preparation follows [ADR0013](../decisions/0013-two-form-pals-and-current-main.md): Base and Grown only, with the existing first transition at five adventures deliberately retained for compatibility. That runtime policy is separate from artwork approval. The catalog keeps unresolved character/form bindings null, and the provisional token scenes do not establish final creature integration. Inspect [delivery state](../../DELIVERY-STATE.md) for the exact source and acceptance status.
 
 ## Keep this method current
 

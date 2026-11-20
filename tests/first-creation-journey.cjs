@@ -105,6 +105,8 @@ async function localFirstJourney(browser,url,device,viewport){
   assert.equal(await page.locator('#studioWelcome').isVisible(),true,'fresh profile has its own creation-first welcome');
   assert.equal(await page.locator('#studioFavoritesSection').isVisible(),false,'the initial invitation does not compete with the full game shelf');
   assert.equal(await page.locator('#studioNavHome').isVisible(),false,'the first invitation has one primary path before ordinary navigation appears');
+  assert.equal(await page.locator('#studioNavPals').isVisible(),false,'the companion entrance joins ordinary navigation after the first invitation');
+  assert.equal(await page.locator('#studioPalsEntry').isVisible(),false,'the companion widget does not compete with the first creation choice');
   for(const selector of ['#studioWelcomeMake','#studioWelcomeExplore']){
    const box=await page.locator(selector).boundingBox();
    assert.ok(box&&box.height>=44&&box.width>=44,selector+' is a visible touch target');

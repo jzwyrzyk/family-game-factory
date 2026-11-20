@@ -50,7 +50,10 @@
     "docs/drawings/ART_STUDIO.md",
     "docs/drawings/GOLD_STANDARD.md",
     "docs/drawings/PROGRAM.md",
-    "docs/decisions/2026-11-19-private-art-studio.md"
+    "docs/decisions/2026-11-19-private-art-studio.md",
+    "docs/pals/README.md",
+    "docs/decisions/0012-pals-from-earned-activity.md",
+    "docs/decisions/0013-two-form-pals-and-current-main.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -80,7 +83,8 @@
     "docs/archetypes/*.md",
     "docs/pals/*.md",
     "skills/gem-pal-studio/*.md",
-    "docs/drawings/*.md"
+    "docs/drawings/*.md",
+    "docs/pals/previews/*.md"
   ],
   "areas": [
     {
@@ -100,10 +104,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:45:20.974Z",
-      "sourceDigest": "885dfbd28815e60044be359944878d7d0af7cbf3f3f2cc6bb1939da577f834e9",
+      "reviewedAt": "2026-11-20T05:14:52.957Z",
+      "sourceDigest": "d18bcd210144e2adf3aa47a4db6a85d631f49495d9506be62fa053b2636fbe12",
       "reviewOutcome": "updated",
-      "reviewReason": "Clarified the accepted optional welcome alongside merged Art Studio: art-only owners remain returning creators, and late eligibility stays deferred through passive refreshes until an intentional Home visit. Preserved both dated decisions, profile ownership and the boundary between preferences and real learning or creative evidence.",
+      "reviewReason": "Independent publication review confirmed the two-form compatibility policy and preserved artwork/ownership boundaries. Corrected only the Pal contract spelling of the existing factoryProblemSolvingRecoveryRaw recovery-export field; no product policy or executable source changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -166,7 +170,8 @@
         "docs/brand/art-library/licenses/README.md",
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/pals/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -186,10 +191,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:45:21.672Z",
-      "sourceDigest": "90f0143f401c9611a8c6f9773e79c776a2878462d7c76cd88f8b998049298249",
+      "reviewedAt": "2026-11-20T05:06:20.191Z",
+      "sourceDigest": "49c2bbdf071814681ed6c9f4378584ced46107e929d63c164639369c6aa27826",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final bounded art-presence lookup, owner/request invalidation and transient same-view deferral through passive renders. Startup mounts Home once before awaiting that cached read, so asynchronous completion cannot reset an early interaction. Updated architecture and journey contracts; no persisted art, guidance, reward or learning record was added.",
+      "reviewReason": "Reviewed the combined Studio and Pal host delta: eight icon destinations, first-welcome hiding, draft/learning guards, parent preferences, owner loading, and shared notices. Updated homepage, first-creation and architecture references; existing Art Studio and exact game returns remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -228,7 +233,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/creation-studio/*.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/pals/*.md"
       ],
       "sources": [
         "src/creation/**",
@@ -236,10 +242,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "1a6f7398d5d0603cd6097b09dbe943e2e7ae087e72324788a61947d5de550124",
-      "reviewedAt": "2026-11-20T04:38:10.646Z",
+      "sourceDigest": "e0a73cebee7e28a95c6383c9d73497e9f85836cd2cc4350107b455c39b89c732",
+      "reviewedAt": "2026-11-20T05:06:21.881Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed combined optional guides and private-art controls, recovery resolution, profile cleanup and permanent source labels. A game-derived scene with private art retains both Art Studio and Back to my game; original game revisions, explicit Keep, trusted artwork resolution and learning guards remain authoritative.",
+      "reviewReason": "Reviewed Pal asset allowlist, scene insertion and refresh handling against current private-art and PR81 source returns. Documented preserved image/rig hashes, actor IDs and exact game revisions, stable token assets, challenge exclusions, explicit Keep and active-picker focus preservation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -278,7 +284,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/rewards/*.md",
         "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
-        "docs/brand/GEM_PROGRESS.md"
+        "docs/brand/GEM_PROGRESS.md",
+        "docs/pals/*.md"
       ],
       "sources": [
         "src/rewards/**",
@@ -287,10 +294,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5855c79c06be66d51a86c998f97a99d07c5ec725bfb9cf4f46493080f1ef8743",
-      "reviewedAt": "2026-11-20T03:42:02.096Z",
+      "sourceDigest": "493e303f89ffcc4763f2486f9cb8eef6db0152fcd69ab96d250040120fb67109",
+      "reviewedAt": "2026-11-20T05:10:52.721Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the dismissible gems/maker/practice explanation and owner-scoped notebook preferences. Reviewed backup rejection of foreign guidance owners and namespace isolation; grants, source eligibility and evidence remain unchanged.",
+      "reviewReason": "Reviewed combined Pals plus APS/guidance backup recovery, captured-domain legacy journals and raw-recovery rejection, with58local contracts and completed full Rewards browser journey. Final test-only change logs the original error before bounded failure capture; it changes no earning, input or assertion. The initial seconds-fill timeout and single unchanged-app rerun remain recorded separately.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -505,7 +512,9 @@
         "docs/brand/achievement-art/README.md",
         "docs/brand/LIBRARY_V1_2.md",
         "docs/rewards/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/pals/*.md",
+        "docs/pals/previews/*.md"
       ],
       "sources": [
         "tests/**",
@@ -513,10 +522,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:03:35.294Z",
-      "sourceDigest": "5c7c560fe86210bbc4c54e258cc32807412d2faaf1685ceeaccc9a3d2d8be615",
+      "reviewedAt": "2026-11-20T05:10:36.845Z",
+      "sourceDigest": "57e4bb966294098357a469c77b250560ccbdbaaa6b4ec172eeb552d33e8ae8c8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the legacy private-drawing regression after its hosted deletion timeout. Visible exact-name locators replace UUID-order assumptions; both key orders verify original dimensions and byte-identical export, referenced-original refusal, unused-cutout deletion, reload/profile isolation and bad-byte rejection. Application behavior and acceptance thresholds are unchanged; delivery records the original failure and scoped local passes.",
+      "reviewReason": "Reviewed final combined regression changes, including PR81 named original/cutout tests in both UUID orders, two-form histories, Pals/APS/guidance backup, private-art scene preservation and eight-route navigation. All scoped local suites passed, including376core and full Art/Creation/Rewards; preserved the first seconds-fill timeout and one unchanged-app rerun, with only early/bounded failure diagnostics added. No expectation was weakened; hosted acceptance remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -545,13 +554,6 @@
           "sourceDigest": "413cc9e3efd2f008302fcda4c8dffd6202eeed27968df440be4b4919bb5039ba",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the tablet quality helper change after the hosted one-part-versus-two assertion. Locator.tap retains real touch with actionability/stability checks; exact intermediate state assertions improve failure localization. Existing counts, selection, capability, geometry, held input and release assertions remain intact, and both orientations pass locally."
-        },
-        {
-          "sourceCommit": "33ecad2d31ffe2cd619d89d817478a20b3d90ceb",
-          "reviewedAt": "2026-11-20T04:38:12.462Z",
-          "sourceDigest": "203fefc369ecc8eb2a4f02f695676cb99ccda06b57503640fa5136b219bfa18b",
-          "reviewOutcome": "updated",
-          "reviewReason": "Reviewed final integration test changes: visible Explore and settled-read entry, real blocked-v1 IndexedDB fallback with late completion and unchanged notebook assertions, art-only return/reload/sibling checks, and exact source-game return after adding private art. Existing assertions remain intact; local and hosted results are recorded separately by source."
         }
       ]
     },
@@ -576,10 +578,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T05:03:35.852Z",
-      "sourceDigest": "b29c436e0b000317a69cfb9f44fac6aef466423c72b2bb420deb354173fc031b",
+      "reviewedAt": "2026-11-20T05:10:37.245Z",
+      "sourceDigest": "d93eb824db660cbfbe150f48575992e0657e939eb1cd1a56a42650ba416becaf",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the exact PR81 integration-head Arcade failure and preserved its source/run/job scope. Distinguished the observed positional-delete timeout from source analysis and subsequent deterministic dependency checks, recorded the unchanged application build and two passing key-order regressions, and left follow-up hosted acceptance, merge and deployment pending.",
+      "reviewReason": "Recorded retained PR68 and published PR81 1b8d7b8 histories, current-main ancestry, merge order, exact application bundle and completed local/independent checks. Preserved original drawing-order failure, Rewards timeout and scoped rerun, browser-environment limitation and historical art evidence. No merge, deployment, selected-art readiness or provider activation is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -615,13 +617,6 @@
           "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
           "reviewOutcome": "updated",
           "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries."
-        },
-        {
-          "sourceCommit": "33ecad2d31ffe2cd619d89d817478a20b3d90ceb",
-          "reviewedAt": "2026-11-20T04:48:15.157Z",
-          "sourceDigest": "90313431a8e81116d239c14c296a1509d24784c943dfdea6ebbc1992cf491ae4",
-          "reviewOutcome": "updated",
-          "reviewReason": "Reconciled both feature histories with main907 and preserved the pre-integration seven-workflow success at 5dbe. Recorded final 8Q build, guidance17, first11, Art Studio, navigation4 and four inspected captures separately from earlier Bq Creation/quality and Cb full-art acceptance. Kept launcher failure and source-review corrections visible; final published identity, new-base commit check and exact-head hosted acceptance belong to the review PR."
         }
       ]
     },
@@ -644,10 +639,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:13.456Z",
-      "sourceDigest": "2c069aefa222d0c7ee8f49ab8dcb240fdda67aff40f34f33dff425aaa9abac9e",
+      "reviewedAt": "2026-11-20T05:06:23.658Z",
+      "sourceDigest": "1235598c9a1c01db3a35f2b6b56febc078d37b187d1495e8d8cb172311722e6b",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved both parents of the documentation merge, all existing registry routes, review-history snapshots and Art Studio requirements. Added first-creation contract/decision routing without removing source coverage or changing the checker; current source facts remain distinct from dated delivery evidence.",
+      "reviewReason": "Reconciled current main registry with only the Pal extension routing additions; registered ADR0013 and Pal contracts/previews, retained all existing art/guidance/APS areas and link scope, and updated canonical decision navigation. No blanket source-review refresh or rule removal.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -710,10 +705,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "dee7eabbe6d4e6b80f15414465af85c3210ddb9c9f6bf6f881a54ac6aeb5fbe2",
-      "reviewedAt": "2026-11-20T03:44:04.029Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the browser fixture profile picker now chooses the visible Explore action for an empty sibling before using the existing navigation. Practice tasks, first-response evidence, hints, learning guards, reports, reward eligibility and backup semantics are unchanged; desktop and phone regression assertions remain intact.",
+      "sourceDigest": "7fe579855e1fb1b96777020f333a15e8e85d9da57bb7f1c1e552f108f0113f81",
+      "reviewedAt": "2026-11-20T05:06:46.338Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the sole APS browser delta: exact navigation count increases from seven to eight for My Pals while unchanged two-row and complete 44px target assertions remain. Updated the current shell contract; independent desktop/touch practice journeys pass with four episodes each. APS scoring, source attribution, assistance, persistence and historical validation receipts remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -736,7 +731,8 @@
       "documents": [
         "docs/pals/*.md",
         "skills/gem-pal-studio/SKILL.md",
-        "docs/decisions/2026-11-19-gem-pal-studio.md"
+        "docs/decisions/2026-11-19-gem-pal-studio.md",
+        "docs/decisions/0013-two-form-pals-and-current-main.md"
       ],
       "sources": [
         "docs/pals/*.md",
@@ -745,10 +741,10 @@
         "docs/pals/art/character-references.json"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "848c8ab214645ca8afb92a3389d14181f8e34667ad7986881e678cbea4a39e79",
-      "reviewedAt": "2026-11-20T01:00:12.877Z",
+      "sourceDigest": "459726b2615fa61432d7b831f18e6f72d932b845d6121d6551ed83683597f7b6",
+      "reviewedAt": "2026-11-20T05:15:23.348Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the complete Studio guides, two-form record template, exact-reference workflow, quality gates and portable skill; normalized the final doctrine newline. Routed the future character-index path without importing draft artwork or making live approval claims."
+      "reviewReason": "Reviewed the complete combined Studio/ADR0013 cross-reference and explicit null character/form mappings without importing or changing selected art. The final Pal contract correction only spells the existing factoryProblemSolvingRecoveryRaw field precisely; two-form art policy, approved references, stable IDs and future versioned-asset boundary remain unchanged."
     },
     {
       "id": "art-studio",
@@ -781,6 +777,27 @@
           "reviewReason": "Reviewed final source-aspect physics and copy polish with all five art browser suites plus refreshed real UI captures; recorded per-command source identities, exact original/version semantics, recovery tests and remaining actual-device limits."
         }
       ]
+    },
+    {
+      "id": "pals",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/pals/*.md",
+        "docs/decisions/0012-pals-from-earned-activity.md",
+        "docs/pals/previews/*.md",
+        "docs/decisions/0013-two-form-pals-and-current-main.md"
+      ],
+      "sources": [
+        "src/pals/**",
+        "tests/pals*",
+        "docs/pals/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "5d11f1505f4977fc758cd82f274a3a332954366fc290da78fd8897b670f1f688",
+      "reviewedAt": "2026-11-20T05:14:52.748Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Completed independent published-source review of two-form progress, immutable token identities and combined recovery; corrected the contract to name the actual factoryProblemSolvingRecoveryRaw export/validation key. This documentation-only correction changes no runtime, tests, assets, schemas or acceptance results."
     }
   ]
 }

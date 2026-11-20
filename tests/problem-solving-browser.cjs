@@ -52,7 +52,7 @@ const KEY='family-game-factory-problem-solving-v1';
     if(device==='touch'){
       await page.setViewportSize({width:320,height:740});await overflow();
       const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
-      assert.equal(buttons.length,7);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'seven destinations use two mobile rows');
+      assert.equal(buttons.length,8);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'eight destinations use two mobile rows');
       assert.ok(buttons.every(button=>button.width>=44&&button.height>=44&&button.x>=0&&button.x+button.width<=320),'mobile navigation keeps complete touch targets');
       await page.screenshot({path:'test-results/problem-solving-navigation-320.png',fullPage:true});
       await page.setViewportSize(viewport);await overflow();

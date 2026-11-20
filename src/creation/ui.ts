@@ -12,12 +12,16 @@ import {rewardSourceWritable} from '../rewards/write-guard';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
+import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
 import './style.css';
 
 type Host = {
   enter(): boolean;
   home(): void;
   openGame(sessionId: string): void | Promise<void>;
+  ownedPals?(): readonly string[];
+  activePal?(): string | null;
+  openPals?(): void;
   onRewardSourceSaved?(owner: string): void;
   guidance?: GuideHost;
 };
@@ -83,12 +87,18 @@ export function installCreationStudio(host: Host) {
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const privateArt=new PrivateArtResolver(owner);
   const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'),privateArt,message=>status(message,true));
+  const palShelf = node('section', 'creation-pal-shelf'); palShelf.id = 'creationPals';
+  palShelf.setAttribute('aria-label', 'Make something with your Pals');
+  $('creationStarters').before(palShelf);
+  const palTools = node('div', 'creation-pal-tools'); palTools.id = 'creationPalTools';
+  $('creationActors').before(palTools);
   let scene: CreationProject | null = null, entryId = '', revisionId = '', sceneOwner = '', selectedActor = '', selectedProgram = '';
   let sourceSessionId = '', challengeId: string | null = null, hintUsed = false, targetMode = false, visible = false;
   let viewEpoch = 0;
   let engine: SceneEngine | null = null, frame = 0, last = 0, checkpointTimer: ReturnType<typeof setInterval> | undefined;
   let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false, recoveryPending = false;
   let sceneImportPending=false;
+  let renderedPalsKey = '';
   type Recording = { recorder: MediaRecorder; stream: MediaStream; chunks: Blob[]; owner: string; title: string; cancelled: boolean; timer?: ReturnType<typeof setTimeout> };
   let recording: Recording | null = null;
   let targetInputs = 0;
@@ -251,6 +261,80 @@ export function installCreationStudio(host: Host) {
     const latest = scenesByActivity().find(project => project.challengeId === id);
     if (latest) loadScene(latest.id); else challenge(id);
   }
+  function ownedPals(): CreationPalId[] { return [...new Set(host.ownedPals?.() ?? [])].filter(isCreationPalId); }
+  function requireOwnedPal(id: string): CreationPalId {
+    if (!isCreationPalId(id) || !ownedPals().includes(id)) throw Error('Choose a Pal from your collection first.');
+    return id;
+  }
+  function openWithPal(id: string): boolean {
+    const palId = requireOwnedPal(id);
+    if (locked()) return false;
+    if (visible) {
+      if (recoveryPending) throw Error(recoveryMessage);
+      saveVersion();
+    }
+    // Read before leaving the current page so damaged scene history cannot be
+    // replaced with an apparently successful new empty collection.
+    const collection = store(); collection.read();
+    const project = createPalPlayground(palId);
+    if (!enter()) return false;
+    const saved = collection.create(owner(), project); loadScene(saved.id);
+    // Show the child's editable tap script immediately; Play and Keep are still
+    // deliberate actions, and the starter blocks retain their starter origin.
+    selectedProgram = scene!.programs.find(program => program.trigger.type === 'tap')!.id;
+    renderEditor(); status('Press Play, then tap your Pal. Change the blocks to make it your own.');
+    return true;
+  }
+  function addOwnedPal(id: string) {
+    assertEditing();
+    if (challengeId) throw Error('Finish your challenge, then choose “Make it my own” to add your Pal.');
+    const palId = requireOwnedPal(id);
+    mutation(project => {
+      const added = addPalToProject(project, palId);
+      Object.assign(project, added.scene); selectedActor = added.actorId; selectedProgram = added.programId; insert = null;
+    });
+    $<HTMLDialogElement>('creationActorDialog').close();
+    status('Your Pal joined the cast. Press Play and tap it, or change its blocks.');
+  }
+  function renderPalShelf() {
+    palShelf.replaceChildren(); palShelf.hidden = !host.ownedPals;
+    if (palShelf.hidden) return;
+    const copy = node('div', 'creation-pal-intro');
+    copy.append(node('h3', '', 'Your Pal. Your next big idea.'), node('p', '', 'A little jump, a silly line, a whole story. You choose.'));
+    palShelf.append(copy);
+    const choices = node('div', 'creation-pal-starts');
+    for (const id of ownedPals()) {
+      const asset = creationAsset('pal-' + id)!;
+      const button = node('button', 'creation-pal-starter'); button.type = 'button'; button.dataset.creationPal = id;
+      const label = node('span'); label.append(node('strong', '', asset.label), node('small', '', 'Make a scene →'));
+      button.append(art(asset.id), label); button.onclick = () => act(() => openWithPal(id)); choices.append(button);
+    }
+    if (!choices.childElementCount && host.openPals) {
+      const choose = node('button', 'creation-button', 'Choose your first Pal'); choose.type = 'button';
+      choose.onclick = () => act(() => { if (!locked()) host.openPals?.(); }); choices.append(choose);
+    }
+    palShelf.append(choices);
+  }
+  function renderPalTools() {
+    palTools.replaceChildren(); palTools.hidden = !!challengeId || !host.ownedPals;
+    if (palTools.hidden) return;
+    const ids = ownedPals(), active = host.activePal?.();
+    const id = isCreationPalId(active) && ids.includes(active) ? active : ids[0];
+    const button = node('button', 'creation-button creation-pal-add', id ? '＋ Add your Pal' : 'Meet your first Pal');
+    button.type = 'button'; button.id = 'creationAddPal';
+    button.onclick = () => act(() => {
+      assertEditing();
+      if (id) addOwnedPal(id);
+      else { saveVersion(); host.openPals?.(); }
+    });
+    palTools.append(button);
+    if (id) palTools.append(node('span', '', `${creationAsset('pal-' + id)!.label} brings a tap-to-dance script. You can change every block.`));
+    if (ids.length > 1) {
+      const choose = node('button', 'creation-text-button', 'Choose another'); choose.type = 'button'; choose.id = 'creationChoosePal';
+      choose.onclick = () => act(() => { assertEditing(); renderActorChoices(true); $<HTMLDialogElement>('creationActorDialog').showModal(); });
+      palTools.append(choose);
+    }
+  }
   function art(assetId: string) {
     const asset = creationAsset(assetId), wrap = node('span', 'creation-actor-art');
     if(parsePrivateArtId(assetId)){
@@ -267,6 +351,7 @@ export function installCreationStudio(host: Host) {
     return wrap;
   }
   function renderShelf() {
+    renderPalShelf();
     const starters = $('creationStarters'); starters.replaceChildren();
     for (const [kind, name, copy, src] of [
       ['dragon', 'A dragon’s big day', 'Old friends. A brand-new story.', './jems-world-dragon.svg'],
@@ -389,6 +474,7 @@ export function installCreationStudio(host: Host) {
   function renderEditor() {
     if (!scene) return;
     renderSource();
+    renderPalTools();
     $<HTMLInputElement>('creationTitle').value = scene.title; $<HTMLSelectElement>('creationBackground').value = scene.background;
     const cast = $('creationActors'); cast.replaceChildren();
     for (const actor of scene.actors) {
@@ -652,12 +738,22 @@ export function installCreationStudio(host: Host) {
       }
     }catch(error){if(current())message.textContent=(error as Error).message;}
   }
-  $('creationAddActor').onclick = () => act(() => { assertEditing(); $<HTMLDialogElement>('creationActorDialog').showModal();void renderPrivateChoices(); });
+  $('creationAddActor').onclick = () => act(() => { assertEditing(); renderActorChoices(); $<HTMLDialogElement>('creationActorDialog').showModal();void renderPrivateChoices(); });
   $('creationOpenArtStudio').onclick=()=>act(()=>{assertEditing();saveVersion();if(FG.artStudio?.open){$<HTMLDialogElement>('creationActorDialog').close();FG.artStudio.open();}else $('creationActorArtStatus').textContent='Art Studio is still opening. Try again in a moment.';});
   $('creationCloseActor').onclick = () => $<HTMLDialogElement>('creationActorDialog').close();
-  for (const asset of CREATION_ASSETS) {
-    const b = node('button', 'creation-character-choice'); b.type = 'button'; b.append(art(asset.id), node('strong', '', asset.label));
-    b.onclick = () => act(() => { mutation(project => { const actor = { id: uid(), assetId: asset.id, name: asset.label, x: 400, y: 300, size: 110, visible: true }; project.actors.push(actor); const program = { id: uid(), actorId: actor.id, trigger: { type: 'start' as const }, actions: [] }; project.programs.push(program); selectedActor = actor.id; selectedProgram = program.id; insert = null; }); $<HTMLDialogElement>('creationActorDialog').close(); }); $('creationActorChoices').append(b);
+  function renderActorChoices(palsOnly = false) {
+    const box = $('creationActorChoices'), ids = ownedPals(); box.replaceChildren();
+    $('creationActorDialogTitle').textContent = palsOnly ? 'Which Pal is joining?' : 'Who’s joining your scene?';
+    for (const asset of CREATION_ASSETS) {
+      if (asset.palId ? challengeId || !ids.includes(asset.palId) : palsOnly) continue;
+      const b = node('button', 'creation-character-choice'); b.type = 'button'; b.dataset.creationAsset = asset.id;
+      b.append(art(asset.id), node('strong', '', asset.label));
+      b.onclick = () => act(() => {
+        if (asset.palId) return addOwnedPal(asset.palId);
+        mutation(project => { const actor = { id: uid(), assetId: asset.id, name: asset.label, x: Math.round(project.width / 2), y: Math.round(project.height * .66), size: 110, visible: true }; project.actors.push(actor); const program = { id: uid(), actorId: actor.id, trigger: { type: 'start' as const }, actions: [] }; project.programs.push(program); selectedActor = actor.id; selectedProgram = program.id; insert = null; });
+        $<HTMLDialogElement>('creationActorDialog').close();
+      }); box.append(b);
+    }
   }
   let drag: { id: string; x: number; y: number; moved: boolean } | null = null;
   const canvas = $<HTMLCanvasElement>('creationCanvas');
@@ -676,7 +772,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return; try { saveVersion(); stop(); } catch (error) { event.preventDefault(); status((error as Error).message, true); } });
   window.addEventListener('factory-profile', () => {
     leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; recoveryPending = false; sourceSessionId = ''; stage.clear();
-    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus']) $(id).replaceChildren();
+    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus','creationPals','creationPalTools','creationActorChoices']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
   window.addEventListener('beforeunload', event => { if (!visible||!rewardSourceWritable()) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });
@@ -704,6 +800,18 @@ export function installCreationStudio(host: Host) {
         status('Your art is ready. Try the starter hop, then change the blocks to make it yours. This scene uses the saved artwork as one character.');
         return saved.id;
       }catch(error){if(current())status((error as Error).message,true);}
+    },
+    openWithPal,
+    refreshPals: () => {
+      // Recheck ownership each time the picker is opened or a Pal is added;
+      // stale cards cannot introduce a previous profile's collection.
+      const key = JSON.stringify([owner(), ownedPals(), host.activePal?.() ?? null]);
+      if (key === renderedPalsKey) return;
+      renderedPalsKey = key;
+      // A background reward refresh must not dismiss an art chooser or move
+      // its focus. Every insertion still rechecks ownership at action time.
+      if (!visible || $<HTMLDialogElement>('creationActorDialog').open) return;
+      if (scene) renderPalTools(); else renderPalShelf();
     },
     fromStudio(session: StudioSession, revision?: SourceRevision, manifest?: unknown) {
       // The caller still owns the visible Studio surface until entry succeeds.

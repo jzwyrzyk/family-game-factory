@@ -363,8 +363,9 @@ async function installAuthFixture(context) {
     assert.deepEqual(errors, []); assert.deepEqual(paid, [], 'The reward journey does not request paid generation or coaching');
     console.log('PASS: full app rewards from Math/English/making/coding, assisted evidence, no shown/duplicate credit, reload, profile/adult isolation, parent backup/restore, source-save failure, legacy host, two-tab save ownership and responsive navigation.');
   } catch (error) {
+    console.error('Rewards browser failure before capture:', error);
     if (dialogs.length) console.error('Recent application dialogs:', JSON.stringify(dialogs.slice(-3)));
-    await context.pages().at(-1)?.screenshot({ path: 'test-results/rewards-app-failure.png', fullPage: true }).catch(() => {});
+    await context.pages().at(-1)?.screenshot({ path: 'test-results/rewards-app-failure.png', fullPage: true, timeout: 5000 }).catch(() => {});
     throw error;
   } finally { await browser.close(); server.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

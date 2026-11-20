@@ -8,6 +8,7 @@ import { CreationStore, CREATION_KEY } from '../src/creation/storage';
 import { createChallengeStarter } from '../src/creation/challenges';
 import { createRewardFact } from '../src/rewards/model';
 import { REWARDS_DB_NAME, RewardsStore, type RewardsPersistence, type RewardsTransaction } from '../src/rewards/store';
+import { PALS_DB_NAME, PalsStore, type PalsPersistence } from '../src/pals/store';
 import { applyFamilyRewardBackup, assertLosslessRewardJSON, FAMILY_STATE_KEY, REWARD_BACKUP_JOURNAL_KEY, REWARD_SOURCE_KEYS, recoverRewardBackupJournal, validateFamilyRewardBackup } from '../src/rewards/backup';
 import { setRewardSourceMaintenance } from '../src/rewards/write-guard';
 import { ProblemSolvingStore } from '../src/problem-solving/storage';
@@ -21,7 +22,7 @@ class SourceMemory {
   setItem(key:string,value:string){if(this.failKeys[0]===key){this.failKeys.shift();throw Error('quota');}this.data.set(key,value);}
   removeItem(key:string){this.data.delete(key);}
 }
-class AtomicMemory implements RewardsPersistence {
+class AtomicMemory implements RewardsPersistence,PalsPersistence {
   data=new Map<string,unknown>();failUpdates=0;
   async read(namespace:string){return clone(this.data.get(namespace)??null);}
   async update<T>(namespace:string,mutate:(current:unknown|null)=>RewardsTransaction<T>):Promise<T>{
@@ -37,7 +38,7 @@ before(async()=>{
   finally{delete (globalThis as any).window;delete (globalThis as any).localStorage;}
 });
 function base(owners=[OWNER]){return {version:1,activeProfile:owners[0],profiles:owners.map(id=>({id,name:id,grade:3,skills:{},stats:{}})),feedback:[],createdAt:TIME};}
-function stores(){const storage=new SourceMemory(),persistence=new AtomicMemory();return {storage,persistence,rewards:new RewardsStore(REWARDS_DB_NAME,persistence)};}
+function stores(){const storage=new SourceMemory(),persistence=new AtomicMemory();return {storage,persistence,rewards:new RewardsStore(REWARDS_DB_NAME,persistence),pals:new PalsStore(PALS_DB_NAME,new AtomicMemory())};}
 const sources=(storage:SourceMemory)=>Object.fromEntries(REWARD_SOURCE_KEYS.map(key=>[key,storage.getItem(key)]));
 function reasoningEpisode(id:string,owner=OWNER):ProblemSolvingEpisode {
   const at=new Date(TIME).toISOString();
@@ -46,15 +47,17 @@ function reasoningEpisode(id:string,owner=OWNER):ProblemSolvingEpisode {
     startedAt:at,completedAt:at,observations:[{id:'fixture-choice',skill:'plan_test',outcome:'demonstrated',authorship:'learner',support:'unknown',elicitation:'prompted',observedAt:at}]};
 }
 async function incoming(owner=OWNER){
-  const {storage,rewards}=stores(),workspace=new RevisionStore(storage),notebook=new StudioNotebook(storage),creation=new CreationStore(storage),problemSolving=new ProblemSolvingStore(storage);
+  const {storage,rewards,pals}=stores(),workspace=new RevisionStore(storage),notebook=new StudioNotebook(storage),creation=new CreationStore(storage),problemSolving=new ProblemSolvingStore(storage);
   const project=workspace.create(owner,'buckets','Saved game');notebook.create(owner,'buckets','Saved game',project.id);
   notebook.dismissWelcome(owner);notebook.dismissGuideTip(owner,'idea');
+  await pals.chooseStarter(owner,'glim',{owner,lifetimeGems:0,activities:[]});
+  await pals.setPreferences(owner,{encouragement:false});
   const scene=creation.create(owner,createChallengeStarter('robot-route'),{challengeId:'robot-route'});
   creation.recordAttempt(scene.id,owner,scene.headId,{challengeId:'robot-route',passed:true,hintUsed:true});
   problemSolving.record(reasoningEpisode('saved-practice',owner));
   const draft=reasoningEpisode('unfinished-practice',owner);delete draft.completedAt;draft.observations=[];problemSolving.saveDraft({episode:draft,stepIndex:0});
   await rewards.project(owner,[createRewardFact({owner,kind:'math.completed',sourceId:'saved-answer',occurredAt:TIME})]);
-  return {...base([owner]),factoryWorkspace:workspace.snapshot(),factoryStudio:notebook.read(),factoryCreation:creation.read(),factoryProblemSolving:problemSolving.export(),factoryRewards:await rewards.export()};
+  return {...base([owner]),factoryWorkspace:workspace.snapshot(),factoryStudio:notebook.read(),factoryCreation:creation.read(),factoryProblemSolving:problemSolving.export(),factoryRewards:await rewards.export(),factoryPals:await pals.export()};
 }
 async function existing(){
   const result=stores();
@@ -68,19 +71,19 @@ async function existing(){
 }
 
 test('whole-family prevalidation uses the real base validator and strips duplicate domain envelopes',async()=>{
-  const {rewards}=stores(),value=await incoming(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards);
+  const {rewards,pals}=stores(),value=await incoming(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals);
   assert.deepEqual(plan.owners,[OWNER]);assert.equal(plan.creation.rewardOutbox?.length,1);
   assert.equal(plan.rewards.data.profiles[0].receipts.length,1);
-  for(const field of ['factoryWorkspace','factoryStudio','factoryCreation','factoryProblemSolving','factoryRewards'])assert.equal(Object.hasOwn(plan.base,field),false);
+  for(const field of ['factoryWorkspace','factoryStudio','factoryCreation','factoryProblemSolving','factoryRewards','factoryPals'])assert.equal(Object.hasOwn(plan.base,field),false);
   assert.equal(plan.problemSolving.episodes.length,1);assert.equal(plan.problemSolving.drafts.length,1);
   assert.equal(value.factoryStudio.sessions.length,1,'validation does not mutate its caller');
-  const legacy=validateFamilyRewardBackup(JSON.stringify(base()),validateBase,rewards);
+  const legacy=validateFamilyRewardBackup(JSON.stringify(base()),validateBase,rewards,pals);
   assert.deepEqual(legacy.workspace.projects,[]);assert.deepEqual(legacy.notebook.sessions,[]);assert.deepEqual(legacy.creation.projects,[]);assert.deepEqual(legacy.rewards.data.profiles,[]);
   assert.deepEqual(legacy.problemSolving,emptyProblemSolvingWorkspace());
 });
 
 test('invalid family ownership, linked games, namespace and recovery-only files are rejected before any write',async()=>{
-  const {storage,rewards}=stores(),valid=await incoming();
+  const {storage,rewards,pals}=stores(),valid=await incoming();
   const invalid:(typeof valid|Record<string,unknown>)[]=[];
   invalid.push({...valid,profiles:[valid.profiles[0],valid.profiles[0]]});
   invalid.push({...valid,activeProfile:OTHER});
@@ -97,15 +100,15 @@ test('invalid family ownership, linked games, namespace and recovery-only files 
   invalid.push({...valid,factoryProblemSolving:{...valid.factoryProblemSolving,discardedByOwner:{[OTHER]:1}}});
   invalid.push({...valid,factoryProblemSolving:{...valid.factoryProblemSolving,episodes:[{...reasoningEpisode('invalid-score'),source:'studio'}]}});
   invalid.push({...valid,profiles:base([OTHER]).profiles,activeProfile:OTHER});
-  for(const value of invalid)assert.throws(()=>validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards));
+  for(const value of invalid)assert.throws(()=>validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals));
   assert.equal(storage.data.size,0);assert.equal((await rewards.summary(OWNER)).lifetimeGems,0);
 });
 
 test('family restoration carries optional guide preferences without creating work or awarding progress',async()=>{
   const source=new StudioNotebook(new SourceMemory());source.dismissWelcome(OWNER);source.dismissGuideTip(OWNER,'waiting');
-  const {storage,rewards}=stores();
-  const plan=validateFamilyRewardBackup(JSON.stringify({...base(),factoryStudio:source.read()}),validateBase,rewards);
-  await applyFamilyRewardBackup(plan,storage,rewards);
+  const {storage,rewards,pals}=stores();
+  const plan=validateFamilyRewardBackup(JSON.stringify({...base(),factoryStudio:source.read()}),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
   const restored=new StudioNotebook(storage);
   assert.deepEqual(restored.guidance(OWNER),{welcomeDismissed:true,dismissedTips:['waiting']});
   assert.deepEqual(restored.guidance(OTHER),{welcomeDismissed:false,dismissedTips:[]});
@@ -115,13 +118,13 @@ test('family restoration carries optional guide preferences without creating wor
 });
 
 test('native remote sessions and remote copies restore without inventing a local project reference',()=>{
-  const {storage,rewards}=stores(),book=new StudioNotebook(storage),remote=book.create(OWNER,'new','Remote original');
+  const {storage,rewards,pals}=stores(),book=new StudioNotebook(storage),remote=book.create(OWNER,'new','Remote original');
   book.update(remote.id,OWNER,session=>{session.remoteId='remote-main-revision';});
   const remoteCopy=book.fork(remote.id,OWNER,'Remote copy',null,'remote-copy-revision');
   // Studio.copyGame passes a null local project id for a remote fork. Its
   // server project id is only transient provenance when opening a coding scene.
   assert.equal(remoteCopy.projectId,null);
-  const remoteOnly=validateFamilyRewardBackup(JSON.stringify({...base(),factoryStudio:book.read()}),validateBase,rewards);
+  const remoteOnly=validateFamilyRewardBackup(JSON.stringify({...base(),factoryStudio:book.read()}),validateBase,rewards,pals);
   assert.equal(remoteOnly.notebook.sessions.length,2);assert.deepEqual(remoteOnly.workspace.projects,[]);
   const workspace=new RevisionStore(storage),local=workspace.create(OWNER,'buckets','Local original');
   const transitioned=book.create(OWNER,'buckets','Developed remotely',local.id);
@@ -129,112 +132,115 @@ test('native remote sessions and remote copies restore without inventing a local
   const copy=book.fork(transitioned.id,OWNER,'Remote development copy',null,'remote-development-copy');
   assert.equal(copy.projectId,null);assert.equal(copy.rewardProjectId,local.id);
   const complete={...base(),factoryStudio:book.read(),factoryWorkspace:workspace.snapshot()};
-  assert.equal(validateFamilyRewardBackup(JSON.stringify(complete),validateBase,rewards).notebook.sessions.length,4);
-  assert.throws(()=>validateFamilyRewardBackup(JSON.stringify({...complete,factoryWorkspace:{version:2,projects:[],revisions:[],plays:[]}}),validateBase,rewards),/missing its matching saved workspace/,'the retained local origin must still have its actual saved workspace');
+  assert.equal(validateFamilyRewardBackup(JSON.stringify(complete),validateBase,rewards,pals).notebook.sessions.length,4);
+  assert.throws(()=>validateFamilyRewardBackup(JSON.stringify({...complete,factoryWorkspace:{version:2,projects:[],revisions:[],plays:[]}}),validateBase,rewards,pals),/missing its matching saved workspace/,'the retained local origin must still have its actual saved workspace');
 });
 
 test('successful replacement commits all five sources and the ledger without projecting pending activity or scoring rewards',async()=>{
-  const {storage,rewards}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
-  await applyFamilyRewardBackup(plan,storage,rewards);
+  const {storage,rewards,pals}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
   assert.deepEqual(JSON.parse(storage.getItem(FAMILY_STATE_KEY)!),plan.base);
   assert.deepEqual(JSON.parse(storage.getItem(WORKSPACE_KEY)!),plan.workspace);
   assert.deepEqual(JSON.parse(storage.getItem(STUDIO_KEY)!),plan.notebook);
   assert.deepEqual(new StudioNotebook(storage).guidance(OWNER),{welcomeDismissed:true,dismissedTips:['idea']});
   assert.deepEqual(JSON.parse(storage.getItem(CREATION_KEY)!),plan.creation);
   assert.deepEqual(JSON.parse(storage.getItem(PROBLEM_SOLVING_KEY)!),plan.problemSolving);
+  assert.deepEqual(await pals.export(),plan.pals);
+  assert.equal((await pals.view(OWNER)).activeId,'glim');
+  assert.equal((await pals.view(OWNER)).preferences.encouragement,false);
   assert.equal((await rewards.summary(OWNER)).lifetimeGems,2,'the pending coding receipt is not silently projected during restore');
   assert.equal((await rewards.summary(OWNER)).practiceCount,1,'reasoning episodes and drafts do not mint rewards or practice bonuses');
   assert.equal((await rewards.summary(OTHER)).lifetimeGems,0);
   assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'committed');
-  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/Finish recovering/);
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'cleaned');
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/Finish recovering/);
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');
   assert.equal(storage.getItem(REWARD_BACKUP_JOURNAL_KEY),null);
   assert.equal((await rewards.summary(OWNER)).lifetimeGems,2);
 });
 
 test('a source write failure rolls back exact prior source bytes, absent keys and prior ledger',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
   storage.failKeys=[WORKSPACE_KEY];
-  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/original progress was restored/);
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/original progress was restored/);
   assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
   assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'rolled-back');
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'cleaned');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');
 });
 
 test('a ledger transaction failure restores every source and preserves the original reward total',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
   persistence.failUpdates=1;
-  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/original progress was restored/);
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/original progress was restored/);
   assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
   assert.equal((await rewards.summary(OTHER)).lifetimeGems,25);
 });
 
 test('an APS source write failure restores original bytes across all domains and the ledger',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
   storage.failKeys=[PROBLEM_SOLVING_KEY];
-  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/original progress was restored.*problem-solving/);
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/original progress was restored.*problem-solving/);
   assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'cleaned');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');
 });
 
 test('interruption after replacement but before commit rolls back once and requires a fresh document',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
-  await applyFamilyRewardBackup(plan,storage,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
   const journal=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);journal.phase='pending';storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(journal));
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'reload');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'reload');
   assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
   assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'rolled-back','marker blocks stale in-memory stores before reload');
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'cleaned');
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'none');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'none');
   assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
 });
 
 test('a failed rollback keeps the original safety journal and a later startup can recover',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
   storage.failKeys=[WORKSPACE_KEY,FAMILY_STATE_KEY];
-  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/recovery is still pending/);
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/recovery is still pending/);
   assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'pending');
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'reload');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'reload');
   assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
 });
 
 test('legacy four-source pending journals recover only their captured keys without erasing APS history',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
-  await applyFamilyRewardBackup(plan,storage,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
   const journal=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);journal.phase='pending';delete journal.sources[PROBLEM_SOLVING_KEY];
   storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(journal));
   const retainedAPS=storage.getItem(PROBLEM_SOLVING_KEY);
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'reload');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'reload');
   assert.deepEqual(sources(storage),{...beforeSources,[PROBLEM_SOLVING_KEY]:retainedAPS});
   assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);
   assert.equal(new ProblemSolvingStore(storage).list(OWNER).length,1);
-  assert.equal(await recoverRewardBackupJournal(storage,rewards),'cleaned');
+  assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');
 });
 
 test('no room for a safety journal leaves every original source and reward unchanged',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
   storage.failKeys=[REWARD_BACKUP_JOURNAL_KEY];
-  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/Nothing was replaced/);
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/Nothing was replaced/);
   assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);assert.equal(storage.getItem(REWARD_BACKUP_JOURNAL_KEY),null);
 });
 
 test('journal validation cannot restore arbitrary source keys or a foreign rewards namespace',async()=>{
-  const {storage,rewards,persistence,beforeSources,beforeLedger}=await existing();
+  const {storage,rewards,pals,persistence,beforeSources,beforeLedger}=await existing();
   const journal={schema:'jems.reward.backup.journal.v1',phase:'pending',operation:'restore',sources:beforeSources,rewards:await rewards.snapshotRawForRecovery()};
   for(const invalid of [{...journal,sources:{...beforeSources,'unrelated-setting':'overwrite'}},{...journal,rewards:{...journal.rewards,namespace:'other-family'}},{...journal,phase:'unsupported'}]){
-    storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(invalid));await assert.rejects(recoverRewardBackupJournal(storage,rewards),/unsupported/);
+    storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(invalid));await assert.rejects(recoverRewardBackupJournal(storage,rewards,pals),/unsupported/);
     assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);assert.equal(storage.getItem('unrelated-setting'),null);
   }
 });
 
 test('damaged JSON reward values survive rollback, while non-JSON IDB values fail before mutation',async()=>{
-  const {storage,rewards,persistence,beforeSources}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
+  const {storage,rewards,pals,persistence,beforeSources}=await existing(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
   const damaged={schema:'unknown',receipts:[{future:true}],nested:{preserve:'verbatim value'}};persistence.data.set(REWARDS_DB_NAME,damaged);
-  storage.failKeys=[WORKSPACE_KEY];await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/original progress was restored/);
-  assert.deepEqual(await persistence.read(REWARDS_DB_NAME),damaged);await recoverRewardBackupJournal(storage,rewards);
+  storage.failKeys=[WORKSPACE_KEY];await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/original progress was restored/);
+  assert.deepEqual(await persistence.read(REWARDS_DB_NAME),damaged);await recoverRewardBackupJournal(storage,rewards,pals);
   for(const unsupported of [new Uint8Array([1,2]),{missing:undefined},{when:new Date(TIME)},[Number.NaN],[-0]]){
     persistence.data.set(REWARDS_DB_NAME,unsupported);
-    await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards),/safely|recovery/);
+    await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/safely|recovery/);
     assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),unsupported);assert.equal(storage.getItem(REWARD_BACKUP_JOURNAL_KEY),null);
   }
   const cyclic:any={};cyclic.self=cyclic;assert.throws(()=>assertLosslessRewardJSON(cyclic),/safely/);
@@ -242,12 +248,13 @@ test('damaged JSON reward values survive rollback, while non-JSON IDB values fai
 
 test('a legacy restore or explicit reset empties missing domains and their unacknowledged outboxes',async()=>{
   for(const operation of ['restore','reset'] as const){
-    const {storage,rewards}=stores(),complete=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
-    await applyFamilyRewardBackup(complete,storage,rewards);await recoverRewardBackupJournal(storage,rewards);
-    const legacy=validateFamilyRewardBackup(JSON.stringify(base()),validateBase,rewards);await applyFamilyRewardBackup(legacy,storage,rewards,operation);
+    const {storage,rewards,pals}=stores(),complete=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
+    await applyFamilyRewardBackup(complete,storage,rewards,'restore',pals);await recoverRewardBackupJournal(storage,rewards,pals);
+    const legacy=validateFamilyRewardBackup(JSON.stringify(base()),validateBase,rewards,pals);await applyFamilyRewardBackup(legacy,storage,rewards,operation,pals);
     assert.deepEqual(new StudioNotebook(storage).pendingRewards(OWNER),[]);assert.deepEqual(new CreationStore(storage).pendingRewards(OWNER),[]);
     assert.equal(new RevisionStore(storage).list(OWNER).length,0);assert.equal((await rewards.summary(OWNER)).lifetimeGems,0);
     assert.deepEqual(new ProblemSolvingStore(storage).export(),emptyProblemSolvingWorkspace());
+    assert.equal((await pals.view(OWNER)).starterId,null);
     assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).operation,operation);
   }
 });
@@ -257,8 +264,8 @@ test('coordinated restore invalidates an open reasoning view after replacement w
   for(const name of ['factory-problem-solving-reset','factory-problem-solving-updated'])bus.addEventListener(name,()=>events.push(name));
   Object.defineProperty(globalThis,'window',{configurable:true,value:{dispatchEvent:bus.dispatchEvent.bind(bus)}});
   try{
-    const {storage,rewards}=stores(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards);
-    await applyFamilyRewardBackup(plan,storage,rewards);
+    const {storage,rewards,pals}=stores(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
+    await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
     assert.deepEqual(events,['factory-problem-solving-reset','factory-problem-solving-updated']);
     assert.deepEqual(new ProblemSolvingStore(storage).export(),plan.problemSolving);
   }finally{if(priorWindow)Object.defineProperty(globalThis,'window',priorWindow);else delete (globalThis as any).window;}
