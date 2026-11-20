@@ -31,6 +31,7 @@ import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView 
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
 import { installArtStudio } from '../drawing/studio';
+import { installArtEntryPoints } from './art-entry';
 import { rigById } from '../drawing/store';
 import { vehicleGeometry } from '../drawing/model';
 import { drawing, drawings, drawingBlob } from '../assets/private-drawings';
@@ -92,6 +93,7 @@ export async function installStudio(){
  let coaching:ReturnType<typeof installCoaching>|undefined;
  let voice:ReturnType<typeof installStudioVoice>|undefined;
  let privateSpeech:ReturnType<typeof installStudioPrivateSpeech>|undefined;
+ let artEntries:ReturnType<typeof installArtEntryPoints>|undefined;
  const stopSpeech=()=>{voice?.cancel();privateSpeech?.cancel();};
  const sending=new Set<string>();
  let panel:'game'|'talk'|'versions'='game';
@@ -886,6 +888,7 @@ export async function installStudio(){
   const creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   const hasIdea=creating&&s.messages.some(m=>m.role==='child');
   page.classList.toggle('studio-creating',creating);
+  artEntries?.setCreating(creating);
   page.classList.toggle('studio-idea-unstarted',creating&&!hasIdea);
   page.classList.toggle('studio-idea-started',creating&&hasIdea);
   creationHero.hidden=!creating;
@@ -1392,11 +1395,6 @@ export async function installStudio(){
  // without a second automatic navigation overriding a child's early choice.
  home();
  await readWelcomeArt();
- try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI),{cache:'no-store'})).json());}catch{remote={version:1,mode:'unavailable'};}
- configReady=true;
- if(remote.mode!=='remote'){coachConnection='unavailable';builderReadiness='not-configured';}
- if(activeId)render();else updateCreationNote();
- void refreshServiceReadiness();resumeOutstanding();refreshShelf();
  FG.studio={version:1,flushDraft,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
  let palsInterface:ReturnType<typeof installPalsInterface>;
  const creation=installCreationStudio({
@@ -1435,13 +1433,7 @@ export async function installStudio(){
    await open(session.id);
   },
  });
- const artEntry=el('button','studio-scene-entry') as HTMLButtonElement;artEntry.id='studioArt';artEntry.type='button';
- artEntry.innerHTML='<img src="./jems-art/character_spark_wave.webp" alt=""><span><strong>Bring your drawing to life</strong><small>Your own Art Studio. Draw, upload, give it movement, and reuse it in your games.</small></span><b aria-hidden="true">→</b>';
- artEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));artEntry.onclick=()=>act(()=>artStudio.open());libraryTools.before(artEntry);
- const artShortcut=iconEl('button','studio-button','edit','Art Studio') as HTMLButtonElement;artShortcut.id='studioArtShortcut';artShortcut.type='button';artShortcut.onclick=()=>act(()=>artStudio.open());libraryTools.prepend(artShortcut);
- const creationArt=iconEl('button','creation-button','edit','My art & drawings') as HTMLButtonElement;creationArt.id='creationArtStudio';creationArt.type='button';creationArt.onclick=()=>act(()=>artStudio.open());$('creationShelfImport').after(creationArt);
- const artFromIdea=iconEl('button','studio-button','edit','Use my drawing') as HTMLButtonElement;artFromIdea.id='studioUseDrawing';artFromIdea.type='button';artFromIdea.onclick=()=>act(()=>artStudio.open());$('studioHelp').after(artFromIdea);
- const legacyArt=iconEl('button','studio-button','edit','Open Art Studio') as HTMLButtonElement;legacyArt.id='collectionArtStudio';legacyArt.type='button';legacyArt.onclick=()=>act(()=>artStudio.open());$('page-creations').querySelector('.page-head')!.append(legacyArt);
+ artEntries=installArtEntryPoints({homeAction:library.querySelector('.studio-home-action')!,libraryTools,open:()=>act(()=>artStudio.open())});
  installCreationProgress();
  const scenesNav=iconEl('button','','grid','Create & code') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
  const scenesEntry=el('button','studio-scene-entry') as HTMLButtonElement;scenesEntry.id='studioScenes';scenesEntry.type='button';
@@ -1507,4 +1499,27 @@ export async function installStudio(){
  if(new URLSearchParams(location.search).get('creation')==='1')creation.open();
  if(new URLSearchParams(location.search).get('problem-solving')==='1')practice.open();
  if(new URLSearchParams(location.search).get('art')==='1')void artStudio.open().catch(error=>status((error as Error).message,true));
+ // Local drawing, scenes and their navigation must not wait for the remote
+ // builder configuration. Only the existing online readiness state depends on
+ // this request; completing it never navigates away from the child's work.
+ async function loadRemoteConfiguration(){
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10_000);
+  try{
+   const response=await fetch(new URL('factory-config.json',document.baseURI),{cache:'no-store',signal:controller.signal});
+   if(!response.ok)throw Error('Builder configuration is unavailable.');
+   remote=validateBuilderConfig(await response.json());
+  }catch{remote={version:1,mode:'unavailable'};}
+  finally{clearTimeout(timeout);}
+  // A saved remote game may have been opened while configuration was still
+  // pending. Replace those unavailable clients on the next explicit action;
+  // never replay a build request merely because configuration arrived.
+  for(const [id,client] of clients)if(client.config!==remote){client.disconnect();clients.delete(id);}
+  configReady=true;
+  coachConnection=remote.mode==='remote'?'checking':'unavailable';
+  builderReadiness=remote.mode==='remote'?'checking':'not-configured';
+  if(route==='studio'&&activeId)render();else if(route==='library')updateCreationNote();
+  void refreshServiceReadiness().catch(error=>status('Could not check the game workshop: '+(error as Error).message,true));
+  resumeOutstanding();refreshShelf();
+ }
+ void loadRemoteConfiguration().catch(error=>status('Could not refresh the game workshop: '+(error as Error).message,true));
 }

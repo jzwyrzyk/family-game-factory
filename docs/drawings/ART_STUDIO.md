@@ -4,7 +4,9 @@
 
 ## The experience
 
-Art Studio is an owned creation space in the current Jems shell. Enter from **Menu → Make → Art Studio**, **My Games → Art Studio**, **Bring your drawing to life**, an idea's **Use my drawing** action, **Create & code → My art & drawings**, the legacy saved collection, or `?art=1`. These remain creation destinations in the compact My Games / Create / Menu shell; entry retains the existing save, owner and learning guards. Grown-ups can open the selected player's art from the existing backup settings.
+Art Studio is an owned creation space in the current Jems shell. Enter from **Menu → Make → Art Studio**, **My Games → Art Studio** beside **Invent a game**, an idea's **Use my picture** action, **Create & code → Art Studio**, the legacy saved collection, or `?art=1`. These are subdestinations of creation in the compact My Games / Create / Menu shell, with the existing saved-draft, learning and ownership guards. Grown-ups can open the selected player's art from the existing backup settings.
+
+**Entry correction, November 20, 2026:** the home action appears before the game catalogue. The new-idea composer shows **Use my picture** directly; that same control returns to the game toolbar for an existing game, where it remains available. The earlier placement inside the hidden new-idea toolbar made the upload journey undiscoverable. Local Art Studio and Create & code install before the background builder-configuration request; a delayed or unavailable workshop cannot hold their routes behind a network response. The configuration request has a 10-second bound and can update readiness without replaying the initial route, replacing the current owner or submitting a build.
 
 The [first-creation entry](../child-journey/FIRST-CREATION.md) recognizes saved private art as existing creative work even before a game or scene exists. Its presence check respects the active owner and keeps the ordinary home available when art storage cannot be read; it creates no progress or guidance records.
 
@@ -13,6 +15,14 @@ The [first-creation entry](../child-journey/FIRST-CREATION.md) recognizes saved 
 3. **Prepare the picture.** Crop, turn, flip and optionally remove connected white border paper. Undo/Redo operates on the edit. Saving creates a new PNG derivative linked to the original; no original image is rewritten. The working copy is bounded to 1600 pixels on its longest side; the original retains its full bytes.
 4. **Give it movement.** Correct the local suggestions, add/remove/move/resize parts, choose roles, and test real motion. Advanced controls expose outlines, parenting, hinge placement, brush-mask erase/restore and numeric geometry. Touch, pointer and keyboard controls work on the same model. Suggestions are disclosed as guesses. The editor and runtime use the decoded source image's width/height and one physical scale, preserving rectangular-image proportions; designs outside the bounded physics range receive an explicit correction message.
 5. **Save and reuse.** Each saved movement design has an immutable ID and parent revision. Draft recovery is separate from choosing a saved version. Open the selected original or movement design in a new Create & code scene, or create a saved Junkyard Rally game from a car design.
+
+After an upload/photo import, local drawing save or edited-picture save, the newly selected artwork receives focus. Narrow screens scroll its details into view. Drawing and picture dialogs finish closing before focus moves; owner, page and selected-art checks prevent a stale save callback from moving focus in another player's work.
+
+## Later web-journey and menu integration
+
+The owner requested these corrections first and the broader navigation integration later. The separately developed compact menu already provides **Make → Art Studio**. Integrate the corrected entry module rather than restoring the old bottom-of-catalogue banner or hidden composer action. `src/studio/art-entry.ts` retains the existing `studioArt`, `studioArtShortcut`, `studioUseDrawing`, `creationArtStudio` and `collectionArtStudio` IDs and uses the host's existing guarded Art Studio callback. `?art=1` and `FG.artStudio.open` remain compatible; no upload handler or art store is duplicated.
+
+When combining the menu branch, connect its **Art Studio** action to the same guarded route and mark that menu destination current while the art page is open. Preserve the separate child-interface text/typography changes and selected-maker imagery; these corrections do not replace that work. Recheck menu open/close and focus, first-visit entry, return to the original game/scene, owner changes, required-learning and failed-save guards on the combined source. A prepared branch does not establish that this combined menu is deployed.
 
 The source [gold standard](GOLD_STANDARD.md) still requires visible artwork fidelity, inspectable assumptions, purposeful real movement and recoverability. This branch does not claim universal drawing recognition, broad photo segmentation accuracy or observed child enjoyment.
 
@@ -58,6 +68,7 @@ To move family progress and its art: download progress and each relevant player'
 
 | Area | Source / meaningful checks |
 | --- | --- |
+| Entrances and offline startup | `src/studio/art-entry.ts`, `art-entry.css`, `ui.ts`; `tests/art-entry-readiness.cjs` checks the phone home/composer entrances, pending/rejected configuration, actual upload/drawing save, late readiness and profile isolation |
 | Dedicated library and picture tools | `src/drawing/studio.ts`, `studio.css`, `picture.ts`; `tests/art-studio-browser.cjs`, `tests/picture-tools-browser.cjs` |
 | Original storage, rigs, drafts, transfers | `src/assets/private-drawings.ts`, `src/drawing/library.ts`, `store.ts`, `transfer.ts`; `tests/art-storage-browser.cjs` |
 | Parts, segmentation and physics | `src/drawing/model.ts`, `segmentation.ts`, `playground.ts`, `rally.ts`, `src/quality/physics.ts`; `tests/drawing-engine.test.ts`, `tests/drawing-engine-browser.cjs` |

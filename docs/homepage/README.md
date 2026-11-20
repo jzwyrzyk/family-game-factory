@@ -16,6 +16,7 @@ See the [first-creation contract](../child-journey/FIRST-CREATION.md) for small 
 4. **I want to keep exploring:** the Studio's My Games button always returns here. My Powers and family settings remain available, without becoming competing first-screen calls to action.
 5. **Something takes time or is unavailable:** the existing nonmodal build shelf preserves play during an actual pending build; the homepage never promises new AI builds when the private builder is unavailable.
 6. **I want an earlier idea or drawing:** **Saved ideas & drawings** opens the retained collection, with an explicit **My Games** button to return.
+7. **I have a picture:** **Art Studio** sits beside **Invent a game** before the catalogue. It opens the current player's upload, camera, drawing and reusable-art space. An unavailable online builder does not block this local destination.
 
 ## Saved ideas and drawings remain reachable
 

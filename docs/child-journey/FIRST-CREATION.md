@@ -30,6 +30,8 @@ The ordinary shell exposes **My Games**, **Create** and **Menu**. Secondary crea
 
 New-idea guidance follows the composer so Send and Build remain the primary task; on phones, the introductory hero retains its art and headline in a compact row. In playable views, guidance follows the game stage. Existing build progress and ready actions remain available above it. Practice choices appear before the shelf's optional guide.
 
+**Use my picture** is a visible action inside the new-idea composer. The same control belongs in the game toolbar for an existing playable game; hiding that toolbar for a new idea must not hide the artwork entrance. It opens the existing Art Studio through the same draft-save and learning guards. The saved idea is retained, and selecting this route alone neither attaches private pixels to a model prompt nor submits a generation request. Art and scene tools initialize independently of the online builder configuration.
+
 The bounded tip IDs are `idea`, `waiting`, `ready`, `play`, `improve`, `keep`, `saved`, `scenes`, `practice`, and `progress`. **Menu → Help → Journey help** explains character choice, idea, explicit Build, play while waiting, revision and Keep, and lets a player show tips again. Resetting tips does not reset their creations, rewards, learning, or remembered welcome choice.
 
 Journey help also points to the existing scene-video route: **Create & code → More scene tools → Save a video**. This makes recording discoverable without adding a new recording capability or implying that every generated game has an editable scene equivalent.

@@ -73,7 +73,11 @@ export function sourceDigest(root, area, paths = trackedPaths(root), registry = 
     hash.update(`\0${path}\0${contents.length}\0`);
     hash.update(contents);
   }
-  return hash.digest('hex');
+  const digest = hash.digest('hex');
+  // Print the computed review fingerprint on hosted checks so a combined PR
+  // can reconcile independent source reviews without weakening any guard.
+  if (process.env.GITHUB_ACTIONS === 'true') console.log(`JEMS_SOURCE_DIGEST ${area.id} ${digest}`);
+  return digest;
 }
 
 function registryErrors(registry) {
