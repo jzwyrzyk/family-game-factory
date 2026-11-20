@@ -1,5 +1,12 @@
 # Rebuild the accepted sandbox contract — manual GHCR publication
 
+## November 20 manual-publication dry-run failure and repair
+
+The initial manual `sandbox-publish.yml` run [44837433067](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44837433067) verified exact approved source `b472c224...`, staged all committed sandbox inputs, built the Docker image and compared actual packaged `worker.cjs`, `source-validator.cjs` and `quality-capture.cjs` SHA-256 bytes. It then **failed safely before GHCR publication**, during the local synthetic `{game:hopper}` protocol check: the fixture loader attempted `import {hopper}` from the repository's TypeScript module compiled as CommonJS, resulting in `SyntaxError: ... does not provide an export named 'hopper'`. Consequently the no-network container received no input and emitted `Unexpected end of JSON input`. **This is a fixture-loading defect in the publishing workflow, not evidence of an image or sandbox runtime failure. No new digest exists from this run.**
+
+The follow-up fixes only the publisher's synthetic fixture-loading method: use Node `--import tsx` with CommonJS `require(...generated-fixtures.ts)`, verify fixture shape, write a bounded local `{game:...}` JSON input, validate it **before launching Docker**, and only then exercise the sandbox. An offline CI test invokes the same TypeScript fixture loader instead of merely checking a workflow string. Re-run manual image publication only after the follow-up PR has merged with its exact-head tests green; never re-dispatch the failed workflow commit or assume the old OCI image is acceptable.
+
+
 **Release correction, November 20, 2026.** Owner production smoke [private run 44830655674](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44830655674) pulled the configured immutable image `ghcr.io/jzwyrzyk/family-game-factory-sandbox@sha256:4495d9558b1c3f5c8b350f0f00030c934b742eb2e0a4e23dc0e4ada12a30f731` without credentials and verified gVisor `network=none` egress denial and all host readiness checks. The required full sandbox tests **failed** with `PLAYTEST_FAILED:GENERATED_ARTIFACT_REJECTED` before browser regressions. The owner launcher confirmed `SMOKE_STATUS=FAILED`, `CLEANUP_STATUS=VERIFIED`, `SMOKE_AUTH_STATUS=VERIFIED`, `FINAL_STATUS=FAILED`. That image is **not** accepted for current production execution.
 
 ## Determined compatibility cause
