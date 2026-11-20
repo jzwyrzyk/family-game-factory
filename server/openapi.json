@@ -3726,7 +3726,7 @@
             "maximum": 20
           }
         },
-        "description": "Durably queued observations, not proof of PostHog delivery. Disabled config accepts zero."
+        "description": "Observations admitted to the best-effort collector before workspace capacity handling, not guaranteed retention or PostHog delivery. Disabled config accepts zero; transient observations can be discarded to preserve core data and consent records."
       },
       "FamilyAnalyticsChoiceRequest": {
         "type": "object",

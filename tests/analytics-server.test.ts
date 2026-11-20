@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {randomUUID} from 'node:crypto';
+import {createHash, randomUUID} from 'node:crypto';
 import {createServer, type Server} from 'node:http';
 import {ANALYTICS_NOTICE_VERSION, validateClientAnalyticsEvent, type ClientAnalyticsEvent} from '../src/analytics/contract';
 import {analyticsConfig} from '../server/analytics/config';
@@ -9,6 +9,8 @@ import {ProductAnalytics} from '../server/analytics/service';
 import {analyticsHandler} from '../server/analytics/http';
 import type {AnalyticsConfig, AnalyticsPayload} from '../server/analytics/types';
 import {MemoryRepository} from '../server/pipeline/repository';
+import {FirestoreRepository} from '../server/pipeline/firestore';
+import type {ArtifactRef, PrivateArtifacts} from '../server/storage/artifacts';
 import {JobService} from '../server/pipeline/service';
 import {apiHandler} from '../server/pipeline/http';
 import {signSession} from '../server/pipeline/auth';
@@ -22,8 +24,8 @@ const enabled: Extract<AnalyticsConfig, {enabled: true}> = {
 };
 const origin = 'https://jems.example', signing = 'synthetic-analytics-session-signing-key';
 const parentChoice = {noticeVersion: ANALYTICS_NOTICE_VERSION, guardianAffirmed: true, providerAcknowledged: true};
-async function fixture(options: {config?: AnalyticsConfig; consent?: boolean; send?: (events: AnalyticsPayload[]) => Promise<boolean>} = {}) {
-  const repo = new MemoryRepository(), time = {now: Date.now()}, sent: AnalyticsPayload[][] = [];
+async function fixture(options: {repo?: Repository; config?: AnalyticsConfig; consent?: boolean; send?: (events: AnalyticsPayload[]) => Promise<boolean>} = {}) {
+  const repo = options.repo || new MemoryRepository(), time = {now: Date.now()}, sent: AnalyticsPayload[][] = [];
   const session: VerifiedSession = {familyId: 'family-fixture-one', deviceId: randomUUID(), subject: 'family-designer', role: 'designer', expiresAt: time.now + 86400000};
   const parent: VerifiedSession = {...session, role: 'parent', subject: 'family-parent'};
   await repo.transaction(state => {
@@ -64,6 +66,121 @@ async function listen(handler: ReturnType<typeof analyticsHandler>) {
   return {server, url: `http://127.0.0.1:${(server.address() as {port: number}).port}`};
 }
 async function close(server: Server) { await new Promise<void>(resolve => server.close(() => resolve())); }
+
+/** Exercise the real chunk encoder/capacity gate without a cloud connection. */
+function firestoreFixture(artifacts?: PrivateArtifacts) {
+  interface Reference {path: string; collection(name: string): {doc(id: string): Reference}}
+  const root = 'factoryWorkspaces/analytics-capacity-fixture/state/current';
+  const documents = new Map<string, Record<string, unknown>>();
+  const ref = (path: string): Reference => ({path, collection: name => ({doc: id => ref(path + '/' + name + '/' + id)})});
+  const snapshot = (reference: Reference) => ({exists: documents.has(reference.path), data: () => structuredClone(documents.get(reference.path))});
+  const db = {doc: ref, runTransaction: async (callback: (transaction: {
+    get(reference: Reference): Promise<ReturnType<typeof snapshot>>;
+    getAll(...references: Reference[]): Promise<ReturnType<typeof snapshot>[]>;
+    set(reference: Reference, value: Record<string, unknown>): void; delete(reference: Reference): void;
+  }) => Promise<unknown>) => {
+    const writes = new Map<string, Record<string, unknown>>(), deletes = new Set<string>();
+    const result = await callback({get: async reference => snapshot(reference), getAll: async (...references) => references.map(snapshot),
+      set: (reference, value) => { writes.set(reference.path, structuredClone(value)); }, delete: reference => { deletes.add(reference.path); }});
+    for (const path of deletes) documents.delete(path);
+    for (const [path, value] of writes) documents.set(path, value);
+    return result;
+  }};
+  const repo = new FirestoreRepository(db as unknown as ConstructorParameters<typeof FirestoreRepository>[0], 'analytics-capacity-fixture', artifacts);
+  const encoded = () => Array.from({length: Number(documents.get(root)?.chunks || 0)}, (_, i) => String(documents.get(root + '/chunks/' + i)?.json || '')).join('');
+  return {repo, encoded};
+}
+async function fillWorkspace(store: ReturnType<typeof firestoreFixture>, bytes: number) {
+  const index = await store.repo.transaction(state => { state.audit.push({jobId: 'capacity-fixture', familyId: 'family-fixture-one',
+    status: 'failed', at: new Date().toISOString(), code: ''}); return state.audit.length - 1; });
+  const padding = bytes - Buffer.byteLength(store.encoded()); assert.ok(padding >= 0);
+  await store.repo.transaction(state => { state.audit[index].code = 'x'.repeat(padding); return true; });
+  assert.equal(Buffer.byteLength(store.encoded()), bytes);
+}
+async function queuedCapacityFixture(repo: Repository) {
+  const f = await fixture({repo}), jobId = randomUUID(), requestId = randomUUID();
+  const context = await f.analytics.prepareSubmission(f.session, {schemaVersion: 1, choiceId: f.choiceId,
+    ownerId: 'profile-local-1', creationId: 'studio-local-1'}, {clientRequestId: requestId});
+  assert.ok(context);
+  await repo.transaction(state => {
+    state.jobs.push({id: jobId, familyId: f.session.familyId, gameId: 'new', baseRevisionId: null, prompt: 'Synthetic capacity fixture',
+      clientRequestId: requestId, status: 'queued', adapter: 'mock', maxUnits: 0, usedUnits: 0, retryCount: 0});
+    state.audit.push({jobId, familyId: f.session.familyId, status: 'queued', at: new Date(f.time.now).toISOString()}); return true;
+  });
+  await f.analytics.acceptedSubmission(f.session, context, {jobId});
+  return {...f, jobId};
+}
+
+test('Firestore drops transient analytics at capacity while preserving the terminal update, choices and encoded artifacts', async () => {
+  const blobs = new Map<string, Buffer>(); let uploads = 0;
+  const artifacts: PrivateArtifacts = {put: async bytes => {
+    uploads++; const value: ArtifactRef = {storage: 'private-artifact-v1', sha256: createHash('sha256').update(bytes).digest('hex'), bytes: bytes.length};
+    blobs.set(value.sha256, Buffer.from(bytes)); return value;
+  }, get: async value => Buffer.from(blobs.get(value.sha256)!)};
+  const store = firestoreFixture(artifacts), f = await queuedCapacityFixture(store.repo);
+  await f.repo.transaction(state => {
+    state.revisions.push({id: 'saved-fixture', familyId: f.session.familyId, projectId: 'saved-fixture-project', parentId: null,
+      game: {kind: 'generated-module-v1', title: 'Synthetic fixture', instructions: 'Use arrows', source: ' '.repeat(20000), controls: ['left']}});
+    return true;
+  });
+  await fillWorkspace(store, 3 * 1024 * 1024 - 300);
+  const before = await f.repo.snapshot(), packedBefore = JSON.parse(store.encoded()), expected = structuredClone(before);
+  assert.equal(before.analytics!.pending.length, 1); assert.equal(before.analytics!.bindings.length, 1);
+  expected.jobs[0].status = 'failed'; expected.analytics!.pending = []; expected.analytics!.bindings = []; expected.analytics!.receipts = [];
+  let updates = 0; uploads = 0;
+  assert.equal(await f.analytics.repository.transaction(state => { updates++; state.jobs[0].status = 'failed'; return 'core-saved'; }), 'core-saved');
+  assert.equal(updates, 1, 'capacity handling does not rerun the core action');
+  assert.equal(uploads, 1, 'capacity handling reuses the first artifact encoding');
+  assert.deepEqual(await f.repo.snapshot(), expected);
+  assert.deepEqual(JSON.parse(store.encoded()).revisions, packedBefore.revisions, 'encoded artifact references remain exact');
+  assert.equal(analyticsStatus(await f.repo.snapshot(), f.session, true, f.time.now).permitted, true);
+  await f.analytics.flush(); assert.equal(f.sent.length, 0);
+});
+
+test('preexisting bounded telemetry yields capacity to a valid core write even when capture is off', async () => {
+  const store = firestoreFixture(), f = await queuedCapacityFixture(store.repo);
+  await f.repo.transaction(state => {
+    const a = state.analytics!, pending = a.pending[0], binding = a.bindings[0], receipt = a.receipts[0];
+    a.pending = Array.from({length: 256}, () => { const id = randomUUID(); return {...structuredClone(pending), id, payload: {...pending.payload, uuid: id}}; });
+    a.bindings = Array.from({length: 512}, () => ({...binding, jobId: randomUUID()}));
+    a.receipts = Array.from({length: 2048}, () => ({...receipt, id: randomUUID()}));
+    const choice = a.choices[0];
+    a.choices.unshift({...choice, id: randomUUID(), requestedAt: f.time.now - 1000, verifiedAt: f.time.now - 900, revokedAt: f.time.now - 100});
+    return true;
+  });
+  await fillWorkspace(store, 3 * 1024 * 1024 - 100);
+  const expected = await f.repo.snapshot(), quiet = new ProductAnalytics(f.repo, {enabled: false});
+  const revision = {id: randomUUID(), familyId: f.session.familyId, projectId: randomUUID(), parentId: null,
+    game: {kind: 'star-catcher-v1' as const, target: 4, seconds: 10}};
+  expected.revisions.push(revision); expected.active[revision.projectId] = revision.id;
+  expected.analytics!.pending = []; expected.analytics!.bindings = []; expected.analytics!.receipts = [];
+  let updates = 0;
+  await quiet.repository.transaction(state => { updates++; state.revisions.push(revision); state.active[revision.projectId] = revision.id; return true; });
+  assert.equal(updates, 1);
+  assert.deepEqual(await f.repo.snapshot(), expected, 'all existing choices, core data and the new revision remain exact');
+  assert.ok(Buffer.byteLength(store.encoded()) <= 3 * 1024 * 1024);
+});
+
+test('genuine core or core-plus-permission overcapacity remains rejected atomically', async () => {
+  for (const consent of [false, true]) {
+    const store = firestoreFixture(), f = await fixture({repo: store.repo, consent, config: {enabled: false}});
+    await fillWorkspace(store, 3 * 1024 * 1024 - 100);
+    const before = await f.repo.snapshot(); let updates = 0;
+    await assert.rejects(f.analytics.repository.transaction(state => {
+      updates++; state.audit.push({jobId: 'overflow-fixture', familyId: f.session.familyId, status: 'failed', at: new Date().toISOString(), code: 'x'.repeat(1024)}); return true;
+    }), /WORKSPACE_CAPACITY_REACHED/);
+    assert.equal(updates, 1); assert.deepEqual(await f.repo.snapshot(), before);
+  }
+});
+
+test('collector accepted count means admission even when capacity drops the event before retention', async () => {
+  const store = firestoreFixture(), f = await fixture({repo: store.repo});
+  await fillWorkspace(store, 3 * 1024 * 1024 - 100);
+  const before = await f.repo.snapshot();
+  assert.deepEqual(await f.analytics.record(f.session, {events: [f.event()]}), {accepted: 1});
+  assert.deepEqual(await f.repo.snapshot(), before, 'only newly admitted transient delivery state was discarded');
+  await f.analytics.flush(); assert.equal(f.sent.length, 0);
+});
 
 test('disabled or incomplete analytics config stays inert without replacing the core repository', async () => {
   const f = await fixture({config: {enabled: false}});

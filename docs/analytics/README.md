@@ -51,7 +51,7 @@ The new default is an integration dependency: the gateway, preview service, priv
 
 The browser uses direct credentialed requests to the same gateway, with a 1.5-second timeout, no auth renewal and no retry. It holds at most 20 observations until a microtask flush. Profile changes clear the queue and cancel pending requests; failed withdrawal pauses the current tab through automatic status refresh until an explicit choice action resumes it.
 
-The gateway's existing durable repository holds a bounded outbox. Server outcome observations are enqueued in the transaction that observes the terminal transition; a separate sender performs the network call. Each outgoing event has a deterministic scoped UUID for deduplication. A failed network call may be retried from this outbox without replaying a build, model call or child action.
+The gateway's existing durable repository holds a bounded outbox. At the existing Firestore workspace size limit, it discards only pending analytics, job bindings and duplicate receipts before serializing the already encoded state again. Saved games, core state and consent choices are preserved; the core callback and artifact uploads are not repeated. Core plus consent records still obey the existing workspace capacity limit. Server outcome observations are enqueued in the transaction that observes the terminal transition; a separate sender performs the network call. Each outgoing event has a deterministic scoped UUID for deduplication. A failed network call may be retried from this outbox without replaying a build, model call or child action.
 
 The analytics collector and authenticated scheduler await one bounded drain before ending their response, so request-billed hosting can complete it. Core game responses do not wait for PostHog; their post-response drain is opportunistic. Without later collector/scheduler activity, pending data can expire. A scheduler failure cannot authorize replay of a paid action.
 
@@ -69,7 +69,7 @@ Expiry cleanup is opportunistic on later activity, not a guaranteed wall-clock d
 
 For a deletion request, stop the applicable reporting scope first, identify the scoped exported profile(s) in the operator's private environment, apply the selected project's supported data-deletion process and verify completion. Never copy raw identities or HMAC secrets into this public repository. No downstream erasure tool or confirmed retention policy is claimed by this PR. Do not enable collection until the operator can fulfill that process.
 
-Reporting is best effort: bounded queues, timeouts, privacy changes, outages and immutable older runtimes can lose evidence. Capture-quality counts describe received data, not a complete delivery denominator. “No recorded terminal” and “no captured play” remain unknown where evidence is missing.
+Reporting is best effort: bounded queues, workspace capacity pressure, timeouts, privacy changes, outages and immutable older runtimes can lose evidence. The collector’s `accepted` count describes observations admitted before capacity handling, not guaranteed retention or PostHog receipt. Capture-quality counts describe received data, not a complete delivery denominator. “No recorded terminal” and “no captured play” remain unknown where evidence is missing.
 
 ## Configuration and launch sequence
 
@@ -99,7 +99,7 @@ To stop new collection, turn the gateway switch off and remove the public switch
 
 The [OpenAPI contract](../../server/openapi.json) describes analytics status, events, the adult choice and authenticated parent choice/revocation. `/v1/jobs` accepts an optional `analytics` context outside the core build request; invalid/unavailable telemetry is ignored without changing admission or idempotency. Existing unknown core fields still fail validation.
 
-- `npm run test:analytics`: client permission/failure isolation, server trust/correlation/outbox contracts and synthetic dashboard/API tests.
+- `npm run test:analytics`: client permission/failure isolation, server trust/correlation/outbox and Firestore capacity contracts, and synthetic dashboard/API tests.
 - `npm run test:analytics-browser`: actual IndexedDB/scene actions, production permission UI, trusted preview starts and native Studio launch/copy checks.
 - `npm run test:deployment`: offline source/archive and existing deployment contracts; no cloud mutations.
 - Existing adult, parent, art, generated-runtime and learning suites cover the shared boundaries. Test fixtures and emulated viewports do not establish live-provider, physical-device or child acceptance.

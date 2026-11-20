@@ -112,6 +112,8 @@ export class ProductAnalytics {
     a.receipts.push({id: payload.uuid, at: now, familyId: scope.familyId, deviceId: scope.deviceId});
     a.receipts = a.receipts.slice(-MAX_RECEIPTS); return true;
   }
+  /** Accepted counts admission to this best-effort collector, not guaranteed
+   * retention or export; storage pressure may discard transient delivery state. */
   async record(session: VerifiedSession, input: unknown): Promise<{accepted: number}> {
     if (!this.config.enabled) return {accepted: 0};
     const body = input as Record<string, unknown>;

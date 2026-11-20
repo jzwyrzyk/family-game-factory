@@ -320,10 +320,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:24:23.208Z",
-      "sourceDigest": "e139cb6c03ee97605ce24fe788b9eb5c61eab106102adcac99cb07a2d9b8788e",
+      "reviewedAt": "2026-11-20T04:46:39.589Z",
+      "sourceDigest": "3eacf8526e6849513f303f9f9aae14f9d81772f170c29e89b1ad1c2e50132ef4",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed authenticated analytics routes, current consent checks, optional job wrapper field, OpenAPI and Docker/source archive dependencies. Documented server-only configuration, pre-response collector/scheduler drain and no core PostHog latency."
+      "reviewReason": "Reviewed the collector response contract against the Firestore fallback; updated OpenAPI and architecture to distinguish admitted observations from guaranteed retention or delivery."
     },
     {
       "id": "generation",
@@ -346,10 +346,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:24:23.500Z",
-      "sourceDigest": "1d5abde5187f6cbb362826bf4c778a5dcc5edad7a4aa3d2eae7f1d803fe294e3",
+      "reviewedAt": "2026-11-20T04:46:40.204Z",
+      "sourceDigest": "9505c7024cf8e1cefb4dda3d57f895cfc1f88585690785ec6716d510bbaeade1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed repository terminal-state observation, exact accepted-job correlation, trusted first-running-frame signal and immutable v2.1.1 hash. Updated runtime references and mixed-worker rollout limitation; preserved all prior archives and existing build admission."
+      "reviewReason": "Reviewed capacity handling after artifact encoding. Only transient analytics is removed; core state, choices and artifact references remain exact. Architecture records that the fallback repeats neither the core callback nor artifact uploads and retains genuine core capacity errors."
     },
     {
       "id": "coach",
@@ -395,10 +395,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "c3f80bc3a4fa5deb96406451c7f0bcae4f9e9a98d0a3b20599a45881e6cf4e46",
-      "reviewedAt": "2026-11-20T04:24:23.853Z",
+      "sourceDigest": "4bbdb5872f3c90ce39adec023cd2389603e6a4cbebb3f520e887274d1ad1ce28",
+      "reviewedAt": "2026-11-20T04:46:40.850Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented independent family analytics guardian verification and exact-session Adult opt-in; reviewed revocation, no cross-unlock inheritance, origin/CSRF/device checks and explicit downstream-erasure limit. AI/speech permission remains separate."
+      "reviewReason": "Reviewed the changed collector response description and retention fallback. Architecture and delivery notes explicitly preserve all permission choices; authorization, adult grant scope, revocation and downstream deletion rules remain as documented."
     },
     {
       "id": "validation",
@@ -423,10 +423,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:24:24.200Z",
-      "sourceDigest": "89a1273896eeea4cfef35581be2ead48548900fbd93e5873e0f7a780f35427e0",
+      "reviewedAt": "2026-11-20T04:46:41.432Z",
+      "sourceDigest": "57f8585389485742c1a18f02f1dc4857f4d9b14dd2140b695a82bc42326f13ee",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed 376 existing unit checks, 45 focused client/server/report tests and real browser art, permission, native and generated-start regressions. Recorded synthetic/real-browser scope, supported headless shell and live-service/device evidence limits.",
+      "reviewReason": "Reviewed four actual Firestore repository regressions for terminal updates, bounded telemetry, true overcapacity rollback and best-effort admission. All 49 focused analytics/report checks, all 376 unit checks and typecheck passed; updated delivery evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -465,10 +465,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:24:24.564Z",
-      "sourceDigest": "714dfca2e1cd93b8517d78b6e5c484ecf04c1bd14e999ced3c83649c20ca3fc6",
+      "reviewedAt": "2026-11-20T04:46:42.011Z",
+      "sourceDigest": "fac83f7b810959f7983cb134fae35aaa3ea9e601fe85863dccc7b90ae346ef53",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed merged Art Studio main ancestry, false-by-default Pages input, server COPY/archive allowlist and CI test commands. Recorded source-only preparation and coordinated runtime rollout; no deployment, consent mutation or PostHog apply is claimed.",
+      "reviewReason": "Updated delivery evidence to 27 server checks and documented the reproduced capacity issue and focused correction. This remains source review only, with no merge, deployment or live PostHog activation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -627,10 +627,10 @@
         "tests/analytics-*"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "249016472f0913a8dc6240ae1ff2a2b68289cd1d0db8d76ab212caf92f40d3f1",
-      "reviewedAt": "2026-11-20T04:24:20.626Z",
+      "sourceDigest": "b6de1af107dc0ee055085be93004c2685b1cf9e5094f2b43940932f5592ecb04",
+      "reviewedAt": "2026-11-20T04:46:42.570Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed strict schema, per-device HMAC references, exact current choice and Adult grant, committed job/art attribution, bounded collector and SQL bootstrap. Documented default-off setup, true running signals, unknown delivery, exact-revision undercounts and unconnected live project."
+      "reviewReason": "Reviewed collector admission semantics and capacity pressure as a possible evidence loss. Updated runbook, dashboard limits, architecture and delivery notes; consent and core records survive while only pending events, bindings and receipts are discarded."
     }
   ]
 }
