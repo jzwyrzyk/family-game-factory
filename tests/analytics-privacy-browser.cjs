@@ -62,6 +62,17 @@ const NOTICE='jems-product-analytics-2026-11-v1',API='https://analytics-api.test
    const parent=async()=>{await page.evaluate(()=>FG.app.page('parent'));await page.click('#parentTab-settings');await page.locator('#builderParentUnlockPassphrase').waitFor({state:'visible'});};
    const unlockParent=async()=>{await page.fill('#builderParentUnlockPassphrase','synthetic parent passphrase');await page.locator('#builderParentUnlock button').click();};
    const exploreFirstWelcome=async()=>{const visibleEscape=page.locator('#studioWelcomeExplore');if(await visibleEscape.isVisible())await visibleEscape.click();};
+   // A new Adult profile can receive its own first-time invitation even when
+   // the family profile previously dismissed theirs. Use the visible journey
+   // action, not the intentionally hidden navigation, to begin that idea.
+   const startNewIdea=async()=>{
+    await page.waitForFunction(()=>['studioWelcomeMake','studioNavCreate'].some(id=>{
+     const node=document.getElementById(id);
+     return node instanceof HTMLElement&&node.getClientRects().length>0;
+    }));
+    if(await page.locator('#studioWelcomeMake').isVisible())await page.locator('#studioWelcomeMake').click();
+    else await page.click('#studioNavCreate');
+   };
    await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
    await exploreFirstWelcome();
    await page.click('#studioNavCreate');await settled();
@@ -96,7 +107,7 @@ const NOTICE='jems-product-analytics-2026-11-v1',API='https://analytics-api.test
    fs.mkdirSync('test-results',{recursive:true});
    await page.locator('#jemsAnalyticsPrivacy').screenshot({path:'test-results/analytics-privacy-'+device+'.png'});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'permission controls fit '+device);
-   await page.click('#homeBtn');await page.click('#studioNavCreate');
+   await page.click('#homeBtn');await startNewIdea();
    await page.waitForFunction(()=>document.getElementById('studioPrompt')!==null);await settled();
    for(let i=0;i<40&&events.length===0;i++)await page.waitForTimeout(25);
    assert.equal(events.length,1,'one explicit new-idea observation after opt-in');
@@ -109,7 +120,7 @@ const NOTICE='jems-product-analytics-2026-11-v1',API='https://analytics-api.test
    await parent();await page.locator('#jemsAnalyticsRevoke').waitFor({state:'visible'});
    failRevoke=true;await page.click('#jemsAnalyticsRevoke');await page.waitForFunction(()=>document.getElementById('jemsAnalyticsStatus').textContent.includes('could not be confirmed'));
    assert.equal(await page.locator('#jemsAnalyticsRevoke').isVisible(),true,'failed withdrawal remains retryable');
-   await page.click('#homeBtn');await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await page.click('#studioNavCreate');await settled();
+   await page.click('#homeBtn');await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await startNewIdea();await settled();
    assert.equal(events.length,1,'failed withdrawal pauses this tab even when focus refreshes');
    failRevoke=false;await parent();await page.locator('#jemsAnalyticsRevoke').waitFor({state:'visible'});await page.click('#jemsAnalyticsRevoke');
    await page.waitForFunction(()=>document.getElementById('jemsAnalyticsStatus').textContent.includes('stopped'));
