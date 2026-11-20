@@ -4,9 +4,9 @@
 
 The owner requested the complementary companion system, then authorized implementation with funny encouragement, a useful collection, visible progress and easy use in children's games. The owner also asked for a practical balance between engagement and the heavy subscription/addiction patterns of comparable products. Character artwork remains a separate development conversation. [ADR0012](../decisions/0012-pals-from-earned-activity.md) records this scope alongside the existing [shared Rewards contract](../rewards/README.md).
 
-The [Gem Pal artwork reference library](art/README.md) records approved concept masters, selected growth references and separately marked expression candidates. It is **not a runtime mapping**. Until exact form versions and Pal species assignments are approved and implemented, the collection retains its provisional token portraits and stable saved-scene IDs.
+The [Gem Pal artwork reference library](art/README.md) binds the complete approved original roster to exact Base/Grown neutral and expression images, while preserving historical references and Brio's separately marked expression candidates. Those art identities do not reassign saved collection identities. The earned collection retains its provisional token portraits and stable saved-scene IDs until an explicit creature-to-collection mapping is implemented.
 
-The [approved core expression library](EXPRESSIONS.md) supplies 184 versioned still images for 23 original individual profiles. **Try Pal expressions** is a read-only preview independent of Glim/Kip/Riff ownership; choosing Grown or a reaction there cannot unlock or equip a companion. The separated [Brio reference](art/characters/brio/README.md) retains its own emotion approval status.
+The [approved core expression library](EXPRESSIONS.md) supplies 184 versioned still images for 23 original individual profiles. **Try Pal expressions** is a read-only preview independent of Glim/Kip/Riff ownership; choosing Grown or a reaction there cannot unlock or equip a companion. The separate [Brio reference](art/characters/brio/README.md) retains two approved neutrals and six expressions in review. The explorer follows the existing Menu → Your world → My Pals route; it loads only after opening and resets its temporary choice across owner changes.
 
 ## Launch collection and eligibility
 
@@ -28,7 +28,7 @@ Ownership and availability are persisted. Ordinary breaks, changing the active P
 
 | Surface | Actual interaction and value |
 | --- | --- |
-| **My Pals** | Choose a starter, inspect the three-Pal library, see owned/available/locked states, view growth and remaining progress, welcome an eligible Pal, choose who comes along, or create a scene. |
+| **My Pals** | Choose a starter, inspect the three-Pal library, see owned/available/locked states, view growth and remaining progress, welcome an eligible Pal, choose who comes along, or create a scene. Open **Try Pal expressions** to preview the approved original-roster artwork independently of ownership. |
 | **Pal detail playground** | Tap an owned portrait for a short finite visual reaction and a scripted funny line. Taps are play, with no gems or growth awarded. |
 | **Home entry** | Open the collection or start creating with the active owned Pal. The entry follows the existing playable game shelf and creation entrance. |
 | **Studio cameo** | A small trusted-host companion beside the game surface, with collection access and the host's existing Help action. It is not injected into a game's iframe and does not change the game's score, physics or difficulty. |
@@ -133,6 +133,7 @@ An unsupported or damaged collection remains available through the recovery expo
 | [ui.ts](../../src/pals/ui.ts) / [pals.css](../../src/pals/pals.css) | Collection page, progress, local tap toy, home widget, cameo and accessible presentation |
 | [host.ts](../../src/pals/host.ts) | Application navigation, existing hint/help delegation, parent options and coordinated notices |
 | [creation.ts](../../src/pals/creation.ts) | Validated playable starter and additive scene insertion using the existing engine |
+| [Expression modules](EXPRESSIONS.md) | Exact approved art resolution, transient expression state, lazy image loading, own-form fallback and the independent My Pals playground |
 
 `installCreationStudio` accepts optional `ownedPals(): readonly string[]`, `activePal(): string | null`, and `openPals(): void` host hooks. Its returned `openWithPal(id): boolean` preserves current work and creates the selected owned-Pal scene synchronously; `refreshPals()` refreshes the owned choices without altering the current program. These hooks contain host-owned selection data and are not a generated-game inventory interface.
 
@@ -151,4 +152,4 @@ The [component browser checks](../../tests/pals-ui-browser.cjs) use explicit syn
 
 [Receipt-bridge tests](../../tests/pals-service.test.ts) use validated shared-ledger exports to check eligible activity mapping, bonuses without extra adventures, foreign/corrupt data, historical baselines and delayed attribution. [Backup fault tests](../../tests/pals-backup.test.ts) inject database and source-storage failures to verify full rollback, legacy/reset behavior, crash recovery, unsupported recovery namespaces and preservation of damaged originals. These test local contracts, not actual-device reliability or engagement outcomes.
 
-The separate artwork workstream holds the selected character library. Its exact runtime identity/form bindings, production portraits/rigs, richer animation and companion behavior inside arbitrary generated-game mechanics remain separate integration work; this runtime preparation does not reopen settled art choices or claim all assets are ready. New art should preserve the existing IDs and source ownership rules. New earning policies, paid features, trading, cross-device synchronization or a generated-game companion API require an explicit new contract; none is implied by the catalog or the provisional artwork.
+The original-roster artwork and form/expression bindings are complete for the independent expression playground. Explicit mapping into earned collection IDs, articulated rigs, richer animation and companion behavior inside arbitrary generated-game mechanics remain separate integration work; this runtime preparation does not reopen settled art choices. New art should preserve the existing IDs and source ownership rules. New earning policies, paid features, trading, cross-device synchronization or a generated-game companion API require an explicit new contract; none is implied by the catalog or the provisional artwork.

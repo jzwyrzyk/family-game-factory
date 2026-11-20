@@ -1,135 +1,142 @@
 import { loadApprovedPalArtwork } from './approved-artwork';
-import { createPalExpressionPanel } from './expression-panel';
 import type { PalArtworkForm, PalArtworkResolver } from './artwork';
+import { createPalExpressionPanel } from './expression-panel';
+import { PAL_EXPRESSION_MOTION_PILOT } from './artwork-view';
 import './expression-explorer.css';
 
-/** Optional, read-only gallery with its own exact art identity. It does not
- * choose a starter, equip a Pal, unlock a growth stage or write a receipt. */
-export function createPalExpressionExplorer(options: { owner: string }) {
+/** A read-only playground for approved art identities. Choosing a character or
+ * Grown here never equips a saved companion or changes earned progress. */
+export function createPalExpressionExplorer(initialScope: string) {
+  let scope = initialScope, visible = false, disposed = false, epoch = 0;
+  let resolver: PalArtworkResolver | null = null;
+  let panel: ReturnType<typeof createPalExpressionPanel> | null = null;
+  let pending = false;
   const element = document.createElement('details');
   element.className = 'pal-expression-explorer';
   const summary = document.createElement('summary');
   summary.textContent = 'Try Pal expressions';
+  summary.dataset.palsFocus = 'expressions';
   const body = document.createElement('div');
   body.className = 'pal-expression-explorer__body';
-  const introduction = document.createElement('p');
-  introduction.textContent = 'Choose a Pal, a form, and a face.';
-  const message = document.createElement('p');
-  message.className = 'pal-expression-explorer__status';
-  message.setAttribute('role', 'status');
-  message.setAttribute('aria-live', 'polite');
+  const intro = document.createElement('p');
+  intro.textContent = 'Choose a Pal and a form.';
+  const status = document.createElement('p');
+  status.setAttribute('role', 'status');
+  status.hidden = true;
   const retry = document.createElement('button');
   retry.type = 'button';
   retry.textContent = 'Try loading again';
   retry.hidden = true;
-  const selectors = document.createElement('div');
-  selectors.className = 'pal-expression-explorer__choices';
-  const characterLabel = document.createElement('label');
-  characterLabel.textContent = 'Pal';
-  const characterSelect = document.createElement('select');
-  characterSelect.setAttribute('aria-label', 'Pal to preview');
-  characterLabel.append(characterSelect);
+  const choices = document.createElement('div');
+  choices.className = 'pal-expression-explorer__choices';
+  choices.hidden = true;
+  const palLabel = document.createElement('label');
+  palLabel.textContent = 'Pal';
+  const pal = document.createElement('select');
+  pal.dataset.palExpressionCharacter = '';
+  pal.dataset.palsFocus = 'expression-character';
+  palLabel.append(pal);
   const formLabel = document.createElement('label');
   formLabel.textContent = 'Form';
-  const formSelect = document.createElement('select');
-  formSelect.setAttribute('aria-label', 'Pal form to preview');
+  const form = document.createElement('select');
+  form.dataset.palExpressionForm = '';
+  form.dataset.palsFocus = 'expression-form';
   for (const [value, label] of [['base', 'Base'], ['mature', 'Grown']] as const) {
     const option = document.createElement('option');
-    option.value = value;
-    option.textContent = label;
-    formSelect.append(option);
+    option.value = value; option.textContent = label; form.append(option);
   }
-  formLabel.append(formSelect);
-  selectors.append(characterLabel, formLabel);
-  selectors.hidden = true;
-  body.append(introduction, message, retry, selectors);
+  formLabel.append(form);
+  choices.append(palLabel, formLabel);
+  const stage = document.createElement('div');
+  body.append(intro, status, retry, choices, stage);
   element.append(summary, body);
-  let owner = options.owner;
-  let epoch = 0;
-  let disposed = false;
-  let visible = true;
-  let resolver: PalArtworkResolver | null = null;
-  let panel: ReturnType<typeof createPalExpressionPanel> | null = null;
-  function clear() {
-    panel?.dispose(); panel = null;
-    resolver = null;
-    characterSelect.replaceChildren();
-    formSelect.value = 'base';
-    selectors.hidden = true;
-    message.textContent = '';
-    retry.hidden = true;
+
+  function selection() {
+    return { scope, characterKey: pal.value, form: form.value as PalArtworkForm };
+  }
+  function renderPanel() {
+    if (!resolver || !visible || !element.open || disposed) return;
+    if (!panel) {
+      panel = createPalExpressionPanel({ resolver, ...selection() });
+      stage.replaceChildren(panel.element);
+    } else {
+      void panel.setSelection(selection());
+      void panel.setVisible(true);
+    }
   }
   async function open() {
+    if (disposed || !visible || !element.open) return;
+    if (resolver) { renderPanel(); return; }
+    if (pending) return;
     const captured = ++epoch;
-    if (!element.open || !visible || disposed) return;
-    message.textContent = 'Loading Pal pictures…';
-    retry.hidden = true;
+    const retryOwnedFocus = document.activeElement === retry;
+    pending = true;
+    status.textContent = 'Opening the Pals…'; status.hidden = false;
+    // Keep a focused retry in place while loading. Hiding it would drop keyboard
+    // focus to the document, making later recovery indistinguishable from a
+    // deliberate move elsewhere. pending still prevents duplicate requests.
+    retry.hidden = !retryOwnedFocus;
+    retry.setAttribute('aria-disabled', 'true');
     try {
       const loaded = await loadApprovedPalArtwork();
-      if (disposed || captured !== epoch || !element.open || !visible) return;
+      if (disposed || captured !== epoch || !visible || !element.open) return;
       resolver = loaded;
-      if (!characterSelect.options.length) {
-        for (const character of resolver.manifest.characters) {
-          const option = document.createElement('option');
-          option.value = character.characterKey;
-          option.textContent = character.name;
-          characterSelect.append(option);
-        }
+      pal.replaceChildren(...loaded.manifest.characters.map(character => {
+        const option = document.createElement('option');
+        option.value = character.characterKey; option.textContent = character.name;
+        return option;
+      }));
+      // The pilot opens on its exact approved identity. This is only a local
+      // preview choice and is never a collection/ownership assignment.
+      pal.value = PAL_EXPRESSION_MOTION_PILOT.characterKey;
+      if (!pal.value) pal.selectedIndex = 0;
+      form.value = 'base';
+      choices.hidden = false; status.hidden = true;
+      renderPanel();
+      if (retryOwnedFocus && document.activeElement === retry && !document.hidden && element.isConnected) {
+        pal.focus({ preventScroll: true });
       }
-      const wink = resolver.manifest.characters.find(c => c.slug === 'wink');
-      if (wink) characterSelect.value = wink.characterKey;
-      const selected = resolver.manifest.characters.find(c => c.characterKey === characterSelect.value);
-      if (!selected) throw Error('No character found in the approved collection.');
-      selectors.hidden = false;
-      panel?.dispose();
-      panel = createPalExpressionPanel({
-        resolver,
-        scope: owner,
-        characterKey: selected.characterKey,
-        form: formSelect.value as PalArtworkForm,
-        motionPilot: true,
-      });
-      body.append(panel.element);
-      message.textContent = '';
+      retry.hidden = true;
     } catch {
-      if (disposed || captured !== epoch || !element.open || !visible) return;
-      message.textContent = 'The pictures are unavailable right now.';
-      retry.hidden = false;
+      if (disposed || captured !== epoch) return;
+      status.textContent = 'Pictures could not load. Try again.';
+      status.hidden = false; retry.hidden = false;
+    } finally {
+      if (captured === epoch) { pending = false; retry.removeAttribute('aria-disabled'); }
     }
   }
-  function choose() {
-    if (disposed || !panel || !resolver) return;
-    const current = resolver.manifest.characters.find(x => x.characterKey === characterSelect.value);
-    if (!current) return;
-    void panel.setContext(owner, current.characterKey, formSelect.value as PalArtworkForm);
+  function pause() {
+    epoch++; pending = false;
+    retry.removeAttribute('aria-disabled');
+    void panel?.setVisible(false);
   }
-  characterSelect.addEventListener('change', choose);
-  formSelect.addEventListener('change', choose);
-  retry.addEventListener('click', () => {
-    void open().then(() => {
-      if (!disposed && panel) characterSelect.focus({ preventScroll: true });
-    });
-  });
-  element.addEventListener('toggle', () => {
-    if (element.open) void open();
-    else {
-      ++epoch;
-      panel?.dispose(); panel = null;
-      selectors.hidden = true;
-      message.textContent = '';
-    }
-  });
+  const onToggle = () => { if (element.open && visible) void open(); else pause(); };
+  element.addEventListener('toggle', onToggle);
+  pal.onchange = form.onchange = () => { if (visible && element.open) renderPanel(); };
+  retry.onclick = () => { void open(); };
+
   return {
     element,
-    updateOwner(nextOwner: string) {
-      if (disposed || owner === nextOwner) return;
-      owner = nextOwner;
-      ++epoch;
+    setScope(next: string) {
+      if (next === scope || disposed) return;
+      pause(); scope = next;
+      panel?.dispose(); panel = null;
       element.open = false;
-      clear();
+      pal.value = PAL_EXPRESSION_MOTION_PILOT.characterKey;
+      form.value = 'base';
+      status.hidden = true; retry.hidden = true;
     },
-    show() { visible = true; if (element.open) void open(); },
-    hide() { visible = false; ++epoch; void panel?.setVisible(false); },
-    dispose() { disposed = true; ++epoch; clear(); element.remove(); },
+    setVisible(next: boolean) {
+      if (disposed) return;
+      visible = next;
+      if (next && element.open) void open(); else pause();
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true; pause();
+      element.removeEventListener('toggle', onToggle);
+      panel?.dispose(); panel = null;
+      element.remove();
+    },
   };
 }

@@ -19,17 +19,17 @@ The manifest preserves all 23 established `characterKey` values and existing nul
 
 ## Lossless exports and manifest binding
 
-[`public/jems-pals/manifest.json`](../../public/jems-pals/manifest.json) has `schemaVersion: 1`, `assetVersion: "core-2026-11-20"` and scope `original-23`. Its SHA-256 is `f804ef2077688f92f758232d49c9f0dd9fa1c862b57764f89353150fac361f80`. Source artwork is selected package 2.9; the runtime asset version and individual art revisions are separate identifiers.
+[`public/jems-pals/manifest.json`](../../public/jems-pals/manifest.json) has `schemaVersion: 1`, `assetVersion: "core-2026-11-20"` and scope `original-23`. Its SHA-256 is `4135c90c543b134395af1b9bba24b98722057d24ee64ba3435025482125a44ca`. Source artwork is selected package 2.9; the runtime asset version and individual art revisions are separate identifiers.
 
 | Recorded bytes | Count |
 | --- | ---: |
 | Original 184 PNG sources | 312,373,555 |
-| 184 lossless WebP images | 212,513,480 |
-| Image bytes saved | 99,860,075 |
+| 184 lossless WebP images | 207,077,748 |
+| Image bytes saved | 105,295,807 |
 | Manifest | 144,160 |
-| WebP images plus manifest | 212,657,641 |
+| WebP images plus manifest | 207,221,908 |
 
-The WebP images reduce source image bytes by **31.9682%**; that percentage excludes the manifest. The [exporter](../../scripts/export-pal-assets.py) preserves the complete native dimensions and decoded RGBA pixels, including RGB beneath fully transparent pixels. It uses lossless WebP with `exact=True` and compares the source and exported pixel buffers before registering an image. It does not crop, resize, repaint, composite or remove the approved background. The byte-reproducible encoder pins are Pillow 12.3.0 and libwebp 1.6.0; other encoder versions can produce different encoded bytes.
+The WebP images reduce source image bytes by **33.7083%**; that percentage excludes the manifest. The [exporter](../../scripts/export-pal-assets.py) preserves the complete native dimensions and decoded RGBA pixels, including RGB beneath fully transparent pixels. It uses lossless WebP with `exact=True` and compares the source and exported pixel buffers before registering an image. It does not crop, resize, repaint, composite or remove the approved background. The byte-reproducible encoder pins are Pillow 13.0.0 and libwebp 1.6.0; other encoder versions can produce different encoded bytes.
 
 Each asset records its form, expression, source PNG SHA-256, exported WebP SHA-256, native width and height, alpha flag, decoded RGBA SHA-256, pixel-parity result and byte counts. URLs are bundled relative paths of the form `jems-pals/<slug>/<base|mature>/<state>-<source-hash-prefix>.webp`; the filename uses the first 12 source-hash characters and the manifest retains the full hash. The filename spelling for `encouraging_retry` is `encouraging-retry`.
 
@@ -76,7 +76,7 @@ These modules do not persist mood or preview selections, change collection owner
 
 [`createPalsPage`](../../src/pals/ui.ts) mounts [`expression-explorer.ts`](../../src/pals/expression-explorer.ts) as a collapsed **Try Pal expressions** section. Intentional opening loads the manifest and initially selects the exact **Wink Base** pilot. The explorer offers the 23 approved identities, Base/Grown and the four expression controls. Selecting Grown is an artwork preview, not earned growth or an unlock.
 
-Page show/hide calls control portrait visibility. Owner-scope changes close the explorer, dispose its panel and reset its local selection; pending work cannot reopen an old owner's panel. Choices remain component memory only. The panel exposes loading/retry feedback, labelled native selectors, pressed-state buttons, visible keyboard focus, readable 18 px controls and 48 px minimum targets. Reactions do not take focus or play audio.
+Page show/hide calls control portrait visibility. Owner-scope changes close the explorer, dispose its panel and reset its local selection; pending work cannot reopen an old owner's panel. Choices remain component memory only. The panel exposes loading/retry feedback, labelled native selectors, pressed-state buttons, visible keyboard focus, readable 18 px controls and 48 px minimum targets. An explicitly focused loading-retry button stays present during its request; successful recovery moves focus to the loaded Pal selector or Ready control only while that same retry still owns focus. Repeated failures retain retry focus, and navigation or a deliberate move elsewhere prevents recovery from taking focus back. Ordinary reactions do not take focus or play audio.
 
 This is a read-only expression playground beside the existing collection. The collection still uses its established Glim/Kip/Riff identities and rules. The parallel full-roster gallery is not integrated by this increment; it can reuse `createPalExpressionPanel` with an exact selected character key and form when its own integration is ready. Automatic saved-success/growth reactions are not connected to earned companion events by this mount.
 

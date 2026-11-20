@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Export the approved core Gem Pal kit without changing decoded image pixels.
 
-Requires Python 3.10+, Pillow 12.3.0 and libwebp 1.6.0 for byte-reproducible
+Requires Python 3.10+, Pillow 13.0.0 and libwebp 1.6.0 for byte-reproducible
 exports. No npm dependency is added. Other encoder versions may produce different
 bytes and are reported; use --require-pinned-encoder for the recorded build.
 
@@ -31,7 +31,7 @@ from PIL import Image, ImageDraw, ImageFont, features
 
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = "core-2026-11-20"
-PINNED_PILLOW = "12.3.0"
+PINNED_PILLOW = "13.0.0"
 PINNED_WEBP = "1.6.0"
 FORM_MAP = {"initial": "base", "growth": "mature"}
 STATES = ("neutral", "celebrate", "thinking", "encouraging_retry")
@@ -168,7 +168,7 @@ def export_one(record, output):
     # Preserve straight RGB values even beneath fully transparent pixels.
     with Image.open(io.BytesIO(raw)) as source:
         encoded = io.BytesIO()
-        source.save(encoded, format="WEBP", lossless=True, quality=100, method=3, exact=True)
+        source.save(encoded, format="WEBP", lossless=True, quality=100, method=6, exact=True)
     webp = encoded.getvalue()
     exported_rgba, exported_mode = decode(webp)
     source_pixels, exported_pixels = source_rgba.tobytes(), exported_rgba.tobytes()
@@ -250,7 +250,7 @@ def contact_sheets(manifest, output, folder):
 def run_export(args):
     require(features.check("webp"), "Pillow was built without WebP support")
     if args.require_pinned_encoder:
-        require(PIL.__version__ == PINNED_PILLOW and features.version("webp") == PINNED_WEBP, "Pinned encoder requires Pillow 12.3.0 / libwebp 1.6.0")
+        require(PIL.__version__ == PINNED_PILLOW and features.version("webp") == PINNED_WEBP, "Pinned encoder requires Pillow 13.0.0 / libwebp 1.6.0")
     output = Path(args.output).resolve()
     require(output.name == "jems-pals", "Output directory must be named jems-pals")
     characters, records = source_records(args.kit)

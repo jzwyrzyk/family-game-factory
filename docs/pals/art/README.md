@@ -59,6 +59,8 @@ There are exactly two visible forms: **Base → Grown, one transition**. Keep th
 
 ## Retained reference history
 
+All 13 PNGs published in PR74 at `aa4ce0c54dcd6f58adb42d57c8eb8f7e729d7465` were already imported byte-for-byte by [PR85](https://github.com/jzwyrzyk/family-game-factory/pull/85). The current [PR90 successor](https://github.com/jzwyrzyk/family-game-factory/pull/90) completes the approved original-roster exports and expression playground from main after PR89; it does not require merging PR74's stale branch. Actual PR disposition and acceptance are recorded in [delivery state](../../../DELIVERY-STATE.md).
+
 The earlier import from PR74 head `d2f344e0e56a274175cbca78ab361783b46d9882` recorded selected, in-review and unresolved forms. Those dated states are now preserved in each form's history, while every pre-existing asset record remains unchanged. The current selected pointers above supersede the import's unresolved Chimi/Navi and other original-roster gaps. Historical source boards remain references, not additional active neutral masters.
 
 The [base adoption](../../decisions/2026-11-19-pal-base-design-adoption.md) and [form reconciliation](../../decisions/2026-11-19-pal-form-reconciliation.md) decisions keep their original dated scope. [approved-base-designs.json](approved-base-designs.json) retains the original S–X specifications and protected Base anchors. No historical decision document is rewritten by this reconciliation.
@@ -75,6 +77,6 @@ The eight Brio PNG hashes and sizes remain in [the index](character-references.j
 
 ## Application handoff and acceptance
 
-Use the immutable manifest version, exact character key, form and expression together. Missing or unsupported expressions should fall back to that form's approved neutral. Preserve full silhouettes, props and contact/hover relationships when displaying or animating these images; align any later derivatives without replacing approved sources silently.
+The [implemented expression playground](../EXPRESSIONS.md) uses the immutable manifest version, exact character key, form and expression together. Its My Pals preview does not assign these species to the existing earned collection. Missing or unsupported expressions should fall back to that form's approved neutral. Preserve full silhouettes, props and contact/hover relationships when displaying or animating these images; align any later derivatives without replacing approved sources silently.
 
 Verify form changes, expression events, a bounded motion pilot, collection/scene use, reload, backup behavior, intended device layouts and reduced motion against the actual implementation. Artwork approval and export validation do not themselves establish those results. The [Pal feature contract](../README.md), [current architecture](../../../ARCHITECTURE-CURRENT.md) and [delivery state](../../../DELIVERY-STATE.md) own the corresponding implementation, merge, deployment and acceptance claims.

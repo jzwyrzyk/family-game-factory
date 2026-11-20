@@ -113,10 +113,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
-      "sourceDigest": "348cc1f5e023e1ba22c84b5081d3f0f9d09e8d6eb64c878d642f40d881ca32f5",
+      "reviewedAt": "2026-11-20T19:16:52.837Z",
+      "sourceDigest": "e48539cc01e28ae57295687155156a54de2f3f8229aa15a9a577cc5cd5aacc06",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined owner-approved character-first navigation and Art Studio discoverability changes, including local picture actions and preserving actual Save, Build, Keep, reward, learning, privacy and artwork ownership rules.",
+      "reviewReason": "Recorded the complete approved core artwork package, separate Brio status, and preview-only collection authority in product doctrine.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -200,10 +200,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
-      "sourceDigest": "b623f2f18eea13951ea0b43f25ec814bfd5f4a28f6b6dae2087e0e257092fa36",
+      "reviewedAt": "2026-11-20T19:16:53.191Z",
+      "sourceDigest": "5b0d7cd1f58f8f428b99a109368161be8aeb770ef3b56f626c83ff772b598355",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated PR88’s early local Art Studio tools and composer picture entry with PR89’s menu, player-bound maker imagery and adult session entry; confirmed distinct guarded routes, draft retention, keyboard/focus and existing generation settings.",
+      "reviewReason": "Reconciled current My Pals expression controls, exact approved portraits, retry focus recovery and optional offline caching in architecture and feature documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -528,13 +528,14 @@
       "sources": [
         "tests/**",
         "tools/**",
-        "scripts/verify-brand-assets.mjs"
+        "scripts/verify-brand-assets.mjs",
+        "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T18:12:45.000Z",
-      "sourceDigest": "b77009a6ebc7ec937948c16ce00c29aa456552668c35fe0ab2b8987319dfa0bd",
+      "reviewedAt": "2026-11-20T19:16:54.038Z",
+      "sourceDigest": "5a9ce4af9cf2cd725b5a100863502dae7bf856c7fffaf0599ab7af6aaa5bef0b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled combined #88/#89 source checks after a legacy Art Studio test assumed an unselected child could activate Let's create. Updated that test to use actual Nova selection; retained file uploads, draft continuity, isolation, no-POST, and required learner journey coverage. Prior failing hosted check remains recorded.",
+      "reviewReason": "Recorded full asset, expression, Pal, navigation and offline quota-recovery checks and routed the focused asset verifier regression tests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -587,10 +588,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T18:12:45.000Z",
-      "sourceDigest": "b6381d06283cc20882272db9cf94dc2f35f7145937523a318214c3b69179933b",
+      "reviewedAt": "2026-11-20T19:17:22.236Z",
+      "sourceDigest": "ccb8813430c60571f8bc827fc77294c71848246e6e8eae0583ba42f6ef0c657b",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the exact combined #88/#89 merge ancestry and initial Arcade failure in Art Studio's old first-time onboarding fixture, then the narrow test-only correction. Recorded hosted six-workflow evidence, kept frontend/source merge distinct from production publication and actual paid execution.",
+      "reviewReason": "Recorded final combined local build, asset parity, browser, navigation, offline and documentation acceptance with hosted checks still pending on PR90.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -648,10 +649,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:11:54.197Z",
-      "sourceDigest": "abfefb8163da78c1366a0cce7214858f9cbbed63c59ca7640c6aa9688d642f7d",
+      "reviewedAt": "2026-11-20T19:16:54.695Z",
+      "sourceDigest": "122158109ee8df03971878fd4a264d605ea748dad961c3c9967683b416827951",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the accepted November20 refinement and linked navigation, owner-scoped imagery and parent access from the documentation map. Existing source globs cover the new modules and tests; no checker rule, exemption or review policy is weakened.",
+      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -753,13 +754,14 @@
         "docs/pals/templates/**",
         "skills/gem-pal-studio/**",
         "docs/pals/art/character-references.json",
-        "scripts/export-pal-assets.py"
+        "scripts/export-pal-assets.py",
+        "public/jems-pals/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fed67752aa5aa82ae59b7d3d3f30942abe95bb6618589365308683b0e194b2a2",
-      "reviewedAt": "2026-11-20T17:11:55.323Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the Pals feature contract adds compact-menu access and distinguishes human-maker choice. Gem Pal design method, selected reference art, Base/Grown identity, expression review and runtime artwork bindings are unchanged."
+      "sourceDigest": "bddf3cf9b7d22c12e18142c5c679a18457f65b23535ba7406ef3da77a0169d30",
+      "reviewedAt": "2026-11-20T19:16:54.972Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reconciled package 2.9 exact selected assets for all 23 original profiles, Navi R2, retained historical references and separate in-review Brio expressions."
     },
     {
       "id": "art-studio",
@@ -808,13 +810,15 @@
         "src/pals/**",
         "tests/pals*",
         "docs/pals/*.md",
-        "scripts/verify-pal-assets.mjs"
+        "scripts/verify-pal-assets.mjs",
+        "public/jems-pals/**",
+        "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "db4d3ee5efef1e0194f98d933ab783a68bf09c6641c769ebbc329247cf76dfa9",
-      "reviewedAt": "2026-11-20T17:11:55.191Z",
+      "sourceDigest": "028c55aeec56393486bb88ab84ee43747deb1496e7736300b8270f6946cd8d70",
+      "reviewedAt": "2026-11-20T19:16:55.644Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed My Pals and scene-entry test helpers using the actual Menu. Documented unchanged guarded collection access and distinct human choice; no species artwork, earned growth, starter choice, equipment, scene mechanics or backup authority changes."
+      "reviewReason": "Updated the exact artwork preview lifecycle, profile cancellation, retry focus and on-demand caching contracts without changing saved collection identities."
     }
   ]
 }

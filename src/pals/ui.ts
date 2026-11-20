@@ -1,7 +1,7 @@
 import { PAL_CATALOG, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
-import './pals.css';
 import { createPalExpressionExplorer } from './expression-explorer';
+import './pals.css';
 
 /** Read-only presentation. Only the trusted coordinator changes ownership or growth. */
 export interface PalsViewState {
@@ -107,7 +107,7 @@ export function createPalsPage(options: PalsPageOptions) {
   total.id = 'jemsPalsCount';
   header.append(titleBlock, total);
 
-  const notice = el('p', 'pals-art-note', 'Gem portraits are a preview. Companion character art is coming next.');
+  const notice = el('p', 'pals-art-note', 'Meet the Gem Pals in the expression playground.');
   const message = el('div', 'pals-status');
   message.id = 'jemsPalsStatus';
   message.setAttribute('role', 'status');
@@ -116,8 +116,8 @@ export function createPalsPage(options: PalsPageOptions) {
   const retry = button('Try again', 'retry');
   retry.onclick = () => { void perform(options.onRetry); };
   const content = el('div', 'pals-content');
-  const expressionExplorer = createPalExpressionExplorer({ owner: state.owner });
-  element.append(back, header, notice, message, retry, content, expressionExplorer.element);
+  const expressions = createPalExpressionExplorer(state.owner);
+  element.append(back, header, notice, message, retry, expressions.element, content);
 
   function focusKey() {
     const target = document.activeElement;
@@ -368,7 +368,6 @@ export function createPalsPage(options: PalsPageOptions) {
     update(next: PalsViewState) {
       if (disposed) return;
       if (next.owner !== state.owner) {
-        expressionExplorer.updateOwner(next.owner);
         epoch++;
         selection = next.profile?.activeId ?? null;
         localSaving = false;
@@ -381,11 +380,12 @@ export function createPalsPage(options: PalsPageOptions) {
         if (playTimer) clearTimeout(playTimer);
       } else if (state.profile?.activeId !== next.profile?.activeId && next.profile?.activeId) selection = next.profile.activeId;
       state = next;
+      expressions.setScope(next.owner);
       render();
     },
-    show() { element.hidden = false; element.classList.remove('hidden'); expressionExplorer.show(); render(); heading.focus({ preventScroll: true }); },
-    hide() { element.hidden = true; element.classList.add('hidden'); expressionExplorer.hide(); if (playTimer) clearTimeout(playTimer); },
-    dispose() { disposed = true; epoch++; expressionExplorer.dispose(); if (playTimer) clearTimeout(playTimer); element.remove(); },
+    show() { element.hidden = false; element.classList.remove('hidden'); expressions.setVisible(true); render(); heading.focus({ preventScroll: true }); },
+    hide() { element.hidden = true; element.classList.add('hidden'); expressions.setVisible(false); if (playTimer) clearTimeout(playTimer); },
+    dispose() { disposed = true; epoch++; if (playTimer) clearTimeout(playTimer); expressions.dispose(); element.remove(); },
   };
 }
 
