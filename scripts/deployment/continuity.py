@@ -41,13 +41,19 @@ def env_of(service):
 
 def ready(service):
     status = service.get('status', {})
+    # Cloud Run can retain historical zero-traffic revision entries, with
+    # omitted/null percent. Only the effective serving split determines whether
+    # this is a single 100% ready revision; do not flag preserved rollback
+    # revisions as drift.
+    serving = [entry for entry in status.get('traffic') or []
+               if entry.get('percent') not in (None, 0)]
     return (
         any(x.get('type') == 'Ready' and x.get('status') == 'True'
             for x in status.get('conditions', []))
         and bool(status.get('latestReadyRevisionName'))
-        and len(status.get('traffic') or []) == 1
-        and status['traffic'][0].get('percent') == 100
-        and status['traffic'][0].get('revisionName') == status['latestReadyRevisionName']
+        and len(serving) == 1
+        and serving[0].get('percent') == 100
+        and serving[0].get('revisionName') == status['latestReadyRevisionName']
     )
 
 def mounted_config(service):
