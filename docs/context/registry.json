@@ -419,10 +419,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T02:51:25.971Z",
-      "sourceDigest": "98e5f93d87d087b4ed977db4b1d0f114fdd45c23a93e0af12f628190e11a1cc9",
+      "reviewedAt": "2026-11-20T04:50:39.486Z",
+      "sourceDigest": "0d8aa3165a97bb1302ab279590a4fd2e7229f90a6e5789ac3dd28f9d79ed18dd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new source and browser regressions plus existing compatibility results; added scoped evidence and capture checksums covering quota failures, owner/view changes, immutable reuse, image fidelity and explicit limits of synthetic device emulation.",
+      "reviewReason": "Reviewed both release-check failures and their bounded diagnostics. Tablet input retains all 19 assertion-bearing lines; legacy drawings now exercise both UUID orders with exact asset selection, original dimensions and protected-source retention. DELIVERY-STATE preserves the failed full rehearsal and separate focused acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -461,10 +461,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:17:14.995Z",
-      "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
+      "reviewedAt": "2026-11-20T04:52:24.992Z",
+      "sourceDigest": "22a6659efb0c8f00a3d5625b298102b87b41be88c0be0a9a2ab792baebca4ee0",
       "reviewOutcome": "updated",
-      "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries.",
+      "reviewReason": "Recorded both release-check failures, matching local/hosted drawing evidence, durable two-order acceptance and the pending combined-head hosted gate. Selected source remains blocked; no merge or deployment is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

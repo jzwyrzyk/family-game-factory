@@ -15,7 +15,9 @@ const {chromium}=require('playwright');
    const touch=async locator=>{
     await locator.scrollIntoViewIfNeeded();
     const r=await locator.boundingBox(); assert.ok(r);
-    await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
+    // Reset can shift the tray after measurement. Wait for the real touch target
+    // to settle and receive input instead of tapping a stale screen coordinate.
+    await locator.tap();
    };
    const assertTouch=async phase=>{
     const capability=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarse:matchMedia('(pointer: coarse)').matches,anyCoarse:matchMedia('(any-pointer: coarse)').matches,innerWidth,innerHeight}));
