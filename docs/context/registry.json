@@ -104,10 +104,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:08:25.020Z",
-      "sourceDigest": "69a2d184455c1d450a7c424548c79d02912fb384d894dc87d71ee10182c88e10",
+      "reviewedAt": "2026-11-20T05:14:52.957Z",
+      "sourceDigest": "d18bcd210144e2adf3aa47a4db6a85d631f49495d9506be62fa053b2636fbe12",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the accepted two-form runtime scope, explicit five-adventure compatibility choice, retained nonspendable activity rules and unresolved art mappings. Also reconciled current APS/homepage/first-creation descriptions with the eighth Pal destination; historical seven-route evidence and independent learning claims remain unchanged.",
+      "reviewReason": "Independent publication review confirmed the two-form compatibility policy and preserved artwork/ownership boundaries. Corrected only the Pal contract spelling of the existing factoryProblemSolvingRecoveryRaw recovery-export field; no product policy or executable source changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -741,10 +741,10 @@
         "docs/pals/art/character-references.json"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "334df8f1e5eac969e6402df32288f66b94f7c6dea404039a5751996a367debd6",
-      "reviewedAt": "2026-11-20T05:06:22.760Z",
+      "sourceDigest": "459726b2615fa61432d7b831f18e6f72d932b845d6121d6551ed83683597f7b6",
+      "reviewedAt": "2026-11-20T05:15:23.348Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Studio to link the deliberate runtime compatibility decision without changing artwork policy, roster or approvals. Base/mature keys and exact selected identity remain authoritative; unresolved species/form mappings remain null and saved token scene assets stay stable."
+      "reviewReason": "Reviewed the complete combined Studio/ADR0013 cross-reference and explicit null character/form mappings without importing or changing selected art. The final Pal contract correction only spells the existing factoryProblemSolvingRecoveryRaw field precisely; two-form art policy, approved references, stable IDs and future versioned-asset boundary remain unchanged."
     },
     {
       "id": "art-studio",
@@ -794,10 +794,10 @@
         "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5b98012c5c0d4692c259212d562a669ac748650d63c847fb49f2c254f2b9089e",
-      "reviewedAt": "2026-11-20T05:06:22.586Z",
+      "sourceDigest": "5d11f1505f4977fc758cd82f274a3a332954366fc290da78fd8897b670f1f688",
+      "reviewedAt": "2026-11-20T05:14:52.748Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed two-form catalog/model/UI and receipt compatibility tests: Base/Grown at five, no third notice, unchanged v1 receipts/inventory/selection history and null selected-art bindings. Recorded actual local contracts, browser groups and scoped captures; old three-stage evidence remains historical."
+      "reviewReason": "Completed independent published-source review of two-form progress, immutable token identities and combined recovery; corrected the contract to name the actual factoryProblemSolvingRecoveryRaw export/validation key. This documentation-only correction changes no runtime, tests, assets, schemas or acceptance results."
     }
   ]
 }
