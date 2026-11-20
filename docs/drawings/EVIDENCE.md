@@ -2,6 +2,18 @@
 
 **Review scope:** November 19, 2026 (America/New_York), the refreshed [drawing PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). The [feature contract](ART_STUDIO.md) describes implemented behavior; this record describes observed verification. This is source integration, not deployment or physical-device acceptance.
 
+## November 20 entry and continuation corrections
+
+This additive record preserves the original PR23 evidence below. The new work starts from main **`69bd11db1c660c65d0febb4af3c19078bbb5eef7`**. The local application/test checkpoint is **`16442c3240338f7871d80c4203c9580bfc1cc7a4`**, with production assets **`index-DplZme_Y.js` / `index-BnhfvcI2.css`**. The local hash identifies the tested checkpoint; publication and hosted CI are recorded on the resulting PR separately.
+
+- TypeScript and the production build passed. The existing bundle-size advisory remains.
+- The new [entry-readiness browser journey](../../tests/art-entry-readiness.cjs) checks real phone file-picker upload while configuration is held, private library ownership, visible home and new-idea entrances, a sibling switch and unfinished draft before late readiness, movement/scene entry, and zero image/provider POSTs. Its failed-configuration journey saves an uploaded picture and a keyboard drawing, verifies focus and visibility after modal close, and confirms originals survive reload. Its third journey opens a synthetic previously saved online game before configuration arrives, then verifies that only an explicit Play retry requests the preview after connection readiness; the revision and draft remain unchanged.
+- The unchanged art storage/physics/binding contracts passed **24 source tests** and **44 IndexedDB storage cases**. The existing complete five-suite art browser sequence passed, including edited-copy focus, physical movement/Rally, image-tool recovery, private scene reuse, video export and owner isolation on desktop and emulated tablet/phone layouts. These checks used the entry/focus implementation before the final loader error-handling/client-refresh refinement; the focused startup journeys cover that refinement.
+- Existing homepage, **17 guidance source checks**, **11 first-creation browser groups** and **four navigation-continuity groups** passed. The navigation script first attempted the system Chromium executable and failed during browser startup because its process socket was unavailable; selecting the installed Playwright headless shell ran the unchanged test successfully. No application assertion was weakened or retried to conceal a failure.
+- Phone and desktop homepage/composer captures were inspected: Art Studio is beside Invent before the catalogue, and Use my picture is visible in the composer. Global menu, maker imagery and child-readable text work remains in its separate integration branch.
+
+These are synthetic local browser checks. No production upload, child photo, physical-camera session, paid generation, merge or deployment was performed. Exact combined-menu acceptance remains a later step as requested.
+
 ## Source identity
 
 The published implementation is [`6f4cd238536b9ad7cf663498565b4e46e2b474fe`](https://github.com/jzwyrzyk/family-game-factory/commit/6f4cd238536b9ad7cf663498565b4e46e2b474fe), complete tree `c27433f4902467069b23b268f7814592cd6d79c7`. Its full tree exactly matches reviewed local preparation `0d925b241195360e234b576437abefc46b010591`. Both original PR head `0f91b52bc162ad8d7fad1211515544f638934e21` and current main `df63bc2c7644a26a84a7c7e626b682e7c76c493d` are its merge parents. The public commit was created through the authenticated repository connector; local preparation hashes below are test receipts, not public commit links.
