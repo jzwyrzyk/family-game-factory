@@ -32,3 +32,7 @@ Revisit the threshold only through an explicit policy change with saved-progress
 - [Pal contracts and compatibility](../pals/README.md), [Gem Pal Studio](../pals/STUDIO.md) and [growth guide](../pals/GROWTH_GUIDE.md).
 - [Shared rewards and backup recovery](../rewards/README.md), [Creation Studio](../creation-studio/README.md), [Art Studio](../drawings/ART_STUDIO.md), and [first-creation journey](../child-journey/FIRST-CREATION.md).
 - [Delivery state](../../DELIVERY-STATE.md) records actual checks and source identities separately from this policy.
+
+## November 20, 2026 — expression animation test observation
+
+The approved **Wink Base** expression pilot is a 180 ms artwork-to-artwork opacity transition. Its reduced-motion requirement remains cancellation on the browser's reported preference change, not permanent disabling of the portrait or a longer animation. The browser's `matchMedia` notification is asynchronous after the test harness changes media emulation; [PR #92](https://github.com/jzwyrzyk/family-game-factory/pull/92) repairs only the timing of the integration test by waiting for controller notification and then checking for zero active animations. The Pal collection, Base/Grown forms, visual assets and user-visible behavior are unchanged.

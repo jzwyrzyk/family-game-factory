@@ -553,10 +553,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:54.038Z",
-      "sourceDigest": "2cda7d3552159d5e67b99c0450df8bd7291213d2e143c4ec937be06fdf1fe793",
+      "reviewedAt": "2026-11-20T20:22:00.000Z",
+      "sourceDigest": "59e9b072b5a88458bdc1de8d9eaaf6722732e7753fd10ec07736d38102672f2b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded full asset, expression, Pal, navigation and offline quota-recovery checks and routed the focused asset verifier regression tests. Additional reconciled review: Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified.",
+      "reviewReason": "Reviewed exact-main reduced-motion failure against the actual Wink portrait event listener: Playwright media emulation precedes asynchronous matchMedia change notification. PR92 waits for controller state and retains zero active-animation assertion. Documented test-only scope in validation evidence; no product/approval or physical-device acceptance is inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -857,10 +857,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "028c55aeec56393486bb88ab84ee43747deb1496e7736300b8270f6946cd8d70",
-      "reviewedAt": "2026-11-20T19:16:55.644Z",
+      "sourceDigest": "1346d9e94ee9face9cfddf762365eb6033a5068949275ff1b3b93828874f4d49",
+      "reviewedAt": "2026-11-20T20:22:00.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the exact artwork preview lifecycle, profile cancellation, retry focus and on-demand caching contracts without changing saved collection identities."
+      "reviewReason": "Reviewed Wink Base finite opacity transition and controller's reduced-motion cancellation in the exact combined-main failure. PR92 changes asynchronous browser assertion timing only; Palette, forms, collection, art and motion policy remain unchanged. Recorded the narrow observation in ADR0013."
     }
   ]
 }

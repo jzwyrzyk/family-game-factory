@@ -158,7 +158,13 @@ start().catch(error=>{document.querySelector('#status').textContent=error.messag
     await page.evaluate(() => window.palsExpressionFixture.panel.portrait.preview('celebrate'));
     assert.equal(await portrait.getAttribute('data-motion'), 'expression-fade');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    assert.equal(await portrait.evaluate(element => element.getAnimations({ subtree: true }).length), 0, 'Enabling reduced motion cancels the pilot immediately');
+    // emulateMedia updates the query before Chromium delivers its asynchronous
+    // change event. Wait for the actual controller notification, then verify
+    // that the active Web Animation was canceled rather than leaking a layer.
+    await page.waitForFunction(() => window.palsExpressionFixture.view().reducedMotion
+      && document.querySelector('#expressions .pal-artwork-view')?.dataset.motion === 'none',
+    null, { timeout: 3000 });
+    assert.equal(await portrait.evaluate(element => element.getAnimations({ subtree: true }).length), 0, 'Reduced-motion notification cancels the pilot animation');
     await page.locator('button[data-expression="thinking"]').click(); await ready('thinking');
     assert.equal(await portrait.locator('img').count(), 1, 'Interrupted transitions leave one selected image');
     await page.locator('button[data-expression="celebrate"]').click(); await ready('celebrate');
