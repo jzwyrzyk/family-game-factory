@@ -4,6 +4,8 @@
 
 The owner requested the complementary companion system, then authorized implementation with funny encouragement, a useful collection, visible progress and easy use in children's games. The owner also asked for a practical balance between engagement and the heavy subscription/addiction patterns of comparable products. Character artwork remains a separate development conversation. [ADR0012](../decisions/0012-pals-from-earned-activity.md) records this scope alongside the existing [shared Rewards contract](../rewards/README.md).
 
+The [Gem Pal artwork reference library](art/README.md) records approved concept masters, selected growth references and separately marked expression candidates. It is **not a runtime mapping**. Until exact form versions and Pal species assignments are approved and implemented, the collection retains its provisional token portraits and stable saved-scene IDs.
+
 ## Launch collection and eligibility
 
 The first collection contains three equal-capability companions. Their names, IDs, personalities, thresholds and temporary art mappings are defined in [catalog.ts](../../src/pals/catalog.ts).
