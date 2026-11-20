@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T19:17:22.236Z",
-      "sourceDigest": "ecc99ddd3395524a8000754ef843c3b7992f1cdbaf9d5bfda813840f7d0ea98b",
+      "reviewedAt": "2026-11-20T21:15:07.000Z",
+      "sourceDigest": "fcbbc9f23c5a87c1065266c29e7c3de011dbf77452d13b7d848ab654d191d13a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded final combined local build, asset parity, browser, navigation, offline and documentation acceptance with hosted checks still pending on PR90. Additional reconciled review: Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment.",
+      "reviewReason": "Reviewed source-level adult AI continuity protections for issue #93: inactive bootstrap now refuses any established gateway/preview service or private config before mutation; new sanitized read-only live-trust audit checks current WIF, worker/tag/variables and optionally mounted config; scripted offline tests exercise fail-closed cases. Updated release continuity and service-image runbooks and delivery evidence. No activation, provider, live OCI, rollout or adult session acceptance is implied.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
