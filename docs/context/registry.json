@@ -111,10 +111,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:13:27.332Z",
-      "sourceDigest": "9bd43f8ec2d80e7678a96049471981fddee61ee189e25133848f2734a8bd1319",
+      "reviewedAt": "2026-11-20T17:55:12.000Z",
+      "sourceDigest": "348cc1f5e023e1ba22c84b5081d3f0f9d09e8d6eb64c878d642f40d881ca32f5",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-approved character-first invitation, selected-human host imagery, compact Menu and permanent private parent access. Preserved explicit Build and Keep, progress and Pal policies, the single-writer boundary and separate provider authorization.",
+      "reviewReason": "Reviewed the combined owner-approved character-first navigation and Art Studio discoverability changes, including local picture actions and preserving actual Save, Build, Keep, reward, learning, privacy and artwork ownership rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -198,10 +198,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:11:53.683Z",
-      "sourceDigest": "a335884b8b323a10be9d6bfcc444776a700603d1bdf85d1d0d13d9e4311f983c",
+      "reviewedAt": "2026-11-20T17:55:12.000Z",
+      "sourceDigest": "b623f2f18eea13951ea0b43f25ec814bfd5f4a28f6b6dae2087e0e257092fa36",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual navigation adapter, first welcome, owner-bound maker renderer and parent access states. Updated canonical and feature contracts for three primary actions, existing guarded secondary routes, neutral imagery before choice and truthful independent tool availability.",
+      "reviewReason": "Integrated PR88’s early local Art Studio tools and composer picture entry with PR89’s menu, player-bound maker imagery and adult session entry; confirmed distinct guarded routes, draft retention, keyboard/focus and existing generation settings.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -529,10 +529,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:31:14.079Z",
-      "sourceDigest": "f8aeed647081630f602c97658a40aecd215e3024a028e8defdf91cddf13ab768",
+      "reviewedAt": "2026-11-20T17:55:12.000Z",
+      "sourceDigest": "a8bf738c64b3a58a7e14d40d32f75f5bd7c72023f136cf362b2266c38aab803f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the hosted Rewards step failure and exact-command local reproduction in Delivery State, retaining the distinction between earlier application-only evidence and the newly passing component plus application suite.",
+      "reviewReason": "Reviewed both independent browser test sets: real Art Studio entry/upload and late configuration behavior alongside 320-pixel menu, maker choice, adult-profile access, Rewards, Creation and child continuity suites; combined hosted checks still required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -585,10 +585,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T17:31:22.906Z",
-      "sourceDigest": "ba3441e859017f698b86ddd65823e78c94c601eba85d30eaf05df8b2f6de2c84",
+      "reviewedAt": "2026-11-20T17:55:12.000Z",
+      "sourceDigest": "0ab2922155be9ff2f3a10eba6611e8f8bea7ad28dd8544a66b6eaa88fc31d542",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery State now records the hosted Rewards follow-up with scoped local evidence, the owner-supplied disabled generation diagnostic and the separate Art Studio integration dependency; no deployment or live acceptance is inferred.",
+      "reviewReason": "Recorded merged PR88 source and the separately staged combined PR89 integration, including exact merge parents, no new production release, preserved approved Adult pilot and pending combined hosted acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -776,10 +776,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "070d60f1ef7b3cbac6f86eaef2671c586524dfee0d1fa2447c9a046acc78428c",
-      "reviewedAt": "2026-11-20T17:11:54.670Z",
+      "sourceDigest": "abf967a1529d9d8118861ab80f6ba034f80adaab4f814535b2c63824e1a3f8a1",
+      "reviewedAt": "2026-11-20T17:55:12.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed private-art browser changes as real Menu clicks to the existing scene handler. Updated the Art Studio entrance contract; original image bytes, immutable game/scene bindings, owner isolation, import/export and deletion guards are unchanged.",
+      "reviewReason": "Reviewed PR88 picture upload, focus and offline-capable local startup combined with the owner-approved Make menu route. Existing private drawing bytes, immutable revisions, user isolation, local exports and model-upload prohibitions remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
