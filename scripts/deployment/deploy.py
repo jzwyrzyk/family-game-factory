@@ -210,6 +210,13 @@ def deploy(cloud, args):
     versions = {'pem':enabled[0]['name'].split('/')[-1]}
     if not versions['pem'].isdigit():
         raise SafeError('Invalid PEM version.')
+    # Bootstrap only. Existing services and configuration must never be fed
+    # through this inactive deployment path: it resets the approval switches,
+    # and would revoke an approved private adult session during routine releases.
+    # An in-place, explicitly reviewed release must preserve those identities.
+    existing_services = {s['metadata']['name'] for s in cloud.run('run', 'services', 'list', '--region', args.region)}
+    if existing_services.intersection({'factory-gateway', 'factory-preview'}) or (set(CONFIGS.values()) & available):
+        raise SafeError('EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE: inactive bootstrap cannot replace a running Jems service or private configuration.')
     old = None
     if CONFIGS['gateway'] in available:
         # Keep private JSON in memory and reuse keys. Do not print it, even on failure.
