@@ -20,9 +20,13 @@ def service(name, paid='false', adult=True):
                   'latestReadyRevisionName':name+'-00001',
                   'traffic':[{'revisionName':name+'-00001','percent':100}]},
         'spec':{'template':{'spec':{
-            'containers':[{'env':env}],
-            'volumes':[{'secret':{'secretName':'factory-gateway-private-config',
-                         'items':[{'key':'17'}]}}] if name == 'factory-gateway' else []
+            'containers':[{'env':env,
+                'volumeMounts':[{'name':'active-config','mountPath':'/var/run/factory-config'}]
+                    if name == 'factory-gateway' else []}],
+            'volumes':[{'name':'active-config',
+                        'secret':{'secretName':'factory-gateway-private-config',
+                                  'items':[{'key':'17'}]}}]
+                    if name == 'factory-gateway' else []
         }}}
     }
 
@@ -111,6 +115,44 @@ class ContinuityTests(unittest.TestCase):
         x=service('factory-gateway')
         x['spec']['template']['spec']['volumes'][0]['secret']['items'][0]['key']='latest'
         self.assertIsNone(c.mounted_config(x))
+    def test_resolve_only_active_mount_with_unmounted_old_secret_versions(self):
+        gateway=service('factory-gateway')
+        spec=gateway['spec']['template']['spec']
+        # This exactly models the owner-observed 2026-11-20 gateway:
+        # version 2 remains as an orphaned volume, while version 3 is mounted.
+        spec['volumes']=[
+            {'name':'factory-gateway-private-config-ped-cut',
+             'secret':{'secretName':'factory-gateway-private-config',
+                       'items':[{'key':'2'}]}},
+            {'name':'factory-gateway-private-config-mis-yek',
+             'secret':{'secretName':'factory-gateway-private-config',
+                       'items':[{'key':'3'}]}}
+        ]
+        spec['containers'][0]['volumeMounts']=[
+            {'name':'factory-gateway-private-config-mis-yek',
+             'mountPath':'/var/run/factory-config'}
+        ]
+        self.assertEqual(c.mounted_config(gateway),
+                         ('factory-gateway-private-config','3'))
+        # Unmounted historical versions may not be silently chosen.
+        spec['containers'][0]['volumeMounts']=[]
+        self.assertIsNone(c.mounted_config(gateway))
+        # A mount to the wrong volume must not trigger a guess.
+        spec['containers'][0]['volumeMounts']=[
+            {'name':'missing','mountPath':'/var/run/factory-config'}]
+        self.assertIsNone(c.mounted_config(gateway))
+        # Two conflicting active mounts must be rejected.
+        spec['containers'][0]['volumeMounts']=[
+            {'name':'factory-gateway-private-config-ped-cut',
+             'mountPath':'/var/run/factory-config'},
+            {'name':'factory-gateway-private-config-mis-yek',
+             'mountPath':'/var/run/factory-config'}]
+        self.assertIsNone(c.mounted_config(gateway))
+        # Correct mount with an unpinned/latest version also fails closed.
+        spec['containers'][0]['volumeMounts']=spec['containers'][0]['volumeMounts'][1:]
+        spec['volumes'][1]['secret']['items'][0]['key']='latest'
+        self.assertIsNone(c.mounted_config(gateway))
+
     def test_cli_only_reads_and_never_discloses_configuration(self):
         commands=[]
         def read(args):
