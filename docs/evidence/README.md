@@ -38,3 +38,9 @@ CI reproduces the same commands on Node 22 / Ubuntu 24.04 and uploads `test-resu
 The mocked builder tests also exercise compare and save-as-new, then verify private family authorization and scan the production JavaScript assets for server secrets and mock-agent implementation. The mock is explicitly labeled in the parent UI, including when reopening saved versions.
 
 CI diagnosis: the runner had unpinned Chromium 157 installed at the system path, while Playwright 1.56.1 downloaded Chromium 141. The mocked browser gate timed out on that system engine. CI now explicitly uses Playwright’s pinned engine; a complete local Node 22 + Chromium 141 run passed without changing assertions.
+
+## November 20, 2026 — Pal reduced-motion notification test gate
+
+After merging Gem Pal expression assets and the learning-surface fixes, the exact-main Arcade `creative` job reproduced an intermittent assertion in `tests/pals-expressions-browser.cjs`: Playwright changed `prefers-reduced-motion` but the test checked Web Animations **before** Chromium's asynchronous `matchMedia` change event had reached the Pal controller. The production portrait already listens for that event and cancels its transition.
+
+[PR #92](https://github.com/jzwyrzyk/family-game-factory/pull/92) now waits up to three seconds for the controller's observed reduced-motion state and its completed visual reset before asserting zero remaining animations. This retains the behavioral assertion and changes no game, artwork, stylesheet, approval or runtime animation policy. Source-only tests, even when green, do not validate physical-device motion or authorize deployment.
