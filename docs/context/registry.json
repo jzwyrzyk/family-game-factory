@@ -513,10 +513,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:12.462Z",
-      "sourceDigest": "203fefc369ecc8eb2a4f02f695676cb99ccda06b57503640fa5136b219bfa18b",
+      "reviewedAt": "2026-11-20T05:03:35.294Z",
+      "sourceDigest": "5c7c560fe86210bbc4c54e258cc32807412d2faaf1685ceeaccc9a3d2d8be615",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final integration test changes: visible Explore and settled-read entry, real blocked-v1 IndexedDB fallback with late completion and unchanged notebook assertions, art-only return/reload/sibling checks, and exact source-game return after adding private art. Existing assertions remain intact; local and hosted results are recorded separately by source.",
+      "reviewReason": "Reviewed the legacy private-drawing regression after its hosted deletion timeout. Visible exact-name locators replace UUID-order assumptions; both key orders verify original dimensions and byte-identical export, referenced-original refusal, unused-cutout deletion, reload/profile isolation and bad-byte rejection. Application behavior and acceptance thresholds are unchanged; delivery records the original failure and scoped local passes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -545,6 +545,13 @@
           "sourceDigest": "413cc9e3efd2f008302fcda4c8dffd6202eeed27968df440be4b4919bb5039ba",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the tablet quality helper change after the hosted one-part-versus-two assertion. Locator.tap retains real touch with actionability/stability checks; exact intermediate state assertions improve failure localization. Existing counts, selection, capability, geometry, held input and release assertions remain intact, and both orientations pass locally."
+        },
+        {
+          "sourceCommit": "33ecad2d31ffe2cd619d89d817478a20b3d90ceb",
+          "reviewedAt": "2026-11-20T04:38:12.462Z",
+          "sourceDigest": "203fefc369ecc8eb2a4f02f695676cb99ccda06b57503640fa5136b219bfa18b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed final integration test changes: visible Explore and settled-read entry, real blocked-v1 IndexedDB fallback with late completion and unchanged notebook assertions, art-only return/reload/sibling checks, and exact source-game return after adding private art. Existing assertions remain intact; local and hosted results are recorded separately by source."
         }
       ]
     },
@@ -569,10 +576,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:48:15.157Z",
-      "sourceDigest": "90313431a8e81116d239c14c296a1509d24784c943dfdea6ebbc1992cf491ae4",
+      "reviewedAt": "2026-11-20T05:03:35.852Z",
+      "sourceDigest": "b29c436e0b000317a69cfb9f44fac6aef466423c72b2bb420deb354173fc031b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both feature histories with main907 and preserved the pre-integration seven-workflow success at 5dbe. Recorded final 8Q build, guidance17, first11, Art Studio, navigation4 and four inspected captures separately from earlier Bq Creation/quality and Cb full-art acceptance. Kept launcher failure and source-review corrections visible; final published identity, new-base commit check and exact-head hosted acceptance belong to the review PR.",
+      "reviewReason": "Recorded the exact PR81 integration-head Arcade failure and preserved its source/run/job scope. Distinguished the observed positional-delete timeout from source analysis and subsequent deterministic dependency checks, recorded the unchanged application build and two passing key-order regressions, and left follow-up hosted acceptance, merge and deployment pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -608,6 +615,13 @@
           "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
           "reviewOutcome": "updated",
           "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries."
+        },
+        {
+          "sourceCommit": "33ecad2d31ffe2cd619d89d817478a20b3d90ceb",
+          "reviewedAt": "2026-11-20T04:48:15.157Z",
+          "sourceDigest": "90313431a8e81116d239c14c296a1509d24784c943dfdea6ebbc1992cf491ae4",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled both feature histories with main907 and preserved the pre-integration seven-workflow success at 5dbe. Recorded final 8Q build, guidance17, first11, Art Studio, navigation4 and four inspected captures separately from earlier Bq Creation/quality and Cb full-art acceptance. Kept launcher failure and source-review corrections visible; final published identity, new-base commit check and exact-head hosted acceptance belong to the review PR."
         }
       ]
     },
