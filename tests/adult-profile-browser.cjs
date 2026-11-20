@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Production frontend integration, explicit API fixtures; no paid provider.
  * The server's real cookie/passphrase/permit tests are separate. */
 const assert=require('node:assert/strict');
@@ -43,8 +44,8 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    });
    const url='http://127.0.0.1:'+server.address().port+'/arcade/';
    const choose=async locator=>{if(!await page.locator('#studioProfileMenu').evaluate(n=>n.open))await page.locator('#studioProfileMenu summary').click();await page.locator(locator).first().click();};
-   const unlock=async()=>{await choose('#adultProfileChoice');await page.fill('#adultProfilePassphrase',PASSPHRASE);await page.click('#adultProfileSubmit');await page.waitForFunction(id=>FG.store.current().id===id,PROFILE);};
-   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);await page.waitForSelector('#adultProfileChoice',{state:'attached'});
+   const unlock=async()=>{await choose('#adultProfileChoice');await page.fill('#adultProfilePassphrase',PASSPHRASE);await page.click('#adultProfileSubmit');await page.waitForFunction(id=>FG.store.current().id===id,PROFILE);await exploreWelcome(page);};
+   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);await exploreWelcome(page);await page.waitForSelector('#adultProfileChoice',{state:'attached'});
    await page.click('#studioNavCreate');await page.fill('#studioPrompt','CHILD NOTEBOOK SENTINEL: my private draft');
    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('family-game-factory-studio-v1')).sessions.some(s=>s.draft.includes('CHILD NOTEBOOK SENTINEL')));
    const familyBefore=await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1'));
@@ -52,7 +53,7 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    await page.waitForFunction(()=>document.getElementById('adultProfileStatus').textContent.includes('Could not switch'));
    assert.equal(await page.evaluate(()=>FG.store.current().id),'player1');assert.equal(await page.locator('#adultProfileBanner').isVisible(),false);
    await page.fill('#adultProfilePassphrase',PASSPHRASE);await page.click('#adultProfileSubmit');await page.waitForFunction(id=>FG.store.current().id===id,PROFILE);
-   await page.waitForFunction(()=>document.getElementById('adultProfileTools').textContent.includes('AI conversation: ready'));
+   await page.waitForFunction(()=>document.getElementById('adultProfileTools').textContent.includes('AI conversation: ready'));await exploreWelcome(page);
    assert.equal(await page.locator('#adultProfileDialog').isVisible(),false,'profile switch itself unlocks tools');
    assert.equal(await page.locator('#adultProfileBanner').isVisible(),true);
    assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),0,'adult starts with a separate notebook');

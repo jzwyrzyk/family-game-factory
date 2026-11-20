@@ -1,6 +1,6 @@
 # Private Art Studio and explicit reusable art versions
 
-**Status:** accepted development direction; implementation in refreshed PR23. Merge and deployment remain separate delivery facts.
+**Status:** accepted development direction; implementation subsequently merged in [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). The [delivery record](../../DELIVERY-STATE.md#pr23-art-studio--merged) preserves its exact-source merge and acceptance; deployment and later first-creation integration remain separate delivery facts.
 
 **Source:** the owner asked to bring the earlier drawing-to-game PR up to the current Jems specification and experience, including a dedicated upload/development space, a mini editor and stored reusable characters/art across games.
 

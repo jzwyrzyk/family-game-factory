@@ -3,6 +3,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 async function switchProfile(page,index){
  if(!await page.locator('#studioProfileMenu').evaluate(node=>node.open))await page.click('#studioProfileMenu summary');
  await page.locator('.profile-choice').nth(index).click();
@@ -57,6 +58,7 @@ async function switchProfile(page,index){
    });
    try{
     await page.goto(url);await page.waitForFunction(()=>FG.studio&&FG.studio.mode()==='remote');
+    await exploreWelcome(page);
     await page.click('[data-starter="gum"]');
     const owner=await page.evaluate(()=>FG.store.current().id);
     const initial=await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]);

@@ -2,6 +2,7 @@ const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const fs=require('node:fs');
 const {build}=require('esbuild');
+const {exploreWelcome}=require('./studio-entry.cjs');
 const readArt=(page,store)=>page.evaluate(name=>new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const db=request.result,tx=db.transaction(name),r=tx.objectStore(name).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);tx.oncomplete=()=>db.close();};}),store);
 (async()=>{
  const contract=await build({stdin:{contents:"export {createCarArtwork,drawCarBody,drawCarWheel} from './src/drawing/rally';",resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'drawingContracts',platform:'browser'});
@@ -16,7 +17,7 @@ const readArt=(page,store)=>page.evaluate(name=>new Promise((resolve,reject)=>{c
    const shelf=async()=>{await page.locator('#studioNavHome').click();await page.locator('#studioSavedIdeas').click();await page.waitForSelector('#drawingUpload',{state:'visible'});};
    const openCar=async()=>{await page.locator('#drawingList article').filter({has:page.getByRole('heading',{name:'My custom car',exact:true})}).getByRole('button',{name:/Bring to life/}).click();await page.locator('dialog.drawing-lab').waitFor({state:'visible'});};
    const drag=async(locator,start,end)=>{await locator.scrollIntoViewIfNeeded();const box=await locator.boundingBox();assert.ok(box);const a={x:box.x+box.width*start.x,y:box.y+box.height*start.y},b={x:box.x+box.width*end.x,y:box.y+box.height*end.y};if(touch){const session=await context.newCDPSession(page);await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[a]});await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[b]});await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await session.detach();}else{await page.mouse.move(a.x,a.y);await page.mouse.down();await page.mouse.move(b.x,b.y,{steps:4});await page.mouse.up();}};
-   await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await page.waitForFunction(()=>window.FG?.drawings);await shelf();
+   await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await page.waitForFunction(()=>window.FG?.drawings&&window.FG?.studio);await exploreWelcome(page);await shelf();
    if(!touch){
     await page.addScriptTag({content:contract.outputFiles[0].text});
     const pixels=await page.evaluate(()=>{

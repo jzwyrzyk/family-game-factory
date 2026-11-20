@@ -12,6 +12,8 @@ The owner requested shared gem increments for completed learning activities, dev
 
 Neither quantity measures intelligence, proficiency, attention, reasoning quality or educational improvement. Math, Language Arts and scene checks retain their existing evidence and assistance fields. The reward ledger stores short action identities and amounts, not answers, private conversation text or model assessments.
 
+The [first-creation journey](../child-journey/FIRST-CREATION.md) presents this distinction in an optional inline guide: gems add up across activities, maker rank follows developed games, and My Powers shows practice. Studio supplies current-owner preference callbacks; the Rewards component owns no new storage. **Got it** saves the presentation preference before hiding the card, and a failed save leaves it visible. Showing or dismissing this explanation never earns a grant or changes a level. Journey help can show tips again without changing rewards.
+
 ## Initial award schedule
 
 These are version-1 product choices, not research-calibrated learning thresholds. The immutable policy and validation are in [model.ts](../../src/rewards/model.ts).

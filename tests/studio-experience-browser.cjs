@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Real production bundle, independent of paid model/generation.
  * Creation-first affordances and non-deceptive offline conversation. */
 const {chromium}=require('playwright');
@@ -11,7 +12,7 @@ const {start}=require('./browser-server.cjs');
   const ctx=await browser.newContext({viewport,reducedMotion:'reduce'}),page=await ctx.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(10000);
   await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/?studio=1');
-  await page.waitForFunction(()=>window.FG?.studio);
+  await page.waitForFunction(()=>window.FG?.studio);await exploreWelcome(page);
   await page.click('#studioNavCreate');
   assert.equal(await page.locator('#page-studio').evaluate(el=>el.classList.contains('studio-creating')),true,'new game is creation-first');
   assert.equal(await page.locator('#studioCanvas').isVisible(),false,'empty canvas must not dominate creation');

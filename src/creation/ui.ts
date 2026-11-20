@@ -9,6 +9,7 @@ import type { StudioSession } from '../studio/notebook';
 import { publishSourceEvidence } from '../problem-solving/signals';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import {rewardSourceWritable} from '../rewards/write-guard';
+import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import './style.css';
@@ -18,6 +19,7 @@ type Host = {
   home(): void;
   openGame(sessionId: string): void | Promise<void>;
   onRewardSourceSaved?(owner: string): void;
+  guidance?: GuideHost;
 };
 type SourceRevision = Parameters<typeof createProjectFromStudio>[1];
 type Insert = { programId: string; blockId?: string; branch?: 'actions' | 'then' | 'else' };
@@ -55,12 +57,13 @@ export function installCreationStudio(host: Host) {
       <div class="creation-mode-switch" role="group" aria-label="Choose how to create"><button id="creationFreeMode" aria-pressed="true">${iconMarkup('star')} Make your own</button><button id="creationChallengeMode" aria-pressed="false">${iconMarkup('grid')} Rebuild a scene</button></div>
       <div class="creation-shelf-tools"><button id="creationShelfImport" class="creation-button">${iconMarkup('book')} Open a scene file</button></div>
       <section id="creationFreeShelf"><div class="creation-shelf-heading"><div><h2>Your next adventure starts here</h2><p>Choose a world. You’re the director.</p></div><span class="creation-small-pill">MOVE · TALK · DANCE · PLAY</span></div><div id="creationStarters" class="creation-starters"></div></section>
-      <section id="creationChallengeShelf" hidden><div class="creation-shelf-heading"><div><h2>Watch it. Wonder. Make it happen.</h2><p>Rebuild the scene your way. Different blocks can tell the same story.</p></div><span class="creation-small-pill">SMALL CHALLENGES · REAL IDEAS</span></div><div id="creationChallenges" class="creation-challenge-grid"></div></section>
+      <section id="creationChallengeShelf" hidden><div class="creation-shelf-heading"><div><h2>Watch it. Wonder. Make it happen.</h2><p>Rebuild the scene your way. Different blocks can tell the same story.</p></div><span class="creation-small-pill">SMALL CHALLENGES · REAL IDEAS</span></div><div id="creationChallenges" class="creation-challenge-grid"></div><div id="creationPracticeGuideSlot"></div></section>
       <section id="creationSavedSection"><div class="creation-shelf-heading"><h2>My scenes</h2><p>Your stories and scene challenges, ready to continue.</p></div><div id="creationSaved" class="creation-saved-grid"></div></section>
     </div>
     <div id="creationWorkspace" hidden>
       <div class="creation-project-bar"><button id="creationBack" class="creation-button creation-quiet">${iconMarkup('arrow', 'jems-icon--back')} My scenes</button><label class="creation-title-label"><span class="creation-sr">Scene title</span><input id="creationTitle" maxlength="80" aria-label="Scene title"></label><span id="creationSaveState" class="creation-save-state">Saved on this device</span><div class="creation-version-actions"><button id="creationUndo" class="creation-button" title="Undo last edit">${iconMarkup('undo')} <span>Undo</span></button><button id="creationRedo" class="creation-button" title="Redo last edit">${iconMarkup('undo', 'jems-icon--mirror')} <span>Redo</span></button><button id="creationKeep" class="creation-button creation-primary">${iconMarkup('check')} Keep this version</button><details class="creation-more" id="creationMore"><summary aria-label="More scene tools">${iconMarkup('menu')}</summary><div><button id="creationCopy">${iconMarkup('add')} Make a copy</button><button id="creationDownload">${iconMarkup('download')} Download editable scene</button><button id="creationImportButton">${iconMarkup('book')} Open scene file</button><button id="creationVideo">${iconMarkup('download')} Save a video</button><button id="creationHistory">${iconMarkup('clock')} See saved versions</button><button id="creationDelete">${iconMarkup('trash')} Delete this scene</button></div></details></div></div>
       <div id="creationSource" class="creation-source" hidden></div>
+      <div id="creationGuideSlot"></div>
       <div id="creationRecovery" class="creation-recovery" hidden><span>You have unfinished changes saved on this device.</span><button id="creationResumeDraft" class="creation-button">${iconMarkup('edit')} Resume my draft</button><button id="creationDiscardDraft" class="creation-button">${iconMarkup('undo')} Use saved version</button></div>
       <section id="creationChallengeBrief" class="creation-challenge-brief" hidden></section>
       <div class="creation-workspace-grid">
@@ -90,6 +93,27 @@ export function installCreationStudio(host: Host) {
   let recording: Recording | null = null;
   let targetInputs = 0;
   const status = (message: string, error = false) => { $('creationStatus').textContent = message; $('creationStatus').classList.toggle('is-error', error); };
+  function renderGuide(mode: 'scene' | 'practice') {
+    const capturedOwner = owner(), capturedEpoch = viewEpoch;
+    const slot = mode === 'practice' && !scene ? $('creationPracticeGuideSlot') : $('creationGuideSlot');
+    if (recoveryPending) { slot.replaceChildren(); return; }
+    const title = mode === 'practice' ? 'Try an idea. Make it yours.' : sourceSessionId ? 'A new adventure for your character' : 'Start with one little action';
+    const description = mode === 'practice'
+      ? 'Watch the goal, build it your way, then check your scene. Afterward, use your idea in a story of your own.'
+      : sourceSessionId
+        ? 'These blocks change this scene. Press Play to try an idea; your original game stays saved.'
+        : 'Choose a character and add an action. Press Play to see what happens, then try a change.';
+    slot.replaceChildren(createGuideCard({
+      id: mode === 'practice' && !scene ? 'creationPracticeGuide' : 'creationGuide',
+      tip: mode === 'practice' ? 'practice' : 'scenes', title, description, host: host.guidance,
+      canAct: () => visible && capturedOwner === owner() && capturedEpoch === viewEpoch && !locked() && !recoveryPending,
+      onError: message => status(message, true),
+      onDismiss: () => {
+        if (scene) $('creationTitle').focus({ preventScroll: true });
+        else ($('creationChallenges').querySelector<HTMLElement>('[data-challenge]') || $('creationChallengeMode')).focus();
+      }
+    }));
+  }
   const isCurrent = () => visible && sceneOwner === owner() && !!scene;
   const act = (fn: () => unknown) => { try { return fn(); } catch (error) { status((error as Error).message, true); } };
   const actAsync=(fn:()=>Promise<unknown>)=>{
@@ -199,7 +223,7 @@ export function installCreationStudio(host: Host) {
     $('creationSaveState').textContent = loaded.project.keptId === revisionId ? 'Your kept version' : 'Saved on this device';
     $<HTMLButtonElement>('creationRun').disabled=false;$<HTMLButtonElement>('creationVideo').disabled=false;$<HTMLButtonElement>('creationDownload').disabled=false;
     if (loaded.project.challengeId && !challengeId) status('This scene’s original challenge is no longer available. You can still edit and keep your scene.');
-    $<HTMLInputElement>('creationTitle').value = scene.title; freshEngine(); renderEditor(); renderBrief(); renderSource(); updateUndo();
+    $<HTMLInputElement>('creationTitle').value = scene.title; freshEngine(); renderEditor(); renderBrief(); renderSource(); renderGuide(challengeId ? 'practice' : 'scene'); updateUndo();
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function enter() { if (!host.enter()) return false; visible = true; page.classList.remove('hidden'); startCheckpointTimer(); return true; }
@@ -212,7 +236,7 @@ export function installCreationStudio(host: Host) {
     $('creationHeading').textContent = 'Little blocks. Big possibilities.'; $('creationSubtitle').textContent = 'Make a story move. Give a character an idea. See what happens.';
     $('creationFreeShelf').hidden = mode !== 'free'; $('creationChallengeShelf').hidden = mode !== 'challenge';
     $('creationFreeMode').setAttribute('aria-pressed', String(mode === 'free')); $('creationChallengeMode').setAttribute('aria-pressed', String(mode === 'challenge'));
-    renderShelf(); status(''); $('creationHeading').focus({ preventScroll: true });
+    renderShelf(); status(''); if (mode === 'challenge') renderGuide('practice'); $('creationHeading').focus({ preventScroll: true });
   }
   function create(kind: 'dragon' | 'buckets' | 'robot' | 'blank') { const project = store().create(owner(), createStarterProject(kind)); loadScene(project.id); }
   function challenge(id: string) { const project = store().create(owner(), { ...createChallengeStarter(id), id: uid() }, { challengeId: id }); loadScene(project.id); }
@@ -282,15 +306,17 @@ export function installCreationStudio(host: Host) {
   }
   function renderSource() {
     const box = $('creationSource'); box.replaceChildren(); const provenance = scene?.provenance;
-    if(scene&&privateArtReferences(scene).length){
-      box.hidden=false;
+    const hasPrivateArt=!!scene&&privateArtReferences(scene).length>0;
+    box.hidden=!hasPrivateArt&&!provenance?.sourceProjectId;if(box.hidden)return;
+    if(sourceSessionId||!hasPrivateArt)box.append(iconNode('span', '', 'star', sourceSessionId
+      ? 'A scene from your game · changes here stay in this scene'
+      : 'A scene from your saved work · linked to its starting version'));
+    if(hasPrivateArt){
       box.append(iconNode('span','','star','Your art · this scene keeps the exact version you chose'));
       const artButton=iconNode('button','creation-text-button','edit','Art Studio');
       artButton.onclick=()=>act(()=>{assertEditing();saveVersion();if(FG.artStudio?.open)FG.artStudio.open();else status('Art Studio is still opening. Try again in a moment.');});
-      box.append(artButton);return;
+      box.append(artButton);
     }
-    box.hidden = !provenance?.sourceProjectId; if (box.hidden) return;
-    box.append(iconNode('span', '', 'star', 'A new scene from your game · linked to the version you chose'));
     if (sourceSessionId) { const button = iconNode('button', 'creation-text-button', 'arrow', 'Back to my game'); button.onclick = () => act(() => { saveVersion(); stop(); void host.openGame(sourceSessionId); }); box.append(button); }
   }
   function renderBrief() {
@@ -319,7 +345,14 @@ export function installCreationStudio(host: Host) {
       list.append(item);
     }); feedback.append(list);
     feedback.append(node('small', '', hintUsed ? 'You explored this scene with a hint. Your next idea is still yours.' : 'This records what your scene did on this challenge.'));
-    if (result.passed) { const remix = iconNode('button', 'creation-button', 'edit', 'Make it my own'); remix.onclick = () => act(() => { assertEditing(); saveVersion(); const copy = store().create(sceneOwner, { ...clone(scene!), id: uid(), title: (scene!.title + ' · my story').slice(0, 60), provenance: { createdBy: 'child', sourceKind: 'creation', sourceProjectId: entryId, sourceRevisionId: revisionId } }); loadScene(copy.id); }); feedback.append(remix); }
+    if (result.passed) {
+      const extension = getCreationChallenge(challengeId)!.extension;
+      const next = node('div', 'creation-next-idea');
+      next.append(node('strong', '', 'What could you make with this?'), node('p', '', extension));
+      const remix = iconNode('button', 'creation-button', 'edit', 'Make it my own');
+      remix.onclick = () => act(() => { assertEditing(); saveVersion(); const copy = store().create(sceneOwner, { ...clone(scene!), id: uid(), title: (scene!.title + ' · my story').slice(0, 60), provenance: { createdBy: 'child', sourceKind: 'creation', sourceProjectId: entryId, sourceRevisionId: revisionId } }); loadScene(copy.id); });
+      next.append(remix); feedback.append(next);
+    }
     freshEngine(); feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   function currentProgram() { return scene?.programs.find(p => p.id === selectedProgram && p.actorId === selectedActor); }
@@ -591,8 +624,8 @@ export function installCreationStudio(host: Host) {
     $('creationVersions').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   });
   $('creationCloseHistory').onclick = () => { $('creationVersions').hidden = true; };
-  $('creationResumeDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); const loaded = store().load(entryId, sceneOwner); if (!loaded.draft) { loadScene(entryId); return; } scene = clone(loaded.draft.scene); dirty = true; recoveryPending = false; $('creationRecovery').hidden = true; $('creationSaveState').textContent = 'Recovered draft · ready to keep'; status('Your draft is ready to continue.'); freshEngine(); renderEditor(); });
-  $('creationDiscardDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); store().discardDraft(entryId, sceneOwner); recoveryPending = false; $('creationRecovery').hidden = true; status('Your saved version is ready to continue.'); freshEngine(); renderEditor(); });
+  $('creationResumeDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); const loaded = store().load(entryId, sceneOwner); if (!loaded.draft) { loadScene(entryId); return; } scene = clone(loaded.draft.scene); dirty = true; recoveryPending = false; $('creationRecovery').hidden = true; $('creationSaveState').textContent = 'Recovered draft · ready to keep'; status('Your draft is ready to continue.'); freshEngine(); renderEditor(); renderGuide(challengeId ? 'practice' : 'scene'); });
+  $('creationDiscardDraft').onclick = () => act(() => { assertEditing({ resolvingRecovery: true }); store().discardDraft(entryId, sceneOwner); recoveryPending = false; $('creationRecovery').hidden = true; status('Your saved version is ready to continue.'); freshEngine(); renderEditor(); renderGuide(challengeId ? 'practice' : 'scene'); });
   async function renderPrivateChoices(){
     const capturedOwner=owner(),capturedView=viewEpoch,dialog=$<HTMLDialogElement>('creationActorDialog');
     const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent()&&dialog.open;
@@ -643,7 +676,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return; try { saveVersion(); stop(); } catch (error) { event.preventDefault(); status((error as Error).message, true); } });
   window.addEventListener('factory-profile', () => {
     leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; recoveryPending = false; sourceSessionId = ''; stage.clear();
-    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus']) $(id).replaceChildren();
+    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
   window.addEventListener('beforeunload', event => { if (!visible||!rewardSourceWritable()) return; try { saveVersion(); } catch { event.preventDefault(); event.returnValue = ''; } });

@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome,waitForWelcome}=require('./studio-entry.cjs');
 const output=path.resolve('test-results/art-studio');
 fs.mkdirSync(output,{recursive:true});
 const ready=page=>page.waitForFunction(()=>window.FG?.artStudio&&window.FG?.creation);
@@ -42,6 +43,22 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   assert.equal((await count(page))[0].category,'vehicle','metadata remains saved when shelf refresh fails');
   assert.equal(await page.locator('#artStatus').getAttribute('role'),'alert','refresh error stays visible instead of false success');
   await page.evaluate(()=>window.FG.artStudio.refresh());
+  // A saved drawing establishes a returning creator before any game or scene
+  // exists. The presence check must not manufacture work or a dismissed tip.
+  const artOnlyNotebook=await page.evaluate(()=>FG.studio.exportNotebook());
+  assert.equal(artOnlyNotebook.sessions.length,0);
+  assert.equal(await page.evaluate(()=>FG.creation.export().projects.length),0);
+  await page.locator('#artHome').click();await waitForWelcome(page);
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'an art-only creator returns Home without the first-creation welcome');
+  assert.equal(await page.locator('#studioArtShortcut').isVisible(),true,'the creator can return to saved artwork without Explore');
+  await page.goto(base);await ready(page);await waitForWelcome(page);
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'default entry recognizes existing private artwork');
+  await page.reload();await ready(page);await waitForWelcome(page);
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'an art-only creator remains recognized after default reload');
+  assert.equal((await count(page)).length,1,'the original artwork remains available');
+  assert.deepEqual(await page.evaluate(()=>FG.studio.exportNotebook()),artOnlyNotebook,'art presence changes no projects, making evidence or guidance preferences');
+  assert.equal(await page.evaluate(()=>FG.creation.export().projects.length),0);
+  await page.locator('#studioArtShortcut').click();await page.locator('[data-art-id="'+before.id+'"]').click();
   await page.locator('#artEditMovement').click();await page.locator('dialog.drawing-lab').waitFor({state:'visible'});
   // Suggestions are editable guesses. Prepare this known synthetic drawing
   // through the same visible outline controls available to the maker.
@@ -99,7 +116,9 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await page.setViewportSize({width:390,height:844});await noOverflow(page,'390px library');const closeIcon=await page.getByRole('button',{name:'Close artwork details'}).locator('svg').boundingBox();assert.ok(closeIcon.width>=16&&closeIcon.height>=16,'icon-only close remains visible');await page.screenshot({path:path.join(output,'art-library-phone.png'),fullPage:true});
   await page.setViewportSize({width:320,height:740});await noOverflow(page,'320px library');
   await page.locator('#artUpload').setInputFiles({name:'fake.png',mimeType:'image/png',buffer:Buffer.from('<svg onload="alert(1)"></svg>')});await page.waitForFunction(()=>document.getElementById('artStatus').classList.contains('is-error'));assert.equal((await count(page)).length,4);
-  await page.setViewportSize({width:1360,height:950});await page.locator('#artHome').click();const menu=page.locator('#studioProfileMenu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();await page.locator('#profile-choices .profile-choice').nth(1).click();await page.locator('#studioArtShortcut').click();await page.locator('#artEmpty').waitFor({state:'visible'});assert.equal(await page.locator('.art-card').count(),0,'another player cannot see prior art');
+  await page.setViewportSize({width:1360,height:950});await page.locator('#artHome').click();const menu=page.locator('#studioProfileMenu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();await page.locator('#profile-choices .profile-choice').nth(1).click();await waitForWelcome(page);
+  assert.equal(await page.locator('#studioWelcome').isVisible(),true,'another player’s saved artwork does not dismiss this fresh sibling’s welcome');
+  await exploreWelcome(page);await page.locator('#studioArtShortcut').click();await page.locator('#artEmpty').waitFor({state:'visible'});assert.equal(await page.locator('.art-card').count(),0,'another player cannot see prior art');
   assert.deepEqual(posts,[],'private artwork makes no POST or model request');assert.deepEqual(errors,[],'no browser exceptions');
   console.log('PASS Art Studio: default navigation, upload, private shelf, truthful refresh failure, metadata/filter, recovered movement draft, notebook quota retry, optional usage-index failure, saved physical ride, picture transform/original preservation, cross-scene use, art export, mobile reflow, invalid image and profile isolation');
  }catch(error){if(page)await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(()=>{});throw error;}

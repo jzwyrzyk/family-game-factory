@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Production-dist tablet voice journey. All requests are browser fixtures;
  * no microphone, Google speech service, model or real child data is processed. */
 const {chromium}=require('playwright');
@@ -50,7 +51,7 @@ const {start}=require('./browser-server.cjs');
    return reply({errorCode:'NOT_FOUND'},404);
   });
   try{
-   await page.goto(base);await page.waitForFunction(()=>FG.studio?.mode()==='remote');
+   await page.goto(base);await page.waitForFunction(()=>FG.studio?.mode()==='remote');await exploreWelcome(page);
    await page.click('#studioNavCreate');
    await page.waitForSelector('#studioPrivateMic:visible');
    assert.match(await page.locator('#studioPrivateMic').textContent(),/Speak/);
@@ -80,6 +81,7 @@ const {start}=require('./browser-server.cjs');
    assert.notEqual(await page.evaluate(()=>FG.store.current().id),childOne);
    assert.equal(await page.locator('#studioMessages').textContent(),'','other child has no original session conversation');
    authorized=false;
+   await exploreWelcome(page);
    await page.click('#studioNavCreate');
    await page.waitForFunction(()=>document.getElementById('studioPrivateMic').hidden===true);
    assert.equal(audioRequests,1,'new child cannot capture audio without fresh approval');

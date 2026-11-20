@@ -1,10 +1,12 @@
 # Art Studio: draw it, develop it, reuse it
 
-**Source scope:** refreshed PR23, November 19, 2026 (America/New_York). This contract describes the integrated branch, not production deployment. The accepted direction is recorded in [the Art Studio decision](../decisions/2026-11-19-private-art-studio.md). [Delivery state](../../DELIVERY-STATE.md) records validation and PR status.
+**Source scope:** Art Studio from merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23), November 19, 2026 (America/New_York). This contract describes source behavior, not production deployment. The accepted direction is recorded in [the Art Studio decision](../decisions/2026-11-19-private-art-studio.md). [Delivery state](../../DELIVERY-STATE.md) records its merge receipt and keeps the subsequent first-creation integration acceptance separate.
 
 ## The experience
 
 Art Studio is an owned creation space in the current Jems shell. Enter from **My Games → Art Studio**, **Bring your drawing to life**, an idea's **Use my drawing** action, **Create & code → My art & drawings**, the legacy saved collection, or `?art=1`. These are subdestinations of creation; the existing seven primary navigation actions remain intact. Grown-ups can open the selected player's art from the existing backup settings.
+
+The [first-creation entry](../child-journey/FIRST-CREATION.md) recognizes saved private art as existing creative work even before a game or scene exists. Its presence check respects the active owner and keeps the ordinary home available when art storage cannot be read; it creates no progress or guidance records.
 
 1. **Bring in an idea.** Upload a PNG/JPEG, use the camera file picker, or draw on a local canvas. Every picture has its own original bytes, hash, name and profile owner.
 2. **Keep an art collection.** Search by name, filter Characters/Vehicles/Things/Worlds, rename and categorize. Thumbnails show real saved art. Archived art is hidden from the ordinary shelf but still resolves in existing adventures.
