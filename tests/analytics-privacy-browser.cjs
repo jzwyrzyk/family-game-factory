@@ -61,12 +61,15 @@ const NOTICE='jems-product-analytics-2026-11-v1',API='https://analytics-api.test
    const settled=()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const parent=async()=>{await page.evaluate(()=>FG.app.page('parent'));await page.click('#parentTab-settings');await page.locator('#builderParentUnlockPassphrase').waitFor({state:'visible'});};
    const unlockParent=async()=>{await page.fill('#builderParentUnlockPassphrase','synthetic parent passphrase');await page.locator('#builderParentUnlock button').click();};
+   const exploreFirstWelcome=async()=>{const visibleEscape=page.locator('#studioWelcomeExplore');if(await visibleEscape.isVisible())await visibleEscape.click();};
    await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
+   await exploreFirstWelcome();
    await page.click('#studioNavCreate');await settled();
    assert.equal(calls.some(call=>call.path.includes('/analytics')),false,'default-off build makes no analytics requests');
    await parent();assert.equal(await page.locator('#jemsAnalyticsPrivacy').isVisible(),false);
 
    configured=true;await page.reload();await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
+   await exploreFirstWelcome();
    await page.click('#studioNavCreate');await settled();assert.equal(events.length,0,'no implicit permission');
    await parent();failStatus=true;await unlockParent();
    await page.waitForFunction(()=>document.getElementById('connectionStatus').textContent.includes('You can now manage'));

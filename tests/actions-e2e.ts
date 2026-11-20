@@ -95,6 +95,25 @@ async function marbleCenter(frame:FrameLocator):Promise<number>{
 async function playV2Marble(page:Page,frame:FrameLocator,device:string):Promise<number>{
  await frame.getByRole('button',{name:'Play!',exact:true}).click();
  await frame.locator('#game[data-frames]').waitFor({timeout:4500});
+ // Do not mistake a ticking canvas for a painted marble. Await actual
+ // matching pixels on animation frames before testing physical movement.
+ await frame.locator('#game').evaluate(async (canvas:HTMLCanvasElement)=>{
+  const present=()=>{
+   const pixels=canvas.getContext('2d')!.getImageData(0,0,canvas.width,canvas.height);
+   for(let y=183;y<216;y+=3)for(let x=9;x<710;x+=3){
+    const i=(y*pixels.width+x)*4,d=pixels.data;
+    if(d[i]>200&&d[i+1]>130&&d[i+1]<205&&d[i+2]<105&&d[i]>d[i+1]+28)return true;
+   }
+   return false;
+  };
+  if(present())return;
+  await new Promise<void>((resolve,reject)=>{
+   let done=false;
+   const limit=setTimeout(()=>{done=true;reject(Error('Marble never became visible on the real canvas'));},4500);
+   const check=()=>{if(done)return;if(present()){done=true;clearTimeout(limit);resolve();}else requestAnimationFrame(check);};
+   requestAnimationFrame(check);
+  });
+ });
  const before=await marbleCenter(frame);
  await frame.locator('[data-control="right"]').focus();
  await page.keyboard.down('ArrowRight');await page.waitForTimeout(670);
