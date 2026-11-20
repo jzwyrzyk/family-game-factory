@@ -37,11 +37,12 @@ async function mount(item:LanguageItem,viewport:{width:number;height:number}={wi
 }
 const state=(page:Page)=>page.evaluate(()=>{const w=window as any;return {p:w.profile,results:w.results,saves:w.saves};});
 test('mobile reading passage: heading focused, no overflow, wrong response and graduated help',async()=>{
-  const item=generateLanguageItem('g3-inference',{tier:0,random:()=>0}),page=await mount(item,{width:390,height:720},650,true);
+  // Keep the question below the fold even after removing the old metadata copy.
+  const item=generateLanguageItem('g3-inference',{tier:0,random:()=>0}),page=await mount(item,{width:390,height:720},950,true);
   try{
     const view=await page.locator('.language-question').evaluate(el=>{const r=el.getBoundingClientRect();return {bottom:r.bottom,focused:document.activeElement===el,scroll:scrollY};});
     assert.equal(view.focused,true);
-    assert.ok(view.scroll>0&&view.bottom<=721);
+    assert.ok(view.scroll>0&&view.bottom<=721,JSON.stringify(view));
     assert.ok(await page.locator('.language-passage').isVisible());
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     const wrong=item.choices!.find(x=>x.value!==item.answer)!;
@@ -141,11 +142,24 @@ test('supported read-aloud includes displayed choices and never counts as indepe
     if(await speak.count()===0)return; // Browser/OS without synthesis still has visible written practice.
     await page.evaluate(()=>{
       const w=window as any;w.spoken='';
-      window.speechSynthesis.speak=(u:SpeechSynthesisUtterance)=>{w.spoken=u.text;};
+      w.SpeechSynthesisUtterance=class {
+        voice:SpeechSynthesisVoice|null=null;lang='';rate=1;pitch=1;
+        onstart:(()=>void)|null=null;onend:(()=>void)|null=null;onerror:(()=>void)|null=null;
+        constructor(public text:string){}
+      };
+      window.speechSynthesis.getVoices=()=>[
+        {name:'David',voiceURI:'David',lang:'en-US',localService:true,default:true},
+        {name:'Samantha',voiceURI:'Samantha',lang:'en-US',localService:true,default:false},
+      ] as SpeechSynthesisVoice[];
+      window.speechSynthesis.speak=(u:SpeechSynthesisUtterance)=>{
+        w.spoken=u.text;w.speakingVoice=u.voice?.name;
+        u.onstart?.call(u,new Event('start') as SpeechSynthesisEvent);
+      };
       window.speechSynthesis.cancel=()=>{};
     });
     await speak.click();
     const spoken=await page.evaluate(()=>(window as any).spoken);
+    assert.equal(await page.evaluate(()=>(window as any).speakingVoice),'Samantha');
     assert.ok(spoken.includes(item.question));
     for(const choice of item.choices||[])assert.ok(spoken.includes(choice.label),
       'Listening support should read the displayed answer choices as well as the question.');
@@ -155,5 +169,53 @@ test('supported read-aloud includes displayed choices and never counts as indepe
     assert.equal(result.p.language.attempts[0].readTargetAt>0,true);
     assert.equal(result.results[0].independent,false);
     assert.equal(result.p.language.totals.assisted,1);
+  }finally{await page.close();}
+});
+
+test('unavailable friendly voice stays readable and does not record listening support',async()=>{
+  const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
+  try{
+    const speak=page.locator('[data-action="read-aloud"]');
+    if(await speak.count()===0)return;
+    await page.evaluate(()=>{
+      const w=window as any;w.spokenCount=0;
+      window.speechSynthesis.getVoices=()=>[
+        {name:'Microsoft David',voiceURI:'David',lang:'en-US',localService:true,default:true},
+        {name:'Microsoft Jenny Online (Natural)',voiceURI:'Jenny',lang:'en-US',localService:false,default:false},
+      ] as SpeechSynthesisVoice[];
+      window.speechSynthesis.speak=()=>{w.spokenCount++;};window.speechSynthesis.cancel=()=>{};
+    });
+    await speak.click();
+    await page.waitForFunction(()=>document.querySelector('.language-reading-notice')?.textContent?.includes('Voice is not ready'));
+    assert.equal(await page.evaluate(()=>(window as any).spokenCount),0);
+    assert.equal((await state(page)).p.language.attempts[0].readTargetAt,undefined);
+    await page.locator('.language-choice').filter({hasText:item.answer!}).click();
+    await page.waitForFunction(()=>(window as any).results.length===1);
+    assert.equal((await state(page)).results[0].independent,true);
+  }finally{await page.close();}
+});
+
+test('leaving while voice choices load prevents delayed read-aloud or assistance credit',async()=>{
+  const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
+  try{
+    const speak=page.locator('[data-action="read-aloud"]');
+    if(await speak.count()===0)return;
+    await page.evaluate(()=>{
+      const w=window as any;w.spokenCount=0;
+      window.speechSynthesis.getVoices=()=>[];
+      window.speechSynthesis.speak=()=>{w.spokenCount++;};window.speechSynthesis.cancel=()=>{};
+    });
+    await speak.click();
+    await page.evaluate(()=>{
+      const w=window as any;w.activity.dispose();
+      window.speechSynthesis.getVoices=()=>[
+        {name:'Samantha',voiceURI:'Samantha',lang:'en-US',localService:true,default:false},
+      ] as SpeechSynthesisVoice[];
+      window.speechSynthesis.dispatchEvent(new Event('voiceschanged'));
+    });
+    assert.equal(await page.evaluate(()=>(window as any).spokenCount),0);
+    const result=await state(page);
+    assert.equal(result.p.language.attempts[0].readTargetAt,undefined);
+    assert.equal(result.p.language.attempts[0].outcome,'interrupted');
   }finally{await page.close();}
 });

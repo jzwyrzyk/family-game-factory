@@ -3,6 +3,7 @@ import {beginLanguageAttempt,finishLanguageAttempt,recordLanguageReadAloud,saveC
   selectLanguageItem,submitLanguageAnswer,useLanguageHint,type LanguageAttempt} from './engine';
 import type {LanguageContext,LanguageItem,LanguageProfile,LanguageResult} from './types';
 import type {LearningMode} from '../learning/types';
+import {createFriendlyNarrator} from '../speech/friendly-narrator';
 
 export interface LanguageActivityOptions {
   profile:LanguageProfile;context?:LanguageContext;item?:LanguageItem;mode?:LearningMode;
@@ -13,14 +14,13 @@ const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls?:string,text?:strin
   const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;
 };
 const button=(text:string,cls?:string,icon?:IconName,iconClass='')=>{const b=make('button',cls,text);b.type='button';if(icon)setIconLabel(b,icon,text,iconClass);return b;};
-const purposeLabel=(purpose?:string)=>purpose==='review'?'MEMORY QUEST':purpose==='prerequisite'?'BUILD A FOUNDATION':
-  purpose==='confidence'?'YOU KNOW THIS ONE':'LANGUAGE QUEST';
 /** Only the host may mount an educational opportunity or record credit. */
 export function mountLanguageActivity(target:HTMLElement,options:LanguageActivityOptions) {
   const prefix='ela-'+(++sequence),mode=options.mode||options.context?.mode||'checkpoint';
   const item=options.item||selectLanguageItem(options.profile,options.context);
   const attempt=beginLanguageAttempt(options.profile,item,{...options.context,mode});
   let disposed=false,done=false,locked=false,wrong=0,hintDepth=0;
+  const narrator=createFriendlyNarrator(()=>!disposed&&!done&&!locked&&root.isConnected);
   let timer:ReturnType<typeof setTimeout>|undefined;
   const listeners=new AbortController();
   const on=(node:EventTarget,event:string,handler:EventListener)=>node.addEventListener(event,handler,{signal:listeners.signal});
@@ -28,19 +28,14 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   root.dataset.subject='language';root.dataset.skillId=item.skillId;root.dataset.kind=item.kind;
   root.dataset.mode=mode;root.dataset.attemptId=attempt.id;
   root.setAttribute('role','group');root.setAttribute('aria-labelledby',prefix+'-title');
-  const eyebrow=make('div','language-eyebrow',mode==='interaction'?'WORD POWER MISSION':purposeLabel(item.purpose));
   const title=make('h2','language-question',item.question);title.id=prefix+'-title';title.tabIndex=-1;
-  const subtitle=make('p','language-skill','Grade '+item.grade+' · '+item.title);
-  const lead=make('p','language-lead',item.kind==='creative'?
-    'Your ideas are yours. This writing adventure has no right-or-wrong grade.':
-    'Think it through. Help is always here if you need it.');
   if(options.onLeave){
     const top=make('div','language-topbar');
     const leave=button('Back to Games','language-leave','arrow','jems-icon--back');leave.dataset.action='leave-game';
     on(leave,'click',()=>{if(!disposed&&!done)options.onLeave?.();});
     top.append(leave);root.append(top);
   }
-  root.append(eyebrow,subtitle,title,lead);
+  root.append(title);
   if(item.passage){
     const story=make('section','language-passage');
     story.setAttribute('aria-label','Read this passage');
@@ -53,23 +48,23 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   readBtn.dataset.action='read-aloud';
   const speechAvailable=typeof window.speechSynthesis!=='undefined'&&typeof window.SpeechSynthesisUtterance!=='undefined';
   if(speechAvailable) {
-    const note=make('small',undefined,'Reading support is recorded separately from independent reading.');
     on(readBtn,'click',()=>{
-      if(disposed||done)return;
-      try {
-        window.speechSynthesis.cancel();
-        const choices=item.choices?.map((choice,index)=>
-          ' Option '+(index+1)+': '+choice.label+'.').join('')||'';
-        const utterance=new SpeechSynthesisUtterance(
-          (item.passage?item.passage+'. ':'')+item.question+'.'+choices);
-        utterance.lang='en-US';utterance.rate=.85;
-        window.speechSynthesis.speak(utterance);
-        recordLanguageReadAloud(options.profile,attempt.id);save();
-      } catch {readingNotice.textContent='Audio could not start. You can still read the text or ask a grown-up.';}
+      if(disposed||done||locked)return;
+      if(narrator.active){narrator.cancel();return;}
+      const choices=item.choices?.map((choice,index)=>
+        ' Option '+(index+1)+': '+choice.label+'.').join('')||'';
+      readingNotice.textContent='';
+      setIconLabel(readBtn,'volume','Stop reading');
+      narrator.speak((item.passage?item.passage+'. ':'')+item.question+'.'+choices,{
+        onStarted:()=>{recordLanguageReadAloud(options.profile,attempt.id);save();},
+        onUnavailable:()=>{readingNotice.textContent='Voice is not ready here. Ask a grown-up to read with you.';},
+        onFinished:()=>setIconLabel(readBtn,'volume','Read this to me'),
+      });
     });
-    support.append(readBtn,note);
+    support.append(readBtn);
   }
   const readingNotice=make('p','language-reading-notice');
+  readingNotice.setAttribute('role','status');readingNotice.setAttribute('aria-live','polite');
   root.append(support,readingNotice);
   const work=make('div','language-work');root.append(work);
   const feedback=make('p','language-feedback');feedback.id=prefix+'-feedback';
@@ -105,7 +100,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const state=outcome==='explored'?'explored':outcome==='shown'?'shown':outcome==='incorrect'?'incorrect':'completed';
     finishLanguageAttempt(options.profile,attempt.id,state);save();
     root.querySelectorAll<HTMLButtonElement|HTMLInputElement|HTMLTextAreaElement>('button,input,textarea').forEach(n=>n.disabled=true);
-    window.speechSynthesis?.cancel();
+    narrator.cancel();
     options.onComplete({independent,outcome,attemptId:attempt.id,item,mode});
   }
   function showWorked(){
@@ -199,7 +194,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const label=make('label',undefined,'Write your idea (no grade)');
     const field=make('textarea','language-creative-input');field.id=prefix+'-write';
     field.maxLength=1200;field.rows=5;label.htmlFor=field.id;
-    const note=make('p','language-creative-note','You are the author. There is no automatic score for imagination or writing quality.');
+    const note=make('p','language-creative-note','There is no single right answer.');
     const go=button('Save my writing and keep playing','language-primary','save');go.type='submit';
     on(form,'submit',ev=>{
       ev.preventDefault();
@@ -216,7 +211,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     dispose(reason:'interrupted'='interrupted'){
       if(disposed)return;disposed=true;
       if(timer)clearTimeout(timer);listeners.abort();
-      window.speechSynthesis?.cancel();
+      narrator.cancel();
       if(!done){finishLanguageAttempt(options.profile,attempt.id,reason);save();}
       root.remove();
     },

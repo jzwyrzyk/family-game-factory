@@ -4,6 +4,7 @@ import { ProblemSolvingStore } from './storage';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import { assertPracticeContinuation, evaluatePracticeChoice, getPracticeTask, practiceTasksForGrade, runPracticeScene, runPracticeTest, runPracticeRevision, validatePracticeDraft, type PracticeChoice, type PracticePhase, type PracticeScene, type PracticeTask, type PracticeTrial } from './practice';
 import './style.css';
+import {createFriendlyNarrator} from '../speech/friendly-narrator';
 
 type Host = { enter(): boolean; home(): void };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = '') => {
@@ -24,11 +25,13 @@ export function installProblemSolvingPractice(host: Host) {
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   let active: ProblemSolvingDraft | null = null, visible = false, activeOwner = '', revisionRetry = false;
-  let speech: SpeechSynthesisUtterance | null = null;
+  let readingEpisode = '', readingPhase: PracticePhase | 'result' | 'finished' = 'finished';
+  const narrator = createFriendlyNarrator(() => isCurrent() && !FG.learning?.active
+    && active?.episode.id === readingEpisode && phaseNow() === readingPhase);
   const status = (text: string, error = false) => { $('psStatus').textContent = text; $('psStatus').classList.toggle('is-error', error); };
   const isCurrent = () => visible && activeOwner === owner();
   const act = (fn: () => void) => { try { fn(); } catch (error) { status((error as Error).message, true); } };
-  const stopSpeech = () => { if (speech && 'speechSynthesis' in window) window.speechSynthesis.cancel(); speech = null; };
+  const stopSpeech = () => narrator.cancel();
   function assertCurrent() {
     if (!isCurrent()) throw Error('Open this idea in your own profile.');
     if (FG.learning?.active) { FG.learning.focus?.(); throw Error('Finish your learning activity, or choose My Games to leave.'); }
@@ -62,7 +65,7 @@ export function installProblemSolvingPractice(host: Host) {
     const next = clone(active);
     next.episode.observations.push({ id: `${kind}-${phase}`, skill: phase === 'interpret' ? 'interpret_evidence' : phase === 'revise' ? 'revise' : 'plan_test',
       outcome: 'unobserved', authorship: 'unknown', support: kind === 'hint' ? 'strategy' : 'access-only', elicitation: 'prompted',
-      observedAt: iso(), responseId: kind + ':' + phase, note: kind === 'hint' ? `A strategy hint was opened during ${phase}.` : `Local read-aloud was requested during ${phase}.` });
+      observedAt: iso(), responseId: kind + ':' + phase, note: kind === 'hint' ? `A strategy hint was opened during ${phase}.` : `Local read-aloud started during ${phase}.` });
     save(next);
   }
   function choose(phase: PracticePhase, id: string) {
@@ -171,13 +174,15 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function narration(text: string, phase: PracticePhase) {
     assertCurrent();
-    if (!('speechSynthesis' in window)) { status('Read aloud is not available on this device.'); return; }
-    // Local voices only: this optional control adds no speech service or remote call.
-    const voice = window.speechSynthesis.getVoices().find(item => item.localService && /^en([-_]|$)/i.test(item.lang));
-    if (!voice) { status('A local English read-aloud voice is not available on this device.'); return; }
-    addSupport('narration', phase); stopSpeech();
-    const utterance = new SpeechSynthesisUtterance(text); utterance.voice = voice; utterance.lang = voice.lang; utterance.rate = .88;
-    speech = utterance; window.speechSynthesis.speak(utterance);
+    if (narrator.active) { stopSpeech(); return; }
+    readingEpisode = active?.episode.id || ''; readingPhase = phase;
+    narrator.speak(text, {
+      onStarted: () => {
+        try { addSupport('narration', phase); }
+        catch (error) { stopSpeech(); status((error as Error).message, true); }
+      },
+      onUnavailable: () => status('Voice is not ready here. Ask a grown-up to read with you.'),
+    });
   }
   function toolsFor(phase: PracticePhase, copy: string) {
     const tools = node('div', 'ps-support'), hint = button('A little hint', 'ps-text-button', 'help'), hear = button('Hear this', 'ps-text-button', 'volume');

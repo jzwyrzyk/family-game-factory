@@ -13,6 +13,8 @@ Start with the canonical references below. Feature documents remain the detailed
 | [Decision records](decisions/README.md) | Why did we choose this approach? | A consequential choice is accepted, replaced or reversed |
 | [Maintenance process](context/MAINTENANCE.md) | Who updates the references, and what catches drift? | Checks, review routing or upkeep changes |
 
+[Child interface: clear at six](brand/CHILD_INTERFACE.md) applies to child copy, readable task surfaces and optional narration. See the [learning readability and voice decision](decisions/2026-11-20-learning-readability-and-narration.md) for the scoped repair and release boundary.
+
 ## Choose the task-specific references
 
 | Task | Intent and detailed contracts | Implementation/evidence entry points |

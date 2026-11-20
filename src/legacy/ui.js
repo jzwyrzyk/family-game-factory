@@ -25,7 +25,7 @@ function safeCheckpoint(kind){
  const complete=()=>{if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;dismiss();game.resume?.();restorePlayFocus(prior);};
  const open=()=>{
   if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;
-  const overlay=overlayHtml('<div id="native-learning-activity" class="modal-card"></div>');
+  const overlay=overlayHtml('<div id="native-learning-activity" class="learning-modal-card"></div>');
   try{if(!FG.learning.checkpoint(overlay.firstElementChild,{...learningContext,opportunity:'mid-play'},complete,{roundId:token,legacyIds:true,onLeave:()=>page('home')}))complete();}
   catch{const box=overlay.firstElementChild;box.replaceChildren();const title=document.createElement('h2'),copy=document.createElement('p'),retry=document.createElement('button');title.textContent='Your game is paused';copy.textContent='A learning activity could not open. Try again, or leave this game and ask a grown-up for help.';retry.className='btn primary';setIconLabel(retry,'retry','Try learning again');retry.onclick=open;box.append(title,copy,retry);retry.focus();}
  };
@@ -47,7 +47,7 @@ function dismiss(){$('game-mount').inert=false;const el=$('stage-overlay');el.cl
 function finish(game,result){
  if(activeGameId!==game)return;
  const session=gameSession,p=FG.store.current();
- const el=overlayHtml('<div id="native-learning-activity" class="modal-card"></div>');
+ const el=overlayHtml('<div id="native-learning-activity" class="learning-modal-card"></div>');
  const asked=FG.learning.checkpoint(el.firstElementChild,{...learningContext,opportunity:'round-end'},response=>{
    if(session!==gameSession)return;
    const outcome=activeGameId==='buckets'&&p.punish&&p.learningSubject!=='language'&&!response.independent?{...result,won:false,title:'Run complete',description:'Original Challenge: this answer ended the run. Try again when ready.'}:result;

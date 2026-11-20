@@ -61,7 +61,10 @@
     "docs/decisions/2026-11-19-brio-art-adoption.md",
     "docs/decisions/2026-11-20-character-first-navigation.md",
     "docs/pals/EXPRESSIONS.md",
-    "docs/decisions/2026-11-20-pal-expression-runtime.md"
+    "docs/decisions/2026-11-20-pal-expression-runtime.md",
+    "docs/brand/CHILD_INTERFACE.md",
+    "docs/decisions/2026-11-20-learning-readability-and-narration.md",
+    "docs/brand/previews/learning-readability-20261120/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -114,9 +117,9 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:52.837Z",
-      "sourceDigest": "e48539cc01e28ae57295687155156a54de2f3f8229aa15a9a577cc5cd5aacc06",
+      "sourceDigest": "85327b2e1ba932d3003a30dc36470442b56e0c2f8761e333411ad5bb9a41515a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the complete approved core artwork package, separate Brio status, and preview-only collection authority in product doctrine.",
+      "reviewReason": "Recorded the complete approved core artwork package, separate Brio status, and preview-only collection authority in product doctrine. Additional reconciled review: Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -159,6 +162,13 @@
           "sourceDigest": "2b74b8ac64d8a5f80eea41e577afb933362153cc194096eb5b41ea084f8d9f5f",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded owner-approved Art Studio merge 20ffb350 with exact tested-tree equality and all eight passing hosted workflows. Product behavior and the local-storage, adapter and acceptance boundaries remain as reviewed."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:56.900Z",
+          "sourceDigest": "a592474519dd7d2cbb9c4298d97ab076395c42176da44f80791c0ab1d23cbe35",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair."
         }
       ]
     },
@@ -180,7 +190,9 @@
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
         "docs/mind-your-jems/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/brand/CHILD_INTERFACE.md",
+        "docs/decisions/2026-11-20-learning-readability-and-narration.md"
       ],
       "sources": [
         "src/main.ts",
@@ -197,13 +209,14 @@
         "src/adult-pilot/**",
         "docs/brand/achievement-art/README.md",
         "docs/brand/achievement-art/*.json",
-        "docs/brand/art-library/**"
+        "docs/brand/art-library/**",
+        "src/speech/**"
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:53.191Z",
-      "sourceDigest": "5b0d7cd1f58f8f428b99a109368161be8aeb770ef3b56f626c83ff772b598355",
+      "sourceDigest": "6a02fbe6f633ac890ad6cbddb6f807338b338bcdc3bb9f8dfeb12f6fd96c7d6b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled current My Pals expression controls, exact approved portraits, retry focus recovery and optional offline caching in architecture and feature documentation.",
+      "reviewReason": "Reconciled current My Pals expression controls, exact approved portraits, retry focus recovery and optional offline caching in architecture and feature documentation. Additional reconciled review: Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -232,6 +245,13 @@
           "sourceDigest": "5dd716aa531805218e50cf7d6866f4eeed7ab613b8d49462f9d94a84366209ad",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the complete first-creation flow and the conditional-header follow-up after real parent-browser overflow. Header tools now wrap within phone width while retaining visible player, subject and help controls; the unchanged first-creation and complete-playable-card guards pass."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:57.154Z",
+          "sourceDigest": "3522e893d70974d52ef32f24618e7ef2522cdfbb03b33efc8bc4949b8555da58",
+          "reviewOutcome": "updated",
+          "reviewReason": "Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race."
         }
       ]
     },
@@ -376,7 +396,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/adaptive-math/*.md",
         "docs/adaptive-language/*.md",
-        "docs/rewards/*.md"
+        "docs/rewards/*.md",
+        "docs/brand/CHILD_INTERFACE.md"
       ],
       "sources": [
         "src/learning/**",
@@ -385,10 +406,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T17:17:56.207Z",
-      "sourceDigest": "2798174cf2197341b90d2bc4a3abf04136091e44948aa2b40550c7542dbd44d5",
+      "reviewedAt": "2026-11-20T19:05:57.591Z",
+      "sourceDigest": "0d75fe89ba7b485648a6bf2cf1f8e84447401bc98358b793a95ff49bbfd8cfb7",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed production host save ordering with Math and English attempts; optional context is emitted only after durable attempt and reward outbox, preserving subject evidence and existing earning eligibility on observer failure."
+      "reviewReason": "Reviewed question-first Math/Language rendering, 18px controls, 20px task text, disabled instructional text, form labels and recovery colors. Documented playback-start assistance with no credit for unavailable voices; curriculum, grading, subject permissions and checkpoint policy remain unchanged."
     },
     {
       "id": "services",
@@ -458,10 +479,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T05:15:29.595Z",
-      "sourceDigest": "d242273dcce3a2661255df5b4f9e18e242088778a592c6abe580f54742da8ad9",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed model and speech completion settlement: a revoked trusted device now returns the existing UNAUTHENTICATED error after the failed receipt and usage charge commit atomically. Adult lock still yields capability unavailable; no reply or transcript is published. Architecture and release contracts already describe these authorization and accounting boundaries accurately."
+      "reviewedAt": "2026-11-20T19:05:57.871Z",
+      "sourceDigest": "8939dd9b318ffc535db5f7166ad77a57f5768f8044706ad0536e990891be0643",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the shared recognized local female voice policy for optional Hear reply, delayed discovery, cancellation and unavailable output. Input recording, explicit Send, provider configuration, budgets and existing privacy boundaries are unchanged."
     },
     {
       "id": "adult-privacy",
@@ -533,9 +554,9 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:54.038Z",
-      "sourceDigest": "5a9ce4af9cf2cd725b5a100863502dae7bf856c7fffaf0599ab7af6aaa5bef0b",
+      "sourceDigest": "2cda7d3552159d5e67b99c0450df8bd7291213d2e143c4ec937be06fdf1fe793",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded full asset, expression, Pal, navigation and offline quota-recovery checks and routed the focused asset verifier regression tests.",
+      "reviewReason": "Recorded full asset, expression, Pal, navigation and offline quota-recovery checks and routed the focused asset verifier regression tests. Additional reconciled review: Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -564,6 +585,13 @@
           "sourceDigest": "413cc9e3efd2f008302fcda4c8dffd6202eeed27968df440be4b4919bb5039ba",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the tablet quality helper change after the hosted one-part-versus-two assertion. Locator.tap retains real touch with actionability/stability checks; exact intermediate state assertions improve failure localization. Existing counts, selection, capability, geometry, held input and release assertions remain intact, and both orientations pass locally."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:58.166Z",
+          "sourceDigest": "cfe5911e9ebbfa04a507da0029b6b91fa3b888948760ffcab84a30f3f11cb68d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified."
         }
       ]
     },
@@ -589,9 +617,9 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-20T19:17:22.236Z",
-      "sourceDigest": "ccb8813430c60571f8bc827fc77294c71848246e6e8eae0583ba42f6ef0c657b",
+      "sourceDigest": "ecc99ddd3395524a8000754ef843c3b7992f1cdbaf9d5bfda813840f7d0ea98b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded final combined local build, asset parity, browser, navigation, offline and documentation acceptance with hosted checks still pending on PR90.",
+      "reviewReason": "Recorded final combined local build, asset parity, browser, navigation, offline and documentation acceptance with hosted checks still pending on PR90. Additional reconciled review: Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -627,6 +655,13 @@
           "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
           "reviewOutcome": "updated",
           "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:58.444Z",
+          "sourceDigest": "c6333bb9df99bd909d230aa35bf3196bf7d66eed6875cb87969f99243727e134",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment."
         }
       ]
     },
@@ -650,9 +685,9 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "122158109ee8df03971878fd4a264d605ea748dad961c3c9967683b416827951",
+      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests.",
+      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -681,6 +716,13 @@
           "sourceDigest": "05b6308f6d0f23bf0e027f2bc9af1e0486825de7c3ebaa8c833f0febfadb19ff",
           "reviewOutcome": "updated",
           "reviewReason": "Registered the first-creation contract and dated decision, routed child-journey and screenshot-caption link checks, and linked the new entry point in the docs index. Reviewed the preserved source area coverage and unchanged documentation-checker behavior."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:58.721Z",
+          "sourceDigest": "3baadae98a9cf0e7015e325454f85ac2f2363ebb89750ff818abaa82ed965e40",
+          "reviewOutcome": "updated",
+          "reviewReason": "Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved."
         }
       ]
     },
@@ -715,10 +757,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3a63415513e1f54af3332636d6fd0a25a452c8fa4628df1b3ff7acac66db5217",
-      "reviewedAt": "2026-11-20T17:11:54.336Z",
+      "sourceDigest": "38e06c1fb6f9a642044a3c0a7d48edd5f148b96fb0ceccd5e25783e4dcf33943",
+      "reviewedAt": "2026-11-20T19:05:58.979Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed touch and mouse navigation helper changes plus compact-shell geometry checks. Updated route placement while retaining every task, assistance, response, learning-guard and evidence assertion; no APS algorithm, award or storage changes.",
+      "reviewReason": "Reviewed local female narration with current owner/episode/phase cancellation and access support recorded only on playback start. Sized its speech status/help controls for child readability without changing authored tasks, grading, competence evidence or storage.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

@@ -63,3 +63,5 @@ Link DELIVERY-STATE.md for implementation and operational status.
 Never copy private child content, credentials or restricted evidence into this public repository. Link an access-controlled evidence location with a safe description when needed.
 
 - [Private Art Studio and explicit reusable art versions](2026-11-19-private-art-studio.md) — dedicated creation space, original preservation, pinned game/scene use and private portability.
+
+- [November 20: readable learning surfaces and friendly narration](2026-11-20-learning-readability-and-narration.md) — question-first copy, semantic light/dark separation, readable type and deliberate local female voice selection.
