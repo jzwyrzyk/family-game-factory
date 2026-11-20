@@ -26,6 +26,10 @@ The switch enables tools; it does not record automatically, send a conversation,
 
 This decision should be revisited when the temporary development need ends or when a separately authorized child AI release changes the audience policy. It is not a permanent replacement for guardian verification or a legal compliance finding. Source/fixture tests, deployed configuration and real provider/device acceptance remain distinct evidence.
 
+### Discoverability refinement — November 20, 2026
+
+[The owner-approved navigation refinement](2026-11-20-character-first-navigation.md) adds a permanent **Private parent session** entry under Menu → Grown-ups and Parent Settings. It explains disconnected, disabled, permit and service readiness states instead of vanishing. The original gated Adult profile choice and same passphrase-backed session remain. This is an entry to the existing switch, not another activation toggle or a server authorization change.
+
 ## Evidence and related documents
 
 - [Adult profile operation, release acceptance and removal](../adult-pilot/VOICE_RELEASE_AND_UAT.md).

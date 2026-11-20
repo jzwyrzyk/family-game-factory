@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
@@ -55,9 +55,14 @@ async function currentNavigation(page,id){
    console.log('jems brand '+label+': Studio booted');
    await approvedIcons(page,'/arcade/');
    await currentNavigation(page,'studioNavHome');
-   for(const [id,name] of [['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],['studioNavProblemSolving','Try an idea'],['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPals','My Pals'],['studioNavPowers','My Powers']]){
+   for(const [id,name] of [['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavMenu','Menu']]){
     assert.equal(await page.locator('.studio-nav').getByRole('button',{name,exact:true}).getAttribute('id'),id,'navigation keeps its visible accessible label');
    }
+   await page.locator('#studioNavMenu').click();
+   for(const [id,name] of [['studioNavScenes','Create & code'],['studioNavProblemSolving','Try an idea'],['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPals','My Pals'],['studioNavPowers','My Powers']]){
+    assert.equal(await page.locator('#studioMenuDialog').getByRole('button',{name,exact:true}).getAttribute('id'),id,'Menu preserves each secondary destination and label');
+   }
+   await page.locator('#studioMenuClose').click();
    await page.locator('#studioNavHome').focus();await page.keyboard.press('Tab');
    assert.equal(await page.evaluate(()=>document.activeElement.id),'studioNavCreate','Tab moves between controls without stopping on their SVGs');
    const focus=await page.locator('#studioNavCreate').evaluate(element=>({visible:element.matches(':focus-visible'),width:parseFloat(getComputedStyle(element).outlineWidth),style:getComputedStyle(element).outlineStyle}));
@@ -70,13 +75,10 @@ async function currentNavigation(page,id){
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
-   // Keep all eight destinations tappable in two rows and hero copy clear of the
-   // original maker portraits at phone widths, including narrow 320px screens.
+   // Keep three primary actions in one row, every secondary route in the drawer,
+   // and the selected maker clear of home actions even at a narrow 320px width.
    if(label==='mobile'){
-    const destinations=[
-     ['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavScenes','Create & code'],
-     ['studioNavProblemSolving','Try an idea'],['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPals','My Pals'],['studioNavPowers','My Powers']
-    ];
+    const destinations=[['studioNavHome','My Games'],['studioNavCreate','Create'],['studioNavMenu','Menu']];
     for(const phoneWidth of [390,320]){
      await page.setViewportSize({width:phoneWidth,height});
      await page.evaluate(()=>document.fonts.ready);
@@ -85,24 +87,27 @@ async function currentNavigation(page,id){
       const action=rect('.studio-home-action'),characters=rect('.jems-home-characters');
       return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,
        overlap:action.left<characters.right&&action.right>characters.left&&action.top<characters.bottom&&action.bottom>characters.top,
-       buttons:[...document.querySelectorAll('.studio-nav button')].map(button=>{
+       buttons:[...document.querySelectorAll('.studio-nav > button')].map(button=>{
         const box=button.getBoundingClientRect();
         return {id:button.id,label:button.textContent.trim(),height:box.height,width:box.width,top:box.top,bottom:box.bottom,left:box.left,right:box.right,fits:button.scrollWidth<=button.clientWidth+1};
        })};
      });
-     assert.equal(layout.buttons.length,8,'all eight navigation destinations remain available');
-     assert.deepEqual(layout.buttons.map(button=>[button.id,button.label]),destinations,'navigation preserves every destination including Try an idea, My rewards and My Pals');
+     assert.equal(layout.buttons.length,3,'only three primary actions occupy the phone navigation');
+     assert.deepEqual(layout.buttons.map(button=>[button.id,button.label]),destinations,'My Games, Create and Menu are the stable primary actions');
      assert.ok(layout.buttons.every(button=>button.height>=44&&button.width>=44&&button.fits),'navigation labels fit touch-sized buttons');
-     for(const row of [layout.buttons.slice(0,4),layout.buttons.slice(4)]){
-      assert.ok(row.every(button=>Math.abs(button.top-row[0].top)<2),'the first four and final four destinations align in separate mobile rows');
-      assert.ok(row.slice(1).every((button,index)=>button.left>=row[index].right-1),'navigation controls cannot overlap within a row');
-     }
-     assert.ok(layout.buttons[4].top>=Math.max(...layout.buttons.slice(0,4).map(button=>button.bottom)),'the two navigation rows do not overlap');
-     assert.ok([0,1,2,3].every(column=>Math.abs(layout.buttons[column].left-layout.buttons[column+4].left)<2),'the final four destinations align to the first four columns');
+     assert.ok(layout.buttons.every(button=>Math.abs(button.top-layout.buttons[0].top)<2),'all three primary actions align in one mobile row');
+     assert.ok(layout.buttons.slice(1).every((button,index)=>button.left>=layout.buttons[index].right-1),'navigation controls cannot overlap');
      assert.ok(layout.buttons.every(button=>button.left>=0&&button.right<=layout.width+1),'complete navigation targets fit the phone viewport');
      assert.equal(layout.overlap,false,'maker artwork cannot cover home actions or service status');
      assert.ok(layout.scrollWidth<=layout.width+2,'narrow home does not scroll horizontally');
      await page.screenshot({path:'test-results/jems-brand-home-'+phoneWidth+'.png',fullPage:false});
+     await page.locator('#studioNavMenu').click();
+     const secondary=await page.locator('#studioMenuDialog [id^="studioNav"]').evaluateAll(buttons=>buttons.map(button=>{
+      const box=button.getBoundingClientRect();return {id:button.id,width:box.width,height:box.height,left:box.left,right:box.right,font:parseFloat(getComputedStyle(button).fontSize)};
+     }));
+     assert.equal(secondary.length,6,'all six secondary destinations remain in the menu');
+     assert.ok(secondary.every(button=>button.height>=44&&button.width>=44&&button.font>=16&&button.left>=0&&button.right<=phoneWidth+1),'drawer routes retain readable labels and complete touch targets');
+     await page.locator('#studioMenuClose').click();
     }
     await page.setViewportSize({width,height});
    }
@@ -187,11 +192,11 @@ async function currentNavigation(page,id){
    await currentNavigation(page,'studioNavHome');
    assert.equal(await page.locator('#studioSavedSection .jems-saved-art').isVisible(),true,'a real saved notebook can use collection art');
    assert.equal(await page.locator('#studioSavedSection .jems-saved-art').getAttribute('alt'),'');
-   await page.locator('#studioNavJourney').click();await currentNavigation(page,'studioNavJourney');
-   await page.locator('#studioNavRewards').click();await currentNavigation(page,'studioNavRewards');
-   await page.locator('#studioNavProblemSolving').click();await currentNavigation(page,'studioNavProblemSolving');
-   await page.locator('#studioNavScenes').click();await currentNavigation(page,'studioNavScenes');
-   await page.locator('#studioNavPowers').click();
+   await navigate(page,'#studioNavJourney');await currentNavigation(page,'studioNavJourney');
+   await navigate(page,'#studioNavRewards');await currentNavigation(page,'studioNavRewards');
+   await navigate(page,'#studioNavProblemSolving');await currentNavigation(page,'studioNavProblemSolving');
+   await navigate(page,'#studioNavScenes');await currentNavigation(page,'studioNavScenes');
+   await navigate(page,'#studioNavPowers');
    await currentNavigation(page,'studioNavPowers');
    assert.equal(await page.locator('#page-lab').isVisible(),true);
    const mathHead=page.locator('#page-lab .math-activity h2');

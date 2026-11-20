@@ -75,7 +75,10 @@ async function localJourney(browser,url,device,viewport){
   await assertTouchDevice(page,device,'after initial navigation');
   const first=await page.locator('#studioStarters [data-starter]').first().boundingBox();
   assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable game choice is in the first viewport');
-  await assertTargets(page,['#studioNavHome','#studioNavCreate','#studioNavPowers','#studioProfileSummary','#studioNew']);
+  await assertTargets(page,['#studioNavHome','#studioNavCreate','#studioNavMenu','#studioProfileSummary','#studioNew']);
+  await page.click('#studioNavMenu');
+  await assertTargets(page,['#studioNavPowers']);
+  await page.click('#studioMenuClose');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
   await journeyScreenshot(page,device,'first-screen');
 

@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 /* Production-dist user journeys. COACH_INLINE_REVIEW is an explicit, non-CI local
  * harness for environments blocking browser HTTP: trusted built bundle + memory
  * storage fixture. It is NOT origin/security/service-worker/live-provider evidence. */
@@ -118,7 +118,7 @@ async function load(page,url,saved={}){
   });
   await page.click('#studioMic');
   await page.waitForFunction(()=>window.__studioVoiceTest?.processLocally===true);
-  await page.click('#studioNavPowers');
+  await navigate(page,'#studioNavPowers');
   assert.equal(await page.evaluate(()=>window.__studioVoiceTest.aborted),true,'My Powers navigation must abort microphone capture');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);console.log(`PASS ${device}: play-first, no duplicate play projects, discussion vs build, support, A/B/C, combination, explicit promotion, old-base continuation, notes/reload, profile and math isolation, skip, first-build plan and honest offline status${inline?' [INLINE HARNESS, not network evidence]':''}`);await ctx.close();
  }

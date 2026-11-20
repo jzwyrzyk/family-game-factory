@@ -1,7 +1,8 @@
 import {createIcon,setIconLabel} from './icons';
+import {createMakerIdentity, MAKER_ARTWORK, setMakerSprite, type MakerAtlas, type MakerCharacter} from './maker-identity';
 
 /** Art choices are cosmetic. They are never gender, ability or learner records. */
-export type JourneyCharacter = 'spark' | 'nova';
+export type JourneyCharacter = MakerCharacter;
 export type JourneyLevel = 0 | 1 | 2 | 3 | 4;
 export type JourneyState = {
   ownerId: string;
@@ -12,7 +13,7 @@ export type JourneyState = {
   /** Label for the host's current next-step action, independent of outfit previews. */
   primaryActionLabel?: string;
 };
-export type JourneyAtlas = { src: string; columns?: number; rows?: number; frameAspectRatio?: number };
+export type JourneyAtlas = MakerAtlas;
 export type JourneyArtwork = {
   spark: JourneyAtlas;
   nova: JourneyAtlas;
@@ -37,9 +38,7 @@ const LEVELS = [
 ] as const;
 
 const DEFAULT_ARTWORK: JourneyArtwork = {
-  spark: { src: 'jems-journey/characters-spark.webp', columns: 4, rows: 1, frameAspectRatio: .75 },
-  nova: { src: 'jems-journey/characters-nova.webp', columns: 4, rows: 1, frameAspectRatio: .75 },
-  gems: { src: 'jems-journey/gems.webp', columns: 4, rows: 1, frameAspectRatio: .75 },
+  ...MAKER_ARTWORK,
   background: 'jems-journey/background.webp'
 };
 
@@ -58,38 +57,21 @@ const button = (className: string, text: string, id?: string) => {
 const assetUrl = (path: string) => new URL(path, document.baseURI).href;
 
 /** Base-path-safe atlas placement shared by the page, home and celebration host. */
-export function setJourneySprite(target: HTMLElement, asset: JourneyAtlas, level: number) {
-  const columns = Math.max(1, Math.floor(asset.columns ?? 4));
-  const rows = Math.max(1, Math.floor(asset.rows ?? 1));
-  const index = Math.max(0, Math.min(columns * rows - 1, level - 1));
-  const x = index % columns, y = Math.floor(index / columns);
-  target.style.backgroundImage = `url(${JSON.stringify(assetUrl(asset.src))})`;
-  target.style.backgroundSize = `${columns * 100}% ${rows * 100}%`;
-  target.style.backgroundPosition = `${columns === 1 ? 0 : 100 * x / (columns - 1)}% ${rows === 1 ? 0 : 100 * y / (rows - 1)}%`;
-  target.style.aspectRatio = String(asset.frameAspectRatio ?? 1);
-  target.dataset.spriteSrc = asset.src;
-  target.dataset.level = String(level);
-}
+export const setJourneySprite = setMakerSprite;
 
-export function createJourneyCharacter(character: JourneyCharacter, level: number, asset = DEFAULT_ARTWORK[character]) {
-  const art = node('span', 'jems-journey-sprite jems-character-art');
-  art.setAttribute('aria-hidden', 'true');
-  art.dataset.character = character;
-  art.dataset.level = String(level);
-  setJourneySprite(art, asset, level);
-  return art;
+export function createJourneyCharacter(character: JourneyCharacter, level: number, asset = DEFAULT_ARTWORK[character], ownerId = '') {
+  return createMakerIdentity({ ownerId, character, level }, { ...MAKER_ARTWORK, [character]: asset });
 }
 
 /** One soft rank tile: the original maker, outfit and held jem stay together.
- * An undecided owner sees both makers; rendering never makes a saved choice. */
-export function createJourneyRankThumbnail(character: JourneyCharacter | null, level: number, artwork: Pick<JourneyArtwork, 'spark' | 'nova'> = DEFAULT_ARTWORK) {
+ * An undecided owner sees a neutral jem; only choice controls show both makers. */
+export function createJourneyRankThumbnail(character: JourneyCharacter | null, level: number, artwork: Pick<JourneyArtwork, 'spark' | 'nova'> = DEFAULT_ARTWORK, ownerId = '') {
   const tile = node('span', 'jems-rank-thumbnail');
   tile.setAttribute('aria-hidden', 'true');
-  tile.dataset.character = character ?? 'both';
+  tile.dataset.character = character ?? 'none';
   tile.dataset.level = String(level);
-  tile.classList.toggle('is-pair', !character);
-  const choices: JourneyCharacter[] = character ? [character] : ['spark', 'nova'];
-  for (const choice of choices) tile.append(createJourneyCharacter(choice, level, artwork[choice]));
+  tile.classList.toggle('is-unselected', !character);
+  tile.append(createMakerIdentity({ ownerId, character, level }, { ...MAKER_ARTWORK, ...artwork }));
   return tile;
 }
 
@@ -208,7 +190,7 @@ export function installGemJourney(options: GemJourneyOptions) {
   dialog.setAttribute('aria-labelledby', 'jemsCharacterTitle');
   dialog.setAttribute('aria-describedby', 'jemsCharacterHint');
   const dialogTop = node('div', 'jems-character-top');
-  const dialogHeading = node('h2', '', 'Choose your maker');
+  const dialogHeading = node('h2', '', 'Choose your character');
   dialogHeading.id = 'jemsCharacterTitle';
   const cancel = button('jems-character-close', '', 'jemsCharacterCancel');
   cancel.append(createIcon('close'));
@@ -268,7 +250,7 @@ export function installGemJourney(options: GemJourneyOptions) {
       ? `Your style. Same adventure. Previewing the Level ${previewLevel} outfit.`
       : 'Your style. Same adventure.';
     for (const item of choiceButtons) {
-      item.art.replaceChildren(createJourneyRankThumbnail(item.character, previewLevel, artwork));
+      item.art.replaceChildren(createJourneyRankThumbnail(item.character, previewLevel, artwork, state.ownerId));
       item.choice.setAttribute('aria-pressed', String(state.character === item.character));
       item.choice.disabled = saving;
       item.selected.hidden = state.character !== item.character;
@@ -296,16 +278,12 @@ export function installGemJourney(options: GemJourneyOptions) {
     setIconLabel(change, 'edit', state.character ? 'Change character' : 'Choose character');
 
     characters.replaceChildren();
-    characters.dataset.character = state.character ?? 'both';
+    characters.dataset.character = state.character ?? 'none';
     characters.dataset.level = String(previewLevel);
-    const selectedCharacters: JourneyCharacter[] = state.character ? [state.character] : ['spark', 'nova'];
-    characters.classList.toggle('is-pair', selectedCharacters.length === 2);
-    for (const character of selectedCharacters) {
-      const art = node('span', 'jems-journey-character');
-      art.dataset.character = character;
-      setJourneySprite(art, artwork[character], previewLevel);
-      characters.append(art);
-    }
+    characters.classList.toggle('is-unselected', !state.character);
+    const portrait = createMakerIdentity({ ownerId: state.ownerId, character: state.character, level: previewLevel }, artwork);
+    portrait.classList.add('jems-journey-character');
+    characters.append(portrait);
     for (const card of cards) {
       const earned = state.level >= card.level;
       card.card.classList.toggle('is-earned', earned);
@@ -318,7 +296,7 @@ export function installGemJourney(options: GemJourneyOptions) {
       if (earned) setIconLabel(card.status, 'check', status);
       else card.status.textContent = status;
       card.card.setAttribute('aria-label', `Level ${card.level}, ${card.name}, ${status}. Preview this level.`);
-      card.illustration.replaceChildren(createJourneyRankThumbnail(state.character, card.level, artwork));
+      card.illustration.replaceChildren(createJourneyRankThumbnail(state.character, card.level, artwork, state.ownerId));
     }
     masterProgress.hidden = state.level < 3;
     masterProgressText.textContent = state.level === 4 ? 'Three projects. So many possibilities.' : `${Math.min(3, state.polishedCount)} of 3 polished projects toward Gem Master`;

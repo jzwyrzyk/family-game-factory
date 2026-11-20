@@ -3,7 +3,9 @@ import { interpretLearningRequest, learningFormatLabel, setMode } from '../learn
 import {installCoaching} from './coaching';
 import {celebrateJem, type JemMilestone} from '../brand/delight';
 import {builderJourney, gemStage, GEM_STAGE_LABELS, type GemStage} from '../brand/gem-progress';
-import {installGemJourney, createJourneyCharacter, createJourneyGem, createJourneyRankThumbnail} from '../brand/journey';
+import {installGemJourney, createJourneyGem, createJourneyRankThumbnail} from '../brand/journey';
+import {createMakerIdentity} from '../brand/maker-identity';
+import {installStudioNavigation} from './navigation';
 import {iconMarkup, createIcon, setIconLabel, type IconName} from '../brand/icons';
 import {createMindYourJems, type WorkshopStatus} from '../games/mind-your-jems';
 import {installStudioVoice} from './voice';
@@ -246,7 +248,7 @@ export async function installStudio(){
   }),close:()=>closeJourneyMap(true),
  });
  globalStatus.after(journeyMap);
- function closeJourneyMap(focus=false){journeyMap.hidden=true;helpButton.setAttribute('aria-expanded','false');if(focus)focusView(helpButton);}
+ function closeJourneyMap(focus=false){journeyMap.hidden=true;helpButton.setAttribute('aria-expanded','false');if(focus)focusView(helpButton.closest('dialog:not([open])')?$('studioNavMenu'):helpButton);}
  function openJourneyMap(){
   if(guardMath())return;
   if(!journeyMap.hidden){closeJourneyMap(true);return;}
@@ -255,17 +257,16 @@ export async function installStudio(){
  helpButton.onclick=()=>act(openJourneyMap);
  journeyMap.addEventListener('keydown',event=>{event.stopPropagation();if(event.key==='Escape'){event.preventDefault();closeJourneyMap(true);}});
  const welcome=createFirstWelcome({
-  make:()=>act(()=>{if(guardMath())return;notebook.dismissWelcome(owner());closeJourneyMap();return newIdea();}),
-  explore:()=>act(()=>{if(guardMath())return;notebook.dismissWelcome(owner());closeJourneyMap();renderLibrary();focusView($('studioLibraryTitle'));}),
+  choose:(character,ownerId)=>chooseMaker(character,ownerId),
+  make:ownerId=>{
+   if(ownerId!==owner()||!notebook.avatar(ownerId))throw Error('Choose your character first.');
+   if(guardMath())return;
+   notebook.dismissWelcome(ownerId);closeJourneyMap();return newIdea();
+  },
   help:()=>act(openJourneyMap),
  });
  library.prepend(welcome.element);
  library.querySelector('.studio-home-hero')!.before($('studioContinue'));
- function welcomeAvailability(){
-  if(!configReady)return 'Checking your creation tools…';
-  if(builderReadiness==='available')return '';
-  return builderReadiness==='not-configured'?'Game building is not connected yet. You can save an idea or make a ready-made game yours.':builderReadinessCopy(builderReadiness)+'. You can still save an idea.';
- }
  function readWelcomeArt(force=false):Promise<void>{
   const capturedOwner=owner();
   if(!force&&welcomeArt?.owner===capturedOwner)return welcomeArt.pending||Promise.resolve();
@@ -302,9 +303,16 @@ export async function installStudio(){
   let hasScenes=true;
   try{hasScenes=new CreationStore(profileStorage(localStorage)).list(owner()).length>0;}catch{}
   void readWelcomeArt();
-  const visible=!welcomeArt!.hasArt&&welcomeArt!.deferredView!==epoch&&!notebook.guidance(owner()).welcomeDismissed&&!hasMeaningfulCreation(notebook.list(owner()),owner())&&!notebook.avatar(owner())&&!hasScenes;
-  library.dataset.firstVisit=String(visible);welcome.update(visible,welcomeAvailability());
+  const visible=!welcomeArt!.hasArt&&welcomeArt!.deferredView!==epoch&&!notebook.guidance(owner()).welcomeDismissed&&!hasMeaningfulCreation(notebook.list(owner()),owner())&&!hasScenes;
+  // Saving a character does not jump past the explicit creation action.
+  // Tool availability is explained in the composer; this first choice stays simple.
+  library.dataset.firstVisit=String(visible);welcome.update(visible,'',{ownerId:owner(),character:notebook.avatar(owner())});
   document.body.classList.toggle('studio-first-visit',visible&&route==='library');
+ }
+ function chooseMaker(character:'spark'|'nova',ownerId:string){
+  if(ownerId!==owner())throw Error('Choose a character for the current player.');
+  notebook.setAvatar(ownerId,character);
+  updateProfile();renderJourney();renderHomeProgress();renderRewards();refreshWelcome();
  }
  const journey=installGemJourney({
   onBack:()=>act(home),onCreate:()=>act(newIdea),
@@ -316,11 +324,7 @@ export async function installStudio(){
    await open(target.id,false);
    if(owner()===ownerId&&activeId===target.id&&route==='studio')setTab(gemStage(target)==='cut'?'versions':'talk');
   }),
-  onChooseCharacter:(character,ownerId)=>{
-   if(ownerId!==owner())throw Error('Choose a maker for the current player.');
-   notebook.setAvatar(ownerId,character);
-   updateProfile();renderJourney();renderHomeProgress();
-  }
+  onChooseCharacter:chooseMaker,
  });
  document.querySelector('main')!.append(journey.element);
  function rewardJourney(){const progress=builderJourney(notebook.list(owner()),owner());return {ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction};}
@@ -447,9 +451,16 @@ export async function installStudio(){
    actions.append(play,practice);buildShelf.append(actions);
   }
  }
+ let renderedMakerOwner='',renderedMakerCharacter:'spark'|'nova'|null=null;
  function updateProfile(){
-  const child=FG.store.current(),character=notebook.avatar(owner());profileSummary.replaceChildren();
-  if(character)profileSummary.append(createJourneyCharacter(character,Math.max(1,builderJourney(notebook.list(owner()),owner()).level)));
+  const child=FG.store.current(),makerOwner=owner(),character=notebook.avatar(makerOwner);
+  // A choice can also change in another tab. Clear old cosmetic notifications
+  // only when the rendered identity actually changes; ordinary saves keep them.
+  if(renderedMakerOwner&&(renderedMakerOwner!==makerOwner||renderedMakerCharacter!==character)){
+   clearRewardCelebration();window.dispatchEvent(new Event('jems:maker-changed'));
+  }
+  renderedMakerOwner=makerOwner;renderedMakerCharacter=character;profileSummary.replaceChildren();
+  if(character)profileSummary.append(createMakerIdentity({ownerId:makerOwner,character,level:builderJourney(notebook.list(makerOwner),makerOwner).level}));
   else profileSummary.append(el('span','',child.icon||'⭐'));
   profileSummary.append(el('span','',child.name));profileSummary.setAttribute('aria-label','Switch player. Current player: '+child.name);profileSummary.title='Switch player';profileMenu.open=false;
  }
@@ -576,9 +587,8 @@ export async function installStudio(){
  }
  function renderHomeProgress(){
   const progress=levelForOwner(),character=notebook.avatar(owner());
-  homeCharacters.replaceChildren();
-  for(const choice of character?[character]:['spark','nova'] as const)homeCharacters.append(createJourneyCharacter(choice,Math.max(1,progress.level)));
-  homeCharacters.classList.toggle('is-pair',!character);
+  homeCharacters.replaceChildren(createMakerIdentity({ownerId:owner(),character,level:progress.level}));
+  homeCharacters.classList.remove('is-pair');
   setIconLabel(homeCharacterLink,'star',character?'My journey':'Choose your maker');
   gemSummary.hidden=progress.level===0;gemSummary.replaceChildren();
   if(progress.level===0)return;
@@ -669,7 +679,7 @@ export async function installStudio(){
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;
   note.textContent=!configReady?'Checking which creation tools are ready…':builderReadiness==='not-configured'?'Game building is not connected yet. Your idea will still save.':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
-  welcome.update(!welcome.element.hidden,welcomeAvailability());
+  welcome.update(!welcome.element.hidden,'',{ownerId:owner(),character:notebook.avatar(owner())});
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;
@@ -820,6 +830,12 @@ export async function installStudio(){
   });installQualityCards();updateCreationNote();refreshWelcome();
  }
  function home(){stopSpeech();flushDraft();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
+ function homeFromNavigation(){
+  // The first invitation has no competing Explore action. After choosing a
+  // character, an intentional Home action can still open the ordinary library.
+  if(route==='library'&&!welcome.element.hidden&&notebook.avatar(owner()))notebook.dismissWelcome(owner());
+  home();
+ }
  function openSavedIdeas(){
   if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();
   $<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('creations');route='other';
@@ -1225,7 +1241,7 @@ export async function installStudio(){
   const target=(event.target as Element)?.closest<HTMLElement>('button,[data-page],[data-game]');if(!target||target.closest('#page-studio')||target.closest('#page-studio-library')||target.closest('.studio-nav'))return;
   if(target.classList.contains('profile-choice')){try{flushDraft();}catch(error){event.preventDefault();event.stopImmediatePropagation();status((error as Error).message,true);}return;}
   if(target.dataset.page==='creations'){event.preventDefault();event.stopImmediatePropagation();act(openSavedIdeas);}
-  else if(target.id==='homeBtn'||target.id==='resultHome'||target.dataset.page==='home'){event.preventDefault();event.stopImmediatePropagation();act(home);}
+  else if(target.id==='homeBtn'||target.id==='resultHome'||target.dataset.page==='home'){event.preventDefault();event.stopImmediatePropagation();act(homeFromNavigation);}
   else if(target.dataset.page==='create'){event.preventDefault();event.stopImmediatePropagation();act(newIdea);}
   else if(target.dataset.page==='feedback'||target.id==='improveThis'||target.id==='returnLive'){event.preventDefault();event.stopImmediatePropagation();act(()=>{if(activeId){showStudio();setTab('talk');$('studioPrompt').focus();}else home();});}
   else if(target.dataset.game){event.preventDefault();event.stopImmediatePropagation();act(()=>start(target.dataset.game as GameId));}
@@ -1239,7 +1255,7 @@ export async function installStudio(){
  $('studioHelp').onclick=()=>act(showHelp);$('studioCloseHelp').onclick=()=>{$('studioHelpPanel').hidden=true;focusView($('studioReturnToPlay')||$('studioHelp'));};
  $('studioReady').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;const ready=readyExperiment(s);if(ready?.candidate.remoteId)await showRemote(s,ready.candidate.remoteId,'candidate',ready.id);});
  $('studioMore').querySelector('summary')!.addEventListener('click',event=>{if(guardMath())event.preventDefault();});
- $('studioHome').onclick=()=>act(home);$('studioNavHome').onclick=()=>act(home);$('studioNew').onclick=()=>act(newIdea);$('studioNavCreate').onclick=()=>act(newIdea);$('studioChooseStarter').onclick=()=>act(home);
+ $('studioHome').onclick=()=>act(home);$('studioNavHome').onclick=()=>act(homeFromNavigation);$('studioNew').onclick=()=>act(newIdea);$('studioNavCreate').onclick=()=>act(newIdea);$('studioChooseStarter').onclick=()=>act(home);
  $('studioNavJourney').onclick=()=>act(()=>openJourney());homeCharacterLink.onclick=()=>act(()=>openJourney(!notebook.avatar(owner())));
  $('studioNavRewards').onclick=()=>act(openRewards);
  $('studioSubjectMath').onclick=()=>chooseLearningSubject('math');$('studioSubjectLanguage').onclick=()=>chooseLearningSubject('language');
@@ -1289,7 +1305,7 @@ export async function installStudio(){
   void readWelcomeArt(true);
  });
  window.addEventListener('beforeunload',event=>{stopSpeech();if(!rewardSourceWritable())return;try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
- window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(route==='journey')act(renderJourney);else if(activeId)act(render);updateProfile();}});
+ window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){updateProfile();if(route==='library')act(renderLibrary);else if(route==='journey')act(renderJourney);else if(route==='rewards')act(renderRewards);else if(activeId)act(render);}});
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
   onSavedDesignChange,
   onCoachReply:text=>voice?.reply(text),
@@ -1448,6 +1464,19 @@ export async function installStudio(){
   },
   home:()=>act(home),create:id=>{creation.openWithPal(id);},
   refreshCreation:()=>creation.refreshPals(),help:()=>{$('studioHelp').click();},
+ });
+ function openParent(connection=false){
+  stopSpeech();flushDraft();FG.creation?.flush();closeJourneyMap();hideJourney();disposeGame();
+  FG.app.page('parent');route='other';setActiveNav(null);
+  if(connection)FG.parentDashboard?.openTab('settings');
+  const target=connection?$('builderConnection'):$('parentDashboard')?.querySelector<HTMLElement>('h1');
+  if(target){target.tabIndex=-1;focusView(target);}
+ }
+ installStudioNavigation({nav,headerTools,helpButton,rewards:rewardsWidget.element,subjects:learningChoice,
+  openArt:()=>act(()=>artStudio.open()),openParent:()=>act(()=>openParent()),
+ });
+ window.addEventListener('factory-open-parent-connection',event=>{
+  event.preventDefault();act(()=>openParent(true));
  });
  $('studioHelp').after(sceneButton);
  sceneButton.onclick=()=>act(async()=>{

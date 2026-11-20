@@ -1,0 +1,10 @@
+/* The original selected human is reused at every size; no new raster crops. */
+.jems-maker-identity { display: block; background-repeat: no-repeat; flex: none; }
+.jems-maker-identity.is-unselected { filter: none; }
+.jems-rank-thumbnail > .jems-maker-identity.is-unselected { width: 57%; }
+.jems-home-characters > .jems-maker-identity.is-unselected {
+  width: 130px; max-width: 65%; margin-bottom: 28px;
+}
+.jems-journey-characters.is-unselected .jems-maker-identity {
+  width: 45%; flex: none; margin-block: 9% 15%;
+}

@@ -13,7 +13,7 @@ The gateway selects these policies with `FACTORY_ADULT_PILOT_MODE`. Adult mode a
 
 ## Profile switching and session isolation
 
-The ordinary profile menu contains Adult (development) when the server exposes the pilot. Choosing it prompts for the passphrase when locked, validates eligibility and opens the adult workspace. AI activates through that switch; it has no separate user activation toggle. The UI distinguishes adult authorization from actual model, speech and build availability.
+The permanent **Menu → Grown-ups → Private parent session** entry and Parent Settings card explain current access even when the browser is disconnected or testing is disabled. That visibility grants no access. The ordinary profile menu additionally contains Adult (development) when the server exposes the pilot. Choosing it prompts for the passphrase when locked, validates eligibility and opens the adult workspace. AI activates through that switch; it has no separate user activation toggle. The UI distinguishes adult authorization from actual model, speech and build availability.
 
 An adult session lasts at most 60 minutes and is bounded by permit/device authorization. Trusted-device refresh cannot extend or recreate it. An HttpOnly cookie alone is insufficient: requests require a proof in the current tab's memory matched to the live server grant. A child tab sharing cookies has no proof. Switching to a child or locking clears local adult authority and requests server revocation. A lost connection may prevent server confirmation; the discarded proof cannot activate new requests in that tab, and the server grant retains its absolute expiry. Reload/new tab starts locked. Device and operator-permit revocation are independent controls.
 
@@ -38,6 +38,6 @@ These records do not grant provider ZDR or certify external guardian-verificatio
 
 ## Remove the temporary feature
 
-Disable `FACTORY_ADULT_PILOT_MODE` across gateway and private service, refresh the site, verify that the adult entry disappears and new unlocks/paid adult calls are denied, and stop outstanding development jobs. Parent choices keep their own pending/verified state; no child approval changes as a side effect. Remove the dedicated adult module and permit branches after development, retaining normal profiles, guardian workflow and generic trusted-device controls.
+Disable `FACTORY_ADULT_PILOT_MODE` across gateway and private service, refresh the site, verify that the gated Adult profile choice disappears, the permanent session entry explains disabled testing, and new unlocks/paid adult calls are denied, and stop outstanding development jobs. Parent choices keep their own pending/verified state; no child approval changes as a side effect. Remove the dedicated adult module and permit branches after development, retaining normal profiles, guardian workflow and generic trusted-device controls.
 
 Related work: [#52 guardian permissions](https://github.com/jzwyrzyk/family-game-factory/pull/52), [#53 adult pilot](https://github.com/jzwyrzyk/family-game-factory/pull/53), [private worker #13](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/13), [release issue #46](https://github.com/jzwyrzyk/family-game-factory/issues/46).

@@ -27,6 +27,8 @@ These records explain durable choices without turning chat history into another 
 | [0012](0012-pals-from-earned-activity.md) | Collectible Pals from shared saved activity, with editable local scenes and separate collection ownership | Accepted for development; original three-stage point superseded by 0013 | Owner companion implementation follow-up; final character artwork remains separate |
 | [0013](0013-two-form-pals-and-current-main.md) | Exactly two Pal forms with earned-progress compatibility and current-main integration | Two forms are owner directed; five-adventure transition is explicit compatibility policy | Owner two-form handoff and request to finish PR81/68 for merge |
 
+| [Character-first navigation](2026-11-20-character-first-navigation.md) | Character choice before creation, selected human throughout host imagery, compact Menu and permanent private parent-session access | Accepted for implementation; source and production evidence separate | Owner's November 20 deployed-site review and explicit instruction to fix all four points |
+
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
 ## When to record a decision

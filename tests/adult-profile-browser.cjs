@@ -15,16 +15,24 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),errors=[],calls=[];
    let page=await ctx.newPage();
    page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push('Primary tab: '+(error.stack||error.message)));
-   let enabled=true,grant=false,holdReply=false,releaseReply,holdUnlock=false,releaseUnlock,ttl=3_600_000;
-   await ctx.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:'https://adult-api.test',previewOrigin:'https://adult-preview.test'})}));
+   let configured=true,connected=true,enabled=true,eligible=true,statusUnavailable=false,builderReady=true,dictationReady=true;
+   let grant=false,holdReply=false,releaseReply,holdUnlock=false,releaseUnlock,holdStatus=false,releaseStatus,ttl=3_600_000;
+   await ctx.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify(configured?{version:1,mode:'remote',apiBaseUrl:'https://adult-api.test',previewOrigin:'https://adult-preview.test'}:{version:1,mode:'unavailable'})}));
    await ctx.route('https://adult-api.test/**',async route=>{
     const req=route.request(),path=new URL(req.url()).pathname,proof=req.headers()['x-factory-adult-session'];
     const headers={'access-control-allow-origin':req.headers().origin||'*','access-control-allow-credentials':'true','access-control-allow-headers':'Content-Type,X-Factory-Request,X-Factory-Adult-Session,X-Factory-Audio-Id','access-control-allow-methods':'GET,POST,OPTIONS'};
     const send=(data,status=200)=>route.fulfill({status,headers,contentType:'application/json',body:JSON.stringify(data)}).catch(()=>{});
     if(req.method()==='OPTIONS')return send({});
-    const active=enabled&&grant&&proof===TOKEN;
+    const active=connected&&enabled&&eligible&&grant&&proof===TOKEN;
     calls.push({path,method:req.method(),proof,body:req.postData()});
-    if(path==='/v1/sessions/status')return send({connected:true,trusted:true,deviceName:'Development browser',adultPilot:{enabled,eligible:enabled,active,profileId:active?PROFILE:null,expiresAt:active?Date.now()+3_600_000:null}});
+    if(path==='/v1/sessions/status'){
+     if(statusUnavailable)return send({errorCode:'SERVICE_UNAVAILABLE'},503);
+     if(!connected)return send({errorCode:'UNAUTHENTICATED'},401);
+     const snapshot={connected:true,trusted:true,deviceName:'Development browser',adultPilot:{enabled,eligible:enabled&&eligible,active,profileId:active?PROFILE:null,expiresAt:active?Date.now()+3_600_000:null}};
+     if(holdStatus){holdStatus=false;await new Promise(resolve=>{releaseStatus=resolve;});}
+     return send(snapshot);
+    }
+    if(path==='/v1/sessions/renew')return connected?send({connected:true,trusted:true}):send({errorCode:'UNAUTHENTICATED'},401);
     if(path==='/v1/sessions/adult/unlock'){
      if(holdUnlock)await new Promise(resolve=>{releaseUnlock=resolve;});
      if(JSON.parse(req.postData()).parentPassphrase!==PASSPHRASE)return send({errorCode:'FORBIDDEN'},403);
@@ -32,8 +40,8 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
     }
     if(path==='/v1/sessions/adult/lock'){if(proof===TOKEN)grant=false;return send({active:false});}
     if(path==='/v1/coach/status')return send({available:active,mode:active?'model':'unavailable'});
-    if(path==='/v1/builder/status')return send({available:active});
-    if(path==='/v1/coach/audio/status')return send({available:active,mode:active?'private':'unavailable'});
+    if(path==='/v1/builder/status')return send({available:active&&builderReady});
+    if(path==='/v1/coach/audio/status')return send({available:active&&dictationReady,mode:active&&dictationReady?'private':'unavailable'});
     if(path==='/v1/creations')return send([]);
     if(path==='/v1/coach'){
      if(!active)return send({errorCode:'ADULT_PILOT_ACCESS_REQUIRED'},403);
@@ -43,7 +51,11 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
     return send({errorCode:'UNAVAILABLE'},404);
    });
    const url='http://127.0.0.1:'+server.address().port+'/arcade/';
-   const choose=async locator=>{if(!await page.locator('#studioProfileMenu').evaluate(n=>n.open))await page.locator('#studioProfileMenu summary').click();await page.locator(locator).first().click();};
+   const capture=async name=>{
+    const directory=process.env.JEMS_ADULT_SCREENSHOTS;if(!directory)return;
+    fs.mkdirSync(directory,{recursive:true});await page.screenshot({path:directory+'/'+device+'-'+name+'.png'});
+   };
+   const choose=async locator=>{try{if(!await page.locator('#studioProfileMenu').evaluate(n=>n.open))await page.locator('#studioProfileMenu summary').click();await page.locator(locator).first().click();}catch(error){await capture('profile-blocked');throw error;}};
    const unlock=async()=>{await choose('#adultProfileChoice');await page.fill('#adultProfilePassphrase',PASSPHRASE);await page.click('#adultProfileSubmit');await page.waitForFunction(id=>FG.store.current().id===id,PROFILE);await exploreWelcome(page);};
    await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);await exploreWelcome(page);await page.waitForSelector('#adultProfileChoice',{state:'attached'});
    await page.click('#studioNavCreate');await page.fill('#studioPrompt','CHILD NOTEBOOK SENTINEL: my private draft');
@@ -58,6 +70,13 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    assert.equal(await page.locator('#adultProfileBanner').isVisible(),true);
    assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),0,'adult starts with a separate notebook');
    assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1')),familyBefore);
+   builderReady=false;dictationReady=false;
+   await page.evaluate(()=>window.dispatchEvent(new Event('factory-open-parent-session')));
+   await page.waitForFunction(()=>document.getElementById('adultBuildingState').textContent==='unavailable');
+   assert.equal(await page.textContent('#adultConversationState'),'ready','an authorized session does not imply every provider is ready');
+   assert.equal(await page.textContent('#adultDictationState'),'unavailable');
+   await capture('active');
+   await page.click('#adultProfileCancel');builderReady=true;dictationReady=true;
    const second=await ctx.newPage();second.setDefaultTimeout(10000);second.on('pageerror',error=>errors.push('Second tab: '+(error.stack||error.message)));
    await second.goto(url);await second.locator('#jemsWriterNotice').waitFor({state:'visible'});
    assert.equal(await second.evaluate(()=>Boolean(window.FG?.studio||window.FG?.builder)),false,'a second tab pauses before installing writable workspaces');
@@ -110,8 +129,58 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    ttl=3_600_000;
    enabled=false;await page.reload();await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
    assert.equal(await page.locator('#adultProfileChoice').count(),0,'disabling the server pilot removes the temporary entry');
+   const openSettings=async()=>{
+    await page.locator('footer [data-page="parent"]').click();
+    await page.click('#parentTab-settings');
+    await page.locator('#adultParentSessionOpen').click();
+   };
+   await openSettings();
+   await page.waitForFunction(()=>document.getElementById('adultProfileDialog').dataset.accessState==='disabled');
+   assert.match(await page.textContent('#adultProfileStatus'),/connected.*not enabled/);
+   assert.equal(await page.locator('#adultProfileSubmit').isVisible(),false,'disabled testing offers no unlock');
+   const unlocksBefore=calls.filter(c=>c.path==='/v1/sessions/adult/unlock').length;
+   await page.keyboard.press('Escape');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'adultParentSessionOpen','closing returns focus to the persistent entry');
+   connected=false;enabled=true;
+   await page.locator('#adultParentSessionOpen').click();
+   await page.waitForFunction(()=>document.getElementById('adultProfileDialog').dataset.accessState==='disconnected');
+   assert.match(await page.textContent('#adultProfileStatus'),/no active family workshop connection/);
+   assert.equal(await page.locator('#adultProfileChoice').count(),0);
+   await capture('disconnected');
+   await page.click('#adultParentConnect');
+   await page.waitForFunction(()=>!document.getElementById('adultProfileDialog').open&&document.activeElement.id==='builderConnection');
+   assert.equal(await page.locator('#parentPanel-settings').isVisible(),true,'connection action lands in the existing parent settings');
+   await page.locator('#adultParentSessionOpen').click();
+   await page.waitForFunction(()=>document.getElementById('adultProfileDialog').dataset.accessState==='disconnected');
+   connected=true;eligible=false;await page.click('#adultParentRecheck');
+   await page.waitForFunction(()=>document.getElementById('adultProfileDialog').dataset.accessState==='approval');
+   assert.match(await page.textContent('#adultProfileStatus'),/review or renew/);
+   assert.equal(await page.locator('#adultProfilePassphrase').isVisible(),false,'passphrase cannot replace a missing permit');
+   statusUnavailable=true;await page.click('#adultParentRecheck');
+   await page.waitForFunction(()=>document.getElementById('adultProfileDialog').dataset.accessState==='unavailable');
+   assert.match(await page.textContent('#adultProfileStatus'),/access cannot be verified/);
+   assert.equal(await page.locator('#adultParentRecheck').isEnabled(),true,'a failed check can be retried');
+   statusUnavailable=false;eligible=true;enabled=false;holdStatus=true;await page.click('#adultParentRecheck');
+   await until(()=>releaseStatus);
+   enabled=true;await page.evaluate(()=>window.dispatchEvent(new Event('factory-session-restored')));
+   await page.waitForFunction(()=>document.getElementById('adultProfileDialog').dataset.accessState==='ready');
+   await Promise.all([page.waitForResponse(response=>response.url().endsWith('/v1/sessions/status')),Promise.resolve().then(()=>releaseStatus())]);
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   assert.equal(await page.locator('#adultProfileDialog').getAttribute('data-access-state'),'ready','a late old status cannot replace newer access information');
+   assert.equal(calls.filter(c=>c.path==='/v1/sessions/adult/unlock').length,unlocksBefore,'opening/rechecking unavailable access never submits an unlock');
+   assert.equal(calls.some(c=>c.path==='/v1/jobs'),false,'entry and readiness checks never create a game');
+   await page.click('#adultProfileCancel');
+   configured=false;await page.reload();await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
+   await openSettings();
+   assert.equal(await page.locator('#adultProfileDialog').getAttribute('data-access-state'),'unconfigured');
+   assert.match(await page.textContent('#adultProfileStatus'),/has not been configured/);
+   await capture('unconfigured');
+   assert.equal(await page.locator('#adultProfileSubmit').isVisible(),false);
+   assert.equal(await page.locator('#adultParentCapabilities').isVisible(),false);
+   assert.equal(await page.evaluate(()=>FG.store.current().id),'player1');
+   assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1')),familyBefore,'recovery guidance preserves saved family work');
    assert.equal(errors.length,0,errors.join('\n'));await ctx.close();
   }
-  console.log('PASS same-site adult profile unlock, ready AI, separate data, child switch, tab/reload isolation and cancelled unlock (desktop/mobile; mocked services)');
+  console.log('PASS persistent parent testing entry, connection/configuration/permit guidance, separate tool readiness, stale-status protection, adult unlock and workspace/tab isolation (desktop/mobile; mocked services)');
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

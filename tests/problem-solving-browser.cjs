@@ -18,7 +18,11 @@ const KEY='family-game-factory-problem-solving-v1';
    const page=await context.newPage(),errors=[],paid=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
    page.on('request',r=>{if(r.method()==='POST'&&/\/v1\/(jobs|coach)(\/|$)|api\.openai\.com/.test(r.url()))paid.push(r.url());});
    await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
-   const activate=async s=>{const l=typeof s==='string'?page.locator(s):s;device==='touch'?await l.tap():await l.click();};
+   const activate=async s=>{
+    const l=typeof s==='string'?page.locator(s):s;
+    if(typeof s==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(s)&&!await l.isVisible())await activate('#studioNavMenu');
+    device==='touch'?await l.tap():await l.click();
+   };
    const phase=()=>page.locator('#page-problem-solving').getAttribute('data-phase');
    const saved=()=>page.evaluate(()=>FG.problemSolvingEvidence.list());
    const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,device+': no page overflow');
@@ -52,7 +56,7 @@ const KEY='family-game-factory-problem-solving-v1';
     if(device==='touch'){
       await page.setViewportSize({width:320,height:740});await overflow();
       const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
-      assert.equal(buttons.length,8);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'eight destinations use two mobile rows');
+      assert.equal(buttons.length,3);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,1,'three primary actions use one mobile row; secondary routes remain in Menu');
       assert.ok(buttons.every(button=>button.width>=44&&button.height>=44&&button.x>=0&&button.x+button.width<=320),'mobile navigation keeps complete touch targets');
       await page.screenshot({path:'test-results/problem-solving-navigation-320.png',fullPage:true});
       await page.setViewportSize(viewport);await overflow();

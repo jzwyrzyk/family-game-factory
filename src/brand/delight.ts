@@ -34,6 +34,9 @@ export function installJemsDelight():void {
   const colors=['blue','gold','mint','purple','coral','gold','purple','blue'];
   const clear=()=>{if(timer!==undefined)clearTimeout(timer);host.replaceChildren();};
   window.addEventListener('factory-profile',()=>{clear();last.clear();});
+  // A successful cosmetic change must not leave the previous human in an
+  // already visible celebration. It does not replay or alter an achievement.
+  window.addEventListener('jems:maker-changed',clear);
   window.addEventListener('jems:milestone',(raw)=>{
     const detail=(raw as CustomEvent<{kind?:string;anchorId?:string;character?:string;level?:number}>).detail;
     if(!detail||!names.includes(detail.kind as JemMilestone))return;

@@ -4,7 +4,7 @@
 
 ## The experience
 
-Art Studio is an owned creation space in the current Jems shell. Enter from **My Games → Art Studio** beside **Invent a game**, an idea's **Use my picture** action, **Create & code → Art Studio**, the legacy saved collection, or `?art=1`. These are subdestinations of creation; this correction does not add another top-bar destination. Grown-ups can open the selected player's art from the existing backup settings.
+Art Studio is an owned creation space in the current Jems shell. Enter from **Menu → Make → Art Studio**, **My Games → Art Studio** beside **Invent a game**, an idea's **Use my picture** action, **Create & code → Art Studio**, the legacy saved collection, or `?art=1`. These are subdestinations of creation in the compact My Games / Create / Menu shell, with the existing saved-draft, learning and ownership guards. Grown-ups can open the selected player's art from the existing backup settings.
 
 **Entry correction, November 20, 2026:** the home action appears before the game catalogue. The new-idea composer shows **Use my picture** directly; that same control returns to the game toolbar for an existing game, where it remains available. The earlier placement inside the hidden new-idea toolbar made the upload journey undiscoverable. Local Art Studio and Create & code install before the background builder-configuration request; a delayed or unavailable workshop cannot hold their routes behind a network response. The configuration request has a 10-second bound and can update readiness without replaying the initial route, replacing the current owner or submitting a build.
 

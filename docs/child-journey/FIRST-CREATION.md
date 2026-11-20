@@ -1,16 +1,18 @@
 # First creation, small hints, and a useful return
 
-**Decision:** [First-creation journey](../decisions/2026-11-19-first-creation-journey.md), accepted for development on November 19, 2026 (America/New_York). This contract describes source behavior and acceptance requirements. [Delivery state](../../DELIVERY-STATE.md) records publication, verification, merge and deployment separately.
+**Decisions:** [First-creation journey](../decisions/2026-11-19-first-creation-journey.md), accepted November 19, and [character-first navigation refinement](../decisions/2026-11-20-character-first-navigation.md), accepted November 20, 2026 (America/New_York). This contract describes source behavior and acceptance requirements. [Delivery state](../../DELIVERY-STATE.md) records publication, verification, merge and deployment separately.
 
 ## Experience
 
 The initial invitation is to make something of the child's own. The intended creative cycle is **imagine → try → change → choose → return**. Finishing a welcome screen or dismissing a hint does not establish that this cycle was completed, and it earns no reward or learning credit.
 
-An eligible first visit presents a simple welcome with **Make my first game** as the main action and a quieter **Explore first** route. Both use existing destinations. The regular navigation and library become available through either choice; the existing primary destinations are retained, with My Pals added by the companion extension. Existing meaningful creation, per-player preferences, and intentional direct entrances are respected. Legacy routes retain their existing behavior.
+An eligible first visit presents **Choose your character**, with large cards for the approved human makers **Spark** and **Nova**, followed by one **Let’s create** action. Continue is enabled only after a choice is durably saved for the current player. Choosing a character does not create a project, build, dismiss the welcome or grant progress. Continue opens the existing idea composer; a failed choice or continuation save reports a retryable error. There is no Explore-first or jump-into-a-game invitation. Existing meaningful creation, per-player welcome preferences, and intentional direct entrances are respected. Legacy routes retain their existing behavior.
 
 Saved scenes and private drawings also identify a returning creator. Studio reads the existing drawing library for the active owner without creating a game, scene, reward or guidance preference. It caches only that owner's presence result and refreshes it after art changes. A pending, timed-out or unreadable art store keeps the ordinary home available; a late result cannot replace a different page or an action the child is already using. That deferral lasts through passive refreshes on the same home visit; an explicit return Home can use the cached eligibility. A fresh sibling's eligibility is checked independently.
 
-The ordinary library's first-phone-viewport playable-choice requirement applies after **Explore first**, rather than requiring the whole library alongside the introductory invitation. Parent/profile controls remain available. The introduction is optional; it does not require avatar selection, an assessment, a completed build, or a compulsory tutorial before play.
+The ordinary library’s first-phone-viewport playable-choice requirement applies when the library is opened, rather than requiring the whole library alongside character selection. Parent/profile controls remain available; **Menu → Grown-ups → Private parent session** is present from the first screen. After selecting a character, an explicit logo/Home action may open the library without making an empty project. The normal first continuation is creation. Returning creators and direct tool entrances are not forced through a new tutorial. No assessment or completed build is required.
+
+The ordinary shell exposes **My Games**, **Create** and **Menu**. Secondary creation, learning, progress, Pals, parent and help destinations retain their existing handlers inside the menu. Character changes in My journey propagate to all host human-maker imagery for that owner. Neutral gems stand in before selection; unrelated Gem Pal and game artwork is not changed.
 
 | Moment | Guidance and action | Ownership boundary |
 | --- | --- | --- |
@@ -30,7 +32,7 @@ New-idea guidance follows the composer so Send and Build remain the primary task
 
 **Use my picture** is a visible action inside the new-idea composer. The same control belongs in the game toolbar for an existing playable game; hiding that toolbar for a new idea must not hide the artwork entrance. It opens the existing Art Studio through the same draft-save and learning guards. The saved idea is retained, and selecting this route alone neither attaches private pixels to a model prompt nor submits a generation request. Art and scene tools initialize independently of the online builder configuration.
 
-The bounded tip IDs are `idea`, `waiting`, `ready`, `play`, `improve`, `keep`, `saved`, `scenes`, `practice`, and `progress`. **Journey help** explains the overall sequence and lets a player show tips again. Resetting tips does not reset their creations, rewards, learning, or remembered welcome choice.
+The bounded tip IDs are `idea`, `waiting`, `ready`, `play`, `improve`, `keep`, `saved`, `scenes`, `practice`, and `progress`. **Menu → Help → Journey help** explains character choice, idea, explicit Build, play while waiting, revision and Keep, and lets a player show tips again. Resetting tips does not reset their creations, rewards, learning, or remembered welcome choice.
 
 Journey help also points to the existing scene-video route: **Create & code → More scene tools → Save a video**. This makes recording discoverable without adding a new recording capability or implying that every generated game has an editable scene equivalent.
 

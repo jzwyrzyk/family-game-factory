@@ -33,6 +33,8 @@ Ownership and availability are persisted. Ordinary breaks, changing the active P
 | **Learning hint entrance** | When a visible supported Math/Language hint control is available, **Ask [Pal] for a hint** invokes that same host control. Existing hint depth, assistance evidence and answer handling remain authoritative. |
 | **Create & code** | Start an editable Pal playground or add an owned Pal to an existing free scene, with real tap-response behavior and editable blocks. |
 
+**Menu → Your world → My Pals** retains the original collection handler and learning/save guards; the home entrance remains available. The first human character choice is distinct from a Pal choice and never selects, equips or awards a companion.
+
 The [page and components](../../src/pals/ui.ts) are presentation only. The [host installer](../../src/pals/host.ts) coordinates navigation, learning visibility, parent settings and compact notices. Neither component rendering nor an animation callback can collect a Pal, award gems or create an adventure.
 
 ### Creating something with a Pal

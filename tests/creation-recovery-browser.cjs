@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 const CREATION_KEY='family-game-factory-creation-v1';
 const STATE_KEYS=['family-game-factory-state-v1','family-game-factory-workspace-v2','family-game-factory-studio-v1',CREATION_KEY];
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -33,7 +33,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   const pacing=()=>page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture did not save');});
   const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();await page.locator('[data-parent-tab="settings"]').click();};
   const switchProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.locator('#studioProfileMenu summary').click();await page.locator('.profile-choice').nth(index).click();};
-  const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await page.locator('#studioNavScenes').click();await page.locator(`[data-scene="${id}"]`).click();};
+  const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await navigate(page,'#studioNavScenes');await page.locator(`[data-scene="${id}"]`).click();};
   const raw=()=>page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),STATE_KEYS);
   const ledger=()=>page.evaluate(()=>new Promise((resolve,reject)=>{
     const opened=indexedDB.open('family-game-factory-rewards-v1',1);opened.onerror=()=>reject(opened.error);
@@ -61,7 +61,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);await ready();await pacing();
     // Include actual Studio notebook/workspace state so rollback covers all four keys.
     await page.locator('#creationHome').click();await exploreWelcome(page);await page.locator('[data-starter="dragon"]').click();
-    await page.locator('#studioNavScenes').click();await page.locator('#creationChallengeMode').click();
+    await navigate(page,'#studioNavScenes');await page.locator('#creationChallengeMode').click();
     await page.locator('[data-challenge="robot-route"]').click();
     await page.locator('#creationTitle').fill('My backup robot experiment');await page.locator('#creationTitle').press('Tab');
     await page.locator('#creationHint').click();await page.locator('#creationCheck').click();

@@ -107,6 +107,16 @@ export async function initBuilder(){
   '<button type="button" class="btn secondary" id="builderIssueInvite" hidden>Invite another family device</button>'+ 
   '<div id="builderNewInvitation" role="status"></div><div id="builderDeviceList" aria-live="polite"></div></div>';
  $('page-parent').querySelector('.panel')!.append(connection);
+  connection.tabIndex=-1;
+  // Studio claims this event through its shared draft/learning guards. The
+  // original arcade uses its existing Grown-ups control when no host claims it.
+  window.addEventListener('factory-open-parent-connection',event=>queueMicrotask(()=>{
+   if(event.defaultPrevented)return;
+   if(FG.learning?.active){FG.learning.focus?.();return;}
+   document.querySelector<HTMLButtonElement>('footer [data-page="parent"]')?.click();
+   if($('page-parent').classList.contains('hidden'))return;
+   FG.parentDashboard?.openTab('settings');connection.focus();connection.scrollIntoView({block:'start',behavior:'auto'});
+  }));
  setIconLabel(connection.querySelector<HTMLButtonElement>('#builderConnectForm button')!,'shield','Trust this family device');
  setIconLabel(connection.querySelector<HTMLButtonElement>('#builderParentUnlock button')!,'parent','Manage family devices');
  setIconLabel($('builderDisconnect'),'lock','Disconnect this device');
