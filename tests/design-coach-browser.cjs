@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Production-dist user journeys. COACH_INLINE_REVIEW is an explicit, non-CI local
  * harness for environments blocking browser HTTP: trusted built bundle + memory
  * storage fixture. It is NOT origin/security/service-worker/live-provider evidence. */
@@ -16,7 +17,7 @@ async function load(page,url,saved={}){
 (async()=>{const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});fs.mkdirSync('test-results',{recursive:true});
  try{for(const [device,viewport]of[['desktop',{width:1400,height:1000}],['mobile',{width:390,height:844}]]){
   const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.setDefaultTimeout(7000);
-  const url=`http://127.0.0.1:${server.address().port}/arcade/?studio=1`;await load(page,url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);
+  const url=`http://127.0.0.1:${server.address().port}/arcade/?studio=1`;await load(page,url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.builder);await exploreWelcome(page);
   // Isolate coaching and game experiments with the ordinary recent-question
   // budget. Math stays enabled; these design actions must not alter its evidence.
   const mathBefore=await page.evaluate(()=>{FG.store.changeProfile({rate:1});const p=FG.store.current();p.mathWindow=[Date.now()];FG.store.save();return JSON.stringify({skills:p.skills,learning:p.learning??null,grade:p.grade,focus:p.focus,intensity:p.intensity,rate:p.rate});});

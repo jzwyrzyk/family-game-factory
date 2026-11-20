@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 const KEY='family-game-factory-problem-solving-v1';
 
 (async()=>{
@@ -22,7 +23,7 @@ const KEY='family-game-factory-problem-solving-v1';
    const saved=()=>page.evaluate(()=>FG.problemSolvingEvidence.list());
    const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,device+': no page overflow');
    const onlyPage=async id=>assert.deepEqual(await page.locator('main > .page:visible').evaluateAll(nodes=>nodes.map(node=>node.id)),[id],device+': one active destination');
-   const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));};
+   const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));await exploreWelcome(page);};
    const parent=()=>activate(page.getByRole('button',{name:'Grown-ups',exact:true}));
    const fault=()=>page.evaluate(()=>{window.psSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k.endsWith('family-game-factory-problem-solving-v1'))throw new DOMException('Fixture quota','QuotaExceededError');return window.psSetItem.call(this,k,v);};});
    const unfault=()=>page.evaluate(()=>{Storage.prototype.setItem=window.psSetItem;delete window.psSetItem;});

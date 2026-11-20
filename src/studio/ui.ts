@@ -33,6 +33,10 @@ import {installRewards, notifyRewardSourceSaved} from '../rewards/service';
 import {createRewardsPage, createRewardsWidget, createRewardCelebration, type RewardsActivity} from '../rewards/ui';
 import {type RewardGrant} from '../rewards/model';
 import {rewardSourceWritable} from '../rewards/write-guard';
+import {createFirstWelcome, createJourneyOverview} from './first-journey';
+import {createGuideCard, type GuideCard, type GuideHost} from './guide-card';
+import {GUIDE_TIPS, hasMeaningfulCreation, recommendNext, readyGuidedExperiment, type GuideTipId} from './guidance';
+import {CreationStore} from '../creation/storage';
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
@@ -64,6 +68,7 @@ export async function installStudio(){
   const warning=el('p','notice',String((error as Error).message));$('page-home').prepend(warning);return;
  }
  const games=new StudioGames(profileStorage(localStorage),FG), owner=()=>String(FG.store.current().id);
+ const guideHost:GuideHost={isDismissed:tip=>notebook.guidance(owner()).dismissedTips.includes(tip),dismiss:tip=>{notebook.dismissGuideTip(owner(),tip);}};
  try{games.export();}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
@@ -80,6 +85,8 @@ export async function installStudio(){
  const stopSpeech=()=>{voice?.cancel();privateSpeech?.cancel();};
  const sending=new Set<string>();
  let panel:'game'|'talk'|'versions'='game';
+ let keptInThisView:string|null=null;
+ let guideSignature='',currentGuide:GuideCard|null=null;
  let pausedForTools=false,viewIntent=0;
  // Local arcade state never owns build readiness, saved games or learning evidence.
  const waitArcade=createMindYourJems();
@@ -97,6 +104,13 @@ export async function installStudio(){
  const studioGemBadge=el('span','jems-gem-status');studioGemBadge.id='studioGemBadge';studioGemBadge.hidden=true;
  page.querySelector('#studioVersion')!.after(studioGemBadge);
  document.querySelector('main')!.append(page);
+ const studioGuideHost=el('div');studioGuideHost.id='studioGuideHost';studioGuideHost.hidden=true;
+ page.querySelector('.studio-mobile-tabs')!.after(studioGuideHost);
+ studioGuideHost.addEventListener('keydown',event=>event.stopPropagation());
+ const doneForNow=iconEl('button','studio-button','save','Done for now') as HTMLButtonElement;
+ doneForNow.id='studioDoneForNow';doneForNow.type='button';
+ doneForNow.onclick=()=>act(()=>{home();status('Your saved work is here when you come back. Ideas and local creations stay on this device.');});
+ page.querySelector('.studio-heading')!.append(doneForNow);
  // One child-facing journey: an idea-first workspace, a composer with attached
  // actions, and a separate status card that only represents observed build states.
  const creationHero=el('section','studio-creation-hero');
@@ -208,6 +222,48 @@ export async function installStudio(){
  headerTools.append(learningChoice,profileBar);
  document.querySelector('.site-header')!.append(headerTools);
  const globalStatus=el('div','studio-status');globalStatus.id='studioGlobalStatus';globalStatus.setAttribute('role','status');globalStatus.setAttribute('aria-live','polite');globalStatus.setAttribute('aria-atomic','true');document.querySelector('main')!.prepend(globalStatus);
+ const helpButton=iconEl('button','studio-button studio-journey-help','help','Journey help') as HTMLButtonElement;
+ helpButton.id='studioJourneyHelp';helpButton.type='button';helpButton.setAttribute('aria-controls','studioJourneyMap');helpButton.setAttribute('aria-expanded','false');
+ headerTools.append(helpButton);
+ const journeyMap=createJourneyOverview({
+  reset:()=>act(()=>{
+   if(guardMath())return;
+   notebook.resetGuidance(owner());closeJourneyMap(true);
+   document.querySelectorAll<GuideCard>('.jems-guide-card').forEach(card=>card.refresh?.());
+   if(route==='studio')refreshStudioGuide();
+   status('Helpful hints are back. You can dismiss each one whenever you like.');
+  }),close:()=>closeJourneyMap(true),
+ });
+ globalStatus.after(journeyMap);
+ function closeJourneyMap(focus=false){journeyMap.hidden=true;helpButton.setAttribute('aria-expanded','false');if(focus)focusView(helpButton);}
+ function openJourneyMap(){
+  if(guardMath())return;
+  if(!journeyMap.hidden){closeJourneyMap(true);return;}
+  journeyMap.hidden=false;helpButton.setAttribute('aria-expanded','true');focusView($('studioJourneyMapTitle'));
+ }
+ helpButton.onclick=()=>act(openJourneyMap);
+ journeyMap.addEventListener('keydown',event=>{event.stopPropagation();if(event.key==='Escape'){event.preventDefault();closeJourneyMap(true);}});
+ const welcome=createFirstWelcome({
+  make:()=>act(()=>{if(guardMath())return;notebook.dismissWelcome(owner());closeJourneyMap();return newIdea();}),
+  explore:()=>act(()=>{if(guardMath())return;notebook.dismissWelcome(owner());closeJourneyMap();renderLibrary();focusView($('studioLibraryTitle'));}),
+  help:()=>act(openJourneyMap),
+ });
+ library.prepend(welcome.element);
+ library.querySelector('.studio-home-hero')!.before($('studioContinue'));
+ function welcomeAvailability(){
+  if(!configReady)return 'Checking your creation tools…';
+  if(builderReadiness==='available')return '';
+  return builderReadiness==='not-configured'?'Game building is not connected yet. You can save an idea or make a ready-made game yours.':builderReadinessCopy(builderReadiness)+'. You can still save an idea.';
+ }
+ function refreshWelcome(){
+  // Existing scene creators and established makers keep their normal home.
+  // A damaged scene store is not a new account and must not be overwritten.
+  let hasScenes=true;
+  try{hasScenes=new CreationStore(profileStorage(localStorage)).list(owner()).length>0;}catch{}
+  const visible=!notebook.guidance(owner()).welcomeDismissed&&!hasMeaningfulCreation(notebook.list(owner()),owner())&&!notebook.avatar(owner())&&!hasScenes;
+  library.dataset.firstVisit=String(visible);welcome.update(visible,welcomeAvailability());
+  document.body.classList.toggle('studio-first-visit',visible&&route==='library');
+ }
  const journey=installGemJourney({
   onBack:()=>act(home),onCreate:()=>act(newIdea),
   onPrimaryAction:ownerId=>act(async()=>{
@@ -227,6 +283,7 @@ export async function installStudio(){
  document.querySelector('main')!.append(journey.element);
  function rewardJourney(){const progress=builderJourney(notebook.list(owner()),owner());return {ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction};}
  const rewardsPage=createRewardsPage({
+  guidance:guideHost,
   state:{...rewards.state,journey:rewardJourney()},onBack:()=>act(home),onOpenJourney:()=>act(()=>openJourney(!notebook.avatar(owner()))),
   onPlay:()=>act(()=>openPractice()),onActivity:activity=>act(()=>openRewardActivity(activity)),
   onCreate:()=>act(newIdea),onRetry:()=>{void rewards.refresh().catch(()=>{});}
@@ -261,7 +318,7 @@ export async function installStudio(){
   window.scrollTo(0,0);void rewards.refresh().catch(()=>{});
  }
  rewards.setOpen(()=>act(openRewards));
- window.addEventListener('factory-page',()=>rewardsPage.hide());
+ window.addEventListener('factory-page',()=>{rewardsPage.hide();document.body.classList.remove('studio-first-visit');closeJourneyMap();globalStatus.textContent='';globalStatus.classList.remove('is-error');globalStatus.setAttribute('role','status');});
  window.addEventListener('factory-profile',()=>{clearRewardCelebration();rewardsPage.hide();});
  window.addEventListener('pagehide',clearRewardCelebration);
  // Background builds are visible on every Studio screen without taking focus.
@@ -300,18 +357,16 @@ export async function installStudio(){
   buildShelf.append(iconEl('strong','','clock','My builds & tests'));
   const items=el('div','studio-build-items');
   for(const s of jobs.slice(0,4)){
-   const state=readyExperiment(s)?'Your test is ready':s.job!.status==='failed'?'Build needs help · current game safe':
+   const state=readyExperiment(s)?s.projectId||s.remoteId?'Your change is ready':'Your game is ready':s.job!.status==='failed'?'Build needs help · current game safe':
     unknownJobs.has(s.id)||remote.mode!=='remote'?'Status unknown · checking connection':s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
     s.job!.status==='testing'?'Testing your game':'Building your idea';
    const item=el('div','studio-build-item'),copy=el('div','studio-build-copy'),controls=el('div','studio-build-item-actions');
    copy.append(el('strong','',s.name),el('span','',state));
-   const openButton=iconEl('button','studio-button','play',readyExperiment(s)?'Try ready test':'Open game') as HTMLButtonElement;
+   const openButton=iconEl('button','studio-button','play',readyExperiment(s)?s.projectId||s.remoteId?'Try ready test':'Play my game':'Open game') as HTMLButtonElement;
    openButton.type='button';openButton.onclick=()=>act(async()=>{
     if(guardMath())return;
-    await open(s.id);
-    if(owner()!==s.owner||route!=='studio'||activeId!==s.id)return;
-    const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
-    if(ready?.candidate.remoteId)await showRemote(latest,ready.candidate.remoteId,'candidate',ready.id);
+    const latest=notebook.get(s.id,s.owner);
+    if(readyExperiment(latest))await openReadySession(s.id,s.owner);else await open(s.id);
    });controls.append(openButton);
    if(busy(s)){
     const stop=iconEl('button','studio-button studio-stop-build','stop','Stop build') as HTMLButtonElement;
@@ -359,7 +414,85 @@ export async function installStudio(){
  updateProfile();
  function focusView(target:HTMLElement){if(!target.isConnected||target.closest('[hidden],.hidden,[inert]'))return;target.focus({preventScroll:true});target.scrollIntoView({block:'nearest',behavior:'instant'});}
  function guardMath(){if(!FG.learning.active)return false;status('Your learning activity is still here. Finish it, or choose My Games to leave.');FG.learning.focus?.();return true;}
- function readyExperiment(s:StudioSession){return s.job?.status==='ready'&&s.job.revisionId?s.experiments?.find(e=>e.candidate.remoteId===s.job!.revisionId&&e.candidate.remoteId!==s.remoteId&&e.id!==s.selectedTest):undefined;}
+ function readyExperiment(s:StudioSession){return readyGuidedExperiment(s);}
+ function refreshStudioGuide(){
+  if(!activeId||route!=='studio'||FG.learning.active||panel==='versions'){studioGuideHost.hidden=true;return;}
+  // The learning host can announce disposal while a profile switch is between
+  // its owner change and Studio's reset. Never read the previous owner's view.
+  const s=notebook.list(owner()).find(session=>session.id===activeId);
+  if(!s){studioGuideHost.hidden=true;return;}
+  const capturedOwner=s.owner,capturedId=s.id;
+  let tip:GuideTipId='play',copy=GUIDE_TIPS.play;
+  let action:{label:string;run:()=>void}|undefined;
+  const ready=readyExperiment(s),hasGame=!!(s.projectId||s.remoteId);
+  if(ready){
+   tip='ready';copy={title:hasGame?'Your change is ready to try':'Your game is ready to play',description:GUIDE_TIPS.ready.description};
+   action={label:hasGame?'Try my change':'Play my game',run:()=>act(()=>openReadySession(capturedId,capturedOwner))};
+  }else if(busy(s)){
+   tip='waiting';copy=unknownJobs.has(s.id)?{title:'Your idea is safe',description:'We are checking the connection. The build may still be working; you can keep playing.'}:GUIDE_TIPS.waiting;
+   action={label:'Play while I wait',run:()=>act(()=>playWhileBuilding(current()))};
+  }else if(s.candidate&&showing==='candidate'&&panel==='game'){
+   tip='keep';copy=hasGame?GUIDE_TIPS.keep:{title:'Your first playable version',description:'Give it a try. If you like it, choose Make this my main game. You can change it again later.'};
+  }else if(!hasGame&&!s.candidate){
+   tip='idea';copy=GUIDE_TIPS.idea;
+   if(s.job?.status==='failed')copy={title:'Your idea is still here',description:'The build did not finish. Your words are saved. You can change your idea or choose Try build again.'};
+  }else if(panel==='talk'){
+   tip='improve';copy=GUIDE_TIPS.improve;
+  }else if(keptInThisView===s.id){
+   tip='saved';copy={title:'Your favorite is kept',description:'Your earlier versions are still in My tests. Keep playing, try another idea, or come back later.'};
+   action={label:'Done for now',run:()=>act(()=>{home();status('Your chosen version is kept. Find it here when you come back.');})};
+  }else{
+   action={label:'Try one change',run:()=>act(()=>{if(setTab('talk'))focusView($('studioPrompt'));})};
+  }
+  const signature=JSON.stringify([s.owner,s.id,tip,copy,action?.label]);
+  // Keep guidance after the task it explains and inside the visible phone panel.
+  const nearComposer=panel==='talk'||s.game==='new'&&!hasGame&&!s.candidate;
+  const moveGuide=studioGuideHost.parentElement!==(nearComposer?$('studioConversation'):$('studioCanvas'));
+  let focusedGuideControl:'action'|'dismiss'|undefined;
+  if((moveGuide||signature!==guideSignature)&&currentGuide?.contains(document.activeElement))focusedGuideControl=document.activeElement?.id==='studioGuideCardAction'?'action':'dismiss';
+  if(moveGuide){if(nearComposer)$('studioPromptForm').after(studioGuideHost);else $('studioGameHost').after(studioGuideHost);}
+  if(signature!==guideSignature){
+   // A background status change may replace this hint while its controls have
+   // keyboard focus. Preserve that position without pulling focus from play.
+   guideSignature=signature;
+   currentGuide=createGuideCard({id:'studioGuideCard',tip,...copy,host:guideHost,action,
+    canAct:()=>owner()===capturedOwner&&activeId===capturedId&&route==='studio'&&!FG.learning.active,
+    onError:message=>status(message,true),
+    onDismiss:()=>{studioGuideHost.hidden=true;focusView(panel==='talk'?$('studioPromptLabel'):$('studioTitle'));},
+   });
+   studioGuideHost.replaceChildren(currentGuide);
+  }else currentGuide?.refresh();
+  studioGuideHost.hidden=!!currentGuide?.hidden;
+  if(focusedGuideControl){
+   const target=studioGuideHost.hidden?$('studioTitle'):
+    currentGuide?.querySelector<HTMLButtonElement>(focusedGuideControl==='action'?'#studioGuideCardAction':'#studioGuideCardDismiss')||
+    currentGuide?.querySelector<HTMLButtonElement>('#studioGuideCardDismiss');
+   target?.focus({preventScroll:true});
+  }
+ }
+ async function openReadySession(id:string,capturedOwner=owner()){
+  if(owner()!==capturedOwner||guardMath())return;
+  const s=notebook.get(id,capturedOwner);
+  if(s.archived)return;
+  if(route!=='studio'||activeId!==id)await open(id,false);
+  if(owner()!==capturedOwner||route!=='studio'||activeId!==id)return;
+  const latest=notebook.get(id,capturedOwner),ready=readyExperiment(latest);
+  if(ready?.candidate.remoteId)await showRemote(latest,ready.candidate.remoteId,'candidate',ready.id);
+  else if(latest.candidate)await playCandidate();
+  else if(latest.projectId||latest.remoteId)await playWorking();
+  else setTab('talk');
+ }
+ async function continueRecommended(id:string,capturedOwner:string){
+  if(owner()!==capturedOwner||guardMath())return;
+  const s=notebook.get(id,capturedOwner);
+  if(s.archived||s.resumeDismissed){renderLibrary();return;}
+  if(readyExperiment(s)){await openReadySession(id,capturedOwner);return;}
+  if(s.candidate){await open(id,false);if(owner()===capturedOwner&&activeId===id&&route==='studio')await playCandidate();return;}
+  if(busy(s)||s.job?.status==='failed'||s.draft.trim()||!s.projectId&&!s.remoteId){
+   await open(id,false);if(owner()===capturedOwner&&activeId===id&&route==='studio')setTab('talk');return;
+  }
+  await open(id);
+ }
 
  const stageFor=(s:StudioSession)=>gemStage(s);
  const levelForOwner=()=>builderJourney(notebook.list(owner()),owner());
@@ -455,9 +588,11 @@ export async function installStudio(){
   document.querySelectorAll('[data-studio-tab]').forEach(b=>b.setAttribute('aria-pressed',String((b as HTMLElement).dataset.studioTab===tab)));
   if(tab==='versions'){$('studioVersions').hidden=false;renderVersions();focusView($('studioVersionsTitle'));}else $('studioVersions').hidden=true;
   if(tab==='talk'){focusView($('studioPromptLabel'));void privateSpeech?.refresh();}
+  refreshStudioGuide();
   return true;
  }
  function showStudio(){
+  document.body.classList.remove('studio-first-visit');closeJourneyMap();
   hideJourney();rewardsPage.hide();FG.problemSolving?.close();
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));page.classList.remove('hidden');route='studio';
   setActiveNav(activeId&&current().game==='new'?'studioNavCreate':'studioNavHome');globalStatus.textContent='';
@@ -492,6 +627,7 @@ export async function installStudio(){
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;
   note.textContent=!configReady?'Checking which creation tools are ready…':builderReadiness==='not-configured'?'Game building is not connected yet. Your idea will still save.':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
+  welcome.update(!welcome.element.hidden,welcomeAvailability());
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;
@@ -545,20 +681,22 @@ export async function installStudio(){
   else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
   if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
   else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unverified';
-  if(activeId)render();else updateCreationNote();
+  if(route==='library')updateCreationNote();else if(activeId)render();
  }
  function renderLibrary(){
   refreshLearningChoice();
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
   // Import references to existing local remixes without copying or migrating their data.
   for(const p of games.list(owner())) if(!entries.some(s=>s.projectId===p.id))entries.push({...notebook.create(owner(),p.game,p.name,p.id)});
-  const last=notebook.last(owner());$('studioContinue').replaceChildren();
-  if(last){
+  const next=recommendNext(entries,owner(),notebook.last(owner())?.id);$('studioContinue').replaceChildren();
+  const last=next?entries.find(session=>session.id===next.sessionId):null;
+  if(last&&next){
    const banner=el('div','studio-continue'),art=el('span','studio-continue-art',icon[last.game]),description=el('div','studio-continue-copy');
+   banner.dataset.nextKind=next.kind;
    art.setAttribute('aria-hidden','true');
-   description.append(el('strong','',last.name));
-   const continueButton=iconEl('button','studio-button studio-primary',last.projectId||last.remoteId?'play':'edit',last.projectId||last.remoteId?'Continue playing':'Continue my idea') as HTMLButtonElement;
-   continueButton.type='button';continueButton.id='studioContinuePlaying';continueButton.onclick=()=>act(()=>open(last.id));
+   description.append(el('span','studio-next-kind',next.title),el('strong','',last.name),el('span','studio-next-description',next.description));
+   const continueButton=iconEl('button','studio-button studio-primary',next.kind==='ready'||next.kind==='play'||next.kind==='experiment'?'play':'edit',next.action) as HTMLButtonElement;
+   continueButton.type='button';continueButton.id='studioContinuePlaying';continueButton.onclick=()=>act(()=>continueRecommended(last.id,last.owner));
    const dismiss=iconEl('button','studio-continue-close','close','') as HTMLButtonElement;
    dismiss.type='button';dismiss.id='studioDismissResume';dismiss.title='Dismiss reminder';
    dismiss.setAttribute('aria-label','Dismiss reminder for '+last.name);
@@ -578,14 +716,15 @@ export async function installStudio(){
    card.dataset.jemsState=state;
    const openButton=el('button','studio-saved-open') as HTMLButtonElement;
    openButton.type='button';openButton.setAttribute('aria-label','Open '+s.name);
-   openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),iconEl('span','studio-card-link','arrow','Open my game'));
+   const cardAction=state==='ready'?s.projectId||s.remoteId?'Try my change':'Play my game':state==='idea'?'Open my idea':'Open my game';
+   openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),iconEl('span','studio-card-link','arrow',cardAction));
    const stage=stageFor(s);
     if(stage!=='none'){
      const gemLabel=el('span','jems-gem-status');
      const gemArt=createJourneyGem(stageNumber(stage));
      gemLabel.append(gemArt,el('span','',GEM_STAGE_LABELS[stage]));openButton.append(gemLabel);
     }
-    openButton.onclick=()=>act(()=>open(s.id));
+    openButton.onclick=()=>act(()=>state==='ready'?openReadySession(s.id,s.owner):open(s.id));
    const putAway=el('button','studio-put-away',busy(s)?'Stop build first':'Put away') as HTMLButtonElement;
    putAway.type='button';putAway.disabled=busy(s);
    putAway.setAttribute('aria-label',busy(s)?'Stop the build before putting away '+s.name:'Put away '+s.name);
@@ -636,9 +775,9 @@ export async function installStudio(){
    const info=el('span','studio-card-info');
    info.append(el('span','studio-card-name',names[game]),el('span','studio-card-state',descriptions[game]),iconEl('span','studio-card-link','play','Play & make it yours'));
    b.append(art,info);b.onclick=()=>act(()=>start(game));starters.append(b);
-  });installQualityCards();updateCreationNote();
+  });installQualityCards();updateCreationNote();refreshWelcome();
  }
- function home(){stopSpeech();flushDraft();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView($('studioLibraryTitle'));}
+ function home(){stopSpeech();flushDraft();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
  function openSavedIdeas(){
   if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();
   $<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('creations');route='other';
@@ -660,9 +799,9 @@ export async function installStudio(){
  function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
-  stopSpeech();flushDraft();disposeGame();notebook.select(id,owner());activeId=id;reflecting=false;lastOutcome=null;showing='working';status('');
+  stopSpeech();flushDraft();disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
   const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper');coaching?.openSession();$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();setTab('game');focusView($('studioTitle'));
-  if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else{$('studioEmpty').hidden=false;setTab('talk');}}
+  if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;setTab('talk');}}
   if(s.job&&busy(s)&&remote.mode==='remote'&&s.job.api===remote.apiBaseUrl&&!clients.has(s.id))resume(s);
  }
  function renderConversation(){
@@ -709,7 +848,7 @@ export async function installStudio(){
   $('studioConversation').dataset.helperState=s.design?.paused||progress?.phase==='cancelled'?'rest':'wave';
   
   $<HTMLButtonElement>('studioPlay').disabled=!(working||s.remoteId||s.candidate);
-  $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);setIconLabel($('studioPlay'),'play',pausedForTools?'Back to my game':'Play');
+  $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);setIconLabel($('studioReady'),'play',s.projectId||s.remoteId?'Try your ready test':'Play my game');$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);setIconLabel($('studioPlay'),'play',pausedForTools?'Back to my game':'Play');
   $<HTMLButtonElement>('studioUndo').disabled=!s.candidate&&!working?.parentId&&!s.remoteId;
   $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&(!working||!games.history(s.projectId!,s.owner).some(r=>r.parentId===working.id)));
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
@@ -722,7 +861,7 @@ export async function installStudio(){
   $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=s.job?.status!=='failed';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
   if(s.projectId&&!s.remoteId)(examples[s.game as GameId]||[]).slice(0,2).forEach(text=>{const b=el('button','studio-chip',text);b.setAttribute('type','button');b.onclick=()=>{reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value=text;flushDraft();render();$('studioPrompt').focus();};suggestions.append(b);});
-  renderConversation();if(panel==='versions'&&!document.activeElement?.closest('#experimentShelf'))coaching?.renderShelf();
+  renderConversation();refreshStudioGuide();if(panel==='versions'&&!document.activeElement?.closest('#experimentShelf'))coaching?.renderShelf();
  }
  function mountNative(){
   pausedForTools=false;$<HTMLDetailsElement>('studioMore').open=false;$('studioEmpty').hidden=true;$('studioRemoteHost').hidden=true;
@@ -951,7 +1090,7 @@ export async function installStudio(){
      else notebook.update(s.id,s.owner,x=>{x.candidate=null;x.undone=null;});
      message(s,'helper',`Kept your change. Your earlier versions are still available in Versions.`);
     }else return;
-    if(sameView(s,at)){showing='working';status('Kept privately. Nothing was published.');updateProfile();celebrateProgress(gemAchievement(gemBefore,notebook.get(s.id,s.owner))||'kept','studioKeep');if(!FG.learning.active)await playWorking();}
+    if(sameView(s,at)){showing='working';keptInThisView=s.id;status('Kept privately. Nothing was published.');updateProfile();celebrateProgress(gemAchievement(gemBefore,notebook.get(s.id,s.owner))||'kept','studioKeep');if(!FG.learning.active)await playWorking();}
   }finally{saving=false;if(activeId===s.id&&owner()===s.owner)render();}
  }
  async function undo(){
@@ -1090,7 +1229,7 @@ export async function installStudio(){
  $('studioReflectAnswer').onclick=()=>act(()=>{if(guardMath())return;reflecting=true;setTab('talk');render();focusView($('studioPrompt'));});$('studioReflectSkip').onclick=()=>act(()=>{const s=current();notebook.update(s.id,s.owner,x=>{x.reflection=false;});coaching?.pauseReflection();reflecting=false;render();void playViewed();});
  $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});$('studioRetry').onclick=()=>act(async()=>{const s=current();await clientFor(s).retry();});
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
- window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
+ window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}refreshStudioGuide();});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
@@ -1196,6 +1335,7 @@ export async function installStudio(){
  void refreshServiceReadiness();resumeOutstanding();refreshShelf();
  FG.studio={version:1,flushDraft,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
  const creation=installCreationStudio({
+  guidance:guideHost,
   enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('creation');route='other';document.body.classList.remove('studio-designing');document.body.classList.add('creation-open');setActiveNav('studioNavScenes');return true;},
   home,openGame:id=>open(id),onRewardSourceSaved:notifyRewardSourceSaved,
  });

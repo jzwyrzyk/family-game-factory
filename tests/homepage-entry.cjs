@@ -2,6 +2,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 
 /** Homepage contract: Studio by default, old Arcade only when explicitly requested.
  * The same saved ideas must survive home and reload without ever claiming an AI build.
@@ -22,6 +23,10 @@ const {start}=require('./browser-server.cjs');
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
    assert.equal(await page.locator('#page-studio-library').isVisible(),true,'the normal URL opens Studio');
    assert.equal(await page.locator('#page-home').isVisible(),false,'the old wizard is not the homepage');
+   assert.equal(await page.locator('#studioWelcome').isVisible(),true,'a new profile starts with the focused first-creation invitation');
+   const firstAction=await page.locator('#studioWelcomeMake').boundingBox();
+   assert.ok(firstAction&&firstAction.height>=44&&firstAction.width>=130,'first creation is a large touch target');
+   await exploreWelcome(page);
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),7,'seven playable favorites');
    assert.equal((await page.locator('#studioLibraryTitle').textContent()).replace(/\s+/g,' ').trim(),'What jems will you make today?');
    assert.equal(await page.locator('#studioStarterTitle').textContent(),'Ready to Play jems');

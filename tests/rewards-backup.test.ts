@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { RevisionStore, WORKSPACE_KEY } from '../src/factory/workspace';
 import { StudioNotebook, STUDIO_KEY } from '../src/studio/notebook';
+import { hasMeaningfulCreation } from '../src/studio/guidance';
 import { CreationStore, CREATION_KEY } from '../src/creation/storage';
 import { createChallengeStarter } from '../src/creation/challenges';
 import { createRewardFact } from '../src/rewards/model';
@@ -47,6 +48,7 @@ function reasoningEpisode(id:string,owner=OWNER):ProblemSolvingEpisode {
 async function incoming(owner=OWNER){
   const {storage,rewards}=stores(),workspace=new RevisionStore(storage),notebook=new StudioNotebook(storage),creation=new CreationStore(storage),problemSolving=new ProblemSolvingStore(storage);
   const project=workspace.create(owner,'buckets','Saved game');notebook.create(owner,'buckets','Saved game',project.id);
+  notebook.dismissWelcome(owner);notebook.dismissGuideTip(owner,'idea');
   const scene=creation.create(owner,createChallengeStarter('robot-route'),{challengeId:'robot-route'});
   creation.recordAttempt(scene.id,owner,scene.headId,{challengeId:'robot-route',passed:true,hintUsed:true});
   problemSolving.record(reasoningEpisode('saved-practice',owner));
@@ -84,6 +86,8 @@ test('invalid family ownership, linked games, namespace and recovery-only files 
   invalid.push({...valid,activeProfile:OTHER});
   invalid.push({...valid,factoryWorkspace:{version:2,projects:[],revisions:[],plays:[]}});
   invalid.push({...valid,factoryStudio:{...valid.factoryStudio,avatars:{[OTHER]:'spark'}}});
+  invalid.push({...valid,factoryStudio:{...valid.factoryStudio,guidance:{[OTHER]:{welcomeDismissed:true,dismissedTips:['idea']}}}});
+  invalid.push({...valid,factoryStudio:{...valid.factoryStudio,guidance:{'adult:foreign':{welcomeDismissed:true,dismissedTips:[]}}}});
   invalid.push({...valid,factoryRewards:{...valid.factoryRewards,namespace:'foreign-workspace'}});
   invalid.push({...valid,factoryRewardsRecovery:{namespace:REWARDS_DB_NAME,raw:{damaged:true}}});
   invalid.push({...valid,factoryProblemSolvingRecoveryRaw:'preserved damaged evidence'});
@@ -95,6 +99,19 @@ test('invalid family ownership, linked games, namespace and recovery-only files 
   invalid.push({...valid,profiles:base([OTHER]).profiles,activeProfile:OTHER});
   for(const value of invalid)assert.throws(()=>validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards));
   assert.equal(storage.data.size,0);assert.equal((await rewards.summary(OWNER)).lifetimeGems,0);
+});
+
+test('family restoration carries optional guide preferences without creating work or awarding progress',async()=>{
+  const source=new StudioNotebook(new SourceMemory());source.dismissWelcome(OWNER);source.dismissGuideTip(OWNER,'waiting');
+  const {storage,rewards}=stores();
+  const plan=validateFamilyRewardBackup(JSON.stringify({...base(),factoryStudio:source.read()}),validateBase,rewards);
+  await applyFamilyRewardBackup(plan,storage,rewards);
+  const restored=new StudioNotebook(storage);
+  assert.deepEqual(restored.guidance(OWNER),{welcomeDismissed:true,dismissedTips:['waiting']});
+  assert.deepEqual(restored.guidance(OTHER),{welcomeDismissed:false,dismissedTips:[]});
+  assert.equal(hasMeaningfulCreation(restored.list(OWNER),OWNER),false,'dismissal is not a completed creation');
+  assert.deepEqual(restored.read().sessions,[]);assert.deepEqual(restored.pendingRewards(OWNER),[]);
+  assert.equal((await rewards.summary(OWNER)).lifetimeGems,0);
 });
 
 test('native remote sessions and remote copies restore without inventing a local project reference',()=>{
@@ -122,6 +139,7 @@ test('successful replacement commits all five sources and the ledger without pro
   assert.deepEqual(JSON.parse(storage.getItem(FAMILY_STATE_KEY)!),plan.base);
   assert.deepEqual(JSON.parse(storage.getItem(WORKSPACE_KEY)!),plan.workspace);
   assert.deepEqual(JSON.parse(storage.getItem(STUDIO_KEY)!),plan.notebook);
+  assert.deepEqual(new StudioNotebook(storage).guidance(OWNER),{welcomeDismissed:true,dismissedTips:['idea']});
   assert.deepEqual(JSON.parse(storage.getItem(CREATION_KEY)!),plan.creation);
   assert.deepEqual(JSON.parse(storage.getItem(PROBLEM_SOLVING_KEY)!),plan.problemSolving);
   assert.equal((await rewards.summary(OWNER)).lifetimeGems,2,'the pending coding receipt is not silently projected during restore');

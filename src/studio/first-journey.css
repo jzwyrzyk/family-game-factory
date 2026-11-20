@@ -1,0 +1,83 @@
+.studio-first-welcome[hidden], .studio-journey-overview[hidden], #studioGuideHost[hidden] { display: none !important; }
+#page-studio-library[data-first-visit="true"] > :not(#studioWelcome) { display: none !important; }
+.studio-review.studio-first-visit .studio-nav,
+.studio-review.studio-first-visit #studioLearningChoice,
+.studio-review.studio-first-visit #jemsRewardsWidget { display: none !important; }
+.studio-review .studio-first-welcome {
+  display: grid; grid-template-columns: minmax(220px, .9fr) minmax(300px, 1.1fr); align-items: center;
+  gap: 24px 40px; max-width: 1020px; margin: 28px auto 24px; padding: 40px 54px 22px;
+  background: linear-gradient(125deg,#fff 15%,#fbf8ff 65%,#eef5ff); border: 1px solid #e3dff0;
+  border-radius: 30px; box-shadow: 0 14px 40px #14244708;
+}
+.studio-welcome-art { min-width: 0; }
+.studio-welcome-art img { display: block; width: 100%; height: auto; object-fit: contain; }
+.studio-welcome-copy { min-width: 0; }
+.studio-welcome-kicker { margin: 0 0 9px; color: #6840ad; font: 800 11px/1.5 var(--jems-body,system-ui); letter-spacing: 1.6px; }
+.studio-review .studio-first-welcome h1 { margin: 0; font-size: clamp(34px,4.2vw,49px); line-height: 1.07; letter-spacing: -1.2px; }
+.studio-welcome-description { margin: 17px 0 24px; color: #4f5b76; font-size: 17px; line-height: 1.55; }
+.studio-review .studio-welcome-make { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 16px 24px; min-height: 56px; font-size: 17px; }
+.studio-welcome-explore,.studio-welcome-footer button { border: 0; background: transparent; color: #4d5d7b; font: 650 14px/1.4 var(--jems-body,system-ui); min-height: 44px; padding: 10px 4px; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.studio-welcome-explore { margin-top: 8px; }
+.studio-welcome-availability { margin: 7px 0 0; color: #596780; font-size: 12px; line-height: 1.5; max-width: 380px; }
+.studio-welcome-availability:empty { display: none; }
+.studio-welcome-footer { grid-column: 1/-1; display: flex; justify-content: space-between; align-items: center; gap: 16px; border-top: 1px solid #e7e3ef; padding-top: 14px; color: #596780; font-size: 12px; }
+.studio-review .studio-journey-help { padding: 6px 10px; min-height: 44px; color: #4d5d7b; font-size: 12px; background: transparent; border-color: transparent; box-shadow: none; white-space: nowrap; }
+.studio-review .studio-journey-overview { max-width: 1040px; margin: 12px auto 22px; padding: 24px; background: #fff; border: 1px solid #ddd9ef; border-radius: 20px; }
+.studio-overview-heading { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+.studio-overview-heading h2 { margin: 0; font-size: 23px; }
+.studio-overview-steps { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 24px; padding: 0; margin: 25px 0 20px; list-style: none; counter-reset: journey-step; }
+.studio-overview-steps li { display: grid; gap: 6px; align-content: start; counter-increment: journey-step; }
+.studio-overview-steps li::before { content: counter(journey-step); display: grid; place-items: center; height: 28px; width: 28px; border-radius: 50%; color: #60449b; background: #f0eaff; font-size: 13px; font-weight: 800; }
+.studio-overview-steps strong { font-family: var(--jems-round,system-ui); font-size: 17px; }
+.studio-overview-steps span,.studio-overview-paths { font-size: 13px; color: #4f5b76; line-height: 1.6; }
+.studio-overview-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #e8e9f0; padding-top: 13px; }
+.studio-overview-footer p { color: #586782; font-size: 12px; }
+.studio-review #studioDoneForNow { min-height: 44px; margin-left: auto; white-space: nowrap; font-size: 12px; }
+#studioGuideHost { max-width: 1182px; margin: 0 auto; }
+.studio-creating #studioGuideHost { max-width: 880px; }
+.studio-review #page-studio.studio-creating #studioGuideHost { max-width: none; margin: 0 14px 14px; }
+.studio-review #page-studio.studio-creating #studioGuideHost .jems-guide-card { margin: 0; }
+/* These are route announcements, not interactive fields. */
+.studio-review :is(#studioWelcomeTitle,#studioJourneyMapTitle):focus { outline: none; }
+.studio-review .studio-continue-copy .studio-next-kind { display: block; font-size: 11px; line-height: 1.5; font-weight: 800; color: #5b3e95; margin: 0 0 4px; }
+.studio-review .studio-continue-copy .studio-next-description { display: block; font-size: 12px; line-height: 1.5; color: #53617d; margin: 4px 0 0; overflow-wrap: anywhere; }
+.studio-review #studioContinue:empty { display: none; }
+.studio-review #studioContinue { margin: 0 0 20px; }
+.studio-review #studioContinue .studio-continue { margin: 0; }
+.studio-welcome-explore:focus-visible,.studio-welcome-footer button:focus-visible { outline: 3px solid #7136c9; outline-offset: 3px; border-radius: 8px; }
+@media(max-width:760px) {
+  /* Keep the approved art and one invitation, without repeating the welcome copy. */
+  .studio-review #page-studio.studio-idea-unstarted #studioCreationHero { display: flex; gap: 10px; padding: 9px 14px; }
+  .studio-review #page-studio.studio-idea-unstarted #studioCreationHero > img { width: 48px; height: 48px; }
+  .studio-review #page-studio.studio-idea-unstarted #studioCreationHero h2 { margin: 0; }
+  .studio-review #page-studio.studio-idea-unstarted #studioCreationHero :is(p,.studio-creation-kicker) { display: none; }
+  .studio-review #page-studio.studio-creating #studioGuideHost { margin: 0 9px 12px; }
+  .studio-review .studio-first-welcome { grid-template-columns: 1fr; gap: 8px; text-align: center; padding: 20px 22px 16px; margin: 12px auto 20px; }
+  .studio-welcome-art img { max-width: 240px; margin: 0 auto; }
+  .studio-review .studio-first-welcome h1 { font-size: 38px; }
+  .studio-welcome-description { font-size: 15px; margin: 13px 0 20px; }
+  .studio-review .studio-welcome-make { margin: 0 auto; width: min(100%,320px); font-size: 16px; padding: 13px 18px; }
+  .studio-welcome-availability { margin: 5px auto 0; }
+  .studio-welcome-footer { flex-direction: column; gap: 0; margin-top: 10px; }
+  .studio-overview-steps { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+  .studio-review .studio-journey-overview { padding: 18px; }
+  .studio-overview-footer { align-items: flex-start; flex-direction: column; }
+}
+@media(max-width:650px) {
+  /* Leave room for a complete playable choice after the optional welcome. */
+  body.studio-review #page-studio-library .studio-home-hero { min-height: 330px; padding-top: 21px; row-gap: 10px; }
+}
+@media(max-width:420px) {
+  .studio-review .studio-first-welcome { padding: 12px 17px; }
+  .studio-welcome-art img { max-width: 184px; }
+  .studio-review .studio-first-welcome h1 { font-size: 33px; }
+  .studio-review #studioDoneForNow { padding: 7px 9px; }
+  .studio-review .studio-heading { flex-wrap: wrap; }
+  .studio-review .studio-journey-help { font-size: 11px; }
+  .studio-overview-heading h2 { font-size: 20px; }
+}
+@media(max-width:350px) {
+  .studio-review #page-studio .studio-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 5px 10px; }
+  .studio-review #page-studio .studio-title-wrap { grid-column: 1/-1; grid-row: 2; }
+  .studio-review #page-studio #studioDoneForNow { grid-column: 2; grid-row: 1; }
+}

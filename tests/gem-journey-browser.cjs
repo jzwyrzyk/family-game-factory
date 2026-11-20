@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Production-browser checks for the earned, owner-scoped illustrated journey.
  * Notebook fixtures below use the production schema/API; they are isolated test
  * data, never demo progress in the application. The final milestone is exercised
@@ -71,10 +72,11 @@ function visualFixture(){
   page.on('pageerror',error=>errors.push(error.message));
   page.on('dialog',dialog=>{dialogs.push({type:dialog.type(),message:dialog.message()});void dialog.accept();});
   page.on('request',request=>{if(request.url().includes('/v1/jobs'))network.push(request.url());});
-  await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('studioNavJourney'));
+  await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('studioNavJourney'));await exploreWelcome(page);
   return {page,context,errors,network,dialogs};
  };
  const openJourney=async page=>{
+  await exploreWelcome(page);
   await page.click('#studioNavJourney');
   await page.locator('#page-jems-journey').waitFor({state:'visible'});
   await page.evaluate(async()=>{

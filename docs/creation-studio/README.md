@@ -99,6 +99,10 @@ The result reports `kind: formative`, `source: bounded-scene-runs`, `independent
 
 ## Learning, ownership, and recovery
 
+The [first-creation guidance](../child-journey/FIRST-CREATION.md) adds optional inline scene and practice tips through callbacks supplied by Studio. Dismissals are saved in the current player's existing Studio notebook; they do not mark the challenge's assessed hint as used or create learning evidence. Unresolved recovery takes priority over tips, and tip controls cannot move focus out of an active required learning activity. The persistent source label explains that changes stay in the scene, alongside the existing **Back to my game** action. A scene copied from saved scene work is described as such instead of being mislabeled as a game conversion.
+
+After a successful challenge check, the already-authored extension is displayed beside **Make it my own**. That action retains its existing copy-to-free-scene behavior and provenance; the guidance does not write changes back into the source game or introduce a new challenge/evaluator.
+
 The existing Math/Language learning host retains subject, grade, checkpoint selection, answer handling, and progress. Scene playback and instructional interactions must honor an active host activity; the interpreter cannot mark the activity correct or dismiss it. [Math integration](../adaptive-math/integration.md) and [Language integration](../adaptive-language/integration.md) remain the relevant learning contracts.
 
 The separate local key is `family-game-factory-creation-v1`, schema `jems.creation.workspace.v1`. Storage keeps owner-scoped project entries, immutable revisions, a separately selected kept revision, recoverable drafts, and bounded attempt records. An autosave protects an experiment; it does not choose a favorite. Editing uses an expected base revision to reject stale writes. A saved source reference cannot be rewritten through an ordinary edit.

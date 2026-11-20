@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
@@ -50,7 +51,7 @@ async function currentNavigation(page,id){
    const page=await browser.newPage({viewport:{width,height},hasTouch:label==='mobile'}),errors=[];
    page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(15000);
    page.on('pageerror',e=>errors.push((e.stack||e.message)));await page.goto(base,{waitUntil:'domcontentloaded'});
-   await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
+   await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);await exploreWelcome(page);
    console.log('jems brand '+label+': Studio booted');
    await approvedIcons(page,'/arcade/');
    await currentNavigation(page,'studioNavHome');

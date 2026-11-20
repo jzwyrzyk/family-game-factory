@@ -1,5 +1,6 @@
 import { createJourneyGem, createJourneyRankThumbnail, type JourneyState } from '../brand/journey';
 import { GEM_MILESTONE_START, REWARD_AMOUNTS, type RewardGrant, type RewardsSummary } from './model';
+import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import './rewards.css';
 
 export type RewardsViewState = {
@@ -20,6 +21,7 @@ export type RewardsPageOptions = {
   /** The host chooses the destination and enforces the player's subject settings. */
   onActivity?: (activity: RewardsActivity) => void;
   onRetry?: () => void;
+  guidance?: GuideHost;
 };
 
 const makerNames = ['Ready to create', 'Gem Maker', 'Gem Cutter', 'Gem Polisher', 'Gem Master'] as const;
@@ -122,8 +124,14 @@ export function createRewardsPage(options: RewardsPageOptions) {
   makerCopy.append(makerState, makerName, makerNext, makerAction);
   maker.append(makerArt, makerCopy);
   hero.append(copy, maker);
-  const progressExplanation = node('p', 'jems-rewards-explainer', 'Your gems add up across activities. Your maker level grows as you test and improve your saved games.');
-  progressExplanation.id = 'jemsRewardsExplanation';
+  const progressExplanation = createGuideCard({
+    id: 'jemsRewardsExplanation', tip: 'progress', title: 'More than one way to grow',
+    description: 'Your gems add up across activities. Your maker level grows as you test and improve your saved games. My Powers shows your practice; gems are not a skill score.',
+    host: options.guidance,
+    canAct: () => !disposed && !element.hidden && state.summary.owner === state.journey.ownerId,
+    onError: message => { status.hidden = false; statusText.textContent = message; retry.hidden = true; },
+    onDismiss: () => play.focus({ preventScroll: true })
+  });
 
   const milestonesSection = node('section', 'jems-rewards-section');
   milestonesSection.setAttribute('aria-labelledby', 'jemsRewardsMilestonesTitle');
@@ -200,6 +208,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
     status.hidden = !error;
     statusText.textContent = error ? 'Your rewards couldn’t load. Try again in a moment.' : '';
     retry.hidden = !error || !options.onRetry;
+    progressExplanation.refresh();
     encouragement.textContent = waiting ? 'Opening your rewards…' : error ? 'You can keep playing and creating.' : summary.lifetimeGems === 0 ? 'Your next little adventure starts here.' : 'You’re making progress, one adventure at a time.';
     next.hidden = unavailable;
     nextTitle.textContent = `Next milestone: ${number(summary.nextGemMilestone)} gems`;
@@ -273,7 +282,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
   return {
     element,
     update(nextState: RewardsViewState) { state = nextState; render(); },
-    show() { if (disposed) return; element.hidden = false; element.classList.remove('hidden'); heading.focus({ preventScroll: true }); },
+    show() { if (disposed) return; progressExplanation.refresh(); element.hidden = false; element.classList.remove('hidden'); heading.focus({ preventScroll: true }); },
     hide() { element.hidden = true; element.classList.add('hidden'); },
     dispose() { disposed = true; element.remove(); }
   };

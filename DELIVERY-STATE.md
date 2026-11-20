@@ -1,5 +1,37 @@
 # jems delivery state
 
+## First creation and contextual journey — implementation for review
+
+The owner's November 19, 2026 direction authorized a simple first creation entry and small optional journey explanations. Branch `feature/jems-first-creation-journey` starts from main **`df63bc2c7644a26a84a7c7e626b682e7c76c493d`**, preserving the merged navigation repairs and Gem Pal Studio method. The [accepted decision](docs/decisions/2026-11-19-first-creation-journey.md), [feature contract](docs/child-journey/FIRST-CREATION.md) and [rendered review captures](docs/child-journey/previews/README.md) describe this increment.
+
+An eligible first visit now has one dominant **Make my first game** action and a quieter **Explore games first** choice. Optional hints follow the current task: the idea composer, actual waiting and ready states, play, a change, choosing a main version and returning. **Journey help** explains making, practice and the existing scene-video path, and can show tips again. **Done for now** saves the Studio draft before returning. The home recommendation prioritizes a saved ready result and unfinished creative work over unrelated recent play, with a direct explicit first-result action. Creation and Rewards explain scene boundaries, practice extensions and the separate meanings of gems, maker growth and skill practice.
+
+Preferences use an optional bounded owner-keyed map in the existing notebook, with backward-compatible old-notebook reads and family/adult backup validation. They create no learning observations, reward facts or completed-creation claims. Shared global navigation retains Creation's existing autosaved-draft recovery choice. Explicit Keep, required-learning guards, source-owner checks, model/provider permissions and the reward economy remain authoritative.
+
+### Local verification
+
+The final rendered application bundles were **`index-CUQPh3v2.js`** and **`index-CjxPPoGo.css`**. The review PR records the published commit, matching tree and hosted workflow outcomes separately.
+
+| Check | Observed result |
+| --- | --- |
+| Production build and TypeScript | Passed. The existing large-bundle warning remains. |
+| Core unit suite | 360/360 passed. |
+| New guidance model/preferences | 17/17 passed, including old notebooks, owner isolation, failed writes, reward independence and return priority. |
+| Rewards and backup suites | 58/58 passed, including foreign-owner guidance rejection and adult namespace validation. |
+| First-creation browser journeys | All 10 desktop/phone groups passed: welcome and existing-user continuation, real native improvement and explicit Keep, mocked first-generation handoff, focused Action/Dismiss readiness races, save failures, learning guards, and practice/reward hints without false credit. |
+| Navigation continuity | All four desktop/phone groups passed, retaining the complete first playable starter within the ordinary 390 × 844 home viewport after Explore. |
+| Full Studio regression gate | `npm run test:studio` passed on the final bundle: approved assets, Studio units, homepage, desktop/phone brand, motion variants, build-wait game, native editing/undo/redo/fork, seven favorites, parent privacy, adult profile isolation and Gem Factory desktop/tablet/phone. |
+| Existing child journey and build continuity | All eight child-journey paths passed on the final bundle. Desktop/mobile build continuity passed on the earlier working bundle, including uncertain status, playing elsewhere, profile/reload boundaries, explicit ready actions and recovery. |
+| Creation | All eight recovery groups passed on the final bundle, including explicit Resume / Use saved behavior for an autosaved scene draft. Desktop and tablet authoring journeys passed on the earlier working bundle. |
+| Rewards and problem-solving browser integration | Integrated Rewards passed on the final bundle, including activity routes, family/adult separation, save failures and backups. Problem-solving passed desktop/phone on the earlier working bundle, including required-learning guards and empty-sibling entry. |
+| Documentation checker tests | 18/18 passed; source review fingerprints and local document links are checked with this candidate. |
+
+Visual review inspected welcome, idea, return, practice, play and change at 320, 390, 768 and 1280 pixel widths. On the 390 × 844 phone, Send and Build remain visible in the first composer viewport; the playable stage precedes its optional guide. The smaller 320 × 740 viewport uses ordinary scrolling. Four small JPEGs capture the selected welcome, composer and help views. Browser fixtures use synthetic local profiles and controlled service responses, and the screenshots deliberately show the unavailable-builder state. These results do not claim a production generation or deployment observation.
+
+**Preserved correction history:** initial checks exposed a missing async error return, a profile-disposal read of the previous active view, focus loss on replaced hints, excessive phone stacking, and an unnecessary shared-Home scene flush that removed the existing recovery decision. Those issues were corrected. Existing mobile playable-card, decoded-artwork and scene-recovery assertions were retained. Existing browser fixture entry points now choose the visible Explore action when appropriate; they do not preseed a hidden introduction bypass.
+
+**Disposition:** implemented for review. This work does not merge or deploy the application, select a new release source, change service configuration or activate providers. Parallel Art Studio [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23), Gem Pal runtime/artwork, arbitrary same-game code editing and cross-device synchronization remain separate work. The frozen coordinated-release source **`b6e160b9ec402d8cf7b728ab3189600628bde640`** remains unchanged.
+
 ## Gem Pal Studio — merged design method
 
 [PR79](https://github.com/jzwyrzyk/family-game-factory/pull/79) merged on November 19, 2026, at 8:30:11 PM America/New_York (`2026-11-20T01:30:11Z`) as **`eaab21cc6ce0ad8a19d02cd9279fdadf5f597d4f`**, from final head `3b81da980c4c5934582cdd5b1adc66dbc4ead3fa`. The merged tree has no file differences from that tested head; its complete tree is `42001de4d2eb854286956a6c0ddae04da029211c`, equal to the independently reviewed local tree. The canonical entry point is [Gem Pal Studio](docs/pals/STUDIO.md), with design, growth, quality, continuity, prompt and empty-record references. Root agent instructions and the repository skill route future Pal work to this guide.

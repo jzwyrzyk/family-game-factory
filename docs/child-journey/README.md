@@ -1,6 +1,8 @@
-# Child journey v1 — integrated review
+# Child journey — current entry and original integrated review
 
-This review joins Adaptive Math v1, Game Quality v1, and the child-owned Studio into one tested development branch. It is opt-in with `?studio=1`. The ordinary arcade remains supported. No publication, paid inference, credentials, runner trust changes, or cloud activation is part of this work.
+The current application opens the Studio experience by default. The accepted [first-creation journey](FIRST-CREATION.md) adds an optional focused welcome, small contextual hints, a direct ready-result action, and useful return recommendations. The [homepage contract](../homepage/README.md) describes the ordinary library after the welcome. `?studio=1` remains an alias; `?arcade=1` and `?studio=0` deliberately select the legacy experience.
+
+The sections below preserve the original Adaptive Math v1, Game Quality v1, and child-owned Studio integration review. Its source pins and evidence are historical. At that review the combined UI was opt-in; later homepage and first-creation decisions supersede that entry mode. Current release and verification claims belong in [delivery state](../../DELIVERY-STATE.md).
 
 ## First-release standard
 
@@ -12,7 +14,7 @@ These are documented product patterns and accessibility guidance, not evidence t
 
 | Reference | Documented pattern | First-release choice |
 | --- | --- | --- |
-| [Khan Academy Kids: getting started](https://khankids.zendesk.com/hc/en-us/articles/360006764812-Parent-and-Home-Account-Users-Getting-Started-and-creating-an-account-with-Khan-Academy-Kids) | A prominent play entry, a separate child-selected library, and repeatable guide instructions | Playable choices in the first ordinary phone viewport; a clear return action; no required coaching conversation before an existing game |
+| [Khan Academy Kids: getting started](https://khankids.zendesk.com/hc/en-us/articles/360006764812-Parent-and-Home-Account-Users-Getting-Started-and-creating-an-account-with-Khan-Academy-Kids) | A prominent play entry, a separate child-selected library, and repeatable guide instructions | Playable choices in the first ordinary phone viewport after Explore first; a clear return action; no required coaching conversation before an existing game |
 | [ScratchJr interface guide](https://sites.bc.edu/scratchjr/learn/) | Immediate experimentation, reset, undo/redo, and project saving | Retain independent tests and earlier versions; opening a test never chooses it as the main game |
 | [Minecraft Education accessibility](https://edusupport.minecraft.net/hc/en-us/articles/360061503031-Accessibility-Features) | Consistent accessibility settings and device-specific input hints | A visible How to play action; short touch or keyboard guidance derived from the game actually being viewed |
 | [Xbox Accessibility Guideline 116](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/116) | Sufficient time to understand non-game UI; important information can wait for the player | Math, help, errors, and ready previews wait for an appropriate child action; a background build does not replace the active game |
@@ -23,7 +25,7 @@ These are documented product patterns and accessibility guidance, not evidence t
 
 ### Entering and returning
 
-The library puts games and the last project before promotional copy. A compact player switcher keeps the current owner visible. Playing an original does not create duplicate visible cards; a meaningful experiment still creates a recoverable project. New ideas, playable games, builds, and ready tests have distinct labels.
+The original library put games and the last project before promotional copy. Current [return guidance](FIRST-CREATION.md#return-priority) additionally prioritizes ready and unfinished creative work. A compact player switcher keeps the current owner visible. Playing an original does not create duplicate visible cards; a meaningful experiment still creates a recoverable project. New ideas, playable games, builds, and ready tests have distinct labels.
 
 In a game, Play, Change my game, and How to play are prominent. Undo, Redo, versions, and copying are under More game tools. Math presentation choices remain available in a disclosure, with no Off choice. Grade and learning settings remain in the grown-up area.
 
@@ -71,4 +73,4 @@ This branch resolves the overlap and adds the journey changes above. Earlier bra
 
 The practical v1 uses deterministic navigation and learning, local game simulation, ordinary browser storage, and the existing optional builder/coach transport. It adds no new AI dependency.
 
-Read-aloud, voice input, cross-device conversation sync, and universal design-time mid-round resume are not delivered by this batch. Device screen readers can use the new focus and announcement markup; a real screen-reader review is still required. The grade range remains bounded supplemental math practice, not a complete certified curriculum. The new UI is still opt-in pending owner review.
+Read-aloud, voice input, cross-device conversation sync, and universal design-time mid-round resume were not delivered by the original integration batch. Later [voice](../issue-28/PUSH_TO_TALK_MVP.md) and [homepage](../homepage/README.md) decisions supersede the old voice/entry description; this history does not limit their current source scope. Device screen readers can use the focus and announcement markup; a real screen-reader review is still required. The grade range remains bounded supplemental practice, not a complete certified curriculum.

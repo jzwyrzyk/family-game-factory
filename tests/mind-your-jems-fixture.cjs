@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 const assert=require('node:assert/strict');
 const path=require('node:path');
 
@@ -59,7 +60,7 @@ window.addEventListener('message',event=>{if(!readySent&&event.source===parent&&
 document.querySelector('#play').onclick=()=>document.querySelector('#result').textContent='Game started';
 </script></body></html>`}));
  await page.goto(base+'?studio=1',{waitUntil:'domcontentloaded',timeout:30000});
- await page.waitForFunction(()=>window.FG?.studio?.mode()==='remote');
+ await page.waitForFunction(()=>window.FG?.studio?.mode()==='remote');await exploreWelcome(page);
  assert.equal(await page.locator('dialog.myj-arcade').isVisible(),false,'mini-game is optional');
  await page.locator('[data-starter="gum"]').click();
  if(device.existingRemote){

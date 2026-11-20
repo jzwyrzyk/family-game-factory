@@ -27,6 +27,8 @@
     "docs/decisions/0009-approved-brand-library-v1-2.md",
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
+    "docs/child-journey/FIRST-CREATION.md",
+    "docs/decisions/2026-11-19-first-creation-journey.md",
     "docs/decisions/0007-creation-and-rebuild-practice.md",
     "docs/parent-progress/README.md",
     "docs/parent-progress/RESEARCH.md",
@@ -65,6 +67,8 @@
     "docs/brand/GEM_FACTORY.md",
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
     "docs/creation-studio/*.md",
+    "docs/child-journey/*.md",
+    "docs/child-journey/previews/*.md",
     "docs/rewards/*.md",
     "docs/rewards/previews/*.md",
     "docs/problem-solving/*.md",
@@ -90,10 +94,10 @@
         "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T01:16:17.200Z",
-      "sourceDigest": "75b29311edbe4e453d7388b30781161b3607d6b7c0f544450bf1ec79210e9565",
+      "reviewedAt": "2026-11-20T03:41:59.237Z",
+      "sourceDigest": "052a9ff9b1ed3cdd951cd252ef7e68c4facf5102b51a557069fce0009c442a24",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated Gem Pal doctrine and guide over merged PR78. Preserved its restored collection access, navigation, same-project continuation, private drawings, explicit Keep, maker evidence and lifetime reward contracts; added the two artistic forms and purposeful structural growth without altering earning thresholds, runtime delivery or exact-art approval.",
+      "reviewReason": "Documented the accepted first-creation invitation, optional task hints, child-selected Keep and meaningful return priority in doctrine and the dated decision. Guidance preferences do not constitute learning, reward or creation evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -162,10 +166,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T00:42:23.714Z",
-      "sourceDigest": "e3a140cb860db24ccb173d850d7d7387c08b62dae35e19718252babb729453df",
+      "reviewedAt": "2026-11-20T03:42:00.190Z",
+      "sourceDigest": "2b736db5832e3cdb1bcd860d81dc3e5658c3b79f67635e7f1176a6a92685ec46",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the confirmed phone first-viewport defect from the collection shortcut, then moved the existing entry after the Ready to Play game shelf. Preserves all seven primary destinations, collection accessibility, profile boundaries and the original playable-first homepage contract.",
+      "reviewReason": "Reviewed the first welcome, owner-scoped task hints, direct first-ready action, return recommendation and Studio Done behavior. Documented active-panel placement, keyboard focus retention, phone layout, preserved scene recovery and explicit saved-version choice.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -198,10 +202,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "bb9c80603eae9fd973eb540fed3f2edfda1e1ebb2aa4336e43d404647db0243c",
-      "reviewedAt": "2026-11-19T23:24:41.389Z",
+      "sourceDigest": "5042a4ef455c4412ddf3ba81dfbd42a6acc94b7e44aa9881419048b5df033b1e",
+      "reviewedAt": "2026-11-20T03:42:01.268Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented saved scenes on both tabs, most-recent owner-scoped challenge continuation, explicit new attempts and direct validated file import with draft, recovery and stale-read guards. Reviewed actual UI and desktop/tablet/recovery regression changes; source schema and Keep rules are unchanged.",
+      "reviewReason": "Documented optional scene and practice guidance, permanent source boundaries and authored extensions after successful checks. Reviewed recovery suppression and focus guards; global Home retains existing autosaved recovery drafts and does not promote a revision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -235,10 +239,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5ce3a2b2d093c434cb667629ba028398816ad02a5b1b6f1a0ec7d824f16cd06a",
-      "reviewedAt": "2026-11-19T23:24:41.916Z",
+      "sourceDigest": "5855c79c06be66d51a86c998f97a99d07c5ec725bfb9cf4f46493080f1ef8743",
+      "reviewedAt": "2026-11-20T03:42:02.096Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented actionable earning rows, parent-controlled subject routing, direct unset-maker selection and the distinction between lifetime gems and maker evidence. Reviewed component and integrated route assertions; reward receipts, amounts and source eligibility are unchanged."
+      "reviewReason": "Documented the dismissible gems/maker/practice explanation and owner-scoped notebook preferences. Reviewed backup rejection of foreign guidance owners and namespace isolation; grants, source eligibility and evidence remain unchanged."
     },
     {
       "id": "games",
@@ -385,10 +389,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "153f9fd6ed825e3bfb85cb4768ccb433bc6cb4e0e21b93877925e4fd9d398043",
-      "reviewedAt": "2026-11-19T16:20:30.000Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed brand control changes alongside family/adult reward namespaces and parent Settings backup controls; no guardian scope, device trust or paid provider permission changes."
+      "sourceDigest": "b06116996cbf77a9e1c2d30eb04758a3d73aa09a454e4b0a5e72979bd8378afe",
+      "reviewedAt": "2026-11-20T03:42:03.089Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Browser fixture entry now chooses the real Explore control for fresh family or adult profiles before existing assertions. Identity, authorization, namespace, parent consent and provider source code are unchanged; rewards backup separately validates the new notebook preferences."
     },
     {
       "id": "validation",
@@ -413,10 +417,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T00:42:23.714Z",
-      "sourceDigest": "b2cd17614edab21251b06e9dac17032543df27341d72ca817582ca822cec7137",
+      "reviewedAt": "2026-11-20T03:42:03.885Z",
+      "sourceDigest": "a746f99c32803f94f341829538a2ad40030100dbb4ac8764ce3f76a8a4d46d47",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new phone first-viewport assertion in navigation continuity, preserving the complete playable-card criterion and existing owner, contrast, legacy entry, save and collection checks. The quality-tablet touch fault is separately rerun rather than weakening test thresholds.",
+      "reviewReason": "Reviewed ten new browser journey groups, guidance-model and backup cases, and explicit Explore fixture preparation. Retained existing phone playable-card, decoded artwork, owner, required-learning, save-failure and scene-recovery assertions; delivery evidence distinguishes final-bundle and earlier working-bundle runs.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -455,10 +459,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T01:30:50.441Z",
-      "sourceDigest": "fd447672aab90ceb331b96b8d59cf251b3ad5c82922ebe312737db7d8bb66a74",
+      "reviewedAt": "2026-11-20T03:43:32.632Z",
+      "sourceDigest": "4249dfec7b2cb86309d4f8ccd15e7469bcfc48d9c121eab75077d84a84344849",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded observed PR79 merge eaab21cc, equality to tested head3b81 and all five successful final workflows. Preserved earlier canvas/tablet assertions and superseded retry, recorded actual PR78 merge over its historical candidate receipt, and kept the frozen release source, separate Pal drafts and unverified deployment/physical-device boundaries.",
+      "reviewReason": "Recorded the implemented first-creation review candidate from main df63bc2, final bundle identities, passing local acceptance and preserved correction history. Earlier working-bundle checks remain labeled; published-head CI is recorded in the PR. No merge, deployment, provider activation or release-source change is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -502,10 +506,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T00:59:07.305Z",
-      "sourceDigest": "8b82d89552d6e03ae5f9f0f7093cbfc149a234ac31bef51ff2090279cc855d9d",
+      "reviewedAt": "2026-11-20T03:42:04.869Z",
+      "sourceDigest": "05b6308f6d0f23bf0e027f2bc9af1e0486825de7c3ebaa8c833f0febfadb19ff",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed agent and Project retrieval routes, decision/index links, feedback maintenance and the registry-policy diff. Registered the portable skill, template, canonical guides and exact future character index under pal-design without importing or merging the artwork draft.",
+      "reviewReason": "Registered the first-creation contract and dated decision, routed child-journey and screenshot-caption link checks, and linked the new entry point in the docs index. Reviewed the preserved source area coverage and unchanged documentation-checker behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -554,10 +558,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3670012075fbf05ffe4eb33752061ab8e1490ec3092ea83bf175907971a77419",
-      "reviewedAt": "2026-11-19T17:17:56.960Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared writer guard, five-source backup, child-view and native-parent integration, deterministic tasks and new failure regressions; documented current local evidence and pending exact-head browser acceptance."
+      "sourceDigest": "dee7eabbe6d4e6b80f15414465af85c3210ddb9c9f6bf6f881a54ac6aeb5fbe2",
+      "reviewedAt": "2026-11-20T03:44:04.029Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the browser fixture profile picker now chooses the visible Explore action for an empty sibling before using the existing navigation. Practice tasks, first-response evidence, hints, learning guards, reports, reward eligibility and backup semantics are unchanged; desktop and phone regression assertions remain intact."
     },
     {
       "id": "pal-design",

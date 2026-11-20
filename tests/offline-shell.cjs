@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const {once}=require('node:events');
 // The cache/game smoke test starts after a recent question; math stays enabled.
@@ -32,7 +33,7 @@ const {once}=require('node:events');
   await page.evaluate(()=>FG.app.openGame('dragon'));await page.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);
   await page.locator('#startBtn').click();assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.dragonHP),2);
   await page.locator('#game-mount').screenshot({path:'test-results/offline-original-dragon.png'});
-  await page.goto(base);await page.waitForFunction(()=>window.FG?.studio);
+  await page.goto(base);await page.waitForFunction(()=>window.FG?.studio);await exploreWelcome(page);
   await page.waitForFunction(()=>document.querySelector('#studioNavHome svg')?.getBBox().width>0);
   assert.match(await page.locator('#studioNavHome use').getAttribute('href'),/\/arcade\/jems-art\/icons\/jems-icons\.svg#jems-home$/,'offline navigation resolves the same sprite below the site base');
   await page.locator('#studioNavCreate').click();

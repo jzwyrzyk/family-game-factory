@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Real production-dist journeys. All program edits use the public UI; FG.creation is read-only inspection. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -111,12 +112,12 @@ const {start}=require('./browser-server.cjs');
         await activate('#creationBack');await activate('#creationChallengeMode');await activate('[data-challenge="robot-route"]');
         assert.equal((await scene()).id,firstChallenge.id,'A newly checked earlier scene becomes the latest continuation');
         assert.equal((await workspace()).projects.length,beforeResume+1);
-        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));await exploreWelcome(page);
         await activate('#studioNavScenes');await activate('#creationChallengeMode');
         assert.equal(await page.locator('#creationSaved [data-scene]').count(),0);
         assert.equal(await page.locator('[data-challenge-new]').count(),0);
         assert.doesNotMatch(await page.locator('#creationChallenges').textContent(),/Continue my scene/,'A sibling has no continuation into another owner’s scenes');
-        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());await exploreWelcome(page);
         await pacing();await activate('#studioNavScenes');
 
         // Unsupported games offer a separate scene before the click, not a failed conversion.
@@ -267,12 +268,12 @@ const {start}=require('./browser-server.cjs');
         assert.deepEqual((await scene()).programs,exported.programs);
 
         // Profile changes hide the other child's projects and clear the rendered scene.
-        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));await exploreWelcome(page);
         await pacing();await activate('#studioNavScenes');
         assert.equal(await page.locator('#creationSaved [data-scene]').count(),0);
         assert.equal(await scene(),null);
         assert.equal(await page.locator('#creationBlocks').textContent(),'');
-        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());await exploreWelcome(page);
         await pacing();await activate('#studioNavScenes');await activate(`[data-scene="${projectId}"]`);
         assert.deepEqual((await scene()).programs,exported.programs);
 
@@ -388,7 +389,7 @@ const {start}=require('./browser-server.cjs');
         assert.match(await page.textContent('#creationLabProgress'),/Matched this goal/);
         assert.match(await page.textContent('#creationLabProgress'),/hint was opened/);
         await page.screenshot({path:`test-results/creation-progress-${device}.png`,fullPage:true});
-        await profiles();await activate(page.locator('.profile-choice').nth(1));
+        await profiles();await activate(page.locator('.profile-choice').nth(1));await exploreWelcome(page);
         await activate('#studioNavPowers');
         assert.equal(await page.locator('#creationLabProgress [data-project-id]').count(),0,'Progress contains only the selected profile’s checked scenes');
         assert.match(await page.textContent('#creationLabProgress'),/Try a scene challenge/);

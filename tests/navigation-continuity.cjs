@@ -5,6 +5,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 
 const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1';
 const IDEAS=[
@@ -29,6 +30,7 @@ async function prepare(browser,base,viewport){
  page.on('dialog',dialog=>void dialog.dismiss());
  await page.route('**/factory-config.json',unavailable);
  await page.goto(base);await ready(page);
+ await exploreWelcome(page);
  return {context,page,errors,posts};
 }
 
@@ -68,6 +70,7 @@ async function choosePlayer(page,index){
  await page.locator('#profile-choices .profile-choice').nth(index).click();
  await page.waitForFunction(id=>window.FG.store.current().id===id,'player'+(index+1));
  await page.locator('#page-studio-library').waitFor({state:'visible'});
+ await exploreWelcome(page);
 }
 
 async function assertCollection(page,ownerIndex){
@@ -206,6 +209,7 @@ async function legacyReturn(browser,base){
    const expected=new URL(old);expected.searchParams.delete('arcade');if(expected.searchParams.get('studio')==='0')expected.searchParams.delete('studio');
    assert.equal(new URL(await link.getAttribute('href'),page.url()).href,expected.href,'return link removes only legacy mode flags');
    await Promise.all([page.waitForURL(expected.href),link.click()]);await ready(page);
+   await exploreWelcome(page);
    assert.equal(await page.locator('#page-studio-library').isVisible(),true,'the visible link reaches the modern home');
    assert.equal(await page.locator('#studioSavedIdeas').isVisible(),true);
    assert.deepEqual(errors,[]);

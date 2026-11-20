@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Production app reward journey. Grants come only from ordinary host UI actions.
  * FG.rewards is inspected/refreshed, never given invented grants. Adult endpoints
  * are explicit local auth fixtures; this test invokes no paid provider. */
@@ -48,7 +49,7 @@ async function answerMath(page, { hint = false, wrong = false } = {}) {
 async function chooseFamily(page, index) {
   if (!await page.locator('#studioProfileMenu').evaluate(element => element.open)) await page.click('#studioProfileMenu summary');
   await page.locator('.profile-choice:not(#adultProfileChoice)').nth(index).click();
-  await page.waitForFunction(index => FG.store.current().id === `player${index + 1}`, index);
+  await page.waitForFunction(index => FG.store.current().id === `player${index + 1}`, index); await exploreWelcome(page);
 }
 async function openRewards(page) {
   await page.click('#jemsRewardsWidget');
@@ -135,7 +136,7 @@ async function installAuthFixture(context) {
   fs.mkdirSync('test-results', { recursive: true });
   const base = `http://127.0.0.1:${server.address().port}/arcade/`;
   try {
-    await page.goto(base); await ready(page); await expectTotal(page, 0);
+    await page.goto(base); await ready(page); await exploreWelcome(page); await expectTotal(page, 0);
     await openRewards(page);
     assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '0');
     assert.equal(await page.locator('#jemsRewardsMakerName').textContent(), 'Ready to create');
@@ -295,7 +296,7 @@ async function installAuthFixture(context) {
     // Adult authorization is exercised through the real dialog; reward namespaces stay separate.
     if (!await page.locator('#studioProfileMenu').evaluate(element => element.open)) await page.click('#studioProfileMenu summary');
     await page.click('#adultProfileChoice'); await page.fill('#adultProfilePassphrase', PASSPHRASE); await page.click('#adultProfileSubmit');
-    await page.waitForFunction(id => FG.store.current().id === id, ADULT); await expectTotal(page, 0);
+    await page.waitForFunction(id => FG.store.current().id === id, ADULT); await expectTotal(page, 0); await exploreWelcome(page);
     await startMath(page); await answerMath(page); await expectTotal(page, 2);
     await chooseFamily(page, 0); await expectTotal(page, 100);
     await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
