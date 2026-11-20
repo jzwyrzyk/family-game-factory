@@ -84,6 +84,27 @@ class ContinuityTests(unittest.TestCase):
         s=snapshot();s['factory-gateway']=service('factory-gateway',adult=False)
         with self.assertRaisesRegex(c.ContinuityError,'ADULT_POLICY_DRIFT'):
             c.assess(s,wif(),P,P,P,'false',P,'inactive')
+    def test_historical_cloud_run_revisions_are_not_live_traffic_drift(self):
+        # Real Cloud Run reports old revision entries with null traffic; only
+        # the newest, ready revision actually receives 100%.
+        active=snapshot()
+        gateway=active['factory-gateway']
+        current=gateway['status']['latestReadyRevisionName']
+        gateway['status']['traffic']=[
+            {'revisionName':'factory-gateway-00003-old'},
+            {'revisionName':'factory-gateway-00007-old','percent':None},
+            {'revisionName':current,'percent':100},
+        ]
+        self.assertTrue(c.ready(gateway))
+        self.assertEqual(c.assess(active,wif(),P,P,P,'false',P,'inactive')['result'],
+                         'CURRENT_STATE_VERIFIED')
+        # Two positive traffic destinations are not a single accepted release.
+        gateway['status']['traffic'][0]['percent']=1
+        self.assertFalse(c.ready(gateway))
+        # A serving revision that is not the ready revision is also rejected.
+        gateway['status']['traffic']=[{'revisionName':'other-revision','percent':100}]
+        self.assertFalse(c.ready(gateway))
+
     def test_exact_pinned_version_not_latest(self):
         self.assertEqual(c.mounted_config(service('factory-gateway')),
                          ('factory-gateway-private-config','17'))
