@@ -775,10 +775,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2025d5dad440338e30d62ac914a5ea4496d5197dc5566e9b832d10596e0fee0a",
-      "reviewedAt": "2026-11-20T17:10:31.580Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Documented upload/draw/edited-copy continuation, post-modal focus and current owner/page guards; reviewed real pending/rejected configuration tests and saved-preview explicit retry. Original storage, private asset boundaries and saved version bindings remain intact.",
+      "sourceDigest": "802c3ec9f1903b3fca827c791548020027bdcc6e93a1b3916b7f6df16edd5dd9",
+      "reviewedAt": "2026-11-20T17:27:34.787Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the first-person to child-directed 'You drew it' headline correction against the existing Art Studio flow. This is display copy only: the original image, player isolation, local upload, saved versions, game links and navigation behavior are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
