@@ -114,11 +114,18 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:53:00.000Z",
-      "sourceDigest": "211e411eeb0c2a361761b3610377babce8df83d9fba68e212aa73e42948c307f",
+      "reviewedAt": "2026-11-20T06:14:00.000Z",
+      "sourceDigest": "e23419eb434492442be40bd9e752b5ef9b1972269e6409fe37af65038adaeb00",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged first-creation and companion doctrine alongside the optional usage pilot; analytics is not a learning grade, gem reward, or child-benefit claim.",
+      "reviewReason": "Reviewed newly approved Pal artwork and design references with the analytics integration; neither changes educational measurement or product usage permissions.",
       "reviewHistory": [
+        {
+          "sourceCommit": "aedfa9125a5817c0cbbb07c716891237eace17fd",
+          "reviewedAt": "2026-11-20T05:53:00.000Z",
+          "sourceDigest": "211e411eeb0c2a361761b3610377babce8df83d9fba68e212aa73e42948c307f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the merged first-creation and companion doctrine alongside the optional usage pilot; analytics is not a learning grade, gem reward, or child-benefit claim."
+        },
         {
           "sourceCommit": "3fe66afdaeb1ccd609004564cbc296b5fd4850a4",
           "reviewedAt": "2026-11-20T05:14:52.957Z",
@@ -594,11 +601,18 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:53:00.000Z",
-      "sourceDigest": "78eb753474ee0643925d08ff3ba5fa8c0aa02882a24ab738edb9602e753dad12",
+      "reviewedAt": "2026-11-20T06:14:00.000Z",
+      "sourceDigest": "2861db603645bbc2ef4c60d62394b1e987f6a0b08e38cd8b0a0d62bf7f23883c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed analytics, first-journey, Gem Pal and keyed private-drawing regression coverage in the combined source, preserving original assertions.",
+      "reviewReason": "Reviewed explicit first-welcome navigation and real canvas-paint synchronization tests without weakening actual gameplay or art assertions.",
       "reviewHistory": [
+        {
+          "sourceCommit": "aedfa9125a5817c0cbbb07c716891237eace17fd",
+          "reviewedAt": "2026-11-20T05:53:00.000Z",
+          "sourceDigest": "78eb753474ee0643925d08ff3ba5fa8c0aa02882a24ab738edb9602e753dad12",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed analytics, first-journey, Gem Pal and keyed private-drawing regression coverage in the combined source, preserving original assertions."
+        },
         {
           "sourceCommit": "3fe66afdaeb1ccd609004564cbc296b5fd4850a4",
           "reviewedAt": "2026-11-20T05:10:36.845Z",
@@ -725,11 +739,18 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:53:00.000Z",
-      "sourceDigest": "d62127191f6de1603b79e5dc4f16f4bc9e34d6325f2f75a01f6fa1c84fd9cf8f",
+      "reviewedAt": "2026-11-20T06:14:00.000Z",
+      "sourceDigest": "87995ebe5eee3f681f04c2b08fcac8b988fbc4694c90165debf69f5358342f0c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed new analytics documentation routes and preserved current main's first-journey and companion references; the registry still covers canonical source areas.",
+      "reviewReason": "Reconciled the current main Pal artwork decisions and documentation index with the independent analytics guide and review registry routes.",
       "reviewHistory": [
+        {
+          "sourceCommit": "aedfa9125a5817c0cbbb07c716891237eace17fd",
+          "reviewedAt": "2026-11-20T05:53:00.000Z",
+          "sourceDigest": "d62127191f6de1603b79e5dc4f16f4bc9e34d6325f2f75a01f6fa1c84fd9cf8f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed new analytics documentation routes and preserved current main's first-journey and companion references; the registry still covers canonical source areas."
+        },
         {
           "sourceCommit": "3fe66afdaeb1ccd609004564cbc296b5fd4850a4",
           "reviewedAt": "2026-11-20T05:06:23.658Z",
@@ -948,10 +969,19 @@
         "tests/analytics-*"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b6de1af107dc0ee055085be93004c2685b1cf9e5094f2b43940932f5592ecb04",
-      "reviewedAt": "2026-11-20T04:46:42.570Z",
+      "sourceDigest": "a82f823bd99d4bb22d25e4be7b3fca85912a54f86a91d652eaafc634e6bbcb78",
+      "reviewedAt": "2026-11-20T06:14:00.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed collector admission semantics and capacity pressure as a possible evidence loss. Updated runbook, dashboard limits, architecture and delivery notes; consent and core records survive while only pending events, bindings and receipts are discarded."
+      "reviewReason": "Reviewed updated browser fixtures for the visible first-time welcome action while preserving opt-in and actual-frame observation requirements.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "aedfa9125a5817c0cbbb07c716891237eace17fd",
+          "reviewedAt": "2026-11-20T04:46:42.570Z",
+          "sourceDigest": "b6de1af107dc0ee055085be93004c2685b1cf9e5094f2b43940932f5592ecb04",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed collector admission semantics and capacity pressure as a possible evidence loss. Updated runbook, dashboard limits, architecture and delivery notes; consent and core records survive while only pending events, bindings and receipts are discarded."
+        }
+      ]
     }
   ]
 }
