@@ -1,5 +1,11 @@
 # Publish reviewed gateway and preview images
 
+## Pinned sandbox image publication after obsolete OCI contract failure
+
+The application source pin required by the current private worker is `b472c224f7e8ef8ab0986ce6f755728d7cc63d46`. On November 20, production gVisor smoke [run 44830655674](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44830655674) showed that the previously configured GHCR image built from `31f8c463f95260a2b5c64f442a53adfe603a2228` still uses a bare-game stdin contract, whereas the reviewed worker source sends a `{game,...}` envelope. The resulting `GENERATED_ARTIFACT_REJECTED` is a real incompatible package, not grounds to relax source validation. VM/runner cleanup and smoke authorization reset were both verified.
+
+Use the new [source-pinned, manual GitHub-hosted GHCR publisher](SANDBOX-PUBLISH.md) to build and publish a **replacement immutable OCI digest** through a cloud-to-cloud workflow with no local Docker or workstation upload. The workflow tests bundled source hashes and the envelope protocol before publishing, but **does not run real production gVisor** or activate AI. Retain the old digest for audit/rollback; never keep testing it against an incompatible new source. A separate owner-run, billable sandbox security/gameplay acceptance is still mandatory before enabling adult paid generation.
+
 ## Continuity of an approved private adult release
 
 **Do not use `scripts/deployment/deploy.py` for an existing service.** That historical bootstrap intentionally resets AI approvals to inactive and now refuses any existing gateway/preview service or private-config secret before mutations. Use [Adult AI release continuity](RELEASE-CONTINUITY.md) for the preserved-state operating contract and read-only live audit. The service-image publisher in this document only publishes OCI images; it does not deploy them or toggle provider availability. Existing approved Cloud Run settings must be preserved by a separate, verified in-place rollout.
