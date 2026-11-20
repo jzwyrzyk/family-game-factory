@@ -178,7 +178,7 @@ export async function installStudio(){
  const libraryTools=el('div','studio-library-tools');
  const savedIdeas=iconEl('button','studio-button','grid','Saved ideas & drawings') as HTMLButtonElement;
  savedIdeas.id='studioSavedIdeas';savedIdeas.type='button';savedIdeas.onclick=()=>act(openSavedIdeas);
- libraryTools.append(savedIdeas);library.querySelector('#studioContinue')!.after(libraryTools);
+ libraryTools.append(savedIdeas);library.querySelector('#studioFavoritesSection')!.after(libraryTools);
  const collectionBack=iconEl('button','studio-button','arrow','My Games','jems-icon--back') as HTMLButtonElement;
  collectionBack.id='studioCollectionBack';collectionBack.type='button';collectionBack.onclick=()=>act(home);
  $('page-creations').querySelector('.page-head')!.prepend(collectionBack);

@@ -118,6 +118,11 @@ async function collectionJourney(browser,base,device,viewport){
   assert.equal(new URL(page.url()).search,'','the regression starts in ordinary default mode');
   assert.equal(await page.locator('#page-studio-library').isVisible(),true);
   assert.equal(await page.locator('.studio-nav button').count(),NAV.length,'the modern seven-destination navigation is preserved');
+  if(device==='phone'){
+   const firstGame=await page.locator('#studioStarters [data-starter]').first().boundingBox();
+   assert.ok(firstGame&&firstGame.y>=0&&firstGame.y+firstGame.height<=viewport.height,
+     'restoring saved collections must not move the first complete playable game below the phone viewport');
+  }
   for(const id of NAV)assert.equal(await page.locator('#'+id).isVisible(),true,id+' is discoverable');
   const entry=page.getByRole('button',{name:'Saved ideas & drawings',exact:true});
   assert.equal(await entry.getAttribute('id'),'studioSavedIdeas');
