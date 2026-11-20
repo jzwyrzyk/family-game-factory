@@ -107,14 +107,28 @@ class DeploymentTests(unittest.TestCase):
         self.assertNotIn(cloud.secrets[d.CONFIGS['gateway']]['sessionKey'],out.getvalue())
         config=copy.deepcopy(cloud.secrets)
         cloud.calls=[]
-        with patch.object(d,'health'),redirect_stdout(io.StringIO()):d.main(args,cloud)
+        # This script is now strictly first-time bootstrap. Even an inactive
+        # existing production service must not have its approvals reset.
+        with self.assertRaisesRegex(d.SafeError,'EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE'):
+            d.main(args,cloud)
         self.assertEqual(cloud.secrets,config)
-        self.assertEqual(len([x for x in cloud.calls if x[0][:2]==('run','deploy')]),2)
-        for arguments,data in cloud.calls:
-            self.assertFalse(any('--set-env-vars'==a and 'PRIVATE_KEY' in arguments[i+1] for i,a in enumerate(arguments)))
-        # Active configs and unmanaged services are never silently replaced.
+        self.assertFalse(any(x[0][:2]==('run','deploy') for x in cloud.calls))
+        self.assertFalse(any(x[0][:3]==('secrets','versions','add') for x in cloud.calls))
+        # An active configuration is likewise protected before any mutation.
         cloud.secrets[d.CONFIGS['gateway']]['active']=True
-        with self.assertRaises(d.SafeError):d.main(args,cloud)
+        cloud.calls=[]
+        with self.assertRaisesRegex(d.SafeError,'EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE'):
+            d.main(args,cloud)
+        self.assertFalse(any(x[0][:2]==('run','deploy') for x in cloud.calls))
+
+    def test_existing_gateway_or_preview_blocks_inactive_bootstrap_before_mutation(self):
+        args=['deploy','--execute','--region','europe-west1','--gateway-image',IMAGE,'--preview-image',PREVIEW]
+        for name in ('factory-gateway','factory-preview'):
+            cloud=FakeCloud()
+            cloud.services[name]={'metadata':{'name':name}}
+            with self.assertRaisesRegex(d.SafeError,'EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE'):
+                d.main(args,cloud)
+            self.assertFalse(any(x[0][:2]==('run','deploy') or x[0][:3]==('secrets','versions','add') for x in cloud.calls))
 
     def test_drift_rejected(self):
         cloud=FakeCloud()

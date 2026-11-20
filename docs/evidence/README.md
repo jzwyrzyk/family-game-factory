@@ -1,5 +1,9 @@
 # Synthetic validation evidence
 
+## November 20, 2026 — adult AI continuity regression boundaries
+
+[Issue #93](https://github.com/jzwyrzyk/family-game-factory/issues/93) follows a real operator complaint that each Jems update appeared to require reactivating AI. The new `scripts/deployment/test_continuity.py` exercises strict current-state classification, fail-closed policy/worker/WIF drift, secret-version inspection and sanitized read-only commands. The deployment tests additionally ensure an already-existing inactive or active Jems Cloud Run release is never silently republished with `FACTORY_ACTIONS_APPROVED=false` by the first-time bootstrap. These are deterministic **offline fixtures**; they do not prove model entitlement, production gVisor cleanup, a durable adult permit or actual in-place cloud upgrade. See [continuity contract](../assignment-006/RELEASE-CONTINUITY.md).
+
 ## Current Art Studio review
 
 The refreshed drawing PR has its own [source-scoped evidence](../drawings/EVIDENCE.md), [feature contract](../drawings/ART_STUDIO.md) and production-browser captures. Those tests cover reusable private art, movement versions, native game/scene integration and recovery. The older Live Remix results below retain their original scope and counts.

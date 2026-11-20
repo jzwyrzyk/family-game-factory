@@ -1,5 +1,9 @@
 # Publish reviewed gateway and preview images
 
+## Continuity of an approved private adult release
+
+**Do not use `scripts/deployment/deploy.py` for an existing service.** That historical bootstrap intentionally resets AI approvals to inactive and now refuses any existing gateway/preview service or private-config secret before mutations. Use [Adult AI release continuity](RELEASE-CONTINUITY.md) for the preserved-state operating contract and read-only live audit. The service-image publisher in this document only publishes OCI images; it does not deploy them or toggle provider availability. Existing approved Cloud Run settings must be preserved by a separate, verified in-place rollout.
+
 The service path in `scripts/deployment/build.py` uses one regional Cloud Build default-pool job to build the existing gateway and preview Dockerfiles and publish them to the existing Artifact Registry repository. This replaces local Docker publication. No Cloud Shell Docker/Skopeo retry, private pool, GitHub federation or deployment pipeline is needed. Publishing is a release operation, never a per-game requirement.
 
 The publisher does not enable APIs, create cloud resources, grant permissions, deploy services or activate AI. Perform live publication within the existing owner-authorized release scope. Use the private owner handoff for the approved source pins, actual resource names and rollout decisions.
