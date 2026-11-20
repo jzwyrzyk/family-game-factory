@@ -417,10 +417,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T03:42:03.885Z",
-      "sourceDigest": "a746f99c32803f94f341829538a2ad40030100dbb4ac8764ce3f76a8a4d46d47",
+      "reviewedAt": "2026-11-20T04:07:32.421Z",
+      "sourceDigest": "413cc9e3efd2f008302fcda4c8dffd6202eeed27968df440be4b4919bb5039ba",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed ten new browser journey groups, guidance-model and backup cases, and explicit Explore fixture preparation. Retained existing phone playable-card, decoded artwork, owner, required-learning, save-failure and scene-recovery assertions; delivery evidence distinguishes final-bundle and earlier working-bundle runs.",
+      "reviewReason": "Reviewed the tablet quality helper change after the hosted one-part-versus-two assertion. Locator.tap retains real touch with actionability/stability checks; exact intermediate state assertions improve failure localization. Existing counts, selection, capability, geometry, held input and release assertions remain intact, and both orientations pass locally.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -459,10 +459,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T03:57:30.759Z",
-      "sourceDigest": "485d434f0c83f70edba21697e29e1cf48107e91c9b80e84a12286e998360d46d",
+      "reviewedAt": "2026-11-20T04:07:33.092Z",
+      "sourceDigest": "bc7f537e6b323d5e7e7f10af7473f438506d73767dcb4e89cd02bc2267f187d0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded initial published head173e90c/tree47341b3, successful hosted checks, the actual parent320px failure and corrected header measurements. Distinguished initial local acceptance, follow-up parent/child/navigation and quality passes, and the earlier hosted quality failure; current CI remains separate from merge or deployment.",
+      "reviewReason": "Preserved initial and header-follow-up hosted quality failures separately from passing local checks. Recorded the exact first tablet assertion, known coordinate helper behavior and narrowly reviewed real-touch helper update without claiming the old cause proven or merging/deploying the feature.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

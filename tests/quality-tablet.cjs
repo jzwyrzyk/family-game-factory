@@ -12,11 +12,9 @@ const {chromium}=require('playwright');
    const context=await browser.newContext({viewport,hasTouch:true,isMobile:true,deviceScaleFactor:2});
    const page=await context.newPage(),errors=[];
    page.on('pageerror',error=>errors.push(error.message));
-   const touch=async locator=>{
-    await locator.scrollIntoViewIfNeeded();
-    const r=await locator.boundingBox(); assert.ok(r);
-    await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
-   };
+   // Keep real touch input and wait for the control's actionability and stable
+   // position instead of dispatching at separately measured coordinates.
+   const touch=async locator=>{await locator.tap();};
    const assertTouch=async phase=>{
     const capability=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarse:matchMedia('(pointer: coarse)').matches,anyCoarse:matchMedia('(any-pointer: coarse)').matches,innerWidth,innerHeight}));
     assert.ok(capability.maxTouchPoints>0&&capability.coarse&&capability.anyCoarse,`${orientation} ${phase}: real tablet touch emulation remains active: ${JSON.stringify(capability)}`);
@@ -35,8 +33,15 @@ const {chromium}=require('playwright');
     await assertTouch('after navigation');
     await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.app.openGame('gum',{config:{qualityVersion:1,gravity:10,thrust:1,originalRules:true,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}})});
     const root=page.locator('.quality-builder'),button=name=>root.getByRole('button',{name,exact:true}),canvas=root.locator('.q-canvas');
-    await root.waitFor();await touch(button('Start fresh'));await touch(button('Add Bottle'));await touch(button('Add Cardboard box'));
+    await root.waitFor();await touch(button('Start fresh'));
     let state=await page.evaluate(()=>FG.runtime.snapshot().state);
+    assert.equal(state.parts.length,0,'Start fresh clears the actual construction');
+    assert.equal(state.selected,null,'Start fresh clears the selected part');
+    await touch(button('Add Bottle'));state=await page.evaluate(()=>FG.runtime.snapshot().state);
+    assert.equal(state.parts.length,1,'one Add Bottle touch adds exactly one part');
+    assert.equal(state.parts[0].kind,'bottle','the first touch adds the requested bottle');
+    assert.equal(state.selected,state.parts[0].id,'the added bottle becomes the selected part');
+    await touch(button('Add Cardboard box'));state=await page.evaluate(()=>FG.runtime.snapshot().state);
     assert.equal(state.parts.length,2); assert.equal(state.selected,state.parts[1].id);
     const previous=button('Previous piece'),next=button('Next piece');
     assert.equal(await previous.isVisible(),true,'tablet has a way to select small or overlapping parts');
