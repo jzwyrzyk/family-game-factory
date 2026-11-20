@@ -18,7 +18,7 @@
 
 Use one existing character-reference index. Its established repository path is `docs/pals/art/character-references.json`; this guide does not create a competing `CHARACTER_REGISTRY.json` or copy a stale roster into the method.
 
-At this guide's November 19, 2026 integration baseline (`a3b9051822943b095828c3ff06169da1e5f32011`), that index is in the separate artwork [PR74](https://github.com/jzwyrzyk/family-game-factory/pull/74), not yet in main. The inspected draft head is `d2f344e0e56a274175cbca78ab361783b46d9882`: [exact index snapshot](https://github.com/jzwyrzyk/family-game-factory/blob/d2f344e0e56a274175cbca78ab361783b46d9882/docs/pals/art/character-references.json). This is a dated retrieval fallback, not a claim that the draft has merged or every selection is current.
+As of November 20, 2026, the first selected-art reference tranche is represented at [the canonical index](art/character-references.json) and [visual entry point](art/README.md). It retains owner-selected Base and Grown references with in-review expression states explicitly distinguished. Missing Chimi/Navi exact sources and other forms remain unresolved; the dated imported records are not a claim that all 24 profiles are production-ready.
 
 For each task:
 
@@ -48,7 +48,7 @@ Use small batches and reject weak briefs before rendering. Default exploration l
 
 The current art policy has **two total forms: Base → Grown, one transition**. The four-level Spark/Nova maker journey is a separate system. The artwork policy does not determine unlock prices, adventure thresholds, receipt rules, or saved-data migrations.
 
-The earlier inspected companion implementation [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) used New/Bright/Radiant. Its current preparation follows [ADR0013](../decisions/0013-two-form-pals-and-current-main.md): Base and Grown only, with the existing first transition at five adventures deliberately retained for compatibility. That runtime policy is separate from artwork approval. The catalog keeps unresolved character/form bindings null, and the provisional token scenes do not establish final creature integration. Inspect [delivery state](../../DELIVERY-STATE.md) for the exact source and acceptance status.
+The companion runtime [PR68](https://github.com/jzwyrzyk/family-game-factory/pull/68) has merged with Base and Grown only under [ADR0013](../decisions/0013-two-form-pals-and-current-main.md), retaining the first transition at five adventures. This does not approve or bind the creature artwork to temporary `glim`/`kip`/`riff` collection IDs. Inspect [delivery state](../../DELIVERY-STATE.md) for the exact source and acceptance status.
 
 ## Keep this method current
 

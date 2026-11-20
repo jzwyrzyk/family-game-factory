@@ -53,7 +53,12 @@
     "docs/decisions/2026-11-19-private-art-studio.md",
     "docs/pals/README.md",
     "docs/decisions/0012-pals-from-earned-activity.md",
-    "docs/decisions/0013-two-form-pals-and-current-main.md"
+    "docs/decisions/0013-two-form-pals-and-current-main.md",
+    "docs/pals/art/README.md",
+    "docs/decisions/2026-11-19-pal-base-design-adoption.md",
+    "docs/decisions/2026-11-19-pal-form-reconciliation.md",
+    "docs/pals/art/characters/brio/README.md",
+    "docs/decisions/2026-11-19-brio-art-adoption.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -91,7 +96,8 @@
       "id": "product",
       "documents": [
         "PRODUCT-DOCTRINE.md",
-        "docs/decisions/*.md"
+        "docs/decisions/*.md",
+        "docs/pals/art/README.md"
       ],
       "sources": [
         "docs/design-coach/GOLD_STANDARD.md",
@@ -732,7 +738,12 @@
         "docs/pals/*.md",
         "skills/gem-pal-studio/SKILL.md",
         "docs/decisions/2026-11-19-gem-pal-studio.md",
-        "docs/decisions/0013-two-form-pals-and-current-main.md"
+        "docs/decisions/0013-two-form-pals-and-current-main.md",
+        "docs/pals/art/README.md",
+        "docs/decisions/2026-11-19-pal-base-design-adoption.md",
+        "docs/decisions/2026-11-19-pal-form-reconciliation.md",
+        "docs/pals/art/characters/brio/README.md",
+        "docs/decisions/2026-11-19-brio-art-adoption.md"
       ],
       "sources": [
         "docs/pals/*.md",
@@ -786,7 +797,8 @@
         "docs/pals/*.md",
         "docs/decisions/0012-pals-from-earned-activity.md",
         "docs/pals/previews/*.md",
-        "docs/decisions/0013-two-form-pals-and-current-main.md"
+        "docs/decisions/0013-two-form-pals-and-current-main.md",
+        "docs/pals/art/README.md"
       ],
       "sources": [
         "src/pals/**",
