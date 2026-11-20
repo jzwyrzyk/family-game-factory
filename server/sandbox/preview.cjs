@@ -9,14 +9,14 @@ function renderGenerated(game,artifactId,channel){
 const config=${data};
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),status=document.getElementById('status');
 let worker=null,timer=null,watch=null,inputs=0,frames=0,changed=0,lastFrame='',ended=false,last=0;
-let connected=false,paused=false,roundId=0,checkpointId=0,activeSeconds=0;
+let connected=false,paused=false,roundId=0,checkpointId=0,activeSeconds=0,validatedPlayRound=0;
 const pressed=new Set();let tap=null;
 function report(event,extra={}){parent.postMessage({type:'factory-preview',channel:config.channel,artifactId:config.artifactId,event,roundId,...extra},'*')}
 function controls(){document.getElementById('start').disabled=paused;document.getElementById('replay').disabled=paused;canvas.setAttribute('aria-disabled',String(paused));}
 function pause(){paused=true;pressed.clear();tap=null;controls();}
 addEventListener('message',event=>{
  const d=event.data;if(event.source!==parent||!d||d.type!=='factory-learning'||d.channel!==config.channel||d.artifactId!==config.artifactId)return;
- if(d.action==='connect'){connected=true;report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});return;}
+ if(d.action==='connect'){connected=true;report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});if(validatedPlayRound===roundId&&roundId>0)report('play-started',{learningProtocol:1});return;}
  if(d.action==='pause')pause();
  if(d.action==='resume'){paused=false;last=performance.now();controls();}
 });
@@ -43,6 +43,7 @@ function draw(message){
   if(!inputs)throw Error();ended=true;status.textContent=out.status==='won'?'You did it!':'Try another way!';
   if(connected)pause();report('round-complete',{won:out.status==='won',score:out.score});stop();
  }
+ else if(frames===1){validatedPlayRound=roundId;report('play-started',{learningProtocol:1});}
 }
 function start(){
  if(paused)return;stop();ended=false;roundId++;checkpointId=0;activeSeconds=0;inputs=frames=changed=0;lastFrame='';pressed.clear();tap=null;

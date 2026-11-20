@@ -82,7 +82,7 @@ export function installParentDashboard() {
   const problemControls = node('section', 'pd-card'); problemControls.id = 'problemSolvingParentControls';
   problemControls.hidden = true; settings.append(problemControls);
   function adoptPrivacyPanels() {
-    for (const id of ['builderPrivacyPanel']) { const panel = document.getElementById(id); if (panel && !settings.contains(panel)) settings.append(panel); }
+    for (const id of ['builderPrivacyPanel','jemsAnalyticsPrivacy']) { const panel = document.getElementById(id); if (panel && !settings.contains(panel)) settings.append(panel); }
     for (const id of ['creationParentProgress']) { const panel = document.getElementById(id); if (panel && !legacyObservations.contains(panel)) { legacyObservations.append(panel); legacyObservations.hidden = false; } }
   }
   adoptPrivacyPanels();

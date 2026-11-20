@@ -105,7 +105,7 @@ class ServiceBuildTests(unittest.TestCase):
             git('init','-q')
             files=['package.json','package-lock.json','.dockerignore','server/Dockerfile.gateway','server/Dockerfile.preview',
                    'server/gateway.ts','server/private-config.ts','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
-                   'src/creation/model.ts','src/creation/projects.ts',
+                   'src/creation/model.ts','src/creation/projects.ts','src/analytics/contract.ts',
                    'server/key.pem','server/config.json','server/config.private.json','server/service-account.json','server/credentials.json',
                    'server/token.json','server/api-key.json','server/.env','server/.private/config.json','server/node_modules/p/index.js',
                    'server/testing/fixture.ts','unrelated.txt']
@@ -122,7 +122,7 @@ class ServiceBuildTests(unittest.TestCase):
                     archive,digest=b.source_archive(root,staged,sha);hashes.append(digest)
                     with tarfile.open(archive) as tar:
                         names=tar.getnames()
-                        self.assertEqual(set(names),set(files[:12]))
+                        self.assertEqual(set(names),set(files[:13]))
                         self.assertEqual(tar.extractfile('server/gateway.ts').read(),b'reviewed server/gateway.ts')
             self.assertEqual(hashes[0],hashes[1])
 
@@ -140,7 +140,7 @@ class ServiceBuildTests(unittest.TestCase):
                 return git('rev-parse','HEAD')
             git('init','-q')
             inputs=['package.json','package-lock.json','.dockerignore','server/gateway.ts','server/preview-server.ts',
-                    'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
+                    'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/analytics/contract.ts',
                     'src/creation/model.ts','src/creation/projects.ts']
             for name in inputs:write(name,'reviewed '+name)
             write('.dockerignore',dockerignore)
@@ -175,15 +175,15 @@ class ServiceBuildTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError,'src/unstaged.ts.*COPY'):b.source_archive(root,staged,missing)
                 cloud.assert_not_called()
 
-            # Rollback source predating Creation must remain publishable with
+            # Rollback source predating Creation and analytics remains publishable with
             # this reviewed publisher; its own Dockerfiles determine inputs.
             for kind,content in dockerfiles.items():
-                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/creation/' not in line)+'\n')
-            for name in inputs[-2:]: (root/name).unlink()
+                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/creation/' not in line and 'src/analytics/' not in line)+'\n')
+            for name in [*inputs[-2:],'src/analytics/contract.ts']: (root/name).unlink()
             older=commit()
             with tempfile.TemporaryDirectory() as staged:
                 archive,_=b.source_archive(root,staged,older)
-                with tarfile.open(archive) as tar:self.assertFalse(any(name.startswith('src/creation/') for name in tar.getnames()))
+                with tarfile.open(archive) as tar:self.assertFalse(any(name.startswith(('src/creation/','src/analytics/')) for name in tar.getnames()))
 
     def test_full_publish_stages_once_builds_both_and_independently_verifies_digests(self):
         cloud=FakeCloud()

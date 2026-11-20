@@ -12,6 +12,8 @@ import {rewardSourceWritable} from '../rewards/write-guard';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
+import {originalDrawingId} from '../assets/private-drawings';
+import {analyticsBuildContext,trackAnalytics} from '../analytics/client';
 import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
 import './style.css';
 
@@ -98,6 +100,8 @@ export function installCreationStudio(host: Host) {
   let engine: SceneEngine | null = null, frame = 0, last = 0, checkpointTimer: ReturnType<typeof setInterval> | undefined;
   let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false, recoveryPending = false;
   let sceneImportPending=false;
+  type AnalyticsArtBinding = {assetId:string;originalId:string};
+  const pendingArtBindings = new Map<string,AnalyticsArtBinding>();
   let renderedPalsKey = '';
   type Recording = { recorder: MediaRecorder; stream: MediaStream; chunks: Blob[]; owner: string; title: string; cancelled: boolean; timer?: ReturnType<typeof setTimeout> };
   let recording: Recording | null = null;
@@ -145,6 +149,24 @@ export function installCreationStudio(host: Host) {
     // failures can never leave an orphan reservation that traps the artwork.
     for(const resolved of bindings)void registerArtUsage(capturedOwner,{targetId:projectId,targetKind:'scene',drawingId:resolved.drawingId,...(resolved.rigId?{rigId:resolved.rigId}:{})}).catch(()=>{});
   }
+  async function prepareAnalyticsArt(capturedOwner:string,creationId:string,bindings:ResolvedPrivateArt[],current:()=>boolean):Promise<AnalyticsArtBinding[]>{
+    if(!analyticsBuildContext(capturedOwner,creationId))return [];
+    const ready=await Promise.all(bindings.map(async binding=>{
+      try{return {assetId:binding.assetId,originalId:await originalDrawingId(capturedOwner,binding.drawingId,current)};}
+      catch{return null;}
+    }));
+    return ready.filter((binding):binding is AnalyticsArtBinding=>binding!==null);
+  }
+  function observeSceneArt(projectId:string,capturedOwner:string,savedRevisionId:string,bindings:AnalyticsArtBinding[]){
+    // Authored writes call this explicitly. Supplementary index repairs,
+    // imports, restore, and opening old scenes do not manufacture new use.
+    try{
+      if(owner()!==capturedOwner)return;
+      for(const assetId of new Set(bindings.map(binding=>binding.originalId)))trackAnalytics('jems_asset_added_to_game',{
+        ownerId:capturedOwner,creationId:projectId,gameId:projectId,revisionId:savedRevisionId,assetId,creationMode:'scene',surface:'creation-studio',
+      });
+    }catch{/* Optional measurement never changes a saved scene. */}
+  }
   function locked() { if (!FG.learning.active) return false; FG.learning.focus?.(); status('Finish your learning activity, or choose My Games to leave.'); return true; }
   const recoveryMessage = 'Choose “Resume my draft” or “Use saved version” before changing this scene.';
   function assertEditing(options: { resolvingRecovery?: boolean } = {}) { if (!isCurrent()) throw Error('Reopen your scene in your own profile.'); if (locked()) throw Error('Your learning activity is still open.'); if (recoveryPending && !options.resolvingRecovery) throw Error(recoveryMessage); }
@@ -189,7 +211,7 @@ export function installCreationStudio(host: Host) {
   }
   async function run(record = false) {
     assertEditing(); saveVersion();
-    const capturedOwner=owner(),capturedView=viewEpoch,project=scene!;
+    const capturedOwner=owner(),capturedView=viewEpoch,project=scene!,playedId=entryId,playedRevision=revisionId;
     const references=privateArtReferences(project);
     if(references.length){
       $<HTMLButtonElement>('creationRun').disabled=true;$<HTMLButtonElement>('creationVideo').disabled=true;
@@ -200,7 +222,17 @@ export function installCreationStudio(host: Host) {
       status('');
     }
     assertEditing();
-    learningThen(() => { stop(); freshEngine(); engine!.start(); if (record) beginRecording(); animate(); });
+    learningThen(() => {
+      stop(); freshEngine(); engine!.start();
+      // Only the authored, saved scene is a launch. Target watching, stepping,
+      // learning resumes and individual actors never create extra launches.
+      try{
+        if(capturedOwner===owner()&&capturedView===viewEpoch&&project===scene&&playedId===entryId&&playedRevision===revisionId&&!dirty)trackAnalytics('jems_game_play_started',{
+          ownerId:capturedOwner,creationId:playedId,gameId:playedId,revisionId:playedRevision,creationMode:'scene',surface:'creation-studio',
+        });
+      }catch{/* Play continues even if optional measurement is unavailable. */}
+      if (record) beginRecording(); animate();
+    });
   }
   function mutation(change: (project: CreationProject) => void, rerender = true) {
     assertEditing(); stop();
@@ -216,11 +248,15 @@ export function installCreationStudio(host: Host) {
     if (!scene || !dirty) return;
     if (recoveryPending) throw Error(recoveryMessage);
     const revision = store().save(entryId, sceneOwner, scene, revisionId); revisionId = revision.id; dirty = false;
+    const retained=new Set(privateArtReferences(scene));
+    observeSceneArt(entryId,sceneOwner,revisionId,[...pendingArtBindings.values()].filter(binding=>retained.has(binding.assetId)));
+    pendingArtBindings.clear();
     $('creationSaveState').textContent = 'Version saved · ready to keep';
   }
   function loadScene(id: string) {
     const loaded = store().load(id, owner());
     viewEpoch++;
+    pendingArtBindings.clear();
     privateArt.clear();stage.clear();
     status(''); $<HTMLDetailsElement>('creationMore').open = false;
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
@@ -656,7 +692,17 @@ export function installCreationStudio(host: Host) {
   $('creationUndo').onclick = () => act(() => { assertEditing(); if (!undo.length) return; const previous = undo.at(-1)!; store().autosave(entryId, sceneOwner, previous, revisionId); stop(); redo.push(clone(scene!)); scene = undo.pop()!; dirty = true; freshEngine(); renderEditor(); });
   $('creationRedo').onclick = () => act(() => { assertEditing(); if (!redo.length) return; const next = redo.at(-1)!; store().autosave(entryId, sceneOwner, next, revisionId); stop(); undo.push(clone(scene!)); scene = redo.pop()!; dirty = true; freshEngine(); renderEditor(); });
   $('creationKeep').onclick = () => act(() => { assertEditing(); saveVersion(); store().keep(entryId, sceneOwner, revisionId); $('creationSaveState').textContent = 'Your kept version'; status('This version is yours to keep. You can keep experimenting.'); });
-  $('creationCopy').onclick = () => act(() => { assertEditing(); saveVersion(); const copied = store().copy(entryId, sceneOwner, scene!.title + ' copy'); loadScene(copied.id); });
+  $('creationCopy').onclick = () => actAsync(async () => {
+    assertEditing(); saveVersion();
+    const capturedOwner=sceneOwner,capturedView=viewEpoch,sourceId=entryId,sourceRevision=revisionId,source=scene!;
+    const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent()&&sourceId===entryId&&sourceRevision===revisionId&&source===scene&&!dirty&&!FG.learning.active;
+    // A deliberate copy is another authored game. Reading its optional
+    // analytics identities must not prevent the durable copy if art is absent.
+    const bindings=analyticsBuildContext(capturedOwner,sourceId)?await prepareSceneArt(source,current).catch(()=>[]):[];
+    const observed=await prepareAnalyticsArt(capturedOwner,sourceId,bindings,current);if(!current())return;
+    const copied=store().copy(sourceId,capturedOwner,source.title+' copy');
+    observeSceneArt(copied.id,capturedOwner,copied.headId,observed);loadScene(copied.id);
+  });
   $('creationDownload').onclick = () => actAsync(async () => {
     assertEditing();const capturedOwner=owner(),capturedView=viewEpoch,copy=clone(scene!);
     const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent();
@@ -726,10 +772,12 @@ export function installCreationStudio(host: Host) {
           assertEditing();choice.disabled=true;
           try{
             const resolved=await privateArt.load(item.assetId);if(!current())return;
+            const observed=await prepareAnalyticsArt(capturedOwner,entryId,[resolved],current);if(!current())return;
             mutation(project=>{
               const actor={id:uid(),assetId:item.assetId,name:item.label,x:400,y:300,size:140,visible:true};project.actors.push(actor);
               const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};project.programs.push(program);selectedActor=actor.id;selectedProgram=program.id;insert=null;
             });
+            for(const binding of observed)pendingArtBindings.set(binding.assetId,binding);
             indexSceneArt(entryId,capturedOwner,[resolved]);
             dialog.close();status('Your own art is in the scene. Add blocks to tell it what to do.');
           }finally{if(current())choice.disabled=false;}
@@ -796,7 +844,9 @@ export function installCreationStudio(host: Host) {
         ];
         project.provenance={createdBy:'child',sourceKind:'art',sourceProjectId:choice.drawingId,sourceRevisionId:choice.rigId||parsePrivateArtId(choice.assetId)!.sha256};
         const bindings=await prepareSceneArt(project,current);if(!current())return;
-        const saved=store().create(capturedOwner,project);indexSceneArt(saved.id,capturedOwner,bindings);loadScene(saved.id);
+        const observed=await prepareAnalyticsArt(capturedOwner,project.id,bindings,current);if(!current())return;
+        const saved=store().create(capturedOwner,project);indexSceneArt(saved.id,capturedOwner,bindings);
+        observeSceneArt(saved.id,capturedOwner,saved.headId,observed);loadScene(saved.id);
         status('Your art is ready. Try the starter hop, then change the blocks to make it yours. This scene uses the saved artwork as one character.');
         return saved.id;
       }catch(error){if(current())status((error as Error).message,true);}

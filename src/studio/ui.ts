@@ -11,6 +11,7 @@ import {installStudioPrivateSpeech} from './private-speech';
 import {freshDesign} from './design';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCopy,canCompareExperiments,type BuilderReadiness,type CoachConnection} from './experience';
 import {familyFetch} from '../builder/session';
+import {analyticsBuildContext,trackAnalytics} from '../analytics/client';
 import {profileStorage} from '../adult-pilot/storage';
 import './style.css';
 import '../brand/jems.css';
@@ -31,7 +32,7 @@ import { installCreationProgress } from '../creation/progress';
 import { installArtStudio } from '../drawing/studio';
 import { rigById } from '../drawing/store';
 import { vehicleGeometry } from '../drawing/model';
-import { drawing, drawings, drawingBlob } from '../assets/private-drawings';
+import { drawing, drawings, drawingBlob, originalDrawingId } from '../assets/private-drawings';
 import { registerArtUsage } from '../drawing/library';
 import { installProblemSolvingPractice } from '../problem-solving/ui';
 import {installRewards, notifyRewardSourceSaved} from '../rewards/service';
@@ -80,6 +81,7 @@ export async function installStudio(){
  try{games.export();}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
+ let nativeAnalyticsController:AbortController|null=null;
  const clients=new Map<string,BuilderClient>();
  const unknownJobs=new Set<string>();
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
@@ -657,6 +659,7 @@ export async function installStudio(){
   pausedPreview.append(scene,caption);pausedPreview.hidden=false;
  }
  function disposeGame(keepScene=false){
+  nativeAnalyticsController?.abort();nativeAnalyticsController=null;
   if(keepScene&&(mounted||iframe))capturePausedPreview();else clearPausedPreview();
   if(!keepScene){pausedForTools=false;$('studioHelpPanel').hidden=true;}
   ++epoch;previewLearning?.dispose();previewLearning=null;FG.learning.dispose();iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
@@ -836,7 +839,7 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
- function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
+ function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');trackAnalytics('jems_journey_started',{ownerId:s.owner,creationId:s.id,creationMode:'generated',surface:'studio'});message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
   stopSpeech();flushDraft();disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
@@ -925,6 +928,19 @@ export async function installStudio(){
   const playedTest=view==='candidate'?s.candidate?.id||s.selectedTest||null:null;
   disposeGame();lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
   const boundRevision=s.projectId?games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined)):null;
+  // Rally loads private artwork asynchronously. Count a launch only when the
+  // real Drive action passes its artwork/host gates, not when its shell mounts.
+  if(s.game==='hill'&&s.projectId&&boundRevision){
+   nativeAnalyticsController=new AbortController();
+   nativeStage.addEventListener('jems-native-play-started',()=>{
+    if(!sameView(s,generation)||FG.learning.active)return;
+    const playedRevision=view==='candidate'?s.candidate?.id:revisionId||boundRevision.id;
+    if(!playedRevision)return;
+    const details={ownerId:s.owner,creationId:s.id,gameId:s.projectId!,revisionId:playedRevision,creationMode:'native' as const,surface:'studio' as const};
+    trackAnalytics('jems_game_play_started',details);
+    if(view==='candidate'?s.candidate?.baseId:boundRevision.parentId)trackAnalytics('jems_game_revision_played',details);
+   },{once:true,signal:nativeAnalyticsController.signal});
+  }
   FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
@@ -1007,7 +1023,8 @@ export async function installStudio(){
   sending.add(s.id);render();status('Sending your request. No job has been queued yet.');
   const r=s.projectId?games.revision(s.projectId,s.owner):null;
   const chosen=continueTest?s.candidate:null;
-  const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
+  const analytics=analyticsBuildContext(s.owner,s.id);
+  const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{}),...(analytics?{analytics}:{})};
   // Request admission ends at the durable ACK, not when a game finishes building.
   // Continue status polling independently while a child plays or makes other edits.
   void clientFor(s).submit(input).catch(error=>{
@@ -1103,7 +1120,17 @@ export async function installStudio(){
   iframe=document.createElement('iframe');iframe.title='Private game preview';iframe.setAttribute('sandbox','allow-scripts');iframe.referrerPolicy='no-referrer';
   previewChannel=crypto.randomUUID();previewArtifact=preview.artifactId;previewOwner=s.owner;
   const url=new URL(preview.url);url.searchParams.set('channel',previewChannel);iframe.src=url.href;host.replaceChildren(iframe);
-  previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onReadyChange:()=>queueMicrotask(()=>{if(sameView(s,generation))render();}),onRound:d=>announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest)});
+  let launchObserved=false;
+  previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onPlayStarted:()=>{
+   if(!launchObserved&&sameView(s,generation)){
+    launchObserved=true;
+    const details={ownerId:s.owner,creationId:s.id,gameId:preview.projectId||id,revisionId:id,
+      ...(s.job?.revisionId===id?{jobId:s.job.id}:{}),creationMode:'generated' as const,surface:'studio' as const};
+    trackAnalytics('jems_game_play_started',details);
+    const tested=s.experiments?.find(test=>test.candidate.remoteId===id);
+    if(tested?.baseId)trackAnalytics('jems_game_revision_played',details);
+   }
+  },onReadyChange:()=>{queueMicrotask(()=>{if(sameView(s,generation))render();});},onRound:d=>announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest)});
   $('studioPlayNote').textContent=preview.adapter==='mock'?'Test builder (mock)—not a real AI generation.':'Private preview. Your working game stays unchanged until you keep it.';
   render();setTab('game');
  }
@@ -1210,10 +1237,21 @@ export async function installStudio(){
  }
  async function copyGame(name:string){
   if(saving)return;const s=current(),at=epoch;if(!canChangePlay(s,at))return;saving=true;const sourceMode=FG.learning.modeFor(s.id);render();
-  try{let projectId:string|null=null,remoteId:string|null=null;
+  try{let projectId:string|null=null,remoteId:string|null=null,analyticsAssetId:string|undefined;
+    // Resolve optional original-art identity before the two durable saves. A
+    // missing lineage cannot prevent the child from copying a working game.
+    if(s.game==='hill'&&s.projectId&&analyticsBuildContext(s.owner,s.id)){
+     try{
+      const rigId=games.revision(s.projectId,s.owner).drawingRigId;
+      if(rigId){const rig=await rigById(s.owner,rigId);analyticsAssetId=await originalDrawingId(s.owner,rig.assembly.sourceId,()=>sameView(s,at));}
+     }catch{/* Optional observation only. */}
+     if(!canChangePlay(s,at))return;
+    }
     if(s.remoteId||showing==='candidate'&&s.candidate?.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(remoteViewedId||(showing==='candidate'?s.candidate?.remoteId:undefined)||s.remoteId!)+'/fork',{name});remoteId=r.revisionId;}
     else if(s.projectId){const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?games.revision(s.projectId,s.owner,viewedRevisionId):null;const p=games.fork(s.owner,s.projectId,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);projectId=p.id;}
-    const saved=notebook.fork(s.id,s.owner,name,projectId,remoteId);const learner=FG.store.data.profiles.find((p:any)=>p.id===s.owner);if(learner){const before=learner.mathModes;setMode(learner,saved.id,sourceMode);if(!FG.store.save()){learner.mathModes=before;throw Error('Your separate game was saved, but its learning format could not be copied.');}}$<HTMLDialogElement>('studioCopyDialog').close();
+    const saved=notebook.fork(s.id,s.owner,name,projectId,remoteId);
+    if(analyticsAssetId&&projectId&&sameView(s,at))trackAnalytics('jems_asset_added_to_game',{ownerId:s.owner,creationId:saved.id,gameId:projectId,revisionId:games.revision(projectId,s.owner).id,assetId:analyticsAssetId,creationMode:'native',surface:'studio'});
+    const learner=FG.store.data.profiles.find((p:any)=>p.id===s.owner);if(learner){const before=learner.mathModes;setMode(learner,saved.id,sourceMode);if(!FG.store.save()){learner.mathModes=before;throw Error('Your separate game was saved, but its learning format could not be copied.');}}$<HTMLDialogElement>('studioCopyDialog').close();
     if(canChangePlay(s,at)){message(saved,'helper','Saved as a separate game. Your original game is unchanged.');await open(saved.id);celebrateJem('copied','studioStatus');}
   }finally{saving=false;render();}
  }
@@ -1400,6 +1438,7 @@ export async function installStudio(){
    const stillCurrent=()=>isCurrent()&&owner()===capturedOwner&&epoch===capturedEpoch;
    const rig=await rigById(capturedOwner,rigId);if(!stillCurrent())return;
    const source=await drawing(capturedOwner,rig.assembly.sourceId);
+   const analyticsAssetId=analyticsBuildContext(capturedOwner,source.id)?await originalDrawingId(capturedOwner,source.id,stillCurrent).catch(()=>undefined):undefined;
    if(!stillCurrent()||guardMath())return;if(rig.assembly.kind!=='car')throw Error('Choose a saved car design for Rally.');
    const picture=await createImageBitmap(drawingBlob(source));
    try{if(!stillCurrent())return;vehicleGeometry(rig.assembly,picture.width/picture.height);}finally{picture.close();}
@@ -1412,6 +1451,10 @@ export async function installStudio(){
    const pending=games.list(capturedOwner).find(item=>item.game==='hill'&&!listed.has(item.id)&&games.revision(item.id,capturedOwner).drawingRigId===rig.id);
    const p=pending??games.create(capturedOwner,'hill',(source.name+' Rally').slice(0,60),defaults('hill'),rig.id);
    const session=notebook.create(capturedOwner,'hill',p.name,p.id);
+   if(analyticsAssetId){
+    trackAnalytics('jems_journey_started',{ownerId:capturedOwner,creationId:session.id,gameId:p.id,creationMode:'native',surface:'art-studio'});
+    trackAnalytics('jems_asset_added_to_game',{ownerId:capturedOwner,creationId:session.id,gameId:p.id,revisionId:games.revision(p.id,capturedOwner).id,assetId:analyticsAssetId,creationMode:'native',surface:'art-studio'});
+   }
    // Actual retained game revisions are authoritative for art usage. Index
    // repair is supplementary and cannot strand an already-saved game.
    void registerArtUsage(capturedOwner,{targetId:p.id,targetKind:'game',drawingId:source.id,rigId:rig.id},()=>owner()===capturedOwner&&rewardSourceWritable()).catch(()=>{});

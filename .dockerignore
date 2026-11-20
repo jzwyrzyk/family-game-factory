@@ -12,6 +12,8 @@
 !src/creation/
 !src/creation/model.ts
 !src/creation/projects.ts
+!src/analytics/
+!src/analytics/contract.ts
 server/**/node_modules
 server/**/.env*
 server/**/*.pem

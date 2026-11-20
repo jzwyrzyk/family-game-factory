@@ -4,6 +4,7 @@ interface PreviewLearningOptions extends LearningContext {
   channel:string; artifactId:string; ownerId:string;
   onRound?:(result:{won:boolean;score:number})=>void;
   onReadyChange?:(ready:boolean)=>void;
+  onPlayStarted?:()=>void;
 }
 type PreviewEvent = {event:'round-complete'|'math-checkpoint';roundId:number;checkpointId?:number;won?:boolean;score?:number};
 const boundedId=(value:unknown):value is number=>Number.isInteger(value)&&(value as number)>=1&&(value as number)<=1_000_000;
@@ -14,6 +15,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
   let instanceId=crypto.randomUUID(),alive=true,ready=false,cover:HTMLDivElement|null=null,waiting=false,waitingRound=0,pendingRound:PreviewEvent|null=null;
   let handshakeTimer:ReturnType<typeof setTimeout>|undefined;
   let protocolError:string|null=null,connectionPaused=false;
+  let observedPlayRound=0;
   const parent=frame.parentElement!,oldPosition=parent.style.position;
   parent.style.position='relative';
   const owns=()=>alive&&options.ownerId===FG.store.current().id;
@@ -78,6 +80,14 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
       if(!waiting){cover?.remove();cover=null;frame.inert=false;frame.style.pointerEvents='';if(connectionPaused){connectionPaused=false;tell('resume');}}
       notifyReady();return;
     }
+    if(d.event==='play-started'){
+      // Readiness only unlocks the controls. Reviewed renderers send this
+      // separate signal after an actual validated running frame/init.
+      if(!ready||waiting||FG.learning.active||d.learningProtocol!==1||!boundedId(d.roundId)||d.roundId<=observedPlayRound)return;
+      observedPlayRound=d.roundId;
+      try{options.onPlayStarted?.();}catch{/* Optional observers cannot interrupt play or learning. */}
+      return;
+    }
     if(!ready||!['round-complete','math-checkpoint'].includes(d.event))return;
     if(!boundedId(d.roundId)){
       if(d.roundId===undefined&&!waiting){ready=false;protocolError='This preview needs an updated game player to include '+(FG.learning.subject==='language'?'learning':'math')+'. Leave this preview and ask a grown-up to update the workshop.';failed(protocolError);}
@@ -97,7 +107,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
   function loaded(){
     if(!owns())return;
     if(waiting)FG.learning.dispose();pendingRound=null;waiting=false;waitingRound=0;
-    instanceId=crypto.randomUUID();seen.clear();handshake();
+    instanceId=crypto.randomUUID();seen.clear();observedPlayRound=0;handshake();
   }
   function dispose(){
     if(!alive)return;alive=false;clearTimeout(handshakeTimer);

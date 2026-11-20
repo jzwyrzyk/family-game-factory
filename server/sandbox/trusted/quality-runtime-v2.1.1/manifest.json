@@ -1,0 +1,19 @@
+{
+  "version": "quality-runtime-v2.1.1",
+  "hash": "7f0de54d4c30aa6e026f9bcc29bffd0e911069b70c8b73686a9ecf23ffd58a5c",
+  "workerHash": "1339e7ae42bc9c60edc2ed0ceadf65eaf6a517d969696bff2d3ced99a0aa0dd1",
+  "clientHash": "b9efb17f8c9bb44b61e0c08c8c5677b1521d31b03de4852e5aa97ac3393d1fb3",
+  "sourceHashes": {
+    "server/sandbox/runtime-v2.ts": "6da1a9f4b052f05d03d54d1bdb144028b731967356718f61764362ecbd3fe3ba",
+    "server/sandbox/worker-bootstrap-v2.ts": "82b32ad27ca8d1693c8974cb542c686c2a5e3890719af59dae7f75f2c8685c9c",
+    "server/sandbox/harden-v2.ts": "38c036d1d01dd7e9576fc7798a3e8146aa77a1bcd7788ddb5516b275a36de2ce",
+    "server/sandbox/language-v2.cjs": "a9f30fe33202e378f7f864eb37d2c4690a3f814f7deab29746bc8487433968c8",
+    "server/sandbox/private-clock-v2.cjs": "d29aaace9e487da4751f1464a8b1a798c251060ec7daded548d7a742959ab449",
+    "server/sandbox/frame-v2.ts": "df2e7ea413df3cb5aedc3544d026c701d65d322c8f86473ded10b8c98dc7e390",
+    "server/sandbox/client-v2.ts": "f54c1961d2d2f9d5bc7f70e3b8316ed2cfa48ab9544ac7ed8b4cff53c31f8686",
+    "src/quality/parts.ts": "1c9cd20902cc1129e64d187b11add96c7a5f7e34681429c8075af606db8d83f3",
+    "src/quality/art.ts": "2f7c12430a5b98d9736d04873792e112b6d48105c888974952c4e12a5a3f4574"
+  },
+  "planck": "1.4.2",
+  "esbuild": "0.25.12"
+}

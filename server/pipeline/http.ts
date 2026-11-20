@@ -7,7 +7,8 @@ import {verifyBrowserSession} from '../trusted-devices';
 import type {Repository} from './types';
 import { renderPreview } from './artifacts';
 import { JobService } from './service';
-interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>}
+import type {ProductAnalytics, PreparedAnalyticsSubmission} from '../analytics/service';
+interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>;analytics?:Pick<ProductAnalytics,'prepareSubmission'|'acceptedSubmission'>}
 function json(response:ServerResponse,status:number,value:unknown){response.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});response.end(JSON.stringify(value));}
 async function body(request:IncomingMessage){let text='';for await(const chunk of request){text+=chunk;if(Buffer.byteLength(text)>12000)throw Error('REQUEST_TOO_LARGE');}return JSON.parse(text||'{}');}
 const signature=(key:string,fields:string)=>createHmac('sha256',key).update(fields).digest('base64url');
@@ -25,7 +26,18 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
    if(path==='/v1/builder/status'&&request.method==='GET')return json(response,200,await service.readiness(session));
    if(path==='/v1/revisions'&&request.method==='POST')return json(response,200,await service.registerBase(session,await body(request)));
    if(path==='/v1/jobs'&&request.method==='POST'){
-    const ack=await service.submit(session,await body(request));json(response,202,ack);if(ack.status==='queued')setImmediate(()=>{void (config.dispatch?config.dispatch(ack.jobId):service.run(ack.jobId)).catch(()=>{});});return;
+    const input=await body(request);
+    let context:PreparedAnalyticsSubmission|null=null;
+    // Optional observation context is not part of the paid build contract.
+    // Strip it before strict validation; a malformed context cannot break play.
+    let core=input;
+    if(input&&typeof input==='object'&&!Array.isArray(input)&&Object.hasOwn(input,'analytics')){
+     const {analytics,...rest}=input;core=rest;
+     try{context=await config.analytics?.prepareSubmission(session,analytics,core)??null;}catch{}
+    }
+    const ack=await service.submit(session,core);
+    if(context)try{await config.analytics?.acceptedSubmission(session,context,ack);}catch{}
+    json(response,202,ack);if(ack.status==='queued')setImmediate(()=>{void (config.dispatch?config.dispatch(ack.jobId):service.run(ack.jobId)).catch(()=>{});});return;
    }
    let match=path.match(/^\/v1\/jobs\/([\w-]+)(\/(?:cancel|retry))?$/);
    if(match){if(match[2]==='/retry'&&request.method==='POST'){const input=await body(request),ack=await service.retry(session,match[1],input.clientRequestId);json(response,202,ack);if(config.dispatch)void config.dispatch(ack.jobId).catch(()=>{});else void service.run(ack.jobId).catch(()=>{});return;}if(match[2]==='/cancel'&&request.method==='POST')return json(response,200,await service.cancel(session,match[1]));if(!match[2]&&request.method==='GET'){await service.get(session,match[1]);await config.poll?.();return json(response,200,await service.get(session,match[1]));}}

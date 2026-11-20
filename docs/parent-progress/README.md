@@ -1,5 +1,7 @@
 # Parent progress
 
+**Optional usage observations:** Grown-ups Settings also hosts the separately permissioned [Help improve Jems pilot](../analytics/README.md). Its optional product usage never reads or exports the evidence records in this reporting surface; adoption of the panel does not change subject reports, recommendations or local backup semantics.
+
 **Feature contract — November 19, 2026.** The parent-area source is merged in
 [PR65](https://github.com/jzwyrzyk/family-game-factory/pull/65) as `864bee8f9427bce4a8dc0e7df5495e576fd3bcdc`.
 The [merge receipt](../../DELIVERY-STATE.md#pr65-parent-reporting--merged) owns release

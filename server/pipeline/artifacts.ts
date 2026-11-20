@@ -12,19 +12,19 @@ export function renderPreview(game:StarGame,artifactId:string,channel:string):{h
  if(!/^[\w-]{1,100}$/.test(artifactId)||!/^[\w-]{8,100}$/.test(channel))throw Error('INVALID_CHANNEL');validateArtifact({format:'declarative-v1',game});
  const script=`
 const config=${JSON.stringify(game)},channel=${JSON.stringify(channel)},artifactId=${JSON.stringify(artifactId)};
-let count=0,remaining=config.seconds,timer=null,ended=false,paused=false,connected=false,roundId=0;
+let count=0,remaining=config.seconds,timer=null,ended=false,paused=false,connected=false,roundId=0,validatedPlayRound=0;
 const target=document.getElementById('field'),status=document.getElementById('status'),score=document.getElementById('score');
 function report(event,extra={}){parent.postMessage({type:'factory-preview',channel,artifactId,event,roundId,...extra},'*')}
 function pause(){paused=true;document.getElementById('restart').disabled=true;target.inert=true;}
 addEventListener('message',event=>{const d=event.data;if(event.source!==parent||!d||d.type!=='factory-learning'||d.channel!==channel||d.artifactId!==artifactId)return;
- if(d.action==='connect'){connected=true;report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});}
+ if(d.action==='connect'){connected=true;report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});if(validatedPlayRound===roundId&&roundId>0)report('play-started',{learningProtocol:1});}
  if(d.action==='pause')pause();
  if(d.action==='resume'){paused=false;document.getElementById('restart').disabled=false;target.inert=false;}
 });
 function draw(){score.textContent=count+' / '+config.target+' stars · '+remaining+' seconds'}
 function finish(won){ended=true;clearInterval(timer);target.replaceChildren();status.textContent=won?'You caught the stars!':'Time is up. Try another way!';if(connected)pause();report('round-complete',{won,score:count})}
 function place(){target.replaceChildren();for(let i=0;i<3;i++){const star=document.createElement('button');star.textContent='⭐';star.setAttribute('aria-label','Catch star');star.style.left=(5+i*30+Math.random()*3)+'%';star.style.top=(5+Math.random()*65)+'%';star.onclick=()=>{if(ended||paused)return;count++;draw();if(count>=config.target)finish(true);else place()};target.append(star)}}
-function start(){if(paused)return;clearInterval(timer);roundId++;count=0;remaining=config.seconds;ended=false;status.textContent='Tap the stars before time runs out!';draw();place();timer=setInterval(()=>{if(paused||document.hidden)return;remaining--;draw();if(remaining<=0)finish(false)},1000)}
+function start(){if(paused)return;clearInterval(timer);roundId++;count=0;remaining=config.seconds;ended=false;status.textContent='Tap the stars before time runs out!';draw();place();timer=setInterval(()=>{if(paused||document.hidden)return;remaining--;draw();if(remaining<=0)finish(false)},1000);validatedPlayRound=roundId;report('play-started',{learningProtocol:1})}
 document.getElementById('restart').onclick=start;start();report('ready',{learningProtocol:1,height:Math.ceil(document.body.scrollHeight)});`;
  const scriptHash=createHash('sha256').update(script).digest('base64');
  const csp=`default-src 'none'; script-src 'sha256-${scriptHash}'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors *`;

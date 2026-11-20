@@ -53,6 +53,9 @@ test('authenticated owner polling recovers a stalled job; unauthenticated and ot
 test('pilot URLs stay unavailable by default, require separate HTTPS origins, expose no private config',()=>{
  assert.deepEqual(siteConfig('',''),{version:1,mode:'unavailable'});
  assert.deepEqual(siteConfig('https://gateway.example','https://preview.example'),{version:1,mode:'remote',apiBaseUrl:'https://gateway.example',previewOrigin:'https://preview.example'});
+ assert.deepEqual(siteConfig('https://gateway.example','https://preview.example',true),{version:1,mode:'remote',apiBaseUrl:'https://gateway.example',previewOrigin:'https://preview.example',analytics:{version:1,enabled:true}});
+ assert.equal(siteConfig('','',true).analytics,undefined,'no disconnected analytics configuration');
+ assert.equal(siteConfig('https://gateway.example','https://preview.example','true' as any).analytics,undefined,'only an explicit boolean enables the public setting');
  for(const pair of [['https://gateway.example',''],['http://gateway.example','https://preview.example'],['https://same.example','https://same.example'],['https://user:secret@gateway.example','https://preview.example'],['https://gateway.example/path','https://preview.example']])assert.throws(()=>siteConfig(pair[0],pair[1]));
 });
 test('provider preflight only reads selected model; no prompt or generation request and no key in result',async()=>{

@@ -17,7 +17,7 @@ import time
 PROJECT='family-game-factory-jzw'
 SANDBOX='ghcr.io/jzwyrzyk/family-game-factory-sandbox'
 BUILDER='factory-service-builder@'+PROJECT+'.iam.gserviceaccount.com'
-SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/creation/model.ts','src/creation/projects.ts']
+SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/creation/model.ts','src/creation/projects.ts','src/analytics/contract.ts']
 REQUIRED_APIS={'cloudbuild.googleapis.com','artifactregistry.googleapis.com','logging.googleapis.com','storage.googleapis.com','iam.googleapis.com'}
 
 

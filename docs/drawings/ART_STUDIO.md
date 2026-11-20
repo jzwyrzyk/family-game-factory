@@ -1,5 +1,7 @@
 # Art Studio: draw it, develop it, reuse it
 
+**Optional usage observations:** The optional [product analytics pilot](../analytics/README.md) records only committed original saves and explicit saved-game bindings after separate permission. It resolves immutable derivatives to their original identity; no pixels, hashes, names, imports or index-repair events leave the art store. Missing analytics or lineage never prevents a save.
+
 **Source scope:** Art Studio from merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23), November 19, 2026 (America/New_York). This contract describes source behavior, not production deployment. The accepted direction is recorded in [the Art Studio decision](../decisions/2026-11-19-private-art-studio.md). [Delivery state](../../DELIVERY-STATE.md) records its merge receipt and keeps the subsequent first-creation integration acceptance separate.
 
 ## The experience

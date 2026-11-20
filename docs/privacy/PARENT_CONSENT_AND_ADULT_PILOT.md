@@ -1,5 +1,7 @@
 # Jems parent privacy and temporary adult development profile
 
+**Separate product analytics:** the [PostHog pilot](../analytics/README.md) has its own notice/choice and defaults off. The permissions in this document do not authorize analytics. Family analytics remains pending until independent guardian verification; Adult analytics expires with the exact current unlock session. Stop reporting and downstream history deletion are different operations.
+
 This change adds a temporary authenticated adult development profile to the existing Jems website alongside ordinary child profiles. Once deployed and configured, switching to Adult (development) activates approved AI tools after the existing passphrase unlock. It needs neither another site nor a separate activation button. See [the adult release guide](../adult-pilot/VOICE_RELEASE_AND_UAT.md) for the session contract and deployment steps.
 
 ## Parent choices in Grown-ups

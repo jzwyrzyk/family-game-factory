@@ -6,6 +6,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [November 19 product analytics](2026-11-19-optional-product-analytics.md) | Explicit optional PostHog pilot for creation-to-play and original-art reuse | Accepted implementation scope; activation unverified | Owner approval to proceed with the PostHog plan |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
 | [0003](0003-explicit-voice-and-build.md) | Editable dictation, explicit Send and separate Build | Accepted, retrospectively documented | November 18, 2026 push-to-talk decision |

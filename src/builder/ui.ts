@@ -3,6 +3,8 @@ import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest } from '../learning/policy';
 import { BuilderClient,validateBuilderConfig,type RequestChange,type JobView,type BuilderConfig } from './client';
 import {installParentPrivacy} from './privacy';
+import {configureAnalytics} from '../analytics/client';
+import {installAnalyticsPrivacy} from '../analytics/privacy';
 import {profileStorage} from '../adult-pilot/storage';
 import type { LearningMode } from '../learning/types';
 const FG=(window as any).FG;
@@ -26,6 +28,7 @@ export async function initBuilder(){
  setIconLabel(library.querySelector('h2')!,'grid','My builder games');
  const create=document.createElement('button');create.type='button';create.id='createTry';create.className='btn primary';setIconLabel(create,'play','Try It');$('inventIdea').after(create);
  let config:BuilderConfig;try{config=validateBuilderConfig(await (await fetch(new URL('factory-config.json',document.baseURI))).json());}catch{config=validateBuilderConfig({version:1,mode:'unavailable'});}
+ configureAnalytics(config);
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let readyPreview:{revisionId:string;owner:string;inheritedMode?:LearningMode;jobId?:string}|null=null;
  const pendingKey='family-game-factory-pending-build-v1';let currentKind='star-catcher-v1';let previewSequence=0,profileSequence=0;let currentRevision:string|null=null,currentProject:string|null=null,channel='',artifactId='',previewOwner='',previousPage='create';
@@ -112,6 +115,7 @@ export async function initBuilder(){
  setIconLabel($('builderDisconnect'),'lock','Disconnect this device');
  setIconLabel($('builderIssueInvite'),'add','Invite another family device');
  const privacy=installParentPrivacy(client,$('page-parent'));
+ const analyticsPrivacy=installAnalyticsPrivacy(client,$('page-parent'));
  let managementSequence=0;
  const managementView=()=>({profile:profileSequence,page:managementSequence});
  const sameManagementView=(at:ReturnType<typeof managementView>)=>at.profile===profileSequence&&at.page===managementSequence&&currentPage==='parent';
@@ -218,7 +222,10 @@ export async function initBuilder(){
     if(!sameManagementView(at))return;
     await showDevices();
     if(!sameManagementView(at))return;
-    await privacy.show();$('connectionStatus').textContent='You can now manage trusted devices and permissions.';
+    await privacy.show();
+    if(!sameManagementView(at))return;
+    await analyticsPrivacy.show();
+    if(sameManagementView(at))$('connectionStatus').textContent='You can now manage trusted devices and permissions.';
    }catch{if(sameManagementView(at))$('connectionStatus').textContent='Parent access was not verified. Check your passphrase or temporary lock.';}})();
  };
  $('builderDisconnect').onclick=()=>{
@@ -229,7 +236,8 @@ export async function initBuilder(){
  window.addEventListener('factory-page',event=>{
   ++managementSequence;
   privacy.hide();
-  if((event as CustomEvent<string>).detail==='parent'){void connectionStatus();return;}
+  analyticsPrivacy.hide();
+  if((event as CustomEvent<string>).detail==='parent'){void connectionStatus();void analyticsPrivacy.showAdult();return;}
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
   $<HTMLButtonElement>('builderDisconnect').hidden=true;
@@ -239,6 +247,7 @@ export async function initBuilder(){
  window.addEventListener('factory-profile',()=>{
   ++managementSequence;
   privacy.hide();
+  analyticsPrivacy.hide();
   $('builderNewInvitation').replaceChildren();$('builderDeviceList').replaceChildren();
   $<HTMLButtonElement>('builderIssueInvite').hidden=true;
   $<HTMLButtonElement>('builderDisconnect').hidden=true;
