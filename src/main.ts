@@ -1,9 +1,12 @@
+import './brand/icons.css';
 import './legacy/store.js';
 import './adult-pilot/style.css';
 import './learning/bootstrap';
 import './legacy/bridge.js';
 import './runtime/registry';
 import './legacy/ui.js';
+import {installProblemSolvingEvidence} from './problem-solving/bridge';
+import {installProblemSolvingProgress} from './problem-solving/progress';
 import {initLiveRemix} from './factory/ui';
 import {initBuilder} from './builder/ui';
 import {installAdultProfile} from './adult-pilot/ui';
@@ -16,6 +19,7 @@ import {installQualityCards} from './quality/cards';
 import {installStudio} from './studio/ui';
 import {installStudioHostNavigation} from './studio/host-navigation';
 import {installRewardWriteGuard,setRewardSourceMaintenance} from './rewards/write-guard';
+import {installParentDashboard} from './parent/ui';
 import {installRewards} from './rewards/service';
 import {recoverRewardBackup,hasPendingRewardBackup,installRewardBackupControls} from './rewards/backup';
 
@@ -26,11 +30,12 @@ void installRewardWriteGuard().then(async writable=>{
   await recoverRewardBackup();
   if(hasPendingRewardBackup())return; // Recovery is reloading the document.
   setRewardSourceMaintenance(false);
+  installProblemSolvingEvidence();
   const rewards=installRewards();
   installRewardBackupControls(rewards);
   initLiveRemix();
   void initBuilder().then(installAdultProfile);
-  installJemsDelight();installOffline();installDrawings();installQualityCards();
+  installJemsDelight();installOffline();installDrawings();installQualityCards();installParentDashboard();installProblemSolvingProgress();
   await installStudio();installStudioHostNavigation();
 }).catch(error=>{
   setRewardSourceMaintenance(true);

@@ -1,0 +1,20 @@
+{
+  "build": {
+    "sha": "75e888ee2910dcaf285f3c6b8c73d63e098c3919",
+    "dirty": false
+  },
+  "browser": "141.0.7390.37",
+  "acceptedBy": "Explicit MYJ_UPDATE_BASELINES command after visual review",
+  "states": [
+    "idle",
+    "warning",
+    "ready"
+  ],
+  "devices": [
+    "desktop",
+    "tablet-portrait",
+    "mobile"
+  ],
+  "channelTolerance": 20,
+  "maximumChangedRatio": 0.008
+}

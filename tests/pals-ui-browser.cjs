@@ -15,8 +15,8 @@ import './src/brand/art-library.css';
 const preferences={showCompanion:true,encouragement:true};
 const empty={owner:'player1',profile:{owner:'player1',starterId:null,activeId:null,owned:[],availableIds:[],preferences},lifetimeGems:0,loading:false};
 const state={owner:'player1',profile:{owner:'player1',starterId:'glim',activeId:'glim',availableIds:[],preferences,owned:[
- {id:'glim',joinedAt:'2026-11-19T12:00:00.000Z',source:'starter',adventures:8,practiceActivities:17,creationAdventures:5,stage:2,stageName:'Bright Pal',nextStageAt:15,adventuresToNext:7,practiceToNextAdventure:3},
- {id:'kip',joinedAt:'2026-11-19T13:00:00.000Z',source:'gems',adventures:1,practiceActivities:6,creationAdventures:0,stage:1,stageName:'New Pal',nextStageAt:5,adventuresToNext:4,practiceToNextAdventure:4}
+ {id:'glim',joinedAt:'2026-11-19T12:00:00.000Z',source:'starter',adventures:8,practiceActivities:17,creationAdventures:5,stage:2,form:'mature',stageName:'Grown',nextStageAt:null,adventuresToNext:0,practiceToNextAdventure:3},
+ {id:'kip',joinedAt:'2026-11-19T13:00:00.000Z',source:'gems',adventures:1,practiceActivities:6,creationAdventures:0,stage:1,form:'base',stageName:'Base',nextStageAt:5,adventuresToNext:4,practiceToNextAdventure:4}
 ]},lifetimeGems:138,loading:false};
 window.palActions=[];
 const control={fail:false,defer:false,resolve:null,reject:null};
@@ -58,7 +58,10 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].map(image=>image.decode()));});
     assert.equal(await page.locator('#jemsPalsCount').innerText(),'2 / 3 Pals');
     assert.equal(await page.locator('#jemsPalDetailTitle').innerText(),'Glim');
-    assert.match(await page.locator('.pals-detail .pals-growth').innerText(),/7 more adventures to Radiant Pal/);
+    assert.match(await page.locator('.pals-detail .pals-growth').innerText(),/8 adventures together/);
+    assert.deepEqual(await page.locator('.pals-growth-stages > li').allTextContents(),['✓Base','✓Grown']);
+    assert.equal(await page.locator('.pals-hero-portrait').getAttribute('data-form'),'mature');
+    assert.equal(await page.locator('.pals-hero-portrait').getAttribute('data-artwork'),'preview');
     assert.match(await page.locator('[data-pals-focus="create-glim"]').innerText(),/Make something/);
     assert.match(await page.locator('.pals-card[data-pal="riff"]').innerText(),/12 more gems/);
     assert.ok(await page.locator('.pals-portrait img').evaluateAll(images=>images.every(image=>image.naturalWidth>0&&image.src.includes('/arcade/jems-art/'))));
@@ -104,6 +107,7 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     await page.waitForFunction(()=>document.getElementById('jemsPalsStatus').textContent.includes('storage is full'));
     assert.equal(await page.locator('#jemsPalsCount').innerText(),'0 / 3 Pals','failed selection never fabricates an owned Pal');
     assert.equal(await page.locator('[data-pals-focus="starter-kip"]').isEnabled(),true);
+    await page.screenshot({path:path.join(root,'test-results/pals-ui-save-error.png'),fullPage:true});
     await page.evaluate(()=>{window.palsFixture.control.fail=false;window.palsFixture.control.defer=true;});
     await page.locator('[data-pals-focus="starter-glim"]').click();
     assert.equal(await page.locator('[data-pals-focus="starter-kip"]').isDisabled(),true);
@@ -123,6 +127,7 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     assert.equal(await page.locator('#jemsPalsCount').innerText(),'Your collection');
     await page.evaluate(()=>window.palsFixture.update({...window.palsFixture.empty,profile:null,lifetimeGems:null,loading:true}));
     assert.equal(await page.locator('.pals-gem-count').count(),0,'loading is not a fake zero balance');
+    await page.screenshot({path:path.join(root,'test-results/pals-ui-owner-loading.png'),fullPage:true});
     await page.evaluate(()=>window.palsFixture.update(window.palsFixture.state));
     await page.locator('#outside').focus();
     assert.equal(await page.evaluate(()=>window.palsFixture.cameo.say('growth',0)),true);

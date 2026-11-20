@@ -80,7 +80,7 @@ test('practice and maker bonuses count toward gem unlocks without creating extra
   assert.equal(glim.practiceActivities, 10);
   assert.equal(glim.creationAdventures, 2);
   assert.equal(glim.adventures, 4);
-  assert.equal(glim.stage, 1, 'bonuses must not cause a premature Bright Pal stage');
+  assert.equal(glim.stage, 1, 'bonuses must not cause a premature Grown form');
   assert.deepEqual(result.profile.availableIds, ['kip'], 'the same lifetime gem total still unlocks the other starter');
 });
 

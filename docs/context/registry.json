@@ -27,11 +27,33 @@
     "docs/decisions/0009-approved-brand-library-v1-2.md",
     "docs/creation-studio/README.md",
     "docs/creation-studio/ACCEPTANCE.md",
+    "docs/child-journey/FIRST-CREATION.md",
+    "docs/decisions/2026-11-19-first-creation-journey.md",
     "docs/decisions/0007-creation-and-rebuild-practice.md",
+    "docs/parent-progress/README.md",
+    "docs/parent-progress/RESEARCH.md",
     "docs/rewards/README.md",
     "docs/decisions/0010-lifetime-gems-and-shared-rewards.md",
+    "docs/problem-solving/README.md",
+    "docs/problem-solving/BENCHMARKS.md",
+    "docs/problem-solving/IMPLEMENTATION.md",
+    "docs/decisions/0011-formative-problem-solving-evidence.md",
+    "docs/mind-your-jems/README.md",
+    "docs/pals/STUDIO.md",
+    "docs/pals/DESIGN_DOCTRINE.md",
+    "docs/pals/GROWTH_GUIDE.md",
+    "docs/pals/QUALITY_GATES.md",
+    "docs/pals/CONTINUITY.md",
+    "docs/pals/PROMPT_RECIPES.md",
+    "skills/gem-pal-studio/SKILL.md",
+    "docs/decisions/2026-11-19-gem-pal-studio.md",
+    "docs/drawings/ART_STUDIO.md",
+    "docs/drawings/GOLD_STANDARD.md",
+    "docs/drawings/PROGRAM.md",
+    "docs/decisions/2026-11-19-private-art-studio.md",
     "docs/pals/README.md",
-    "docs/decisions/0012-pals-from-earned-activity.md"
+    "docs/decisions/0012-pals-from-earned-activity.md",
+    "docs/decisions/0013-two-form-pals-and-current-main.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -52,9 +74,16 @@
     "docs/brand/GEM_FACTORY.md",
     "docs/game-intelligence/PRESENTATION-QUALITY.md",
     "docs/creation-studio/*.md",
+    "docs/child-journey/*.md",
+    "docs/child-journey/previews/*.md",
     "docs/rewards/*.md",
     "docs/rewards/previews/*.md",
+    "docs/problem-solving/*.md",
+    "docs/mind-your-jems/*.md",
+    "docs/archetypes/*.md",
     "docs/pals/*.md",
+    "skills/gem-pal-studio/*.md",
+    "docs/drawings/*.md",
     "docs/pals/previews/*.md"
   ],
   "areas": [
@@ -70,13 +99,59 @@
         "docs/child-continuity/*.md",
         "docs/brand/*.md",
         "docs/rewards/*.md",
-        "docs/pals/*.md"
+        "docs/problem-solving/*.md",
+        "docs/pals/*.md",
+        "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:18:10.026Z",
-      "sourceDigest": "eb505c8ebc8e31c0011a06436d8bad2cbc8d792fd5d0d0d7ab77b49fb3502e6f",
+      "reviewedAt": "2026-11-20T05:08:25.020Z",
+      "sourceDigest": "69a2d184455c1d450a7c424548c79d02912fb384d894dc87d71ee10182c88e10",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled PR66 handbook coverage and current Rewards PR67 documentation with the companion policy; documented the three decorative gems now used by Pals while leaving unused artwork and optional sound accurately labeled."
+      "reviewReason": "Reviewed the accepted two-form runtime scope, explicit five-adventure compatibility choice, retained nonspendable activity rules and unresolved art mappings. Also reconciled current APS/homepage/first-creation descriptions with the eighth Pal destination; historical seven-route evidence and independent learning claims remain unchanged.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T07:03:47.934Z",
+          "sourceDigest": "323579edd6dd9dbf940b981fceaa41e9b911cecc56d97e5e5a6c47b3c3006b0f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved both owner-directed intents: merged style-diverse quality ADR0006 and Creation Studio ADR0007. Child ownership, explicit Keep and formative rather than global thinking claims remain distinct from release evidence."
+        },
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:24.202Z",
+          "sourceDigest": "d24e39014dffd1394fd967dc06d6d7dc52c160b4968ac1a7165a66f550f32f44",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved current Creation Studio and adult/guardian doctrine while integrating approved ray-free identity, original four-rank maker portraits and brand library v1.2; earning and learning semantics remain unchanged."
+        },
+        {
+          "sourceCommit": "7fa7ff252e277bd9610a11afeca8bf8f1ae13715",
+          "reviewedAt": "2026-11-19T15:03:30.676Z",
+          "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
+        },
+        {
+          "sourceCommit": "3cf23a866770e4cd22765ba822bcf1c988f60bcf",
+          "reviewedAt": "2026-11-19T23:24:40.702Z",
+          "sourceDigest": "5525f4f96e6cb9c02cf35e32381d8a6286ab659df44a1f3a6e225b825a5026e2",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed restored collection access, activity links, same-project continuation and score wording against the doctrine. Existing family idea sharing, private drawings, parent learning controls, explicit Keep, maker evidence and lifetime reward policy are unchanged; no new product entitlement or progression rule is introduced."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:41:59.237Z",
+          "sourceDigest": "052a9ff9b1ed3cdd951cd252ef7e68c4facf5102b51a557069fce0009c442a24",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented the accepted first-creation invitation, optional task hints, child-selected Keep and meaningful return priority in doctrine and the dated decision. Guidance preferences do not constitute learning, reward or creation evidence."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T04:17:14.624Z",
+          "sourceDigest": "2b74b8ac64d8a5f80eea41e577afb933362153cc194096eb5b41ea084f8d9f5f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded owner-approved Art Studio merge 20ffb350 with exact tested-tree equality and all eight passing hosted workflows. Product behavior and the local-storage, adapter and acceptance boundaries remain as reviewed."
+        }
+      ]
     },
     {
       "id": "experience",
@@ -94,6 +169,8 @@
         "docs/brand/art-library/README.md",
         "docs/brand/art-library/licenses/README.md",
         "docs/rewards/*.md",
+        "docs/problem-solving/*.md",
+        "docs/mind-your-jems/*.md",
         "docs/pals/*.md"
       ],
       "sources": [
@@ -114,10 +191,40 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:02:15.282Z",
-      "sourceDigest": "6d70f6affbdc0cd15b05f73898315989ddb24e3c6e991e08aafc212a9cda21bb",
+      "reviewedAt": "2026-11-20T05:06:20.191Z",
+      "sourceDigest": "49c2bbdf071814681ed6c9f4378584ced46107e929d63c164639369c6aa27826",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Studio navigation, profile guards, host hint delegation, parent preferences, existing-brand tokens and child creation shortcuts; documented the isolated Pal store and coordinated family restore while preserving current adult cleanup."
+      "reviewReason": "Reviewed the combined Studio and Pal host delta: eight icon destinations, first-welcome hiding, draft/learning guards, parent preferences, owner loading, and shared notices. Updated homepage, first-creation and architecture references; existing Art Studio and exact game returns remain intact.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T14:39:48.683Z",
+          "sourceDigest": "47de8040f2678b39938d4658261da388a415397262aecebbe18709a2d7d29bc9",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the complete recovered v1.2 source against current main and the published PR57 branch. The only new runtime reconciliation closes the Journey picker and hides Journey on entering Creation; existing scene exit, save-without-Keep, learning guards, owner boundaries and five-tab mobile layout remain intact. Canonical architecture and delivery scope now describe this combined behavior."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:29.265Z",
+          "sourceDigest": "0b1511c17500501860cd69c9563a3e39018f6994049739f7be56c000fc9d1d87",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the new parent route, copied report reads, preserved settings and family backup handlers, and family/adult profile event refresh. Canonical doctrine, architecture and parent feature contract now describe these boundaries."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T02:53:46.287Z",
+          "sourceDigest": "948cd4d31496de87a8597c60f144bf5e1153d27f9839afede9d7cc612a0f2d81",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the final library label polish and repeated real Art Studio journey; singular part/use text changes no persistence or navigation behavior, and architecture continues to document exact asset bindings, local backup and owner-safe recovery."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:57:29.866Z",
+          "sourceDigest": "5dd716aa531805218e50cf7d6866f4eeed7ab613b8d49462f9d94a84366209ad",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the complete first-creation flow and the conditional-header follow-up after real parent-browser overflow. Header tools now wrap within phone width while retaining visible player, subject and help controls; the unchanged first-creation and complete-playable-card guards pass."
+        }
+      ]
     },
     {
       "id": "creation",
@@ -135,10 +242,40 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "0356a833a8c91fa3231870fc947ba27a1d6ab29bb3af50bd058d4af1bed27dd3",
-      "reviewedAt": "2026-11-19T15:02:16.300Z",
+      "sourceDigest": "e0a73cebee7e28a95c6383c9d73497e9f85836cd2cc4350107b455c39b89c732",
+      "reviewedAt": "2026-11-20T05:06:21.881Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented stable Pal scene assets, starter-attributed jump/dance/speech programs, owned collection shortcuts, preserved free-scene actors and drafts, challenge exclusions and creative imports without collection entitlement."
+      "reviewReason": "Reviewed Pal asset allowlist, scene insertion and refresh handling against current private-art and PR81 source returns. Documented preserved image/rig hashes, actor IDs and exact game revisions, stable token assets, challenge exclusions, explicit Keep and active-picker focus preservation.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:58:08.260Z",
+          "sourceDigest": "79550dae3c5cd44758f0fabef07732504db741af6b4f907af6eee6a8dc923ff6",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented explicit scene exit when navigating to chat Create or My journey: guard learning, preserve pending scene version without Keep, and stop hidden playback. Added regression cases while retaining current scene evidence, adapters and backup schema."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:29.799Z",
+          "sourceDigest": "10c3746e45402bb430ca64b1fa65de7a6e2b1ba9be0900b0fe7addc705396ef8",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Only the existing creation recovery browser helper now selects the Settings tab before using the preserved backup controls. Scene records, behavioral checks, revision ownership and creation storage source are unchanged."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T02:51:25.558Z",
+          "sourceDigest": "e06b8d6186a8c58911e04b9e0f32049ab94125a59cc660392389d63bce82a88f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed local private-reference parsing, renderer cancellation, exact composite pixels and portable scene imports; updated Creation contracts and acceptance to distinguish local artwork from bundled-only generated manifests and one-actor scenes from articulated physics."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:42:01.268Z",
+          "sourceDigest": "5042a4ef455c4412ddf3ba81dfbd42a6acc94b7e44aa9881419048b5df033b1e",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented optional scene and practice guidance, permanent source boundaries and authored extensions after successful checks. Reviewed recovery suppression and focus guards; global Home retains existing autosaved recovery drafts and does not promote a revision."
+        }
+      ]
     },
     {
       "id": "rewards",
@@ -157,30 +294,26 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "963297f5910c4053c0086b110f46bb6872deff5d1a6ab26b5803abacc2eb7bcd",
-      "reviewedAt": "2026-11-19T15:11:19.831Z",
+      "sourceDigest": "493e303f89ffcc4763f2486f9cb8eef6db0152fcd69ab96d250040120fb67109",
+      "reviewedAt": "2026-11-20T05:10:52.721Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented companion consumption, shared notices and dual-store backup rollback; reconciled the published PR67 dependency without changing reward amounts, source eligibility or the validated receipt bridge."
-    },
-    {
-      "id": "pals",
-      "documents": [
-        "PRODUCT-DOCTRINE.md",
-        "ARCHITECTURE-CURRENT.md",
-        "docs/pals/*.md",
-        "docs/decisions/0012-pals-from-earned-activity.md",
-        "docs/pals/previews/*.md"
-      ],
-      "sources": [
-        "src/pals/**",
-        "tests/pals*",
-        "docs/pals/*.md"
-      ],
-      "reviewAfterDays": 30,
-      "sourceDigest": "86b57d2c2439d2923001c77aae0e7ed874f2dd3c4a896ba90d40b6cb910f7a1b",
-      "reviewedAt": "2026-11-19T15:03:50.280Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final Pal code and queue fixes against the contract, coordinated dual-store rollback and actual editable scenes; added final production screenshots that separate five UI-earned learning completions from synthetic higher-stage receipt fixtures."
+      "reviewReason": "Reviewed combined Pals plus APS/guidance backup recovery, captured-domain legacy journals and raw-recovery rejection, with58local contracts and completed full Rewards browser journey. Final test-only change logs the original error before bounded failure capture; it changes no earning, input or assertion. The initial seconds-fill timeout and single unchanged-app rerun remain recorded separately.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-19T23:24:41.916Z",
+          "sourceDigest": "5ce3a2b2d093c434cb667629ba028398816ad02a5b1b6f1a0ec7d824f16cd06a",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented actionable earning rows, parent-controlled subject routing, direct unset-maker selection and the distinction between lifetime gems and maker evidence. Reviewed component and integrated route assertions; reward receipts, amounts and source eligibility are unchanged."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:42:02.096Z",
+          "sourceDigest": "5855c79c06be66d51a86c998f97a99d07c5ec725bfb9cf4f46493080f1ef8743",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented the dismissible gems/maker/practice explanation and owner-scoped notebook preferences. Reviewed backup rejection of foreign guidance owners and namespace isolation; grants, source eligibility and evidence remain unchanged."
+        }
+      ]
     },
     {
       "id": "games",
@@ -189,7 +322,9 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/GAME-QUALITY.md",
         "docs/game-quality/*.md",
-        "docs/brand/GEM_FACTORY.md"
+        "docs/brand/GEM_FACTORY.md",
+        "docs/mind-your-jems/*.md",
+        "docs/archetypes/*.md"
       ],
       "sources": [
         "src/games/**",
@@ -197,13 +332,33 @@
         "src/quality/**",
         "scripts/build-generated-runtime.cjs",
         "docs/GAME-QUALITY.md",
-        "docs/game-quality/*.md"
+        "docs/game-quality/*.md",
+        "docs/mind-your-jems/**",
+        "public/art/mind-your-jems/**",
+        "public/fonts/fredoka/**",
+        "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T06:35:41.812Z",
-      "sourceDigest": "ed5238e7bb5c02ca44c2411d727ab6da9cc20b307c88160cc3a677ca883fd6eb",
+      "reviewedAt": "2026-11-20T04:38:11.591Z",
+      "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Gem Factory artwork provenance and documented the stable gift button with animated inner artwork, addressing the concrete ordinary-click failure while retaining physical sorting and wrapping."
+      "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-19T23:24:42.267Z",
+          "sourceDigest": "11d65db71f1e2e5032c77e750fe0f25c7c1bfb64897f1b2c8622501fe9587c65",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the Mind Your Jems copy-only change and updated its feature contract: This round is in-memory scoring, Help explains reset and separation from lifetime gems, and build-wait-only entry remains. Visual comparison, inputs, handoff and recovery passed without baseline or tolerance changes."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T02:51:25.731Z",
+          "sourceDigest": "f7be746d325b6fe720eb05f67cb0182c7d56e4f04057cfd81aa3ce8fa8ed14e4",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed native Rally and shared physics changes including original-aspect scaling, full wheel masks, fixed decorations, exact revision selection and missing-art behavior; architecture and drawing contracts describe supported geometry and preserve stock runtime compatibility."
+        }
+      ]
     },
     {
       "id": "learning",
@@ -221,10 +376,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T14:50:01.741Z",
-      "sourceDigest": "473ce6752757395f995584ea8ec6ce6f6fdde286f513bda388bd7015b3a7cd36",
+      "reviewedAt": "2026-11-19T17:17:56.207Z",
+      "sourceDigest": "2798174cf2197341b90d2bc4a3abf04136091e44948aa2b40550c7542dbd44d5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed live Math and Language completion staging, durable-save notification and original host handling; documented equal engagement grants for assisted corrections and unscored saved writing while preserving independent evidence, shown-answer exclusion and no historical replay."
+      "reviewReason": "Reviewed production host save ordering with Math and English attempts; optional context is emitted only after durable attempt and reward outbox, preserving subject evidence and existing earning eligibility on observer failure."
     },
     {
       "id": "services",
@@ -321,10 +476,26 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "5eaf6d3199be0c8ee8d271c26efc59361fa67948fd0f7111f22426d8880922c3",
-      "reviewedAt": "2026-11-19T14:58:17.911Z",
+      "sourceDigest": "b06116996cbf77a9e1c2d30eb04758a3d73aa09a454e4b0a5e72979bd8378afe",
+      "reviewedAt": "2026-11-20T03:42:03.089Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected same-context paused-tab and takeover assertions in the adult browser suite: family/adult notebook isolation, explicit unlock, no inherited authorization, reload reset and stale-reply rejection remain. Pure in-memory exit cleanup after lock release adds no persistent write or authority; existing privacy contracts remain accurate."
+      "reviewReason": "Browser fixture entry now chooses the real Explore control for fresh family or adult profiles before existing assertions. Identity, authorization, namespace, parent consent and provider source code are unchanged; rewards backup separately validates the new notebook preferences.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-19T16:20:30.000Z",
+          "sourceDigest": "153f9fd6ed825e3bfb85cb4768ccb433bc6cb4e0e21b93877925e4fd9d398043",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed brand control changes alongside family/adult reward namespaces and parent Settings backup controls; no guardian scope, device trust or paid provider permission changes."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:42:03.089Z",
+          "sourceDigest": "b06116996cbf77a9e1c2d30eb04758a3d73aa09a454e4b0a5e72979bd8378afe",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Browser fixture entry now chooses the real Explore control for fresh family or adult profiles before existing assertions. Identity, authorization, namespace, parent consent and provider source code are unchanged; rewards backup separately validates the new notebook preferences."
+        }
+      ]
     },
     {
       "id": "validation",
@@ -341,6 +512,7 @@
         "docs/brand/achievement-art/README.md",
         "docs/brand/LIBRARY_V1_2.md",
         "docs/rewards/*.md",
+        "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
         "docs/pals/previews/*.md"
       ],
@@ -350,10 +522,40 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:03:50.760Z",
-      "sourceDigest": "7421d8f149e74e6f830ceb29e900d5027d0bb4554ec4d604b31514ce4463c7a7",
+      "reviewedAt": "2026-11-20T05:10:36.845Z",
+      "sourceDigest": "57e4bb966294098357a469c77b250560ccbdbaaa6b4ec172eeb552d33e8ae8c8",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded runtime candidate ef62e3b with 42 Pal, 54 rewards, 77 creation and 28 maker checks, plus five component and seven built-app groups; documented test-only image decoding waits and explicit fixture versus UI-earned progress in review captures."
+      "reviewReason": "Reviewed final combined regression changes, including PR81 named original/cutout tests in both UUID orders, two-form histories, Pals/APS/guidance backup, private-art scene preservation and eight-route navigation. All scoped local suites passed, including376core and full Art/Creation/Rewards; preserved the first seconds-fill timeout and one unchanged-app rerun, with only early/bounded failure diagnostics added. No expectation was weakened; hosted acceptance remains pending.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:25.107Z",
+          "sourceDigest": "b0158a975de90f442c7cdcf1d9695661013a090eaa92179d0365fe58f26a2f50",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved all current main CI jobs; added brand asset verifier, narrow phone layout and scene-to-Create/Journey regressions alongside existing illustrated progression, offline and saved-state checks. Local build/nonbrowser results recorded separately from pending CI browser evidence."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:57:15.605Z",
+          "sourceDigest": "321ed825245f691048c66461c2c2de27bc7a590027be5da16de2264590f73874",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added browser assertions that unscored saved writing and exact checked scene titles remain inspectable even without a first scored response; synthetic fixture grade scope now includes the existing reviewed writing activity."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T02:51:25.971Z",
+          "sourceDigest": "98e5f93d87d087b4ed977db4b1d0f114fdd45c23a93e0af12f628190e11a1cc9",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the new source and browser regressions plus existing compatibility results; added scoped evidence and capture checksums covering quota failures, owner/view changes, immutable reuse, image fidelity and explicit limits of synthetic device emulation."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T04:07:32.421Z",
+          "sourceDigest": "413cc9e3efd2f008302fcda4c8dffd6202eeed27968df440be4b4919bb5039ba",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the tablet quality helper change after the hosted one-part-versus-two assertion. Locator.tap retains real touch with actionability/stability checks; exact intermediate state assertions improve failure localization. Existing counts, selection, capability, geometry, held input and release assertions remain intact, and both orientations pass locally."
+        }
+      ]
     },
     {
       "id": "delivery",
@@ -361,7 +563,8 @@
         "DELIVERY-STATE.md",
         "ARCHITECTURE-CURRENT.md",
         "docs/context/MAINTENANCE.md",
-        "docs/assignment-006/*.md"
+        "docs/assignment-006/*.md",
+        "docs/mind-your-jems/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -375,10 +578,47 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-19T15:18:10.540Z",
-      "sourceDigest": "be97378b7c41c35874c219d5b71966e4284eecb5c7c84badee05e3783308baea",
+      "reviewedAt": "2026-11-20T05:10:37.245Z",
+      "sourceDigest": "d93eb824db660cbfbe150f48575992e0657e939eb1cd1a56a42650ba416becaf",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the rewards branch documentation update e9dd62a into draft PR68, preserving PR66 release receipts and resolving shared review fingerprints without runtime changes; local checks and pending hosted CI remain explicitly separate."
+      "reviewReason": "Recorded retained PR68 and published PR81 1b8d7b8 histories, current-main ancestry, merge order, exact application bundle and completed local/independent checks. Preserved original drawing-order failure, Rewards timeout and scoped rerun, browser-environment limitation and historical art evidence. No merge, deployment, selected-art readiness or provider activation is claimed.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T14:39:49.831Z",
+          "sourceDigest": "f11b89808e6e8b82b00edb653f7da9476a706df106543c55072e1062512804ce",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved latest main eebeebeb and PR63 release receipts, PR58 hosted results, PR62 measurement limits and private worker14 status without duplicate capability rows. Reviewed the retained CI diagnostic as read-only source-digest output. Recorded current merge authorization separately from pending exact-candidate browser/CI and merge evidence; earlier launcher failures, smoke success and historical suite results retain their scopes."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:57:16.414Z",
+          "sourceDigest": "68b357798b8b050a58b0e9198bd8c6925c02cd4a7152d8b7a0d9916dbfec2039",
+          "reviewOutcome": "updated",
+          "reviewReason": "Pinned the dedicated parent job to the same Ubuntu 24.04 and browser install pattern as existing successful repository journeys after the new latest runner resolved to unsupported Ubuntu 26.04. Recorded the setup failure without treating it as application evidence."
+        },
+        {
+          "sourceCommit": "7fa7ff252e277bd9610a11afeca8bf8f1ae13715",
+          "reviewedAt": "2026-11-19T15:03:31.282Z",
+          "sourceDigest": "42ab7a524f224769708b9edccb6edf6dc032f3bafb77f653546230103c2660bd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded observed PR57 merge c6576c16 at 2026-11-19T15:02:05Z, exact tree equality to tested source1488871/local879c93e, all four final hosted workflows, scoped local acceptance and the source-only release boundary. Preserved earlier receipts as historical and documented actual handbook coverage."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T04:07:33.092Z",
+          "sourceDigest": "bc7f537e6b323d5e7e7f10af7473f438506d73767dcb4e89cd02bc2267f187d0",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved initial and header-follow-up hosted quality failures separately from passing local checks. Recorded the exact first tablet assertion, known coordinate helper behavior and narrowly reviewed real-touch helper update without claiming the old cause proven or merging/deploying the feature."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T04:17:14.995Z",
+          "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
+          "reviewOutcome": "updated",
+          "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries."
+        }
+      ]
     },
     {
       "id": "context",
@@ -399,10 +639,165 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T15:03:52.279Z",
-      "sourceDigest": "106d752eef1915081465345e5454ec310cacc70b573db1ef9857269511f893ab",
+      "reviewedAt": "2026-11-20T05:06:23.658Z",
+      "sourceDigest": "1235598c9a1c01db3a35f2b6b56febc078d37b187d1495e8d8cb172311722e6b",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the Pal feature and accepted decision to canonical navigation, routed src/pals and tests/pals to explicit review ownership, and registered the companion contract and screenshot evidence for local link checking."
+      "reviewReason": "Reconciled current main registry with only the Pal extension routing additions; registered ADR0013 and Pal contracts/previews, retained all existing art/guidance/APS areas and link scope, and updated canonical decision navigation. No blanket source-review refresh or rule removal.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
+          "reviewedAt": "2026-11-19T12:57:25.915Z",
+          "sourceDigest": "9314eb35617cf99993071c8e0b9111cc38031e901cd52beb55f9d81e002bf67c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Resolved ADR collisions by preserving main decisions 0006/0007 and renumbering unpublished brand decisions 0008/0009; routed asset contracts and preserved all canonical links and current-main registry areas."
+        },
+        {
+          "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
+          "reviewedAt": "2026-11-19T14:52:31.544Z",
+          "sourceDigest": "94d5ed0db4d3faf049edd394e1a1800613c81c2229dfa60c79413d61f1649007",
+          "reviewOutcome": "updated",
+          "reviewReason": "Registered the new parent-reporting source and test family with canonical and feature references, added required parent contract and research documents, and linked the dated reporting decision from the documentation indexes."
+        },
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T02:51:26.397Z",
+          "sourceDigest": "c8d4c0f251e818f6cfcc0552e573613e1ac3bdcf038c107fb9492e4ac0673007",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed registry policy changes and the new documentation links; added the dedicated art source/test area and required contracts, and documented cross-area review duties in maintenance without weakening existing fingerprint or link checks."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:42:04.869Z",
+          "sourceDigest": "05b6308f6d0f23bf0e027f2bc9af1e0486825de7c3ebaa8c833f0febfadb19ff",
+          "reviewOutcome": "updated",
+          "reviewReason": "Registered the first-creation contract and dated decision, routed child-journey and screenshot-caption link checks, and linked the new entry point in the docs index. Reviewed the preserved source area coverage and unchanged documentation-checker behavior."
+        }
+      ]
+    },
+    {
+      "id": "parent-reporting",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/parent-progress/*.md",
+        "docs/decisions/2026-11-19-parent-evidence-reporting.md"
+      ],
+      "sources": [
+        "src/parent/**",
+        "tests/parent-dashboard*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
+      "reviewedAt": "2026-11-19T17:17:56.552Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states."
+    },
+    {
+      "id": "problem-solving",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/problem-solving/*.md",
+        "docs/decisions/0011-formative-problem-solving-evidence.md"
+      ],
+      "sources": [
+        "src/problem-solving/**",
+        "tests/problem-solving-*"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "7fe579855e1fb1b96777020f333a15e8e85d9da57bb7f1c1e552f108f0113f81",
+      "reviewedAt": "2026-11-20T05:06:46.338Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the sole APS browser delta: exact navigation count increases from seven to eight for My Pals while unchanged two-row and complete 44px target assertions remain. Updated the current shell contract; independent desktop/touch practice journeys pass with four episodes each. APS scoring, source attribution, assistance, persistence and historical validation receipts remain unchanged.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-19T17:17:56.960Z",
+          "sourceDigest": "3670012075fbf05ffe4eb33752061ab8e1490ec3092ea83bf175907971a77419",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed shared writer guard, five-source backup, child-view and native-parent integration, deterministic tasks and new failure regressions; documented current local evidence and pending exact-head browser acceptance."
+        },
+        {
+          "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
+          "reviewedAt": "2026-11-20T03:44:04.029Z",
+          "sourceDigest": "dee7eabbe6d4e6b80f15414465af85c3210ddb9c9f6bf6f881a54ac6aeb5fbe2",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Only the browser fixture profile picker now chooses the visible Explore action for an empty sibling before using the existing navigation. Practice tasks, first-response evidence, hints, learning guards, reports, reward eligibility and backup semantics are unchanged; desktop and phone regression assertions remain intact."
+        }
+      ]
+    },
+    {
+      "id": "pal-design",
+      "documents": [
+        "docs/pals/*.md",
+        "skills/gem-pal-studio/SKILL.md",
+        "docs/decisions/2026-11-19-gem-pal-studio.md",
+        "docs/decisions/0013-two-form-pals-and-current-main.md"
+      ],
+      "sources": [
+        "docs/pals/*.md",
+        "docs/pals/templates/**",
+        "skills/gem-pal-studio/**",
+        "docs/pals/art/character-references.json"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "334df8f1e5eac969e6402df32288f66b94f7c6dea404039a5751996a367debd6",
+      "reviewedAt": "2026-11-20T05:06:22.760Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Updated Studio to link the deliberate runtime compatibility decision without changing artwork policy, roster or approvals. Base/mature keys and exact selected identity remain authoritative; unresolved species/form mappings remain null and saved token scene assets stay stable."
+    },
+    {
+      "id": "art-studio",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/drawings/*.md",
+        "docs/creation-studio/*.md",
+        "docs/decisions/2026-11-19-private-art-studio.md"
+      ],
+      "sources": [
+        "src/drawing/**",
+        "src/assets/**",
+        "tests/art-*",
+        "tests/drawing-*",
+        "tests/creation-private-art*",
+        "tests/picture-tools-browser.cjs"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "eca73a5d8ef20efde98e5a0de81cb75a4fff6ada194c3f1e8b43023325ce542f",
+      "reviewedAt": "2026-11-20T04:38:14.270Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the merged private-art contract and new first-creation integration tests. Art-only owners retain ordinary home, siblings remain isolated and mixed-source scenes retain both return actions; storage, immutable bindings and portable-art authority are unchanged. Updated current PR23 disposition while retaining its dated evidence.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
+          "reviewedAt": "2026-11-20T02:53:46.697Z",
+          "sourceDigest": "45c272ca36ecd6386ac752d92507253396a3c3761ea13ba3e6a358f3110bbf9a",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed final source-aspect physics and copy polish with all five art browser suites plus refreshed real UI captures; recorded per-command source identities, exact original/version semantics, recovery tests and remaining actual-device limits."
+        }
+      ]
+    },
+    {
+      "id": "pals",
+      "documents": [
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/pals/*.md",
+        "docs/decisions/0012-pals-from-earned-activity.md",
+        "docs/pals/previews/*.md",
+        "docs/decisions/0013-two-form-pals-and-current-main.md"
+      ],
+      "sources": [
+        "src/pals/**",
+        "tests/pals*",
+        "docs/pals/*.md"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "5b98012c5c0d4692c259212d562a669ac748650d63c847fb49f2c254f2b9089e",
+      "reviewedAt": "2026-11-20T05:06:22.586Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed two-form catalog/model/UI and receipt compatibility tests: Base/Grown at five, no third notice, unchanged v1 receipts/inventory/selection history and null selected-art bindings. Recorded actual local contracts, browser groups and scoped captures; old three-stage evidence remains historical."
     }
   ]
 }

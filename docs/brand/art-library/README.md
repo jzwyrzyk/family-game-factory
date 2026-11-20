@@ -65,4 +65,4 @@ node scripts/verify-brand-assets.mjs
 
 It checks deployed file hashes and dimensions, exact identity lineage, the banned ray signature, unchanged Journey frames and rank mappings, sprite coverage, font packages and license presence. It also rejects an unregistered illustration or retired reward in the active art directory. Source PNGs are outside this repository; their recorded export comparison is protected by the approved derivative byte hashes.
 
-Keep optional poses, collectible shapes and future cover artwork out of eager first-visit loading. Their availability in the asset registry does not require preloading every illustration. Runtime and offline caching policy belongs to the application integration.
+Keep unused editorial artwork, collectible shapes and future covers out of eager first-visit loading. All five companion poses now have real application states; the active set and icon sprite belong to the core offline shell. Their availability in the asset registry does not require preloading every illustration. Runtime and offline caching policy belongs to the application integration.

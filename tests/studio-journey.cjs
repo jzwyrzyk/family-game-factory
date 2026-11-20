@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Runs against the real production dist and original game host. No paid model calls. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -11,7 +12,7 @@ const {start}=require('./browser-server.cjs');
   const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),page=await ctx.newPage(),errors=[],jobs=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(r.url().includes('/v1/jobs'))jobs.push(r.url());});
   const url=`http://127.0.0.1:${server.address().port}/arcade/?studio=1`;
-  await page.goto(url);await page.waitForFunction(()=>FG.studio&&FG.factory&&FG.builder);
+  await page.goto(url);await page.waitForFunction(()=>FG.studio&&FG.factory&&FG.builder);await exploreWelcome(page);
   // This suite checks studio/history isolation. A recent question satisfies the
   // ordinary pacing budget; math remains mandatory and is tested separately.
   const seededSkill=await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();FG.store.current().skills['mul:8x7']={tries:4,right:2,hints:1,streak:1,last:'2026-11-14T00:00:00Z'};FG.store.save();return JSON.stringify(FG.store.current().skills['mul:8x7']);});
@@ -78,7 +79,7 @@ const {start}=require('./browser-server.cjs');
   await page.getByRole('button',{name:/Test machine/}).click();
   await page.waitForFunction(()=>FG.runtime.snapshot().state.simulation?.status==='won',null,{timeout:15000});
   assert.equal((await notebook()).sessions.some(s=>s.reflection),false,'physics success alone does not force reflection');
-  await page.getByRole('button',{name:'Finish challenge →',exact:true}).click();
+  await page.getByRole('button',{name:'Finish challenge',exact:true}).click();
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.reflection));
   await talk();assert.match(await page.textContent('#studioMessages'),/fun or tricky/);
   await page.click('#studioReflectAnswer');await page.fill('#studioPrompt','I liked seeing my rocket stay together.');await page.click('#studioSend');
@@ -150,7 +151,7 @@ const {start}=require('./browser-server.cjs');
   await route.fulfill({status:data.errorCode?404:200,headers,contentType:'application/json',body:JSON.stringify(data)});
  });
  await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script>`}));
- await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);
+ await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);await exploreWelcome(page);
  await page.click('#studioNavCreate');await page.fill('#studioPrompt','Create a novel test fixture');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('designPlan')?.open===true);await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');await page.waitForSelector('#studioReady:not([hidden])');await page.click('#studioReady');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');

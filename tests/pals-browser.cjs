@@ -9,6 +9,7 @@ const { once } = require('node:events');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
+const { exploreWelcome } = require('./studio-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const outputs = path.join(root, 'test-results');
@@ -30,7 +31,7 @@ async function openPals(page) {
 async function chooseFamily(page, index) {
   if (!await page.locator('#studioProfileMenu').evaluate(element => element.open)) await page.click('#studioProfileMenu summary');
   await page.locator('.profile-choice:not(#adultProfileChoice)').nth(index).click();
-  await page.waitForFunction(index => FG.store.current().id === `player${index + 1}` && FG.pals.view()?.owner === `player${index + 1}`, index);
+  await page.waitForFunction(index => FG.store.current().id === `player${index + 1}` && FG.pals.view()?.owner === `player${index + 1}`, index); await exploreWelcome(page);
 }
 async function pacingFixture(page) {
   await page.evaluate(() => {
@@ -115,7 +116,7 @@ async function installReceiptFixture(page) {
     page.on('dialog', dialog => void dialog.accept());
     page.on('request', request => { if (request.method() === 'POST' && /\/v1\/(jobs|coach)(\/|$)|api\.openai\.com/.test(request.url())) paidRequests.push(request.url()); });
     const base = `http://127.0.0.1:${server.address().port}/arcade/`;
-    await page.goto(base); await ready(page);
+    await page.goto(base); await ready(page); await exploreWelcome(page);
 
     phase = 'choosing a starter and reloading';
     assert.equal(await page.locator('#studioNavPals').count(), 1);
@@ -194,7 +195,20 @@ async function installReceiptFixture(page) {
     await page.click('#creationKeep');
     const addedProjectId = afterAdd.id;
     await noOverflow(page, 'Pal added to a free scene');
-    mark('Add your Pal preserves existing scene actors and scripts');
+    await page.click('#creationAddActor');
+    await page.locator('#creationActorDialog').waitFor({ state: 'visible' });
+    await page.locator('#creationOpenArtStudio').focus();
+    await page.evaluate(async () => {
+      window.__palsPickerRefreshObserved = false;
+      const observer = new MutationObserver(() => { observer.disconnect(); window.__palsPickerRefreshObserved = true; });
+      observer.observe(document.getElementById('page-jems-pals'), { attributes: true, attributeFilter: ['aria-busy'] });
+      await FG.rewards.refresh();
+    });
+    await page.waitForFunction(() => window.__palsPickerRefreshObserved);
+    assert.equal(await page.locator('#creationActorDialog').isVisible(), true, 'background collection refresh preserves the open art/character picker');
+    assert.equal(await page.locator('#creationOpenArtStudio').evaluate(element => element === document.activeElement), true, 'background collection refresh does not steal art-picker focus');
+    await page.click('#creationCloseActor');
+    mark('Add your Pal preserves existing scene actors/scripts and background refresh preserves the art picker');
 
     phase = 'real learning, delegated Pal hint and collection navigation guard';
     await pacingFixture(page); await page.click('#creationRun'); await page.click('#creationTapActor');
@@ -291,15 +305,17 @@ async function installReceiptFixture(page) {
     await page.waitForFunction(() => FG.pals.view()?.owned.some(pal => pal.id === 'riff')); await idle(page);
     assert.equal(await gems(page), 150);
     await seed(5, 'scene.challenge', 'radiant-at-15-adventures', 190);
-    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'glim')?.stage === 3);
-    const radiant = (await view(page)).owned.find(pal => pal.id === 'glim');
-    assert.equal(radiant.adventures, 15); assert.equal(radiant.stageName, 'Radiant Pal');
+    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'glim')?.adventures === 15);
+    const grown = (await view(page)).owned.find(pal => pal.id === 'glim');
+    assert.equal(grown.adventures, 15); assert.equal(grown.stageName, 'Grown');
+    assert.equal(grown.form, 'mature'); assert.equal(grown.stage, 2); assert.equal(grown.nextStageAt, null);
+    assert.equal(await page.locator('.pals-growth-stages > li').count(), 2);
     await page.click('[data-pals-focus="equip-kip"]');
     await page.waitForFunction(() => FG.pals.view()?.activeId === 'kip'); await idle(page);
     assert.equal((await view(page)).owned.find(pal => pal.id === 'kip').adventures, 0, 'Changing the active Pal cannot reassign old receipts');
     await page.click('[data-pals-focus="equip-glim"]');
     await page.waitForFunction(() => FG.pals.view()?.activeId === 'glim'); await idle(page);
-    mark('explicit receipt fixtures verify 50/150 gem collection, Bright/Radiant growth, no spending and no replay on equip');
+    mark('explicit receipt fixtures verify 50/150 gem collection, Base/Grown growth with no third form, no spending and no replay on equip');
 
     phase = 'responsive integrated collection and owned-Pal picker';
     await page.locator('.pals-portrait img').evaluateAll(images => Promise.all(images.map(image => image.decode())));

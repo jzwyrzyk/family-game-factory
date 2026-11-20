@@ -1,6 +1,7 @@
 import { createPalsPage, createPalsWidget, createPalCameo } from './ui';
 import { palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsController, PalsNotice } from './service';
+import { setIconLabel } from '../brand/icons';
 import './pals.css';
 
 interface PalsHost {
@@ -42,7 +43,7 @@ export function installPalsInterface(host: PalsHost) {
     onPreferences: patch => pals.setPreferences(patch), onRetry: () => pals.refresh(),
   });
   document.querySelector('main')!.append(page.element);
-  const nav = node('button', '', 'My Pals'); nav.id = 'studioNavPals'; nav.type = 'button'; nav.onclick = open;
+  const nav = node('button'); setIconLabel(nav, 'star', 'My Pals'); nav.id = 'studioNavPals'; nav.type = 'button'; nav.onclick = open;
   const journeyNav = document.getElementById('studioNavJourney');
   (document.getElementById('studioNavRewards') ?? journeyNav)?.after(nav);
 
@@ -112,7 +113,7 @@ export function installPalsInterface(host: PalsHost) {
     cameo.say(kind, ++quip);
     const copy = node('div', 'pals-reward-note');
     if (available) copy.append(node('strong', '', `${palDefinition(available).name} is ready to join!`));
-    else if (gained) copy.append(node('strong', '', `${palDefinition(active).name} is now a ${gained.to === 3 ? 'Radiant' : 'Bright'} Pal!`));
+    else if (gained) copy.append(node('strong', '', `${palDefinition(active).name} has grown!`));
     copy.append(node('p', '', `${palDefinition(active).name}: ${palLine(active, kind, quip)}`));
     // One shared achievement surface for a saved action. If the gem popup is
     // already present, add this small Pal response to it rather than stack cards.

@@ -18,6 +18,8 @@ The selected public-facing brand is **jems** (lowercase), with a faceted **gem a
 
 Avoid using pastel colors as small text on white. Maintain readable navy text on mint, gold, coral, and Cloud. The approved v1.2 interface uses locally bundled, licensed **Nunito** for rounded headings and **Inter** for body/interface text, with system fallbacks and retained OFL notices. The logo remains its supplied outlined artwork and is never typeset in either font. The earlier guide's “Poppins Rounded” label did not supply an installable font; it is not the current interface font contract.
 
+The optional [Mind Your Jems arcade](../mind-your-jems/README.md) keeps the approved outlined jems logo while using locally licensed Fredoka for game-specific typography. Its layered character/world artwork must be reviewed against the approved storyboard and real browser output before accepting baselines.
+
 ## Logo
 `public/jems-mark.svg` and `public/jems-logo.svg` retain the supplied faceted gem/wrench layout and traced lowercase wordmark. The current approved revision removes only the specific three short rays above the gem; the single four-point wordmark sparkle, open-ended white wrench, facets, tagline and palette remain intact. Copy the current supplied variants exactly at their existing URLs, with the [identity lineage](art-library/identity/revision-manifest.json). These SVGs originated as reconstructed/traced implementations of raster references; the controlled edit does not change that provenance. Never regenerate, typeset, stretch, skew, recolor, filter or add shadows to the logo.
 
@@ -26,6 +28,7 @@ Avoid using pastel colors as small text on white. Maintain readable navy text on
 - The [illustrated making journey](GEM_PROGRESS.md), cosmetic character picker and saved-progress popups; source and release status remain scoped to [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57).
 - Parent Controls, My Powers, Math/Language Arts checkpoints, error/success notices, profile controls and optional offline update notification.
 - PWA manifest, icon, document title/metadata and original legacy Arcade escape route.
+- The shared approved SVG sprite supplies functional icons across existing host and game controls, with text labels, keyboard focus and dynamic states preserved. All five Gem companion poses and saved/build/reconnect spots follow the real state map in the library contract.
 - Product messaging: **Create. Solve. Build. Play. Grow.** Child creates/decides; jems is a helper. **Send to jems** sends a typed message; **Speak** is the microphone action.
 - CSS lives in `src/brand/jems.css`; existing physics and learning logic, isolation, storage keys and privacy gates remain unchanged.
 

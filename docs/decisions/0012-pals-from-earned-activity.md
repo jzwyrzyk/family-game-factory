@@ -1,6 +1,6 @@
 # 0012 — Collectible Pals from shared earned activity
 
-**Status:** Accepted for development; initial collection and growth thresholds are implementation policy.
+**Status:** Accepted for development; initial collection thresholds remain implementation policy. The original three-stage growth clause in point 2 is superseded by [ADR0013](0013-two-form-pals-and-current-main.md), which records exactly two forms and the deliberate earned-progress compatibility choice. The original clause below is retained as decision history.
 **Recorded:** November 19, 2026 (UTC).
 **Decision source:** The owner's companion-specific follow-up requested the system complementary to shared gems, reserved final artistic development for another conversation, then explicitly authorized implementation. The follow-up emphasized useful companions in children's own games, funny encouragement and a measured balance between engagement and the heavy addictive/subscription patterns of comparable products. This record paraphrases that private direction; implementation and release evidence belong in [delivery state](../../DELIVERY-STATE.md).
 

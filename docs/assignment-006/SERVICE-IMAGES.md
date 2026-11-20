@@ -2,7 +2,7 @@
 
 The service path in `scripts/deployment/build.py` uses one regional Cloud Build default-pool job to build the existing gateway and preview Dockerfiles and publish them to the existing Artifact Registry repository. This replaces local Docker publication. No Cloud Shell Docker/Skopeo retry, private pool, GitHub federation or deployment pipeline is needed. Publishing is a release operation, never a per-game requirement.
 
-This PR does not enable APIs, create cloud resources, grant permissions, publish images, deploy services or activate AI. First live publication requires separate owner authorization. Use the private owner handoff for the approved source pins, actual resource names and rollout decisions.
+The publisher does not enable APIs, create cloud resources, grant permissions, deploy services or activate AI. Perform live publication within the existing owner-authorized release scope. Use the private owner handoff for the approved source pins, actual resource names and rollout decisions.
 
 ## Commands and source boundary
 
@@ -15,6 +15,8 @@ python3 scripts/deployment/build.py --region REGION --reviewed-source-sha FULL_C
 `--preflight` reads prerequisite metadata only. `--execute` uploads the staged archive and submits one billable build. They are mutually exclusive. `--build-id BUILD_UUID` recovers a previous submission by polling and verifying it; it never submits another build. The service modes never invoke local Docker or deploy anything. The existing local sandbox mode remains separate and unchanged.
 
 The source archive contains only committed build inputs selected with `git ls-tree` and `git show` at the supplied SHA. It excludes dirty working-tree edits, untracked files, Git metadata, hidden environment/config directories, key files, private JSON configuration, token files, local dependencies, server test fixtures and unrelated workspace contents. Credentials/build secrets are never supplied. As with any reviewed source, a credential deliberately embedded inside a committed code file must be caught in code review; filename filters are not a general secret scanner.
+
+The gateway and preview compilation inputs include `src/creation/model.ts` and `src/creation/projects.ts` alongside the existing runtime and Studio types. The publisher explicitly includes those two committed paths, `.dockerignore` permits them in the Docker context, and literal local `COPY` inputs are validated against the staged Dockerfiles from the selected source. A missing or unsupported input fails before upload or billable submission. Older reviewed sources remain buildable when their own Dockerfiles do not require Creation inputs; rollback does not require adding new files to an old application commit. This closes the merged-source packaging gap found while preparing the November 19 release at `0dedb7839e17a4a0df84e83ebdde65261056b32d`. The corrected Docker ignore file is itself a committed build input, so new image publication must select a reviewed source SHA that includes this correction; changing only the operator's publisher checkout is insufficient.
 
 Archive names/content/order/modes/timestamps are stable, yielding a deterministic source hash. The build config is generated separately and is not uploaded as application source. Both Dockerfiles, their non-root ownership, the package lockfile and existing dependency-install restrictions are retained. Cloud Build runs the two builds sequentially so identical layers can be reused.
 
@@ -68,13 +70,15 @@ Cloud Build removes its disposable worker. The client removes local staging on n
 
 [Cloud Build pricing](https://cloud.google.com/build/pricing), checked November 17, 2026, lists `E2_MEDIUM` at $0.003/build-minute in the supported US region. A 5–10 minute combined build is approximately $0.015–$0.030 compute; the 20-minute execution timeout is approximately $0.060 per submission, excluding storage, logging, network, taxes and exceptional billing behavior. No free tier is assumed. Repeated publications retain additional image versions; no image-deletion policy is introduced.
 
-After owner review of the receipt, deployment remains a **separate authorization**. Update the existing preview first, then gateway, by immutable digest. Save prior revision/traffic metadata; use an image-only update and `--no-traffic`, verify readiness and unchanged identities/URLs/env/secret mounts/data settings/limits, then route traffic and check health. Restore the saved prior traffic split if needed. Do not run the old bootstrap/IAM deployment path merely to update images.
+After verifying the receipt, deployment is a separate operation within the applicable owner-authorized release scope. Update the existing preview first, then gateway, by immutable digest. Save prior revision/traffic metadata; use an image-only update and `--no-traffic`, verify readiness and unchanged identities/URLs/env/secret mounts/data settings/limits, then route traffic and check health. Restore the saved prior traffic split if needed. Do not run the old bootstrap/IAM deployment path merely to update images.
 
-Review/release the compatible website only after backend verification. Preserve disabled paid execution throughout publication and inactive rollout. A later owner-only pilot has its own explicit authorization and allowance. Do not repeat accepted sandbox tests or change worker pins merely because the service publisher changed. Existing Math/Language Arts, mouse/touch, replay, physics, generated gameplay and security behavior are unaffected.
+Review/release the compatible website only after backend verification. Preserve the existing approved activation flags and allowances, including a working Adult pilot; publication and image refresh must not enable new paid capabilities or disable an already authorized pilot. Do not repeat accepted sandbox tests or change worker pins merely because the service publisher changed. Existing Math/Language Arts, mouse/touch, replay, physics, generated gameplay and security behavior are unaffected.
 
 ## Tests
 
-`npm run test:deployment` covers offline plans, exact source requirements, real Git staging with dirty/untracked/private fixtures, both images in one build, read-only preflight/recovery, inherited IAM rejection, bounded polling, credential-safe diagnostics and failed/partial/unverified digest rejection. Existing sandbox/deployment contracts are preserved. The normal full PR CI runs the application, Math/Language Arts, creative/generated/mobile and security journeys; exact head/run identifiers are recorded on the draft PR. Offline CI is not a claim of successful live publication.
+`npm run test:deployment` covers offline plans, exact source requirements, real Git staging with dirty/untracked/private fixtures, both images in one build, current Dockerfile COPY inputs, missing-input rejection before cloud calls, historical rollback sources, read-only preflight/recovery, inherited IAM rejection, bounded polling, credential-safe diagnostics and failed/partial/unverified digest rejection. Existing sandbox/deployment contracts are preserved. The normal full PR CI runs the application, Math/Language Arts, creative/generated/mobile and security journeys; exact head/run identifiers belong in the release evidence. Offline CI is not a claim of successful live publication.
+
+The scoped [Service image packaging workflow](../../.github/workflows/service-image-contracts.yml) stages the exact CI commit with the publisher and builds both Dockerfiles from that archive, including its actual `.dockerignore`. It then loads both packaged entry modules as non-root with network access disabled. This catches source/context omissions and missing runtime dependencies without Google Cloud configuration, provider credentials, registry publication or production traffic changes. Record the hosted result for the final correction source before image publication; the earlier application baseline's green checks do not certify a later packaging change.
 
 References: [user-managed build identity](https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts), [gcloud builds submit](https://docs.cloud.google.com/sdk/gcloud/reference/builds/submit), [Cloud Build access](https://docs.cloud.google.com/build/docs/securing-builds/configure-access-to-resources).
 
@@ -90,3 +94,20 @@ us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/coach@sha256:99
 ```
 
 An already-successful build must **not** be resubmitted when verification fails. Use the original build ID and exact reviewed source SHA with `build_coach.py --build-id BUILD_UUID` after the verifier correction. Recovery must independently confirm the Artifact Registry digest. Image publication does not imply Cloud Run deployment, private gateway reachability, model credentials, approvals, or paid AI activation.
+
+## 2026-11-19 — Manually publish the pinned Adult pilot frontend
+
+The production gateway, preview and private-coach images for the supervised Adult-only Jems pilot were built from merged public source `079978f3034e007e8bbad1f43571aaa7867b5098`. This historical pilot release pin remains a rollback reference; the subsequently authorized coordinated release is tracked in [delivery state](../../DELIVERY-STATE.md). The existing Pages workflow requires a manually entered, immutable 40-character `source_sha`, verifies the commit is already merged into the triggering `main` history, and checks out exactly that source for tests and the public build. Only the reviewed production gateway and preview origins may be published; missing/empty origins fail rather than disconnecting the existing site. The built `dist/jems-release.json` includes the reviewed source SHA for post-deployment inspection.
+
+Once the compatible gateway/preview revisions are checked and deliberately serving, use the existing manual workflow (no automatic main-push deployment):
+
+```sh
+gh workflow run pages.yml --repo jzwyrzyk/family-game-factory --ref main \
+  -f source_sha=079978f3034e007e8bbad1f43571aaa7867b5098 \
+  -f gateway_origin=https://factory-gateway-ola734esta-ul.a.run.app \
+  -f preview_origin=https://factory-preview-ola734esta-ul.a.run.app
+```
+
+Before and after publication, retain the old Pages artifact/deployment ID and prior Cloud Run traffic splits for rollback. Require the selected source SHA's full test suite to pass and inspect the live `/family-game-factory/jems-release.json` and `factory-config.json`. Confirm the actual browser shows the Adult (development) selector and trusted-device enrollment. Initial API checks may be unavailable until the device is enrolled and granted an Adult permit. Do not claim paid inference, reliable iOS microphone capture or private worker generation from a successful Pages publication alone.
+
+This release workflow is still manual and deploys **only the public static website**; it does not modify Cloud Run, Secret Manager, Firestore, provider credentials, allowance, worker pins, or the private coach.

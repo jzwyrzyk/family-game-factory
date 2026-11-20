@@ -25,6 +25,8 @@ The [owner-approved coaching standard](docs/design-coach/GOLD_STANDARD.md) is th
 
 The owner's November 19, 2026 direction adds child-facing computational practice to the creation experience. A child's game characters and ideas can become editable stories, animations, and behavior rules. Free creation and **watch a scene, then rebuild it** practice share meaningful actions; practice should help children gain control of their own creations. Children can start with a game, a story, or a challenge without a compulsory ladder.
 
+The subsequently accepted [first-creation journey](docs/child-journey/FIRST-CREATION.md) makes the first invitation simple: make a game, with an optional way to explore first. Use brief contextual hints as the child imagines, waits, plays, tries a change, chooses a version and returns. Keep the child's ready result or unfinished intention easy to continue. The child can dismiss hints and show them again; those preferences are never achievements or learning evidence. A **Done for now** action must save through the existing guards and report a failed save honestly. The [decision record](docs/decisions/2026-11-19-first-creation-journey.md) preserves this approved scope.
+
 Use demonstrated behavior, predictions, experiments, and revisions as specific formative observations. Allow equivalent working programs. An AI-authored scene, copied solution, or hint-supported attempt must not be counted as independent mastery. Critical thinking and computational thinking are intended capabilities, with no global thinking score or validated growth claim implied by this first implementation. [ADR0007](docs/decisions/0007-creation-and-rebuild-practice.md) records the accepted development direction; the [Creation Studio contract](docs/creation-studio/README.md) distinguishes current source adapters from the broader continuous-project vision.
 
 ## 2. Deliver the actual playable experience
@@ -44,6 +46,10 @@ Choose a game's form from its actions and consequences. Rendering (2D or true 3D
 Use actual physics when weight, contact, balance, momentum, suspension or another physical cause materially determines the requested experience, or when it is an explicit requirement. Preserve verified existing mechanics when editing a saved game. If an essential requirement exceeds the runtime's capabilities, explain the gap or resolve the choice; do not silently substitute an easier experience and claim completion. Reusable game families should support invention rather than confine every idea to the same game.
 
 See [the game-form decision](docs/decisions/0002-intent-faithful-game-forms.md). The current runtime capability is an architecture fact, not a permanent limit on the product's ambition.
+
+### Original drawings belong to the child across creations
+
+The [Art Studio](docs/drawings/ART_STUDIO.md) is a dedicated place to import or draw pictures, prepare separate derivatives, develop meaningful parts and motion, and reuse chosen versions in games and scenes. Preserve original pixels and the child’s decisions. A saved use pins the chosen image or movement revision; later library edits cannot silently change an earlier adventure. Keep local storage, export/restore and missing-asset recovery explicit. Supported physical and block-scene adapters do not imply arbitrary generated-game compatibility, universal recognition or cloud synchronization. [The accepted decision](docs/decisions/2026-11-19-private-art-studio.md) records this extension.
 
 ## 4. Experiments are recoverable; choosing a favorite is explicit
 
@@ -69,6 +75,12 @@ Keep Math and Language Arts evidence distinct. Preserve independent responses, h
 
 Computational thinking and active problem solving are intended opportunities, not automatically validated scores. Engineering tests, game performance, clicks and session length do not prove mastery, intelligence, emotions or learning gains. Product thresholds require calibration and appropriate real-use evidence before stronger claims. See [Math](docs/adaptive-math/README.md), [Language Arts](docs/adaptive-language/README.md) and [coaching evidence boundaries](docs/design-coach/GOLD_STANDARD.md).
 
+The owner's November 19, 2026 direction adds [formative problem-solving observations](docs/problem-solving/README.md) across the three existing mechanisms and game creation. Quiet source context and optional structured reasoning opportunities share provenance, not a combined ability score. Keep six dimensions distinct: define, compare, test, interpret, revise and transfer. A missing opportunity remains unknown; a failed initial prediction can be followed by useful revision; no recorded hint does not prove no outside help. Neutral access support and reasoning assistance have different effects on the construct being observed. Only known task rules may produce a structured result; arbitrary chat, game complexity and AI-authored work cannot earn competence credit. [ADR0011](docs/decisions/0011-formative-problem-solving-evidence.md) records the accepted design. Independent benchmark research remains separate from this formative layer, and early/recent records do not establish calibrated growth.
+
+### Parent reporting follows the evidence
+
+The [parent area](docs/parent-progress/README.md) should help a parent see what happened, inspect the supporting example, and choose a useful next step. Keep Math, Language Arts, Computational Thinking and Problem Solving distinct. Clearly separate recent retained records from accumulated skill history, and observed task performance from standards coverage or validated assessment results. Unknown evidence is not a deficit; recorded help is context for teaching. Explain connections to familiar products and frameworks without converting scores or implying an overall grade level. Recommendations and exports must remain profile-specific and grounded in existing records. See the [parent reporting decision](docs/decisions/2026-11-19-parent-evidence-reporting.md).
+
 ## 7. The experience must work across devices and retain its identity
 
 Tablet/touch use and desktop/keyboard/mouse use are first-class product targets. Controls, layouts, voice recovery, focus, pause/resume and saved versions need evidence on the intended devices. A desktop screenshot or simulated mobile viewport does not establish actual tablet reliability. Preserve readable text, accessible targets, keyboard operation and reduced-motion behavior.
@@ -85,11 +97,15 @@ The shared [Rewards experience](docs/rewards/README.md) adds nonspendable lifeti
 
 ### Companions make progress useful and playful
 
-[Jem Pals](docs/pals/README.md) provide an earned collection, visible growth, short funny reactions and characters children can immediately use in editable scenes. Glim and Kip offer equally useful free starter choices; the other starter and Riff become available at transparent lifetime-gem targets. Collecting does not spend gems. Growth follows completed activities while that Pal is taken along, with no reward for tapping a portrait, waiting or keeping the app open.
+[Jem Pals](docs/pals/README.md) provide an earned collection, visible growth, short funny reactions and characters children can immediately use in editable scenes. Glim and Kip offer equally useful free starter choices; the other starter and Riff become available at transparent lifetime-gem targets. Collecting does not spend gems. Growth follows completed activities while that Pal is taken along, with no reward for tapping a portrait, waiting or keeping the app open. There are exactly two forms, Base and Grown. [The compatibility policy](docs/decisions/0013-two-form-pals-and-current-main.md) preserves the first earned transition at five adventures and all original receipts; it does not infer a numerical threshold from artwork approval.
 
 Use clear goals, anticipation, expressive personalities and creative utility to encourage return visits. Avoid paid luck, subscription pressure, disappearing companions, care chores, lost-progress threats and guilt about taking breaks. A funny line should respond to something the child did, stay brief, and never ridicule a mistake or claim the Pal needs the child emotionally. Parent controls can hide appearances and encouragement without reducing earned growth.
 
 Pals remain separate from the Gem brand helper and the Spark/Nova maker choices. A Pal can delegate to an existing host hint, retaining recorded assistance; it cannot grade answers, award currency, bypass a checkpoint or become an unbounded AI relationship. Editable Pal starter programs retain their starter attribution and do not prove independent coding ability. Existing approved gem tokens are functional preview art until the separate character-art review.
+
+### Gem Pal character design
+
+The [Gem Pal Studio method](docs/pals/STUDIO.md) governs companion artwork: invent purposeful gem anatomy from useful inspirations, give the Base a complete identity, and develop one recognizable Grown form through meaningful changes in structure or movement. The current art scope is two total forms and one transition; it is separate from the four maker ranks and any runtime earning thresholds. Preserve exact selected references across edits, one character per individual profile, and form-specific anatomy during expressions. Art approval, expression approval, animation compatibility and in-game acceptance remain distinct. [The accepted method](docs/decisions/2026-11-19-gem-pal-studio.md) makes this reusable in repository work; it does not establish that a companion collection or final art is integrated.
 
 ## 8. Truth, privacy and ownership are part of the product
 

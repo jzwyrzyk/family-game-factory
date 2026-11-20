@@ -4,6 +4,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 const {renderGenerated}=require('../server/sandbox/preview.cjs');
 const {renderGeneratedV2}=require('../server/sandbox/preview-v2.cjs');
 const {runtimeBundle}=require('../server/sandbox/bundle-v2.cjs');
@@ -70,6 +71,7 @@ async function localJourney(browser,url,device,viewport){
  try{
   await page.route('**/factory-config.json',unavailable);await page.clock.install();
   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
+  await exploreWelcome(page);
   await assertTouchDevice(page,device,'after initial navigation');
   const first=await page.locator('#studioStarters [data-starter]').first().boundingBox();
   assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable game choice is in the first viewport');
@@ -194,6 +196,7 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
    return route.fulfill({headers:{'Content-Security-Policy':rendered.csp},contentType:'text/html',body:rendered.html});
   });
   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&FG.studio.mode()==='remote');
+  await exploreWelcome(page);
   await openPhysicalGum(page);await localTest(page);
   const originalCandidate=(await currentSession(page)).candidate.id,originalMain=await mainId(page);
   await page.click('#studioChange');await page.fill('#studioPrompt','Replace the rocket with a bouncing banana maze');await page.click('#coachTry');
@@ -322,6 +325,7 @@ async function recoveryJourney(browser,url,device,viewport){
  const {context,page,errors}=await prepare(browser,viewport,device);
  try{
   await page.route('**/factory-config.json',unavailable);await page.goto(url);await page.waitForFunction(()=>window.FG?.studio);
+  await exploreWelcome(page);
   const original=await page.evaluate(key=>localStorage.getItem(key),NOTEBOOK);
   await storageFailure(page,true);await page.click('#studioNavCreate');
   assert.equal(await page.locator('#page-studio-library').isVisible(),true);

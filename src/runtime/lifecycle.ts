@@ -2,7 +2,7 @@ import { validateConfig } from './manifests';
 import type { Difficulty, GameLifecycle, GamePlugin, Mechanics, PlayOutcome, GameContext } from './types';
 
 /** Host learning and game focus/manual pauses share one elapsed-time ledger. */
-export function createLifecycle(plugin: GamePlugin, target: HTMLElement, config: Mechanics, difficulty: Difficulty, onOutcome: (outcome: PlayOutcome) => void, persistence?: GameContext['persistence']): GameLifecycle {
+export function createLifecycle(plugin: GamePlugin, target: HTMLElement, config: Mechanics, difficulty: Difficulty, onOutcome: (outcome: PlayOutcome) => void, persistence?: GameContext['persistence'], drawingRigId?: string | null): GameLifecycle {
   const checked = validateConfig(plugin.manifest.id, config);
   let instance: ReturnType<GamePlugin['mount']> | undefined, disposed = false, finished = false;
   let began = performance.now(), pausedAt: number | null = null, pausedMs = 0, hostPaused = false, gamePaused = false;
@@ -11,7 +11,7 @@ export function createLifecycle(plugin: GamePlugin, target: HTMLElement, config:
     if (paused && pausedAt === null) pausedAt = performance.now();
     if (!paused && pausedAt !== null) { pausedMs += performance.now() - pausedAt; pausedAt = null; }
   }
-  const context: GameContext = { persistence, difficulty, config: Object.freeze({ ...checked }),
+  const context: GameContext = { persistence, drawingRigId, difficulty, config: Object.freeze({ ...checked }),
     emit(event) {
       if (disposed) return;
       if (event.type === 'pause' || event.type === 'resume') { gamePaused = event.type === 'pause'; clockState(); }

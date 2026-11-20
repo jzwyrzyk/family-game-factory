@@ -4,6 +4,8 @@ import {installCoaching} from './coaching';
 import {celebrateJem, type JemMilestone} from '../brand/delight';
 import {builderJourney, gemStage, GEM_STAGE_LABELS, type GemStage} from '../brand/gem-progress';
 import {installGemJourney, createJourneyCharacter, createJourneyGem, createJourneyRankThumbnail} from '../brand/journey';
+import {iconMarkup, createIcon, setIconLabel, type IconName} from '../brand/icons';
+import {createMindYourJems, type WorkshopStatus} from '../games/mind-your-jems';
 import {installStudioVoice} from './voice';
 import {installStudioPrivateSpeech} from './private-speech';
 import {freshDesign} from './design';
@@ -26,15 +28,26 @@ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
+import { installArtStudio } from '../drawing/studio';
+import { rigById } from '../drawing/store';
+import { vehicleGeometry } from '../drawing/model';
+import { drawing, drawings, drawingBlob } from '../assets/private-drawings';
+import { registerArtUsage } from '../drawing/library';
+import { installProblemSolvingPractice } from '../problem-solving/ui';
 import {installRewards, notifyRewardSourceSaved} from '../rewards/service';
-import {createRewardsPage, createRewardsWidget, createRewardCelebration} from '../rewards/ui';
+import {createRewardsPage, createRewardsWidget, createRewardCelebration, type RewardsActivity} from '../rewards/ui';
 import {type RewardGrant} from '../rewards/model';
 import {rewardSourceWritable} from '../rewards/write-guard';
+import {createFirstWelcome, createJourneyOverview} from './first-journey';
+import {createGuideCard, type GuideCard, type GuideHost} from './guide-card';
+import {GUIDE_TIPS, hasMeaningfulCreation, recommendNext, readyGuidedExperiment, type GuideTipId} from './guidance';
+import {CreationStore} from '../creation/storage';
 import {installPals} from '../pals/service';
 import {installPalsInterface} from '../pals/host';
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
+const iconEl=(tag:string,className:string,name:IconName,label:string,iconClass='')=>{const target=el(tag,className);setIconLabel(target,name,label,iconClass);return target;};
 const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',moon:'🌙',robot:'🤖',factory:'💎',new:'✨'};
 const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',moon:'Moon Donut Dash',robot:'Robot Route Lab',factory:'Gem Factory',new:'A brand-new idea'};
 const busy=(s:StudioSession)=>!!s.job&&['queued','building','testing'].includes(s.job.status);
@@ -45,7 +58,15 @@ const isRealAdapter=(adapter:string|undefined)=>adapter==='metered-api'||adapter
 /** Studio is the primary child homepage; ?arcade=1 is the reversible legacy route. */
 export async function installStudio(){
  const entry=new URLSearchParams(location.search);
- if(entry.get('arcade')==='1'||entry.get('studio')==='0')return;
+ if(entry.get('arcade')==='1'||entry.get('studio')==='0'){
+  const currentUrl=new URL(location.href);
+  if(entry.get('arcade')==='1')currentUrl.searchParams.delete('arcade');
+  if(entry.get('studio')==='0')currentUrl.searchParams.delete('studio');
+  const notice=el('div','notice studio-legacy-return');
+  const link=el('a','btn secondary','Open current Jems') as HTMLAnchorElement;
+  link.id='jemsCurrentExperience';link.href=currentUrl.href;
+  notice.append(link);document.querySelector('main')!.prepend(notice);return;
+ }
  const FG=(window as any).FG;
  if(!FG?.app||!FG?.store)return;
  const rewards=installRewards();
@@ -55,6 +76,7 @@ export async function installStudio(){
   const warning=el('p','notice',String((error as Error).message));$('page-home').prepend(warning);return;
  }
  const games=new StudioGames(profileStorage(localStorage),FG), owner=()=>String(FG.store.current().id);
+ const guideHost:GuideHost={isDismissed:tip=>notebook.guidance(owner()).dismissedTips.includes(tip),dismiss:tip=>{notebook.dismissGuideTip(owner(),tip);}};
  try{games.export();}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
@@ -71,25 +93,39 @@ export async function installStudio(){
  const stopSpeech=()=>{voice?.cancel();privateSpeech?.cancel();};
  const sending=new Set<string>();
  let panel:'game'|'talk'|'versions'='game';
+ let keptInThisView:string|null=null;
+ let guideSignature='',currentGuide:GuideCard|null=null;
+ let welcomeArt:{owner:string;hasArt:boolean;pending:Promise<void>|null;deferredView:number|null}|null=null;
  let pausedForTools=false,viewIntent=0;
+ // Local arcade state never owns build readiness, saved games or learning evidence.
+ const waitArcade=createMindYourJems();
+ let waitProject:{id:string;owner:string}|null=null;
 
  const page=el('section','page hidden');page.id='page-studio';
- page.innerHTML=`<div class="studio-heading"><button type="button" class="studio-back" id="studioHome">← My Games</button><div class="studio-title-wrap"><h1 id="studioTitle" tabindex="-1">Let's make something.</h1></div><span class="studio-storage" id="studioStorage">Saved on this device</span></div>
- <div class="studio-topbar"><div class="studio-version"><span class="studio-dot" aria-hidden="true"></span><span id="studioVersion">New idea</span></div><div class="studio-actions"><button id="studioPlay" class="studio-button studio-primary">▶ Play</button><button id="studioKeep" class="studio-button studio-keep" disabled hidden>⭐ Make this my main game</button><button id="studioHelp" class="studio-button">? How to play</button><details id="studioMore" class="studio-more"><summary>More game tools</summary><div class="studio-more-actions"><button id="studioUndo" class="studio-button" disabled>↶ Undo</button><button id="studioRedo" class="studio-button" disabled>↷ Redo</button><button id="studioCompare" class="studio-button">▤ Tests & versions</button><button id="studioCopy" class="studio-button">＋ Save as a different game</button></div></details></div></div>
- <div id="studioStatus" class="studio-status" role="status" aria-live="polite" aria-atomic="true"></div><button id="studioReady" class="studio-button studio-ready" hidden>Try your ready test →</button>
- <nav class="studio-mobile-tabs" aria-label="Studio panels"><button data-studio-tab="game" aria-pressed="true" aria-controls="studioCanvas">🎮 Game</button><button data-studio-tab="talk" aria-pressed="false" aria-controls="studioConversation">💬 My ideas</button><button data-studio-tab="versions" aria-pressed="false" aria-controls="studioVersions">▤ My tests</button></nav>
- <div class="studio-workspace" data-mobile-panel="game"><div id="studioCanvas" class="studio-canvas-column"><section id="studioHelpPanel" class="studio-help" aria-labelledby="studioHelpTitle" hidden><h2 id="studioHelpTitle" tabindex="-1">How to play</h2><p id="studioHelpGoal"></p><p id="studioHelpControls"></p><details><summary>More controls</summary><p id="studioHelpKeyboard"></p></details><button id="studioCloseHelp" class="studio-button">Got it</button></section><div id="studioPreviewNotice" class="studio-preview-notice" hidden>Trying a different version. Your main game is safe. <button id="studioBackWorking">Back to my main game</button></div><div id="studioGameHost" class="studio-game-host" tabindex="-1" aria-label="Current game"><div id="studioEmpty" class="studio-empty"><img class="jems-empty-workbench" src="./jems-art/spot_first_idea.webp" width="1536" height="1024" alt="" aria-hidden="true" decoding="async"><h2>Every great game starts with an idea.</h2><p>Tell jems what you imagine, or choose a game to change.</p><button class="studio-button" id="studioChooseStarter">Choose a starting game</button></div><div id="studioRemoteHost" hidden></div></div><details id="studioMathOptions" class="studio-math-options"><summary>Learning in this game</summary><div id="studioGameSubject" class="studio-game-subject" hidden><strong>Next learning subject</strong><div class="learning-subject-switch" role="group" aria-label="Next game practice subject"><button type="button" id="studioGameMath" aria-pressed="true">🔢 Math</button><button type="button" id="studioGameLanguage" aria-pressed="false">📚 English</button></div><small>Finish any open question before switching.</small></div><div id="studioMathMode"></div></details><p class="studio-footnote" id="studioPlayNote">Your ideas save on this device.</p></div>
- <aside id="studioConversation" class="studio-conversation" aria-label="Your game ideas"><div class="studio-helper-heading"><span class="studio-helper-icon" aria-hidden="true"><img class="jems-helper-mark" src="./jems-art/character_spark_think.webp" width="1254" height="1254" alt="" decoding="async"></span><div><h2>jems · Your idea partner</h2><p id="studioAvailability">Checking available tools…</p></div></div><div id="studioMessages" class="studio-messages" role="log" aria-label="Project conversation" aria-live="polite" aria-relevant="additions text"></div><div id="studioReflection" class="studio-reflection" hidden><p id="studioReflectionQuestion">What was fun or tricky?</p><div><button id="studioReflectAnswer" class="studio-chip">Share a thought</button><button id="studioReflectSkip" class="studio-chip">Keep playing</button></div></div><form id="studioPromptForm" class="studio-prompt"><label for="studioPrompt" id="studioPromptLabel" tabindex="-1">What should happen next?</label><textarea id="studioPrompt" rows="3" maxlength="2000" placeholder="Tell me what you imagine…" required></textarea><div id="studioSuggestions" class="studio-suggestions"></div><div class="studio-send-row"><span id="studioDraftStatus" role="status" aria-live="polite">Your ideas save as you type</span><button id="studioTalk" class="studio-button studio-primary" type="button" aria-label="Send your written message to jems">➤ Send to jems</button><button id="studioSend" class="studio-button" type="submit">Try a change →</button></div><div class="studio-voice-row"><button id="studioMic" class="studio-button" type="button" aria-pressed="false" aria-label="Speak to jems using the microphone when supported">🎙 Speak</button><button id="studioVoicePack" class="studio-button" type="button" hidden>Install voice pack</button><button id="studioHear" class="studio-button" type="button" disabled>🔊 Hear reply</button><span id="studioVoiceStatus" role="status" aria-live="polite">Tap Speak, review the words, then press Send to jems.</span></div><p class="studio-voice-note">Speak uses private on-device recognition when supported or a parent-approved private transcription service. A short recording may be sent for transcription, but never automatically to the game builder. Review the words before choosing Send to jems. You can always type.</p><div class="studio-build-controls"><button id="studioCancel" class="studio-button" type="button" hidden>Cancel build</button><button id="studioRetry" class="studio-button" type="button" hidden>Try build again</button></div></form></aside></div>
+ page.innerHTML=`<div class="studio-heading"><button type="button" class="studio-back" id="studioHome">${iconMarkup('arrow','jems-icon--back')} My Games</button><div class="studio-title-wrap"><h1 id="studioTitle" tabindex="-1">Let's make something.</h1></div><span class="studio-storage" id="studioStorage">Saved on this device</span></div>
+ <div class="studio-topbar"><div class="studio-version"><span class="studio-dot" aria-hidden="true"></span><span id="studioVersion">New idea</span></div><div class="studio-actions"><button id="studioPlay" class="studio-button studio-primary">${iconMarkup('play')} Play</button><button id="studioKeep" class="studio-button studio-keep" disabled hidden>${iconMarkup('star')} Make this my main game</button><button id="studioHelp" class="studio-button">${iconMarkup('help')} How to play</button><details id="studioMore" class="studio-more"><summary>More game tools</summary><div class="studio-more-actions"><button id="studioUndo" class="studio-button" disabled>${iconMarkup('undo')} Undo</button><button id="studioRedo" class="studio-button" disabled>${iconMarkup('undo','jems-icon--mirror')} Redo</button><button id="studioCompare" class="studio-button">${iconMarkup('grid')} Tests & versions</button><button id="studioCopy" class="studio-button">${iconMarkup('save')} Save as a different game</button></div></details></div></div>
+ <div id="studioStatus" class="studio-status" role="status" aria-live="polite" aria-atomic="true"></div><button id="studioReady" class="studio-button studio-ready" hidden>${iconMarkup('play')} Try your ready test</button>
+ <nav class="studio-mobile-tabs" aria-label="Studio panels"><button data-studio-tab="game" aria-pressed="true" aria-controls="studioCanvas">${iconMarkup('play')} Game</button><button data-studio-tab="talk" aria-pressed="false" aria-controls="studioConversation">${iconMarkup('edit')} My ideas</button><button data-studio-tab="versions" aria-pressed="false" aria-controls="studioVersions">${iconMarkup('grid')} My tests</button></nav>
+ <div class="studio-workspace" data-mobile-panel="game"><div id="studioCanvas" class="studio-canvas-column"><section id="studioHelpPanel" class="studio-help" aria-labelledby="studioHelpTitle" hidden><h2 id="studioHelpTitle" tabindex="-1">How to play</h2><p id="studioHelpGoal"></p><p id="studioHelpControls"></p><details><summary>More controls</summary><p id="studioHelpKeyboard"></p></details><button id="studioCloseHelp" class="studio-button">Got it</button></section><div id="studioPreviewNotice" class="studio-preview-notice" hidden>Trying a different version. Your main game is safe. <button id="studioBackWorking">Back to my main game</button></div><div id="studioGameHost" class="studio-game-host" tabindex="-1" aria-label="Current game"><div id="studioEmpty" class="studio-empty"><img class="jems-empty-workbench" src="./jems-art/spot_first_idea.webp" width="1536" height="1024" alt="" aria-hidden="true" decoding="async"><h2>Every great game starts with an idea.</h2><p>Tell jems what you imagine, or choose a game to change.</p><button class="studio-button" id="studioChooseStarter">Choose a starting game</button></div><div id="studioRemoteHost" hidden></div></div><details id="studioMathOptions" class="studio-math-options"><summary>Learning in this game</summary><div id="studioGameSubject" class="studio-game-subject" hidden><strong>Next learning subject</strong><div class="learning-subject-switch" role="group" aria-label="Next game practice subject"><button type="button" id="studioGameMath" aria-pressed="true">${iconMarkup('grid')} Math</button><button type="button" id="studioGameLanguage" aria-pressed="false">${iconMarkup('book')} English</button></div><small>Finish any open question before switching.</small></div><div id="studioMathMode"></div></details><p class="studio-footnote" id="studioPlayNote">Your ideas save on this device.</p></div>
+ <aside id="studioConversation" class="studio-conversation" aria-label="Your game ideas"><div class="studio-helper-heading"><span class="studio-helper-icon" aria-hidden="true">${['wave','think','rest'].map(pose=>`<img class="jems-helper-mark" data-helper-pose="${pose}" src="./jems-art/character_spark_${pose}.webp" width="1254" height="1254" alt="" decoding="async">`).join('')}</span><div><h2>jems · Your idea partner</h2><p id="studioAvailability">Checking available tools…</p></div></div><div id="studioMessages" class="studio-messages" role="log" aria-label="Project conversation" aria-live="polite" aria-relevant="additions text"></div><div id="studioReflection" class="studio-reflection" hidden><p id="studioReflectionQuestion">What was fun or tricky?</p><div><button id="studioReflectAnswer" class="studio-chip">Share a thought</button><button id="studioReflectSkip" class="studio-chip">Keep playing</button></div></div><form id="studioPromptForm" class="studio-prompt"><label for="studioPrompt" id="studioPromptLabel" tabindex="-1">What should happen next?</label><textarea id="studioPrompt" rows="3" maxlength="2000" placeholder="Tell me what you imagine…" required></textarea><div id="studioSuggestions" class="studio-suggestions"></div><div class="studio-send-row"><span id="studioDraftStatus" role="status" aria-live="polite">Your ideas save as you type</span><button id="studioTalk" class="studio-button studio-primary" type="button" aria-label="Send your written message to jems">${iconMarkup('send')} Send to jems</button><button id="studioSend" class="studio-button" type="submit">${iconMarkup('arrow')} Try a change</button></div><div class="studio-voice-row"><button id="studioMic" class="studio-button" type="button" aria-pressed="false" aria-label="Speak to jems using the microphone when supported">${iconMarkup('mic')} Speak</button><button id="studioVoicePack" class="studio-button" type="button" hidden>Install voice pack</button><button id="studioHear" class="studio-button" type="button" disabled>${iconMarkup('volume')} Hear reply</button><span id="studioVoiceStatus" role="status" aria-live="polite">Tap Speak, review the words, then press Send to jems.</span></div><p class="studio-voice-note">Speak uses private on-device recognition when supported or a parent-approved private transcription service. A short recording may be sent for transcription, but never automatically to the game builder. Review the words before choosing Send to jems. You can always type.</p><div class="studio-build-controls"><button id="studioCancel" class="studio-button" type="button" hidden>${iconMarkup('stop')} Cancel build</button><button id="studioRetry" class="studio-button" type="button" hidden>${iconMarkup('retry')} Try build again</button></div></form></aside></div>
  <section id="studioVersions" class="studio-versions" aria-labelledby="studioVersionsTitle" hidden><div class="studio-section-heading"><div><h2 id="studioVersionsTitle" tabindex="-1">My tests & versions</h2><p>Try your ideas. You choose which one becomes your main game.</p></div><button class="studio-button" id="studioCloseVersions">Back to game</button></div><div id="studioVersionCards" class="studio-version-cards"></div></section>
  <dialog id="studioCopyDialog" class="studio-dialog" aria-labelledby="studioCopyTitle"><form id="studioCopyForm"><h2 id="studioCopyTitle">Give this game a new name</h2><p>Your original stays safe. Your ideas come with the copy.</p><label for="studioCopyName">Game name</label><input id="studioCopyName" maxlength="60" required><div><button class="studio-button" id="studioCopyCancel" type="button">Cancel</button><button class="studio-button studio-primary" type="submit">Save new game</button></div></form></dialog>`;
  const studioGemBadge=el('span','jems-gem-status');studioGemBadge.id='studioGemBadge';studioGemBadge.hidden=true;
  page.querySelector('#studioVersion')!.after(studioGemBadge);
  document.querySelector('main')!.append(page);
+ const studioGuideHost=el('div');studioGuideHost.id='studioGuideHost';studioGuideHost.hidden=true;
+ page.querySelector('.studio-mobile-tabs')!.after(studioGuideHost);
+ studioGuideHost.addEventListener('keydown',event=>event.stopPropagation());
+ const doneForNow=iconEl('button','studio-button','save','Done for now') as HTMLButtonElement;
+ doneForNow.id='studioDoneForNow';doneForNow.type='button';
+ doneForNow.onclick=()=>act(()=>{home();status('Your saved work is here when you come back. Ideas and local creations stay on this device.');});
+ page.querySelector('.studio-heading')!.append(doneForNow);
  // One child-facing journey: an idea-first workspace, a composer with attached
  // actions, and a separate status card that only represents observed build states.
  const creationHero=el('section','studio-creation-hero');
  creationHero.id='studioCreationHero';
- creationHero.innerHTML='<img src="./jems-art/hero_workshop.webp" width="1536" height="1024" alt="" aria-hidden="true" decoding="async"><div><span class="studio-creation-kicker">✨ ANY IDEA CAN START HERE</span><h2>What game can you dream up?</h2><p>A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!</p></div>';
+ // Decode the hidden workshop hero with its reveal frame; async decoding can leave a blank keyboard-entry frame.
+ creationHero.innerHTML='<img src="./jems-art/hero_workshop.webp" width="1536" height="1024" alt="" aria-hidden="true" decoding="sync"><div><span class="studio-creation-kicker">Any idea can start here</span><h2>What game can you dream up?</h2><p>A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!</p></div>';
  $('studioConversation').querySelector('.studio-helper-heading')!.after(creationHero);
  const chatOptions=el('details','studio-chat-options') as HTMLDetailsElement;
  chatOptions.id='studioChatOptions';
@@ -100,10 +136,10 @@ export async function installStudio(){
  $('studioConversation').querySelector('.studio-helper-heading')!.append(chatOptions);
  const sendRow=$('studioPromptForm').querySelector('.studio-send-row')!;
  sendRow.prepend($('studioMic'));
- const privateMic=el('button','studio-button','🎙 Speak') as HTMLButtonElement;
+ const privateMic=iconEl('button','studio-button','mic','Speak') as HTMLButtonElement;
  privateMic.id='studioPrivateMic';privateMic.type='button';privateMic.hidden=true;
  privateMic.setAttribute('aria-pressed','false');
- privateMic.setAttribute('aria-label','Use microphone for parent-approved private transcription, then review your message');
+ privateMic.setAttribute('aria-label','Speak using parent-approved private transcription, then review your message');
  sendRow.prepend(privateMic);
  sendRow.after($('studioDraftStatus'));
  const workshopNote=el('span','studio-workshop-availability');
@@ -113,11 +149,14 @@ export async function installStudio(){
  progressBanner.id='studioBuildProgress';progressBanner.hidden=true;
  progressBanner.setAttribute('role','status');progressBanner.setAttribute('aria-live','polite');
  const progressTitle=el('strong','studio-progress-title'),progressDetails=el('p','studio-progress-detail');
- progressBanner.append(progressTitle,progressDetails);
+ const arcadeButton=el('button','studio-button studio-wait-arcade-button','💎 Play Mind Your Jems!') as HTMLButtonElement;
+ arcadeButton.type='button';arcadeButton.hidden=true;
+ progressBanner.append(progressTitle,progressDetails,arcadeButton);
+ arcadeButton.onclick=()=>act(()=>{if(activeId)playWhileBuilding(current());});
  page.querySelector('.studio-workspace')!.before(progressBanner);
  progressBanner.append($('studioReady'),$('studioPromptForm').querySelector('.studio-build-controls')!);
  const ideaSparks=el('details','studio-idea-sparks') as HTMLDetailsElement;ideaSparks.id='studioIdeaSparks';
- ideaSparks.append(el('summary','','💡 Need a spark of inspiration?'));
+ ideaSparks.append(iconEl('summary','','help','Need a spark of inspiration?'));
  const sparkOptions=el('div','studio-idea-spark-options');
  for(const [label,idea] of [
   ['🦭 Bouncing seal','Make a game where a seal jumps across icy platforms to reach the end.'],
@@ -143,6 +182,12 @@ export async function installStudio(){
  pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
  library.innerHTML="<section class=\"studio-home-hero\" aria-labelledby=\"studioLibraryTitle\">\n<div class=\"studio-home-intro\"><h1 id=\"studioLibraryTitle\" tabindex=\"-1\">What jems will you <span>make today?</span></h1><p>Imagine it. Play it. Make it yours.</p><span class=\"studio-hero-sparkles\" aria-hidden=\"true\">✧ ✦</span></div>\n<div class=\"studio-home-action\"><button type=\"button\" id=\"studioNew\" class=\"studio-make-tile\"><span class=\"studio-make-icon\" aria-hidden=\"true\">✨</span><span class=\"studio-make-copy\"><strong>Invent a game</strong><small>Start with your own idea</small></span><span class=\"studio-make-arrow\" aria-hidden=\"true\">→</span></button><p id=\"studioCreationNote\" class=\"studio-creation-note\" role=\"status\" aria-live=\"polite\"></p></div>\n</section>\n<div id=\"studioContinue\"></div>\n<section id=\"studioFavoritesSection\" class=\"studio-home-favorites\" aria-labelledby=\"studioStarterTitle\"><div class=\"studio-section-heading\"><div><h2 id=\"studioStarterTitle\">Ready to Play jems</h2></div></div><div id=\"studioStarters\" class=\"studio-library-grid\"></div></section>\n<section id=\"studioSavedSection\" class=\"studio-home-saved\" aria-labelledby=\"studioSavedTitle\" hidden><div class=\"studio-section-heading\"><div><h2 id=\"studioSavedTitle\">My jems</h2></div></div><div id=\"studioLibrary\" class=\"studio-library-grid\"></div><div id=\"studioArchived\"></div></section>";
+ library.querySelector('.studio-make-icon')!.replaceChildren(createIcon('add'));
+ library.querySelector('.studio-make-arrow')!.replaceChildren(createIcon('arrow'));
+ library.querySelector('.studio-hero-sparkles')!.replaceChildren(createIcon('star'),createIcon('star'));
+ const savedArt=el('img','jems-saved-art') as HTMLImageElement;
+ savedArt.src='./jems-art/spot_safe_storage.webp';savedArt.alt='';savedArt.width=1536;savedArt.height=1024;savedArt.decoding='async';savedArt.loading='lazy';savedArt.setAttribute('aria-hidden','true');
+ library.querySelector('#studioSavedSection .studio-section-heading')!.prepend(savedArt);
  const gemSummary=el('section','jems-builder-progress');gemSummary.id='studioGemProgress';gemSummary.hidden=true;
  gemSummary.setAttribute('aria-label','My builder level');
  library.querySelector('#studioSavedSection .studio-section-heading')!.after(gemSummary);
@@ -153,15 +198,26 @@ export async function installStudio(){
  const homeCharacterLink=el('button','jems-home-journey','Choose your maker') as HTMLButtonElement;
  homeCharacterLink.type='button';homeCharacterLink.id='studioHomeCharacter';
  library.querySelector('.studio-home-action')!.append(homeCharacterLink);
+ const libraryTools=el('div','studio-library-tools');
+ const savedIdeas=iconEl('button','studio-button','grid','Saved ideas & drawings') as HTMLButtonElement;
+ savedIdeas.id='studioSavedIdeas';savedIdeas.type='button';savedIdeas.onclick=()=>act(openSavedIdeas);
+ libraryTools.append(savedIdeas);library.querySelector('#studioFavoritesSection')!.after(libraryTools);
+ const collectionBack=iconEl('button','studio-button','arrow','My Games','jems-icon--back') as HTMLButtonElement;
+ collectionBack.id='studioCollectionBack';collectionBack.type='button';collectionBack.onclick=()=>act(home);
+ $('page-creations').querySelector('.page-head')!.prepend(collectionBack);
+ const collectionTitle=$('page-creations').querySelector('h1')!;collectionTitle.tabIndex=-1;
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
- learningChoice.innerHTML='<div class="studio-learning-copy"><strong id="studioLearningTitle">Learning adventure</strong><small id="studioLearningNote"></small></div><div class="learning-subject-switch" role="group" aria-label="Choose practice subject"><button type="button" id="studioSubjectMath" aria-pressed="true">🔢 Math</button><button type="button" id="studioSubjectLanguage" aria-pressed="false">📚 English</button></div>';
+ learningChoice.innerHTML='<div class="studio-learning-copy"><strong id="studioLearningTitle">Learning adventure</strong><small id="studioLearningNote"></small></div><div class="learning-subject-switch" role="group" aria-label="Choose practice subject"><button type="button" id="studioSubjectMath" aria-pressed="true">Math</button><button type="button" id="studioSubjectLanguage" aria-pressed="false">English</button></div>';
  // The subject switch belongs to the player's header, not below the game shelf.
+ for(const [id,name,label] of [['studioSubjectMath','grid','Math'],['studioSubjectLanguage','book','English']] as const)setIconLabel(learningChoice.querySelector<HTMLElement>('#'+id)!,name,label);
  const nativeStage=$('page-game');
  const originalNav=document.querySelector('.site-header nav') as HTMLElement;
  originalNav.hidden=true;
  const nav=el('nav','studio-nav');nav.setAttribute('aria-label','Main navigation');
  nav.innerHTML='<button id="studioNavHome">My Games</button><button id="studioNavCreate">Create</button><button id="studioNavJourney">My journey</button><button id="studioNavRewards">My rewards</button><button id="studioNavPowers">My Powers</button>';
+ for(const [id,name,label] of [['studioNavHome','home','My Games'],['studioNavCreate','add','Create'],['studioNavJourney','star','My journey'],['studioNavRewards','star','My rewards'],['studioNavPowers','chart','My Powers']] as const)setIconLabel(nav.querySelector<HTMLElement>('#'+id)!,name,label);
+ function setActiveNav(id:string|null){nav.querySelectorAll('button').forEach(button=>{const active=button.id===id;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});}
  originalNav.after(nav);document.body.classList.add('studio-review');
  const profileBar=document.querySelector('.profile-bar') as HTMLElement,profileChoices=$('profile-choices');
  const profileMenu=document.createElement('details');profileMenu.id='studioProfileMenu';profileMenu.className='studio-profile-menu';
@@ -175,8 +231,89 @@ export async function installStudio(){
  headerTools.append(learningChoice,profileBar);
  document.querySelector('.site-header')!.append(headerTools);
  const globalStatus=el('div','studio-status');globalStatus.id='studioGlobalStatus';globalStatus.setAttribute('role','status');globalStatus.setAttribute('aria-live','polite');globalStatus.setAttribute('aria-atomic','true');document.querySelector('main')!.prepend(globalStatus);
+ const helpButton=iconEl('button','studio-button studio-journey-help','help','Journey help') as HTMLButtonElement;
+ helpButton.id='studioJourneyHelp';helpButton.type='button';helpButton.setAttribute('aria-controls','studioJourneyMap');helpButton.setAttribute('aria-expanded','false');
+ headerTools.append(helpButton);
+ const journeyMap=createJourneyOverview({
+  reset:()=>act(()=>{
+   if(guardMath())return;
+   notebook.resetGuidance(owner());closeJourneyMap(true);
+   document.querySelectorAll<GuideCard>('.jems-guide-card').forEach(card=>card.refresh?.());
+   if(route==='studio')refreshStudioGuide();
+   status('Helpful hints are back. You can dismiss each one whenever you like.');
+  }),close:()=>closeJourneyMap(true),
+ });
+ globalStatus.after(journeyMap);
+ function closeJourneyMap(focus=false){journeyMap.hidden=true;helpButton.setAttribute('aria-expanded','false');if(focus)focusView(helpButton);}
+ function openJourneyMap(){
+  if(guardMath())return;
+  if(!journeyMap.hidden){closeJourneyMap(true);return;}
+  journeyMap.hidden=false;helpButton.setAttribute('aria-expanded','true');focusView($('studioJourneyMapTitle'));
+ }
+ helpButton.onclick=()=>act(openJourneyMap);
+ journeyMap.addEventListener('keydown',event=>{event.stopPropagation();if(event.key==='Escape'){event.preventDefault();closeJourneyMap(true);}});
+ const welcome=createFirstWelcome({
+  make:()=>act(()=>{if(guardMath())return;notebook.dismissWelcome(owner());closeJourneyMap();return newIdea();}),
+  explore:()=>act(()=>{if(guardMath())return;notebook.dismissWelcome(owner());closeJourneyMap();renderLibrary();focusView($('studioLibraryTitle'));}),
+  help:()=>act(openJourneyMap),
+ });
+ library.prepend(welcome.element);
+ library.querySelector('.studio-home-hero')!.before($('studioContinue'));
+ function welcomeAvailability(){
+  if(!configReady)return 'Checking your creation tools…';
+  if(builderReadiness==='available')return '';
+  return builderReadiness==='not-configured'?'Game building is not connected yet. You can save an idea or make a ready-made game yours.':builderReadinessCopy(builderReadiness)+'. You can still save an idea.';
+ }
+ function readWelcomeArt(force=false):Promise<void>{
+  const capturedOwner=owner();
+  if(!force&&welcomeArt?.owner===capturedOwner)return welcomeArt.pending||Promise.resolve();
+  const capturedView=epoch,state:{owner:string;hasArt:boolean;pending:Promise<void>|null;deferredView:number|null}={owner:capturedOwner,hasArt:true,pending:null,deferredView:null};
+  welcomeArt=state;library.setAttribute('aria-busy','true');
+  // A blocked IndexedDB upgrade cannot hold the whole Studio at startup.
+  // Unknown or unreadable art conservatively keeps the ordinary home available.
+  let timer:ReturnType<typeof setTimeout>;
+  const timeout=new Promise<boolean>(resolve=>{timer=setTimeout(()=>resolve(true),1500);});
+  state.pending=Promise.race([drawings(capturedOwner).then(items=>items.length>0,()=>true),timeout]).then(hasArt=>{
+   clearTimeout(timer);
+   if(welcomeArt!==state||owner()!==capturedOwner)return;
+   state.hasArt=hasArt;state.pending=null;library.setAttribute('aria-busy','false');
+   if(route!=='library')return;
+   const focused=document.activeElement,homeTitle=$('studioLibraryTitle'),welcomeTitle=$('studioWelcomeTitle');
+   // A read may finish after the child has chosen an action. Never replace that
+   // interaction on this visit, including a later passive storage refresh.
+   // Explicit Home advances the view and can use the cached result then.
+   if(epoch!==capturedView||(focused!==document.body&&focused!==homeTitle&&focused!==welcomeTitle)){
+    if(!hasArt&&welcome.element.hidden)state.deferredView=epoch;
+    return;
+   }
+   act(()=>{
+    refreshWelcome();
+    if(focused===homeTitle&&!welcome.element.hidden)focusView(welcomeTitle);
+    else if(focused===welcomeTitle&&welcome.element.hidden)focusView(homeTitle);
+   });
+  });
+  return state.pending;
+ }
+ function refreshWelcome(){
+  // Existing scene creators and established makers keep their normal home.
+  // A damaged scene store is not a new account and must not be overwritten.
+  let hasScenes=true;
+  try{hasScenes=new CreationStore(profileStorage(localStorage)).list(owner()).length>0;}catch{}
+  void readWelcomeArt();
+  const visible=!welcomeArt!.hasArt&&welcomeArt!.deferredView!==epoch&&!notebook.guidance(owner()).welcomeDismissed&&!hasMeaningfulCreation(notebook.list(owner()),owner())&&!notebook.avatar(owner())&&!hasScenes;
+  library.dataset.firstVisit=String(visible);welcome.update(visible,welcomeAvailability());
+  document.body.classList.toggle('studio-first-visit',visible&&route==='library');
+ }
  const journey=installGemJourney({
   onBack:()=>act(home),onCreate:()=>act(newIdea),
+  onPrimaryAction:ownerId=>act(async()=>{
+   if(ownerId!==owner())return;
+   if(guardMath())return;
+   const target=journeyContinuation();
+   if(!target){newIdea();return;}
+   await open(target.id,false);
+   if(owner()===ownerId&&activeId===target.id&&route==='studio')setTab(gemStage(target)==='cut'?'versions':'talk');
+  }),
   onChooseCharacter:(character,ownerId)=>{
    if(ownerId!==owner())throw Error('Choose a maker for the current player.');
    notebook.setAvatar(ownerId,character);
@@ -186,8 +323,9 @@ export async function installStudio(){
  document.querySelector('main')!.append(journey.element);
  function rewardJourney(){const progress=builderJourney(notebook.list(owner()),owner());return {ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction};}
  const rewardsPage=createRewardsPage({
-  state:{...rewards.state,journey:rewardJourney()},onBack:()=>act(home),onOpenJourney:()=>act(()=>openJourney()),
-  onPlay:()=>act(()=>{stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';}),
+  guidance:guideHost,
+  state:{...rewards.state,journey:rewardJourney()},onBack:()=>act(home),onOpenJourney:()=>act(()=>openJourney(!notebook.avatar(owner()))),
+  onPlay:()=>act(()=>openPractice()),onActivity:activity=>act(()=>openRewardActivity(activity)),
   onCreate:()=>act(newIdea),onRetry:()=>{void rewards.refresh().catch(()=>{});}
  });
  document.querySelector('main')!.append(rewardsPage.element);
@@ -213,43 +351,68 @@ export async function installStudio(){
   },180);
  });
  function openRewards(){
-  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();disposeGame();FG.app.page('home');
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));
   route='rewards';globalStatus.textContent='';renderRewards();rewardsPage.show();
-  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.id==='studioNavRewards'));
+  setActiveNav('studioNavRewards');
   window.scrollTo(0,0);void rewards.refresh().catch(()=>{});
  }
  rewards.setOpen(()=>act(openRewards));
- window.addEventListener('factory-page',()=>rewardsPage.hide());
+ window.addEventListener('factory-page',()=>{rewardsPage.hide();document.body.classList.remove('studio-first-visit');closeJourneyMap();globalStatus.textContent='';globalStatus.classList.remove('is-error');globalStatus.setAttribute('role','status');});
  window.addEventListener('factory-profile',()=>{clearRewardCelebration();rewardsPage.hide();});
  window.addEventListener('pagehide',clearRewardCelebration);
  // Background builds are visible on every Studio screen without taking focus.
  const buildShelf=el('aside','studio-build-shelf');buildShelf.id='studioBuildShelf';
  buildShelf.setAttribute('aria-label','Background game builds');buildShelf.hidden=true;globalStatus.after(buildShelf);
+
+ function playWhileBuilding(s:StudioSession){
+  if(owner()!==s.owner||guardMath())return;
+  const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
+  if(!latest.job||(!busy(latest)&&!ready))return;
+  stopSpeech();flushDraft();++viewIntent;
+  if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;render();}
+  waitProject={id:s.id,owner:s.owner};
+  waitArcade.open({
+   projectName:s.name,status:unknownJobs.has(s.id)?'reconnecting':latest.job.status as WorkshopStatus,
+   isReady:!!ready,
+   onClose:()=>{waitProject=null;if(activeId&&owner()===s.owner&&route==='studio')render();},
+   onBackToStudio:()=>act(async()=>{
+    if(owner()!==s.owner)return;
+    await open(s.id,false);
+    if(owner()===s.owner&&activeId===s.id&&route==='studio')setTab('talk');
+   }),
+   onPlayReady:()=>act(async()=>{
+    if(owner()!==s.owner)return;
+    const fresh=notebook.get(s.id,s.owner),candidate=readyExperiment(fresh);
+    if(!candidate?.candidate.remoteId)return;
+    await open(s.id,false);
+    const newest=notebook.get(s.id,s.owner),selected=readyExperiment(newest);
+    if(selected?.candidate.remoteId)await showRemote(newest,selected.candidate.remoteId,'candidate',selected.id);
+   })
+  });
+ }
  function refreshShelf(){
   const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
-  buildShelf.append(el('strong','','🏗️ My builds & tests'));
+  buildShelf.append(iconEl('strong','','clock','My builds & tests'));
   const items=el('div','studio-build-items');
   for(const s of jobs.slice(0,4)){
-   const state=readyExperiment(s)?'✨ Your test is ready':s.job!.status==='failed'?'Build needs help · current game safe':
+   const state=readyExperiment(s)?s.projectId||s.remoteId?'Your change is ready':'Your game is ready':s.job!.status==='failed'?'Build needs help · current game safe':
     unknownJobs.has(s.id)||remote.mode!=='remote'?'Status unknown · checking connection':s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
     s.job!.status==='testing'?'Testing your game':'Building your idea';
    const item=el('div','studio-build-item'),copy=el('div','studio-build-copy'),controls=el('div','studio-build-item-actions');
    copy.append(el('strong','',s.name),el('span','',state));
-   const openButton=el('button','studio-button',readyExperiment(s)?'Try ready test':'Open game') as HTMLButtonElement;
+   const openButton=iconEl('button','studio-button','play',readyExperiment(s)?s.projectId||s.remoteId?'Try ready test':'Play my game':'Open game') as HTMLButtonElement;
    openButton.type='button';openButton.onclick=()=>act(async()=>{
     if(guardMath())return;
-    await open(s.id);
-    if(owner()!==s.owner||route!=='studio'||activeId!==s.id)return;
-    const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
-    if(ready?.candidate.remoteId)await showRemote(latest,ready.candidate.remoteId,'candidate',ready.id);
+    const latest=notebook.get(s.id,s.owner);
+    if(readyExperiment(latest))await openReadySession(s.id,s.owner);else await open(s.id);
    });controls.append(openButton);
    if(busy(s)){
-    const stop=el('button','studio-button studio-stop-build','Stop build') as HTMLButtonElement;
+    const stop=iconEl('button','studio-button studio-stop-build','stop','Stop build') as HTMLButtonElement;
     stop.type='button';stop.setAttribute('aria-label','Stop build for '+s.name);
     stop.onclick=()=>{
-     stop.disabled=true;stop.textContent='Stopping…';
+     stop.disabled=true;setIconLabel(stop,'stop','Stopping…');
      void (async()=>{
       try{
        const result=await clientFor(s).cancel(s.job!.id);
@@ -262,17 +425,22 @@ export async function installStudio(){
      })();
     };controls.append(stop);
    }
+   if(busy(s)){
+    const mini=el('button','studio-button studio-wait-arcade-button','💎 Mind Your Jems!') as HTMLButtonElement;
+    mini.type='button';mini.setAttribute('aria-label','Play Mind Your Jems while '+s.name+' is building');
+    mini.onclick=()=>act(()=>playWhileBuilding(s));controls.prepend(mini);
+   }
    item.append(copy,controls);items.append(item);
   }
   buildShelf.append(items);
   if(jobs.some(busy)){
-   const actions=el('div','studio-build-actions'),play=el('button','studio-button','🎮 Ready to Play jems') as HTMLButtonElement;
+   const actions=el('div','studio-build-actions'),play=iconEl('button','studio-button','play','Ready to Play jems') as HTMLButtonElement;
    if(route==='studio'&&activeId&&jobs.some(s=>s.id===activeId)){
-    const keep=el('button','studio-button','▶ Keep playing') as HTMLButtonElement;
+    const keep=iconEl('button','studio-button','play','Keep playing') as HTMLButtonElement;
     keep.type='button';keep.onclick=()=>act(playViewed);actions.append(keep);
    }
    play.type='button';play.onclick=()=>act(home);
-   const practice=el('button','studio-button','⚡ Extra practice (optional)') as HTMLButtonElement;
+   const practice=iconEl('button','studio-button','book','Extra practice (optional)') as HTMLButtonElement;
    practice.type='button';practice.onclick=()=>act(()=>{if(guardMath())return;stopSpeech();flushDraft();disposeGame();FG.app.page('lab');route='other';});
    actions.append(play,practice);buildShelf.append(actions);
   }
@@ -286,7 +454,85 @@ export async function installStudio(){
  updateProfile();
  function focusView(target:HTMLElement){if(!target.isConnected||target.closest('[hidden],.hidden,[inert]'))return;target.focus({preventScroll:true});target.scrollIntoView({block:'nearest',behavior:'instant'});}
  function guardMath(){if(!FG.learning.active)return false;status('Your learning activity is still here. Finish it, or choose My Games to leave.');FG.learning.focus?.();return true;}
- function readyExperiment(s:StudioSession){return s.job?.status==='ready'&&s.job.revisionId?s.experiments?.find(e=>e.candidate.remoteId===s.job!.revisionId&&e.candidate.remoteId!==s.remoteId&&e.id!==s.selectedTest):undefined;}
+ function readyExperiment(s:StudioSession){return readyGuidedExperiment(s);}
+ function refreshStudioGuide(){
+  if(!activeId||route!=='studio'||FG.learning.active||panel==='versions'){studioGuideHost.hidden=true;return;}
+  // The learning host can announce disposal while a profile switch is between
+  // its owner change and Studio's reset. Never read the previous owner's view.
+  const s=notebook.list(owner()).find(session=>session.id===activeId);
+  if(!s){studioGuideHost.hidden=true;return;}
+  const capturedOwner=s.owner,capturedId=s.id;
+  let tip:GuideTipId='play',copy=GUIDE_TIPS.play;
+  let action:{label:string;run:()=>void}|undefined;
+  const ready=readyExperiment(s),hasGame=!!(s.projectId||s.remoteId);
+  if(ready){
+   tip='ready';copy={title:hasGame?'Your change is ready to try':'Your game is ready to play',description:GUIDE_TIPS.ready.description};
+   action={label:hasGame?'Try my change':'Play my game',run:()=>act(()=>openReadySession(capturedId,capturedOwner))};
+  }else if(busy(s)){
+   tip='waiting';copy=unknownJobs.has(s.id)?{title:'Your idea is safe',description:'We are checking the connection. The build may still be working; you can keep playing.'}:GUIDE_TIPS.waiting;
+   action={label:'Play while I wait',run:()=>act(()=>playWhileBuilding(current()))};
+  }else if(s.candidate&&showing==='candidate'&&panel==='game'){
+   tip='keep';copy=hasGame?GUIDE_TIPS.keep:{title:'Your first playable version',description:'Give it a try. If you like it, choose Make this my main game. You can change it again later.'};
+  }else if(!hasGame&&!s.candidate){
+   tip='idea';copy=GUIDE_TIPS.idea;
+   if(s.job?.status==='failed')copy={title:'Your idea is still here',description:'The build did not finish. Your words are saved. You can change your idea or choose Try build again.'};
+  }else if(panel==='talk'){
+   tip='improve';copy=GUIDE_TIPS.improve;
+  }else if(keptInThisView===s.id){
+   tip='saved';copy={title:'Your favorite is kept',description:'Your earlier versions are still in My tests. Keep playing, try another idea, or come back later.'};
+   action={label:'Done for now',run:()=>act(()=>{home();status('Your chosen version is kept. Find it here when you come back.');})};
+  }else{
+   action={label:'Try one change',run:()=>act(()=>{if(setTab('talk'))focusView($('studioPrompt'));})};
+  }
+  const signature=JSON.stringify([s.owner,s.id,tip,copy,action?.label]);
+  // Keep guidance after the task it explains and inside the visible phone panel.
+  const nearComposer=panel==='talk'||s.game==='new'&&!hasGame&&!s.candidate;
+  const moveGuide=studioGuideHost.parentElement!==(nearComposer?$('studioConversation'):$('studioCanvas'));
+  let focusedGuideControl:'action'|'dismiss'|undefined;
+  if((moveGuide||signature!==guideSignature)&&currentGuide?.contains(document.activeElement))focusedGuideControl=document.activeElement?.id==='studioGuideCardAction'?'action':'dismiss';
+  if(moveGuide){if(nearComposer)$('studioPromptForm').after(studioGuideHost);else $('studioGameHost').after(studioGuideHost);}
+  if(signature!==guideSignature){
+   // A background status change may replace this hint while its controls have
+   // keyboard focus. Preserve that position without pulling focus from play.
+   guideSignature=signature;
+   currentGuide=createGuideCard({id:'studioGuideCard',tip,...copy,host:guideHost,action,
+    canAct:()=>owner()===capturedOwner&&activeId===capturedId&&route==='studio'&&!FG.learning.active,
+    onError:message=>status(message,true),
+    onDismiss:()=>{studioGuideHost.hidden=true;focusView(panel==='talk'?$('studioPromptLabel'):$('studioTitle'));},
+   });
+   studioGuideHost.replaceChildren(currentGuide);
+  }else currentGuide?.refresh();
+  studioGuideHost.hidden=!!currentGuide?.hidden;
+  if(focusedGuideControl){
+   const target=studioGuideHost.hidden?$('studioTitle'):
+    currentGuide?.querySelector<HTMLButtonElement>(focusedGuideControl==='action'?'#studioGuideCardAction':'#studioGuideCardDismiss')||
+    currentGuide?.querySelector<HTMLButtonElement>('#studioGuideCardDismiss');
+   target?.focus({preventScroll:true});
+  }
+ }
+ async function openReadySession(id:string,capturedOwner=owner()){
+  if(owner()!==capturedOwner||guardMath())return;
+  const s=notebook.get(id,capturedOwner);
+  if(s.archived)return;
+  if(route!=='studio'||activeId!==id)await open(id,false);
+  if(owner()!==capturedOwner||route!=='studio'||activeId!==id)return;
+  const latest=notebook.get(id,capturedOwner),ready=readyExperiment(latest);
+  if(ready?.candidate.remoteId)await showRemote(latest,ready.candidate.remoteId,'candidate',ready.id);
+  else if(latest.candidate)await playCandidate();
+  else if(latest.projectId||latest.remoteId)await playWorking();
+  else setTab('talk');
+ }
+ async function continueRecommended(id:string,capturedOwner:string){
+  if(owner()!==capturedOwner||guardMath())return;
+  const s=notebook.get(id,capturedOwner);
+  if(s.archived||s.resumeDismissed){renderLibrary();return;}
+  if(readyExperiment(s)){await openReadySession(id,capturedOwner);return;}
+  if(s.candidate){await open(id,false);if(owner()===capturedOwner&&activeId===id&&route==='studio')await playCandidate();return;}
+  if(busy(s)||s.job?.status==='failed'||s.draft.trim()||!s.projectId&&!s.remoteId){
+   await open(id,false);if(owner()===capturedOwner&&activeId===id&&route==='studio')setTab('talk');return;
+  }
+  await open(id);
+ }
 
  const stageFor=(s:StudioSession)=>gemStage(s);
  const levelForOwner=()=>builderJourney(notebook.list(owner()),owner());
@@ -308,14 +554,18 @@ export async function installStudio(){
  }
  function renderJourney(){
   const progress=levelForOwner();
-  journey.render({ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction});
+  journey.render({ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction,primaryActionLabel:journeyContinuation()?'Continue my jem':'Make a jem'});
+ }
+ function journeyContinuation(){
+  const sessions=notebook.list(owner()).filter(s=>!s.archived&&!busy(s));
+  return sessions.find(s=>gemStage(s)==='cut')||sessions.find(s=>gemStage(s)==='rough')||null;
  }
  function hideJourney(){journey.closeCharacterPicker(false);journey.element.hidden=true;journey.element.classList.add('hidden');}
  function openJourney(choose=false){
-  if(guardMath())return;stopSpeech();flushDraft();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));
   journey.element.hidden=false;journey.element.classList.remove('hidden');route='journey';globalStatus.textContent='';renderJourney();
-  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.id==='studioNavJourney'));
+  setActiveNav('studioNavJourney');
   window.scrollTo(0,0);focusView($('jemsJourneyTitle'));if(choose)journey.openCharacterPicker();
  }
  function renderGemBadge(s:StudioSession){
@@ -327,7 +577,7 @@ export async function installStudio(){
   homeCharacters.replaceChildren();
   for(const choice of character?[character]:['spark','nova'] as const)homeCharacters.append(createJourneyCharacter(choice,Math.max(1,progress.level)));
   homeCharacters.classList.toggle('is-pair',!character);
-  homeCharacterLink.textContent=character?'My journey →':'Choose your maker';
+  setIconLabel(homeCharacterLink,'star',character?'My journey':'Choose your maker');
   gemSummary.hidden=progress.level===0;gemSummary.replaceChildren();
   if(progress.level===0)return;
   const open=el('button','jems-builder-open') as HTMLButtonElement;open.id='studioJourneyOpen';open.type='button';
@@ -336,7 +586,7 @@ export async function installStudio(){
   copy.append(el('small','','My journey · Level '+progress.level),el('strong','',progress.name));
   const steps=el('span','jems-builder-steps');steps.setAttribute('aria-hidden','true');
   for(let level=1;level<=4;level++){const gem=createJourneyGem(level);gem.classList.toggle('is-earned',level<=progress.level);steps.append(gem);}
-  open.append(art,copy,steps,el('span','jems-builder-arrow','→'));open.onclick=()=>act(()=>openJourney());gemSummary.append(open);
+  const arrow=el('span','jems-builder-arrow');arrow.append(createIcon('arrow'));open.append(art,copy,steps,arrow);open.onclick=()=>act(()=>openJourney());gemSummary.append(open);
  }
  function onSavedDesignChange(before:StudioSession,after:StudioSession){
   if(before.owner!==owner()||after.owner!==owner()||before.id!==activeId)return;
@@ -378,12 +628,14 @@ export async function installStudio(){
   document.querySelectorAll('[data-studio-tab]').forEach(b=>b.setAttribute('aria-pressed',String((b as HTMLElement).dataset.studioTab===tab)));
   if(tab==='versions'){$('studioVersions').hidden=false;renderVersions();focusView($('studioVersionsTitle'));}else $('studioVersions').hidden=true;
   if(tab==='talk'){focusView($('studioPromptLabel'));void privateSpeech?.refresh();}
+  refreshStudioGuide();
   return true;
  }
  function showStudio(){
-  hideJourney();
+  document.body.classList.remove('studio-first-visit');closeJourneyMap();
+  hideJourney();rewardsPage.hide();FG.problemSolving?.close();
   document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));page.classList.remove('hidden');route='studio';
-  nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));globalStatus.textContent='';
+  setActiveNav(activeId&&current().game==='new'?'studioNavCreate':'studioNavHome');globalStatus.textContent='';
  }
  function clearPausedPreview(){pausedPreview.hidden=true;pausedPreview.replaceChildren();}
  function capturePausedPreview(){
@@ -400,8 +652,8 @@ export async function installStudio(){
     for(let i=3;i<pixels.length;i+=4)if(pixels[i]){frame.setAttribute('role','img');frame.setAttribute('aria-label',name+' — paused scene');scene.append(frame);break;}
    }
   }catch{/* A missing or unreadable frame still gets the named placeholder below. */}
-  if(!scene.childElementCount){const symbol=el('span','studio-paused-symbol','Ⅱ');symbol.setAttribute('aria-hidden','true');scene.append(symbol);}
-  caption.append(el('strong','',name),el('p','','Your game is waiting. Your construction is saved; action games start a new round.'));const back=el('button','studio-button studio-primary','Back to this game →');back.id='studioReturnToPlay';back.onclick=()=>act(playViewed);caption.append(back);
+  if(!scene.childElementCount){const art=el('img','jems-paused-art') as HTMLImageElement;art.src='./jems-art/character_spark_rest.webp';art.alt='';art.width=1254;art.height=1254;art.decoding='async';art.setAttribute('aria-hidden','true');scene.append(art);}
+  caption.append(el('strong','',name),el('p','','Your game is waiting. Your construction is saved; action games start a new round.'));const back=iconEl('button','studio-button studio-primary','play','Back to this game');back.id='studioReturnToPlay';back.onclick=()=>act(playViewed);caption.append(back);
   pausedPreview.append(scene,caption);pausedPreview.hidden=false;
  }
  function disposeGame(keepScene=false){
@@ -415,6 +667,7 @@ export async function installStudio(){
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;
   note.textContent=!configReady?'Checking which creation tools are ready…':builderReadiness==='not-configured'?'Game building is not connected yet. Your idea will still save.':builderReadinessCopy(builderReadiness)+'. Your ideas stay saved here.';
+  welcome.update(!welcome.element.hidden,welcomeAvailability());
  }
  function refreshLearningChoice(){
    const p=FG.store.current(),subject=FG.learning.subject,both=!!p.allowSubjectSwitch;
@@ -438,6 +691,20 @@ export async function installStudio(){
    try{FG.learning.setSubject(subject);refreshLearningChoice();if(route==='studio')$('studioStatus').textContent='';else globalStatus.textContent='';}
    catch(error){globalStatus.textContent=(error as Error).message;}
  }
+ function openPractice(subject?:'math'|'language'){
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();
+  // The existing learning host enforces the grown-up's allowed subject choices.
+  if(subject&&FG.learning.subject!==subject)FG.learning.setSubject(subject);
+  refreshLearningChoice();hideJourney();disposeGame();FG.app.page('lab');route='other';
+ }
+ function openRewardActivity(activity:RewardsActivity){
+  if(activity==='making'){newIdea();return;}
+  if(activity==='coding'){
+   if(FG.creation?.openChallenges)FG.creation.openChallenges();else status('Create & code is still opening. Try again in a moment.');
+   return;
+  }
+  openPractice(activity);
+ }
  async function refreshServiceReadiness(){
   if(remote.mode!=='remote')return;
   const actor=owner(),at=epoch;
@@ -454,21 +721,23 @@ export async function installStudio(){
   else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
   if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
   else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unverified';
-  if(activeId)render();else updateCreationNote();
+  if(route==='library')updateCreationNote();else if(activeId)render();
  }
  function renderLibrary(){
   refreshLearningChoice();
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
   // Import references to existing local remixes without copying or migrating their data.
   for(const p of games.list(owner())) if(!entries.some(s=>s.projectId===p.id))entries.push({...notebook.create(owner(),p.game,p.name,p.id)});
-  const last=notebook.last(owner());$('studioContinue').replaceChildren();
-  if(last){
+  const next=recommendNext(entries,owner(),notebook.last(owner())?.id);$('studioContinue').replaceChildren();
+  const last=next?entries.find(session=>session.id===next.sessionId):null;
+  if(last&&next){
    const banner=el('div','studio-continue'),art=el('span','studio-continue-art',icon[last.game]),description=el('div','studio-continue-copy');
+   banner.dataset.nextKind=next.kind;
    art.setAttribute('aria-hidden','true');
-   description.append(el('strong','',last.name));
-   const continueButton=el('button','studio-button studio-primary',last.projectId||last.remoteId?'▶ Continue playing':'✦ Continue my idea') as HTMLButtonElement;
-   continueButton.type='button';continueButton.id='studioContinuePlaying';continueButton.onclick=()=>act(()=>open(last.id));
-   const dismiss=el('button','studio-continue-close','×') as HTMLButtonElement;
+   description.append(el('span','studio-next-kind',next.title),el('strong','',last.name),el('span','studio-next-description',next.description));
+   const continueButton=iconEl('button','studio-button studio-primary',next.kind==='ready'||next.kind==='play'||next.kind==='experiment'?'play':'edit',next.action) as HTMLButtonElement;
+   continueButton.type='button';continueButton.id='studioContinuePlaying';continueButton.onclick=()=>act(()=>continueRecommended(last.id,last.owner));
+   const dismiss=iconEl('button','studio-continue-close','close','') as HTMLButtonElement;
    dismiss.type='button';dismiss.id='studioDismissResume';dismiss.title='Dismiss reminder';
    dismiss.setAttribute('aria-label','Dismiss reminder for '+last.name);
    dismiss.onclick=()=>act(()=>{notebook.dismissResume(last.id,last.owner);renderLibrary();});
@@ -483,18 +752,19 @@ export async function installStudio(){
    const card=el('article','studio-library-card studio-saved-card');card.setAttribute('data-session',s.id);
    const state:'building'|'ready'|'playable'|'idea'=busy(s)?'building':readyExperiment(s)||s.candidate?'ready':s.projectId||s.remoteId?'playable':'idea';
    const label={building:'Working on your idea',ready:'A test is ready to try',playable:'Ready to play',idea:'Idea · not built yet'}[state];
-   const badge={building:'Tools at work',ready:'✦ Test ready',playable:'✦ Playable jem',idea:'✦ Your idea'}[state];
+   const badge={building:'Tools at work',ready:'Test ready',playable:'Playable jem',idea:'Your idea'}[state];
    card.dataset.jemsState=state;
    const openButton=el('button','studio-saved-open') as HTMLButtonElement;
    openButton.type='button';openButton.setAttribute('aria-label','Open '+s.name);
-   openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),el('span','studio-card-link','Open my game →'));
+   const cardAction=state==='ready'?s.projectId||s.remoteId?'Try my change':'Play my game':state==='idea'?'Open my idea':'Open my game';
+   openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),iconEl('span','studio-card-link','arrow',cardAction));
    const stage=stageFor(s);
     if(stage!=='none'){
      const gemLabel=el('span','jems-gem-status');
      const gemArt=createJourneyGem(stageNumber(stage));
      gemLabel.append(gemArt,el('span','',GEM_STAGE_LABELS[stage]));openButton.append(gemLabel);
     }
-    openButton.onclick=()=>act(()=>open(s.id));
+    openButton.onclick=()=>act(()=>state==='ready'?openReadySession(s.id,s.owner):open(s.id));
    const putAway=el('button','studio-put-away',busy(s)?'Stop build first':'Put away') as HTMLButtonElement;
    putAway.type='button';putAway.disabled=busy(s);
    putAway.setAttribute('aria-label',busy(s)?'Stop the build before putting away '+s.name:'Put away '+s.name);
@@ -543,30 +813,35 @@ export async function installStudio(){
    }
    art.append(el('span','jems-world-chip',worldLabels[game]));
    const info=el('span','studio-card-info');
-   info.append(el('span','studio-card-name',names[game]),el('span','studio-card-state',descriptions[game]),el('span','studio-card-link','Play & make it yours  →'));
+   info.append(el('span','studio-card-name',names[game]),el('span','studio-card-state',descriptions[game]),iconEl('span','studio-card-link','play','Play & make it yours'));
    b.append(art,info);b.onclick=()=>act(()=>start(game));starters.append(b);
-  });installQualityCards();updateCreationNote();
+  });installQualityCards();updateCreationNote();refreshWelcome();
  }
- function home(){stopSpeech();flushDraft();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.id==='studioNavHome'));window.scrollTo(0,0);focusView($('studioLibraryTitle'));}
+ function home(){stopSpeech();flushDraft();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
+ function openSavedIdeas(){
+  if(guardMath())return;stopSpeech();flushDraft();FG.creation?.flush();hideJourney();
+  $<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('creations');route='other';
+  document.body.classList.remove('studio-designing');setActiveNav('studioNavHome');focusView(collectionTitle);
+ }
  function start(game:GameId){
   const existing=notebook.list(owner()).find(s=>s.game===game&&s.playOnly);if(existing)return open(existing.id);
   const p=games.create(owner(),game,`My ${names[game]}`,defaults(game,FG.store.current().remixes?.[game]||'classic'));
   const s=notebook.create(owner(),game,p.name,p.id);notebook.update(s.id,s.owner,x=>{x.playOnly=true;});message(s,'helper','Play first. When you want to test an idea, your original game stays safe.');return open(s.id);
  }
  function leaveCreationForStudio(){
+  if(guardMath())return false;
   const creationPage=document.getElementById('page-creation');
   if(!creationPage||creationPage.classList.contains('hidden'))return true;
-  if(guardMath())return false;
   // Save the scene before changing Studio selection. The normal page event
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
  function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
- async function open(id:string){
+ async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
-  stopSpeech();flushDraft();disposeGame();notebook.select(id,owner());activeId=id;reflecting=false;lastOutcome=null;showing='working';status('');
+  stopSpeech();flushDraft();disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
   const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper');coaching?.openSession();$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();setTab('game');focusView($('studioTitle'));
-  if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else{$('studioEmpty').hidden=false;setTab('talk');}
+  if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;setTab('talk');}}
   if(s.job&&busy(s)&&remote.mode==='remote'&&s.job.api===remote.apiBaseUrl&&!clients.has(s.id))resume(s);
  }
  function renderConversation(){
@@ -587,6 +862,8 @@ export async function installStudio(){
   if(!activeId)return;const s=current(),working=s.projectId?games.revision(s.projectId,s.owner):null;refreshShelf();
   refreshGameSubject();FG.learning.modeControl($('studioMathMode'),s.id);$('studioTitle').textContent=s.name;$('studioStorage').textContent=s.remoteId||s.candidate?.remoteId?'Private family game · local conversation':'Saved on this device';
   renderGemBadge(s);
+  const sceneAction=$('studioMakeScene');
+  if(sceneAction)setIconLabel(sceneAction,'grid',s.remoteId||s.candidate?.remoteId||['dragon','buckets','robot'].includes(s.game)&&s.projectId?'Animate & code':'Start a separate scene');
   const n=s.projectId?games.history(s.projectId,s.owner).findIndex(r=>r.id===working?.id)+1:0;
   $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · version ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
   $('studioPreviewNotice').hidden=showing==='working';
@@ -604,25 +881,27 @@ export async function installStudio(){
   workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
   const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id));
   progressBanner.hidden=!progress;
+  arcadeButton.hidden=!busy(s);
   progressBanner.dataset.phase=progress?.phase||'';
   progressTitle.textContent=progress?.title||'';
   progressDetails.textContent=progress?.description||'';
+  $('studioConversation').dataset.helperState=s.design?.paused||progress?.phase==='cancelled'?'rest':'wave';
   
   $<HTMLButtonElement>('studioPlay').disabled=!(working||s.remoteId||s.candidate);
-  $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);$('studioPlay').textContent=pausedForTools?'▶ Back to my game':'▶ Play';
+  $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);setIconLabel($('studioReady'),'play',s.projectId||s.remoteId?'Try your ready test':'Play my game');$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);setIconLabel($('studioPlay'),'play',pausedForTools?'Back to my game':'Play');
   $<HTMLButtonElement>('studioUndo').disabled=!s.candidate&&!working?.parentId&&!s.remoteId;
   $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&(!working||!games.history(s.projectId!,s.owner).some(r=>r.parentId===working.id)));
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
-  $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving;$('studioSend').textContent=reflecting?'Save thought →':'Try a change →';
+  $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving;
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
   $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?(hasIdea?'What happens next in your game?':'Tell jems your game idea'):'Tell jems what you want to discuss or change';
   // A child who already told jems an idea can choose Build without repeating it.
   $<HTMLTextAreaElement>('studioPrompt').required=!(creating&&s.messages.some(m=>m.role==='child'));
-  $('studioSend').textContent=reflecting?'Save thought →':creating?'✨ Build my game':'Try a change →';
+  setIconLabel($('studioSend'),reflecting?'save':creating?'add':'arrow',reflecting?'Save thought':creating?'Build my game':'Try a change');
   $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=s.job?.status!=='failed';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
   if(s.projectId&&!s.remoteId)(examples[s.game as GameId]||[]).slice(0,2).forEach(text=>{const b=el('button','studio-chip',text);b.setAttribute('type','button');b.onclick=()=>{reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value=text;flushDraft();render();$('studioPrompt').focus();};suggestions.append(b);});
-  renderConversation();if(panel==='versions'&&!document.activeElement?.closest('#experimentShelf'))coaching?.renderShelf();
+  renderConversation();refreshStudioGuide();if(panel==='versions'&&!document.activeElement?.closest('#experimentShelf'))coaching?.renderShelf();
  }
  function mountNative(){
   pausedForTools=false;$<HTMLDetailsElement>('studioMore').open=false;$('studioEmpty').hidden=true;$('studioRemoteHost').hidden=true;
@@ -645,7 +924,8 @@ export async function installStudio(){
   if(!canChangePlay(s))return false;
   const playedTest=view==='candidate'?s.candidate?.id||s.selectedTest||null:null;
   disposeGame();lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
-  FG.app.openGame(s.game,{config,stateKey:key,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
+  const boundRevision=s.projectId?games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined)):null;
+  FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
     announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`,false,playedTest);
@@ -771,6 +1051,10 @@ export async function installStudio(){
     notebook.update(captured.id,captured.owner,s=>{s.pendingExperiment=null;});
     if(owner()===captured.owner){const achievement=gemAchievement(before,notebook.get(captured.id,captured.owner));updateProfile();if(achievement&&!FG.learning.active){celebrateProgress(achievement);celebratedLevel=true;}}
   }
+  if(waitProject?.id===captured.id&&waitProject.owner===captured.owner&&waitArcade.isOpen()){
+   const latest=notebook.get(captured.id,captured.owner);
+   if(latest.job)waitArcade.update(latest.job.status as WorkshopStatus,!!readyExperiment(latest));
+  }
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){
    status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]||'Your working game is safe.');render();
    // Only a confirmed new real revision earns the playable burst; never a mock or queued job.
@@ -782,7 +1066,7 @@ export async function installStudio(){
    if(owner()===captured.owner){
     refreshShelf();
     if(job.status==='ready'&&prior.job?.status!=='ready'&&(activeId!==captured.id||route!=='studio')&&!FG.learning.active)
-     globalStatus.textContent='✨ '+captured.name+' is ready to try. Your current game is safe.';
+     globalStatus.textContent=captured.name+' is ready to try. Your current game is safe.';
    }
  }
  const retryTimers=new Map<string,ReturnType<typeof setTimeout>>();
@@ -791,6 +1075,7 @@ export async function installStudio(){
    void clientFor(s).resume(s.job.id).catch(()=>{
     if(owner()!==s.owner)return;
     unknownJobs.add(s.id);refreshShelf();
+    if(waitProject?.id===s.id&&waitProject.owner===s.owner&&waitArcade.isOpen())waitArcade.update('reconnecting',false);
      if(activeId===s.id)status('Connection interrupted. The build may still be running. We will check again.');
     if(retryTimers.has(s.id))clearTimeout(retryTimers.get(s.id)!);
     retryTimers.set(s.id,setTimeout(()=>{retryTimers.delete(s.id);try{const latest=notebook.get(s.id,s.owner);if(busy(latest))resume(latest);}catch{/* original work remains */}},15000));
@@ -846,7 +1131,7 @@ export async function installStudio(){
      else notebook.update(s.id,s.owner,x=>{x.candidate=null;x.undone=null;});
      message(s,'helper',`Kept your change. Your earlier versions are still available in Versions.`);
     }else return;
-    if(sameView(s,at)){showing='working';status('Kept privately. Nothing was published.');updateProfile();celebrateProgress(gemAchievement(gemBefore,notebook.get(s.id,s.owner))||'kept','studioKeep');if(!FG.learning.active)await playWorking();}
+    if(sameView(s,at)){showing='working';keptInThisView=s.id;status('Kept privately. Nothing was published.');updateProfile();celebrateProgress(gemAchievement(gemBefore,notebook.get(s.id,s.owner))||'kept','studioKeep');if(!FG.learning.active)await playWorking();}
   }finally{saving=false;if(activeId===s.id&&owner()===s.owner)render();}
  }
  async function undo(){
@@ -896,10 +1181,10 @@ export async function installStudio(){
    return note||last?.text||'No notes yet';
   });
   const actions=document.createElement('tr'),label=document.createElement('th');label.scope='row';label.textContent='Try it';actions.append(label);
-  const main=document.createElement('td'),mainButton=el('button','studio-button','▶ Main game') as HTMLButtonElement;
+  const main=document.createElement('td'),mainButton=iconEl('button','studio-button','play','Main game') as HTMLButtonElement;
   mainButton.type='button';mainButton.onclick=()=>act(playWorking);main.append(mainButton);actions.append(main);
   for(const e of candidates){
-   const cell=document.createElement('td'),button=el('button','studio-button','▶ '+e.label) as HTMLButtonElement;
+   const cell=document.createElement('td'),button=iconEl('button','studio-button','play',e.label) as HTMLButtonElement;
    button.type='button';button.onclick=()=>act(async()=>{
     if(!canChangePlay(s))return;
     if(e.candidate.remoteId)await showRemote(s,e.candidate.remoteId,'candidate',e.id);
@@ -914,7 +1199,7 @@ export async function installStudio(){
  function renderVersions(){
   if(!activeId)return;coaching?.renderShelf();const s=current(),box=$('studioVersionCards');box.replaceChildren();
   if(s.projectId&&!s.remoteId){const currentRevision=games.revision(s.projectId,s.owner);for(const [i,r] of games.history(s.projectId,s.owner).entries()){
-    const card=el('article','studio-version-card');card.append(el('span','jems-version-badge',r.id===currentRevision.id?'✦ Your main version':'Saved version'),el('strong','',`Version ${i+1}${r.id===currentRevision.id?' · working':''}`),el('p','',r.label));
+    const card=el('article','studio-version-card');card.append(el('span','jems-version-badge',r.id===currentRevision.id?'Your main version':'Saved version'),el('strong','',`Version ${i+1}${r.id===currentRevision.id?' · working':''}`),el('p','',r.label));
     const detail=el('p','studio-version-detail',manifests[s.game as GameId].mechanics.map(m=>`${m.label}: ${human(r.config[m.key])}`).join(' · '));card.append(detail);
     const play=el('button','studio-button','Play this version');play.onclick=()=>act(()=>{if(playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id))status('Comparing only. Your working version has not changed.');});
     const restore=el('button','studio-button','Use this version');restore.onclick=()=>act(async()=>{if(!canChangePlay(s))return;if(current().candidate&&!confirm('Keep your saved conversation, discard the unkept preview, and use this version?'))return;games.checkout(s.owner,s.projectId!,r.id);notebook.update(s.id,s.owner,x=>{x.candidate=null;});await playWorking();renderVersions();});card.append(play,restore);box.append(card);
@@ -936,7 +1221,8 @@ export async function installStudio(){
  document.addEventListener('click',event=>{
   const target=(event.target as Element)?.closest<HTMLElement>('button,[data-page],[data-game]');if(!target||target.closest('#page-studio')||target.closest('#page-studio-library')||target.closest('.studio-nav'))return;
   if(target.classList.contains('profile-choice')){try{flushDraft();}catch(error){event.preventDefault();event.stopImmediatePropagation();status((error as Error).message,true);}return;}
-  if(target.id==='homeBtn'||target.id==='resultHome'||target.dataset.page==='home'||target.dataset.page==='creations'){event.preventDefault();event.stopImmediatePropagation();act(home);}
+  if(target.dataset.page==='creations'){event.preventDefault();event.stopImmediatePropagation();act(openSavedIdeas);}
+  else if(target.id==='homeBtn'||target.id==='resultHome'||target.dataset.page==='home'){event.preventDefault();event.stopImmediatePropagation();act(home);}
   else if(target.dataset.page==='create'){event.preventDefault();event.stopImmediatePropagation();act(newIdea);}
   else if(target.dataset.page==='feedback'||target.id==='improveThis'||target.id==='returnLive'){event.preventDefault();event.stopImmediatePropagation();act(()=>{if(activeId){showStudio();setTab('talk');$('studioPrompt').focus();}else home();});}
   else if(target.dataset.game){event.preventDefault();event.stopImmediatePropagation();act(()=>start(target.dataset.game as GameId));}
@@ -955,7 +1241,7 @@ export async function installStudio(){
  $('studioNavRewards').onclick=()=>act(openRewards);
  $('studioSubjectMath').onclick=()=>chooseLearningSubject('math');$('studioSubjectLanguage').onclick=()=>chooseLearningSubject('language');
  $('studioGameMath').onclick=()=>chooseLearningSubject('math');$('studioGameLanguage').onclick=()=>chooseLearningSubject('language');
- $('studioNavPowers').onclick=()=>act(()=>{stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';});
+ $('studioNavPowers').onclick=()=>act(()=>{if(guardMath())return;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';});
  $('studioPlay').onclick=()=>act(playViewed);$('studioKeep').onclick=()=>act(keep);$('studioUndo').onclick=()=>act(undo);
  $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;});await playCandidate();return;}if(!s.projectId)return;games.redo(s.owner,s.projectId);await playWorking();});
  $('studioCompare').onclick=()=>act(()=>{if(setTab('versions'))$<HTMLDetailsElement>('studioMore').open=false;});$('studioCloseVersions').onclick=()=>act(()=>{setTab('game');focusView($('studioReturnToPlay')||$('studioPlay'));});$('studioBackWorking').onclick=()=>act(playWorking);
@@ -967,7 +1253,7 @@ export async function installStudio(){
   const s=current();
   if(saving){status('Let this version finish saving before clearing chat.',true);return;}
   if(busy(s)||s.pendingExperiment){status('Finish or cancel this build before clearing chat.',true);return;}
-  if(!confirm('Clear this chat and its design notes on this device? Your saved game versions and any remote copies will remain.'))return;
+  if(!confirm('Clear this chat and its design notes on this device? Removing making evidence can lower your maker level and change your outfit. Your lifetime gems, saved game versions and any remote copies will remain.'))return;
   stopSpeech();coaching?.reset();chatOptions.open=false;
   notebook.clearConversation(s.id,s.owner);
   updateProfile();
@@ -984,17 +1270,21 @@ export async function installStudio(){
  $('studioReflectAnswer').onclick=()=>act(()=>{if(guardMath())return;reflecting=true;setTab('talk');render();focusView($('studioPrompt'));});$('studioReflectSkip').onclick=()=>act(()=>{const s=current();notebook.update(s.id,s.owner,x=>{x.reflection=false;});coaching?.pauseReflection();reflecting=false;render();void playViewed();});
  $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});$('studioRetry').onclick=()=>act(async()=>{const s=current();await clientFor(s).retry();});
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
- window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}});
+ window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}refreshStudioGuide();});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
- window.addEventListener('factory-profile',()=>{stopSpeech();hideJourney();
+ window.addEventListener('factory-profile',()=>{welcomeArt=null;waitArcade.close();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   $('studioMessages').replaceChildren();$('coachProposals').replaceChildren();
   $('coachModeStatus').textContent='';$<HTMLTextAreaElement>('studioPrompt').value='';
   $('studioVoiceStatus').textContent='';
   coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);void refreshServiceReadiness();resumeOutstanding();});
+ window.addEventListener('factory-art-updated',event=>{
+  if((event as CustomEvent).detail?.owner!==owner())return;
+  void readWelcomeArt(true);
+ });
  window.addEventListener('beforeunload',event=>{stopSpeech();if(!rewardSourceWritable())return;try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(route==='journey')act(renderJourney);else if(activeId)act(render);updateProfile();}});
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
@@ -1011,6 +1301,7 @@ export async function installStudio(){
  // Put live response status next to the conversation it describes, not below
  // unrelated experiment controls. It stays an accessible aria-live status.
  $('studioMessages').after($('coachModeStatus'));
+ setIconLabel($('studioChange'),'edit','Talk or change my game');
  const appendSpeechDraft=(text:string)=>{
   // Both speech paths produce a draft only. The child chooses Send or Build.
   const input=$<HTMLTextAreaElement>('studioPrompt');
@@ -1020,6 +1311,7 @@ export async function installStudio(){
  };
  voice=installStudioVoice({
   microphone:$<HTMLButtonElement>('studioMic'),installPack:$<HTMLButtonElement>('studioVoicePack'),
+  renderMicrophone:(state,label)=>{const button=$('studioMic');setIconLabel(button,state==='idle'?'mic':state==='recording'?'stop':'close',label);button.setAttribute('aria-label',state==='idle'?'Speak to jems using the microphone when supported':label);},
   hearReply:$<HTMLButtonElement>('studioHear'),status:$('studioVoiceStatus'),
   scope:()=>activeId?owner()+':'+activeId:'',
   canListen:()=>route==='studio'&&panel==='talk'&&!FG.learning.active,
@@ -1027,6 +1319,7 @@ export async function installStudio(){
  });
  privateSpeech=installStudioPrivateSpeech({
   button:privateMic,status:$('studioVoiceStatus'),
+  renderButton:(state,label)=>{setIconLabel(privateMic,state==='idle'?'mic':state==='recording'?'stop':'close',label);privateMic.setAttribute('aria-label',state==='idle'?'Speak using parent-approved private transcription, then review your message':label);},
   scope:()=>activeId?owner()+':'+activeId:'',
   canListen:()=>route==='studio'&&panel==='talk'&&!FG.learning.active,
   onAvailability:ready=>{
@@ -1079,7 +1372,10 @@ export async function installStudio(){
    await coaching!.tryPreset(prompt);
   })
  });
+ // Mount Home once. The bounded presence check can update this same view,
+ // without a second automatic navigation overriding a child's early choice.
  home();
+ await readWelcomeArt();
  try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI),{cache:'no-store'})).json());}catch{remote={version:1,mode:'unavailable'};}
  configReady=true;
  if(remote.mode!=='remote'){coachConnection='unavailable';builderReadiness='not-configured';}
@@ -1088,18 +1384,68 @@ export async function installStudio(){
  FG.studio={version:1,flushDraft,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.read(),mode:()=>remote.mode};
  let palsInterface:ReturnType<typeof installPalsInterface>;
  const creation=installCreationStudio({
-  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('creation');route='other';document.body.classList.remove('studio-designing');document.body.classList.add('creation-open');nav.querySelectorAll('button').forEach(button=>button.classList.toggle('active',button.id==='studioNavScenes'));return true;},
+  guidance:guideHost,
+  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('creation');route='other';document.body.classList.remove('studio-designing');document.body.classList.add('creation-open');setActiveNav('studioNavScenes');return true;},
   home,openGame:id=>open(id),onRewardSourceSaved:notifyRewardSourceSaved,
   ownedPals:()=>pals.state.profile?.owned.map(pal=>pal.id)??[],
   activePal:()=>pals.state.profile?.activeId??null,
   openPals:()=>palsInterface.open(),
  });
+ const artStudio=installArtStudio({
+  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();creation.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('art-studio');route='other';document.body.classList.remove('studio-designing','creation-open');setActiveNav('studioNavCreate');return true;},
+  home,
+  openScene:async art=>{await creation.openArt(art);},
+  openCar:async(rigId,isCurrent)=>{
+   if(!isCurrent()||guardMath())return;const capturedOwner=owner(),capturedEpoch=epoch;
+   const stillCurrent=()=>isCurrent()&&owner()===capturedOwner&&epoch===capturedEpoch;
+   const rig=await rigById(capturedOwner,rigId);if(!stillCurrent())return;
+   const source=await drawing(capturedOwner,rig.assembly.sourceId);
+   if(!stillCurrent()||guardMath())return;if(rig.assembly.kind!=='car')throw Error('Choose a saved car design for Rally.');
+   const picture=await createImageBitmap(drawingBlob(source));
+   try{if(!stillCurrent())return;vehicleGeometry(rig.assembly,picture.width/picture.height);}finally{picture.close();}
+   if(!stillCurrent()||guardMath())return;
+   if(!leaveCreationForStudio())return;flushDraft();
+   // Keep the two synchronous save steps together. If notebook storage was full
+   // on a previous attempt, recover that exact unlisted project instead of
+   // leaving it behind and creating another copy on every retry.
+   const listed=new Set(notebook.list(capturedOwner).map(item=>item.projectId));
+   const pending=games.list(capturedOwner).find(item=>item.game==='hill'&&!listed.has(item.id)&&games.revision(item.id,capturedOwner).drawingRigId===rig.id);
+   const p=pending??games.create(capturedOwner,'hill',(source.name+' Rally').slice(0,60),defaults('hill'),rig.id);
+   const session=notebook.create(capturedOwner,'hill',p.name,p.id);
+   // Actual retained game revisions are authoritative for art usage. Index
+   // repair is supplementary and cannot strand an already-saved game.
+   void registerArtUsage(capturedOwner,{targetId:p.id,targetKind:'game',drawingId:source.id,rigId:rig.id},()=>owner()===capturedOwner&&rewardSourceWritable()).catch(()=>{});
+   try{message(session,'helper','Your own drawing is driving this game. Its saved movement version stays with this adventure. Try it, then decide what you want to change.');}catch{/* The saved game remains available even if the optional welcome note cannot be written. */}
+   await open(session.id);
+  },
+ });
+ const artEntry=el('button','studio-scene-entry') as HTMLButtonElement;artEntry.id='studioArt';artEntry.type='button';
+ artEntry.innerHTML='<img src="./jems-art/character_spark_wave.webp" alt=""><span><strong>Bring your drawing to life</strong><small>Your own Art Studio. Draw, upload, give it movement, and reuse it in your games.</small></span><b aria-hidden="true">→</b>';
+ artEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));artEntry.onclick=()=>act(()=>artStudio.open());libraryTools.before(artEntry);
+ const artShortcut=iconEl('button','studio-button','edit','Art Studio') as HTMLButtonElement;artShortcut.id='studioArtShortcut';artShortcut.type='button';artShortcut.onclick=()=>act(()=>artStudio.open());libraryTools.prepend(artShortcut);
+ const creationArt=iconEl('button','creation-button','edit','My art & drawings') as HTMLButtonElement;creationArt.id='creationArtStudio';creationArt.type='button';creationArt.onclick=()=>act(()=>artStudio.open());$('creationShelfImport').after(creationArt);
+ const artFromIdea=iconEl('button','studio-button','edit','Use my drawing') as HTMLButtonElement;artFromIdea.id='studioUseDrawing';artFromIdea.type='button';artFromIdea.onclick=()=>act(()=>artStudio.open());$('studioHelp').after(artFromIdea);
+ const legacyArt=iconEl('button','studio-button','edit','Open Art Studio') as HTMLButtonElement;legacyArt.id='collectionArtStudio';legacyArt.type='button';legacyArt.onclick=()=>act(()=>artStudio.open());$('page-creations').querySelector('.page-head')!.append(legacyArt);
  installCreationProgress();
- const scenesNav=el('button','','✦ Create & code') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
+ const scenesNav=iconEl('button','','grid','Create & code') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
  const scenesEntry=el('button','studio-scene-entry') as HTMLButtonElement;scenesEntry.id='studioScenes';scenesEntry.type='button';
  scenesEntry.innerHTML='<img src="./jems-blocks.svg" alt=""><span><strong>Make your imagination move</strong><small>Tell a story with blocks, or watch a scene and rebuild it your way.</small></span><b aria-hidden="true">→</b>';
  // Keep a complete ready-to-play choice in the first mobile viewport.
  scenesEntry.onclick=()=>creation.open();$('studioFavoritesSection').after(scenesEntry);
+ const practice=installProblemSolvingPractice({
+  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();creation.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('problem-solving');route='other';document.body.classList.remove('studio-designing','creation-open');setActiveNav('studioNavProblemSolving');return true;},
+  home,
+ });
+ const practiceNav=iconEl('button','','help','Try an idea') as HTMLButtonElement;practiceNav.id='studioNavProblemSolving';practiceNav.type='button';practiceNav.onclick=()=>practice.open();scenesNav.after(practiceNav);
+ nav.classList.add('studio-nav-has-practice');document.querySelector('.site-header')!.classList.add('studio-practice-navigation');
+ const practiceEntry=el('button','studio-scene-entry') as HTMLButtonElement;practiceEntry.id='studioProblemSolving';practiceEntry.type='button';
+ practiceEntry.innerHTML='<img src="./jems-workbench.svg" alt=""><span><strong>Try an idea</strong><small>Make a guess, try a little test, and choose what to change.</small></span><b aria-hidden="true">→</b>';
+ practiceEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));
+ practiceEntry.onclick=()=>practice.open();scenesEntry.after(practiceEntry);
+ const scenePractice=iconEl('button','creation-button creation-quiet','arrow','Try a little experiment') as HTMLButtonElement;scenePractice.id='creationTryIdea';scenePractice.type='button';scenePractice.onclick=()=>practice.open();$('creationSubtitle').after(scenePractice);
+ window.dispatchEvent(new CustomEvent('factory-problem-solving-updated',{detail:{owner:owner()}}));
+  scenesEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));
+ const sceneButton=iconEl('button','studio-button','grid','Animate & code') as HTMLButtonElement;sceneButton.id='studioMakeScene';sceneButton.type='button';
  palsInterface=installPalsInterface({
   controller:pals,
   enter:()=>{
@@ -1111,7 +1457,6 @@ export async function installStudio(){
   home:()=>act(home),create:id=>{creation.openWithPal(id);},
   refreshCreation:()=>creation.refreshPals(),help:()=>{$('studioHelp').click();},
  });
- const sceneButton=el('button','studio-button','✦ Animate & code') as HTMLButtonElement;sceneButton.id='studioMakeScene';sceneButton.type='button';
  $('studioHelp').after(sceneButton);
  sceneButton.onclick=()=>act(async()=>{
   if(guardMath())return;const s=current(),capturedOwner=owner(),capturedEpoch=epoch;
@@ -1120,14 +1465,17 @@ export async function installStudio(){
    status('Opening the editable scene included with this game…');
    const response=await clientFor(s).creationManifest(remoteId);
    if(owner()!==capturedOwner||epoch!==capturedEpoch||route!=='studio'||activeId!==s.id)return;
-   if(!response.manifest)throw Error('This game does not include an editable scene yet. Choose Create & code to start a scene with available characters.');
+   if(!response.manifest){creation.open();globalStatus.textContent='This game has no editable scene. Choose a starter for a separate scene. Your game stays saved.';return;}
    creation.fromStudio({...s,projectId:response.projectId,remoteId:response.revisionId},undefined,response.manifest);return;
   }
-  if(!s.projectId)throw Error('Choose a starting game, or open Create & code to make a scene.');
+  if(!s.projectId||!['dragon','buckets','robot'].includes(s.game)){creation.open();return;}
   const revision=games.revision(s.projectId,s.owner,showing==='history'&&viewedRevisionId?viewedRevisionId:undefined);
   if(showing==='candidate'&&s.candidate?.config)throw Error('Keep this game version first, then use Animate & code to carry that version into a scene.');
   creation.fromStudio(s,revision);
  });
- window.addEventListener('factory-page',event=>{if((event as CustomEvent).detail!=='creation')document.body.classList.remove('creation-open');});
+ if(activeId)render();
+ window.addEventListener('factory-page',event=>{hideJourney();const destination=(event as CustomEvent).detail;if(destination!=='creation')document.body.classList.remove('creation-open');if(destination==='lab')setActiveNav('studioNavPowers');else if(destination==='parent')setActiveNav(null);});
  if(new URLSearchParams(location.search).get('creation')==='1')creation.open();
+ if(new URLSearchParams(location.search).get('problem-solving')==='1')practice.open();
+ if(new URLSearchParams(location.search).get('art')==='1')void artStudio.open().catch(error=>status((error as Error).message,true));
 }

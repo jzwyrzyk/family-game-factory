@@ -1,3 +1,4 @@
+import {iconMarkup} from '../brand/icons';
 import type { GameContext, GameInstance } from '../runtime/types';
 import { GemSortingSimulation, SORTING_WORLD, type FactoryGemColor } from './gem-factory-physics';
 import { factoryPattern, factorySupply, type FactoryPattern } from './gem-factory-pattern';
@@ -29,13 +30,8 @@ export function gemArt(color: Color, rough = false): string {
 }
 type ControlIcon = 'pause' | 'play' | 'sound-on' | 'sound-off';
 function controlIcon(kind: ControlIcon): string {
-  const paths: Record<ControlIcon, string> = {
-    pause: '<rect x="5" y="4" width="5" height="16" rx="1.5" fill="currentColor"/><rect x="14" y="4" width="5" height="16" rx="1.5" fill="currentColor"/>',
-    play: '<path d="m8 4 12 8-12 8Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
-    'sound-on': '<path d="M4 9h4l5-4v14l-5-4H4Z" fill="currentColor"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    'sound-off': '<path d="M3 9h4l5-4v14l-5-4H3Z" fill="currentColor"/><path d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-  };
-  return `<svg class="gf-ui-icon" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true" focusable="false">${paths[kind]}</svg>`;
+  const icon=iconMarkup(kind==='sound-on'||kind==='sound-off'?'volume':kind,'gf-ui-icon');
+  return kind==='sound-off'?icon+'<span class="gf-sound-state" aria-hidden="true">Off</span>':icon;
 }
 type Paper = 'hearts' | 'stripes' | 'stars';
 const papers: Record<Paper, { name: string; base: string; lid: string; ribbon: string }> = {
@@ -131,7 +127,7 @@ export default class GemFactory implements GameInstance {
       <div class="gf-hud"><div class="gf-day"><strong></strong></div><div class="gf-wallet"><span class="gf-coin" aria-hidden="true">✦</span><strong>0</strong></div></div>
       <section class="gf-order" aria-label="Gem pattern"></section><div class="gf-progress" aria-label="Gifts packed"></div>
       <div class="gf-helper"><img src="./jems-gem-companion.png" alt="Your cheerful Jems gem companion"><p class="gf-helper-hint" aria-hidden="true"></p></div>
-      <div class="gf-effects" aria-hidden="true"></div><div class="gf-pause-overlay" hidden><div class="gf-pause-card"><span class="gf-pause-gem" aria-hidden="true">✦</span><h3>Tea break!</h3><p>Your gems can wait.</p><button type="button" class="gf-primary" data-action="resume">Let's play</button></div></div></div><p class="gf-screen-reader" role="status" aria-live="polite"></p>`;
+      <div class="gf-effects" aria-hidden="true"></div><div class="gf-pause-overlay" hidden><div class="gf-pause-card"><span class="gf-pause-gem" aria-hidden="true">✦</span><h3>Tea break!</h3><p>Your gems can wait.</p><button type="button" class="gf-primary" data-action="resume">${iconMarkup('play')} Let's play</button></div></div></div><p class="gf-screen-reader" role="status" aria-live="polite"></p>`;
     this.world = this.root.querySelector('.gf-world')!;
     this.console = this.root.querySelector('.gf-line')!;
     this.liveGem = this.root.querySelector('.gf-live-gem')!;
@@ -331,13 +327,13 @@ export default class GemFactory implements GameInstance {
     this.liveGem.style.setProperty('--shine', String(this.polish / 100));
     let inner = '';
     if (this.stage === 'pick') {
-      inner = `<div class="gf-sorting-board" aria-label="Choose a bucket for the gem"><div class="gf-sorting-chute" aria-hidden="true"><i></i></div><div class="gf-candidate" role="img"></div><div class="gf-ramp-pivot" aria-hidden="true"></div><div class="gf-sorting-ramp" aria-hidden="true"><i></i><i></i><i></i></div><div class="gf-sorting-gems" aria-hidden="true"></div><button type="button" class="gf-sort-basket gf-order-basket" data-action="route-order"><span class="gf-basket-symbol" aria-hidden="true">♡</span><span>Order</span></button><button type="button" class="gf-sort-basket gf-return-basket" data-action="route-return"><span class="gf-basket-symbol" aria-hidden="true">↻</span><span>Return</span></button></div>`;
+      inner = `<div class="gf-sorting-board" aria-label="Choose a bucket for the gem"><div class="gf-sorting-chute" aria-hidden="true"><i></i></div><div class="gf-candidate" role="img"></div><div class="gf-ramp-pivot" aria-hidden="true"></div><div class="gf-sorting-ramp" aria-hidden="true"><i></i><i></i><i></i></div><div class="gf-sorting-gems" aria-hidden="true"></div><button type="button" class="gf-sort-basket gf-order-basket" data-action="route-order"><span class="gf-basket-symbol" aria-hidden="true">${iconMarkup('check')}</span><span>Order</span></button><button type="button" class="gf-sort-basket gf-return-basket" data-action="route-return"><span class="gf-basket-symbol" aria-hidden="true">${iconMarkup('retry')}</span><span>Return</span></button></div>`;
     } else if (this.stage === 'cut') {
       inner = `<button type="button" class="gf-machine-action gf-cut-action" data-action="cut" aria-label="Tap the cutter when the pointer is in the glowing mint stripe"><span class="gf-machine-halo" aria-hidden="true"></span><span class="gf-tap-spark" aria-hidden="true">✦</span><span class="gf-timing-track" aria-hidden="true"><span class="gf-good-zone"></span><span class="gf-perfect-zone"></span><i class="gf-cutter-needle"></i></span></button>`;
     } else if (this.stage === 'polish') {
       inner = `<button type="button" class="gf-machine-action gf-polish-action gf-polish-stone" data-action="polish" aria-label="Rub or hold the ${colors[this.selected!].name} gem to make it shine. Hold Space or press Enter with a keyboard."><span class="gf-machine-halo" aria-hidden="true"></span>${gemArt(this.selected!)}<span class="gf-polish-cloud" aria-hidden="true"></span><span class="gf-polish-spark" aria-hidden="true">✦</span></button><div class="gf-polish-track" role="progressbar" aria-label="Gem shine" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="gf-polish-fill"></span></div>`;
     } else if (this.stage === 'pack') {
-      inner = `<div class="gf-wrap-options" role="group" aria-label="Choose wrapping paper">${(Object.keys(papers) as Paper[]).map(paper => `<button type="button" class="gf-paper-roll gf-paper-${paper}" data-action="paper" data-paper="${paper}" aria-label="${papers[paper].name} wrapping paper" aria-pressed="${this.paper === paper}"><span class="gf-paper-swatch" aria-hidden="true"></span><span class="gf-paper-name">${paper[0].toUpperCase() + paper.slice(1)}</span><span class="gf-paper-check" aria-hidden="true">✓</span></button>`).join('')}</div><button type="button" class="gf-machine-action gf-gift-action" data-action="pack" data-paper="${this.paper}" aria-label="Wrap and send your gem in ${papers[this.paper].name.toLowerCase()} paper">${giftArt(this.paper)}</button>`;
+      inner = `<div class="gf-wrap-options" role="group" aria-label="Choose wrapping paper">${(Object.keys(papers) as Paper[]).map(paper => `<button type="button" class="gf-paper-roll gf-paper-${paper}" data-action="paper" data-paper="${paper}" aria-label="${papers[paper].name} wrapping paper" aria-pressed="${this.paper === paper}"><span class="gf-paper-swatch" aria-hidden="true"></span><span class="gf-paper-name">${paper[0].toUpperCase() + paper.slice(1)}</span><span class="gf-paper-check" aria-hidden="true">${iconMarkup('check')}</span></button>`).join('')}</div><button type="button" class="gf-machine-action gf-gift-action" data-action="pack" data-paper="${this.paper}" aria-label="Wrap and send your gem in ${papers[this.paper].name.toLowerCase()} paper">${giftArt(this.paper)}</button>`;
     } else {
       inner = `<div class="gf-delivery-spark" aria-hidden="true">✦</div>`;
     }

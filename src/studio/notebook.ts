@@ -1,9 +1,11 @@
 import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
 import { isGameId } from '../runtime/manifests';
 import type { GameId } from '../runtime/types';
+import { publishSourceEvidence } from '../problem-solving/signals';
 import { builderJourney } from '../brand/gem-progress';
 import { createRewardFact, enqueueRewardFact, rewardFactId, validateRewardOutbox, type RewardFact } from '../rewards/model';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
+import { freshGuidance, isGuideTipId, validateGuidePreferences, type GuidePreferences, type GuideTipId } from './guidance';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -27,7 +29,8 @@ export interface StudioSession {
   /** Canonical source project, retained through copies and local/remote transitions. */
   rewardProjectId?:string;
 }
-export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[] }
+export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[];guidance?:Record<string,GuidePreferences> }
+const guidanceFor=(notebook:Notebook,owner:string):GuidePreferences=>notebook.guidance&&Object.hasOwn(notebook.guidance,owner)?notebook.guidance[owner]:freshGuidance();
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
 const safeText = (x: unknown, max: number): x is string => typeof x === 'string' && x.length <= max;
@@ -35,8 +38,12 @@ const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(
 export function validateNotebook(input: unknown): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
-  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox'].includes(k)))throw Error('Unknown studio data; not restored.');
+  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance'].includes(k)))throw Error('Unknown studio data; not restored.');
   if(n.avatars!==undefined&&(!n.avatars||typeof n.avatars!=='object'||Array.isArray(n.avatars)||Object.keys(n.avatars).length>80||!Object.entries(n.avatars).every(([owner,choice])=>ident(owner)&&(choice==='spark'||choice==='nova'))))throw Error('Invalid builder character choice.');
+  if(n.guidance!==undefined){
+    if(!n.guidance||typeof n.guidance!=='object'||Array.isArray(n.guidance)||Object.keys(n.guidance).length>80)throw Error('Invalid journey guidance preferences.');
+    for(const [owner,preferences] of Object.entries(n.guidance)){if(!ident(owner))throw Error('Invalid journey guidance player.');validateGuidePreferences(preferences);}
+  }
   const ids = new Set<string>();
   for (const s of n.sessions) {
     if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
@@ -104,6 +111,23 @@ export class StudioNotebook {
     return copy(result);
   }
   list(owner:string):StudioSession[] {return this.read().sessions.filter(s=>s.owner===owner).sort((a,b)=>b.updated.localeCompare(a.updated));}
+  /** Optional hints are profile preferences, not evidence or a completed journey. */
+  guidance(owner:string):GuidePreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    return guidanceFor(this.read(),owner);
+  }
+  dismissWelcome(owner:string):GuidePreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    return this.write(n=>{const next={...guidanceFor(n,owner),welcomeDismissed:true};n.guidance={...n.guidance,[owner]:next};return next;});
+  }
+  dismissGuideTip(owner:string,tip:GuideTipId):GuidePreferences {
+    if(!ident(owner)||!isGuideTipId(tip))throw Error('Invalid journey guidance preference.');
+    return this.write(n=>{const before=guidanceFor(n,owner),next={...before,dismissedTips:[...new Set([...before.dismissedTips,tip])]};n.guidance={...n.guidance,[owner]:next};return next;});
+  }
+  resetGuidance(owner:string):GuidePreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    return this.write(n=>{const next={...guidanceFor(n,owner),dismissedTips:[]};n.guidance={...n.guidance,[owner]:next};return next;});
+  }
   avatar(owner:string):BuilderAvatar|null {
     if(!ident(owner))throw Error('Invalid player.');
     return this.read().avatars?.[owner]??null;
@@ -121,7 +145,10 @@ export class StudioNotebook {
     return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
-    return this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');fn(s);s.updated=new Date().toISOString();return s;});
+    let before:StudioSession|undefined;
+    const after=this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');before=copy(s);fn(s);s.updated=new Date().toISOString();return s;});
+    if(before)publishSourceEvidence({kind:'studio',before,after});
+    return after;
   }
   select(id:string,owner:string) {this.get(id,owner);this.write(n=>{n.active[owner]=id;return true;});}
   message(id:string,owner:string,role:Message['role'],text:string) {
@@ -132,7 +159,7 @@ export class StudioNotebook {
    * deletion of remote artifacts or backups; the interface must say so.
    */
   clearConversation(id:string,owner:string):StudioSession {
-    return this.update(id,owner,s=>{
+    const result=this.update(id,owner,s=>{
       if(s.job&&['queued','building','testing'].includes(s.job.status)||s.pendingExperiment)
         throw Error('Finish or cancel the current build before clearing this chat.');
       s.messages=[];s.draft='';s.hypothesis='';s.reflection=false;
@@ -141,6 +168,8 @@ export class StudioNotebook {
       // Saved test prompts/notes and game versions retain their existing semantics.
       delete s.keptExperiments;
     });
+    publishSourceEvidence({kind:'clear-studio',owner,sessionId:id});
+    return result;
   }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
     const source=this.get(id,owner);

@@ -1,5 +1,6 @@
 import { createJourneyGem, createJourneyRankThumbnail, type JourneyState } from '../brand/journey';
 import { GEM_MILESTONE_START, REWARD_AMOUNTS, type RewardGrant, type RewardsSummary } from './model';
+import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import './rewards.css';
 
 export type RewardsViewState = {
@@ -9,13 +10,18 @@ export type RewardsViewState = {
   error?: string;
 };
 
+export type RewardsActivity = 'math' | 'language' | 'coding' | 'making';
+
 export type RewardsPageOptions = {
   state: RewardsViewState;
   onBack: () => void;
   onOpenJourney: () => void;
   onPlay: () => void;
   onCreate: () => void;
+  /** The host chooses the destination and enforces the player's subject settings. */
+  onActivity?: (activity: RewardsActivity) => void;
   onRetry?: () => void;
+  guidance?: GuideHost;
 };
 
 const makerNames = ['Ready to create', 'Gem Maker', 'Gem Cutter', 'Gem Polisher', 'Gem Master'] as const;
@@ -80,7 +86,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
   const totalCopy = node('div');
   const total = node('strong', 'jems-rewards-total');
   total.id = 'jemsRewardsTotal';
-  const totalLabel = node('span', 'jems-rewards-total-label', 'Gems earned');
+  const totalLabel = node('span', 'jems-rewards-total-label', 'Lifetime gems earned');
   totalCopy.append(total, totalLabel);
   totalRow.append(totalCopy);
   const encouragement = node('p', 'jems-rewards-encouragement');
@@ -118,6 +124,14 @@ export function createRewardsPage(options: RewardsPageOptions) {
   makerCopy.append(makerState, makerName, makerNext, makerAction);
   maker.append(makerArt, makerCopy);
   hero.append(copy, maker);
+  const progressExplanation = createGuideCard({
+    id: 'jemsRewardsExplanation', tip: 'progress', title: 'More than one way to grow',
+    description: 'Your gems add up across activities. Your maker level grows as you test and improve your saved games. My Powers shows your practice; gems are not a skill score.',
+    host: options.guidance,
+    canAct: () => !disposed && !element.hidden && state.summary.owner === state.journey.ownerId,
+    onError: message => { status.hidden = false; statusText.textContent = message; retry.hidden = true; },
+    onDismiss: () => play.focus({ preventScroll: true })
+  });
 
   const milestonesSection = node('section', 'jems-rewards-section');
   milestonesSection.setAttribute('aria-labelledby', 'jemsRewardsMilestonesTitle');
@@ -137,18 +151,26 @@ export function createRewardsPage(options: RewardsPageOptions) {
   waysTitle.id = 'jemsRewardsWaysTitle';
   const waysList = node('ul', 'jems-rewards-ways-list');
   const routes = [
-    { title: 'Math practice', detail: 'Complete an activity', amount: REWARD_AMOUNTS['math.completed'], icon: 'add', tone: 'blue' },
-    { title: 'Words & stories', detail: 'Complete an activity', amount: REWARD_AMOUNTS['language.completed'], icon: 'book', tone: 'coral' },
-    { title: 'Coding challenges', detail: 'Solve a new challenge', amount: REWARD_AMOUNTS['scene.challenge'], icon: 'grid', tone: 'purple' },
-    { title: 'Your own game', detail: 'Develop it, then keep it', amount: REWARD_AMOUNTS['game.developed'], icon: 'edit', tone: 'mint' }
-  ];
+    { activity: 'math', title: 'Math practice', detail: 'Complete an activity', amount: REWARD_AMOUNTS['math.completed'], icon: 'add', tone: 'blue' },
+    { activity: 'language', title: 'Words & stories', detail: 'Complete an activity', amount: REWARD_AMOUNTS['language.completed'], icon: 'book', tone: 'coral' },
+    { activity: 'coding', title: 'Coding challenges', detail: 'Solve a new challenge', amount: REWARD_AMOUNTS['scene.challenge'], icon: 'grid', tone: 'purple' },
+    { activity: 'making', title: 'Your own game', detail: 'Develop it, then keep it', amount: REWARD_AMOUNTS['game.developed'], icon: 'edit', tone: 'mint' }
+  ] as const;
   for (const route of routes) {
-    const item = node('li', `jems-rewards-way is-${route.tone}`);
+    const item = node('li');
+    const activity = button(`jems-rewards-way is-${route.tone}`, '', () => {
+      if (options.onActivity) options.onActivity(route.activity);
+      else if (route.activity === 'making') options.onCreate();
+      else options.onPlay();
+    });
+    activity.dataset.rewardActivity = route.activity;
+    activity.setAttribute('aria-label', `${route.title}. ${route.detail}. Earn ${route.amount} gems.`);
     const symbol = node('span', 'jems-rewards-way-symbol');
     symbol.append(icon(route.icon));
     const label = node('span', 'jems-rewards-way-copy');
     label.append(node('strong', '', route.title), node('small', '', route.detail));
-    item.append(symbol, label, node('strong', 'jems-rewards-way-amount', `+${route.amount}`));
+    activity.append(symbol, label, node('strong', 'jems-rewards-way-amount', `+${route.amount}`));
+    item.append(activity);
     waysList.append(item);
   }
   const bonus = node('div', 'jems-rewards-bonus');
@@ -171,7 +193,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
   recentEmpty.append(emptyTitle, emptyText);
   recent.append(recentTitle, recentList, recentEmpty);
   bottom.append(ways, recent);
-  element.append(toolbar, status, hero, milestonesSection, bottom);
+  element.append(toolbar, status, hero, progressExplanation, milestonesSection, bottom);
 
   function render() {
     if (disposed) return;
@@ -186,6 +208,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
     status.hidden = !error;
     statusText.textContent = error ? 'Your rewards couldn’t load. Try again in a moment.' : '';
     retry.hidden = !error || !options.onRetry;
+    progressExplanation.refresh();
     encouragement.textContent = waiting ? 'Opening your rewards…' : error ? 'You can keep playing and creating.' : summary.lifetimeGems === 0 ? 'Your next little adventure starts here.' : 'You’re making progress, one adventure at a time.';
     next.hidden = unavailable;
     nextTitle.textContent = `Next milestone: ${number(summary.nextGemMilestone)} gems`;
@@ -203,7 +226,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
     makerState.textContent = level === 0 ? 'Your maker · outfit preview' : `Your making journey · level ${level}`;
     makerName.textContent = makerNames[level];
     makerNext.textContent = journey.nextAction || (level === 0 ? 'Save your first idea.' : 'Keep making something wonderful.');
-    makerAction.textContent = level === 0 && !journey.character ? 'Choose your maker →' : 'See my journey →';
+    makerAction.textContent = !journey.character ? 'Choose your maker →' : 'See my journey →';
 
     milestonesSection.hidden = unavailable;
     milestoneList.replaceChildren();
@@ -259,7 +282,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
   return {
     element,
     update(nextState: RewardsViewState) { state = nextState; render(); },
-    show() { if (disposed) return; element.hidden = false; element.classList.remove('hidden'); heading.focus({ preventScroll: true }); },
+    show() { if (disposed) return; progressExplanation.refresh(); element.hidden = false; element.classList.remove('hidden'); heading.focus({ preventScroll: true }); },
     hide() { element.hidden = true; element.classList.add('hidden'); },
     dispose() { disposed = true; element.remove(); }
   };

@@ -132,6 +132,12 @@ jobs:
       - name: Learning persistence and pacing
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/learning-repair.cjs
+      - name: Problem-solving evidence and authored practice
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:problem-solving
+      - name: Problem-solving desktop and touch journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:problem-solving-browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -160,6 +166,9 @@ jobs:
       - name: Illustrated gem journey
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:gem-journey
+      - name: Saved collections and default navigation continuity
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:navigation-continuity
       - name: Rewards layout, earning and persistence journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:rewards-browser
@@ -172,6 +181,12 @@ jobs:
       - name: Editable creation contracts and behavioral challenges
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation
+      - name: Private Art Studio contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:art
+      - name: Art library, physical drawings and portable scenes
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:art-browser
       - name: Creation desktop and touch journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation-browser

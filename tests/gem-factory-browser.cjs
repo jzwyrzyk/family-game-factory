@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Play the actual Gem Factory through the production Studio and learning host. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -18,6 +19,7 @@ async function chooseProfile(page,index){
  const summary=page.locator('#studioProfileMenu summary');
  if(await summary.count())await summary.click();
  await page.locator('.profile-choice').nth(index).click();
+ await exploreWelcome(page);
 }
 
 async function openFactory(page){
@@ -157,7 +159,7 @@ async function packAndWait(page,last,device,paper){
    page.on('pageerror',error=>errors.push(error.message));page.on('dialog',dialog=>void dialog.accept());
    try{
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
-    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);
+    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);await exploreWelcome(page);
     assert.equal(await page.locator('[data-starter="factory"]').count(),1,'Factory is available from Ready to Play');
     await openFactory(page);
     const root=page.locator('.gem-factory');await root.waitFor();
@@ -268,7 +270,7 @@ async function packAndWait(page,last,device,paper){
   const reduced=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,reducedMotion:'reduce'});
   try{
    const page=await reduced.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
-   await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);await openFactory(page);
+   await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);await exploreWelcome(page);await openFactory(page);
    await checkPattern(page);await chooseGem(page,'phone');await cutGem(page,'phone');await polishByTapping(page,'phone');await choosePaper(page,'stars','phone');
    await capture(page,'phone-reduced','pack');
    assert.equal((await snapshot(page)).stage,'pack','reduced motion preserves physical play and the complete interaction');

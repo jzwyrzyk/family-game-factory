@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { addPalToProject, createPalPlayground, CREATION_PAL_IDS } from '../src/pals/creation';
 import { palDefinition } from '../src/pals/catalog';
-import { creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest } from '../src/creation/projects';
+import { creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest, privateArtId } from '../src/creation/projects';
 import { SceneEngine } from '../src/creation/engine';
 import { CreationStore } from '../src/creation/storage';
 
@@ -117,4 +117,26 @@ test('an imported Pal scene is reusable creative content and is attributed as as
   assert.equal(imported.actors[0].assetId, 'pal-glim');
   assert.equal(Object.hasOwn(imported, 'ownedPals'), false);
   assert.equal(Object.hasOwn(imported, 'lifetimeGems'), false);
+});
+
+test('adding a Pal keeps private original/cutout hashes, exact source pins and prior saved revisions intact', () => {
+  for (const kind of ['image', 'rig'] as const) {
+    const storage = new MemoryStorage(), store = new CreationStore(storage);
+    const original = createStarterProject('blank');
+    original.actors[0].assetId = privateArtId({ kind, id: `private-${kind}`, sha256: 'b'.repeat(64) });
+    original.provenance = { createdBy: 'child', sourceKind: 'curated', sourceProjectId: 'kept-game', sourceRevisionId: 'exact-revision' };
+    const project = store.create('one', original);
+    store.keep(project.id, 'one', project.headId);
+    const combined = addPalToProject(original, 'glim').scene;
+    assert.deepEqual(combined.actors.slice(0, original.actors.length), original.actors);
+    assert.deepEqual(combined.provenance, original.provenance);
+    store.autosave(project.id, 'one', combined, project.headId);
+    const restored = new CreationStore(storage).load(project.id, 'one');
+    assert.deepEqual(restored.scene, original);
+    assert.deepEqual(restored.draft!.scene, combined);
+    assert.equal(restored.project.keptId, project.headId);
+    assert.throws(() => validateGeneratedCreationManifest(combined), /artwork/, 'adding a Pal cannot make private artwork provider eligible');
+    assert.throws(() => store.load(project.id, 'two'), /own profile/);
+    assert.deepEqual(store.pendingRewards('one'), []);
+  }
 });

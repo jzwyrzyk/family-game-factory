@@ -1,12 +1,12 @@
 # Approved Jems brand library v1.2
 
-**Status:** Core application integration merged through [PR57](https://github.com/jzwyrzyk/family-game-factory/pull/57) as `c6576c16e005ae58ce8c706801414be4d864242e`, November 19, 2026, preserving Creation Studio, quality and adult/guardian contracts. All four final PR workflows and current-source local acceptance passed. The coverage table below distinguishes active features from packaged-only assets; deployment is separate. [ADR0009](../decisions/0009-approved-brand-library-v1-2.md) records the decision; [delivery state](../../DELIVERY-STATE.md) records the exact source, checks and merge receipt.
+**Status:** The website completion follow-up now connects the supplied functional icons and all applicable helper/state illustrations to existing application flows; its validation and merge receipt are tracked in [delivery state](../../DELIVERY-STATE.md). Core application integration merged through [PR57](https://github.com/jzwyrzyk/family-game-factory/pull/57) as `c6576c16e005ae58ce8c706801414be4d864242e`, November 19, 2026, preserving Creation Studio, quality and adult/guardian contracts. All four final PR workflows and current-source local acceptance passed. The coverage table below distinguishes active features from packaged-only assets; deployment is separate. [ADR0009](../decisions/0009-approved-brand-library-v1-2.md) records the decision; [delivery state](../../DELIVERY-STATE.md) records the exact source, checks and merge receipt.
 
 ## One identity and one rank-art mapping
 
 Use the supplied current SVG identity, the logo-aligned **Gem companion**, the endorsed factory artwork and the original **Spark/Nova** makers. The Gem companion is the faceted helper; Spark and Nova are the two human maker choices. The legacy `character_spark_*` helper filenames do not rename the human Spark.
 
-The separate [Jem Pals collection](../pals/README.md) uses existing blue, mint and coral gem tokens as explicitly provisional functional artwork for Glim, Kip and Riff. These are neither the Gem helper nor maker-rank replacements. Its growth rings and scene behaviors demonstrate the system; final character designs, expressions, evolution art and animation sheets await the owner's separate artistic-development review. This implementation does not modify the approved assets.
+The separate [Jem Pals collection](../pals/README.md) uses the existing blue, mint and coral gem tokens as explicitly provisional portraits for Glim, Kip and Riff. Collection progress has exactly two forms, Base and Grown; the token is not a selected creature portrait or a substitute for final form artwork. Established `pal-glim`, `pal-kip` and `pal-riff` scene assets retain their original token identity. The separate [Gem Pal Studio](../pals/STUDIO.md) workstream supplies approved character references; no species-to-runtime mapping is invented here.
 
 The primary rank thumbnail is the selected maker in the exact original outfit for that level, holding its original gem. Journey, progress cards and earned popups resolve the same maker/level pair. When no choice is saved, both choices receive equal treatment; a rendered default must not silently persist a preference. An explicit future-stage preview may change the pictured outfit but keeps the actual earned level visible. The chooser follows that explicit preview while saving only the cosmetic maker choice.
 
@@ -31,7 +31,7 @@ Preserve the entire face, held gem, tools, outfit and shoes. Do not stretch the 
 | State illustrations and decorative gems | Registered files in `public/jems-art/` | Place only in the corresponding real state; keep text and actions in the DOM |
 | Human makers | Existing `public/jems-journey/characters-spark.webp` and `characters-nova.webp` | Eight original frames, unchanged native atlas bytes; four stages per maker |
 | Secondary stage gems and Journey scene | Existing `public/jems-journey/gems.webp` and `background.webp` | Four original gem frames and the retained background; no new fourth project-evidence state |
-| Functional icons | `public/jems-art/icons/` and `jems-icons.svg` | Functional UI symbols remain distinct from illustrated artwork; accessible names live on controls |
+| Functional icons | `public/jems-art/icons/jems-icons.svg`, rendered by `src/brand/icons.ts` and `icons.css` | Exact supplied paths with `currentColor`; decorative, nonfocusable SVGs accompany visible control labels. Resolve from the document base, including `/arcade/`. |
 | Local fonts | `public/fonts/jems/Nunito-Variable.woff` and `Inter-Variable.woff` | Nunito headings; Inter interface/body text; retain both OFL notices and fallback stacks |
 | Shared styling | `src/brand/art-library.css`, existing `jems.css`, Journey/Delight styles | Shared semantic surfaces, radii, target sizes, font roles and quiet artwork states; preserve existing controls and behavior |
 
@@ -46,10 +46,10 @@ The 39-page `Jems_Art_and_Brand_Handbook_v1_2.pdf` contains both application des
 | Handbook area | Application coverage |
 | --- | --- |
 | Identity, palette and typography (pages 3–7) | The approved SVG identity, existing palette and local Nunito/Inter fonts are consumed by the app. `src/studio/ui.ts` imports the shared brand styles and `src/brand/art-library.css`. |
-| Workshop, first idea and contextual Gem helper (pages 8–10, 20, 23–25) | Five new illustrations are used: `hero_workshop`, `spot_first_idea`, and the think/celebrate/recover helper poses. Studio renders the first two directly; its real progress phase selects the helper treatment in `art-library.css`. |
+| Workshop, first idea and contextual Gem helper (pages 8–10, 20, 23–25) | Ten illustrations are active: workshop and first-idea art; wave/think/rest/celebrate/recover helper poses; and saved-storage/work-in-progress/reconnect spots. The mapping below binds them to existing observed states. Optional Try an idea also reuses the approved wave companion. |
 | Maker choice, four outfits, Journey and achievements (pages 11–18) | `journey.ts`, Studio and `delight.ts` connect the original Spark/Nova frames to the selected maker and saved making evidence. The shared rank-thumbnail renderer serves the chooser, Journey cards, home progress summary and earned popups. |
-| Functional SVG icons (page 28) | All 32 icons and their sprite are packaged in `public/jems-art/icons/`. Existing application actions and navigation do not yet consume that set; their existing symbols and emoji remain. Packaging is not a completed icon migration. |
-| Additional illustrations and covers (pages 9–10, 16, 19, 23) | Wave/rest poses, saved/reconnect/work-in-progress spots, the maker ensemble, the unused gold decorative gem and the Mind Your Jems/GemBots covers remain available for reuse. The separate [Jem Pals](../pals/README.md) extension now uses the blue, mint and coral gem tokens as provisional collection portraits and scene assets. `tools/offline-build.ts` keeps these optional assets out of eager installation downloads. Cover art does not install those games or merge PR56; existing Gem Factory gameplay has its separate implementation. |
+| Functional SVG icons (page 28) | The shared typed adapter renders the supplied sprite across Studio, Creation, Journey, legacy navigation, live remix, builder, parent/adult/privacy, offline and language support controls. Playable-game actions share the same approved set. Dynamic labels keep their icon and accessible name. Game artwork, player avatars, mathematical notation and learning command sequences retain their own meaning. |
+| Additional illustrations and covers (pages 9–10, 16, 19, 23) | The blue, mint and coral gems are provisional Pal portraits and scene assets. The maker ensemble, gold gem and Mind Your Jems/GemBots covers remain optional editorial/game-specific assets. Existing maker hero and earned rank art remain authoritative. Unused assets stay out of eager installation downloads; cover art alone does not install gameplay. |
 | Parent panels and composed interface examples (pages 20–27, 31) | Existing controls and parent/learning screens retain their behavior and share the brand styles. The PDF's illustrative parent panel is not an additional implemented dashboard, and the component-contract inventory does not establish that every demonstration has an application adapter. |
 | Optional sound (page 32) | The four handbook WAV samples are not imported or connected by this integration. The artwork update adds no sound preference or automatic audio. |
 
@@ -59,7 +59,27 @@ The identity palette remains Ink `#0B1E3B`, Jem Blue `#2E6BFF`, Spark Purple `#8
 
 Use generous white/Cloud space, softly rounded controls and consistent readable type. Main touch actions target 48px and secondary controls 44px as library design targets; verify actual rendered controls and spacing. Native keyboard, focus, disabled/busy/error behavior and visible labels remain part of the existing application. Keep Math, Language Arts, privacy and grown-up surfaces calm. The shared shell does not impose one art style on generated games.
 
-Render state art from real application state: thinking for actual work, recovery for an error or reconnection path, and celebration only after the existing verified transition. Do not invent progress percentages, safe-save promises, unavailable services or successful builds. Companion images must not hide text, capture focus or cover gameplay. Reduced motion keeps the useful still and status text. No automatic audio or new sound preference is introduced by adding artwork.
+Render state art from real application state. Text and recovery controls remain authoritative, visible HTML; the illustration is decorative.
+
+| Observed state | Supporting artwork |
+| --- | --- |
+| Idle idea partner | Wave; the helper switches to think only while the actual coach request status is thinking. |
+| Paused conversation or confirmed cancelled build | Rest. A paused game retains its captured scene; the rest pose is only the fallback when no usable frame exists. |
+| Send pending, before job acceptance | Think, with the existing sending copy. |
+| Accepted queued/building/testing job | Work-in-progress spot; no invented percentage or timer. |
+| Latest job state cannot be confirmed | Reconnect spot with the existing uncertainty copy; this does not assert that the browser is definitely offline. |
+| Confirmed failure / playable-ready test | Recover / celebrate respectively; a ready test is not automatically Keep. |
+| Actual saved or archived game collection | Small safe-storage spot beside My jems; the section stays hidden with no saved records. It does not stand in for draft-save acknowledgement. |
+
+The workshop hero decodes synchronously when revealed so keyboard entry does not leave an empty illustration frame. Other state art retains its quiet, nonblocking presentation.
+
+The host keeps microphone labels and their accessible names aligned through idle, recording and transcription; rendering callbacks do not change consent, recording, cancellation, profile scope or explicit Send. Active navigation uses both the visible selected treatment and `aria-current="page"`.
+
+Do not invent safe-save promises, available services or successful builds. Companion images must not hide text, capture focus or cover gameplay. Reduced motion keeps the useful still and status text. No automatic audio or new sound preference is introduced by adding artwork.
+
+### Reusing the functional icons
+
+Use `iconMarkup(name)` only inside trusted static templates, `createIcon(name)` for decorative DOM artwork, and `setIconLabel(control, name, label)` for controls with changing labels. The latter writes the label as text, preserves the control node/listeners/attributes, and avoids recreating an unchanged icon on animation frames. Its optional class supports supplied arrow direction and mirrored undo/redo without changing source SVG bytes. Import `src/brand/icons.css` once in the host entry point. Every icon is `aria-hidden="true"` and nonfocusable; visible text or an explicit control label supplies the action name. Do not replace gameplay stimuli or code notation with brand icons.
 
 ## Behavior and integration boundaries
 
@@ -69,10 +89,10 @@ Preserve explicit Send, Build and Keep; save failures and recovery; owner/profil
 
 ## Offline asset delivery
 
-`tools/offline-build.ts` retains the strict same-origin build-manifest allowlist and excludes runtime factory configuration and private API paths. The core five artwork files, local fonts and native Journey assets are available through the core offline shell; optional covers, extra poses and icons are fetched and cached on first use. Do not eagerly add every optional illustration to installation downloads. `tests/offline-shell.cjs` verifies core availability, that unused GemBots art is not prefetched, and that an explicit asset fetch becomes available offline. These are cache-boundary checks, not evidence that a remote provider works offline.
+`tools/offline-build.ts` retains the strict same-origin build-manifest allowlist and excludes runtime factory configuration and private API paths. The ten active artwork files, shared SVG sprite, local fonts and native Journey assets are available through the core offline shell. Optional covers, editorial illustrations and unused individual icon files are fetched and cached on first use. Do not eagerly add every optional illustration to installation downloads. `tests/offline-shell.cjs` verifies core availability including the shared sprite and newly active state art, that unused GemBots art is not prefetched, and that an explicit asset fetch becomes available offline. These are cache-boundary checks, not evidence that a remote provider works offline.
 
 ## Acceptance for the integration candidate
 
-Review the actual application after the production build, with the current approved library as the visual reference. Check the exact logo and retained sparkle; the active think/celebrate/recover companion poses in their real states, with wave/rest retained as optional library assets; selected maker/level consistency across Journey, chooser, cards and popup; portrait crops; local font fallback; and absence of retired medals or generated Master diamonds. Reuse the existing evidence, Journey, Delight, homepage and regression suites for the affected paths.
+Review the actual application after the production build, with the current approved library as the visual reference. Check the exact logo and retained sparkle; all five companion poses and the three state spots in their real states; selected maker/level consistency across Journey, chooser, cards and popup; portrait crops; local font fallback; and absence of retired medals or generated Master diamonds. Reuse the existing evidence, Journey, Delight, homepage and regression suites for the affected paths.
 
 Verify desktop/tablet/mobile layouts, 320px reflow, 200% zoom, keyboard/dialog focus, reduced motion, truthful earned-versus-preview state, failed maker saves, profile switching and `/arcade/` asset loading. Keep historical screenshots and their original scope; new exact-head captures establish the new candidate's result. [The documentation maintenance process](../context/MAINTENANCE.md) requires per-area review after source settles, not a blanket fingerprint refresh. Deployment, provider activation and real-device/child acceptance remain separate evidence in delivery state.

@@ -4,26 +4,38 @@
  * Stable IDs and behavior do not depend on that artwork delivery.
  */
 export type PalId = 'glim' | 'kip' | 'riff';
+export type PalForm = 'base' | 'mature';
+/** Artwork approval and application binding are separate from earned progress.
+ * Existing scene token IDs stay immutable; final art needs explicit new bindings. */
+export interface PalArtworkBinding {
+  status: 'preview';
+  speciesId: string | null; characterKey: string | null;
+  forms: Readonly<Record<PalForm, string | null>>;
+}
+const PREVIEW_ARTWORK: Readonly<PalArtworkBinding> = Object.freeze({
+  status: 'preview', speciesId: null, characterKey: null,
+  forms: Object.freeze({ base: null, mature: null }),
+});
 export type PalLineKind = 'welcome' | 'practice' | 'making' | 'coding' | 'growth' | 'play' | 'rest' | 'retry';
 export interface PalDefinition {
   id: PalId; name: string; family: string; tagline: string; description: string;
   personality: string; starter: boolean; unlockGems: number;
-  assetId: string; artPath: string; color: string;
+  assetId: string; artPath: string; color: string; artwork: Readonly<PalArtworkBinding>;
 }
 
 export const PAL_CATALOG: readonly Readonly<PalDefinition>[] = Object.freeze([
   Object.freeze({ id: 'glim' as const, name: 'Glim', family: 'Explorer', tagline: 'What happens if…?',
     description: 'A curious explorer who finds possibilities in every little experiment.',
     personality: 'Curious, adventurous and easily amazed.', starter: true, unlockGems: 50,
-    assetId: 'pal-glim', artPath: 'jems-art/gem_blue.webp', color: '#2E6BFF' }),
+    artwork: PREVIEW_ARTWORK, assetId: 'pal-glim', artPath: 'jems-art/gem_blue.webp', color: '#2E6BFF' }),
   Object.freeze({ id: 'kip' as const, name: 'Kip', family: 'Maker', tagline: 'Let’s give it a go!',
     description: 'An eager builder who loves testing an idea and trying a different way.',
     personality: 'Inventive, determined and delightfully overenthusiastic.', starter: true, unlockGems: 50,
-    assetId: 'pal-kip', artPath: 'jems-art/gem_mint.webp', color: '#22D3A6' }),
+    artwork: PREVIEW_ARTWORK, assetId: 'pal-kip', artPath: 'jems-art/gem_mint.webp', color: '#22D3A6' }),
   Object.freeze({ id: 'riff' as const, name: 'Riff', family: 'Story', tagline: 'And then… a tap-dancing turnip!',
     description: 'A playful storyteller who turns small ideas into unexpected adventures.',
     personality: 'Imaginative, expressive and fond of very silly plot twists.', starter: false, unlockGems: 150,
-    assetId: 'pal-riff', artPath: 'jems-art/gem_coral.webp', color: '#FF5E7A' }),
+    artwork: PREVIEW_ARTWORK, assetId: 'pal-riff', artPath: 'jems-art/gem_coral.webp', color: '#FF5E7A' }),
 ]);
 export function isPalId(value: unknown): value is PalId {
   return typeof value === 'string' && PAL_CATALOG.some(pal => pal.id === value);

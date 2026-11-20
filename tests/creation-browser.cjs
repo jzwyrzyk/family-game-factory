@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Real production-dist journeys. All program edits use the public UI; FG.creation is read-only inspection. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -64,18 +65,71 @@ const {start}=require('./browser-server.cjs');
         await noOverflow();
         await page.screenshot({path:`test-results/creation-shelf-${device}.png`,fullPage:true});
 
-        // A playable native game is not automatically an editable scene adapter.
-        // Errors must stay visible in the Studio that still owns this interaction.
+        // Files open directly from the shelf, without creating a throwaway scene.
+        const fileScene={schema:'jems.creation.v1',id:'file-fixture-'+device,title:'Imported scene '+device,width:800,height:450,background:'meadow',
+          actors:[{id:'gem',name:'File gem',assetId:'gem',x:400,y:225,size:90}],programs:[{id:'gem-start',actorId:'gem',trigger:{type:'start'},actions:[]}],variables:{}};
+        const importFromShelf=async value=>{
+          const choosing=page.waitForEvent('filechooser');await activate('#creationShelfImport');
+          await (await choosing).setFiles({name:'my-scene.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(value))});
+          await page.waitForFunction(()=>document.getElementById('creationImport').value==='');
+        };
+        assert.equal((await workspace()).projects.length,0);
+        await importFromShelf(fileScene);
+        const importedScene=await scene();
+        assert.equal((await workspace()).projects.length,1,'Shelf import creates exactly the imported project');
+        assert.notEqual(importedScene.id,fileScene.id,'Import assigns a new project identity');
+        assert.equal(importedScene.title,fileScene.title);
+        assert.equal(importedScene.provenance.createdBy,'assisted');
+        await activate('#creationBack');
+        const beforeInvalidImport=await workspace();
+        await importFromShelf({...fileScene,actors:[{...fileScene.actors[0],assetId:'unavailable-character'}]});
+        assert.deepEqual(await workspace(),beforeInvalidImport,'Rejected shelf imports preserve existing scenes');
+        assert.match(await page.locator('#creationStatus').textContent(),/artwork that is not available/);
+
+        // A challenge resumes the latest own scene; starting another is explicit.
+        await activate('#creationChallengeMode');await activate('[data-challenge="robot-route"]');
+        const firstChallenge=await scene();await add('say');await activate('#creationKeep');
+        await activate('#creationBack');
+        assert.equal(await page.locator(`[data-scene="${firstChallenge.id}"]`).isVisible(),true);
+        await activate('#creationChallengeMode');
+        assert.equal(await page.locator(`[data-scene="${firstChallenge.id}"]`).isVisible(),true,'Saved challenges remain visible on the challenge tab');
+        assert.equal(await page.locator(`[data-scene="${importedScene.id}"]`).isVisible(),true,'Free scenes remain visible on the challenge tab');
+        assert.match(await page.locator('[data-challenge="robot-route"]').textContent(),/Continue my scene/);
+        const beforeResume=(await workspace()).projects.length;
+        await activate('[data-challenge="robot-route"]');
+        assert.equal((await scene()).id,firstChallenge.id);
+        assert.deepEqual((await scene()).programs[0].actions.map(action=>action.type),['say']);
+        assert.equal((await workspace()).projects.length,beforeResume,'Resuming creates no duplicate challenge');
+        await activate('#creationBack');await activate('#creationChallengeMode');
+        await activate('[data-challenge-new="robot-route"]');
+        const nextChallenge=await scene();assert.notEqual(nextChallenge.id,firstChallenge.id);
+        assert.equal((await workspace()).projects.length,beforeResume+1,'Start new adds one separate attempt');
+        await activate('#creationBack');await activate('#creationChallengeMode');
+        await activate('[data-challenge="robot-route"]');assert.equal((await scene()).id,nextChallenge.id,'The newer scene is the default continuation');
+        assert.equal((await workspace()).projects.length,beforeResume+1);
+        await activate('#creationBack');await activate(`[data-scene="${firstChallenge.id}"]`);
+        await pacing();await activate('#creationCheck');
+        await activate('#creationBack');await activate('#creationChallengeMode');await activate('[data-challenge="robot-route"]');
+        assert.equal((await scene()).id,firstChallenge.id,'A newly checked earlier scene becomes the latest continuation');
+        assert.equal((await workspace()).projects.length,beforeResume+1);
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));await exploreWelcome(page);
+        await activate('#studioNavScenes');await activate('#creationChallengeMode');
+        assert.equal(await page.locator('#creationSaved [data-scene]').count(),0);
+        assert.equal(await page.locator('[data-challenge-new]').count(),0);
+        assert.doesNotMatch(await page.locator('#creationChallenges').textContent(),/Continue my scene/,'A sibling has no continuation into another owner’s scenes');
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());await exploreWelcome(page);
+        await pacing();await activate('#studioNavScenes');
+
+        // Unsupported games offer a separate scene before the click, not a failed conversion.
         for(const unsupported of ['factory','hill']){
           await activate('#creationHome');await activate(`[data-starter="${unsupported}"]`);
           if(!await page.locator('#studioMakeScene').isVisible())await activate('#studioChange');
+          assert.equal((await page.locator('#studioMakeScene').textContent()).trim(),'Start a separate scene');
           const nativeBefore=await page.evaluate(()=>({games:localStorage.getItem('family-game-factory-workspace-v2'),scenes:FG.creation.export()}));
           await activate('#studioMakeScene');
-          await page.waitForFunction(()=>document.getElementById('studioStatus').textContent.includes('does not include an editable scene yet'));
-          assert.equal(await page.locator('#studioStatus').isVisible(),true,`${unsupported}: unavailable feedback stays in the current Studio`);
-          assert.equal(await page.locator('#page-creation').isVisible(),false,`${unsupported}: no invented import or scene transition`);
+          await page.locator('#page-creation:not(.hidden)').waitFor();
+          assert.equal(await scene(),null,`${unsupported}: the child still chooses which scene to create`);
           assert.deepEqual(await page.evaluate(()=>({games:localStorage.getItem('family-game-factory-workspace-v2'),scenes:FG.creation.export()})),nativeBefore,`${unsupported}: source versions and scene storage remain unchanged`);
-          await activate('#studioNavScenes');
           assert.equal(await page.locator('#creationFreeShelf').isVisible(),true,'Independent free creation remains available');
           assert.equal(await page.locator('[data-creation-starter]').count(),4);
         }
@@ -94,7 +148,7 @@ const {start}=require('./browser-server.cjs');
         assert.equal(fromGame.provenance.sourceRevisionId,gameEntry.headId);
         assert.ok(fromGame.actors.some(actor=>actor.assetId==='dragon'));
         await page.screenshot({path:`test-results/creation-from-dragon-${device}.png`,fullPage:true});
-        await activate(page.getByRole('button',{name:'Back to my game →',exact:true}));
+        await activate(page.getByRole('button',{name:'Back to my game',exact:true}));
         assert.equal(await page.locator('#page-creation').isVisible(),false);
         const gameAfter=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
         assert.deepEqual(gameAfter,gameBefore,'Making and viewing a scene does not rewrite the saved game');
@@ -134,11 +188,17 @@ const {start}=require('./browser-server.cjs');
 
         await pacing();await activate('#creationRun');
         await page.waitForFunction(()=>FG.creation.snapshot()?.timeMs>=150&&FG.creation.snapshot()?.status==='running');
-        await activate('#creationPause');const paused=await snapshot();assert.equal(paused.status,'paused');
+        if(touch)await activate('#creationPause');
+        else {await page.locator('#creationPause').focus();await page.keyboard.press('Space');}
+        const paused=await snapshot();assert.equal(paused.status,'paused');
+        assert.equal(await page.getByRole('button',{name:'Resume',exact:true}).getAttribute('id'),'creationPause','the changed visible label remains the accessible name');
+        assert.equal(await page.locator('#creationPause svg').getAttribute('data-jems-icon'),'play','paused playback retains the approved resume icon');
+        if(!touch)assert.equal(await page.evaluate(()=>document.activeElement.id),'creationPause','repainting an icon label preserves keyboard focus');
         await page.waitForTimeout(150);assert.equal((await snapshot()).timeMs,paused.timeMs,'Pause really stops simulation time');
         await activate('#creationStep');const stepped=await snapshot();
         assert.equal(stepped.timeMs,paused.timeMs+100);assert.equal(stepped.status,'paused');
         await activate('#creationPause');
+        assert.equal(await page.locator('#creationPause svg').getAttribute('data-jems-icon'),'pause','resuming updates the icon without duplicating it');
         await page.waitForFunction(()=>FG.creation.snapshot()?.status==='completed',null,{timeout:8000});
         const played=await snapshot();
         assert.equal(played.actors[0].x,start.actors[0].x+160);
@@ -190,7 +250,9 @@ const {start}=require('./browser-server.cjs');
         assert.equal(exported.id,projectId);assert.equal(exported.programs[0].actions[2].count,2);
         assert.equal(exported.schema,'jems.creation.v1');
         await pacing();await activate('#creationVideo');
-        await page.waitForFunction(()=>document.querySelector('#creationVideo')?.textContent==='Stop & save video');
+        await page.waitForFunction(()=>document.querySelector('#creationVideo')?.textContent.trim()==='Stop & save video');
+        assert.equal(await page.getByRole('button',{name:'Stop & save video',exact:true}).getAttribute('id'),'creationVideo');
+        assert.equal(await page.locator('#creationVideo svg').getAttribute('data-jems-icon'),'stop','recording has a visible stop affordance');
         await page.waitForTimeout(1000);
         const videoPromise=page.waitForEvent('download');await activate('#creationVideo');
         const video=await videoPromise,extension=video.suggestedFilename().endsWith('.mp4')?'mp4':'webm';
@@ -206,12 +268,12 @@ const {start}=require('./browser-server.cjs');
         assert.deepEqual((await scene()).programs,exported.programs);
 
         // Profile changes hide the other child's projects and clear the rendered scene.
-        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').nth(1));await exploreWelcome(page);
         await pacing();await activate('#studioNavScenes');
         assert.equal(await page.locator('#creationSaved [data-scene]').count(),0);
         assert.equal(await scene(),null);
         assert.equal(await page.locator('#creationBlocks').textContent(),'');
-        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());
+        await activate('#creationHome');await profiles();await activate(page.locator('.profile-choice').first());await exploreWelcome(page);
         await pacing();await activate('#studioNavScenes');await activate(`[data-scene="${projectId}"]`);
         assert.deepEqual((await scene()).programs,exported.programs);
 
@@ -327,7 +389,7 @@ const {start}=require('./browser-server.cjs');
         assert.match(await page.textContent('#creationLabProgress'),/Matched this goal/);
         assert.match(await page.textContent('#creationLabProgress'),/hint was opened/);
         await page.screenshot({path:`test-results/creation-progress-${device}.png`,fullPage:true});
-        await profiles();await activate(page.locator('.profile-choice').nth(1));
+        await profiles();await activate(page.locator('.profile-choice').nth(1));await exploreWelcome(page);
         await activate('#studioNavPowers');
         assert.equal(await page.locator('#creationLabProgress [data-project-id]').count(),0,'Progress contains only the selected profile’s checked scenes');
         assert.match(await page.textContent('#creationLabProgress'),/Try a scene challenge/);
@@ -336,7 +398,7 @@ const {start}=require('./browser-server.cjs');
         assert.deepEqual(paidRequests,[],'Local creation never requests a model or paid build');
         assert.deepEqual(errors,[],'No unhandled production UI errors');
         results.push({device,viewport,touchEmulated:touch,status:'passed',paidRequests:0,pageErrors:0,
-          verified:['honest unsupported native-source feedback','saved-game source continuity','same-source scene reopen','UI-authored blocks','reorder and undo','nested repeat and condition branches','play/pause/step','scene-to-Create-to-Journey cleanup','scene draft save without Keep on navigation','Keep/reload','editable file export','real canvas video export','profile isolation','target separation','behavioral challenge feedback','persistent hint history','event taps','variable boundary behavior','learning checkpoint guard','profile-scoped progress','overflow']});
+          verified:['shelf import without throwaway scene','invalid import preserves collection','saved scenes visible across shelf modes','challenge resume without duplicate','explicit fresh challenge','latest checked-scene continuation','owner-isolated challenge continuation','honest separate scene entry for unsupported games','saved-game source continuity','same-source scene reopen','UI-authored blocks','reorder and undo','nested repeat and condition branches','play/pause/step','scene-to-Create-to-Journey cleanup','scene draft save without Keep on navigation','Keep/reload','editable file export','real canvas video export','profile isolation','target separation','behavioral challenge feedback','persistent hint history','event taps','variable boundary behavior','learning checkpoint guard','profile-scoped progress','overflow']});
         console.log(`PASS ${device}: production Creation Studio UI, real block edits and playback, saved ownership, target reconstruction, tap behavior and learning guard`);
       } catch(error) {
         await page.screenshot({path:`test-results/creation-failure-${device}.png`,fullPage:true}).catch(()=>{});

@@ -1,24 +1,57 @@
 name: Build reviewed Pages site
-# Deliberately manual: PRs do not change the existing live arcade.
+# Deliberately manual. The code on main can advance without shipping any new feature.
+# Every release selects one previously merged immutable source commit.
 on:
   workflow_dispatch:
     inputs:
+      source_sha:
+        description: Exact reviewed 40-character merged Jems source SHA
+        required: true
+        type: string
       gateway_origin:
-        description: Existing gateway HTTPS origin; empty keeps AI unavailable
-        required: false
+        description: Existing reviewed production gateway HTTPS origin
+        required: true
         type: string
       preview_origin:
-        description: Existing separate preview HTTPS origin
-        required: false
+        description: Existing reviewed production preview HTTPS origin
+        required: true
         type: string
 permissions:
   contents: read
+concurrency:
+  group: jems-reviewed-pages-release
+  cancel-in-progress: false
 jobs:
   build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify immutable merged application source and public destinations
+        env:
+          REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+          FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
+          FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$REVIEWED_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo 'A full reviewed source SHA is required; do not deploy a branch or mutable tag.'
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$REVIEWED_SOURCE_SHA" "$GITHUB_SHA"; then
+            echo 'Requested source is not part of the triggering reviewed main history.'
+            exit 1
+          fi
+          if [[ "$FACTORY_PUBLIC_GATEWAY" != "https://factory-gateway-ola734esta-ul.a.run.app" ||
+                "$FACTORY_PUBLIC_PREVIEW" != "https://factory-preview-ola734esta-ul.a.run.app" ]]; then
+            echo 'Both known production service origins must match exactly.'
+            exit 1
+          fi
+          git checkout --detach "$REVIEWED_SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$REVIEWED_SOURCE_SHA"
+          echo "Building reviewed application source $REVIEWED_SOURCE_SHA"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -31,6 +64,12 @@ jobs:
         env:
           FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
           FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
+      - name: Stamp immutable release source
+        env:
+          REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          test -d dist
+          printf '{"sourceSha":"%s"}\n' "$REVIEWED_SOURCE_SHA" > dist/jems-release.json
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

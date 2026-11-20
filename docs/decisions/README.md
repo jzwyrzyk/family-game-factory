@@ -16,7 +16,13 @@ These records explain durable choices without turning chat history into another 
 | [0008](0008-cosmetic-making-journey.md) | Four illustrated making levels with cosmetic character choice | Accepted visual/product scope; initial threshold documented as implementation policy | Owner-directed refinement tracked in PR57 |
 | [0009](0009-approved-brand-library-v1-2.md) | Approved visual library with original selected-maker rank portraits | Accepted visual scope; integration and release separate | Owner-approved v1.2 and PR57 merge-readiness request |
 | [0010](0010-lifetime-gems-and-shared-rewards.md) | Shared lifetime engagement gems with durable receipts, independent maker ranks and recoverable local persistence | Accepted for development; initial award schedule is implementation policy | Owner's November 19 reward-system implementation direction; companions deferred |
-| [0012](0012-pals-from-earned-activity.md) | Collectible Pals from shared saved activity, with editable local scenes and separate collection ownership | Accepted for development; initial thresholds are implementation policy | Owner's November 19 companion implementation follow-up; final character art deferred |
+| [Parent evidence reporting](2026-11-19-parent-evidence-reporting.md) | Give parents inspectable observations, separate learning areas and useful next steps | Accepted; implementation merged in PR65 | Owner's November 19, 2026 request for benchmarked holistic parent dashboards |
+| [0011](0011-formative-problem-solving-evidence.md) | Combine background activity context with optional structured reasoning observations, preserving assistance and missingness | Accepted for development | Owner's November 19, 2026 post-PR62 review and authorization to correct research assumptions and begin holistic implementation |
+| [Gem Pal Studio](2026-11-19-gem-pal-studio.md) | Repository-owned character design, two-form growth, exact-reference continuity and quality review | Accepted operating method; art and runtime delivery separate | Owner's reusable-guide request and explicit authorization to create and merge the documentation PR |
+| [First-creation journey](2026-11-19-first-creation-journey.md) | A simple optional creation entry, contextual hints, direct ready-result handoff and purposeful return | Accepted for development; release evidence separate | Owner's first-login journey review and explicit instruction to build the aligned experience with small hints |
+
+| [0012](0012-pals-from-earned-activity.md) | Collectible Pals from shared saved activity, with editable local scenes and separate collection ownership | Accepted for development; original three-stage point superseded by 0013 | Owner companion implementation follow-up; final character artwork remains separate |
+| [0013](0013-two-form-pals-and-current-main.md) | Exactly two Pal forms with earned-progress compatibility and current-main integration | Two forms are owner directed; five-adventure transition is explicit compatibility policy | Owner two-form handoff and request to finish PR81/68 for merge |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
@@ -51,3 +57,5 @@ Link DELIVERY-STATE.md for implementation and operational status.
 ```
 
 Never copy private child content, credentials or restricted evidence into this public repository. Link an access-controlled evidence location with a safe description when needed.
+
+- [Private Art Studio and explicit reusable art versions](2026-11-19-private-art-studio.md) — dedicated creation space, original preservation, pinned game/scene use and private portability.

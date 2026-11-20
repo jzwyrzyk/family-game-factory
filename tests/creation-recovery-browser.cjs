@@ -5,6 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 const CREATION_KEY='family-game-factory-creation-v1';
 const STATE_KEYS=['family-game-factory-state-v1','family-game-factory-workspace-v2','family-game-factory-studio-v1',CREATION_KEY];
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -30,7 +31,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   fs.mkdirSync('test-results',{recursive:true});
   const ready=()=>page.waitForFunction(()=>window.FG?.creation&&window.FG?.studio&&document.getElementById('creationParentProgress'));
   const pacing=()=>page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture did not save');});
-  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();};
+  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();await page.locator('[data-parent-tab="settings"]').click();};
   const switchProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.locator('#studioProfileMenu summary').click();await page.locator('.profile-choice').nth(index).click();};
   const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await page.locator('#studioNavScenes').click();await page.locator(`[data-scene="${id}"]`).click();};
   const raw=()=>page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),STATE_KEYS);
@@ -59,7 +60,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   try{
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);await ready();await pacing();
     // Include actual Studio notebook/workspace state so rollback covers all four keys.
-    await page.locator('#creationHome').click();await page.locator('[data-starter="dragon"]').click();
+    await page.locator('#creationHome').click();await exploreWelcome(page);await page.locator('[data-starter="dragon"]').click();
     await page.locator('#studioNavScenes').click();await page.locator('#creationChallengeMode').click();
     await page.locator('[data-challenge="robot-route"]').click();
     await page.locator('#creationTitle').fill('My backup robot experiment');await page.locator('#creationTitle').press('Tab');
@@ -122,7 +123,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.deepEqual(await page.evaluate(()=>FG.creation.export()),backup.factoryCreation);
     assert.equal(await page.evaluate(()=>Object.hasOwn(FG.store.data,'factoryCreation')||Object.hasOwn(FG.store.data,'factoryCreationRecoveryRaw')),false);
     await pacing();await page.locator(`[data-scene="${projectId}"]`).click();
-    assert.equal(await page.locator('#creationHint').textContent(),'See my hint again');
+    assert.equal(await page.getByRole('button',{name:'See my hint again',exact:true}).count(),1);
     await page.locator('#creationCheck').click();await page.waitForFunction(()=>FG.creation.export().attempts.length===2);
     assert.ok((await page.evaluate(()=>FG.creation.export().attempts)).every(attempt=>attempt.hintUsed));
     await parent();assert.equal(await page.locator('#creationParentProgress li').count(),2);
@@ -160,7 +161,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     }
     assert.equal(await page.locator('#creationUndo').isDisabled(),true);assert.equal(await page.locator('#creationRedo').isDisabled(),true);
     await page.locator('#creationMore summary').click();
-    for(const selector of ['#creationCopy','#creationHistory']){await page.locator(selector).click();assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched);}
+    for(const selector of ['#creationCopy','#creationHistory','#creationImportButton']){await page.locator(selector).click();assert.match(await page.locator('#creationStatus').textContent(),/Resume my draft.*Use saved version/);assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched);}
     await page.locator('#creationMore summary').click();
     await page.locator('#creationResumeDraft').click();
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say']);
@@ -172,7 +173,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move']);
     await page.locator('[data-add-block="jump"]').click();
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions.map(action=>action.type)),['say','move','jump']);
-    checks.push('unresolved recovery blocks edits, Keep, checks, playback, copy and history until explicit Resume or Use saved; both choices preserve their selected content');
+    checks.push('unresolved recovery blocks edits, Keep, checks, playback, copy, import and history until explicit Resume or Use saved; both choices preserve their selected content');
     assert.deepEqual(errors,[],'No unhandled browser errors');assert.deepEqual(paidRequests,[],'No generation or coach provider requests');
     fs.writeFileSync('test-results/creation-recovery-browser-results.json',JSON.stringify({passed:checks.length,checks,errors,paidRequests},null,2)+'\n');
     console.log('PASS creation backup recovery browser: '+checks.length+' journeys; corrupt export, invalid input, atomic rollback, valid recovery, hint retention, legacy replacement, retired goals and explicit draft recovery');

@@ -1,5 +1,5 @@
 import { PAL_CATALOG, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
-import type { PalsView, PalPreferences, OwnedPalView } from './model';
+import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
 import './pals.css';
 
 /** Read-only presentation. Only the trusted coordinator changes ownership or growth. */
@@ -40,11 +40,13 @@ const ready = (state: PalsViewState) => !state.loading && !!state.profile && sta
 const count = (value: number) => new Intl.NumberFormat('en-US').format(value);
 
 /** Existing, approved gem tokens. Character designs and evolved portraits remain separate artwork work. */
-export function createPalPortrait(id: PalId, stage = 1, className = ''): HTMLElement {
+export function createPalPortrait(id: PalId, stage: PalStage = 1, className = ''): HTMLElement {
   const definition = palDefinition(id);
   const portrait = el('span', `pals-portrait ${className}`);
   portrait.dataset.pal = id;
   portrait.dataset.stage = String(stage);
+  portrait.dataset.form = stage === 2 ? 'mature' : 'base';
+  portrait.dataset.artwork = definition.artwork.status;
   portrait.setAttribute('aria-hidden', 'true');
   const image = el('img');
   image.src = new URL(definition.artPath, document.baseURI).href;
@@ -65,7 +67,7 @@ function progress(value: number, max: number, label: string) {
 }
 
 function growthCopy(pal: OwnedPalView): string {
-  return pal.nextStageAt === null ? `${count(pal.adventures)} adventures together` : `${count(pal.adventuresToNext)} more adventures to ${pal.stage === 1 ? 'Bright Pal' : 'Radiant Pal'}`;
+  return pal.nextStageAt === null ? `${count(pal.adventures)} adventures together` : `${count(pal.adventuresToNext)} more adventures to Grown`;
 }
 
 /** A complete collection page with no modal takeover and no mutations on render. */
@@ -235,7 +237,7 @@ export function createPalsPage(options: PalsPageOptions) {
       if (starter) {
         actions.append(actionButton(`Choose ${definition.name}`, `starter-${definition.id}`, () => options.onChooseStarter(definition.id, state.owner), true));
       } else if (pal) {
-        const text = el('p', 'pals-card-progress', pal.nextStageAt === null ? `Radiant · ${count(pal.adventures)} adventures` : `${count(pal.adventures)} / ${pal.nextStageAt} adventures`);
+        const text = el('p', 'pals-card-progress', pal.nextStageAt === null ? `Grown · ${count(pal.adventures)} adventures` : `${count(pal.adventures)} / ${pal.nextStageAt} adventures`);
         actions.append(text);
         if (pal.nextStageAt !== null) actions.append(progress(pal.adventures, pal.nextStageAt, `${definition.name}: ${pal.adventures} of ${pal.nextStageAt} adventures`));
         if (profile.activeId !== definition.id) actions.append(actionButton('Take along', `equip-${definition.id}`, () => options.onEquip(definition.id, state.owner)));
@@ -293,7 +295,7 @@ export function createPalsPage(options: PalsPageOptions) {
     info.append(stage);
     const trail = el('ol', 'pals-growth-stages');
     trail.setAttribute('aria-label', `${definition.name}'s growth stages`);
-    for (const [index, label] of ['New', 'Bright', 'Radiant'].entries()) {
+    for (const [index, label] of ['Base', 'Grown'].entries()) {
       const step = el('li');
       step.dataset.earned = String(index + 1 <= pal.stage);
       if (index + 1 === pal.stage) step.setAttribute('aria-current', 'step');
@@ -307,7 +309,7 @@ export function createPalsPage(options: PalsPageOptions) {
     if (pal.nextStageAt !== null) {
       growth.append(progress(pal.adventures, pal.nextStageAt, `${definition.name} growth: ${pal.adventures} of ${pal.nextStageAt} adventures`));
       growth.append(el('span', 'pals-growth-detail', `${count(pal.adventures)} / ${pal.nextStageAt} adventures · ${pal.practiceToNextAdventure} learning ${pal.practiceToNextAdventure === 1 ? 'activity' : 'activities'} to the next adventure`));
-    } else growth.append(el('p', 'pals-growth-detail', 'All growth stages earned. Keep making new memories together.'));
+    } else growth.append(el('p', 'pals-growth-detail', 'Grown form reached. Keep making new memories together.'));
     info.append(growth);
     const actions = el('div', 'pals-detail-actions');
     actions.append(actionButton('Make something with this Pal', `create-${pal.id}`, () => options.onCreate(pal.id, state.owner), true));
@@ -325,7 +327,7 @@ export function createPalsPage(options: PalsPageOptions) {
     summary.dataset.palsFocus = 'growth-help';
     const body = el('div');
     body.append(el('p', '', 'Take a Pal along while you learn and make. Every 5 saved Math or English activities, each new coding challenge, or a developed game adds an adventure. Using help still counts.'));
-    body.append(el('p', '', 'Bright Pal arrives at 5 adventures; Radiant Pal at 15. Tapping your Pal is just for fun. Progress stays when you take a break.'));
+    body.append(el('p', '', 'Your Pal grows from Base to Grown at 5 adventures. There are two forms. Tapping your Pal is just for fun. Progress stays when you take a break.'));
     details.append(summary, body);
     return details;
   }

@@ -1,5 +1,6 @@
 import { World, Vec2, Box, Circle, Polygon, Edge, WeldJoint, RevoluteJoint, WheelJoint, type Body, type Joint } from 'planck';
 import { PARTS, type Point, type PartKind, type PartDefinition, type Material } from './parts';
+import type { VehicleDrawingGeometry } from '../drawing/model';
 import { validateBlueprint, type Blueprint, type GumConnection, worldPoint } from './blueprint';
 
 export const PHYSICS_VERSION = 'planck-1.4.2-quality-1';
@@ -177,21 +178,43 @@ export interface VehicleOptions { enginePower?: number; suspension?: number; whe
 export interface VehicleInput { throttle?: number; brake?: boolean }
 export interface VehicleSnapshot extends SimulationSnapshot { distance: number; bestDistance: number; tilt: number; speed: number; grounded: boolean; track: string }
 export interface VehicleSimulation { step(dt: number, input?: VehicleInput): void; snapshot(): VehicleSnapshot; drainEvents(): PhysicsEvent[]; dispose(): void }
-export function createVehicle(options: VehicleOptions = {}, trackId = 'meadow'): VehicleSimulation {
+export function createVehicle(options: VehicleOptions = {}, trackId = 'meadow', geometry?: VehicleDrawingGeometry): VehicleSimulation {
   const track = TRACKS[trackId]; if (!track) throw Error('UNKNOWN_TRACK');
   const power = bounded(options.enginePower, 1, .5, 2), frequency = bounded(options.suspension, 4, 2, 8);
   const radius = bounded(options.wheelSize, .52, .35, .8), weight = bounded(options.chassisMass, 1, .5, 2), grip = bounded(options.grip, 1, .5, 1.5);
+  // A drawing's wheel locations and sizes MUST change the actual wheel bodies.
+  // Reject unbounded or implausible coordinates before any Planck allocation.
+  if(geometry){
+    const valid=(value:unknown,min:number,max:number)=>typeof value==='number'&&Number.isFinite(value)&&value>=min&&value<=max;
+    if(!valid(geometry.chassisWidth,1,4)||!valid(geometry.chassisHeight,.5,2)||!Array.isArray(geometry.wheels)||geometry.wheels.length!==2
+      ||geometry.wheels.some(w=>!w||!valid(w.x,-1.75,1.75)||!valid(w.y,-.2,1.4)||!valid(w.radius,.35,.8)))
+      throw Error('INVALID_DRAWN_VEHICLE_GEOMETRY');
+  }
+  const custom = geometry ? {
+    width: bounded(geometry.chassisWidth, 2.9, 1, 4),
+    height: bounded(geometry.chassisHeight, 1.25, .5, 2),
+    wheels: geometry.wheels.map(w => ({
+      x: bounded(w.x, 0, -1.75, 1.75),y: bounded(w.y, 0, -.2, 1.4),
+      radius: bounded(w.radius, .52, .35, .8),
+    }))
+  } : undefined;
+  if(custom && (custom.wheels.length!==2 || custom.wheels[1].x-custom.wheels[0].x<.45-1e-9))throw Error('INVALID_DRAWN_VEHICLE_GEOMETRY');
+  const baseY = custom ? Math.min(9.65,10.94-custom.height/2,10.94-Math.max(...custom.wheels.map(w=>w.y+w.radius))) : 9.65;
   const world = new World(Vec2(0, track.gravity)), terrain = world.createBody({ userData: { terrain: true } });
   for (let i = 1; i < track.points.length; i++) terrain.createFixture(Edge(Vec2(track.points[i - 1].x, track.points[i - 1].y), Vec2(track.points[i].x, track.points[i].y)), { friction: .9, restitution: .03 });
-  const body = world.createDynamicBody({ position: Vec2(2.5, 9.65), angularDamping: .3, linearDamping: .02, bullet: true, userData: { id: 'chassis', material: 'metal' } });
-  body.createFixture(Polygon([Vec2(-1.45, .32), Vec2(1.45, .32), Vec2(1.45, -.05), Vec2(.65, -.55), Vec2(-.7, -.55), Vec2(-1.45, -.1)]), { density: 1, friction: .4, restitution: .08 });
-  mass(body, 3.5 * weight);
-  const entries: Entry[] = [{ id: 'chassis', kind: 'chassis', body, width: 2.9, height: 1.25, previous: { x: 2.5, y: 9.65, angle: 0 } }];
+  const body = world.createDynamicBody({ position: Vec2(2.5, baseY), angularDamping: .3, linearDamping: .02, bullet: true, userData: { id: 'chassis', material: 'metal' } });
+  if(custom)body.createFixture(Box(custom.width/2,custom.height/2),{density:1,friction:.4,restitution:.08});
+  else body.createFixture(Polygon([Vec2(-1.45, .32), Vec2(1.45, .32), Vec2(1.45, -.05), Vec2(.65, -.55), Vec2(-.7, -.55), Vec2(-1.45, -.1)]), { density: 1, friction: .4, restitution: .08 });
+  mass(body, 3.5 * weight * (custom ? (custom.width/2.9)*(custom.height/1.25) : 1));
+  const entries: Entry[] = [{ id: 'chassis', kind: 'chassis', body, width: custom?.width??2.9, height: custom?.height??1.25, previous: { x: 2.5, y: baseY, angle: 0 } }];
   const springs: WheelJoint[] = [];
-  for (const [id, x] of [['rear-wheel', 1.55], ['front-wheel', 3.45]] as const) {
-    const wheel = world.createDynamicBody({ position: Vec2(x, 10.4), angularDamping: .04, bullet: true, userData: { id, material: 'rubber' } });
-    wheel.createFixture(Circle(radius), { density: 1, friction: 1.15 * grip, restitution: .05 }); mass(wheel, .65);
-    entries.push({ id, kind: 'wheel', body: wheel, width: radius * 2, height: radius * 2, previous: { x, y: 10.4, angle: 0 } });
+  for (const [index, id] of ['rear-wheel', 'front-wheel'].entries()) {
+    const sampled = custom?.wheels[index], x = sampled ? 2.5 + sampled.x : (index===0?1.55:3.45);
+    const y = sampled ? baseY + sampled.y : 10.4;
+    const wheelRadius = sampled ? bounded(sampled.radius*(radius/.52), .52, .35, .8) : radius;
+    const wheel = world.createDynamicBody({ position: Vec2(x, y), angularDamping: .04, bullet: true, userData: { id, material: 'rubber' } });
+    wheel.createFixture(Circle(wheelRadius), { density: 1, friction: 1.15 * grip, restitution: .05 }); mass(wheel, .65);
+    entries.push({ id, kind: 'wheel', body: wheel, width: wheelRadius * 2, height: wheelRadius * 2, previous: { x, y, angle: 0 } });
     springs.push(world.createJoint(new WheelJoint({ motorSpeed: 0, maxMotorTorque: 18 * power, enableMotor: true, frequencyHz: frequency, dampingRatio: .75, collideConnected: false }, body, wheel, wheel.getPosition(), Vec2(0, 1)))!);
   }
   const events: PhysicsEvent[] = []; let time = 0, accumulator = 0, disposed = false, status: SimulationSnapshot['status'] = 'playing', reason = '', best = 0, grounded = false, wasGrounded = false, upsideDown = 0;

@@ -1,10 +1,12 @@
-import { isPalId, PAL_CATALOG, palDefinition, type PalId } from './catalog';
+import { isPalId, PAL_CATALOG, palDefinition, type PalId, type PalForm } from './catalog';
 
 export const PALS_POLICY_VERSION = 1 as const;
 export const PALS_LIMITS = Object.freeze({ owners: 80, receiptsPerOwner: 25_000, selectionsPerOwner: 25_000, characters: 16_000_000 });
 export const PRACTICE_PER_ADVENTURE = 5;
-export const PAL_STAGE_THRESHOLDS = Object.freeze([0, 5, 15] as const);
-export type PalStage = 1 | 2 | 3;
+// Preserve the first earned transition. Older draft profiles store receipts,
+// not stages: their existing 5+ adventures derive Grown without a data rewrite.
+export const PAL_STAGE_THRESHOLDS = Object.freeze([0, 5] as const);
+export type PalStage = 1 | 2;
 export type PalActivityKind = 'math.completed' | 'language.completed' | 'language.explored' | 'scene.challenge' | 'game.developed';
 export interface PalActivity { id: string; kind: PalActivityKind; occurredAt: string }
 /** Trusted host bridge only: not a generated-game message or a public award API. */
@@ -23,7 +25,7 @@ export interface PalsWorkspace { schema: 'jems.pals.workspace.v1'; profiles: Pal
 export interface PalsBackup { schema: 'jems.pals.backup.v1'; namespace: string; data: PalsWorkspace }
 export interface OwnedPalView extends OwnedPal {
   adventures: number; practiceActivities: number; creationAdventures: number;
-  stage: PalStage; stageName: 'New Pal' | 'Bright Pal' | 'Radiant Pal';
+  stage: PalStage; form: PalForm; stageName: 'Base' | 'Grown';
   nextStageAt: number | null; adventuresToNext: number; practiceToNextAdventure: number;
 }
 export interface PalsView {
@@ -118,16 +120,17 @@ export function validatePalsBackup(value: unknown, namespace?: string): PalsBack
       !isPalsNamespace(value.namespace) || namespace !== undefined && value.namespace !== namespace) invalid();
   return { schema: 'jems.pals.backup.v1', namespace: value.namespace, data: validatePalsWorkspace(value.data) };
 }
-export function palStage(adventures: number): PalStage { return adventures >= 15 ? 3 : adventures >= 5 ? 2 : 1; }
+export function palStage(adventures: number): PalStage { return adventures >= PAL_STAGE_THRESHOLDS[1] ? 2 : 1; }
 export function summarizePals(profile: PalProfile): PalsView {
   const owned = profile.owned.map(pal => {
     const activities = profile.assignments.filter(assignment => assignment.palId === pal.id);
     const practiceActivities = activities.filter(activity => activity.kind.startsWith('math.') || activity.kind.startsWith('language.')).length;
     const creationAdventures = activities.length - practiceActivities;
     const adventures = Math.floor(practiceActivities / PRACTICE_PER_ADVENTURE) + creationAdventures;
-    const stage = palStage(adventures), nextStageAt = stage === 3 ? null : PAL_STAGE_THRESHOLDS[stage];
+    const stage = palStage(adventures), nextStageAt = stage === 2 ? null : PAL_STAGE_THRESHOLDS[stage];
     return { ...copyPals(pal), adventures, practiceActivities, creationAdventures, stage,
-      stageName: (['New Pal', 'Bright Pal', 'Radiant Pal'] as const)[stage - 1], nextStageAt,
+      form: (['base', 'mature'] as const)[stage - 1],
+      stageName: (['Base', 'Grown'] as const)[stage - 1], nextStageAt,
       adventuresToNext: nextStageAt === null ? 0 : nextStageAt - adventures,
       practiceToNextAdventure: PRACTICE_PER_ADVENTURE - practiceActivities % PRACTICE_PER_ADVENTURE };
   });

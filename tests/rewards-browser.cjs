@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Production app reward journey. Grants come only from ordinary host UI actions.
  * FG.rewards is inspected/refreshed, never given invented grants. Adult endpoints
  * are explicit local auth fixtures; this test invokes no paid provider. */
@@ -48,7 +49,7 @@ async function answerMath(page, { hint = false, wrong = false } = {}) {
 async function chooseFamily(page, index) {
   if (!await page.locator('#studioProfileMenu').evaluate(element => element.open)) await page.click('#studioProfileMenu summary');
   await page.locator('.profile-choice:not(#adultProfileChoice)').nth(index).click();
-  await page.waitForFunction(index => FG.store.current().id === `player${index + 1}`, index);
+  await page.waitForFunction(index => FG.store.current().id === `player${index + 1}`, index); await exploreWelcome(page);
 }
 async function openRewards(page) {
   await page.click('#jemsRewardsWidget');
@@ -135,17 +136,50 @@ async function installAuthFixture(context) {
   fs.mkdirSync('test-results', { recursive: true });
   const base = `http://127.0.0.1:${server.address().port}/arcade/`;
   try {
-    await page.goto(base); await ready(page); await expectTotal(page, 0);
+    await page.goto(base); await ready(page); await exploreWelcome(page); await expectTotal(page, 0);
     await openRewards(page);
     assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '0');
     assert.equal(await page.locator('#jemsRewardsMakerName').textContent(), 'Ready to create');
     assert.deepEqual(await page.evaluate(() => window.rewardToastMessages), [], 'Opening rewards cannot earn or replay anything');
     for (const width of [1400, 768, 390, 320]) { await page.setViewportSize({ width, height: 1000 }); await noOverflow(page); }
     await page.setViewportSize({ width: 1400, height: 1000 });
-    await page.click('#jemsRewardsBack');
+
+    // Rewards starts the maker choice directly and routes each earning action
+    // through the ordinary host without granting credit just for navigation.
+    await page.click('#jemsRewardsMakerAction');
+    await page.locator('#jemsCharacterDialog').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('[data-journey-character]').count(), 2);
+    await page.keyboard.press('Escape');
+    await openRewards(page);
+    const sessionsBeforeMaking = await page.evaluate(() => FG.studio.exportNotebook().sessions.length);
+    await page.click('[data-reward-activity="making"]');
+    await page.locator('#page-studio').waitFor({ state: 'visible' });
+    const madeIdea = await page.evaluate(() => {
+      const notebook = FG.studio.exportNotebook();
+      return { count: notebook.sessions.length, session: notebook.sessions.find(session => session.id === notebook.active[FG.store.current().id]) };
+    });
+    assert.equal(madeIdea.count, sessionsBeforeMaking + 1);
+    assert.equal(madeIdea.session.game, 'new', 'Your own game opens a new saved idea');
+    await expectTotal(page, 0);
+
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
+    await page.selectOption('#parentSubject', 'math'); await page.click('#saveParent');
+    await openRewards(page);
+    const lockedSettings = await page.evaluate(() => ({ subject: FG.store.current().learningSubject, switchAllowed: FG.store.current().allowSubjectSwitch }));
+    await page.click('[data-reward-activity="language"]');
+    assert.match(await page.locator('#studioGlobalStatus').textContent(), /grown-up.*enable both subjects/i);
+    assert.equal(await page.locator('#studioGlobalStatus').getAttribute('role'), 'alert');
+    assert.equal(await page.locator('#page-jems-rewards').isVisible(), true, 'A locked subject does not navigate away');
+    assert.deepEqual(await page.evaluate(() => ({ subject: FG.store.current().learningSubject, switchAllowed: FG.store.current().allowSubjectSwitch })), lockedSettings, 'Rewards cannot change the parent subject lock');
+    assert.equal(await page.evaluate(() => FG.learning.subject), 'math');
+    await expectTotal(page, 0);
+    await page.click('[data-reward-activity="math"]');
+    await activeMath(page).waitFor({ state: 'visible' });
+    assert.equal(await page.evaluate(() => FG.learning.subject), 'math', 'The permitted current subject opens even when switching is locked');
+    assert.deepEqual(await page.evaluate(() => ({ subject: FG.store.current().learningSubject, switchAllowed: FG.store.current().allowSubjectSwitch })), lockedSettings);
 
     // Viewing, an accepted wrong response, a hint and a revealed solution are not completion grants.
-    await startMath(page); const shownId = await page.evaluate(() => FG.learning.activeAttemptId);
+    const shownId = await page.evaluate(() => FG.learning.activeAttemptId);
     await answerMath(page, { wrong: true });
     await page.evaluate(() => FG.rewards.refresh()); assert.equal(await total(page), 0);
     await activeMath(page).locator('[data-action="show-solution"]').click();
@@ -182,15 +216,18 @@ async function installAuthFixture(context) {
     await openRewards(page); assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '30');
     await page.click('#jemsRewardsBack');
 
-    // The parent selects English through the ordinary settings; the child completes its real activity.
-    await page.locator('footer [data-page="parent"]').click();
-    await page.selectOption('#parentSubject', 'language'); await page.click('#saveParent');
-    await page.click('#studioNavPowers');
+    // The parent permits both subjects; the Rewards language route chooses the
+    // exact subject without changing that permission, then earns a real grant.
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
+    await page.selectOption('#parentSubject', 'both'); await page.click('#saveParent');
+    await openRewards(page); await page.click('[data-reward-activity="language"]');
+    assert.equal(await page.evaluate(() => FG.learning.subject), 'language');
+    assert.equal(await page.evaluate(() => FG.store.current().allowSubjectSwitch), true);
     if (!await page.evaluate(() => FG.learning.active)) await page.click('#lab-next');
     await page.locator('.language-activity:visible').waitFor();
     await answerLanguage(page); await expectTotal(page, 32);
     assert.equal((await summary(page)).counts.language, 1);
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     await page.selectOption('#parentSubject', 'math'); await page.click('#saveParent');
     await page.click('#studioNavHome');
 
@@ -218,8 +255,11 @@ async function installAuthFixture(context) {
     await page.setViewportSize({ width: 1400, height: 1000 });
 
     // Solve one actual rebuilt scene using the visible block editor; a repeat check pays no extra.
-    await page.click('#studioNavScenes');
-    await page.click('#creationChallengeMode'); await page.click('[data-challenge="robot-taps"]');
+    await page.click('[data-reward-activity="coding"]');
+    await page.locator('#creationChallengeShelf').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#creationChallengeMode').getAttribute('aria-pressed'), 'true');
+    assert.equal(await page.locator('#creationFreeShelf').isVisible(), false, 'Coding rewards opens challenges directly');
+    await page.click('[data-challenge="robot-taps"]');
     await page.getByRole('combobox', { name: 'When', exact: true }).selectOption('tap');
     await page.click('[data-add-block="move"]');
     const scene = await page.evaluate(() => FG.creation.scene());
@@ -233,7 +273,7 @@ async function installAuthFixture(context) {
     assert.equal((await summary(page)).counts.coding, 1);
 
     // Parent UI exports the actual ledger; restoring it twice remains idempotent.
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     const downloadPromise = page.waitForEvent('download'); await page.click('#exportData');
     const download = await downloadPromise, backupPath = path.resolve('test-results/rewards-family-backup.json');
     await download.saveAs(backupPath);
@@ -244,7 +284,7 @@ async function installAuthFixture(context) {
     assert.equal(rewardBackup.data.profiles.find(profile => profile.owner === 'player1').receipts.reduce((sum, receipt) => sum + receipt.amount, 0), 100);
     assert.equal(rewardBackup.data.profiles.some(profile => profile.owner.startsWith('adult:')), false);
     for (let copy = 0; copy < 2; copy++) {
-      await page.locator('footer [data-page="parent"]').click();
+      await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
       const reloaded = page.waitForNavigation({ waitUntil: 'load' });
       const restored = page.waitForEvent('dialog', { predicate: dialog => dialog.type() === 'alert' && /restored successfully/i.test(dialog.message()) });
       await page.locator('#importData').setInputFiles(backupPath); await restored;
@@ -256,10 +296,10 @@ async function installAuthFixture(context) {
     // Adult authorization is exercised through the real dialog; reward namespaces stay separate.
     if (!await page.locator('#studioProfileMenu').evaluate(element => element.open)) await page.click('#studioProfileMenu summary');
     await page.click('#adultProfileChoice'); await page.fill('#adultProfilePassphrase', PASSPHRASE); await page.click('#adultProfileSubmit');
-    await page.waitForFunction(id => FG.store.current().id === id, ADULT); await expectTotal(page, 0);
+    await page.waitForFunction(id => FG.store.current().id === id, ADULT); await expectTotal(page, 0); await exploreWelcome(page);
     await startMath(page); await answerMath(page); await expectTotal(page, 2);
     await chooseFamily(page, 0); await expectTotal(page, 100);
-    await page.locator('footer [data-page="parent"]').click();
+    await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     const afterAdultDownload = page.waitForEvent('download'); await page.click('#exportData');
     const afterAdultPath = path.resolve('test-results/rewards-family-after-adult.json');
     await (await afterAdultDownload).saveAs(afterAdultPath);
@@ -286,7 +326,7 @@ async function installAuthFixture(context) {
     // The legacy host still participates in the same reward ledger without an alternate award path.
     await page.goto(base + '?arcade=1'); await page.waitForFunction(() => window.FG?.rewards && window.FG?.learning);
     assert.equal(await total(page), 100);
-    await page.getByRole('navigation').getByRole('button', { name: '⚡ My Powers', exact: true }).click();
+    await page.getByRole('navigation').getByRole('button', { name: 'My Powers', exact: true }).click();
     await answerMath(page); await expectTotal(page, 102);
 
     // A second real tab cannot write over the active tab. Taking over reloads its
@@ -323,8 +363,9 @@ async function installAuthFixture(context) {
     assert.deepEqual(errors, []); assert.deepEqual(paid, [], 'The reward journey does not request paid generation or coaching');
     console.log('PASS: full app rewards from Math/English/making/coding, assisted evidence, no shown/duplicate credit, reload, profile/adult isolation, parent backup/restore, source-save failure, legacy host, two-tab save ownership and responsive navigation.');
   } catch (error) {
+    console.error('Rewards browser failure before capture:', error);
     if (dialogs.length) console.error('Recent application dialogs:', JSON.stringify(dialogs.slice(-3)));
-    await context.pages().at(-1)?.screenshot({ path: 'test-results/rewards-app-failure.png', fullPage: true }).catch(() => {});
+    await context.pages().at(-1)?.screenshot({ path: 'test-results/rewards-app-failure.png', fullPage: true, timeout: 5000 }).catch(() => {});
     throw error;
   } finally { await browser.close(); server.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

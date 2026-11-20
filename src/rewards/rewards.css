@@ -80,6 +80,7 @@
 .jems-rewards .jems-rewards-maker-name { margin-top: 3px; font-size: 27px; letter-spacing: -.7px; }
 .jems-rewards .jems-rewards-maker-next { color: #5b6680; font-size: 12px; line-height: 1.5; margin-top: 4px; max-width: 250px; }
 .jems-rewards-maker .jems-rewards-text-action { font-size: 12px; min-height: 44px; }
+.jems-rewards .jems-rewards-explainer { margin: 16px 3px 0; color: var(--rewards-muted); font-size: 1rem; line-height: 1.5; }
 .jems-rewards-section { margin-top: 28px; }
 .jems-rewards-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 3px 13px; }
 .jems-rewards-section-heading p { color: var(--rewards-muted); font-size: 12px; }
@@ -98,16 +99,17 @@
 .jems-rewards-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 23px; }
 .jems-rewards-ways, .jems-rewards-recent { min-width: 0; border: 1px solid var(--rewards-line); border-radius: 22px; background: #fff; padding: 23px; }
 .jems-rewards-ways-list, .jems-rewards-recent-list { list-style: none; margin: 17px 0 0; padding: 0; }
-.jems-rewards-way { display: flex; gap: 12px; align-items: center; padding: 9px 0; }
+.jems-rewards-way { display: flex; gap: 12px; align-items: center; width: 100%; min-height: 64px; margin: 7px 0; padding: 10px 8px; border: 1px solid #e8e1ef; border-radius: 12px; background: #fcfaff; text-align: left; }
+.jems-rewards-way:hover { border-color: #d9cbed; background: #f8f4ff; }
 .jems-rewards-way-symbol { display: grid; place-items: center; flex: none; width: 39px; height: 39px; border-radius: 12px; background: #edf3ff; }
 .jems-rewards-way.is-coral .jems-rewards-way-symbol { background: #fff0f3; }
 .jems-rewards-way.is-purple .jems-rewards-way-symbol { background: #f2ebff; }
 .jems-rewards-way.is-mint .jems-rewards-way-symbol { background: #e2fbf3; }
 .jems-rewards-icon { display: block; width: 21px; height: 21px; object-fit: contain; }
 .jems-rewards-way-copy { flex: 1; display: flex; flex-direction: column; min-width: 0; gap: 3px; }
-.jems-rewards-way-copy > strong { color: #223957; font-size: 13px; font-weight: 750; }
-.jems-rewards-way-copy > small { color: #64718a; font-size: 11px; line-height: 1.4; }
-.jems-rewards-way-amount { color: #674291; font-size: 14px; }
+.jems-rewards-way-copy > strong { color: #223957; font-size: 1rem; font-weight: 750; }
+.jems-rewards-way-copy > small { color: #64718a; font-size: .875rem; line-height: 1.4; }
+.jems-rewards-way-amount { color: #674291; font-size: 14px; white-space: nowrap; }
 .jems-rewards-bonus { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 15px; padding: 13px; border-radius: 13px; color: #755215; background: #fff6e1; font-size: 11px; line-height: 1.4; }
 .jems-rewards-bonus > strong { font-weight: 800; }
 .jems-rewards-grant { display: flex; align-items: center; gap: 11px; min-height: 57px; padding: 10px 0; border-bottom: 1px solid #f0ecf5; }

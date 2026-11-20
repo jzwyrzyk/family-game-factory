@@ -1,4 +1,4 @@
-import { beginAttempt, finishAttempt, selectItem, submitAnswer, useHint } from './engine';
+import { beginAttempt, finishAttempt, selectItem, submitAnswer, useHint, type Attempt } from './engine';
 import type { LearnerProfile, LearningContext, LearningMode, MathItem } from './types';
 import { interactionKind, quantityPlaces, renderMathVisual } from './visuals';
 
@@ -15,7 +15,7 @@ export interface MathActivityOptions {
   item?: MathItem;
   mode?: LearningMode;
   onComplete(result: MathActivityResult): void;
-  onSave(): void;
+  onSave(attempt: Attempt): void;
   legacyIds?: boolean;
   challenge?: boolean;
 }
@@ -86,7 +86,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   target.replaceChildren(root);
 
   function save() {
-    try { const result=options.onSave() as unknown; if(result===false)saveWarning.hidden=false; }
+    try { const result=options.onSave(attempt) as unknown; if(result===false)saveWarning.hidden=false; }
     catch { saveWarning.hidden=false; }
   }
   save();

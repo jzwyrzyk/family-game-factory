@@ -5,6 +5,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import shlex
 import subprocess
 import tarfile
 import tempfile
@@ -104,6 +105,7 @@ class ServiceBuildTests(unittest.TestCase):
             git('init','-q')
             files=['package.json','package-lock.json','.dockerignore','server/Dockerfile.gateway','server/Dockerfile.preview',
                    'server/gateway.ts','server/private-config.ts','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
+                   'src/creation/model.ts','src/creation/projects.ts',
                    'server/key.pem','server/config.json','server/config.private.json','server/service-account.json','server/credentials.json',
                    'server/token.json','server/api-key.json','server/.env','server/.private/config.json','server/node_modules/p/index.js',
                    'server/testing/fixture.ts','unrelated.txt']
@@ -120,9 +122,68 @@ class ServiceBuildTests(unittest.TestCase):
                     archive,digest=b.source_archive(root,staged,sha);hashes.append(digest)
                     with tarfile.open(archive) as tar:
                         names=tar.getnames()
-                        self.assertEqual(set(names),set(files[:10]))
+                        self.assertEqual(set(names),set(files[:12]))
                         self.assertEqual(tar.extractfile('server/gateway.ts').read(),b'reviewed server/gateway.ts')
             self.assertEqual(hashes[0],hashes[1])
+
+    def test_real_archive_contains_current_dockerfile_copy_inputs_and_supports_older_sources(self):
+        source=Path(__file__).resolve().parents[2]
+        dockerfiles={kind:(source/('server/Dockerfile.'+kind)).read_text() for kind in ('gateway','preview')}
+        dockerignore=(source/'.dockerignore').read_text()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'repo';root.mkdir()
+            def git(*args):return subprocess.check_output(['git',*args],cwd=root,stderr=subprocess.DEVNULL).decode().strip()
+            def write(name,content):
+                path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(content)
+            def commit():
+                git('add','-A');git('-c','user.name=Test','-c','user.email=test@example.com','commit','-qm','Reviewed')
+                return git('rev-parse','HEAD')
+            git('init','-q')
+            inputs=['package.json','package-lock.json','.dockerignore','server/gateway.ts','server/preview-server.ts',
+                    'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
+                    'src/creation/model.ts','src/creation/projects.ts']
+            for name in inputs:write(name,'reviewed '+name)
+            write('.dockerignore',dockerignore)
+            for kind,content in dockerfiles.items():write('server/Dockerfile.'+kind,content)
+            sha=commit()
+            with tempfile.TemporaryDirectory() as staged:
+                archive,_=b.source_archive(root,staged,sha)
+                with tarfile.open(archive) as tar:
+                    names=set(tar.getnames())
+                    # The source tar is still filtered by Docker. This repository
+                    # uses a deny-by-default context with explicit shared inputs.
+                    patterns=[line.strip() for line in tar.extractfile('.dockerignore').read().decode().splitlines() if line.strip() and not line.lstrip().startswith('#')]
+                    self.assertEqual(patterns[0],'**')
+                    for kind,content in dockerfiles.items():
+                        for line in content.splitlines():
+                            if not line.startswith('COPY '):continue
+                            paths=[token for token in shlex.split(line)[1:] if not token.startswith('--')][:-1]
+                            for name in paths:
+                                self.assertTrue(name in names or any(p.startswith(name+'/') for p in names),(kind,name))
+                                if name.startswith('src/'):
+                                    self.assertIn('!'+name,patterns,(kind,name,'Docker context excludes this COPY input'))
+                                    for parent in Path(name).parents:
+                                        if parent!=Path('.'):self.assertIn('!'+parent.as_posix()+'/',patterns)
+                    for name in inputs[-2:]:self.assertEqual(tar.extractfile(name).read(),('reviewed '+name).encode())
+
+            # A future Dockerfile dependency outside the narrow source allowlist
+            # must fail locally instead of starting a billable doomed build.
+            write('src/unstaged.ts','reviewed but not allowed')
+            write('server/Dockerfile.gateway',dockerfiles['gateway']+'COPY src/unstaged.ts ./src/\n')
+            missing=commit()
+            with tempfile.TemporaryDirectory() as staged,patch.object(b,'cloud') as cloud:
+                with self.assertRaisesRegex(RuntimeError,'src/unstaged.ts.*COPY'):b.source_archive(root,staged,missing)
+                cloud.assert_not_called()
+
+            # Rollback source predating Creation must remain publishable with
+            # this reviewed publisher; its own Dockerfiles determine inputs.
+            for kind,content in dockerfiles.items():
+                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/creation/' not in line)+'\n')
+            for name in inputs[-2:]: (root/name).unlink()
+            older=commit()
+            with tempfile.TemporaryDirectory() as staged:
+                archive,_=b.source_archive(root,staged,older)
+                with tarfile.open(archive) as tar:self.assertFalse(any(name.startswith('src/creation/') for name in tar.getnames()))
 
     def test_full_publish_stages_once_builds_both_and_independently_verifies_digests(self):
         cloud=FakeCloud()

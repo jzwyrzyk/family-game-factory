@@ -26,6 +26,8 @@ export interface PrivateSpeechHooks {
  onTranscript:(message:string)=>void|Promise<void>;
  onRecordingStart?():void;
  onAvailability?(ready:boolean):void;
+ /** The host owns visual branding; recording and consent stay in this adapter. */
+ renderButton?:(state:'idle'|'recording'|'finishing',label:string)=>void;
 }
 export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
  let allowUntil=0,allowedScope='',seq=0,approved=false,finishing=false;
@@ -33,9 +35,13 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
  let chunks:Blob[]=[],bytes=0,timeout:ReturnType<typeof setTimeout>|undefined;
  let request:AbortController|null=null,recording=false;
  const status=(text:string)=>{h.status.textContent=text;};
+ const labelButton=(state:'idle'|'recording'|'finishing')=>{
+  const label=state==='idle'?'Speak':state==='recording'?'Finish speaking':'Cancel transcription';
+  if(h.renderButton)h.renderButton(state,label);else h.button.textContent=label;
+ };
  const button=(active:boolean)=>{
   h.button.setAttribute('aria-pressed',String(active));
-  h.button.textContent=active?(finishing?'Cancel transcription':'■ Finish speaking'):'🎙 Speak';
+  labelButton(active?(finishing?'finishing':'recording'):'idle');
  };
  const mime=()=>{
   const Ctor=(window as any).MediaRecorder as RecorderCtor|undefined;
@@ -111,7 +117,7 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
     const blob=new Blob(chunks,{type:selectedMime}),captured=scope;cleanup();
     if(blob.size<100||blob.size>320000){status('Could not hear a short sentence. Nothing was sent.');return;}
     const controller=new AbortController();request=controller;
-    h.button.textContent='Cancel transcription';h.button.setAttribute('aria-pressed','false');
+    labelButton('finishing');h.button.setAttribute('aria-pressed','false');
     status('Transcribing through the parent-approved private speech service…');
     void h.transcribe(blob,AbortSignal.any([controller.signal,AbortSignal.timeout(15000)]))
      .then(async text=>{

@@ -38,6 +38,7 @@ test('catalog is stable, locally illustrated and carries bounded funny reactions
   for (const pal of PAL_CATALOG) {
     assert.ok(existsSync(resolve('public', pal.artPath)), `${pal.id} artwork exists`);
     assert.equal(pal.assetId, `pal-${pal.id}`);
+    assert.deepEqual(pal.artwork, { status: 'preview', speciesId: null, characterKey: null, forms: { base: null, mature: null } });
     for (const kind of ['welcome', 'practice', 'making', 'coding', 'growth', 'play', 'rest', 'retry'] as PalLineKind[]) {
       const first = palLine(pal.id, kind, 0), second = palLine(pal.id, kind, 1);
       assert.ok(first.length > 10 && first.length < 180); assert.notEqual(first, second);
@@ -78,12 +79,37 @@ test('learning adventures group five receipts, while one coding or making receip
   learning.push(activity('writing-25', 'language.explored', 200));
   let result = await store.sync(owner, snapshot(learning, 50));
   assert.deepEqual(result.growth, [{ palId: 'glim', from: 1, to: 2 }]);
-  assert.equal(owned(result.profile).stageName, 'Bright Pal');
+  assert.equal(owned(result.profile).stageName, 'Grown');
+  assert.equal(owned(result.profile).form, 'mature');
   const creation = Array.from({ length: 10 }, (_, i) => activity(`create-${i}`, i % 2 ? 'scene.challenge' : 'game.developed', i + 300));
   result = await store.sync(owner, snapshot([...learning, ...creation], 150));
-  assert.equal(owned(result.profile).adventures, 15); assert.equal(owned(result.profile).stage, 3);
-  assert.deepEqual(result.growth, [{ palId: 'glim', from: 2, to: 3 }]);
+  assert.equal(owned(result.profile).adventures, 15); assert.equal(owned(result.profile).stage, 2);
+  assert.deepEqual(result.growth, [], 'there is no third form or second growth notice');
   assert.equal(owned(result.profile).nextStageAt, null); assert.equal(owned(result.profile).adventuresToNext, 0);
+});
+
+test('older receipt-only profiles keep earned growth through reload and backup without a new celebration', async () => {
+  for (const adventures of [0, 4, 5, 14, 15, 25]) {
+    const { store, persistence } = fixture();
+    await store.chooseStarter(owner, 'glim', snapshot());
+    const receipts = snapshot(Array.from({ length: adventures }, (_, index) => activity(`old-${index}`, 'scene.challenge', index + 100)), 150);
+    await store.sync(owner, receipts);
+    const saved = await store.export();
+    assert.equal(saved.data.profiles[0].policyVersion, 1);
+    assert.equal(Object.hasOwn(saved.data.profiles[0], 'stage'), false);
+    const reloaded = new PalsStore(PALS_DB_NAME, persistence);
+    const projected = await reloaded.sync(owner, receipts);
+    assert.deepEqual(projected.growth, [], 'loading earned history is not a new growth event');
+    assert.deepEqual(await reloaded.export(), saved, 'the v1 receipt and inventory bytes remain unchanged');
+    const pal = owned(projected.profile);
+    assert.equal(pal.adventures, adventures);
+    assert.equal(pal.form, adventures >= 5 ? 'mature' : 'base');
+    assert.equal(pal.stageName, adventures >= 5 ? 'Grown' : 'Base');
+    assert.equal(pal.nextStageAt, adventures >= 5 ? null : 5);
+    await reloaded.restore(saved, { mode: 'replace', allowedOwners: [owner] });
+    assert.deepEqual((await reloaded.sync(owner, receipts)).growth, []);
+    assert.deepEqual(await reloaded.export(), saved);
+  }
 });
 
 test('duplicate projection, retry, reload and removed source detail cannot multiply or erase growth', async () => {

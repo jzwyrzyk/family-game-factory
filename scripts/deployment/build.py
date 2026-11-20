@@ -7,6 +7,7 @@ import io
 import json
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 import tarfile
@@ -16,7 +17,7 @@ import time
 PROJECT='family-game-factory-jzw'
 SANDBOX='ghcr.io/jzwyrzyk/family-game-factory-sandbox'
 BUILDER='factory-service-builder@'+PROJECT+'.iam.gserviceaccount.com'
-SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts']
+SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/creation/model.ts','src/creation/projects.ts']
 REQUIRED_APIS={'cloudbuild.googleapis.com','artifactregistry.googleapis.com','logging.googleapis.com','storage.googleapis.com','iam.googleapis.com'}
 
 
@@ -96,11 +97,31 @@ def preflight(region,bucket):
             raise RuntimeError('Dedicated builder is missing a scoped grant: '+', '.join(sorted(allowed))+'. No IAM was changed.')
 
 
+def verify_service_copy_inputs(context):
+    # Validate the selected source's Dockerfiles, not the publisher's checkout:
+    # older reviewed releases legitimately have no Creation source dependency.
+    for kind in ('gateway','preview'):
+        dockerfile=context/('server/Dockerfile.'+kind)
+        for line in dockerfile.read_text().replace('\\\n',' ').splitlines():
+            tokens=shlex.split(line,comments=True)
+            if not tokens or tokens[0].upper()!='COPY':continue
+            if any(token.startswith('--from=') for token in tokens[1:]):continue
+            inputs=[token for token in tokens[1:] if not token.startswith('--')][:-1]
+            if not inputs:raise RuntimeError('Unsupported service Dockerfile COPY syntax: '+kind)
+            for name in inputs:
+                path=Path(name)
+                if path.is_absolute() or '..' in path.parts or any(char in name for char in '[]*?${}'):
+                    raise RuntimeError('Unsupported service Dockerfile COPY source: '+name)
+                if not (context/path).exists():
+                    raise RuntimeError('Reviewed service source is incomplete: '+name+' (Dockerfile.'+kind+' COPY)')
+
+
 def source_archive(root,tmp,sha):
     context=Path(tmp)/'context'
     stage_sources(root,context,sha,SERVICE_SCOPE,services=True)
     for name in ['package.json','package-lock.json','.dockerignore','server/Dockerfile.gateway','server/Dockerfile.preview','src/studio/design.ts','src/runtime/types.ts','src/runtime/manifests.ts']:
         if not (context/name).is_file():raise RuntimeError('Reviewed service source is incomplete: '+name)
+    verify_service_copy_inputs(context)
     archive=Path(tmp)/'source.tgz'
     # Stable source digest: only git blobs, sorted names, no host modes/mtime/uid, no SDK ignore rules.
     with archive.open('wb') as output,gzip.GzipFile(fileobj=output,mode='wb',filename='',mtime=0) as compressed,tarfile.open(fileobj=compressed,mode='w') as tar:

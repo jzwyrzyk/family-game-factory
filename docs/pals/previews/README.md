@@ -1,5 +1,22 @@
 # Companion implementation previews
 
+## Current Base/Grown integration
+
+The captures in `two-form/` use production assets **index-CD85vMsh.js / index-C67kjIJc.css** with PR81/current-main integration. The built-app journeys passed on this source, and an independent reviewer inspected desktop/390px collection, scene, failed-save, owner-loading and 320px navigation captures. Historical images below remain unchanged.
+
+| Capture | Exact evidence scope |
+| --- | --- |
+| [Earned collection, desktop](two-form/earned-desktop.png) | Actual local UI Math completions and a delegated host hint produced 10 gems and one adventure. These are automated sample-profile actions, not observations of children or a paid provider. |
+| [Complete collection, desktop](two-form/collection-desktop.png) | Explicit receipt fixtures exercise 50/150-gem unlocks and 15 cumulative adventures. Glim remains Grown with exactly two forms; no third transition is promised. |
+| [Complete collection, phone](two-form/collection-phone.png) | The same labeled fixture at 390px shows both navigation rows, the selected Pal route and readable preview-art/collection controls. |
+| [Editable scene, phone](two-form/scene-phone.png) | Owned token Pals are added through the real editor; actor programs and explicit Keep remain available. This is supported local scene use, not arbitrary generated-game integration. |
+
+The portraits remain provisional gem tokens. These screenshots do not establish an approved character/form mapping, final creature animation, physical-device reliability or child engagement. The source, test correction and publication boundary are recorded in [delivery state](../../../DELIVERY-STATE.md).
+
+## Original three-stage candidate
+
+**Historical capture scope:** the images below record the original three-stage PR68 candidate. They remain provenance, not the current two-form UI. Current Base/Grown integration and its checks are recorded in [delivery state](../../../DELIVERY-STATE.md) and [ADR0013](../../decisions/0013-two-form-pals-and-current-main.md).
+
 Captured on **November 19, 2026** from runtime candidate `ef62e3b` on `feature/jems-pals-implementation`, based on shared Rewards commit `5c61a5c`. A later test-only capture adjustment waits for portrait decoding after equipment updates; it does not change runtime behavior. These are browser screenshots of the working application, not character-art proposals. Existing approved gem tokens remain provisional companion portraits; no artwork was generated or modified.
 
 | Preview | What the shown state means |
