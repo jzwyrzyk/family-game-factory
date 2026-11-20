@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 
 async function records(page,store,owner){
   return page.evaluate(async({store,owner})=>{
@@ -16,6 +17,7 @@ async function profile(page,index){
   const menu=page.locator('#studioProfileMenu');if(!await menu.evaluate(element=>element.open))await menu.locator('summary').click();
   await page.locator('#profile-choices .profile-choice').nth(index).click();
   await page.waitForFunction(id=>FG.store.current().id===id,'player'+(index+1));
+  await exploreWelcome(page);
 }
 async function pacing(page){await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save();});}
 async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.openArt&&window.FG?.studio&&window.FG?.drawings);}
@@ -33,7 +35,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
    page.on('dialog',dialog=>dialog.accept());
    await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
    try{
-    await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await ready(page);await pacing(page);
+    await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await ready(page);await exploreWelcome(page);await pacing(page);
     await page.locator('#studioSavedIdeas').click();
     const png=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=180;canvas.height=160;const c=canvas.getContext('2d');c.fillStyle='#ffffff';c.fillRect(0,0,180,160);c.fillStyle='#8b3ed1';c.fillRect(35,32,110,100);c.fillStyle='#f5c43e';c.fillRect(55,52,20,18);c.fillRect(105,52,20,18);return canvas.toDataURL().split(',')[1];});
     await page.setInputFiles('#drawingUpload',{name:'Fixture purple friend.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
@@ -79,6 +81,26 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     assert.equal(bundle.schema,'jems.scene-art.v1');assert.equal(bundle.art.drawings[0].sha256,source.sha256);
     assert.equal(bundle.art.rigs[0].id,rig.id);assert.equal(Object.hasOwn(bundle.art.drawings[0],'owner'),false);
     assert.equal(bundle.scene.actors[1].assetId,first.actors[0].assetId);
+
+    // Private artwork added to a game-derived scene must preserve the route
+    // back to that game as well as the separate route into Art Studio.
+    await page.locator('#creationHome').click();await page.locator('[data-starter="dragon"]').click();
+    const gameSession=await page.evaluate(()=>{const n=FG.studio.exportNotebook();return n.sessions.find(s=>s.id===n.active[FG.store.current().id]);});
+    const gameBefore=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
+    if(!await page.locator('#studioMakeScene').isVisible())await page.locator('#studioChange').click();
+    await page.locator('#studioMakeScene').click();await page.locator('#creationWorkspace').waitFor({state:'visible'});
+    assert.equal(await page.evaluate(()=>FG.creation.scene().provenance.sourceSessionId),gameSession.id);
+    await page.locator('#creationAddActor').click();
+    await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
+    await page.waitForFunction(assetId=>FG.creation.scene().actors.some(actor=>actor.assetId===assetId),first.actors[0].assetId);
+    const sourceActions=page.locator('#creationSource');
+    assert.equal(await sourceActions.getByRole('button',{name:'Art Studio',exact:true}).isVisible(),true,'a game-derived scene keeps its private-art action');
+    const backToGame=sourceActions.getByRole('button',{name:'Back to my game',exact:true});
+    assert.equal(await backToGame.isVisible(),true,'adding private art keeps the source-game return action');
+    await backToGame.click();await page.locator('#studioGameHost #game-mount').waitFor({state:'visible'});
+    assert.equal(await page.locator('#page-creation').isVisible(),false);
+    assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]),gameSession.id,'the return action opens the exact source game');
+    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2'))),gameBefore,'private-art scene edits preserve the saved source game');
 
     // Another profile cannot see old pixels; a deliberate portable import creates copies.
     await profile(page,1);await pacing(page);

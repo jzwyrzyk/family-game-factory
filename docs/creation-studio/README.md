@@ -6,7 +6,7 @@
 
 **Decision:** [ADR0007 — One creation experience with free scenes and rebuild practice](../decisions/0007-creation-and-rebuild-practice.md). The owner expanded the earlier discussion into an explicit development request during the November 18–19, 2026 session: keep one Jems experience, reuse the child's game characters and ideas, offer editable scenes/actions, and provide a separate practice entrance where children rebuild demonstrated behavior.
 
-**Art Studio integration candidate, November 19, 2026:** the refreshed drawing-to-playable work adds private original drawings and exact saved cutout versions to local scenes. The section below describes that branch implementation; the [acceptance record](ACCEPTANCE.md) and current [delivery state](../../DELIVERY-STATE.md) distinguish its checks and PR disposition from the earlier PR62 merge.
+**Art Studio support:** merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23) adds private original drawings and exact saved cutout versions to local scenes. The section below describes that source behavior; the [acceptance record](ACCEPTANCE.md) and [delivery state](../../DELIVERY-STATE.md) retain its development checks and subsequent merge receipt separately from the earlier PR62 merge. First-creation guidance is now combined with this merged source; delivery evidence distinguishes that integration's local and hosted checks from the earlier receipts.
 
 ## Product purpose and boundaries
 
@@ -61,6 +61,8 @@ Provenance can retain `sourceKind`, `sourceProjectId`, `sourceRevisionId`, `sour
 
 **Art Studio → Make a scene** creates a new editable scene with the selected original drawing or saved cutout design. The visible starter hop and tap-to-hop blocks are marked as starter actions. The child can change them, add dialogue, create rules, keep an edition, and record the resulting canvas video through the existing controls. **Characters & things → Add → My art** adds artwork to an existing scene; the same saved art version can appear in multiple scenes. **Art Studio** links appear in the picker, the scene's source row, and the scene shelf.
 
+Adding private artwork to a game-derived scene preserves both source relationships. The source row shows the exact-art-version label and **Art Studio** action alongside **Back to my game**. Scene changes remain in the scene, and the return action opens its original game without rewriting that game's saved source.
+
 The asset reference is `art:image:<drawingId>:<sourceSha256>` for an original or `art:rig:<rigId>:<assemblySha256>` for a saved cutout. This exact namespace supports source IDs up to 100 characters, matching identity-preserving art restoration; ordinary project, actor, block and variable IDs retain their existing 160-character limit. The latter reference hashes the validated assembly, including its original drawing identity and fingerprint. Saving another drawing design does not update existing scene references. Scene editions, copies and drafts retain their chosen reference. Archiving artwork preserves these uses; hard deletion checks retained sources rather than trusting a potentially stale usage index.
 
 The browser resolves references only against the active profile. It checks the immutable version and recomputes the original byte fingerprint before decoding. Decoding is bounded to the supported image dimensions and a 512-pixel display surface; the original bytes remain untouched. The cache is limited to 32 images and cleared on view/profile changes. Late image results cannot create a scene or fill another profile's thumbnail. No private-art URL, image bytes, family identifier, provider request or upload is added to generated-game manifests.
@@ -106,6 +108,14 @@ The home entrance follows the Ready to Play game shelf so a complete playable ch
 
 The target preview is a separate project. Watching it does not insert its program into the child's editable scene. Practice deliberately exposes the goal and optional hint; these are public learning activities, not protected assessment items.
 
+### Owned Pal playgrounds and free-scene insertion
+
+The [My Pals extension](../pals/README.md) in this change adds owned-companion starter cards and **Add your Pal** to free creation; its integration status is separate from the original Creation Studio release above. A Pal starter is a real editable scene: its start greeting and tap-triggered jump, dance and joke run in the existing interpreter. The tap script is selected for editing; Play and Keep remain explicit. [The Pal scene adapter](../../src/pals/creation.ts) supplies `starter` provenance rather than independent coding credit, and uses the existing approved blue, mint and coral gem artwork while final character art is developed separately.
+
+Adding a Pal gives it an independent actor/script identity and preserves the scene's existing actors, programs, pinned source-game references and private-art image/rig/hash bindings. A mixed scene retains Art Studio and Back to my game. Passive Pal progress refreshes do not dismiss an active actor/art choice. Draft recovery, source-writing guards, local capacity limits and owner checks remain in force. The UI offers only the current profile's owned Pals, rechecking ownership when used. Pal tools are absent from rebuild challenges, and the insertion handler rejects a challenge; children can add a Pal to the free **Make it my own** copy after completing the exercise.
+
+The public scene asset IDs are `pal-glim`, `pal-kip` and `pal-riff`; these remain the original token assets. Later selected creature artwork needs explicit form/version bindings rather than silently replacing art in a saved scene. A validated imported scene can retain these assets without owning the associated collectible. Scene JSON and creative backups never grant collection ownership, adventures or gems. Starting or editing a Pal scene makes no provider request, starts no automatic build and awards no progress merely for inserting or playing the supplied blocks. This is local playable-scene use, not automatic insertion into every native/generated game's mechanics. [Pal creation tests](../../tests/pals-creation.test.ts) cover behavior, preservation and this creative-content boundary.
+
 ### Exact current behavioral probes
 
 The evaluator creates fresh bounded engine runs and samples snapshots every **50 ms**. Position checks generally allow **14 stage units**. Required original actors/assets and starting positions must remain present, and other scene landmarks must stay visible in place during the observation. The route, bounce, and cheer programs must finish within their windows; a correct prefix followed by unfinished instructions is insufficient. A final pose alone does not establish the demonstrated route or event response.
@@ -123,6 +133,10 @@ These probes compare behavior, not a secret exact block sequence, program text, 
 The result reports `kind: formative`, `source: bounded-scene-runs`, `independentAssessment: false`, and `generalThinkingScore: null`. General assistance is not inferred. The local attempt record stores the checked revision, challenge, outcome, and whether this interface's hint was used; a false hint flag does not establish that no adult, AI, or external help occurred.
 
 ## Learning, ownership, and recovery
+
+The [first-creation guidance](../child-journey/FIRST-CREATION.md) adds optional inline scene and practice tips through callbacks supplied by Studio. Dismissals are saved in the current player's existing Studio notebook; they do not mark the challenge's assessed hint as used or create learning evidence. Unresolved recovery takes priority over tips, and tip controls cannot move focus out of an active required learning activity. The persistent source label explains that changes stay in the scene, alongside the existing **Back to my game** action. A scene copied from saved scene work is described as such instead of being mislabeled as a game conversion.
+
+After a successful challenge check, the already-authored extension is displayed beside **Make it my own**. That action retains its existing copy-to-free-scene behavior and provenance; the guidance does not write changes back into the source game or introduce a new challenge/evaluator.
 
 The existing Math/Language learning host retains subject, grade, checkpoint selection, answer handling, and progress. Scene playback and instructional interactions must honor an active host activity; the interpreter cannot mark the activity correct or dismiss it. [Math integration](../adaptive-math/integration.md) and [Language integration](../adaptive-language/integration.md) remain the relevant learning contracts.
 

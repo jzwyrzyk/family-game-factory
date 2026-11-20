@@ -5,6 +5,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 
 const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1';
 const IDEAS=[
@@ -16,7 +17,7 @@ const DRAWINGS=[
  {id:'navigation-drawing-one',owner:'player1',name:'Fixture moon drawing',color:'#7c48db'},
  {id:'navigation-drawing-two',owner:'player2',name:'Fixture garden drawing',color:'#138974'},
 ];
-const NAV=['studioNavHome','studioNavCreate','studioNavScenes','studioNavProblemSolving','studioNavJourney','studioNavRewards','studioNavPowers'];
+const NAV=['studioNavHome','studioNavCreate','studioNavScenes','studioNavProblemSolving','studioNavJourney','studioNavRewards','studioNavPals','studioNavPowers'];
 const unavailable=route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})});
 const ready=page=>page.waitForFunction(()=>window.FG?.studio&&window.FG?.drawings&&window.FG?.creation&&window.FG?.problemSolving);
 
@@ -29,6 +30,7 @@ async function prepare(browser,base,viewport){
  page.on('dialog',dialog=>void dialog.dismiss());
  await page.route('**/factory-config.json',unavailable);
  await page.goto(base);await ready(page);
+ await exploreWelcome(page);
  return {context,page,errors,posts};
 }
 
@@ -68,6 +70,7 @@ async function choosePlayer(page,index){
  await page.locator('#profile-choices .profile-choice').nth(index).click();
  await page.waitForFunction(id=>window.FG.store.current().id===id,'player'+(index+1));
  await page.locator('#page-studio-library').waitFor({state:'visible'});
+ await exploreWelcome(page);
 }
 
 async function assertCollection(page,ownerIndex){
@@ -117,7 +120,7 @@ async function collectionJourney(browser,base,device,viewport){
   await seedHistoricalRecords(page);
   assert.equal(new URL(page.url()).search,'','the regression starts in ordinary default mode');
   assert.equal(await page.locator('#page-studio-library').isVisible(),true);
-  assert.equal(await page.locator('.studio-nav button').count(),NAV.length,'the modern seven-destination navigation is preserved');
+  assert.equal(await page.locator('.studio-nav button').count(),NAV.length,'the modern eight-destination navigation is preserved');
   if(device==='phone'){
    const firstGame=await page.locator('#studioStarters [data-starter]').first().boundingBox();
    assert.ok(firstGame&&firstGame.y>=0&&firstGame.y+firstGame.height<=viewport.height,
@@ -136,6 +139,9 @@ async function collectionJourney(browser,base,device,viewport){
   await page.locator('#page-studio-library').waitFor({state:'visible'});
   await page.click('#studioNavJourney');await page.locator('#studioNavJourney[aria-current="page"]').waitFor();
   await page.click('#studioNavRewards');await page.locator('#studioNavRewards[aria-current="page"]').waitFor();
+  await page.click('#studioNavPals');await page.locator('#page-jems-pals').waitFor({state:'visible'});
+  assert.equal(await page.locator('#studioNavPals').getAttribute('aria-current'),'page');
+  assert.deepEqual(await page.locator('.studio-nav button.active').evaluateAll(buttons=>buttons.map(button=>button.id)),['studioNavPals']);
   await page.click('#studioNavHome');await page.click('#studioSavedIdeas');await assertCollection(page,0);
   await choosePlayer(page,1);await page.click('#studioSavedIdeas');await assertCollection(page,1);
   await page.reload();await ready(page);
@@ -144,7 +150,7 @@ async function collectionJourney(browser,base,device,viewport){
   await choosePlayer(page,0);await page.click('#studioSavedIdeas');await assertCollection(page,0);
   await page.click('#studioCollectionBack');
   assert.deepEqual(errors,[],'no browser runtime errors');assert.deepEqual(posts,[],'collection navigation makes no provider POST');
-  console.log(`PASS navigation ${device}: default entry, shared historical ideas, private drawings, readable collection copy, explicit return, seven routes and reload`);
+  console.log(`PASS navigation ${device}: default entry, shared historical ideas, private drawings, readable collection copy, explicit return, eight routes and reload`);
  }catch(error){await page.screenshot({path:'test-results/navigation-'+device+'-failure.png',fullPage:true}).catch(()=>{});throw error;}
  finally{await context.close();}
 }
@@ -206,6 +212,7 @@ async function legacyReturn(browser,base){
    const expected=new URL(old);expected.searchParams.delete('arcade');if(expected.searchParams.get('studio')==='0')expected.searchParams.delete('studio');
    assert.equal(new URL(await link.getAttribute('href'),page.url()).href,expected.href,'return link removes only legacy mode flags');
    await Promise.all([page.waitForURL(expected.href),link.click()]);await ready(page);
+   await exploreWelcome(page);
    assert.equal(await page.locator('#page-studio-library').isVisible(),true,'the visible link reaches the modern home');
    assert.equal(await page.locator('#studioSavedIdeas').isVisible(),true);
    assert.deepEqual(errors,[]);

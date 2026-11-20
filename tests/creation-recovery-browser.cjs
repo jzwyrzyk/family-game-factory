@@ -5,6 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 const CREATION_KEY='family-game-factory-creation-v1';
 const STATE_KEYS=['family-game-factory-state-v1','family-game-factory-workspace-v2','family-game-factory-studio-v1',CREATION_KEY];
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -59,7 +60,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   try{
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);await ready();await pacing();
     // Include actual Studio notebook/workspace state so rollback covers all four keys.
-    await page.locator('#creationHome').click();await page.locator('[data-starter="dragon"]').click();
+    await page.locator('#creationHome').click();await exploreWelcome(page);await page.locator('[data-starter="dragon"]').click();
     await page.locator('#studioNavScenes').click();await page.locator('#creationChallengeMode').click();
     await page.locator('[data-challenge="robot-route"]').click();
     await page.locator('#creationTitle').fill('My backup robot experiment');await page.locator('#creationTitle').press('Tab');

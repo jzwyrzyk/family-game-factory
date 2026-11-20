@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 const KEY='family-game-factory-problem-solving-v1';
 
 (async()=>{
@@ -22,7 +23,7 @@ const KEY='family-game-factory-problem-solving-v1';
    const saved=()=>page.evaluate(()=>FG.problemSolvingEvidence.list());
    const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,device+': no page overflow');
    const onlyPage=async id=>assert.deepEqual(await page.locator('main > .page:visible').evaluateAll(nodes=>nodes.map(node=>node.id)),[id],device+': one active destination');
-   const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));};
+   const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));await exploreWelcome(page);};
    const parent=()=>activate(page.getByRole('button',{name:'Grown-ups',exact:true}));
    const fault=()=>page.evaluate(()=>{window.psSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k.endsWith('family-game-factory-problem-solving-v1'))throw new DOMException('Fixture quota','QuotaExceededError');return window.psSetItem.call(this,k,v);};});
    const unfault=()=>page.evaluate(()=>{Storage.prototype.setItem=window.psSetItem;delete window.psSetItem;});
@@ -51,7 +52,7 @@ const KEY='family-game-factory-problem-solving-v1';
     if(device==='touch'){
       await page.setViewportSize({width:320,height:740});await overflow();
       const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
-      assert.equal(buttons.length,7);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'seven destinations use two mobile rows');
+      assert.equal(buttons.length,8);assert.equal(new Set(buttons.map(button=>Math.round(button.y))).size,2,'eight destinations use two mobile rows');
       assert.ok(buttons.every(button=>button.width>=44&&button.height>=44&&button.x>=0&&button.x+button.width<=320),'mobile navigation keeps complete touch targets');
       await page.screenshot({path:'test-results/problem-solving-navigation-320.png',fullPage:true});
       await page.setViewportSize(viewport);await overflow();

@@ -1,0 +1,59 @@
+/* Small contextual guidance: optional, in the flow, and never over the game. */
+.jems-guide-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 14px 0;
+  padding: 15px 17px;
+  border: 1px solid #d9e1f4;
+  border-radius: 16px;
+  background: #f2f6ff;
+  color: var(--jems-ink, #0b1e3b);
+  font-family: var(--jems-body, system-ui);
+  box-sizing: border-box;
+}
+.jems-guide-card[hidden] { display: none !important; }
+.jems-guide-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 10px;
+  background: #e3ebff;
+  color: #3157ab;
+}
+.jems-guide-copy { min-width: 0; flex: 1; }
+.jems-guide-card .jems-guide-copy h2 {
+  margin: 0 0 4px;
+  color: var(--jems-ink, #0b1e3b);
+  font: 850 15px/1.35 var(--jems-round, system-ui);
+  letter-spacing: -.15px;
+}
+.jems-guide-card .jems-guide-copy p {
+  margin: 0;
+  color: #455574;
+  font: 400 13px/1.55 var(--jems-body, system-ui);
+  overflow-wrap: anywhere;
+}
+.jems-guide-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex-shrink: 0; }
+.jems-guide-card .jems-guide-controls button {
+  min-height: 44px;
+  min-width: 60px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #3157ab;
+  background: transparent;
+  font: 750 13px/1.4 var(--jems-body, system-ui);
+  cursor: pointer;
+}
+.jems-guide-card .jems-guide-controls .jems-guide-action { background: #fff; border-color: #b7c9ec; }
+.jems-guide-card .jems-guide-controls button:hover { background: #e4ecff; }
+.jems-guide-card .jems-guide-controls button:focus-visible { outline: 3px solid #7136c9; outline-offset: 3px; }
+@media (max-width: 620px) {
+  .jems-guide-card { align-items: flex-start; flex-wrap: wrap; padding: 13px; gap: 9px; }
+  .jems-guide-copy { flex-basis: calc(100% - 40px); }
+  .jems-guide-controls { margin-left: 39px; flex-shrink: 1; }
+}

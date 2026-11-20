@@ -2,7 +2,7 @@
 
 **Scope:** first implementation on `feature/jems-rewards-v1`, prepared directly against main `c6576c16e005ae58ce8c706801414be4d864242e` after PR57's approved-brand merge. Artwork and the maker journey inherit from main. Rewards is a separate feature; this contract describes its implementation and acceptance requirements. [Delivery state](../../DELIVERY-STATE.md) records exact source pins, validation, publication, merge and deployment separately.
 
-The owner requested shared gem increments for completed learning activities, developed games and meaningful milestones, with a cohesive rewards page, progress, popups and the approved web branding. Companion artwork and the collectible-companion system are separate work. [ADR0010](../decisions/0010-lifetime-gems-and-shared-rewards.md) records this decision.
+The owner requested shared gem increments for completed learning activities, developed games and meaningful milestones, with a cohesive rewards page, progress, popups and the approved web branding. [ADR0010](../decisions/0010-lifetime-gems-and-shared-rewards.md) records this decision. The subsequently approved [Jem Pals](../pals/README.md) feature is a separate consumer of this ledger; companion artwork remains its own review.
 
 ## Two truthful kinds of progress
 
@@ -11,6 +11,8 @@ The owner requested shared gem increments for completed learning activities, dev
 **Making rank** remains **Gem Maker → Gem Cutter → Gem Polisher → Gem Master**, derived from the child's retained making evidence under the [existing contract](../brand/GEM_PROGRESS.md). The Rewards page shows that rank alongside the gem total; a larger gem total cannot buy a maker rank. Deleting required making evidence can lower the current rank while previously granted engagement gems remain. Explicit family/profile reset and backup replacement have their own deletion semantics below.
 
 Neither quantity measures intelligence, proficiency, attention, reasoning quality or educational improvement. Math, Language Arts and scene checks retain their existing evidence and assistance fields. The reward ledger stores short action identities and amounts, not answers, private conversation text or model assessments.
+
+The [first-creation journey](../child-journey/FIRST-CREATION.md) presents this distinction in an optional inline guide: gems add up across activities, maker rank follows developed games, and My Powers shows practice. Studio supplies current-owner preference callbacks; the Rewards component owns no new storage. **Got it** saves the presentation preference before hiding the card, and a failed save leaves it visible. Showing or dismissing this explanation never earns a grant or changes a level. Journey help can show tips again without changing rewards.
 
 ## Initial award schedule
 
@@ -48,7 +50,7 @@ Each threshold has one stable receipt. There is no daily streak or expiry. The n
 
 ### Gem milestones
 
-Lifetime totals recognize **50, 150, 300, 600 and 1,000 gems**, then each additional **500**. These are progress markers; crossing one does not add another currency award, rank, creature or inventory item. The progress indicator measures the interval from the last reached milestone to the next, with explicit totals and remaining progress.
+Lifetime totals recognize **50, 150, 300, 600 and 1,000 gems**, then each additional **500**. These are progress markers; crossing one does not add another currency award or maker rank. The separate Pals policy reads the lifetime total to offer deterministic collectible unlocks without spending gems. The progress indicator measures the interval from the last reached milestone to the next, with explicit totals and remaining progress.
 
 ## Durable evidence and idempotent projection
 
@@ -86,7 +88,9 @@ Clearing a conversation, archiving a project or removing learning detail does no
 
 ## Interface and artwork
 
-[Rewards UI](../../src/rewards/ui.ts) and [styles](../../src/rewards/rewards.css) use the approved Jems identity, existing gem artwork and selected maker thumbnails. The page presents the lifetime total, next milestone, how to earn, recent committed grants and the existing maker rank. The compact entry/widget leads back to that shared page. No new logo, medal, creature collection, shop or companion inventory is introduced.
+[Rewards UI](../../src/rewards/ui.ts) and [styles](../../src/rewards/rewards.css) use the approved Jems identity, existing gem artwork and selected maker thumbnails. The page presents the lifetime total, next milestone, how to earn, recent committed grants and the existing maker rank. The compact entry/widget leads back to that shared page. Collection ownership belongs to My Pals, with its own validated store. Pals can add a brief response to the existing saved-reward toast so one action does not require competing popups.
+
+Family backup includes the optional `factoryPals` snapshot under the same source/reward recovery journal. The host drains both coordinators before replacement; rollback restores sources, gems and collection together. Pals use explicit backup replacement, never merge divergent equipment timelines. A legacy backup without Pals restores an empty collection, and damaged `factoryPalsRecovery` exports remain recovery material, not importable reward or ownership evidence. Current imports also preserve problem-solving records and owner-bounded notebook guidance. Four/five-source historical journals, with or without a Pal snapshot, restore only their captured domains; raw problem-solving recovery payloads are likewise not complete family backups. Private drawing bytes continue to require the separate art backup.
 
 The four earning rows are keyboard- and touch-accessible buttons for Math, Language, coding challenges and game creation. The optional typed `onActivity` callback hands their destination to the host, which retains learning guards and the parent's subject-selection rules. Hosts without that callback keep the existing practice/creation fallbacks. Opening a route never awards gems. Brief page copy distinguishes lifetime gems from maker levels earned through saved game improvements.
 

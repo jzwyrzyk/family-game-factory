@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* jems joy layer contract: durable idea, color zones and respectful motion. */
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -9,7 +10,7 @@ const {start}=require('./browser-server.cjs');
   const ctx=await browser.newContext({viewport:{width:1280,height:900},serviceWorkers:'block'});
   await ctx.addInitScript(()=>{window.__jemsMilestones=[];window.addEventListener('jems:milestone',e=>window.__jemsMilestones.push(e.detail.kind));});
   const page=await ctx.newPage();page.on('dialog',d=>void d.accept());
-  await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('jems-delight-host'));
+  await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('jems-delight-host'));await exploreWelcome(page);
   assert.equal(await page.locator('[data-starter]').count(),7);
   assert.equal(await page.locator('.jems-world-scene').count(),5,'5 illustrated worlds + 2 existing quality-game canvases');
   for(const asset of ['jems-workbench.svg','jems-world-buckets.svg','jems-world-dragon.svg','jems-world-moon.svg','jems-world-robot.svg']){

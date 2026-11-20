@@ -1,3 +1,4 @@
+const {exploreWelcome}=require('./studio-entry.cjs');
 /* Curated favorites run in the actual game lifecycle, not fake loading screens. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -11,7 +12,7 @@ const {start}=require('./browser-server.cjs');
    const context=await browser.newContext({viewport,hasTouch:device==='tablet',reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
    page.on('pageerror',error=>errors.push(error.message));
    try{
-    await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);
+    await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);await exploreWelcome(page);
     const favorites=page.locator('#studioStarters [data-starter]');
     assert.equal(await favorites.count(),7,'seven distinct playable favorites');
     assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon','factory','gum','hill','moon','robot']);

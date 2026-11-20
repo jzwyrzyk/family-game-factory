@@ -1,5 +1,7 @@
 # Creation Studio acceptance evidence
 
+**Current disposition:** the private-art capability below subsequently merged in [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). [Delivery state](../../DELIVERY-STATE.md#pr23-art-studio--merged) records that exact-source merge and hosted acceptance. The dated development records below retain their original source and test scope; acceptance of the later first-creation reconciliation with main is recorded separately in the current delivery section.
+
 ## Art Studio integration candidate — November 19, 2026
 
 The refreshed drawing-to-playable branch integrates current Jems source from main

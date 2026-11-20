@@ -4,18 +4,22 @@
 
 Make the Studio library the default at `/`. Keep `?studio=1` as a backward-compatible alias and `?arcade=1` / `?studio=0` as deliberate legacy compatibility and rollback paths. Legacy mode includes a visible **Open current Jems** link back to the modern experience. It removes the active legacy mode flags while preserving unrelated query parameters and the URL hash. This is a **frontend-only change**. Do not change the local game engine, child-specific storage, learning cadence, conversation privacy gates, existing version history, Cloud Run deployments, or paid AI access.
 
+The owner's later [first-creation decision](../decisions/2026-11-19-first-creation-journey.md) adds a focused optional welcome before the ordinary library for eligible first visits. **Make my first game** opens the existing composer; **Explore first** opens this full library. The choice is remembered per player. The normal phone-viewport playable-choice requirement below applies after Explore first. Prior meaningful work and explicit direct entrances remain accessible; completing the welcome does not count as completing a creation.
+
+See the [first-creation contract](../child-journey/FIRST-CREATION.md) for small contextual hints, Journey help, **Done for now**, and the return priority. A ready requested result takes precedence over the ready-made game played during its build; unfinished creative work takes precedence over ordinary recent play. The action rechecks current saved state and owner before opening it. The same hint preferences travel in existing notebook backups and can be reset independently of work and progress.
+
 ## Child mental model
 
 1. **I have an idea:** “Invent a game” opens the existing conversational Studio. Talking or saving an idea must not imply a build was completed; “Try a change” remains separate.
 2. **I want to have fun now:** seven illustrated developer favorites are playable from whole-card targets on a responsive desktop and mobile shelf.
-3. **I already started something:** a compact, recognizable Continue row appears only when real saved work exists. Saved creations remain selectable and segregated by the active player.
+3. **I already started something:** a compact, recognizable Continue row prioritizes ready results and unfinished creative intentions before ordinary recent play. Saved creations remain selectable and segregated by the active player; an archived or dismissed-resume item is not recommended.
 4. **I want to keep exploring:** the Studio's My Games button always returns here. My Powers and family settings remain available, without becoming competing first-screen calls to action.
 5. **Something takes time or is unavailable:** the existing nonmodal build shelf preserves play during an actual pending build; the homepage never promises new AI builds when the private builder is unavailable.
 6. **I want an earlier idea or drawing:** **Saved ideas & drawings** opens the retained collection, with an explicit **My Games** button to return.
 
 ## Saved ideas and drawings remain reachable
 
-The seven modern header destinations stay **My Games**, **Create**, **Create & code**, **Try an idea**, **My journey**, **My rewards**, and **My Powers**. **Saved ideas & drawings** is a supporting action on the homepage, below the Continue area. It opens the existing My Creations page through the guarded Studio navigation; it does not require a legacy URL or replace the modern navigation.
+After the optional welcome, the existing header destinations remain **My Games**, **Create**, **Create & code**, **Try an idea**, **My journey**, **My rewards**, and **My Powers**. The companion extension adds **My Pals** as an eighth destination using the same responsive icon navigation. **Saved ideas & drawings** is a supporting action on the homepage, below the Continue area. It opens the existing My Creations page through the guarded Studio navigation; it does not require a legacy URL or replace the modern navigation.
 
 Preserve the collection's existing ownership semantics. **Our idea notebook** remains shared among family profiles, including older ideas without an assigned profile. **My drawings** remains specific to the current player. Modern Studio games continue to use their existing per-player notebook and revision storage. Restoring this route does not migrate records, assign ownership to older ideas, or change their stored text.
 
@@ -41,7 +45,7 @@ The source owners remain the [Studio navigation](../../src/studio/ui.ts), [origi
 ## Automated and manual gates
 
 - `npm test` must pass at the exact PR head, including the `tests/homepage-entry.cjs` contract, existing Studio/voice/continuity/learning/game suites and explicit old Arcade regression tests.
-- After building the production bundle, run `npm run test:navigation-continuity`. The [default-mode regression](../../tests/navigation-continuity.cjs) covers desktop and 390px entry/return, preserved historical family ideas, player-specific drawings, reload, empty collections, draft-save failure/retry, the seven modern destinations, and a visible exit from both legacy modes. It uses synthetic local records and unavailable provider configuration; it does not establish live-service, physical-device or child acceptance.
+- After building the production bundle, run `npm run test:navigation-continuity`. The [default-mode regression](../../tests/navigation-continuity.cjs) covers desktop and 390px entry/return, preserved historical family ideas, player-specific drawings, reload, empty collections, draft-save failure/retry, all eight modern destinations, and a visible exit from both legacy modes. It uses synthetic local records and unavailable provider configuration; it does not establish live-service, physical-device or child acceptance.
 - Inspect `test-results/navigation-collection-desktop.png` and `navigation-collection-phone.png` for the restored collection. The regression also captures a failure screenshot if a journey fails. Legacy-only feature tests remain useful, but do not prove discoverability from the normal homepage.
 - Inspect `test-results/homepage-desktop.png` and `homepage-mobile.png` at real rendered viewport sizes, including two-column card widths, typography wraps, contrast, dropdown layering, and visible scroll affordances.
 - Manually check keyboard only, VoiceOver/TalkBack, iPad portrait/landscape, small Android, 200% zoom, two child profiles, local storage full/denied, poor/offline network, parent controls and game exit.
