@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T22:16:23.000Z",
-      "sourceDigest": "45a6fa0fb1bc603dbd846f6a812d5631737e1f61390248a602e9132801889989",
+      "reviewedAt": "2026-11-20T22:49:33.000Z",
+      "sourceDigest": "e9a721604795209962a4c5802d453d0f4b26d2622c79a3886618de6c74c4c0a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed owner-provided Cloud Run service volume and mount metadata: version 2 remains as an unmounted historical gateway config volume, while version 3 is the only volume mounted at /var/run/factory-config. Corrected continuity audit to select the exact mounted volume, reject orphaned/ambiguous/mutable mounts and preserve constrained explicit env binding. Added a regression fixture reproducing both observed volumes and updated the release continuity and delivery ledgers. No live secret, approval, account or gateway traffic change claimed.",
+      "reviewReason": "Reviewed actual failed old-image gVisor smoke 44830655674 and independently verified resource cleanup: old GHCR digest from public 31f8c463 accepts bare game, whereas reviewed worker public b472c224 transmits {game,...} and needs source-bound quality evidence. New manual-only pinned SHA GitHub-hosted GHCR publishing workflow validates committed build context, packaged worker/source/quality hashes, current envelope and a no-network wire test before any package write; fixes local build.py dependency staging with missing-input regression. Updated release publication handoff, evidence and delivery ledger; no new image, model activation, private WIF or Cloud Run changes claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

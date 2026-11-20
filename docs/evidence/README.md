@@ -1,5 +1,9 @@
 # Synthetic validation evidence
 
+## November 20, 2026 — failed production sandbox image smoke
+
+[Private run 44830655674](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44830655674) ran the configured GHCR image on an actual isolated gVisor runner. Host/full readiness, image pull, and explicit network egress denial passed. `npm run test:sandbox` then failed on the first generated-game fixture with `PLAYTEST_FAILED:GENERATED_ARTIFACT_REJECTED`; later browser and hostile-source checks did not complete. The owner reported `CLEANUP_STATUS=VERIFIED` and `SMOKE_AUTH_STATUS=VERIFIED`, but **`FINAL_STATUS=FAILED`**. The image was published from older source `31f8c463…`, whose bare-game stdin contract is incompatible with current worker-approved `b472c224…` (`{game,...}` envelope). A new [manual source-pinned GHCR publisher](../assignment-006/SANDBOX-PUBLISH.md) adds pre-publication package/source hash and envelope smoke gates. No new image or real passing production acceptance is claimed by this code PR.
+
 ## November 20, 2026 — adult AI continuity regression boundaries
 
 [Issue #93](https://github.com/jzwyrzyk/family-game-factory/issues/93) follows a real operator complaint that each Jems update appeared to require reactivating AI. The new `scripts/deployment/test_continuity.py` exercises strict current-state classification, fail-closed policy/worker/WIF drift, secret-version inspection and sanitized read-only commands. The deployment tests additionally ensure an already-existing inactive or active Jems Cloud Run release is never silently republished with `FACTORY_ACTIONS_APPROVED=false` by the first-time bootstrap. These are deterministic **offline fixtures**; they do not prove model entitlement, production gVisor cleanup, a durable adult permit or actual in-place cloud upgrade. See [continuity contract](../assignment-006/RELEASE-CONTINUITY.md).
