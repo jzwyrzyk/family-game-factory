@@ -35,7 +35,7 @@ def wif(sha=P):
         "assertion.repository_owner_id=='357047835' && "
         "assertion.repository_id=='1458899834' && "
         "assertion.ref=='refs/heads/main' && "
-        "assertion.workflow_ref.endsWith('factory-private.yml@refs/heads/main') && "
+        "assertion.workflow_ref=='family-game-factory-lab/family-game-factory-worker/.github/workflows/factory-private.yml@refs/heads/main' && "
         "assertion.workflow_sha=='"+sha+"'")}
 
 def config(active):
@@ -70,6 +70,12 @@ class ContinuityTests(unittest.TestCase):
         bad=wif();bad['attributeCondition'] += " || assertion.workflow_sha=='"+OLD+"'"
         with self.assertRaisesRegex(c.ContinuityError,'WIF_TRUST_DRIFT'):
             c.assess(snapshot(),bad,P,P,P,'false',P,'inactive')
+        not_equal=wif()
+        not_equal['attributeCondition']=not_equal['attributeCondition'].replace(
+            "assertion.repository_owner_id=='357047835'",
+            "assertion.repository_owner_id!='357047835'")
+        with self.assertRaisesRegex(c.ContinuityError,'WIF_TRUST_DRIFT'):
+            c.assess(snapshot(),not_equal,P,P,P,'false',P,'inactive')
     def test_distinct_service_readiness_and_adult_authorization(self):
         s=snapshot()
         s['factory-preview']['status']['traffic'][0]['percent']=20
