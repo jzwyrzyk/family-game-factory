@@ -17,6 +17,8 @@ An existing production gateway/preview image change must use a separately review
 
 The existing Pages workflow makes no Cloud Run/IAM/Secret Manager writes. CI tests now guard the bootstrap boundary. The read-only `scripts/deployment/continuity.py` compares the **current** service readiness and 100% traffic, adult flags, private main/tag/variable, the independent worker approval switch, and live WIF condition—not a volatile immediate before/after WIF snapshot. It prints only sanitized statuses, never credentials or private config contents.
 
+**Historical revisions are not a health failure:** Cloud Run can include older revisions in `status.traffic` with missing/null/zero percentages even though the latest ready revision receives 100%. The audit now ignores only those non-serving entries, retaining strict rejection of a second positive split, a non-ready serving revision, missing readiness or incomplete effective 100% traffic. This correction follows a real sanitized owner inventory on November 20. It changes no service, WIF, session or provider setting.
+
 ## Operator read-only verification
 
 From a trusted Cloud Shell with the existing `gcloud` and `gh` authentication, after reviewing the script in the exact merged checkout:
