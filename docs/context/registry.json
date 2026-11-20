@@ -117,7 +117,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:52.837Z",
-      "sourceDigest": "e48539cc01e28ae57295687155156a54de2f3f8229aa15a9a577cc5cd5aacc06",
+      "sourceDigest": "85327b2e1ba932d3003a30dc36470442b56e0c2f8761e333411ad5bb9a41515a",
       "reviewOutcome": "updated",
       "reviewReason": "Recorded the complete approved core artwork package, separate Brio status, and preview-only collection authority in product doctrine. Additional reconciled review: Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair.",
       "reviewHistory": [
@@ -214,7 +214,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:53.191Z",
-      "sourceDigest": "5b0d7cd1f58f8f428b99a109368161be8aeb770ef3b56f626c83ff772b598355",
+      "sourceDigest": "6a02fbe6f633ac890ad6cbddb6f807338b338bcdc3bb9f8dfeb12f6fd96c7d6b",
       "reviewOutcome": "updated",
       "reviewReason": "Reconciled current My Pals expression controls, exact approved portraits, retry focus recovery and optional offline caching in architecture and feature documentation. Additional reconciled review: Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race.",
       "reviewHistory": [
@@ -554,7 +554,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:54.038Z",
-      "sourceDigest": "5a9ce4af9cf2cd725b5a100863502dae7bf856c7fffaf0599ab7af6aaa5bef0b",
+      "sourceDigest": "2cda7d3552159d5e67b99c0450df8bd7291213d2e143c4ec937be06fdf1fe793",
       "reviewOutcome": "updated",
       "reviewReason": "Recorded full asset, expression, Pal, navigation and offline quota-recovery checks and routed the focused asset verifier regression tests. Additional reconciled review: Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified.",
       "reviewHistory": [
@@ -617,7 +617,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-20T19:17:22.236Z",
-      "sourceDigest": "ccb8813430c60571f8bc827fc77294c71848246e6e8eae0583ba42f6ef0c657b",
+      "sourceDigest": "ecc99ddd3395524a8000754ef843c3b7992f1cdbaf9d5bfda813840f7d0ea98b",
       "reviewOutcome": "updated",
       "reviewReason": "Recorded final combined local build, asset parity, browser, navigation, offline and documentation acceptance with hosted checks still pending on PR90. Additional reconciled review: Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment.",
       "reviewHistory": [
@@ -685,7 +685,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "122158109ee8df03971878fd4a264d605ea748dad961c3c9967683b416827951",
+      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
       "reviewOutcome": "updated",
       "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
       "reviewHistory": [
