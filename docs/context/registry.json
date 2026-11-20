@@ -59,7 +59,9 @@
     "docs/decisions/2026-11-19-pal-form-reconciliation.md",
     "docs/pals/art/characters/brio/README.md",
     "docs/decisions/2026-11-19-brio-art-adoption.md",
-    "docs/decisions/2026-11-20-character-first-navigation.md"
+    "docs/decisions/2026-11-20-character-first-navigation.md",
+    "docs/pals/EXPRESSIONS.md",
+    "docs/decisions/2026-11-20-pal-expression-runtime.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -750,7 +752,8 @@
         "docs/pals/*.md",
         "docs/pals/templates/**",
         "skills/gem-pal-studio/**",
-        "docs/pals/art/character-references.json"
+        "docs/pals/art/character-references.json",
+        "scripts/export-pal-assets.py"
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "fed67752aa5aa82ae59b7d3d3f30942abe95bb6618589365308683b0e194b2a2",
@@ -804,7 +807,8 @@
       "sources": [
         "src/pals/**",
         "tests/pals*",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "scripts/verify-pal-assets.mjs"
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "db4d3ee5efef1e0194f98d933ab783a68bf09c6641c769ebbc329247cf76dfa9",

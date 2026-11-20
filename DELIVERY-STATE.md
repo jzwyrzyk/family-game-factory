@@ -1,5 +1,14 @@
 # jems delivery state
 
+## PR90 original Gem Pal expressions — draft implementation handoff, November 20, 2026
+
+**PR:** [#90](https://github.com/jzwyrzyk/family-game-factory/pull/90) targets merged main `669df0ef5e73e11c8786b741815ba290c820d326` (PR89). The initial source-only commit `8b94acacbd117a2cdb33e57a4e29a05a03c45d02` adds the strict exact-identity expression resolver, read-only My Pals explorer, Wink Base fade pilot, tests, offline cache policy, art export/verifier and design/architecture references. This is a **draft**, not a release or merge acceptance.
+
+The independent owner-approved core kit is package 2.9: exactly 23 original profiles, 46 neutral images, 138 expression images. The prepared local export decoded and compared all **184 PNG/WebP image pairs pixel-for-pixel**, preserving the exact approved Native PNG dimensions/alpha, and rechecked all exported byte hashes. A separate reviewed asset package is ready for the final PR branch commit; **those 184 binary WebPs and the matching runtime manifest are not included in the initial source-only commit**. The repaired Navi Base source hash is `f0d1f53e54dd47da4a658ea2252e9c8ab8c54eceb3ba9fff6c978eb9d1bb4e62`.
+
+Merge remains blocked on the exact asset import, a fresh passing documentation registry check and required source/browser/offline/collection/backup tests at the eventual final PR head. An earlier doc-check on the source-only checkpoint correctly reports missing manifest links, unmapped exporter/verifier routes and stale source reviews; the registry routing is being corrected in follow-up. PR90 does not map legacy `glim`/`kip`/`riff` ownership IDs, change earned growth or grant a new reward. Brio's six separately pending expressions stay unbound. **No production deploy, model activation, cloud IAM or worker source change occurred.**
+
+
 ## PR89 combined-source acceptance and Art Studio fixture correction — November 20, 2026
 
 PR88's already-merged Art Studio entrance and local-startup work (`main` at `9d55b866452369ef00eafc3534a8f1431f302399`) was integrated into the character-first PR89 branch. The integration `7bc0aeab7554dfc67d4fac9f8aeb63a5f3483386` has both the prior PR89 head and PR88-merged main in its ancestry. It preserves the Art Studio's guarded **Use my picture** composer action and nonblocking remote-configuration startup alongside the compact Menu, first-time Spark/Nova choice, selected-human imagery, and permanent private Adult entry. A documentation-only follow-up reconciled the combined source-review fingerprints without weakening the checker; [documentation CI 44787973173](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44787973173) passed. These are application-source validations, not another production Pages release or paid AI activation.
