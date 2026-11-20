@@ -529,10 +529,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
-      "sourceDigest": "a8bf738c64b3a58a7e14d40d32f75f5bd7c72023f136cf362b2266c38aab803f",
+      "reviewedAt": "2026-11-20T18:12:45.000Z",
+      "sourceDigest": "b77009a6ebc7ec937948c16ce00c29aa456552668c35fe0ab2b8987319dfa0bd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed both independent browser test sets: real Art Studio entry/upload and late configuration behavior alongside 320-pixel menu, maker choice, adult-profile access, Rewards, Creation and child continuity suites; combined hosted checks still required.",
+      "reviewReason": "Reconciled combined #88/#89 source checks after a legacy Art Studio test assumed an unselected child could activate Let's create. Updated that test to use actual Nova selection; retained file uploads, draft continuity, isolation, no-POST, and required learner journey coverage. Prior failing hosted check remains recorded.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -585,10 +585,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
-      "sourceDigest": "0ab2922155be9ff2f3a10eba6611e8f8bea7ad28dd8544a66b6eaa88fc31d542",
+      "reviewedAt": "2026-11-20T18:12:45.000Z",
+      "sourceDigest": "b6381d06283cc20882272db9cf94dc2f35f7145937523a318214c3b69179933b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded merged PR88 source and the separately staged combined PR89 integration, including exact merge parents, no new production release, preserved approved Adult pilot and pending combined hosted acceptance.",
+      "reviewReason": "Documented the exact combined #88/#89 merge ancestry and initial Arcade failure in Art Studio's old first-time onboarding fixture, then the narrow test-only correction. Recorded hosted six-workflow evidence, kept frontend/source merge distinct from production publication and actual paid execution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -776,10 +776,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "abf967a1529d9d8118861ab80f6ba034f80adaab4f814535b2c63824e1a3f8a1",
-      "reviewedAt": "2026-11-20T17:55:12.000Z",
+      "sourceDigest": "d13510b92f7f9dcd2ae5b644781134a4e36e981c808e7a7ec371e74a85b799ac",
+      "reviewedAt": "2026-11-20T18:12:45.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR88 picture upload, focus and offline-capable local startup combined with the owner-approved Make menu route. Existing private drawing bytes, immutable revisions, user isolation, local exports and model-upload prohibitions remain unchanged.",
+      "reviewReason": "Reviewed the retained local Art Studio upload, focused saved artwork, private owner isolation, app startup before delayed remote configuration and image-to-scene path. Corrected the browser test to select Nova before creating, without changing any application implementation or authorization.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
