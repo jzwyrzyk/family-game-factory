@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T21:15:07.000Z",
-      "sourceDigest": "fcbbc9f23c5a87c1065266c29e7c3de011dbf77452d13b7d848ab654d191d13a",
+      "reviewedAt": "2026-11-20T21:18:34.000Z",
+      "sourceDigest": "c6d2244f12e3c89f07e95b5dc7827053c251ef823f2d528fd6c27cabafeb4fec",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed source-level adult AI continuity protections for issue #93: inactive bootstrap now refuses any established gateway/preview service or private config before mutation; new sanitized read-only live-trust audit checks current WIF, worker/tag/variables and optionally mounted config; scripted offline tests exercise fail-closed cases. Updated release continuity and service-image runbooks and delivery evidence. No activation, provider, live OCI, rollout or adult session acceptance is implied.",
+      "reviewReason": "Reviewed issue #93 adult AI continuity: existing deployed services and private config are protected from the historical inactive bootstrap before any mutation; read-only operator audit checks ready service traffic, Adult policy, private main/tag/variable and exact positive CEL WIF identity equalities, with an optional pinned private config read that never prints secrets. Added negated-identity, pin drift, config and activation offline regression tests; updated the owner release runbook and delivery evidence. Neither provider activation nor a real cloud release is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
