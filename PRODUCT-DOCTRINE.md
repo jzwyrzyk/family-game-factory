@@ -45,6 +45,10 @@ Use actual physics when weight, contact, balance, momentum, suspension or anothe
 
 See [the game-form decision](docs/decisions/0002-intent-faithful-game-forms.md). The current runtime capability is an architecture fact, not a permanent limit on the product's ambition.
 
+### Original drawings belong to the child across creations
+
+The [Art Studio](docs/drawings/ART_STUDIO.md) is a dedicated place to import or draw pictures, prepare separate derivatives, develop meaningful parts and motion, and reuse chosen versions in games and scenes. Preserve original pixels and the child’s decisions. A saved use pins the chosen image or movement revision; later library edits cannot silently change an earlier adventure. Keep local storage, export/restore and missing-asset recovery explicit. Supported physical and block-scene adapters do not imply arbitrary generated-game compatibility, universal recognition or cloud synchronization. [The accepted decision](docs/decisions/2026-11-19-private-art-studio.md) records this extension.
+
 ## 4. Experiments are recoverable; choosing a favorite is explicit
 
 Keep the current playable game and earlier editions safe while a new experiment is built. New alternatives start from the selected main edition unless the child explicitly continues a particular test. Compare, Keep, Undo, copy and return must preserve ownership and provenance. Autosave protects work; it does not select a favorite, publish or silently promote an experiment.

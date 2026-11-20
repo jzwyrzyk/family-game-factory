@@ -41,7 +41,7 @@ async function seedHistoricalRecords(page){
   const state=window.FG.store.emptyBackup();state.feedback=ideas;state.activeProfile='player1';
   localStorage.setItem(stateKey,JSON.stringify(state));
   const db=await new Promise((resolve,reject)=>{
-   const request=indexedDB.open('family-private-drawings-v1',1);
+   const request=indexedDB.open('family-private-drawings-v1');
    request.onupgradeneeded=()=>request.result.createObjectStore('drawings',{keyPath:'id'});
    request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);
   });

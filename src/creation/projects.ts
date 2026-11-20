@@ -5,7 +5,9 @@ import { defaults, validateConfig } from '../runtime/manifests';
 import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
 import type { StudioSession } from '../studio/notebook';
-import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
+import { validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
+export {parsePrivateArtId};
+export type {PrivateArtReference};
 
 export interface CreationAsset {
   readonly id: string;
@@ -18,7 +20,8 @@ export interface CreationAsset {
   readonly sourceGame?: 'dragon' | 'buckets' | 'robot';
 }
 
-/** Only these bundled resources may be addressed by a saved or generated scene. */
+/** Generated manifests may address only these bundled resources. Local scenes
+ * may also carry the strict private-art references defined below. */
 export const CREATION_ASSETS: readonly CreationAsset[] = Object.freeze([
   {id:'dragon', label:'Dragon', kind:'image', url:'./assets/original-dragon/dragon.png', sourceGame:'dragon'},
   {id:'queen', label:'Queen', kind:'image', url:'./assets/original-dragon/queen.png', sourceGame:'dragon'},
@@ -39,10 +42,19 @@ export function creationAsset(id: string): CreationAsset | undefined {
   return CREATION_ASSETS.find(asset=>asset.id===id);
 }
 
-/** Validate at both persistence and remote-import boundaries, before any rendering. */
-export function validateEditableProject(input: unknown): CreationProject {
+/** Opaque local references are data, never paths or fetchable URLs. The browser
+ * separately resolves them against the active owner's immutable private art. */
+export function privateArtId(reference:PrivateArtReference):string {
+  const id=`art:${reference.kind}:${reference.id}:${reference.sha256}`;
+  if(!parsePrivateArtId(id))throw Error('This private artwork reference is invalid.');
+  return id;
+}
+
+/** Local persistence allows opaque private references; remote model output is
+ * deliberately restricted to the bundled catalogue by its own entry point. */
+export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
   const project=validateCreationProject(input);
-  if(project.actors.some(actor=>!creationAsset(actor.assetId))) {
+  if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');
   }
   return project;
@@ -50,7 +62,7 @@ export function validateEditableProject(input: unknown): CreationProject {
 
 /** Model output cannot attest that the child authored its blocks or its provenance. */
 export function validateGeneratedCreationManifest(input:unknown):CreationProject {
-  const scene=validateEditableProject(input);
+  const scene=validateEditableProject(input,{allowPrivateArt:false});
   const mark=(blocks:CreationBlock[])=>{for(const block of blocks){block.origin='assisted';if(block.type==='repeat')mark(block.actions);if(block.type==='if'){mark(block.then);if(block.else)mark(block.else);}}};
   for(const program of scene.programs)mark(program.actions);
   scene.provenance={createdBy:'assisted'};

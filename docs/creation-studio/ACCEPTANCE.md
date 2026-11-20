@@ -1,5 +1,39 @@
 # Creation Studio acceptance evidence
 
+**Current disposition:** the private-art capability below subsequently merged in [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). [Delivery state](../../DELIVERY-STATE.md#pr23-art-studio--merged) records that exact-source merge and hosted acceptance. The dated development records below retain their original source and test scope; acceptance of the later first-creation reconciliation with main is recorded separately in the current delivery section.
+
+## Art Studio integration candidate — November 19, 2026
+
+The refreshed drawing-to-playable branch integrates current Jems source from main
+`df63bc2c7644a26a84a7c7e626b682e7c76c493d`. The checks below were run on the working
+integration candidate; final PR-head CI and the combined build remain the merge
+authority. The earlier PR62 records below retain their original scope.
+
+| Check | Observed result and limit |
+| --- | --- |
+| `npm run test:creation` | All 77 existing engine, challenge, storage, generated-manifest and generation-budget checks passed. Private local IDs remain rejected by the generated-manifest validator. |
+| `node --import tsx --test tests/creation-private-art.test.ts` | Six additional tests passed: opaque reference restrictions; local versus generated boundaries; immutable reuse in two scenes and copies; no cross-profile access, challenge credit or new execution authority; exact original RGB/maximum-alpha composition; and real CreationStore save/Keep/reload for restored 100-character source IDs while ordinary scene IDs remain capped at 160. |
+| TypeScript and production build | Passed through the final Art Studio build, including strict private-reference bounds and the source-aspect follow-up. The [complete Art Studio evidence](../drawings/EVIDENCE.md) records final source/build identities. |
+| `tests/creation-private-art-browser.cjs` desktop and tablet | Both full production-browser journeys passed again in the complete art command on `index-C7Ixev09.js`: upload synthetic artwork, save its cutout design, play and record that exact art, reuse the version in a second scene, export with original bytes, reject a changed rig hash before import, import as isolated copies into another profile, reload and render. Zero POSTs and page errors. |
+| Failure/recovery assertions in that browser suite | Both devices passed deliberate scene-save quota failure with no orphan art reservation, deliberately delayed image decoding across a profile switch with no late scene/pixel leak, and genuine private-art WebM export. The fixture waits for recorded frames and releases all blocked decodes; earlier incomplete waits were test-fixture failures, not accepted application evidence. |
+| Existing `npm run test:creation-browser` | Desktop and touch-emulated tablet authoring journeys passed against the combined production build, including actual block edits and playback, saved ownership, target reconstruction, tap behavior and learning guards. All eight backup-recovery journeys also passed: corrupt export, invalid input, atomic rollback, valid recovery, hint retention, legacy replacement, retired goals and explicit draft recovery. |
+
+The new screenshot outputs are `test-results/art-in-scene-desktop.png` and
+`test-results/art-in-scene-tablet.png`. Their stage shows a synthetic purple
+character derived from its saved cutout and the real block editor; no child image
+or private conversation is used. The review confirms the current Jems shell and
+actual canvas artwork rather than a separate design mockup.
+
+Private-art import is additive. The art transaction is all-or-nothing; saving the
+separate scene afterward can still fail, in which case the visible message says
+the art was imported but the scene was not saved. Usage indexing follows a
+successful scene write, while retained scene history remains the authority for
+deletion protection. These source/browser checks do not establish production
+deployment, arbitrary generated-game art support, real-device performance,
+universal drawing recognition, observed child enjoyment or learning efficacy.
+
+## Earlier PR62 implementation and merge evidence
+
 **Development date:** November 19, 2026 (America/New_York).
 
 **Base:** `079978f3034e007e8bbad1f43571aaa7867b5098`, verified remote `main` when the isolated feature branch was created.

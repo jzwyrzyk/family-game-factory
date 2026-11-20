@@ -6,11 +6,11 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,waitForWelcome}=require('./studio-entry.cjs');
 
 const NOTEBOOK='family-game-factory-studio-v1';
 const devices=[['desktop',{width:1280,height:900}],['phone',{width:390,height:844}]];
-const ready=page=>page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning&&window.FG?.creation);
+const ready=async page=>{await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning&&window.FG?.creation);await waitForWelcome(page);};
 const notebook=page=>page.evaluate(()=>FG.studio.exportNotebook());
 const current=page=>page.evaluate(()=>{
  const n=FG.studio.exportNotebook();return n.sessions.find(s=>s.id===n.active[FG.store.current().id]);
@@ -27,6 +27,7 @@ async function choosePlayer(page,index){
  if(!await menu.evaluate(node=>node.open))await menu.locator('summary').click();
  await page.locator('#profile-choices .profile-choice').nth(index).click();
  await page.waitForFunction(value=>FG.store.current().id==='player'+(value+1),index);
+ await waitForWelcome(page);
 }
 async function failWrites(page,enabled){
  await page.evaluate(({key,enabled})=>{
@@ -45,6 +46,56 @@ async function prepare(browser,viewport,device){
  page.on('request',request=>{if(request.method()==='POST')posts.push(request.url());});
  page.on('dialog',dialog=>void dialog.accept());
  return {context,page,errors,posts};
+}
+async function blockedArtEntry(browser,url){
+ const {context,page,errors,posts}=await prepare(browser,devices[0][1],'desktop');
+ try{
+  // A real older tab can block the v1-to-v2 art database upgrade. Keep that
+  // connection open rather than replacing the application's storage result.
+  const blocker=await context.newPage();
+  await blocker.route('**/art-upgrade-blocker',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><title>Older art tab fixture</title>'}));
+  await blocker.goto(url+'art-upgrade-blocker');
+  await blocker.evaluate(async()=>{
+   window.firstJourneyArtBlocker=await new Promise((resolve,reject)=>{
+    const request=indexedDB.open('family-private-drawings-v1',1);
+    request.onupgradeneeded=()=>request.result.createObjectStore('drawings',{keyPath:'id'});
+    request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);
+   });
+   window.firstJourneyArtBlocker.onversionchange=()=>{window.firstJourneyArtUpgradeRequested=true;};
+  });
+  await page.addInitScript(()=>{
+   // Observe completion of the original readonly request without changing its
+   // result or timing. Migration's separate readwrite transaction is excluded.
+   const getAll=IDBObjectStore.prototype.getAll;
+   IDBObjectStore.prototype.getAll=function(...args){
+    const request=getAll.apply(this,args);
+    if(this.name==='drawings'&&this.transaction.db.name==='family-private-drawings-v1'&&this.transaction.mode==='readonly'){
+     this.transaction.addEventListener('complete',()=>{window.firstJourneyArtReadComplete=true;});
+    }
+    return request;
+   };
+  });
+  await page.route('**/factory-config.json',unavailable);
+  await page.goto(url);
+  await blocker.waitForFunction(()=>window.firstJourneyArtUpgradeRequested===true);
+  await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning&&window.FG?.creation&&document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false',undefined,{timeout:6000});
+  assert.equal(await page.locator('#page-studio-library').isVisible(),true,'a blocked art upgrade cannot prevent usable Studio entry');
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'unknown saved art conservatively opens ordinary home');
+  assert.equal(await page.locator('#studioFavoritesSection').isVisible(),true);
+  const before=await notebook(page);assert.equal(before.sessions.length,0);
+  assert.equal(await page.evaluate(()=>!!window.firstJourneyArtReadComplete),false,'the real art read is still blocked when home becomes usable');
+  await page.locator('#studioNew').focus();
+  await blocker.evaluate(()=>window.firstJourneyArtBlocker.close());
+  await page.waitForFunction(()=>window.firstJourneyArtReadComplete===true);
+  assert.equal(await page.locator('#studioNew').evaluate(node=>document.activeElement===node),true,'a late art read preserves the focused home action');
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'a losing late read cannot replace the home fallback');
+  assert.deepEqual(await notebook(page),before,'fallback and late recovery create no projects, guidance preferences or making evidence');
+  await page.keyboard.press('Enter');await page.locator('#page-studio').waitFor({state:'visible'});
+  assert.equal((await notebook(page)).sessions.length,1,'the normal home action remains usable after the blocked read settles');
+  assert.deepEqual(posts,[]);assert.deepEqual(errors,[]);
+  console.log('PASS first creation blocked art: bounded normal-home fallback, real late-read completion, stable focus and no invented progress');
+ }catch(error){await page.screenshot({path:'test-results/first-creation-blocked-art-failure.png',fullPage:true}).catch(()=>{});throw error;}
+ finally{await context.close();}
 }
 async function localFirstJourney(browser,url,device,viewport){
  const {context,page,errors,posts}=await prepare(browser,viewport,device);
@@ -358,5 +409,6 @@ async function hintsAcrossModes(browser,url){
   await firstRemoteResult(browser,url,'phone',devices[1][1],'dismiss');
   await welcomeSaveFailure(browser,url);
   await hintsAcrossModes(browser,url);
+  await blockedArtEntry(browser,url);
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

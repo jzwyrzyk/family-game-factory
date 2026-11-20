@@ -70,13 +70,13 @@ Generated v1 artifacts stay on their original contract. Generated v2 artifacts a
 
 The current draft's new archive is `quality-runtime-v2.1.0`. Its approved image commands reference IDs in a server-attached asset pack; the renderer decodes the bytes before Play. Asset hashes and exact plan/playthrough preservation join the source/runtime bindings. Existing saved v1 and earlier v2 artifacts remain readable on their recorded contracts. Opening an old accepted game does not retrospectively require the new review. New real candidates and v2 revisions must pass it; new v1 generation cannot be used to evade the policy.
 
-## Drawing decomposition: the future seam
+## Drawing decomposition and Art Studio
 
-The future drawing branch should produce a **reviewable rig**, not a single texture pasted onto a physics box. For a car, likely components are chassis/cab, front wheel, rear wheel, and decorative detail. Each physical component needs a local pivot, a simplified collider, a bounded mass/material profile, and named attachments. Wheel bindings can then connect to an authored suspension model.
+The quality engine's drawing extension uses a **reviewable rig** with separate physical components. For a car, components include chassis/cab, front wheel, rear wheel, and decorative detail. Each physical component needs a local pivot, a simplified collider, a bounded mass/material profile, and named attachments. Wheel bindings connect to an authored suspension model.
 
 `PartDefinition` carries schema version, ID, sprite ID, dimensions, mass, material, friction, restitution, box/circle/convex collider, pivot, and named attachments. `DrawingRig` carries bounded component IDs, parent IDs, local offsets/angles, physical/decorative flags, and fixed/axle/suspension/gum bindings. Validators reject invalid shapes, duplicate IDs, missing anchors, and cyclic parents. Asset identifiers are data; executable source or arbitrary URLs are not allowed.
 
-The importer still needs image segmentation, confidence and ambiguity handling, private asset registration, a child-friendly component review/correction UI, registration into the runtime catalogue, and tests for poor/ambiguous drawings. Those are intentionally separate work. The current validator does not itself make a drawing playable, and the current native workshop instantiates the reviewed built-in catalogue. Keeping this boundary explicit prevents drawing recognition from becoming a prerequisite for a playable first release.
+The validator alone does not make a drawing playable. The merged [Art Studio](drawings/ART_STUDIO.md) now provides local picture preparation, reviewable component suggestions, manual correction, private versioned storage, the supported Rally adapter and local scene reuse. Its [staged program](drawings/PROGRAM.md) retains recognition quality and a broader generated-game asset registry as separate work. The native workshop still instantiates its reviewed built-in catalogue; Art Studio's explicit adapters do not make arbitrary generated games accept private art.
 
 ## Acceptance and evidence
 

@@ -28,6 +28,11 @@ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
+import { installArtStudio } from '../drawing/studio';
+import { rigById } from '../drawing/store';
+import { vehicleGeometry } from '../drawing/model';
+import { drawing, drawings, drawingBlob } from '../assets/private-drawings';
+import { registerArtUsage } from '../drawing/library';
 import { installProblemSolvingPractice } from '../problem-solving/ui';
 import {installRewards, notifyRewardSourceSaved} from '../rewards/service';
 import {createRewardsPage, createRewardsWidget, createRewardCelebration, type RewardsActivity} from '../rewards/ui';
@@ -87,6 +92,7 @@ export async function installStudio(){
  let panel:'game'|'talk'|'versions'='game';
  let keptInThisView:string|null=null;
  let guideSignature='',currentGuide:GuideCard|null=null;
+ let welcomeArt:{owner:string;hasArt:boolean;pending:Promise<void>|null;deferredView:number|null}|null=null;
  let pausedForTools=false,viewIntent=0;
  // Local arcade state never owns build readiness, saved games or learning evidence.
  const waitArcade=createMindYourJems();
@@ -255,12 +261,43 @@ export async function installStudio(){
   if(builderReadiness==='available')return '';
   return builderReadiness==='not-configured'?'Game building is not connected yet. You can save an idea or make a ready-made game yours.':builderReadinessCopy(builderReadiness)+'. You can still save an idea.';
  }
+ function readWelcomeArt(force=false):Promise<void>{
+  const capturedOwner=owner();
+  if(!force&&welcomeArt?.owner===capturedOwner)return welcomeArt.pending||Promise.resolve();
+  const capturedView=epoch,state:{owner:string;hasArt:boolean;pending:Promise<void>|null;deferredView:number|null}={owner:capturedOwner,hasArt:true,pending:null,deferredView:null};
+  welcomeArt=state;library.setAttribute('aria-busy','true');
+  // A blocked IndexedDB upgrade cannot hold the whole Studio at startup.
+  // Unknown or unreadable art conservatively keeps the ordinary home available.
+  let timer:ReturnType<typeof setTimeout>;
+  const timeout=new Promise<boolean>(resolve=>{timer=setTimeout(()=>resolve(true),1500);});
+  state.pending=Promise.race([drawings(capturedOwner).then(items=>items.length>0,()=>true),timeout]).then(hasArt=>{
+   clearTimeout(timer);
+   if(welcomeArt!==state||owner()!==capturedOwner)return;
+   state.hasArt=hasArt;state.pending=null;library.setAttribute('aria-busy','false');
+   if(route!=='library')return;
+   const focused=document.activeElement,homeTitle=$('studioLibraryTitle'),welcomeTitle=$('studioWelcomeTitle');
+   // A read may finish after the child has chosen an action. Never replace that
+   // interaction on this visit, including a later passive storage refresh.
+   // Explicit Home advances the view and can use the cached result then.
+   if(epoch!==capturedView||(focused!==document.body&&focused!==homeTitle&&focused!==welcomeTitle)){
+    if(!hasArt&&welcome.element.hidden)state.deferredView=epoch;
+    return;
+   }
+   act(()=>{
+    refreshWelcome();
+    if(focused===homeTitle&&!welcome.element.hidden)focusView(welcomeTitle);
+    else if(focused===welcomeTitle&&welcome.element.hidden)focusView(homeTitle);
+   });
+  });
+  return state.pending;
+ }
  function refreshWelcome(){
   // Existing scene creators and established makers keep their normal home.
   // A damaged scene store is not a new account and must not be overwritten.
   let hasScenes=true;
   try{hasScenes=new CreationStore(profileStorage(localStorage)).list(owner()).length>0;}catch{}
-  const visible=!notebook.guidance(owner()).welcomeDismissed&&!hasMeaningfulCreation(notebook.list(owner()),owner())&&!notebook.avatar(owner())&&!hasScenes;
+  void readWelcomeArt();
+  const visible=!welcomeArt!.hasArt&&welcomeArt!.deferredView!==epoch&&!notebook.guidance(owner()).welcomeDismissed&&!hasMeaningfulCreation(notebook.list(owner()),owner())&&!notebook.avatar(owner())&&!hasScenes;
   library.dataset.firstVisit=String(visible);welcome.update(visible,welcomeAvailability());
   document.body.classList.toggle('studio-first-visit',visible&&route==='library');
  }
@@ -884,7 +921,8 @@ export async function installStudio(){
   if(!canChangePlay(s))return false;
   const playedTest=view==='candidate'?s.candidate?.id||s.selectedTest||null:null;
   disposeGame();lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
-  FG.app.openGame(s.game,{config,stateKey:key,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
+  const boundRevision=s.projectId?games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined)):null;
+  FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
     announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`,false,playedTest);
@@ -1233,13 +1271,17 @@ export async function installStudio(){
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
- window.addEventListener('factory-profile',()=>{waitArcade.close();waitProject=null;stopSpeech();hideJourney();
+ window.addEventListener('factory-profile',()=>{welcomeArt=null;waitArcade.close();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   $('studioMessages').replaceChildren();$('coachProposals').replaceChildren();
   $('coachModeStatus').textContent='';$<HTMLTextAreaElement>('studioPrompt').value='';
   $('studioVoiceStatus').textContent='';
   coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);void refreshServiceReadiness();resumeOutstanding();});
+ window.addEventListener('factory-art-updated',event=>{
+  if((event as CustomEvent).detail?.owner!==owner())return;
+  void readWelcomeArt(true);
+ });
  window.addEventListener('beforeunload',event=>{stopSpeech();if(!rewardSourceWritable())return;try{flushDraft();}catch{event.preventDefault();event.returnValue='';}});
  window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){if(route==='library')act(renderLibrary);else if(route==='journey')act(renderJourney);else if(activeId)act(render);updateProfile();}});
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
@@ -1327,7 +1369,10 @@ export async function installStudio(){
    await coaching!.tryPreset(prompt);
   })
  });
+ // Mount Home once. The bounded presence check can update this same view,
+ // without a second automatic navigation overriding a child's early choice.
  home();
+ await readWelcomeArt();
  try{remote=validateBuilderConfig(await(await fetch(new URL('factory-config.json',document.baseURI),{cache:'no-store'})).json());}catch{remote={version:1,mode:'unavailable'};}
  configReady=true;
  if(remote.mode!=='remote'){coachConnection='unavailable';builderReadiness='not-configured';}
@@ -1339,6 +1384,41 @@ export async function installStudio(){
   enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('creation');route='other';document.body.classList.remove('studio-designing');document.body.classList.add('creation-open');setActiveNav('studioNavScenes');return true;},
   home,openGame:id=>open(id),onRewardSourceSaved:notifyRewardSourceSaved,
  });
+ const artStudio=installArtStudio({
+  enter:()=>{if(guardMath())return false;stopSpeech();flushDraft();creation.flush();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('art-studio');route='other';document.body.classList.remove('studio-designing','creation-open');setActiveNav('studioNavCreate');return true;},
+  home,
+  openScene:async art=>{await creation.openArt(art);},
+  openCar:async(rigId,isCurrent)=>{
+   if(!isCurrent()||guardMath())return;const capturedOwner=owner(),capturedEpoch=epoch;
+   const stillCurrent=()=>isCurrent()&&owner()===capturedOwner&&epoch===capturedEpoch;
+   const rig=await rigById(capturedOwner,rigId);if(!stillCurrent())return;
+   const source=await drawing(capturedOwner,rig.assembly.sourceId);
+   if(!stillCurrent()||guardMath())return;if(rig.assembly.kind!=='car')throw Error('Choose a saved car design for Rally.');
+   const picture=await createImageBitmap(drawingBlob(source));
+   try{if(!stillCurrent())return;vehicleGeometry(rig.assembly,picture.width/picture.height);}finally{picture.close();}
+   if(!stillCurrent()||guardMath())return;
+   if(!leaveCreationForStudio())return;flushDraft();
+   // Keep the two synchronous save steps together. If notebook storage was full
+   // on a previous attempt, recover that exact unlisted project instead of
+   // leaving it behind and creating another copy on every retry.
+   const listed=new Set(notebook.list(capturedOwner).map(item=>item.projectId));
+   const pending=games.list(capturedOwner).find(item=>item.game==='hill'&&!listed.has(item.id)&&games.revision(item.id,capturedOwner).drawingRigId===rig.id);
+   const p=pending??games.create(capturedOwner,'hill',(source.name+' Rally').slice(0,60),defaults('hill'),rig.id);
+   const session=notebook.create(capturedOwner,'hill',p.name,p.id);
+   // Actual retained game revisions are authoritative for art usage. Index
+   // repair is supplementary and cannot strand an already-saved game.
+   void registerArtUsage(capturedOwner,{targetId:p.id,targetKind:'game',drawingId:source.id,rigId:rig.id},()=>owner()===capturedOwner&&rewardSourceWritable()).catch(()=>{});
+   try{message(session,'helper','Your own drawing is driving this game. Its saved movement version stays with this adventure. Try it, then decide what you want to change.');}catch{/* The saved game remains available even if the optional welcome note cannot be written. */}
+   await open(session.id);
+  },
+ });
+ const artEntry=el('button','studio-scene-entry') as HTMLButtonElement;artEntry.id='studioArt';artEntry.type='button';
+ artEntry.innerHTML='<img src="./jems-art/character_spark_wave.webp" alt=""><span><strong>Bring your drawing to life</strong><small>Your own Art Studio. Draw, upload, give it movement, and reuse it in your games.</small></span><b aria-hidden="true">→</b>';
+ artEntry.querySelector('b')!.replaceChildren(createIcon('arrow'));artEntry.onclick=()=>act(()=>artStudio.open());libraryTools.before(artEntry);
+ const artShortcut=iconEl('button','studio-button','edit','Art Studio') as HTMLButtonElement;artShortcut.id='studioArtShortcut';artShortcut.type='button';artShortcut.onclick=()=>act(()=>artStudio.open());libraryTools.prepend(artShortcut);
+ const creationArt=iconEl('button','creation-button','edit','My art & drawings') as HTMLButtonElement;creationArt.id='creationArtStudio';creationArt.type='button';creationArt.onclick=()=>act(()=>artStudio.open());$('creationShelfImport').after(creationArt);
+ const artFromIdea=iconEl('button','studio-button','edit','Use my drawing') as HTMLButtonElement;artFromIdea.id='studioUseDrawing';artFromIdea.type='button';artFromIdea.onclick=()=>act(()=>artStudio.open());$('studioHelp').after(artFromIdea);
+ const legacyArt=iconEl('button','studio-button','edit','Open Art Studio') as HTMLButtonElement;legacyArt.id='collectionArtStudio';legacyArt.type='button';legacyArt.onclick=()=>act(()=>artStudio.open());$('page-creations').querySelector('.page-head')!.append(legacyArt);
  installCreationProgress();
  const scenesNav=iconEl('button','','grid','Create & code') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
  const scenesEntry=el('button','studio-scene-entry') as HTMLButtonElement;scenesEntry.id='studioScenes';scenesEntry.type='button';
@@ -1379,4 +1459,5 @@ export async function installStudio(){
  window.addEventListener('factory-page',event=>{hideJourney();const destination=(event as CustomEvent).detail;if(destination!=='creation')document.body.classList.remove('creation-open');if(destination==='lab')setActiveNav('studioNavPowers');else if(destination==='parent')setActiveNav(null);});
  if(new URLSearchParams(location.search).get('creation')==='1')creation.open();
  if(new URLSearchParams(location.search).get('problem-solving')==='1')practice.open();
+ if(new URLSearchParams(location.search).get('art')==='1')void artStudio.open().catch(error=>status((error as Error).message,true));
 }

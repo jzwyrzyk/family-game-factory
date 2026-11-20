@@ -7,7 +7,7 @@ export class StudioGames {
   constructor(private storage: Storage, private fg: any) {}
   private store(){return new RevisionStore(this.storage);}
   list(owner:string){return this.store().list(owner);}
-  create(owner:string,game:GameId,name:string,config:Mechanics){return this.store().create(owner,game,name,config);}
+  create(owner:string,game:GameId,name:string,config:Mechanics,drawingRigId?:string){return this.store().create(owner,game,name,config,undefined,drawingRigId);}
   project(projectId:string,owner:string){return this.store().project(projectId,owner);}
   revision(projectId:string,owner:string,id?:string){return this.store().revision(projectId,owner,id);}
   history(projectId:string,owner:string){return this.store().history(projectId,owner);}

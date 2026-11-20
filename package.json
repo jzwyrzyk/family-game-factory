@@ -10,7 +10,7 @@
     "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts",
     "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts && npm run test:parent-dashboard",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser && npm run test:generated-art && npm run test:quality-capture",
-    "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent",
+    "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:art && npm run test:art-browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent",
     "test:child-journey": "npm run test:first-creation && node tests/child-journey.cjs && node tests/build-continuity.cjs",
     "test:navigation-continuity": "node tests/navigation-continuity.cjs",
     "test:real-agent": "node tests/real-agent-status.cjs",
@@ -52,6 +52,8 @@
     "test:rewards-browser": "node tests/rewards-ui-browser.cjs && node tests/rewards-browser.cjs",
     "test:problem-solving": "node --import tsx --test tests/problem-solving-evidence.test.ts tests/problem-solving-storage.test.ts tests/problem-solving-practice.test.ts tests/problem-solving-adapters.test.ts",
     "test:problem-solving-browser": "node tests/problem-solving-browser.cjs",
+    "test:art": "node --import tsx --test tests/drawing-engine.test.ts tests/drawing-bindings.test.ts tests/creation-private-art.test.ts",
+    "test:art-browser": "node tests/art-storage-browser.cjs && node tests/art-studio-browser.cjs && node tests/picture-tools-browser.cjs && node tests/drawing-engine-browser.cjs && node tests/creation-private-art-browser.cjs",
     "test:first-creation": "node --import tsx --test tests/studio-guidance.test.ts && node tests/first-creation-journey.cjs"
   },
   "devDependencies": {

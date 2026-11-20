@@ -175,6 +175,12 @@ jobs:
       - name: Editable creation contracts and behavioral challenges
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation
+      - name: Private Art Studio contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:art
+      - name: Art library, physical drawings and portable scenes
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:art-browser
       - name: Creation desktop and touch journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:creation-browser

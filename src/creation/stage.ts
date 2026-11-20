@@ -1,18 +1,23 @@
 import type { CreationProject } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
-import { creationAsset, drawCreationVector } from './projects';
+import { creationAsset, drawCreationVector, parsePrivateArtId } from './projects';
+import type { PrivateArtResolver } from './private-art';
 
-/** The trusted scene renderer only resolves the reviewed, local asset catalogue. */
+/** The trusted renderer resolves bundled art and owner-checked local references.
+ * Private art never accepts an externally supplied URL. */
 export class CreationStage {
   private readonly context: CanvasRenderingContext2D;
   private readonly images = new Map<string, HTMLImageElement>();
   private scene: CreationProject | null = null;
   private snapshot: SceneSnapshot | null = null;
   private selected = '';
-  constructor(readonly canvas: HTMLCanvasElement) {
+  private artEpoch=0;
+  private requestedArt=new Set<string>();
+  private failedArt=new Set<string>();
+  constructor(readonly canvas: HTMLCanvasElement,private privateArt?:PrivateArtResolver,private artError?:(message:string)=>void) {
     this.context = canvas.getContext('2d')!;
   }
-  clear() { this.scene = null; this.snapshot = null; this.selected = ''; this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); }
+  clear() { this.artEpoch++;this.requestedArt.clear();this.failedArt.clear();this.scene = null; this.snapshot = null; this.selected = ''; this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); }
   render(scene: CreationProject, snapshot: SceneSnapshot, selected = '') {
     this.scene = scene; this.snapshot = snapshot; this.selected = selected;
     if (this.canvas.width !== scene.width) this.canvas.width = scene.width;
@@ -94,7 +99,30 @@ export class CreationStage {
       c.strokeStyle = '#7452CF'; c.lineWidth = 2; c.setLineDash([5, 4]);
       c.beginPath(); c.roundRect(-s * .58, -s * .57, s * 1.16, s * 1.16, 15); c.stroke(); c.setLineDash([]);
     }
-    if (asset?.url) {
+    if(parsePrivateArtId(actor.assetId)){
+      const resolved=this.privateArt?.get(actor.assetId);
+      if(resolved){
+        const scale=s/Math.max(resolved.image.width,resolved.image.height);
+        c.drawImage(resolved.image,-resolved.image.width*scale/2,-resolved.image.height*scale/2,resolved.image.width*scale,resolved.image.height*scale);
+      }else{
+        if(this.privateArt&&!this.requestedArt.has(actor.assetId)&&!this.failedArt.has(actor.assetId)){
+          this.requestedArt.add(actor.assetId);const epoch=this.artEpoch;
+          void this.privateArt.load(actor.assetId).then(()=>{
+            if(epoch!==this.artEpoch)return;this.requestedArt.delete(actor.assetId);
+            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
+          }).catch(error=>{
+            if(epoch!==this.artEpoch)return;
+            this.requestedArt.delete(actor.assetId);
+            this.failedArt.add(actor.assetId);this.artError?.('Some artwork is unavailable in this profile. Open Art Studio to restore its art bundle. '+(error as Error).message);
+            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
+          });
+        }
+        c.fillStyle='#F5F1FA';c.strokeStyle='#786489';c.lineWidth=2;c.setLineDash([4,4]);
+        c.beginPath();c.roundRect(-s*.46,-s*.4,s*.92,s*.8,10);c.fill();c.stroke();c.setLineDash([]);
+        c.fillStyle='#4C3C61';c.font='600 '+Math.max(10,Math.min(14,s*.12))+'px system-ui';c.textAlign='center';c.textBaseline='middle';
+        c.fillText(this.failedArt.has(actor.assetId)?'Art unavailable':'Loading art…',0,0,s*.85);
+      }
+    } else if (asset?.url) {
       let img = this.images.get(asset.id);
       if (!img) {
         img = new Image(); img.onload = () => { if (this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected); };

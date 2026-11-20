@@ -25,7 +25,11 @@ The child retains choice of entry and next action. Dismissing guidance is a pres
 
 An optional owner-keyed guidance map extends the existing Studio notebook and backup contract without a new progress store. The initial welcome temporarily simplifies navigation; the complete ordinary library remains available through the child's choice. Its existing first-phone-viewport playable-choice criterion is assessed after Explore first.
 
-This increment does not deliver arbitrary same-game code editing, cross-device synchronization, or integration of the parallel Art Studio and Gem Pal branches. It gives their future entrances a consistent guidance pattern. Accepted direction and passing engineering tests do not establish deployment or child acceptance.
+At the original decision, this increment did not include integration of the parallel Art Studio or Gem Pal branches. It did not deliver arbitrary same-game code editing or cross-device synchronization. Accepted direction and passing engineering tests do not establish deployment or child acceptance.
+
+### Integration update — November 20, 2026 (UTC)
+
+[Art Studio PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23) subsequently merged, with [PR82](https://github.com/jzwyrzyk/family-game-factory/pull/82) recording that source and its acceptance. The first-creation branch now preserves that merged capability when reconciling with main `90743ab2b1da098188db15dc5e40c3dfd799e291`. This updates the integration scope, not the child's ownership, optional-guidance or explicit-Keep policy. Art Studio remains a creation subdestination in the existing shell, with local private art and supported adapters; it does not imply arbitrary same-game code round trips. Gem Pal runtime/artwork remain separate. The combined source requires its own verification; earlier checks and captures retain their original scope in [delivery state](../../DELIVERY-STATE.md).
 
 ## References
 

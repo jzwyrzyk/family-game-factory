@@ -61,3 +61,5 @@ import './adult-workspace.test';
 import './adult-profile-client.test';
 
 import './mind-your-jems.test';
+
+import './drawing-engine.test';

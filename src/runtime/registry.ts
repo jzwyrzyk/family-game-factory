@@ -39,7 +39,7 @@ export function snapshot() { return current?.snapshot(); }
 const FG = (window as any).FG;
 FG.runtime = { snapshot, isPlaying: () => current?.isPlaying() ?? false, pause: () => current?.pause(), resume: () => current?.resume() };
 FG.games = Object.fromEntries((Object.keys(plugins) as GameId[]).map(id => [id, {
-  name: manifests[id].name, ...details[id], build: function(target: HTMLElement, ctx: {difficulty: Difficulty; config?: Mechanics; stateKey?:string; finish(outcome: PlayOutcome): void}) {
+  name: manifests[id].name, ...details[id], build: function(target: HTMLElement, ctx: {difficulty: Difficulty; config?: Mechanics; stateKey?:string; drawingRigId?:string|null; finish(outcome: PlayOutcome): void}) {
     const config = ctx.config || defaults(id, ctx.difficulty), key = ctx.stateKey || id;
     // Capture the owning profile. Unmount can happen AFTER the active profile changes.
     const profile = FG.store.current();
@@ -58,7 +58,7 @@ FG.games = Object.fromEntries((Object.keys(plugins) as GameId[]).map(id => [id, 
         if (FG.store.save()) return true;
         p.constructionStates = before; return false;
       }
-    });
+    },ctx.drawingRigId);
     current = lifecycle;
     lifecycle.start();
     return { next: () => lifecycle.next(), restart: () => lifecycle.retry(), retry: () => lifecycle.retry(), isPlaying:()=>lifecycle.isPlaying(),pause:()=>lifecycle.pause(),resume:()=>lifecycle.resume(),unmount: () => lifecycle.dispose() };

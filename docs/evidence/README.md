@@ -1,5 +1,11 @@
 # Synthetic validation evidence
 
+## Current Art Studio review
+
+The refreshed drawing PR has its own [source-scoped evidence](../drawings/EVIDENCE.md), [feature contract](../drawings/ART_STUDIO.md) and production-browser captures. Those tests cover reusable private art, movement versions, native game/scene integration and recovery. The older Live Remix results below retain their original scope and counts.
+
+## Earlier Live Remix evidence
+
 Screenshots are captured by `tests/live-remix.cjs` using default pseudonymous profiles and synthetic “Donut Splash” game names. They contain no real child identities or uploaded artwork.
 
 - [Desktop Live Remix](live-remix-desktop.png), Chromium, 1280×900 viewport

@@ -54,3 +54,5 @@ Link DELIVERY-STATE.md for implementation and operational status.
 ```
 
 Never copy private child content, credentials or restricted evidence into this public repository. Link an access-controlled evidence location with a safe description when needed.
+
+- [Private Art Studio and explicit reusable art versions](2026-11-19-private-art-studio.md) — dedicated creation space, original preservation, pinned game/scene use and private portability.

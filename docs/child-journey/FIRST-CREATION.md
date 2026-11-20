@@ -8,6 +8,8 @@ The initial invitation is to make something of the child's own. The intended cre
 
 An eligible first visit presents a simple welcome with **Make my first game** as the main action and a quieter **Explore first** route. Both use existing destinations. The regular navigation and library become available through either choice; the seven primary destinations are retained. Existing meaningful creation, per-player preferences, and intentional direct entrances are respected. Legacy routes retain their existing behavior.
 
+Saved scenes and private drawings also identify a returning creator. Studio reads the existing drawing library for the active owner without creating a game, scene, reward or guidance preference. It caches only that owner's presence result and refreshes it after art changes. A pending, timed-out or unreadable art store keeps the ordinary home available; a late result cannot replace a different page or an action the child is already using. That deferral lasts through passive refreshes on the same home visit; an explicit return Home can use the cached eligibility. A fresh sibling's eligibility is checked independently.
+
 The ordinary library's first-phone-viewport playable-choice requirement applies after **Explore first**, rather than requiring the whole library alongside the introductory invitation. Parent/profile controls remain available. The introduction is optional; it does not require avatar selection, an assessment, a completed build, or a compulsory tutorial before play.
 
 | Moment | Guidance and action | Ownership boundary |
@@ -30,7 +32,7 @@ The bounded tip IDs are `idea`, `waiting`, `ready`, `play`, `improve`, `keep`, `
 
 Journey help also points to the existing scene-video route: **Create & code → More scene tools → Save a video**. This makes recording discoverable without adding a new recording capability or implying that every generated game has an editable scene equivalent.
 
-Creation Studio uses the same pattern. The permanent source label says a linked scene's changes stay in that scene; **Back to my game** retains its existing meaning. Optional scene guidance never implies arbitrary game-to-block conversion. Practice guidance explains watching, trying and checking without supplying a solution or marking an assessment hint as used. After a successful check, the existing authored extension appears beside **Make it my own**. Unresolved scene recovery takes priority over optional tips.
+Creation Studio uses the same pattern. The permanent source label says a linked scene's changes stay in that scene; **Back to my game** retains its existing meaning. Adding private art keeps that return action alongside the exact-art-version label and **Art Studio** action. Optional scene guidance never implies arbitrary game-to-block conversion. Practice guidance explains watching, trying and checking without supplying a solution or marking an assessment hint as used. After a successful check, the existing authored extension appears beside **Make it my own**. Unresolved scene recovery takes priority over optional tips.
 
 Rewards uses a compact explanation of lifetime gems, the maker journey and My Powers. Dismissing it cannot grant gems, advance a rank, or create a learning observation.
 
@@ -46,11 +48,15 @@ The existing version-1 Studio notebook has an optional bounded `guidance` map ke
 
 Preference writes re-read the notebook and respect the existing source-writer guard. They do not update a project's activity time, append design observations, or produce reward facts. Interface callbacks retain owner/view checks so a stale control cannot act for a different player. Required learning and scene-recovery guards remain authoritative.
 
-The implementation reuses the current build shelf, polling, wait arcade, scene adapters, draft saving and revision history. It does not add arbitrary code round trips, cloud synchronization, new learning scores, public sharing, or a new generation route. Parallel Art Studio and Gem Pal development remain separate integrations.
+The implementation reuses the current build shelf, polling, wait arcade, scene adapters, draft saving and revision history. It does not add arbitrary code round trips, cloud synchronization, new learning scores, public sharing, or a new generation route.
+
+The [Art Studio](../drawings/ART_STUDIO.md) is now inherited from merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). Its My Games, idea-workspace, Create & code and saved-collection entrances remain subdestinations within the same seven-route shell. The first-creation integration retains its explicit art choices, profile-owned originals, pinned uses and scene recovery while adding optional guidance. A direct `?art=1` entrance still opens the requested tool. Earlier first-creation captures and checks predate this merge; [delivery state](../../DELIVERY-STATE.md) records acceptance of the combined source separately. Gem Pal runtime/artwork remain separate scope.
 
 ## Verification
 
 [Model and preference tests](../../tests/studio-guidance.test.ts) cover backward compatibility, owner isolation, malformed preferences, failed writes, reward independence and recommendation ordering. [First-creation browser journeys](../../tests/first-creation-journey.cjs) exercise the visible introduction, optional hints, return behavior, ready-result handoff and existing learning/save guards. Existing homepage, build-continuity, Creation, Rewards and navigation suites remain relevant.
+
+The browser journey also holds a real older art-database connection open to check bounded startup, ordinary-home fallback, late completion, retained focus and unchanged notebook state. The [Art Studio journey](../../tests/art-studio-browser.cjs) checks art-only Home and reload behavior plus a fresh sibling; the [private-art scene journey](../../tests/creation-private-art-browser.cjs) checks both source actions, the exact game return and preservation of the original saved game.
 
 [Selected visual captures](previews/README.md) record the welcome, first phone composer and Journey help, with their fixture and source-build context.
 
