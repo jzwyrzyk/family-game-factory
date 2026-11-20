@@ -419,10 +419,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T02:51:25.971Z",
-      "sourceDigest": "98e5f93d87d087b4ed977db4b1d0f114fdd45c23a93e0af12f628190e11a1cc9",
+      "reviewedAt": "2026-11-20T04:37:01.901Z",
+      "sourceDigest": "632b61d3426bb1526e45d3ff7c4431ece324d53f3674ad1f3f9ee592296431ee",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new source and browser regressions plus existing compatibility results; added scoped evidence and capture checksums covering quota failures, owner/view changes, immutable reuse, image fidelity and explicit limits of synthetic device emulation.",
+      "reviewReason": "Recorded the exact main tablet part-count failure, captured 65px tray movement and DIV click, and bounded corrective acceptance in DELIVERY-STATE. The test now uses Playwright real-touch target actionability; all 19 assertion-bearing lines and physical-device evidence limits are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -461,10 +461,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T04:17:14.995Z",
-      "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
+      "reviewedAt": "2026-11-20T04:37:06.027Z",
+      "sourceDigest": "d59f3866f7021f824ed62639d6ac61f418d99582c03ee1455a176644a53a9b6e",
       "reviewOutcome": "updated",
-      "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries.",
+      "reviewReason": "Added the current merged-source release blocker and exact hosted job link, concrete touch-event diagnosis, local focused/full-quality results and the isolated test-only candidate boundary. The original main failure is retained; no draft merge, deployment or provider activation is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

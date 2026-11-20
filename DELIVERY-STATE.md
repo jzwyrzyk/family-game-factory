@@ -1,5 +1,23 @@
 # jems delivery state
 
+## November 19 merged-source release preparation — tablet check correction
+
+The selected merged source is **`90743ab2b1da098188db15dc5e40c3dfd799e291`**. Its [main Arcade run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44673626234) records a failed **Physical and generated games** step in [creative job `136080262794`](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44673626234/job/136080262794). The exact log reports `tests/quality-tablet.cjs:40`: one part after two requested additions, where two parts are required. Earlier passing PR evidence does not clear this current-source failure. The other physical-builder, Rally, drawing and generated-runtime suites in that step passed.
+
+An unchanged local tablet run reproduced the assertion. A bounded diagnostic then captured the lost input: after **Start fresh**, the Bottle button was measured at y=279.875, but the tray subsequently shifted upward **65 CSS pixels** to y=214.875. The raw tap's pointer-down/up events targeted Bottle; its synthesized click landed on a `DIV`, so only the following Carton was added. The intended add handler did not receive that synthesized click; this explains the missing automated addition. The trace does not assess rapid input on physical devices during the same layout transition. The diagnostic uses synthetic profiles and retains the actual event targets and measured bounds in the prepared release evidence.
+
+The isolated correction changes only the tablet test helper to `locator.tap()`, allowing the intended element to settle and receive real touchscreen input. It preserves the existing bounding-box assertion, all gameplay assertions, touch-capability checks, viewports, screenshot checks and held-pedal input. It adds no sleep, custom retry loop, forced event, relaxed tolerance, product change or permission change. The behavior follows Playwright's [touch actionability contract](https://playwright.dev/docs/actionability).
+
+| Local corrective acceptance | Observed scope |
+| --- | --- |
+| Unchanged tablet test | Failed at the same one-part-versus-two assertion. |
+| Corrected tablet test | Three consecutive independent runs passed both portrait and landscape, six complete journeys; assertions unchanged. |
+| Full `npm run test:quality` | Passed once after the correction: native builder and Rally desktop/touch, tablet portrait/landscape, drawing desktop/tablet, generated desktop/mobile controls and containment, and sticker-builder desktop/tablet/phone. |
+
+Local execution uses Node **24.22.3**, Playwright **1.56.1** and its supported Chromium **141.0.7390.37** headless shell. Hosted CI remains Node 22 / Ubuntu 24.04. These observations establish the stated synthetic test scope, not actual-family-device or child acceptance.
+
+**Disposition:** local test-only corrective candidate on `fix/tablet-touch-release-20261119`, based on the selected merged source. It is not yet published or merged, and the original release gate remains blocked. No application, service, asset, dependency, build-script or workflow file changes. No website publication, service deployment, traffic change, worker repin or paid activation occurred. A release containing this correction needs its own reviewed source acceptance; it must not be silently substituted into the already-merged release target.
+
 ## PR23 Art Studio — merged
 
 [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23) merged on **November 19, 2026, at 11:15:12 p.m. America/New_York** (`2026-11-20T04:15:12Z`) as [`20ffb350f91091d5cfb64ec6b8c805f4cfd30183`](https://github.com/jzwyrzyk/family-game-factory/commit/20ffb350f91091d5cfb64ec6b8c805f4cfd30183), from reviewed head `8317c325c3d3e638ae21f7cd298f69f187978729` into main `df63bc2c7644a26a84a7c7e626b682e7c76c493d`. The actual merged tree **`75d2295ba1989c39976e81100550ee14c408f128`** exactly matches both the tested PR head and GitHub integration checkout `ce020bf13d9fd0e5b6a7504fd1e3eca082969354`. The owner explicitly authorized the merge after the completed feature review. Fresh checks found no new source changes or outstanding review threads.
