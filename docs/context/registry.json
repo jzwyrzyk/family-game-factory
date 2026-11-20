@@ -36,7 +36,15 @@
     "docs/problem-solving/BENCHMARKS.md",
     "docs/problem-solving/IMPLEMENTATION.md",
     "docs/decisions/0011-formative-problem-solving-evidence.md",
-    "docs/mind-your-jems/README.md"
+    "docs/mind-your-jems/README.md",
+    "docs/pals/STUDIO.md",
+    "docs/pals/DESIGN_DOCTRINE.md",
+    "docs/pals/GROWTH_GUIDE.md",
+    "docs/pals/QUALITY_GATES.md",
+    "docs/pals/CONTINUITY.md",
+    "docs/pals/PROMPT_RECIPES.md",
+    "skills/gem-pal-studio/SKILL.md",
+    "docs/decisions/2026-11-19-gem-pal-studio.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -61,7 +69,9 @@
     "docs/rewards/previews/*.md",
     "docs/problem-solving/*.md",
     "docs/mind-your-jems/*.md",
-    "docs/archetypes/*.md"
+    "docs/archetypes/*.md",
+    "docs/pals/*.md",
+    "skills/gem-pal-studio/*.md"
   ],
   "areas": [
     {
@@ -76,13 +86,14 @@
         "docs/child-continuity/*.md",
         "docs/brand/*.md",
         "docs/rewards/*.md",
-        "docs/problem-solving/*.md"
+        "docs/problem-solving/*.md",
+        "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T23:24:40.702Z",
-      "sourceDigest": "5525f4f96e6cb9c02cf35e32381d8a6286ab659df44a1f3a6e225b825a5026e2",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed restored collection access, activity links, same-project continuation and score wording against the doctrine. Existing family idea sharing, private drawings, parent learning controls, explicit Keep, maker evidence and lifetime reward policy are unchanged; no new product entitlement or progression rule is introduced.",
+      "reviewedAt": "2026-11-20T01:16:17.200Z",
+      "sourceDigest": "75b29311edbe4e453d7388b30781161b3607d6b7c0f544450bf1ec79210e9565",
+      "reviewOutcome": "updated",
+      "reviewReason": "Integrated Gem Pal doctrine and guide over merged PR78. Preserved its restored collection access, navigation, same-project continuation, private drawings, explicit Keep, maker evidence and lifetime reward contracts; added the two artistic forms and purposeful structural growth without altering earning thresholds, runtime delivery or exact-art approval.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -104,6 +115,13 @@
           "sourceDigest": "3925f4d8fadeb82ef2d541a79e5bbf4ad6741232221b9f29b8d5b32056c21f33",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed handbook coverage against the merged source. This clarification separates active identity, fonts, helper and maker-journey integration from installed optional icons/artwork and unactivated illustrative screens/sounds; it changes no accepted product intent, earning rule, learning claim or provider policy."
+        },
+        {
+          "sourceCommit": "3cf23a866770e4cd22765ba822bcf1c988f60bcf",
+          "reviewedAt": "2026-11-19T23:24:40.702Z",
+          "sourceDigest": "5525f4f96e6cb9c02cf35e32381d8a6286ab659df44a1f3a6e225b825a5026e2",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed restored collection access, activity links, same-project continuation and score wording against the doctrine. Existing family idea sharing, private drawings, parent learning controls, explicit Keep, maker evidence and lifetime reward policy are unchanged; no new product entitlement or progression rule is introduced."
         }
       ]
     },
@@ -484,10 +502,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:17:18.881Z",
-      "sourceDigest": "a47a6d61c57e945533d5c4066702005a4a1764d693d5b4967ac591a7e13bec40",
+      "reviewedAt": "2026-11-20T00:59:07.305Z",
+      "sourceDigest": "8b82d89552d6e03ae5f9f0f7093cbfc149a234ac31bef51ff2090279cc855d9d",
       "reviewOutcome": "updated",
-      "reviewReason": "Mapped the new illustrated game source, approved assets, font, tests, and newly integrated PR48 archetype research files; preserved existing independent learning, privacy, brand, Rewards and parent-reporting scopes.",
+      "reviewReason": "Reviewed agent and Project retrieval routes, decision/index links, feedback maintenance and the registry-policy diff. Registered the portable skill, template, canonical guides and exact future character index under pal-design without importing or merging the artwork draft.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -540,6 +558,25 @@
       "reviewedAt": "2026-11-19T17:17:56.960Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed shared writer guard, five-source backup, child-view and native-parent integration, deterministic tasks and new failure regressions; documented current local evidence and pending exact-head browser acceptance."
+    },
+    {
+      "id": "pal-design",
+      "documents": [
+        "docs/pals/*.md",
+        "skills/gem-pal-studio/SKILL.md",
+        "docs/decisions/2026-11-19-gem-pal-studio.md"
+      ],
+      "sources": [
+        "docs/pals/*.md",
+        "docs/pals/templates/**",
+        "skills/gem-pal-studio/**",
+        "docs/pals/art/character-references.json"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "848c8ab214645ca8afb92a3389d14181f8e34667ad7986881e678cbea4a39e79",
+      "reviewedAt": "2026-11-20T01:00:12.877Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the complete Studio guides, two-form record template, exact-reference workflow, quality gates and portable skill; normalized the final doctrine newline. Routed the future character-index path without importing draft artwork or making live approval claims."
     }
   ]
 }

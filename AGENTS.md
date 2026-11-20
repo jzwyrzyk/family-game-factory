@@ -11,6 +11,8 @@ At the start of a new task, after a handoff, or after losing conversation contex
 3. Verify the current branch, working tree, base/main SHA, related open PRs and dependencies. Work from an isolated branch; preserve concurrent work. For a continued task, inspect what changed since the last verified SHA instead of restarting the entire audit.
 4. Establish the requested outcome, applicable invariants, integration points and acceptance evidence. A user-approved plan or release scope is not evidence that its implementation or deployment succeeded.
 
+For Gem Pal concepts, Base/Grown forms, expressions, art quality, or continuity, start with [Gem Pal Studio](docs/pals/STUDIO.md) and the [repository skill](skills/gem-pal-studio/SKILL.md). Resolve the current character-reference index and exact selected form before image work; do not infer art approval or runtime integration from the method.
+
 For a substantive project answer, consult the applicable references before reasoning from memory. For a development task, apply the same references to implementation, validation and handoff. If repository or live-service access is unavailable, identify the missing evidence and qualify only the affected claims.
 
 ## Authority and conflicting evidence
