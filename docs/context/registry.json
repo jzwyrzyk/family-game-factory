@@ -144,10 +144,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T23:24:41.030Z",
-      "sourceDigest": "0cebb8092459e58da848c884dbff1ccf26b96ef93ceb152c24481183f4bc4b1f",
+      "reviewedAt": "2026-11-20T00:42:23.714Z",
+      "sourceDigest": "e3a140cb860db24ccb173d850d7d7387c08b62dae35e19718252babb729453df",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the restored saved ideas and drawings entrance and return, legacy exit, contextual Journey continuation, accurate scene action, reward routes and round-score explanation after reviewing Studio, Journey and style diffs. Collection copy now uses readable ink without restyling dark idea cards.",
+      "reviewReason": "Reviewed the confirmed phone first-viewport defect from the collection shortcut, then moved the existing entry after the Ready to Play game shelf. Preserves all seven primary destinations, collection accessibility, profile boundaries and the original playable-first homepage contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -395,10 +395,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T23:24:42.621Z",
-      "sourceDigest": "13e52e8dfc7cc2b7de8a5cb24b3a988aa3360f70b527864cbad8e2e61755e506",
+      "reviewedAt": "2026-11-20T00:42:23.714Z",
+      "sourceDigest": "b2cd17614edab21251b06e9dac17032543df27341d72ca817582ca822cec7137",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the new default-navigation fixture and extended Creation, Rewards and Journey tests. Architecture and delivery distinguish synthetic local browser evidence, save/profile/subject/recovery checks and contrast from deployed-provider and physical-device acceptance. Existing tests wildcard routes the new test.",
+      "reviewReason": "Reviewed the new phone first-viewport assertion in navigation continuity, preserving the complete playable-card criterion and existing owner, contrast, legacy entry, save and collection checks. The quality-tablet touch fault is separately rerun rather than weakening test thresholds.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
