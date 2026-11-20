@@ -68,10 +68,19 @@ def mounted_config(service):
 
 def check_wif(wif, p):
     condition = wif.get('attributeCondition', '')
-    required = ('assertion.repository_owner_id', '357047835',
-                'assertion.repository_id', '1458899834',
-                'refs/heads/main', 'factory-private.yml', 'workflow_sha')
-    if (wif.get('state') != 'ACTIVE' or not all(v in condition for v in required)
+    # Require positive equality for every critical claim. A mere substring
+    # would incorrectly accept a weakened condition such as owner_id != ID.
+    exact = {
+        'repository_owner_id': '357047835',
+        'repository_id': '1458899834',
+        'ref': 'refs/heads/main',
+        'workflow_ref': PRIVATE_REPO+'/.github/workflows/factory-private.yml@refs/heads/main',
+        'workflow_sha': p,
+    }
+    matches = all(re.search(r'assertion\\.' + name + r'\\s*==\\s*([\\\'"])'
+                            + re.escape(value) + r'\\1', condition)
+                  for name, value in exact.items())
+    if (wif.get('state') != 'ACTIVE' or not matches
             or '||' in condition or set(ALL_SHAS.findall(condition)) != {p}):
         raise ContinuityError('WIF_TRUST_DRIFT')
 
