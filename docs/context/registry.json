@@ -60,6 +60,8 @@
     "docs/pals/art/characters/brio/README.md",
     "docs/decisions/2026-11-19-brio-art-adoption.md",
     "docs/decisions/2026-11-20-character-first-navigation.md",
+    "docs/pals/EXPRESSIONS.md",
+    "docs/decisions/2026-11-20-pal-expression-runtime.md",
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
     "docs/brand/previews/learning-readability-20261120/README.md"
@@ -114,10 +116,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:56.900Z",
-      "sourceDigest": "a592474519dd7d2cbb9c4298d97ab076395c42176da44f80791c0ab1d23cbe35",
+      "reviewedAt": "2026-11-20T19:16:52.837Z",
+      "sourceDigest": "e48539cc01e28ae57295687155156a54de2f3f8229aa15a9a577cc5cd5aacc06",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair.",
+      "reviewReason": "Recorded the complete approved core artwork package, separate Brio status, and preview-only collection authority in product doctrine. Additional reconciled review: Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -160,6 +162,13 @@
           "sourceDigest": "2b74b8ac64d8a5f80eea41e577afb933362153cc194096eb5b41ea084f8d9f5f",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded owner-approved Art Studio merge 20ffb350 with exact tested-tree equality and all eight passing hosted workflows. Product behavior and the local-storage, adapter and acceptance boundaries remain as reviewed."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:56.900Z",
+          "sourceDigest": "a592474519dd7d2cbb9c4298d97ab076395c42176da44f80791c0ab1d23cbe35",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair."
         }
       ]
     },
@@ -204,10 +213,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:57.154Z",
-      "sourceDigest": "3522e893d70974d52ef32f24618e7ef2522cdfbb03b33efc8bc4949b8555da58",
+      "reviewedAt": "2026-11-20T19:16:53.191Z",
+      "sourceDigest": "5b0d7cd1f58f8f428b99a109368161be8aeb770ef3b56f626c83ff772b598355",
       "reviewOutcome": "updated",
-      "reviewReason": "Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race.",
+      "reviewReason": "Reconciled current My Pals expression controls, exact approved portraits, retry focus recovery and optional offline caching in architecture and feature documentation. Additional reconciled review: Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -236,6 +245,13 @@
           "sourceDigest": "5dd716aa531805218e50cf7d6866f4eeed7ab613b8d49462f9d94a84366209ad",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the complete first-creation flow and the conditional-header follow-up after real parent-browser overflow. Header tools now wrap within phone width while retaining visible player, subject and help controls; the unchanged first-creation and complete-playable-card guards pass."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:57.154Z",
+          "sourceDigest": "3522e893d70974d52ef32f24618e7ef2522cdfbb03b33efc8bc4949b8555da58",
+          "reviewOutcome": "updated",
+          "reviewReason": "Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race."
         }
       ]
     },
@@ -533,13 +549,14 @@
       "sources": [
         "tests/**",
         "tools/**",
-        "scripts/verify-brand-assets.mjs"
+        "scripts/verify-brand-assets.mjs",
+        "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:58.166Z",
-      "sourceDigest": "cfe5911e9ebbfa04a507da0029b6b91fa3b888948760ffcab84a30f3f11cb68d",
+      "reviewedAt": "2026-11-20T19:16:54.038Z",
+      "sourceDigest": "5a9ce4af9cf2cd725b5a100863502dae7bf856c7fffaf0599ab7af6aaa5bef0b",
       "reviewOutcome": "updated",
-      "reviewReason": "Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified.",
+      "reviewReason": "Recorded full asset, expression, Pal, navigation and offline quota-recovery checks and routed the focused asset verifier regression tests. Additional reconciled review: Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -568,6 +585,13 @@
           "sourceDigest": "413cc9e3efd2f008302fcda4c8dffd6202eeed27968df440be4b4919bb5039ba",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the tablet quality helper change after the hosted one-part-versus-two assertion. Locator.tap retains real touch with actionability/stability checks; exact intermediate state assertions improve failure localization. Existing counts, selection, capability, geometry, held input and release assertions remain intact, and both orientations pass locally."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:58.166Z",
+          "sourceDigest": "cfe5911e9ebbfa04a507da0029b6b91fa3b888948760ffcab84a30f3f11cb68d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added complete-production-CSS contrast matrix across four hosts/two widths, real Studio native/practice/result journeys and named-voice lifecycle tests. Preserved focus visibility by moving the intentionally below-fold fixture; included the independently reproduced microphone availability race. Actual sound and physical-device acceptance remain unverified."
         }
       ]
     },
@@ -592,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T19:05:58.444Z",
-      "sourceDigest": "c6333bb9df99bd909d230aa35bf3196bf7d66eed6875cb87969f99243727e134",
+      "reviewedAt": "2026-11-20T19:17:22.236Z",
+      "sourceDigest": "ccb8813430c60571f8bc827fc77294c71848246e6e8eae0583ba42f6ef0c657b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment.",
+      "reviewReason": "Recorded final combined local build, asset parity, browser, navigation, offline and documentation acceptance with hosted checks still pending on PR90. Additional reconciled review: Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -631,6 +655,13 @@
           "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
           "reviewOutcome": "updated",
           "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:58.444Z",
+          "sourceDigest": "c6333bb9df99bd909d230aa35bf3196bf7d66eed6875cb87969f99243727e134",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded actual PR89 base, recovered-but-unmerged broad cleanup, scoped source fixes, passed local checks and preserved initial failures. Wired narrator and composed learning regression into existing hosted commands; source publication remains distinct from merge and deployment."
         }
       ]
     },
@@ -653,10 +684,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:58.721Z",
-      "sourceDigest": "3baadae98a9cf0e7015e325454f85ac2f2363ebb89750ff818abaa82ed965e40",
+      "reviewedAt": "2026-11-20T19:16:54.695Z",
+      "sourceDigest": "122158109ee8df03971878fd4a264d605ea748dad961c3c9967683b416827951",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
+      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -685,6 +716,13 @@
           "sourceDigest": "05b6308f6d0f23bf0e027f2bc9af1e0486825de7c3ebaa8c833f0febfadb19ff",
           "reviewOutcome": "updated",
           "reviewReason": "Registered the first-creation contract and dated decision, routed child-journey and screenshot-caption link checks, and linked the new entry point in the docs index. Reviewed the preserved source area coverage and unchanged documentation-checker behavior."
+        },
+        {
+          "sourceCommit": "ca5f0aa7c0b7ac0dcdc55018ffe0f582e6cf5718",
+          "reviewedAt": "2026-11-20T19:05:58.721Z",
+          "sourceDigest": "3baadae98a9cf0e7015e325454f85ac2f2363ebb89750ff818abaa82ed965e40",
+          "reviewOutcome": "updated",
+          "reviewReason": "Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved."
         }
       ]
     },
@@ -757,13 +795,15 @@
         "docs/pals/*.md",
         "docs/pals/templates/**",
         "skills/gem-pal-studio/**",
-        "docs/pals/art/character-references.json"
+        "docs/pals/art/character-references.json",
+        "scripts/export-pal-assets.py",
+        "public/jems-pals/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fed67752aa5aa82ae59b7d3d3f30942abe95bb6618589365308683b0e194b2a2",
-      "reviewedAt": "2026-11-20T17:11:55.323Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the Pals feature contract adds compact-menu access and distinguishes human-maker choice. Gem Pal design method, selected reference art, Base/Grown identity, expression review and runtime artwork bindings are unchanged."
+      "sourceDigest": "bddf3cf9b7d22c12e18142c5c679a18457f65b23535ba7406ef3da77a0169d30",
+      "reviewedAt": "2026-11-20T19:16:54.972Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reconciled package 2.9 exact selected assets for all 23 original profiles, Navi R2, retained historical references and separate in-review Brio expressions."
     },
     {
       "id": "art-studio",
@@ -811,13 +851,16 @@
       "sources": [
         "src/pals/**",
         "tests/pals*",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "scripts/verify-pal-assets.mjs",
+        "public/jems-pals/**",
+        "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "db4d3ee5efef1e0194f98d933ab783a68bf09c6641c769ebbc329247cf76dfa9",
-      "reviewedAt": "2026-11-20T17:11:55.191Z",
+      "sourceDigest": "028c55aeec56393486bb88ab84ee43747deb1496e7736300b8270f6946cd8d70",
+      "reviewedAt": "2026-11-20T19:16:55.644Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed My Pals and scene-entry test helpers using the actual Menu. Documented unchanged guarded collection access and distinct human choice; no species artwork, earned growth, starter choice, equipment, scene mechanics or backup authority changes."
+      "reviewReason": "Updated the exact artwork preview lifecycle, profile cancellation, retry focus and on-demand caching contracts without changing saved collection identities."
     }
   ]
 }

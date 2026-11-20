@@ -9,7 +9,7 @@
 
 **Companion extension:** November 19, 2026: the owner approved implementation of the separate companion framework, including funny encouragement and easy use in children's games. [ADR0012](docs/decisions/0012-pals-from-earned-activity.md) records the accepted engagement balance. Final character artwork remains a separate owner review.
 
-**Partial Gem Pal art reference integration:** November 20, 2026: the first source-only tranche records selected S–X Base boards, Pleeko/Talli/Whorl Grown portraits and Brio's two approved neutral forms. Brio's six expressions are retained as **in-review** candidates, not owner-approved expressions. The [artwork index](docs/pals/art/README.md) preserves exact sources and outstanding gaps; it does not replace PR68's provisional three-Pal runtime artwork or change growth policy.
+**Historical first Gem Pal art tranche:** November 20, 2026: PR85 preserved the selected S–X Base boards, Pleeko/Talli/Whorl Grown portraits and Brio's two approved neutral forms from PR74. The original roster's later approved package 2.9 now resolves its former form/expression gaps in the [artwork index](docs/pals/art/README.md). Brio's six expressions retain their separate **in-review** status. Artwork approval does not assign a creature identity to the provisional three-Pal collection or change growth policy.
 
 **Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
 
@@ -108,6 +108,9 @@ The shared [Rewards experience](docs/rewards/README.md) adds nonspendable lifeti
 Use clear goals, anticipation, expressive personalities and creative utility to encourage return visits. Avoid paid luck, subscription pressure, disappearing companions, care chores, lost-progress threats and guilt about taking breaks. A funny line should respond to something the child did, stay brief, and never ridicule a mistake or claim the Pal needs the child emotionally. Parent controls can hide appearances and encouragement without reducing earned growth.
 
 Pals remain separate from the Gem brand helper and the Spark/Nova maker choices. A Pal can delegate to an existing host hint, retaining recorded assistance; it cannot grade answers, award currency, bypass a checkpoint or become an unbounded AI relationship. Editable Pal starter programs retain their starter attribution and do not prove independent coding ability. Existing approved gem tokens are functional preview art until the separate character-art review.
+
+
+**Approved core emotion artwork and application previews (November 20, 2026):** The owner approved all 184 core images for 23 original individual Gem Pal profiles: 46 Base/Grown neutral masters and 138 form-specific expressions. The [expression runtime decision](docs/decisions/2026-11-20-pal-expression-runtime.md) implements exact versioned artwork previews, same-character/same-form neutral fallback and a finite Wink Base motion pilot. Preview selections have no collection, growth, scene-save, learning or reward authority; the saved Glim/Kip/Riff IDs retain their existing meanings. Brio remains an independent profile with two approved neutrals and six expressions in review. Source, merge and production acceptance remain separately recorded in delivery state.
 
 ### Gem Pal character design
 

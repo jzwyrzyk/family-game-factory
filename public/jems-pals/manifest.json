@@ -1,0 +1,3047 @@
+{
+  "schemaVersion": 1,
+  "assetVersion": "core-2026-11-20",
+  "scope": {
+    "id": "original-23",
+    "characterCount": 23,
+    "assetCount": 184
+  },
+  "characters": [
+    {
+      "characterKey": "first-round-2026-11-19/A",
+      "speciesId": null,
+      "slug": "luma",
+      "name": "Luma",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/luma/base/neutral-93fde3101e62.webp",
+          "neutralSourceSHA256": "93fde3101e627dc2020fc5e84ee171addec3415400b0dcf52c4fda106b2ea0f5",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/luma/base/neutral-93fde3101e62.webp",
+              "sourceSHA256": "93fde3101e627dc2020fc5e84ee171addec3415400b0dcf52c4fda106b2ea0f5",
+              "exportedSHA256": "026baf8d05490dfd7a8b48219747da0f01973b65ea88f2cb64c85e519a2596fd",
+              "width": 1425,
+              "height": 795,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e09abb4eb84fc7db286b879d513502cf83bf220db2ee1bb07a09d23eddbc2873",
+              "sourceBytes": 1185758,
+              "exportedBytes": 863434
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/luma/base/celebrate-385db67c5961.webp",
+              "sourceSHA256": "385db67c5961a6a545d030b4f96034b899f5bc4e48200d9acf4fe4b4c63ded12",
+              "exportedSHA256": "e95ae7f0e213e34f2bf361b0ad95b61718b10a4ce25bda70669e3e616e750043",
+              "width": 1679,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "3990b186bbc84f3147a15fec1679f1b663d21c4e4b22f160333fe858bc05e258",
+              "sourceBytes": 1847779,
+              "exportedBytes": 1208890
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/luma/base/thinking-0154deb790db.webp",
+              "sourceSHA256": "0154deb790db8a03eb8b63cd51075dee61e5fa22679edd55e49b072e86cdc4cb",
+              "exportedSHA256": "ca5426f65729158b3534c23a099832911bc53f9a1c7a329e60cbd2b541558d9d",
+              "width": 1679,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d1dacb91450a96471e4ad358657ec2afda89bc319fa17635fa46f9c964f9c7f3",
+              "sourceBytes": 1808718,
+              "exportedBytes": 1177468
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/luma/base/encouraging-retry-b51667e217fc.webp",
+              "sourceSHA256": "b51667e217fc076c3395bb204359997277f041950cd9cefbf2468032d951c42e",
+              "exportedSHA256": "acece08d1bd618ee16cb404c5f407ed757d4b73553a89600861fd20885906ad1",
+              "width": 1679,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8da487a06672dc85585e74bd27acf1ddaf05e7e8914fdeba79454e42b5e1a873",
+              "sourceBytes": 1813801,
+              "exportedBytes": 1192704
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/luma/mature/neutral-6b3ffa07f571.webp",
+          "neutralSourceSHA256": "6b3ffa07f571852e7b975e057f961d4b9c6cdc589a09ff07b1273c72cc4a18c6",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/luma/mature/neutral-6b3ffa07f571.webp",
+              "sourceSHA256": "6b3ffa07f571852e7b975e057f961d4b9c6cdc589a09ff07b1273c72cc4a18c6",
+              "exportedSHA256": "9af252d28372d4f8c96ce26f85142b21c469693c98579a7ca983e10578cbfee3",
+              "width": 1679,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "44fa1dc9a75d3d82a602b37a245e3f30758e00f408bd966888e0bfc49feacb41",
+              "sourceBytes": 1891849,
+              "exportedBytes": 1242404
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/luma/mature/celebrate-ddcfb1f44e92.webp",
+              "sourceSHA256": "ddcfb1f44e9238d2eb52ca7c2bb80403c2dabe45062d27286d7514c20ea16583",
+              "exportedSHA256": "1b3057240c5a72d407d129b3b81cb9fa851b13ffdcf317d3654a15a3d1d597be",
+              "width": 1678,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2c29a4642acfdb8af411be3988885cb0ea3da84c996df4c49c93a51a555b0878",
+              "sourceBytes": 1849530,
+              "exportedBytes": 1226212
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/luma/mature/thinking-5dc612792318.webp",
+              "sourceSHA256": "5dc6127923182fd3f2ef72218e5a34113b2fc62c3c66a83428fcbbf4b17ed2a1",
+              "exportedSHA256": "6403388334ac8aea55c2ed465b1e3b19852aef3a126938a3922b2fb24f7844b9",
+              "width": 1678,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "00bb33238e72a7d7d42ab5ccc235b4bf85af9162bbcdc0a0ba8aadd6f2985392",
+              "sourceBytes": 1871791,
+              "exportedBytes": 1251604
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/luma/mature/encouraging-retry-02078a368879.webp",
+              "sourceSHA256": "02078a3688793b9d18c0af8085381695942bd6905357e38875428e7886e8108e",
+              "exportedSHA256": "f2feb75610a5c215186de18e80b13c64c5bf41d2f2f81247e544ceed3c677861",
+              "width": 1678,
+              "height": 937,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5e67851cfd1e927236f7d9449e38eb4825e2c393578cf3550bd32bd65eb5d0e7",
+              "sourceBytes": 1846512,
+              "exportedBytes": 1224872
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/B",
+      "speciesId": null,
+      "slug": "nook",
+      "name": "Nook",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/nook/base/neutral-458c3fb0fc44.webp",
+          "neutralSourceSHA256": "458c3fb0fc4471498dd3d57ecadd747c68129838c8a5b641cb42052a00fc3fa9",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/nook/base/neutral-458c3fb0fc44.webp",
+              "sourceSHA256": "458c3fb0fc4471498dd3d57ecadd747c68129838c8a5b641cb42052a00fc3fa9",
+              "exportedSHA256": "fd953b14a5dc3c63beb91d869860201925ed219dd564ba97ea697b6aefec9056",
+              "width": 830,
+              "height": 760,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "424856d5f92ce79d154bc018d8080c0b4704150048e7977465e7a91f18926f12",
+              "sourceBytes": 850867,
+              "exportedBytes": 625658
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/nook/base/celebrate-a718317d5a66.webp",
+              "sourceSHA256": "a718317d5a666e92195e44fdda0143abcbb69466a24c5db961b0915171eba62b",
+              "exportedSHA256": "2b9bba95cbfc0065098e2d1c89b673bcee5f2c5de4c1b36f15a830b6a24e99f7",
+              "width": 1311,
+              "height": 1200,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8c0ab5e39cfd1a56ba576b5d591cd3f8248602a223619812c95a5d22490df466",
+              "sourceBytes": 2186187,
+              "exportedBytes": 1455982
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/nook/base/thinking-8383b4e94890.webp",
+              "sourceSHA256": "8383b4e94890860b7a86a9126a7ee234eb1c150f7b0e38adba563d5e73a22121",
+              "exportedSHA256": "68bb90d42b698444356731deb31fdfb6ed1547535a03c47da4a98c4fb69d2594",
+              "width": 1311,
+              "height": 1200,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d8c0a7bf7e27044afca07af54b21134ed59d22c4cfc4b0f449e1417374be9d4b",
+              "sourceBytes": 2102390,
+              "exportedBytes": 1422386
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/nook/base/encouraging-retry-ef8873bd2366.webp",
+              "sourceSHA256": "ef8873bd23669db2dec50ff3bbcb11eebb7c8f8e571b0a79d9267a35c65f55f9",
+              "exportedSHA256": "a45d62e2daae8e2e59f7e37a48aab66fa655fed9c6b4c2836a373835c5808cde",
+              "width": 1311,
+              "height": 1200,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2745919f19ae1959412eaa66c05b9a90c86db237e045255e38bf332edd2909f8",
+              "sourceBytes": 2158645,
+              "exportedBytes": 1440986
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/nook/mature/neutral-be860de47216.webp",
+          "neutralSourceSHA256": "be860de4721695dc5ef1cdc1347d6fb474129232602ad86e7fd4f5163ef8857a",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/nook/mature/neutral-be860de47216.webp",
+              "sourceSHA256": "be860de4721695dc5ef1cdc1347d6fb474129232602ad86e7fd4f5163ef8857a",
+              "exportedSHA256": "e10af853aef5cff37bb26f0bacd8cf3b233852d7841656133a96cdaaec4f9e3b",
+              "width": 1254,
+              "height": 1080,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "9bdba82245afe97c289d71b42f82256465c4313847c1eebd85f087d5460a1abc",
+              "sourceBytes": 1674455,
+              "exportedBytes": 1248738
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/nook/mature/celebrate-634f87de83d3.webp",
+              "sourceSHA256": "634f87de83d3914212b76b9ca231b6dda8f3e74046c0f7608a8d2edf6f72be7d",
+              "exportedSHA256": "eb6d4d67aebe6ef988d1600792cffb73e23561c72dea6c126a6907d10caf754f",
+              "width": 1351,
+              "height": 1164,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "7a4bb2641984e9238e77eb047d1046a4d64dce8519b3abb5570d482f4d72aa58",
+              "sourceBytes": 2030696,
+              "exportedBytes": 1375330
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/nook/mature/thinking-86bb2470f52c.webp",
+              "sourceSHA256": "86bb2470f52caebf914f74535ea8c62a461e665480cf97b5aca1b779a73e6a6e",
+              "exportedSHA256": "c505946efff227134ef02789bc7fed3fc3b0bd3fea0c4dea2b9cd2d832672fa5",
+              "width": 1351,
+              "height": 1164,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5c6278fb5b4ac55c212fbb137877b1b56d44f901e3c865d12b77bd884d5da58f",
+              "sourceBytes": 2018083,
+              "exportedBytes": 1366988
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/nook/mature/encouraging-retry-be1039f14555.webp",
+              "sourceSHA256": "be1039f14555ff34a110442a581834c58b99d4369e5d269839228ec9df3b4751",
+              "exportedSHA256": "b0e6dd1c6f6c3c5b158fbaa3cf61026a979aa130c981fed2f56cee189a5769db",
+              "width": 1351,
+              "height": 1164,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "74221c437f87af5c4fce048e4714ea40a8f059d1e4e125d3fa0279cd33ccf1da",
+              "sourceBytes": 2019211,
+              "exportedBytes": 1364096
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/D",
+      "speciesId": null,
+      "slug": "mizzle",
+      "name": "Mizzle",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/mizzle/base/neutral-37e57f8937e6.webp",
+          "neutralSourceSHA256": "37e57f8937e630261ee66acc444a13e8c558a5510984c02a05a490f623632b07",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/mizzle/base/neutral-37e57f8937e6.webp",
+              "sourceSHA256": "37e57f8937e630261ee66acc444a13e8c558a5510984c02a05a490f623632b07",
+              "exportedSHA256": "d6b64b1a91f91dc9e3f6f3ab6d5ddf7cbe94e9c31aed9319849aac2d7b7d2a5f",
+              "width": 485,
+              "height": 655,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "a1a0aa45d4b7151e2f7ee3683b132e34063733d5934868e16acd7902dbc33293",
+              "sourceBytes": 440452,
+              "exportedBytes": 319420
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/mizzle/base/celebrate-fffc8d6ba26a.webp",
+              "sourceSHA256": "fffc8d6ba26a59a7b85204e7931877b6099b56ddb228e42c98b5fed9f560fbf9",
+              "exportedSHA256": "ac44ae3ec6b5d4f58b0f3ecf3af9fd7e9d6d05c938782e1cc75a34c650b71b94",
+              "width": 1079,
+              "height": 1457,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5c2c218f1d278a52961dddf903f307be4b346a6dbe0b05ea3bc70e5f47007637",
+              "sourceBytes": 2149575,
+              "exportedBytes": 1432436
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/mizzle/base/thinking-e3bdfa6fb339.webp",
+              "sourceSHA256": "e3bdfa6fb3390be87c8c0bcb372f0e4f383ed79771a50621c7a5d159b534cf82",
+              "exportedSHA256": "4e86560bf7ac65c7243d70487e3558bac8de8fb7e5a4d243d06354a29f0ce77b",
+              "width": 1079,
+              "height": 1457,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c11c5b65772f1098ac2138fe770f732bb7dfc5fb6cff2363e5fa26ef189f0dc2",
+              "sourceBytes": 2023490,
+              "exportedBytes": 1358492
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/mizzle/base/encouraging-retry-1b1f2d1f9e8f.webp",
+              "sourceSHA256": "1b1f2d1f9e8f23c62cc76c504e7316e59cbe12f80e6957e290eec878f6aaaad3",
+              "exportedSHA256": "e80228244193314f14b2e2cf38bf7bbd3c6014baa40c1b1120bc04f7a73c4fea",
+              "width": 1079,
+              "height": 1457,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5fedeee3a474ff85c109bbd8dfbdd647cd6b023087a3749e765aa15275daeadf",
+              "sourceBytes": 2133605,
+              "exportedBytes": 1430980
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/mizzle/mature/neutral-e978474ddffa.webp",
+          "neutralSourceSHA256": "e978474ddffa3ba7fed88a39593ad733d98768f64f55dc76d572152ad2b15cbc",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/mizzle/mature/neutral-e978474ddffa.webp",
+              "sourceSHA256": "e978474ddffa3ba7fed88a39593ad733d98768f64f55dc76d572152ad2b15cbc",
+              "exportedSHA256": "2c2bd26cc7a2274c4f52f8239789ccc72b45dc60a73e04089f01edc5e1f363a1",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "a4afe1a2d2f5410faf59ad46c16d38d8f59cb6f8d864274c1fb8f79ba66dcbef",
+              "sourceBytes": 2192746,
+              "exportedBytes": 1378770
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/mizzle/mature/celebrate-09321e479673.webp",
+              "sourceSHA256": "09321e47967307f1c629b49fb78a214c8d1a496eb1ca4749ff29582cdedefd34",
+              "exportedSHA256": "235477bc0b8b87b357093285432092cdf5237cf04652c4a768734b4e5477972e",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "611af2985748bdc5fa4fed0d89bd9610956005d294277a3d96bb7db48bd6b2a7",
+              "sourceBytes": 2111467,
+              "exportedBytes": 1319648
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/mizzle/mature/thinking-5cf01483c919.webp",
+              "sourceSHA256": "5cf01483c919c9ed5d9743162a49723257906b61c841cd50413279016624cc39",
+              "exportedSHA256": "92324b3fb9c0934978463e454c7fc97b56743aeada614defc64ec97a592dfad6",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "00b98a4a3e2d396f207a3c7bf2c378b01fd3fffc3644ad697af36616eb15fa35",
+              "sourceBytes": 2064330,
+              "exportedBytes": 1296818
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/mizzle/mature/encouraging-retry-e2ec2b967fde.webp",
+              "sourceSHA256": "e2ec2b967fde9dd93a6a56599e24c7b2dfc03a502ac7bf4584644774636aaadb",
+              "exportedSHA256": "91e77aa3171b31fc968015dae91d3e58c6f4a4a3b338b0d54b3addbd80be5dd8",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b36a9989b618dc339d830d496704366ce41fbc45bbd1c28d0214e845ee8f5c51",
+              "sourceBytes": 2078408,
+              "exportedBytes": 1313924
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/E",
+      "speciesId": null,
+      "slug": "tumble",
+      "name": "Tumble",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/tumble/base/neutral-a75baf959eda.webp",
+          "neutralSourceSHA256": "a75baf959edac5b21a950646f25a2d3dd3321c891ea0a6a806b2c20e626f2d5e",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/tumble/base/neutral-a75baf959eda.webp",
+              "sourceSHA256": "a75baf959edac5b21a950646f25a2d3dd3321c891ea0a6a806b2c20e626f2d5e",
+              "exportedSHA256": "366ec0293fd6af513e84e2081d8d02a6c1f6b4864bcbffa8605d0ab566b18801",
+              "width": 700,
+              "height": 700,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4f5d6dff250bd658a26cbb954c3a7a6d0366654ddbdf1eac3d449073f8a12758",
+              "sourceBytes": 678074,
+              "exportedBytes": 437144
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/tumble/base/celebrate-530f62979cfb.webp",
+              "sourceSHA256": "530f62979cfbce667e232376869a0310b5462dad44c89da6ccc559d71be66a1b",
+              "exportedSHA256": "9f0f2f89e9fcc909ae237d783d0f5cb2760461530d4fe7c93d9d075fee0a2e8b",
+              "width": 1254,
+              "height": 1254,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "89f99b5077051d2c5d4fb3cd0c4b8626bb46e14a2c7c172bd819c1844c1e1af7",
+              "sourceBytes": 1516364,
+              "exportedBytes": 960022
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/tumble/base/thinking-c892fbc81a1f.webp",
+              "sourceSHA256": "c892fbc81a1f3694b977562646aaf06b5cfec752240e608f8eb759cd2ad0e8b4",
+              "exportedSHA256": "ff1e21d16a6f2f837de63532e830a4b1416f7be6cb0f621366d0ca2a74d17c55",
+              "width": 1254,
+              "height": 1254,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "21a4eab6ea0c6309311b6b02c38dd890418db7fd09206c546adcda62690b74ef",
+              "sourceBytes": 2828392,
+              "exportedBytes": 1315522
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/tumble/base/encouraging-retry-ec1bea3cc937.webp",
+              "sourceSHA256": "ec1bea3cc9375e098df9d18d3c5323a510d57fd6f5bd6bd0ed2ba59762fcff28",
+              "exportedSHA256": "9fe59fc5e2aa8fd68df55b7c5a607c2b79dde5652d8f8cca968216411418f016",
+              "width": 1254,
+              "height": 1254,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "7b0592b7498d353b8917bc2c7fa94e62da2f8363013dc399486ed21d977a1c62",
+              "sourceBytes": 1576979,
+              "exportedBytes": 1008236
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/tumble/mature/neutral-8279cc081987.webp",
+          "neutralSourceSHA256": "8279cc0819873c3caebb4e658af06a3cbbc600ff06a52123184f6310fd0c418f",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/tumble/mature/neutral-8279cc081987.webp",
+              "sourceSHA256": "8279cc0819873c3caebb4e658af06a3cbbc600ff06a52123184f6310fd0c418f",
+              "exportedSHA256": "5fa702e0f9cdee681ded5564cc0f5cdf1cdeab9895d6d48978bf75d4e3ff1367",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "32bfa32c9dc9501c597ee0aaf63b11beef8f8e6afbc3b22b5eb88a8c8f873216",
+              "sourceBytes": 2116446,
+              "exportedBytes": 1365212
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/tumble/mature/celebrate-7f2d67166e75.webp",
+              "sourceSHA256": "7f2d67166e75ddb9b04a1373541441fc1c434b2d4e8faeb4fafb187594bcfe5d",
+              "exportedSHA256": "52e64f7396b894fd33c67ba6c9c9a3269d4d370a41f60f52f65fde59cfb408ac",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d6e80fa3cce91d82d8b442c6fe32c8bf2e9fe2f1ebf3cf2722f93e566a9fdfce",
+              "sourceBytes": 2044014,
+              "exportedBytes": 1323356
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/tumble/mature/thinking-fa71dd898dce.webp",
+              "sourceSHA256": "fa71dd898dce63373f6c0824b164f36a23dd26b7ae6a9d8986b219c2f7848dde",
+              "exportedSHA256": "ffa4b0a67917a2aba7f65904e3b50f233e276d64119e34ab282e12914fcaef43",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "6e3ecdb63273c3651db7c7bfb485e60a5f25b63dd7606f5ed230fd01e8ce3fc1",
+              "sourceBytes": 2041436,
+              "exportedBytes": 1311824
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/tumble/mature/encouraging-retry-299d0c76374c.webp",
+              "sourceSHA256": "299d0c76374c57c9283db317ccaa54c8abe394aaf0269153dae277e433b570eb",
+              "exportedSHA256": "4a06508db18290e2d70bfc980eb7458491694ce09efa8022380e5f1e50630a30",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "52a0c13261900b5459845bc0942932936ab192630c85f58d4a50aa5b10fc79a2",
+              "sourceBytes": 2047026,
+              "exportedBytes": 1313826
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/F1",
+      "speciesId": null,
+      "slug": "navi",
+      "name": "Navi",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/navi/base/neutral-f0d1f53e54dd.webp",
+          "neutralSourceSHA256": "f0d1f53e54dd47da4a658ea2252e9c8ab8c54eceb3ba9fff6c978eb9d1bb4e62",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/navi/base/neutral-f0d1f53e54dd.webp",
+              "sourceSHA256": "f0d1f53e54dd47da4a658ea2252e9c8ab8c54eceb3ba9fff6c978eb9d1bb4e62",
+              "exportedSHA256": "044cd3b3ab9678e65b7113b53f883b6cd17fc9e2a596327446f016a2881b84e6",
+              "width": 1191,
+              "height": 1321,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "6afcc8dcff62a1b8367935375433b63b7bab7f09c6556e26b25489ba55fec849",
+              "sourceBytes": 1580472,
+              "exportedBytes": 1027930
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/navi/base/celebrate-af7aa241a0d0.webp",
+              "sourceSHA256": "af7aa241a0d0e1cfd554a66c13d76506517dbdce8cd3a2c2f8f9a23b6e458c5b",
+              "exportedSHA256": "37ad916c1c4ddbcd3c291c6bfd51afa43c763409bb63c9a84a8e8af4800ef131",
+              "width": 1190,
+              "height": 1322,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "01b4aed8da599b98750dec63c88cfdd4abd238b35d9a94c792ac7e8a0b11d6b8",
+              "sourceBytes": 1582951,
+              "exportedBytes": 1023150
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/navi/base/thinking-ab5cd0edd358.webp",
+              "sourceSHA256": "ab5cd0edd35801d6f6a030fc1add84c589005f42f350e255ade978ef20857b29",
+              "exportedSHA256": "dfaefe4681c6da0805b4d5534ed603a991f78323b417128fb0e3f565f13ba468",
+              "width": 1190,
+              "height": 1322,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "6a89ca7515f55bd97f2a1499704a17c299e21d4dc8aa95a1afc6aec371cd79ab",
+              "sourceBytes": 1494241,
+              "exportedBytes": 951490
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/navi/base/encouraging-retry-091d4b403e3c.webp",
+              "sourceSHA256": "091d4b403e3c18ff6747abd972a3e36a6760d13f2e2e5001c76f66d89bbf154e",
+              "exportedSHA256": "b49cfecf6f7a45d0a9c3156bfb0d0682d28876847d234463ff704f0384bbe893",
+              "width": 1190,
+              "height": 1322,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b3b983b03866ee0ac827bda9c548254c590a66a890b866e55038db29426550e2",
+              "sourceBytes": 1473949,
+              "exportedBytes": 968902
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/navi/mature/neutral-ed4534b76918.webp",
+          "neutralSourceSHA256": "ed4534b7691848815947c30492f8a70efa33574d438a0cd186261b53ecaab668",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/navi/mature/neutral-ed4534b76918.webp",
+              "sourceSHA256": "ed4534b7691848815947c30492f8a70efa33574d438a0cd186261b53ecaab668",
+              "exportedSHA256": "d68b37ab1afc013200bda70134aededea4a745ca3e072e31d3bc0d93ede73ee7",
+              "width": 1191,
+              "height": 1321,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "48d57aee4037359cce7c87944927f0ae0b45c037a29422d59ec72c8671af63a2",
+              "sourceBytes": 1877528,
+              "exportedBytes": 1255780
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/navi/mature/celebrate-4b3edbaee1a2.webp",
+              "sourceSHA256": "4b3edbaee1a28444db3ffba8ec1d662c383c74a8741326546d8563425d61912f",
+              "exportedSHA256": "b7f3a6a3d03d21a3737d96c553e4487e0d56eabb83cded3bc64a79a3f8b7535f",
+              "width": 1190,
+              "height": 1322,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "18d47aee1b6ad378212716f87e638223f03d8e7241ea23d916b1b57a8e1ec3fc",
+              "sourceBytes": 1867799,
+              "exportedBytes": 1255964
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/navi/mature/thinking-e9f003f6185e.webp",
+              "sourceSHA256": "e9f003f6185e840c68848e8ecf1a635d53affd631870d3b16c8b72a8869a9180",
+              "exportedSHA256": "51fce964a3aab03d7b7c7133a7775158352645f5014e90862070a1efb5355a31",
+              "width": 1190,
+              "height": 1322,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "7993b6a0d86caa13e6f00a504049725723af71492d7abe989891ea43c0936df5",
+              "sourceBytes": 1831674,
+              "exportedBytes": 1233552
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/navi/mature/encouraging-retry-c020e1134c9d.webp",
+              "sourceSHA256": "c020e1134c9d2d6fee34a678807943e3fa14d8b57cf8c9bc3f14b95f1a68c15d",
+              "exportedSHA256": "5b18c71c86ddc4d22929c203029dde00f88cec59320cdf796e8ee777c825653a",
+              "width": 1190,
+              "height": 1322,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2b3cc455e422a7ba7ac9920d3b6a6b69ac2bb65a8879f1b480d105eda67c9608",
+              "sourceBytes": 1835810,
+              "exportedBytes": 1237244
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/F2",
+      "speciesId": null,
+      "slug": "mote",
+      "name": "Mote",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/mote/base/neutral-4dc984ce0f70.webp",
+          "neutralSourceSHA256": "4dc984ce0f70f65a1c78f444988f9ae402a08fee9f3a8d890db7af1df2e29d61",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/mote/base/neutral-4dc984ce0f70.webp",
+              "sourceSHA256": "4dc984ce0f70f65a1c78f444988f9ae402a08fee9f3a8d890db7af1df2e29d61",
+              "exportedSHA256": "402e8cfa1c5d20931746514a4eb1c0b5e32654a372b238f33324474f4c9f1ae5",
+              "width": 125,
+              "height": 145,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "0bb4088016dbdb03a0ae0195fc929c347bcc765001a4b88275641a50e305e73a",
+              "sourceBytes": 21609,
+              "exportedBytes": 16390
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/mote/base/celebrate-a6fece6ced46.webp",
+              "sourceSHA256": "a6fece6ced460c5a8cb3c5a306388d9830cbf43159305b36f60a1903bb915b0c",
+              "exportedSHA256": "fd2b0b4de0c4cfe4491e8f5cf6927c077c1d1d9db80f59825d81d690542e0791",
+              "width": 1164,
+              "height": 1351,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5e2ef2dba166c5a53c1416c41b08e81798a90152e835f035487870aa24208198",
+              "sourceBytes": 1634266,
+              "exportedBytes": 967218
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/mote/base/thinking-777666cc61b7.webp",
+              "sourceSHA256": "777666cc61b7a0200b4c8bfa1d2635d293370e6315e1f5faefc9116b07aac728",
+              "exportedSHA256": "078bf50b6c58c2ae9e84788c495e1cbc1488e2a029e2c32c45476fd5edd20a74",
+              "width": 1164,
+              "height": 1351,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "3d232afc95ed8a94d07dcf53cb86c9fc4689a73739646870ea7f75b091d5441f",
+              "sourceBytes": 1593928,
+              "exportedBytes": 927792
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/mote/base/encouraging-retry-bff770b87951.webp",
+              "sourceSHA256": "bff770b87951ac977eed0b162e8a8a1f99259d7e10315831942f1f1540683d08",
+              "exportedSHA256": "394b042e16418bbff2e01232a3a8719caf34ee2dac520ed22bb3253273379061",
+              "width": 1164,
+              "height": 1351,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "15d692a5ce0ecb147a2d86f15d5f34d451e152f3c1c859435e9930698d7b38f2",
+              "sourceBytes": 1627310,
+              "exportedBytes": 990724
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/mote/mature/neutral-2db6976032b2.webp",
+          "neutralSourceSHA256": "2db6976032b2db7704335610adbcb1ad50dc8d5b0b6a9ada8eddb94b11027c91",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/mote/mature/neutral-2db6976032b2.webp",
+              "sourceSHA256": "2db6976032b2db7704335610adbcb1ad50dc8d5b0b6a9ada8eddb94b11027c91",
+              "exportedSHA256": "c32a7e0aeaee5cf010f9dea15e03a97c5c74659f8d7c6a38b721ed755139b3f1",
+              "width": 1209,
+              "height": 1301,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "73189e01c80c15c5c6d804928092e22f181a920a059c95608ebbcd488eb89519",
+              "sourceBytes": 1789770,
+              "exportedBytes": 1165652
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/mote/mature/celebrate-f7d68a53aa92.webp",
+              "sourceSHA256": "f7d68a53aa92b0f7ad6ed5cfe68ed342e0d1f179f6c379bfee3c0260f5622af1",
+              "exportedSHA256": "e31399d5014a3a611b14072d267b6807ec73c6b716fa70e5f4ebaad57065aeb3",
+              "width": 1209,
+              "height": 1301,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d42a95595ce6189282666591c2807dd21f50f5abd0a2951a2b337088ba03309f",
+              "sourceBytes": 1830154,
+              "exportedBytes": 1216126
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/mote/mature/thinking-602763217271.webp",
+              "sourceSHA256": "60276321727150c3e8045aacb64a4ae16e75e5f9997784871319764a35f3ea8e",
+              "exportedSHA256": "0c9c26fb02096e998ed51e431ef31013fd06bc4d799f17f05eb37e7714146cbe",
+              "width": 1209,
+              "height": 1301,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "22f9205631334fe05eb3aff7f1b9dd027742ef15427c82f7bd16f0ba6c36fe2b",
+              "sourceBytes": 1816586,
+              "exportedBytes": 1208922
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/mote/mature/encouraging-retry-acc2a9046740.webp",
+              "sourceSHA256": "acc2a904674020e79f3252e08f56bb16f87cf429ea2954ed8c5e554d5bb019ba",
+              "exportedSHA256": "133a5cadb7ae9e5be97814794368541eabb6ad8c176b88732c8c74713688db3a",
+              "width": 1209,
+              "height": 1301,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "fe3975ee4429f6bf3b264b452806fea5a1156dc3554e0e642da3c1d44de1d144",
+              "sourceBytes": 1838274,
+              "exportedBytes": 1228790
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/G",
+      "speciesId": null,
+      "slug": "sivo",
+      "name": "Sivo",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/sivo/base/neutral-b3600e7cc722.webp",
+          "neutralSourceSHA256": "b3600e7cc72224a5f3a5990bf3442d67133b82ab212dd3725a66f1d55034a8ec",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/sivo/base/neutral-b3600e7cc722.webp",
+              "sourceSHA256": "b3600e7cc72224a5f3a5990bf3442d67133b82ab212dd3725a66f1d55034a8ec",
+              "exportedSHA256": "1896ab2f16d8756f1db92f8e2e9226025521e40680765dab6522be96c593ac7c",
+              "width": 665,
+              "height": 530,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5e6d8b74f371d2cc723e5d7a3596935e5b118312f7501cf7617f158ff625e736",
+              "sourceBytes": 603360,
+              "exportedBytes": 399638
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/sivo/base/celebrate-8204067d2f61.webp",
+              "sourceSHA256": "8204067d2f61430f9b46c88abe5669cba9102120592e2c3758054b78dafc3d7e",
+              "exportedSHA256": "a21bb32a7751a966d5e2bf946f4fb33aabaf1d31a659267d9b346176c1ad3b4e",
+              "width": 1405,
+              "height": 1120,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5b7a6021f8f6913d7f3e36bf4c6798601c36af93603fd5c3d8f41f54f983cd46",
+              "sourceBytes": 2318714,
+              "exportedBytes": 1579374
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/sivo/base/thinking-78ca6bc7b656.webp",
+              "sourceSHA256": "78ca6bc7b6566b7c558b25e04ddc25027d8f9f1ab9db70cc193e7f5a64dd0e9f",
+              "exportedSHA256": "ad6d3baa68f5a144392c2ed77e3a476c6a90aa4d05cb7ea031a2a250035aff16",
+              "width": 1405,
+              "height": 1120,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "bae7b981e86c8de7cb033f4632662d20e8ff094ead1186f61d7d6aa26e9cf03d",
+              "sourceBytes": 2249765,
+              "exportedBytes": 1544300
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/sivo/base/encouraging-retry-bca0e175d3ca.webp",
+              "sourceSHA256": "bca0e175d3cafcebb6d197ae39b1917fe511ad38cbd363d106d28c1ecb6f4c4d",
+              "exportedSHA256": "11a44fd01c55162b69880b1dab74f9312be891685f53e981c3fe2a09794d996c",
+              "width": 1405,
+              "height": 1120,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "388ad0265dcf153ca17cf817cbb1d9bcd4c88672d728285a041b5e396160aa56",
+              "sourceBytes": 2346994,
+              "exportedBytes": 1594982
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/sivo/mature/neutral-7837cf6380f8.webp",
+          "neutralSourceSHA256": "7837cf6380f8db57d31d326d475ffe89fc1076ceb29637fbb32f82356281e8f2",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/sivo/mature/neutral-7837cf6380f8.webp",
+              "sourceSHA256": "7837cf6380f8db57d31d326d475ffe89fc1076ceb29637fbb32f82356281e8f2",
+              "exportedSHA256": "2cac6208ad0ec41cb3225615ad3dd24fa1696cea73aea5fd06394bce5d3a95c9",
+              "width": 1754,
+              "height": 896,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d0a979d82f85e3cd00859923ca5f26ce95ca9eca1bcd06dd38d8c233cc903f73",
+              "sourceBytes": 1814699,
+              "exportedBytes": 1242540
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/sivo/mature/celebrate-042c2538146d.webp",
+              "sourceSHA256": "042c2538146d648f70e113c3923841443aae0c0652a533eafe2e1638c8aae93b",
+              "exportedSHA256": "9937dda166c598e7bbee8f7483eade3a30f14130d3032f62e7bf166370168a94",
+              "width": 1755,
+              "height": 896,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "76c263c9dc08501719e0786ba442d1f27431f631d7b695dcaa21914f7781357e",
+              "sourceBytes": 1506425,
+              "exportedBytes": 1038026
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/sivo/mature/thinking-85dcd07965f8.webp",
+              "sourceSHA256": "85dcd07965f8782434101c17dbd7875585abdfd568d2b65ac0fa3cdc4fbe6fa4",
+              "exportedSHA256": "59059d9a02c211af190053961bbb6e4d8e0e52d599fe6f198993e4084d28bba0",
+              "width": 1755,
+              "height": 896,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d28658f90e6497776e867b0cf24a7ec2468e490d696a5db9f5f6461992e31a8f",
+              "sourceBytes": 1497067,
+              "exportedBytes": 1045738
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/sivo/mature/encouraging-retry-7cb0b1fd99b7.webp",
+              "sourceSHA256": "7cb0b1fd99b7afbe58a769b4d18122c754c47d98e740e56139c68636bed29193",
+              "exportedSHA256": "23ad79c0f632fdc55632236f3c113994cc082aa634cceedf64881746a4e901eb",
+              "width": 1755,
+              "height": 896,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "13a94ea55161bb3709aeed94f910d76c113ca38ee921c83c4201dfebb2d4598c",
+              "sourceBytes": 1481831,
+              "exportedBytes": 1016894
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/H",
+      "speciesId": null,
+      "slug": "furl",
+      "name": "Furl",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/furl/base/neutral-b6ba89248449.webp",
+          "neutralSourceSHA256": "b6ba89248449af73e359697ac0a723252ab85f2212935883c0debfc6eb11ea40",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/furl/base/neutral-b6ba89248449.webp",
+              "sourceSHA256": "b6ba89248449af73e359697ac0a723252ab85f2212935883c0debfc6eb11ea40",
+              "exportedSHA256": "adab66a6a715819ee564b1876efa411fc9fcf1824580866280156b67277d8092",
+              "width": 930,
+              "height": 760,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "dd1657717ca44457d8846567c773b88e21cf10717d0196e9f8a68ff5ef841b56",
+              "sourceBytes": 723405,
+              "exportedBytes": 543354
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/furl/base/celebrate-0e639ce235ab.webp",
+              "sourceSHA256": "0e639ce235ab8580167bc140991a4eae1c777bb606231511593f79e4fbecc591",
+              "exportedSHA256": "bc9ab48e19592855d55ce7ee42c3c4c34f288549709c1352f223dc5a7828f653",
+              "width": 1388,
+              "height": 1133,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "09a8033991962b067ded6b25a7cc47032550ca1fb82c790dde4cb5606445ffbc",
+              "sourceBytes": 1758772,
+              "exportedBytes": 1132710
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/furl/base/thinking-661ed0c0fecb.webp",
+              "sourceSHA256": "661ed0c0fecbc1e1b3af5fe3bfc3ac1e28f4e9eff366fa4d4392b9d66fd4db98",
+              "exportedSHA256": "91c2298df6a9095a6fb2b2b33103c467f05ea4f51700dbb7d17ef4002186edd4",
+              "width": 1388,
+              "height": 1133,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b129d87eeb88e4f416c2c7dac0350c5770f47d201cc4eccd2164fdf7197fb94d",
+              "sourceBytes": 1737562,
+              "exportedBytes": 1112172
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/furl/base/encouraging-retry-086958becd9c.webp",
+              "sourceSHA256": "086958becd9c02f94bf4ecd5ff4f7626975a90a554d50c7eebc13d7a58c13daa",
+              "exportedSHA256": "3b4660b7f0c02e2f70e8c4904ba2e9410987a9f6c62359acf9527faa38e4cd3b",
+              "width": 1388,
+              "height": 1133,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "82bc401644b680aef8b746365bba49568099b8f0b7a14c120be9dec858f4de52",
+              "sourceBytes": 1744751,
+              "exportedBytes": 1120558
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/furl/mature/neutral-c689f2256e41.webp",
+          "neutralSourceSHA256": "c689f2256e41148c7c87fae9a7e9ce8b658537b1ae251f0cf967bd7ce482c4ab",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/furl/mature/neutral-c689f2256e41.webp",
+              "sourceSHA256": "c689f2256e41148c7c87fae9a7e9ce8b658537b1ae251f0cf967bd7ce482c4ab",
+              "exportedSHA256": "0107463dd7818f41424896fc10b2aa72c3cbc99fd577999269a449ae645f045a",
+              "width": 1672,
+              "height": 941,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "90810d9d7a3d72eab1fc66d223f8b7d9f5dbbdf229de6b15479e2b663f5af00d",
+              "sourceBytes": 1673594,
+              "exportedBytes": 1052362
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/furl/mature/celebrate-3a20af25a4d8.webp",
+              "sourceSHA256": "3a20af25a4d86414a0a7d77e73e487e23a02259b1e970a8b38295b6639c15bb5",
+              "exportedSHA256": "346cb351177959a91ceae6325f3ec5d8ff12bc8e8568386f012ea9f517f14423",
+              "width": 1672,
+              "height": 941,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "ce57a6643c8bf9f364e66dbef6fec964b45a0b706ea84083dba9a46cc1915691",
+              "sourceBytes": 1687291,
+              "exportedBytes": 1057424
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/furl/mature/thinking-735e5cbb3e2d.webp",
+              "sourceSHA256": "735e5cbb3e2dbf611844af4c9801324e3e6bccc3eabac4d13cbd50b2e4deb410",
+              "exportedSHA256": "8a90ee6d7b0df0becded3fdc13ee816e66876490f8fae87940840dcc50770476",
+              "width": 1672,
+              "height": 941,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "fd8023aecee5c5c36991514d687a92b1d93dd77b65f0028f9c1cebfe71112222",
+              "sourceBytes": 1689151,
+              "exportedBytes": 1061132
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/furl/mature/encouraging-retry-b681c3fa4e41.webp",
+              "sourceSHA256": "b681c3fa4e4142d23f7ecd6d58372c47a4ccae1e0baf2a3f3f335c4bbb2e3aec",
+              "exportedSHA256": "db10ba0159d34cc8cc0c2cb6466c613d6e88bc45a94925c10d8c329c1e22838b",
+              "width": 1672,
+              "height": 941,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c24501d3a6fcf86ace6e9329a0936a8c239fc3abb3293aa5641887f7c9c951aa",
+              "sourceBytes": 1693892,
+              "exportedBytes": 1062090
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/I",
+      "speciesId": null,
+      "slug": "tessit",
+      "name": "Tessit",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/tessit/base/neutral-114b74de9e72.webp",
+          "neutralSourceSHA256": "114b74de9e724e87885953f9d751a8a791e38fa299424a82d06de70bba70f5c0",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/tessit/base/neutral-114b74de9e72.webp",
+              "sourceSHA256": "114b74de9e724e87885953f9d751a8a791e38fa299424a82d06de70bba70f5c0",
+              "exportedSHA256": "9d0b160b9b172b50410160819a599dd3b55a56c2d859a34d15c146d07107834a",
+              "width": 582,
+              "height": 695,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b5597a5bac9b1e203867ba9e80c49721c9461aba6fcff06a9262932326eccc1f",
+              "sourceBytes": 510928,
+              "exportedBytes": 376982
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/tessit/base/celebrate-4ba08bf2f914.webp",
+              "sourceSHA256": "4ba08bf2f914312256e04f56e3900d2dc68ef0634556463eaf3dd68cfd1743c2",
+              "exportedSHA256": "9345111a87e7676a25ba117d934cda21f147b40ab71cfac55b9702e1c3c73ae0",
+              "width": 1147,
+              "height": 1371,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "30ad77abd5a748ba1341d565b24353f204ae377b6acf9e7e631f176893376b2d",
+              "sourceBytes": 1935485,
+              "exportedBytes": 1241890
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/tessit/base/thinking-7162450ac1ba.webp",
+              "sourceSHA256": "7162450ac1bae22708d356ad78e7db7f6a16f0f146438459e6317274e7dc8316",
+              "exportedSHA256": "615b6324cb8cbf3e9d06167b908d9f9def8cf4a6e34712b7ad6fbfd92e21b77e",
+              "width": 1147,
+              "height": 1371,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "0f604c6e4a8fe5dc25908ce74e8d5275367c4758c958aa7326f73a2f4cbe755f",
+              "sourceBytes": 1913657,
+              "exportedBytes": 1250624
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/tessit/base/encouraging-retry-affc61e08f7f.webp",
+              "sourceSHA256": "affc61e08f7ff3fdfa37ae0dadb511810f11d101f5bc343080799b8063f0e65f",
+              "exportedSHA256": "df138e9fc288281fd53d93ee5331fa91f73fc4e2bd755a29b5f8b023bf391605",
+              "width": 1147,
+              "height": 1371,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "bf0d12cd1bd1778f1a5313deea3762490c6f28914a2f860d328b1d0fad1cbc8f",
+              "sourceBytes": 1850333,
+              "exportedBytes": 1193048
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/tessit/mature/neutral-a50b4cddf9b2.webp",
+          "neutralSourceSHA256": "a50b4cddf9b2a60a716e4ed85444e0746b86b0de7b32c2594f3a1b43ba3978c6",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/tessit/mature/neutral-a50b4cddf9b2.webp",
+              "sourceSHA256": "a50b4cddf9b2a60a716e4ed85444e0746b86b0de7b32c2594f3a1b43ba3978c6",
+              "exportedSHA256": "80236f0e8ee6bca6f833ea3d18945133ceea45bff3e3c9deeb70c0d9ae1a1a79",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "295100a824586dc52aa9a0998eca9617980ae4a151ce2b03638a61a03c115e09",
+              "sourceBytes": 2132914,
+              "exportedBytes": 1353600
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/tessit/mature/celebrate-594d4d7b380e.webp",
+              "sourceSHA256": "594d4d7b380e75aa5f6454d31cd09aaef9c1e8bf41a61ba00f696579fd1c3be0",
+              "exportedSHA256": "719108cf63ecc1e816704bc0a79e7e0d7a3a40f449e362739fe0f1d2d72f14c5",
+              "width": 1536,
+              "height": 1024,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "1ccfbb2b8e35aa41909f5f03ff887754685271101c6bf23b2f6d139dcc2d7afe",
+              "sourceBytes": 2149873,
+              "exportedBytes": 1349556
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/tessit/mature/thinking-3ece58a9c4ea.webp",
+              "sourceSHA256": "3ece58a9c4ea5f1148c04465e051bd8d64c66b8c1b2ac5ead6347d21d5838a58",
+              "exportedSHA256": "c575a0278819ef9ad1780ebbe94f420d9b2753f1aef29da59aeed36ad02fa7f4",
+              "width": 1536,
+              "height": 1024,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5c03c4ddd87bccf9ad752011ffef78d30ca5b4d62a9e1f238a7fa29cbad59bfe",
+              "sourceBytes": 2121910,
+              "exportedBytes": 1345790
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/tessit/mature/encouraging-retry-a728f2da84c6.webp",
+              "sourceSHA256": "a728f2da84c641b7323a840461f677eeb7693472f00b1aa0210d8f0c36d00df6",
+              "exportedSHA256": "011a2e07e9cbd59a9f0368a702816124099783cfb803df1033c5b4637435b51a",
+              "width": 1536,
+              "height": 1024,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e7ceee34394d67be50e5f8b7f6dc5b2d873d180399ff73c6db0e6ece4c436bb3",
+              "sourceBytes": 2195818,
+              "exportedBytes": 1397760
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/K",
+      "speciesId": null,
+      "slug": "flick",
+      "name": "Flick",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/flick/base/neutral-09e10c435dcd.webp",
+          "neutralSourceSHA256": "09e10c435dcd75968e704ddd271ab52f1c7bce982cede6987eee5d176576d943",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/flick/base/neutral-09e10c435dcd.webp",
+              "sourceSHA256": "09e10c435dcd75968e704ddd271ab52f1c7bce982cede6987eee5d176576d943",
+              "exportedSHA256": "6655deef94923fdeb21cba4de3d7af09ee3b393ea3f7238b50ed7366c69582a9",
+              "width": 525,
+              "height": 785,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "dac0cd1dca11ca6fa98f891e6a3f6829037bf5ea5c1c8ffcba304090435a9c25",
+              "sourceBytes": 510646,
+              "exportedBytes": 333592
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/flick/base/celebrate-14edf1cdedc2.webp",
+              "sourceSHA256": "14edf1cdedc29114b63a12951431bdaad3946da80a6b4942c5173f1a31e710dc",
+              "exportedSHA256": "d0411c600fe70c1d1d2971023df9033a24e806860ecccb43ebe0251d61dbe2ca",
+              "width": 1025,
+              "height": 1534,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "72d1983a99aeff4439bd411ad2dea2948a0709fad0e0c66c2e26fa4d1e8b9da7",
+              "sourceBytes": 1704311,
+              "exportedBytes": 1083982
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/flick/base/thinking-5e942c5f30d6.webp",
+              "sourceSHA256": "5e942c5f30d67b6803ac8064fb524b197c323e954881c16e500535e4f77cf29b",
+              "exportedSHA256": "a72e8612e3479aab4c38c7cc458cac9b0c6759a68d9e68443b8a839e8c32fc46",
+              "width": 1025,
+              "height": 1534,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "05bdd4b18c760dc2be189d85477219ade9727b6842a358b1dbff3804df7e787d",
+              "sourceBytes": 1714485,
+              "exportedBytes": 1117886
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/flick/base/encouraging-retry-af9223c17027.webp",
+              "sourceSHA256": "af9223c170278a2425d0a5c533eadc006cb4a20ddd80e53dd3baa488fc8c94bd",
+              "exportedSHA256": "a4942e27a87f6af7913cf7e54d1c4d9c04bef705946e1b260ecf0801efc869ec",
+              "width": 1025,
+              "height": 1534,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "3a807ed3b9c8b7b9c70b3899e6ccbfc65f80828b6a8bce293e3a48561ca1974b",
+              "sourceBytes": 1700031,
+              "exportedBytes": 1080180
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/flick/mature/neutral-bd0f358d1012.webp",
+          "neutralSourceSHA256": "bd0f358d101269a632fe5976c44a9790afb80dd897d6101c02bd217cbc73c647",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/flick/mature/neutral-bd0f358d1012.webp",
+              "sourceSHA256": "bd0f358d101269a632fe5976c44a9790afb80dd897d6101c02bd217cbc73c647",
+              "exportedSHA256": "9dd0244ca4b10954ec6600d188e3c2084f9b7086ea209301db1a4d292d963a58",
+              "width": 1199,
+              "height": 1312,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "428e79ec5b9682aa83ba95704d6e93e2e8b1df90d84ebcdace1c0b0062157265",
+              "sourceBytes": 2024785,
+              "exportedBytes": 1206684
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/flick/mature/celebrate-a994c6e10e54.webp",
+              "sourceSHA256": "a994c6e10e54cfdb1818f1a704c66c8902803e15058b91d935b53eb1a3ec202f",
+              "exportedSHA256": "8e5df147b27156f58d207a0c9d8f29ab6876e26363364c87d5f8fa2d611610ed",
+              "width": 1199,
+              "height": 1312,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2bfc37089b1d7e503ec90a9f72c4b76d9e0d7c7e0ddf0dcc7cea2362c258e7cd",
+              "sourceBytes": 1550304,
+              "exportedBytes": 940148
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/flick/mature/thinking-4d82d14440a3.webp",
+              "sourceSHA256": "4d82d14440a35b5ee5d7efba4743e40915d6fe251bd525d060240d34fb5e6743",
+              "exportedSHA256": "2ac1a77eb35a21c6c01056ddc62559ef013bf8404359c89eadcd57ea70dbe16c",
+              "width": 1199,
+              "height": 1312,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "0dd02f548fcd3784087b68015b786e62165b518d3ac514fab245131f44ee1cda",
+              "sourceBytes": 1454648,
+              "exportedBytes": 893132
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/flick/mature/encouraging-retry-a495d1726f6e.webp",
+              "sourceSHA256": "a495d1726f6e32ce1f1e2164919f9356e9dd2d0e1baa7505e3d3aafb925c20c8",
+              "exportedSHA256": "bb03ac1cb232ce1f59b280f6976a24fa267f5d6238452054b74da1c69167c733",
+              "width": 1199,
+              "height": 1312,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e6a8ca7dc97c0ca3a25da5fcc4dfc6c887e4bf507aeeadbc4cfd7b5a375871b7",
+              "sourceBytes": 1472182,
+              "exportedBytes": 906558
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/L",
+      "speciesId": null,
+      "slug": "clasp",
+      "name": "Clasp",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/clasp/base/neutral-b0b8aba2bb28.webp",
+          "neutralSourceSHA256": "b0b8aba2bb281762ab303db59bc0f02a4d0ae2383344bc9546f5ea82fa8e4c30",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/clasp/base/neutral-b0b8aba2bb28.webp",
+              "sourceSHA256": "b0b8aba2bb281762ab303db59bc0f02a4d0ae2383344bc9546f5ea82fa8e4c30",
+              "exportedSHA256": "82be1b513713bbcd4802ab7076e6cc2f2c3f22062e24a9ee34ca1b907d67cc65",
+              "width": 607,
+              "height": 770,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "aa78164f687bf9c1afdd10728b7848c4a293db92124b857432ff177d776efa3d",
+              "sourceBytes": 561485,
+              "exportedBytes": 422292
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/clasp/base/celebrate-d691bd691f12.webp",
+              "sourceSHA256": "d691bd691f12d0958698599b8593c3c0b98d983f5e3208c150069e4b64789f59",
+              "exportedSHA256": "62b62cb1a03bad893a67c1c2aa044ca18766fd7b108afd972ac2b92c56403cb8",
+              "width": 1114,
+              "height": 1412,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b165514d31eb2edf01dd849e571387d9bac171327636206a470cbd7d64e0d4a9",
+              "sourceBytes": 1604224,
+              "exportedBytes": 1064774
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/clasp/base/thinking-058510599c12.webp",
+              "sourceSHA256": "058510599c12392211809126bcb63f1ad2d08eb4c8cd3bdb72afba1b607097ff",
+              "exportedSHA256": "994489143883e04e1bd60b2eec03c77370d87153d4ec2c4e2f5fb289de0c1ea0",
+              "width": 1114,
+              "height": 1412,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "591e82a6817035ea958957f5cd70a70e0088a7d94b2bf68c63d18b5cb3ea7f5a",
+              "sourceBytes": 1639680,
+              "exportedBytes": 1111826
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/clasp/base/encouraging-retry-277f78551779.webp",
+              "sourceSHA256": "277f78551779ecb85389775e4cd440d21048160884ff8e858c5c5936da5acdd0",
+              "exportedSHA256": "5db824b76cb5329c75dabb6e90529b213f803a1dd691e9191052d16b4cf99b50",
+              "width": 1114,
+              "height": 1412,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "1db7d1a67f93a86f2ff6bea40e730be9649cc54a2752bae14dea566f578ad241",
+              "sourceBytes": 1666246,
+              "exportedBytes": 1108528
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/clasp/mature/neutral-a6c9939e3eed.webp",
+          "neutralSourceSHA256": "a6c9939e3eeda4ebb2691a79d0e6bf0cca453377f51a79d900901a9f77dcb628",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/clasp/mature/neutral-a6c9939e3eed.webp",
+              "sourceSHA256": "a6c9939e3eeda4ebb2691a79d0e6bf0cca453377f51a79d900901a9f77dcb628",
+              "exportedSHA256": "f5a6cb26f3e1016c448a0733c7833e23498e2ce6c5c258d06f0995e1984f7888",
+              "width": 1254,
+              "height": 950,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "ef085799695616eace63457e5002cd7b9a4bea9044500920876544eaf3f52992",
+              "sourceBytes": 1397840,
+              "exportedBytes": 1066396
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/clasp/mature/celebrate-4cf6df7cb7dc.webp",
+              "sourceSHA256": "4cf6df7cb7dce21cd72ae7dad730d830ecb447a41d3f38e9375f421a23157d32",
+              "exportedSHA256": "5b06868730bed0d304c52f6ccfff68c288def2483b932b2160cb3e7f591217d5",
+              "width": 1441,
+              "height": 1091,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "66e812e912ee5b8a7520446e2df0fcdd1e48fbe68a9261b94dd8dce1354c5837",
+              "sourceBytes": 1614997,
+              "exportedBytes": 1073050
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/clasp/mature/thinking-3403d101bfdf.webp",
+              "sourceSHA256": "3403d101bfdf976a0826b562900ec228d23f03bb62752c2b8065ee35cd06bfb5",
+              "exportedSHA256": "63cdc1fcc7141808185b46600ccbd6996b277d9a0644da6226b75ae58feab34f",
+              "width": 1441,
+              "height": 1091,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "26e2866367bde3626ac298f067680c321e2affff61c30f020d49f4c78739de2d",
+              "sourceBytes": 1543361,
+              "exportedBytes": 1015132
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/clasp/mature/encouraging-retry-6ddfcea1f232.webp",
+              "sourceSHA256": "6ddfcea1f23214c2b0ebdf736e9c429c6bef956d5277459931f0cc209ad404ee",
+              "exportedSHA256": "6d4ac68b6629c4abe03dc26ec6059f69074074dbd83d67cb435a2d846401f4e6",
+              "width": 1441,
+              "height": 1091,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "f4080c1cff317334c37880f9ffea760fdc31c693cc7ad03502f853695df7633c",
+              "sourceBytes": 1572668,
+              "exportedBytes": 1019054
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/M",
+      "speciesId": null,
+      "slug": "skiff",
+      "name": "Skiff",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/skiff/base/neutral-ff5d636dbdce.webp",
+          "neutralSourceSHA256": "ff5d636dbdce258f57c340dcc14fb6a806500e6b360c22f96785bc70138061b1",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/skiff/base/neutral-ff5d636dbdce.webp",
+              "sourceSHA256": "ff5d636dbdce258f57c340dcc14fb6a806500e6b360c22f96785bc70138061b1",
+              "exportedSHA256": "fb6da33f9d48c8afbaa8cec34480c11264b462835b2368fb61082779e6c7c621",
+              "width": 550,
+              "height": 700,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "16975da972bb2d5ae1bdb292a407f553180fe3b416dcbce4e97f821f2a46f819",
+              "sourceBytes": 426315,
+              "exportedBytes": 323420
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/skiff/base/celebrate-49d9f46504bf.webp",
+              "sourceSHA256": "49d9f46504bfa71b5eb0181269e40a0a7a6a809b807d646a441af709de5ea0e5",
+              "exportedSHA256": "ea05b0aa9b864cf90551aea56898b7b3157d4b94618265d26d4857b9684928f4",
+              "width": 1111,
+              "height": 1415,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4aadfef3c6106a40d43e09ce7c15bb2441cb45110ff30ee47dda142854fccbb5",
+              "sourceBytes": 1941402,
+              "exportedBytes": 1352878
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/skiff/base/thinking-8e2f008f1c92.webp",
+              "sourceSHA256": "8e2f008f1c924059275eaa114af1726c669424dbb9a3db8085b85d87cdd092f1",
+              "exportedSHA256": "d3b0c041df93d93c186ff162aa865a39e06fdb541916e488a85f3cd2e2d08cae",
+              "width": 1111,
+              "height": 1415,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "a3b0acc7354ec76ad5f73d7be2291b1b7cb9ff77cb729c78f2fdbe47b81361d1",
+              "sourceBytes": 1933220,
+              "exportedBytes": 1345496
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/skiff/base/encouraging-retry-cbe1519013c8.webp",
+              "sourceSHA256": "cbe1519013c80922a106ec351cfea6a93f1e3ace765527ad21808649cefdfd1f",
+              "exportedSHA256": "3e4636a4f90421e8dc12ca6d637cac1a4a69d322f66d10125c38c63320f8c8fa",
+              "width": 1111,
+              "height": 1415,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "01321670afb6a0a24517135b242032cd33a7deba14f1cae8139a467be3f3379d",
+              "sourceBytes": 1921803,
+              "exportedBytes": 1339840
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/skiff/mature/neutral-006e15bba0a9.webp",
+          "neutralSourceSHA256": "006e15bba0a9a93264d8d6ade330c753b9c2bfb8359e0faa25cb27c515e7ef26",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/skiff/mature/neutral-006e15bba0a9.webp",
+              "sourceSHA256": "006e15bba0a9a93264d8d6ade330c753b9c2bfb8359e0faa25cb27c515e7ef26",
+              "exportedSHA256": "ea185b302eaf286d8fc0a89054c88b4a23b44f010415e04541e9f3bbe01d565b",
+              "width": 1254,
+              "height": 1020,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "41f2297e3085611bfb719e9956a95f0dbe9b6196ebc747eb318a9e67ab310a6b",
+              "sourceBytes": 1441895,
+              "exportedBytes": 1077278
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/skiff/mature/celebrate-684130700858.webp",
+              "sourceSHA256": "68413070085886b305260dfa23bed6987f8d6a133d3962e284c3497617ab02cb",
+              "exportedSHA256": "7809b87a9f755f5f5827f7a3a4220a32fe7652fb52ed4f9eba60ec26bc64e011",
+              "width": 1391,
+              "height": 1131,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b5fb2b12fe5434ce6008696b8861d564acc8d2c0aae1173f15e841e35129636d",
+              "sourceBytes": 1903633,
+              "exportedBytes": 1272438
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/skiff/mature/thinking-6cc14cdfdbaf.webp",
+              "sourceSHA256": "6cc14cdfdbafcb8f13f7532f5e9a05f01e17b6fd7c28a30ae9a370b1e2d9a005",
+              "exportedSHA256": "fb6af33ecfe41d58383815981c76b8533ef02a073bc58af2257d01449fb1c950",
+              "width": 1391,
+              "height": 1131,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "981570e550815f2969bedc7bd71cfc83514a49a42ac64ae7a039f9cd0fc9967a",
+              "sourceBytes": 1910355,
+              "exportedBytes": 1284944
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/skiff/mature/encouraging-retry-791c45085e15.webp",
+              "sourceSHA256": "791c45085e15aad0e519d64869d0acd2e9cf30a30cca51c5836ac2530369f4b7",
+              "exportedSHA256": "fbe423402d5e397cd2685607ac1cd784923b76dedf30d34ffc34c89eca7ba0ec",
+              "width": 1391,
+              "height": 1131,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "000a3d393946d5b56f29266dcd47798c1f67dc6c42d24f31383fff60ad338139",
+              "sourceBytes": 1887483,
+              "exportedBytes": 1261866
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/N",
+      "speciesId": null,
+      "slug": "peep",
+      "name": "Peep",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/peep/base/neutral-e5fb86581cc8.webp",
+          "neutralSourceSHA256": "e5fb86581cc8bf6a1482250c864c99e54fdb44423f8d4706abc767911c00e937",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/peep/base/neutral-e5fb86581cc8.webp",
+              "sourceSHA256": "e5fb86581cc8bf6a1482250c864c99e54fdb44423f8d4706abc767911c00e937",
+              "exportedSHA256": "5bccae3c1ab8cc9a9caa1001e78153bd4000a51d5c43ff46975f5be6554dc0da",
+              "width": 520,
+              "height": 535,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c39ff4a44c2478b634ee16397ae2e2a00eb085dfe5f70bd2b01f943a60d24934",
+              "sourceBytes": 343792,
+              "exportedBytes": 258152
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/peep/base/celebrate-c62533c51e13.webp",
+              "sourceSHA256": "c62533c51e13a698da9faf86c952733858a586deb2d5f5842121c54adba7150a",
+              "exportedSHA256": "2b0b44c454460916fc8720632a4546572d86a34272983d7978f69f058fb0d23e",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "cedf01bd6d101d21b1adbc6be67d9667ddd98d6b8e7c624344bcd8bb0146539d",
+              "sourceBytes": 2030745,
+              "exportedBytes": 1426700
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/peep/base/thinking-51e17ce6ce69.webp",
+              "sourceSHA256": "51e17ce6ce6978e06bc8318be23a76095cbdabbebed9c275a744778a8cf13b0f",
+              "exportedSHA256": "6aa5a032dc7fb5e1e8ca4df14991a6240ef230c6ebe5841a75a2122f6c093415",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "f0b232e4a6518415cd87d95ff42a6c4df4c3b3396982913e3dc4eade35e610fe",
+              "sourceBytes": 2010711,
+              "exportedBytes": 1403098
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/peep/base/encouraging-retry-2ec609e6543b.webp",
+              "sourceSHA256": "2ec609e6543b78c7c67cc8287ce4bfc5be5d457ef5e6a2a06a0a649c15a7ddb5",
+              "exportedSHA256": "391bcdd6cdc4d545c32e7edc68149be8e8d002e7d62400bd65fea16379e84de3",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "100fcc9d7053b52f5573b9939333f843e5003c40c2a0944e7a7de15a79260be2",
+              "sourceBytes": 1951117,
+              "exportedBytes": 1366942
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/peep/mature/neutral-6afc004481ee.webp",
+          "neutralSourceSHA256": "6afc004481ee277c6a5dad7b6e5ba3a33aa2b02445be62fa7883578cf48abb8b",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/peep/mature/neutral-6afc004481ee.webp",
+              "sourceSHA256": "6afc004481ee277c6a5dad7b6e5ba3a33aa2b02445be62fa7883578cf48abb8b",
+              "exportedSHA256": "e81941f3ba8e1741bed16d1aac92144c00e0884d1cbfa001523c87c52a70afd5",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "a2550ed930719cf0f2b5d979ff0560188503bf9ff3cb07355f917e79d4cb8c4c",
+              "sourceBytes": 1995352,
+              "exportedBytes": 1338856
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/peep/mature/celebrate-a42cd6b7e925.webp",
+              "sourceSHA256": "a42cd6b7e92557c2d6110f5dcbe1bb9a5aef8c5f764a1158c24806e45e0cb5b4",
+              "exportedSHA256": "84400dcb5437df8ab28cd8cd76e99427e54e72a293e9fdeca67a8ed6097bb19f",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c322c6d5c7e63bca7c4f2e33bcdd1423caaaaddf6010e8dfe7f1a8054e1861a1",
+              "sourceBytes": 1932926,
+              "exportedBytes": 1344876
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/peep/mature/thinking-d183a8cc506f.webp",
+              "sourceSHA256": "d183a8cc506fe4198477dc3f0cb208fcd569ac8fb327618515c76e724da9b459",
+              "exportedSHA256": "e78e1db9f3a74962106a94338b6e5ec9b60ad2868669aeab1a8ac95b05c9f88f",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "83d61d6a099f99a6610c1074b053d62df9352932268d7c45e2902a498720c28e",
+              "sourceBytes": 1921151,
+              "exportedBytes": 1340938
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/peep/mature/encouraging-retry-4f4946050036.webp",
+              "sourceSHA256": "4f4946050036869c0da648b7aea96826c1c6ab0767d0278754db3829f42aa182",
+              "exportedSHA256": "173164067852c6a5621fe28564cc5760d2b7854c9e79745f8b1062ffd69383fa",
+              "width": 1236,
+              "height": 1272,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c1a30d8d68007c39c09b772f959810c6f9c2af0870b5b2ccaf0972386a0d8f5c",
+              "sourceBytes": 1916647,
+              "exportedBytes": 1337600
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/O",
+      "speciesId": null,
+      "slug": "weft",
+      "name": "Weft",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/weft/base/neutral-ce8ebc0adae5.webp",
+          "neutralSourceSHA256": "ce8ebc0adae5f29519fccf5207da60940fac012a2ef2fdb507197799de6accbd",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/weft/base/neutral-ce8ebc0adae5.webp",
+              "sourceSHA256": "ce8ebc0adae5f29519fccf5207da60940fac012a2ef2fdb507197799de6accbd",
+              "exportedSHA256": "f6c196a4fcdbec225caa0cd5bcd59b5bf76b76c6157e88d7232804de7ba3ae4c",
+              "width": 600,
+              "height": 805,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "bfabccb352374ef9d4187dd700b9b819282127026b0220a8b49488c7245300b3",
+              "sourceBytes": 567875,
+              "exportedBytes": 424336
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/weft/base/celebrate-984d5899320c.webp",
+              "sourceSHA256": "984d5899320cd1918620f56bf07e2198fe690f19675a2ce2515e373a8c548008",
+              "exportedSHA256": "81031a9bd21ea9a6c2a556224ae7c6fdfc09f0c0f53d5f06d25525d8367ad266",
+              "width": 1083,
+              "height": 1453,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c70b3625c75810fe839290fbc3f737d069e481d15f6708dd54ff518cc8cae5b9",
+              "sourceBytes": 1884849,
+              "exportedBytes": 1289076
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/weft/base/thinking-4a93d531d5cc.webp",
+              "sourceSHA256": "4a93d531d5ccf6a0f5b2d7470493c7f97a46cc88f872d9075a618bbd9363110e",
+              "exportedSHA256": "29562fdf5763c611321da4d73a3e59b7a78d1092ebbabb41c14181a30fe455e7",
+              "width": 1083,
+              "height": 1453,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "892ae599ba4986bc66b5310c7543e2e4c2363e3dd6d61ad0c16203f0c23500c2",
+              "sourceBytes": 1942023,
+              "exportedBytes": 1335094
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/weft/base/encouraging-retry-f2d2c41833d3.webp",
+              "sourceSHA256": "f2d2c41833d388e5c1fda914475a4e0a8c76aaa79f4e33a765463b18a7cf70d3",
+              "exportedSHA256": "3cefc3eb931f75877723f0aa1ea11dbcdb668bed1ad309c02b3a4aef1ff556d0",
+              "width": 1083,
+              "height": 1453,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "593d9403e076618ea1edfa837721d338a58862a8f6f1683cb1f9515f9ff5b650",
+              "sourceBytes": 1912585,
+              "exportedBytes": 1304300
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/weft/mature/neutral-d8a6165d9fa1.webp",
+          "neutralSourceSHA256": "d8a6165d9fa144934eae94dc083243cd05443e280b633bc10ed3ebcd8b45b95d",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/weft/mature/neutral-d8a6165d9fa1.webp",
+              "sourceSHA256": "d8a6165d9fa144934eae94dc083243cd05443e280b633bc10ed3ebcd8b45b95d",
+              "exportedSHA256": "628d306b862d41e433317c60c70329f4d27e1caacbcbc07ca9f9345bd2010b8c",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "691d4171888e4ad4fd0bacdbed0f592d5dc638a9e0aee0a52c1fc7b070f13d7b",
+              "sourceBytes": 1883083,
+              "exportedBytes": 1196480
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/weft/mature/celebrate-41750774d524.webp",
+              "sourceSHA256": "41750774d524d0ee472752ef8dc6644e1b73f6c40a822253e39385f32d7fd4ef",
+              "exportedSHA256": "22cc5aa59e0a994b00060fbd258ed905e197d3376013a1c744ac3ae72e344dc0",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "67d6de55ce874f8e633e46b2d617fadebfcdee23413fd721b29edbde5b9ec318",
+              "sourceBytes": 1852683,
+              "exportedBytes": 1186104
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/weft/mature/thinking-c5d297e3d72c.webp",
+              "sourceSHA256": "c5d297e3d72cbd2665dc65278484b9ee799b4e5c4a3139d9cff4aea4cfc030aa",
+              "exportedSHA256": "a92d0a99f0caa80763dd8662231e05b2cfe60eb7d5d724ca74732d02681d2266",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4e6d622a68ba09bd85921b7b311cc6123b01714fd7aaf2f0b2997aa200edec85",
+              "sourceBytes": 1875823,
+              "exportedBytes": 1209010
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/weft/mature/encouraging-retry-cf9f9cf8ddde.webp",
+              "sourceSHA256": "cf9f9cf8ddde44b552a1f0b9fd2698b056d2550f4e1555b86203ab66be5a816d",
+              "exportedSHA256": "e18f47c42a3cd35b747b267dd5dc03cdef31df964d4ce0bbc26f05b78268d43d",
+              "width": 1536,
+              "height": 1024,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "6cf98f6721f106af400a87e84a1d380f5d780319c262c0928d0935e6f49343ea",
+              "sourceBytes": 1846224,
+              "exportedBytes": 1184518
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/P",
+      "speciesId": null,
+      "slug": "cache",
+      "name": "Cache",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/cache/base/neutral-9dac020556a5.webp",
+          "neutralSourceSHA256": "9dac020556a5621580543c0c70dc6525ed1c6cf1cc04f0fa461baa64dfd2c936",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/cache/base/neutral-9dac020556a5.webp",
+              "sourceSHA256": "9dac020556a5621580543c0c70dc6525ed1c6cf1cc04f0fa461baa64dfd2c936",
+              "exportedSHA256": "9dbd7c3065d39c51fea1582a5a8a1f70c60c07f640b78f8068adf98d417f8b54",
+              "width": 600,
+              "height": 605,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c6bf926d00cf1a87cdfd0b0fd652e143c93ddfef0590e1d89c7009a1e6c67342",
+              "sourceBytes": 563018,
+              "exportedBytes": 366370
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/cache/base/celebrate-1d10fdef7554.webp",
+              "sourceSHA256": "1d10fdef75543c948814f27ae9890bb164d7a88c453f62eee88ac32a011fa1ce",
+              "exportedSHA256": "0b68aca1657b2c5aa7231c4032683d52be53418a9ad7be75d583370a8444c603",
+              "width": 1247,
+              "height": 1261,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2556890ad2eced58da102d66c5e0e0778f34c66bca1844b9f8d4e3464e8f7233",
+              "sourceBytes": 1781744,
+              "exportedBytes": 1150814
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/cache/base/thinking-552b838b3c85.webp",
+              "sourceSHA256": "552b838b3c85cb99f248a1ed97b59a2efeed8a5313b0a74230db78259a15f0f6",
+              "exportedSHA256": "51428605d8a95a69caef0dbb14d4d585c021e4057b8e22a4340e0e31af101865",
+              "width": 1254,
+              "height": 1254,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "ac9a91cea600b3b064d9ec114726aaa74ae93856dbd10117b6e3e33185b2d83c",
+              "sourceBytes": 1824254,
+              "exportedBytes": 1188294
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/cache/base/encouraging-retry-6160e3247960.webp",
+              "sourceSHA256": "6160e3247960a9702af9185c1013f2908bd8e7bc7ce6bfe2d487c647510149ae",
+              "exportedSHA256": "dc58f26724590a159b9345226fb0ce317f031ef3c8224cf4d604b95d437fe758",
+              "width": 1254,
+              "height": 1254,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e675faa354d76e225d56c3a0fe10062a11ed77f410e65637d76575706a6bba66",
+              "sourceBytes": 1835345,
+              "exportedBytes": 1166350
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/cache/mature/neutral-9fffd1f08a0f.webp",
+          "neutralSourceSHA256": "9fffd1f08a0fb069c0b394fbfd83690aca11d6a0cd66f10539fb531296e87141",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/cache/mature/neutral-9fffd1f08a0f.webp",
+              "sourceSHA256": "9fffd1f08a0fb069c0b394fbfd83690aca11d6a0cd66f10539fb531296e87141",
+              "exportedSHA256": "51aa4388301f54eb3dedd7b402d0041db8fbc3a69efc7198af447aa4f400f8b5",
+              "width": 1254,
+              "height": 945,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4877b1813599d3c06d934137c955a0edf1487613ed05fa9f6f862160b2b95b48",
+              "sourceBytes": 1569551,
+              "exportedBytes": 1166336
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/cache/mature/celebrate-05bab185893c.webp",
+              "sourceSHA256": "05bab185893ce9ef43adfddc47bd815e4ab37f1c1612a0d383d9d6e409a1f0d6",
+              "exportedSHA256": "95865a38e319d6ed0b70f5c21e3612b2f3466128a9c87da6fdbdf3db59f8321b",
+              "width": 1445,
+              "height": 1089,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "20366b2f533b7fccb4ae6c0f98e2f023a3e1cd8c63edce8baf0575a2f80ee619",
+              "sourceBytes": 2190984,
+              "exportedBytes": 1471926
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/cache/mature/thinking-730b68af30ac.webp",
+              "sourceSHA256": "730b68af30acf85327eab48e7c3c30aa2bb1fde25a5ab4675353b44414c4d3c9",
+              "exportedSHA256": "430c75603c312d5c8f7fbac977cb8b114a6454113a8e19f756eed4d5102c7113",
+              "width": 1445,
+              "height": 1089,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "bb3155382a1b771426186cd3927afd217de7f2babc15119e7fcb5472b890e501",
+              "sourceBytes": 2234795,
+              "exportedBytes": 1504168
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/cache/mature/encouraging-retry-219dde0ff089.webp",
+              "sourceSHA256": "219dde0ff089bb7d45058f145b3e83621f5ed039edb44f5a467fafe0e3338079",
+              "exportedSHA256": "45334d19ed22ec23c0e1b9b55690adcf12084d6c434a267243b9c09fd0475d29",
+              "width": 1445,
+              "height": 1089,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "dc9a745e11fe71fb6bcbb7574f37081e9d7c8fd1d7b676615f10b44757d72b68",
+              "sourceBytes": 2154735,
+              "exportedBytes": 1455704
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/Q",
+      "speciesId": null,
+      "slug": "brim",
+      "name": "Brim",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/brim/base/neutral-ecfe4d863199.webp",
+          "neutralSourceSHA256": "ecfe4d8631997e73b1ce6ff9fe71aa8e06b1f53a52efdd6d0db1f5a4f34c2e08",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/brim/base/neutral-ecfe4d863199.webp",
+              "sourceSHA256": "ecfe4d8631997e73b1ce6ff9fe71aa8e06b1f53a52efdd6d0db1f5a4f34c2e08",
+              "exportedSHA256": "58fcb6281b66f9acd453aa8482e25737e24dcfb7d1a62f62eb64ad8ab9eba8a9",
+              "width": 695,
+              "height": 655,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "01add3f47b01866d324f1f63f912c9e965944657914715f5ab9025cda274c698",
+              "sourceBytes": 643371,
+              "exportedBytes": 439106
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/brim/base/celebrate-e1b78d9e74dc.webp",
+              "sourceSHA256": "e1b78d9e74dc68dd9ca34c552ae10243793284b22120a889801c8931837e2f4b",
+              "exportedSHA256": "3c5837a5899587eb2c61acb5920022ffe5fc57dbe1136dc680c3afbb2980b6be",
+              "width": 1292,
+              "height": 1217,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "41bc8f6cae52d421e2eaa0d0a5913ecc54076313d3188e1c88330641225747d1",
+              "sourceBytes": 1514361,
+              "exportedBytes": 1071770
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/brim/base/thinking-916c58f756f8.webp",
+              "sourceSHA256": "916c58f756f87ead261af860d5397ff37fad536dda30f5051ee6c63e687cf8cc",
+              "exportedSHA256": "ef83763e88270f6c1526c7342ff01f6e84941a0906089796cd2235cd39575dbb",
+              "width": 1292,
+              "height": 1217,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4dece7dbb23639f69eac311f937119eff1c57b847bf59495e595f72922131a0b",
+              "sourceBytes": 1700156,
+              "exportedBytes": 1141904
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/brim/base/encouraging-retry-8d5215cd4d93.webp",
+              "sourceSHA256": "8d5215cd4d9339fddbde98f0e106afda6b6749bce4cab58d14b3341f8459f288",
+              "exportedSHA256": "4b962a69c79719a56c250c84f90b4520c75b858d8041c5f7169d794a3f1ef554",
+              "width": 1292,
+              "height": 1217,
+              "alpha": true,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "35939a0dc915b50ac363347fc8486a8712a3db5291f6a258381fe3cdccd13b63",
+              "sourceBytes": 1483373,
+              "exportedBytes": 1042122
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/brim/mature/neutral-e1deceb1c58f.webp",
+          "neutralSourceSHA256": "e1deceb1c58fbfac627a364197e26f13b08e22eaee13c734744c93ed5bf54aaa",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/brim/mature/neutral-e1deceb1c58f.webp",
+              "sourceSHA256": "e1deceb1c58fbfac627a364197e26f13b08e22eaee13c734744c93ed5bf54aaa",
+              "exportedSHA256": "63682631dd52818fcc9f2c5dae0d0b52df9acd20bb43f2adfac0f5f0c6201929",
+              "width": 1254,
+              "height": 930,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "eea23a89153f36c296ede63a719d6515f74509c177b155adae617cec3567705d",
+              "sourceBytes": 1401355,
+              "exportedBytes": 1088096
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/brim/mature/celebrate-e89d52cc2c47.webp",
+              "sourceSHA256": "e89d52cc2c47f8f7340921d31a308ce22c769642d8557cc2c1dd1fa69f2f1956",
+              "exportedSHA256": "48e06a3fa9370d979906353aef731e6aa17ca652e8c3240965b81e60637ad2ee",
+              "width": 1456,
+              "height": 1080,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e4a87341f9ef469f30003ebdf66cdb8643781e38490a64ee3d5e520fc983a96f",
+              "sourceBytes": 1976441,
+              "exportedBytes": 1399358
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/brim/mature/thinking-157025e1f3d1.webp",
+              "sourceSHA256": "157025e1f3d14053b15c4b1190c26a9961af868b251c33ea6d48f2e771cb16d2",
+              "exportedSHA256": "c205d681af4b2ddb34ca9d9c025e64a887804e86ae77e89d13594a14701eed62",
+              "width": 1456,
+              "height": 1080,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "cb46cd70f8de1b5d18a6d8e3c391f6e682af9867209fb5513c4ab54f6674ddca",
+              "sourceBytes": 1968350,
+              "exportedBytes": 1396948
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/brim/mature/encouraging-retry-a9eb000aec87.webp",
+              "sourceSHA256": "a9eb000aec87322e16443273325e03b87f153b418505db9dc50644ea5a61a68c",
+              "exportedSHA256": "181869f4607fc5cb7966d0a828feb9df187a10cce69e1bf34cd892f0cb4ea0a4",
+              "width": 1456,
+              "height": 1080,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8fa879db1456b8adb2d082a59f92d1117899bc1ceba24df3104f55301cf97f0c",
+              "sourceBytes": 1940858,
+              "exportedBytes": 1374222
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "first-round-2026-11-19/R",
+      "speciesId": null,
+      "slug": "wink",
+      "name": "Wink",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/wink/base/neutral-42c9a2c10602.webp",
+          "neutralSourceSHA256": "42c9a2c10602ee0d79c2536494b9780f8f595a63ee8d6eae9b2cb02b8fc67d79",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/wink/base/neutral-42c9a2c10602.webp",
+              "sourceSHA256": "42c9a2c10602ee0d79c2536494b9780f8f595a63ee8d6eae9b2cb02b8fc67d79",
+              "exportedSHA256": "7f9afa03ecca9fe361f98100636ac047e98a81ebcdbd76b729197cc7cd932048",
+              "width": 594,
+              "height": 590,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "7ae98cce72c0e89a97e4afd9a9bcc9828ab409cb7aea2664405c668efe87ee27",
+              "sourceBytes": 465911,
+              "exportedBytes": 344298
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/wink/base/celebrate-fc0133673049.webp",
+              "sourceSHA256": "fc01336730491e980d7bd3a27c00382b8a6358e7bdd2e936b2fd12404e50daab",
+              "exportedSHA256": "b555c3abde3e60565860e3869a1a0abf2147e7f31fc8d09e2a7cd5c9451368ee",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4e075b9b360f8210d6ec2e3ece69294e64ded9ca532dedb03ce8ada211ec49ee",
+              "sourceBytes": 2109948,
+              "exportedBytes": 1417062
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/wink/base/thinking-bf5aa4b954e5.webp",
+              "sourceSHA256": "bf5aa4b954e52207df857d86a6fb53a312d4338bd727725be5d7283ba83b9974",
+              "exportedSHA256": "8718cc2dab9127398df80e1a14888c101c594b337f99fd76dd3ace90f2734261",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d72a9cffaa9232a8fb37da597f5a5dbc111eb6f8939c36cc7623e90a2a5b3168",
+              "sourceBytes": 2164598,
+              "exportedBytes": 1443654
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/wink/base/encouraging-retry-33405e1fc90b.webp",
+              "sourceSHA256": "33405e1fc90bcda767798cb1e0adad9f526ab0a447d1ce12b8c31e2972b12d6e",
+              "exportedSHA256": "d1b755943818eefe662011f8db386961733e1ee4d81235dcfdc2174bcfa316a4",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "cc3c7f8dbc7e445ca44383a1c2fa7226ba8bae2c6f4aae4ec21bcabad3186d87",
+              "sourceBytes": 2027609,
+              "exportedBytes": 1369844
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/wink/mature/neutral-7c83c99e39f5.webp",
+          "neutralSourceSHA256": "7c83c99e39f53887220ffef35af86782c62646309aba0fac1fb259470ae18b52",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/wink/mature/neutral-7c83c99e39f5.webp",
+              "sourceSHA256": "7c83c99e39f53887220ffef35af86782c62646309aba0fac1fb259470ae18b52",
+              "exportedSHA256": "353a89056a5c2ac30582baa018abc3bc9435a7415ddc4b3221657794361d29b5",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "ea789ac2c1652879c5b7993a4bf13f22cd075dc81eb0a4c9a44e14810da81ee9",
+              "sourceBytes": 1910120,
+              "exportedBytes": 1198026
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/wink/mature/celebrate-f9ca5ddde71e.webp",
+              "sourceSHA256": "f9ca5ddde71edbecd6fed454eca739ffd45e5585d560cfd092fc3e5db155fdb5",
+              "exportedSHA256": "8b24f171ac6161cd20cc4f9ccfc3ac704b350a4068dc6588c6b6dfe56b4a334c",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "f241caaa5c2bac73394e0eb71aa2210ba30d3e33c20a38ed9a902719391f02ac",
+              "sourceBytes": 1858851,
+              "exportedBytes": 1180672
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/wink/mature/thinking-d3e38c65528c.webp",
+              "sourceSHA256": "d3e38c65528ca168ccba300ffdf0dc10b290f6da9e75c54fbdb438ae68e0d0ba",
+              "exportedSHA256": "6e3b3cf40df6a361600b2904cc8903eb2628669abab1d2793c303c27c1a3fa45",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8be264f32e4e144f9d9f5f981e833153d251076fde762ca249dbcf1ea3ea65f6",
+              "sourceBytes": 1826727,
+              "exportedBytes": 1160564
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/wink/mature/encouraging-retry-3f165e021d2f.webp",
+              "sourceSHA256": "3f165e021d2fc6d64158a07b48052876a5820d43ee8d51c5aa195f30ef79527a",
+              "exportedSHA256": "5bc4efd72bea386ab5209f5b0454db0901c26046f1d47b92fa8d9bcf7dd32180",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "189aad282375f6de31f99c885b63c0cb4388607f673daa6f626e432a15568282",
+              "sourceBytes": 1856449,
+              "exportedBytes": 1180272
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "expansion-2026-11-19/S",
+      "speciesId": "GP-S019",
+      "slug": "poff",
+      "name": "Poff",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/poff/base/neutral-147c13ba7e6c.webp",
+          "neutralSourceSHA256": "147c13ba7e6cfee4bd100d04d680bf99ef8e12f43ac31df1655b8e921dc04812",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/poff/base/neutral-147c13ba7e6c.webp",
+              "sourceSHA256": "147c13ba7e6cfee4bd100d04d680bf99ef8e12f43ac31df1655b8e921dc04812",
+              "exportedSHA256": "024f90901d9080ad34cb99d6f653c26cbb3ae415577473d140b8985612b6fa51",
+              "width": 715,
+              "height": 595,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "562602de5925fac69026fca813808d18fc657f79fec89e74f0be2c2b053671ae",
+              "sourceBytes": 478479,
+              "exportedBytes": 356160
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/poff/base/celebrate-2f6306196749.webp",
+              "sourceSHA256": "2f63061967495276f4cbef9d5fdb25419c1d70ef38a4924e0a908b7196f02b32",
+              "exportedSHA256": "6c44162ddfc909e3a8fd141a17e3d016b07f893a391aca8edf195235507617a0",
+              "width": 1375,
+              "height": 1144,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "71bf35e60d0df53725f8f56ed038c6e2e5565d428360465916e81b541348f912",
+              "sourceBytes": 1906024,
+              "exportedBytes": 1293436
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/poff/base/thinking-a64c4f3cc586.webp",
+              "sourceSHA256": "a64c4f3cc586cae9150a8bceefdc8032886c01c58ed6c98108bbfc3f2b600b27",
+              "exportedSHA256": "d699ad942ec3169e9cdc05a17d0966483e3ab1bb84dbd9961104648a8f5d5925",
+              "width": 1375,
+              "height": 1144,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5c25fc0d2a7511bb9dbe77583caaee6d817de7299a64205a7f8cf138f0da9aa3",
+              "sourceBytes": 1885965,
+              "exportedBytes": 1284020
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/poff/base/encouraging-retry-08c47a7fbaf8.webp",
+              "sourceSHA256": "08c47a7fbaf840cecdfda4c739938f988ce4283d091d8377258471bf5d319ac2",
+              "exportedSHA256": "e614ca3243434a06270d83ddf91645ef83b770d26f40b291bab55a116c54f185",
+              "width": 1375,
+              "height": 1144,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "1de1c995093b6976f766d3c0b0a60cf7b35c557fc9264370966edeeed17e8d01",
+              "sourceBytes": 1884623,
+              "exportedBytes": 1279262
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/poff/mature/neutral-8504050f12e9.webp",
+          "neutralSourceSHA256": "8504050f12e97e6f99ca31cc207dbeb206d5ba8f0ad12dc021036b445fe19f9a",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/poff/mature/neutral-8504050f12e9.webp",
+              "sourceSHA256": "8504050f12e97e6f99ca31cc207dbeb206d5ba8f0ad12dc021036b445fe19f9a",
+              "exportedSHA256": "edd66d7d42bc0355e1371d19600c7a43d6e5c1559d19a267ad921eaf3194067f",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "dd69558b361d7021074b1de770af06cb36c27934f79a42fe990d27b2a91ac014",
+              "sourceBytes": 1897914,
+              "exportedBytes": 1271932
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/poff/mature/celebrate-d0c9266ce26a.webp",
+              "sourceSHA256": "d0c9266ce26aa9f80e3b66980475a7761841803520001e1a6db2b15b458c55b5",
+              "exportedSHA256": "f050e742779bbafd2f0f7146b67a43ae1a4af2d943abd89beaa544c0570b027c",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "ef4c3e23c55d473963fb31aeba5dde3fe578404152c3591b61324b47ab9799b2",
+              "sourceBytes": 1849967,
+              "exportedBytes": 1244264
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/poff/mature/thinking-ad7996b5db08.webp",
+              "sourceSHA256": "ad7996b5db0895a888482c6653dcae594430a736e19cea3af14508754cfa86b0",
+              "exportedSHA256": "637fc76d9101c64c1b2605f283c1cfa5b64ee5ff1fef727c74d5e02780440cd0",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "150c70a0671e8f2a723d9fbc875ef584c88e4f047d91993ee0da2ea32b65c3b0",
+              "sourceBytes": 1837629,
+              "exportedBytes": 1165858
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/poff/mature/encouraging-retry-5622d6661680.webp",
+              "sourceSHA256": "5622d66616803c5c8825dae3803c10604100984fcc9adbcbef5a40c3054ca450",
+              "exportedSHA256": "e7cc32ce9dc0f1949a0235be1251b6812f4f8b32d86dd88fbdaf67a28d6dc9e8",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "6cfa1e11279d61e0d4adfd937ac672fdcead4342a0caa97cdc3d9ff46a9e0cba",
+              "sourceBytes": 1894323,
+              "exportedBytes": 1269498
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "expansion-2026-11-19/T",
+      "speciesId": "GP-S020",
+      "slug": "chimi",
+      "name": "Chimi",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/chimi/base/neutral-2dc6024a8f92.webp",
+          "neutralSourceSHA256": "2dc6024a8f9273aef806c0d7f1b994ba094e43a551c067ee6a05148815ce89fe",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/chimi/base/neutral-2dc6024a8f92.webp",
+              "sourceSHA256": "2dc6024a8f9273aef806c0d7f1b994ba094e43a551c067ee6a05148815ce89fe",
+              "exportedSHA256": "38f0cbe88b80f29eed22b23a905b8c4e005e6ad7f8ebc96582cf5c9385104779",
+              "width": 660,
+              "height": 625,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "190628c8c490046c132a7ac9e6cdc8ed8a953e91959ed881571ba4c572b7123b",
+              "sourceBytes": 475805,
+              "exportedBytes": 353708
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/chimi/base/celebrate-17e6613d1663.webp",
+              "sourceSHA256": "17e6613d16634f2596191b24e29074c5bafe40fab8287ac5cb66fac12c3ecfed",
+              "exportedSHA256": "dc849cd14b2d54b8a604da49288f571fda36d70f8a9aa1f86354c3e5b9a59fa4",
+              "width": 1289,
+              "height": 1220,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5d65a8725cbb38b5467980da37fb26205f2b3fb8c4a045a6237549395dd6bb07",
+              "sourceBytes": 1877120,
+              "exportedBytes": 1231096
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/chimi/base/thinking-81c10ac318c4.webp",
+              "sourceSHA256": "81c10ac318c4be06cba93e44bf7bd4d0bf6ebbfa4c4351e4dead8de5d098bdf6",
+              "exportedSHA256": "e4420c96f9176fdda38762564617ccfc15f6714374125fd7d8b0406f8506952f",
+              "width": 1289,
+              "height": 1220,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "aaa935ebdb3438ecea756427f499a478a015e90fc626f60a11fb4e704463ae0b",
+              "sourceBytes": 1924669,
+              "exportedBytes": 1265728
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/chimi/base/encouraging-retry-af7056f5524a.webp",
+              "sourceSHA256": "af7056f5524aa7b5bf556c1cf09c442d78788408357f9c0d48201df5e5581966",
+              "exportedSHA256": "2e19e2bcf7fbc3ae9d4878118d663c53c113fad6731fc9d71b98d53aaee5df6b",
+              "width": 1289,
+              "height": 1220,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "9c3987ddc7ce639db0e11af3e1603fa88e9c3000e29805aa1e71384373ea3e5c",
+              "sourceBytes": 1867161,
+              "exportedBytes": 1223818
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/chimi/mature/neutral-839afb70a7e3.webp",
+          "neutralSourceSHA256": "839afb70a7e3b4a5564f0b218d436507de61c5ce5f0bc5014bbb3fe5dcf93a1c",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/chimi/mature/neutral-839afb70a7e3.webp",
+              "sourceSHA256": "839afb70a7e3b4a5564f0b218d436507de61c5ce5f0bc5014bbb3fe5dcf93a1c",
+              "exportedSHA256": "2de886ab5bc5abcafb802b867873a69c786f01db5b1e992a0164728414dd4525",
+              "width": 1422,
+              "height": 1106,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "cd88939e7bfa2328668b8e9d6a32474768a0f708df0d771f85f4b424cca3c916",
+              "sourceBytes": 1791743,
+              "exportedBytes": 1228916
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/chimi/mature/celebrate-70b40180a5d0.webp",
+              "sourceSHA256": "70b40180a5d0821b3c9c2be5d5a705f12d546b8b971707459a4590aab3cd4688",
+              "exportedSHA256": "0d0fb5721105d6d9715191b874b5e5f441aeded262052e4c7ebcf1ef2d0cd367",
+              "width": 1422,
+              "height": 1106,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d482bd65753b8eebf1311c05948dd616d799541a2e94ec406cc2894f99a8a1e0",
+              "sourceBytes": 1811311,
+              "exportedBytes": 1194198
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/chimi/mature/thinking-f623ea5b4f9e.webp",
+              "sourceSHA256": "f623ea5b4f9e833f2f71cf2baf4279ce45b549577c463da0b6f131e7ba3239e6",
+              "exportedSHA256": "46c0c254cf25786bce5fd2dd08c44f329aeebfc9be3b7b6df0433cc19ca829bf",
+              "width": 1422,
+              "height": 1106,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "04e8f64f535f7e93696b46253fc7f66c0cdeaa62775ce18680ebe0544e10c471",
+              "sourceBytes": 1820461,
+              "exportedBytes": 1195820
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/chimi/mature/encouraging-retry-b9c0cbdb9c87.webp",
+              "sourceSHA256": "b9c0cbdb9c8793f0a84fa3ce166379cefd6d1485ec7cf8c49dbfc6d45fea2230",
+              "exportedSHA256": "b75fcde8f90e6518e9dc512ebed225e61339972474ce74db08e76b40206e8e4c",
+              "width": 1422,
+              "height": 1106,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2eb0edae4097ad8fc2fa3691fdda9d571bbb2f7ffe90d0a0a039413c75e0018f",
+              "sourceBytes": 1830811,
+              "exportedBytes": 1210170
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "expansion-2026-11-19/U",
+      "speciesId": "GP-S021",
+      "slug": "pleeko",
+      "name": "Pleeko",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/pleeko/base/neutral-acf9007b0389.webp",
+          "neutralSourceSHA256": "acf9007b0389a5327b7ee15f406c7c783634a3af72791d490170625e233ad6dc",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/pleeko/base/neutral-acf9007b0389.webp",
+              "sourceSHA256": "acf9007b0389a5327b7ee15f406c7c783634a3af72791d490170625e233ad6dc",
+              "exportedSHA256": "2fefe8edc89c4a7a4391d0e4fb6a05e9173335c76f050f78960774e89cac1a28",
+              "width": 792,
+              "height": 470,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "63655eb81ccc8e6cc2a09d3dbe85d57313fa943d5658f10d70f439cd6373fa2c",
+              "sourceBytes": 430777,
+              "exportedBytes": 328500
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/pleeko/base/celebrate-f6faf468e661.webp",
+              "sourceSHA256": "f6faf468e661a3576877023f4ef092f4c1d999ccdd4edcc8e40ef288720e4c60",
+              "exportedSHA256": "c99fe482a55463b13d15753f35c7e8a2a44fe327b97e38d0cc546598a4e8274d",
+              "width": 1629,
+              "height": 966,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "89b4dec822bdebdd718dd00e112dc35ea7c25bb845e0705b11a0a822f1fccaa4",
+              "sourceBytes": 1815521,
+              "exportedBytes": 1252812
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/pleeko/base/thinking-fbe7660eca8e.webp",
+              "sourceSHA256": "fbe7660eca8e7f93499c55e0dd28e4dec85aad133d49fd896bf2b8e41ca570fa",
+              "exportedSHA256": "9e3bdd5eb141e53fce96360f4b6811fd1dd4efa427d6f17c8fb6bc1a5cd3f486",
+              "width": 1629,
+              "height": 966,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "d451d9f6ec1ad530b86ae1ef0fb53a9e4922260ef5262ca556bbecaf70e31d8c",
+              "sourceBytes": 1802645,
+              "exportedBytes": 1240740
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/pleeko/base/encouraging-retry-8e430529917d.webp",
+              "sourceSHA256": "8e430529917da86e27fa7c37b8e8f3b73641a25396cd4858ab3f40f271f8a3d2",
+              "exportedSHA256": "ca1412b18f428be3598d14d4e1403edf7bc38c380a977e0c22b4bf00dab98c5d",
+              "width": 1629,
+              "height": 966,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "5ddd99913a22488023406154ec7f15b87fa68aad4024cb710a6b1ec24ed61b89",
+              "sourceBytes": 1916901,
+              "exportedBytes": 1316656
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/pleeko/mature/neutral-3c0b43f73d21.webp",
+          "neutralSourceSHA256": "3c0b43f73d21a415a659cbf2f9db41a567b80ef5dfd8952f9a4177400037062d",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/pleeko/mature/neutral-3c0b43f73d21.webp",
+              "sourceSHA256": "3c0b43f73d21a415a659cbf2f9db41a567b80ef5dfd8952f9a4177400037062d",
+              "exportedSHA256": "2b39338386d6c5e2d453248df94edb13310f4fafc183ee88c7f053cf0743be59",
+              "width": 1254,
+              "height": 1085,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "606a16ec931e07a41a536bce5f2c24e833280482c81bd6da8c0f634a66d0dd8c",
+              "sourceBytes": 1564665,
+              "exportedBytes": 1139648
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/pleeko/mature/celebrate-4190f74ab563.webp",
+              "sourceSHA256": "4190f74ab56391e34cfc8eef1a19b5d5e4ce9e274d1f64a20e4267c76d2c5d8e",
+              "exportedSHA256": "04db0d2bce4e9ed2eb1e934e80cd138137cc64bee9f2859af0ce93bd64902846",
+              "width": 1348,
+              "height": 1167,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "538959dea013793184868728745b168c59232da36f1fa98e26f7d506166268d4",
+              "sourceBytes": 1948146,
+              "exportedBytes": 1271008
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/pleeko/mature/thinking-574bdf92b047.webp",
+              "sourceSHA256": "574bdf92b047c024da28247a21463ec40f45ab724bed4f9095f2f11923171f7d",
+              "exportedSHA256": "04c3d43398e480d63b317f4cd64307c30571399fdea59eb4a86dbb330bb73bbe",
+              "width": 1348,
+              "height": 1167,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "11484d1071b20253ba3836bbf806f4a66592b9dcbbbed28a11ddd10eb09d5059",
+              "sourceBytes": 1909165,
+              "exportedBytes": 1243588
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/pleeko/mature/encouraging-retry-85c03d77033c.webp",
+              "sourceSHA256": "85c03d77033c17aab661616aea4012a6b2263924ce7c9b499dae65d1008ec1a4",
+              "exportedSHA256": "351c36ea2fe15781fab70a320368c6e735c8a9261fb0deef6931264574e96a8a",
+              "width": 1348,
+              "height": 1167,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "63e8235991b472a3d868085344209ae7ef6d45958c5054ba42a42a7612a86bae",
+              "sourceBytes": 1928864,
+              "exportedBytes": 1247334
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "expansion-2026-11-19/V",
+      "speciesId": "GP-S022",
+      "slug": "talli",
+      "name": "Talli",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/talli/base/neutral-e86fa909bb99.webp",
+          "neutralSourceSHA256": "e86fa909bb991396994b1a40d768e5624b18875be80f73624fa11c49715f8e36",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/talli/base/neutral-e86fa909bb99.webp",
+              "sourceSHA256": "e86fa909bb991396994b1a40d768e5624b18875be80f73624fa11c49715f8e36",
+              "exportedSHA256": "0bb58ab7736953fed08027b96da484f8373685e61b2416ae0ad65d09cddb178f",
+              "width": 610,
+              "height": 665,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "127fef986e1eb63cda9fb5b9e2bf708d4365ac1c7ad0df4464f5a30b17f24a98",
+              "sourceBytes": 444583,
+              "exportedBytes": 334296
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/talli/base/celebrate-9cfa5d3017c5.webp",
+              "sourceSHA256": "9cfa5d3017c501b1254903eea3ef66b99f13723d476025d74c0d6210123c82c1",
+              "exportedSHA256": "dec4ef17c83cd6086086a0f016b008e222793b2996fdda08ad29e7e3d38d4a97",
+              "width": 1201,
+              "height": 1310,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4ece92dd1fb3459d6e75ce4150b73cdb9f9ec47591860b9be125035eda946ae6",
+              "sourceBytes": 1868650,
+              "exportedBytes": 1263276
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/talli/base/thinking-8298c76511a8.webp",
+              "sourceSHA256": "8298c76511a812711325280eefa12cde0c6478313c897a740fdf34974a1c3de7",
+              "exportedSHA256": "d2b4a3f5075a1c071bae3f9b93c7a06a414c6fa9723925546d078cb24d155324",
+              "width": 1201,
+              "height": 1310,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8f05b63dac6c8e971a8abe8fd07b8e876caa2c59ae28dd3108ec7f679f5923be",
+              "sourceBytes": 1859496,
+              "exportedBytes": 1257376
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/talli/base/encouraging-retry-37dc4829aeb4.webp",
+              "sourceSHA256": "37dc4829aeb4f399878f2b93924b3d8b08c099a033eff731d15144166938c25c",
+              "exportedSHA256": "fee9323eea8154d4c82b4679ed4c1ece1bdcf6988751186ea256da8e19f3e15b",
+              "width": 1201,
+              "height": 1310,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8a26230b7da8ed45899fdf8176289069dd80f3baa65e9f187fd50fb0091de968",
+              "sourceBytes": 1860132,
+              "exportedBytes": 1256200
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/talli/mature/neutral-0785af1c21ae.webp",
+          "neutralSourceSHA256": "0785af1c21ae2422ab78ac18e9b5b316484532fcb2752146d41555ff78fb91d2",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/talli/mature/neutral-0785af1c21ae.webp",
+              "sourceSHA256": "0785af1c21ae2422ab78ac18e9b5b316484532fcb2752146d41555ff78fb91d2",
+              "exportedSHA256": "81376d317c0ea5342842d55534104cc1c571b3f05e826b9e65e9fe9b8b221777",
+              "width": 1254,
+              "height": 1085,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "60d805c5592395f2581eec1f877d4024007a78e593a3a47f946ada5b140204e5",
+              "sourceBytes": 1386981,
+              "exportedBytes": 1010332
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/talli/mature/celebrate-ab39f137f541.webp",
+              "sourceSHA256": "ab39f137f54108ce39bb68ebbeb167238905086f003590d92480a46a5c861ada",
+              "exportedSHA256": "181c8eceea9df4728fef715b1f57db6a4f8fce09d738e6e989d97c3fe6747b07",
+              "width": 1348,
+              "height": 1167,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "702a7d09f116c62eb0dc9b15bd4b88c59b80f89c6b6828250adff424ef473276",
+              "sourceBytes": 1794286,
+              "exportedBytes": 1136306
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/talli/mature/thinking-f465f3123489.webp",
+              "sourceSHA256": "f465f3123489485316e6be82af6e1f0331a6b25090382d6702e161f974aea2ea",
+              "exportedSHA256": "1c0eb64091713665533a4bec79b99eff9da9d1e8eaac76cba74aff425a92d141",
+              "width": 1348,
+              "height": 1167,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "1f88556bd5cb83c7fd603e7d4f7925f4fb7e0b7e6388732e3a0f7de51e190b45",
+              "sourceBytes": 1795876,
+              "exportedBytes": 1141852
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/talli/mature/encouraging-retry-d777cd8fc756.webp",
+              "sourceSHA256": "d777cd8fc7563b5d9141ee62641bca187f78304a77ea41941861839475ce159d",
+              "exportedSHA256": "51432e67d896065eab903fc083b17f8bedfdae5a2cc26dfccb4a8437fd310eca",
+              "width": 1348,
+              "height": 1167,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "75b8148ad6071c6686b183edc52aa9b22f56f33e238a3c0bb72d8506c8f74184",
+              "sourceBytes": 1824746,
+              "exportedBytes": 1162474
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "expansion-2026-11-19/W",
+      "speciesId": "GP-S023",
+      "slug": "zippa",
+      "name": "Zippa",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/zippa/base/neutral-b0f8aca344a3.webp",
+          "neutralSourceSHA256": "b0f8aca344a34d329434bcc032af451469a738ce2ab441b7817ad121d1ae38a1",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/zippa/base/neutral-b0f8aca344a3.webp",
+              "sourceSHA256": "b0f8aca344a34d329434bcc032af451469a738ce2ab441b7817ad121d1ae38a1",
+              "exportedSHA256": "4965c2e453ba970440aef8fb9b4845a57677f490ffbd39d07a60fb5d92eca5f9",
+              "width": 515,
+              "height": 730,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "3eb5158271e2b013df29bd36d1d25e8564130fb641ea07d3e7771f9c02c6f188",
+              "sourceBytes": 462701,
+              "exportedBytes": 336026
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/zippa/base/celebrate-777a587cacec.webp",
+              "sourceSHA256": "777a587cacec400e14d995847bef7425de438044291c612aca5297c64a697c0d",
+              "exportedSHA256": "0cef1528dc4a0cc2cab1f6e69ae089c4e129e7285f64064318d1d3ce8dbbb142",
+              "width": 1053,
+              "height": 1493,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "c80994f3c7c40b2fae2ad4fb90542358a021fe8305246d8788ba89eac1eb17b4",
+              "sourceBytes": 2037557,
+              "exportedBytes": 1384450
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/zippa/base/thinking-adb92600ce86.webp",
+              "sourceSHA256": "adb92600ce861ac3deba92d7f4993143309d93137b5087f66bdd472be301d0ae",
+              "exportedSHA256": "9707d2b60944836c46bc0e456f2b6c65989523b288c6e4f3913f6f1ea58a2736",
+              "width": 1053,
+              "height": 1493,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "8cfe4d79d17b8002cca4a20b9e7a2a5c6042bdcc41cd3d3c062020f916ae5458",
+              "sourceBytes": 2072370,
+              "exportedBytes": 1408172
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/zippa/base/encouraging-retry-dda8c100e77d.webp",
+              "sourceSHA256": "dda8c100e77d536f41fde421a00cd2e613422a03008fab3c8bdc4206b7e67f8e",
+              "exportedSHA256": "2d118abb3869c6f67d25166c34232d765e98a28031603f95599589c20e057ae6",
+              "width": 1053,
+              "height": 1493,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "0173295f7eeb73324251f25af179a9e2dde71ee0cf8b140c5a00fa70d3e43a77",
+              "sourceBytes": 2059732,
+              "exportedBytes": 1391284
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/zippa/mature/neutral-df295181dbce.webp",
+          "neutralSourceSHA256": "df295181dbced5e82f67f329a21c74cb21ec09ab6cefdfd2203ed179061404d0",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/zippa/mature/neutral-df295181dbce.webp",
+              "sourceSHA256": "df295181dbced5e82f67f329a21c74cb21ec09ab6cefdfd2203ed179061404d0",
+              "exportedSHA256": "3f92f90b5614faf105b762c2f1e8cdbe58ac3cfb9f893e4eef2483212a8db48c",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "2579f2ff611d8fa5b6bbc664cd3308beef642f3832f2f0a0b9ffc6d577477ce2",
+              "sourceBytes": 1966908,
+              "exportedBytes": 1236998
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/zippa/mature/celebrate-91c568325e4c.webp",
+              "sourceSHA256": "91c568325e4cc964050f50fbc374bdeab10cf11c7bc9bab1b2c023eb55d135af",
+              "exportedSHA256": "71aaec5bb3e38e0b4bd2ab947e2f161957f095a25d6b9326ed70a0d4de21631f",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4053e3dcb31957ccfac7ccf1e43229cb7bf6a1eaad526ff52564ab6db6c7a5a9",
+              "sourceBytes": 1901322,
+              "exportedBytes": 1203298
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/zippa/mature/thinking-3253323605fa.webp",
+              "sourceSHA256": "3253323605fae23cff974f1759018586d5f0c00a1f76e0b15f17ae1b226e9230",
+              "exportedSHA256": "c83cf068561113b5d488b36931b43439a1598aa3801fd6bcaa81c95857b565b1",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b1a4c4d6f149cd3efa3f2a02091b97c78aa4483de9542605129534dee62ca62b",
+              "sourceBytes": 1923426,
+              "exportedBytes": 1212302
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/zippa/mature/encouraging-retry-f2a920aa3c48.webp",
+              "sourceSHA256": "f2a920aa3c488c66dcd1244dfa28cd387b315d2f2ab37d68908d58872d35da37",
+              "exportedSHA256": "479db2e20b02b6017e3a24dbd609948890c721b6ecee908ea3665045e7904cf7",
+              "width": 1254,
+              "height": 1254,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b7f3150970a66470fd53717c439100d6e3293b88dc8c4f2e2fcbe44dc04401a8",
+              "sourceBytes": 1906982,
+              "exportedBytes": 1210980
+            }
+          }
+        }
+      }
+    },
+    {
+      "characterKey": "expansion-2026-11-19/X",
+      "speciesId": "GP-S024",
+      "slug": "whorl",
+      "name": "Whorl",
+      "forms": {
+        "base": {
+          "neutralFallback": "jems-pals/whorl/base/neutral-6c3dfbd80b7c.webp",
+          "neutralSourceSHA256": "6c3dfbd80b7c185de1078b779c29cbe6a67a720860b25843e2352f77ba28823e",
+          "expressions": {
+            "neutral": {
+              "form": "base",
+              "expression": "neutral",
+              "url": "jems-pals/whorl/base/neutral-6c3dfbd80b7c.webp",
+              "sourceSHA256": "6c3dfbd80b7c185de1078b779c29cbe6a67a720860b25843e2352f77ba28823e",
+              "exportedSHA256": "f59eadb8a8ce018f24e8406003292f103a94955f35d44d20c6615939eb05b10b",
+              "width": 625,
+              "height": 785,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "bb800906f34c1d6397af1d04f213f5667c9a391c9da1435febbaf409ae0ecdd6",
+              "sourceBytes": 526374,
+              "exportedBytes": 383180
+            },
+            "celebrate": {
+              "form": "base",
+              "expression": "celebrate",
+              "url": "jems-pals/whorl/base/celebrate-eceaf6d7d827.webp",
+              "sourceSHA256": "eceaf6d7d827955118c0149078331237c1b06018536814cac3ca9b35d4004084",
+              "exportedSHA256": "9ab35a0e11357ff9801f787da4e99e0e3a97114380aa0d94edaa4ecc0cdbf1ae",
+              "width": 1119,
+              "height": 1406,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "b816287db5a61534c0bc175c98c86b0e4b6aa3b6edb0c3ae0a07f61fa770249d",
+              "sourceBytes": 1841225,
+              "exportedBytes": 1240990
+            },
+            "thinking": {
+              "form": "base",
+              "expression": "thinking",
+              "url": "jems-pals/whorl/base/thinking-0f1bf3f63a3a.webp",
+              "sourceSHA256": "0f1bf3f63a3afbd23b5ee09d58468079256fd2f8a2f32c7910651eb8f84d9b44",
+              "exportedSHA256": "97bde623b0121d0f5d4e95abfb24edbe3bd7ff12ff297deb6e1b875666d830fe",
+              "width": 1119,
+              "height": 1406,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "f5ba967482dc6162faa3f7baf91827f364e97315ebadb90700ff5e310ceb5052",
+              "sourceBytes": 1863151,
+              "exportedBytes": 1252972
+            },
+            "encouraging_retry": {
+              "form": "base",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/whorl/base/encouraging-retry-53fb20bbb17c.webp",
+              "sourceSHA256": "53fb20bbb17c7491b367d0c821416e37c8d2b0599412e02d8f5d3767141b6303",
+              "exportedSHA256": "fd76aadc0f44517e7e1c0495b13e967fbb6685a08f67d59f67a84abd3886cead",
+              "width": 1119,
+              "height": 1406,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "6ccf81d0cc49d2d30670c38fdd0314554fb7e5c8c9be6381483ec2397adb0e2d",
+              "sourceBytes": 1896673,
+              "exportedBytes": 1278682
+            }
+          }
+        },
+        "mature": {
+          "neutralFallback": "jems-pals/whorl/mature/neutral-bcca0e4f1289.webp",
+          "neutralSourceSHA256": "bcca0e4f12891bc89ca1a941fa7ac4c25dbd2aed7226ab4ef5f4a6666d806b85",
+          "expressions": {
+            "neutral": {
+              "form": "mature",
+              "expression": "neutral",
+              "url": "jems-pals/whorl/mature/neutral-bcca0e4f1289.webp",
+              "sourceSHA256": "bcca0e4f12891bc89ca1a941fa7ac4c25dbd2aed7226ab4ef5f4a6666d806b85",
+              "exportedSHA256": "248ddfed3162102f6c23e3e39ae633f5faf11f03cdd4b60dadf5549e86d883c7",
+              "width": 1254,
+              "height": 1100,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "4eba457c785b21d414596190a4bbb0dd3fd836fbf9f10e3eaf39f71d8101b678",
+              "sourceBytes": 1303890,
+              "exportedBytes": 934930
+            },
+            "celebrate": {
+              "form": "mature",
+              "expression": "celebrate",
+              "url": "jems-pals/whorl/mature/celebrate-21aa64920da2.webp",
+              "sourceSHA256": "21aa64920da2d3563c1546f9d5c8af6ab9215a5a1c14c46cbb8ed56dc0a7ad73",
+              "exportedSHA256": "64420959493f33b70fc0c44b45fab478656813dbbda968bce74902fa6dc2bd9b",
+              "width": 1339,
+              "height": 1175,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e14b97805c4cf3f6d15f8e0c93a610f0b1a5a536c824d0a14630cccde4eaca1e",
+              "sourceBytes": 1747586,
+              "exportedBytes": 1080232
+            },
+            "thinking": {
+              "form": "mature",
+              "expression": "thinking",
+              "url": "jems-pals/whorl/mature/thinking-646927e41128.webp",
+              "sourceSHA256": "646927e41128f4f0a15b69fd0f7ad4a14347fa875a006464ab80a995a701c527",
+              "exportedSHA256": "5b0b1c775322549a4be8176fe83e5b17e78a10c26b44b54741013bbffdacbf39",
+              "width": 1339,
+              "height": 1175,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "e717a999a359f1b28e9477cd7cf6fa04480a20d025f1860b80f7ecf5a740fac8",
+              "sourceBytes": 1747360,
+              "exportedBytes": 1065722
+            },
+            "encouraging_retry": {
+              "form": "mature",
+              "expression": "encouraging_retry",
+              "url": "jems-pals/whorl/mature/encouraging-retry-a7f9ea8bd65b.webp",
+              "sourceSHA256": "a7f9ea8bd65b7a78e258c15a7e7f0c1e629e0bf83fcfb31dda3220f8b91805dc",
+              "exportedSHA256": "b8ded32705edc875b4e4b6ffe4d10a301686bc91af5b535d6bbb30d57ccc0059",
+              "width": 1339,
+              "height": 1175,
+              "alpha": false,
+              "decodedPixelParity": true,
+              "decodedRGBA8SHA256": "1ca1ee64379acad95b8468543954effbf7f597affb3a1c6caac63b69b009680a",
+              "sourceBytes": 1728782,
+              "exportedBytes": 1060362
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -139,6 +139,54 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     assert.equal(await page.evaluate(()=>window.palsFixture.cameo.say('practice',0)),false);
     assert.equal(await page.locator('#page-jems-pals').isVisible(),true,'collection remains available when cameo is disabled');
     results.push('owner-safe loading, voluntary encouragement and nonblocking host reactions');
+
+    const manifestRoute='**/jems-pals/manifest.json*';
+    const explorer=page.locator('.pal-expression-explorer');
+    const explorerRetry=explorer.locator('.pal-expression-explorer__body > button');
+    const explorerFailed=()=>page.waitForFunction(()=>{
+      const explorer=document.querySelector('.pal-expression-explorer');
+      const retry=explorer?.querySelector('.pal-expression-explorer__body > button');
+      return retry&&!retry.hidden&&retry.getAttribute('aria-disabled')!=='true'
+        &&explorer.querySelector('[role="status"]').textContent.includes('Pictures could not load');
+    });
+    await page.route(manifestRoute,route=>route.fulfill({status:503,body:'Fixture manifest unavailable'}));
+    await explorer.locator('summary').focus();await page.keyboard.press('Enter');await explorerFailed();
+    assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'expressions','First opening does not move focus to loading or error controls');
+    await explorerRetry.focus();await page.keyboard.press('Enter');await explorerFailed();
+    assert.equal(await explorerRetry.evaluate(button=>document.activeElement===button),true,'A repeated manifest failure retains keyboard retry focus');
+
+    await page.unroute(manifestRoute);
+    let releaseManifest;
+    const delayedManifest=new Promise(resolve=>{releaseManifest=resolve;});
+    await page.route(manifestRoute,async route=>{await delayedManifest;await route.fulfill({status:503,body:'Fixture manifest unavailable'});});
+    await explorerRetry.press('Enter');
+    await page.waitForFunction(()=>document.querySelector('.pal-expression-explorer__body > button')?.getAttribute('aria-disabled')==='true');
+    await page.locator('#outside').focus();releaseManifest();await explorerFailed();
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'outside','Retry completion does not take focus back from another control');
+
+    await page.unroute(manifestRoute);
+    let releaseHiddenManifest;
+    const hiddenManifest=new Promise(resolve=>{releaseHiddenManifest=resolve;});
+    await page.route(manifestRoute,async route=>{await hiddenManifest;await route.fulfill({status:503,body:'Fixture manifest unavailable'});});
+    await explorerRetry.focus();await page.keyboard.press('Enter');
+    await page.waitForFunction(()=>document.querySelector('.pal-expression-explorer__body > button')?.getAttribute('aria-disabled')==='true');
+    await page.evaluate(()=>window.palsFixture.page.hide());await page.locator('#outside').focus();
+    const hiddenResponse=page.waitForResponse(response=>response.url().includes('/jems-pals/manifest.json'));
+    releaseHiddenManifest();await(await hiddenResponse).finished();
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'outside','A retry finishing after navigation does not restore focus into the hidden page');
+    await page.evaluate(()=>window.palsFixture.page.show());await explorerFailed();
+    await page.unroute(manifestRoute);
+    await explorerRetry.focus();await page.keyboard.press('Enter');
+    await page.waitForFunction(()=>document.querySelector('.pal-expression-explorer .pal-artwork-view')?.dataset.state==='ready');
+    assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'expression-character','A successful current keyboard retry continues at the Pal selector');
+
+    const freshPage=await context.newPage();freshPage.on('pageerror',error=>errors.push(error.message));
+    await freshPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
+    await freshPage.locator('.pal-expression-explorer > summary').focus();await freshPage.keyboard.press('Enter');
+    await freshPage.waitForFunction(()=>document.querySelector('.pal-expression-explorer .pal-artwork-view')?.dataset.state==='ready');
+    assert.equal(await freshPage.evaluate(()=>document.activeElement.dataset.palsFocus),'expressions','A successful first open preserves summary focus');
+    await freshPage.close();
+    results.push('manifest retry keyboard focus, repeated failures, successful recovery and no focus theft after navigation or another choice');
     assert.deepEqual(errors,[]);
     fs.writeFileSync(path.join(root,'test-results/pals-ui-results.json'),JSON.stringify({scope:'Synthetic component fixture; not observed child or live award evidence',checks:results,errors},null,2)+'\n');
     console.log(`PASS: ${results.length} Pal component groups: ${results.join('; ')}.`);
