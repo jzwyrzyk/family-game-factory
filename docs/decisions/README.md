@@ -29,6 +29,8 @@ These records explain durable choices without turning chat history into another 
 
 | [Character-first navigation](2026-11-20-character-first-navigation.md) | Character choice before creation, selected human throughout host imagery, compact Menu and permanent private parent-session access | Accepted for implementation; source and production evidence separate | Owner's November 20 deployed-site review and explicit instruction to fix all four points |
 
+| [Gem Pal expression runtime](2026-11-20-pal-expression-runtime.md) | Versioned 184-image original-roster exports, isolated expression previews and a finite Wink Base opacity pilot | Accepted for implementation; release acceptance separate | Owner approved the completed core artwork and integration work, November 20, 2026 |
+
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
 ## When to record a decision

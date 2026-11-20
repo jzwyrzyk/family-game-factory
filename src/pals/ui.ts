@@ -1,6 +1,7 @@
 import { PAL_CATALOG, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
 import './pals.css';
+import { createPalExpressionExplorer } from './expression-explorer';
 
 /** Read-only presentation. Only the trusted coordinator changes ownership or growth. */
 export interface PalsViewState {
@@ -115,7 +116,8 @@ export function createPalsPage(options: PalsPageOptions) {
   const retry = button('Try again', 'retry');
   retry.onclick = () => { void perform(options.onRetry); };
   const content = el('div', 'pals-content');
-  element.append(back, header, notice, message, retry, content);
+  const expressionExplorer = createPalExpressionExplorer({ owner: state.owner });
+  element.append(back, header, notice, message, retry, content, expressionExplorer.element);
 
   function focusKey() {
     const target = document.activeElement;
@@ -366,6 +368,7 @@ export function createPalsPage(options: PalsPageOptions) {
     update(next: PalsViewState) {
       if (disposed) return;
       if (next.owner !== state.owner) {
+        expressionExplorer.updateOwner(next.owner);
         epoch++;
         selection = next.profile?.activeId ?? null;
         localSaving = false;
@@ -380,9 +383,9 @@ export function createPalsPage(options: PalsPageOptions) {
       state = next;
       render();
     },
-    show() { element.hidden = false; element.classList.remove('hidden'); render(); heading.focus({ preventScroll: true }); },
-    hide() { element.hidden = true; element.classList.add('hidden'); if (playTimer) clearTimeout(playTimer); },
-    dispose() { disposed = true; epoch++; if (playTimer) clearTimeout(playTimer); element.remove(); },
+    show() { element.hidden = false; element.classList.remove('hidden'); expressionExplorer.show(); render(); heading.focus({ preventScroll: true }); },
+    hide() { element.hidden = true; element.classList.add('hidden'); expressionExplorer.hide(); if (playTimer) clearTimeout(playTimer); },
+    dispose() { disposed = true; epoch++; expressionExplorer.dispose(); if (playTimer) clearTimeout(playTimer); element.remove(); },
   };
 }
 

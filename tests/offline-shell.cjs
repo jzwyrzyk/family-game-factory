@@ -17,6 +17,8 @@ const {once}=require('node:events');
   const activeBrand=['jems-art/icons/jems-icons.svg',...activeArt];
   for(const asset of activeBrand)assert.ok(cached.includes(new URL(asset,base).href),asset+' is installed before a child first needs it offline');
   assert.ok(!cached.some(x=>x.endsWith('jems-art/hero_gembots.webp')),'unused cover is not downloaded during installation');
+  assert.ok(cached.some(x=>x.endsWith('/jems-pals/manifest.json')),'approved expression manifest is in offline shell');
+  assert.ok(!cached.some(x=>/\/jems-pals\/.*\.webp/.test(x)),'184 Gem Pal pictures are not all downloaded on install');
   const optional=await page.evaluate(async()=>{
    const response=await fetch('./jems-art/hero_gembots.webp');const c=await caches.open((await caches.keys())[0]);
    return response.ok&&!!await c.match(new URL('./jems-art/hero_gembots.webp',document.baseURI).href);

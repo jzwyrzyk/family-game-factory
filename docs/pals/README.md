@@ -6,6 +6,8 @@ The owner requested the complementary companion system, then authorized implemen
 
 The [Gem Pal artwork reference library](art/README.md) records approved concept masters, selected growth references and separately marked expression candidates. It is **not a runtime mapping**. Until exact form versions and Pal species assignments are approved and implemented, the collection retains its provisional token portraits and stable saved-scene IDs.
 
+The [approved core expression library](EXPRESSIONS.md) supplies 184 versioned still images for 23 original individual profiles. **Try Pal expressions** is a read-only preview independent of Glim/Kip/Riff ownership; choosing Grown or a reaction there cannot unlock or equip a companion. The separated [Brio reference](art/characters/brio/README.md) retains its own emotion approval status.
+
 ## Launch collection and eligibility
 
 The first collection contains three equal-capability companions. Their names, IDs, personalities, thresholds and temporary art mappings are defined in [catalog.ts](../../src/pals/catalog.ts).
