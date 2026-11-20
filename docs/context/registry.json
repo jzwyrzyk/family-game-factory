@@ -96,10 +96,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T03:01:29.268Z",
+      "reviewedAt": "2026-11-20T04:17:14.624Z",
       "sourceDigest": "2b74b8ac64d8a5f80eea41e577afb933362153cc194096eb5b41ea084f8d9f5f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled Art Studio evidence with public implementation 6f4cd238 and its exact complete-tree match to local preparation. Retained original per-command test scopes and current private reusable-art behavior.",
+      "reviewReason": "Recorded owner-approved Art Studio merge 20ffb350 with exact tested-tree equality and all eight passing hosted workflows. Product behavior and the local-storage, adapter and acceptance boundaries remain as reviewed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -461,10 +461,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T03:01:29.663Z",
-      "sourceDigest": "0f1cc1686b048c2141b491d5228489b138e185fac54d4f2918be8255b31ab53a",
+      "reviewedAt": "2026-11-20T04:17:14.995Z",
+      "sourceDigest": "9ead7b6c48894e0db8c171cbc67499ba428b26c43b0b4015404679a9f504b847",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded authenticated public implementation 6f4cd238, exact tree c27433f4 and preserved main/original-PR parents. Distinguished local preparation receipts from public source and reserved hosted acceptance for the final PR head.",
+      "reviewReason": "Replaced the PR23 review-candidate disposition with its observed merge time, source/tree identity and hosted acceptance links. Preserved local test history and the separate deployment, provider and physical-device boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
