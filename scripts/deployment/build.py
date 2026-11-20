@@ -16,6 +16,8 @@ import time
 
 PROJECT='family-game-factory-jzw'
 SANDBOX='ghcr.io/jzwyrzyk/family-game-factory-sandbox'
+SANDBOX_SCOPE=['.dockerignore','server/sandbox','server/agent/game-assets.cjs','server/quality/game-quality-evidence.cjs']
+REQUIRED_SANDBOX_FILES=['server/sandbox/Dockerfile','server/sandbox/worker.cjs','server/sandbox/quality-capture.cjs','server/sandbox/source-validator.cjs','server/agent/game-assets.cjs','server/quality/game-quality-evidence.cjs']
 BUILDER='factory-service-builder@'+PROJECT+'.iam.gserviceaccount.com'
 SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/creation/model.ts','src/creation/projects.ts']
 REQUIRED_APIS={'cloudbuild.googleapis.com','artifactregistry.googleapis.com','logging.googleapis.com','storage.googleapis.com','iam.googleapis.com'}
@@ -231,7 +233,9 @@ def main():
         run(['git','cat-file','-e',sha+'^{commit}'],root)
         image=SANDBOX+':'+sha
         with tempfile.TemporaryDirectory(prefix='factory-sandbox-build-') as tmp:
-            stage_sources(root,tmp,sha,['.dockerignore','server/sandbox'])
+            stage_sources(root,tmp,sha,SANDBOX_SCOPE)
+            missing=[name for name in REQUIRED_SANDBOX_FILES if not (Path(tmp)/name).is_file()]
+            if missing:raise RuntimeError('Reviewed sandbox source incomplete: '+', '.join(missing))
             run(['docker','buildx','version'])
             run(['docker','buildx','inspect','--bootstrap'])
             run(['env','DOCKER_BUILDKIT=1','docker','build','--pull','--label','org.opencontainers.image.revision='+sha,
