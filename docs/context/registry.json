@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T21:18:34.000Z",
-      "sourceDigest": "c6d2244f12e3c89f07e95b5dc7827053c251ef823f2d528fd6c27cabafeb4fec",
+      "reviewedAt": "2026-11-20T21:46:00.000Z",
+      "sourceDigest": "91f4afb22c35b06e03a38ebdb047f056f0fac8d18c4b01e6d8c71df4dab7f877",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed issue #93 adult AI continuity: existing deployed services and private config are protected from the historical inactive bootstrap before any mutation; read-only operator audit checks ready service traffic, Adult policy, private main/tag/variable and exact positive CEL WIF identity equalities, with an optional pinned private config read that never prints secrets. Added negated-identity, pin drift, config and activation offline regression tests; updated the owner release runbook and delivery evidence. Neither provider activation nor a real cloud release is claimed.",
+      "reviewReason": "Reviewed user-supplied production Cloud Run gateway traffic: status lists two historical revisions without active percent and one latest ready revision serving 100%. Corrected read-only continuity audit to ignore only null/zero history, preserving strict checks for ready/current serving revision and rejecting positive split traffic. Added regression fixture reproducing observed gateway shape and documented audit limitation; no runtime/config/auth/provider change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
