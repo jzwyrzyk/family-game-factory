@@ -1,6 +1,6 @@
 # Mind Your Jems! — the illustrated wait-time arcade
 
-Mind Your Jems is a prebuilt, local mini-game available only after Studio has acknowledged a background game build. The score is play currency for this session. It does not represent learning progress, influence build progress, or change the child's saved game.
+Mind Your Jems is a prebuilt, local mini-game available only after Studio has acknowledged a background game build. Its **This round** score and stars belong to the current mini-game session, separate from the lifetime gems shown in **My rewards**. They do not represent learning progress, influence build progress, or change the child's saved game.
 
 ## Visual contract
 
@@ -24,17 +24,20 @@ Production assets live in `public/art/mind-your-jems/`. They are reusable illust
 ## Child experience
 
 1. **Mine:** tap a crystal or activate it with the keyboard. Most are worth 1 Jem; golden and sunset crystals are worth 3. The bag holds 8.
-2. **Bank:** tap the cart or **Bank my Jems**. Banked Jems remain safe through every shake. Actual deposits advance the next 25-Jem star.
+2. **Bank:** tap the cart or **Bank my Jems**. Deposits add to **This round** and remain safe through every shake during that round. Actual deposits advance the next 25-Jem round star.
 3. **Notice:** after 11–18 seconds, the mountain has a big idea. A 3.6-second warning gives time to bank and grab.
 4. **Grab:** visibly hold the hair to avoid a funny slide. All unbanked Jems still fly away in the shake; banking is the only way to preserve them.
 5. **Continue:** shaking lasts 1.25 seconds, followed by a fresh mining period. There is no death, payment or recovery purchase.
 6. **Return:** a verified playable revision enables **Play my game**. The child chooses when to leave. Readiness never interrupts a turn or opens a preview automatically.
 
-Closing resets this mini-game's scores. Help and a hidden browser tab cancel an approaching hazard without silently losing carried Jems. Returning gives a fresh warning interval. A profile change closes the arcade. Timers and optional sound are cleaned up on close, and an old native close event cannot erase an immediately reopened session.
+Closing resets this mini-game's scores; reopening starts a fresh round. The Help panel explicitly explains that these Jems and stars are round scores and do not add to My rewards. This wording clarifies the existing session boundary without adding rewards, persistence, conversion or a new economy.
+
+Help and a hidden browser tab cancel an approaching hazard without silently losing carried Jems. Returning gives a fresh warning interval. A profile change closes the arcade. Timers and optional sound are cleaned up on close, and an old native close event cannot erase an immediately reopened session.
 
 ## Studio integration
 
 - The launch control appears after a durable queued/building/testing job is acknowledged. An already-open arcade receives confirmed readiness and offers the explicit handoff. Typing an idea alone does not offer the arcade.
+- This remains a wait-time activity, launched from the active build banner or background-build shelf. It has no standalone tile in the ordinary Ready to Play collection and is not offered there when no eligible build is active.
 - Learning activity guards still apply. Launch stops speech and pauses the previous game using Studio's existing saved-scene mechanism.
 - Studio owns job polling, retry, cancellation and the authoritative `readyExperiment` check. Labels show observed phases, including interrupted connections; no invented percentages or completion times.
 - The ready handoff opens the chosen project without first loading its older working preview, then revalidates and opens the ready candidate once.

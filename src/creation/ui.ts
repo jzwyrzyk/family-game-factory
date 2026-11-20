@@ -1,6 +1,6 @@
 import { SceneEngine, type SceneSnapshot } from './engine';
 import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
-import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset } from './projects';
+import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace } from './storage';
 import { CREATION_CHALLENGES, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge } from './challenges';
 import { profileStorage } from '../adult-pilot/storage';
@@ -51,11 +51,13 @@ export function installCreationStudio(host: Host) {
     <div id="creationStatus" class="creation-status" role="status" aria-live="polite"></div>
     <div id="creationShelf">
       <div class="creation-mode-switch" role="group" aria-label="Choose how to create"><button id="creationFreeMode" aria-pressed="true">${iconMarkup('star')} Make your own</button><button id="creationChallengeMode" aria-pressed="false">${iconMarkup('grid')} Rebuild a scene</button></div>
-      <section id="creationFreeShelf"><div class="creation-shelf-heading"><div><h2>Your next adventure starts here</h2><p>Choose a world. You’re the director.</p></div><span class="creation-small-pill">MOVE · TALK · DANCE · PLAY</span></div><div id="creationStarters" class="creation-starters"></div><section id="creationSavedSection"><div class="creation-shelf-heading"><h2>My scenes</h2><p>Pick up where your imagination left off.</p></div><div id="creationSaved" class="creation-saved-grid"></div></section></section>
+      <div class="creation-shelf-tools"><button id="creationShelfImport" class="creation-button">${iconMarkup('book')} Open a scene file</button></div>
+      <section id="creationFreeShelf"><div class="creation-shelf-heading"><div><h2>Your next adventure starts here</h2><p>Choose a world. You’re the director.</p></div><span class="creation-small-pill">MOVE · TALK · DANCE · PLAY</span></div><div id="creationStarters" class="creation-starters"></div></section>
       <section id="creationChallengeShelf" hidden><div class="creation-shelf-heading"><div><h2>Watch it. Wonder. Make it happen.</h2><p>Rebuild the scene your way. Different blocks can tell the same story.</p></div><span class="creation-small-pill">SMALL CHALLENGES · REAL IDEAS</span></div><div id="creationChallenges" class="creation-challenge-grid"></div></section>
+      <section id="creationSavedSection"><div class="creation-shelf-heading"><h2>My scenes</h2><p>Your stories and scene challenges, ready to continue.</p></div><div id="creationSaved" class="creation-saved-grid"></div></section>
     </div>
     <div id="creationWorkspace" hidden>
-      <div class="creation-project-bar"><button id="creationBack" class="creation-button creation-quiet">${iconMarkup('arrow', 'jems-icon--back')} My scenes</button><label class="creation-title-label"><span class="creation-sr">Scene title</span><input id="creationTitle" maxlength="80" aria-label="Scene title"></label><span id="creationSaveState" class="creation-save-state">Saved on this device</span><div class="creation-version-actions"><button id="creationUndo" class="creation-button" title="Undo last edit">${iconMarkup('undo')} <span>Undo</span></button><button id="creationRedo" class="creation-button" title="Redo last edit">${iconMarkup('undo', 'jems-icon--mirror')} <span>Redo</span></button><button id="creationKeep" class="creation-button creation-primary">${iconMarkup('check')} Keep this version</button><details class="creation-more" id="creationMore"><summary aria-label="More scene tools">${iconMarkup('menu')}</summary><div><button id="creationCopy">${iconMarkup('add')} Make a copy</button><button id="creationDownload">${iconMarkup('download')} Download editable scene</button><button id="creationImportButton">${iconMarkup('book')} Open scene file</button><input id="creationImport" type="file" accept="application/json,.json" hidden><button id="creationVideo">${iconMarkup('download')} Save a video</button><button id="creationHistory">${iconMarkup('clock')} See saved versions</button><button id="creationDelete">${iconMarkup('trash')} Delete this scene</button></div></details></div></div>
+      <div class="creation-project-bar"><button id="creationBack" class="creation-button creation-quiet">${iconMarkup('arrow', 'jems-icon--back')} My scenes</button><label class="creation-title-label"><span class="creation-sr">Scene title</span><input id="creationTitle" maxlength="80" aria-label="Scene title"></label><span id="creationSaveState" class="creation-save-state">Saved on this device</span><div class="creation-version-actions"><button id="creationUndo" class="creation-button" title="Undo last edit">${iconMarkup('undo')} <span>Undo</span></button><button id="creationRedo" class="creation-button" title="Redo last edit">${iconMarkup('undo', 'jems-icon--mirror')} <span>Redo</span></button><button id="creationKeep" class="creation-button creation-primary">${iconMarkup('check')} Keep this version</button><details class="creation-more" id="creationMore"><summary aria-label="More scene tools">${iconMarkup('menu')}</summary><div><button id="creationCopy">${iconMarkup('add')} Make a copy</button><button id="creationDownload">${iconMarkup('download')} Download editable scene</button><button id="creationImportButton">${iconMarkup('book')} Open scene file</button><button id="creationVideo">${iconMarkup('download')} Save a video</button><button id="creationHistory">${iconMarkup('clock')} See saved versions</button><button id="creationDelete">${iconMarkup('trash')} Delete this scene</button></div></details></div></div>
       <div id="creationSource" class="creation-source" hidden></div>
       <div id="creationRecovery" class="creation-recovery" hidden><span>You have unfinished changes saved on this device.</span><button id="creationResumeDraft" class="creation-button">${iconMarkup('edit')} Resume my draft</button><button id="creationDiscardDraft" class="creation-button">${iconMarkup('undo')} Use saved version</button></div>
       <section id="creationChallengeBrief" class="creation-challenge-brief" hidden></section>
@@ -70,12 +72,14 @@ export function installCreationStudio(host: Host) {
       </div>
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
+    <input id="creationImport" type="file" accept="application/json,.json" hidden>
     <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><div><span class="creation-eyebrow">EVERY STORY NEEDS A CAST</span><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2></div><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'));
   let scene: CreationProject | null = null, entryId = '', revisionId = '', sceneOwner = '', selectedActor = '', selectedProgram = '';
   let sourceSessionId = '', challengeId: string | null = null, hintUsed = false, targetMode = false, visible = false;
+  let viewEpoch = 0;
   let engine: SceneEngine | null = null, frame = 0, last = 0, checkpointTimer: ReturnType<typeof setInterval> | undefined;
   let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false, recoveryPending = false;
   type Recording = { recorder: MediaRecorder; stream: MediaStream; chunks: Blob[]; owner: string; title: string; cancelled: boolean; timer?: ReturnType<typeof setTimeout> };
@@ -147,6 +151,7 @@ export function installCreationStudio(host: Host) {
   }
   function loadScene(id: string) {
     const loaded = store().load(id, owner());
+    viewEpoch++;
     status(''); $<HTMLDetailsElement>('creationMore').open = false;
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
     selectedActor = scene.actors[0]?.id || ''; selectedProgram = scene.programs.find(p => p.actorId === selectedActor)?.id || '';
@@ -162,8 +167,9 @@ export function installCreationStudio(host: Host) {
   }
   function enter() { if (!host.enter()) return false; visible = true; page.classList.remove('hidden'); startCheckpointTimer(); return true; }
   function open(id?: string) { act(() => { if (!enter()) return; if (id) loadScene(id); else shelf(); }); }
+  function openChallenges() { act(() => { if (!enter()) return; shelf('challenge'); }); }
   function shelf(mode: 'free' | 'challenge' = 'free') {
-    if (locked()) return; saveVersion(); stop(); scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
+    if (locked()) return; saveVersion(); stop(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
     $('creationHeading').textContent = 'Little blocks. Big possibilities.'; $('creationSubtitle').textContent = 'Make a story move. Give a character an idea. See what happens.';
     $('creationFreeShelf').hidden = mode !== 'free'; $('creationChallengeShelf').hidden = mode !== 'challenge';
@@ -172,6 +178,17 @@ export function installCreationStudio(host: Host) {
   }
   function create(kind: 'dragon' | 'buckets' | 'robot' | 'blank') { const project = store().create(owner(), createStarterProject(kind)); loadScene(project.id); }
   function challenge(id: string) { const project = store().create(owner(), { ...createChallengeStarter(id), id: uid() }, { challengeId: id }); loadScene(project.id); }
+  function scenesByActivity() {
+    const current = store(), projects = current.list(owner()), data = current.read();
+    const recent = new Map(projects.map(project => [project.id, Date.parse(project.updatedAt)]));
+    for (const draft of data.drafts) if (recent.has(draft.projectId)) recent.set(draft.projectId, Math.max(recent.get(draft.projectId)!, Date.parse(draft.updatedAt)));
+    for (const attempt of data.attempts) if (recent.has(attempt.projectId)) recent.set(attempt.projectId, Math.max(recent.get(attempt.projectId)!, Date.parse(attempt.checkedAt)));
+    return projects.sort((a, b) => recent.get(b.id)! - recent.get(a.id)!);
+  }
+  function continueChallenge(id: string) {
+    const latest = scenesByActivity().find(project => project.challengeId === id);
+    if (latest) loadScene(latest.id); else challenge(id);
+  }
   function art(assetId: string) {
     const asset = creationAsset(assetId), wrap = node('span', 'creation-actor-art');
     if (asset?.url) { const img = node('img'); img.src = asset.url; img.alt = ''; wrap.append(img); }
@@ -191,8 +208,9 @@ export function installCreationStudio(host: Host) {
       const info = node('span', 'creation-starter-copy'); info.append(node('strong', '', name), node('span', '', copy), iconNode('b', '', 'arrow', 'Make a scene'));
       button.append(image, info); button.onclick = () => act(() => create(kind)); starters.append(button);
     }
+    const projects = scenesByActivity();
     const saved = $('creationSaved'); saved.replaceChildren();
-    for (const project of store().list(owner())) {
+    for (const project of projects) {
       const loaded = store().load(project.id, owner()); const button = node('button', 'creation-saved-card'); button.type = 'button'; button.dataset.scene = project.id;
       const thumb = art(loaded.scene.actors[0]?.assetId || 'gem');
       const copy = node('span'); copy.append(node('strong', '', project.title), node('small', '', project.challengeId ? 'Scene challenge · continue' : loaded.draft ? 'Unfinished ideas saved' : project.keptId ? 'A scene you kept' : 'Your work in progress'));
@@ -201,10 +219,18 @@ export function installCreationStudio(host: Host) {
     $('creationSavedSection').hidden = !saved.childElementCount;
     const challenges = $('creationChallenges'); challenges.replaceChildren();
     CREATION_CHALLENGES.forEach((item, index) => {
+      const choice = node('div', 'creation-challenge-choice');
+      const latest = projects.find(project => project.challengeId === item.id);
       const button = node('button', 'creation-challenge-card'); button.type = 'button'; button.dataset.challenge = item.id;
       const stamp = node('span', 'creation-challenge-stamp', ['↗', '↻', '☝', '✦', '⑂'][index] || '◎');
-      button.append(stamp, node('small', '', 'SCENE ' + String(index + 1).padStart(2, '0')), node('strong', '', item.title), node('p', '', item.brief), node('span', 'creation-challenge-concepts', item.concepts.join(' · ')), iconNode('b', '', 'arrow', 'Watch & rebuild'));
-      button.onclick = () => act(() => challenge(item.id)); challenges.append(button);
+      button.append(stamp, node('small', '', 'SCENE ' + String(index + 1).padStart(2, '0')), node('strong', '', item.title), node('p', '', item.brief), node('span', 'creation-challenge-concepts', item.concepts.join(' · ')), iconNode('b', '', 'arrow', latest ? 'Continue my scene' : 'Watch & rebuild'));
+      button.onclick = () => act(() => continueChallenge(item.id)); choice.append(button);
+      if (latest) {
+        const fresh = iconNode('button', 'creation-button creation-quiet', 'add', 'Start a new scene'); fresh.type = 'button'; fresh.dataset.challengeNew = item.id;
+        fresh.setAttribute('aria-label', 'Start a new ' + item.title + ' scene');
+        fresh.onclick = () => act(() => challenge(item.id)); choice.append(fresh);
+      }
+      challenges.append(choice);
     });
   }
   function renderSource() {
@@ -425,7 +451,7 @@ export function installCreationStudio(host: Host) {
     checkpointTimer = setInterval(() => { if (!isCurrent() || targetMode || FG.learning.active || engine?.snapshot().status !== 'running') return; const wasRunning = true; learningThen(() => { if (wasRunning && engine?.snapshot().status === 'paused') { engine.resume(); animate(); } }); }, 15000);
   }
   function leave() {
-    if (!visible) return; stop(); clearInterval(checkpointTimer); visible = false;
+    if (!visible) return; stop(); clearInterval(checkpointTimer); visible = false; viewEpoch++;
     $<HTMLDialogElement>('creationActorDialog').close(); $('creationLearning').hidden = true;
   }
   $('creationHome').onclick = () => act(() => { saveVersion(); host.home(); });
@@ -458,10 +484,25 @@ export function installCreationStudio(host: Host) {
   $('creationCopy').onclick = () => act(() => { assertEditing(); saveVersion(); const copied = store().copy(entryId, sceneOwner, scene!.title + ' copy'); loadScene(copied.id); });
   $('creationDownload').onclick = () => act(() => { assertEditing(); download(new Blob([JSON.stringify(scene, null, 2)], { type: 'application/json' }), 'jems-scene.json'); });
   $('creationVideo').onclick = () => act(() => { if (recording) { if (recording.recorder.state !== 'inactive') recording.recorder.stop(); return; } run(true); });
-  $('creationImportButton').onclick = () => act(() => { assertEditing(); $<HTMLInputElement>('creationImport').click(); });
+  function assertImportReady() {
+    if (scene) { assertEditing(); return; }
+    if (!visible) throw Error('Open Create & code before opening a scene file.');
+    if (locked()) throw Error('Your learning activity is still open.');
+  }
+  const chooseImport = () => act(() => { assertImportReady(); $<HTMLInputElement>('creationImport').click(); });
+  $('creationImportButton').onclick = chooseImport;
+  $('creationShelfImport').onclick = chooseImport;
   $('creationImport').onchange = async () => {
-    const input = $<HTMLInputElement>('creationImport'), file = input.files?.[0], capturedOwner = owner(); if (!file) return;
-    try { assertEditing(); if (file.size > 500000) throw Error('This scene file is too large.'); const imported = validateCreationProject(JSON.parse(await file.text())); if (owner() !== capturedOwner || !visible) return; assertEditing(); const project = store().create(owner(), { ...imported, id: uid(), provenance: { ...imported.provenance, createdBy: 'assisted' } }); loadScene(project.id); status('Your scene file is open as a new project.'); } catch (error) { status((error as Error).message, true); } finally { input.value = ''; }
+    const input = $<HTMLInputElement>('creationImport'), file = input.files?.[0], capturedOwner = owner(), capturedView = viewEpoch; if (!file) return;
+    try {
+      assertImportReady(); if (file.size > 500000) throw Error('This scene file is too large.');
+      const contents = await file.text();
+      if (owner() !== capturedOwner || !visible || viewEpoch !== capturedView) return;
+      const imported = validateEditableProject(JSON.parse(contents));
+      assertImportReady(); saveVersion();
+      const project = store().create(owner(), { ...imported, id: uid(), provenance: { ...imported.provenance, createdBy: 'assisted' } });
+      loadScene(project.id); status('Your scene file is open as a new project.');
+    } catch (error) { if (owner() === capturedOwner && visible && viewEpoch === capturedView) status((error as Error).message, true); } finally { input.value = ''; }
   };
   $('creationDelete').onclick = () => act(() => { assertEditing(); if (!confirm('Delete this scene and all of its versions from this device?')) return; store().remove(entryId, sceneOwner); publishSourceEvidence({kind:'clear-creation',owner:sceneOwner,projectId:entryId}); dirty = false; scene = null; shelf(); });
   $('creationHistory').onclick = () => act(() => {
@@ -504,7 +545,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { stop(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
   const api = {
-    open,
+    open, openChallenges,
     fromStudio(session: StudioSession, revision?: SourceRevision, manifest?: unknown) {
       // The caller still owns the visible Studio surface until entry succeeds.
       // Unsupported sources and unreadable collections must report there.

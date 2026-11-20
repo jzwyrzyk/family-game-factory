@@ -14,6 +14,8 @@ Each child can choose one of two equally capable characters, **Spark** or **Nova
 
 The dedicated **My journey** page is always available from navigation. The home **My jems** area provides a compact link back to it. The page shows the current earned level, the character at that stage, a short next step, and all four stages. Future artwork can be explored, but a preview must be labeled and must leave the actual earned level visible.
 
+When the current player has an unfinished rough or cut project, the primary action is **Continue my jem**. Studio considers only that player's unarchived projects without a queued, building or testing job, preferring a cut project before a rough one. It resolves the eligible project again when the button is activated. A cut project opens **My tests**; a rough project opens **My ideas**. The action resumes the same saved session without automatically playing a game, starting a build, or choosing Keep. With no eligible project, **Make a jem** opens a new idea. Previewing a future outfit does not change this current-player action.
+
 The original PR57 scope extends the existing verified celebration layer from PR #33 without a separate points economy. The later Rewards extension is documented above. Neither maker rank nor that extension introduces spendable currency, streaks, rankings, daily pressure, child comparisons, or an academic proficiency claim. **Gem Master** means the child has completed the saved making cycle in three different projects. Learning evidence and game scores stay independent.
 
 ## Four levels, three kinds of project evidence
@@ -54,6 +56,8 @@ Putting a project away preserves its saved evidence, so an archived polished pro
 
 **Clear chat on this device** clears the conversation, design observations, and dependent keep receipts. It retains working game versions and the existing saved test prompts/notes, matching the Studio's retention behavior. A retained child test prompt can still qualify as rough; a retained child test note can still qualify as cut. The erased keep receipts cannot leave that project polished or keep its contribution toward Gem Master alive. A character choice is independent of clearing a project's chat.
 
+The confirmation explains that removing this making evidence can lower the maker level and change the displayed outfit. It also states that previously earned lifetime gems, saved game versions and remote copies remain. The warning makes the existing erasure rules visible; it does not change the rank or reward policy.
+
 Storage failures must remain visible and retryable. Do not close the character picker, switch the visible selected character, or emit a milestone when the corresponding notebook write fails. Keep errors must preserve the existing working game and must not fabricate a receipt.
 
 ## Art and layout
@@ -81,7 +85,7 @@ Keep the primary interface to short labels and one next step:
 - Character action: **Choose character** / **Change character**
 - Picker heading: **Choose your maker**
 - Choice names: **Spark**, **Nova**
-- Main action: **Make a jem** / **Make something new**
+- Main action: **Continue my jem** when an eligible unfinished project exists; otherwise **Make a jem**
 - Preview action: **Back to my level**
 - Future-stage marker: **Preview**
 
@@ -125,8 +129,10 @@ npm run test:gem-journey
 - An empty account, honest future-stage previews, and both persisted character choices.
 - Character save failure and retry, keyboard dismissal/focus, and owner isolation.
 - Real rough/cut/polished progression and a single Gem Master transition.
+- Rough and cut next-step actions resume the exact saved session in My ideas or My tests without creating another project.
 - No milestone replay on viewing, reloading, or switching profiles.
 - Archive/restore retention and erasure of dependent polished credit.
+- Clear-chat confirmation explains the possible maker-level/outfit reduction and retained lifetime gems; clearing preserves the gem total.
 - Removing the last reflection on a kept test while another unkept test remains: immediate level/art downgrade, no cross-test credit, and no downgrade celebration.
 - No mutation of learning records or paid build request from this local workflow.
 - Desktop, tablet, mobile, 320-pixel width, 200% CSS zoom, and reduced motion.

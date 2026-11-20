@@ -1,16 +1,30 @@
 # Studio-first homepage — product rationale and acceptance
 
 ## Decision
-Make the Studio library the default at `/`. Keep `?studio=1` as a backward-compatible alias and `?arcade=1` as a deliberate, non-advertised legacy rollback path. This is a **frontend-only change**. Do not change the local game engine, child-specific storage, learning cadence, conversation privacy gates, existing version history, Cloud Run deployments, or paid AI access.
+
+Make the Studio library the default at `/`. Keep `?studio=1` as a backward-compatible alias and `?arcade=1` / `?studio=0` as deliberate legacy compatibility and rollback paths. Legacy mode includes a visible **Open current Jems** link back to the modern experience. It removes the active legacy mode flags while preserving unrelated query parameters and the URL hash. This is a **frontend-only change**. Do not change the local game engine, child-specific storage, learning cadence, conversation privacy gates, existing version history, Cloud Run deployments, or paid AI access.
 
 ## Child mental model
+
 1. **I have an idea:** “Invent a game” opens the existing conversational Studio. Talking or saving an idea must not imply a build was completed; “Try a change” remains separate.
-2. **I want to have fun now:** six illustrated developer favorites are all genuinely playable, each whole card clickable, in a predictable 3-by-2 desktop / 2-by-3 mobile layout.
+2. **I want to have fun now:** seven illustrated developer favorites are playable from whole-card targets on a responsive desktop and mobile shelf.
 3. **I already started something:** a compact, recognizable Continue row appears only when real saved work exists. Saved creations remain selectable and segregated by the active player.
 4. **I want to keep exploring:** the Studio's My Games button always returns here. My Powers and family settings remain available, without becoming competing first-screen calls to action.
 5. **Something takes time or is unavailable:** the existing nonmodal build shelf preserves play during an actual pending build; the homepage never promises new AI builds when the private builder is unavailable.
+6. **I want an earlier idea or drawing:** **Saved ideas & drawings** opens the retained collection, with an explicit **My Games** button to return.
+
+## Saved ideas and drawings remain reachable
+
+The seven modern header destinations stay **My Games**, **Create**, **Create & code**, **Try an idea**, **My journey**, **My rewards**, and **My Powers**. **Saved ideas & drawings** is a supporting action on the homepage, below the Continue area. It opens the existing My Creations page through the guarded Studio navigation; it does not require a legacy URL or replace the modern navigation.
+
+Preserve the collection's existing ownership semantics. **Our idea notebook** remains shared among family profiles, including older ideas without an assigned profile. **My drawings** remains specific to the current player. Modern Studio games continue to use their existing per-player notebook and revision storage. Restoring this route does not migrate records, assign ownership to older ideas, or change their stored text.
+
+Entry saves pending Studio and Creation work before changing the visible page. A save failure keeps the current work visible and recoverable. The existing learning guard and page lifecycle still control transitions. Focus moves to the collection heading on entry and to the homepage heading on its **My Games** return. Changing players keeps the existing return-home behavior; reopening the collection shows that player's drawings alongside the shared family ideas.
+
+The source owners remain the [Studio navigation](../../src/studio/ui.ts), [original idea notebook](../../src/legacy/ui.js), and [private drawing controls](../../src/assets/ui.ts). The collection can be empty without hiding its drawing upload or return action. Its light-panel descriptions and empty-state copy use the existing muted brand ink; the dark notebook cards retain their light text. The default-mode regression checks computed text contrast of at least 4.5:1 for both surfaces.
 
 ## Visual design system
+
 - Single dominant violet create surface; calm lilac/blue ambient background; white supporting cards with gentle shadows.
 - Scannable five-to-seven-word phrases and short verb-led actions, not a separate form, Remix navigation, or parent-facing jargon on the first screen.
 - Full-card color-coded native artwork/illustrations; titles are text, never image-only. No autoplay sound, moving hero, loading gimmick, or external font/image trackers.
@@ -18,13 +32,17 @@ Make the Studio library the default at `/`. Keep `?studio=1` as a backward-compa
 - Keyboard-visible high-contrast focus, 44px+ essential touch targets, reduced-motion support, no horizontal overflow at 390px, no stolen focus when build finishes.
 
 ## Research-grounded choices
+
 - Nielsen Norman Group, [Children’s UX](https://www.nngroup.com/articles/childrens-websites-usability-issues/): children aged 6–8 differ substantially from 9–12, and redundant navigation and long reading burdens are especially problematic.
 - Nielsen Norman Group, [Homepage design principles](https://www.nngroup.com/articles/homepage-design-principles/): simplify first-screen decisions and make the value and primary action obvious.
 - Nielsen Norman Group, [Visual design principles](https://www.nngroup.com/articles/principles-visual-design/): use scale, contrast, proximity and balance to organize attention.
 - W3C [WCAG 2.2](https://www.w3.org/TR/wcag/): minimum target-size and focus guidance; this implementation intentionally targets larger, 44px actions for child touch use.
 
 ## Automated and manual gates
-- `npm test` must pass at the exact PR head, including the new `tests/homepage-entry.cjs` contract, existing Studio/voice/continuity/learning/game suites and explicit old Arcade regression tests.
+
+- `npm test` must pass at the exact PR head, including the `tests/homepage-entry.cjs` contract, existing Studio/voice/continuity/learning/game suites and explicit old Arcade regression tests.
+- After building the production bundle, run `npm run test:navigation-continuity`. The [default-mode regression](../../tests/navigation-continuity.cjs) covers desktop and 390px entry/return, preserved historical family ideas, player-specific drawings, reload, empty collections, draft-save failure/retry, the seven modern destinations, and a visible exit from both legacy modes. It uses synthetic local records and unavailable provider configuration; it does not establish live-service, physical-device or child acceptance.
+- Inspect `test-results/navigation-collection-desktop.png` and `navigation-collection-phone.png` for the restored collection. The regression also captures a failure screenshot if a journey fails. Legacy-only feature tests remain useful, but do not prove discoverability from the normal homepage.
 - Inspect `test-results/homepage-desktop.png` and `homepage-mobile.png` at real rendered viewport sizes, including two-column card widths, typography wraps, contrast, dropdown layering, and visible scroll affordances.
 - Manually check keyboard only, VoiceOver/TalkBack, iPad portrait/landscape, small Android, 200% zoom, two child profiles, local storage full/denied, poor/offline network, parent controls and game exit.
 - Actual children aged 6–8 and 9–12 should attempt unaided: **play a favorite**, **invent an idea**, **continue an existing game**, **return to My Games**. Observe mis-taps, wrong navigation, first-action latency and interpretation of build availability; automated screenshots do not establish age appropriateness.
@@ -32,7 +50,7 @@ Make the Studio library the default at `/`. Keep `?studio=1` as a backward-compa
 
 ## Discoverable Math and English practice
 
-The homepage now has a compact **Learning adventure** Math/English control, repeated in **My Powers** before voluntary practice. The grown-up chooses Math only, English only or **Both — child can switch**. The control is visible with the alternate subject disabled when Both is not enabled; it is also disabled while a question is active. Switching selects the subject for future questions, is saved to the current child profile, survives reload, and does not reset separate learning records or the shared required-checkpoint budget. Parent Controls display both subject reports when Both is enabled.
+The homepage has a compact **Learning adventure** Math/English control when **Both — child can switch** is enabled. The grown-up chooses Math only, English only or Both. **My Powers** also displays the subject choices before voluntary practice, with switching disabled when the parent selected only one subject. Subject switching is disabled while a question is active. Switching selects the subject for future questions, is saved to the current child profile, survives reload, and does not reset separate learning records or the shared required-checkpoint budget. Parent Controls display both subject reports when Both is enabled.
 
 Both means children can **choose** the next subject; there is no forced alternation, no Off mode, and no new claims of curriculum completeness. Existing profiles retain their previously chosen subject and restriction until a grown-up enables Both.
 
