@@ -98,6 +98,8 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await page.locator('.art-picture').waitFor({state:'visible'});await page.locator('[data-edge="left"]').fill('10');await page.locator('[data-edge="left"]').dispatchEvent('change');
   await page.locator('[data-turn]').click();await page.locator('.art-picture [data-name]').fill('Jellybean close-up');
   await page.locator('.art-picture [data-save]').click();await page.locator('.art-picture').waitFor({state:'detached'});
+  await page.waitForFunction(()=>document.activeElement?.id==='artDetailTitle');
+  assert.equal(await page.locator('#artDetailTitle').textContent(),'Jellybean close-up','saving a picture returns focus to its new artwork, after the editor closes');
   const after=await count(page);assert.equal(after.length,2);const original=after.find(item=>item.id===before.id),copy=after.find(item=>item.sourceId===before.id);assert.equal(original.sha256,before.sha256,'picture editing preserves original hash');assert.ok(copy&&copy.sha256!==before.sha256,'picture tools save actual transformed bytes as derivative');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).revisions.find(r=>r.drawingRigId)?.drawingRigId),originalBinding,'picture edits leave saved ride binding unchanged');
   await upload(page,'Mochi monster.png','character');await page.getByLabel('Artwork collection',{exact:true}).selectOption('character');await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');

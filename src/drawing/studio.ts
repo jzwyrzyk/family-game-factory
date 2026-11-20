@@ -31,6 +31,17 @@ export function installArtStudio(host:Host){
   const release=()=>{urls.forEach(URL.revokeObjectURL);urls=[];};
   const imageUrl=(item:Drawing,thumbnail=false)=>{const url=URL.createObjectURL(thumbnail&&item.preview?new Blob([item.preview],{type:'image/png'}):drawingBlob(item));urls.push(url);return url;};
   function current(capturedOwner:string,capturedEpoch=epoch){return visible&&owner()===capturedOwner&&capturedEpoch===epoch;}
+  function focusSelectedArtwork(artId:string,capturedOwner:string,capturedEpoch:number){
+    if(!current(capturedOwner,capturedEpoch)||selected!==artId)return;
+    const pane=$('artDetails'),title=pane.querySelector<HTMLElement>('#artDetailTitle');
+    if(pane.hidden||!title)return;
+    // Drawing and picture tools call onSaved before closing their modal. Let
+    // that close finish before moving focus into the newly selected artwork.
+    const editor=document.querySelector<HTMLDialogElement>('dialog.art-picture[open],dialog.drawing-paint[open]');
+    if(editor){editor.addEventListener('close',()=>queueMicrotask(()=>focusSelectedArtwork(artId,capturedOwner,capturedEpoch)),{once:true});return;}
+    if(innerWidth<850)pane.scrollIntoView({behavior:'auto',block:'start'});
+    title.focus({preventScroll:true});
+  }
   async function action(fn:()=>Promise<void>|void){const id=owner(),run=epoch;try{await fn();}catch(error){if(current(id,run))status((error as Error).message,true);}}
   const button=(label:string,icon:IconName,fn:()=>Promise<void>|void,primary=false)=>{const b=node('button','art-button'+(primary?' art-primary':''));b.type='button';setIconLabel(b,icon,label);b.onclick=()=>{if(b.disabled)return;b.disabled=true;void action(fn).finally(()=>{if(b.isConnected)b.disabled=false;});};return b;};
   function notify(savedOwner:string){window.dispatchEvent(new CustomEvent('factory-art-updated',{detail:{owner:savedOwner}}));}
@@ -59,7 +70,7 @@ export function installArtStudio(host:Host){
       const versions=rigs.filter(r=>r.assembly.sourceId===item.id),copy=node('div','art-card-copy');
       copy.append(node('span','art-card-category',categories[item.category??'other']),node('strong','',item.name));
       const meta=node('span','art-card-meta',versions.length?`${versions.length} movement ${versions.length===1?'version':'versions'}`:item.sourceId?'Edited picture · original kept':'Original picture');
-      copy.append(meta);card.append(preview,copy);card.onclick=()=>void action(async()=>{const captured=owner(),run=epoch;selected=item.id;renderGrid();await details(item.id);if(!current(captured,run)||selected!==item.id)return;if(innerWidth<850)$('artDetails').scrollIntoView({behavior:'auto',block:'start'});$('artDetailTitle').focus({preventScroll:true});});grid.append(card);
+      copy.append(meta);card.append(preview,copy);card.onclick=()=>void action(async()=>{const captured=owner(),run=epoch;selected=item.id;renderGrid();await details(item.id);focusSelectedArtwork(item.id,captured,run);});grid.append(card);
     }
     for(const filter of $('artFilters').querySelectorAll<HTMLButtonElement>('button'))filter.setAttribute('aria-pressed',String(filter.dataset.category===category));
     setIconLabel($('artShowArchive'),'clock',archive?'Show current art':'Show archived art');
@@ -84,7 +95,7 @@ export function installArtStudio(host:Host){
     const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,scene,car);pane.append(actions);
     const hint=node('p','art-small','This choice is copied into the new game or scene. Earlier adventures keep their chosen version.');pane.append(hint);
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
-    tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);},()=>current(captured,run));}));
+    tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));
     tools.append(button('Download original picture','download',()=>download(drawingBlob(item),'my-drawing.'+(item.mime==='image/png'?'png':'jpg'))));
     tools.append(button(item.archived?'Restore to My art':'Archive picture','clock',async()=>{await updateDrawing(captured,id,{archived:!item.archived},()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status(item.archived?'Picture returned to My art.':'Picture archived. Saved games and scenes can still use it.');notify(captured);}));
     tools.append(button('Delete unused picture','trash',async()=>{if(!confirm('Delete this picture and its movement versions from this device? Download your art library first to keep a copy. Pictures used by saved work cannot be deleted.'))return;await deleteArtwork(captured,id,()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status('Unused picture deleted.');notify(captured);}));
@@ -99,11 +110,11 @@ export function installArtStudio(host:Host){
   $('artUploadButton').onclick=()=>$<HTMLInputElement>('artUpload').click();$('artCameraButton').onclick=()=>$<HTMLInputElement>('artCamera').click();
   const upload=async(input:HTMLInputElement)=>{const file=input.files?.[0],id=owner(),run=epoch;if(!file)return;
     const controls=[$<HTMLButtonElement>('artUploadButton'),$<HTMLButtonElement>('artCameraButton')];controls.forEach(b=>b.disabled=true);
-    try{assertRewardSourceWritable();status('Opening your picture…');const saved=await saveDrawing(id,file.name.replace(/\.[^.]+$/,''),file,undefined,()=>current(id,run));if(!current(id,run))return;selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';if(!await refresh())return;status('Your picture is saved. Give it a name, then decide what it should do.');notify(id);$('artDetailTitle')?.focus({preventScroll:true});}
+    try{assertRewardSourceWritable();status('Opening your picture…');const saved=await saveDrawing(id,file.name.replace(/\.[^.]+$/,''),file,undefined,()=>current(id,run));if(!current(id,run))return;selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';if(!await refresh())return;status('Your picture is saved. Give it a name, then decide what it should do.');notify(id);focusSelectedArtwork(saved.id,id,run);}
     finally{input.value='';controls.forEach(b=>b.disabled=false);}
   };
   for(const id of ['artUpload','artCamera'])$<HTMLInputElement>(id).onchange=()=>void action(()=>upload($<HTMLInputElement>(id)));
-  $('artDrawButton').onclick=()=>void action(()=>{const id=owner(),run=epoch;return drawOnTablet(id,async saved=>{if(!current(id,run))return;selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';if(!await refresh())return;status('Drawing saved. Let’s see what it can do.');notify(id);},()=>current(id,run));});
+  $('artDrawButton').onclick=()=>void action(()=>{const id=owner(),run=epoch;return drawOnTablet(id,async saved=>{if(!current(id,run))return;selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';if(!await refresh())return;status('Drawing saved. Let’s see what it can do.');notify(id);focusSelectedArtwork(saved.id,id,run);},()=>current(id,run));});
   $('artSearch').oninput=()=>{renderGrid();if(selected)void action(()=>details(selected));};
   $('artFilters').onclick=e=>{const target=(e.target as HTMLElement).closest<HTMLButtonElement>('[data-category]');if(!target)return;category=target.dataset.category!;renderGrid();if(selected)void action(()=>details(selected));};
   $('artShowArchive').onclick=()=>{archive=!archive;selected='';$('artDetails').hidden=true;renderGrid();};

@@ -110,10 +110,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:49:40.000Z",
-      "sourceDigest": "ae7c17d6a7b8a3c1e502963c79a1ac467f831fdaa61b928e2ae138a80991212b",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first-tranche Gem Pal reference art and current-main documentation together: exact selected Base/Grown artwork, six explicitly in-review Brio emotions, preserved two-form PR68 policy, unchanged provisional runtime mapping and local documentation links. No gameplay or collection changes.",
+      "reviewedAt": "2026-11-20T17:10:30.575Z",
+      "sourceDigest": "81977b3f0559f995de891dbd9de31fe8789d073b407f75414d12517274628d6f",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed entry/readiness changes and updated feature contracts against the doctrine: same child-owned local art, explicit Send/Build/Keep, existing learning guards, profile ownership and immutable uses; no new provider processing, reward rule or accepted product capability.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -197,10 +197,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:06:20.191Z",
-      "sourceDigest": "49c2bbdf071814681ed6c9f4378584ced46107e929d63c164639369c6aa27826",
+      "reviewedAt": "2026-11-20T17:10:30.990Z",
+      "sourceDigest": "ca02625a89d65af7406683115756bd089c4f944c7cd08b3f68e087f009909dfa",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Studio and Pal host delta: eight icon destinations, first-welcome hiding, draft/learning guards, parent preferences, owner loading, and shared notices. Updated homepage, first-creation and architecture references; existing Art Studio and exact game returns remain intact.",
+      "reviewReason": "Documented visible home/composer Art Studio entrances, consistent naming and local-tools-before-network startup. Reviewed shared guarded callbacks, unchanged first-welcome behavior and later menu/maker/readability integration boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -528,10 +528,10 @@
         "scripts/verify-brand-assets.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T05:10:36.845Z",
-      "sourceDigest": "57e4bb966294098357a469c77b250560ccbdbaaa6b4ec172eeb552d33e8ae8c8",
+      "reviewedAt": "2026-11-20T17:10:31.979Z",
+      "sourceDigest": "c6d148cc2a8aeb8f3606f59aa4720799ba75f63754f5be68c3546de20deea639",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final combined regression changes, including PR81 named original/cutout tests in both UUID orders, two-form histories, Pals/APS/guidance backup, private-art scene preservation and eight-route navigation. All scoped local suites passed, including376core and full Art/Creation/Rewards; preserved the first seconds-fill timeout and one unchanged-app rerun, with only early/bounded failure diagnostics added. No expectation was weakened; hosted acceptance remains pending.",
+      "reviewReason": "Recorded source/build-scoped Art, storage, phone entry, late readiness, modal-close focus, homepage/guidance and navigation checks; preserved the system-browser launch failure and supported-headless-shell result. Tests use synthetic local art and mocked service configuration, not production/provider/device acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -584,10 +584,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T05:10:37.245Z",
-      "sourceDigest": "d93eb824db660cbfbe150f48575992e0657e939eb1cd1a56a42650ba416becaf",
+      "reviewedAt": "2026-11-20T17:10:32.507Z",
+      "sourceDigest": "5d0637a79000b68abedb8d871c63cbb314626aba1932f806c51b14de0a95dfe3",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded retained PR68 and published PR81 1b8d7b8 histories, current-main ancestry, merge order, exact application bundle and completed local/independent checks. Preserved original drawing-order failure, Rewards timeout and scoped rerun, browser-environment limitation and historical art evidence. No merge, deployment, selected-art readiness or provider activation is claimed.",
+      "reviewReason": "Recorded the pre-change live Art Studio route and served source 69bd11d, separate prepared correction branch and local source checkpoint; added focused browser command without modifying release workflow/provider configuration. Broader menu integration, merge and deployment remain later work.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -775,10 +775,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "eca73a5d8ef20efde98e5a0de81cb75a4fff6ada194c3f1e8b43023325ce542f",
-      "reviewedAt": "2026-11-20T04:38:14.270Z",
+      "sourceDigest": "2025d5dad440338e30d62ac914a5ea4496d5197dc5566e9b832d10596e0fee0a",
+      "reviewedAt": "2026-11-20T17:10:31.580Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the merged private-art contract and new first-creation integration tests. Art-only owners retain ordinary home, siblings remain isolated and mixed-source scenes retain both return actions; storage, immutable bindings and portable-art authority are unchanged. Updated current PR23 disposition while retaining its dated evidence.",
+      "reviewReason": "Documented upload/draw/edited-copy continuation, post-modal focus and current owner/page guards; reviewed real pending/rejected configuration tests and saved-preview explicit retry. Original storage, private asset boundaries and saved version bindings remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
