@@ -1,0 +1,438 @@
+/* jems · Universal brand layer — loaded after existing arcade and Studio styles. */
+/* Brand portfolio approved Nov 2026; legacy local data keys are intentionally unchanged. */
+:root {
+ --jems-ink:#0B1E3B; --jems-blue:#2E6BFF; --jems-purple:#8B5CF6;
+ --jems-mint:#22D3A6; --jems-gold:#FFC24D; --jems-coral:#FF5E7A;
+ --jems-cloud:#FFF7EE; --jems-lilac:#E6D8FF;
+ --jems-text:#0B1E3B; --jems-muted:#596583; --jems-border:#DBDFF0;
+ --jems-shadow:0 10px 30px #0B1E3B12;
+ --jems-round:"Poppins Rounded","Arial Rounded MT Bold","Nunito","Trebuchet MS",ui-rounded,system-ui,sans-serif;
+ --jems-body:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+ --bg:#F8F9FE; --ink:#0B1E3B; --muted:#596583; --edge:#DBDFF0;
+ --pink:#FF5E7A; --yellow:#FFC24D; --aqua:#22D3A6; --blue:#2E6BFF;
+}
+body,body.studio-review {
+ background:radial-gradient(circle at 95% -15%,#E6D8FF85,transparent 43%),#F8F9FE;
+ color:var(--jems-ink);color-scheme:light;font-family:var(--jems-body);
+}
+h1,h2,h3,.brand,.studio-card-name,.studio-make-copy strong,.studio-library-heading h1,
+.studio-review .studio-home-intro h1,.favorite-title,.page-head h1,.page-heading h1 {
+ font-family:var(--jems-round);letter-spacing:-.45px;color:var(--jems-ink);
+}
+.site-header,.studio-review .site-header {max-width:1230px;border-bottom:1px solid #E6E7F1;padding:11px 24px;}
+.brand,.studio-review .brand {display:flex;align-items:center;gap:0;min-height:55px;padding:0;color:var(--jems-ink);}
+.jems-brand-logo{display:block;width:176px;height:59px;max-width:100%;object-fit:contain;object-position:left center}
+.site-header nav .nav,.studio-review .studio-nav button {border-radius:999px;color:#4F5D7C;font-size:14px;font-weight:750;}
+.studio-review .studio-nav button.active,.studio-review .studio-nav button:hover,.nav.active,.nav:hover {background:#E6D8FF;color:#3C217F;border-color:#C6B3FF;}
+.studio-review .profile-bar{background:transparent;border:0;}
+.studio-review .studio-profile-menu>summary,.profile-choice {border-color:#DEE2F1;color:#34446D;}
+.studio-review .profile-choice.active,.profile-choice.active {background:#E6D8FF;color:#4C2799;border-color:#BA97FF;}
+.studio-review main {max-width:1230px;}
+.studio-review #page-studio-library .studio-home-hero,.hero {
+ background:linear-gradient(120deg,#FFFDFD 0%,#F6F0FF 57%,#E9F1FF 100%);
+ border-color:#E3D9FA;box-shadow:0 14px 34px #0B1E3B0B;
+}
+.studio-review #page-studio-library .studio-home-hero::before,
+.studio-review #page-studio-library .studio-home-hero::after{border-color:#CFC4FF}
+.studio-review .studio-home-intro .studio-kicker,.studio-kicker,.eyebrow{color:#6B38D4;}
+.studio-review .studio-home-intro h1 span {color:#7540DC;}
+.studio-review .studio-home-intro>p,.studio-review .studio-section-heading p{color:#56627F;}
+.studio-review .studio-hero-sparkles{color:#FFC24D}
+.studio-review .studio-make-tile {
+ background:linear-gradient(135deg,#2E6BFF 0%,#3466E7 100%);
+ border-color:#2C6CE4;box-shadow:0 16px 29px #2E6BFF33;color:white;
+}
+.studio-review .studio-make-tile:hover {box-shadow:0 18px 32px #2E6BFF44;}
+.studio-review .studio-make-icon{background:#FFFFFF28;border:1px solid #FFFFFF66;}
+.studio-review .studio-make-copy small{color:#F3F7FF}
+.studio-review .studio-creation-note,.studio-library-note{color:#5B6683}
+.studio-review #page-studio-library .studio-library-grid{gap:17px}
+.studio-review #page-studio-library .studio-starter,
+.studio-review #page-studio-library .studio-saved-card,
+.studio-review .studio-continue {border-color:#E1E4F1;box-shadow:0 6px 22px #0B1E3B0C;background:white}
+.studio-review #page-studio-library .studio-starter:hover,.studio-review .studio-library-card:hover{border-color:#B394F9;box-shadow:0 12px 25px #0B1E3B1A}
+.studio-review .studio-art-buckets{background:linear-gradient(135deg,#FFF7EE,#FFE4D6)}
+.studio-review .studio-art-dragon{background:linear-gradient(135deg,#EEE2FF,#E6D8FF)}
+.studio-review .studio-art-moon{background:linear-gradient(135deg,#DEE5FF,#E9E2FF)}
+.studio-review .studio-art-robot{background:linear-gradient(135deg,#D8FFF2,#E6F6FE)}
+.studio-review .studio-card-name{color:#0B1E3B}
+.studio-review .studio-card-state{color:#5D6B88}
+.studio-review .studio-card-link{color:#6837CC}
+.studio-review .studio-continue-art{background:#E6D8FF}
+.studio-review .studio-continue .studio-primary{color:#4D2BAA;border-color:#B699F9}
+.studio-review .studio-section-kicker{color:#7641D8}
+.studio-review .studio-section-heading h2 {color:#0B1E3B}
+.studio-button,.btn,.studio-review .studio-button {border-radius:12px;font-family:var(--jems-body);font-weight:750;}
+.btn.primary,.studio-button.studio-primary,.studio-review .studio-button.studio-primary {
+ background:#2E6BFF;border-color:#2E6BFF;color:white;box-shadow:0 6px 18px #2E6BFF28;
+}
+.btn.primary:hover,.studio-review .studio-button.studio-primary:hover{background:#195FD0;border-color:#195FD0}
+.studio-review .studio-button.studio-keep,.studio-review .studio-ready{background:#DAFAEF;border-color:#89DECB;color:#0B634C;box-shadow:none;}
+.studio-review .studio-button:hover:not(:disabled):not(.studio-primary) {background:#F1EAFF;border-color:#B79AFC;color:#502CA2}
+.studio-review .studio-chip:hover,.studio-review .studio-chip[aria-pressed=true]{background:#EEE5FF;color:#4D259F;border-color:#BBA0FF}
+.studio-review .studio-heading h1,.studio-review .studio-helper-heading h2{color:#0B1E3B}
+.studio-review .studio-helper-icon{background:#E6D8FF;color:#6938D4;border:1px solid #DAC3FF;overflow:hidden}
+.jems-helper-mark{display:block;width:30px;height:30px;object-fit:contain}
+.studio-review .studio-conversation,.studio-review .studio-game-host,.panel,.game-card,.studio-review .studio-library-card{
+ border-color:#DFE2F0;box-shadow:0 7px 22px #0B1E3B09;
+}
+.studio-review .studio-conversation{background:#fff}
+.studio-review .studio-helper-heading{border-bottom-color:#EEE7FA;background:#FBF9FF}
+.studio-review .studio-prompt{background:#FCFBFF;border-top-color:#EAE5F2}
+.studio-review .studio-prompt textarea{background:white;color:#0B1E3B;border-color:#C8D1E6;font-size:15px}
+.studio-review .studio-message p{background:#F2F4FC;color:#304467}
+.studio-review .studio-message.child p{background:#EDE4FF;color:#3B2672}
+.studio-review .studio-message.reflection p{background:#E4FBF2;color:#215847}
+.studio-review .studio-chip,.studio-review .studio-more>summary{background:#FFF;color:#415276}
+.studio-review #studioTalk {font-size:15px;font-weight:800}
+.studio-review #studioMic {background:#F1E8FF;color:#5327A7;border-color:#BCA2EF}
+.studio-review #studioMic[aria-pressed=true] {background:#FFE4DF;color:#772D37;border-color:#FF7E89}
+.studio-review .studio-build-shelf{background:#12265F;color:#fff;border-color:#2D4383}
+.studio-review .studio-build-item{background:#223B72;border-color:#4766A3}
+.studio-review .studio-build-copy span{color:#D1DDF5}
+.studio-review .studio-versions,.studio-review .design-plan{border-color:#CFC9EC}
+.studio-review .studio-preview-notice{background:#FFF3D0;border-color:#FFD878;color:#5B4306}
+.studio-review .studio-profile-menu .profile-choices{border-color:#DED5EF}
+.studio-review #page-parent,.studio-review #page-lab,.studio-review #page-creations,
+.studio-review #page-create,.studio-review #page-feedback{color:#0B1E3B}
+.page-head h1,.page-head p,.panel h2,.panel h3{color:#0B1E3B}
+.page-head p,.muted,.fine,.studio-footnote{color:#596583}
+.panel{background:#fff;border-color:#DCE1F0}
+.notice{background:#FFF7EE;color:#5C4C34;border:1px solid #EDD9C2;border-radius:13px}
+.studio-review .page-head{color:#0B1E3B}
+#page-parent input,#page-parent select,#page-parent textarea,
+#page-create input,#page-create select,#page-create textarea,#page-feedback textarea {
+ background:#FFFFFF;color:#0B1E3B;border-color:#CCD3E6;
+}
+.game-card{background:#fff;color:#0B1E3B}
+.game-card .card-body h3{color:#0B1E3B}
+.game-card .card-body p{color:#5B6683}
+.game-card .card-foot{color:#6736C6}
+.game-stage{border-color:#CFCFF0}
+.favorite-game{color:#EAF2FF}
+.math-activity {
+ --math-ink:#FFFFFF;--math-muted:#D6E2FA;--math-panel:#182B60;--math-edge:#6283C9;
+ --math-accent:#FFC24D;
+ background:linear-gradient(148deg,#223872,#0B1E3B);
+ border-color:#506CB3;box-shadow:0 15px 35px #0B1E3B31;
+}
+.math-activity button.math-primary{background:#FFC24D;color:#0B1E3B;border-color:#FFC24D}
+.math-activity .math-answer-input{background:#081942;color:#fff}
+.math-activity .math-eyebrow{color:#22D3A6}
+.language-activity{border-color:#CBC5ED}
+.language-activity button:focus-visible,.math-activity button:focus-visible,
+.studio-review button:focus-visible,.studio-review input:focus-visible,.studio-review textarea:focus-visible{
+ outline:3px solid #7136C9;outline-offset:3px;
+}
+.math-activity button:focus-visible{outline-color:#FFC24D}
+body.studio-review > .factory-update-notice{background:#F9F7FF;color:#26375B;border-color:#D5D9EA}
+footer,.studio-review footer{border-color:#E2E4F0;color:#62718F}
+@media(max-width:650px){
+ .site-header,.studio-review .site-header{padding:9px 13px}
+ .jems-brand-logo{width:135px;height:48px}
+ .studio-review .studio-nav button{min-height:44px}
+ .studio-review #page-studio-library .studio-home-hero{padding:20px 22px 17px}
+ .studio-review #studioTalk,.studio-review #studioSend{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+ .studio-review .studio-make-tile,.studio-review .studio-library-card{transition:none}
+ .studio-review .studio-make-tile:hover,.studio-review .studio-library-card:hover{transform:none}
+}
+
+/* Brand implementation v2: semantic roles preserve the approved eight-color palette.
+   Contrast note: white on raw Gem Blue is 3.9:1, so small white button labels
+   use a deeper interactive shade (#195FD0, 5.85:1). */
+:root {
+  --jems-action-blue:#195FD0; --jems-action-blue-hover:#124FB2;
+  --jems-action-purple:#7136C9; --jems-action-purple-hover:#5B28AA;
+  --jems-success-ink:#0B634C; --jems-warning-ink:#5B4306;
+  --jems-surface:#FFFFFF; --jems-surface-soft:#FBF9FF;
+  --jems-radius-sm:10px; --jems-radius-md:15px; --jems-radius-lg:21px;
+  --jems-focus:#7136C9; --jems-input:#C8D1E6;
+  --jems-shadow-card:0 7px 22px #0B1E3B0C;
+  --jems-shadow-raised:0 14px 30px #0B1E3B16;
+}
+body, body.studio-review {
+  background:radial-gradient(ellipse at 94% 1%,#E6D8FF77,transparent 43%),
+             linear-gradient(162deg,#FFF7EE 0%,#F8F9FE 35%,#FCFAFF 67%,#FFF7EE 100%);
+  color:var(--jems-ink);
+}
+::selection{background:#E6D8FF;color:#0B1E3B}
+button,input,textarea,select,summary{accent-color:var(--jems-action-purple)}
+button:focus-visible,a:focus-visible,summary:focus-visible,
+input:focus-visible,select:focus-visible,textarea:focus-visible {
+  outline:3px solid var(--jems-focus);outline-offset:3px;
+}
+.site-header,.studio-review .site-header {
+  background:linear-gradient(180deg,#FFFFFFBD,#FFF7EE55);
+  backdrop-filter:saturate(125%);
+  border-bottom-color:#E6D8FF;
+}
+.studio-review .studio-nav button.active,
+.studio-review .studio-nav button[aria-current="page"],
+.studio-review .studio-mobile-tabs button[aria-pressed="true"] {
+  background:#E6D8FF;color:#49268E;border-color:#CDB6FF;
+}
+.studio-review .profile-choice.active,
+.studio-review .studio-profile-menu>summary:hover{
+  border-color:#BDA3EC;background:#F3EDFF;
+}
+.studio-review #page-studio-library .studio-home-hero {
+  background-image:url("/jems-clouds.svg"),
+                   linear-gradient(125deg,#FFFDFB 0%,#F8F2FF 55%,#ECF4FF 100%);
+  background-position:right bottom,center;
+  background-size:58% auto,cover;
+  background-repeat:no-repeat;
+  border-color:#DAD0F5;
+  box-shadow:var(--jems-shadow-card);
+}
+.studio-review .studio-home-hero::before{
+  content:"";top:auto;right:-25px;bottom:-50px;width:250px;height:160px;
+  border:0;border-radius:0;opacity:.10;
+  background:url("/jems-blocks.svg") center/contain no-repeat;
+  pointer-events:none;
+}
+.studio-review .studio-home-hero::after{
+  content:"";right:15px;top:7px;width:105px;height:65px;
+  border:0;border-radius:0;opacity:.27;
+  background:url("/jems-sparks.svg") center/contain no-repeat;
+  pointer-events:none;
+}
+.studio-review .studio-hero-sparkles{color:#E5A700}
+.studio-review .studio-home-intro h1 span{color:#7136C9}
+.studio-review .studio-home-intro .studio-kicker{color:#6935C7}
+.studio-review .studio-make-tile {
+  background:linear-gradient(125deg,var(--jems-action-blue) 0%,#225DBF 66%,var(--jems-action-purple) 100%);
+  border-color:#1B57C0;box-shadow:0 15px 30px #195FD034;color:#FFF;
+}
+.studio-review .studio-make-tile:hover{background:linear-gradient(125deg,#124FB2,var(--jems-action-purple));box-shadow:0 19px 35px #195FD040}
+.studio-review .studio-make-icon{border-radius:18px;background:#FFFFFF26;border:1px solid #FFFFFF80}
+.studio-review .studio-make-copy small{color:#FFF}
+.studio-review .studio-home-favorites .studio-section-heading h2::after{
+  content:"✦";margin-left:11px;font-size:18px;color:#E7AD0A;vertical-align:middle;
+}
+.studio-review .studio-home-saved .studio-section-heading h2::after{
+  content:"";display:inline-block;width:19px;height:19px;margin-left:10px;
+  background:url("/jems-mark.svg") center/contain no-repeat;vertical-align:middle;
+}
+.studio-review #page-studio-library .studio-starter,
+.studio-review #page-studio-library .studio-saved-card,
+.studio-review .studio-library-card,
+.studio-review .studio-version-card {
+  border:1px solid #DEE3F0;background:#FFFFFF;
+  border-radius:var(--jems-radius-lg);
+  box-shadow:var(--jems-shadow-card);
+}
+.studio-review #page-studio-library .studio-starter:hover,
+.studio-review #page-studio-library .studio-saved-card:hover{
+  border-color:#B99AF5;box-shadow:var(--jems-shadow-raised);
+}
+.studio-review .studio-continue{border-inline-start:4px solid var(--jems-mint)!important}
+.studio-review .studio-continue-art{background:#E6D8FF}
+.studio-review .studio-card-link{color:#7136C9}
+.studio-review .studio-card-link:focus-visible{outline:3px solid #7136C9}
+.studio-review .studio-section-kicker{color:#7841D9}
+.studio-review .studio-empty{
+  background-image:url("/jems-clouds.svg"),radial-gradient(circle at 50% 44%,#F4EEFF,#FFFFFF 77%);
+  background-position:center bottom,center;background-repeat:no-repeat;
+  background-size:100% auto,cover;
+}
+.studio-review .jems-empty-mark{display:block;width:82px;height:82px;object-fit:contain}
+.studio-review .studio-helper-heading{background:linear-gradient(95deg,#FFFDFB,#F3EEFF);border-color:#E6D8FF}
+.studio-review .studio-conversation,.studio-review .studio-game-host,.studio-review .studio-versions{
+  border-color:#DCE1F0;box-shadow:var(--jems-shadow-card);
+}
+.studio-review .studio-message.child p{background:#EEE6FF;color:#3E266F}
+.studio-review .studio-message.reflection p{background:#DDF8EE;color:#0B634C}
+.studio-review .studio-prompt{background:#FBF9FF;border-top-color:#E9DFF6}
+.studio-review .studio-prompt textarea,
+.studio-review .studio-dialog input,
+.studio-review .design-plan textarea{border-color:var(--jems-input);border-radius:var(--jems-radius-sm)}
+.studio-review .studio-version-card.is-candidate{background:#FFFAEA;border-color:#E8C96D}
+.studio-review .studio-status.is-error{background:#FFF2EF;color:#8D2733;border-color:#F7B8C0}
+.studio-review .studio-preview-notice{background:#FFF5D9;color:var(--jems-warning-ink);border-color:#EECB6D}
+.studio-review .studio-build-shelf{background:linear-gradient(135deg,#0B1E3B,#192F65);border-color:#334A83}
+.studio-review .studio-build-item{background:#213A72;border-color:#4C6298}
+.studio-review .studio-button,
+.studio-review .studio-chip,
+.studio-review #studioTalk,
+.btn {font-family:var(--jems-body);font-weight:750}
+.btn.primary,.studio-button.studio-primary,
+.studio-review .studio-button.studio-primary{
+  background:var(--jems-action-blue);
+  border-color:var(--jems-action-blue);
+  color:#FFFFFF;
+  box-shadow:0 5px 16px #195FD027;
+}
+.btn.primary:hover,.studio-button.studio-primary:hover,
+.studio-review .studio-button.studio-primary:hover {
+  background:var(--jems-action-blue-hover);
+  border-color:var(--jems-action-blue-hover);color:#FFFFFF;
+}
+.studio-review .studio-button.studio-keep,.studio-review .studio-ready{
+  background:#DDF9EF;color:var(--jems-success-ink);border-color:#87DDC7
+}
+.studio-review #studioMic{background:#F0E6FF;color:#5327A7;border-color:#BDA3EC}
+.studio-review #studioMic[aria-pressed=true]{background:#FFE5E6;color:#802B3C;border-color:#F79DA5}
+.studio-review .learning-subject-switch{background:#FFF;border-radius:14px;border-color:#DAD7EF}
+.studio-review .learning-subject-switch button[aria-pressed="true"]{
+  background:#E6D8FF!important;color:#4A228D!important;border-color:#B69BEE!important;
+}
+.studio-review .learning-subject-switch button:disabled{opacity:.63}
+.studio-review .studio-learning-choice,.studio-review .learning-adventure{
+  background:linear-gradient(100deg,#FFFDFB,#F4F0FF);border-color:#DDD3EE;
+}
+.studio-review .studio-dialog{border-color:#C6B2EC}
+.studio-review .studio-math-options,
+.studio-review .studio-help,.studio-review .design-controls{
+  border-color:#DAD4ED;background:#FCFAFF;
+}
+.studio-review .studio-math-options summary,.studio-review .studio-more>summary{color:#55319F}
+.studio-review #page-lab .panel:first-child{border-top:4px solid var(--jems-blue)}
+.studio-review #page-lab .panel:last-child{border-top:4px solid var(--jems-mint)}
+.studio-review #page-parent .panel:first-child{border-top:4px solid var(--jems-purple)}
+.studio-review #page-parent .panel:last-child{border-top:4px solid var(--jems-blue)}
+.studio-review .panel,.panel,.game-card{border-color:#DDE1EF;box-shadow:var(--jems-shadow-card)}
+#page-parent input,#page-parent select,#page-parent textarea,
+#page-lab input,#page-lab select,#page-lab textarea,
+#page-create input,#page-create select,#page-create textarea {
+  border:1px solid var(--jems-input);border-radius:var(--jems-radius-sm);
+  color:#0B1E3B;background:#FFF;
+}
+.studio-review .math-activity{border-radius:18px}
+.studio-review .math-activity button.math-primary {
+  background:var(--jems-gold);color:var(--jems-ink);border-color:#E2AF00;
+}
+.studio-review .language-activity{border-color:#C9B8ED;box-shadow:0 7px 22px #7136C914}
+.studio-review .language-activity :is(button,input,textarea):focus-visible,
+.studio-review .math-activity :is(button,input):focus-visible {outline-offset:3px}
+.studio-review .studio-mobile-tabs{border-color:#DAD3F0}
+.studio-review .studio-mobile-tabs button[aria-pressed="true"]{
+  color:#5628A9;background:#E6D8FF
+}
+.studio-review .factory-update-notice{background:#FFFDFB;border-color:#DAD5EC;color:#26375B}
+.studio-review footer,.studio-review .home-footer{border-color:#E6D8FF}
+body:not(.studio-review) .hero{
+  background-image:url("/jems-clouds.svg"),linear-gradient(135deg,#FFFDFB,#F1EAFF 65%,#EDF5FF);
+  background-position:right bottom,center;background-size:46% auto,cover;background-repeat:no-repeat;
+  border-color:#E2D7F5;color:#0B1E3B;
+}
+body:not(.studio-review) .hero h1,body:not(.studio-review) .hero em{color:#0B1E3B}
+body:not(.studio-review) .panel,body:not(.studio-review) .game-card{background:#FFF;border-color:#DEE2EF}
+body:not(.studio-review) .btn.primary{background:var(--jems-action-blue);border-color:var(--jems-action-blue)}
+/* Keep decorative art optional and out of active game areas. */
+@media(max-width:650px){
+  .studio-review #page-studio-library .studio-home-hero{background-size:100% 68%,cover}
+  .studio-review .studio-home-hero::before,
+  .studio-review .studio-home-hero::after{display:none}
+  .studio-review .studio-home-favorites .studio-section-heading h2::after{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  .studio-review .studio-make-tile,
+  .studio-review .studio-starter,
+  .studio-review .studio-library-card {transition:none!important;transform:none!important}
+}
+
+/* Screenshot QA: restore legible text on newly light panels while preserving dark playable games.
+   Verified failure surfaces: desktop/mobile Home, Parent Controls, My Powers,
+   Math interaction and optional legacy Arcade after the light-mode conversion. */
+
+/* The global display-heading rule is Ink by default; the creation tile needs white. */
+body.studio-review .studio-make-tile .studio-make-copy strong,
+body.studio-review .studio-make-tile .studio-make-copy small { color:#FFFFFF; }
+body.studio-review .studio-make-tile .studio-make-icon { color:#FFFFFF; }
+
+/* Only parent/learning and other content panels are light; keep game canvases intact. */
+body.studio-review #page-parent .panel,
+body.studio-review #page-lab .panel,
+body.studio-review #page-create .panel,
+body.studio-review #page-feedback .panel,
+body:not(.studio-review) .page .panel { color:var(--jems-ink); }
+
+#page-parent .panel label:not(.check-row),
+#page-create .panel label:not(.check-row),
+#page-feedback .panel label:not(.check-row),
+#page-creations .panel label:not(.check-row),
+#page-parent .panel .check-row,
+#page-parent .panel .stat-title,
+#page-parent .panel .skill-meter,
+#page-parent .panel .learning-progress-card,
+#page-lab #skill-report,
+#page-lab #skill-report .learning-progress-card,
+#page-lab .panel .learning-adventure-note,
+#page-create .panel legend,
+#page-feedback .panel legend {
+ color:#344466;
+}
+#page-parent .panel .stat-title,
+#page-parent .panel .learning-progress-card .row,
+#page-parent .panel .skill-meter .row,
+#page-lab #skill-report .learning-progress-card .row,
+#page-lab #skill-report .skill-meter .row {color:var(--jems-ink);}
+#page-parent .panel .learning-progress-card small,
+#page-lab #skill-report .learning-progress-card small {color:#556684;}
+#page-parent .panel .learning-state,
+#page-lab #skill-report .learning-state{color:#0B7159;}
+
+/* Dark Math activity is a self-contained high-contrast reading surface.
+   Avoid inheriting the dark Ink headline color used on white cards. */
+body.studio-review .math-activity,
+body.studio-review .math-activity h2,
+body.studio-review .math-activity .math-prompt,
+body:not(.studio-review) .math-activity h2 {color:#FFFFFF;}
+body.studio-review .math-activity h3,
+body:not(.studio-review) .math-activity h3 {color:#A8ECDD;}
+body.studio-review .math-activity .math-hint h3 {color:#8CE7D1;}
+body.studio-review .math-activity .math-visual figcaption {color:#D3DEF1;}
+body.studio-review .math-activity .math-activity-label {color:#E9F2FF;}
+
+/* The optional old Arcade is now light like Studio, not a partly dark relic. */
+body:not(.studio-review) .profile-bar {
+ background:#F5F1FF;border-color:#E4DAF5;
+}
+body:not(.studio-review) .profile-label,
+body:not(.studio-review) .local-pill {color:#4A5774;}
+body:not(.studio-review) .profile-choice {
+ background:#FFFFFF;color:#334569;border-color:#C8CDE4;
+}
+body:not(.studio-review) .profile-choice.active{
+ background:#E6D8FF;color:#4B278D;border-color:#BEA3EB;
+}
+body:not(.studio-review) .hero p {color:#455574;}
+body:not(.studio-review) .hero .btn.ghost {
+ color:#522C9D;background:#F0E8FF;border:1px solid #BDA4F3;
+}
+body:not(.studio-review) .hero .btn.ghost:hover {
+ background:#E6D8FF;color:#482187;
+}
+body:not(.studio-review) .game-card .tag,
+body:not(.studio-review) .tag {color:#0C7466;}
+body:not(.studio-review) .home-footer strong,
+body:not(.studio-review) .home-footer h2,
+body:not(.studio-review) .home-footer h3 {color:#FFFFFF;}
+body:not(.studio-review) footer .text-btn {
+ color:#6732C5;min-height:44px;
+}
+
+/* Inputs remain visually calm and readable inside white legacy forms. */
+body:not(.studio-review) :is(#page-create,#page-feedback,#page-parent,#page-creations) :is(input:not([type="checkbox"]):not([type="range"]),select,textarea),
+body:not(.studio-review) #page-feedback .live-factory select {
+ background:#FFFFFF;color:var(--jems-ink);border:1px solid #BDC7E0;
+ border-radius:var(--jems-radius-sm);
+}
+body:not(.studio-review) .page .panel .btn.secondary{
+ background:#F2ECFF;color:#513099;border:1px solid #C8B4F1;
+}
+body:not(.studio-review) #page-feedback .live-factory {color:var(--jems-ink);}
+body:not(.studio-review) #page-feedback .live-factory label {color:#344466;}
+
+/* Preserve legible titles in *dark* modal overlays; these are not white panels. */
+.stage-overlay .modal-card,.studio-review .studio-native-game .modal-card {color:#FFFFFF;}
+.stage-overlay .modal-card h2,.stage-overlay .modal-card h3,
+.studio-review .studio-native-game .modal-card h2 {color:#FFFFFF;}
+
+/* Parent restore action uses a pale secondary button rather than dark-on-dark label text. */
+#page-parent .panel label.upload-button.btn.secondary {background:#F2ECFF;color:#513099;border:1px solid #C8B4F1;min-height:44px;}
+
+/* PR #34: approved named brand roles; keep the Jems 5 UX accessible action shades. */
+:root{--jems-spark:var(--jems-purple);--jems-play:var(--jems-coral);--jems-idea:var(--jems-gold);--jems-build:var(--jems-mint)}

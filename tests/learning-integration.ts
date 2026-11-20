@@ -5,7 +5,7 @@ import type {AddressInfo} from 'node:net';
 import {build, transformSync} from 'esbuild';
 import {chromium, type Browser, type Page} from 'playwright';
 import {start} from './browser-server.cjs';
-import {generateItem} from '../src/learning/content';
+import {generateItem,evaluateAnswer} from '../src/learning/content';
 import type {MathItem} from '../src/learning/types';
 import {renderPreview} from '../server/pipeline/artifacts';
 import {renderGenerated} from '../server/sandbox/preview.cjs';
@@ -33,10 +33,16 @@ async function submitWritten(page:Page,item:MathItem,answer=String(item.answer))
   }
 }
 function wrongAnswer(item:MathItem):string {
-  if(item.answerKind==='choice')return item.choices!.find(c=>c.value!==String(item.answer))!.value;
-  if(item.answerKind==='number')return String(Number(item.answer)+1);
-  if(item.answerKind==='fraction')return Number(String(item.answer).split('/')[0])===0?'1/1':'0/1';
-  return String(item.answer)==='1:00'?'2:00':'1:00';
+  const choices=item.answerKind==='choice'
+    ?(item.choices||[]).map(c=>c.value)
+    :item.answerKind==='text'
+      ?['definitely incorrect','1:00','2:00',String(item.answer)+' different']
+      :item.answerKind==='fraction'
+        ?['0/1','1/1','2/1','1/2','3/4']
+        :['0','1','2','3','-1','10','100',String(Number(item.answer)+1)];
+  const candidate=choices.find(raw=>{const result=evaluateAnswer(item,raw);return result.valid&&!result.correct;});
+  assert.ok(candidate,'The fixture needs a valid-but-incorrect response for '+item.skillId);
+  return candidate;
 }
 async function finishWithHelp(page:Page) {
   await activity(page).locator('[data-action="show-solution"]').click();
@@ -55,7 +61,8 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>void d.accept());
   try{
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning&&window.FG?.factory);
-    await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+    await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
+    await page.locator('[data-parent-tab="settings"]').click();
     assert.deepEqual(await page.locator('#parentGrade option').evaluateAll(nodes=>nodes.map(n=>(n as HTMLOptionElement).value)),['1','2','3','4']);
     assert.equal(await page.locator('#parentRate').getAttribute('min'),'1');
     for(const grade of [1,2,3,4]){
@@ -70,15 +77,19 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.screenshot({path:`test-results/math-settings-${name}.png`,fullPage:true});
 
     // A real Math Lab item, including a first error, help request, and abandoned activity.
-    await nav(page,'⚡ My Powers');await activity(page).waitFor({state:'visible'});
+    await nav(page,'My Powers');await activity(page).waitFor({state:'visible'});
     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
     await submitWritten(page,first,wrongAnswer(first));
     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});
-    assert.equal(savedWrong.answers.length,1);assert.equal(savedWrong.answers[0].correct,false);assert.equal(savedWrong.outcome,'open');
+    assert.equal(savedWrong.answers.length,1,
+      'Every accepted wrong response must be saved immediately; '+JSON.stringify({
+        skill:first.skillId,kind:first.answerKind,answer:first.answer,
+        candidate:wrongAnswer(first),lastAttempt:savedWrong
+      }));assert.equal(savedWrong.answers[0].correct,false);assert.equal(savedWrong.outcome,'open');
     await activity(page).locator('[data-action="hint"]').click();
     const hinted=(await attempts(page)).find((a:any)=>a.id===firstId);assert.equal(hinted.hintLevel,1);
     await page.screenshot({path:`test-results/math-lab-help-${name}.png`,fullPage:true});
-    await nav(page,'🎮 Play');
+    await nav(page,'Play');
     const ended=(await attempts(page)).find((a:any)=>a.id===firstId);
     assert.equal(ended.outcome,'interrupted');assert.equal(ended.answers.length,1);assert.equal(ended.hintEvents.length,1);
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
@@ -88,9 +99,9 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
 
     // Both profiles practice through the real UI; neither child's history is copied or cleared.
     const ownerHistory=JSON.stringify((await profile(page)).learning);
-    await page.locator('.profile-choice').nth(1).click();await nav(page,'⚡ My Powers');
+    await page.locator('.profile-choice').nth(1).click();await nav(page,'My Powers');
     const otherOwner=(await profile(page)).id;assert.notEqual(otherOwner,owner);
-    await submitWritten(page,await activeItem(page));await page.waitForSelector('#lab-next');await nav(page,'🎮 Play');
+    await submitWritten(page,await activeItem(page));await page.waitForSelector('#lab-next');await nav(page,'Play');
     const otherHistory=JSON.stringify((await profile(page)).learning);
     const originalHistory=await page.evaluate(id=>JSON.stringify(window.FG.store.data.profiles.find((p:any)=>p.id===id).learning),owner);
     assert.equal(originalHistory,ownerHistory,'the second child cannot mutate the first child’s evidence');
@@ -125,7 +136,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     assert.equal(await page.evaluate(()=>window.FG.math.canAsk(window.FG.store.current())),false,'one child shares one pacing budget');
 
     // The child may change the math format in a real remix, without removing math.
-    await nav(page,'🎛️ Remix');await page.selectOption('#liveGame','gum');await page.click('#newLiveGame');
+    await nav(page,'Remix');await page.selectOption('#liveGame','gum');await page.click('#newLiveGame');
     const projectId=await page.locator('#liveProjects').inputValue();
     const beforeRemix=await attempts(page),workspaceBefore=await page.evaluate(()=>JSON.stringify(window.FG.factory.exportWorkspace()));
     await page.fill('#livePrompt','Put math inside the game');await page.click('#livePromptForm button[type=submit]');
@@ -136,7 +147,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.fill('#livePrompt','Use both math formats');await page.click('#livePromptForm button[type=submit]');
     assert.equal(await page.evaluate(id=>window.FG.learning.modeFor(id),projectId),'both');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.factory.exportWorkspace())),workspaceBefore,'format preferences do not rewrite game versions');
-    await advanceBudget(page);await page.click('#livePlay');await page.getByRole('button',{name:'Add Bottle',exact:true}).click();
+    await advanceBudget(page);await page.click('#livePlay');await page.locator('.gum-play').waitFor();await page.getByRole('button',{name:'Select Super star'}).click();await page.getByRole('button',{name:'Put a sticker on Top'}).click();
     await page.clock.runFor(91_000);await page.waitForSelector('#stage-overlay .math-activity');
     assert.equal(await activity(page).getAttribute('data-mode'),'both');
     const remixId=await page.evaluate(()=>window.FG.learning.activeAttemptId);await submitWritten(page,await activeItem(page));
@@ -147,7 +158,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     assert.equal(await page.evaluate(id=>JSON.stringify(window.FG.store.data.profiles.find((p:any)=>p.id===id).learning),otherOwner),otherHistory);
 
     // A fixed curriculum item gives an inspectable fraction construction in the production host.
-    await nav(page,'⚡ My Powers');
+    await nav(page,'My Powers');
     const fraction=generateItem('g3-unit-fraction',{random:()=>.55,representation:'visual'});
     await page.evaluate(item=>{
       const w=window as any;w.fractionResult=null;
@@ -300,7 +311,7 @@ async function qualityNativeJourney(browser:Browser,base:string,device:typeof de
     await page.clock.install();await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);
     await page.evaluate(()=>{window.FG.store.changeProfile({grade:2,focus:'adaptive',rate:1,punish:false});window.FG.app.openGame('hill');});
     const hill=page.locator('.quality-hill'),state=()=>page.evaluate(()=>window.FG.runtime.snapshot().state);
-    await hill.getByRole('button',{name:'Let’s drive →',exact:true}).click();
+    await hill.getByRole('button',{name:'Let’s drive',exact:true}).click();
     await page.keyboard.down('ArrowRight');await page.clock.runFor(12_000);await page.keyboard.up('ArrowRight');
     await page.waitForFunction(()=>window.FG.learning.active);const before=await state();
     assert.equal(before.mode,'result');assert.equal(before.status,'won');assert.equal(before.hostPaused,true);
@@ -314,7 +325,7 @@ async function qualityNativeJourney(browser:Browser,base:string,device:typeof de
     await hill.getByRole('button',{name:'Finish this trip',exact:true}).click();await page.waitForSelector('#resultNext');
     assert.equal(await page.evaluate(()=>document.activeElement?.id),'native-result-title','round completion moves focus to its labelled result');
     await page.click('#resultNext');assert.equal((await state()).track,'ridge');
-    await advanceBudget(page);await page.evaluate(()=>window.FG.app.openGame('gum'));
+    await advanceBudget(page);await page.evaluate(()=>window.FG.app.openGame('gum',{config:{qualityVersion:1,gravity:10,thrust:1,originalRules:true,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}}));
     const workshop=page.locator('.quality-builder');await workshop.getByRole('button',{name:'Add Bottle',exact:true}).click();
     const part=await page.evaluate(()=>window.FG.runtime.snapshot().state.parts.at(-1));
     await page.clock.runFor(91_000);await page.waitForFunction(()=>window.FG.learning.active);
@@ -379,7 +390,7 @@ async function main(){
   const server=start();let browser:Browser|undefined;
   try{
     if(!server.listening)await new Promise<void>(resolve=>server.once('listening',resolve));
-    const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}/arcade/`;
+    const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}/arcade/?arcade=1`;
     const output=await build({entryPoints:['src/learning/remote.ts'],bundle:true,format:'iife',globalName:'PreviewLearningTest',platform:'browser',write:false});
     browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
     const activeBrowser=browser,failures:Error[]=[];

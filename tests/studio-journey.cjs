@@ -23,8 +23,18 @@ const {start}=require('./browser-server.cjs');
   const talk=async()=>{await page.click('#studioChange');};
   const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore summary');};
   const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
-  assert.equal(await page.locator('#studioStarters [data-starter]').count(),4);
+  assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
+  await page.click('[data-starter="gum"]');
+  // This suite exercises the preserved physical builder; newly created games
+  // default to sticker mode and are tested in sticker-builder-browser.cjs.
+  await page.evaluate(()=>{
+    const key='family-game-factory-workspace-v2',w=JSON.parse(localStorage.getItem(key));
+    const p=w.projects.find(p=>p.game==='gum'),r=w.revisions.find(r=>r.id===p.headId);
+    r.config.qualityVersion=1;
+    localStorage.setItem(key,JSON.stringify(w));
+  });
+  await page.reload();await page.waitForFunction(()=>FG.studio);
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   // A replay/version control must retain an active host activity; leaving the game may interrupt it.
   const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
@@ -36,6 +46,17 @@ const {start}=require('./browser-server.cjs');
   assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'interrupted');
   assert.deepEqual(await page.evaluate(id=>{const a=FG.store.current().learning.attempts.find(a=>a.id===id);return {answers:a.answers.length,correct:a.correct,independent:a.independent};},guardedAttempt),{answers:0,correct:false,independent:false});
   assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills['mul:8x7'])),seededSkill);
+  // An unanswered checkpoint now refunds its pacing receipt. Assert that
+  // requirement, then use the test-only pacing fixture from this suite to
+  // isolate Studio/physics interactions from unrelated later checkpoints.
+  assert.equal(await page.evaluate(()=>FG.math.canAsk(FG.store.current())),true,
+    'Leaving an unanswered checkpoint must not satisfy the learning budget');
+  await page.evaluate(()=>{
+    FG.store.current().mathWindow=[Date.now()];
+    if(!FG.store.save())throw Error('Could not save Studio pacing fixture');
+  });
+  assert.equal(await page.evaluate(()=>FG.math.canAsk(FG.store.current())),false,
+    'The Studio journey requires a deliberately satisfied test-only pacing budget');
   // The intentional presentation may create a zero-count legacy fact. Subsequent
   // design/history actions must preserve this post-checkpoint learning baseline.
   const original=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
@@ -57,7 +78,7 @@ const {start}=require('./browser-server.cjs');
   await page.getByRole('button',{name:/Test machine/}).click();
   await page.waitForFunction(()=>FG.runtime.snapshot().state.simulation?.status==='won',null,{timeout:15000});
   assert.equal((await notebook()).sessions.some(s=>s.reflection),false,'physics success alone does not force reflection');
-  await page.getByRole('button',{name:'Finish challenge →',exact:true}).click();
+  await page.getByRole('button',{name:'Finish challenge',exact:true}).click();
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.reflection));
   await talk();assert.match(await page.textContent('#studioMessages'),/fun or tricky/);
   await page.click('#studioReflectAnswer');await page.fill('#studioPrompt','I liked seeing my rocket stay together.');await page.click('#studioSend');
@@ -104,7 +125,7 @@ const {start}=require('./browser-server.cjs');
   await page.click('#studioKeep');assert.notEqual((await workspace()).projects.find(p=>p.game==='hill').headId,hillMain);
   await talk();assert.match(await page.textContent('#studioPausedPreview'),/Junkyard Rally/);
   await page.click('#studioNavCreate');assert.equal(await page.locator('#studioPausedPreview').textContent(),'');assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a new idea clears the previous game preview');
-  await page.fill('#studioPrompt','Build a brand new flying banana universe');await page.click('#studioSend');assert.match(await page.textContent('#studioMessages'),/Local design helper/);await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');assert.match(await page.textContent('#studioMessages'),/no build was started/);assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
+  await page.fill('#studioPrompt','Build a brand new flying banana universe');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.match(await page.textContent('#studioMessages'),/Your new game idea is saved/);await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');assert.match(await page.textContent('#studioMessages'),/no build was started/);assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);
   const n=await notebook();assert.ok(n.sessions.some(s=>s.game==='new'&&!s.projectId&&!s.remoteId));
   console.log(`PASS ${device}: production studio, five staged changes, physical construction, optional reflection, static paused preview and cleanup, Hill garage routing, undo/redo/fork, private draft/reload and honest offline AI`);await ctx.close();
@@ -116,7 +137,11 @@ const {start}=require('./browser-server.cjs');
   const req=route.request(),path=new URL(req.url()).pathname;let data;
   const headers={'Access-Control-Allow-Origin':`http://127.0.0.1:${server.address().port}`,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
   if(req.method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
-  if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
+  // Model a real authenticated modern gateway. An absent session-status
+  // endpoint must NEVER silently authorize a paid build.
+  if(path==='/v1/sessions/status'&&req.method()==='GET')
+   data={connected:true,trusted:true,expiresAt:Date.now()+60000};
+  else if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
   else if(path==='/v1/jobs/fixture-job'){polls++;data=polls<2?{jobId:'fixture-job',status:'testing',adapter:'mock'}:phase==='failed'?{jobId:'fixture-job',status:'failed',adapter:'mock'}:{jobId:'fixture-job',status:'ready',revisionId:'fixture-rev',adapter:'mock'};}
   else if(path.endsWith('/preview'))data={url:'https://studio-preview.test/game?capability=TEST_ONLY',artifactId:'fixture-artifact',expiresAt:Date.now()+60000,kind:'generated-module-v2',adapter:'mock'};
   else if(path.endsWith('/keep')){kept++;data={ok:true};}
@@ -126,7 +151,7 @@ const {start}=require('./browser-server.cjs');
  });
  await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script>`}));
  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);
- await page.click('#studioNavCreate');await page.fill('#studioPrompt','Create a novel test fixture');await page.click('#studioSend');await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');await page.waitForSelector('#studioReady:not([hidden])');await page.click('#studioReady');await page.waitForSelector('#studioRemoteHost iframe');
+ await page.click('#studioNavCreate');await page.fill('#studioPrompt','Create a novel test fixture');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('designPlan')?.open===true);await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');await page.waitForSelector('#studioReady:not([hidden])');await page.click('#studioReady');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');
  assert.match(await page.textContent('#studioPlayNote'),/mock/);assert.equal(kept,0);

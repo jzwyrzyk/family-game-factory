@@ -22,11 +22,12 @@ export class GcsPrivateArtifacts implements PrivateArtifacts {
  }
  async get(ref:ArtifactRef){validateRef(ref);const cached=this.cache.get(ref.sha256);if(cached){if(cached.length!==ref.bytes)throw Error('PRIVATE_ARTIFACT_INTEGRITY_FAILED');this.remember(ref,cached);return Buffer.from(cached)}const [bytes]=await this.file(ref).download({start:0,end:MAX_ARTIFACT_BYTES});if(bytes.length!==ref.bytes||digest(bytes)!==ref.sha256)throw Error('PRIVATE_ARTIFACT_INTEGRITY_FAILED');this.remember(ref,bytes);return bytes;}
 }
-// Only game payloads are externalized. Jobs, authorization, budgets and revision relationships stay transactional.
+// Game payloads and private captured-review evidence are externalized. Jobs, authorization, budgets and revision relationships stay transactional.
 function gameSlots(state:any):Array<{get:()=>any;set:(value:any)=>void}>{
  const slots:Array<{get:()=>any;set:(value:any)=>void}>=[];
  for(const r of state.revisions||[])if(r.game)slots.push({get:()=>r.game,set:v=>r.game=v});
  for(const j of state.jobs||[])if(j.execution?.candidate?.game)slots.push({get:()=>j.execution.candidate.game,set:v=>j.execution.candidate.game=v});
+ for(const j of state.jobs||[])if(j.execution?.qualityEvidence)slots.push({get:()=>j.execution.qualityEvidence,set:v=>j.execution.qualityEvidence=v});
  return slots;
 }
 export async function encodeArtifacts(state:PipelineState,store?:PrivateArtifacts):Promise<string>{

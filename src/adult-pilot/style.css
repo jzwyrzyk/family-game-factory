@@ -1,0 +1,13 @@
+.adult-profile-choice { border-style: dashed; }
+.adult-profile-dialog { width: min(32rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; border: 2px solid #0b1e3b; border-radius: 1.25rem; padding: 1.5rem; color: #0b1e3b; }
+.adult-profile-dialog::backdrop { background: #0b1e3baa; }
+.adult-profile-dialog h2 { margin-top: 0; }
+.adult-profile-dialog p { line-height: 1.5; }
+.adult-profile-dialog input { box-sizing: border-box; width: 100%; min-height: 48px; margin-top: .5rem; }
+.adult-profile-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+.adult-profile-actions button { min-height: 44px; }
+.adult-profile-banner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 2px dashed #0b1e3b; border-radius: 1rem; padding: 1rem; margin: 1rem 0; background: #fff5d6; color: #0b1e3b; }
+.adult-profile-banner[hidden] { display: none; }
+.adult-profile-banner p { margin: .35rem 0; line-height: 1.5; }
+.adult-profile-banner small { display: block; }
+@media(max-width: 600px) { .adult-profile-banner { align-items: stretch; flex-direction: column; } }

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320" role="img" aria-labelledby="t">
+<title id="t">Playful building blocks becoming a colorful creation</title>
+<defs>
+ <linearGradient id="sky" x2=".8" y2="1"><stop stop-color="#F2E7FF"/><stop offset="1" stop-color="#E8F5FF"/></linearGradient>
+ <linearGradient id="gem" x2=".3" y2="1"><stop stop-color="#AB6EFF"/><stop offset="1" stop-color="#7040D9"/></linearGradient>
+ <filter id="sh"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0B1D4D" flood-opacity=".13"/></filter>
+</defs>
+<path d="M70 255c-49-46 6-104 66-83 21-88 135-95 172-23 85-36 143 9 139 77 43-2 64 23 48 48H70Z" fill="url(#sky)"/>
+<g opacity=".75" fill="#FFC828"><path d="m416 35 8 20 20 8-20 8-8 20-8-20-20-8 20-8Z"/><path d="m95 65 5 15 15 5-15 5-5 15-5-15-15-5 15-5Z"/><circle cx="463" cy="135" r="5"/></g>
+<ellipse cx="282" cy="278" rx="197" ry="17" fill="#0B1D4D" opacity=".09"/>
+<g filter="url(#sh)">
+<g transform="translate(96 157)"><rect x="0" y="27" width="122" height="89" rx="16" fill="#7239D5"/><path d="M0 42Q0 27 17 27H105Q122 27 122 44V65H0Z" fill="#8A4DFF"/><rect x="20" y="5" width="33" height="32" rx="10" fill="#AA71FF"/><ellipse cx="36.5" cy="5" rx="16.5" ry="8" fill="#B994FF"/><rect x="69" y="5" width="33" height="32" rx="10" fill="#AA71FF"/><ellipse cx="85.5" cy="5" rx="16.5" ry="8" fill="#B994FF"/></g>
+<g transform="translate(220 183)"><rect x="0" y="24" width="118" height="68" rx="13" fill="#10AE96"/><path d="M0 38Q0 24 16 24H102Q118 24 118 40V57H0Z" fill="#34D7B3"/><rect x="38" width="43" height="31" rx="10" fill="#27CEAD"/><ellipse cx="59.5" cy="0" rx="21.5" ry="9" fill="#68EACC"/></g>
+<g transform="translate(353 208)"><rect width="88" height="67" rx="12" fill="#F6B511"/><path d="M0 14Q0 0 14 0H74Q88 0 88 14V35H0Z" fill="#FFC828"/><path d="M44 14v30M29 29h30" stroke="#FFF" stroke-linecap="round" stroke-width="8"/></g>
+</g>
+<g transform="translate(220 48)" filter="url(#sh)">
+ <path d="M60 4H127L151 40 93 131 34 40Z" fill="#5125BF"/>
+ <path d="M60 4H127L113 40H76Z" fill="url(#gem)"/>
+ <path d="M34 40 60 4 76 40 62 62Z" fill="#2D9EFF"/>
+ <path d="M34 40 62 62 93 131Z" fill="#34D7B3"/>
+ <path d="M62 62 76 40 113 40 125 62 93 131Z" fill="#2D7BFF"/>
+ <path d="M113 40 127 4 151 40 125 62Z" fill="#AE79FF"/>
+ <path d="M125 62 151 40 93 131Z" fill="#FF6B7A"/>
+ <path d="M79 52c-12 4-16 21-6 32l13 7v39h14V91l12-7c10-12 6-27-6-32v19c-9 7-18 7-27 0Z" fill="white"/>
+</g>
+<path d="M157 122c16-17 34-22 47-24" fill="none" stroke="#FFC828" stroke-width="8" stroke-linecap="round"/>
+<path d="M354 117q20 5 35 22" fill="none" stroke="#FFC828" stroke-width="8" stroke-linecap="round"/>
+</svg>

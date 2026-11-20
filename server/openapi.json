@@ -3,7 +3,7 @@
   "info": {
     "title": "Family Factory private build API",
     "version": "2.0.0",
-    "description": "Authenticated family gateway and separate private preview; Actions worker stages use approved workflow OIDC. Paid activation requires owner setup."
+    "description": "Authenticated family gateway and separate private game preview. The temporary Adult development profile lives on the existing website. Paid adult calls require a valid family session AND an independent HttpOnly adult cookie AND a per-tab proof, plus an owner-issued permit and configured rollout/provider/budget gates. The family-session security alternative describes child/family mode and does not bypass runtime adult-only policy; child mode retains separately verified guardian scopes and actual provider privacy requirements. Parent privacy choices remain pending until externally verified. Neither a profile switch nor a checkbox creates consent, ZDR or a spending allowance. Browser POSTs require exact Origin, X-Factory-Request: 1 and the documented Content-Type; private responses are no-store. This schema covers build/revision/worker contracts, session status, adult activation/lock, parent unlock/privacy and read-only coach/speech readiness. Existing full conversation, binary speech and other trusted-device payload schemas remain incomplete; consult their executable handlers. Source contracts are not evidence of live deployment or paid activation."
   },
   "servers": [
     {
@@ -16,6 +16,795 @@
     }
   ],
   "paths": {
+    "/v1/sessions/status": {
+      "get": {
+        "summary": "Read the current family session and Adult profile eligibility/activity",
+        "description": "Family authentication is required. A family-only request reports eligibility and active:false even if the browser has an ambient adult cookie. To report adult active:true, the same request must additionally supply adultCookie AND adultProof. Invalid or expired adult proof reports active:false rather than elevating the family session. This read-only operation never unlocks a profile, renews adult access, spends money or proves provider readiness. Responses are no-store.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verified family access and per-request adult activity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilySessionStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/adult/unlock": {
+      "post": {
+        "summary": "Switch to the temporary Adult development profile and activate its privileged session",
+        "description": "Requires an active trusted device in this gateway family, the existing adult/parent passphrase, a current operator-issued adult permit, and all adult rollout flags. The passphrase is checked with the shared family lockout (five failures lock for 15 minutes). The device and permit are rechecked in the admission transaction. Success immediately activates the Adult profile: it returns a per-tab proof and sets a distinct HttpOnly adult cookie; no separate AI activation endpoint or second website is required. A new unlock supersedes the prior adult grant on this device. No parent-management cookie, guardian verification, provider approval or spending allowance is granted. The grant lasts at most 60 minutes and expires with its permit; ordinary family renewal never extends it.",
+        "security": [
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PassphraseUnlockRequest"
+              }
+            }
+          },
+          "description": "application/json only; exact fields and a maximum encoded body of 2048 bytes."
+        },
+        "responses": {
+          "200": {
+            "description": "Adult profile active; return sessionToken only in this tab memory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdultUnlockResponse"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "$ref": "#/components/headers/AdultCookieIssued"
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON, unknown fields, or invalid request/choice values. No authorization is granted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The shared parent passphrase lockout or bounded record limit is active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/adult/lock": {
+      "post": {
+        "summary": "End this tab Adult profile session without requiring a fresh family access token",
+        "description": "The caller drops its in-memory proof before making this request. Revocation requires adultCookie AND adultProof matching the same live grant, device, permit and gateway family; a familySession is not required because this operation only reduces privilege. Exact Origin and X-Factory-Request: 1 remain mandatory. The empty security alternative permits idempotent inactive cleanup only: missing/invalid/expired/nonexistent adult cookies return active:false and may be cleared, but cannot revoke another grant. When an older tab proof accompanies the browser newer valid cookie, return active:false with no Set-Cookie and preserve that newer grant. Successful matching revocation clears the adult cookie and invalidates work bound to that grant. A private-store failure returns 503 with no Set-Cookie because the current cookie cannot be safely classified.",
+        "security": [
+          {
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {}
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          },
+          "description": "Strict empty JSON object; at most 2048 bytes."
+        },
+        "responses": {
+          "200": {
+            "description": "Caller inactive; only a matched grant is revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdultLockResponse"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "$ref": "#/components/headers/AdultCookieCleared"
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON, unknown fields, or invalid request/choice values. No authorization is granted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/devices/unlock": {
+      "post": {
+        "summary": "Unlock parent management for the current trusted family device",
+        "description": "Checks the family parent passphrase and shared five-failure/15-minute lockout, then sets a separate 15-minute factory_parent cookie. The device is rechecked in the transaction. This is the prerequisite for the privacy routes; it does not create an Adult AI session or externally verified guardian consent.",
+        "security": [
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PassphraseUnlockRequest"
+              }
+            }
+          },
+          "description": "application/json only, exact fields, at most 2048 bytes."
+        },
+        "responses": {
+          "200": {
+            "description": "Parent management unlocked for this family/device",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentUnlockResponse"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "$ref": "#/components/headers/ParentCookieIssued"
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON, unknown fields, or invalid request/choice values. No authorization is granted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The shared parent passphrase lockout or bounded record limit is active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/devices/privacy": {
+      "get": {
+        "summary": "Read the latest parent privacy choice and its current verification status",
+        "description": "Requires familySession AND parentUnlock matching the exact active trusted device and family. Returns only the parent-visible notice, scopes, timestamps and status; no verification receipt or identity evidence is returned. A verified status requires complete, current external evidence; the response never asserts provider ZDR or service activation.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest parent privacy status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentPrivacyStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Record a pending parent privacy choice for selected future family AI scopes",
+        "description": "Requires a freshly unlocked parent on the same active trusted device. The exact notice version, both acknowledgements and at least one requested scope are required. Submission revokes previous choices and associated coach consent for this family immediately, then creates a pending record with a maximum 90-day lifetime. Only the separate trusted-owner external-verification process can verify it. Browser form submission cannot enable child AI, create an adult permit or assert ZDR.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParentPrivacyChoiceRequest"
+              }
+            }
+          },
+          "description": "Strict application/json object, at most 2048 bytes."
+        },
+        "responses": {
+          "200": {
+            "description": "Choice saved as pending external verification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentPrivacyPendingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON, unknown fields, or invalid request/choice values. No authorization is granted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The shared parent passphrase lockout or bounded record limit is active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/devices/privacy/revoke": {
+      "post": {
+        "summary": "Withdraw all current family privacy choices and associated coach consent",
+        "description": "Requires familySession AND parentUnlock on the same active trusted device. Revocation is transactional and is rechecked at paid boundaries and before publishing in-flight results. This withdraws future child/family processing permission; it does not erase existing data, refund completed provider work, revoke a separate operator adult permit or change provider approval flags.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          },
+          "description": "Strict empty JSON object, at most 2048 bytes."
+        },
+        "responses": {
+          "200": {
+            "description": "Family choices and associated coach consent withdrawn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentPrivacyRevokeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON, unknown fields, or invalid request/choice values. No authorization is granted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/devices/privacy/erase": {
+      "post": {
+        "summary": "Erase completed family coach and speech receipt records with explicit parent confirmation",
+        "description": "Requires familySession AND parentUnlock on the exact active trusted device plus {confirm:true}. The gateway delegates to the family-scoped erasure service, which rechecks device trust and refuses while a coach/audio request is running. Completed reply caches and receipt metadata are erased; aggregate accounting and audit remain. This operation does not erase device-local notebooks, game revisions, learning data, provider logs or backups, and does not revoke consent.",
+        "security": [
+          {
+            "familySession": [],
+            "parentUnlock": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EraseCoachReceiptsRequest"
+              }
+            }
+          },
+          "description": "Strict application/json object, at most 2048 bytes."
+        },
+        "responses": {
+          "200": {
+            "description": "Completed receipt records erased; accounting preserved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EraseCoachReceiptsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON, unknown fields, or invalid request/choice values. No authorization is granted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/builder/status": {
+      "get": {
+        "summary": "Read-only, authenticated family workshop readiness; never queues a game",
+        "responses": {
+          "200": {
+            "description": "Availability and a coarse readiness reason, not job progress",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "available",
+                    "reason"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "enum": [
+                        "READY",
+                        "UNAVAILABLE",
+                        "ALLOWANCE_REQUIRED"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or expired family session"
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Current generation adapter, permission and allowance availability; never queues a game or proves successful generation. During FACTORY_ADULT_PILOT_MODE=true, available:true requires familySession AND adultCookie AND adultProof for an owner-enrolled active adult grant; family-only callers receive unavailable. When adult pilot mode is off, the family-only alternative uses the server-verified generation guardian permission and that service provider/privacy gates; adult credentials do not substitute for child consent or ZDR. The security alternatives represent these runtime contexts, not a client choice to bypass the active audience policy. Invalid adult proof is rejected, not silently downgraded to a family request.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ]
+      }
+    },
+    "/v1/coach/status": {
+      "get": {
+        "summary": "Read-only, authenticated model-coach configuration readiness; not a proof of a successful inference",
+        "responses": {
+          "200": {
+            "description": "Coach availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "available",
+                    "mode"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "model",
+                        "unavailable"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or expired family session"
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Current model coach permission, provider configuration and allowance availability; never submits a conversation or proves a successful inference. During FACTORY_ADULT_PILOT_MODE=true, available:true requires familySession AND adultCookie AND adultProof for an owner-enrolled active adult grant; family-only callers receive unavailable. When adult pilot mode is off, the family-only alternative uses the server-verified conversation guardian permission and that service provider/privacy gates; adult credentials do not substitute for child consent or ZDR. The security alternatives represent these runtime contexts, not a client choice to bypass the active audience policy. Invalid adult proof is rejected, not silently downgraded to a family request.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ]
+      }
+    },
     "/v1/jobs": {
       "post": {
         "summary": "Validate, authorize, reserve quota and durably acknowledge an idempotent job",
@@ -80,7 +869,26 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "Runtime audience policy: with FACTORY_ADULT_PILOT_MODE=true, paid admission requires familySession AND adultCookie AND adultProof, an active owner-enrolled trusted device and its current 60-minute adult grant. With adult mode off, only the family-session path is available and current server-verified guardian generation permission is required. These alternatives are selected by server configuration, not caller role/profile JSON. Existing provider, private worker, budget and quota gates remain required. Admission and asynchronous worker claim/report/Ready publication recheck the applicable permission; adult jobs retain the exact grant that admitted them. Do not automatically replay an uncertain paid POST.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ]
       }
     },
     "/v1/jobs/{id}": {
@@ -136,6 +944,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -147,8 +965,22 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
           }
-        ]
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
       }
     },
     "/v1/jobs/{id}/cancel": {
@@ -204,6 +1036,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -225,8 +1067,25 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
           }
-        ]
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
       }
     },
     "/v1/revisions": {
@@ -293,7 +1152,26 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "Registers a validated local manifest/config seed without a model call. In adult pilot mode a live adult grant (familySession AND adultCookie AND adultProof) is required and the seed is bound to that adult workspace. In family mode the family session creates a family-audience seed; registering a local seed is not a paid operation or guardian verification. Seed IDs are derived by the server from the family and audience. Existing content cannot be reassigned across audiences.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ]
       }
     },
     "/v1/revisions/{id}/preview": {
@@ -349,6 +1227,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -360,8 +1248,22 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
           }
-        ]
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant. The issued capability expires within two minutes and no later than the authenticated access deadline. For an adult revision, its signature binds the adult grant, device and profile; the separate preview service rechecks the live grant. Lock, revocation or expiry denies subsequent preview requests even before the URL deadline. Never persist signed preview URLs in browser storage."
       }
     },
     "/v1/revisions/{id}/keep": {
@@ -417,6 +1319,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -438,8 +1350,25 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
           }
-        ]
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
       }
     },
     "/v1/revisions/{id}/undo": {
@@ -495,6 +1424,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -516,8 +1455,25 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
           }
-        ]
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
       }
     },
     "/v1/creations": {
@@ -574,7 +1530,23 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ]
       }
     },
     "/v1/revisions/{id}": {
@@ -589,6 +1561,9 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
           }
         ],
         "responses": {
@@ -601,8 +1576,49 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
       }
     },
     "/v1/revisions/{id}/fork": {
@@ -617,6 +1633,12 @@
               "type": "string",
               "pattern": "^[\\w-]{1,100}$"
             }
+          },
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
           }
         ],
         "requestBody": {
@@ -639,8 +1661,49 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
       }
     },
     "/v1/sessions": {
@@ -664,7 +1727,15 @@
           "403": {
             "description": "Invalid/expired/used invitation or Origin/CSRF mismatch"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ]
       }
     },
     "/v1/jobs/{id}/retry": {
@@ -672,8 +1743,98 @@
         "summary": "Retry an authorized failed job after reload without copying its prompt",
         "responses": {
           "202": {
-            "description": "Idempotent bounded retry acknowledgement"
+            "description": "Bounded retry acknowledged under current applicable permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid retry key, retry limit, consent, quota or conflicting request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Builder unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "Runtime audience policy: with FACTORY_ADULT_PILOT_MODE=true, paid admission requires familySession AND adultCookie AND adultProof, an active owner-enrolled trusted device and its current 60-minute adult grant. With adult mode off, only the family-session path is available and current server-verified guardian generation permission is required. These alternatives are selected by server configuration, not caller role/profile JSON. Existing provider, private worker, budget and quota gates remain required. Admission and asynchronous worker claim/report/Ready publication recheck the applicable permission; adult jobs retain the exact grant that admitted them. Do not automatically replay an uncertain paid POST.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/AllowedOrigin"
+          },
+          {
+            "$ref": "#/components/parameters/FactoryRequest"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryRequest"
+              }
+            }
+          },
+          "description": "A new idempotency key for the authorized failed job; the server reuses that job prompt, source and audience."
         }
       }
     },
@@ -692,7 +1853,13 @@
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "description": "Existing private worker OIDC and job/stage/run bindings remain mandatory. For adult jobs, the original device, profile and privilege grant must still be current at claim/report and Ready publication; a later unlock cannot authorize an old job. Family generation consent remains independently enforced in family mode. The worker does not receive browser adult credentials."
       }
     },
     "/v1/worker/jobs/{id}/report": {
@@ -710,7 +1877,13 @@
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "description": "Existing private worker OIDC and job/stage/run bindings remain mandatory. For adult jobs, the original device, profile and privilege grant must still be current at claim/report and Ready publication; a later unlock cannot authorize an old job. Family generation consent remains independently enforced in family mode. The worker does not receive browser adult credentials."
       }
     },
     "/v1/worker/jobs/{id}/status": {
@@ -728,7 +1901,13 @@
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "description": "Existing private worker OIDC and job/stage/run bindings remain mandatory. For adult jobs, the original device, profile and privilege grant must still be current at claim/report and Ready publication; a later unlock cannot authorize an old job. Family generation consent remains independently enforced in family mode. The worker does not receive browser adult credentials."
       }
     },
     "/v1/internal/dispatch": {
@@ -748,6 +1927,251 @@
           }
         }
       }
+    },
+    "/v1/coach/audio/status": {
+      "get": {
+        "summary": "Read authenticated private dictation availability",
+        "responses": {
+          "200": {
+            "description": "Private dictation availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "available",
+                    "mode"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "private",
+                        "unavailable"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private state or the required service is unavailable. No activation or erasure success is asserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Current private dictation permission, provider configuration and allowance availability; never records or transcribes audio. During FACTORY_ADULT_PILOT_MODE=true, available:true requires familySession AND adultCookie AND adultProof for an owner-enrolled active adult grant; family-only callers receive unavailable. When adult pilot mode is off, the family-only alternative uses the server-verified remoteSpeech guardian permission and that service provider/privacy gates; adult credentials do not substitute for child consent or ZDR. The security alternatives represent these runtime contexts, not a client choice to bypass the active audience policy. Invalid adult proof is rejected, not silently downgraded to a family request.",
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ]
+      }
+    },
+    "/v1/revisions/{id}/creation": {
+      "get": {
+        "summary": "Read an optional editable companion scene for this exact saved revision",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w-]{1,100}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exact revision and project identity with validated companion data or null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "revisionId",
+                    "projectId",
+                    "manifest"
+                  ],
+                  "properties": {
+                    "revisionId": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "manifest": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "object",
+                          "description": "Validated jems.creation.v1 scene; recursive actor, program, action and provenance contract is the shared source validator.",
+                          "required": [
+                            "schema",
+                            "id",
+                            "title",
+                            "width",
+                            "height",
+                            "background",
+                            "actors",
+                            "programs",
+                            "variables"
+                          ],
+                          "properties": {
+                            "schema": {
+                              "const": "jems.creation.v1"
+                            },
+                            "id": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "width": {
+                              "type": "integer",
+                              "minimum": 200,
+                              "maximum": 1600
+                            },
+                            "height": {
+                              "type": "integer",
+                              "minimum": 160,
+                              "maximum": 1200
+                            },
+                            "background": {
+                              "type": "string",
+                              "enum": [
+                                "meadow",
+                                "night",
+                                "workshop",
+                                "sky"
+                              ]
+                            },
+                            "actors": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 16,
+                              "items": {
+                                "type": "object"
+                              }
+                            },
+                            "programs": {
+                              "type": "array",
+                              "maxItems": 48,
+                              "items": {
+                                "type": "object"
+                              }
+                            },
+                            "variables": {
+                              "type": "object",
+                              "maxProperties": 24,
+                              "additionalProperties": {
+                                "type": "number"
+                              }
+                            },
+                            "provenance": {
+                              "type": "object"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or revoked family access, or a missing/expired parent unlock where required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/CSRF mismatch, wrong family/device, invalid passphrase, or missing adult authorization for the requested operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested private resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "Reuses the saved revision family, trusted-device and adult-profile audience checks. Returns manifest:null for old games and games without an authored companion; it never analyzes or executes game JavaScript. A manifest is bounded jems.creation.v1 data, with reviewed local asset IDs only, no source code, external URLs, credentials or private preview capabilities. It is a separate editable companion, not an assertion that game artwork or arbitrary mechanics were translated. All generated blocks are marked assisted. Exact recursive validation is implemented in src/creation/model.ts and src/creation/projects.ts. Responses are no-store."
+      }
     }
   },
   "components": {
@@ -756,7 +2180,7 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "factory_session",
-        "description": "Server-issued signed HttpOnly Secure SameSite cookie from trusted family identity provisioning. Never a caller-selected family ID. POST additionally requires an allowed Origin and X-Factory-Request: 1."
+        "description": "Signed factory_session cookie issued by trusted family provisioning: Secure, HttpOnly, SameSite=None, Partitioned, Path=/v1. A device-bound session is checked against the live trusted-device record on every request. Neither a local profile name nor caller JSON establishes adult authorization. All browser POSTs additionally require the exact configured Origin, X-Factory-Request: 1 and the documented Content-Type."
       },
       "workerOIDC": {
         "type": "http",
@@ -768,6 +2192,24 @@
         "type": "http",
         "scheme": "bearer",
         "description": "Google signed OIDC; exact scheduler account email, verified email and gateway audience."
+      },
+      "adultCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "factory_adult",
+        "description": "Independent server-issued HttpOnly adult credential (Secure, SameSite=None, Partitioned, Path=/v1). Issued only by the passphrase-checked adult unlock on an owner-approved trusted device. The cookie alone grants no adult capability: adultProof is required in the same security requirement. The stored grant expires after at most 60 minutes, is bounded by the operator permit, and is not extended by ordinary family-session renewal."
+      },
+      "adultProof": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Factory-Adult-Session",
+        "description": "43-character base64url proof returned by adult unlock, retained only in the active browser tab memory. It is distinct from the HttpOnly adult cookie secret. Both hashes must match the same live grant, family, trusted device and current owner permit. A local role/profile field, a cookie alone, another tab proof, or a signed family-cookie adult claim cannot replace this proof. This scheme is not OAuth and has no caller-selected scopes."
+      },
+      "parentUnlock": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "factory_parent",
+        "description": "15-minute signed parent-management cookie issued after POST /v1/devices/unlock validates the family passphrase. Secure, HttpOnly, SameSite=None, Partitioned, Path=/v1/devices. Must match the familySession family and exact active trusted device. Adult AI profile access does not grant parent management, and a parent passphrase does not establish externally verified guardian consent."
       }
     },
     "schemas": {
@@ -805,7 +2247,8 @@
           },
           "clientRequestId": {
             "type": "string",
-            "pattern": "^[\\w-]{1,100}$"
+            "pattern": "^[\\w-]{1,100}$",
+            "description": "Idempotency key scoped by the authenticated family and audience; never used to select an adult profile."
           },
           "retryOf": {
             "type": "string"
@@ -851,6 +2294,7 @@
             "enum": [
               "generating",
               "testing",
+              "reviewing",
               "repairing",
               "ready",
               "failed"
@@ -960,8 +2404,12 @@
             },
             "game": {
               "oneOf": [
-                {"$ref": "#/components/schemas/StarGame"},
-                {"$ref": "#/components/schemas/GeneratedMetadata"}
+                {
+                  "$ref": "#/components/schemas/StarGame"
+                },
+                {
+                  "$ref": "#/components/schemas/GeneratedMetadata"
+                }
               ]
             }
           }
@@ -1019,8 +2467,12 @@
           },
           "game": {
             "oneOf": [
-              {"$ref": "#/components/schemas/StarGame"},
-              {"$ref": "#/components/schemas/GeneratedMetadata"}
+              {
+                "$ref": "#/components/schemas/StarGame"
+              },
+              {
+                "$ref": "#/components/schemas/GeneratedMetadata"
+              }
             ]
           },
           "name": {
@@ -1033,7 +2485,10 @@
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["generated-module-v1", "generated-module-v2"]
+            "enum": [
+              "generated-module-v1",
+              "generated-module-v2"
+            ]
           },
           "title": {
             "type": "string"
@@ -1062,6 +2517,447 @@
             "maxLength": 100
           }
         }
+      },
+      "AdultProfileId": {
+        "type": "string",
+        "pattern": "^adult:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+        "description": "Server-derived stable adult workspace ID for the approved trusted device. It is an audience identifier, not a credential."
+      },
+      "AdultPilotStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enabled",
+          "eligible",
+          "active",
+          "profileId",
+          "expiresAt"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "True only when all adult development rollout flags are configured. Does not assert that any paid provider is ready."
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "The authenticated trusted device has a current owner-issued adult permit; eligibility alone never activates AI."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "True only when this request supplies the matching adult cookie and per-tab proof for a live grant."
+          },
+          "profileId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^adult:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+            "description": "Eligible device workspace ID, including when eligible but not unlocked; null when ineligible."
+          },
+          "expiresAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Effective adult access deadline in Unix milliseconds, capped by both family access and adult grant expiry; null unless active."
+          }
+        }
+      },
+      "FamilySessionStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "connected",
+          "trusted",
+          "deviceName",
+          "expiresAt",
+          "adultPilot"
+        ],
+        "properties": {
+          "connected": {
+            "type": "boolean",
+            "const": true
+          },
+          "trusted": {
+            "type": "boolean"
+          },
+          "deviceName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 48
+          },
+          "expiresAt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Absolute Unix time in milliseconds."
+          },
+          "adultPilot": {
+            "$ref": "#/components/schemas/AdultPilotStatus"
+          }
+        }
+      },
+      "PassphraseUnlockRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "parentPassphrase"
+        ],
+        "properties": {
+          "parentPassphrase": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 128,
+            "writeOnly": true,
+            "description": "The existing family parent passphrase. Never persist in browser storage or request logs."
+          }
+        }
+      },
+      "AdultUnlockResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "active",
+          "profileId",
+          "sessionToken",
+          "expiresAt"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "const": true
+          },
+          "profileId": {
+            "$ref": "#/components/schemas/AdultProfileId"
+          },
+          "sessionToken": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 43,
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "Return as X-Factory-Adult-Session only while this tab uses the Adult profile. Keep in tab memory, never localStorage or a child profile."
+          },
+          "expiresAt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Absolute adult grant deadline: at most 60 minutes from unlock and no later than the current operator permit expiry. Family renewal never extends it."
+          }
+        }
+      },
+      "AdultLockResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "active"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "description": "The caller must discard its local proof immediately. An inactive response does not claim a different tab grant was revoked."
+      },
+      "ParentUnlockResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "unlocked",
+          "expiresAt"
+        ],
+        "properties": {
+          "unlocked": {
+            "type": "boolean",
+            "const": true
+          },
+          "expiresAt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Absolute Unix time in milliseconds."
+          }
+        }
+      },
+      "ParentPrivacyScopes": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generation",
+          "conversation",
+          "remoteSpeech"
+        ],
+        "properties": {
+          "generation": {
+            "type": "boolean"
+          },
+          "conversation": {
+            "type": "boolean"
+          },
+          "remoteSpeech": {
+            "type": "boolean"
+          }
+        },
+        "description": "Independent requested permissions; a true choice is pending until current external guardian verification is recorded. These are not API-key/OAuth scopes or provider activation flags."
+      },
+      "ParentPrivacyChoiceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "noticeVersion",
+          "guardianAffirmed",
+          "providerAcknowledged",
+          "scopes"
+        ],
+        "properties": {
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-parent-privacy-2026-11-v1"
+          },
+          "guardianAffirmed": {
+            "type": "boolean",
+            "const": true
+          },
+          "providerAcknowledged": {
+            "type": "boolean",
+            "const": true
+          },
+          "scopes": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParentPrivacyScopes"
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "generation": {
+                        "const": true
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "conversation": {
+                        "const": true
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "remoteSpeech": {
+                        "const": true
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "description": "Exact pending-choice request. At least one scope must be true. The browser cannot supply verification timestamps, receipts, family/device IDs or a verified status."
+      },
+      "ParentPrivacyStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "noticeVersion",
+          "status",
+          "choiceId",
+          "scopes",
+          "requestedAt",
+          "expiresAt",
+          "externalVerificationRequired"
+        ],
+        "properties": {
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-parent-privacy-2026-11-v1"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not-requested",
+              "pending",
+              "verified",
+              "revoked",
+              "expired"
+            ]
+          },
+          "choiceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/ParentPrivacyScopes"
+          },
+          "requestedAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Absolute Unix time in milliseconds."
+          },
+          "expiresAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Absolute Unix time in milliseconds."
+          },
+          "externalVerificationRequired": {
+            "type": "boolean",
+            "description": "False only for current, complete external verification evidence. Never an assertion of provider-level ZDR or paid-service readiness."
+          }
+        }
+      },
+      "ParentPrivacyPendingResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "choiceId",
+          "noticeVersion"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "pending"
+          },
+          "choiceId": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+          },
+          "noticeVersion": {
+            "type": "string",
+            "const": "jems-parent-privacy-2026-11-v1"
+          }
+        }
+      },
+      "ParentPrivacyRevokeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "revoked"
+          }
+        }
+      },
+      "EraseCoachReceiptsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "confirm"
+        ],
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      },
+      "EraseCoachReceiptsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "erased"
+        ],
+        "properties": {
+          "erased": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of removed completed coach/audio receipt records. Aggregate accounting and audit remain; this does not delete local notebooks, games, provider logs or backups."
+          }
+        }
+      },
+      "RetryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clientRequestId"
+        ],
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "pattern": "^[\\w-]{1,100}$"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "AllowedOrigin": {
+        "name": "Origin",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": "Must exactly equal the gateway configured appOrigin. No wildcard or alternate site is accepted."
+      },
+      "OptionalAllowedOrigin": {
+        "name": "Origin",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": "When present, must exactly equal the gateway configured appOrigin. Cross-origin browser requests use credentialed CORS for that exact origin."
+      },
+      "FactoryRequest": {
+        "name": "X-Factory-Request",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "const": "1"
+        },
+        "description": "Required explicit browser mutation/CSRF header; does not grant identity or consent."
+      },
+      "ResourceId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[\\w-]{1,100}$"
+        }
+      }
+    },
+    "headers": {
+      "AdultCookieIssued": {
+        "schema": {
+          "type": "string"
+        },
+        "description": "Sets factory_adult with Path=/v1; Secure; HttpOnly; SameSite=None; Partitioned and Max-Age no greater than 3600 seconds (shorter when the operator permit expires sooner). Never store this credential in browser JavaScript."
+      },
+      "AdultCookieCleared": {
+        "schema": {
+          "type": "string"
+        },
+        "description": "When returned, clears factory_adult with the same cookie attributes and Max-Age=0. Omitted when a stale/mismatched proof accompanies a newer valid cookie; that newer grant is preserved."
+      },
+      "ParentCookieIssued": {
+        "schema": {
+          "type": "string"
+        },
+        "description": "Sets factory_parent with Path=/v1/devices; Secure; HttpOnly; SameSite=None; Partitioned; Max-Age=900."
       }
     }
   }

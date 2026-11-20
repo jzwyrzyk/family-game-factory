@@ -1,0 +1,76 @@
+{
+  "sourceImplementationCommit": "0fc798d8e2131d9ffc1ee42afc1b248d3e04f489",
+  "matchingLocalImplementationCommit": "5c4717224b08004256706ae79498c24524b752de",
+  "matchingImplementationTree": "d5afceaaab0563711f91227cc56230e9190be9ee",
+  "mainIntegrated": "02bdb58d17d5687e39ab20bd884f02a18007ede5",
+  "productionBundle": "index-cszUlGZq.js",
+  "runtime": "production-dist",
+  "realChildrenTested": false,
+  "realTabletTested": false,
+  "results": [
+    {
+      "device": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1080
+      },
+      "touchEmulated": false,
+      "status": "passed",
+      "paidRequests": 0,
+      "pageErrors": 0,
+      "verified": [
+        "honest unsupported native-source feedback",
+        "saved-game source continuity",
+        "same-source scene reopen",
+        "UI-authored blocks",
+        "reorder and undo",
+        "nested repeat and condition branches",
+        "play/pause/step",
+        "Keep/reload",
+        "editable file export",
+        "real canvas video export",
+        "profile isolation",
+        "target separation",
+        "behavioral challenge feedback",
+        "persistent hint history",
+        "event taps",
+        "variable boundary behavior",
+        "learning checkpoint guard",
+        "profile-scoped progress",
+        "overflow"
+      ]
+    },
+    {
+      "device": "tablet",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "touchEmulated": true,
+      "status": "passed",
+      "paidRequests": 0,
+      "pageErrors": 0,
+      "verified": [
+        "honest unsupported native-source feedback",
+        "saved-game source continuity",
+        "same-source scene reopen",
+        "UI-authored blocks",
+        "reorder and undo",
+        "nested repeat and condition branches",
+        "play/pause/step",
+        "Keep/reload",
+        "editable file export",
+        "real canvas video export",
+        "profile isolation",
+        "target separation",
+        "behavioral challenge feedback",
+        "persistent hint history",
+        "event taps",
+        "variable boundary behavior",
+        "learning checkpoint guard",
+        "profile-scoped progress",
+        "overflow"
+      ]
+    }
+  ]
+}

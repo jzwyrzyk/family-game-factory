@@ -40,3 +40,47 @@ export function interpretMathRequest(text: string): MathRequest | null {
   if (removal.test(t) && !negatedRemoval) return { kind: 'required', message: REQUIRED_MATH_MESSAGE };
   return null;
 }
+
+/** ELA remains required; a grown-up controls whether children can switch between activities.
+ * Never reinterpret an ordinary game-design request as a learning-policy change.
+ */
+export const REQUIRED_LANGUAGE_MESSAGE =
+  'Language Arts checkpoints stay part of every game. A grown-up enables Math, Language Arts or Both in Parent Controls. Children can only switch when Both is enabled and no question is active; learning stays required.';
+export const LANGUAGE_MODE_LABELS:Record<LearningMode,string> = {
+  checkpoint:'Language at a pause',
+  interaction:'Build words & sentences when available',
+  both:'A mix of language activities',
+};
+export function learningFormatLabel(subject:unknown,mode:LearningMode):string {
+  return subject==='language'?LANGUAGE_MODE_LABELS[mode]:MODE_LABELS[mode];
+}
+export function interpretLearningRequest(text:string,subject:unknown='math'):MathRequest|null {
+  if(subject!=='language')return interpretMathRequest(text);
+  const t=text.toLowerCase().replace(/[’']/g,"'").trim();
+  // Do not construe "remove all math" as an attempt to remove current language practice.
+  // Subject changes are parent-owned, including explicit requests for Math instead.
+  if(/\b(?:switch|change|replace|choose|select)\b.{0,50}\b(?:learning subject|subject to math|math instead|from (?:english|language|reading) to math)\b/.test(t)||
+     /\b(?:use|do|give me) math instead of (?:english|language|reading)\b/.test(t)){
+    return {kind:'required',message:REQUIRED_LANGUAGE_MESSAGE};
+  }
+  const domain='(?:language(?: arts)?|english|reading|literacy|spelling|learning(?: activities| questions| checkpoints)?|educational (?:activities|questions)|checkpoints?)';
+  const removal=new RegExp('\\b(?:remove|disable|delete|skip|eliminate|hide|stop|turn off|switch off|get rid of)\\s+(?:(?:all|the|any|these|every|more)\\s+){0,2}'+domain+'\\b|\\b(?:no|without|zero)\\s+(?:(?:more|any|the)\\s+){0,2}'+domain+'\\b|\\b(?:don.t want|never show|never ask for)\\s+(?:(?:any|the|more)\\s+)?'+domain+'\\b|\\b'+domain+'\\s+(?:off|disabled|removed)\\b');
+  const negated=/\b(?:don't|never)\s+(?:remove|disable|delete|skip|turn off)\s+(?:(?:the|all|any)\s+)?(?:language arts|english|reading|literacy|learning|checkpoints?)\b/.test(t);
+  if(removal.test(t)&&!negated)return {kind:'required',message:REQUIRED_LANGUAGE_MESSAGE};
+  const language=/\b(?:language|english|reading|literacy|spelling|vocabulary|word-building|word tiles|sentence tiles|sentences?|phonics)\b/.test(t);
+  if(!language)return null;
+  // A complete creative-game brief is not only a mode request.
+  if(/^(?:please )?(?:build|create|design|invent)\b/.test(t)||
+     /^(?:please )?make (?:a|an|new)\b/.test(t)||
+     /approved game plan/.test(t))return null;
+  if(/\b(?:both|mix|mixture|combine)\b/.test(t)&&/\b(?:activities|formats|reading|words|spelling|language)\b/.test(t)){
+    return {kind:'mode',mode:'both'};
+  }
+  if(/\b(?:inside|within|interactive|interaction|embedded|build words|word tiles|sentence tiles)\b/.test(t)){
+    return {kind:'mode',mode:'interaction'};
+  }
+  if(/\b(?:checkpoints?|pauses?|between rounds|at a pause)\b/.test(t)){
+    return {kind:'mode',mode:'checkpoint'};
+  }
+  return null;
+}

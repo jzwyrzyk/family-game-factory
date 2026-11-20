@@ -1,7 +1,8 @@
 import { defaults, isGameId, validateConfig } from '../runtime/manifests';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
+import { assertRewardSourceWritable } from '../rewards/write-guard';
 export const WORKSPACE_KEY = 'family-game-factory-workspace-v2';
-export interface Revision { id: string; projectId: string; parentId: string | null; sourceRevisionId?: string; config: Mechanics; label: string; hypothesis: string; createdAt: string; state: 'private' }
+export interface Revision { id: string; projectId: string; parentId: string | null; sourceRevisionId?: string; drawingRigId?: string; config: Mechanics; label: string; hypothesis: string; createdAt: string; state: 'private' }
 export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string }
 export interface PlayRecord { id: string; revisionId: string; outcome: PlayOutcome; reflection: string }
 export interface Workspace { version: 2; projects: Project[]; revisions: Revision[]; plays: PlayRecord[] }
@@ -23,6 +24,7 @@ export function validateWorkspace(value: unknown): Workspace {
     const project = d.projects.find(p=>p.id===r.projectId);
     if (!project || r.state!=='private' || !text(r.label,300) || !text(r.hypothesis,300) || !text(r.createdAt,40) || !Number.isFinite(Date.parse(r.createdAt))) throw Error('Invalid revision.');
     validateConfig(project.game, r.config);
+    if (r.drawingRigId !== undefined && (project.game !== 'hill' || typeof r.drawingRigId !== 'string' || !/^[\w-]{1,100}$/.test(r.drawingRigId))) throw Error('Invalid saved drawing version.');
     if (r.sourceRevisionId && !d.revisions.some(x=>x.id===r.sourceRevisionId)) throw Error('Missing fork source.');
     const seen = new Set([r.id]); let parent = r.parentId;
     while (parent !== null) { const next = d.revisions.find(x=>x.id===parent && x.projectId===r.projectId); if (!next || seen.has(next.id)) throw Error('Invalid revision history.'); seen.add(next.id); parent = next.parentId; }
@@ -57,6 +59,7 @@ export class RevisionStore {
   }
   snapshot(): Workspace { return copy(this.data); }
   private transaction<T>(mutate:(next:Workspace)=>T):T {
+    assertRewardSourceWritable();
     const next=copy(this.data), result=mutate(next);validateWorkspace(next);
     try { this.storage.setItem(WORKSPACE_KEY,JSON.stringify(next)); } catch { throw Error('Could not save on this device. Your last working version is safe. Free some space and try again.'); }
     this.data=next;return copy(result);
@@ -65,13 +68,13 @@ export class RevisionStore {
   revision(projectId:string,owner:string,revisionId?:string):Revision {const p=this.project(projectId,owner);const r=this.data.revisions.find(r=>r.id===(revisionId||p.headId)&&r.projectId===p.id);if(!r)throw Error('Version not found.');return copy(r);}
   list(owner:string):Project[]{return copy(this.data.projects.filter(p=>p.owner===owner));}
   history(projectId:string,owner:string):Revision[]{this.project(projectId,owner);return copy(this.data.revisions.filter(r=>r.projectId===projectId));}
-  create(owner:string,game:GameId,name:string,config=defaults(game),revisionId:string=id()):Project {
+  create(owner:string,game:GameId,name:string,config=defaults(game),revisionId:string=id(),drawingRigId?:string):Project {
     const checked=validateConfig(game,config);
-    return this.transaction(d=>{const projectId=id();const p={id:projectId,owner,game,name:name.trim().slice(0,60)||'My remix',headId:revisionId};d.projects.push(p);d.revisions.push({id:revisionId,projectId,parentId:null,config:checked,label:'Starting game',hypothesis:'',createdAt:new Date().toISOString(),state:'private'});return p;});
+    return this.transaction(d=>{const projectId=id();const p={id:projectId,owner,game,name:name.trim().slice(0,60)||'My remix',headId:revisionId};d.projects.push(p);d.revisions.push({id:revisionId,projectId,parentId:null,...(drawingRigId?{drawingRigId}:{}),config:checked,label:'Starting game',hypothesis:'',createdAt:new Date().toISOString(),state:'private'});return p;});
   }
   commit(projectId:string,owner:string,config:Mechanics,label:string,hypothesis='',revisionId:string=id()):Revision {
     const p=this.project(projectId,owner),checked=validateConfig(p.game,config);
-    return this.transaction(d=>{const revision={id:revisionId,projectId,parentId:p.headId,config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);d.projects.find(x=>x.id===p.id)!.headId=revision.id;return revision;});
+    return this.transaction(d=>{const source=d.revisions.find(r=>r.id===p.headId)!;const revision={id:revisionId,projectId,parentId:p.headId,...(source.drawingRigId?{drawingRigId:source.drawingRigId}:{}),config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);d.projects.find(x=>x.id===p.id)!.headId=revision.id;return revision;});
   }
   keep(projectId:string,owner:string):void {const p=this.project(projectId,owner);this.transaction(d=>{d.projects.find(x=>x.id===p.id)!.keptId=p.headId;return true;});}
   checkout(projectId:string,owner:string,revisionId:string):void {this.revision(projectId,owner,revisionId);this.transaction(d=>{d.projects.find(p=>p.id===projectId)!.headId=revisionId;return true;});}

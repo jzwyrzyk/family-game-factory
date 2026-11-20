@@ -1,0 +1,41 @@
+{
+  "localImplementationCommit": "6f5177eff1943c8b6d094162771d35faf17b86d8",
+  "priorPublishedCommit": "f44061fb842380a260f3ca178e6d61f4d5f22a5f",
+  "observedAt": "2026-11-19T06:39:52.817290+00:00",
+  "productionBuild": "passed",
+  "creationTests": {
+    "passed": 72,
+    "failed": 0
+  },
+  "existingUnitTests": {
+    "passed": 296,
+    "failed": 0
+  },
+  "authoringBrowser": {
+    "desktop": "passed",
+    "touchEmulatedTablet": "passed",
+    "realTabletTested": false,
+    "realChildrenTested": false,
+    "paidRequests": 0,
+    "pageErrors": 0
+  },
+  "recoveryBrowser": {
+    "groupedJourneysPassed": 8,
+    "paidRequests": 0,
+    "pageErrors": 0
+  },
+  "additionalFocusedRegression": {
+    "passed": 22,
+    "failed": 0,
+    "includesEightBudgetTestsAlreadyCountedAbove": true,
+    "kind": "stub-transport pilot-release and generation-preflight contracts"
+  },
+  "childJourneyAndBuildContinuity": {
+    "desktop": "passed",
+    "mobile": "passed",
+    "scope": "Run after the mobile home-card correction, before the final scene-recovery and server transport fixes; final-head CI remains required."
+  },
+  "documentationCheck": "passed",
+  "mergeOrDeploymentPerformed": false,
+  "liveProviderUsed": false
+}

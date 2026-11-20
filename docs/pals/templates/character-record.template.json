@@ -1,0 +1,113 @@
+{
+  "template_version": 1,
+  "record_kind": "empty_template_not_a_live_registry",
+  "instructions": "Adapt to the established character-reference index. Null means unknown. Preserve existing identities and status meanings; this file supplies no approvals, production schema, or runtime mapping.",
+  "identity": {
+    "species_id": null,
+    "character_key": null,
+    "display_name": null,
+    "board_aliases": []
+  },
+  "design": {
+    "source_cards": [],
+    "borrowed_properties": [],
+    "story": null,
+    "useful_action": null,
+    "personality_contrast": null,
+    "family_anchors": [],
+    "nearest_neighbors": []
+  },
+  "growth_form_policy": {
+    "stage_count": 2,
+    "display_names": [
+      "Base",
+      "Grown"
+    ],
+    "form_keys": [
+      "base",
+      "mature"
+    ],
+    "growth_transitions": 1,
+    "progression_threshold": null
+  },
+  "forms": {
+    "base": {
+      "form_key": "base",
+      "stage": 1,
+      "display_name": "Base",
+      "variant": "default",
+      "spec_revision": null,
+      "art_revision": null,
+      "status": "draft",
+      "anatomy": null,
+      "gem_mechanism": null,
+      "identity_anchors": [],
+      "selected_direction": null,
+      "approved_reference": null,
+      "current_review_reference": null,
+      "approval_evidence": null,
+      "qa_results": [],
+      "expression_set": {
+        "reference": null,
+        "status": "not_verified"
+      },
+      "rig_and_animation": {
+        "reference": null,
+        "status": "not_verified"
+      },
+      "application_binding": null,
+      "in_game_evidence": null,
+      "unresolved_issues": [],
+      "superseded_references": []
+    },
+    "mature": {
+      "form_key": "mature",
+      "stage": 2,
+      "display_name": "Grown",
+      "variant": "default",
+      "spec_revision": null,
+      "art_revision": null,
+      "status": "draft",
+      "anatomy": null,
+      "gem_mechanism": null,
+      "identity_anchors": [],
+      "selected_direction": null,
+      "approved_reference": null,
+      "current_review_reference": null,
+      "approval_evidence": null,
+      "qa_results": [],
+      "expression_set": {
+        "reference": null,
+        "status": "not_verified"
+      },
+      "rig_and_animation": {
+        "reference": null,
+        "status": "not_verified"
+      },
+      "application_binding": null,
+      "in_game_evidence": null,
+      "unresolved_issues": [],
+      "superseded_references": []
+    }
+  },
+  "growth_contract": {
+    "preserve": [],
+    "structural_change": null,
+    "gem_development": null,
+    "new_capability": null,
+    "story_connection": null,
+    "excluded_directions": []
+  },
+  "reference_shape_example": {
+    "asset_id": null,
+    "repository_path": null,
+    "source_commit": null,
+    "sha256": null,
+    "source_region": null,
+    "pixels_inspected": false,
+    "approval_evidence": null
+  },
+  "feedback_history": [],
+  "downstream_impacts": [],
+  "last_verified_at": null
+}

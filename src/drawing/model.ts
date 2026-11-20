@@ -70,16 +70,62 @@ export function validateAssembly(value:unknown):DrawingAssembly {
 }
 const center=(r:Region)=>({x:r.x+r.w/2,y:r.y+r.h/2});
 const clamp=(v:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,v));
+const precise=(value:number)=>Math.round(value*1e12)/1e12;
+function imageAspect(value:number){
+  if(!Number.isFinite(value)||value<=0)throw Error('This picture has unsupported dimensions.');
+  return value;
+}
+function faithfulScale(wanted:number,min:number,max:number,message:string){
+  if(![wanted,min,max].every(Number.isFinite)||min>max+1e-10)throw Error(message);
+  return clamp(wanted,min,max);
+}
 export interface VehicleDrawingGeometry {
   chassisWidth:number; chassisHeight:number;
   wheels:[{x:number;y:number;radius:number},{x:number;y:number;radius:number}];
 }
-/** Geometry is calibrated from the CHILD'S selected regions, not a stock car overlay. */
-export function vehicleGeometry(input:DrawingAssembly):VehicleDrawingGeometry {
+/** Rally has three physical bodies. Fixed decorations are part of its chassis art. */
+export interface VehicleDrawingParts {
+  body:DrawingPiece; wheels:[DrawingPiece,DrawingPiece]; decorations:DrawingPiece[];
+}
+export function vehicleParts(input:DrawingAssembly):VehicleDrawingParts {
   const a=validateAssembly(input);
   if(a.kind!=='car')throw Error('This design is not a car.');
-  const body=a.pieces.find(p=>p.role==='body'),wheels=a.pieces.filter(p=>p.role==='wheel').sort((l,r)=>center(l.region).x-center(r.region).x);
-  if(!body||wheels.length!==2)throw Error('Choose one body and exactly two wheels before driving.');
+  const bodies=a.pieces.filter(p=>p.role==='body');
+  const wheels=a.pieces.filter(p=>p.role==='wheel').sort((l,r)=>center(l.region).x-center(r.region).x);
+  if(bodies.length!==1||wheels.length!==2)throw Error('Choose exactly one body and two wheels before driving.');
+  const body=bodies[0];
+  if(!body.physical||body.parentId!==null||wheels.some(p=>!p.physical||p.parentId!==body.id))
+    throw Error('The car body must be the main part, with both moving wheels attached to it.');
+  const decorations=a.pieces.filter(p=>p.role!=='body'&&p.role!=='wheel');
+  if(decorations.some(p=>p.role!=='decoration'||p.physical||p.parentId!==body.id))
+    throw Error('For Rally, extra pieces must be Decorations attached to the body. Use a Character or Machine for extra moving parts.');
+  return {body,wheels:[wheels[0],wheels[1]],decorations};
+}
+/** Pass original image WIDTH / HEIGHT for faithful source geometry. The omitted
+ * aspect retains the original normalized calibration for legacy structural callers. */
+export function vehicleGeometry(input:DrawingAssembly,sourceAspect?:number):VehicleDrawingGeometry {
+  const {body,wheels}=vehicleParts(input);
+  if(sourceAspect!==undefined){
+    const aspect=imageAspect(sourceAspect),b=center(body.region),height=body.region.h/aspect;
+    const outlines=wheels.map(piece=>{
+      const c=center(piece.region);
+      return {x:c.x-b.x,y:(c.y-b.y)/aspect,radius:Math.min(piece.region.w,piece.region.h/aspect)/2};
+    });
+    const separation=outlines[1].x-outlines[0].x;
+    if(separation<=0)throw Error('Move the wheels farther apart to make a stable car.');
+    let min=Math.max(1/body.region.w,.5/height,.45/separation);
+    let max=Math.min(4/body.region.w,2/height);
+    for(const wheel of outlines){
+      min=Math.max(min,.35/wheel.radius);max=Math.min(max,.8/wheel.radius);
+      if(wheel.x)max=Math.min(max,1.75/Math.abs(wheel.x));
+      if(wheel.y<0)max=Math.min(max,.2/-wheel.y);
+      else if(wheel.y>0)max=Math.min(max,1.4/wheel.y);
+    }
+    const wanted=clamp(body.region.w/.72*2.9,1.65,3.7)/body.region.w;
+    const scale=faithfulScale(wanted,min,max,'These outlines cannot keep their proportions in Rally yet. Check the body and wheel outlines, or use a Machine for this design.');
+    return {chassisWidth:precise(body.region.w*scale),chassisHeight:precise(height*scale),
+      wheels:outlines.map(wheel=>({x:precise(wheel.x*scale),y:precise(wheel.y*scale),radius:precise(wheel.radius*scale)})) as VehicleDrawingGeometry['wheels']};
+  }
   // Both the body's visible shape and its selected wheel regions govern physics.
   // Normalize against the reviewed starter's body coverage, then bound the size.
   const chassisWidth=clamp(body.region.w/.72*2.9,1.65,3.7);
@@ -93,12 +139,23 @@ export function vehicleGeometry(input:DrawingAssembly):VehicleDrawingGeometry {
   return {chassisWidth,chassisHeight:clamp(body.region.h*scale,.55,1.75),wheels:offsets};
 }
 /** Verified game-runtime contract; images remain separate private assets. */
-export function assemblyRig(input:DrawingAssembly):DrawingRig {
+export function assemblyRig(input:DrawingAssembly,sourceAspect?:number):DrawingRig {
   const a=validateAssembly(input);
   const first=a.pieces.find(p=>p.role==='body')||a.pieces[0];
-  const anchor=center(first.region),scale=2.9/first.region.w;
+  const anchor=center(first.region),aspect=sourceAspect===undefined?1:imageAspect(sourceAspect);
+  let scale=2.9/first.region.w;
+  if(sourceAspect!==undefined){
+    let min=0,max=Infinity;
+    for(const piece of a.pieces){
+      const r=piece.region,c=center(r),height=r.h/aspect,dx=c.x-anchor.x,dy=(c.y-anchor.y)/aspect;
+      min=Math.max(min,.15/r.w,.15/height);max=Math.min(max,8/r.w,8/height);
+      if(dx)max=Math.min(max,8/Math.abs(dx));if(dy)max=Math.min(max,8/Math.abs(dy));
+    }
+    scale=faithfulScale(scale,min,max,'These outlines have very different sizes. Make the tiny pieces larger or split this drawing into two designs.');
+  }
   const components=a.pieces.map(piece=>{
-    const r=piece.region,c=center(r),width=clamp(r.w*scale,.15,8),height=clamp(r.h*scale,.15,8),wheel=piece.role==='wheel';
+    const r=piece.region,c=center(r),width=sourceAspect===undefined?clamp(r.w*scale,.15,8):precise(r.w*scale),
+      height=sourceAspect===undefined?clamp(r.h*scale,.15,8):precise(r.h/aspect*scale),wheel=piece.role==='wheel';
     const material:Material=wheel?'rubber':piece.role==='wing'?'fabric':piece.role==='platform'?'wood':'plastic';
     const pivot={x:((piece.pivot?.x??.5)-.5)*width,y:((piece.pivot?.y??.5)-.5)*height};
     const part={
@@ -110,7 +167,9 @@ export function assemblyRig(input:DrawingAssembly):DrawingRig {
       attachments:[{id:'center',x:0,y:0,role:'mount' as const},{id:'axle',x:0,y:0,role:'axle' as const},
         {id:'pivot',x:pivot.x,y:pivot.y,role:'axle' as const}],
     };
-    return {id:piece.id,parentId:piece.parentId,part,offset:{x:clamp((c.x-anchor.x)*scale,-8,8),y:clamp((c.y-anchor.y)*scale,-8,8)},angle:0,physical:piece.physical};
+    return {id:piece.id,parentId:piece.parentId,part,offset:{
+      x:sourceAspect===undefined?clamp((c.x-anchor.x)*scale,-8,8):precise((c.x-anchor.x)*scale),
+      y:sourceAspect===undefined?clamp((c.y-anchor.y)*scale,-8,8):precise((c.y-anchor.y)/aspect*scale)},angle:0,physical:piece.physical};
   });
   const body=a.pieces.find(p=>p.role==='body');
   const bindings=a.pieces.filter(p=>p.parentId!==null).map(p=>({

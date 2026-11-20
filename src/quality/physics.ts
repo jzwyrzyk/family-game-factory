@@ -184,6 +184,12 @@ export function createVehicle(options: VehicleOptions = {}, trackId = 'meadow', 
   const radius = bounded(options.wheelSize, .52, .35, .8), weight = bounded(options.chassisMass, 1, .5, 2), grip = bounded(options.grip, 1, .5, 1.5);
   // A drawing's wheel locations and sizes MUST change the actual wheel bodies.
   // Reject unbounded or implausible coordinates before any Planck allocation.
+  if(geometry){
+    const valid=(value:unknown,min:number,max:number)=>typeof value==='number'&&Number.isFinite(value)&&value>=min&&value<=max;
+    if(!valid(geometry.chassisWidth,1,4)||!valid(geometry.chassisHeight,.5,2)||!Array.isArray(geometry.wheels)||geometry.wheels.length!==2
+      ||geometry.wheels.some(w=>!w||!valid(w.x,-1.75,1.75)||!valid(w.y,-.2,1.4)||!valid(w.radius,.35,.8)))
+      throw Error('INVALID_DRAWN_VEHICLE_GEOMETRY');
+  }
   const custom = geometry ? {
     width: bounded(geometry.chassisWidth, 2.9, 1, 4),
     height: bounded(geometry.chassisHeight, 1.25, .5, 2),
@@ -192,7 +198,7 @@ export function createVehicle(options: VehicleOptions = {}, trackId = 'meadow', 
       radius: bounded(w.radius, .52, .35, .8),
     }))
   } : undefined;
-  if(custom && (custom.wheels.length!==2 || custom.wheels[1].x-custom.wheels[0].x<.45))throw Error('INVALID_DRAWN_VEHICLE_GEOMETRY');
+  if(custom && (custom.wheels.length!==2 || custom.wheels[1].x-custom.wheels[0].x<.45-1e-9))throw Error('INVALID_DRAWN_VEHICLE_GEOMETRY');
   const baseY = custom ? Math.min(9.65,10.94-custom.height/2,10.94-Math.max(...custom.wheels.map(w=>w.y+w.radius))) : 9.65;
   const world = new World(Vec2(0, track.gravity)), terrain = world.createBody({ userData: { terrain: true } });
   for (let i = 1; i < track.points.length; i++) terrain.createFixture(Edge(Vec2(track.points[i - 1].x, track.points[i - 1].y), Vec2(track.points[i].x, track.points[i].y)), { friction: .9, restitution: .03 });

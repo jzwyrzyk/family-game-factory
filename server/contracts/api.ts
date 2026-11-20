@@ -3,7 +3,10 @@ import type { GameId, Mechanics } from '../../src/runtime/types';
 export type Role = 'designer' | 'parent';
 export interface VerifiedSession {
   // Obtained from verified identity middleware, NEVER from request JSON.
-  subject: string; familyId: string; role: Role; expiresAt: number;
+  subject: string; familyId: string; role: Role; expiresAt: number; deviceId?: string;
+  // Attached by the adult cookie + per-tab proof middleware, never a profile
+  // name, client JSON field or an ambient family-session cookie.
+  adultSessionId?:string; adultProfileId?:string;
 }
 export interface PrivateResource { familyId: string; id: string }
 export type GenerationState = 'queued' | 'running' | 'validating' | 'ready' | 'failed' | 'cancelled';

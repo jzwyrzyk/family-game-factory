@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validateAssembly,vehicleGeometry,assemblyRig,type DrawingAssembly} from '../src/drawing/model';
+import {validateAssembly,vehicleGeometry,vehicleParts,assemblyRig,type DrawingAssembly} from '../src/drawing/model';
 import {suggestParts} from '../src/drawing/segmentation';
 import {createVehicle} from '../src/quality/physics';
 import {createDrawingPlayground} from '../src/drawing/playground';
@@ -31,6 +31,101 @@ test("Changing the child's wheel geometry changes the actual Planck world",()=>{
   for(let i=0;i<240;i++){a.step(1/60,{throttle:1});b.step(1/60,{throttle:1});}
   assert.ok(Number.isFinite(a.snapshot().distance)&&Number.isFinite(b.snapshot().distance));
  }finally{a.dispose();b.dispose();}
+});
+test('Malformed imported vehicle geometry is rejected before physics allocation instead of using a stock fallback',()=>{
+ const geometry=vehicleGeometry(sample);
+ for(const invalid of [
+  {...geometry,chassisWidth:NaN},
+  {...geometry,chassisHeight:Infinity},
+  {...geometry,wheels:[]},
+  {...geometry,wheels:[geometry.wheels[0],{...geometry.wheels[1],radius:-1}]},
+  {...geometry,wheels:[geometry.wheels[0],{...geometry.wheels[1],x:3}]},
+  {...geometry,wheels:[null,geometry.wheels[1]]},
+ ])assert.throws(()=>createVehicle({},'meadow',invalid as any),/INVALID_DRAWN_VEHICLE_GEOMETRY/);
+});
+test('Rally preserves fixed body decorations and rejects every unsupported independent part explicitly',()=>{
+ const decorated=structuredClone(sample);
+ decorated.pieces.push({id:'flag',name:'My flag',role:'decoration',parentId:'car_body',physical:false,
+   region:{x:.42,y:.04,w:.18,h:.25,shape:'rect'}});
+ assert.deepEqual(vehicleGeometry(decorated),vehicleGeometry(sample),'fixed art leaves the three-body physics unchanged');
+ assert.equal(vehicleParts(decorated).decorations[0].id,'flag');
+ const extraBody=structuredClone(decorated);extraBody.pieces.push({...sample.pieces[0],id:'second_body'});
+ assert.throws(()=>vehicleGeometry(extraBody),/exactly one body/);
+ for(const overrides of [{physical:true},{role:'wing' as const,physical:true},{parentId:null},{parentId:'rear_wheel'}]){
+  const unsupported=structuredClone(decorated);Object.assign(unsupported.pieces[3],overrides);
+  assert.throws(()=>vehicleGeometry(unsupported),/extra pieces must be Decorations attached to the body/);
+  assert.doesNotThrow(()=>assemblyRig({...unsupported,kind:'machine'}),'generic rigs continue to support the other arrangements');
+ }
+ for(const index of [0,1,2]){
+  const fixed=structuredClone(sample);fixed.pieces[index].physical=false;
+  assert.throws(()=>vehicleGeometry(fixed),/both moving wheels attached/);
+ }
+ const detached=structuredClone(sample);detached.pieces[1].parentId=null;
+ assert.throws(()=>vehicleGeometry(detached),/both moving wheels attached/);
+});
+test('Rally sprites and colliders use the same wheel center ordering even for unequal outlines',()=>{
+ const unusual=structuredClone(sample);
+ unusual.pieces[1].region={x:.3,y:.58,w:.65,h:.27,shape:'ellipse'};
+ unusual.pieces[2].region={x:.35,y:.58,w:.10,h:.27,shape:'ellipse'};
+ const parts=vehicleParts(unusual),geometry=vehicleGeometry(unusual);
+ assert.equal(parts.wheels[0].id,'front_wheel');assert.equal(parts.wheels[1].id,'rear_wheel');
+ assert.ok(geometry.wheels[0].x<geometry.wheels[1].x);
+});
+test('A 600 by 420 drawing retains one pixel scale for chassis, tires and actual wheel anchors',()=>{
+ const width=600,height=420,geometry=vehicleGeometry(sample,width/height);
+ const close=(actual:number,expected:number)=>assert.ok(Math.abs(actual-expected)<1e-9,`${actual} must equal ${expected}`);
+ const pixelsToWorld=geometry.chassisWidth/(sample.pieces[0].region.w*width);
+ close(geometry.chassisWidth,3.15);close(geometry.chassisHeight,1.40875);
+ close(geometry.chassisHeight,sample.pieces[0].region.h*height*pixelsToWorld);
+ close(geometry.wheels[0].x,-.74375);close(geometry.wheels[0].y,.8115625);
+ close(geometry.wheels[1].x,1.00625);close(geometry.wheels[0].radius,.35);
+ const world=createVehicle({},'meadow',geometry);
+ try{
+  const snapshot=world.snapshot(),body=snapshot.bodies[0],region=sample.pieces[0].region;
+  for(const [i,wheel]of snapshot.bodies.slice(1).entries()){
+   const r=sample.pieces[i+1].region;
+   close(wheel.x-body.x,((r.x+r.w/2)-(region.x+region.w/2))*width*pixelsToWorld);
+   close(wheel.y-body.y,((r.y+r.h/2)-(region.y+region.h/2))*height*pixelsToWorld);
+   close(wheel.width,Math.min(r.w*width,r.h*height)*pixelsToWorld);
+  }
+ }finally{world.dispose();}
+});
+test('Explicit square sources retain existing proportions when the legacy calibration already fits safely',()=>{
+ const square=structuredClone(sample);square.pieces[0].region.h=.34;
+ for(const wheel of square.pieces.slice(1))Object.assign(wheel.region,{w:.2,h:.2,y:.55});
+ const legacy=vehicleGeometry(square),faithful=vehicleGeometry(square,1);
+ for(const key of ['chassisWidth','chassisHeight'] as const)assert.ok(Math.abs(legacy[key]-faithful[key])<1e-9);
+ for(const [i,wheel]of faithful.wheels.entries())for(const key of ['x','y','radius'] as const)assert.ok(Math.abs(wheel[key]-legacy.wheels[i][key])<1e-9);
+ for(const aspect of [0,-1,NaN,Infinity])assert.throws(()=>vehicleGeometry(square,aspect),/unsupported dimensions/);
+ assert.throws(()=>vehicleGeometry(square,.05),/cannot keep their proportions/,'an impossible source is rejected rather than stretched');
+});
+test('Faithful geometry at the wheel-separation safety boundary survives floating-point rounding',()=>{
+ const narrow=structuredClone(sample);
+ narrow.pieces[0].region={x:.2,y:.3,w:.5,h:.2,shape:'rect'};
+ narrow.pieces[1].region={x:.3,y:.5,w:.2,h:.2,shape:'ellipse'};
+ narrow.pieces[2].region={x:.375,y:.5,w:.2,h:.2,shape:'ellipse'};
+ const geometry=vehicleGeometry(narrow,1);
+ assert.ok(Math.abs(geometry.wheels[1].x-geometry.wheels[0].x-.45)<1e-9);
+ const world=createVehicle({},'meadow',geometry);world.dispose();
+});
+test('Rectangular character and machine artwork keeps its proportions in real playground bodies and hinges',()=>{
+ const machine:DrawingAssembly={...sample,kind:'machine',pieces:[
+  {id:'body',name:'Body',role:'body',parentId:null,physical:true,region:{x:.2,y:.2,w:.6,h:.5,shape:'rect'}},
+  {id:'wing',name:'Wing',role:'wing',parentId:'body',physical:true,pivot:{x:.1,y:.2},region:{x:.55,y:.1,w:.2,h:.25,shape:'rect'}}
+ ]};
+ const aspect=600/420,rig=assemblyRig(machine,aspect),root=rig.components[0],wing=rig.components[1];
+ const close=(actual:number,expected:number)=>assert.ok(Math.abs(actual-expected)<1e-9,`${actual} must equal ${expected}`);
+ const pixelsToWorld=root.part.width/(.6*600);
+ close(root.part.height,.5*420*pixelsToWorld);close(wing.part.height,.25*420*pixelsToWorld);
+ close(wing.offset.x,.15*600*pixelsToWorld);close(wing.offset.y,-.225*420*pixelsToWorld);
+ const world=createDrawingPlayground(machine,aspect);
+ try{
+  const actual=world.snapshot(),body=actual.parts[0],part=actual.parts[1];
+  close(part.w,wing.part.width);close(part.h,wing.part.height);
+  close(part.x-body.x,wing.offset.x);close(part.y-body.y,wing.offset.y);
+  close(actual.joints[0].x,part.x+wing.part.pivot.x);close(actual.joints[0].y,part.y+wing.part.pivot.y);
+ }finally{world.dispose();}
+ assert.throws(()=>assemblyRig(machine,4096),/very different sizes/);
 });
 test('Mask corrections are bounded and cannot overwrite or masquerade as source art',()=>{
  const edited=structuredClone(sample);

@@ -12,6 +12,9 @@ import type { AgentAdapter } from '../server/pipeline/types';
 import type { VerifiedSession } from '../server/contracts/api';
 import { defaults, manifests } from '../src/runtime/manifests';
 import type { GameId } from '../src/runtime/types';
+import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
+import {syntheticQualityReview} from '../server/testing/presentation-quality-fixtures';
+import {productionFixture,testedPipelineFixture} from './quality-pipeline-fixtures';
 const session:VerifiedSession={subject:'designer-a',familyId:'family-a',role:'parent',expiresAt:Date.now()+60000};
 const request={gameId:'new',baseRevisionId:null,prompt:'Catch five stars',clientRequestId:'request-123'};
 const gate={test:async()=>{}}; // Unit fake; browser suite supplies an actual isolated browser smoke gate.
@@ -38,10 +41,12 @@ test('every reviewed native game can seed a family-scoped builder request, inclu
  assert.equal((await repo.snapshot()).jobs.length,Object.keys(manifests).length);
 });
 test('spending is disabled by default, reserved atomically, cut off under concurrent jobs and parent-controlled',async()=>{
- const adapter:AgentAdapter={available:true,kind:'metered-api',async generate(){return {candidate:{format:'declarative-v1',game:{kind:'star-catcher-v1',target:3,seconds:10}},usageUnits:2}}};
- const repo=new MemoryRepository(),service=new JobService(repo,adapter,gate,{allowMock:false,maxUnits:5,timeoutMs:1000,maxRetries:2});
- await assert.rejects(service.submit(session,request),/SPENDING_CUTOFF/);await assert.rejects(service.setAllowance({...session,role:'designer'},5,true),/FORBIDDEN/);await service.setAllowance(session,5,true);
- const first=await service.submit(session,request);await assert.rejects(service.submit(session,{...request,clientRequestId:'request-456'}),/SPENDING_CUTOFF/);await service.run(first.jobId);
+ // Synthetic full-policy fixture: this tests metering, not model or visual quality.
+ const spendingRequest={...request,prompt:'Attach stickers to a rocket and launch it.'},game=productionFixture(stickerLaunchFixture,spendingRequest.prompt);
+ const adapter:AgentAdapter={available:true,kind:'metered-api',async generate(){return {candidate:{format:'generated-source-v1',game},usageUnits:1}},async review(_input,compiled,evidence){return {review:syntheticQualityReview(compiled,evidence),usageUnits:1};}};
+ const repo=new MemoryRepository(),service=new JobService(repo,adapter,{test:async()=>testedPipelineFixture(game)},{allowMock:false,maxUnits:5,timeoutMs:1000,maxRetries:2});
+ await assert.rejects(service.submit(session,spendingRequest),/SPENDING_CUTOFF/);await assert.rejects(service.setAllowance({...session,role:'designer'},5,true),/FORBIDDEN/);await service.setAllowance(session,5,true);
+ const first=await service.submit(session,spendingRequest);await assert.rejects(service.submit(session,{...spendingRequest,clientRequestId:'request-456'}),/SPENDING_CUTOFF/);await service.run(first.jobId);
  const ledger=(await repo.snapshot()).ledgers[session.familyId];assert.equal(ledger.used,2);assert.equal(ledger.reserved,0);assert.equal((await service.get(session,first.jobId)).status,'ready');
 });
 test('cancellation is terminal, failed validation never replaces kept content, retry policy is bounded',async()=>{

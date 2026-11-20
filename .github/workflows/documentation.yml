@@ -1,0 +1,50 @@
+name: Documentation context
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  schedule:
+    # Weekly drift review. An old review date is a reminder, not a merge failure.
+    - cron: '19 13 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: documentation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  context:
+    name: Documentation references
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # PR github.sha is GitHub's prospective merge tree. A stale branch
+          # review must also match the integrated source before it can pass.
+          # Diff attribution still uses the event's real base/head SHAs.
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise documentation failure paths
+        run: node --test scripts/tests/check-docs.test.mjs
+      - name: Print deterministic review digests for inspected areas
+        if: ${{ !cancelled() }}
+        run: |
+          node --input-type=module -e 'import {sourceDigest} from "./scripts/check-docs.mjs"; import {readFileSync} from "node:fs"; const r=JSON.parse(readFileSync("docs/context/registry.json","utf8")); for (const a of r.areas) console.log("DOC_SOURCE_DIGEST",a.id,sourceDigest(process.cwd(),a));'
+      - name: Check reference integrity and reviewed source
+        if: ${{ !cancelled() }}
+        run: node scripts/check-docs.mjs check --report test-results/documentation-context.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-context
+          path: test-results/documentation-context.md
+          if-no-files-found: warn
+# No install scripts, provider calls, write token, auto-stamps, comments, issues,
+# main commits, deployments or pull_request_target execution. Making this check
+# a required branch rule is a separate repository-administration choice.

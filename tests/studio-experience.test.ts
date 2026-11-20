@@ -1,0 +1,62 @@
+import assert from 'node:assert/strict';
+import {JobService} from '../server/pipeline/service';
+import {MemoryRepository} from '../server/pipeline/repository';
+import {BuilderClient} from '../src/builder/client';
+import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,canCompareExperiments,coachConnectionCopy,conversationDisposition} from '../src/studio/experience';
+assert.match(coachConnectionCopy('unavailable'),/not connected/);
+assert.match(coachConnectionCopy('available'),/no game is building/);
+assert.match(builderReadinessCopy('allowance-required'),/paused/);
+assert.match(builderReadinessCopy('unverified'),/not been verified/);
+assert.match(buildErrorCopy('SPENDING_CUTOFF'),/allowance/);
+assert.match(buildErrorCopy('UNAUTHENTICATED'),/reconnect/);
+assert.match(buildProgressCopy(undefined,true)!.description,/No build is confirmed yet/);
+assert.equal(buildProgressCopy(undefined,false),null);
+assert.equal(buildProgressCopy({status:'queued'},false)!.phase,'queued');
+assert.equal(buildProgressCopy({status:'building',phase:'repairing'},false)!.phase,'building');
+assert.match(buildProgressCopy({status:'building',phase:'repairing'},false)!.description,/repairing/);
+assert.equal(buildProgressCopy({status:'testing'},false)!.phase,'testing');
+assert.equal(buildProgressCopy({status:'ready'},false)!.phase,'ready');
+assert.match(buildProgressCopy({status:'failed'},false)!.description,/not completed/);
+assert.equal(buildProgressCopy(undefined,false,true)!.phase,'uncertain');
+assert.equal(canCompareExperiments(1),false);
+assert.equal(canCompareExperiments(3),true);
+assert.equal(conversationDisposition('I just want to play now!'),'play');
+assert.equal(conversationDisposition('Let me play.'),'play');
+assert.equal(conversationDisposition('No more questions'),'play');
+assert.equal(conversationDisposition('Actually never mind'),'cancel');
+assert.equal(conversationDisposition('The dragon says never mind, then jumps'),'continue');
+assert.equal(conversationDisposition('Make a game where we play on the moon'),'continue');
+async function readiness(){
+ const repository=new MemoryRepository(),session={subject:'family-designer',familyId:'family-1',role:'designer' as const,expiresAt:Date.now()+60000};
+ const agent={kind:'metered-api' as const,available:true,generate:async()=>{throw Error('fixture must never generate');}};
+ const options={allowMock:false,maxUnits:500,timeoutMs:1000,maxRetries:0};
+ const service=new JobService(repository,agent as any,{test:async()=>{throw Error('no worker execution');}},options);
+ assert.deepEqual(await service.readiness(session),{available:false,reason:'ALLOWANCE_REQUIRED'});
+ await repository.transaction(state=>{state.ledgers['family-1']={month:new Date().toISOString().slice(0,7),allowance:800,used:50,reserved:50,paidEnabled:true};return true;});
+ assert.deepEqual(await service.readiness(session),{available:true,reason:'READY'});
+ await repository.transaction(state=>{state.ledgers['family-1'].reserved=300;return true;});
+ assert.deepEqual(await service.readiness(session),{available:false,reason:'ALLOWANCE_REQUIRED'});
+ assert.equal((await repository.snapshot()).jobs.length,0,'readiness never starts paid execution');
+ const disabled=new JobService(repository,{...agent,available:false} as any,{test:async()=>{}},options);
+ assert.deepEqual(await disabled.readiness(session),{available:false,reason:'UNAVAILABLE'});
+ console.log('PASS creation truth, authenticated build-readiness gates, and optional experiment comparison');
+}
+async function cancelFromReload(){
+ const originalFetch=globalThis.fetch,calls:string[]=[],events:string[]=[];
+ try{
+  globalThis.fetch=(async(input:RequestInfo|URL,init?:RequestInit)=>{
+   const url=String(input);calls.push((init?.method||'GET')+' '+url);
+   if(url.endsWith('/v1/sessions/status'))return new Response(JSON.stringify({connected:true}),{status:200});
+   if(url.endsWith('/v1/jobs/known-job'))return new Response(JSON.stringify({jobId:'known-job',status:'building'}),{status:200});
+   if(url.endsWith('/v1/jobs/known-job/cancel'))return new Response(JSON.stringify({jobId:'known-job',status:'cancelled'}),{status:200});
+   throw Error('Unexpected endpoint '+url);
+  }) as typeof fetch;
+  const client=new BuilderClient({version:1,mode:'remote',apiBaseUrl:'https://factory.test',previewOrigin:'https://preview.test'},job=>events.push(job.status));
+  const stopped=await client.cancel('known-job');
+  assert.equal(stopped.status,'cancelled');
+  assert.deepEqual(calls,['GET https://factory.test/v1/jobs/known-job','GET https://factory.test/v1/sessions/status','POST https://factory.test/v1/jobs/known-job/cancel']);
+  assert.deepEqual(events,['cancelled']);
+  console.log('PASS exact-job cancellation after reload, verified server transition');
+ }finally{globalThis.fetch=originalFetch;}
+}
+void (async()=>{await readiness();await cancelFromReload();})().catch(error=>{console.error(error);process.exitCode=1;});

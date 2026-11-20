@@ -2,11 +2,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { defaults, diff, validateConfig } from '../src/runtime/manifests';
 import { interpret } from '../src/factory/interpreter';
+import {buildPollDelay} from '../src/builder/client';
 import { RevisionStore, migrateWorkspace, WORKSPACE_KEY, validateWorkspace } from '../src/factory/workspace';
 import { DesignCoach } from '../src/factory/coach';
 import { createLifecycle } from '../src/runtime/lifecycle';
 import { manifests } from '../src/runtime/manifests';
 import type { GamePlugin, GameContext, PlayOutcome } from '../src/runtime/types';
+const physicsGum=()=>({...defaults('gum'),qualityVersion:1});
 const memory=()=>{const values=new Map<string,string>();return {getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{values.set(key,value);}};};
 const outcome:PlayOutcome={game:'buckets',won:true,level:1,title:'Stayed dry',description:'One safe choice',durationMs:900,at:'2026-11-15T00:00:00Z',config:defaults('buckets')};
 test('manifest types, ranges, steps and unknown keys fail closed; presets preserve originals',()=>{
@@ -18,7 +20,44 @@ test('honest interpreter accepts bounded child language, rejects mixed/novel ins
  const intent=interpret('buckets',defaults('buckets'),'Please give me four buckets!');assert.equal(intent.kind,'supported');if(intent.kind==='supported')assert.equal(intent.config.bucketCount,4);
  for(const text of ['Give me four buckets and add a flying dragon','Run this JavaScript: alert(1)','Build a skateboard racing game','Change math difficulty'])assert.equal(interpret('buckets',defaults('buckets'),text).kind,'generation-needed');
  assert.equal(interpret('buckets',defaults('buckets'),'Give me 99 buckets').kind,'invalid');assert.equal(interpret('buckets',defaults('buckets'),'Give me three buckets').kind,'unchanged');
- assert.equal(interpret('gum',defaults('gum'),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
+ assert.equal(interpret('gum',physicsGum(),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
+});
+test('seven native game manifests and transactional composed changes stay bounded',()=>{
+ assert.equal(Object.keys(manifests).length,7);
+ assert.equal(defaults('moon').donutGoal,6);assert.equal(defaults('robot','gentle').robotSpeed,.75);
+ assert.throws(()=>validateConfig('moon',{...defaults('moon'),meteorRate:5}));
+ assert.throws(()=>validateConfig('robot',{...defaults('robot'),script:true}));
+ const composed=interpret('gum',physicsGum(),'Give me 15 gum sticks and make fan stronger');
+ assert.equal(composed.kind,'supported');if(composed.kind==='supported'){assert.equal(composed.config.gumBudget,15);assert.equal(composed.config.thrust,1.1);}
+ const atomic=interpret('gum',physicsGum(),'Give me 15 gum sticks and make a new universe');
+ assert.equal(atomic.kind,'generation-needed');
+ const moon=interpret('moon',defaults('moon'),'Make meteors slower and make moon gravity lower');
+ assert.equal(moon.kind,'supported');if(moon.kind==='supported'){assert.equal(moon.config.meteorRate,.75);assert.equal(moon.config.moonGravity,.5);}
+ const physical=interpret('moon',defaults('moon'),'Add bounce pads and make moon gravity lower');
+ assert.equal(physical.kind,'supported');if(physical.kind==='supported')assert.equal(physical.config.bouncePads,true);
+ const portal=interpret('robot',defaults('robot'),'Add portals and make robot faster');
+ assert.equal(portal.kind,'supported');if(portal.kind==='supported')assert.equal(portal.config.portalEnabled,true);
+ const robot=interpret('robot',defaults('robot'),'Make robot faster and hide my path');
+ assert.equal(robot.kind,'supported');if(robot.kind==='supported'){assert.equal(robot.config.robotSpeed,1.25);assert.equal(robot.config.showTrail,false);}
+});
+test('Gem Factory presets and remixes stay within playable settings',()=>{
+ assert.deepEqual(defaults('factory'),{orderSize:3,cutterSpeed:1,sparkleBoost:false});
+ assert.deepEqual(defaults('factory','gentle'),{orderSize:2,cutterSpeed:.75,sparkleBoost:false});
+ assert.deepEqual(defaults('factory','stretch'),{orderSize:5,cutterSpeed:1.25,sparkleBoost:false});
+ const change=interpret('factory',defaults('factory'),'Pack 4 gems per order and add extra sparkles');
+ assert.equal(change.kind,'supported');if(change.kind==='supported'){assert.equal(change.config.orderSize,4);assert.equal(change.config.sparkleBoost,true);}
+ const slower=interpret('factory',defaults('factory'),'Make the cutter slower');
+ assert.equal(slower.kind,'supported');if(slower.kind==='supported')assert.equal(slower.config.cutterSpeed,.75);
+ assert.equal(interpret('factory',defaults('factory'),'Pack 99 gems per order').kind,'invalid');
+ assert.equal(interpret('factory',defaults('factory'),'Turn off learning').kind,'generation-needed');
+ assert.throws(()=>validateConfig('factory',{...defaults('factory'),cutterSpeed:0}));
+});
+test('background build polling slows down rather than querying every quarter-second',()=>{
+ assert.equal(buildPollDelay(0),1000);
+ assert.equal(buildPollDelay(14999),1000);
+ assert.equal(buildPollDelay(15000),3000);
+ assert.equal(buildPollDelay(60000),8000);
+ assert.equal(buildPollDelay(600000),8000);
 });
 test('revision DAG preserves alternate futures; undo, compare, fork and reload never overwrite source',()=>{
  const storage=memory(),store=new RevisionStore(storage);const project=store.create('p1','buckets','My game');const root=store.revision(project.id,'p1');

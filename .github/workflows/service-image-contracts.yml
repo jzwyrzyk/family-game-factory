@@ -1,0 +1,91 @@
+name: Service image packaging
+on:
+  push:
+    paths:
+      - '.github/workflows/service-image-contracts.yml'
+      - '.dockerignore'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'server/**'
+      - 'src/runtime/types.ts'
+      - 'src/runtime/manifests.ts'
+      - 'src/studio/design.ts'
+      - 'src/creation/model.ts'
+      - 'src/creation/projects.ts'
+      - 'scripts/deployment/build.py'
+      - 'scripts/deployment/test_build.py'
+  pull_request:
+    paths:
+      - '.github/workflows/service-image-contracts.yml'
+      - '.dockerignore'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'server/**'
+      - 'src/runtime/types.ts'
+      - 'src/runtime/manifests.ts'
+      - 'src/studio/design.ts'
+      - 'src/creation/model.ts'
+      - 'src/creation/projects.ts'
+      - 'scripts/deployment/build.py'
+      - 'scripts/deployment/test_build.py'
+permissions:
+  contents: read
+concurrency:
+  group: service-images-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  service-images:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage the exact committed publication archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import importlib.util
+          import os
+          from pathlib import Path
+          import subprocess
+
+          root = Path.cwd()
+          source_sha = os.environ['GITHUB_SHA']
+          assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() == source_sha
+          spec = importlib.util.spec_from_file_location('service_build', root / 'scripts/deployment/build.py')
+          publisher = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(publisher)
+          staged = Path(os.environ['RUNNER_TEMP']) / 'factory-service-source'
+          staged.mkdir()
+          archive, digest = publisher.source_archive(root, staged, source_sha)
+          print(f'Reviewed source: {source_sha}; archive SHA256: {digest}')
+          print(f'Staged archive: {archive}')
+          PY
+      - name: Build both service images from the publication archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Docker receives the same narrow archive as Cloud Build, including
+          # its .dockerignore. Building from the checkout could hide omissions.
+          for kind in gateway preview; do
+            docker build --pull --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+              --file "server/Dockerfile.$kind" --tag "jems-$kind:ci" \
+              - < "$RUNNER_TEMP/factory-service-source/source.tgz"
+          done
+      - name: Load packaged service modules as non-root without network access
+        shell: bash
+        run: |
+          set -euo pipefail
+          # No service is configured or started; importing these entry modules
+          # checks runtime dependencies without cloud credentials or providers.
+          for kind in gateway preview; do
+            entry=gateway
+            if [ "$kind" = preview ]; then entry=preview-server; fi
+            docker run --rm --network none --entrypoint node \
+              --env "SERVICE_ENTRY=./server/$entry.ts" "jems-$kind:ci" \
+              --import tsx --input-type=module -e '
+                if (process.getuid() === 0) throw new Error("Service image must run as non-root");
+                await import(process.env.SERVICE_ENTRY);
+                console.log("Packaged service imports passed as non-root");
+              '
+          done

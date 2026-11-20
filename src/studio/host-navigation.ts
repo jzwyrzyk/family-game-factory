@@ -20,7 +20,7 @@ export function installStudioRemixRouting(host: { activeGame(): GameId | null; o
 /** Bridge the original round-result Home button back to the studio library. */
 export function installStudioHostNavigation() {
   const fg = (window as any).FG;
-  if (!fg?.studio || new URLSearchParams(location.search).get('studio') !== '1') return;
+  if (!fg?.studio || new URLSearchParams(location.search).get('arcade') === '1' || new URLSearchParams(location.search).get('studio') === '0') return;
   document.addEventListener('click', event => {
     const button = (event.target as Element | null)?.closest<HTMLElement>('#resultHome, #exitGame');
     if (!button?.closest('#page-studio')) return;

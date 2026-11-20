@@ -1,5 +1,7 @@
 # Adaptive Math v1 — grades 1–4
 
+> **Feature contract with historical implementation status.** References below to draft PRs, opt-in Studio and pending release describe the original review. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current integration and release evidence. The learning model, scope limits and recorded acceptance evidence remain relevant; this banner does not claim educational validation.
+
 ## What this change delivers
 
 A shared, deterministic learning service now connects the original games, local remixes, the Studio draft, generated previews, and My Powers. It adjusts the next activity using the child's actual practice history; game scores and game difficulty never establish mathematical proficiency.
@@ -7,6 +9,8 @@ A shared, deterministic learning service now connects the original games, local 
 The release includes 73 bounded supplemental skill units across grades 1–4, progressive hints and worked examples, answer-building interactions, conservative evidence states, spaced review, confidence practice, and a host-owned game checkpoint protocol. It requires no inference call, credentials, cloud provisioning, or paid activation to generate or check math.
 
 This is the implementation of the learning-model phase. It does not certify a complete school curriculum or demonstrated learning gains. The code and automated acceptance gates can be reviewed now; educator review and a pilot across real elapsed days remain release-validation work. [The curriculum catalog](curriculum.md) states the exact coverage and limits.
+
+The [formative problem-solving feature](../problem-solving/README.md) can observe newly completed Math activities as subject context. It preserves this engine's grading and support semantics; an arithmetic answer, correction or hint count is not automatically scored as a general APS skill. Optional reasoning practice remains separate from required Math checkpoints and uses its own declared opportunities.
 
 The math component was developed in [draft #19](https://github.com/jzwyrzyk/family-game-factory/pull/19). It is now combined with the current physical games and child journey in [integrated draft #21](https://github.com/jzwyrzyk/family-game-factory/pull/21); that review's checks are the authority for the combined application. The ordinary arcade path still works. Add `?studio=1` to the development URL to inspect Studio integration. Opening or testing the draft does not merge it, change the live Pages site, provision cloud services, or enable the paid agent.
 

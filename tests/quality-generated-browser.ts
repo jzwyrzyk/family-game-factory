@@ -7,6 +7,7 @@ import {renderGeneratedV2} from '../server/sandbox/preview-v2.cjs';
 import {playtestV2,touchGesture} from '../server/sandbox/playtest-v2.cjs';
 import {hash,type GeneratedGame} from '../server/agent/generated';
 import {physicalWorkshop,suspensionChallenge,ignoresInput,focusedControls} from '../server/testing/quality-generated-fixtures';
+import {verifyTouchCancellation} from './quality-touch-cancel';
 
 // Only reviewed, hand-authored fixtures are compiled here. Production generated source still requires gVisor.
 // These are standalone renderer/physics/audio/containment fixtures, with no app learner host.
@@ -43,6 +44,10 @@ async function controlsAndCueTail(page:Page,frame:FrameLocator,touch:boolean){
  await page.waitForTimeout(350);const after=await frame.locator('body').evaluate(()=>(window as any).__qualityAudio);assert.equal(after.created,atFinish.created,'terminal stop cancels the music scheduler');assert.equal(after.active,0,'all short cue tails finish without sustained voices');
 }
 async function main(){const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});try{
+ if(process.argv.includes('--touch-cancel-only')){
+  const context=await browser.newContext({viewport:{width:375,height:812},hasTouch:true});await observeAudio(context);const page=await context.newPage();let requests=0;await context.route('**/*',r=>{requests++;return r.abort();});
+  try{await verifyTouchCancellation(page,game=>load(page,game));assert.equal(requests,0);}finally{await context.close();}return;
+ }
  for(const [device,viewport]of [['desktop',{width:1024,height:900}],['mobile',{width:375,height:812}]] as const){
   const context=await browser.newContext({viewport,hasTouch:device==='mobile'});await observeAudio(context);const page=await context.newPage();let requests=0;await context.route('**/*',r=>{requests++;return r.abort();});
   try{
@@ -54,11 +59,12 @@ async function main(){const browser=await chromium.launch({executablePath:proces
    frame=await load(page,focusedControls);await controlsAndCueTail(page,frame,device==='mobile');
    frame=await load(page,physicalWorkshop);await page.waitForTimeout(200);const canvas=frame.locator('#game'),before=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy'),box=(await canvas.boundingBox())!;const x=box.x+before.x/720*box.width,y=box.y+before.y/400*box.height;
    if(device==='mobile'){const touch=await context.newCDPSession(page);try{await touchGesture(touch,{x,y},{x:x+80,y:y-70},{steps:20,holdMs:350,cancel:true});}finally{await touch.detach();}}else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+80,y-70,{steps:20});await page.waitForTimeout(350);await page.mouse.up();}
-   const after=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy');assert.ok(Math.hypot(after.x-before.x,after.y-before.y)>25,'drag changes physical location');if(device==='mobile'){await page.waitForTimeout(250);const released=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy');assert.ok(released.y>after.y+2,'touch cancellation releases the spring drag');}
+   const after=JSON.parse(await canvas.getAttribute('data-snapshot')||'[]').find((c:any)=>c.key==='toy');assert.ok(Math.hypot(after.x-before.x,after.y-before.y)>25,'drag changes physical location');
    // The parent button can be above the viewport after canvas auto-focus.
    // Establish actual focus loss; scrolling alone can consume the first pointer event.
    await page.locator('#parent').focus();
    if(device==='mobile')await page.locator('#parent').tap();else await page.click('#parent');await page.waitForTimeout(100);assert.equal(await canvas.getAttribute('data-paused'),'true','focus loss pauses');const paused=await canvas.getAttribute('data-ticks');await page.waitForTimeout(180);assert.equal(await canvas.getAttribute('data-ticks'),paused);assert.equal(requests,0);
+   if(device==='mobile'){await verifyTouchCancellation(page,game=>load(page,game));assert.equal(requests,0);}
    console.log('PASS generated v2 '+device+': endless/challenge smoke, immediate keyboard controls, no held input after pause, bounded success cue tails, real pointer/touch drag+cancel, known win/loss, replay, limits and no egress.');
   }finally{await context.close();}
  }

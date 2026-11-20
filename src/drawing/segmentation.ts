@@ -113,7 +113,9 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
    const ax=r.x+(x+.5)/W*r.w,ay=r.y+(y+.5)/H*r.h;
    for(const other of pieces)if(other.id!==piece.id&&other.role==='wheel'){
     const q=other.region,nx=(ax-q.x-q.w/2)/(q.w/2),ny=(ay-q.y-q.h/2)/(q.h/2);
-    if(nx*nx+ny*ny<.92)d[p+3]=0;
+    // Match the full selected outline. An inset hole leaves the outer tire
+    // pixels on the chassis as well as on the independently moving wheel.
+    if(q.shape==='ellipse'?nx*nx+ny*ny<=1:Math.abs(nx)<=1&&Math.abs(ny)<=1)d[p+3]=0;
    }
   }
  }

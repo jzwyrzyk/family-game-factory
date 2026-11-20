@@ -1,0 +1,244 @@
+/* Child-first creation and transparent progress. Approved jems colors/assets only. */
+.studio-review #page-studio.studio-creating .studio-workspace{display:block;max-width:880px;margin:0 auto}
+.studio-review #page-studio.studio-creating #studioCanvas{display:none!important}
+.studio-review #page-studio.studio-creating #studioConversation{width:100%;position:static;top:auto}
+.studio-review #page-studio.studio-creating .studio-topbar{max-width:880px;margin:0 auto 10px}
+.studio-review #page-studio.studio-creating .studio-actions{display:none}
+.studio-review #page-studio.studio-creating .studio-mobile-tabs{display:none}
+.studio-review #page-studio.studio-creating .studio-version{color:var(--jems-purple);font-weight:800}
+.studio-review .studio-helper-heading{padding:15px 20px}
+.studio-review .studio-helper-heading h2{font-size:16px}
+.studio-review .studio-helper-heading p{font-size:11px;color:var(--jems-muted);line-height:1.5}
+.studio-review .studio-creation-hero{
+ display:flex;align-items:center;justify-content:center;gap:24px;
+ padding:22px 27px;background:linear-gradient(115deg,#FFFFFF 5%,#F2EAFE 72%,#E8F2FF 100%);
+ border-bottom:1px solid #E6D8FF;color:var(--jems-ink)
+}
+.studio-review .studio-creation-hero[hidden]{display:none!important}
+.studio-review .studio-creation-hero img{width:160px;height:130px;object-fit:contain;flex:none}
+.studio-review .studio-creation-hero h2{font:800 clamp(24px,3vw,31px)/1.18 var(--jems-round);letter-spacing:-.6px;color:var(--jems-ink);margin:6px 0 8px}
+.studio-review .studio-creation-hero p{font:500 14px/1.55 var(--jems-body);color:#415178;margin:0;max-width:420px}
+.studio-review .studio-creation-kicker{font-size:11px;letter-spacing:1px;color:#6834C4;font-weight:850}
+.studio-review #page-studio.studio-creating #studioMessages{height:auto;min-height:110px;max-height:min(40vh,350px);overflow-y:auto;padding:21px 28px;background:#fff}
+.studio-review .studio-messages{height:300px}
+.studio-review .studio-message p{font-size:14px;line-height:1.58;max-width:95%;border-radius:14px;padding:13px 16px}
+.studio-review .studio-message.child p{background:#EEE6FF;color:#352060}
+.studio-review .studio-message.helper p{background:#F0F3FF;color:var(--jems-ink)}
+.studio-review .studio-prompt{
+ margin:10px 14px 14px;padding:14px 17px 13px;background:#FFF!important;
+ border:2px solid var(--jems-purple)!important;border-radius:18px!important;
+ box-shadow:0 6px 20px #8B5CF611;transition:box-shadow .18s,border-color .18s
+}
+.studio-review .studio-prompt:focus-within{box-shadow:0 0 0 4px #8B5CF622,0 8px 20px #8B5CF617;border-color:#6C32D8!important}
+.studio-review .studio-prompt label{font:800 15px/1.4 var(--jems-round);color:var(--jems-ink)}
+.studio-review .studio-prompt textarea{
+ min-height:98px;max-height:260px;font:500 15px/1.6 var(--jems-body);
+ padding:10px 4px 5px;border:0!important;background:#fff;color:var(--jems-ink);
+ border-radius:0!important;resize:vertical
+}
+.studio-review .studio-prompt textarea:focus-visible{outline:0}
+.studio-review .studio-send-row{display:grid!important;grid-template-columns:auto 1fr auto;align-items:center;gap:9px!important;flex-wrap:nowrap!important;margin:6px 0 0}
+.studio-review .studio-send-row #studioMic{grid-column:1;min-width:106px;min-height:47px;border:1px solid #B99AF5;background:#F3EEFF;color:#5E2BAC;font-size:13px}
+.studio-review .studio-send-row #studioTalk{
+ grid-column:3;min-height:49px;min-width:150px;flex:none!important;font-weight:850;
+ background:var(--jems-blue);border-color:var(--jems-blue);color:white;
+ box-shadow:0 8px 18px #2E6BFF24
+}
+.studio-review .studio-send-row #studioSend{
+ grid-column:2;justify-self:end;min-height:47px;flex:none!important;
+ background:white;border:1px solid #B6C5E6;color:#263F7E;box-shadow:none;font-weight:800
+}
+.studio-review #page-studio.studio-creating .studio-send-row #studioSend{
+ grid-column:1/-1;width:100%;margin-top:12px;min-height:60px;
+ background:var(--jems-ink)!important;border:2px solid var(--jems-ink)!important;
+ color:#FFFFFF!important;font:850 17px/1.2 var(--jems-round)!important;
+ box-shadow:0 12px 26px #0B1E3B2B!important
+}
+.studio-review .studio-send-row #studioSend:disabled,.studio-review .studio-send-row #studioTalk:disabled{opacity:.6}
+.studio-review .studio-workshop-availability{display:none}
+.studio-review #page-studio.studio-creating .studio-workshop-availability{
+ grid-column:1/-1;display:block;text-align:center;
+ font:600 11px/1.4 var(--jems-body);color:#526386;margin:-3px 0 0
+}
+.studio-review #studioDraftStatus{display:block;font:500 11px/1.4 var(--jems-body);color:#687490;margin:7px 3px 0}
+.studio-review .studio-suggestions{margin:3px 0 8px}
+.studio-review .studio-chip{font-size:12px;min-height:37px;border-color:#C6D2EF;color:#36486F}
+.studio-review .studio-voice-details{margin-top:8px;border-top:1px solid #ECECF6;padding-top:7px}
+.studio-review .studio-voice-details summary{cursor:pointer;font:650 11px var(--jems-body);color:#667390}
+.studio-review .studio-voice-details .studio-voice-row{margin-top:7px}
+.studio-review .studio-voice-details .studio-voice-note{font-size:11px}
+.studio-review .design-controls{
+ display:flex;flex-direction:column;gap:8px;padding:10px 0 3px;margin:12px 0 0;
+ border-top:1px solid #E7E4F1
+}
+.studio-review .design-mode{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0}
+.studio-review .design-mode strong,.studio-review #coachDiscuss{display:none}
+.studio-review .design-controls #coachTry,.studio-review .design-controls #coachPlanToggle{
+ align-self:flex-start;min-height:36px;font-size:12px;
+ background:#F6F2FF;border:1px solid #D9C8FF;color:#6435B2
+}
+.studio-review .design-controls #coachModeStatus{font-size:11px;color:#5C6581;margin:2px 0 0}
+.studio-review .design-controls .design-options{font-size:11px;color:#617294}
+.studio-review #page-studio.studio-creating #coachExperimentOptions,
+.studio-review #page-studio.studio-creating #coachSupportOptions,
+.studio-review #page-studio.studio-creating #coachTry,
+.studio-review #page-studio.studio-creating #coachThink{display:none!important}
+.studio-review #page-studio.studio-creating .design-mode{display:none}
+.studio-review #page-studio.studio-creating .design-controls{padding-top:6px;margin-top:7px}
+.studio-review #page-studio.studio-creating #designPlan:not([open]){display:none!important}
+.studio-review .design-plan{max-height:min(70vh,700px);overflow:auto}
+.studio-review .studio-progress-banner{
+ margin:14px;padding:17px 20px;display:flex;flex-direction:column;gap:7px;
+ border:2px solid #C2ACF8;border-radius:17px;
+ background:linear-gradient(130deg,#F5EEFF,#EAF2FF);color:var(--jems-ink)
+}
+.studio-review .studio-progress-banner[hidden]{display:none!important}
+.studio-review .studio-progress-title{font:850 17px/1.3 var(--jems-round);color:var(--jems-ink)}
+.studio-review .studio-progress-detail{font-size:13px;line-height:1.5;color:#445475;margin:0}
+.studio-review .studio-progress-banner[data-phase="ready"]{background:#E8FFF6;border-color:#79DDB8}
+.studio-review .studio-progress-banner[data-phase="failed"],
+.studio-review .studio-progress-banner[data-phase="uncertain"]{background:#FFF7E9;border-color:#E8C96D}
+.studio-review .studio-progress-banner #studioReady{align-self:flex-start;min-height:47px;background:var(--jems-ink);border-color:var(--jems-ink);color:#fff}
+.studio-review .studio-progress-banner #studioReady[hidden]{display:none!important}
+.studio-review .studio-comparison{grid-column:1/-1;background:#F9F5FF;border:1px solid #D8C7F5;border-radius:17px;padding:16px;overflow-x:auto}
+.studio-review .studio-comparison h3{font:850 19px var(--jems-round);margin:0 0 5px}
+.studio-review .studio-comparison p{font-size:12px;color:#52617F;margin:0 0 12px}
+.studio-review .studio-comparison table{width:100%;border-collapse:separate;border-spacing:0;min-width:520px;font-size:12px;color:var(--jems-ink)}
+.studio-review .studio-comparison th,.studio-review .studio-comparison td{padding:10px 12px;vertical-align:top;text-align:left;border-bottom:1px solid #E0D6F5;max-width:230px;overflow-wrap:anywhere}
+.studio-review .studio-comparison th{background:#EDE4FF;font-weight:850}
+.studio-review .studio-comparison button{min-height:39px;margin-top:5px}
+@media(max-width:760px){
+ .studio-review .studio-creation-hero{padding:18px;gap:12px;flex-direction:column;text-align:center}
+ .studio-review .studio-creation-hero img{width:116px;height:92px}
+ .studio-review .studio-creation-hero h2{font-size:24px}
+ .studio-review #page-studio.studio-creating #studioMessages{padding:15px;max-height:40vh}
+ .studio-review .studio-prompt{margin:9px;padding:12px}
+ .studio-review .studio-send-row{grid-template-columns:auto 1fr auto}
+ .studio-review .studio-send-row #studioTalk{min-width:125px;font-size:12px}
+ .studio-review .studio-send-row #studioMic{min-width:85px;font-size:12px}
+ .studio-review .studio-send-row #studioSend{grid-column:1/-1;justify-self:stretch;width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ .studio-review .studio-prompt{transition:none}
+}
+
+/* The first-build plan is guided; the full eight-field reference is opt-in. */
+.studio-review .design-plan-field[hidden]{display:none!important}
+.studio-review .design-plan.guided{margin:11px 14px 18px;padding:18px 20px;max-height:none;overflow:visible;background:#FFF9E9;border:2px solid #D3B3F0}
+.studio-review .design-plan.guided .design-guide-status{font:800 13px/1.4 var(--jems-round);color:#6031B0;margin:12px 0}
+.studio-review .design-plan.guided .design-plan-field{padding:8px 0}
+.studio-review .design-plan.guided .design-plan-field label{font:800 17px/1.4 var(--jems-round);color:var(--jems-ink);margin:8px 0}
+.studio-review .design-plan.guided .design-plan-field textarea{min-height:95px}
+.studio-review .design-plan.guided #buildGamePlan{font:850 16px var(--jems-round);background:var(--jems-ink);color:white;border-color:var(--jems-ink);min-height:54px;padding:12px 20px}
+.studio-review .design-plan:not(.guided) .design-guide-status{font-size:12px;color:#596583}
+@media(max-width:760px){.studio-review .design-plan.guided{margin:8px;padding:13px}}
+
+/* Existing-game actions must remain full-size tap targets. */
+.studio-review .studio-actions #studioChange{min-height:46px;padding:10px 13px}
+.studio-review .studio-send-row #studioMic[aria-pressed="true"]{background:#FFECE6;border-color:#C34E42;color:#8D2733}
+
+/* Build recovery belongs to the status, never below unrelated chat settings. */
+.studio-review .studio-progress-banner .studio-build-controls{margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
+.studio-review .studio-progress-banner .studio-build-controls .studio-button{min-height:44px;padding:10px 16px}
+.studio-review .studio-progress-banner[data-phase="failed"] #studioRetry{background:var(--jems-ink);border-color:var(--jems-ink);color:white}
+
+/* When improving an existing game, conversation takes focus; the paused game
+   remains visible as reference but no longer crowds out the child's words. */
+@media(min-width:1080px){
+ .studio-review.studio-designing #page-studio:not(.studio-creating) .studio-workspace{
+  grid-template-columns:minmax(340px,.85fr) minmax(0,1.45fr);
+  align-items:start
+ }
+ .studio-review.studio-designing #page-studio:not(.studio-creating) #studioMessages{
+  height:min(34vh,360px);min-height:255px
+ }
+ .studio-review.studio-designing #page-studio:not(.studio-creating) #studioConversation{
+  border:2px solid #BFA7F5;min-width:0
+ }
+}
+
+/* First-screen discipline: the child should see the input and send affordance
+   immediately, especially on a phone. The onboarding hero replaces a verbose
+   duplicate helper message; its original text remains in the saved notebook. */
+.studio-review #page-studio.studio-creating .studio-intro-message{display:none!important}
+.studio-review #page-studio.studio-idea-unstarted #studioMessages{display:none!important}
+.studio-review #page-studio.studio-creating .studio-topbar{display:none!important}
+.studio-review #page-studio.studio-creating .design-controls{
+ background:transparent;border:0;box-shadow:none;padding:1px 0 0;margin:5px 0 0;
+ min-height:0
+}
+.studio-review #page-studio.studio-idea-unstarted .design-controls{display:none!important}
+
+.studio-review #page-studio.studio-idea-started .studio-creation-hero{padding:13px 19px}
+.studio-review #page-studio.studio-idea-started .studio-creation-hero img{width:95px;height:77px}
+.studio-review #page-studio.studio-idea-started .studio-creation-hero h2{font-size:24px}
+.studio-review #page-studio.studio-creating .studio-prompt #studioPromptLabel:focus{outline:0}
+@media(max-width:760px){
+ .studio-review #page-studio.studio-creating .studio-creation-hero{
+  flex-direction:row;text-align:left;justify-content:flex-start;
+  align-items:center;gap:11px;padding:12px 14px
+ }
+ .studio-review #page-studio.studio-creating .studio-creation-hero img{
+  width:62px;height:62px;flex:none
+ }
+ .studio-review #page-studio.studio-creating .studio-creation-kicker{display:none}
+ .studio-review #page-studio.studio-creating .studio-creation-hero h2{
+  font-size:21px;line-height:1.2;letter-spacing:-.35px;margin:0 0 4px
+ }
+ .studio-review #page-studio.studio-creating .studio-creation-hero p{
+  font-size:12px;line-height:1.4
+ }
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero{padding:10px 14px}
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero img{width:48px;height:48px}
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero h2{font-size:20px}
+ .studio-review #page-studio.studio-idea-started .studio-creation-hero p{display:none}
+ .studio-review #page-studio.studio-creating #studioMessages{
+  height:auto;min-height:0;max-height:190px;padding:9px 13px
+ }
+ .studio-review #page-studio.studio-creating .studio-prompt{margin:9px;padding:12px}
+ .studio-review #page-studio.studio-creating .studio-prompt textarea{min-height:84px}
+}
+
+/* Thinking is an ephemeral conversation state, not a permanent technology
+   status paragraph crowding out the child's message composer. */
+.studio-review #page-studio.studio-creating #coachModeStatus:not(.is-thinking){display:none!important}
+.studio-review #page-studio.studio-creating #coachModeStatus.is-thinking{
+ display:block!important;background:#F4EDFF;border:1px solid #D2BFFA;color:#6031AE;
+ font:750 13px/1.45 var(--jems-body);border-radius:12px;
+ padding:9px 13px;margin:5px 13px 0
+}
+
+/* Show a concise, attributable summary before the child approves the first build. */
+.studio-review .design-plan-review{margin:15px 0;padding:15px;background:#FFFFFF;border:2px solid #B99AF5;border-radius:16px;color:var(--jems-ink)}
+.studio-review .design-plan-review[hidden]{display:none!important}
+.studio-review .design-plan-review h3{font:850 18px var(--jems-round);margin:0 0 12px;color:var(--jems-ink)}
+.studio-review .design-plan-review-item{padding:9px 0;border-top:1px solid #E9E2F7}
+.studio-review .design-plan-review-item strong{font-size:13px;display:block}
+.studio-review .design-plan-review-item p{font-size:13px;margin:3px 0;color:#3B496B;overflow-wrap:anywhere}
+.studio-review .design-plan-review-item small{font-size:11px;color:#765AB1}
+
+/* Opt-in inspiration belongs after the primary composer, never between text
+   and Send. It populates a draft; it never sends or starts a build. */
+.studio-review .studio-idea-sparks{margin:4px 20px 14px;padding:0 2px;color:var(--jems-ink)}
+.studio-review .studio-idea-sparks[hidden]{display:none!important}
+.studio-review .studio-idea-sparks>summary{cursor:pointer;font:750 13px/1.5 var(--jems-body);color:#6834C4;list-style-position:inside}
+.studio-review .studio-idea-spark-options{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}
+.studio-review .studio-idea-spark-options .studio-chip{min-height:42px;border-color:#BAA1EE;color:#512996;background:#F6F1FF}
+@media(max-width:760px){.studio-review .studio-idea-sparks{margin:5px 13px 12px}.studio-review .studio-idea-spark-options{gap:7px}}
+
+/* Conversation privacy actions remain discreet and are never mixed with Send. */
+.studio-review .studio-helper-heading .studio-chat-options{margin-left:auto;align-self:center;position:relative;z-index:5}
+.studio-review .studio-chat-options>summary{cursor:pointer;font:700 11px/1.3 var(--jems-body);color:#596583;padding:10px 6px;min-height:43px;display:flex;align-items:center}
+.studio-review .studio-chat-options[open] .studio-button{position:absolute;right:0;top:100%;background:#fff;min-width:240px;z-index:6;border-color:#C9B6F0;box-shadow:0 14px 32px #0B1D4D21;white-space:normal}
+@media(max-width:760px){.studio-review .studio-chat-options>summary{font-size:10px;padding:8px 4px}}
+
+/* Parent privacy permissions: accessible, readable and distinct from gameplay. */
+#builderPrivacyPanel{max-width:840px;margin:14px auto;padding:18px 20px;border:1px solid #c6d5f1;border-radius:15px}
+#builderPrivacyPanel p{line-height:1.55}
+#builderPrivacyPanel details{background:#f6f8ff;border-radius:10px;padding:10px 13px;margin:10px 0}
+#builderPrivacyPanel summary{cursor:pointer;font-weight:700}
+#builderPrivacyPanel form{display:grid;gap:10px;margin:12px 0}
+#builderPrivacyPanel form label{display:flex;gap:10px;align-items:flex-start;line-height:1.45;cursor:pointer}
+#builderPrivacyPanel form input[type=checkbox]{width:20px;height:20px;min-width:20px;accent-color:#2153ad}
+#builderPrivacyPanel button{min-height:44px;max-width:340px}
+#builderPrivacyStatus{font-weight:650}

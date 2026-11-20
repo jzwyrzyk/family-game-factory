@@ -2,10 +2,13 @@ import type {Drawing} from '../assets/private-drawings';
 import {drawingBlob} from '../assets/private-drawings';
 import {type DrawingAssembly,type DrawingKind,type DrawingPiece,type Role,validateAssembly,vehicleGeometry,assemblyRig} from './model';
 import {suggestParts,layerCanvas} from './segmentation';
-import {saveRig,listRigs,selectRig,rigById,type SavedRig} from './store';
+import {saveRig,listRigs,rigById,loadDrawingDraft,saveDrawingDraft,deleteDrawingDraft,type SavedRig} from './store';
 import {createVehicle,TRACKS,type VehicleSnapshot} from '../quality/physics';
 import {createDrawingPlayground,type PlayScene} from './playground';
+import {createCarArtwork,drawCarBody,drawCarWheel,type CarArtwork} from './rally';
 import {createFixedClock} from '../quality/clock';
+import {iconMarkup} from '../brand/icons';
+import {assertRewardSourceWritable,rewardSourceWritable} from '../rewards/write-guard';
 import './style.css';
 const roles:Role[]=['body','wheel','wing','limb','propeller','decoration','platform','obstacle','collectible'];
 const kindNames:Record<DrawingKind,string>={car:'Car or vehicle',character:'Character or creature',machine:'Invention or machine',scene:'World or level'};
@@ -13,29 +16,51 @@ const clamp=(n:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,n));
 const q=<T extends HTMLElement>(root:HTMLElement,selector:string)=>root.querySelector(selector)! as T;
 const button=(label:string,action:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',action);return b;};
 
-/** On-device component editor. No service, model call, upload or hidden asset publishing. */
-export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>void){
+export interface DrawingLabOptions {
+ rigId?:string;
+ isCurrent?:()=>boolean;
+ onSaved?:(rig:SavedRig)=>void|Promise<void>;
+}
+/** On-device component editor. Source pixels and every saved version remain immutable. */
+export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rigId:string)=>void|Promise<void>,options:DrawingLabOptions={}){
  const stillOwner=()=>String((window as any).FG?.store?.current()?.id||'')===owner;
- if(!stillOwner())throw Error('That drawing belongs to another player.');
- const image=await createImageBitmap(drawingBlob(source));
- if(!stillOwner()){image.close();throw Error('The active player changed. Open your own drawings.');}
+ const currentPage=()=>options.isCurrent?.()!==false;
+ if(!stillOwner()||source.owner!==owner)throw Error('That drawing belongs to another player.');
+ if(!currentPage())throw Error('Open this drawing again from your Art Studio.');
+ assertRewardSourceWritable();
+ const returnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
+ const originPage=document.querySelector<HTMLElement>('.page:not(.hidden)')?.id.replace(/^page-/,'');
+ let openingCurrent=true,ownerCurrent=true;
+ const openingPage=(event:Event)=>{if(originPage&&(event as CustomEvent).detail!==originPage)openingCurrent=false;};
+ const openingProfile=()=>{if(!stillOwner())ownerCurrent=false;};
+ window.addEventListener('factory-page',openingPage);window.addEventListener('factory-profile',openingProfile);
+ let image:ImageBitmap;
+ try{image=await createImageBitmap(drawingBlob(source));}
+ finally{window.removeEventListener('factory-page',openingPage);window.removeEventListener('factory-profile',openingProfile);}
+ if(!openingCurrent||!ownerCurrent||!stillOwner()||!currentPage()){image.close();throw Error('The drawing editor changed. Open your drawing again.');}
  const sourceCanvas=document.createElement('canvas');
+ const sourceAspect=image.width/image.height;
  const shrink=Math.min(1,768/Math.max(image.width,image.height));
  sourceCanvas.width=Math.max(1,Math.round(image.width*shrink));sourceCanvas.height=Math.max(1,Math.round(image.height*shrink));
  sourceCanvas.getContext('2d')!.drawImage(image,0,0,sourceCanvas.width,sourceCanvas.height);image.close();
  const working=document.createElement('dialog');working.className='drawing-lab';working.setAttribute('aria-label','Bring my drawing to life');
- working.innerHTML=`<div class="dl-shell"><header class="dl-header"><div><span class="dl-kicker">MY DRAWING LAB</span><h2>Make my drawing move!</h2><p>The original stays safe. You decide what each part does.</p></div><button type="button" data-close aria-label="Close drawing designer">✕ Close</button></header>
+ working.innerHTML=`<div class="dl-shell"><header class="dl-header"><div><span class="dl-kicker">ART STUDIO · BRING IT TO LIFE</span><h2>Make my drawing move!</h2><p>The original stays safe. You decide what each part does.</p></div><button type="button" data-close aria-label="Close drawing designer">${iconMarkup('close')} Close</button></header>
+  <div class="dl-steps" aria-label="Making steps"><span><b>1</b> Choose pieces</span><span><b>2</b> Try movement</span><span><b>3</b> Save & reuse</span><span data-draft-status role="status"></span></div>
   <div class="dl-main"><section class="dl-stage"><canvas class="dl-canvas" tabindex="0" aria-label="Drawing editor. Tap a highlighted part, drag to move it, or drag its corner to resize."></canvas>
-  <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">✏️ Fix parts</button><button type="button" data-mode="play">▶ Try it!</button><button type="button" data-cutouts>✂️ Check cutouts</button><button type="button" data-retry hidden>↶ Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Jump ↑</button></div><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
+  <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">${iconMarkup('edit')} Edit pieces</button><button type="button" data-mode="play">${iconMarkup('play')} Try it!</button><button type="button" data-cutouts>${iconMarkup('grid')} Check cutouts</button><button type="button" data-retry hidden>${iconMarkup('retry')} Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Hold to jump ↑</button></div><p class="dl-canvas-help">Drag a piece or its corner. With a keyboard: arrows move, Shift + arrows resize.</p><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
   <aside class="dl-tools"><label>What did you draw?<select data-kind><option value="car">Car or vehicle</option><option value="character">Character or creature</option><option value="machine">Invention or machine</option><option value="scene">World or level</option></select></label>
   <p data-explanation class="dl-note" aria-live="polite"></p><div data-piece-list class="dl-piece-list" role="group" aria-label="Pieces in this drawing"></div>
-  <div class="dl-edit-tools"><button type="button" data-add>＋ Mark another part</button><button type="button" data-pivot aria-pressed="false">🔩 Place hinge</button><button type="button" data-mask-exclude aria-pressed="false">🧽 Erase extra pixels</button><button type="button" data-mask-include aria-pressed="false">🖍️ Restore pixels</button><label>Brush size<input data-brush-size type="range" min="6" max="34" value="18"></label><button type="button" data-undo>↶ Undo</button><button type="button" data-delete>Remove part</button>
+  <div class="dl-edit-tools"><div class="dl-edit-row"><button type="button" data-add>${iconMarkup('add')} Add a piece</button><button type="button" data-delete>${iconMarkup('trash')} Remove</button></div>
   <label>What is this part?<input data-piece-name maxlength="50" placeholder="Name this part"></label>
   <label>What should it do?<select data-role></select></label>
+  <div class="dl-edit-row"><button type="button" data-undo>${iconMarkup('undo')} Undo</button><button type="button" data-redo>${iconMarkup('retry')} Redo</button></div>
+  <details class="dl-advanced"><summary>Refine cutouts & hinges</summary><div class="dl-advanced-body"><button type="button" data-pivot aria-pressed="false">${iconMarkup('settings')} Place hinge</button><button type="button" data-mask-exclude aria-pressed="false">${iconMarkup('edit')} Erase extra pixels</button><button type="button" data-mask-include aria-pressed="false">${iconMarkup('undo')} Restore pixels</button><label>Brush size<input data-brush-size type="range" min="6" max="34" value="18"></label>
   <label>Outline shape<select data-shape><option value="rect">Square or rectangle</option><option value="ellipse">Round or oval</option></select></label>
   <label>Attached to<select data-parent></select></label>
-  <p class="dl-guidance">Tap a part or its name. Drag its outline to move it; drag the corner to resize. To mark a new part, draw its box. For an arm or wing, place the hinge where it connects. If a cutout looks wrong, use Erase or Restore to brush over the pixels you want to change.</p></div>
-  <div class="dl-version"><button type="button" data-save>💾 Save this test</button><button type="button" data-use disabled>⭐ Use my car in Rally</button><label>Earlier tests<select data-history><option value="">Choose a saved version</option></select></label></div></aside></div>
+  <div class="dl-region-fields"><label>Left (%)<input data-region="x" type="number" min="0" max="97.5" step="1"></label><label>Top (%)<input data-region="y" type="number" min="0" max="97.5" step="1"></label><label>Width (%)<input data-region="w" type="number" min="2.5" max="100" step="1"></label><label>Height (%)<input data-region="h" type="number" min="2.5" max="100" step="1"></label></div>
+  <div class="dl-region-fields"><label>Hinge across (%)<input data-pivot-axis="x" type="number" min="0" max="100" step="1"></label><label>Hinge down (%)<input data-pivot-axis="y" type="number" min="0" max="100" step="1"></label></div>
+  <p class="dl-guidance">For an arm or wing, put the hinge where it connects. Erase and Restore only change the cutout. Your original pixels stay safe.</p></div></details></div>
+  <div class="dl-version"><button type="button" data-save>${iconMarkup('save')} Save this version</button><button type="button" data-use disabled>${iconMarkup('play')} Drive this car</button><label>Saved versions<select data-history><option value="">Choose a saved version</option></select></label></div></aside></div>
   <footer class="dl-footer"><span data-status role="status" aria-live="polite">Choose the parts of your drawing. Nothing leaves this device.</span><span>On computer: hold Space to move during a test.</span></footer></div>`;
  document.body.append(working);
  const canvas=q<HTMLCanvasElement>(working,'.dl-canvas'),ctx=canvas.getContext('2d')!;
@@ -44,22 +69,59 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  shapeInput=q<HTMLSelectElement>(working,'[data-shape]'),parentInput=q<HTMLSelectElement>(working,'[data-parent]');
  const historyInput=q<HTMLSelectElement>(working,'[data-history]');
  for(const role of roles){const o=document.createElement('option');o.value=role;o.textContent=role.charAt(0).toUpperCase()+role.slice(1);roleInput.append(o);}
- let kind:DrawingKind='car',assembly:DrawingAssembly,selected='',mode:'edit'|'play'='edit',disposed=false;
- const onProfile=()=>{if(!stillOwner())working.close();};
+ const initialKind:DrawingKind=source.category==='character'?'character':source.category==='world'?'scene':source.category==='prop'?'machine':'car';
+ let kind:DrawingKind=initialKind,assembly!:DrawingAssembly,selected='',mode:'edit'|'play'='edit',disposed=false,leaving=false;
+ const onProfile=()=>{if(!stillOwner()){ownerCurrent=false;working.close();}};
+ const onPage=(event:Event)=>{
+  if(currentPage()&&(!originPage||(event as CustomEvent).detail===originPage))return;
+  leaving=true;stopPlay();
+  // Finish only edits already made by this owner. A route change cannot create
+  // a new version or let a delayed load reopen this editor over another page.
+  void flushDraft().then(()=>{if(!disposed)working.close();}).catch(error=>{
+   message((error as Error).message+' Your edits remain here. Close retries the draft save.');
+  });
+ };
  window.addEventListener('factory-profile',onProfile);
+ window.addEventListener('factory-page',onPage);
  let pendingNew=false,pendingPivot=false,brushMode:'include'|'exclude'|null=null,history:SavedRig|null=null,lastStored:SavedRig|null=null;
  let drag:null|{pointer:number;type:'create'|'move'|'resize'|'mask';id:string;startX:number;startY:number;before:DrawingAssembly} = null;
- const undo:DrawingAssembly[]=[];
+ const undo:DrawingAssembly[]=[],redo:DrawingAssembly[]=[];
+ let saving=false,dirty=false,draftSequence=0,savedDraftSequence=0,draftError:Error|null=null,draftQueue=Promise.resolve();
  const partsPanel=q<HTMLElement>(working,'[data-piece-list]'),clockHolder:{clock?:ReturnType<typeof createFixedClock>}={};
  const cutoutPreview=q<HTMLElement>(working,'[data-cutout-preview]');
  let showCutouts=false;
  let car:ReturnType<typeof createVehicle>|null=null,other:ReturnType<typeof createDrawingPlayground>|null=null;
+ let carArtwork:CarArtwork|null=null;
  let carScene:VehicleSnapshot|null=null,otherScene:PlayScene|null=null;
- let go=false,jump=false,playDistance=0,lastFrame=0;
+ let go=false,jump=false;
  const layerCache=new Map<string,HTMLCanvasElement>();
  let imageRect={x:0,y:0,w:1,h:1};
  const contentWidth=()=>canvas.getBoundingClientRect().width||900;
  const message=(value:string)=>{if(!disposed)status.textContent=value;};
+ const alive=()=>!disposed&&ownerCurrent&&!leaving&&stillOwner()&&currentPage();
+ const draftAlive=()=>!disposed&&ownerCurrent&&stillOwner()&&(currentPage()||leaving);
+ const canEdit=()=>{if(!alive())return false;if(saving){message('Finishing your save…');return false;}if(!rewardSourceWritable()){message('Saving is paused. Return to the active Jems tab to continue.');return false;}return true;};
+ const draftStatus=q<HTMLElement>(working,'[data-draft-status]');
+ function queueDraft(){
+  dirty=true;const sequence=++draftSequence,copy=validateAssembly(assembly),parent=history?.id??null;
+  draftStatus.textContent='Saving draft…';
+  draftQueue=draftQueue.then(async()=>{
+   if(!draftAlive()||sequence!==draftSequence)return;
+   await saveDrawingDraft(owner,copy,parent,draftAlive);
+   if(!draftAlive())return;
+   savedDraftSequence=sequence;
+   if(sequence===draftSequence){draftError=null;draftStatus.textContent='Draft saved on this device';}
+  }).catch(error=>{if(!draftAlive())return;draftError=error instanceof Error?error:Error('Could not save your draft.');draftStatus.textContent='Draft not saved';message(draftError.message+' Keep this editor open and try again.');});
+ }
+ async function flushDraft(){
+  if(dirty&&savedDraftSequence<draftSequence&&draftError)queueDraft();
+  await draftQueue;
+  if(dirty&&savedDraftSequence<draftSequence)throw draftError??Error('Your draft could not finish saving. Keep this editor open.');
+ }
+ async function requestClose(){
+  if(saving){message('Finishing your save…');return;}
+  try{await flushDraft();if(!disposed&&stillOwner())working.close();}catch(error){message((error as Error).message);}
+ }
  function originalForeground(){
   const img=document.createElement('canvas'),limit=260,ratio=Math.min(1,limit/Math.max(sourceCanvas.width,sourceCanvas.height));
   img.width=Math.max(1,Math.round(sourceCanvas.width*ratio));img.height=Math.max(1,Math.round(sourceCanvas.height*ratio));
@@ -67,38 +129,63 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   return c.getImageData(0,0,img.width,img.height);
  }
  function proposals(next:DrawingKind){
+  const before=assembly?structuredClone(assembly):null;
   const p=suggestParts(originalForeground(),next);
-  assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:'',revision:1};
+  assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:before?.notes??'',revision:before?.revision??1};
+  kind=next;
   notice.textContent=p.explanation+' You can change any piece.';
-  selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;brushMode=null;layerCache.clear();history=null;lastStored=null;
+  selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;brushMode=null;layerCache.clear();lastStored=null;
   q<HTMLButtonElement>(working,'[data-use]').disabled=true;
-  resetHistory();refresh();
+  if(before)remember(before);else resetHistory();refresh();
  }
- function resetHistory(){undo.length=0;}
- function remember(before:DrawingAssembly){undo.push(before);if(undo.length>30)undo.shift();lastStored=null;q<HTMLButtonElement>(working,'[data-use]').disabled=true;}
+ function resetHistory(){undo.length=0;redo.length=0;}
+ function remember(before:DrawingAssembly){undo.push(before);if(undo.length>30)undo.shift();redo.length=0;lastStored=null;queueDraft();q<HTMLButtonElement>(working,'[data-use]').disabled=true;}
+ function restoreUndo(direction:'undo'|'redo'){
+  if(!canEdit()||mode!=='edit')return;
+  const from=direction==='undo'?undo:redo,to=direction==='undo'?redo:undo,previous=from.pop();
+  if(!previous)return;
+  to.push(structuredClone(assembly));assembly=previous;kind=assembly.kind;
+  q<HTMLSelectElement>(working,'[data-kind]').value=kind;
+  if(!assembly.pieces.some(piece=>piece.id===selected))selected=assembly.pieces[0].id;
+  pendingNew=false;pendingPivot=false;brushMode=null;lastStored=null;layerCache.clear();queueDraft();refresh();
+ }
  function getSelected(){return assembly.pieces.find(p=>p.id===selected);}
  function updatePanel(){
+  const locked=saving||!rewardSourceWritable();
   partsPanel.replaceChildren();
   for(const p of assembly.pieces){
    const b=button(p.name+' · '+p.role,()=>{selected=p.id;refresh();});b.className=p.id===selected?'dl-selected':'';
-   b.setAttribute('aria-pressed',String(p.id===selected));partsPanel.append(b);
+   b.setAttribute('aria-pressed',String(p.id===selected));b.disabled=locked;partsPanel.append(b);
   }
   const piece=getSelected();
   nameInput.value=piece?.name||'';roleInput.value=piece?.role||'body';shapeInput.value=piece?.region.shape||'rect';
-  nameInput.disabled=roleInput.disabled=shapeInput.disabled=!piece||mode==='play';
+  nameInput.disabled=roleInput.disabled=shapeInput.disabled=!piece||mode==='play'||locked;
   parentInput.replaceChildren();
   const root=document.createElement('option');root.value='';root.textContent='Nothing (main part)';parentInput.append(root);
   for(const p of assembly.pieces.filter(p=>p.id!==selected)){const o=document.createElement('option');o.value=p.id;o.textContent=p.name;parentInput.append(o);}
-  parentInput.value=piece?.parentId||'';parentInput.disabled=!piece||mode==='play';
-  q<HTMLButtonElement>(working,'[data-delete]').disabled=!piece||assembly.pieces.length===1||mode==='play';
-  q<HTMLButtonElement>(working,'[data-undo]').disabled=!undo.length||mode==='play';
-  q<HTMLButtonElement>(working,'[data-add]').disabled=assembly.pieces.length>=24||mode==='play';
+  parentInput.value=piece?.parentId||'';parentInput.disabled=!piece||mode==='play'||locked;
+  q<HTMLButtonElement>(working,'[data-delete]').disabled=!piece||assembly.pieces.length===1||mode==='play'||locked;
+  q<HTMLButtonElement>(working,'[data-undo]').disabled=!undo.length||mode==='play'||locked;
+  q<HTMLButtonElement>(working,'[data-redo]').disabled=!redo.length||mode==='play'||locked;
+  q<HTMLButtonElement>(working,'[data-add]').disabled=assembly.pieces.length>=24||mode==='play'||locked;
+  q<HTMLButtonElement>(working,'[data-save]').disabled=locked||!!drag||(!dirty&&!!lastStored);
+  q<HTMLButtonElement>(working,'[data-use]').disabled=locked||!lastStored||kind!=='car'||!onPlayCar;
+  q<HTMLButtonElement>(working,'[data-use]').hidden=!onPlayCar;
+  q<HTMLSelectElement>(working,'[data-kind]').disabled=locked;
+  historyInput.disabled=locked;
+  for(const input of working.querySelectorAll<HTMLInputElement>('[data-region]')){
+   const key=input.dataset.region as 'x'|'y'|'w'|'h';input.value=piece?String(Math.round(piece.region[key]*1000)/10):'';
+   input.disabled=locked||!piece||mode==='play';
+  }
   const hingeButton=q<HTMLButtonElement>(working,'[data-pivot]');
-  hingeButton.disabled=!piece||mode==='play'||piece.role==='body'||piece.role==='decoration'||piece.role==='wheel'||piece.parentId===null;
+  hingeButton.disabled=locked||!piece||mode==='play'||piece.role==='body'||piece.role==='decoration'||piece.role==='wheel'||piece.parentId===null;
   hingeButton.setAttribute('aria-pressed',String(pendingPivot));
+  for(const input of working.querySelectorAll<HTMLInputElement>('[data-pivot-axis]')){
+   input.disabled=hingeButton.disabled;input.value=String(Math.round((piece?.pivot?.[input.dataset.pivotAxis as 'x'|'y']??.5)*100));
+  }
   for(const action of ['include','exclude'] as const){
    const brush=q<HTMLButtonElement>(working,'[data-mask-'+action+']');
-   brush.disabled=!piece||mode==='play';
+   brush.disabled=locked||!piece||mode==='play';
    brush.setAttribute('aria-pressed',String(brushMode===action));
   }
  }
@@ -183,10 +270,15 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    ctx.beginPath();ground.points.forEach((p,i)=>i?ctx.lineTo(x(p.x),y(p.y)):ctx.moveTo(x(p.x),y(p.y)));
    ctx.lineTo(w+100,h+50);ctx.lineTo(-50,h+50);ctx.closePath();ctx.fillStyle='#bda477';ctx.fill();
    ctx.strokeStyle='#4a957b';ctx.lineWidth=9;ctx.beginPath();ground.points.forEach((p,i)=>i?ctx.lineTo(x(p.x),y(p.y)):ctx.moveTo(x(p.x),y(p.y)));ctx.stroke();
-   const parts=carScene?.bodies||[],bodyPiece=assembly.pieces.find(p=>p.role==='body');
-   const wheels=assembly.pieces.filter(p=>p.role==='wheel').sort((a,b)=>a.region.x-b.region.x);
-   const base=parts[0];if(base&&bodyPiece)drawPartAt(bodyPiece,x(base.x),y(base.y),base.width*scale,base.height*scale,base.angle);
-   for(let i=1;i<parts.length;i++)if(wheels[i-1])drawPartAt(wheels[i-1],x(parts[i].x),y(parts[i].y),parts[i].width*scale,parts[i].height*scale,parts[i].angle);
+   const parts=carScene?.bodies||[],wheels=carArtwork?.pieces.wheels??[];
+   const base=parts[0];if(base&&carArtwork){
+    ctx.save();ctx.translate(x(base.x),y(base.y));ctx.rotate(base.angle);
+    drawCarBody(ctx,carArtwork,base.width*scale,base.height*scale);ctx.restore();
+   }
+   for(let i=1;i<parts.length;i++)if(wheels[i-1]&&carArtwork){
+    ctx.save();ctx.translate(x(parts[i].x),y(parts[i].y));ctx.rotate(parts[i].angle);
+    drawCarWheel(ctx,carArtwork,(i-1) as 0|1,parts[i].width*scale);ctx.restore();
+   }
    ctx.font='bold 17px system-ui';ctx.fillStyle='#204c58';ctx.fillText('Distance: '+Math.floor(carScene?.distance||0)+' m',18,29);
   }else{
    ctx.fillStyle='#a5d394';ctx.fillRect(0,h-48,w,48);
@@ -200,7 +292,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  function refresh(){if(disposed)return;updatePanel();mode==='edit'?drawEdit():drawPlay();renderCutoutPreview();}
  function stopPlay(){
   clockHolder.clock?.dispose();clockHolder.clock=undefined;car?.dispose();other?.dispose();
-  car=null;other=null;carScene=null;otherScene=null;go=false;jump=false;
+  car=null;other=null;carArtwork=null;carScene=null;otherScene=null;go=false;jump=false;
   q<HTMLButtonElement>(working,'[data-go]').hidden=true;
   q<HTMLButtonElement>(working,'[data-jump]').hidden=true;
   q<HTMLButtonElement>(working,'[data-retry]').hidden=true;cutoutPreview.hidden=true;
@@ -209,10 +301,10 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   stopPlay();
   try{
    if(assembly.kind==='car'){
-    const geom=vehicleGeometry(assembly);
-    car=createVehicle({},'meadow',geom);carScene=car.snapshot();
+    carArtwork=createCarArtwork(assembly,sourceCanvas,sourceAspect);
+    car=createVehicle({},'meadow',carArtwork.geometry);carScene=car.snapshot();
    }else{
-    assemblyRig(assembly);other=createDrawingPlayground(assembly);otherScene=other.snapshot();
+    assemblyRig(assembly,sourceAspect);other=createDrawingPlayground(assembly,sourceAspect);otherScene=other.snapshot();
    }
    mode='play';pendingPivot=false;pendingNew=false;brushMode=null;
     canvas.setAttribute('aria-label','Play with your moving drawing. Hold Space to move; use the buttons on touch.');
@@ -247,7 +339,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   const r=p.region;return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
  }
  canvas.addEventListener('pointerdown',e=>{
-  if(mode!=='edit'||e.button>0||drag)return;
+  if(mode!=='edit'||e.button>0||drag||!canEdit())return;
   const point=position(e),before=structuredClone(assembly);
   if(brushMode){
    const p=getSelected();
@@ -281,9 +373,9 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   canvas.setPointerCapture(e.pointerId);refresh();e.preventDefault();
  });
  canvas.addEventListener('pointermove',e=>{
-  if(!drag||drag.pointer!==e.pointerId)return;
+  if(!drag||drag.pointer!==e.pointerId||!alive()||!rewardSourceWritable())return;
   const point=position(e),p=assembly.pieces.find(p=>p.id===drag!.id),old=drag.before.pieces.find(p=>p.id===drag!.id);
-  if(!p||!old)return;
+  if(!p||(drag.type!=='create'&&!old))return;
   const dx=point.x-drag.startX,dy=point.y-drag.startY;
   if(drag.type==='mask'){
    const stroke=p.maskStrokes?.at(-1),last=stroke?.points.at(-1);
@@ -293,31 +385,37 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    e.preventDefault();return;
   }
   if(drag.type==='create'){
-   const x=Math.min(drag.startX,point.x),y=Math.min(drag.startY,point.y);
+   const x=Math.min(.975,drag.startX,point.x),y=Math.min(.975,drag.startY,point.y);
    p.region={...p.region,x,y,w:clamp(Math.abs(point.x-drag.startX),.025,1-x),h:clamp(Math.abs(point.y-drag.startY),.025,1-y)};
   }else if(drag.type==='resize'){
-   p.region={...p.region,w:clamp(old.region.w+dx,.025,1-old.region.x),h:clamp(old.region.h+dy,.025,1-old.region.y)};
+   p.region={...p.region,w:clamp(old!.region.w+dx,.025,1-old!.region.x),h:clamp(old!.region.h+dy,.025,1-old!.region.y)};
   }else{
-   p.region={...p.region,x:clamp(old.region.x+dx,0,1-old.region.w),y:clamp(old.region.y+dy,0,1-old.region.h)};
+   p.region={...p.region,x:clamp(old!.region.x+dx,0,1-old!.region.w),y:clamp(old!.region.y+dy,0,1-old!.region.h)};
   }
   layerCache.clear();drawEdit();e.preventDefault();
  });
  const finishDrag=(e:PointerEvent)=>{
   if(!drag||drag.pointer!==e.pointerId)return;const prior=drag.before;drag=null;
+  if(!alive()||!rewardSourceWritable()){assembly=prior;layerCache.clear();refresh();return;}
   if(JSON.stringify(assembly)!==JSON.stringify(prior))remember(prior);
   refresh();message('Piece outline updated. Try it to see whether it moves correctly.');
  };
  canvas.addEventListener('pointerup',finishDrag);
  canvas.addEventListener('pointercancel',e=>{if(!drag||drag.pointer!==e.pointerId)return;assembly=drag.before;drag=null;layerCache.clear();refresh();});
- q<HTMLButtonElement>(working,'[data-close]').addEventListener('click',()=>working.close());
+ canvas.addEventListener('lostpointercapture',e=>{if(drag?.pointer===e.pointerId){assembly=drag.before;drag=null;layerCache.clear();refresh();}});
+ q<HTMLButtonElement>(working,'[data-close]').addEventListener('click',()=>{void requestClose();});
+ working.addEventListener('cancel',event=>{event.preventDefault();void requestClose();});
+ working.addEventListener('click',event=>{const target=event.target as HTMLElement;if(target.closest('button')&&!target.closest('[data-close]')&&!canEdit()){event.preventDefault();event.stopImmediatePropagation();}},true);
+ working.addEventListener('change',event=>{if(!canEdit()){event.preventDefault();event.stopImmediatePropagation();refresh();}},true);
  working.addEventListener('close',()=>{
-  disposed=true;stopPlay();window.removeEventListener('factory-profile',onProfile);imageRect={x:0,y:0,w:1,h:1};working.remove();
+  disposed=true;stopPlay();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);imageRect={x:0,y:0,w:1,h:1};working.remove();
+  if(stillOwner()&&currentPage()&&!leaving&&returnFocus?.isConnected)returnFocus.focus({preventScroll:true});
  });
  q<HTMLSelectElement>(working,'[data-kind]').addEventListener('change',e=>{
   if(mode==='play')setMode('edit');kind=(e.target as HTMLSelectElement).value as DrawingKind;
   proposals(kind);message('These are suggestions. Mark the pieces that should move.');
  });
- q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;pendingPivot=false;brushMode=null;refresh();message('Drag a box around the new part on your drawing.');canvas.focus({preventScroll:true});});
+ q<HTMLButtonElement>(working,'[data-add]').addEventListener('click',()=>{pendingNew=true;pendingPivot=false;brushMode=null;refresh();message('Drag a box around the new piece, or press Enter to add one in the middle.');canvas.focus({preventScroll:true});});
  q<HTMLButtonElement>(working,'[data-pivot]').addEventListener('click',()=>{
    const p=getSelected();if(mode!=='edit'||!p||!p.parentId||p.role==='body'||p.role==='decoration'||p.role==='wheel')return;
    pendingPivot=!pendingPivot;pendingNew=false;brushMode=null;refresh();
@@ -333,7 +431,19 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
    canvas.focus({preventScroll:true});
   });
  }
- q<HTMLButtonElement>(working,'[data-undo]').addEventListener('click',()=>{const previous=undo.pop();if(!previous)return;assembly=previous;selected=assembly.pieces[0].id;layerCache.clear();refresh();});
+ q<HTMLButtonElement>(working,'[data-undo]').addEventListener('click',()=>restoreUndo('undo'));
+ q<HTMLButtonElement>(working,'[data-redo]').addEventListener('click',()=>restoreUndo('redo'));
+ for(const input of working.querySelectorAll<HTMLInputElement>('[data-region]'))input.addEventListener('change',()=>{
+  const piece=getSelected(),value=Number(input.value)/100;if(!piece||!Number.isFinite(value)){refresh();return;}
+  const before=structuredClone(assembly),key=input.dataset.region as 'x'|'y'|'w'|'h';
+  const max=key==='x'?1-piece.region.w:key==='y'?1-piece.region.h:key==='w'?1-piece.region.x:1-piece.region.y;
+  piece.region[key]=clamp(value,(key==='w'||key==='h')?.025:0,max);remember(before);layerCache.clear();refresh();
+ });
+ for(const input of working.querySelectorAll<HTMLInputElement>('[data-pivot-axis]'))input.addEventListener('change',()=>{
+  const piece=getSelected(),value=Number(input.value)/100;if(!piece||!Number.isFinite(value)||input.disabled){refresh();return;}
+  const before=structuredClone(assembly);piece.pivot={x:piece.pivot?.x??.5,y:piece.pivot?.y??.5,[input.dataset.pivotAxis!]:clamp(value,0,1)};
+  remember(before);layerCache.clear();refresh();
+ });
  q<HTMLButtonElement>(working,'[data-delete]').addEventListener('click',()=>{
   if(assembly.pieces.length===1)return;
   const before=structuredClone(assembly);assembly.pieces=assembly.pieces.filter(p=>p.id!==selected);
@@ -373,16 +483,33 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
  q<HTMLButtonElement>(working,'[data-retry]').addEventListener('click',()=>setMode('play'));
  const goButton=q<HTMLButtonElement>(working,'[data-go]'),jumpButton=q<HTMLButtonElement>(working,'[data-jump]');
  for(const [b,key] of [[goButton,'go'],[jumpButton,'jump']] as const){
-  const down=(e:PointerEvent)=>{e.preventDefault();if(mode!=='play')return;b.setPointerCapture(e.pointerId);if(key==='go')go=true;else jump=true;};
+   const down=(e:PointerEvent)=>{e.preventDefault();if(mode!=='play'||!canEdit())return;b.setPointerCapture(e.pointerId);if(key==='go')go=true;else jump=true;};
   const up=(e:PointerEvent)=>{if(key==='go')go=false;else jump=false;};
   b.addEventListener('pointerdown',down);
   for(const name of ['pointerup','pointercancel','lostpointercapture'] as const)b.addEventListener(name,up);
+  b.addEventListener('keydown',event=>{if((event.code==='Space'||event.code==='Enter')&&mode==='play'&&canEdit()){event.preventDefault();if(key==='go')go=true;else jump=true;}});
+  b.addEventListener('keyup',event=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();if(key==='go')go=false;else jump=false;}});
+  b.addEventListener('blur',()=>{if(key==='go')go=false;else jump=false;});
  }
  const abort=new AbortController();
  working.addEventListener('close',()=>abort.abort(),{once:true});
  working.addEventListener('keydown',e=>{
   const target=e.target as HTMLElement;
+  if(mode==='edit'&&(e.ctrlKey||e.metaKey)&&e.code==='KeyZ'&&!target.closest('input,textarea')){e.preventDefault();restoreUndo(e.shiftKey?'redo':'undo');return;}
   if(target.closest('input,select,textarea,button'))return;
+  if(!canEdit())return;
+  if(mode==='edit'&&e.code==='Enter'&&pendingNew){
+   e.preventDefault();const before=structuredClone(assembly),id='piece_'+crypto.randomUUID().slice(0,8);
+   assembly.pieces.push({id,name:'My new piece',role:'limb',region:{x:.4,y:.4,w:.2,h:.2,shape:'rect'},parentId:assembly.pieces[0].id,physical:true});
+   selected=id;pendingNew=false;remember(before);refresh();message('Piece added. Use the arrows to move it; Shift + arrows change its size.');return;
+  }
+  if(mode==='edit'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.code)){
+   const piece=getSelected();if(!piece)return;e.preventDefault();const before=structuredClone(assembly);
+   const horizontal=e.code==='ArrowLeft'||e.code==='ArrowRight',amount=(e.code==='ArrowLeft'||e.code==='ArrowUp'?-.01:.01),r=piece.region;
+   if(e.shiftKey){if(horizontal)r.w=clamp(r.w+amount,.025,1-r.x);else r.h=clamp(r.h+amount,.025,1-r.y);}
+   else {if(horizontal)r.x=clamp(r.x+amount,0,1-r.w);else r.y=clamp(r.y+amount,0,1-r.h);}
+   remember(before);layerCache.clear();refresh();return;
+  }
   if(mode==='play'&&(e.code==='Space'||e.code==='ArrowRight'||e.code==='KeyD')){e.preventDefault();go=true;}
   if(mode==='play'&&(e.code==='ArrowUp'||e.code==='KeyW')){e.preventDefault();jump=true;}
  },{signal:abort.signal});
@@ -391,38 +518,67 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:()=>
   if(['ArrowUp','KeyW'].includes(e.code))jump=false;
  },{signal:abort.signal});
  window.addEventListener('blur',()=>{go=jump=false;},{signal:abort.signal});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)go=jump=false;},{signal:abort.signal});
+ const observer=new ResizeObserver(()=>{if(!disposed&&assembly){mode==='edit'?drawEdit():drawPlay();}});
+ observer.observe(canvas);working.addEventListener('close',()=>observer.disconnect(),{once:true});
+ let historyLoad=0;
  const versions=async()=>{
-  historyInput.replaceChildren();const o=document.createElement('option');o.value='';o.textContent='Choose a saved version';historyInput.append(o);
   const all=(await listRigs(owner)).filter(x=>x.assembly.sourceId===source.id);
-  for(const entry of all){const item=document.createElement('option');item.value=entry.id;item.textContent='Test from '+new Date(entry.savedAt).toLocaleString();historyInput.append(item);}
+  if(!alive())return all;
+  historyInput.replaceChildren();const o=document.createElement('option');o.value='';o.textContent='Choose a saved version';historyInput.append(o);
+  for(const entry of all){const item=document.createElement('option');item.value=entry.id;item.textContent='Version '+entry.assembly.revision+' · '+new Date(entry.savedAt).toLocaleString();historyInput.append(item);}
+  historyInput.value=lastStored?.id??'';return all;
  };
  historyInput.addEventListener('change',async()=>{
   if(!historyInput.value)return;
-  try{const saved=await rigById(owner,historyInput.value);setMode('edit');assembly=saved.assembly;kind=assembly.kind;
+  const token=++historyLoad,requested=historyInput.value;saving=true;updatePanel();
+  try{await flushDraft();const saved=await rigById(owner,requested);if(!alive()||token!==historyLoad)return;
+   if(saved.assembly.sourceId!==source.id||saved.assembly.sourceSha256!==source.sha256)throw Error('That saved version does not belong to this drawing.');
+   const before=structuredClone(assembly);setMode('edit');assembly=saved.assembly;kind=assembly.kind;
    q<HTMLSelectElement>(working,'[data-kind]').value=kind;selected=assembly.pieces[0].id;lastStored=saved;history=saved;
-   undo.length=0;layerCache.clear();refresh();q<HTMLButtonElement>(working,'[data-use]').disabled=kind!=='car';
-   message('This earlier test is open. You can change it without overwriting any previous version.');
-  }catch(e){message((e as Error).message);}
+   undo.push(before);redo.length=0;dirty=false;layerCache.clear();queueDraft();dirty=false;
+   message('Saved version opened. Undo returns to your previous edit. Changes create a new version.');
+  }catch(e){message((e as Error).message);}finally{saving=false;if(alive())refresh();}
  });
  q<HTMLButtonElement>(working,'[data-save]').addEventListener('click',async()=>{
+  if(!canEdit())return;saving=true;updatePanel();
   try{
-   validateAssembly(assembly);assemblyRig(assembly);if(kind==='car')vehicleGeometry(assembly);
+   await flushDraft();if(!alive())return;assertRewardSourceWritable();
+   validateAssembly(assembly);assemblyRig(assembly,sourceAspect);if(kind==='car')vehicleGeometry(assembly,sourceAspect);
    const before=lastStored;
-   const copy={...assembly,revision:Math.min(10000,assembly.revision+1)};
-   if(!stillOwner())throw Error('The active player changed.');
-   const saved=await saveRig(owner,copy,before?.id||history?.id||null);
-   if(disposed||!stillOwner())return;lastStored=saved;history=saved;assembly=copy;
-   q<HTMLButtonElement>(working,'[data-use]').disabled=kind!=='car';
-   message('Saved as a new test. Your drawing and other versions are safe.');await versions();
-  }catch(e){message((e as Error).message);}
+   if(assembly.revision>=10000)throw Error('This drawing has reached its version limit. Export it before starting a new drawing.');
+   const copy={...assembly,revision:history?Math.max(assembly.revision,history.assembly.revision)+1:assembly.revision};
+   if(!alive())throw Error('The drawing editor changed. Open your drawing again.');
+   const saved=await saveRig(owner,copy,before?.id||history?.id||null,alive);
+   if(!alive())return;lastStored=saved;history=saved;assembly=copy;
+   dirty=false;draftStatus.textContent='Version '+saved.assembly.revision+' saved';
+   await deleteDrawingDraft(owner,source.id,alive);if(!alive())return;
+   savedDraftSequence=draftSequence;draftError=null;
+   message('New version saved. Your drawing and earlier versions are safe.');await versions();
+   if(alive())await options.onSaved?.(saved);
+  }catch(e){message((e as Error).message);}finally{saving=false;if(alive())refresh();}
  });
  q<HTMLButtonElement>(working,'[data-use]').addEventListener('click',async()=>{
-  if(!lastStored||!stillOwner())return;
-  try{await selectRig(owner,lastStored.id);if(disposed||!stillOwner())return;message('Your moving car is ready in Rally!');
-   working.close();onPlayCar?.();
-  }catch(e){message((e as Error).message);}
+  if(!lastStored||!canEdit()||!onPlayCar)return;saving=true;updatePanel();
+  try{await flushDraft();if(!alive())return;const selected=lastStored;
+   await onPlayCar(selected.id);if(!alive())return;working.close();
+  }catch(e){message((e as Error).message);}finally{saving=false;if(alive())refresh();}
  });
- proposals(kind);await versions();working.showModal();
- canvas.focus({preventScroll:true});
- return working;
+ try{
+  proposals(kind);
+  const all=await versions(),draft=options.rigId?null:await loadDrawingDraft(owner,source.id);
+  const saved=options.rigId?await rigById(owner,options.rigId):all[0];
+  if(!alive())throw Error('The active player changed.');
+  if(saved&&(saved.assembly.sourceId!==source.id||saved.assembly.sourceSha256!==source.sha256))throw Error('This version belongs to a different drawing.');
+  if(draft){
+   assembly=validateAssembly(draft.assembly);history=draft.parentId?all.find(entry=>entry.id===draft.parentId)??null:null;
+   notice.textContent='Your saved pieces are here. Choose what to change, then try the movement.';
+   dirty=true;draftStatus.textContent='Recovered draft';message('Your draft is back. Continue editing, or save a version to reuse.');
+  }else if(saved){assembly=saved.assembly;history=saved;lastStored=saved;draftStatus.textContent='Version '+saved.assembly.revision;notice.textContent='Your saved pieces are here. Change anything to make a new version.';}
+  kind=assembly.kind;selected=assembly.pieces[0].id;q<HTMLSelectElement>(working,'[data-kind]').value=kind;
+  historyInput.value=lastStored?.id??'';layerCache.clear();refresh();
+  working.showModal();canvas.focus({preventScroll:true});return working;
+ }catch(error){
+  disposed=true;stopPlay();abort.abort();observer.disconnect();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);working.remove();throw error;
+ }
 }

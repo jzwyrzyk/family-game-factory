@@ -11,8 +11,8 @@ export interface PlayControls {go?:boolean;jump?:boolean}
  * Movement and joints are real Planck bodies, not CSS animation or a canned GIF.
  * Unusual semantics remain intentionally explicit choices made by the child.
  */
-export function createDrawingPlayground(input:DrawingAssembly){
- const rig:DrawingRig=validateDrawingRig(assemblyRig(input)),world=new World(Vec2(0,9));
+export function createDrawingPlayground(input:DrawingAssembly,sourceAspect?:number){
+ const rig:DrawingRig=validateDrawingRig(assemblyRig(input,sourceAspect)),world=new World(Vec2(0,9));
  const floor=world.createBody({position:Vec2(0,10.8)});
  floor.createFixture(Box(24,.3),{friction:.9});
  const bodies=new Map<string,Body>(),order=rig.components,joints:{a:string;b:string;kind:string;joint:Joint}[]=[];

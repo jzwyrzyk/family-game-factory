@@ -1,5 +1,7 @@
 # Drawing-to-Playable Engine — Gold Standard
 
+**Current integration:** the refreshed PR23 [Art Studio contract](ART_STUDIO.md) supersedes the earlier branch UI/storage limits below where specified. It adds the dedicated branded library, crop/turn/flip tools, recoverable drafts and Undo/Redo, immutable per-game bindings, private local scene artwork, and art/scene portability. The physical and recognition principles remain unchanged.
+
 **North star:** A child draws something, explains what it should do, and can immediately see *their actual artwork* doing it in a physically meaningful game. The software removes implementation difficulty, not authorship. A missed detection must be easy to correct without asking an adult or redrawing the object.
 
 The image itself is never sufficient to prove an object's physical function. We separate **pixels**, **named components**, **physical constraints**, and **behavior/game intent**. The child can override all ordinary assumptions.
@@ -57,7 +59,7 @@ Record:
 
 ## Boundaries and nonclaims
 
-This release does NOT include universal segmentation of arbitrary drawings; a paid vision model; accurate inference of imaginary object semantics; missing-art reconstruction; full skeletal animation/mesh skinning; asset registry injection into generated games; cross-device rig transfers; or measured efficacy with real children.
+This release does NOT include universal segmentation of arbitrary drawings; a paid vision model; accurate inference of imaginary object semantics; missing-art reconstruction; full skeletal animation/mesh skinning; asset registry injection into arbitrary generated JavaScript; or measured efficacy with real children. Local art/rig and combined scene transfers are now implemented by the Art Studio contract.
 
 A passing unit or browser test proves the stated behavior under its synthetic inputs, not perceived enjoyment or broad recognition accuracy. Running physics with a hand-marked joint is still a real, useful intermediate achievement; calling it full general intelligence would be misleading.
 

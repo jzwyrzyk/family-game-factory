@@ -4,13 +4,13 @@ import {readFile} from 'node:fs/promises';
 import {Firestore} from '@google-cloud/firestore';
 import {FirestoreRepository} from './pipeline/firestore';
 import {previewHandler} from './pipeline/http';
-import {requireFamily} from './contracts/api';
+import {requireResourceAudience} from './pipeline/audience';
 import {startBootstrap} from './bootstrap';
 export interface PreviewConfig {previewOrigin:string;previewKey:string;projectId:string;artifactBucket?:string;workspace:string}
 export function createPreview(config:PreviewConfig,repo:Pick<FirestoreRepository,'snapshot'>){
  if(Object.keys(config).some(key=>!['previewOrigin','previewKey','projectId','artifactBucket','workspace'].includes(key)))throw Error('PREVIEW_CONFIG_MUST_NOT_CONTAIN_GATEWAY_SECRETS');
  const origin=new URL(config.previewOrigin);if(origin.protocol!=='https:'||origin.origin!==config.previewOrigin)throw Error('HTTPS_ORIGIN_REQUIRED');
- const handler=previewHandler({revision:async(session,id)=>{const r=(await repo.snapshot()).revisions.find(x=>x.id===id&&x.game);if(!r)throw Error('NOT_FOUND');requireFamily(session,r);return r;}},config);
+ const handler=previewHandler({revision:async(session,id)=>{const state=await repo.snapshot(),r=state.revisions.find(x=>x.id===id&&x.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(state,session,r);return r;}},config);
  return async(req:Parameters<typeof handler>[0],res:Parameters<typeof handler>[1])=>{
   if(req.headers.host!==origin.host){res.writeHead(403);res.end();return;}
   if(req.url==='/health'){

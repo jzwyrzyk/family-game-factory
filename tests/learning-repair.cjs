@@ -9,11 +9,12 @@ const assert=require('node:assert/strict');
   page.on('pageerror',error=>errors.push(error.message));
   page.on('dialog',dialog=>dialog.accept());
   await page.clock.install({time:new Date('2026-11-16T08:00:00Z')});
-  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);
   await page.waitForFunction(()=>window.FG?.app&&window.FG?.learning?.version===2);
 
   // Multiplication is available only when the parent has selected grade 3+.
-  await page.getByRole('button',{name:'⚙️ Grown-ups',exact:true}).click();
+  await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
+  await page.locator('[data-parent-tab="settings"]').click();
   assert.equal(await page.locator('#parentFacts').isDisabled(),true);
   await page.selectOption('#parentGrade','3');
   await page.selectOption('#parentIntensity','balanced');

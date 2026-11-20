@@ -10,24 +10,31 @@ import {OpenAIResponsesAgent,type AgentApproval} from '../server/agent/openai';
 import {physicalWorkshop} from '../server/testing/quality-generated-fixtures';
 import {prepareOwnerAccess} from '../server/owner-setup';
 import {MemoryRepository} from '../server/pipeline/repository';
+import {runtimeBundle} from '../server/sandbox/bundle-v2.cjs';
+import {fixturePlanProposal,fixtureModuleReply,fixtureProviderResponse} from '../server/testing/presentation-quality-fixtures';
 test('owner invitation and budget setup needs no App PEM, model key or generation and preserves spend/data',async()=>{
  const repo=new MemoryRepository();await repo.transaction(s=>{s.ledgers.owner={month:new Date().toISOString().slice(0,7),allowance:1,used:200,reserved:100,paidEnabled:false};s.revisions.push({id:'saved',familyId:'owner',parentId:null,projectId:'saved',adapter:'metered-api',game:physicalWorkshop});return true;});
  const token=await prepareOwnerAccess({active:true,familyId:'owner',workspace:'existing'},5000000,repo);
  const state=await repo.snapshot();assert.equal(state.ledgers.owner.used,200);assert.equal(state.ledgers.owner.reserved,100);assert.equal(state.ledgers.owner.allowance,5000000);assert.equal(state.revisions[0].id,'saved');assert.equal(state.invitations?.length,1);assert.ok(!JSON.stringify(state).includes(token));
  await assert.rejects(prepareOwnerAccess({active:true,familyId:'__proto__',workspace:'existing'},5,repo));
 });
-test('real Responses adapter sends v2 schema/physics/required math and preserves source in paid-usage reports',async()=>{
+test('real Responses adapter keeps math and source while selecting physics docs only for physical generation/repair',async()=>{
  const approval:AgentApproval={enabled:true,approvalId:'synthetic-only',model:'gpt-5.4-mini-2026-03-17',reasoningEffort:'low',inputUsdPerMillion:.75,outputUsdPerMillion:4.5,maxInputTokens:64000,maxOutputTokens:8000,priceReviewedOn:new Date().toISOString().slice(0,10)};
  let calls=0;
  const adapter=new OpenAIResponsesAgent(approval,()=> 'synthetic-not-real-key',(async(url,options)=>{
-  calls++;assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(String(options?.body));
+  assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(String(options?.body));
+  if(body.text.format.name==='family_game_plan')return fixtureProviderResponse(fixturePlanProposal(body),3000,2000);
+  calls++;
   assert.equal(body.store,false);assert.equal(body.text.format.strict,true);assert.ok(body.text.format.schema.properties.kind.enum.includes('generated-module-v2'));
-  assert.match(body.instructions,/quality-runtime-v2.0.3/);assert.match(body.instructions,/Math is required/);assert.match(body.instructions,/physics.part/);assert.equal(body.reasoning.effort,'low');
-  return new Response(JSON.stringify({status:'completed',usage:{input_tokens:3000,output_tokens:2000},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(physicalWorkshop)}]}]}));
+  assert.ok(body.instructions.includes(runtimeBundle().version));assert.match(body.instructions,/Math is required/);
+  if(calls===1){assert.doesNotMatch(body.instructions,/physics.part/);assert.equal(JSON.parse(body.input).gameDesignPreflight.motion,'rule-driven');}
+  else {assert.doesNotMatch(body.instructions,/physics.part/);assert.match(JSON.parse(body.input).base.source,/api.physics/);assert.equal(JSON.parse(body.input).gameDesignPreflight.form.simulation,'rule-driven','a failed generated candidate cannot choose the engine for its repair');}
+  assert.equal(body.reasoning.effort,'low');
+  return fixtureProviderResponse(fixtureModuleReply(physicalWorkshop),3000,2000);
  }) as typeof fetch);
  const input={childIntent:'Make a moon construction game',gameManifest:{id:'new',allowedMechanics:['generated-module-v2']},baseRevision:{id:'new'},allowedCapabilities:['generated-module-v2'],budget:{maxUnits:300000,timeoutMs:60000},signal:new AbortController().signal};
- const result=await adapter.generate(input);assert.deepEqual(result.candidate.game,physicalWorkshop);assert.equal(result.usageUnits,11250);
- await adapter.repair(input,physicalWorkshop,'SYNTHETIC_PHYSICS_FAILURE');assert.equal(calls,2);
+ const result=await adapter.generate(input);assert.equal((result.candidate.game as typeof physicalWorkshop).source,physicalWorkshop.source);assert.equal(result.usageUnits,22500);
+ await adapter.repair(input,result.candidate.game as typeof physicalWorkshop,'SYNTHETIC_PHYSICS_FAILURE');assert.equal(calls,2);
 });
 test('authenticated owner polling recovers a stalled job; unauthenticated and other-family reads cannot trigger dispatch',async()=>{
  let polls=0,reads=0;

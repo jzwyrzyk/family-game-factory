@@ -1,0 +1,104 @@
+name: jems full visual review
+on:
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: jems-visual-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  screenshots:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build production
+        run: npm run build
+      - name: Capture all real jems pages
+        run: node tests/brand-review-pages.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jems-page-by-page-review
+          path: test-results/brand-review/
+          if-no-files-found: warn
+  brand-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build for isolated smoke test
+        run: npm run build
+      - name: Run isolated jems brand-browser contract
+        run: node tests/brand-browser.cjs
+  studio-journey:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build for isolated smoke test
+        run: npm run build
+      - name: Run isolated Studio save-play-iterate journey
+        run: node tests/studio-journey.cjs
+  joy-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build jems with joy layer
+        run: npm run build
+      - name: Test earned celebrations and Math-English accents
+        run: node tests/jems-delight-browser.cjs
+  gem-factory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build the playable workshop
+        run: npm run build
+      - name: Play desktop, tablet and phone orders through the learning host
+        run: npm run test:gem-factory
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gem-factory-gameplay
+          path: test-results/gem-factory/
+          if-no-files-found: warn

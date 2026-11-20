@@ -1,6 +1,33 @@
 name: Arcade journeys
 on: [push, pull_request]
+# Push and PR workflows from the same source branch share one latest-head run.
+# Do not spend runners on superseded commits during rapid review iterations.
+concurrency:
+  group: arcade-journeys-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 jobs:
+  private-coach-image:
+    # No provider key, cloud identity or funded API endpoint is available here.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build dedicated isolated coach image
+        run: docker build --file server/Dockerfile.coach --tag jems-private-coach:ci .
+      - name: Prove inactive image starts and refuses inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint /bin/sh jems-private-coach:ci -c 'test ! -f /app/server/gateway.ts && test ! -d /app/src'
+          id=$(docker run -d --rm -p 127.0.0.1:18080:8080 -e K_SERVICE=factory-coach-private -e FACTORY_COACH_EXECUTION_ENV=dedicated-cloud-run jems-private-coach:ci)
+          trap 'docker rm -f "$id" >/dev/null 2>&1 || true' EXIT
+          seen=0
+          for i in $(seq 1 25); do
+            code=$(curl -s --output /dev/null --write-out '%{http_code}' --max-time 2 -X POST http://127.0.0.1:18080/v1/private-coach/complete || true)
+            if [ "$code" = "403" ]; then seen=1; break; fi
+            sleep 1
+          done
+          test "$seen" = "1"
+          test "$(docker inspect --format '{{.State.Running}}' "$id")" = "true"
   browser:
     # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest can move to unsupported OS versions.
     runs-on: ubuntu-24.04
@@ -11,7 +38,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build production
         id: build
         run: npm run build
@@ -20,6 +47,12 @@ jobs:
       - name: Unit and contract checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:unit
+      - name: Earned gem progress contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-progress
+      - name: Lifetime rewards and durable source integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:rewards
       - name: Deployment configuration checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:deployment
@@ -35,9 +68,21 @@ jobs:
       - name: Build actions
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/actions-e2e.ts
+      - name: Independent intent gameplay browser tests
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:intent-playtest
+      - name: Repair and retest in existing sandbox worker
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:intent-repair-browser
       - name: Generated worker security
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx tests/generated-worker-security.ts
+      - name: Approved artwork and archived runtime compatibility
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:generated-art
+      - name: Actual normal-motion review captures and input receipts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:quality-capture
       - name: Restored games
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/restored-games.cjs
@@ -68,7 +113,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build production
         id: build
         run: npm run build
@@ -78,9 +123,21 @@ jobs:
       - name: Learning integration
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:learning-integration
+      - name: Language activities
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:language-ui
+      - name: Language subject integration
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:language-integration
       - name: Learning persistence and pacing
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/learning-repair.cjs
+      - name: Problem-solving evidence and authored practice
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:problem-solving
+      - name: Problem-solving desktop and touch journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:problem-solving-browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -96,7 +153,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build production
         id: build
         run: npm run build
@@ -106,6 +163,27 @@ jobs:
       - name: Studio journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:studio
+      - name: Illustrated gem journey
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-journey
+      - name: Saved collections and default navigation continuity
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:navigation-continuity
+      - name: Rewards layout, earning and persistence journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:rewards-browser
+      - name: Editable creation contracts and behavioral challenges
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation
+      - name: Private Art Studio contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:art
+      - name: Art library, physical drawings and portable scenes
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:art-browser
+      - name: Creation desktop and touch journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation-browser
       - name: Design coach checks
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:coach

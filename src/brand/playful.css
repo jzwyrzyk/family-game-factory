@@ -1,0 +1,210 @@
+/* jems Joy Layer / child-facing design system.
+ * Extend the approved palette; keep literacy, parent controls and live games quiet.
+ * Saturated colors belong in artwork, meaningful actions and verified milestones.
+ */
+:root{
+ --jems-zone-imagine:#8B5CF6;--jems-zone-build:#22D3A6;
+ --jems-zone-play:#2E6BFF;--jems-zone-discover:#FFC24D;
+ --jems-zone-test:#FF5E7A;--jems-zone-learn-math:#2E6BFF;
+ --jems-zone-learn-english:#8B5CF6;
+}
+/* The welcome is a creative workshop, not a wall of decorative elements. */
+body.studio-review #page-studio-library .studio-home-hero{
+ background-image:linear-gradient(111deg,#FFFDFC 0%,#F4ECFF 54%,#E3F1FF 100%);
+ border-color:#D8CAF5;
+ box-shadow:0 12px 32px #0B1E3B12;
+}
+body.studio-review #page-studio-library .studio-home-hero::before{
+ background:url('/jems-workbench.svg') center/contain no-repeat;
+ top:auto;bottom:-39px;right:-72px;width:289px;height:173px;
+ border:0;opacity:.22;z-index:0;
+}
+body.studio-review #page-studio-library .studio-home-hero::after{
+ background:url('/jems-sparks.svg') center/contain no-repeat;
+ width:110px;height:65px;top:3px;right:8px;opacity:.66;
+ border:0;z-index:0;
+}
+body.studio-review .studio-home-intro,body.studio-review .studio-home-action{z-index:1;position:relative}
+body.studio-review .studio-home-intro h1{letter-spacing:-1.8px}
+body.studio-review .studio-home-intro .studio-kicker{color:#6632BA}
+body.studio-review .studio-hero-sparkles{
+ color:#D6A000;text-shadow:0 2px 9px #FFC24D37;
+ animation:jems-idle-spark 5s ease-in-out infinite;
+}
+body.studio-review .studio-make-tile{
+ background:linear-gradient(125deg,#195FD0 0%,#2E6BFF 45%,#7136C9 100%);
+ border:1px solid #265FC5;box-shadow:0 13px 26px #195FD036;
+}
+body.studio-review .studio-make-tile .studio-make-copy strong{color:#FFFFFF}
+body.studio-review .studio-make-tile .studio-make-copy small{color:#FFFFFF}
+body.studio-review .studio-make-icon{background:#FFFFFF26;border:1px solid #FFFFFF94}
+body.studio-review .studio-make-icon::after{
+ content:'✦';position:absolute;top:-14px;right:-13px;font-size:19px;
+ color:#FFC24D;text-shadow:0 2px 8px #0B1E3B38;
+}
+body.studio-review .studio-make-tile:hover,
+body.studio-review .studio-make-tile:focus-visible{
+ box-shadow:0 17px 32px #7136C942;
+}
+body.studio-review .studio-make-tile:hover .studio-make-icon::after,
+body.studio-review .studio-make-tile:focus-visible .studio-make-icon::after{
+ animation:jems-spark-tap .5s cubic-bezier(.2,.9,.3,1);
+}
+body.studio-review .studio-make-tile:active{transform:translateY(1px) scale(.99)}
+
+/* Distinct worlds, one unified jems card construction language. */
+body.studio-review .studio-starter.gum{--jems-world-color:#119D89;--jems-world-light:#D7FBF1}
+body.studio-review .studio-starter.hill{--jems-world-color:#B77800;--jems-world-light:#FFF0C9}
+body.studio-review .studio-starter.buckets{--jems-world-color:#A93657;--jems-world-light:#FFE1E8}
+body.studio-review .studio-starter.dragon{--jems-world-color:#723DCE;--jems-world-light:#EEE1FF}
+body.studio-review .studio-starter.moon{--jems-world-color:#255BC2;--jems-world-light:#E0E9FF}
+body.studio-review .studio-starter.robot{--jems-world-color:#07877E;--jems-world-light:#D4F8F0}
+body.studio-review .studio-starter.factory{--jems-world-color:#7350C3;--jems-world-light:#F1E4FF}
+body.studio-review #page-studio-library .studio-starter{
+ border-color:#D9D9EB;box-shadow:0 6px 19px #0B1E3B0F;
+ transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+body.studio-review #page-studio-library .studio-starter:hover,
+body.studio-review #page-studio-library .studio-starter:focus-visible{
+ border-color:var(--jems-world-color);
+ box-shadow:0 13px 28px #0B1E3B22;transform:translateY(-4px);
+}
+body.studio-review #page-studio-library .studio-starter:focus-visible{
+ outline:3px solid #7136C9;outline-offset:3px;
+}
+body.studio-review #page-studio-library .studio-starter:active{transform:translateY(-1px) scale(.995)}
+body.studio-review .studio-starter .studio-game-art{background:var(--jems-world-light)}
+body.studio-review .studio-starter .studio-game-art .jems-world-scene{
+ position:absolute;inset:0;width:100%;height:100%;
+ object-fit:cover;display:block;z-index:1;
+}
+body.studio-review .studio-game-art:has(.jems-world-scene) :is(.studio-art-halo,.studio-art-symbol,.studio-art-companion){display:none}
+body.studio-review .jems-world-chip{
+ display:inline-flex;align-items:center;position:absolute;top:9px;left:10px;z-index:4;
+ padding:5px 9px;border-radius:999px;background:#FFFFFFE6;
+ color:var(--jems-world-color,#0B1E3B);
+ border:1px solid #FFFFFF;font:900 10px/1 system-ui,sans-serif;
+ letter-spacing:.5px;text-shadow:none;
+ box-shadow:0 2px 7px #0B1E3B16;pointer-events:none;
+}
+body.studio-review .studio-starter .studio-card-info{
+ border-top:3px solid var(--jems-world-color);
+ background:linear-gradient(180deg,var(--jems-world-light) -60%,#FFFFFF 40%);
+}
+body.studio-review .studio-starter .studio-card-link{
+ color:var(--jems-world-color);font-weight:850;
+}
+body.studio-review .studio-starter:hover .studio-card-link::after{
+ content:' ✦';color:#D19B00;
+}
+body.studio-review .studio-starter :is(.quality-card-art,.jems-world-scene){transition:transform .26s ease}
+body.studio-review .studio-starter:hover :is(.quality-card-art,.jems-world-scene){transform:scale(1.035)}
+
+/* A real maker's workspace while the child is deciding what to create.
+   No false progress meter or suggestion that an empty idea already built a game. */
+body.studio-review .studio-empty{
+ background-image:url('/jems-clouds.svg'),
+ linear-gradient(152deg,#FDFBFF 0%,#F6F0FF 66%,#EAF7FF 100%);
+ background-position:center bottom,center;background-repeat:no-repeat;
+ background-size:100% auto,cover;gap:4px;min-height:470px;
+}
+body.studio-review .jems-empty-workbench{
+ width:min(340px,100%);max-height:210px;object-fit:contain;
+ filter:drop-shadow(0 10px 16px #7B55D51C);
+ animation:jems-bob 6s ease-in-out infinite;
+}
+body.studio-review .studio-empty h2{max-width:410px;color:#0B1E3B}
+body.studio-review .studio-empty p{color:#516383}
+body.studio-review #studioChooseStarter{
+ color:#542AAB;background:#F1E8FF;border-color:#CDB9F6;
+}
+
+/* Creations and versions should feel owned, but never like a reward economy. */
+body.studio-review .studio-saved-card{
+ position:relative;min-height:165px;border-left:4px solid #8B5CF6;
+ background:linear-gradient(135deg,#FFF,#F9F5FF);
+}
+body.studio-review .studio-saved-card[data-jems-state='playable']{border-left-color:#22BAA2}
+body.studio-review .studio-saved-card[data-jems-state='ready']{border-left-color:#2E6BFF}
+body.studio-review .studio-saved-card[data-jems-state='building']{border-left-color:#EFB913}
+body.studio-review .jems-project-badge,
+body.studio-review .jems-version-badge{
+ display:inline-flex;align-items:center;align-self:flex-start;
+ padding:4px 10px;border-radius:999px;
+ font:800 11px/1.25 system-ui,sans-serif;color:#6731A9;
+ background:#F0E7FF;border:1px solid #E3D6F6;
+}
+body.studio-review .studio-saved-card[data-jems-state='playable'] .jems-project-badge{
+ color:#075D4D;background:#DCFAEF;border-color:#A4EBD7;
+}
+body.studio-review .studio-saved-card[data-jems-state='ready'] .jems-project-badge{
+ color:#1A50AA;background:#E5EFFF;border-color:#BCD3FF;
+}
+body.studio-review .studio-saved-card[data-jems-state='building'] .jems-project-badge{
+ color:#765000;background:#FFF2CC;border-color:#F2D782;
+}
+body.studio-review .studio-continue-art{background:linear-gradient(135deg,#E6D8FF,#DDF9EF)}
+body.studio-review .studio-version-card{
+ border:1px solid #DAD5EC;background:linear-gradient(130deg,#FFF,#F9F6FF);
+}
+body.studio-review .studio-version-card.is-candidate{
+ background:linear-gradient(130deg,#FFFAEB,#F6EDFF);border-color:#DEBE72;
+}
+body.studio-review .studio-version-card .jems-version-badge{margin-bottom:8px}
+body.studio-review .studio-versions .studio-section-heading h2::after{
+ content:'✦';font-size:17px;margin-left:8px;color:#E5AE02;
+}
+
+/* Math and English have identities outside questions; the actual activity stays calm. */
+body.studio-review #page-lab .page-head{
+ background:linear-gradient(100deg,#F2F6FF,#F6EEFF);
+ border:1px solid #E2D8FA;border-radius:21px;padding:20px 22px;
+ margin-bottom:16px;position:relative;overflow:hidden;
+}
+body.studio-review #page-lab .page-head::after{
+ content:'✦';position:absolute;top:9px;right:21px;
+ font-size:30px;color:#FFC24D;opacity:.8;pointer-events:none;
+}
+body.studio-review #page-lab .page-head h1{color:#0B1E3B}
+body.studio-review #page-lab .panel:first-child{border-top:4px solid var(--jems-zone-learn-math)}
+body.studio-review #page-lab .panel:last-child{border-top:4px solid var(--jems-zone-build)}
+body.studio-review #page-lab:has(#labSubjectLanguage[aria-pressed='true']) .panel:first-child{
+ border-top-color:var(--jems-zone-learn-english);
+}
+body.studio-review #page-lab:has(#labSubjectLanguage[aria-pressed='true']) .page-head{
+ background:linear-gradient(100deg,#F8F1FF,#FFF1F3);
+}
+body.studio-review .studio-learning-choice{border-left:4px solid var(--jems-zone-learn-math)}
+body.studio-review .studio-learning-choice:has(#studioSubjectLanguage[aria-pressed='true']){
+ border-left-color:var(--jems-zone-learn-english);
+}
+body.studio-review .studio-game-subject:has(#studioGameLanguage[aria-pressed='true']){
+ border-inline-start:3px solid var(--jems-zone-learn-english);
+}
+
+/* Game physics, live canvas, question text and Parent Controls are intentionally untouched. */
+@keyframes jems-idle-spark{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes jems-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes jems-spark-tap{0%{transform:scale(.8) rotate(-25deg)}60%{transform:scale(1.3) rotate(18deg)}100%{transform:scale(1) rotate(0)}}
+@media(max-width:650px){
+ body.studio-review #page-studio-library .studio-home-hero::before,
+ body.studio-review #page-studio-library .studio-home-hero::after{display:none}
+ body.studio-review .studio-empty{min-height:330px;padding:16px 22px}
+ body.studio-review .jems-empty-workbench{width:min(235px,88%);max-height:144px}
+ body.studio-review .jems-world-chip{top:6px;left:7px;padding:4px 7px;font-size:9px}
+ body.studio-review .studio-starter .studio-card-info{border-top-width:2px}
+ body.studio-review .studio-saved-card{min-height:0}
+ body.studio-review #page-lab .page-head{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.studio-review .studio-hero-sparkles,body.studio-review .jems-empty-workbench,
+ body.studio-review .studio-make-tile:hover .studio-make-icon::after{
+  animation:none!important;
+ }
+ body.studio-review .studio-starter:hover :is(.quality-card-art,.jems-world-scene),
+ body.studio-review .studio-starter:focus-visible :is(.quality-card-art,.jems-world-scene){
+  transform:none!important;transition:none!important;
+ }
+ body.studio-review #page-studio-library .studio-starter:hover,
+ body.studio-review #page-studio-library .studio-starter:active{transform:none!important}
+}

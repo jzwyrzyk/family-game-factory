@@ -1,0 +1,572 @@
+{
+  "version": "1.2.0",
+  "status": "Proposed implementation contract. CSS and sample behavior are provided; application adapters and production integration remain required.",
+  "global": {
+    "logo": "Load the supplied current-revision SVG. Preserve all geometry; the three short ray marks removed on 19 November 2026 must not be restored. No filter, mask, recolor, distortion or procedural redraw.",
+    "art": "Choose an asset ID from the delivered manifest and honor its review status; dimensions explicit; alt empty when decorative.",
+    "target": "48 CSS px main controls; 44 CSS px secondary controls.",
+    "keyboard": "Every clickable control uses native semantics and visible focus.",
+    "events": "Server/app events drive success, progress and achievement state; no timer-generated success."
+  },
+  "components": [
+    {
+      "name": "BrandLogo",
+      "element": "img",
+      "props": [
+        "src: locked asset ID",
+        "variant: primary | inverse | symbol",
+        "width",
+        "height",
+        "homeLink: optional"
+      ],
+      "states": [
+        "default"
+      ],
+      "rules": [
+        "Preserve intrinsic aspect ratio.",
+        "Accessible home link name is Jems home.",
+        "Never replace a missing asset with generated artwork."
+      ]
+    },
+    {
+      "name": "Button",
+      "class": "jems-button",
+      "props": [
+        "variant: primary | blue | mint | gold | secondary | quiet | danger",
+        "size: default | compact",
+        "icon?: 24px icon ID",
+        "busy?: boolean",
+        "disabled?: boolean"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "pressed",
+        "focus-visible",
+        "disabled",
+        "loading"
+      ],
+      "rules": [
+        "Keep visible text when busy.",
+        "aria-busy announces in-flight work; prevent duplicate mutations in application logic.",
+        "Use native disabled when unavailable; associate explanatory help where needed."
+      ]
+    },
+    {
+      "name": "GameCard",
+      "class": "jems-card",
+      "slots": [
+        "art",
+        "title",
+        "description",
+        "primaryAction",
+        "optionsMenu"
+      ],
+      "props": [
+        "gameId",
+        "status: ready | building | needs-retry",
+        "favorite?: boolean"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "focus-within",
+        "building",
+        "error"
+      ],
+      "rules": [
+        "Do not nest buttons inside links.",
+        "A separate visible or labeled options control provides remove/archive without opening the game.",
+        "Card art describes the game, not a new logo."
+      ]
+    },
+    {
+      "name": "IdeaComposer",
+      "class": "jems-composer",
+      "slots": [
+        "label",
+        "textarea",
+        "voiceControl",
+        "submitControl",
+        "help",
+        "error"
+      ],
+      "props": [
+        "value",
+        "busy",
+        "error",
+        "maxLength"
+      ],
+      "states": [
+        "empty",
+        "editing",
+        "focus-visible",
+        "disabled",
+        "submitting",
+        "error"
+      ],
+      "rules": [
+        "Label remains visible.",
+        "Enter behavior must not interfere with multiline input or speech review.",
+        "Sending a message does not automatically accept an edit."
+      ]
+    },
+    {
+      "name": "BuildStatus",
+      "class": "jems-build-status",
+      "props": [
+        "stage: queued | building | testing | repairing | ready | failed | cancelled",
+        "progress?: actual number",
+        "liveAnnouncement?: string",
+        "hasRecoverableVersion?: verified boolean"
+      ],
+      "states": [
+        "indeterminate",
+        "determinate",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "rules": [
+        "Never invent a percentage or ETA.",
+        "When progress is unknown omit aria-valuenow.",
+        "Polite stage announcements are throttled; avoid per-frame screen reader updates.",
+        "Keep a verified recoverable game available when one exists; show neutral failure copy otherwise."
+      ]
+    },
+    {
+      "name": "VoiceControl",
+      "class": "jems-voice",
+      "props": [
+        "state: idle | recording | transcribing | review | blocked | empty | failed",
+        "transcript",
+        "seconds?: actual number"
+      ],
+      "states": [
+        "idle",
+        "recording",
+        "transcribing",
+        "review",
+        "blocked",
+        "empty",
+        "failed"
+      ],
+      "rules": [
+        "Microphone click starts a user-approved recording flow.",
+        "Stop is always available during recording.",
+        "Review text before Send.",
+        "Typing remains an alternative.",
+        "Recording indicator uses text and shape, never color alone."
+      ]
+    },
+    {
+      "name": "Banner",
+      "class": "jems-banner",
+      "props": [
+        "tone: info | success | warning | error",
+        "title",
+        "body",
+        "action?",
+        "dismissible?"
+      ],
+      "states": [
+        "default",
+        "focus-within",
+        "dismissed"
+      ],
+      "rules": [
+        "No attention animation on errors.",
+        "Recovery action stays visible.",
+        "Decorative art is separate from live message text."
+      ]
+    },
+    {
+      "name": "Toast",
+      "class": "jems-toast",
+      "props": [
+        "message",
+        "action?",
+        "dismissible",
+        "tone"
+      ],
+      "states": [
+        "enter",
+        "visible",
+        "dismissed"
+      ],
+      "rules": [
+        "Create polite live region before adding content.",
+        "No automatic disappearance for required actions.",
+        "Critical messages remain inline as well.",
+        "Undo/remove announcements reflect successful application events."
+      ]
+    },
+    {
+      "name": "Achievement",
+      "class": "jems-achievement",
+      "slots": [
+        "rank thumbnail",
+        "rank title",
+        "observed action",
+        "primaryAction",
+        "dismissAction"
+      ],
+      "props": [
+        "stage: rough | cut | polished | master",
+        "evidenceEventId",
+        "tier: quiet | milestone",
+        "motion: default | calm",
+        "makerId: spark | nova",
+        "level: 1 | 2 | 3 | 4",
+        "rankThumbnail: exact maker_{spark|nova}_{1..4} asset"
+      ],
+      "states": [
+        "locked",
+        "earned",
+        "seen"
+      ],
+      "rules": [
+        "Trigger once per verified event.",
+        "Use PR57 highest-stage logic: saved idea -> rough / Gem Maker; saved experiment plus linked child observation -> cut / Gem Cutter; cut plus confirmed kept version -> polished / Gem Polisher.",
+        "Never promote through points, repeated clicks or a visual timer.",
+        "At most one large celebration at a time.",
+        "Dismiss without blocking return to play.",
+        "Never claim tested learning gains from game completion.",
+        "Gem Master is the requested fourth builder level. Inspected PR57 draft b12a2a5 currently uses three independent qualifying polished projects. Runtime eligibility remains achievement-adapter owned; this art library does not evaluate or award it.",
+        "Primary rank artwork is the chosen human maker in the exact level outfit, holding the original level jem. Reuse the same source frame in Journey, rank card, chooser and popup.",
+        "Use a soft Cloud or lilac thumbnail tile at 96–192 CSS px; contain the full 3:4 figure. No metal medal, ornate frame, crown or replacement gem hero.",
+        "Changing maker preserves the selected or verified earned level. Changing the demo level updates the thumbnail, title, reason, Journey and both chooser portraits together.",
+        "Standalone source jems are secondary 16–32 CSS px progress icons only. Master uses the original rainbow star, held by the original level 4 maker."
+      ]
+    },
+    {
+      "name": "Dialog",
+      "class": "jems-dialog",
+      "element": "dialog",
+      "slots": [
+        "title",
+        "description",
+        "content",
+        "primaryAction",
+        "cancelAction"
+      ],
+      "props": [
+        "id",
+        "open",
+        "destructive?"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "busy",
+        "error"
+      ],
+      "rules": [
+        "Use showModal so the background is inert.",
+        "Label the dialog with aria-labelledby.",
+        "Restore focus to the opener on close.",
+        "Escape closes unless a brief non-cancellable operation truly requires otherwise.",
+        "Focus least destructive action for destructive confirmations."
+      ]
+    },
+    {
+      "name": "EmptyState",
+      "class": "jems-empty",
+      "slots": [
+        "spot art",
+        "title",
+        "body",
+        "primaryAction"
+      ],
+      "props": [
+        "reason: new | no-results | offline | unavailable"
+      ],
+      "states": [
+        "default",
+        "offline",
+        "error"
+      ],
+      "rules": [
+        "Provide one clear next action.",
+        "Keep language reassuring and literal.",
+        "Offline state does not promise an unsaved idea is stored."
+      ]
+    },
+    {
+      "name": "ParentSummary",
+      "class": "jems-parent-panel",
+      "slots": [
+        "heading",
+        "metric labels",
+        "evidence date",
+        "settings",
+        "help"
+      ],
+      "props": [
+        "period",
+        "observedCounts",
+        "measurementDefinition"
+      ],
+      "states": [
+        "empty",
+        "loading",
+        "available",
+        "error"
+      ],
+      "rules": [
+        "Calmer artwork density and motion.",
+        "Always distinguish practice activity, assessed ability and causal improvement.",
+        "Do not show percentages without denominator and method."
+      ]
+    },
+    {
+      "name": "Navigation",
+      "class": "jems-nav",
+      "slots": [
+        "brand",
+        "primaryLinks",
+        "profile",
+        "parentEntry"
+      ],
+      "props": [
+        "currentPage",
+        "layout: desktop | compact"
+      ],
+      "states": [
+        "default",
+        "current",
+        "focus-visible",
+        "expanded"
+      ],
+      "rules": [
+        "Use aria-current=page.",
+        "Do not hide required navigation behind hover.",
+        "Keep labels at tablet and phone sizes when feasible."
+      ]
+    },
+    {
+      "name": "Switch",
+      "class": "jems-switch-row",
+      "element": "input type=checkbox",
+      "props": [
+        "id",
+        "label",
+        "checked",
+        "description?",
+        "disabled?"
+      ],
+      "states": [
+        "off",
+        "on",
+        "focus-visible",
+        "disabled"
+      ],
+      "rules": [
+        "Input retains native accessibility.",
+        "Visible label describes the setting.",
+        "Audio stays user-controllable."
+      ]
+    },
+    {
+      "name": "MakerChooser",
+      "element": "dialog with fieldset and native radio inputs",
+      "props": [
+        "maker: spark | nova",
+        "previewLevel: 1 | 2 | 3 | 4",
+        "onChoose(makerId)"
+      ],
+      "states": [
+        "open",
+        "closed",
+        "Spark selected",
+        "Nova selected"
+      ],
+      "rules": [
+        "Use Spark and Nova names without gender labels.",
+        "Show the retained maker asset at the same preview level for both choices.",
+        "Provide an accessible dialog name, visible close control, Escape handling and return focus.",
+        "Character preference changes appearance only; preserve all verified earned progress.",
+        "Catalog selection is local and does not store a preference or contact an account.",
+        "Both chooser portraits use the currently previewed or verified earned level; do not reset to a different outfit when opening the chooser."
+      ]
+    },
+    {
+      "name": "Journey",
+      "slots": [
+        "clean journey background",
+        "selected original maker outfit",
+        "four rank thumbnail cards",
+        "optional application-verified next step"
+      ],
+      "props": [
+        "maker: spark | nova",
+        "previewLevel: 1 | 2 | 3 | 4",
+        "earnedLevels?: verified application state",
+        "nextStep?: verified application copy"
+      ],
+      "states": [
+        "Gem Maker preview",
+        "Gem Cutter preview",
+        "Gem Polisher preview",
+        "Gem Master preview"
+      ],
+      "rules": [
+        "Use maker_spark_1..4 or maker_nova_1..4 with native aspect ratio and object-fit contain.",
+        "Display current-revision identity separately from artwork; never use an old screenshot header as artwork.",
+        "Previewing an outfit does not award, lock or unlock progress.",
+        "Production earned markers, progress fractions and next steps require the achievement adapter. The inspected draft Master policy uses three independent qualifying polished projects; a preview selection cannot supply that evidence.",
+        "Treat the five-pose gemstone helper as Gem companion, distinct from the named human maker Spark.",
+        "Every primary rank image is the chosen maker in the exact rank outfit holding the original jem; use the same rank-thumbnail recipe across cards, chooser and popup.",
+        "Standalone gem_rough, gem_cut, gem_polished_rainbow and gem_master are secondary compact progress icons only. Never use a medal or bare gem as the primary rank visual."
+      ]
+    }
+  ],
+  "coverage": [
+    {
+      "surface": "Welcome and home",
+      "components": [
+        "BrandLogo",
+        "Navigation",
+        "IdeaComposer",
+        "GameCard"
+      ],
+      "art": "Welcoming workshop hero; optional small helper"
+    },
+    {
+      "surface": "Ready to Play jems",
+      "components": [
+        "GameCard",
+        "Navigation"
+      ],
+      "art": "Consistent thumbnail family"
+    },
+    {
+      "surface": "My jems",
+      "components": [
+        "GameCard",
+        "EmptyState",
+        "Toast",
+        "Dialog"
+      ],
+      "art": "Collection spot art; own game thumbnails"
+    },
+    {
+      "surface": "Invent chat",
+      "components": [
+        "IdeaComposer",
+        "VoiceControl",
+        "Banner"
+      ],
+      "art": "One small supporting character; quiet reading area"
+    },
+    {
+      "surface": "Build and edit wait",
+      "components": [
+        "BuildStatus",
+        "Banner",
+        "Button"
+      ],
+      "art": "Workshop activity loop or static calm equivalent"
+    },
+    {
+      "surface": "Game ready",
+      "components": [
+        "Banner",
+        "Toast"
+      ],
+      "art": "Small finished gem or approved launch illustration"
+    },
+    {
+      "surface": "Gameplay shell",
+      "components": [
+        "Button",
+        "BuildStatus",
+        "Navigation"
+      ],
+      "art": "Game world owns artwork; shell stays restrained"
+    },
+    {
+      "surface": "Achievements and milestones",
+      "components": [
+        "Achievement",
+        "Toast",
+        "Banner"
+      ],
+      "art": "Chosen Spark or Nova in the exact earned-rank outfit, original held jem intact, on a soft rank-thumbnail tile. Same artwork in card and nonblocking popup."
+    },
+    {
+      "surface": "Voice and transcript review",
+      "components": [
+        "VoiceControl",
+        "IdeaComposer",
+        "Banner"
+      ],
+      "art": "Minimal supporting helper pose"
+    },
+    {
+      "surface": "Recovery and offline",
+      "components": [
+        "EmptyState",
+        "Banner",
+        "Button"
+      ],
+      "art": "Calm helper repair/connection spot; no sad punishment"
+    },
+    {
+      "surface": "Parent and learning views",
+      "components": [
+        "ParentSummary",
+        "Switch",
+        "Dialog"
+      ],
+      "art": "Quiet accents; no success claims baked into artwork"
+    },
+    {
+      "surface": "Settings and account",
+      "components": [
+        "Switch",
+        "Button",
+        "Dialog",
+        "Banner"
+      ],
+      "art": "Small neutral workshop prop"
+    },
+    {
+      "surface": "Choose your maker and My journey",
+      "components": [
+        "MakerChooser",
+        "Journey",
+        "Achievement",
+        "Button",
+        "Dialog"
+      ],
+      "art": "Eight exact Spark/Nova outfit frames, clean journey scenery and four original source jems for secondary tiny progress icons."
+    }
+  ],
+  "celebrations": [
+    {
+      "tier": "micro",
+      "trigger": "ordinary successful save or accepted action",
+      "visual": "brief check or tiny gem shine",
+      "maximumDurationMs": 200,
+      "interruptsPlay": false,
+      "sound": "none"
+    },
+    {
+      "tier": "milestone",
+      "trigger": "verified achievement event",
+      "visual": "brief chosen-maker rank thumbnail reveal in a nonblocking message",
+      "maximumDurationMs": 800,
+      "interruptsPlay": false,
+      "sound": "optional user-enabled gentle chime"
+    },
+    {
+      "tier": "major",
+      "trigger": "verified Gem Studio stage transition, only where existing product behavior supports it",
+      "visual": "single dismissible panel with approved art",
+      "maximumDurationMs": 1200,
+      "interruptsPlay": "only at a safe transition, never mid-input",
+      "sound": "optional, user-enabled"
+    }
+  ]
+}

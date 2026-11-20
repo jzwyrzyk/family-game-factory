@@ -1,9 +1,10 @@
+import {createIcon,setIconLabel,type IconName} from '../brand/icons';
 import type { GameContext, GameInstance } from '../runtime/types';
 import { createVehicle, TRACKS, type VehicleSnapshot, type VehicleOptions } from '../quality/physics';
 import { createFixedClock, interpolateBody } from '../quality/clock';
 import { createGameAudio } from '../quality/audio';
 import { drawLandscape, drawPart, drawFlag, palette } from '../quality/art';
-import {loadActiveCar,type DrawnCar} from '../drawing/rally';
+import {loadDrawnCar,drawCarBody,drawCarWheel,type DrawnCar} from '../drawing/rally';
 
 type Mode = 'ready' | 'drive' | 'result';
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; size: number }
@@ -34,6 +35,10 @@ export default class QualityHill implements GameInstance {
   private simulation: ReturnType<typeof createVehicle>;
   private drawnCar: DrawnCar|null = null;
   private drawingOwner = '';
+  private drawingRigId:string|null = null;
+  private drawingLoading = false;
+  private drawingUnavailable = false;
+  private drawingError = '';
   private scene: VehicleSnapshot;
   private options: VehicleOptions;
   private mode: Mode = 'ready';
@@ -59,13 +64,18 @@ export default class QualityHill implements GameInstance {
     const saved = context.persistence?.load();
     if (saved !== undefined && saved !== null) {
       try {
-        const data = saved as { schema: string; track: string; best: Record<string, number>; paint: string };
+        const data = saved as { schema: string; track: string; best: Record<string, number>; paint: string; drawingRigId?:string|null };
         if (data.schema !== 'quality-hill-v1' || typeof data.track !== 'string' || !Object.hasOwn(TRACKS, data.track) || !data.best || typeof data.best !== 'object' || Array.isArray(data.best)
           || Object.entries(data.best).some(([k, v]) => !Object.hasOwn(TRACKS, k) || typeof v !== 'number' || !Number.isFinite(v) || v < 0 || v > 1000)
-          || !['#e99b55', '#50a89a', '#b29bd5'].includes(data.paint)) throw Error('Unsupported saved ride');
+          || !['#e99b55', '#50a89a', '#b29bd5'].includes(data.paint)
+          || (data.drawingRigId!==undefined&&data.drawingRigId!==null&&(typeof data.drawingRigId!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(data.drawingRigId)))) throw Error('Unsupported saved ride');
         this.track = data.track; this.best = { ...data.best }; this.paint = data.paint;
+        this.drawingRigId=data.drawingRigId??null;
       } catch { this.storageBlocked = true; }
     }
+    // The saved game revision is authoritative. Missing means legacy progress;
+    // explicit null always chooses the original car. Never consult a global picker.
+    if(context.drawingRigId!==undefined)this.drawingRigId=context.drawingRigId;
     this.simulation = createVehicle(this.options, this.track); this.scene = this.simulation.snapshot();
     this.context2d = this.canvas.getContext('2d')!;
     this.root.dataset.qualityGame = 'hill'; this.root.setAttribute('aria-label', 'Junkyard Rally');
@@ -75,7 +85,7 @@ export default class QualityHill implements GameInstance {
     this.musicButton = this.button('Music', 'q-chip', () => { void this.audio.unlock(); this.audio.setMusic(!this.audio.settings.music); this.audioLabels(); });
     this.effectsButton = this.button('Sound', 'q-chip', () => { void this.audio.unlock(); this.audio.setEffects(!this.audio.settings.effects); this.audioLabels(); });
     this.musicButton.setAttribute('aria-label', 'Toggle music'); this.effectsButton.setAttribute('aria-label', 'Toggle sound effects');
-    this.pauseButton = this.button('Ⅱ', 'q-chip', () => this.togglePause()); this.pauseButton.setAttribute('aria-label', 'Pause game');
+    this.pauseButton = this.button('', 'q-chip', () => this.togglePause()); this.pauseButton.append(createIcon('pause')); this.pauseButton.setAttribute('aria-label', 'Pause game');
     tools.append(this.musicButton, this.effectsButton, this.pauseButton); const top = el('div', 'q-topbar'); top.append(heading, tools);
     const mission = el('div', 'q-mission'); const copy = el('div', 'q-mission-copy');
     copy.append(el('b', '', 'Take the little car to camp'), el('span', '', 'Ease off at a crest. Brake to settle the wheels.'));
@@ -87,9 +97,9 @@ export default class QualityHill implements GameInstance {
     this.distance.style.cssText = 'position:absolute;right:14px;top:12px;background:#fffbecdf;border-radius:14px;padding:8px 12px;pointer-events:none';
     this.result.hidden = true; this.result.setAttribute('aria-live', 'polite'); this.status.setAttribute('role', 'status'); stage.append(this.canvas, el('div', 'q-stage-label', 'THE GREAT OUTDOORS'), this.distance, this.status, this.result);
     const toolbar = el('div', 'q-toolbar'), actions = el('div', 'q-edit-actions'), pedals = el('div', 'q-drive-controls');
-    this.driveButton = this.button('Let’s drive →', 'q-button q-primary', () => this.begin());
-    actions.append(this.driveButton, this.button('↶ Try again', 'q-button', () => this.restart()));
-    pedals.append(this.pedal('Brake', 'brake'), this.pedal('Go →', 'go')); toolbar.append(actions, pedals);
+    this.driveButton = this.button('Let’s drive', 'q-button q-primary', () => this.begin(), 'play');
+    actions.append(this.driveButton, this.button('Try again', 'q-button', () => this.restart(), 'retry'));
+    pedals.append(this.pedal('Brake', 'brake'), this.pedal('Go', 'go')); toolbar.append(actions, pedals);
     const garage = el('details', 'q-garage'); garage.style.cssText = 'padding:10px 16px;background:#f0efdf;border-top:1px solid #d8dfca';
     const summary = el('summary', '', 'Make this ride your own'); summary.style.cssText = 'font-size:13px;font-weight:700;cursor:pointer'; garage.append(summary);
     const choices = el('div', 'q-tuning'); choices.style.padding = '12px 0';
@@ -112,27 +122,33 @@ export default class QualityHill implements GameInstance {
     }
     mount.replaceChildren(this.root); this.audioLabels();
     this.clock = createFixedClock({ update: dt => this.update(dt), render: (alpha, elapsed) => this.render(alpha, elapsed),
-      onPause: () => { this.clearInput(); this.audio.pause(); this.pauseButton.textContent = '▶'; this.pauseButton.setAttribute('aria-label', 'Resume game'); this.context.emit?.({ type: 'pause', name: 'hill' }); },
-      onResume: () => { this.clearInput(); this.audio.resume(); this.pauseButton.textContent = 'Ⅱ'; this.pauseButton.setAttribute('aria-label', 'Pause game'); this.context.emit?.({ type: 'resume', name: 'hill' }); } });
+      onPause: () => { this.clearInput(); this.audio.pause(); this.pauseButton.replaceChildren(createIcon('play')); this.pauseButton.setAttribute('aria-label', 'Resume game'); this.context.emit?.({ type: 'pause', name: 'hill' }); },
+      onResume: () => { this.clearInput(); this.audio.resume(); this.pauseButton.replaceChildren(createIcon('pause')); this.pauseButton.setAttribute('aria-label', 'Pause game'); this.context.emit?.({ type: 'resume', name: 'hill' }); } });
     window.addEventListener('keydown', this.keydown, { signal: this.listeners.signal });
     window.addEventListener('keyup', this.keyup, { signal: this.listeners.signal });
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(stage);
     window.addEventListener('resize', this.onWindowResize, { signal: this.listeners.signal });
     this.resize(); this.resetCamera(); this.hud(); this.clock.start();
-    // Explicitly selected drawing is optional. Never reveal another profile's art;
-    // loading stays local and cannot mutate an unmounted game.
     this.drawingOwner=String((window as any).FG?.store?.current()?.id||'');
-    if(this.drawingOwner)void loadActiveCar(this.drawingOwner).then(asset=>{
-      if(!asset||this.disposed||this.drawingOwner!==String((window as any).FG?.store?.current()?.id||''))return;
-      this.drawnCar=asset;
-      if(this.mode==='ready')this.restart();
-      else this.status.textContent='Your drawing is ready. It will appear on the next ride.';
-    }).catch(()=>{if(!this.disposed)this.status.textContent='Could not open your drawing here. The original Rally car still works.';});
+    if(this.drawingRigId){
+      this.drawingLoading=true;this.driveButton.disabled=true;this.trackSelect.disabled=true;this.hud();
+      void loadDrawnCar(this.drawingOwner,this.drawingRigId).then(asset=>{
+        if(this.disposed||this.drawingOwner!==String((window as any).FG?.store?.current()?.id||''))return;
+        this.drawnCar=asset;this.drawingLoading=false;this.drawingUnavailable=false;
+        this.simulation.dispose();this.simulation=createVehicle(this.options,this.track,asset.geometry);this.scene=this.simulation.snapshot();
+        this.driveButton.disabled=false;this.trackSelect.disabled=false;this.resetCamera();this.hud();this.clock.invalidate();
+      }).catch(error=>{
+        if(this.disposed||this.drawingOwner!==String((window as any).FG?.store?.current()?.id||''))return;
+        this.drawingLoading=false;this.drawingUnavailable=true;
+        this.drawingError=error instanceof Error?error.message:'The saved drawing could not be opened.';
+        this.hud();this.clock.invalidate();
+      });
+    }
   }
 
-  private button(label: string, className: string, action: () => void) { const b = el('button', className, label); b.type = 'button'; b.addEventListener('click', action); return b; }
+  private button(label: string, className: string, action: () => void, icon?: IconName) { const b = el('button', className, label); b.type = 'button'; if(icon)setIconLabel(b,icon,label); b.addEventListener('click', action); return b; }
   private pedal(label: string, name: 'go' | 'brake') {
-    const b = el('button', 'q-pedal', label); b.type = 'button'; b.style.touchAction = 'none'; b.dataset.pedal = name;
+    const b = el('button', 'q-pedal', label); b.type = 'button'; setIconLabel(b,name==='go'?'arrow':'stop',label); b.style.touchAction = 'none'; b.dataset.pedal = name;
     b.addEventListener('pointerdown', event => { event.preventDefault(); if (this.mode === 'ready') this.begin(); if (this.clock.paused || this.mode !== 'drive') return;
       void this.audio.unlock(); b.setPointerCapture(event.pointerId); this.pedals.set(event.pointerId, name); b.setAttribute('aria-pressed', 'true'); });
     const release = (e: PointerEvent) => { this.pedals.delete(e.pointerId); b.setAttribute('aria-pressed', 'false'); };
@@ -161,17 +177,17 @@ export default class QualityHill implements GameInstance {
   };
   private keyup = (e: KeyboardEvent) => { this.keys.delete(e.code); if(e.code === 'Space' || e.code === 'Enter'){ this.keys.delete('go'); this.keys.delete('brake'); } };
   private clearInput() { this.keys.clear(); this.pedals.clear(); this.root.querySelectorAll('[data-pedal]').forEach(b => b.setAttribute('aria-pressed', 'false')); }
-  private audioLabels() { this.musicButton.setAttribute('aria-pressed', String(this.audio.settings.music)); this.effectsButton.setAttribute('aria-pressed', String(this.audio.settings.effects)); }
+  private audioLabels() { this.musicButton.setAttribute('aria-pressed', String(this.audio.settings.music)); this.effectsButton.setAttribute('aria-pressed', String(this.audio.settings.effects)); setIconLabel(this.musicButton,'music',this.audio.settings.music?'Music':'Music off'); setIconLabel(this.effectsButton,'volume',this.audio.settings.effects?'Sound':'Sound off'); }
   private save() {
     // A trail switch changes this.track before saving; the run still belongs to scene.track.
     this.best[this.scene.track] = Math.max(this.best[this.scene.track] || 0, this.scene.bestDistance);
-    if (this.storageBlocked) return false;
-    const ok = this.context.persistence?.save({ schema: 'quality-hill-v1', track: this.track, best: { ...this.best }, paint: this.paint }) ?? true;
+    if (this.storageBlocked||this.drawingLoading||this.drawingUnavailable) return false;
+    const ok = this.context.persistence?.save({ schema: 'quality-hill-v1', track: this.track, best: { ...this.best }, paint: this.paint,drawingRigId:this.drawingRigId }) ?? true;
     this.saveNotice.hidden = ok;
     if (!ok) this.saveNotice.textContent = 'Could not save on this device. Keep this page open to protect your changes; your earlier saved ride is safe.';
     return ok;
   }
-  private begin(focus=true) { if (this.hostPaused) return; if (this.mode === 'result') this.restart(); if (this.mode !== 'ready') return; this.mode = 'drive'; this.clock.resume('user'); void this.audio.unlock(); this.audio.setScene('run'); this.driveButton.textContent = 'Driving'; this.driveButton.disabled = true; this.hud(); if(focus)this.canvas.focus({ preventScroll: true }); }
+  private begin(focus=true) { if (this.hostPaused||this.drawingLoading||this.drawingUnavailable) return; if (this.mode === 'result') this.restart(); if (this.mode !== 'ready') return; this.mode = 'drive'; this.clock.resume('user'); void this.audio.unlock(); this.audio.setScene('run'); setIconLabel(this.driveButton,'play','Driving'); this.driveButton.disabled = true; this.hud(); if(focus)this.canvas.focus({ preventScroll: true }); }
   private resize() {
     const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
     const normalHeight = w < 600 ? Math.max(290, w * .75) : w * .54;
@@ -206,13 +222,16 @@ export default class QualityHill implements GameInstance {
   }
   private hud() {
     this.distance.textContent = `${Math.floor(this.scene.distance)} / ${Math.round(TRACKS[this.track].goalX - 2.5)} m · Best ${Math.floor(Math.max(this.best[this.track] || 0, this.scene.bestDistance))} m`;
+    if(this.drawingLoading){this.status.textContent='Opening the saved car for this game…';return;}
+    if(this.drawingUnavailable){this.status.textContent=this.drawingError+' Open Art Studio to check the saved parts or restore missing art, then reopen this game. Your saved ride has not changed.';return;}
     const text = this.mode === 'ready' ? 'Hold Go to begin. You can stop and try again whenever you like.' : this.mode === 'drive' ? (this.scene.grounded ? (this.scene.speed > 8 ? 'A crest ahead? Ease off and feel the landing.' : 'A little gas. A little brake. Find your rhythm.') : 'Wheels in the air! Ease off for a gentle landing.') : this.status.textContent;
     if (this.status.textContent !== text) this.status.textContent = text;
   }
   private showResult() {
     this.mode = 'result'; this.clearInput(); this.audio.setMotor(0); this.save(); this.hud();
     this.result.replaceChildren(); this.result.hidden = false;
-    this.result.append(el('div', 'q-result-icon', this.scene.status === 'won' ? '⚑' : '↶'), el('h3', '', this.scene.status === 'won' ? 'Hello, happy camper!' : 'One more little adventure?'), el('p', '', this.scene.reason));
+    const resultIcon=el('div','q-result-icon');resultIcon.append(createIcon(this.scene.status==='won'?'check':'retry'));
+    this.result.append(resultIcon, el('h3', '', this.scene.status === 'won' ? 'Hello, happy camper!' : 'One more little adventure?'), el('p', '', this.scene.reason));
     const actions = el('div', 'q-result-actions'); actions.append(this.button('Try again', 'q-button q-primary', () => { this.restart(); this.begin(); }),
       this.button('Keep exploring', 'q-button', () => this.next()));
     if (this.scene.status === 'won') actions.append(this.button('Finish this trip', 'q-button', () => {
@@ -237,6 +256,10 @@ export default class QualityHill implements GameInstance {
     }
     const goalPoint = track.points.find(p => p.x >= track.goalX)!; drawFlag(c, x(track.goalX), y(goalPoint.y) - 7, s * 1.7, 'CAMP');
     c.restore();
+    if(this.drawingRigId&&!this.drawnCar){
+      c.fillStyle='#ffffffd9';c.fillRect(0,0,v.w,v.h);c.fillStyle=palette.ink;c.textAlign='center';c.font='bold 18px system-ui';
+      c.fillText(this.drawingUnavailable?'Check your saved car in Art Studio.':'Opening your own car…',v.w/2,v.h/2);return;
+    }
     const bodies = this.scene.bodies.map(b => interpolateBody(b, alpha)), chassis = bodies[0];
     c.save(); c.strokeStyle = '#5e6d6d'; c.lineWidth = Math.max(2, s * .07);
     for (const wheel of bodies.slice(1)) {
@@ -248,10 +271,9 @@ export default class QualityHill implements GameInstance {
     }
     for (const body of bodies) {
       c.save();c.translate(x(body.x),y(body.y));c.rotate(body.angle);
-      const custom=this.drawnCar,part=body.id==='chassis'?custom?.pieces.body:
-        body.id==='rear-wheel'?custom?.pieces.wheels[0]:body.id==='front-wheel'?custom?.pieces.wheels[1]:undefined;
-      const sprite=part&&custom?.layers.get(part.id);
-      if(sprite)c.drawImage(sprite,-body.width*s/2,-body.height*s/2,body.width*s,body.height*s);
+      const custom=this.drawnCar;
+      if(custom&&body.id==='chassis')drawCarBody(c,custom,body.width*s,body.height*s);
+      else if(custom&&(body.id==='rear-wheel'||body.id==='front-wheel'))drawCarWheel(c,custom,body.id==='rear-wheel'?0:1,body.width*s);
       else drawPart(c,body.kind,body.width*s,body.height*s,{time:elapsed,tint:this.paint});
       c.restore();
     }
@@ -263,11 +285,11 @@ export default class QualityHill implements GameInstance {
   isPlaying() { return !this.disposed && !this.finished && !this.hostPaused && !this.clock.paused && this.mode === 'drive'; }
   pause() { if (this.disposed || this.hostPaused) return false; this.hostPaused = true; this.clearInput(); this.clock.pause('host'); return true; }
   resume() { if (!this.hostPaused) return; this.hostPaused = false; this.clock.resume('host'); }
-  restart() { if (this.disposed || this.hostPaused) return; this.manualPause = false; this.save(); this.clearInput(); this.simulation.dispose(); this.simulation = createVehicle(this.options, this.track, this.drawnCar?.geometry); this.scene = this.simulation.snapshot(); this.mode = 'ready'; this.finished = false; this.particles = []; this.result.hidden = true; this.driveButton.textContent = 'Let’s drive →'; this.driveButton.disabled = false; this.audio.setMotor(0); this.audio.setScene('build'); this.clock.resume('user'); this.clock.resume('host'); this.resetCamera(); this.hud(); }
+  restart() { if (this.disposed || this.hostPaused||this.drawingLoading||this.drawingUnavailable) return; this.manualPause = false; this.save(); this.clearInput(); this.simulation.dispose(); this.simulation = createVehicle(this.options, this.track,this.drawnCar?.geometry); this.scene = this.simulation.snapshot(); this.mode = 'ready'; this.finished = false; this.particles = []; this.result.hidden = true; setIconLabel(this.driveButton,'play','Let’s drive'); this.driveButton.disabled = false; this.audio.setMotor(0); this.audio.setScene('build'); this.clock.resume('user'); this.clock.resume('host'); this.resetCamera(); this.hud(); }
   retry() { this.restart(); }
   next() { const tracks = Object.keys(TRACKS); this.track = tracks[(tracks.indexOf(this.track) + 1) % tracks.length]; this.trackSelect.value = this.track; this.save(); this.restart(); }
   snapshot() { return { engine: 'quality-hill-v1', mode: this.mode, paused: this.clock.paused, hostPaused: this.hostPaused, track: this.track, options: { ...this.options }, paint: this.paint,
     distance: this.scene.distance, status: this.scene.status, time: this.scene.time, bodies: this.scene.bodies, best: { ...this.best }, grounded: this.scene.grounded, speed: this.scene.speed,
-    inputActive: this.keys.size + this.pedals.size, drawingRigId: this.drawnCar?.rigId??null, performance: this.clock.stats, resources: { bodies: 3, joints: 2, particles: this.particles.length }, storageBlocked: this.storageBlocked }; }
+    inputActive: this.keys.size + this.pedals.size,drawingRigId:this.drawnCar?.rigId??null,requestedDrawingRigId:this.drawingRigId,drawingLoading:this.drawingLoading,drawingUnavailable:this.drawingUnavailable, performance: this.clock.stats, resources: { bodies: 3, joints: 2, particles: this.particles.length }, storageBlocked: this.storageBlocked }; }
   unmount() { if (this.disposed) return; this.disposed = true; this.save(); this.clock.dispose(); this.audio.dispose(); this.simulation.dispose(); this.resizeObserver.disconnect(); this.listeners.abort(); this.clearInput(); this.mount.replaceChildren(); }
 }

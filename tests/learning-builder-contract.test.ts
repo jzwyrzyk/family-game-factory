@@ -54,20 +54,37 @@ async function uiHarness() {
     bundledUI = result.outputFiles[0].text;
   }
   const nodes = new Map<string, any>(), listeners = new Map<string, Function[]>(), saved = new Map<string, string>();
+  class TextNode {
+    readonly nodeType = 3;
+    constructor(public data: string) {}
+    get textContent() { return this.data; }
+    set textContent(value: string) { this.data = value; }
+  }
   class Element {
-    private name = ''; hidden = false; children: any[] = []; style: any = {}; value = ''; textContent = ''; innerHTML = ''; src?: string;
+    private name = ''; private attributes = new Map<string, string>();
+    readonly nodeType = 1; childNodes: (Element | TextNode)[] = []; dataset: Record<string, string> = {};
+    hidden = false; style: any = {}; value = ''; innerHTML = ''; src?: string;
     onclick?: Function; onsubmit?: Function;
+    constructor(public localName = 'div', public namespaceURI = 'http://www.w3.org/1999/xhtml') {}
     set id(value: string) { this.name = value; nodes.set(value, this); } get id() { return this.name; }
+    get children() { return this.childNodes.filter(child => child instanceof Element); }
+    get firstChild() { return this.childNodes[0] || null; }
+    get lastChild() { return this.childNodes.at(-1) || null; }
+    get textContent(): string { return this.childNodes.map(child => child.textContent).join(''); }
+    set textContent(value: string) { this.replaceChildren(...(value ? [new TextNode(value)] : [])); }
     querySelector() { return new Element(); } after() {} before() {}
-    append(...children: any[]) { this.children.push(...children); }
-    replaceChildren(...children: any[]) { this.children = children; }
-    setAttribute() {} removeAttribute(name: string) { if (name === 'src') delete this.src; }
+    append(...children: (Element | TextNode | string)[]) { this.childNodes.push(...children.map(child => typeof child === 'string' ? new TextNode(child) : child)); }
+    replaceChildren(...children: (Element | TextNode | string)[]) { this.childNodes = []; this.append(...children); }
+    setAttribute(name: string, value: string) { this.attributes.set(name, value); }
+    getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+    removeAttribute(name: string) { this.attributes.delete(name); if (name === 'src') delete this.src; }
     reportValidity() { return true; }
   }
   const node = (id: string) => { if (!nodes.has(id)) { const e = new Element(); e.id = id; } return nodes.get(id); };
   const profiles: any[] = [{ id: 'a', skills: {}, mathModes: { 'builder-generated': 'both' } }, { id: 'b', skills: {} }];
   let active = profiles[0], nextRevision = 'revision-one', jobs = 0;
   const pending = new Map<string, {resolve:(value:unknown)=>void;reject:(error:Error)=>void}>(), requests: string[] = [];
+  const delayedManagement=new Set<string>(),managementPending=new Map<string,(value:unknown)=>void>();
   const emit = (type: string, detail?: string) => { for (const listener of listeners.get(type) || []) listener({ detail }); };
   const FG: any = { store: { current: () => active }, learning: {
     active:false,focus(){},
@@ -75,25 +92,36 @@ async function uiHarness() {
     setMode: (key: string, mode: string) => { active.mathModes = { ...active.mathModes, [key]: mode }; }, modeControl() {},
   }, app: { page: (page: string) => emit('factory-page', page) } };
   const window: any = { FG, mounts: [], disposals: 0, addEventListener: (type: string, listener: Function) => listeners.set(type, [...listeners.get(type) || [], listener]) };
-  const document: any = { baseURI: 'https://app.example/', createElement: () => new Element(), getElementById: node, querySelector: () => ({ id: 'page-create' }) };
+  const document: any = { baseURI: 'https://app.example/', createElement: (name: string) => new Element(name),
+    createElementNS: (namespace: string, name: string) => new Element(name, namespace), createTextNode: (text: string) => new TextNode(text),
+    getElementById: node, querySelector: () => ({ id: 'page-create' }) };
   const fetch = async (input: any) => {
     const url = new URL(String(input)), path = url.pathname;
     requests.push(path);
     let body: any;
     if (path === '/factory-config.json') body = { version: 1, mode: 'remote', apiBaseUrl: 'https://api.example', previewOrigin: 'https://preview.example' };
+    else if (path === '/v1/sessions/status') body = { connected: true, trusted: true, expiresAt: Date.now() + 60_000 };
+    else if(delayedManagement.has(path))return {ok:true,status:200,json:()=>new Promise(resolve=>managementPending.set(path,resolve))};
+    else if(path==='/v1/devices/unlock')body={unlocked:true};
+    else if(path==='/v1/devices')body={devices:[{id:'device-one',name:'Parent browser',current:true}]};
+    else if(path==='/v1/devices/privacy')body={status:'not-requested',scopes:{generation:false,conversation:false,remoteSpeech:false}};
+    else if(path==='/v1/devices/invite')body={invitation:'current-parent-invitation',expiresAt:Date.now()+60_000};
     else if (path === '/v1/jobs') body = { jobId: 'job-' + ++jobs, status: 'ready', revisionId: nextRevision };
     else if (path.endsWith('/preview')) return { ok: true, json: () => new Promise((resolve,reject) => pending.set(path.split('/')[3], {resolve,reject})) };
     else if (path.endsWith('/fork')) body = { revisionId: 'fork-revision' };
     else if (path === '/v1/creations') body = [];
     else throw Error('Unexpected test request: ' + path);
-    return { ok: true, json: async () => body };
+    return { ok: true, status: 200, json: async () => body };
   };
-  const context: any = { window, document, fetch, URL, crypto: { randomUUID }, setTimeout, clearTimeout,
+  const context: any = { window, document, fetch, URL, Headers, Response, AbortController, AbortSignal, crypto: { randomUUID }, setTimeout, clearTimeout,
     localStorage: { getItem: (key: string) => saved.get(key) || null, setItem: (key: string, value: string) => saved.set(key, value), removeItem: (key: string) => saved.delete(key) } };
   runInNewContext(bundledUI, context);
   await context.BuilderUI.initBuilder();
   const flush = () => new Promise<void>(resolve => setImmediate(resolve));
   return { node, window, profiles, emit, pending, flush,
+    delayManagement(path:string){delayedManagement.add(path);},
+    async resolveManagement(path:string,value:unknown){assert.ok(managementPending.has(path),'management request is pending');managementPending.get(path)!(value);managementPending.delete(path);await flush();},
+    async unlockParent(){node('builderParentUnlockPassphrase').value='fixture parent passphrase';node('builderParentUnlock').onsubmit({preventDefault(){}});await flush();},
     async start(id = 'revision-one') { nextRevision = id; node('inventIdea').value = 'Catch three stars'; node('createTry').onclick(); await flush(); },
     async resolve(id: string, projectId: string) { assert.ok(pending.has(id), `preview is pending: ${JSON.stringify({requests,status:node('builderStatus').textContent})}`); pending.get(id)!.resolve({ projectId, artifactId: id, url: 'https://preview.example/preview/' + id, expiresAt: Date.now() + 60_000, kind: 'star-catcher-v1' }); pending.delete(id); await flush(); },
     async openReady(){node('openReadyBuild').onclick();await flush();},
@@ -102,6 +130,24 @@ async function uiHarness() {
     switchProfile() { active = profiles[1]; emit('factory-profile'); },
   };
 }
+
+test('late parent device listing cannot reappear after a profile switch',async()=>{
+ const h=await uiHarness();h.emit('factory-page','parent');h.delayManagement('/v1/devices');await h.unlockParent();
+ h.switchProfile();await h.resolveManagement('/v1/devices',{devices:[{id:'device-one',name:'Private parent browser',current:true}]});
+ assert.equal(h.node('builderDeviceList').children.length,0);
+ assert.equal(h.node('builderIssueInvite').hidden,true);
+ assert.equal(h.node('builderDisconnect').hidden,true);
+});
+
+test('late invitation cannot reappear after leaving and returning to Parent Controls',async()=>{
+ const h=await uiHarness();h.emit('factory-page','parent');await h.unlockParent();
+ assert.equal(h.node('builderIssueInvite').hidden,false,'current verified view can manage devices');
+ h.delayManagement('/v1/devices/invite');h.node('builderIssueInvite').onclick();await h.flush();
+ h.emit('factory-page','home');h.emit('factory-page','parent');
+ await h.resolveManagement('/v1/devices/invite',{invitation:'sensitive-one-use-secret',expiresAt:Date.now()+60_000});
+ assert.equal(h.node('builderNewInvitation').children.length,0);
+ assert.equal(h.node('builderIssueInvite').hidden,true);
+});
 
 test('leaving the builder while preview is pending cannot mount hidden math later', async () => {
   const h = await uiHarness(); await h.start(); assert.ok(h.pending.has('revision-one'));

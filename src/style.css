@@ -25,3 +25,81 @@ fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-size:25px;font-weig
 .learning-mode-control{display:flex;flex-direction:column;gap:6px;margin:10px 0}.learning-mode-control label{font-size:13px;font-weight:700;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.learning-mode-control select{max-width:100%;min-height:44px;font:inherit;border:1px solid var(--edge);border-radius:10px;background:var(--card2);color:var(--ink);padding:8px 10px}.learning-mode-control small{font-size:12px;color:var(--muted)}.learning-progress-card{display:flex;flex-direction:column;gap:6px;padding:15px 0;border-top:1px solid var(--edge)}.learning-state{color:var(--aqua);font-size:14px}.learning-progress-card small{color:var(--muted);font-size:12px;line-height:1.5}.learning-save-warning{padding:14px;border:1px solid #ffc886;border-radius:12px;color:#ffe4bc;line-height:1.5}.stage-overlay:has(.math-activity)>.modal-card{max-width:620px;padding:0;border:0;background:transparent;box-shadow:none;margin:auto 0}.game-bottom .learning-mode-control{flex-basis:100%}
 /* Four starter games; the two physical toys share their actual local artwork. */
 #game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quality-card-art{display:block;width:100%;height:100%;object-fit:cover}.game-card.hill .game-picture{background:#d8e9d7}@media(max-width:600px){#game-grid{grid-template-columns:1fr}}
+
+
+/* Language quests are an accessible learning surface, not a tiny stage widget.
+ * Game physics remains frozen/inert while the child reads or constructs words.
+ * The global navigation is not the only escape: native quests offer Back to Play.
+ */
+.stage-overlay:has(.language-activity){
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  width:100vw;
+  height:100dvh;
+  padding:clamp(12px,2vh,24px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  align-items:flex-start;
+  justify-content:center;
+  background:rgba(13,25,52,.91);
+}
+.stage-overlay:has(.language-activity) > .modal-card{
+  width:min(100%,700px);
+  max-width:700px;
+  margin:auto 0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+  text-align:left;
+}
+.stage-overlay:has(.language-activity) .language-activity{
+  width:100%;
+  max-width:700px;
+  min-height:0;
+  margin:0;
+  font-family:system-ui,-apple-system,sans-serif;
+}
+.stage-overlay:has(.language-activity) .language-activity h2 {
+  font-size:clamp(24px,3.2vw,32px);
+  line-height:1.23;
+  margin:6px 0 12px;
+  color:#18334b;
+}
+.stage-overlay:has(.language-activity) .language-activity p{color:#48657b}
+.stage-overlay:has(.language-activity) .language-activity .language-story-text{color:#223f57}
+.stage-overlay:has(.language-activity) .language-activity .language-eyebrow{color:#136c73}
+.stage-overlay:has(.language-activity) .language-activity .language-feedback[data-state=incorrect]{color:#9b3d19}
+.stage-overlay:has(.language-activity) .language-activity .language-feedback[data-state=correct]{color:#136846}
+.stage-overlay:has(.language-activity) .language-activity .language-hint p{color:#53421b}
+.stage-overlay:has(.language-activity) .language-activity input{
+  max-width:none;
+  background:#fff;
+  border:2px solid #8db9c6;
+  color:#18334b;
+  text-align:left;
+  font:inherit;
+}
+@media(max-width:600px){
+  .stage-overlay:has(.language-activity){padding:12px 9px 22px}
+  .stage-overlay:has(.language-activity) .language-activity{border-radius:18px}
+}
+
+/* Two fully local, curated games. Controls are comfortable on a tablet. */
+.favorite-game{padding:16px;border-radius:18px;background:linear-gradient(145deg,#213054,#425680);color:#f5f7ff;text-align:center}
+.favorite-title{font-size:clamp(22px,4vw,32px);margin:0 0 5px}
+.favorite-subtitle{font-size:14px;color:#dfebfc;margin:0 0 10px}
+.favorite-hud{font-size:17px;font-weight:850;margin:5px 0 10px;color:#fff0a9}
+.favorite-canvas{display:block;width:100%;height:auto;max-height:66vh;object-fit:contain;border:2px solid #a3b8d2;border-radius:14px;background:#192944;margin:auto}
+.favorite-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0 5px}
+.favorite-control{min-height:52px;min-width:85px;padding:11px 18px;border:2px solid #b7d5de;border-radius:13px;background:#e2edf4;color:#24354f;
+ font:800 15px system-ui;touch-action:manipulation;cursor:pointer}
+.favorite-control:active{transform:translateY(2px);background:#ffe4a5}
+.favorite-control:focus-visible{outline:3px solid #ffdf8a;outline-offset:3px}
+.favorite-control-primary{background:#ffde82;border-color:#e8ad40}
+.favorite-note{font-size:14px;color:#f0eff7;margin:8px 0}
+.favorite-command-list{font-size:16px;font-weight:800;min-height:25px;word-break:break-word;color:#ffe7a4}
+@media(max-width:540px){.favorite-game{padding:9px}.favorite-control{min-height:50px;min-width:70px;padding:10px 12px;font-size:13px}.favorite-hud{font-size:15px}}

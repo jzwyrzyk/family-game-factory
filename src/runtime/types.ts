@@ -1,4 +1,4 @@
-export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill';
+export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill' | 'moon' | 'robot' | 'factory';
 export type Difficulty = 'gentle' | 'classic' | 'stretch';
 export type Mechanics = Record<string, number | boolean>;
 export interface Mechanic {
@@ -19,6 +19,8 @@ export interface GameInstance {
   snapshot?(): Record<string, unknown>;
 }
 export interface GameContext {
+  /** Trusted host binding to one immutable private drawing rig. Never a URL. */
+  drawingRigId?: string | null;
   persistence?: {load():unknown;save(state:unknown):boolean};
   difficulty: Difficulty; config: Mechanics; finish(result: RoundResult): void;
   /** Local gameplay events for coordinated learning/coaching; never a network request. */
