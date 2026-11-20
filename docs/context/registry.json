@@ -36,7 +36,15 @@
     "docs/problem-solving/BENCHMARKS.md",
     "docs/problem-solving/IMPLEMENTATION.md",
     "docs/decisions/0011-formative-problem-solving-evidence.md",
-    "docs/mind-your-jems/README.md"
+    "docs/mind-your-jems/README.md",
+    "docs/pals/STUDIO.md",
+    "docs/pals/DESIGN_DOCTRINE.md",
+    "docs/pals/GROWTH_GUIDE.md",
+    "docs/pals/QUALITY_GATES.md",
+    "docs/pals/CONTINUITY.md",
+    "docs/pals/PROMPT_RECIPES.md",
+    "skills/gem-pal-studio/SKILL.md",
+    "docs/decisions/2026-11-19-gem-pal-studio.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -61,7 +69,9 @@
     "docs/rewards/previews/*.md",
     "docs/problem-solving/*.md",
     "docs/mind-your-jems/*.md",
-    "docs/archetypes/*.md"
+    "docs/archetypes/*.md",
+    "docs/pals/*.md",
+    "skills/gem-pal-studio/*.md"
   ],
   "areas": [
     {
@@ -76,13 +86,14 @@
         "docs/child-continuity/*.md",
         "docs/brand/*.md",
         "docs/rewards/*.md",
-        "docs/problem-solving/*.md"
+        "docs/problem-solving/*.md",
+        "docs/pals/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:12:55.026Z",
-      "sourceDigest": "c2d0e02afdcc7f466138ffaa4f224c43a02646df8a4f670621a9b71d35001ddd",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the source-only merge receipt and final acceptance update. Product doctrine, educational claim limits, reward policy and formative feature scope are unchanged; only implementation and delivery history now record observed facts.",
+      "reviewedAt": "2026-11-20T01:00:13.109Z",
+      "sourceDigest": "ac3ed77536a7cabf99813efb77eaa08116df0f9fb1d49b19bb0ec21d9d2af17d",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed Gem Pal creative scope and the final whitespace-normalized doctrine against existing brand, maker-rank and rewards contracts. Added purposeful structural growth and two artistic forms while keeping earning thresholds, runtime delivery and exact-art approval separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -484,10 +495,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T20:17:18.881Z",
-      "sourceDigest": "a47a6d61c57e945533d5c4066702005a4a1764d693d5b4967ac591a7e13bec40",
+      "reviewedAt": "2026-11-20T00:59:07.305Z",
+      "sourceDigest": "8b82d89552d6e03ae5f9f0f7093cbfc149a234ac31bef51ff2090279cc855d9d",
       "reviewOutcome": "updated",
-      "reviewReason": "Mapped the new illustrated game source, approved assets, font, tests, and newly integrated PR48 archetype research files; preserved existing independent learning, privacy, brand, Rewards and parent-reporting scopes.",
+      "reviewReason": "Reviewed agent and Project retrieval routes, decision/index links, feedback maintenance and the registry-policy diff. Registered the portable skill, template, canonical guides and exact future character index under pal-design without importing or merging the artwork draft.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -540,6 +551,25 @@
       "reviewedAt": "2026-11-19T17:17:56.960Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed shared writer guard, five-source backup, child-view and native-parent integration, deterministic tasks and new failure regressions; documented current local evidence and pending exact-head browser acceptance."
+    },
+    {
+      "id": "pal-design",
+      "documents": [
+        "docs/pals/*.md",
+        "skills/gem-pal-studio/SKILL.md",
+        "docs/decisions/2026-11-19-gem-pal-studio.md"
+      ],
+      "sources": [
+        "docs/pals/*.md",
+        "docs/pals/templates/**",
+        "skills/gem-pal-studio/**",
+        "docs/pals/art/character-references.json"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "848c8ab214645ca8afb92a3389d14181f8e34667ad7986881e678cbea4a39e79",
+      "reviewedAt": "2026-11-20T01:00:12.877Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the complete Studio guides, two-form record template, exact-reference workflow, quality gates and portable skill; normalized the final doctrine newline. Routed the future character-index path without importing draft artwork or making live approval claims."
     }
   ]
 }
