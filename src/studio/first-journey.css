@@ -64,6 +64,8 @@
   .studio-overview-footer { align-items: flex-start; flex-direction: column; }
 }
 @media(max-width:650px) {
+  /* The optional subject switch adds a fourth control; keep the player chooser usable. */
+  .studio-review .site-header .studio-header-tools { max-width: 100%; flex-wrap: wrap; }
   /* Leave room for a complete playable choice after the optional welcome. */
   body.studio-review #page-studio-library .studio-home-hero { min-height: 330px; padding-top: 21px; row-gap: 10px; }
 }

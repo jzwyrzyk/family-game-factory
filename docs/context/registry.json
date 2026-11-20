@@ -166,10 +166,10 @@
         "docs/brand/art-library/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T03:42:00.190Z",
-      "sourceDigest": "2b736db5832e3cdb1bcd860d81dc3e5658c3b79f67635e7f1176a6a92685ec46",
+      "reviewedAt": "2026-11-20T03:57:29.866Z",
+      "sourceDigest": "5dd716aa531805218e50cf7d6866f4eeed7ab613b8d49462f9d94a84366209ad",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the first welcome, owner-scoped task hints, direct first-ready action, return recommendation and Studio Done behavior. Documented active-panel placement, keyboard focus retention, phone layout, preserved scene recovery and explicit saved-version choice.",
+      "reviewReason": "Reviewed the complete first-creation flow and the conditional-header follow-up after real parent-browser overflow. Header tools now wrap within phone width while retaining visible player, subject and help controls; the unchanged first-creation and complete-playable-card guards pass.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -459,10 +459,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T03:43:32.632Z",
-      "sourceDigest": "4249dfec7b2cb86309d4f8ccd15e7469bcfc48d9c121eab75077d84a84344849",
+      "reviewedAt": "2026-11-20T03:57:30.759Z",
+      "sourceDigest": "485d434f0c83f70edba21697e29e1cf48107e91c9b80e84a12286e998360d46d",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the implemented first-creation review candidate from main df63bc2, final bundle identities, passing local acceptance and preserved correction history. Earlier working-bundle checks remain labeled; published-head CI is recorded in the PR. No merge, deployment, provider activation or release-source change is claimed.",
+      "reviewReason": "Recorded initial published head173e90c/tree47341b3, successful hosted checks, the actual parent320px failure and corrected header measurements. Distinguished initial local acceptance, follow-up parent/child/navigation and quality passes, and the earlier hosted quality failure; current CI remains separate from merge or deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

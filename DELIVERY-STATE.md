@@ -8,9 +8,9 @@ An eligible first visit now has one dominant **Make my first game** action and a
 
 Preferences use an optional bounded owner-keyed map in the existing notebook, with backward-compatible old-notebook reads and family/adult backup validation. They create no learning observations, reward facts or completed-creation claims. Shared global navigation retains Creation's existing autosaved-draft recovery choice. Explicit Keep, required-learning guards, source-owner checks, model/provider permissions and the reward economy remain authoritative.
 
-### Local verification
+### Local verification of the initial implementation
 
-The final rendered application bundles were **`index-CUQPh3v2.js`** and **`index-CjxPPoGo.css`**. The review PR records the published commit, matching tree and hosted workflow outcomes separately.
+The initial reviewed application bundles were **`index-CUQPh3v2.js`** and **`index-CjxPPoGo.css`**, published in [PR81](https://github.com/jzwyrzyk/family-game-factory/pull/81) at **`173e90cad252bd1cf1a38746c6545f79c1df2b36`**, tree **`47341b3d8dea46d93fc33e3b0668356382a30cbc`**. The table's final-bundle checks refer to that initial implementation; the narrow-header follow-up is recorded separately below. The review PR records current published-head workflow outcomes.
 
 | Check | Observed result |
 | --- | --- |
@@ -29,6 +29,14 @@ The final rendered application bundles were **`index-CUQPh3v2.js`** and **`index
 Visual review inspected welcome, idea, return, practice, play and change at 320, 390, 768 and 1280 pixel widths. On the 390 × 844 phone, Send and Build remain visible in the first composer viewport; the playable stage precedes its optional guide. The smaller 320 × 740 viewport uses ordinary scrolling. Four small JPEGs capture the selected welcome, composer and help views. Browser fixtures use synthetic local profiles and controlled service responses, and the screenshots deliberately show the unavailable-builder state. These results do not claim a production generation or deployment observation.
 
 **Preserved correction history:** initial checks exposed a missing async error return, a profile-disposal read of the previous active view, focus loss on replaced hints, excessive phone stacking, and an unnecessary shared-Home scene flush that removed the existing recovery decision. Those issues were corrected. Existing mobile playable-card, decoded-artwork and scene-recovery assertions were retained. Existing browser fixture entry points now choose the visible Explore action when appropriate; they do not preseed a hidden introduction bypass.
+
+### Narrow-header integration follow-up
+
+The first published head's [Parent reporting workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44670107941) passed its build and 17 unit tests, then failed the unchanged 320-pixel overview overflow guard. Reproduction found that the new Journey help control plus the optional subject switch squeezed the profile chooser and made the document 335 pixels wide. At 390 pixels, the same conditional controls could overlap without causing document overflow.
+
+The existing phone breakpoint now bounds the header tools to the available width and lets their flex row wrap. The rebuilt follow-up is **`index-jzesmVuQ.js` / `index-QfvbilBM.css`**. The unchanged full parent browser suite passes desktop, tablet, phone and small-phone views. Actual final header measurements show document width equal to 320/390 pixels, a 105-pixel profile chooser, separate help and subject controls, and 44–48-pixel control heights. All ten first-creation groups and four navigation groups pass again; the ordinary 390-pixel first playable card still ends at 829.75 pixels in the 844-pixel viewport. No test assertion, tolerance or evidence rule changed.
+
+On the initial published head, documentation, trusted-device security, service packaging, all five full-visual jobs and Mind Your Jems passed. The Arcade creative job separately reported a failed physical/generated-quality step; its diagnostic and the current published-head outcomes are retained in the PR evidence rather than being treated as a successful initial run. The unchanged complete `npm run test:quality` passes locally on the header follow-up, including physical builder/driving, tablet input, generated containment and sticker journeys. That local result does not erase the earlier hosted failure or establish its cause.
 
 **Disposition:** implemented for review. This work does not merge or deploy the application, select a new release source, change service configuration or activate providers. Parallel Art Studio [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23), Gem Pal runtime/artwork, arbitrary same-game code editing and cross-device synchronization remain separate work. The frozen coordinated-release source **`b6e160b9ec402d8cf7b728ab3189600628bde640`** remains unchanged.
 
