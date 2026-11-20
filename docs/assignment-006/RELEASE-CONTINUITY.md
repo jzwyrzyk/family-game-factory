@@ -19,6 +19,12 @@ The existing Pages workflow makes no Cloud Run/IAM/Secret Manager writes. CI tes
 
 **Historical revisions are not a health failure:** Cloud Run can include older revisions in `status.traffic` with missing/null/zero percentages even though the latest ready revision receives 100%. The audit now ignores only those non-serving entries, retaining strict rejection of a second positive split, a non-ready serving revision, missing readiness or incomplete effective 100% traffic. This correction follows a real sanitized owner inventory on November 20. It changes no service, WIF, session or provider setting.
 
+## Active secret mount versus old configuration volumes
+
+The gateway may retain multiple `factory-gateway-private-config` volumes from prior `--update-secrets` operations. **Only the volume named in the gateway container's `volumeMounts` at `/var/run/factory-config` is active**; unmounted historical volumes are not the live configuration. The read-only `continuity.py` now resolves the mounted volume by exact name and path, rejects ambiguous or unpinned versions, and never substitutes the first secret volume in a list. A later config pin update must apply the same rule and preserve the old mounted version and prior serving revision for rollback.
+
+**Observed November 20, 2026:** the operator's sanitized gateway report showed historical volume `factory-gateway-private-config-ped-cut` with version `2` (unmounted), and mounted volume `factory-gateway-private-config-mis-yek` with version `3` at `/var/run/factory-config`. The only serving revision remained `factory-gateway-00008-tbk` at 100%. No inference about the contents of mounted version 3, its worker pin, or paid activation is justified by the mount metadata alone. Read version 3 separately and print only sanitized fields before any secret-version change. Do not recreate version 2 or overwrite a newer accepted secret.
+
 ## Operator read-only verification
 
 From a trusted Cloud Shell with the existing `gcloud` and `gh` authentication, after reviewing the script in the exact merged checkout:

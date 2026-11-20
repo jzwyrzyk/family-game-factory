@@ -57,19 +57,40 @@ def ready(service):
     )
 
 def mounted_config(service):
+    """Resolve the secret version actually *mounted* into the running gateway.
+
+    Cloud Run retains old/unmounted volumes across --update-secrets revisions.
+    The first volume naming the gateway secret need not be the active version.
+    Never read a private config from an orphaned or ambiguous volume.
+    """
     template = service.get('spec', {}).get('template', {}).get('spec', {})
-    for v in template.get('volumes', []):
-        secret = v.get('secret') or {}
-        if secret.get('secretName') == 'factory-gateway-private-config':
-            keys = [x.get('key') for x in secret.get('items', [])]
-            if len(keys) == 1 and str(keys[0]).isdigit():
-                return (secret['secretName'], str(keys[0]))
-    for c in template.get('containers', []):
-        for item in c.get('env', []):
-            keyref = item.get('valueFrom', {}).get('secretKeyRef', {})
-            if (keyref.get('name') == 'factory-gateway-private-config'
-                    and str(keyref.get('key', '')).isdigit()):
-                return (keyref['name'], str(keyref['key']))
+    containers = template.get('containers', [])
+    if len(containers) != 1:
+        return None
+    container = containers[0]
+    mounts = [x for x in container.get('volumeMounts', [])
+              if x.get('mountPath') == '/var/run/factory-config']
+    if mounts:
+        if len(mounts) != 1 or not mounts[0].get('name'):
+            return None
+        volumes = [v for v in template.get('volumes', [])
+                   if v.get('name') == mounts[0]['name']]
+        if len(volumes) != 1:
+            return None
+        secret = volumes[0].get('secret') or {}
+        items = secret.get('items') or []
+        if (secret.get('secretName') == 'factory-gateway-private-config'
+                and len(items) == 1 and str(items[0].get('key', '')).isdigit()):
+            return (secret['secretName'], str(items[0]['key']))
+        return None
+    # Keep support for a future explicit environment secret binding, but do
+    # not infer active configuration from any unmounted Secret Manager volume.
+    refs = [item.get('valueFrom', {}).get('secretKeyRef', {})
+            for item in container.get('env', [])
+            if (item.get('valueFrom', {}).get('secretKeyRef', {})
+                .get('name') == 'factory-gateway-private-config')]
+    if len(refs) == 1 and str(refs[0].get('key', '')).isdigit():
+        return (refs[0]['name'], str(refs[0]['key']))
     return None
 
 def check_wif(wif, p):

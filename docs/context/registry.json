@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T21:46:00.000Z",
-      "sourceDigest": "91f4afb22c35b06e03a38ebdb047f056f0fac8d18c4b01e6d8c71df4dab7f877",
+      "reviewedAt": "2026-11-20T22:16:23.000Z",
+      "sourceDigest": "45a6fa0fb1bc603dbd846f6a812d5631737e1f61390248a602e9132801889989",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed user-supplied production Cloud Run gateway traffic: status lists two historical revisions without active percent and one latest ready revision serving 100%. Corrected read-only continuity audit to ignore only null/zero history, preserving strict checks for ready/current serving revision and rejecting positive split traffic. Added regression fixture reproducing observed gateway shape and documented audit limitation; no runtime/config/auth/provider change.",
+      "reviewReason": "Reviewed owner-provided Cloud Run service volume and mount metadata: version 2 remains as an unmounted historical gateway config volume, while version 3 is the only volume mounted at /var/run/factory-config. Corrected continuity audit to select the exact mounted volume, reject orphaned/ambiguous/mutable mounts and preserve constrained explicit env binding. Added a regression fixture reproducing both observed volumes and updated the release continuity and delivery ledgers. No live secret, approval, account or gateway traffic change claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

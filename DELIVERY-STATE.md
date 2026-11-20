@@ -1,5 +1,11 @@
 # jems delivery state
 
+## Production gateway secret-mount correction — November 20, 2026
+
+The owner-supplied read-only Cloud Run diagnostic confirmed two historical Secret Manager volume objects for `factory-gateway-private-config`: `factory-gateway-private-config-ped-cut` at version 2 is **unmounted**, while `factory-gateway-private-config-mis-yek` at version 3 is the only volume mounted in the active container under `/var/run/factory-config`. The serving gateway remained `factory-gateway-00008-tbk` at 100%. A prior owner script stopped with `CONFIG_VOLUME_NOT_PINNED` before mutation because it counted both volumes, and the first continuity-audit implementation would incorrectly select version 2 as the current secret. The new fix resolves the mounted secret by exact container volume name and path, rejects ambiguous mounts and does not read orphaned volumes. Offline tests include the exact observed two-volume fixture. See [continuity release contract](docs/assignment-006/RELEASE-CONTINUITY.md).
+
+**Operator acceptance still pending:** the contents of mounted secret version 3 have not been read into a sanitized receipt yet; therefore the current `workerApprovedSha` is not asserted. No new Secret Manager version or Cloud Run deployment was created by this code patch, and paid generation remains reported disabled. The older worker-tag/WIF review and new `factory-quality` environment/key are separately complete. Do not activate generation until the reviewed production sandbox, correct mounted gateway worker config, provider/budget, and adult Build → Play acceptance are proven.
+
 ## Adult AI activation continuity — issue #93, November 20, 2026
 
 The owner explicitly requires that once private Adult (development) AI is accepted, ordinary site/branding releases do not disable game generation or require reactivating Google Cloud services. [The continuity contract](docs/assignment-006/RELEASE-CONTINUITY.md) separates persistent paid-service approval from short-lived adult login and from exceptional private-worker/OCI release rotations. This is a source-level safeguard, **not** an assertion of active paid generation.
