@@ -65,7 +65,8 @@
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
     "docs/brand/previews/learning-readability-20261120/README.md",
-    "docs/operations/POLICY_FOUNDATION.md"
+    "docs/operations/POLICY_FOUNDATION.md",
+    "docs/operations/COACH_DIAGNOSTIC_ROLLOUT.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -693,10 +694,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T19:44:00.253Z",
-      "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+      "reviewedAt": "2026-11-21T20:16:37.339Z",
+      "sourceDigest": "7f603b275336c750dc81d5e765be2dadc398c9b0b275761c8eddeed2fb6ea55f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified.",
+      "reviewReason": "Recorded PR124 merge b4734b1323de87dfee96bb91769cbab3cff432e6 at20:15:43UTC, exact equality to tested5688 tree, seven passing PR workflows and successful canceled-push rerun; retained the original tablet failure and prepared but unexecuted coach-only rollout boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -775,10 +776,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:33:42.892Z",
-      "sourceDigest": "ebd564a2e3fe8d4256e42e76f568e11490bfcdaa08616de70e02f79d1d1a1d67",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed routing additions for the generator, supplemental approved art and integration decision; existing maintenance, evidence and PR review procedures already govern this additive feature and remain accurate.",
+      "reviewedAt": "2026-11-21T19:23:33.952Z",
+      "sourceDigest": "03ba0c08e5488895242b3baab24a492e34367d28507778fb80187561a57d02dc",
+      "reviewOutcome": "updated",
+      "reviewReason": "Registered the scoped private-coach diagnostic rollout runbook and task index entry; existing maintenance, source review and evidence distinctions remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
