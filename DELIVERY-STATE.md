@@ -1,5 +1,13 @@
 # jems delivery state
 
+## November 21, 2026 — combined Pal verification holds merge for image diagnosis
+
+Combined PR114 head `aeab9d68ff155501af88ff08f42b23629a8c81db` has tree `1a1c977ce9f4b48a5d66ff728c314a36e6afa825`, identical to its hosted merge checkout `efdec44c7ed1e0742045f80536d2aeaf9698bf89`. The [Arcade run44920474005](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44920474005) passed learning and the private-coach image, but failed browser/creative. All eight other PR workflows, including service packaging, documentation, operations policy and full visual review, passed. This is a failed combined merge gate, not a release receipt.
+
+The offline step again attempted to scroll a card just as a quiet collection refresh replaced it. Its correction reselects the current card while scrolling and awaiting exact decoded offline artwork; byte counts, SHA-256, cache and downstream UI assertions remain intact. The separate Pal app journey passed seven groups through expressions, real scene Keep/reload, learning receipts, profile isolation and growth, then failed decoding the current Grown Luma hero. Its failure screenshot shows several actual unavailable pictures, while the component suite decoded the same approved art and application/console error arrays remained empty. A stale test handle alone does not explain that evidence. No speculative runtime workaround or weakened image assertion is accepted.
+
+The follow-up adds bounded, read-only Pal response/request-failure, current-image and CacheStorage-byte diagnostics to the failing test. It retains the original decode assertion and performs no refetch, image retry, provider request or paid action. Fresh hosted evidence must distinguish transport/cache and image lifecycle behavior before a corrective runtime change or merge. Failure artifact `14714166289` has SHA-256 `0b7fe0b18b5969de998d4281d2f48389bf21345856802000de8e3c43f2bdd646`. Backend and website deployment remain pending.
+
 ## November 21, 2026 — Pal integration resumed after PR115 merge
 
 The owner resumed the authorized Pal implementation and deployment after [PR115](https://github.com/jzwyrzyk/family-game-factory/pull/115) merged at **10:33:04 a.m. America/New_York** (`2026-11-21T15:33:04Z`) as `19f5e46ae1141da3df7bf14d682757de7e9aec69`. [PR114](https://github.com/jzwyrzyk/family-game-factory/pull/114) is being reconciled with that source. Both delivery histories and review records are retained; the shared Studio integration keeps PR115's reconnect/saved-job retry behavior and the Pal host's earned-form callback. The current combined candidate needs its own hosted checks before merge.

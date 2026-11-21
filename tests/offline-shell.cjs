@@ -97,11 +97,18 @@ const vm=require('node:vm');
   await page.locator('#page-jems-pals').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.getElementById('page-jems-pals')?.getAttribute('aria-busy')==='false');
   const naviCard=page.locator('.pals-card[data-pal="navi"]');
-  await naviCard.scrollIntoViewIfNeeded();
-  await page.waitForFunction(hash=>{
-   const image=document.querySelector('.pals-card[data-pal="navi"] img');
-   return image?.complete&&image.naturalWidth>0&&image.src.includes(hash.slice(0,12));
-  },selectedPal.sourceSHA256);
+  // A quiet collection refresh can replace cards while aria-busy stays false.
+  // Re-resolve each poll and let scrolling trigger the native lazy image load.
+  await page.waitForFunction(async url=>{
+   const card=document.querySelector('.pals-card[data-pal="navi"]'),image=card?.querySelector('img');
+   if(!(card instanceof HTMLElement)||!(image instanceof HTMLImageElement))return false;
+   card.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
+   const expected=new URL(url,document.baseURI).href;
+   if(image.src!==expected||!image.complete||image.naturalWidth===0)return false;
+   try{await image.decode();}catch{return false;}
+   return card.isConnected&&image.isConnected&&document.querySelector('.pals-card[data-pal="navi"] img')===image
+    &&image.currentSrc===expected&&image.complete&&image.naturalWidth>0;
+  },selectedPal.url,{timeout:30_000});
   assert.match(await naviCard.locator('img').getAttribute('src'), /jems-pals\/navi\/base\/neutral-/,'the actual collection renders previously viewed approved pixels offline');
   assert.equal(await page.locator('[data-pals-focus="starter-glim"]').count(),1,'offline collection still offers the free starter');
   await page.locator('#jemsPalsBack').click();

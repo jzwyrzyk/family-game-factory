@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.666Z",
-      "sourceDigest": "e0796602d95c9beba06287761834fa7a4f5b87b0f8e65285739d27d8f9cc268a",
+      "reviewedAt": "2026-11-21T16:01:33.009Z",
+      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded all green pre-pause PR114 workflows and duplicate push rerun, preserved PR115 recovery coverage, and required fresh exact combined-source hosted tests; fixture and emulated-viewport evidence remain distinct from live-provider and device acceptance.",
+      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T15:39:46.919Z",
-      "sourceDigest": "b85fa5e888095c9d881686fa0b602becf3c50b094de2c31d259b4ef6007c31f5",
+      "reviewedAt": "2026-11-21T16:01:33.314Z",
+      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR115 merge 19f5e46 and owner-resumed PR114 reconciliation, preserved both histories and prior exact-source green runs, and superseded the Pal-only rollout with backend-before-Pages dependency and authenticated Cloud Shell access boundary.",
+      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -954,10 +954,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "516b63d8e314c6036200e3c27eea2cab6ccaeeb9c43a0d1a74e9cd818a60dc50",
-      "reviewedAt": "2026-11-21T14:33:44.077Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the feature contract with the full approved catalog, stable inventory aliases, five-adventure Grown art, actual collection expression controls, saved-scene compatibility and offline/recovery boundaries."
+      "sourceDigest": "3b734e7783f81ca8f947f67615961eb46db1ccac12414ca7d925d79b4f810363",
+      "reviewedAt": "2026-11-21T16:01:33.583Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Inspected actual unavailable-picture screenshot and runtime loader guards; no speculative artwork/runtime workaround is justified. Added failure-only bounded public-asset diagnostics; approved identities, forms, ownership, recovery and acceptance assertions remain unchanged."
     }
   ]
 }

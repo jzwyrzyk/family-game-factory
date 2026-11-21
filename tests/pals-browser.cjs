@@ -5,6 +5,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { createHash } = require('node:crypto');
 const { once } = require('node:events');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
@@ -14,6 +15,11 @@ const { exploreWelcome, navigate } = require('./studio-entry.cjs');
 const root = path.resolve(__dirname, '..');
 const outputs = path.join(root, 'test-results');
 const approvedArtwork = JSON.parse(fs.readFileSync(path.join(root, 'public/jems-pals/manifest.json'), 'utf8'));
+const approvedReferences = JSON.parse(fs.readFileSync(path.join(root, 'docs/pals/art/character-references.json'), 'utf8'));
+const palArtworkPaths = new Set([
+  ...approvedArtwork.characters.flatMap(character => Object.values(character.forms).flatMap(form => Object.values(form.expressions).map(expression => expression.url))),
+  ...approvedReferences.roster_entries.flatMap(entry => entry.members.flatMap(member => Object.values(member.application_mapping?.forms || {}).map(form => form.neutral_url))),
+]);
 const ready = page => page.waitForFunction(() => window.FG?.pals?.view()?.owner === FG.store.current().id && !!FG.creation && !!FG.studio);
 const view = page => page.evaluate(() => FG.pals.view());
 const scene = page => page.evaluate(() => FG.creation.scene());
@@ -62,6 +68,86 @@ async function readablePalText(page, selector) {
   }));
   assert.ok(readings.length && readings.every(reading => reading.contrastAgainstWhite >= 4.5), `Pal text stays readable inside the production shell: ${JSON.stringify(readings)}`);
 }
+async function palImageDiagnostics(page, base) {
+  // Failure evidence only: inspect attached pictures and existing public cache
+  // entries. Never refetch, retry, alter the page, or accept unavailable art.
+  let deadline;
+  const inspection = page.evaluate(async ({ base, paths }) => {
+    const allowed = new Set(paths.map(value => new URL(value, base).href));
+    const pictures = [...document.querySelectorAll('#page-jems-pals .pals-portrait')].slice(0, 30).map(portrait => {
+      const image = portrait.querySelector('img'), rect = image?.getBoundingClientRect();
+      return { pal: portrait.dataset.pal, form: portrait.dataset.form, expression: portrait.dataset.expression, state: portrait.dataset.state,
+        hero: portrait.classList.contains('pals-hero-portrait'), connected: !!image?.isConnected,
+        src: allowed.has(image?.src) ? image.src : null, currentSrc: allowed.has(image?.currentSrc) ? image.currentSrc : null,
+        complete: image?.complete, hidden: image?.hidden, naturalWidth: image?.naturalWidth, naturalHeight: image?.naturalHeight,
+        visible: !!image?.getClientRects().length && getComputedStyle(image).visibility !== 'hidden',
+        rect: rect ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height } : null };
+    });
+    const failed = pictures.filter(picture => picture.src && (picture.state !== 'ready' || !picture.complete || !picture.naturalWidth));
+    const sampled = [...new Set(failed.map(picture => picture.src))].slice(0, 4);
+    const comparison = pictures.find(picture => picture.src && picture.state === 'ready' && picture.naturalWidth > 0 && !sampled.includes(picture.src));
+    if (comparison) sampled.push(comparison.src);
+    const cacheEntries = [], prefix = 'family-arcade:' + new URL(base).pathname + ':';
+    const cacheNames = await caches.keys().then(names => names.filter(name => name.startsWith(prefix)).slice(0, 2)).catch(error => {
+      cacheEntries.push({ error: String(error) }); return [];
+    });
+    let totalBytes = 0;
+    for (const name of cacheNames) {
+      const cache = await caches.open(name).catch(error => { cacheEntries.push({ name, error: String(error) }); return null; });
+      if (!cache) continue;
+      for (const url of sampled) {
+        const record = { name, url };
+        cacheEntries.push(record);
+        const response = await cache.match(url).catch(error => { record.error = String(error); return null; });
+        record.found = !!response;
+        if (!response) continue;
+        Object.assign(record, { status: response.status, type: response.type, contentType: response.headers.get('content-type'), contentLength: response.headers.get('content-length') });
+        const reader = response.body?.getReader(), chunks = [];
+        let bytes = 0;
+        try {
+          if (!reader) throw Error('Cached response has no body');
+          while (true) {
+            const part = await reader.read();
+            if (part.done) break;
+            bytes += part.value.byteLength; totalBytes += part.value.byteLength;
+            if (bytes > 4 * 1024 * 1024 || totalBytes > 16 * 1024 * 1024) {
+              await reader.cancel(); record.truncated = true; break;
+            }
+            chunks.push(part.value);
+          }
+          record.bytes = bytes;
+          if (!record.truncated) {
+            const body = new Uint8Array(bytes); let offset = 0;
+            for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.byteLength; }
+            record.sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', body))].map(value => value.toString(16).padStart(2, '0')).join('');
+          }
+        } catch (error) { record.error = String(error); }
+        if (totalBytes > 16 * 1024 * 1024) break;
+      }
+      if (totalBytes > 16 * 1024 * 1024) break;
+    }
+    return { pictures, sampled, cacheNames, cacheEntries };
+  }, { base, paths: [...palArtworkPaths] });
+  const result = await Promise.race([inspection, new Promise((_, reject) => {
+    deadline = setTimeout(() => reject(Error('Pal image diagnostics exceeded five seconds')), 5000);
+  })]).finally(() => clearTimeout(deadline));
+  let bundledBytes = 0;
+  result.bundled = result.sampled.map(url => {
+    const relative = new URL(url).pathname.slice(new URL(base).pathname.length);
+    assert.ok(palArtworkPaths.has(relative), 'Diagnostics read only approved public Pal files');
+    const file = path.join(root, 'dist', relative), size = fs.statSync(file).size;
+    if (size > 4 * 1024 * 1024 || bundledBytes + size > 16 * 1024 * 1024) return { url, bytes: size, truncated: true };
+    bundledBytes += size;
+    const bytes = fs.readFileSync(file);
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    return { url, bytes: bytes.length, sha256 };
+  });
+  for (const entry of result.cacheEntries) {
+    const expected = result.bundled.find(item => item.url === entry.url);
+    if (entry.sha256 && expected?.sha256) entry.matchesBundled = entry.sha256 === expected.sha256 && entry.bytes === expected.bytes;
+  }
+  return result;
+}
 async function answerMath(page, { palHint = false } = {}) {
   const item = await page.evaluate(() => FG.learning.activeItem);
   assert.ok(item, 'The trusted learning host supplies the active item');
@@ -104,8 +190,12 @@ async function installReceiptFixture(page) {
 (async () => {
   process.chdir(root); fs.mkdirSync(outputs, { recursive: true });
   const server = start(); if (!server.listening) await once(server, 'listening');
+  const base = `http://127.0.0.1:${server.address().port}/arcade/`;
+  const allowedPalUrls = new Set([...palArtworkPaths].map(value => new URL(value, base).href));
   let browser, page, phase = 'opening the integrated app';
   const checks = [], errors = [], consoleErrors = [], paidRequests = [], fixtures = [], expressionRequests = [];
+  const imageNetwork = [];
+  const recordImageNetwork = entry => { imageNetwork.push(entry); if (imageNetwork.length > 160) imageNetwork.shift(); };
   const mark = name => { checks.push(name); console.log(`PASS: ${name}`); };
   try {
     browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
@@ -117,7 +207,13 @@ async function installReceiptFixture(page) {
     page.on('dialog', dialog => void dialog.accept());
     page.on('request', request => { if (request.method() === 'POST' && /\/v1\/(jobs|coach)(\/|$)|api\.openai\.com/.test(request.url())) paidRequests.push(request.url()); });
     page.on('request', request => { if (/\/jems-pals(?:-extra)?\//.test(request.url())) expressionRequests.push(request.url()); });
-    const base = `http://127.0.0.1:${server.address().port}/arcade/`;
+    page.on('requestfailed', request => {
+      if (allowedPalUrls.has(request.url())) recordImageNetwork({ type: 'failed', url: request.url(), failure: request.failure()?.errorText });
+    });
+    page.on('response', response => {
+      if (allowedPalUrls.has(response.url())) recordImageNetwork({ type: 'response', url: response.url(), status: response.status(),
+        fromServiceWorker: response.fromServiceWorker(), contentType: response.headers()['content-type'], contentLength: response.headers()['content-length'] });
+    });
     await page.goto(base); await ready(page); await exploreWelcome(page);
 
     phase = 'choosing a starter and reloading';
@@ -418,8 +514,10 @@ async function installReceiptFixture(page) {
     console.log(`PASS: ${checks.length} integrated Pal browser groups.`);
   } catch (error) {
     if (page) {
+      const imageDiagnostics = await palImageDiagnostics(page, base).catch(diagnosticError => ({ error: String(diagnosticError) }));
       await page.screenshot({ path: path.join(outputs, 'pals-app-failure.png'), fullPage: true }).catch(() => {});
       fs.writeFileSync(path.join(outputs, 'pals-app-failure.json'), JSON.stringify({ phase, error: String(error), checks, errors, consoleErrors, paidRequests,
+        imageNetwork, imageDiagnostics,
         state: await page.evaluate(() => ({ pals: window.FG?.pals?.view(), activeLearning: window.FG?.learning?.active, scene: window.FG?.creation?.scene(), visiblePages: [...document.querySelectorAll('main > .page')].filter(element => element.getClientRects().length).map(element => element.id) })).catch(() => null),
       }, null, 2) + '\n');
     }
