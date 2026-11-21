@@ -102,6 +102,103 @@ Before new web traffic, retain the serving backend revisions and verify old-clie
 
 References: [user-managed build identity](https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts), [gcloud builds submit](https://docs.cloud.google.com/sdk/gcloud/reference/builds/submit), [Cloud Build access](https://docs.cloud.google.com/build/docs/securing-builds/configure-access-to-resources).
 
+## Manual gateway repair release
+
+The [gateway repair operator](../../scripts/deployment/release_gateway.py) is a
+separate manual route for an authorized gateway-only correction after the
+coordinated backend/web release. It does not run automatically on a merge and
+does not use or activate PR107's privileged workflows. Use it from a clean,
+reviewed tool checkout in the existing authenticated Cloud Shell. It uses the
+existing `factory-service-builder`, `factory-services` repository and source
+bucket in `family-game-factory-jzw` / `us-east5`; it creates no IAM grant,
+service account, registry, secret, provider approval or worker identity.
+
+Supply the exact merged application SHA and the exact tested PR SHA. Their
+complete Git trees must match. The operator verifies repository identity,
+protected main ancestry, successful real GitHub Actions checks including service
+packaging, and absence of newer service-source changes on main. It repeats the
+main service-source check before publication and before each service write. A
+documentation-only main advance is allowed. A newer service change stops the
+release for reconciliation.
+
+Before publishing, it reads and pins the current single 100% serving gateway
+revision. The latest template must match that serving revision, all active
+secret references must use numeric versions, desired/effective routes must
+agree, and no unrelated staged revision may be present. The private journal
+captures the service configuration, IAM, original route and public health.
+These reads never print raw service metadata or secret material.
+
+The gateway repair includes PR108's creation-context contract, so a successful
+Pages release alone is insufficient compatibility evidence. Before a billable
+build, each gateway transition and final acceptance, the operator reads the
+currently serving private coach. It requires one actively ready 100% revision
+with the exact reviewed c43 coach digest
+`sha256:52e0bd8c0565e3ccf85ce6e111909d2cdc9446bfce159b7d62c92db1c24a8f54`.
+The [immutable PR109 image receipt](https://github.com/jzwyrzyk/family-game-factory/blob/1505b1ff34c5a5e0f9b0514b9ba18de29860dafd/docs/child-journey/PR108-PRODUCTION.md#prepared-image-receipts--november-21-2026)
+ties that image to source `c43a18148421ea22edfba5f7e891530678ad4f4f` and
+Cloud Build `8cf9e78c-b328-41b3-911e-1b34b0b9a995`.
+
+To verify that the checked coach is the one the gateway actually uses, it reuses
+the existing audited consumed-config mount and numeric-version selectors. It
+reads only that pinned `factory-gateway-private-config` version in the existing
+authenticated owner process and compares `coachPrivateOrigin` with the coach's
+canonical URL, declared audience and expected gateway service account. The
+payload and credential fields are never printed or persisted; the private
+journal receives only the non-secret origin/version/image/revision receipt.
+This does not enumerate secrets, request a new role, call a model or update the
+coach. The peer is checked again after a long build and after promotion; a changed
+or incompatible peer stops the release. Emergency gateway rollback does not
+depend on coach availability. Do not replay PR109 to bypass a failed peer check.
+
+```sh
+python3 scripts/deployment/release_gateway.py \
+  --reviewed-source-sha FULL_MERGED_APPLICATION_SHA \
+  --tested-source-sha FULL_SUCCESSFUL_PR_SHA \
+  --state-dir "$HOME/jems-gateway-repair-state-FULL_MERGED_APPLICATION_SHA"
+```
+
+Without a mutation flag this prints a remote-read-only plan. For the already
+authorized release, append `--execute` to publish one gateway image from the
+committed source archive, load its packaged entry module as non-root without
+network access, verify the resulting immutable digest, stage at zero traffic,
+promote the gateway and verify canonical health. The source SHA and archive
+digest are fixed image labels in the verified Cloud Build configuration. The
+preview, coach, website, worker and sandbox remain outside this operation.
+
+Every Cloud Run write carries the prior `resourceVersion`; it changes only the
+image/revision during staging or the route during promotion. IAM and the full
+retained serving configuration are rechecked. A stored retired zero-traffic
+candidate can satisfy staging configuration verification, but final acceptance
+requires observed Ready, Active and ResourcesAvailable, the exact digest and
+100% desired/effective candidate traffic. The prior serving revision may then
+legitimately become retired. Public health must retain its prior paid-execution
+state; it does not prove a real adult game succeeds.
+
+Keep the private state directory outside the checkout. It is mode0700 with
+atomic mode0600 journals and a process lock. The operator records each attempted
+submission or service write **before** making it. Rerunning the same pinned
+command reads the existing build or service operation; it never resubmits an
+attempted build or repeats a service PUT. An uncertain build without a unique
+matching receipt stops for inspection. Do not delete the journal or choose a
+new directory to bypass that stop.
+
+If a traffic rollback is required, use the same tool/source/tested SHA/state
+arguments with **`--rollback` instead of `--execute`**. It restores only the
+journal's original traffic after checking the current candidate, retained
+baseline, configuration and IAM. It preserves the candidate template and
+existing tags, refuses a newer release or changed policy, and has its own
+no-replay recovery journal. Rollback does not depend on a live GitHub/CI query;
+it uses the previously verified private journal and local pinned source/tool.
+A rolled-back release cannot automatically promote again.
+
+Offline guard tests cover current-source/CI identity, unpinned secrets,
+configuration/IAM/traffic drift, retired staging and baseline lifecycles,
+generation/readiness, concurrent updates, lost responses, unique build recovery
+and traffic-only rollback. These fixtures do not establish live Cloud Build or
+Cloud Run acceptance. Record the actual source/image/revision receipt after
+execution, then run the authorized adult Build → Review → Play → Edit → Keep →
+Reload journey separately.
+
 
 ## 2026-11-19 — Private coach build verification recovery
 
