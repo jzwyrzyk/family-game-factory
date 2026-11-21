@@ -1,3 +1,4 @@
+# Advisory ownership for the sole maintainer. The main ruleset requires CI.
 /.github/CODEOWNERS @jzwyrzyk
 /.github/workflows/ @jzwyrzyk
 /ops/ @jzwyrzyk

@@ -1,7 +1,7 @@
 # Jems operational access and release controls
 
 This change adds a release controller and scoped diagnostic clients. Each production
-operation requires a reviewed intent on protected main. The repository opt-ins and
+operation requires a maintainer-reviewed intent on protected main. The repository opt-ins and
 Google grants are initially absent. Existing Pages, sandbox publication, smoke,
 worker trust and provider approval retain their current release paths.
 
@@ -56,8 +56,10 @@ lane fetches no worker logs, job names, artifacts, application input or child co
    that exact main SHA. The application must pass the existing Arcade journeys
    workflow at that SHA before rollout. Image builds use credential-free runners
    and the same narrow committed archive as the existing publisher. The publication
-   job receives the saved image artifact, pushes to the fixed regional repository
-   and produces signed GitHub provenance for each digest. It never runs the image.
+   job receives the saved image artifact, requires immutable tags on the dedicated
+   regional `jems-release-images` repository, and produces signed GitHub
+   provenance for each digest. Existing `factory-services` digests remain valid
+   baselines for traffic rollback. It never runs the image.
 2. Read the serving baseline with
    `python3 scripts/ops/release.py --inspect-service factory-preview` in an
    authenticated read-only context. Use the returned baseline revision, digest
@@ -103,38 +105,51 @@ migrations, paid activation, or privately authenticated runtime smoke.
 
 ## Consolidated account-level activation
 
+Follow the [sole-maintainer decision](https://github.com/jzwyrzyk/family-game-factory/pull/107#issuecomment-7057935599).
 Keep PR #107 in draft and leave `JEMS_IMAGE_PUBLISH_ENABLED` and
-`JEMS_CLOUD_RUN_RELEASE_ENABLED` unset through this checklist. This setup
-authorizes identities and review controls only. The first hosted build,
-staging and rollback drill need a separate approved release intent.
+`JEMS_CLOUD_RUN_RELEASE_ENABLED` unset. This procedure is for the one-time
+administrator setup. Review the exact grants and any billing impact before
+applying them. Keep the existing worker tag ruleset and smoke setup intact.
 
 ### GitHub administration
 
-1. Create an **Active** repository branch ruleset for `refs/heads/main`. Require
-   a pull request, one approval, code-owner approval for the paths in
-   [.github/CODEOWNERS](../../.github/CODEOWNERS), dismissal of stale approvals,
-   approval of the latest reviewable push, resolved conversations, and protection
-   against deletion and force pushes. Set no automation bypass. Check that the
-   owner and an independent reviewer can approve the privileged files. If the
-   current owner is the PR author, add the independently approved reviewer to
-   CODEOWNERS in the draft first. Avoid an unreviewable owner-only rule.
-2. Require GitHub Actions checks **Jems operations policy**,
-   **Documentation references**, **browser**, **learning**, **creative** and
-   **private-coach-image**. Select them from the PR's reported status checks.
-   These are always scheduled on PRs. Leave path-filtered suites out of the
-   global required list. Verify a draft check cannot substitute for the final
-   head and inspect the active rule before marking this PR ready.
+1. In Settings → Rules → Rulesets, apply the
+   [reviewed main ruleset](../../ops/github-main-ruleset.json) as an active branch
+   ruleset. Confirm these check contexts appear on the exact PR head and are
+   published by the GitHub Actions app (ID `15368`). An administrator using
+   `gh` can inspect `gh api repos/jzwyrzyk/family-game-factory/commits/<PR-head>/check-runs --jq '.check_runs[] | [.name,.app.id,.app.slug,.conclusion] | @tsv'`.
+   If the named ruleset is absent and there is no overlapping branch policy,
+   create it with `gh api -X POST repos/jzwyrzyk/family-game-factory/rulesets --input ops/github-main-ruleset.json`
+   from the reviewed checkout. If it already exists, compare its fields before
+   updating. Do not create a duplicate or replace another ruleset. Verify the
+   effective rule for `main` and the repository plan's enforcement support.
+2. Require PRs with **zero mandatory human approvals** and strict current-head
+   checks. Keep resolved conversations, no deletion, no force push and no
+   bypass. Leave stale-approval dismissal, last-push approval and required
+   code-owner approval off. [.github/CODEOWNERS](../../.github/CODEOWNERS)
+   records sole ownership for review routing. The required GitHub Actions
+   checks are **Jems operations policy**, **Documentation references**,
+   **browser**, **learning**, **creative**, and **private-coach-image**.
+   Path-filtered jobs remain outside the global ruleset.
 3. Create `jems-image-publication` and `jems-cloud-run-production` under
-   Settings → Environments. Select only `main` as a deployment branch,
-   enable required reviewers and prevent self-review. Verify protection by
-   inspecting the settings while the workflow opt-ins remain unset. Plan a
-   documented, independently authorized emergency rollback path.
-4. Publish the Codex egress draft containing `api.github.com` and
+   Settings → Environments. Set Deployment branches and tags to **Selected
+   branches and tags**, add one branch rule for literal `main`, and add no
+   tag rules. Leave required reviewers and prevent self-review off.
+   Inspect the environment settings and confirm exact-branch-only deployment.
+   Both privileged workflows also require GitHub's protected-ref context.
+4. Publish the saved Codex egress draft containing `api.github.com` and
    `logging.googleapis.com` alongside the existing Cloud Run hosts. Use a
    repository-scoped GitHub connection with Contents/PR write and check read
    on the application repo, and Actions read on the worker only. No Actions
-   write token is needed. Confirm these reads before relying on automated
-   incident triage.
+   write token is needed. Confirm the reads from Codex before relying on
+   automated incident triage.
+
+The maintainer can change source, CI and the privileged workflows through a
+PR. A compromised maintainer can therefore change those safeguards. Pinned
+actions, scoped keyless grants, signed digests, exact workflow claims and
+guarded serving-state transitions reduce exposure. They provide no
+independent human review. Permission increases, paid activation,
+destructive actions and first release enrollment remain explicit owner decisions.
 
 ### Google Cloud administration
 
@@ -178,11 +193,14 @@ the exact principal
 principal://iam.googleapis.com/projects/1054529152893/locations/global/workloadIdentityPools/<pool>/subject/repo:jzwyrzyk@356692244/family-game-factory@1458033181:environment:<environment>
 ```
 
-- Bind `roles/artifactregistry.writer` for
-  `jems-image-publisher@family-game-factory-jzw.iam.gserviceaccount.com` on
-  the regional `factory-services` repository only. Bind
-  `roles/artifactregistry.reader` there for
+- Create `jems-release-images` as a regional Docker repository with immutable
+  tags (`gcloud artifacts repositories create jems-release-images --project=family-game-factory-jzw --location=us-east5 --repository-format=docker --immutable-tags`).
+  Verify `dockerConfig.immutableTags == true`. Bind `roles/artifactregistry.writer`
+  there only for `jems-image-publisher@family-game-factory-jzw.iam.gserviceaccount.com`.
+  Bind `roles/artifactregistry.reader` there only for
   `jems-cloud-run-release@family-game-factory-jzw.iam.gserviceaccount.com`.
+  Leave the existing `factory-services` registry, tags and access policy intact.
+  No cleanup policy should remove retained rollback images.
 - Create the custom role `jemsCloudRunRelease` with `run.services.get`,
   `run.services.update`, and `run.revisions.get`. Bind it on
   `factory-preview`, `factory-gateway`, and `factory-coach-private`
@@ -214,9 +232,70 @@ principal://iam.googleapis.com/projects/1054529152893/locations/global/workloadI
   writer access with the approved synthetic markers before relying on the view.
   Keep existing subscriptions, sinks, log retention and worker trust intact.
 
-Record the active ruleset, eligible reviewer, environment protections, identity
-provider conditions, exact resource bindings, and synthetic redaction checks.
-After those are reviewed, the first separately approved release should rehearse
-staging and rollback on an isolated equivalent before permitting production
-canary operations. Keep the coach release blocked while its staged speech
-configuration differs from the serving baseline.
+### Isolated drill and evidence
+
+Run this section with an approved, billed nonproduction project named
+`jems-ops-drill-<suffix>` with no production connectivity, application data,
+provider secrets or worker trust. Enable the needed APIs only under the approved
+budget. Use the exact PR head being reviewed and an authenticated administrator
+Cloud Shell. This drill uses fixed synthetic images from [ops/drill](../../ops/drill)
+and the [same transition controller](../../scripts/ops/release.py) as production.
+
+1. Create an immutable Docker repository named `jems-drill` in `us-east5`.
+   Create `jems-release-drill-runtime` with no workload grants and a separate
+   `jems-release-drill-operator` service account. Give the operator a custom
+   role on the single synthetic service with `run.services.get`,
+   `run.services.getIamPolicy`, `run.services.update` and `run.revisions.get`.
+   Scope `iam.serviceAccounts.actAs` to the synthetic runtime account if required.
+   If needed, grant `run.operations.get` at the isolated project boundary via a
+   separate custom role. The administrator may impersonate only the drill
+   operator using its service-account IAM policy for the drill. Use no keys.
+2. In the reviewed checkout, set `DRILL_PROJECT` to the approved project ID and
+   run the following after the registry and runtime identity are provisioned.
+   The deploy command is solely for a **new** synthetic service. If it already
+   exists, inspect its state and use the drill's read-only plan rather than
+   re-running creation.
+
+   ```bash
+   set -euo pipefail
+   [[ "$DRILL_PROJECT" =~ ^jems-ops-drill-[a-z0-9]{3,12}$ ]]
+   number="$(gcloud projects describe "$DRILL_PROJECT" --format='value(projectNumber)')"
+   [[ "$number" =~ ^[0-9]{6,20}$ && "$number" != 1054529152893 ]]
+   image="us-east5-docker.pkg.dev/$DRILL_PROJECT/jems-drill/synthetic"
+   gcloud auth configure-docker us-east5-docker.pkg.dev --quiet
+   for marker in baseline candidate; do
+     docker build --platform linux/amd64 --build-arg "DRILL_MARKER=$marker" \
+       -t "$image:$marker" ops/drill
+     docker push "$image:$marker"
+   done
+   baseline="$(gcloud artifacts docker images describe "$image:baseline" --project="$DRILL_PROJECT" --format='value(image_summary.digest)')"
+   candidate="$(gcloud artifacts docker images describe "$image:candidate" --project="$DRILL_PROJECT" --format='value(image_summary.digest)')"
+   [[ "$baseline" =~ ^sha256:[a-f0-9]{64}$ && "$candidate" =~ ^sha256:[a-f0-9]{64}$ && "$baseline" != "$candidate" ]]
+   gcloud run deploy jems-release-drill --project="$DRILL_PROJECT" --region=us-east5 \
+     --image="$image@$baseline" --ingress=internal --no-allow-unauthenticated \
+     --service-account="jems-release-drill-runtime@$DRILL_PROJECT.iam.gserviceaccount.com" \
+     --min-instances=0 --max-instances=1 --labels=jems-isolated-drill=true
+   ```
+
+3. Read back the service identity, ingress, IAM and immutable baseline. With the
+   scoped operator grants confirmed, run the following in the same shell. The
+   first command is read-only. The second records stage, 5% canary, promotion
+   and rollback. It attempts the same guarded rollback if a canary or
+   promotion response is uncertain. Verify the baseline again after completion.
+
+   ```bash
+   drill=(python3 scripts/ops/drill.py --project "$DRILL_PROJECT"
+     --project-number "$number" --candidate "$image@$candidate")
+   export CLOUDSDK_AUTH_IMPERSONATE_SERVICE_ACCOUNT="jems-release-drill-operator@$DRILL_PROJECT.iam.gserviceaccount.com"
+   "${drill[@]}"
+   "${drill[@]}" --apply
+   unset CLOUDSDK_AUTH_IMPERSONATE_SERVICE_ACCOUNT
+   ```
+
+4. Record the active ruleset, the two exact-branch environments, OIDC claim
+   evidence, grant scope, synthetic log redaction checks and drill receipts.
+   Local smoke and fixture tests remain separate from a real Cloud Run drill.
+   Return this one evidence set for verification and the readiness recommendation.
+   Keep both production flags unset while these checks are outstanding. Keep
+   the coach release blocked while its staged speech configuration differs from
+   the serving baseline.

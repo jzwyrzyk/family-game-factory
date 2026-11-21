@@ -620,10 +620,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T05:03:54.018Z",
-      "sourceDigest": "e8a660d28e07177b4f961f37bf2579a0e31e6cc9263c17144336335f45bd4461",
+      "reviewedAt": "2026-11-21T05:34:12.979Z",
+      "sourceDigest": "391fb852793bbc99ceda88209092981e56f889f0d9ae81c4acd4712506354be5",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified supported Logging restriction fields in the SDK API schema and excluded unsupported correlation fields at ingestion.",
+      "reviewReason": "Implemented the sole-maintainer control model, isolated immutable image publication, and reviewed the scoped Cloud Run drill and account setup.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

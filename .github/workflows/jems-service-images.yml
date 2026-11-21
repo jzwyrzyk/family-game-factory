@@ -57,7 +57,10 @@ jobs:
       - name: Push immutable candidates without running image code
         run: |
           set -euo pipefail
-          registry=us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services
+          registry=us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images
+          gcloud artifacts repositories describe jems-release-images \
+            --project=family-game-factory-jzw --location=us-east5 --format=json |
+            jq -e '.format == "DOCKER" and .dockerConfig.immutableTags == true' >/dev/null
           gcloud auth configure-docker us-east5-docker.pkg.dev --quiet
           docker load --input "$RUNNER_TEMP/images.tar.gz"
           : > "$RUNNER_TEMP/subjects"

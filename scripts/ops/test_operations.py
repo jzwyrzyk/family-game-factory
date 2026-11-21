@@ -13,7 +13,7 @@ class CloudRunFixture:
     service = "factory-preview"
     resource = f"{release.LOCATION}/services/{service}"
     baseline = f"{service}-00001-abc"
-    baseline_image = f"{release.REGISTRY}/preview@sha256:" + "1" * 64
+    baseline_image = f"{release.LEGACY_REGISTRY}/preview@sha256:" + "1" * 64
     candidate_image = f"{release.REGISTRY}/preview@sha256:" + "2" * 64
 
     def __init__(self):
@@ -51,8 +51,9 @@ class CloudRunFixture:
         self.state["traffic"] = payload["traffic"]
         if "template" in payload:
             self.state["template"] = payload["template"]
-            self.state["latestCreatedRevision"] = f"{self.resource}/revisions/{self.candidate}"
-            self.revisions[self.candidate] = self.revision(self.candidate, payload["template"])
+            candidate = payload["template"]["revision"]
+            self.state["latestCreatedRevision"] = f"{self.resource}/revisions/{candidate}"
+            self.revisions[candidate] = self.revision(candidate, payload["template"])
 
     def transition(self, operation):
         return release.rollout({**self.intent, "operation": operation}, self.call)
@@ -148,3 +149,93 @@ class LogSummaryTests(unittest.TestCase):
         self.assertEqual(log_summary.summarize([entry, unrelated, entry]), [
             {"service": "factory-gateway", "category": "request", "severity": "ERROR", "count": 2},
         ])
+
+
+class SoloActivationTests(unittest.TestCase):
+    def test_protected_main_policy_has_no_bypass_or_self_approval(self):
+        root = Path(__file__).resolve().parents[2]
+        config = json.loads((root / "ops/github-main-ruleset.json").read_text())
+        self.assertEqual(config["enforcement"], "active")
+        self.assertEqual(config["bypass_actors"], [])
+        self.assertEqual(config["conditions"]["ref_name"], {"include": ["refs/heads/main"], "exclude": []})
+        rules = {rule["type"]: rule.get("parameters") for rule in config["rules"]}
+        self.assertEqual(set(rules), {"deletion", "non_fast_forward", "pull_request", "required_status_checks"})
+        approval = rules["pull_request"]
+        self.assertEqual(approval["required_approving_review_count"], 0)
+        self.assertFalse(approval["require_code_owner_review"])
+        self.assertFalse(approval["require_last_push_approval"])
+        self.assertTrue(approval["required_review_thread_resolution"])
+        required = rules["required_status_checks"]
+        self.assertTrue(required["strict_required_status_checks_policy"])
+        self.assertEqual({item["context"] for item in required["required_status_checks"]},
+                         {"Jems operations policy", "Documentation references", "browser",
+                          "learning", "creative", "private-coach-image"})
+
+
+class IsolatedDrillTests(unittest.TestCase):
+    def setUp(self):
+        import drill
+        self.drill = drill
+        self.project = "jems-ops-drill-test"
+        self.number = "1234567890"
+        self.fixture = CloudRunFixture()
+        f = self.fixture
+        f.service = drill.SERVICE
+        f.resource = f"{drill.location_for(self.project, self.number)}/services/{drill.SERVICE}"
+        f.baseline = f"{f.service}-00001-baseline"
+        prefix = f"us-east5-docker.pkg.dev/{self.project}/jems-drill/synthetic@sha256:"
+        f.baseline_image = prefix + "1" * 64
+        f.candidate_image = prefix + "2" * 64
+        template = {"serviceAccount": f"{f.service}-runtime@{self.project}.iam.gserviceaccount.com",
+                    "containers": [{"image": f.baseline_image}]}
+        f.state.update(name=f.resource, ingress="INGRESS_TRAFFIC_INTERNAL_ONLY",
+                       labels={"jems-isolated-drill": "true"}, template=template,
+                       latestCreatedRevision=f"{f.resource}/revisions/{f.baseline}",
+                       trafficStatuses=[release.traffic_target(f.baseline, 100)])
+        f.revisions = {f.baseline: f.revision(f.baseline, template)}
+        self.iam = {}
+
+    def api(self, method, path, payload=None):
+        if method == "GET" and path == self.fixture.resource + ":getIamPolicy":
+            return self.iam
+        return self.fixture.call(method, path, payload)
+
+    def run_drill(self, *, apply):
+        events = []
+        self.drill.run(self.project, self.number, self.fixture.candidate_image, self.api,
+                       apply=apply, emit=events.append)
+        return [entry["status"] for entry in events]
+
+    def test_isolated_drill_restores_baseline(self):
+        self.assertEqual(self.run_drill(apply=False), ["PLAN_ONLY"])
+        self.assertEqual(self.fixture.patches, [])
+        self.assertEqual(self.run_drill(apply=True), ["STAGED", "CANARY", "PROMOTED", "ROLLED_BACK"])
+        self.assertEqual(release.traffic(self.fixture.state), {self.fixture.baseline: 100})
+
+    def test_drill_refuses_production_public_access_and_runtime_overrides(self):
+        for project, number in ((release.PROJECT, self.number), (self.project, release.PROJECT_NUMBER)):
+            with self.assertRaises(release.ReleaseError):
+                self.drill.location_for(project, number)
+        self.iam = {"bindings": [{"role": "roles/run.invoker", "members": ["allUsers"]}]}
+        with self.assertRaisesRegex(release.ReleaseError, "public IAM"):
+            self.run_drill(apply=True)
+        self.iam = {}
+        self.fixture.state["template"]["vpcAccess"] = {"connector": "unexpected"}
+        with self.assertRaises(release.ReleaseError):
+            self.run_drill(apply=True)
+        self.assertEqual(self.fixture.patches, [])
+
+
+    def test_drill_rolls_back_after_an_uncertain_canary_update(self):
+        original_api = self.api
+
+        def uncertain_api(method, path, payload=None):
+            result = original_api(method, path, payload)
+            if method == "PATCH" and any(item["percent"] == 5 for item in payload["traffic"]):
+                raise release.ReleaseError("Lost canary update response")
+            return result
+
+        self.api = uncertain_api
+        with self.assertRaisesRegex(release.ReleaseError, "Lost canary"):
+            self.run_drill(apply=True)
+        self.assertEqual(release.traffic(self.fixture.state), {self.fixture.baseline: 100})

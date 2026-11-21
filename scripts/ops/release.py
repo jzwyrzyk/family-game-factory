@@ -19,7 +19,8 @@ SERVICES = {
     "factory-gateway": "gateway",
     "factory-coach-private": "coach",
 }
-REGISTRY = f"us-east5-docker.pkg.dev/{PROJECT}/factory-services"
+REGISTRY = f"us-east5-docker.pkg.dev/{PROJECT}/jems-release-images"
+LEGACY_REGISTRY = f"us-east5-docker.pkg.dev/{PROJECT}/factory-services"
 DIGEST = r"sha256:[a-f0-9]{64}"
 SHA = r"[a-f0-9]{40}"
 
@@ -44,11 +45,12 @@ def read_intent(path):
     service = intent["service"]
     require(service in SERVICES, "Service outside approved release scope")
     prefix = re.escape(f"{REGISTRY}/{SERVICES[service]}@")
+    legacy = re.escape(f"{LEGACY_REGISTRY}/{SERVICES[service]}@")
     for key, pattern in {
         "operation": r"stage|canary|promote|rollback",
         "source": SHA,
         "image": prefix + DIGEST,
-        "baselineImage": prefix + DIGEST,
+        "baselineImage": f"(?:{prefix}|{legacy})" + DIGEST,
         "baseline": rf"{service}-[a-z0-9-]+",
         "configuration": r"[a-f0-9]{64}",
         "compatibility": r"[a-f0-9]{64}",
@@ -133,11 +135,11 @@ def pinned_tags(service):
     return [dict(traffic_target(revision, 0), tag=tag) for tag, revision in sorted(declared.items())]
 
 
-def rollout(intent, api):
+def rollout(intent, api, *, location=LOCATION):
     service = intent["service"]
     candidate = revision_name(intent)
     baseline = intent["baseline"]
-    resource = f"{LOCATION}/services/{service}"
+    resource = f"{location}/services/{service}"
     current = api("GET", resource)
     require(not current.get("reconciling", False), "Cloud Run service is reconciling")
     serving = traffic(current)
@@ -199,7 +201,7 @@ def rollout(intent, api):
     return statuses[operation]
 
 
-def cloud_api(token):
+def cloud_api(token, *, project=PROJECT, project_number=PROJECT_NUMBER):
     def request(method, path, payload=None):
         headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
         body = json.dumps(payload).encode() if payload is not None else None
@@ -215,7 +217,7 @@ def cloud_api(token):
         if method != "PATCH":
             return result
         operation = result.get("name", "")
-        require(re.fullmatch(rf"projects/(?:{re.escape(PROJECT)}|{PROJECT_NUMBER})/locations/us-east5/operations/[A-Za-z0-9_-]+", operation),
+        require(re.fullmatch(rf"projects/(?:{re.escape(project)}|{re.escape(project_number)})/locations/us-east5/operations/[A-Za-z0-9_-]+", operation),
                 "Cloud Run returned an unexpected operation resource")
         for _ in range(90):
             if result.get("done"):
@@ -228,8 +230,8 @@ def cloud_api(token):
     return call
 
 
-def inspect_service(service, api):
-    resource = f"{LOCATION}/services/{service}"
+def inspect_service(service, api, *, location=LOCATION):
+    resource = f"{location}/services/{service}"
     current = api("GET", resource)
     require(not current.get("reconciling", False), "Cloud Run service is reconciling")
     serving = traffic(current)
