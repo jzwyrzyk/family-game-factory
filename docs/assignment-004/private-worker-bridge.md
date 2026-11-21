@@ -46,8 +46,59 @@ Owner can use `scripts/deployment/private_worker_config.py --input /secure/old.j
 - GCP: update Workload Identity Federation trust conditions (only when separately authorized) to organization owner ID `357047835`, repo ID `1458899834`, exact trusted `workflow_ref@refs/heads/main`, `factory-infrastructure` environment and reviewed private SHA. No new credentials or VM provisioned by PRs.
 - Future owner-authorized redeployment: update the **existing gateway only** using owner-reviewed immutable image and new private secret version, preserving Cloud Run hostname, service account, request/instance controls, current preview, Firestore workspace and signing secrets. No deployment or configuration change performed here.
 
+## Bounded workflow leases
+
+The coordinator now records deadlines separately from `claimAt`. Previously a valid generation report left generation's 15-minute clock running while infrastructure was provisioned, so 9 minutes generating followed by 7 minutes preparing could expire before test claimed its work. The accepted generation report now enters a bounded preparation/test handoff.
+
+The default budgets reflect the reviewed private workflow's 12-minute generation, 18-minute preparation, 12-minute test and 12-minute review job limits:
+
+| Boundary | Maximum coordinator window | What advances it |
+| --- | --- | --- |
+| Dispatch queue | 15 minutes | Initial enqueue or one of the two permitted repairs |
+| Generation | 12 minutes | Authenticated generation claim |
+| Preparation and test handoff | 30 minutes total | Validated generation report |
+| Test execution | At most 12 minutes, also bounded by the existing 30-minute handoff deadline | Authenticated test claim |
+| Review handoff and execution | 12 minutes total | Validated successful test report; review claim retains that same deadline |
+| Whole job, including repairs | 207 minutes: `(15 + 12 + 30 + 12) × 3` | Fixed once; never extended by repair or worker traffic |
+
+The job-wide number is an outer bound, not a target wait. A missed phase deadline, lost grant, disabled paid approval or cancellation can stop work earlier. Existing shorter coordinator lease configuration shortens these windows. Provider input timeout is also capped by the current deadline. A late claim cannot create a new lease, and a late new report cannot publish a candidate. Status reads and duplicate reports never extend time, consent or spending authority. The scheduler settles expired jobs using the existing conservative reservation policy; status can tell an active worker to stop immediately without scheduling or writing from a read.
+
+Persisted executions without the new deadline fields remain readable. Migration derives an absolute deadline from the earliest stored queue/claim/audit time. Because old rows did not record report acceptance time, a pending test handoff is conservatively bounded from the old generation claim plus generation and handoff budgets; it does not restart at migration or polling time.
+
+`tests/worker-lifecycle.test.ts` uses a synthetic clock and synthetic game/evidence fixtures to verify slow valid work, shared setup budgets, non-renewing polls/reports, late callbacks, repair/global limits and legacy migration. It makes no paid calls and proves no live latency or deployment acceptance. This source change does not alter the private workflow, its approved SHA, the public source pin or any live configuration. The coordinator change can serve the existing callback shape; activating revised worker code still requires the separately reviewed cross-repository release process.
+
+## Bounded worker coordination and report reconciliation
+
+`server/actions/worker-transport.ts` separates coordination transport from the CLI's one execution of generation, testing or review. Its default bounds are:
+
+| Operation | Bound and behavior |
+| --- | --- |
+| OIDC plus one gateway operation | 15 seconds total, including response-body streaming; external process cancellation propagates to both requests |
+| Response bytes | OIDC: 32 KiB; claim: 10 MiB; status/report receipt: 16 KiB; count actual streamed bytes before parsing |
+| Heartbeat | One status request at a time, with 3 seconds between completed polls |
+| Lost status visibility | At most 45 seconds since the last confirmed active response; temporary transport/408/429/5xx errors do not mean cancellation |
+| Terminal/authentication response | Stop active work immediately; a received cancelled/failed/ready state is distinct from an unreachable gateway |
+| Claim | One request; an unknown claim outcome cannot authorize execution or an automatic second claim |
+| Finished report | Serialize once; at most three identical attempts and 45 seconds total, with bounded backoff; no replacement error report after an uncertain result |
+
+Each accepted report stores a compact receipt containing its attempt/run/stage/repository/SHA identity, SHA-256 report fingerprint and original `reviewRequired` decision. At most three stages across three attempts can be retained. A matching replay returns that original receipt even after test or review rejection has already queued repair and changed the current run. A different payload, workflow identity or stage is rejected. The receipt stores no prompt, game source, image or provider credential. Existing stored stage hashes remain compatible for retries within their original attempt; receipts cannot reconstruct a lost pre-upgrade report whose old repair already erased those hashes.
+
+Before handling a pending callback, current consent, paid approval and fixed deadlines still apply. An unauthorized or late new result cannot create a new accepted receipt. Previously accepted receipts acknowledge completed coordination only; they cannot renew a grant, add spending, publish another revision or schedule another repair. Heartbeat polling stops before report reconciliation so a successful repair transition cannot make an obsolete status identity abort its own acknowledgment recovery.
+
+The worker HTTP adapter retains generic 403 responses for authentication and named contract rejection, and uses a generic 503 for unexpected service failures, including temporary Firestore/gRPC and key-fetch failures. Private diagnostics are not returned. A report still unconfirmed after its bounded reconciliation exits with an explicit uncertain-acknowledgment log; it never repeats the provider call. If the process is terminated or all acknowledgments are lost, the remaining stage can still expire under the fixed lease. This is not an exactly-once delivery claim.
+
+`tests/worker-transport.test.ts` injects stalled requests/bodies, oversized replies, cancellation, transient outages and lost acknowledgments. The lifecycle suite also exercises the real coordinator with synthetic transport loss after generation acceptance, repair scheduling and passing/failing review. It verifies one execution, one charge, one revision/repair and immutable report identity. These suites are included in `npm run test:unit`.
+
+Deploy compatible gateway code before relying on new worker reconciliation across repair attempts. The old worker request/receipt shape remains supported. Activating the CLI change requires the private repository's public source pin and its reviewed workflow identity to be updated through the established release process; those pins, environments, infrastructure and live services are unchanged by this implementation.
+
 ## Security evidence and limits
 
 Public CI includes branch/tag-drift and strict organization OIDC negative tests, plus existing child's desktop/mobile mocked creation, repair, play, keep, undo and fork journeys. Private PR supplies `scripts/runner/verify_group_policy.py`: read-only query of actual organization runner-group and selected-repository access; offline tests reject extra repositories, extra workflows, public access and tag-ref substitutions.
 
 **This chat cannot verify live group settings through the exposed GitHub connection, and no registered runner can be scheduled for a real denied-workflow test without separately authorized infrastructure.** No claim of actual unauthorized workflow denial until the owner runs the policy audit and a controlled negative scheduling test. Do not set `FACTORY_ACTIONS_APPROVED=true`; do not merge or deploy automatically.
+
+## Dispatch transport and status reads
+
+The gateway dispatcher has a 30-second deadline covering installation-token acquisition, immutable-tag verification, protected-main verification and the workflow-dispatch request. Installation-token HTTP exchange has its own 10-second deadline, including the response body. Exact target repository, workflow, tag/main SHA and redirect restrictions remain enforced; this transport layer adds no retry. If a dispatch POST's acknowledgement is lost or times out, its remote outcome remains uncertain. The existing durable job/attempt/run claim checks still prevent competing workflows from independently acquiring paid generation; the deadline is not evidence that GitHub rejected the POST.
+
+Job-status HTTP responses read authorized durable state once and do not await unrelated dispatch. Active-job reads can wake a coalesced best-effort recovery pass after the response; terminal and unauthorized reads cannot. The authenticated scheduler remains the independent durable trigger. [Status tests](../../tests/job-status-http.test.ts) hold an unrelated dispatch open while authorized status remains readable and the fallback coalesces. [Dispatch tests](../../tests/dispatch-deadlines.test.ts) stall each HTTP phase and token response body, verify cancellation and count that no dispatch POST is replayed by the transport. These source fixtures do not inspect live scheduler, GitHub or runner availability.

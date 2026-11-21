@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewedAt": "2026-11-21T18:37:22.463Z",
+      "sourceDigest": "65b33350826d184455c4c69c39ce1253a3bed34734340421f63f9786babe74ee",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the combined continuation, capacity and submission-recovery contracts against product doctrine. They preserve child authorship, explicit Build and Keep, independent saved games and truthful uncertainty without automatic paid replay; they introduce no new consent, earning, learning or publication policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -229,10 +229,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.352Z",
-      "sourceDigest": "fe2798829c213e3c2515a4dff46c256408d3aa8f6aa5a7de9b1ad7427ed14bc0",
+      "reviewedAt": "2026-11-21T18:37:22.926Z",
+      "sourceDigest": "cba5d48cf312f21ce42bf1281fbba61aa4dbef39e232f5c18c9211a32828f20a",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected combined Studio diff: PR115 reconnect, visible Build, saved-job retry and owner guards are preserved, with only the Pal earned-form callback added; both UI contracts and scoped hosted visual evidence remain documented.",
+      "reviewReason": "Reviewed the combined workspace, notebook, builder and session diff. Architecture and child-continuity contracts now cover latest-source transactions, retained conversation chapters, capacity preflight, durable initial-request identity, awaited acknowledgement publication, profile fencing and bounded request transport. Explicit game selection and newer drafts remain protected.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -367,10 +367,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "46276557b98b0399551a4e1a57c65b7f758f45950e5d128131edce84fabd47d7",
-      "reviewedAt": "2026-11-21T05:39:47.126Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed cosmetic suppression of reward and rank popups while the creation conversation is visible. Updated rewards and joy-layer contracts: committed receipts, gems, levels and normal Play/Keep/versions celebrations remain unchanged. Final Gem Journey and delight browser checks passed.",
+      "sourceDigest": "a27f13c3351bcea2dc3f3b5a31c160cf37905c2514ca006304585a94bf371e8b",
+      "reviewedAt": "2026-11-21T18:37:24.021Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The rewards change adds a full-family backup regression for linked notebook chapters. Existing source attribution, canonical project identity, receipt deduplication, earned totals and explicit erasure rules remain unchanged; continuation and pending build recovery create no reward entitlement.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -475,10 +475,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T18:37:24.491Z",
+      "sourceDigest": "00716376a0cd527a8ae3e74d4c2db5fae84620811f506e3419fee0d2f03601c7",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Reviewed all gateway HTTP, OpenAPI and packaging changes together. Service and architecture contracts describe actual-byte UTF-8 parsing, authenticated read-only request lookup, bounded browser renewal, expired paid-receipt reconciliation and worker rejection versus temporary unavailability. Readiness wording now accurately permits reconciliation without inference.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -517,10 +517,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.976Z",
-      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
+      "reviewedAt": "2026-11-21T18:37:24.930Z",
+      "sourceDigest": "b22f2e1752caa0d27f581384e2ad32536c8587b866705fdd731b2aa3f73a4e0d",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
+      "reviewReason": "Reviewed combined coordinator, worker transport, dispatcher and job-service changes. Architecture and worker contracts cover fixed phase and global deadlines, immutable report receipts, bounded identity and dispatch requests, status responses independent of dispatch and exact initial-request lookup. Authorization, transactional spending and uncertain-outcome no-replay boundaries are preserved."
     },
     {
       "id": "coach",
@@ -539,10 +539,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:36:52.129Z",
-      "sourceDigest": "ebaea1ce57ffb0ec47757d2378241f5eebd03970856d9e8f751e2c2f18e53731",
+      "reviewedAt": "2026-11-21T18:37:25.356Z",
+      "sourceDigest": "5907a330d5a176847db2c3a91489869a39afe77747bfd6820711476e048dd03c",
       "reviewOutcome": "updated",
-      "reviewReason": "Coaching standard and architecture distinguish playable creative gaps from optional polish, retain original authored intent, require opted-in readiness, remove scripted outage interviews, and separate technical output failures from refusals."
+      "reviewReason": "Reviewed coach and speech recovery with the shared body reader and private admission changes. Contracts document fixed reservation identities and leases, one-time conservative settlement, original-month accounting, late-result and erasure fencing, bounded UTF-8 envelopes and shared text/audio provider slots. Readiness can reconcile expired receipts without starting inference."
     },
     {
       "id": "adult-privacy",
@@ -566,10 +566,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
-      "reviewedAt": "2026-11-21T14:34:24.173Z",
+      "sourceDigest": "a0d1e78719df6382dcd23b1ee812134d423fe56395752980ab3c46b421a6ddae",
+      "reviewedAt": "2026-11-21T18:37:25.788Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
+      "reviewReason": "Reviewed trusted-device parsing, audience-bound request lookup and API documentation with existing adult and guardian gates. Architecture now distinguishes authenticated configuration readiness that can reconcile expired reservations from inference. Device, family, adult-session, parent-erasure and spending authority remain intact; no consent or live rollout is inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:01:33.009Z",
-      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
+      "reviewedAt": "2026-11-21T18:37:26.257Z",
+      "sourceDigest": "e2f9802ba845b4213e9e5859b1b975a8c886f8c5a9b595bf509ca9aa566daae3",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
+      "reviewReason": "Reviewed all combined test additions and their entrypoints. Delivery records the exact integrated runtime source with 485 passing unit tests, eight paid-receipt recovery tests, 79 deployment tests and production build/typecheck. Existing fixture limitations, Chromium launch failures and missing combined browser/live-provider acceptance remain explicit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:01:33.314Z",
-      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
+      "reviewedAt": "2026-11-21T18:37:41.932Z",
+      "sourceDigest": "7500d72416ca0e0820a703a967da6c90a6907528ff2a76e7cc52da209bacd977",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
+      "reviewReason": "Reviewed gateway and coach Docker inputs, Docker exclusions, exact-source packaging scope, both archive fixture additions and test scripts. Delivery records local integration evidence separately from component receipts, with no merge, deployment, pin update or provider activation. Both shared JSON and build-submission modules are included.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

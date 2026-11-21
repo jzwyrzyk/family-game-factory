@@ -3,7 +3,7 @@
   "info": {
     "title": "Family Factory private build API",
     "version": "2.0.0",
-    "description": "Authenticated family gateway and separate private game preview. The temporary Adult development profile lives on the existing website. Paid adult calls require a valid family session AND an independent HttpOnly adult cookie AND a per-tab proof, plus an owner-issued permit and configured rollout/provider/budget gates. The family-session security alternative describes child/family mode and does not bypass runtime adult-only policy; child mode retains separately verified guardian scopes and actual provider privacy requirements. Parent privacy choices remain pending until externally verified. Neither a profile switch nor a checkbox creates consent, ZDR or a spending allowance. Browser POSTs require exact Origin, X-Factory-Request: 1 and the documented Content-Type; private responses are no-store. This schema covers build/revision/worker contracts, session status, adult activation/lock, parent unlock/privacy and read-only coach/speech readiness. Existing full conversation, binary speech and other trusted-device payload schemas remain incomplete; consult their executable handlers. Source contracts are not evidence of live deployment or paid activation."
+    "description": "Authenticated family gateway and separate private game preview. The temporary Adult development profile lives on the existing website. Paid adult calls require a valid family session AND an independent HttpOnly adult cookie AND a per-tab proof, plus an owner-issued permit and configured rollout/provider/budget gates. The family-session security alternative describes child/family mode and does not bypass runtime adult-only policy; child mode retains separately verified guardian scopes and actual provider privacy requirements. Parent privacy choices remain pending until externally verified. Neither a profile switch nor a checkbox creates consent, ZDR or a spending allowance. Browser POSTs require exact Origin, X-Factory-Request: 1 and the documented Content-Type; private responses are no-store. This schema covers build/revision/worker contracts, session status, adult activation/lock, parent unlock/privacy and authenticated coach/speech configuration readiness. Coach/speech readiness may reconcile expired reservations and never starts inference. Existing full conversation, binary speech and other trusted-device payload schemas remain incomplete; consult their executable handlers. Source contracts are not evidence of live deployment or paid activation."
   },
   "servers": [
     {
@@ -734,7 +734,7 @@
     },
     "/v1/coach/status": {
       "get": {
-        "summary": "Read-only, authenticated model-coach configuration readiness; not a proof of a successful inference",
+        "summary": "Authenticated model-coach configuration readiness; may reconcile expired reservations, never starts inference",
         "responses": {
           "200": {
             "description": "Coach availability",
@@ -1852,6 +1852,9 @@
           },
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          },
+          "503": {
+            "description": "Worker coordination service unavailable. A lost claim acknowledgment must not trigger automatic claim or paid generation replay."
           }
         },
         "parameters": [
@@ -1872,10 +1875,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Authorized job-scoped stage result"
+            "description": "Accepted report receipt, or the original receipt for an identical job/attempt/run/stage fingerprint, including after repair changes the active attempt."
           },
           "403": {
-            "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+            "description": "Untrusted, foreign, unclaimed or conflicting worker report rejected"
+          },
+          "503": {
+            "description": "Worker coordination service unavailable. The identical serialized report may be reconciled within the worker's bounded retry window; paid work must not be repeated."
           }
         },
         "parameters": [
@@ -1896,10 +1902,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Authorized job-scoped stage result"
+            "description": "Read-only current state or stop indication for an expired/revoked job. Status does not renew a phase lease, permission or payment authority."
           },
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          },
+          "503": {
+            "description": "Temporary worker coordination failure, distinct from authoritative cancellation or authentication rejection."
           }
         },
         "parameters": [
@@ -1930,7 +1939,7 @@
     },
     "/v1/coach/audio/status": {
       "get": {
-        "summary": "Read authenticated private dictation availability",
+        "summary": "Authenticated private dictation configuration readiness; may reconcile expired reservations, never starts inference",
         "responses": {
           "200": {
             "description": "Private dictation availability",
@@ -2171,6 +2180,113 @@
           }
         ],
         "description": "Reuses the saved revision family, trusted-device and adult-profile audience checks. Returns manifest:null for old games and games without an authored companion; it never analyzes or executes game JavaScript. A manifest is bounded jems.creation.v1 data, with reviewed local asset IDs only, no source code, external URLs, credentials or private preview capabilities. It is a separate editable companion, not an assertion that game artwork or arbitrary mechanics were translated. All generated blocks are marked assisted. Exact recursive validation is implemented in src/creation/model.ts and src/creation/projects.ts. Responses are no-store."
+      }
+    },
+    "/v1/job-requests/{clientRequestId}": {
+      "get": {
+        "summary": "Recover an initial submission by its saved request identity without submitting or dispatching work",
+        "responses": {
+          "200": {
+            "description": "Accepted job, or an unresolved identity with no visible admission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "job"
+                  ],
+                  "properties": {
+                    "job": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/Job"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "clientRequestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w-]{1,100}$"
+            }
+          },
+          {
+            "name": "payloadHash",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "Authenticate the same family/adult workspace, find the original clientRequestId, and verify the SHA-256 payload identity. The hash covers the fixed JSON tuple [\"build\", clientRequestId, gameId, baseRevisionId, normalized prompt]. A matching accepted request returns its authorized job view, including any retry successor. job:null means no matching admission is currently visible; it is still uncertain because the original POST may commit later. Never treat absence or a network failure as authorization to submit a second paid build. This GET does not reserve allowance, call providers, create retries or run dispatch. Expired/revoked sessions and foreign audiences remain denied or undisclosed."
       }
     }
   },

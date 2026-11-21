@@ -82,6 +82,22 @@ test('whole-family prevalidation uses the real base validator and strips duplica
   assert.deepEqual(legacy.problemSolving,emptyProblemSolvingWorkspace());
 });
 
+test('full-family backup preserves linked chat pages, provenance and the same native game',async()=>{
+  const value=await incoming(),source=new SourceMemory(),book=new StudioNotebook(source);
+  book.restore(value.factoryStudio);const session=book.list(OWNER)[0];
+  book.update(session.id,OWNER,s=>{s.messages=Array.from({length:200},(_,index)=>({id:'backup-turn-'+index,role:index%2?'helper':'child',text:'Original words '+index,at:new Date(TIME).toISOString()}));s.design!.plan.action={value:'Original words 0',origin:'child',accepted:true,delegated:false};});
+  book.continueConversation(session.id,OWNER);book.message(session.id,OWNER,'child','My next idea');
+  value.factoryStudio=book.read();
+  const {storage,rewards,pals}=stores(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
+  const restored=new StudioNotebook(storage);
+  assert.deepEqual(restored.read(),book.read());
+  assert.deepEqual(restored.get(session.id,OWNER),book.get(session.id,OWNER));
+  assert.equal(new RevisionStore(storage).project(session.projectId!,OWNER).id,session.projectId);
+  const foreign=structuredClone(value);foreign.factoryStudio.conversationChapters![0].owner=OTHER;
+  assert.throws(()=>validateFamilyRewardBackup(JSON.stringify(foreign),validateBase,rewards,pals),/conversation link/);
+});
+
 test('invalid family ownership, linked games, namespace and recovery-only files are rejected before any write',async()=>{
   const {storage,rewards,pals}=stores(),valid=await incoming();
   const invalid:(typeof valid|Record<string,unknown>)[]=[];

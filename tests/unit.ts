@@ -1,14 +1,24 @@
 import './intent-repair.test';
 import './intent-worker-binding.test';
 import './private-generation-preflight.test';
+import './http-json.test';
+import './private-coach-concurrency.test';
+import './job-status-http.test';
+import './dispatch-deadlines.test';
+import './browser-request-deadlines.test';
 import './working-game-contract.test';
 import './game-form.test';
 import './child-intent.test';
 import './game-intelligence.test';
 import './factory.test';
+import './workspace-consistency.test';
+import './notebook-capacity.test';
 import './backend-contracts.test';
 import './pipeline.test';
+import './build-submission-recovery.test';
 import './assignment-002.test';
+import './worker-lifecycle.test';
+import './worker-transport.test';
 
 import './construction.test';
 

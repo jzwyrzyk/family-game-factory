@@ -3,6 +3,7 @@ import {verifyBrowserSession} from '../trusted-devices';
 import type {Repository} from '../pipeline/types';
 import {CoachService,type CoachConfig} from './service';
 import {adultPilotFlags} from '../adult-pilot';
+import {readJsonBody} from '../http-json';
 export function coachConfig(env:NodeJS.ProcessEnv):CoachConfig {
  return {adultPilot:adultPilotFlags(env),enabled:env.FACTORY_COACH_APPROVED==='true',privacyApproved:env.FACTORY_COACH_PRIVACY_APPROVED==='true',moderationApproved:env.FACTORY_COACH_SAFEGUARDS_APPROVED==='true',zdrVerified:env.FACTORY_COACH_ZDR_VERIFIED==='true',privateExecutionApproved:env.FACTORY_COACH_PRIVATE_EXECUTION_APPROVED==='true',model:env.FACTORY_COACH_MODEL||'',maxInputChars:Number(env.FACTORY_COACH_INPUT_CHARS||16000),maxOutputTokens:Number(env.FACTORY_COACH_OUTPUT_TOKENS||800),maxTurnMicroUsd:Number(env.FACTORY_COACH_MAX_MICRO_USD||0),inputMicroUsdPerMillion:Number(env.FACTORY_COACH_INPUT_PRICE||0),outputMicroUsdPerMillion:Number(env.FACTORY_COACH_OUTPUT_PRICE||0),pricesReviewedAt:env.FACTORY_COACH_PRICES_REVIEWED||''};
 }
@@ -19,15 +20,13 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(path==='/v1/coach/status'&&req.method==='GET'){const available=await service.ready(session);return send(200,{available,mode:available?'model':'unavailable'});}
    if(path==='/v1/coach/erase'&&req.method==='POST'){
     if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
-    let raw='';for await(const chunk of req){raw+=String(chunk);if(Buffer.byteLength(raw)>1024)throw Error('INVALID_REQUEST');}
-    let input:any;try{input=JSON.parse(raw);}catch{throw Error('INVALID_REQUEST');}
+    const input=await readJsonBody(req,1024,{invalidJsonError:'INVALID_REQUEST'});
     if(!input||Object.keys(input).length!==1||input.confirm!=='ERASE_FAMILY_COACH_RECEIPTS')throw Error('INVALID_REQUEST');
     return send(200,await service.eraseFamilyReceipts(session));
    }
    if(path!=='/v1/coach'||req.method!=='POST')return send(404,{errorCode:'NOT_FOUND'});
    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
-   let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>50000)throw Error('INVALID_REQUEST');}
-   send(200,await service.respond(session,JSON.parse(body)));
+   send(200,await service.respond(session,await readJsonBody(req,50000)));
   }catch(err){const c=(err as Error).message;const permitted=['FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','UNAUTHENTICATED','COACH_UNAVAILABLE','SPENDING_CUTOFF','RATE_LIMIT','IDEMPOTENCY_CONFLICT','COACH_REQUEST_EXISTS','COACH_REFUSED','PRIVATE_INFORMATION','COACH_HISTORY_FULL','INVALID_REQUEST'];send(c==='UNAUTHENTICATED'?401:c==='FORBIDDEN'||c==='ADULT_PILOT_ACCESS_REQUIRED'?403:c==='COACH_UNAVAILABLE'?503:400,{errorCode:permitted.includes(c)?c:'COACH_UNAVAILABLE'});}
  };
 }

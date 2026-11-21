@@ -81,8 +81,8 @@ test('v1 workspace migration is durable on next save; unrelated original math/pr
 });
 test('invalid DAG, unknown versions, private executable fields and corrupt storage are not silently reset',()=>{
  const storage=memory(),store=new RevisionStore(storage),p=store.create('p1','buckets','Test');const raw=store.snapshot();raw.revisions[0].parentId=raw.revisions[0].id;assert.throws(()=>validateWorkspace(raw),/history/);
- assert.throws(()=>migrateWorkspace({version:99}));storage.setItem(WORKSPACE_KEY,'{bad');assert.throws(()=>new RevisionStore(storage));assert.equal(storage.getItem(WORKSPACE_KEY),'{bad');
  const snapshot=store.snapshot();snapshot.revisions[0].config.exec='evil' as unknown as boolean;assert.throws(()=>validateWorkspace(snapshot));assert.equal(store.revision(p.id,'p1').parentId,null);
+ assert.throws(()=>migrateWorkspace({version:99}));storage.setItem(WORKSPACE_KEY,'{bad');assert.throws(()=>new RevisionStore(storage));assert.throws(()=>store.snapshot());assert.equal(storage.getItem(WORKSPACE_KEY),'{bad');
 });
 test('play evidence must match the revision, coach uses real outcome and supports skip and a testable hypothesis',()=>{
  const store=new RevisionStore(memory()),p=store.create('p1','buckets','Test'),revision=store.revision(p.id,'p1'),coach=new DesignCoach();

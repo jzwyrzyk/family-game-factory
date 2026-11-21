@@ -136,3 +136,7 @@ body.studio-review #page-studio :is(summary, button, textarea):focus-visible { o
 @media (prefers-reduced-motion:reduce) {
  body.studio-review #page-studio :is(.studio-prompt, .studio-messages) { transition: none; scroll-behavior: auto; }
 }
+.studio-review .studio-capacity-notice{padding:14px 16px;margin:12px 0;color:#352558;background:#f6f3ff;border:1px solid #d8cdeb;border-radius:12px;font-size:var(--jems-child-label,18px);line-height:1.5}
+.studio-review .studio-capacity-notice summary{padding:9px 0;min-height:44px;cursor:pointer}
+.studio-review .studio-capacity-notice .studio-button{display:block;margin-top:12px}
+.studio-review #studioContinueChat{min-height:48px;font-size:var(--jems-child-label,18px);margin:0 16px 12px}

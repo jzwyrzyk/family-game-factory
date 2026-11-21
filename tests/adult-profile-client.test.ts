@@ -55,7 +55,7 @@ test('a builder disconnected after registering a revision cannot submit the old 
   if(path==='/v1/revisions'){started();return new Promise(resolve=>{release=resolve;});}
   jobs++;return {jobId:'unexpected',status:'failed'};
  };
- const work=client.submit({gameId:'gum',baseRevisionId:'old-child-base',prompt:'Child saved context',config:{gumBudget:12}});
+ const work=client.submit({gameId:'gum',baseRevisionId:'old-child-base',prompt:'Child saved context',config:{gumBudget:12}},()=>{});
  await reached;client.disconnect();release({revisionId:'seeded'});await work;
  assert.equal(jobs,0);
 });

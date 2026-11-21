@@ -1,4 +1,5 @@
 import {CoachService} from './coach/service';
+import {reconcilePaidReceipts} from './coach/receipts';
 import {PrivateCoachBridge,PrivateSpeechBridge,privateCoachOrigin} from './coach/private-bridge';
 import {CoachAudioService,speechConfig,type SpeechProvider} from './coach/speech';
 import {speechHttpHandler} from './coach/audio-http';
@@ -51,7 +52,7 @@ export async function createGateway(config:GatewayConfig){
  if(config.active)validateApproval(config.approval);if(!Number.isInteger(config.maxJobMicroUsd)||config.maxJobMicroUsd<1||config.maxJobMicroUsd>1000000)throw Error('JOB_BUDGET_REQUIRED');
  if(process.env.K_SERVICE&&config.localFile)throw Error('CLOUD_RUN_REQUIRES_DURABLE_FIRESTORE');
  const repo=config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
- await repo.snapshot();
+ await reconcilePaidReceipts(repo);
  const agent={kind:'metered-api' as const,available:paidEnabled,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
  const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled});
  const privateWorker=Boolean(config.workerRepository||config.workerRepositoryId||config.workerWorkflow||config.workerApprovedSha);
@@ -76,7 +77,7 @@ export async function createGateway(config:GatewayConfig){
   if(url.pathname.startsWith('/preview/')){res.writeHead(403);res.end('Separate preview origin required');return;}
   if(url.pathname.startsWith('/v1/worker/')){await worker(req,res);queueMicrotask(()=>{void coordinator.tick().catch(()=>{});});return;}
   if(url.pathname==='/v1/internal/dispatch'){
-   try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
+   try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await reconcilePaidReceipts(repo);await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
   }
   if(url.pathname==='/v1/coach/audio'||url.pathname==='/v1/coach/audio/status'){await audio(req,res);return;}
   if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'||url.pathname==='/v1/coach/erase'){await coach(req,res);return;}

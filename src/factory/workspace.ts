@@ -11,6 +11,19 @@ const empty = (): Workspace => ({ version: 2, projects: [], revisions: [], plays
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 const id = () => crypto.randomUUID();
 const text = (s: unknown, max: number): s is string => typeof s === 'string' && s.length <= max;
+function ownedProject(data: Workspace, projectId: string, owner: string): Project {
+  const project = data.projects.find(p => p.id === projectId && p.owner === owner);
+  if (!project) throw Error('Choose a game in your own profile.');
+  return project;
+}
+function projectRevision(data: Workspace, project: Project, revisionId = project.headId): Revision {
+  const revision = data.revisions.find(r => r.id === revisionId && r.projectId === project.id);
+  if (!revision) throw Error('Version not found.');
+  return revision;
+}
+function checkHead(project: Project, expectedHeadId?: string): void {
+  if (expectedHeadId !== undefined && project.headId !== expectedHeadId) throw Error('This game changed elsewhere. Compare with the latest version before keeping this preview.');
+}
 export function validateWorkspace(value: unknown): Workspace {
   const d = value as Workspace;
   if (!d || d.version !== 2 || !Array.isArray(d.projects) || !Array.isArray(d.revisions) || !Array.isArray(d.plays) || d.projects.length > 50 || d.revisions.length > 500 || d.plays.length > 1000) throw Error('This workspace backup is not supported.');
@@ -52,46 +65,65 @@ export function migrateWorkspace(value: unknown): Workspace {
 }
 export class RevisionStore {
   private data: Workspace;
+  private raw: string | null;
   constructor(private storage: StoragePort) {
-    const raw=storage.getItem(WORKSPACE_KEY);
+    this.raw=storage.getItem(WORKSPACE_KEY);
     // Never silently replace corrupt data: caller can keep playing the original arcade.
-    this.data=raw===null?empty():migrateWorkspace(JSON.parse(raw));
+    this.data=this.raw===null?empty():migrateWorkspace(JSON.parse(this.raw));
   }
-  snapshot(): Workspace { return copy(this.data); }
+  private read(): Workspace {
+    const raw = this.storage.getItem(WORKSPACE_KEY);
+    if (raw !== this.raw) {
+      const next = raw === null ? empty() : migrateWorkspace(JSON.parse(raw));
+      this.data = next;
+      this.raw = raw;
+    }
+    // Cache by source bytes so an unsaved v1 migration retains its revision IDs.
+    return this.data;
+  }
+  snapshot(): Workspace { return copy(this.read()); }
+  private save(next: Workspace): void {
+    const checked = validateWorkspace(next);
+    const raw = JSON.stringify(checked);
+    try { this.storage.setItem(WORKSPACE_KEY,raw); } catch { throw Error('Could not save on this device. Your last working version is safe. Free some space and try again.'); }
+    this.data = checked;
+    this.raw = raw;
+  }
   private transaction<T>(mutate:(next:Workspace)=>T):T {
     assertRewardSourceWritable();
-    const next=copy(this.data), result=mutate(next);validateWorkspace(next);
-    try { this.storage.setItem(WORKSPACE_KEY,JSON.stringify(next)); } catch { throw Error('Could not save on this device. Your last working version is safe. Free some space and try again.'); }
-    this.data=next;return copy(result);
+    // Same-document stores share storage, not their snapshots. Keep the read,
+    // preconditions and write synchronous; the source-writer lock guards tabs.
+    const next=copy(this.read()), result=mutate(next);
+    this.save(next);return copy(result);
   }
-  project(projectId:string,owner:string):Project { const p=this.data.projects.find(p=>p.id===projectId&&p.owner===owner);if(!p)throw Error('Choose a game in your own profile.');return copy(p); }
-  revision(projectId:string,owner:string,revisionId?:string):Revision {const p=this.project(projectId,owner);const r=this.data.revisions.find(r=>r.id===(revisionId||p.headId)&&r.projectId===p.id);if(!r)throw Error('Version not found.');return copy(r);}
-  list(owner:string):Project[]{return copy(this.data.projects.filter(p=>p.owner===owner));}
-  history(projectId:string,owner:string):Revision[]{this.project(projectId,owner);return copy(this.data.revisions.filter(r=>r.projectId===projectId));}
+  project(projectId:string,owner:string):Project { return copy(ownedProject(this.read(),projectId,owner)); }
+  revision(projectId:string,owner:string,revisionId?:string):Revision {const d=this.read();return copy(projectRevision(d,ownedProject(d,projectId,owner),revisionId));}
+  list(owner:string):Project[]{return copy(this.read().projects.filter(p=>p.owner===owner));}
+  history(projectId:string,owner:string):Revision[]{const d=this.read();ownedProject(d,projectId,owner);return copy(d.revisions.filter(r=>r.projectId===projectId));}
   create(owner:string,game:GameId,name:string,config=defaults(game),revisionId:string=id(),drawingRigId?:string):Project {
     const checked=validateConfig(game,config);
     return this.transaction(d=>{const projectId=id();const p={id:projectId,owner,game,name:name.trim().slice(0,60)||'My remix',headId:revisionId};d.projects.push(p);d.revisions.push({id:revisionId,projectId,parentId:null,...(drawingRigId?{drawingRigId}:{}),config:checked,label:'Starting game',hypothesis:'',createdAt:new Date().toISOString(),state:'private'});return p;});
   }
-  commit(projectId:string,owner:string,config:Mechanics,label:string,hypothesis='',revisionId:string=id()):Revision {
-    const p=this.project(projectId,owner),checked=validateConfig(p.game,config);
-    return this.transaction(d=>{const source=d.revisions.find(r=>r.id===p.headId)!;const revision={id:revisionId,projectId,parentId:p.headId,...(source.drawingRigId?{drawingRigId:source.drawingRigId}:{}),config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);d.projects.find(x=>x.id===p.id)!.headId=revision.id;return revision;});
+  commit(projectId:string,owner:string,config:Mechanics,label:string,hypothesis='',revisionId:string=id(),expectedHeadId?:string):Revision {
+    return this.transaction(d=>{const p=ownedProject(d,projectId,owner);checkHead(p,expectedHeadId);const checked=validateConfig(p.game,config),source=projectRevision(d,p);const revision={id:revisionId,projectId,parentId:p.headId,...(source.drawingRigId?{drawingRigId:source.drawingRigId}:{}),config:checked,label:label.slice(0,300),hypothesis:hypothesis.slice(0,300),createdAt:new Date().toISOString(),state:'private' as const};d.revisions.push(revision);p.headId=revision.id;return revision;});
   }
-  keep(projectId:string,owner:string):void {const p=this.project(projectId,owner);this.transaction(d=>{d.projects.find(x=>x.id===p.id)!.keptId=p.headId;return true;});}
-  checkout(projectId:string,owner:string,revisionId:string):void {this.revision(projectId,owner,revisionId);this.transaction(d=>{d.projects.find(p=>p.id===projectId)!.headId=revisionId;return true;});}
-  undo(projectId:string,owner:string):void {const r=this.revision(projectId,owner);if(!r.parentId)throw Error('You are at the starting version.');this.checkout(projectId,owner,r.parentId);}
-  redo(projectId:string,owner:string,childId?:string):void {const current=this.revision(projectId,owner);const children=this.history(projectId,owner).filter(r=>r.parentId===current.id);const next=childId?children.find(r=>r.id===childId):children.at(-1);if(!next)throw Error('No later change on this branch. Choose another version in Compare.');this.checkout(projectId,owner,next.id);}
-  fork(projectId:string,owner:string,name:string,revisionId:string=id()):Project {
-    const p=this.project(projectId,owner),r=this.revision(projectId,owner);
-    return this.transaction(d=>{const project={id:id(),owner,game:p.game,name:name.trim().slice(0,60)||'My new remix',headId:revisionId};d.projects.push(project);d.revisions.push({...r,id:project.headId,projectId:project.id,parentId:null,sourceRevisionId:r.id,label:'Saved as a new game'});return project;});
+  keep(projectId:string,owner:string,expectedHeadId?:string):void {this.transaction(d=>{const p=ownedProject(d,projectId,owner);checkHead(p,expectedHeadId);p.keptId=p.headId;return true;});}
+  checkout(projectId:string,owner:string,revisionId:string,expectedHeadId?:string):void {this.transaction(d=>{const p=ownedProject(d,projectId,owner);checkHead(p,expectedHeadId);p.headId=projectRevision(d,p,revisionId).id;return true;});}
+  undo(projectId:string,owner:string):void {this.transaction(d=>{const p=ownedProject(d,projectId,owner),r=projectRevision(d,p);if(!r.parentId)throw Error('You are at the starting version.');p.headId=r.parentId;return true;});}
+  redo(projectId:string,owner:string,childId?:string):void {this.transaction(d=>{const p=ownedProject(d,projectId,owner),children=d.revisions.filter(r=>r.projectId===p.id&&r.parentId===p.headId);const next=childId?children.find(r=>r.id===childId):children.at(-1);if(!next)throw Error('No later change on this branch. Choose another version in Compare.');p.headId=next.id;return true;});}
+  fork(projectId:string,owner:string,name:string,revisionId:string=id(),expectedHeadId?:string):Project {
+    return this.transaction(d=>{const p=ownedProject(d,projectId,owner);checkHead(p,expectedHeadId);const r=projectRevision(d,p),project={id:id(),owner,game:p.game,name:name.trim().slice(0,60)||'My new remix',headId:revisionId};d.projects.push(project);d.revisions.push({...r,id:project.headId,projectId:project.id,parentId:null,sourceRevisionId:r.id,label:'Saved as a new game'});return project;});
   }
   record(projectId:string,owner:string,revisionId:string,outcome:PlayOutcome):PlayRecord {
-    this.revision(projectId,owner,revisionId);
-    return this.transaction(d=>{const play={id:id(),revisionId,outcome,reflection:''};d.plays.push(play);return play;});
+    return this.transaction(d=>{projectRevision(d,ownedProject(d,projectId,owner),revisionId);const play={id:id(),revisionId,outcome,reflection:''};d.plays.push(play);return play;});
   }
   reflect(playId:string,owner:string,reflection:string):void {
-    const play=this.data.plays.find(p=>p.id===playId);if(!play)throw Error('Play not found.');const revision=this.data.revisions.find(r=>r.id===play.revisionId)!;this.project(revision.projectId,owner);
-    this.transaction(d=>{d.plays.find(p=>p.id===playId)!.reflection=reflection.slice(0,300);return true;});
+    this.transaction(d=>{const play=d.plays.find(p=>p.id===playId);if(!play)throw Error('Play not found.');const revision=d.revisions.find(r=>r.id===play.revisionId)!;ownedProject(d,revision.projectId,owner);play.reflection=reflection.slice(0,300);return true;});
   }
-  export():string {return JSON.stringify(this.data,null,2);}
-  restore(raw:string):void {const next=migrateWorkspace(JSON.parse(raw));this.transaction(d=>{Object.assign(d,next);return true;});}
+  export():string {return JSON.stringify(this.read(),null,2);}
+  restore(raw:string):void {
+    assertRewardSourceWritable();
+    // Explicit replacement may recover corrupt source bytes; ordinary edits may not.
+    this.save(migrateWorkspace(JSON.parse(raw)));
+  }
 }
