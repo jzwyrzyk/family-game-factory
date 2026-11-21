@@ -116,10 +116,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:37.392Z",
-      "sourceDigest": "540a37c8973af219599963da90a95ab555fe3182a3ae7003d21f9e0ad7a26514",
-      "reviewOutcome": "updated",
-      "reviewReason": "Clarified the accepted guided-creation decision with actual gateway/private-coach/web dependency and asymmetric notebook rollback compatibility. Child ownership, readiness, explicit Build and Keep remain unchanged; no new release authorization is invented.",
+      "reviewedAt": "2026-11-21T07:54:38.657Z",
+      "sourceDigest": "49dcadbcf420021dca946d3dc1f61434440090e55819af37223f19b57237cfcf",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed retired-state staging recovery, traffic-only promotion and immediate Pages dispatch. The child-led conversation, enough-understanding gate, explicit Build and Keep, compatible notebooks, and existing paid audience/budget policy remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T06:51:38.849Z",
-      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
+      "reviewedAt": "2026-11-21T07:54:38.970Z",
+      "sourceDigest": "81d2a354729db3c07bcefa2e09cf81d8f199f6581626c7cd42ce266eadf6b8a1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
+      "reviewReason": "Recorded owner-returned retired coach metadata, configuration-only staging recovery without PUT replay, strict active promotion, immediate normal Pages dispatch after backend health, private journal recovery, and 127 passing offline deployment tests. Live promotion, publication and conversation acceptance remain unobserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
