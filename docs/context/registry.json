@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.184Z",
-      "sourceDigest": "57392b5aa735fe2782a4d43087b2f5cdb4385688b3c77c0d573469431352afbe",
-      "reviewOutcome": "updated",
-      "reviewReason": "Clarified faithful playable-first-version readiness, visible Build/check/reconnect actions, true chat outcomes, and explicit recoverable retries in doctrine and the accepted creation decision.",
+      "reviewedAt": "2026-11-21T16:27:13.436Z",
+      "sourceDigest": "fb5e4bc0370f53dae1bf7d5ddeca2e8a33b4f46ede6eadd3be40a1a350b5babf",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the final cutover receipt and narrow notebook-title evidence clarification: this is deployment and visible-interface evidence only, with product policy, access and authenticated chat/game acceptance unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T14:34:24.560Z",
-      "sourceDigest": "64860b987176b12c2989d5aa7545db91d586735753fa3be4d24e33f100ad5841",
+      "reviewedAt": "2026-11-21T16:27:13.696Z",
+      "sourceDigest": "b3d9997d6683ad52b1c52ac1745e5510a7651778e26ff8356db6275e59adf43b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source repair on merged PR112, observed PR108 Pages marker and separately reported gateway repair, hosted browser/package gate requirement and compatible gateway/private-coach/web rollout with unchanged worker and settings.",
+      "reviewReason": "Recorded completed PR115 backend and Pages delivery, exact public source/origins, visible updated Build controls, and explicitly limited cached-update continuity to the existing notebook title; marked earlier pending receipt as historical.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
