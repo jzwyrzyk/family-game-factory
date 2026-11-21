@@ -31,11 +31,13 @@ and any project-wide log-view grant.
 
 The filter selects entries, and selected entries can still have sensitive fields.
 Before binding the reader, configure bucket restricted fields `textPayload`,
-`jsonPayload`, `protoPayload`, `httpRequest`, `labels`, `sourceLocation`,
-`operation`, `trace`, and `spanId`. In an isolated test bucket with synthetic
-markers, test the effective reader can see timestamps, platform resource labels
+`jsonPayload`, `protoPayload`, `httpRequest`, `labels`, and `sourceLocation`.
+Cloud Logging does not support field restrictions for `operation`, `trace`,
+or `spanId`, so the sink drops entries containing those fields. This can
+exclude request errors with trace correlation. In an isolated test bucket
+with synthetic markers, test the effective reader can see timestamps, platform resource labels
 and severity, while marker values are absent even with an unfiltered direct API
-request. Verify the platform accepts the full restriction list. If any required
+request. Verify the restrictions and sink exclusions independently using controlled entries. If any required
 field cannot be restricted, keep the view inaccessible and use a metadata-only
 publisher instead. Separately verify broad log-view and field-access permissions
 are absent for the diagnostic identity. Grant only `roles/logging.viewAccessor`

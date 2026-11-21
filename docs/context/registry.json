@@ -620,10 +620,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T05:02:53.799Z",
-      "sourceDigest": "0efe7b101c9d3f6e290e47db7cc166d217885c1785bea1993117fb9b6c5e3358",
+      "reviewedAt": "2026-11-21T05:03:54.018Z",
+      "sourceDigest": "e8a660d28e07177b4f961f37bf2579a0e31e6cc9263c17144336335f45bd4461",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the protected-ref job guard, documented current GitHub immutable OIDC subjects, and retained narrow sink-writer verification.",
+      "reviewReason": "Verified supported Logging restriction fields in the SDK API schema and excluded unsupported correlation fields at ingestion.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
