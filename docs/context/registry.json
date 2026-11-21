@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T07:17:33.152Z",
-      "sourceDigest": "54c8a21d7f36bf7f70c43db6b799548c6ce5616c335cf8d711bd706e5f941dc7",
+      "reviewedAt": "2026-11-21T07:35:26.612Z",
+      "sourceDigest": "c168831d63bb423458036ae8320f9269c101ac7984d1bedb7afb1e0cf2dba6fd",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated the previously reviewed pinned installation and worker-rotation helpers with current main c43a181, preserving PR108 source, packaging, canonical records and unaffected registry reviews. Added the owner-confirmed config9 rotation, initial INPUT_RESPONSE_FAILED rejection and subsequent ADULT_PILOT_ACCESS_REQUIRED interruption, with both cleanups verified and playable acceptance still outstanding. Kept PR109 and its coordinated gateway/coach/web release separate; no new frontend deployment or specific grant-expiry cause is claimed.",
+      "reviewReason": "Documented the read-only build-status helper extension that emits only allowlisted saved quality findings with explicit previous-attempt provenance. Verified bounded parsing, omission of unknown/free-text values, boolean report-fingerprint presence and side-effect-free imports in six passing synthetic tests. Existing cloud reads, deployment permissions, runtime behavior and canonical in-progress-game evidence are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
