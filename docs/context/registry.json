@@ -116,10 +116,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T05:39:45.013Z",
-      "sourceDigest": "f951549de77abc9316053136eced5e9cd42768699d0aaeabca9d8164d999bfc4",
+      "reviewedAt": "2026-11-21T06:51:37.392Z",
+      "sourceDigest": "540a37c8973af219599963da90a95ab555fe3182a3ae7003d21f9e0ad7a26514",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner's November 21 clarification: contextual conversation must develop the child's own answers, with no supplied-answer chips, delegation shortcut or premature first Build. Updated doctrine, child-interface guidance and the dated decision without changing existing Keep, learning, privacy or generation authority.",
+      "reviewReason": "Clarified the accepted guided-creation decision with actual gateway/private-coach/web dependency and asymmetric notebook rollback compatibility. Child ownership, readiness, explicit Build and Keep remain unchanged; no new release authorization is invented.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -431,10 +431,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:50.701Z",
-      "sourceDigest": "993d1bc5ede9a3befd153f0c288c33901280d9cc60e39b879035c0aa119f8183",
+      "reviewedAt": "2026-11-21T06:51:37.941Z",
+      "sourceDigest": "dd4bd3d500e0151bc5e433b5fb2b809f9e387eb581c303a2573a71a6dab1e14f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the authenticated read-only companion endpoint and gateway/preview COPY inputs against merged quality artifacts. It returns bounded scene data through the existing revision audience check with no-store, while approved game art and private capture storage retain main's contracts."
+      "reviewReason": "Reviewed gateway Docker dependency failure and fixed the archive, Docker ignore allowlist and image COPY graph. Updated service-image guidance for all three archive-built images and backend-first creation-context compatibility. No provider configuration, worker pin, IAM or production service mutation is included."
     },
     {
       "id": "generation",
@@ -479,10 +479,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T05:39:47.591Z",
-      "sourceDigest": "a4ea0a11a3176c4c20fb25be655d1ec29a8c1bdbc5e55925b8629f4734cb6bc2",
+      "reviewedAt": "2026-11-21T06:51:38.389Z",
+      "sourceDigest": "21de22fb6e723f266423e2a5789455e0b256a75390abda620d3a096e034018fb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed contextual policy, optional creation request/reply contract, saved review validation, exact-child evidence, pending/draft guards and removal of helper/delegation first-build shortcuts. Updated Gold Standard and architecture; distinguished host provenance checks from model coherence judgment and documented coordinated coach/browser rollout. Full corrected coach suite passed; Docker source-set bundle was checked."
+      "reviewReason": "Reviewed shared gateway/private-executor validation and private coach archive dependencies. Documented old-client response compatibility, new-context live acceptance and compatible notebook-reader requirements for frontend fallback; status probes alone do not certify the new contract."
     },
     {
       "id": "adult-privacy",
@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T05:39:48.472Z",
-      "sourceDigest": "71a9543753e05920fa7b47d872d310068ae5efab246712368461282416fd9ea9",
+      "reviewedAt": "2026-11-21T06:51:38.849Z",
+      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the corrected candidate branch/base, final asset identities, passing local checks, inspected screenshots and remaining live-model/device acceptance. No merge, deployment or activation is claimed; existing production sandbox pins and separately authorized fixed-source release remain unchanged.",
+      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
