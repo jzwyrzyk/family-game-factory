@@ -238,6 +238,32 @@ def require_consumed_config_mount(service):
             and items[0].get("path") == "config.json", "GATEWAY_CONFIG_SECRET_PATH_UNVERIFIED")
 
 
+
+def serving_revision_summary(name, service, continuity):
+    """Require one healthy serving revision. Tolerate only the known retired
+    coach candidate, never a non-ready or split-traffic gateway/preview."""
+    status = service.get("status", {})
+    require(continuity.ready(service), "SERVICE_NOT_SINGLE_READY_REVISION")
+    ready = status.get("latestReadyRevisionName")
+    created = status.get("latestCreatedRevisionName")
+    require(isinstance(ready, str) and bool(ready) and isinstance(created, str) and bool(created),
+            "SERVICE_NOT_SINGLE_READY_REVISION")
+    retired = created != ready
+    if retired:
+        # Owner-observed 2026-11-20: coach 00003 was retired, while 00002
+        # remains Ready and receives exactly 100% of traffic. Do not broaden
+        # this exception to arbitrary future revisions or other services.
+        require(name == "factory-coach-private"
+                and created == "factory-coach-private-00003-dqb"
+                and ready == "factory-coach-private-00002-48r"
+                and any(c.get("type") == "ConfigurationsReady" and c.get("status") == "True"
+                        and c.get("reason") == "Retired" for c in status.get("conditions", []))
+                and all(t.get("revisionName") != created or t.get("percent") in (None, 0)
+                        for t in status.get("traffic", [])),
+                "SERVICE_NOT_SINGLE_READY_REVISION")
+    return {"revision": ready, "readyAt100Percent": True,
+            "knownRetiredNonServingCoachRevision": retired}
+
 def audit(c):
     services = {}
     service_report = {}
@@ -246,12 +272,11 @@ def audit(c):
                                   "--project=" + PROJECT, "--region=" + REGION, "--format=json"])
         status = service.get("status", {})
         require(service.get("metadata", {}).get("name") == name, "SERVICE_IDENTITY_MISMATCH")
-        require(c.ready(service) and status.get("latestCreatedRevisionName") == status.get("latestReadyRevisionName"),
-                "SERVICE_NOT_SINGLE_READY_REVISION")
+        revision_report = serving_revision_summary(name, service, c)
         if name in ORIGINS:
             require(status.get("url") == ORIGINS[name], "SERVICE_ORIGIN_MISMATCH")
         env = c.env_of(service)
-        service_report[name] = {"revision": status["latestReadyRevisionName"], "readyAt100Percent": True}
+        service_report[name] = revision_report
         if name != "factory-preview":
             service_report[name]["adultFlags"] = {k: flag(env.get(k)) for k in ADULT_FLAGS}
         if name == "factory-gateway":
