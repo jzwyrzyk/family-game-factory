@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:34:48.469Z",
-      "sourceDigest": "de16e53771055a25d74b87cc548e29938bfe93ded10b4074f27def196158efe0",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed third-head screenshots and preserved native learning guards while correcting More reopen timing, natural-height Dragon cards, readable Robot directions and separate portrait packing/helper space.",
+      "reviewedAt": "2026-11-21T21:36:55.413Z",
+      "sourceDigest": "60d76c6f9083ff71e302036a62cae29673830c67e82c15a84c878a8069ec1901",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The scoped profile-menu min-width correction enforces the existing documented containment inside More; profile handlers, ownership, learning levels and navigation behavior remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:34:50.057Z",
-      "sourceDigest": "cd90da3a9c08d0b6dbb7fe988ca99cfe787a3f4e173bb5bcf32404997ba789d7",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded 32-of-35 third-head game passes and the three precise remaining failures; retained hit/bounds checks, added deliberate scrolled-menu pointer/keyboard reopening and settled packing label/control assertions.",
+      "reviewedAt": "2026-11-21T21:36:56.441Z",
+      "sourceDigest": "11b25ef33d7b0304b25cc99c2966cfb23ec51a665ed89086c53dad4fc7c43ad5",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing player-menu contract now checks every actual profile choice for whole-pill viewport/menu containment, typography, target size and hit testing; no acceptance criterion or documented behavior was weakened.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

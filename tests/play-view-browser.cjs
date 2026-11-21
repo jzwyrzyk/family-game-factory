@@ -237,13 +237,18 @@ async function checkMore(page, label) {
 async function checkPlayerMenu(page, label) {
   await page.locator('#studioMore > summary').click();
   await page.locator('#studioProfileMenu > summary').click();
-  const choice = page.locator('#studioProfileMenu .profile-choice').first();
-  await choice.scrollIntoViewIfNeeded();
-  assert.equal(await choice.evaluate(node => {
-    const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && r.height >= 48 &&
-      parseFloat(getComputedStyle(node).fontSize) >= 18 && (hit === node || node.contains(hit));
-  }), true, label + ': the existing player choices remain readable and reachable inside More');
+  const choices = page.locator('#studioProfileMenu .profile-choice');
+  assert.ok(await choices.count() > 0, label + ': the existing player choices are present');
+  for (const [index, choice] of (await choices.all()).entries()) {
+    await choice.scrollIntoViewIfNeeded();
+    assert.equal(await choice.evaluate(node => {
+      const r = node.getBoundingClientRect(), menu = node.closest('.studio-more-actions').getBoundingClientRect();
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && r.height >= 48 &&
+        r.left >= menu.left && r.right <= menu.right && r.top >= menu.top && r.bottom <= menu.bottom &&
+        parseFloat(getComputedStyle(node).fontSize) >= 18 && (hit === node || node.contains(hit));
+    }), true, label + ': player choice ' + (index + 1) + ' remains readable and reachable inside More');
+  }
   await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-player-menu.png` });
   await page.locator('#studioProfileMenu > summary').click();
   await page.locator('#studioMore > summary').click();
