@@ -45,7 +45,13 @@ Preserving ownership is not withholding help. Offer help that leaves meaningful 
 
 Start with the idea and what the child thinks would make it fun. Resolve meaningful missing decisions: core actions, objective/winning, failure/recovery (including a deliberate no-loss design), scoring or its deliberate absence, visual style/characters/drawings, challenge/progression and unusual mechanics. Do not ask answered questions or impose a two-question cap. Do not turn this into a mandatory long form.
 
-Allow child answers, “you decide”, alternatives, and revision. Mark AI suggestions as suggestions; never rewrite their origin as child-authored. Confirm a compact game-plan card before the first real build. Preserve the fun intention as an evaluation anchor. Parent learning/privacy/spending settings are inherited, not configured by the child.
+The owner's [November 21 clarification](../decisions/2026-11-20-guided-chat-creation.md) requires a conversation coach that guides children to their own answers. Do not turn creation into tapping suggested answers, and do not offer **You choose** or **Choose the rest** to complete the design for them. An invitation to give the child ideas can provide perspective, a brief explanation or clearly attributed inspiration in conversation when requested; it is not a clickable answer menu or permission to generate a new game from the helper's choices. Preserve alternatives, the child's own wording and their right to revise an earlier choice. Parent learning/privacy/spending settings remain inherited.
+
+No new game may be created until there is enough coherent child-provided detail to make a reasonable game. The coach follows the actual idea across turns and asks at most one useful open question about a material gap. Understand what the player does, what happens as a result or what they are trying to make happen, and the intended experience. Resolve additional rules when this particular idea depends on them. Do not equate readiness with eight completed fields, a turn count, word count, keyword matches, an accepted helper proposal or an old delegation flag. A sufficiently clear child-authored idea can be ready without an interview; an incomplete one stays in conversation even if Build is requested.
+
+The default workspace is chat, free text or editable dictation, and action buttons. The full plan and other tools remain expandable for inspection, but neither a hidden plan action nor an old approval field may bypass first-creation readiness. Readiness must be grounded in the current child's stated intent, become stale when material choices change, and never itself submit a job. The child still explicitly chooses Build after the coach has enough information. Preserve the fun intention as an evaluation anchor.
+
+Keep experiment controls, explanation preferences and longer support behind a disclosure. Build compiles the child's coherent saved intent without inserting the compiled prompt into the transcript. Lifecycle progress belongs in the focused handoff or concise status, with optional play after an acknowledged build. Background readiness cannot demand a response, choose Keep or interrupt required learning. A limited local fallback must identify itself honestly; it cannot pretend a live coach has understood the idea or grant readiness through a scripted questionnaire.
 
 ## Experiments and editions
 
@@ -59,7 +65,7 @@ The child may play variants serially, use notes or remember impressions mentally
 
 ## Reflection without homework
 
-One useful question at a time, short exchanges, and no compulsory answer before play or implementation. Do not ask for reasons already given. Accept showing, pointing, drawing and brief speech where supported; reading/writing skill must not define creative control. Teach a small concept when useful rather than delivering a lecture first.
+Optional reflection uses one useful question at a time and short exchanges. It is not a prerequisite for playing an existing game or implementing a sufficiently specified change. First creation still requires coherent child-stated intent as described above. Do not ask for reasons already given. Accept showing, pointing, drawing and brief speech where supported; reading/writing skill must not define creative control. Teach a small concept when useful rather than delivering a lecture first.
 
 Avoid stacking math, reflection and version dialogs. A math overlay has priority; optional reflection comes later. Respect skipped coaching for the current round/session. A loss or slow response is not evidence of emotions, diagnosis, aptitude, or motivation. Winning does not prove enjoyment, and a single play is not proof of a better design.
 

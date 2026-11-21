@@ -1,4 +1,4 @@
-const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,sendChildMessage}=require('./studio-entry.cjs');
 /* jems final premerge screenshot review: real built app, synthetic local browser data. */
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -36,9 +36,10 @@ async function pages(device,viewport){
   // mobile Game/Talk tabs until a playable game exists.
   await p.locator('#studioPrompt').fill('A cat invents a rocket-powered donut car');
   await shot(p,device,'02-create-idea-conversation');
-  await p.locator('#studioTalk').click();
-  await p.waitForFunction(()=>!!document.querySelector('.jems-delight-toast[data-kind="idea"]'));
-  await shot(p,device,'02-first-idea-celebration');
+  await sendChildMessage(p,'A cat invents a rocket-powered donut car');
+  assert.equal(await p.locator('#coachGuidedChoices').count(),0,'questions invite the child’s own words');
+  assert.equal(await p.locator('.jems-delight-toast[data-kind="idea"]').count(),0,'guided creation keeps the next question clear');
+  await shot(p,device,'02-first-guided-question');
   // New invention deliberately hides old-game tools; compare versions from a playable game.
   await home(p);await p.locator('[data-starter="gum"]').click();
   await p.locator('.gum-play').waitFor({state:'visible'});

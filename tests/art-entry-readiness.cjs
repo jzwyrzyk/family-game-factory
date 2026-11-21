@@ -92,7 +92,10 @@ async function delayedConfig(browser,base){
   if(await page.locator('#studioWelcome').isVisible())await completeWelcome(page,'nova');
   else await page.locator('#studioNavCreate').click();
   await page.locator('#page-studio').waitFor({state:'visible'});
-  assert.equal(await page.locator('#studioUseDrawing').isVisible(),true,'the picture entrance is available in a brand-new idea composer');
+  assert.equal(await page.locator('#studioUseDrawing').isVisible(),false,'extra tools do not crowd the new-game conversation');
+  assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'new-game tools start collapsed');
+  await page.locator('#studioMoreChoices > summary').click();
+  assert.equal(await page.locator('#studioUseDrawing').isVisible(),true,'the same guarded picture entrance is available in More choices');
   assert.equal(await page.locator('#studioUseDrawing').textContent().then(value=>value.trim()),'Use my picture');
   const draft='A kite catches purple bubbles for this player.';
   await page.locator('#studioPrompt').fill(draft);
@@ -128,7 +131,7 @@ async function delayedConfig(browser,base){
   assert.equal(sibling.draft,draft,'using the first player’s art keeps the sibling’s saved idea intact');
   assert.deepEqual(posts,[],'local uploads, scene use and configuration readiness make no POST or provider request');
   assert.deepEqual(errors,[],'no browser exception during delayed initialization');
-  console.log('PASS Art entry with delayed configuration: phone upload/focus, profile switch, late readiness, visible home/composer entrances, private library, movement and editable scene');
+  console.log('PASS Art entry with delayed configuration: phone upload/focus, profile switch, late readiness, home/expanded-chat entrances, private library, movement and editable scene');
  }catch(error){await page.screenshot({path:path.join(output,'delayed-config-failure.png'),fullPage:true}).catch(()=>{});throw error;}
  finally{releaseConfig();await context.close();}
 }

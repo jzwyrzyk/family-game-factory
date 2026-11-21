@@ -21,6 +21,8 @@ const currentSession=page=>page.evaluate(()=>{
 const runtime=page=>page.evaluate(()=>FG.runtime.snapshot());
 const mainId=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects[0].headId);
 async function more(page){if(!await page.locator('#studioMore').evaluate(node=>node.open))await page.locator('#studioMore > summary').click();}
+async function moreChoices(page){const choices=page.locator('#studioMoreChoices');if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();}
+async function talk(page){if(!await page.locator('#studioPrompt').isVisible())await page.click('#studioChange');}
 async function player(page,index){if(!await page.locator('#studioProfileMenu').evaluate(node=>node.open))await page.locator('#studioProfileMenu > summary').click();await page.locator('.profile-choice').nth(index).click();}
 async function assertTargets(page,selectors){
  for(const selector of selectors){const box=await page.locator(selector).boundingBox();assert.ok(box&&box.width>=44&&box.height>=44,`${selector} is a visible target of at least 44 × 44 CSS pixels`);}
@@ -202,20 +204,25 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await exploreWelcome(page);
   await openPhysicalGum(page);await localTest(page);
   const originalCandidate=(await currentSession(page)).candidate.id,originalMain=await mainId(page);
-  await page.click('#studioChange');await page.fill('#studioPrompt','Replace the rocket with a bouncing banana maze');await page.click('#coachTry');
+  await page.click('#studioChange');await page.fill('#studioPrompt','Replace the rocket with a bouncing banana maze');await page.click('#studioSend');
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='testing'));
+  await page.waitForFunction(()=>document.getElementById('studioBuildHandoff')?.open&&document.getElementById('studioBuildHandoff')?.dataset.phase==='testing');
+  assert.equal(await page.locator('#studioBuildHandoffPlay').isEnabled(),true,'an accepted build actively offers play while waiting');
+  await page.locator('#studioBuildHandoffStay').click();
   assert.equal(requests.length,1);assert.equal(await page.inputValue('#studioPrompt'),'','the submitted idea clears only after the durable acknowledgement');
-   assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'the child can see a build while continuing to play');
+   assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'extra tools remain optional in chat');
+   await moreChoices(page);
+   assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'the child can inspect background build controls by choice');
    // Conversation during a slow remote build must remain child-led and must
    // not dispatch a second job, change the selected game or interrupt learning.
-   await page.click('#studioChange');await page.fill('#studioPrompt','Could the rocket have a funny secret name?');
+   await talk(page);await page.fill('#studioPrompt','Could the rocket have a funny secret name?');
    await page.click('#studioTalk');
    await page.waitForFunction(()=>document.getElementById('coachModeStatus')?.textContent.includes('Local reflection'));
    assert.equal(requests.length,1,'conversation cannot dispatch another build');
    assert.equal((await currentSession(page)).job?.status,'testing','talk preserves the remote job');
    assert.equal((await currentSession(page)).experiments.length,1,'talk cannot invent a game revision');
    // A slow AI test cannot block a second, instant local experiment.
-   await page.click('#studioChange');await page.fill('#studioPrompt','Give me 12 gum sticks');await page.click('#studioSend');
+   await talk(page);await page.fill('#studioPrompt','Give me 12 gum sticks');await page.click('#studioSend');
    await expectBudget(page,12);
    const concurrentCandidate=(await currentSession(page)).candidate.id;
    assert.notEqual(concurrentCandidate,originalCandidate,'the quick edit is an independent recoverable experiment');
@@ -226,7 +233,9 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
    const laterDraft='My next idea is a tiny moon elevator. Keep this thought for later.';
   await page.fill('#studioPrompt',laterDraft);await page.click('#studioPlay');await expectBudget(page,12);
   ready=true;await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='ready'));
-  await page.waitForSelector('#studioReady');
+  assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'background completion never reopens the build handoff over play');
+  const readyFromPlay=page.locator('#studioBuildShelf').getByRole('button',{name:'Try ready test',exact:true});
+  await readyFromPlay.waitFor({state:'visible'});
   const completed=await currentSession(page);
   assert.equal(completed.draft,laterDraft,'the later draft survives job completion');assert.equal(await page.inputValue('#studioPrompt'),laterDraft);
   assert.equal(completed.candidate.id,concurrentCandidate,'a background build cannot select itself');assert.equal(completed.selectedTest,concurrentCandidate);
@@ -238,7 +247,7 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   // Hold the real preview endpoint after an explicit child choice. A newer
   // decision to think/type must win over that in-flight network response.
   const heldRequest=page.waitForRequest(request=>request.url()===api+'/v1/revisions/journey-ready/preview');heldRequest.catch(()=>{});
-  await page.click('#studioReady');await heldRequest;
+  await readyFromPlay.click();await heldRequest;
   assert.equal((await runtime(page)).disposed,false,'fetching a preview keeps the currently playable game available');
   assert.equal((await currentSession(page)).candidate.id,concurrentCandidate,'selection waits for an accepted preview response');
   if(device==='mobile')await page.click('[data-studio-tab="talk"]');else await page.click('#studioChange');

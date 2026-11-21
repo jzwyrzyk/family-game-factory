@@ -8,6 +8,18 @@ Use a clear heading, the object being chosen and a short action label. Add one s
 
 Keep the actual question, necessary passage or diagram, answer controls, useful status, and optional help. Parent-level assessment explanations belong in Grown-ups. For example, listening support must still be recorded correctly without placing an explanation of independent-reading evidence beside the child's Read this to me button. Longer directions can live behind clearly named Help or More controls. Real errors and recovery actions must remain visible and understandable.
 
+### Creation is a guided conversation
+
+The owner's [creation refinement and November 21 clarification](../decisions/2026-11-20-guided-chat-creation.md) make the ordinary new-game screen **a conversation coach, one input and useful action buttons**. The coach responds to what the child actually says and asks one useful open question when more understanding is needed. The child supplies the creative answer through typing or reviewed dictation. Do not offer suggested-answer chips, a menu of feelings or styles, or a **Choose the rest** shortcut. Buttons support actions such as Send, Speak and the eventual explicit Build; they do not supply the child's game design.
+
+New-game creation stays blocked until the child has supplied enough coherent detail for a reasonable game. The coach should understand the intended action, what happens because of it and the experience the child wants, then resolve only material gaps for that idea. This is not a fixed interview or a compulsory planning form. Do not repeat an answered question or demand a score, losing condition or progression system for a game that does not need one. A short conversational confirmation can precede Build once the child's actual idea is ready; a delegated or helper-authored plan cannot stand in for it.
+
+Put the detailed plan, experiment settings, explanation controls and longer help behind an optional disclosure. Avoid competing hero copy, repeated save notices and several different help panels around the current question. Keep the child's own idea and relevant choices in the conversation; compiled build instructions, technical status updates and raw job output belong outside it. Minimal presentation must not erase saved provenance or hide a real error.
+
+Keep decorative reward popups out of an active creation conversation so they cannot cover the question or answer controls. Earned levels and gem totals still update; this presentation choice does not alter receipts, learning evidence or normal celebrations in play.
+
+An explicit Build receives immediate, focused acknowledgement. Pending submission and an accepted build use different truthful states. Once accepted, offer **Play while I wait** and **Stay here** in the focused handoff. Use approved artwork, short copy and large controls; no fictitious time estimate is needed. Ordinary background readiness remains a visible, explicit action and never reopens a dismissed dialog or interrupts play. The [first-creation contract](../child-journey/FIRST-CREATION.md#build-handoff-and-recovery) defines the state and focus boundaries.
+
 ## Readability holds on phones
 
 | Element | Product target |

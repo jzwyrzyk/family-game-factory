@@ -31,7 +31,7 @@ function coachingHarness(game:'new'|'gum'='new'){
  for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
  const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
  const storage=new Memory(),book=new StudioNotebook(storage),initial=game==='new'?book.create('child-one','new','Synthetic new game'):book.create('child-one','gum','Synthetic game','fixture-project');let active=initial;
- const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[],requests:any[]=[];let playCalls=0;
+ const statuses:{text:string;error:boolean}[]=[],pending:{resolve:(response:Response)=>void;reject:(error:Error)=>void;signal:AbortSignal}[]=[],milestones:string[]=[],requests:any[]=[],buildRequests:{prompt:string;displayText?:string;compiledPlan?:boolean}[]=[];let playCalls=0,interceptBuildRequests=false;
  Object.defineProperty(globalThis,'document',{configurable:true,value:documentPort});Object.defineProperty(globalThis,'window',{configurable:true,value:{FG:{learning:{active:false}},dispatchEvent:(event:Event)=>{if(event.type==='jems:milestone')milestones.push((event as CustomEvent<{kind:string}>).detail.kind);return true;}}});
  Object.defineProperty(globalThis,'fetch',{configurable:true,value:(url:string,options:RequestInit={})=>{
   // Session preflight is separate from the model reply: no message is queued
@@ -42,9 +42,9 @@ function coachingHarness(game:'new'|'gum'='new'){
  const coach=installCoaching({notebook:book,current:()=>book.get(active.id,active.owner),owner:()=>active.owner,
   message:(session,role,text)=>{book.message(session.id,session.owner,role,text);},render(){},status:(text,error=false)=>{statuses.push({text,error});},
   config:()=>({version:1,mode:'remote',apiBaseUrl:'https://api.example',previewOrigin:'https://preview.example'}),localSupported:()=>false,
-  tryRequest:async()=>{},rules:()=>'',playTest:async()=>{},playMain:async()=>{playCalls++;},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
+  tryRequest:async(prompt,_origin,_depth,displayText,compiledPlan)=>{buildRequests.push({prompt,displayText,compiledPlan});if(interceptBuildRequests)await coach.intercept(prompt,true);},rules:()=>'',playTest:async()=>{},playMain:async()=>{playCalls++;},combineTests:async()=>{},pauseForThinking:()=>true,showTalk(){}
  });coach.openSession();
- return {coach,book,storage,statuses,pending,milestones,requests,get playCalls(){return playCalls;},get,
+ return {coach,book,storage,statuses,pending,milestones,requests,buildRequests,routeBuildRequestsThroughCoach:()=>{interceptBuildRequests=true;},get playCalls(){return playCalls;},get,has:(id:string)=>elements.has(id),
   async awaitModelRequest(){
    // A successful auth preflight adds asynchronous microtasks before the model call.
    // Wait for the real call rather than assuming it is queued in the same tick.
@@ -88,7 +88,7 @@ await test('cross-profile selection and notes rejected',()=>{assert.throws(()=>n
 await test('failed shelf write is atomic',()=>{const old=mem.getItem(STUDIO_KEY);mem.fail=true;assert.throws(()=>nb.saveExperiment(s.id,owner,c('failed',17)));mem.fail=false;assert.equal(mem.getItem(STUDIO_KEY),old);});
 await test('unknown and cyclic test parents rejected',()=>{assert.throws(()=>experiment(c('z',5),nb.get(s.id,owner).experiments!,['z']));});
 await test('helper provenance remains after child adopts an idea',()=>{nb.update(s.id,owner,x=>{x.design!.ideas.push({id:'idea1',text:'Try a different interaction',origin:'helper',adopted:true});});assert.equal(nb.get(s.id,owner).design!.ideas[0].origin,'helper');});
-await test('game plan permits no-score/no-loss and explicit delegation',()=>{const d=freshDesign();for(const k of PLAN_FIELDS)d.plan[k]={value:k==='score'||k==='setback'?'None':'A choice',origin:'child',accepted:true,delegated:false};assert.deepEqual(missingPlan(d),[]);d.plan.special={value:'',origin:'helper',accepted:false,delegated:true};assert.deepEqual(missingPlan(d),[]);});
+await test('legacy design storage preserves no-score/no-loss and delegation without granting build authority',()=>{const d=freshDesign();for(const k of PLAN_FIELDS)d.plan[k]={value:k==='score'||k==='setback'?'None':'A choice',origin:'child',accepted:true,delegated:false};assert.deepEqual(missingPlan(d),[]);d.plan.special={value:'',origin:'helper',accepted:false,delegated:true};assert.deepEqual(missingPlan(d),[]);});
 await test('unaccepted helper plan is not called child-approved',()=>{const d=freshDesign();d.plan.goal={value:'Rescue the dragon',origin:'helper',accepted:false,delegated:false};assert.ok(missingPlan(d).includes('goal'));});
 await test('record rejects inferred emotions, secret fields, malformed evidence',()=>{assert.throws(()=>validateDesign({...freshDesign(),emotion:'frustrated'}));assert.throws(()=>validateDesign({...freshDesign(),plan:{token:{value:'secret'}}}));assert.throws(()=>validateExperiments([{...nb.get(s.id,owner).experiments![0],url:'https://secret'}]));});
 const context:CoachContext={message:'I dislike aiming',mode:'discuss',game:'dragon',plan:{fun:{value:'Exciting close calls',origin:'child',accepted:true,delegated:false}},friction:'',helpLevel:0,support:'balanced',conversation:[],observations:[],tests:[]};
@@ -115,7 +115,8 @@ await test('safety refusal or private information never falls into unreviewed lo
    const turn=h.coach.discuss('discuss');await h.awaitModelRequest();
    h.pending.shift()!.resolve(new Response(JSON.stringify({errorCode:code}),{status:422}));
    await turn;
-   assert.match(h.session().messages.at(-1)!.text,/safe game ideas/);
+   assert.match(h.session().messages.slice(-2).map(m=>m.text).join(' '),/safe game ideas/);
+   assert.equal(h.session().messages.at(-1)!.text,'What would you like to create instead?');
    assert.match(h.get('coachModeStatus').textContent,/could not be used safely/);
    assert.equal(h.session().job,null);
    assert.equal(h.session().experiments?.length,0);
@@ -180,7 +181,7 @@ await test('just let me play returns to the existing game without interviewing o
  }finally{h.dispose();}
 });
 await test('a delayed coach reply preserves a newly typed draft before its debounce saves',async()=>{
- const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();assert.deepEqual(h.milestones,['idea'],'first persisted child idea emits its earned milestone');
+ const h=coachingHarness();try{h.input('studioPrompt','I want a different way to move');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();assert.deepEqual(h.milestones,[],'saving the first idea does not place a cosmetic popup over the next action');
   h.input('studioPrompt','Maybe the penguin could bounce');h.resolve(reply);await turn;
   assert.equal(h.get('studioPrompt').value,'Maybe the penguin could bounce');assert.equal(h.session().draft,'Maybe the penguin could bounce');assert.equal(h.session().messages[0].text,'I want a different way to move');assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
@@ -195,7 +196,7 @@ await test('an old rejected coach request cannot write into a new child or inter
  const h=coachingHarness();try{h.input('studioPrompt','First child idea');const old=h.coach.discuss('discuss');await h.awaitModelRequest();const oldRequest=h.pending.shift()!;
   h.switchChild();h.input('studioPrompt','Second child idea');const current=h.coach.discuss('discuss');await h.awaitModelRequest();oldRequest.reject(Error('Late aborted network request'));await old;
   assert.match(h.get('coachModeStatus').textContent,/thinking about your idea/i);assert.deepEqual(h.session().messages.map(m=>m.text),['Second child idea']);
-  h.resolve(reply);await current;assert.equal(h.session().messages.length,2);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
+  h.resolve(reply);await current;assert.deepEqual(h.session().messages.map(m=>m.role),['child','helper','helper']);assert.ok(h.session().messages.every(m=>!m.text.includes('First child')));assert.equal(h.statuses.some(s=>s.error),false);
  }finally{h.dispose();}
 });
 await test('a failed plan autosave keeps the visible answer through another save and can retry',()=>{
@@ -216,6 +217,151 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
  const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
   assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);
+ }finally{h.dispose();}
+});
+
+const ownGame='I steer a purple cat over clouds. Landing makes a cloud bounce. I want calm discoveries. It is a moon painted with soft colors. There are no points and no losing; I just explore.';
+const ownEvidence={action:'I steer a purple cat over clouds.',consequence:'Landing makes a cloud bounce.',experience:'I want calm discoveries.',world:'It is a moon painted with soft colors.'};
+const readyReply:CoachReply={...reply,text:'Your cat can explore bouncy moon clouds.',question:null,childDecisions:[{field:'action',quote:ownEvidence.action},{field:'fun',quote:ownEvidence.experience},{field:'style',quote:ownEvidence.world},{field:'goal',quote:'I just explore.'}],creationReadiness:{ready:true,evidence:ownEvidence,unresolved:[]}};
+const unresolved=(question:string):CoachReply=>({...reply,text:'Let’s think about the moment you want to play.',question,creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:''},unresolved:[question]}});
+async function sendTurn(h:ReturnType<typeof coachingHarness>,text:string,result:CoachReply){h.input('studioPrompt',text);const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.resolve(result);await turn;}
+
+await test('premature first Build preserves the draft and requires the conversation, with no form or answer chips',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt','A cat jumps between donuts');
+  assert.equal(await h.coach.intercept('A cat jumps between donuts',true),true);
+  assert.equal(h.get('designPlan').open,false);assert.equal(h.has('coachGuidedChoices'),false);assert.equal(h.has('coachChooseRest'),false);assert.equal(h.has('buildGamePlan'),false);
+  assert.equal(h.get('studioPrompt').value,'A cat jumps between donuts');
+  assert.equal(h.session().messages.length,0);assert.equal(h.session().job,null);assert.equal(h.requests.length,0);
+  assert.equal(h.coach.buildReadiness().ready,false);assert.throws(()=>h.coach.buildPrompt(),/Send your new thought/);
+ }finally{h.dispose();}
+});
+await test('the connected coach keeps its genuine contextual question instead of a preset interview',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,'The dragon sneezes spaghetti.',unresolved('What should the spaghetti do when it lands?'));
+  assert.equal(h.session().messages.at(-1)!.text,'What should the spaghetti do when it lands?');
+  assert.equal(h.session().messages.at(-2)!.text,'Let’s think about the moment you want to play.');
+  assert.deepEqual(h.requests[0].context.creation,{version:1});assert.equal(h.get('coachProposals').children.length,0);
+  assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.session().job,null);
+ }finally{h.dispose();}
+});
+await test('a coherent child-authored idea can be reviewed without filling every plan field or automatically building',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,ownGame,readyReply);
+  assert.equal(h.coach.buildReadiness().ready,true);assert.equal(h.session().design!.creationReview!.source,'model');
+  assert.ok(Object.keys(h.session().design!.plan).length<8,'no mandatory eight-field interview');
+  assert.equal(h.session().design!.approvedPlan,false,'legacy plan approval is not the gate');
+  assert.equal(h.buildRequests.length,0);assert.equal(h.session().job,null);assert.equal(await h.coach.intercept(ownGame,true),false);
+  const payload=h.coach.buildPrompt()!;assert.match(payload,/Landing makes a cloud bounce/);assert.match(payload,/no points and no losing/);
+  assert.doesNotMatch(h.session().messages.map(m=>m.text).join(' '),/Current choices|Choose sensible details|Approved game plan/);
+ }finally{h.dispose();}
+});
+await test('complete-looking legacy child or delegated plans cannot bypass a missing contextual review',async()=>{
+ for(const delegated of [false,true]){
+  const h=coachingHarness();try{
+   const s=h.session();h.book.message(s.id,s.owner,'child',ownGame);h.book.update(s.id,s.owner,x=>{for(const key of PLAN_FIELDS)x.design!.plan[key]={value:delegated?'':'A supplied field',origin:delegated?'helper':'child',accepted:!delegated,delegated};x.design!.approvedPlan=true;});
+   assert.equal(h.coach.buildReadiness().ready,false);assert.equal(await h.coach.intercept(ownGame,true),true);assert.throws(()=>h.coach.buildPrompt(),/talk through/);
+  }finally{h.dispose();}
+ }
+});
+await test('a normal old coach reply without readiness cannot unlock first Build',async()=>{
+ const h=coachingHarness();try{await sendTurn(h,ownGame,{...readyReply,creationReadiness:undefined});assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.session().design!.creationReview,undefined);}finally{h.dispose();}
+});
+await test('you choose remains a conversation request and never resolves the child’s plan',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,'A cat on the moon.',unresolved('What would you enjoy making the cat do?'));
+  await sendTurn(h,'You choose the rest.',unresolved('Imagine playing for a moment. What would you try first?'));
+  assert.equal(h.requests.length,2);assert.equal(Object.values(h.session().design!.plan).some(field=>field?.delegated),false);
+  assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.buildRequests.length,0);
+  assert.equal(h.session().messages.at(-1)!.text,'Imagine playing for a moment. What would you try first?');
+ }finally{h.dispose();}
+});
+await test('offline help saves the child’s own answer without pretending to judge completeness',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt',ownGame);const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.pending.shift()!.resolve(new Response(JSON.stringify({errorCode:'COACH_UNAVAILABLE'}),{status:503}));await turn;
+  assert.equal(h.session().messages[0].text,ownGame);assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.session().design!.creationReview,undefined);
+  assert.doesNotMatch(h.session().messages.map(m=>m.text).join(' '),/Ready!|Tap Build/);assert.match(h.get('coachModeStatus').textContent,/Local reflection/);
+ }finally{h.dispose();}
+});
+await test('helper inspiration stays labelled prose and cannot supply a first-game build shortcut',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt','Please help me think of a game');const turn=h.coach.discuss('ideas');await h.awaitModelRequest();h.resolve({...reply,text:'Imagine a surprising way your character could move.',question:'What would you try?',suggestions:['A robot slides on jelly.','A cat rolls inside a bubble.'],proposedChange:{title:'Jelly robot',request:'Build a robot sliding on jelly.',depth:'redesign'}});await turn;
+  assert.equal(h.get('coachProposals').children.length,0);assert.ok(h.session().messages.some(message=>message.text.startsWith('Some ideas from jems:')));
+  assert.equal(h.session().design!.ideas.filter(idea=>idea.origin==='helper').every(idea=>!idea.adopted),true);
+  h.input('studioPrompt','My unfinished own thought');await h.coach.tryPreset('Build a robot sliding on jelly.');
+  assert.equal(h.buildRequests.length,0);assert.equal(h.get('studioPrompt').value,'My unfinished own thought');assert.equal(h.coach.buildReadiness().ready,false);
+ }finally{h.dispose();}
+});
+await test('typing an answer retains the child’s exact words and the model’s next contextual question',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,'A cat on the moon.',unresolved('What would make exploring it feel special?'));
+  await sendTurn(h,'It should feel like finding a secret cave.',{...unresolved('What would you find inside?'),childDecisions:[{field:'fun',quote:'It should feel like finding a secret cave.'}]});
+  assert.deepEqual(h.session().design!.plan.fun,{value:'It should feel like finding a secret cave.',origin:'child',accepted:true,delegated:false});
+  assert.equal(h.session().messages.at(-1)!.text,'What would you find inside?');assert.equal(h.get('designPlan').open,false);
+ }finally{h.dispose();}
+});
+await test('a fresh sent correction revises an earlier feeling without being misfiled as the current question',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,ownGame,{...readyReply,question:'Where should the cat go next?',creationReadiness:{...readyReply.creationReadiness!,ready:false,unresolved:['Where should the cat go next?']}});
+  const correction='Actually make it funny instead.';
+  await sendTurn(h,correction,{...readyReply,childDecisions:[{field:'fun',quote:correction}],creationReadiness:{ready:true,evidence:{...ownEvidence,experience:correction},unresolved:[]}});
+  assert.equal(h.session().design!.plan.fun!.value,correction);assert.equal(h.session().design!.plan.style!.value,ownEvidence.world);
+  assert.equal(h.coach.buildReadiness().ready,true);assert.match(h.coach.buildPrompt()!,/fun: Actually make it funny instead/);
+ }finally{h.dispose();}
+});
+await test('unreviewed drafts and optional field edits invalidate readiness while preserving the last review',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,ownGame,readyReply);h.input('studioPrompt','The clouds should sing.');
+  assert.equal(h.coach.buildReadiness().ready,false);assert.throws(()=>h.coach.buildPrompt(),/Send your new thought/);
+  h.input('studioPrompt','');h.input('plan-style','A purple pencil moon');assert.equal(h.coach.buildReadiness().ready,false);assert.equal(await h.coach.intercept(ownGame,true),true);
+  assert.equal(h.session().design!.creationReview!.source,'model');
+ }finally{h.dispose();}
+});
+await test('a delayed ready verdict cannot bless a newer optional plan edit',async()=>{
+ const h=coachingHarness();try{
+  h.input('studioPrompt',ownGame);const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.input('plan-action','The cat swims inside a bubble.');h.resolve(readyReply);await turn;
+  assert.equal(h.session().design!.plan.action!.value,'The cat swims inside a bubble.');assert.equal(h.session().design!.creationReview,undefined);assert.equal(h.coach.buildReadiness().ready,false);
+ }finally{h.dispose();}
+});
+await test('a newer authored choice wins over a delayed correction and the rejected correction stays out of build intent',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,ownGame,readyReply);h.input('studioPrompt','Actually use the sound of rain instead.');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.input('plan-fun','Quiet space exploring');
+  h.resolve({...readyReply,childDecisions:[{field:'fun',quote:'the sound of rain'}],creationReadiness:{ready:true,evidence:{...ownEvidence,experience:'the sound of rain'},unresolved:[]}});await turn;
+  assert.equal(h.session().design!.plan.fun!.value,'Quiet space exploring');assert.equal(h.coach.buildReadiness().ready,false);
+  await sendTurn(h,'I want Quiet space exploring.',{...readyReply,childDecisions:[],creationReadiness:{ready:true,evidence:{...ownEvidence,experience:'Quiet space exploring'},unresolved:[]}});
+  const payload=h.coach.buildPrompt()!;assert.match(payload,/Quiet space exploring/);assert.doesNotMatch(payload,/sound of rain/);
+ }finally{h.dispose();}
+});
+await test('creative questions and plain follow-up mechanics survive normal chat and later reviewed Build',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,ownGame,{...readyReply,question:'What else could happen on your moon?'});
+  for(const text of ['Could the clouds be trampolines?','The dragon sneezes bubbles.'])await sendTurn(h,text,{...readyReply,childDecisions:[]});
+  assert.equal(h.coach.buildReadiness().ready,true);const payload=h.coach.buildPrompt()!;
+  assert.match(payload,/Could the clouds be trampolines/);assert.match(payload,/The dragon sneezes bubbles/);assert.equal(h.get('studioPrompt').value,'');
+ }finally{h.dispose();}
+});
+await test('a refused correction changes no accepted choice and never enters a later reviewed payload',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,ownGame,readyReply);h.input('studioPrompt','Actually make it funny with rejected private details.');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.pending.shift()!.resolve(new Response(JSON.stringify({errorCode:'PRIVATE_INFORMATION'}),{status:422}));await turn;
+  assert.equal(h.session().design!.plan.fun!.value,ownEvidence.experience);assert.equal(h.coach.buildReadiness().ready,false);
+  await sendTurn(h,'Keep my safe moon idea.',{...readyReply,childDecisions:[]});assert.doesNotMatch(h.coach.buildPrompt()!,/rejected private details/);
+ }finally{h.dispose();}
+});
+await test('copying a helper suggestion never relabels its source or supplies readiness evidence',async()=>{
+ const h=coachingHarness();try{
+  await sendTurn(h,'A cat jumps over stones.',{...reply,text:'Here is one possibility to think about.',question:'What would you invent?',suggestions:['Make it silly']});
+  await sendTurn(h,'Make it silly',{...reply,text:'Tell me what makes that interesting to you.',question:null,childDecisions:[{field:'fun',quote:'silly'}]});
+  assert.equal(h.session().design!.plan.fun!.origin,'helper');assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.buildRequests.length,0);
+ }finally{h.dispose();}
+});
+await test('a legacy sole compiled message needs a new contextual review and its payload stays out of visible intent',async()=>{
+ const h=coachingHarness();try{
+  const s=h.session(),envelope='\n\nApproved game plan (full choices remain in this notebook):\n'+PLAN_FIELDS.map(field=>field+': My choice').join('\n');
+  h.book.message(s.id,s.owner,'child',ownGame+envelope);h.book.update(s.id,s.owner,x=>{x.design!.approvedPlan=true;});
+  assert.equal(h.coach.buildReadiness().ready,false);const original=h.session().messages[0].text;
+  await sendTurn(h,'Keep the moon game I described.',readyReply);
+  assert.doesNotMatch(JSON.stringify(h.requests.at(-1).context.conversation),/Approved game plan/);
+  assert.equal(h.coach.buildReadiness().ready,true);assert.doesNotMatch(h.coach.buildPrompt()!,/Approved game plan/);assert.equal(h.session().messages[0].text,original);
  }finally{h.dispose();}
 });
 

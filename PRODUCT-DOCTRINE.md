@@ -23,6 +23,8 @@ Support tuning, redesigning the interaction and rethinking the objective. An unu
 
 The [owner-approved coaching standard](docs/design-coach/GOLD_STANDARD.md) is the detailed behavioral contract. A software defect is the system's responsibility, not evidence of a child's poor thinking.
 
+The [guided-chat creation decision](docs/decisions/2026-11-20-guided-chat-creation.md), clarified by the owner on November 21, 2026, makes the default creation workspace a real conversation coach, one input and useful action buttons. The coach guides the child toward their own answers with relevant open questions, including the experience they want; it does not replace creative thinking with suggested-answer chips or a **Choose the rest** shortcut. A new game cannot be built until the child has supplied enough coherent detail to make a reasonable game. Readiness follows the meaning of that particular idea, not a fixed questionnaire or a count of completed fields. Put additional tools and details behind an optional disclosure. An explicit Build follows readiness, and internal build instructions and lifecycle output stay out of the child's conversation.
+
 ### One creation journey: games, scenes, and problem solving
 
 The owner's November 19, 2026 direction adds child-facing computational practice to the creation experience. A child's game characters and ideas can become editable stories, animations, and behavior rules. Free creation and **watch a scene, then rebuild it** practice share meaningful actions; practice should help children gain control of their own creations. Children can start with a game, a story, or a challenge without a compulsory ladder.
@@ -58,6 +60,8 @@ The [Art Studio](docs/drawings/ART_STUDIO.md) is a dedicated place to import or 
 Keep the current playable game and earlier editions safe while a new experiment is built. New alternatives start from the selected main edition unless the child explicitly continues a particular test. Compare, Keep, Undo, copy and return must preserve ownership and provenance. Autosave protects work; it does not select a favorite, publish or silently promote an experiment.
 
 While a build runs, the child can keep playing, make supported local edits and choose optional practice. A ready result must not seize focus, replace a newer decision or interrupt the learning host. Failure, cancellation, disconnection or a stale callback must not destroy the last working version. Report save failures honestly.
+
+An explicit Build receives an immediate focused handoff: acknowledge submission truthfully, then offer **Play while I wait** and **Stay here** after a job is accepted. Dismissing that handoff does not cancel the job. Polling and background completion must not reopen it; the child explicitly opens a ready result. Keep the distinction between a submitted request, an acknowledged job and a saved playable result.
 
 See [child continuity](docs/child-continuity/README.md) and [the ownership decision](docs/decisions/0001-child-led-creation.md). Supported local edits must change real mechanics; an unsupported novel request must identify the need for the builder.
 

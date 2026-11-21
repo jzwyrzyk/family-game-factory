@@ -8,6 +8,15 @@ async function switchProfile(page,index){
  if(!await page.locator('#studioProfileMenu').evaluate(node=>node.open))await page.click('#studioProfileMenu summary');
  await page.locator('.profile-choice').nth(index).click();
 }
+async function moreChoices(page){
+ const choices=page.locator('#studioMoreChoices');
+ if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();
+}
+async function stayAfterBuild(page,phase){
+ await page.waitForFunction(value=>document.getElementById('studioBuildHandoff')?.open&&document.getElementById('studioBuildHandoff')?.dataset.phase===value,phase);
+ await page.locator('#studioBuildHandoffStay').click();
+ assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false);
+}
 (async()=>{
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  const url='http://127.0.0.1:'+server.address().port+'/arcade/?studio=1';
@@ -71,7 +80,12 @@ async function switchProfile(page,index){
     assert.equal(await page.locator('.jems-helper-mark:visible').getAttribute('data-helper-pose'),'wave','the helper returns to idle after the reply or truthful fallback');
     assert.equal(submitted,0,'conversation artwork never implies a submitted game build');
     await page.fill('#studioPrompt','Replace the rocket with a flying doughnut spaceship');
-    await page.click('#coachTry');
+    await page.click('#studioSend');
+    await page.locator('#studioBuildHandoff').waitFor({state:'visible'});
+    assert.equal(await page.locator('#studioBuildHandoff').getAttribute('data-phase'),'sending','Build immediately acknowledges submission');
+    assert.equal(await page.locator('#studioBuildHandoffPlay').isDisabled(),true,'unacknowledged submission cannot launch the wait arcade');
+    assert.equal(await page.locator('#studioBuildHandoffStay').isEnabled(),true,'the child may dismiss while sending');
+    await stayAfterBuild(page,'sending');
     await progress('sending','character_spark_think');
     assert.match(await page.locator('#studioBuildProgress').textContent(),/No build is confirmed yet/);
     acceptBuild();
@@ -80,7 +94,10 @@ async function switchProfile(page,index){
     state='testing';await progress('testing','spot_work_in_progress');
     await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='testing'));
     assert.equal(submitted,1);
-    assert.equal(await page.locator('#studioBuildShelf').isVisible(),true);
+    assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'accepted job polling never reopens a dismissed popup');
+    assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'optional build details do not expand automatically');
+    await moreChoices(page);
+    assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'background build controls remain reachable by choice');
     statusUnavailable=true;await progress('uncertain','spot_reconnect');
     assert.equal(await page.evaluate(()=>navigator.onLine),true,'an unavailable status endpoint does not prove the browser is offline');
     assert.match(await page.locator('#studioBuildProgress').textContent(),/not confirmed its latest state/);
@@ -122,15 +139,20 @@ async function switchProfile(page,index){
     assert.equal(returned,initial,'the child can find the saved original project');
     assert.equal(previewRequests,1,'only the explicit child click asks for a private preview');
     assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'a failed preview never becomes an unverified playable game');
+    // Play and conversation now have separate focused surfaces. The saved
+    // result remains reachable from the play shelf and the conversation.
+    if(!await page.locator('#studioReady').isVisible())await page.click('#studioChange');
     assert.equal(await page.locator('#studioReady').isVisible(),true,'the ready test is still accessible for another try');
     await progress('ready','character_spark_celebrate');
     assert.equal(submitted,1,'reload and navigation do not resubmit a paid job');
     // New, explicit experiments exercise real terminal responses, not DOM-only fixtures.
-    if(!await page.locator('#coachTry').isVisible())await page.click('#studioChange');
-    state='failed';await page.fill('#studioPrompt','Replace the spaceship with a dancing teapot');await page.click('#coachTry');
+    if(!await page.locator('#studioSend').isVisible())await page.click('#studioChange');
+    state='failed';await page.fill('#studioPrompt','Replace the spaceship with a dancing teapot');await page.click('#studioSend');
+    await stayAfterBuild(page,'failed');
     await progress('failed','character_spark_recover');
     assert.equal(submitted,2);
-    state='testing';await page.fill('#studioPrompt','Replace the spaceship with a flying paintbrush');await page.click('#coachTry');
+    state='testing';await page.fill('#studioPrompt','Replace the spaceship with a flying paintbrush');await page.click('#studioSend');
+    await stayAfterBuild(page,'testing');
     await progress('testing','spot_work_in_progress');
     await page.click('#studioCancel');await progress('cancelled','character_spark_rest');
     assert.equal(await page.locator('.jems-helper-mark:visible').getAttribute('data-helper-pose'),'rest','confirmed cancellation uses the quiet helper pose');

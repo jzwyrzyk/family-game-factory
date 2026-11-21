@@ -347,8 +347,18 @@ function visualFixture(){
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'cut');
    assert.equal(session.design.observations.filter(observation=>observation.source==='child'&&observation.experimentId===testId).length,1);
-   await waitForLevelPopup(page,2);
-   assert.equal(await levelEventCount(page,2),1,'one cut-level popup for a durable linked reflection');
+   await page.waitForFunction(async()=>{
+    const owner=FG.store.current().id,summary=await FG.rewards.summary();
+    return summary.recentGrants.some(grant=>grant.id==='maker.milestone:level%3A2')&&
+     !(FG.studio.exportNotebook().rewardOutbox||[]).some(fact=>fact.owner===owner&&fact.kind==='maker.milestone'&&fact.level===2);
+   });
+   assert.equal((await earned(page)).level,2,'the linked chat reflection still earns the same cut level');
+   const cutGrant=await page.evaluate(async()=>(await FG.rewards.summary()).recentGrants.find(grant=>grant.id==='maker.milestone:level%3A2'));
+   assert.equal(cutGrant.amount,10,'the ordinary milestone grant remains durable while chat stays quiet');
+   // Give the normal reward batching interval time to finish. An immediately
+   // empty toast container alone would not prove the chat presentation policy.
+   await page.waitForTimeout(250);
+   assert.equal(await levelEventCount(page,2),0,'a reward popup must not cover the active conversation');
    await openJourney(page);await page.click('#jemsJourneyCreate');
    await page.locator('#studioVersions').waitFor({state:'visible'});
    assert.equal((await notebook(page)).active.player1,session.id,'A cut next step opens the same project’s tests');
@@ -447,6 +457,7 @@ function visualFixture(){
    await page.click('#studioNavHome');await page.locator(`[data-session="${hill.id}"] .studio-saved-open`).click();
    await page.click('#studioChange');
    const gemsBeforeClear=(await page.evaluate(()=>FG.rewards.summary())).lifetimeGems;
+   if(!await page.locator('#studioMoreChoices').evaluate(element=>element.open))await page.click('#studioMoreChoices > summary');
    await page.click('#studioChatOptions summary');await page.click('#studioClearChat');
    const clearConfirmation=dialogs.filter(dialog=>dialog.type==='confirm').at(-1)?.message||'';
    assert.match(clearConfirmation,/lower your maker level.*change your outfit/i,'Clear chat explains its visible rank and outfit consequence');

@@ -39,7 +39,8 @@ export function buildErrorCopy(code:string|undefined):string {
 }
 export function buildProgressCopy(job:BuildView|undefined, sending:boolean, uncertain=false){
  if(uncertain)return {title:'Checking the workshop connection',description:'A build might still be running. We have not confirmed its latest state.',phase:'uncertain' as const};
- if(!job)return sending?{title:'Sending your idea…',description:'Waiting for the workshop to accept it. No build is confirmed yet.',phase:'sending' as const}:null;
+ if(sending)return {title:'Sending your idea…',description:'Waiting for the workshop to accept it. No build is confirmed yet.',phase:'sending' as const};
+ if(!job)return null;
  switch(job.status){
   case 'queued':return {title:'Your idea reached the workshop!',description:'Your build was accepted and is waiting to start.',phase:'queued' as const};
   case 'building':return {title:'jems is building your game!',description:job.phase==='repairing'?'The workshop is repairing a test version.':'Your new game is being created in the workshop.',phase:'building' as const};
