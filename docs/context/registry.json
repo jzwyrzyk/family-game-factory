@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewedAt": "2026-11-21T18:04:48.577Z",
+      "sourceDigest": "615fbbe4533b865db20d53e75bbd03e7c7736779cc32cb85524b3589ac20a5f9",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the workspace continuity follow-up against immutable work, explicit Keep and backup recovery doctrine. Refreshing current storage and refusing stale source heads implements the existing promise without changing product intent, authority or retention limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -229,10 +229,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.352Z",
-      "sourceDigest": "fe2798829c213e3c2515a4dff46c256408d3aa8f6aa5a7de9b1ad7427ed14bc0",
+      "reviewedAt": "2026-11-21T18:04:57.552Z",
+      "sourceDigest": "398554c81ca9f4571972bf90b8119c579ff609d8d379a20d2c96cec6c3cc08c2",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected combined Studio diff: PR115 reconnect, visible Build, saved-job retry and owner guards are preserved, with only the Pal earned-form callback added; both UI contracts and scoped hosted visual evidence remain documented.",
+      "reviewReason": "Documented the actual Live Remix and Studio shared-storage boundary: fresh reads, in-transaction owner/revision/head checks, copied-construction source binding, conditional rollback, stable v1 migration and explicit corrupt-source replacement. Schema, namespaces and source-writer guards remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:01:33.009Z",
-      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
+      "reviewedAt": "2026-11-21T18:04:58.394Z",
+      "sourceDigest": "fd03a7e2fb0e3c996a72f0a8cfc2d26d9c11553f00fe5abfdd24af39ee62bd2f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
+      "reviewReason": "Reviewed 23 new real-adapter consistency cases/subcases and the ordinary-URL saved-collection Keep regression. Recorded 410 unit, 31 Studio and 58 rewards/backup passes plus build/typecheck; Chromium failed before page creation with denied socket creation, so browser execution remains outstanding.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:01:33.314Z",
-      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
+      "reviewedAt": "2026-11-21T18:04:58.835Z",
+      "sourceDigest": "96905cf62f96aace6f335f3c2b65a52ec8b7abc293501a7d573217d2bf77a037",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
+      "reviewReason": "Recorded isolated workspace-integrity preparation from main6cc9c380, actual local suite/build results and the Chromium launch blocker. The owner explicitly prohibited merging; this change performs no merge, deployment, live setting change or paid request and makes no hosted acceptance claim.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

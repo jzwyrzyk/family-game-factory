@@ -7,7 +7,7 @@ const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
 const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 
-const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1';
+const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1',WORKSPACE='family-game-factory-workspace-v2';
 const IDEAS=[
  {id:'navigation-idea-one',game:'new',type:'new game design',idea:'Fixture: a moon elevator made from jelly.',profile:'player1',createdAt:'2026-11-18T12:00:00.000Z'},
  {id:'navigation-idea-two',game:'robot',type:'feature',idea:'Fixture: a robot that carries a tiny garden.',profile:'player2',createdAt:'2026-11-18T13:00:00.000Z'},
@@ -203,6 +203,38 @@ async function recoveryJourney(browser,base){
  finally{await context.close();}
 }
 
+async function workspaceIntegrityJourney(browser,base){
+ const {context,page,errors,posts}=await prepare(browser,base,{width:1280,height:900});
+ const workspace=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)),WORKSPACE);
+ try{
+  await page.click('[data-starter="buckets"]');
+  await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===1,WORKSPACE);
+  await page.click('#studioNavHome');await page.reload();await ready(page);
+  const original=(await workspace()).projects[0];
+  // The legacy store now knows the first game. Keep this same document alive
+  // while Studio adds a second game through its actual adapter and controls.
+  await page.click('[data-starter="robot"]');
+  await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===2,WORKSPACE);
+  const before=await workspace();
+  await page.click('#studioNavHome');await page.click('#studioSavedIdeas');
+  await page.locator('#savedRemixes').getByRole('button',{name:original.name,exact:true}).click();
+  await page.locator('#liveKeep').waitFor({state:'visible'});await page.click('#liveKeep');
+  assert.match(await page.textContent('#liveStatus'),/pinned/);
+  const saved=await workspace();
+  assert.deepEqual(saved.projects.map(p=>p.id),before.projects.map(p=>p.id),'legacy Keep preserves the game created by Studio after this document loaded');
+  assert.deepEqual(saved.revisions,before.revisions,'both immutable starting versions survive');
+  assert.equal(saved.projects.find(p=>p.id===original.id).keptId,original.headId);
+  assert.deepEqual(await page.evaluate(()=>FG.factory.exportWorkspace()),saved,'legacy export reads the same latest workspace');
+  await page.reload();await ready(page);
+  assert.deepEqual(await workspace(),saved,'both games survive reload');
+  const sessions=await page.evaluate(()=>FG.studio.exportNotebook().sessions);
+  for(const project of saved.projects)assert.ok(sessions.some(s=>s.projectId===project.id),'the Studio notebook retains its saved game '+project.id);
+  assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);
+  console.log('PASS workspace integrity: create in Studio, reopen the original through Saved ideas & drawings, Keep in Live Remix, and reload without losing either game');
+ }catch(error){await page.screenshot({path:'test-results/navigation-workspace-integrity-failure.png',fullPage:true}).catch(()=>{});throw error;}
+ finally{await context.close();}
+}
+
 async function legacyReturn(browser,base){
  for(const modes of ['arcade=1','studio=0','arcade=1&studio=0']){
   const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage(),errors=[];
@@ -234,6 +266,7 @@ async function legacyReturn(browser,base){
   await collectionJourney(browser,base,'desktop',{width:1280,height:900});
   await collectionJourney(browser,base,'phone',{width:390,height:844});
   await recoveryJourney(browser,base);
+  await workspaceIntegrityJourney(browser,base);
   await legacyReturn(browser,base);
  }finally{await browser?.close();server.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

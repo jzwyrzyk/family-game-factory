@@ -186,6 +186,10 @@ The separate [Jem Pals contract](docs/pals/README.md) adds local collectible com
 
 Browser stores are device- and origin-specific. Server revisions do not imply automatic synchronization of local profiles, learning or drawings. Any origin migration, deletion, backup or cross-device feature must explicitly cover each store and preserve recovery.
 
+The native [workspace store](src/factory/workspace.ts) reads the current storage value before every read and mutation. Long-lived Live Remix and per-operation Studio adapters therefore share the latest project/revision graph. Ownership, revision membership, undo/redo selection and optional expected-head checks run inside the same synchronous read/validate/write operation. A preview or construction copy tied to an older head is refused; failed Studio construction saving rolls back only its own head, preserving a newer writer's edit. The existing source-writer lock still supplies the separate cross-tab boundary.
+
+The store caches only an unchanged source string, retaining stable IDs for a v1 migration until its next successful save. Returned data and supplied play evidence cannot mutate that cache. A changed corrupt source or a failed write cannot be replaced by an older snapshot; ordinary reads/edits fail visibly. Explicit validated backup restoration remains replacement, including recovery from corrupt source bytes. The [workspace continuity contract](docs/child-continuity/README.md#native-workspace-continuity--november-21-source-follow-up) records the adapter regressions and browser evidence boundary.
+
 ## Shared rewards, source handoff and concurrency
 
 The [reward schedule](docs/rewards/README.md) grants 2 gems per completed Math/Language activity or saved unscored writing, 8 once per scene challenge, 25 once per qualifying canonical developed project, and 5/10/20/40 once per newly earned maker level. Practice-count bonuses and lifetime gem milestones have deterministic keys. These values express engagement policy; assistance, mastery interpretation and grade selection remain in the existing engines.

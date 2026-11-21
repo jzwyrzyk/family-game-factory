@@ -1,5 +1,13 @@
 # jems delivery state
 
+## November 21, 2026 — audit workspace integrity fix prepared locally
+
+The audit reproduced data loss when a long-lived Live Remix store kept an older game after Studio created another game in the same document. The isolated `fix/audit-workspace-integrity-20261121` source starts from main `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`. Native workspace reads and mutations now use current storage, with ownership, revision and expected-head preconditions inside each synchronous transaction. Studio compensation preserves an intervening writer's head. Deliberate validated backup replacement, corrupt-source recovery, drawing references, immutable branches, profile namespaces and the existing writer/maintenance guard retain their contracts.
+
+Local validation passed all **410 unit tests**, all **31 Studio unit tests**, all **58 rewards/backup tests**, strict TypeScript checking and the production build. The unit total includes 23 new real-adapter cases/subcases for the workspace defect and related consistency boundaries. The build retains its existing large-chunk warning; no performance gain is claimed from these correctness checks. The added ordinary-URL browser regression creates a Studio game, reloads, creates another, opens the original through **Saved ideas & drawings**, chooses legacy Keep, and verifies both games after reload. Its local run was blocked before page creation by Chromium's `process_singleton_posix.cc` failure, `socket() failed: Operation not permitted`; this is infrastructure failure, not a browser pass. Hosted execution of that regression remains outstanding.
+
+The owner requested implementation without merging. This entry records local source/test preparation only. No merge, deployment, live-service change, paid request or real-device acceptance occurred as part of this fix.
+
 ## November 21, 2026 — combined Pal verification holds merge for image diagnosis
 
 Combined PR114 head `aeab9d68ff155501af88ff08f42b23629a8c81db` has tree `1a1c977ce9f4b48a5d66ff728c314a36e6afa825`, identical to its hosted merge checkout `efdec44c7ed1e0742045f80536d2aeaf9698bf89`. The [Arcade run44920474005](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44920474005) passed learning and the private-coach image, but failed browser/creative. All eight other PR workflows, including service packaging, documentation, operations policy and full visual review, passed. This is a failed combined merge gate, not a release receipt.

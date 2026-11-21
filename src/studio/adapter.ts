@@ -18,11 +18,14 @@ export class StudioGames {
     if(!this.fg.store.save()){p.constructionStates=before;throw Error('Could not preserve the construction. Your original is unchanged.');}
   }
   keep(owner:string,projectId:string,baseId:string,config:Mechanics,prompt:string,hypothesis:string,stateKey:string){
-    const store=this.store();if(store.project(projectId,owner).headId!==baseId)throw Error('This game changed elsewhere. Compare with the latest version before keeping this preview.');
-    // Preserve play state before changing the working pointer. No gameplay rules are modified.
+    const store=this.store();
     const p=this.fg.store.current();if(p.id!==owner)throw Error('Player changed. Reopen your game.');
-    const revision=store.commit(projectId,owner,config,prompt,hypothesis);
-    try {this.clonePlayState(owner,stateKey,revision.id);store.keep(projectId,owner);} catch(err) {store.checkout(projectId,owner,baseId);throw err;}
+    const revision=store.commit(projectId,owner,config,prompt,hypothesis,undefined,baseId);
+    try {this.clonePlayState(owner,stateKey,revision.id);store.keep(projectId,owner,revision.id);} catch(err) {
+      // Undo only this operation's pointer; preserve a newer writer's revision.
+      if(store.project(projectId,owner).headId===revision.id)store.checkout(projectId,owner,baseId,revision.id);
+      throw err;
+    }
     return revision;
   }
   undo(owner:string,projectId:string){this.store().undo(projectId,owner);}
@@ -30,9 +33,9 @@ export class StudioGames {
   checkout(owner:string,projectId:string,id:string){this.store().checkout(projectId,owner,id);}
   record(owner:string,projectId:string,revisionId:string,outcome:any){this.store().record(projectId,owner,revisionId,outcome);}
   fork(owner:string,projectId:string,name:string,config?:Mechanics,prompt='',stateKey?:string){
-    const store=this.store(),base=store.revision(projectId,owner),p=store.fork(projectId,owner,name);
+    const store=this.store(),base=store.revision(projectId,owner),p=store.fork(projectId,owner,name,undefined,base.id);
     const revision=config?store.commit(p.id,owner,config,prompt):store.revision(p.id,owner);
-    this.clonePlayState(owner,stateKey||base.id,revision.id);store.keep(p.id,owner);return p;
+    this.clonePlayState(owner,stateKey||base.id,revision.id);store.keep(p.id,owner,revision.id);return p;
   }
   export(){return this.store().snapshot();}
 }
