@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T06:51:38.849Z",
-      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
+      "reviewedAt": "2026-11-21T07:17:33.152Z",
+      "sourceDigest": "54c8a21d7f36bf7f70c43db6b799548c6ce5616c335cf8d711bd706e5f941dc7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
+      "reviewReason": "Integrated the previously reviewed pinned installation and worker-rotation helpers with current main c43a181, preserving PR108 source, packaging, canonical records and unaffected registry reviews. Added the owner-confirmed config9 rotation, initial INPUT_RESPONSE_FAILED rejection and subsequent ADULT_PILOT_ACCESS_REQUIRED interruption, with both cleanups verified and playable acceptance still outstanding. Kept PR109 and its coordinated gateway/coach/web release separate; no new frontend deployment or specific grant-expiry cause is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
