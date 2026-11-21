@@ -136,17 +136,17 @@ async function firstCreationConversation(browser,url){
  const {page}=f;
  try{
   await page.click('#studioNavCreate');
-  assert.equal(await page.locator('#studioSend').isVisible(),false,'new creation does not begin with Build');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'new creation does not begin with an enabled Build');
   await page.fill('#studioPrompt',idea);await page.click('#studioTalk');
   await page.waitForFunction(()=>!document.getElementById('coachModeStatus').classList.contains('is-thinking'));
   assert.match(await page.locator('#studioMessages').textContent(),/What happens when you help your cat move/);
-  assert.equal(await page.locator('#studioSend').isVisible(),false,'a partial idea cannot be submitted');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'a partial idea cannot be submitted');
   assert.equal(await page.locator('#coachGuidedChoices button, #coachChooseRest, #coachChooseForMe').count(),0,'no supplied-answer or delegation buttons are created');
   assert.equal(await page.getByRole('button',{name:'Try this idea: Helper-made cat',exact:true}).count(),0,'a model proposal cannot become a first-build shortcut');
   assert.equal(await page.locator('#coachProposals button').count(),0,'even an older model response cannot introduce creative answer chips');
   assert.equal(f.requests.length,0);
   await page.fill('#studioPrompt',answer);await page.click('#studioTalk');
-  await page.locator('#studioSend').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   assert.equal((await session(page)).design.creationReview.ready,true);
   assert.equal(f.coachRequests.length,2,'two explicit child messages drive the existing conversation service');
   assert.ok(f.coachRequests.every(context=>context.creation?.version===1));
@@ -154,9 +154,9 @@ async function firstCreationConversation(browser,url){
   // New unsent thoughts are not silently folded into a previously reviewed game.
   const draft='Keep this thought for a different version.';
   await page.fill('#studioPrompt',draft);
-  await page.locator('#studioSend').waitFor({state:'hidden'});
+  await page.waitForFunction(()=>document.getElementById('studioSend').disabled);
   assert.equal(f.requests.length,0);
-  await page.fill('#studioPrompt','');await page.locator('#studioSend').waitFor({state:'visible'});
+  await page.fill('#studioPrompt','');await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   const submission=page.waitForRequest(request=>request.url().endsWith('/v1/jobs')&&request.method()==='POST');
   await page.click('#studioSend');await submission;await page.locator('#studioBuildHandoff[open]').waitFor();
   assert.equal(f.requests.length,1);
@@ -208,16 +208,16 @@ async function sentCorrections(browser,url){
  try{
   await page.click('#studioNavCreate');
   await page.fill('#studioPrompt',idea);await page.click('#studioTalk');
-  await page.locator('#studioSend').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   assert.equal(f.requests.length,0);
   const originalReview=(await session(page)).design.creationReview.fingerprint;
-  await page.fill('#studioPrompt',correction);await page.locator('#studioSend').waitFor({state:'hidden'});
+  await page.fill('#studioPrompt',correction);await page.waitForFunction(()=>document.getElementById('studioSend').disabled);
   await page.click('#studioTalk');
   await page.waitForFunction(()=>document.getElementById('coachModeStatus').classList.contains('is-thinking'));
-  assert.equal(await page.locator('#studioSend').isVisible(),false,'an earlier verdict cannot authorize an unreviewed correction');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'an earlier verdict cannot authorize an unreviewed correction');
   assert.equal(f.requests.length,0,'sending a correction never builds');
   assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'coaching is not presented as game generation');
-  finishAssessment();await page.locator('#studioSend').waitFor({state:'visible'});
+  finishAssessment();await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   const current=await session(page);
   assert.notEqual(current.design.creationReview.fingerprint,originalReview,'the new assessment is bound to the revised child intent');
   assert.equal(current.design.plan.fun.value,'Actually make it calm instead.');

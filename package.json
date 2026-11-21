@@ -63,7 +63,7 @@
     "test:pals-expressions-browser": "node tests/pals-expressions-browser.cjs",
     "test:read-aloud": "node --import tsx --test tests/friendly-narrator.test.ts",
     "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
-    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs"
+    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

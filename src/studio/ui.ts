@@ -27,7 +27,7 @@ import { installStudioRemixRouting } from './host-navigation';
 import { defaults, manifests, validateConfig } from '../runtime/manifests';
 import { interpret } from '../factory/interpreter';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
-import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
+import { BuilderClient, isKnownBuildRejection, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
 import { installArtStudio } from '../drawing/studio';
@@ -89,6 +89,10 @@ export async function installStudio(){
  let remote:BuilderConfig={version:1,mode:'unavailable'};
  const clients=new Map<string,BuilderClient>();
  const unknownJobs=new Set<string>();
+ const retryBlocks=new Map<string,{jobId:string;reason:string}>();
+ // A lost first acknowledgement has no job ID to check. Never mistake an
+ // older failed job for this new request or replay it from a recovery button.
+ const unconfirmedSubmissions=new Set<string>();
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'journey'|'rewards'|'pals'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
@@ -114,11 +118,13 @@ export async function installStudio(){
   isCurrent:identity=>owner()===identity.ownerId&&activeId===identity.sessionId&&route==='studio'&&!FG.learning.active,
   onPlayWhileWaiting:identity=>act(()=>playWhileBuilding(notebook.get(identity.sessionId,identity.ownerId))),
   onPlayReady:identity=>act(()=>openReadySession(identity.sessionId,identity.ownerId)),
+  onRecover:(_identity,action)=>act(()=>recoverBuild(action)),
   onStay:identity=>{if(owner()===identity.ownerId&&activeId===identity.sessionId&&route==='studio'&&!FG.learning.active)$('studioPrompt').focus({preventScroll:true});}
  });
  function beginBuildHandoff(s:StudioSession,state:BuildHandoffState){
   const identity={ownerId:s.owner,sessionId:s.id,attemptId:crypto.randomUUID()};
   buildAttempts.set(s.id,identity);handoff.begin(identity,state);
+  return identity;
  }
  function updateBuildHandoff(s:StudioSession,state:BuildHandoffState){
   const identity=buildAttempts.get(s.id);if(identity&&identity.ownerId===s.owner)handoff.update(identity,state);
@@ -168,6 +174,13 @@ export async function installStudio(){
  const workshopNote=el('span','studio-workshop-availability');
  workshopNote.id='studioWorkshopAvailability';
  $('studioSend').after(workshopNote);
+ const buildGuidance=el('div','studio-build-guidance');buildGuidance.id='studioBuildGuidance';buildGuidance.hidden=true;
+ const buildReason=el('p','studio-build-reason');buildReason.id='studioBuildReason';buildReason.setAttribute('role','status');
+ const checkIdea=iconEl('button','studio-button','retry','Check my idea') as HTMLButtonElement;
+ checkIdea.id='studioCheckIdea';checkIdea.type='button';checkIdea.hidden=true;
+ checkIdea.onclick=()=>act(async()=>{stopSpeech();flushDraft();if(coachConnection==='sign-in'||remote.mode!=='remote'){openParent(true);return;}await coaching?.reassess();});
+ buildGuidance.append(buildReason,checkIdea);$('studioSend').after(buildGuidance);
+ $('studioSend').setAttribute('aria-describedby','studioBuildReason');
  const progressBanner=el('section','studio-progress-banner');
  progressBanner.id='studioBuildProgress';progressBanner.hidden=true;
  progressBanner.setAttribute('role','status');progressBanner.setAttribute('aria-live','polite');
@@ -191,7 +204,7 @@ export async function installStudio(){
  $('studioPromptForm').querySelector('.studio-voice-row')!.before(voiceDetails);
  voiceDetails.append($('studioPromptForm').querySelector('.studio-voice-row')!, $('studioPromptForm').querySelector('.studio-voice-note')!);
  // Optional tools stay outside the conversation. The child supplies the ideas;
- // the coach guides them, and Build appears only after a grounded review.
+ // the coach guides them, and Build enables only after a grounded review.
  const moreChoices=el('details','studio-more-choices') as HTMLDetailsElement;moreChoices.id='studioMoreChoices';
  moreChoices.append(el('summary','','More choices'));
  const extraTools=el('div','studio-extra-tools');extraTools.id='studioExtraTools';moreChoices.append(extraTools);
@@ -650,8 +663,17 @@ export async function installStudio(){
   if(!activeId)return;
   const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value})):null;
-  $<HTMLButtonElement>('studioSend').hidden=creating&&!readiness?.ready;
-  $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving||creating&&(busy(s)||!readiness?.ready);
+  const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id);
+  $<HTMLButtonElement>('studioSend').hidden=false;
+  $<HTMLButtonElement>('studioSend').disabled=pending||!reflecting&&uncertain||creating&&(busy(s)||!readiness?.ready);
+  const hasIdea=s.messages.some(message=>message.role==='child');
+  const reconnect=['limited','unavailable','sign-in'].includes(coachConnection);
+  buildReason.textContent=creating?(pending?'Getting your build ready…':unconfirmedSubmissions.has(s.id)?'The workshop has not confirmed this request. Your idea is safe.':uncertain?'Check your last build before starting another.':busy(s)?'Your game is already building.':readiness?.ready?'':
+   !hasIdea?'Tell me your game idea first.':$<HTMLTextAreaElement>('studioPrompt').value.trim()?'Send your new thought first.':
+   reconnect?'Chat needs to reconnect to check your idea.':readiness?.reason||'Let’s check your idea together.') : '';
+  checkIdea.hidden=!creating||pending||busy(s)||uncertain||!!readiness?.ready||!coaching?.canReassess();
+  setIconLabel(checkIdea,'retry',reconnect?'Reconnect chat':'Check my idea');
+  buildGuidance.hidden=!creating||(!buildReason.textContent&&checkIdea.hidden);
  }
  function act(action:()=>void|Promise<void>){const actor=owner();try{const result=action(),project=activeId,view=route;Promise.resolve(result).catch(error=>{if(owner()===actor&&activeId===project&&route===view)status((error as Error).message,true);});}catch(error){if(owner()===actor)status((error as Error).message,true);}}
  function status(text:string,error=false){const target=route==='studio'?$('studioStatus'):globalStatus;target.textContent=text;target.classList.toggle('is-error',error);target.setAttribute('role',error?'alert':'status');}
@@ -772,7 +794,11 @@ export async function installStudio(){
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
   if(actor!==owner()||at!==epoch)return;
-  if(coach.status==='fulfilled')coachConnection=coach.value?.available?'available':'unavailable';
+  if(coach.status==='fulfilled'){
+   // A healthy route cannot erase a failed model turn or certify a live reply.
+   if(!coach.value?.available)coachConnection='unavailable';
+   else if(!['connected','limited'].includes(coachConnection))coachConnection='available';
+  }
   else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
   if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
   else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unverified';
@@ -948,10 +974,10 @@ export async function installStudio(){
   if(creating){$('studioTitle').textContent='Make a game';if(doneForNow.parentElement!==extraTools)extraTools.append(doneForNow);}
   else if(doneForNow.parentElement!==page.querySelector('.studio-heading'))page.querySelector('.studio-heading')!.append(doneForNow);
   $('studioAvailability').textContent=coachConnectionCopy(configReady?coachConnection:'checking');
-  connectionHint.textContent=!configReady||coachConnection==='checking'?'Connecting…':coachConnection==='sign-in'?'Chat needs a grown-up to reconnect.':['limited','unavailable'].includes(coachConnection)?'Simple guide · chat is offline':'';
+  connectionHint.textContent=!configReady||coachConnection==='checking'?'Checking chat…':coachConnection==='sign-in'?'Chat needs a grown-up to reconnect.':['limited','unavailable'].includes(coachConnection)?'Chat is disconnected. Your idea is saved.':'';
   connectionHint.hidden=!connectionHint.textContent;
   workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
-  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id));
+  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id));
   progressBanner.hidden=!progress;
   arcadeButton.hidden=!busy(s);
   progressBanner.dataset.phase=progress?.phase||'';
@@ -967,10 +993,14 @@ export async function installStudio(){
   refreshBuildAction();
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
   $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?(hasIdea?'Your answer or idea':'Tell me your game idea'):'What would you like to change?';
-  // The coach's saved review, not the presence of a first idea, offers Build.
+  // The coach's saved review, not the presence of a first idea, enables Build.
   $<HTMLTextAreaElement>('studioPrompt').required=!(creating&&s.messages.some(m=>m.role==='child'));
   setIconLabel($('studioSend'),reflecting?'save':creating?'add':'arrow',reflecting?'Save thought':creating?'Build my game':'Try a change');
-  $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=s.job?.status!=='failed';
+  $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=unconfirmedSubmissions.has(s.id)||!s.job||(s.job.status!=='failed'&&!unknownJobs.has(s.id));
+  setIconLabel($('studioRetry'),unknownJobs.has(s.id)?'clock':'retry',unknownJobs.has(s.id)?'Check build status':'Try build again');
+  const retryBlock=retryBlocks.get(s.id);
+  $<HTMLButtonElement>('studioRetry').disabled=sending.has(s.id)||saving||!unknownJobs.has(s.id)&&retryBlock?.jobId===s.job?.id;
+  $('studioRetry').title=retryBlock&&retryBlock.jobId===s.job?.id?retryBlock.reason:'';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
   page.classList.toggle('studio-has-build',!!progress);
   renderConversation();refreshStudioGuide();if(panel==='versions'&&!document.activeElement?.closest('#experimentShelf'))coaching?.renderShelf();
@@ -1049,6 +1079,7 @@ export async function installStudio(){
    render();if(achievement){updateProfile();celebrateProgress(achievement);}return;
   }
   if(sending.has(s.id)){status('Sending the earlier request. Your ideas and game are safe.');return;}
+  if(unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id)){status('The last request is not confirmed. Your new thought is saved; no second build was sent.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
   if(mathRequest){message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`);clearConsumedDraft();}render();return;}
   if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started))return;
@@ -1093,37 +1124,80 @@ export async function installStudio(){
   c=new BuilderClient(remote,job=>{void onJob(s,job).catch(e=>{if(activeId===s.id&&owner()===s.owner){updateBuildHandoff(s,{phase:'uncertain'});status('Could not save the build status. Keep this page open. Your current game is safe.',true);}});});clients.set(s.id,c);return c;
  }
  async function build(s:StudioSession,prompt:string,continueTest=false){
-  sending.add(s.id);moreChoices.open=false;beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
+  sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
   const r=s.projectId?games.revision(s.projectId,s.owner):null;
   const chosen=continueTest?s.candidate:null;
   const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
   // Request admission ends at the durable ACK, not when a game finishes building.
   // Continue status polling independently while a child plays or makes other edits.
   void clientFor(s).submit(input).catch(error=>{
-   if(owner()!==s.owner)return;
+   if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)return;
    const saved=notebook.get(s.id,s.owner);
-   if(busy(saved)&&saved.job?.api===remote.apiBaseUrl){
+   if(saved.job&&busy(saved)&&saved.job.api===remote.apiBaseUrl&&saved.job.id!==s.job?.id){
     unknownJobs.add(s.id);refreshShelf();resume(saved);
-    updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:true});
+    updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:true,recovery:'check'});
     if(activeId===s.id&&owner()===s.owner)
      status('Connection interrupted. The builder may still be working; checking again.');
    }else{
     const code=error instanceof Error?error.message:undefined;
-    const explanation=buildErrorCopy(code);
-    const knownRejection=['UNAUTHENTICATED','FORBIDDEN','SPENDING_CUTOFF','BUILDER_UNAVAILABLE','RATE_LIMIT','PRIVATE_INFORMATION','REQUEST_REJECTED','INVALID_REQUEST'].includes(code||'');
+    const knownRejection=isKnownBuildRejection(error);
+    const explanation=buildErrorCopy(knownRejection?code:undefined);
+    if(knownRejection&&saved.job?.id===s.job?.id){
+     // No new job accepted this request. Keep the saved failed job's exact
+     // experiment metadata for its retry, and leave the rejected draft alone.
+     notebook.update(s.id,s.owner,x=>{x.pendingExperiment=s.pendingExperiment||null;});
+     submittedDrafts.delete(s.id);
+    }
+    if(!knownRejection)unconfirmedSubmissions.add(s.id);
     updateBuildHandoff(s,{phase:knownRejection?'unavailable':'uncertain'});
     if(activeId===s.id&&owner()===s.owner)status(explanation,true);
    }
   }).finally(()=>{
-   sending.delete(s.id);
+   if(buildAttempts.get(s.id)?.attemptId===identity.attemptId)sending.delete(s.id);
    if(activeId===s.id&&owner()===s.owner)render();
   }).catch(error=>{
    if(activeId===s.id&&owner()===s.owner)status('Could not save the builder status. Your current game is safe.',true);
   });
  }
+ async function recoverBuild(action:'retry'|'check'){
+  if(guardMath())return;stopSpeech();flushDraft();const s=current();
+  if(!s.job||sending.has(s.id)||saving||unconfirmedSubmissions.has(s.id))return;
+  if(action==='retry'&&s.job.status!=='failed')action='check';
+  const retryBlock=retryBlocks.get(s.id);
+  if(action==='retry'&&retryBlock?.jobId===s.job.id){status(retryBlock.reason,true);return;}
+  if(remote.mode!=='remote'||s.job.api!==remote.apiBaseUrl){status('Reconnect this game’s workshop before checking its build. Your idea is saved.',true);return;}
+  const identity=beginBuildHandoff(s,{phase:'checking'});
+  sending.add(s.id);render();status('Checking your saved build…');
+  try{
+   const client=clientFor(s);
+   if(action==='check'){
+    const job=await client.check(s.job.id);
+    if(job&&owner()===s.owner&&['queued','building','testing'].includes(job.status))resume(notebook.get(s.id,s.owner));
+   }else await client.retry(s.job.id);
+  }catch(error){
+   if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)return;
+   const latest=notebook.get(s.id,s.owner),code=error instanceof Error?error.message:undefined;
+   const rejected=action==='retry'&&!busy(latest)&&isKnownBuildRejection(error);
+   if(rejected){
+    unknownJobs.delete(s.id);
+    const canRetry=!['RETRY_LIMIT','NOT_FOUND','IDEMPOTENCY_CONFLICT','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED'].includes(code||'');
+    if(!canRetry)retryBlocks.set(s.id,{jobId:latest.job!.id,reason:buildErrorCopy(code,true)});
+    updateBuildHandoff(s,{phase:'failed',...(canRetry?{recovery:'retry' as const}:{}),description:buildErrorCopy(code,true)});
+   }else{
+    unknownJobs.add(s.id);
+    updateBuildHandoff(s,{phase:'uncertain',recovery:'check',canPlayWhileWaiting:busy(latest)});
+   }
+   if(activeId===s.id&&route==='studio')status(rejected?buildErrorCopy(code,true):'The connection interrupted our check. Check build status to find your last attempt. Your idea is safe.',true);
+   refreshShelf();
+  }finally{
+   if(buildAttempts.get(s.id)?.attemptId===identity.attemptId)sending.delete(s.id);
+   if(owner()===s.owner&&activeId===s.id&&route==='studio')render();
+  }
+ }
  async function onJob(captured:StudioSession,job:JobView){
   if(owner()!==captured.owner)return;
-  const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);
+  const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);unconfirmedSubmissions.delete(captured.id);
+  if(retryBlocks.get(captured.id)?.jobId!==job.jobId||job.status!=='failed')retryBlocks.delete(captured.id);
   let celebratedLevel=false;
   const phase=typeof job.phase==='string'&&/^[a-z-]{1,32}$/.test(job.phase)?job.phase:undefined;
    if(prior.job?.id!==job.jobId||prior.job.status!==job.status||prior.job.revisionId!==job.revisionId||prior.job.phase!==phase)
@@ -1145,9 +1219,9 @@ export async function installStudio(){
    if(latest.job)waitArcade.update(latest.job.status as WorkshopStatus,!!readyExperiment(latest));
   }
   const latest=notebook.get(captured.id,captured.owner);
-  if(job.status!=='draft')updateBuildHandoff(captured,{phase:job.status,canPlayWhileWaiting:busy(latest),canPlayReady:!!readyExperiment(latest)});
+  if(job.status!=='draft')updateBuildHandoff(captured,{phase:job.status,canPlayWhileWaiting:busy(latest),canPlayReady:!!readyExperiment(latest),...(job.status==='failed'?{...(retryBlocks.has(captured.id)?{}:{recovery:'retry' as const}),description:retryBlocks.get(captured.id)?.reason||buildErrorCopy(job.errorCode,true)}:{})});
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){
-   status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]||'Your working game is safe.');render();
+   status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode,true):texts[job.status]||'Your working game is safe.');render();
    // Only a confirmed new real revision earns the playable burst; never a mock or queued job.
    if(job.status==='ready'&&job.revisionId&&isRealAdapter(job.adapter)&&prior.job?.status!=='ready'&&!FG.learning.active&&!celebratedLevel)
     celebrateJem('playable','studioReady');
@@ -1166,7 +1240,7 @@ export async function installStudio(){
    void clientFor(s).resume(s.job.id).catch(()=>{
     if(owner()!==s.owner)return;
     unknownJobs.add(s.id);refreshShelf();
-    updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:true});
+    updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:busy(s),recovery:'check'});
     if(waitProject?.id===s.id&&waitProject.owner===s.owner&&waitArcade.isOpen())waitArcade.update('reconnecting',false);
      if(activeId===s.id){status('Connection interrupted. The build may still be running. We will check again.');if(route==='studio')render();}
     if(retryTimers.has(s.id))clearTimeout(retryTimers.get(s.id)!);
@@ -1361,13 +1435,7 @@ export async function installStudio(){
  $('studioPrompt').oninput=()=>{refreshBuildAction();clearTimeout(draftTimer);$('studioDraftStatus').textContent='Saving draft…';draftTimer=setTimeout(()=>act(()=>{flushDraft();$('studioDraftStatus').textContent='Draft saved on this device';}),180);};
  $('studioReflectAnswer').onclick=()=>act(()=>{if(guardMath())return;reflecting=true;setTab('talk');render();focusView($('studioPrompt'));});$('studioReflectSkip').onclick=()=>act(()=>{const s=current();notebook.update(s.id,s.owner,x=>{x.reflection=false;});coaching?.pauseReflection();reflecting=false;render();void playViewed();});
  $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});
- $('studioRetry').onclick=()=>act(async()=>{
-  if(guardMath())return;stopSpeech();flushDraft();const s=current();if(s.job?.status!=='failed'||sending.has(s.id))return;
-  sending.add(s.id);beginBuildHandoff(s,{phase:'sending'});render();
-  try{await clientFor(s).retry();}
-  catch(error){if(owner()===s.owner){updateBuildHandoff(s,{phase:'uncertain'});if(activeId===s.id)status(buildErrorCopy(error instanceof Error?error.message:undefined),true);}}
-  finally{sending.delete(s.id);if(owner()===s.owner&&activeId===s.id&&route==='studio')render();}
- });
+ $('studioRetry').onclick=()=>act(()=>recoverBuild(unknownJobs.has(current().id)?'check':'retry'));
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
  window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail){handoff.close();if(route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}}refreshStudioGuide();});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
@@ -1389,7 +1457,7 @@ export async function installStudio(){
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
   onSavedDesignChange,
   onCoachReply:text=>voice?.reply(text),
-  onCoachState:state=>{coachConnection=state;if(activeId)render();},
+  onCoachState:state=>{coachConnection=state;if(activeId)render();window.dispatchEvent(new CustomEvent('factory-coach-connection',{detail:{ownerId:owner(),state}}));},
   rules:()=>{const s=current();if(s.game==='new')return 'New game: rules are being agreed; do not invent recorded outcomes.';const r=s.projectId?games.revision(s.projectId,s.owner):null;return JSON.stringify({game:s.game,instructions:FG.games[s.game]?.instructions,controls:FG.games[s.game]?.controls,settings:r?.config,learningSubject:FG.learning.subject,editable:manifests[s.game as GameId]?.mechanics.map(m=>({key:m.key,label:m.label}))}).slice(0,2000);},
   localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details();return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:games.revision(s.projectId,s.owner).config,prompt).kind==='supported';},
   tryRequest:async(prompt,_origin,_depth,displayText,compiledPlan)=>{await submit({prompt,displayText,compiledPlan});},

@@ -6,6 +6,7 @@ const http = require('node:http');
 const { once } = require('node:events');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
+const { assertTextContrast } = require('./helpers/text-contrast.cjs');
 
 const root = path.resolve(__dirname, '..');
 const fixture = `
@@ -17,6 +18,7 @@ const handoff=createBuildHandoff({
   isCurrent:identity=>identity.ownerId===window.handoffScope.ownerId&&identity.sessionId===window.handoffScope.sessionId&&!window.handoffScope.learning,
   onPlayWhileWaiting:identity=>window.handoffActions.push(['wait',identity]),
   onPlayReady:identity=>window.handoffActions.push(['ready',identity]),
+  onRecover:(identity,action)=>window.handoffActions.push([action,identity]),
   onStay:()=>document.getElementById('idea').focus({preventScroll:true}),
 });
 window.handoff=handoff;
@@ -29,7 +31,7 @@ document.getElementById('build').onclick=()=>window.beginHandoff('first');
   const bundle = await build({absWorkingDir:root,stdin:{contents:fixture,resolveDir:root,sourcefile:'build-handoff-fixture.ts'},bundle:true,format:'iife',outdir:'build-handoff-fixture',write:false,external:['/fonts/*','/jems-art/*']});
   const js = bundle.outputFiles.find(file=>file.path.endsWith('.js')).text;
   const css = bundle.outputFiles.find(file=>file.path.endsWith('.css')).text;
-  const html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="/arcade/"><title>Build handoff fixture</title><link rel="stylesheet" href="./bundle.css"><style>body{margin:0;background:#faf7ff;font-family:system-ui;overflow:auto}main{padding:24px}button{min-height:48px;padding:12px 20px}h1{font-size:28px}</style></head><body style="overflow:auto"><main><h1>Your game idea</h1><button id="build">Build my game</button><button id="other">Keep thinking</button><input id="idea" aria-label="Your idea"></main><script src="./bundle.js"></script></body></html>';
+  const html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="/arcade/"><title>Build handoff fixture</title><link rel="stylesheet" href="./bundle.css"><style>body{margin:0;background:#faf7ff;font-family:system-ui;overflow:auto}main{padding:24px}button{min-height:48px;padding:12px 20px}button:disabled{opacity:.5}h1{font-size:28px}</style></head><body style="overflow:auto"><main><h1>Your game idea</h1><button id="build">Build my game</button><button id="other">Keep thinking</button><input id="idea" aria-label="Your idea"></main><script src="./bundle.js"></script></body></html>';
   const mime={'.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2'};
   const server = http.createServer((request,response)=>{
     const pathname = new URL(request.url,'http://localhost').pathname;
@@ -50,7 +52,7 @@ document.getElementById('build').onclick=()=>window.beginHandoff('first');
       page.on('pageerror',error=>errors.push(error.message));
       await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
       await page.waitForFunction(()=>!!window.handoff);
-      const dialog=page.locator('#studioBuildHandoff'),play=page.locator('#studioBuildHandoffPlay'),stay=page.locator('#studioBuildHandoffStay');
+      const dialog=page.locator('#studioBuildHandoff'),play=page.locator('#studioBuildHandoffPlay'),stay=page.locator('#studioBuildHandoffStay'),recover=page.locator('#studioBuildHandoffRecover');
       await page.locator('#build').click();
       assert.equal(await dialog.isVisible(),true,'Build immediately opens its own handoff');
       assert.equal(await play.isDisabled(),true,'submission is not an accepted build');
@@ -94,6 +96,7 @@ document.getElementById('build').onclick=()=>window.beginHandoff('first');
       // Unknown outcomes never grow a retry button or a fake accepted-job claim.
       await page.evaluate(()=>{document.getElementById('build').focus();window.beginHandoff('uncertain',{phase:'uncertain'});document.getElementById('build').disabled=true;});
       assert.equal(await play.isVisible(),false);
+      assert.equal(await recover.isVisible(),false,'an unacknowledged request has no safe job recovery action');
       assert.match(await page.locator('#studioBuildHandoffDescription').innerText(),/might still be building/);
       await page.keyboard.press('Escape');assert.equal(await dialog.isVisible(),false);
       assert.equal(await page.evaluate(()=>document.activeElement.id),'idea','explicit dismissal restores a useful target even when the Build trigger is disabled');
@@ -102,13 +105,30 @@ document.getElementById('build').onclick=()=>window.beginHandoff('first');
       assert.equal(await play.isVisible(),false,'unavailable is never an accepted wait arcade');
       await stay.click();
 
+      // A durable failed job can be retried directly in the modal. An uncertain
+      // known job offers a read-only check, never a blind retry submission.
+      await page.evaluate(()=>window.beginHandoff('recover-failed',{phase:'failed',recovery:'retry'}));
+      assert.equal(await recover.innerText(),'Try build again');
+      await recover.click();
+      assert.equal(await page.evaluate(()=>window.handoffActions.at(-1)[0]),'retry');
+      assert.equal(await recover.isDisabled(),true,'one recovery gesture cannot be submitted twice');
+      await assertTextContrast(page,'#studioBuildHandoffRecover','disabled recovery action',{includeDisabled:true});
+      await page.evaluate(()=>window.updateHandoff('recover-failed',{phase:'uncertain',recovery:'check'}));
+      assert.equal(await recover.innerText(),'Check build status');
+      assert.equal(await recover.isEnabled(),true);
+      await recover.click();
+      assert.equal(await page.evaluate(()=>window.handoffActions.at(-1)[0]),'check');
+      await page.evaluate(()=>window.updateHandoff('recover-failed',{phase:'uncertain',recovery:'retry'}));
+      assert.equal(await recover.isVisible(),false,'uncertainty cannot offer a retry even if the host supplies it');
+      await stay.click();
+
       // Stale owners, attempts and learning checkpoints cannot operate the popup.
       await page.evaluate(()=>window.beginHandoff('third',{phase:'building',canPlayWhileWaiting:true}));
       await page.evaluate(()=>window.updateHandoff('first',{phase:'failed'}));
       assert.equal(await dialog.getAttribute('data-phase'),'building','old attempt cannot overwrite current status');
       await page.evaluate(()=>{window.handoffScope.ownerId='player2';document.getElementById('studioBuildHandoffPlay').click();});
       assert.equal(await dialog.isVisible(),false);
-      assert.equal(await page.evaluate(()=>window.handoffActions.length),2,'stale action cannot play another owner’s game');
+      assert.equal(await page.evaluate(()=>window.handoffActions.length),4,'stale action cannot play another owner’s game');
       await page.evaluate(()=>{window.handoffScope.ownerId='player1';window.handoffScope.learning=true;window.beginHandoff('blocked');});
       assert.equal(await dialog.isVisible(),false,'required learning prevents opening');
       await page.evaluate(()=>{window.handoffScope.learning=false;window.beginHandoff('fourth');window.beginHandoff('fifth',{phase:'building',canPlayWhileWaiting:true});});

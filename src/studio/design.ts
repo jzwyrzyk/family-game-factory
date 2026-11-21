@@ -79,7 +79,13 @@ export function validateCoachReply(value:unknown,context:CoachContext):CoachRepl
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)throw Error('Missing proposal.');
  if(((r.text+' '+(r.question||'')).match(/\?/g)||[]).length>1)throw Error('Ask one useful question at a time.');
  const reply=copy(r);
- if(context.creation?.version===1){if(reply.creationReadiness!==undefined&&reply.creationReadiness!==null)reply.creationReadiness=validateCreationReadiness(reply.creationReadiness,context);}
+ if(context.creation?.version===1){
+  if(reply.creationReadiness===undefined||reply.creationReadiness===null)throw Error('CREATION_REVIEW_MISSING');
+  reply.creationReadiness=validateCreationReadiness(reply.creationReadiness,context);
+  // A successful review means no material question remains. Do not send a
+  // child into another optional design turn after inviting their explicit Build.
+  if(reply.creationReadiness.ready)reply.question=null;
+ }
  else delete reply.creationReadiness;
  return reply;
 }

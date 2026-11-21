@@ -31,6 +31,21 @@ export class JobService {
  private controllers=new Map<string,AbortController>();
  constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean;adultPilotMode?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){}
  private async authorized(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),job=state.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(state,session,job);return job;}
+ /** A failed job has one retry successor. Its durable reference lets a browser
+  * recover a lost retry acknowledgement without submitting another paid job. */
+ private retrySuccessor(state:PipelineState,session:VerifiedSession,prior:Job):Job|undefined {
+  const audience=prior.adultPilotProfileId||(prior.adultPilotDeviceId?`adult:${prior.adultPilotDeviceId}`:undefined);
+  const matches=state.jobs.filter(job=>job.retryOf===prior.id&&job.familyId===prior.familyId&&
+   (job.adultPilotProfileId||(job.adultPilotDeviceId?`adult:${job.adultPilotDeviceId}`:undefined))===audience);
+  // Older gateways could admit multiple retry children with different request
+  // IDs. Do not guess which accepted job represents the user's lost response.
+  if(matches.length>1)throw Error('IDEMPOTENCY_CONFLICT');
+  const next=matches[0];
+  if(!next)return;
+  requireResourceAudience(state,session,next);
+  if(prior.status!=='failed'||next.gameId!==prior.gameId||next.prompt!==prior.prompt||next.baseRevisionId!==prior.baseRevisionId||next.retryCount!==prior.retryCount+1)throw Error('IDEMPOTENCY_CONFLICT');
+  return next;
+ }
  private requireJobPermission(state:PipelineState,job:Job){
   if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(state,job.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
   if(this.options.adultPilotMode||job.adultPilotDeviceId||job.adultPilotSessionId||job.adultPilotProfileId){
@@ -75,7 +90,18 @@ export class JobService {
    if(this.options.requireVerifiedParentPrivacy&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
    if(this.options.adultPilotMode&&!adultPilotAllowed(s,session))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
    const existing=s.jobs.find(j=>j.familyId===session.familyId&&j.clientRequestId===r.clientRequestId&&(j.adultPilotProfileId||(j.adultPilotDeviceId?`adult:${j.adultPilotDeviceId}`:undefined))===session.adultProfileId);
-   if(existing){requireResourceAudience(s,session,existing);if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
+   if(existing){requireResourceAudience(s,session,existing);if(existing.prompt!==r.prompt||existing.baseRevisionId!==r.baseRevisionId||existing.gameId!==r.gameId||existing.retryOf!==r.retryOf)throw Error('IDEMPOTENCY_CONFLICT');return {jobId:existing.id,status:existing.status,adapter:existing.adapter};}
+   let retryCount=0;
+   if(r.retryOf){
+    const prior=s.jobs.find(j=>j.id===r.retryOf);if(!prior)throw Error('NOT_FOUND');requireResourceAudience(s,session,prior);
+    if(prior.status!=='failed'||prior.gameId!==r.gameId||prior.prompt!==r.prompt||prior.baseRevisionId!==r.baseRevisionId)throw Error('RETRY_LIMIT');
+    // Read and reuse inside the same transaction as reservation. Different
+    // client request IDs after reload or concurrent clicks cannot fork retries.
+    const next=this.retrySuccessor(s,session,prior);
+    if(next)return {jobId:next.id,status:next.status,adapter:next.adapter};
+    if(prior.retryCount>=this.options.maxRetries)throw Error('RETRY_LIMIT');
+    retryCount=prior.retryCount+1;
+   }
    const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
    if(r.baseRevisionId){if(!base)throw Error('NOT_FOUND');requireResourceAudience(s,session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
    // O4: reject unsupported or contradictory forms BEFORE reserving an
@@ -90,7 +116,6 @@ export class JobService {
       budget:{maxUnits:0,timeoutMs:0},signal:new AbortController().signal
     });
    }
-   let retryCount=0;if(r.retryOf){const prior=s.jobs.find(j=>j.id===r.retryOf);if(!prior)throw Error('NOT_FOUND');requireResourceAudience(s,session,prior);if(prior.status!=='failed'||prior.gameId!==r.gameId||prior.prompt!==r.prompt||prior.baseRevisionId!==r.baseRevisionId||prior.retryCount>=this.options.maxRetries)throw Error('RETRY_LIMIT');retryCount=prior.retryCount+1;}
    const recent=s.audit.filter(e=>e.familyId===session.familyId&&e.status==='queued'&&Date.parse(e.at)>Date.now()-60000);if(recent.length>=10)throw Error('RATE_LIMIT');
    let ledger=s.ledgers[session.familyId];if(!ledger||ledger.month!==month())ledger=s.ledgers[session.familyId]={allowance:0,used:0,reserved:ledger?.reserved||0,paidEnabled:false,month:month()};
    const maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
@@ -99,7 +124,11 @@ export class JobService {
    ledger.reserved+=maxUnits;const job:Job={...r,...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
   });
  }
- async get(session:VerifiedSession,id:string){const j=await this.authorized(session,id);return {jobId:j.id,status:j.status,revisionId:j.revisionId,errorCode:j.errorCode,adapter:j.adapter,phase:j.phase,attempts:j.attempts};}
+ async get(session:VerifiedSession,id:string){
+  const state=await this.repo.snapshot(),j=state.jobs.find(job=>job.id===id);if(!j)throw Error('NOT_FOUND');requireResourceAudience(state,session,j);
+  const next=this.retrySuccessor(state,session,j);
+  return {jobId:j.id,status:j.status,revisionId:j.revisionId,errorCode:j.errorCode,adapter:j.adapter,phase:j.phase,attempts:j.attempts,...(next?{retryJobId:next.id}:{})};
+ }
  async retry(session:VerifiedSession,id:string,clientRequestId:string){const j=await this.authorized(session,id);return this.submit(session,{gameId:j.gameId,baseRevisionId:j.baseRevisionId,prompt:j.prompt,clientRequestId,retryOf:j.id});}
  async cancel(session:VerifiedSession,id:string){const result=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(s,session,job);if(['queued','building','testing'].includes(job.status)){audit(s,job,'cancelled');s.ledgers[job.familyId].reserved-=job.maxUnits;job.usedUnits=job.maxUnits;s.ledgers[job.familyId].used+=job.maxUnits;if(job.execution){delete job.execution.candidate;delete job.execution.qualityEvidence;}}return {jobId:id,status:job.status};});this.controllers.get(id)?.abort();return result;}
  async run(id:string){
