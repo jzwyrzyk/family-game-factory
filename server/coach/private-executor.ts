@@ -7,7 +7,7 @@
 import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
 import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {approved,validateCoachContext,type CoachProvider} from './service';
-import {OpenAICoachProvider,type PrivateCoachConfig} from './private-provider';
+import {OpenAICoachProvider,coachFailureEvent,tagCoachFailure,type PrivateCoachConfig,type CoachFailureEvent,type CoachFailureStage} from './private-provider';
 import {validateCoachReply} from '../../src/studio/design';
 import {privateCoachOrigin} from './private-bridge';
 import {speechApproved,speechConfig,validateAudio,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
@@ -32,6 +32,7 @@ export interface PrivateCoachRuntime {
  maxConcurrent?:number;
  audio?:SpeechProvider;
  audioConfig?:SpeechConfig;
+ reportFailure?:(event:CoachFailureEvent)=>void|Promise<void>;
 }
 export function privateCoachHandler(runtime:PrivateCoachRuntime){
  let active=0;
@@ -41,16 +42,25 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
   res.end(JSON.stringify(data));
  };
  return async(req:IncomingMessage,res:ServerResponse)=>{
+  const started=performance.now();
+  let coachPost=false,stage:CoachFailureStage='caller_verification';
+  // Recognize the one diagnostic route without changing the order or result of
+  // the existing Origin, caller, method and body checks below.
+  try{coachPost=req.method==='POST'&&new URL(req.url||'','http://private').pathname==='/v1/private-coach/complete';}catch{}
   const aborted=new AbortController();
+  let failureSignal:AbortSignal|undefined=aborted.signal;
   res.once('close',()=>{if(!res.writableEnded)aborted.abort();});
   try{
    if(req.headers.origin||req.headers['x-factory-request']!=='1')throw Error('FORBIDDEN');
    const path=new URL(req.url||'','http://private').pathname;
    const token=req.headers.authorization?.match(/^Bearer ([A-Za-z0-9._-]{40,12000})$/)?.[1];
    if(!token||!await runtime.verifyCaller(token))throw Error('FORBIDDEN');
-   const available=runtime.enabled&&approved(runtime.config)&&
-    !!runtime.config.apiKey&&runtime.config.apiKey.length>=16&&
-    (!runtime.provider.readiness||await runtime.provider.readiness(AbortSignal.any([aborted.signal,AbortSignal.timeout(3000)])).catch(()=>false));
+   stage='configuration';
+   const configured=runtime.enabled&&approved(runtime.config)&&!!runtime.config.apiKey&&runtime.config.apiKey.length>=16;
+   let readinessFailure:unknown,readinessSignal:AbortSignal|undefined;
+   stage='readiness';
+   const available=configured&&
+    (!runtime.provider.readiness||await runtime.provider.readiness(readinessSignal=AbortSignal.any([aborted.signal,AbortSignal.timeout(3000)])).catch(error=>{readinessFailure=error;return false;}));
    // Both readiness probes authenticate the exact gateway identity.
    // No prompt, child ID, audio or provider request is included.
    if(path==='/v1/private-coach/status'&&req.method==='GET')
@@ -59,9 +69,17 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    if(path==='/v1/private-coach/audio/status'&&req.method==='GET')
     return send(res,200,{available:voiceReady,mode:voiceReady?'private':'unavailable'});
    const isAudio=path==='/v1/private-coach/audio';
+   stage='input_validation';
    if((path!=='/v1/private-coach/complete'&&!isAudio)||req.method!=='POST'||
     !String(req.headers['content-type']||'').startsWith('application/json'))throw Error('FORBIDDEN');
-   if(isAudio?!voiceReady:!available)throw Error(isAudio?'AUDIO_UNAVAILABLE':'COACH_UNAVAILABLE');
+   if(isAudio?!voiceReady:!available){
+    const error=Error(isAudio?'AUDIO_UNAVAILABLE':'COACH_UNAVAILABLE');
+    if(!isAudio){
+     stage=configured?'readiness':'configuration';
+     if(readinessFailure!==undefined)tagCoachFailure(error,coachFailureEvent(readinessFailure,stage,0,readinessSignal));
+    }
+    throw error;
+   }
    if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
    let data='';
    for await(const chunk of req){
@@ -95,15 +113,27 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
    active++;
    try{
+    stage='inference';
     const {reply,usedMicroUsd}=await runtime.provider.complete(context,
-     AbortSignal.any([aborted.signal,AbortSignal.timeout(25000)]));
+     failureSignal=AbortSignal.any([aborted.signal,AbortSignal.timeout(25000)]));
+    stage='usage_validation';failureSignal=undefined;
     if(!Number.isSafeInteger(usedMicroUsd)||usedMicroUsd<0||usedMicroUsd>runtime.config.maxTurnMicroUsd)
      throw Error('COACH_PROVIDER_FAILED');
+    stage='reply_validation';
     const validated=validateCoachReply(reply,context);
     return send(res,200,{reply:validated,usedMicroUsd});
    }finally{active--;}
   }catch(error){
    const code=(error as Error).message;
+   if(coachPost){
+    try{
+     const event=coachFailureEvent(error,stage,performance.now()-started,failureSignal);
+     const report=runtime.reportFailure||((value:CoachFailureEvent)=>{console.error(JSON.stringify(value));});
+     // Diagnostic output must not affect the request, even for an injected
+     // reporter that throws synchronously or returns a rejected promise.
+     void Promise.resolve(report(event)).catch(()=>{});
+    }catch{}
+   }
    return send(res,code==='FORBIDDEN'?403:code==='INVALID_REQUEST'||code==='PRIVATE_INFORMATION'||code==='INVALID_AUDIO'?400:
     code==='RATE_LIMIT'?429:code==='COACH_REFUSED'||code==='AUDIO_NO_SPEECH'?422:503,{errorCode:
     ['FORBIDDEN','INVALID_REQUEST','PRIVATE_INFORMATION','INVALID_AUDIO','RATE_LIMIT','COACH_REFUSED','AUDIO_NO_SPEECH'].includes(code)?code:'COACH_UNAVAILABLE'});

@@ -1,5 +1,46 @@
 # jems delivery state
 
+## November 21, 2026 — private chat failures observed; diagnostics prepared
+
+The owner supplied Cloud Run request metadata for two failed real chat turns at
+**12:49 p.m. America/New_York** (`2026-11-21T17:49Z`). Private coach
+`factory-coach-private-pr115-19f5e46ae114-fb5fa6` returned HTTP 503 in
+4.266 and 3.737 seconds, with matching gateway
+`factory-gateway-pr115-19f5e46ae114-fb5fa6` HTTP 503 responses in 4.472 and
+3.912 seconds. These are owner-provided log observations, not a successful
+conversation receipt. They narrow the failure to the private-service path and
+occur before the explicit 25-second inference deadline. They do not establish
+whether caller verification, a provider call, an allowance or reply validation
+failed. The earlier generic error handling discarded that distinction.
+
+The diagnostic candidate starts from merged main
+`6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`, preserving PR115 and the approved
+Pal integration. It adds one content-free, allowlisted private error event per
+failed conversation POST and a standalone read-only configuration/request
+inspector. Its [contract](docs/issue-28/SECURE_INFERENCE_AND_RELEASE.md#private-conversation-diagnostics)
+documents the exact privacy and interpretation limits. Public error responses,
+provider request payloads, model/token/price settings, deadlines, approved
+audiences, authorization and accounting behavior remain unchanged. No automatic
+paid retry is introduced, and normal-profile AI remains subject to the existing
+adult-pilot/guardian gates.
+
+Source verification covers real loopback HTTP calls with synthetic provider
+responses, failure-stage identification, logging redaction, unchanged public
+errors, no additional provider calls, logger-failure isolation and the read-only
+inspector's serving-revision/redaction boundaries. Exact local and hosted results
+belong to the published PR; none establishes the live failure's root cause.
+
+**Prepared and unmerged. No deployment or configuration change is claimed.**
+The runtime delta affects the private-coach image only; the gateway, browser,
+preview, generation worker and sandbox need no change for these diagnostics.
+Before any approved rollout, verify the actual serving source/configuration and
+use the current immutable private-coach image procedure. Do not replay PR109,
+PR113 or PR116's fixed-source rollout commands. [PR116](https://github.com/jzwyrzyk/family-game-factory/pull/116)
+retains the preceding backend rollout evidence, while
+[PR117](https://github.com/jzwyrzyk/family-game-factory/pull/117) tracks the separate
+Pal website cutover. A safe diagnostic record followed by the appropriate
+correction and a validated real reply is still required to close this incident.
+
 ## November 21, 2026 — combined Pal verification holds merge for image diagnosis
 
 Combined PR114 head `aeab9d68ff155501af88ff08f42b23629a8c81db` has tree `1a1c977ce9f4b48a5d66ff728c314a36e6afa825`, identical to its hosted merge checkout `efdec44c7ed1e0742045f80536d2aeaf9698bf89`. The [Arcade run44920474005](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44920474005) passed learning and the private-coach image, but failed browser/creative. All eight other PR workflows, including service packaging, documentation, operations policy and full visual review, passed. This is a failed combined merge gate, not a release receipt.
