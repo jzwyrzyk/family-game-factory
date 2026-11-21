@@ -57,6 +57,62 @@ test('cancellation is terminal, failed validation never replaces kept content, r
  const retry=await service.submit(session,{...request,prompt:'Build a new car game',clientRequestId:'retry-123',retryOf:bad.jobId});await service.run(retry.jobId);await assert.rejects(service.submit(session,{...request,prompt:'Build a new car game',clientRequestId:'retry-456',retryOf:retry.jobId}),/RETRY_LIMIT/);
  const states=(await repo.snapshot()).audit.filter(x=>x.jobId===initial.jobId).map(x=>x.status);assert.deepEqual(states,['queued','building','testing','ready']);
 });
+test('lost retry acknowledgement and concurrent explicit retries recover one durable successor and one reservation',async()=>{
+ // No provider is called. A synthetic metered failure exercises the real
+ // reservation, retry transaction and restart/read contracts.
+ const adapter:AgentAdapter={available:true,kind:'metered-api',async generate(){throw Error('SYNTHETIC_FAILURE');}};
+ const repo=new MemoryRepository(),options={allowMock:false,maxUnits:5,timeoutMs:1000,maxRetries:2};
+ const service=new JobService(repo,adapter,gate,options),input={...request,prompt:'Attach stickers to a rocket and launch it.'};
+ await service.setAllowance(session,100,true);
+ const original=await service.submit(session,input);await service.run(original.jobId);
+ assert.equal((await service.get(session,original.jobId)).status,'failed');
+ const [first,repeated]=await Promise.all([
+  service.retry(session,original.jobId,'first-retry-lost-response'),
+  service.retry(session,original.jobId,'concurrent-retry-new-client-id')
+ ]);
+ assert.equal(first.jobId,repeated.jobId,'different request IDs cannot create sibling retry jobs');
+ let state=await repo.snapshot();assert.equal(state.jobs.length,2);
+ assert.deepEqual({used:state.ledgers[session.familyId].used,reserved:state.ledgers[session.familyId].reserved},{used:5,reserved:5});
+ assert.equal(state.audit.filter(event=>event.status==='queued').length,2,'only one new reservation and queued event');
+
+ const restarted=new JobService(repo,adapter,gate,options),beforeRead=await repo.snapshot();
+ assert.equal((await restarted.get(session,original.jobId)).retryJobId,first.jobId,'a fresh browser can discover the accepted retry by reading its saved original job');
+ assert.deepEqual(await repo.snapshot(),beforeRead,'recovery lookup is read-only');
+ assert.equal((await restarted.retry(session,original.jobId,'after-reload-new-client-id')).jobId,first.jobId);
+ assert.deepEqual(await repo.snapshot(),beforeRead,'an explicit duplicate retry does not reserve or enqueue again');
+ await assert.rejects(restarted.submit(session,{...input,retryOf:original.jobId,clientRequestId:input.clientRequestId}),/IDEMPOTENCY_CONFLICT/,'an existing submission key cannot be reassigned to a retry');
+ await assert.rejects(restarted.submit(session,{...input,prompt:'Attach a different sticker and launch it.',retryOf:original.jobId,clientRequestId:'changed-retry-intent'}),/RETRY_LIMIT/);
+
+ await restarted.run(first.jobId);assert.equal((await restarted.get(session,first.jobId)).status,'failed');
+ assert.equal((await restarted.retry(session,original.jobId,'recover-failed-successor')).jobId,first.jobId,'a failed successor requires a new explicit decision; recovery never retries it recursively');
+ const second=await restarted.retry(session,first.jobId,'explicit-second-retry');await restarted.run(second.jobId);
+ assert.equal((await restarted.get(session,first.jobId)).retryJobId,second.jobId);
+ await assert.rejects(restarted.retry(session,second.jobId,'beyond-retry-limit'),/RETRY_LIMIT/);
+ state=await repo.snapshot();assert.equal(state.jobs.length,3);
+ assert.deepEqual(state.jobs.map(job=>job.retryCount),[0,1,2]);
+ assert.equal(state.ledgers[session.familyId].used,15);assert.equal(state.ledgers[session.familyId].reserved,0);
+ await assert.rejects(restarted.get({...session,familyId:'other-family'},original.jobId),/Forbidden/);
+ await assert.rejects(restarted.retry({...session,familyId:'other-family'},original.jobId,'foreign-recovery'),/Forbidden/);
+});
+test('ambiguous legacy retry siblings stop recovery without another reservation or job mutation',async()=>{
+ const adapter:AgentAdapter={available:true,kind:'metered-api',async generate(){throw Error('SYNTHETIC_FAILURE');}};
+ const repo=new MemoryRepository(),service=new JobService(repo,adapter,gate,{allowMock:false,maxUnits:5,timeoutMs:1000,maxRetries:2});
+ await service.setAllowance(session,100,true);
+ const original=await service.submit(session,{...request,prompt:'Attach stickers to a rocket and launch it.'});await service.run(original.jobId);
+ const accepted=await service.retry(session,original.jobId,'legacy-first-retry');
+ await repo.transaction(state=>{
+  const first=state.jobs.find(job=>job.id===accepted.jobId)!;
+  state.jobs.push({...first,id:'legacy-second-retry',clientRequestId:'legacy-second-key'});
+  state.ledgers[session.familyId].reserved+=first.maxUnits;
+  state.audit.push({jobId:'legacy-second-retry',familyId:session.familyId,status:'queued',at:new Date().toISOString()});
+  return true;
+ });
+ const before=await repo.snapshot();
+ await assert.rejects(service.get(session,original.jobId),/IDEMPOTENCY_CONFLICT/,'status recovery must not pick one of two accepted siblings');
+ await assert.rejects(service.retry(session,original.jobId,'new-key-after-unknown-ack'),/IDEMPOTENCY_CONFLICT/);
+ assert.deepEqual(await repo.snapshot(),before,'conflict leaves every accepted job and all accounting unchanged');
+ assert.equal((await service.get(session,accepted.jobId)).jobId,accepted.jobId,'an exact known child ID remains readable');
+});
 test('durable queue survives reopening; immutable revisions and kept pointers survive restart',async()=>{
  const directory=await mkdtemp(join(tmpdir(),'factory-job-test-'));try{
  const file=join(directory,'jobs.json'),first=await FileRepository.open(file),service=new JobService(first,new MockAgent(),gate,{allowMock:true,maxUnits:0,timeoutMs:1000,maxRetries:1});const ack=await service.submit(session,request);

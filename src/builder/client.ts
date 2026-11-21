@@ -4,7 +4,7 @@ import {validateGeneratedCreationManifest} from '../creation/projects';
 export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
-export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number}
+export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number;retryJobId?:string}
 export interface Preview {revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
 export interface CreationManifestResponse {revisionId:string;projectId:string;manifest:CreationProject|null}
 const loopback=(url:URL)=>['127.0.0.1','localhost','[::1]'].includes(url.hostname);
@@ -15,20 +15,68 @@ export function validateBuilderConfig(input:unknown):BuilderConfig {
 }
 /** Adaptive polling avoids thousands of status reads during a long build. */
 export function buildPollDelay(elapsedMs:number){return elapsedMs<15000?1000:elapsedMs<60000?3000:8000;}
+/** A structured gateway rejection is different from a lost response. */
+export class BuilderApiError extends Error {
+ constructor(code:string,readonly status:number){super(code);this.name='BuilderApiError';}
+}
+export function isKnownBuildRejection(error:unknown):boolean {
+ // REQUEST_REJECTED is the gateway's catch-all, including datastore errors;
+ // it cannot prove that a request was never admitted.
+ return error instanceof BuilderApiError&&['UNAUTHENTICATED','FORBIDDEN','SPENDING_CUTOFF','BUILDER_UNAVAILABLE','RATE_LIMIT','PRIVATE_INFORMATION','INVALID_REQUEST','NOT_FOUND','RETRY_LIMIT','IDEMPOTENCY_CONFLICT','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','GUARDIAN_CONSENT_REQUIRED','ADULT_PILOT_ACCESS_REQUIRED'].includes(error.message);
+}
+const validJobId=(value:unknown):value is string=>typeof value==='string'&&/^[\w-]{1,100}$/.test(value);
+function validateJob(value:JobView,expectedId?:string):JobView {
+ if(!value||!validJobId(value.jobId)||expectedId&&value.jobId!==expectedId||!['queued','building','testing','ready','failed','cancelled'].includes(value.status)||value.retryJobId!==undefined&&(!validJobId(value.retryJobId)||value.retryJobId===value.jobId))throw Error('INVALID_JOB_RESPONSE');
+ return value;
+}
 export class BuilderClient {
- private generation=0;private request:RequestChange|null=null;private requestId='';private retryOf:string|undefined;private last:JobView|null=null;
+ private generation=0;private request:RequestChange|null=null;private requestId='';private last:JobView|null=null;
  constructor(readonly config:BuilderConfig,private update:(job:JobView)=>void){}
  async api(path:string,body?:unknown){
   if(this.config.mode!=='remote')throw Error('BUILDER_UNAVAILABLE');const response=await familyFetch(this.config.apiBaseUrl!,path,{method:body===undefined?'GET':'POST',credentials:'include',headers:body===undefined?{}:{'Content-Type':'application/json','X-Factory-Request':'1'},body:body===undefined?undefined:JSON.stringify(body)});
-  const data=await response.json();if(!response.ok)throw Error(data.errorCode||'BUILDER_UNAVAILABLE');return data;
+  const data=await response.json();if(!response.ok){if(typeof data?.errorCode!=='string')throw Error('UNCONFIRMED_BUILD_RESPONSE');throw new BuilderApiError(data.errorCode,response.status);}return data;
  }
- async submit(input:RequestChange){this.request={...input};this.requestId=crypto.randomUUID();this.retryOf=undefined;this.last=null;return this.send();}
- async retry(){if(!this.request){if(this.last?.status!=='failed')throw Error('NO_REQUEST');const token=++this.generation;const ack=await this.api('/v1/jobs/'+this.last.jobId+'/retry',{clientRequestId:crypto.randomUUID()});if(token!==this.generation)return;return this.resume(ack.jobId);}if(this.last?.status==='failed'){this.retryOf=this.last.jobId;this.requestId=crypto.randomUUID();}return this.send();}
+ async submit(input:RequestChange){this.request={...input};this.requestId=crypto.randomUUID();this.last=null;return this.send();}
+ /** Restore the exact saved job, including a retry whose acknowledgement was
+  * lost. Looking up or following that chain never submits another paid job. */
+ private async readLatestJob(jobId:string,token:number):Promise<JobView|undefined>{
+  if(!validJobId(jobId))throw Error('INVALID_JOB');
+  const seen=new Set<string>();
+  for(let depth=0;depth<12;depth++){
+   if(seen.has(jobId))throw Error('INVALID_JOB_RESPONSE');seen.add(jobId);
+   const job=validateJob(await this.api('/v1/jobs/'+jobId),jobId);
+   if(token!==this.generation)return;
+   if(!job.retryJobId)return job;
+   jobId=job.retryJobId;
+  }
+  throw Error('INVALID_JOB_RESPONSE');
+ }
+ async check(jobId:string){
+  const token=++this.generation,job=await this.readLatestJob(jobId,token);
+  if(!job||token!==this.generation)return;
+  this.last=job;this.update(job);return job;
+ }
+ async retry(jobId=this.last?.jobId){
+  if(!jobId)throw Error('NO_ACKNOWLEDGED_JOB');
+  const token=++this.generation,job=await this.readLatestJob(jobId,token);
+  if(!job||token!==this.generation)return;
+  // An earlier click already created a retry, or the saved status was stale.
+  // Recover it; retrying a newly observed failure requires another explicit click.
+  if(job.jobId!==jobId||job.status!=='failed'){
+   this.last=job;this.update(job);
+   if(['queued','building','testing'].includes(job.status))return this.resume(job.jobId);
+   return job;
+  }
+  const ack=validateJob(await this.api('/v1/jobs/'+jobId+'/retry',{clientRequestId:crypto.randomUUID()}));
+  if(token!==this.generation)return;
+  this.last=ack;this.update(ack);
+  return this.resume(ack.jobId);
+ }
  private async send(){
   const token=++this.generation,input=this.request!;let baseRevisionId=input.baseRevisionId;
   if(input.config&&baseRevisionId){const base=await this.api('/v1/revisions',{gameId:input.gameId,localRevisionId:baseRevisionId,config:input.config});baseRevisionId=base.revisionId;}
   if(token!==this.generation)return; // Profile changed while registering the starting revision.
-  const acknowledged=await this.api('/v1/jobs',{gameId:input.gameId,baseRevisionId,prompt:input.prompt,clientRequestId:this.requestId,...(this.retryOf?{retryOf:this.retryOf}:{})});
+  const acknowledged=await this.api('/v1/jobs',{gameId:input.gameId,baseRevisionId,prompt:input.prompt,clientRequestId:this.requestId});
   if(typeof acknowledged.jobId!=='string'||!/^[\w-]{1,100}$/.test(acknowledged.jobId)||!['queued','building','testing','ready','failed','cancelled'].includes(acknowledged.status))throw Error('INVALID_ACKNOWLEDGEMENT');
   if(token!==this.generation)return;this.last=acknowledged;this.update(this.last!);
   const started=Date.now();for(let i=0;i<3600&&token===this.generation&&Date.now()-started<30*60_000;i++){
@@ -39,7 +87,7 @@ export class BuilderClient {
   }
   if(token!==this.generation)return;throw Error('POLL_TIMEOUT');
  }
- async resume(jobId:string){if(!/^[\w-]{1,100}$/.test(jobId))throw Error('INVALID_JOB');const token=++this.generation,started=Date.now();for(let i=0;i<3600&&token===this.generation&&Date.now()-started<30*60_000;i++){const job=await this.api('/v1/jobs/'+jobId);if(token!==this.generation)return;if(job.jobId!==jobId||!['queued','building','testing','ready','failed','cancelled'].includes(job.status))throw Error('INVALID_JOB_RESPONSE');this.last=job;this.update(job);if(['ready','failed','cancelled'].includes(job.status))return job;await new Promise(r=>setTimeout(r,buildPollDelay(Date.now()-started)));}if(token!==this.generation)return;throw Error('POLL_TIMEOUT');}
+ async resume(jobId:string){if(!validJobId(jobId))throw Error('INVALID_JOB');const token=++this.generation,started=Date.now();for(let i=0;i<3600&&token===this.generation&&Date.now()-started<30*60_000;i++){const job=await this.readLatestJob(jobId,token);if(!job||token!==this.generation)return;jobId=job.jobId;this.last=job;this.update(job);if(['ready','failed','cancelled'].includes(job.status))return job;await new Promise(r=>setTimeout(r,buildPollDelay(Date.now()-started)));}if(token!==this.generation)return;throw Error('POLL_TIMEOUT');}
  async cancel(jobId?:string){
   const id=jobId||this.last?.jobId;
   if(!id||!/^[\w-]{1,100}$/.test(id))throw Error('NO_ACKNOWLEDGED_JOB');

@@ -71,6 +71,12 @@ body.studio-review #page-studio .studio-send-row #studioSend {
  grid-column: 1 / -1; justify-self: stretch; width: 100%; min-height: 52px;
  color: #fff !important; background: #0b1e3b !important; border: 2px solid #0b1e3b !important;
 }
+body.studio-review #page-studio .studio-send-row #studioSend:disabled {
+ color: #51416e !important; background: #e9e3f4 !important; border-color: #c8b8df !important; opacity: 1; cursor: not-allowed;
+}
+body.studio-review #page-studio .studio-build-guidance { grid-column: 1 / -1; min-width: 0; }
+body.studio-review #page-studio .studio-build-reason { margin: 2px 0 8px; color: #35435b; font: 600 20px/1.45 var(--jems-body,system-ui); overflow-wrap: anywhere; }
+body.studio-review #page-studio #studioCheckIdea { min-height: 48px; font: 750 18px/1.4 var(--jems-body,system-ui); padding: 10px 15px; color: #462774; background: #f5f0ff; border: 1px solid #c9b4e8; border-radius: 13px; }
 body.studio-review #page-studio :is(#studioDraftStatus, #studioVoiceStatus) {
  font: 600 18px/1.45 var(--jems-body,system-ui); color: #35435b; margin: 12px 2px 0; overflow-wrap: anywhere;
 }

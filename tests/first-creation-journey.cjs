@@ -134,7 +134,7 @@ async function localFirstJourney(browser,url,device,viewport){
   await page.locator('#page-studio').waitFor({state:'visible'});
   assert.equal((await notebook(page)).sessions.length,1,'the primary action creates exactly one idea');
   assert.equal((await current(page)).job,null,'a welcome action never submits a build');
-  assert.equal(await page.locator('#studioSend').isVisible(),false,'new creation waits for enough child-provided intent before offering Build');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'new creation waits for enough child-provided intent before enabling Build');
   if(device==='phone')for(const selector of ['#studioPrompt','#studioTalk']){
    const box=await page.locator(selector).boundingBox();
    assert.ok(box&&box.y>=0&&box.y+box.height<=viewport.height,selector+' remains visible in the first phone composer');
@@ -312,15 +312,15 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   await page.route(preview+'/**',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><html><body><h1>First creation transport fixture</h1><p>This is a synthetic game response, not an AI output.</p><button>Play fixture</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='first-artifact';addEventListener('message',event=>{if(event.source===parent&&event.data.type==='factory-learning'&&event.data.channel===channel&&event.data.artifactId===artifactId&&event.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script></body></html>`}));
   await page.goto(url);await ready(page);await page.waitForFunction(()=>FG.studio.mode()==='remote');
   await completeWelcome(page);
-  assert.equal(await page.locator('#studioSend').isVisible(),false,'Build is not offered before the child’s idea is understood');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'Build stays disabled before the child’s idea is understood');
   await page.fill('#studioPrompt',firstIdea);await page.click('#studioTalk');
   await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('What should happen when you help your cat move?'));
   assert.equal(await page.locator('#designPlan').isVisible(),false,'the useful next question stays in conversation');
   assert.equal(await page.locator('#coachGuidedChoices button, #coachChooseRest, #coachChooseForMe').count(),0,'the child supplies an answer without suggestions or delegation chips');
-  assert.equal(await page.locator('#studioSend').isVisible(),false);
+  assert.equal(await page.locator('#studioSend').isDisabled(),true);
   assert.equal(submitted,0,'talking through an incomplete idea does not start generation');
   await page.fill('#studioPrompt',ownDetails);await page.click('#studioTalk');
-  await page.locator('#studioSend').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   assert.equal(coachTurns,2,'the child’s own next turn supplies the material missing details');
   assert.equal(submitted,0,'a ready review still waits for explicit Build');
   await page.click('#studioSend');

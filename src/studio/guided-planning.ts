@@ -56,8 +56,9 @@ export function explicitPlanChoices(text:string):Partial<Record<PlanField,Design
  return result;
 }
 
-export function isRejectedChildTurn(messages:readonly Message[],index:number):boolean {
+export function isRejectedChildTurn(messages:readonly Message[],index:number,design?:DesignRecord):boolean {
  if(messages[index]?.role!=='child')return false;
+ if(design?.ideas.some(idea=>idea.id==='refused-turn:'+messages[index].id&&!idea.adopted))return true;
  for(const next of messages.slice(index+1)){
   if(next.role==='child')break;
   if(next.role==='helper'&&next.text.startsWith('I can help with safe game ideas. Let’s try another idea without sharing private details.'))return true;
@@ -77,7 +78,7 @@ export function isHelperAuthoredTurn(message:Message,design:DesignRecord):boolea
 export function authoredFollowupIntents(messages:readonly Message[],design:DesignRecord):string[]{
  const result:string[]=[];let sawIdea=false;
  for(let index=0;index<messages.length;index++){
-  const message=messages[index];if(message.role!=='child'||isHelperAuthoredTurn(message,design)||isRejectedChildTurn(messages,index)||design.ideas.some(idea=>idea.id==='superseded-turn:'+message.id&&!idea.adopted))continue;
+  const message=messages[index];if(message.role!=='child'||isHelperAuthoredTurn(message,design)||isRejectedChildTurn(messages,index,design)||design.ideas.some(idea=>idea.id==='superseded-turn:'+message.id&&!idea.adopted))continue;
   const text=message.text.trim();
   if(!text||guidedDelegation(text)||['Build my game','Build this plan'].includes(text))continue;
   if(!sawIdea){sawIdea=true;continue;}
