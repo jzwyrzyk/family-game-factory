@@ -612,6 +612,7 @@
         "scripts/deployment/**",
         "scripts/ops/**",
         "ops/**",
+        ".github/CODEOWNERS",
         "package.json",
         "package-lock.json",
         "tsconfig.json",
@@ -621,10 +622,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T13:24:45.322Z",
-      "sourceDigest": "61a5b11f11fea9368b06e8020368d60d9be6503c93aca327c52f1fc27cedffb8",
+      "reviewedAt": "2026-11-21T13:29:20.585Z",
+      "sourceDigest": "874386e76b832bf879f003581bc732337938eb81281805bc76e9d8d13ad1ad23",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated unchanged PR111 gateway repair and its tests with the unchanged real operations policy foundation in PR112, preserving both source and delivery histories. Confirmed 43 focused and 21 operations tests plus typecheck on the combined tree. Recorded successful PR108 Pages run44906553925 and public source marker at c43a181; current authenticated backend baselines and the new gateway rollout remain unverified, and historical PR109 promotion must not be replayed. Privileged workflows and Phase2 activation remain excluded.",
+      "reviewReason": "Reconciled draft PR107 with PR112 policy and game-repair integration, retaining all newer runtime, packaging and delivery evidence. Verified both privileged workflows, advisory CODEOWNERS, administrator/controller modules and fixed assets remain unchanged from reviewed PR107. Updated architecture, task routing and Phase2 runbook to distinguish the extracted real CI dependency from still-pending cloud grants, claims proofs, Logging validation and isolated live drill; no deployment or activation is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -689,10 +690,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T13:18:52.237Z",
-      "sourceDigest": "85bfd72a406e676b3a44e0ec57dc9475613ea48db0b8157226619f10945abf70",
+      "reviewedAt": "2026-11-21T13:29:21.019Z",
+      "sourceDigest": "fb2db8d59833d74bffaaeeb43e39b2b6918b595e24e8197895597cf5511883b1",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the policy-foundation contract and operations links, and routed scripts/ops and ops assets through delivery. The documentation map explicitly separates the real CI check from uninstalled privileged workflows; existing coverage, fingerprint checks and review requirements are preserved.",
+      "reviewReason": "Preserved PR112 required policy-foundation document, operations link checking and all newer area reviews; restored advisory CODEOWNERS source coverage for the remaining draft. Reconciled the documentation index and architecture so policy/game-fix integration and held privileged workflow activation have separate truthful entry points without weakening registry checks or source coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
