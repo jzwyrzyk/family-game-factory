@@ -1,6 +1,17 @@
 # Design-coach-first studio: implementation and evidence
 
-## Scope
+## Current DEV integration — source addition, November 20, 2026 (America/New_York)
+
+The [isolated DEV workbench](../development/DEV-WORKBENCH.md) can exercise the same conversation and dictation product paths using an operator-confirmed adult's synthetic content. Its app/gateway validate Google's signed IAP assertion against the exact app-service audience and adult subject/email allowlist. A separate DEV project, private coach service and exact gateway service-account caller/audience preserve the keyless browser/gateway boundary. Production defaults remain unchanged; the historical implementation record below is not a claim about current deployment.
+
+Actual Adult-profile requests retain their operator permit, passphrase-backed session, cookie and tab proof. Synthetic child-style requests require a server-only test grant bound to the current DEV policy, synthetic family, trusted device and hashed adult identity for at most one hour. The gateway checks that original grant before admitting and after completing coach/speech work, and partitions receipts/cache by the grant ID. A renewed grant cannot recover a previously authorized reply or transcript after expiry/revocation. No guardian consent, child coach consent or provider ZDR approval is manufactured for this route. It validates adult-operated product behavior, not real-child processing or child-policy acceptance.
+
+Generation, model coaching and speech share a durable maximum-cost admission counter (the manifest example is **$5 total**) in addition to existing family/per-call limits, with only one paid operation active at once. Failed, canceled or uncertain work does not refund the admitted maximum, and monthly rollover does not reset it. Unresolved running reservations require explicit reconciliation; no automatic replay of uncertain paid POSTs is added. This bound excludes infrastructure billing and does not replace provider/privacy/safeguarding approvals or reviewed prices.
+
+The focused DEV suites use signed identity and provider fixtures. Live IAP/routing, provider billing, ordinary adult enrollment/unlock and actual-browser microphone/preview acceptance remain outstanding. Coaching quality, authorship, explicit Send/Build/Keep, and the [gold-standard product requirements](GOLD_STANDARD.md) are unchanged. No educational or child-playtest outcome follows from these fixtures.
+
+## Historical scope — original PR18 studio
+
 This extends PR #18's review-only `?studio=1` studio. No merge, Pages deployment, account changes, new secrets, funded API invocation or worker-security modification is authorized by this implementation. Existing games and math algorithms are unchanged.
 
 The governing product specification is `GOLD_STANDARD.md`. Its accepted conversation principles are requirements, not a claim of validated educational efficacy.

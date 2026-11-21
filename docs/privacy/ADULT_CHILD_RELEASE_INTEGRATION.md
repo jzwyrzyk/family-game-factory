@@ -2,14 +2,19 @@
 
 This candidate integrates PR #52's parent choices with PR #53's adult pilot on **one existing Jems site**. The temporary adult profile directly activates AI for development. The same frontend keeps ordinary child profiles; privileged requests are authorized by the backend rather than by a hostname or local profile name.
 
+**Source update, November 20, 2026 (America/New_York):** the original integration and existing-site release requirements remain below. The isolated [DEV workbench](../development/DEV-WORKBENCH.md) adds an adult-operated synthetic test policy without changing production defaults. Its source/fixture checks are not deployment or child-processing acceptance.
+
 ## Runtime policies
 
 | Active rollout | Authorization for paid work | Effect on the current site |
 | --- | --- | --- |
 | Temporary adult development pilot | Live trusted device, operator-issued permit and recent passphrase-backed adult session with cookie plus tab-specific proof; normal provider/spend approvals | Selecting Adult (development) unlocks the AI workspace. Child profiles continue locally without adult AI access. |
 | Future child/family AI | Current notice-bound guardian receipt, separate generation/conversation/remote-speech scopes, applicable verified provider ZDR and privacy/provider/spend approvals | Adult pilot is disabled. Paid child capabilities remain unavailable until their independent requirements are met. |
+| Explicit isolated DEV synthetic testing | Exact signed IAP adult identity allowlist, separate validated DEV project, configured synthetic family, live trusted device and server-only test grant lasting at most one hour; applicable provider/spend approvals | An approved adult can exercise child-style product paths with synthetic data. The actual Adult workspace still requires the normal permit and session above. No production child authority is granted. |
 
-The gateway selects these policies with `FACTORY_ADULT_PILOT_MODE`. Adult mode also requires `FACTORY_ADULT_PILOT_OWNER_APPROVED` and `FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED`. There is no separate frontend and no `github.io` ban. The obsolete private-host flag cannot substitute for the new profile-access review.
+The existing-site gateway selects the adult/guardian policies with `FACTORY_ADULT_PILOT_MODE`. Adult mode also requires `FACTORY_ADULT_PILOT_OWNER_APPROVED` and `FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED`. There is no separate frontend requirement or `github.io` ban for that policy. The obsolete private-host flag cannot substitute for the new profile-access review.
+
+DEV additionally requires `FACTORY_ENVIRONMENT=development` plus complete `devAccess`, exact project metadata and own app/gateway/preview/coach/worker targets. App and gateway verify the signed IAP assertion's issuer, ES256 signature, exact app-service audience, validity and subject/email allowlist; preview verifies its own audience plus the existing artifact ticket. No unsigned identity header or local profile label can satisfy these checks. Synthetic grants bind a hashed adult identity, policy, family and device; old jobs and cached replies cannot acquire authority from replacement grants. No guardian, coach-consent, adult-permit or ZDR record is fabricated. The **$5 total example** uses durable maximum-cost admissions across generation, model coach and speech, one active paid operation and no automatic refund/monthly reset. Infrastructure billing and live acceptance remain separate; see the runbook for release and reconciliation.
 
 ## Profile switching and session isolation
 

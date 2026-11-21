@@ -7,6 +7,7 @@ import type {IncomingMessage,ServerResponse} from 'node:http';
 import type {VerifiedSession} from './contracts/api';
 import type {Repository,PipelineState} from './pipeline/types';
 import {signSession,verifySession} from './pipeline/auth';
+import {attachDevTestSession} from './dev-test-policy';
 import {privacyStatus,submitParentPrivacyChoice,revokeParentPrivacyChoice} from './privacy/parent-consent';
 import {adultPilotConfigured,adultPilotEligible,adultPilotProfileId,adultPilotCookieSession,authenticateAdultPilotSession,
  beginAdultPilotSession,type AdultPilotFlags} from './adult-pilot';
@@ -52,7 +53,7 @@ export function assertActiveTrustedDevice(state:Pick<PipelineState,'devices'>,se
 }
 export async function verifyBrowserSession(repo:Repository|undefined,rawCookie:string|undefined,key:string,
  now=Date.now(),adultProof:string|string[]|undefined=undefined):Promise<VerifiedSession>{
- const {adultSessionId:_ignoredId,adultProfileId:_ignoredProfile,...session}=
+ const {adultSessionId:_ignoredId,adultProfileId:_ignoredProfile,devTestGrantId:_ignoredDevGrant,...session}=
   verifySession(cookieValue(rawCookie,'factory_session'),key,now);
  let state:PipelineState|undefined;
  if(session.deviceId){
@@ -63,7 +64,7 @@ export async function verifyBrowserSession(repo:Repository|undefined,rawCookie:s
   if(!state)throw Error('ADULT_PILOT_ACCESS_REQUIRED');
   return authenticateAdultPilotSession(state,session,cookieValue(rawCookie,'factory_adult'),adultProof,now);
  }
- return session;
+ return attachDevTestSession(repo,session,now);
 }
 const secureCookie=(name:string,value:string,maxAge:number,path='/v1')=>
  name+'='+value+'; Path='+path+'; Secure; HttpOnly; SameSite=None; Partitioned; Max-Age='+Math.max(0,Math.floor(maxAge));
@@ -322,10 +323,10 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
    reply(404,{errorCode:'NOT_FOUND'});
   }catch(error){
    const reason=(error as Error).message;
-   const status=reason==='UNAUTHENTICATED'?401:reason==='INVALID_INVITATION'||reason==='INVALID_PARENT_ACCESS'||reason==='FORBIDDEN'||reason==='ADULT_PILOT_ACCESS_REQUIRED'?403:
+   const status=reason==='UNAUTHENTICATED'?401:reason==='INVALID_INVITATION'||reason==='INVALID_PARENT_ACCESS'||reason==='FORBIDDEN'||reason==='ADULT_PILOT_ACCESS_REQUIRED'||reason==='DEV_TEST_ACCESS_REQUIRED'?403:
     reason==='PARENT_LOCKED'||reason==='DEVICE_LIMIT'||reason==='INVITE_LIMIT'||reason==='PRIVACY_RECORD_LIMIT'?429:
     reason==='INVALID_REQUEST'||reason==='INVALID_PRIVACY_CHOICE'?400:503;
-   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','PRIVACY_RECORD_LIMIT','INVALID_REQUEST','INVALID_PRIVACY_CHOICE','PARENT_UNLOCK_REQUIRED'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
+   reply(status,{errorCode:['UNAUTHENTICATED','INVALID_INVITATION','INVALID_PARENT_ACCESS','FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','DEV_TEST_ACCESS_REQUIRED','PARENT_LOCKED','DEVICE_LIMIT','INVITE_LIMIT','PRIVACY_RECORD_LIMIT','INVALID_REQUEST','INVALID_PRIVACY_CHOICE','PARENT_UNLOCK_REQUIRED'].includes(reason)?reason:'SERVICE_UNAVAILABLE'});
   }
  };
 }

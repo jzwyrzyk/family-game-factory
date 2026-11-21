@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "environment": "development",
+  "projectId": "REQUIRED_SEPARATE_DEV_PROJECT_ID",
+  "projectNumber": "REQUIRED_ACTUAL_DEV_PROJECT_NUMBER",
+  "region": "REQUIRED_REVIEWED_REGION",
+  "sourceSha": "REQUIRED_REVIEWED_40_HEX_APPLICATION_SHA",
+  "allowedAdults": [
+    {
+      "subject": "REQUIRED_ACTUAL_IAP_GOOGLE_SUBJECT",
+      "email": "REQUIRED_VERIFIED_ADULT_EMAIL",
+      "operatorConfirmedAdult": false
+    }
+  ],
+  "worker": {
+    "repository": "REQUIRED_VERIFIED_OWNER/REQUIRED_PRIVATE_WORKER_REPOSITORY-dev",
+    "repositoryId": "REQUIRED_ACTUAL_REPOSITORY_ID",
+    "ownerId": "REQUIRED_ACTUAL_OWNER_ID",
+    "workflow": "factory-private-dev.yml",
+    "sha": "REQUIRED_REVIEWED_40_HEX_PRIVATE_WORKER_SHA",
+    "runnerGroupId": "REQUIRED_ACTUAL_ISOLATED_RUNNER_GROUP_ID",
+    "githubAppId": "REQUIRED_DEV_ONLY_DISPATCH_APP_ID",
+    "githubInstallationId": "REQUIRED_DEV_ONLY_DISPATCH_INSTALLATION_ID"
+  },
+  "budget": {
+    "totalMicroUsd": 5000000,
+    "maxJobMicroUsd": 1000000,
+    "maxCoachTurnMicroUsd": 100000
+  },
+  "images": {
+    "app": null,
+    "gateway": null,
+    "preview": null,
+    "coach": null,
+    "sandbox": null
+  },
+  "secretVersions": {
+    "app-config": null,
+    "gateway-config": null,
+    "preview-config": null,
+    "github-app-key": null,
+    "coach-key": null
+  },
+  "iap": {
+    "oauthConfigured": false,
+    "appAudience": null,
+    "previewAudience": null
+  },
+  "coachEnvironment": {
+    "FACTORY_COACH_APPROVED": "false",
+    "FACTORY_COACH_PRIVACY_APPROVED": "false",
+    "FACTORY_COACH_SAFEGUARDS_APPROVED": "false",
+    "FACTORY_COACH_ZDR_VERIFIED": "false",
+    "FACTORY_COACH_PRIVATE_EXECUTION_APPROVED": "false",
+    "FACTORY_COACH_AUDIO_APPROVED": "false",
+    "FACTORY_COACH_AUDIO_PRIVACY_APPROVED": "false",
+    "FACTORY_COACH_AUDIO_PROVIDER_VERIFIED": "false",
+    "FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED": "false"
+  },
+  "generationEnabled": false
+}

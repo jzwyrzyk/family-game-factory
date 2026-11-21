@@ -15,5 +15,6 @@ export function requireResourceAudience(
  const audience=resource.adultPilotProfileId||
   (resource.adultPilotDeviceId?`adult:${resource.adultPilotDeviceId}`:undefined);
  if(audience!==session.adultProfileId)throw Error('FORBIDDEN');
- if((audience||session.adultSessionId)&&!adultPilotAllowed(state,session))throw Error('FORBIDDEN');
+ const adultTagged=audience!==undefined||session.adultSessionId!==undefined||session.adultProfileId!==undefined;
+ if(adultTagged&&(session.devTestGrantId!==undefined||!adultPilotAllowed(state,session)))throw Error('FORBIDDEN');
 }

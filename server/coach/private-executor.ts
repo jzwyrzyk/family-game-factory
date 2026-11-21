@@ -13,10 +13,13 @@ import {privateCoachOrigin} from './private-bridge';
 import {speechApproved,speechConfig,validateAudio,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
 import {GooglePrivateSpeech} from './private-speech-provider';
 import {adultPilotFlags} from '../adult-pilot';
+import {validateDevProject,devServiceOrigin,assertDevProjectBinding,type DevCloudTarget} from '../dev-access';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
-export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
- if(!/^https:\/\/[^/?#]+$/.test(audience)||approvedServiceAccount!=='factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com')
+export function googleCallerVerifier(audience:string,approvedServiceAccount:string,development?:DevCloudTarget):VerifyCaller {
+ const expected=development?`jems-dev-gateway@${development.projectId}.iam.gserviceaccount.com`:'factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com';
+ if(!/^https:\/\/[^/?#]+$/.test(audience)||approvedServiceAccount!==expected||
+  (development&&audience!==devServiceOrigin(development,'coach')))
   throw Error('PRIVATE_COACH_IDENTITY_REQUIRED');
  const googleKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return async(token)=>{
@@ -133,11 +136,13 @@ function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
  * a dedicated scoped API key, current prices and the approved gateway identity.
  */
 export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
- if(env.K_SERVICE!=='factory-coach-private'||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
+ const development=devCoachTarget(env);
+ if(env.K_SERVICE!==(development?'jems-dev-coach':'factory-coach-private')||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
   throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
  if(env.FACTORY_OPENAI_API_KEY||env.FACTORY_COACH_API_KEY)
   throw Error('GENERATION_OR_GATEWAY_KEY_FORBIDDEN_IN_PRIVATE_COACH');
  const config=privateConfig(env),audioConfig=speechConfig(env);
+ if(development&&audioConfig.projectId&&audioConfig.projectId!==development.projectId)throw Error('DEV_SPEECH_PROJECT_REQUIRED');
  const requested=env.FACTORY_COACH_APPROVED==='true';
  const audioRequested=env.FACTORY_COACH_AUDIO_APPROVED==='true';
  if(!requested&&!audioRequested){
@@ -151,13 +156,23 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
  if(audioRequested&&!speechApproved(audioConfig))throw Error('AUDIO_APPROVAL_REQUIRED');
  const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
  const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
- if(privateCoachOrigin(audience)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
- return {config,enabled:requested,verifyCaller:googleCallerVerifier(audience,caller),
+ if(privateCoachOrigin(audience,development)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
+ return {config,enabled:requested,verifyCaller:googleCallerVerifier(audience,caller,development),
+  ...(development?{maxConcurrent:1}:{}),
   provider:new OpenAICoachProvider(config),
   audioConfig,
   audio:audioRequested?new GooglePrivateSpeech(audioConfig.projectId):undefined};
 }
+export function devCoachTarget(env:NodeJS.ProcessEnv):DevCloudTarget|undefined{
+ const requested=env.FACTORY_ENVIRONMENT==='development'||env.FACTORY_DEV_PROJECT_ID!==undefined||env.FACTORY_DEV_PROJECT_NUMBER!==undefined||env.FACTORY_DEV_REGION!==undefined;
+ if(!requested)return undefined;
+ if(env.FACTORY_ENVIRONMENT!=='development')throw Error('DEV_ACCESS_CONFIG_REQUIRED');
+ const project=validateDevProject(env.FACTORY_DEV_PROJECT_ID||'',env.FACTORY_DEV_PROJECT_NUMBER||'');
+ const target={...project,region:env.FACTORY_DEV_REGION||''};devServiceOrigin(target,'coach');return target;
+}
 async function main(){
+ const development=devCoachTarget(process.env);
+ if(development)await assertDevProjectBinding(development);
  const runtime=dedicatedCoachRuntime(process.env);
  const handler=privateCoachHandler(runtime);
  const port=Number(process.env.PORT||8080);

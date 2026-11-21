@@ -7,6 +7,8 @@ export interface VerifiedSession {
   // Attached by the adult cookie + per-tab proof middleware, never a profile
   // name, client JSON field or an ambient family-session cookie.
   adultSessionId?:string; adultProfileId?:string;
+  /** Server-attached lease for an IAP-verified adult testing synthetic child UI. */
+  devTestGrantId?:string;
 }
 export interface PrivateResource { familyId: string; id: string }
 export type GenerationState = 'queued' | 'running' | 'validating' | 'ready' | 'failed' | 'cancelled';

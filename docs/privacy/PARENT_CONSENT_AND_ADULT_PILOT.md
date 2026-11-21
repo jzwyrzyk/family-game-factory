@@ -32,6 +32,16 @@ An operator permit makes a known adult's enrolled device eligible. The profile s
 
 Adult mode restricts remote AI to that authorization while child profiles retain local behavior. It does not set child consent or provider ZDR flags to true. Model, speech, budget, worker isolation and private routing approvals still apply. Disabling the temporary mode restores the child consent policy with its existing fail-closed approvals.
 
+## Isolated DEV synthetic testing — source addition, November 20, 2026 (America/New_York)
+
+The [DEV workbench](../development/DEV-WORKBENCH.md) adds a separate, explicitly configured nonproduction policy. Only operator-confirmed adults whose exact subject/email pair passes signed Google IAP verification can use it. The app/gateway bind the exact app-service audience; preview binds its own audience and still checks signed artifact access. DEV uses its own validated cloud project, storage, service identities, secrets and private worker/coach. These controls do not change production guardian or adult-profile defaults.
+
+A trusted device in the one configured synthetic family can receive a server-only test grant lasting at most one hour, bound to the adult identity hash and current policy. This permits that adult to exercise child-style generation, coach and speech with synthetic test content. Original grants are rechecked at admission, asynchronous execution and completion; expiry, revocation or replacement cannot renew old work. Actual Adult-profile requests still require their ordinary operator permit, passphrase session, cookie and tab proof.
+
+Test grants are distinct records, not pending/verified parent choices, coach consent, adult permits or evidence of provider Zero Data Retention. No such approvals are seeded to make tests pass. Do not import production records or real child data. DEV results are adult-operated product evidence, not acceptance of production child consent or real-child processing. Provider/privacy/safeguarding configuration remains independently required.
+
+Generation, model coach and speech share a durable maximum-cost admission counter; the manifest example is **$5 total**, without automatic refunds or monthly refill, and one active paid operation at a time. Existing family/per-request limits also apply. This accounting is separate from stored-content retention, receipt erasure and infrastructure billing. Local fixtures do not establish cloud deployment, live IAP/provider controls, microphone behavior or completed privacy operations.
+
 ## Evidence outside this source change
 
 Before processing child data, complete the operator's actual notice/contact information, direct parent delivery, appropriate external verification process, data/provider inventory, access/erasure and backup policy, withdrawal handling and applicable provider approvals. This form is not a legal certification. Provider ZDR is independently verified; a request option such as `store:false` does not establish approval.
