@@ -737,10 +737,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:01:33.314Z",
-      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
+      "reviewedAt": "2026-11-21T18:28:14.380Z",
+      "sourceDigest": "4fdbc432c5deae030baebd8e3f7f33cd2c0a9fdae03d952fcaf46caf870adc66",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the isolated service-archive fixture against the actual coach Dockerfile: added server/http-json.ts to the synthetic repository so COPY verification exercises the complete current input set. SERVICE_SCOPE already includes server; production packaging, approval rules and deployment settings are unchanged. All 79 deployment tests pass, including older-source and missing-input rejection checks. Existing architecture and private-coach documentation already describe the shared reader and explicit image input.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -142,7 +142,7 @@ class ServiceBuildTests(unittest.TestCase):
                 return git('rev-parse','HEAD')
             git('init','-q')
             inputs=['package.json','package-lock.json','.dockerignore','server/gateway.ts','server/preview-server.ts',
-                    'server/coach/private-executor.ts','server/trusted-devices.ts','server/privacy/parent-consent.ts',
+                    'server/coach/private-executor.ts','server/trusted-devices.ts','server/http-json.ts','server/privacy/parent-consent.ts',
                     'server/adult-pilot.ts','server/pipeline/auth.ts',
                     'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
                     'src/studio/creation-readiness.ts','src/studio/conversation-view.ts',
