@@ -109,13 +109,17 @@ async function checkGameContent(page, game, label) {
     await insideHost(page, '.robot-plan-actions button', label + ' persistent Run, Undo and Clear actions', 48);
     for (const button of await page.locator('.robot-plan-tools button').all()) {
       await button.scrollIntoViewIfNeeded();
-      assert.equal(await button.evaluate(node => {
+      const direction = await button.evaluate(node => {
         const r = node.getBoundingClientRect(), tray = node.closest('.robot-plan-tools').getBoundingClientRect();
         const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-        return r.width >= 48 && r.height >= 48 && r.left >= tray.left - 1 && r.right <= tray.right + 1 &&
+        return { text: node.textContent, rect: {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height},
+          tray: {left:tray.left,right:tray.right,top:tray.top,bottom:tray.bottom}, hit:hit?.id||hit?.className||hit?.tagName,
+          font:parseFloat(getComputedStyle(node).fontSize),scrollWidth:node.scrollWidth,clientWidth:node.clientWidth,
+          usable: r.width >= 48 && r.height >= 48 && r.left >= tray.left - 1 && r.right <= tray.right + 1 &&
           r.top >= tray.top - 1 && r.bottom <= tray.bottom + 1 && parseFloat(getComputedStyle(node).fontSize) >= 18 &&
-          node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit));
-      }), true, label + ': every direction is readable and reachable inside its own tool panel');
+          node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit)) };
+      });
+      assert.equal(direction.usable, true, label + ': every direction is readable and reachable inside its own tool panel: '+JSON.stringify(direction));
       assert.equal(await board.evaluate(node => node.getBoundingClientRect().top), boardTop, label + ': tools scrolling keeps the board still');
       assert.equal(await page.evaluate(() => scrollY), pageY, label + ': tools scrolling cannot move the page');
     }
@@ -209,6 +213,22 @@ async function checkMore(page, label) {
   await summary.focus();
   for (let index = 0; index < 8 && !await action.evaluate(node => document.activeElement === node); index++) await page.keyboard.press('Tab');
   assert.equal(await action.evaluate(node => document.activeElement === node), true, label + ': More supports keyboard navigation');
+  const menu = page.locator('#studioMore .studio-more-actions');
+  if (label.endsWith('factory') && await menu.evaluate(node => node.scrollHeight > node.clientHeight + 1)) {
+    for (const activation of ['pointer', 'Enter', 'Space']) {
+      await page.locator('#studioProfileMenu > summary').scrollIntoViewIfNeeded();
+      assert.ok(await menu.evaluate(node => node.scrollTop > 0), label + ': the menu was genuinely scrolled before reopening');
+      await summary.click();
+      if (activation === 'pointer') await summary.click();
+      else { await summary.focus(); await page.keyboard.press(activation); }
+      const reopened = await action.evaluate(node => {
+        const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return { scroll: node.closest('.studio-more-actions').scrollTop, reachable: hit === node || node.contains(hit) };
+      });
+      assert.equal(reopened.scroll, 0, label + ': ' + activation + ' reopens More at its first tools');
+      assert.equal(reopened.reachable, true, label + ': ' + activation + ' makes the first tools immediately reachable');
+    }
+  }
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#studioMore').evaluate(node => node.open), false, label + ': Escape closes More');
   assert.equal(await summary.evaluate(node => document.activeElement === node), true, label + ': closing More returns focus');

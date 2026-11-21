@@ -27,9 +27,30 @@ async function openFactory(page){
 }
 
 async function capture(page,device,stage){
+ // Capture the settled station, not an intermediate frame in its intentional
+ // camera pan. This waits for that finite transition, never for valid bounds.
+ await page.locator('.gf-room').evaluate(async room=>{room.getBoundingClientRect();await Promise.allSettled(room.getAnimations().map(animation=>animation.finished));});
  await checkRoomBounds(page,device,stage);
+ if(stage==='pack'&&device.startsWith('phone'))await checkPackingSpace(page,device);
  fs.mkdirSync('test-results/gem-factory',{recursive:true});
  await page.locator('.gem-factory').screenshot({path:`test-results/gem-factory/${device}-${stage}.png`});
+}
+
+async function checkPackingSpace(page,device){
+ const result=await page.evaluate(()=>{
+  const world=document.querySelector('.gf-world').getBoundingClientRect(),hint=document.querySelector('.gf-helper-hint');
+  const h=hint.getBoundingClientRect();
+  const rect=r=>({left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height});
+  return {world:rect(world),hint:rect(h),hintFont:parseFloat(getComputedStyle(hint).fontSize),
+   labels:[...document.querySelectorAll('.gf-paper-name')].map(node=>{const r=node.getBoundingClientRect();return {text:node.textContent,...rect(r),font:parseFloat(getComputedStyle(node).fontSize),
+    overlapsHint:r.left<h.right&&r.right>h.left&&r.top<h.bottom&&r.bottom>h.top};}),
+   controls:[...document.querySelectorAll('.gf-paper-roll,.gf-gift-action')].map(node=>{const r=node.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {name:node.getAttribute('aria-label'),...rect(r),reachable:hit===node||node.contains(hit)};})};
+ });
+ assert.ok(result.hintFont>=20&&result.hint.top>=result.world.top&&result.hint.bottom<=result.world.bottom+1,device+': packing instructions remain readable in their own space: '+JSON.stringify(result));
+ for(const label of result.labels)assert.ok(label.font>=18&&!label.overlapsHint&&label.left>=result.world.left-1&&label.right<=result.world.right+1&&label.top>=result.world.top&&label.bottom<=result.world.bottom+1,
+  device+': paper names stay visible above the helper: '+JSON.stringify(label));
+ for(const control of result.controls)assert.ok(control.width>=48&&control.height>=48&&control.reachable&&control.left>=result.world.left-1&&control.right<=result.world.right+1&&control.top>=result.world.top&&control.bottom<=result.world.bottom+1,
+  device+': each paper and the gift remain reachable: '+JSON.stringify(control));
 }
 
 async function checkRoomBounds(page,device,stage){

@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:16:29.695Z",
-      "sourceDigest": "f9be7239dda38092d9a409d4a9e2b1c3e9c4a97e0d40f25441205f15c4e5d50a",
+      "reviewedAt": "2026-11-21T21:34:48.469Z",
+      "sourceDigest": "de16e53771055a25d74b87cc548e29938bfe93ded10b4074f27def196158efe0",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the play contract after actual second-head captures: visible Dragon initialization and hero controls, More scroll reset, readable sticker tray and a stable Robot board with persistent actions.",
+      "reviewReason": "Reviewed third-head screenshots and preserved native learning guards while correcting More reopen timing, natural-height Dragon cards, readable Robot directions and separate portrait packing/helper space.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:16:31.613Z",
-      "sourceDigest": "d9702344816df23b93b97f2ce474a824dddbbc5e11588669e064495301025a3b",
+      "reviewedAt": "2026-11-21T21:34:49.477Z",
+      "sourceDigest": "0e21cdff6e77ab119bfc348e63ba2eaa26f85f938d4db5b194ade1978225c0aa",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented native Dragon initialization and keyboard handling, bounded shadow-menu refitting and Robot board/tool separation; game goals, saved routes and learning authority are preserved.",
+      "reviewReason": "Updated the play contract for two-column Robot directions without changing board size, action visibility, game handlers, saved routes or scoring.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:16:32.078Z",
-      "sourceDigest": "ffde966ad8a3d0381c211d4f70520421c043e41af13467c4c4c4be85a01386ad",
+      "reviewedAt": "2026-11-21T21:34:50.057Z",
+      "sourceDigest": "cd90da3a9c08d0b6dbb7fe988ca99cfe787a3f4e173bb5bcf32404997ba789d7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded second-head passes and exact failed geometry/menu findings; strengthened board-size, label/target, tray, Start and keyboard checks while retaining existing saved-work and owner assertions.",
+      "reviewReason": "Recorded 32-of-35 third-head game passes and the three precise remaining failures; retained hit/bounds checks, added deliberate scrolled-menu pointer/keyboard reopening and settled packing label/control assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T21:16:32.559Z",
-      "sourceDigest": "92cf2874cdfad7d712db3c7c523badf303e921005a34b0b93f9f2389a8127a64",
+      "reviewedAt": "2026-11-21T21:34:50.615Z",
+      "sourceDigest": "5b70e44a5cabf9b0ec0042bad9ebf0b2de3044d4289fc90fe4b6958e738fe7ea",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded initial and second-head evidence, the narrow previously verified Pal extraction and new source corrections; combined hosted verification remains required and the candidate is draft, undeployed, with narration off.",
+      "reviewReason": "Recorded exact third-head passing workflows, learning/reading and combined Pal evidence alongside the failed Studio matrix; final source remains unmerged, undeployed and separately gated from natural voice activation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

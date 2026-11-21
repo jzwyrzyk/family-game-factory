@@ -124,7 +124,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
           .wrap:has(#menu:not(.hidden)){width:100%!important;height:var(--jems-native-space)}
           .wrap:has(#menu:not(.hidden))>canvas{height:100%;object-fit:contain}
           .wrap:has(#menu:not(.hidden))>#hud{position:absolute;inset:10px 10px auto}
-          #menu{padding:10px}#menu .panel{height:100%;padding:12px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px;overflow:hidden}
+          #menu{padding:10px}#menu .panel{height:auto;max-height:100%;padding:12px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px;overflow:hidden}
           #menu .panel h1{font-size:24px;line-height:1.1;margin:0}#menu .panel p{font-size:20px;line-height:1.25;margin:0}
           #menu .heroes{min-height:0;overflow:auto;overscroll-behavior:contain;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(100px,1fr);align-content:start;margin:0;padding:4px;gap:8px}
           #menu .heroCard{min-width:0;min-height:100px;padding:6px;gap:4px}#menu .heroCard img,#menu .heroCard canvas{height:56px}#menu .heroCard strong{font-size:18px}#menu .heroCard>div{display:none}
@@ -193,13 +193,21 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
   }
   button.onclick = () => { void toggleFullscreen(); };
   const more = page.querySelector<HTMLDetailsElement>('#studioMore')!;
-  more.addEventListener('toggle', () => {
+  const resetMoreScroll = () => {
     if (!active || !more.open) return;
     // A previous visit to profiles or a long build shelf must not reopen the
     // tool menu partway down, hiding its first actions above the scrollport.
-    more.querySelector<HTMLElement>('.studio-more-actions')!.scrollTop = 0;
+    const menu = more.querySelector<HTMLElement>('.studio-more-actions')!;
+    menu.getBoundingClientRect(); // materialize the newly opened scrollport
+    menu.scrollTop = 0;
     scheduleResize();
-  });
+  };
+  // Native details dispatches toggle in a later task. Observe the actual open
+  // attribute so click/keyboard activation resets its scrollport before paint,
+  // without replacing native activation or bypassing the learning click guard.
+  const moreState = new MutationObserver(resetMoreScroll);
+  moreState.observe(more, { attributes: true, attributeFilter: ['open'] });
+  more.addEventListener('toggle', resetMoreScroll);
   page.addEventListener('keydown', event => {
     if (event.key !== 'Escape' || !active || !expanded || document.fullscreenElement === page || page.querySelector('#studioMore[open]')) return;
     event.preventDefault(); event.stopPropagation();

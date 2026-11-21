@@ -44,7 +44,7 @@ body.studio-review .studio-play-mode #studioMore .studio-more-actions {
   position: fixed; top: var(--jems-play-menu-top, 140px); right: max(12px, env(safe-area-inset-right)); left: auto;
   width: min(340px, calc(100vw - 24px)); z-index: 50;
   max-height: calc(100dvh - var(--jems-play-menu-top, 140px) - 12px);
-  overflow: auto; overscroll-behavior: contain;
+  overflow: auto; overscroll-behavior: contain; overflow-anchor: none;
 }
 body.studio-review .studio-play-mode #studioMore .studio-more-actions button { white-space: normal; }
 body.studio-review .studio-play-mode #studioProfileMenu { position: static; margin: 0; max-width: 100%; }
@@ -130,6 +130,23 @@ body.studio-review .studio-play-mode .quality-game .q-garage[open] { max-height:
   body.studio-review .studio-play-mode .studio-title-wrap { display: none; }
   body.studio-review #page-studio.studio-play-mode .studio-heading { justify-content: space-between; }
   body.studio-review .studio-play-mode #studioFullScreen { max-width: 46%; }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  /* Packing choices and the helper have separate space after the camera pans
+     to the gift machine. Keep all paper names above the helper's speech. */
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-line {
+    top: 12px; bottom: 148px; display: grid; grid-template-rows: minmax(48px, 1fr) auto; gap: 12px; align-items: center;
+  }
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-gift-action {
+    position: relative; grid-row: 1; left: 77%; top: auto; height: 100%; max-height: 140px;
+  }
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-wrap-options {
+    position: relative; grid-row: 2; left: 70%; top: auto; bottom: auto; width: 28%; padding: 12px 10px 30px; gap: 10px;
+  }
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-paper-roll { min-width: 48px; }
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-paper-name { font-size: 18px; }
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-helper { bottom: 8px; }
+  body.studio-review .studio-play-mode .gem-factory[data-stage="pack"] .gf-helper-hint { font-size: 20px; }
 }
 @media (max-height: 600px) and (min-width: 600px) {
   body.studio-review #page-studio.studio-play-mode { grid-template-rows: auto minmax(0,1fr); grid-template-columns: auto minmax(0,1fr); grid-template-areas: 'heading tools' 'game game'; }
