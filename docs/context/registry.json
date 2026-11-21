@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:26:19.153Z",
-      "sourceDigest": "e68052c4b7446361dbff2c06962e92b909c65909b15fd19f6ac08fc45df44ca2",
+      "reviewedAt": "2026-11-21T18:47:52.614Z",
+      "sourceDigest": "fb0203836e8bc80a13efba1356ac62be9b370f8857f73e9e925e09e2bb7ce608",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed linked chat continuation and partial capacity repair against child authorship, explicit Keep and recovery doctrine. Original words, plan provenance, game identity and existing explicit erasure semantics are preserved. The 80-item bound is retained and long-term project cleanup remains explicitly deferred.",
+      "reviewReason": "Reviewed the PR120 fixture corrections against child draft ownership, exact retained artwork and existing recovery doctrine. Only browser setup, preservation assertions and one real-adapter regression change; no product source, approval boundary or retention policy changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -229,10 +229,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:26:19.608Z",
+      "reviewedAt": "2026-11-21T18:47:53.059Z",
       "sourceDigest": "82be299900b1cee0e1e24885f563e5086ac4adc67339f4a418eb227ffb3ab40c",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented immutable linked chat pages, original-word read views, same-session identity, full-copy confirmation, truthful active/put-away/chapter capacity and staged local creation with conditional compensation. Recorded reader rollback compatibility, preflight versus reservation limits, and remaining crash/remote-copy/retention work.",
+      "reviewReason": "Recorded why PR120 draft seeding conflicted with the existing unload save and how the real-composer setup now checks draft preservation through reload, copy and continuation. Runtime draft authority and user-facing flows are unchanged; corrected hosted journeys remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:26:21.103Z",
-      "sourceDigest": "bed4d694bc8b8d6b5b6e783cc75b5db0d3049f93d4d315a9759e452cc53085c4",
+      "reviewedAt": "2026-11-21T18:47:54.617Z",
+      "sourceDigest": "3b26554d357e9f653704faae57b3119580498bc2e87d03cad399b4e9dea67504",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 18 new notebook/creation consistency tests, actual whole-family chapter restore and source-level browser regressions. Combined local unit, rewards, Studio, readiness/maker and coach suites plus build pass; Chromium again failed before page creation. Independent review found no scoped blocker and clarified the capacity preflight limitation.",
+      "reviewReason": "Diagnosed both PR120 failures using complete logs and hash-verified screenshots. Added earlier real-composer draft assertions, exact compensation and retry checks, and one retained-drawing recovery test. Focused regressions pass 60/60, art contracts 24/24, syntax/typecheck/build pass; Chromium cannot launch, so corrected browser gates await hosted execution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T18:26:21.513Z",
-      "sourceDigest": "ccb72f60323a2476527343e173e5baafc780a0becbb7fa369c8586f28eba2788",
+      "reviewedAt": "2026-11-21T18:47:55.049Z",
+      "sourceDigest": "a30bcb5957cbc399fbfe0f7464242794ad1039a74a3af3c5b5dda977098bf6ef",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the unmerged notebook branch on workspace fix1f2a2fd, actual local verification and blocked browser execution. F05 continuation is implemented; F06 remains partial with retained cleanup, crash-safe journaling and remote-copy reconciliation outstanding. No merge, deployment or live provider claim is made.",
+      "reviewReason": "Recorded exact PR120 remote/source heads, failed creative job, verified artifact digest, narrow fixture corrections and actual local results. Hosted rerun remains pending and the unrelated baseline Pal decode finding remains open; no merge, deployment or acceptance is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -917,10 +917,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e40f7771e964582539cd6ed734a89e9f1cacf1d93f92acde43b164385cc6effe",
-      "reviewedAt": "2026-11-21T05:39:49.111Z",
+      "sourceDigest": "61ee87115e1225f2f03cd1fd65e8a1fdf11637bbca613006006cd3e70a3ee892",
+      "reviewedAt": "2026-11-21T18:47:54.203Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the retained guarded Use my picture action moving to collapsed More choices for new ideas, with existing-game toolbar unchanged. Updated Art Studio and architecture references; final-bundle art-entry checks passed delayed/rejected config, mobile upload/drawing/focus, owner isolation and read-only recovery without paid replay.",
+      "reviewReason": "Documented Rally native/notebook staging and conditional compensation. Corrected the old orphan-game browser expectation to exact unchanged source bytes plus one linked game on retry despite usage-index failure, and retained legacy unlisted project and rig recovery coverage. Original artwork and ownership assertions stay intact.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
