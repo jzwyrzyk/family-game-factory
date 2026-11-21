@@ -6,6 +6,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; initial diagnostic tooling, live connection pending | Owner's November 20 access-efficiency discussion and request to make direct troubleshooting real |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
 | [0003](0003-explicit-voice-and-build.md) | Editable dictation, explicit Send and separate Build | Accepted, retrospectively documented | November 18, 2026 push-to-talk decision |

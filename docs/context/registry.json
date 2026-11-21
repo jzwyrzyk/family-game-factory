@@ -64,7 +64,9 @@
     "docs/decisions/2026-11-20-pal-expression-runtime.md",
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
-    "docs/brand/previews/learning-readability-20261120/README.md"
+    "docs/brand/previews/learning-readability-20261120/README.md",
+    "docs/operations/ASSISTANT_ACCESS.md",
+    "docs/decisions/2026-11-20-direct-operations.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -95,7 +97,8 @@
     "docs/pals/*.md",
     "skills/gem-pal-studio/*.md",
     "docs/drawings/*.md",
-    "docs/pals/previews/*.md"
+    "docs/pals/previews/*.md",
+    "docs/operations/*.md"
   ],
   "areas": [
     {
@@ -616,10 +619,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T00:33:29.000Z",
-      "sourceDigest": "e80e3c47855c3b5e6c184caab0f576abe22596a49c399c69387ca79611476688",
+      "reviewedAt": "2026-11-21T01:09:58.285Z",
+      "sourceDigest": "c656576f9f35221e6e69285990a1974ed587d5a8a87ceb6bb6de02a01bfd0aec",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual PR98 merge d93ed92c against tested head 73a872a: identical Git tree and 14 passing checks; preserved the failed publisher 44837433067 and pending production acceptance. Updated the delivery ledger and existing sandbox handoff with the authenticated Cloud Shell dispatch step, exact fixed workflow-blob guard and disabled-generation check. Only post-merge evidence and handoff prose changed; runtime/workflow bytes, private worker pin, cloud configuration and activation remain unchanged. Delivery includes the ledger itself, so this records review of the new receipt against the independently computed hosted source digest.",
+      "reviewReason": "Recorded the completed local acceptance: 51 existing deployment tests, 25 new offline operation tests and a zero-error documentation check. The actual self-check stopped because gcloud is absent. No live identity, cloud permission, diagnostic or deployment acceptance is asserted.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -684,10 +687,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
+      "reviewedAt": "2026-11-21T01:07:26.533Z",
+      "sourceDigest": "057398101b002b674208d9afd031177a8451203bc9e2dd59a64e7519a6355ffe",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
+      "reviewReason": "Recorded the owner request to eliminate command-output relay and continue after a brief notice for larger in-scope fixes. Added the operations source route, required setup runbook and dated decision while preserving the documentation checker and separate authority, data and spending boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -861,6 +864,23 @@
       "reviewedAt": "2026-11-20T20:22:00.000Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed Wink Base finite opacity transition and controller's reduced-motion cancellation in the exact combined-main failure. PR92 changes asynchronous browser assertion timing only; Palette, forms, collection, art and motion policy remain unchanged. Recorded the narrow observation in ADR0013."
+    },
+    {
+      "id": "operations",
+      "documents": [
+        "docs/operations/*.md",
+        "docs/decisions/2026-11-20-direct-operations.md",
+        "ARCHITECTURE-CURRENT.md",
+        "DELIVERY-STATE.md"
+      ],
+      "sources": [
+        "scripts/ops/**"
+      ],
+      "reviewAfterDays": 30,
+      "reviewedAt": "2026-11-21T01:07:26.027Z",
+      "sourceDigest": "12cdad816b644bdfdf09239dfd9e49b820b9f620185947df87fdc3c27b2e8721",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed exact-subject additive setup, all-resource preflight, conflict rejection, selected OIDC bindings, error redaction and separate staged-versus-serving readiness against 25 passing fixture tests. Documented metadata-only access, actual connection setup, no logs or deployment writes, inherited-access limits and required live verification."
     }
   ]
 }

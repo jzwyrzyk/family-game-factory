@@ -17,6 +17,11 @@ Start with the canonical references below. Feature documents remain the detailed
 
 ## Choose the task-specific references
 
+| Operational topic | Entry point | Source / boundary |
+| --- | --- | --- |
+| Direct assistant diagnostics and one-time cloud connection | [Assistant access](operations/ASSISTANT_ACCESS.md), [accepted operating decision](decisions/2026-11-20-direct-operations.md) | `scripts/ops/`; initial service/revision metadata reads, separate setup authority, live connection and release automation still require verification |
+
+
 | Task | Intent and detailed contracts | Implementation/evidence entry points |
 | --- | --- | --- |
 | Child creation, conversation and experiments | [Design-coach gold standard](design-coach/GOLD_STANDARD.md), [child journey](child-journey/README.md), [creation release gate](jems-creation/RELEASE_GATE.md) | `src/studio/`, `src/factory/`, [child acceptance](child-journey/acceptance.md) |
