@@ -36,18 +36,23 @@ test('real Responses adapter keeps math and source while selecting physics docs 
  const result=await adapter.generate(input);assert.equal((result.candidate.game as typeof physicalWorkshop).source,physicalWorkshop.source);assert.equal(result.usageUnits,22500);
  await adapter.repair(input,result.candidate.game as typeof physicalWorkshop,'SYNTHETIC_PHYSICS_FAILURE');assert.equal(calls,2);
 });
-test('authenticated owner polling recovers a stalled job; unauthenticated and other-family reads cannot trigger dispatch',async()=>{
- let polls=0,reads=0;
+test('owner polling returns durable status before background recovery; unauthorized reads cannot trigger dispatch',async()=>{
+ let polls=0,reads=0,polled!:()=>void;
+ const recovered=new Promise<void>(resolve=>{polled=resolve;});
  const key='synthetic-session-key-for-pilot-test-only',family='owner-family';
  const service={get:async(session:any,id:string)=>{reads++;if(session.familyId!==family)throw Error('Forbidden');return {jobId:id,status:polls?'failed':'building'};}};
- const handler=apiHandler(service as any,{sessionKey:key,previewKey:key,appOrigin:'https://app.example',previewOrigin:'https://preview.example',poll:async()=>{polls++;}});
+ const handler=apiHandler(service as any,{sessionKey:key,previewKey:key,appOrigin:'https://app.example',previewOrigin:'https://preview.example',poll:async()=>{polls++;polled();}});
  const server=createServer((req,res)=>{void handler(req,res);});await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));
  const url='http://127.0.0.1:'+(server.address() as {port:number}).port+'/v1/jobs/job';
  try{
   assert.equal((await fetch(url)).status,401);assert.equal(polls,0);
   const token=(f:string)=>signSession({familyId:f,subject:'owner',role:'parent',expiresAt:Date.now()+60000},key);
   assert.equal((await fetch(url,{headers:{cookie:'factory_session='+token('other')}})).status,403);assert.equal(polls,0);
-  const response=await fetch(url,{headers:{cookie:'factory_session='+token(family)}});assert.equal((await response.json()).status,'failed');assert.equal(polls,1);assert.equal(reads,3);
+  const response=await fetch(url,{headers:{cookie:'factory_session='+token(family)}});
+  assert.equal((await response.json()).status,'building');assert.equal(reads,2,'one authorized read per status response');
+  await recovered;
+  const after=await fetch(url,{headers:{cookie:'factory_session='+token(family)}});
+  assert.equal((await after.json()).status,'failed');assert.equal(polls,1);assert.equal(reads,3);
  }finally{await new Promise<void>(r=>server.close(()=>r()));}
 });
 test('pilot URLs stay unavailable by default, require separate HTTPS origins, expose no private config',()=>{

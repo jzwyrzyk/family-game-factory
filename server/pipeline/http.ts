@@ -15,6 +15,12 @@ const signature=(key:string,fields:string)=>createHmac('sha256',key).update(fiel
 const equal=(a:string,b:string)=>{const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&timingSafeEqual(x,y);};
 export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository){
  if(config.sessionKey.length<32||config.previewKey.length<32)throw Error('Server signing keys are not configured');
+ let polling=false;
+ const wakeDispatcher=()=>{
+  if(!config.poll||polling)return;
+  polling=true;
+  setImmediate(()=>{void Promise.resolve().then(()=>config.poll!()).catch(()=>{}).finally(()=>{polling=false;});});
+ };
  return async(request:IncomingMessage,response:ServerResponse)=>{
   try{
    const origin=request.headers.origin;
@@ -29,7 +35,7 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
     const ack=await service.submit(session,await body(request));json(response,202,ack);if(ack.status==='queued')setImmediate(()=>{void (config.dispatch?config.dispatch(ack.jobId):service.run(ack.jobId)).catch(()=>{});});return;
    }
    let match=path.match(/^\/v1\/jobs\/([\w-]+)(\/(?:cancel|retry))?$/);
-   if(match){if(match[2]==='/retry'&&request.method==='POST'){const input=await body(request),ack=await service.retry(session,match[1],input.clientRequestId);json(response,202,ack);if(ack.status==='queued'){if(config.dispatch)void config.dispatch(ack.jobId).catch(()=>{});else void service.run(ack.jobId).catch(()=>{});}return;}if(match[2]==='/cancel'&&request.method==='POST')return json(response,200,await service.cancel(session,match[1]));if(!match[2]&&request.method==='GET'){await service.get(session,match[1]);await config.poll?.();return json(response,200,await service.get(session,match[1]));}}
+   if(match){if(match[2]==='/retry'&&request.method==='POST'){const input=await body(request),ack=await service.retry(session,match[1],input.clientRequestId);json(response,202,ack);if(ack.status==='queued'){if(config.dispatch)void config.dispatch(ack.jobId).catch(()=>{});else void service.run(ack.jobId).catch(()=>{});}return;}if(match[2]==='/cancel'&&request.method==='POST')return json(response,200,await service.cancel(session,match[1]));if(!match[2]&&request.method==='GET'){const job=await service.get(session,match[1]);json(response,200,job);if(['queued','building','testing'].includes(job.status))wakeDispatcher();return;}}
    if(/^\/v1\/revisions\/[\w-]+$/.test(path)&&request.method==='GET'){const r=await service.revision(session,path.split('/').at(-1)!);return json(response,200,{id:r.id,projectId:r.projectId,parentId:r.parentId,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game,name:r.name});}
    const creationMatch=path.match(/^\/v1\/revisions\/([\w-]+)\/creation$/);
    if(creationMatch&&request.method==='GET'){
