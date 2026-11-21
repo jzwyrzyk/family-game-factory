@@ -25,10 +25,12 @@ jobs:
   build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Verify immutable merged application source and public destinations
         env:
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
@@ -57,8 +59,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - run: npm run build
       - name: Configure reviewed public service URLs
         run: node --import tsx scripts/deployment/site-config.ts
         env:
@@ -68,13 +69,74 @@ jobs:
         env:
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
         run: |
-          test -d dist
-          printf '{"sourceSha":"%s"}\n' "$REVIEWED_SOURCE_SHA" > dist/jems-release.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          source = os.environ['REVIEWED_SOURCE_SHA']
+          info = json.loads(Path('dist/build-info.json').read_text())
+          if info.get('sha') != source or info.get('dirty') is not False:
+              raise SystemExit('PAGES_BUILD_SOURCE_MISMATCH')
+          Path('dist/jems-release.json').write_text(json.dumps({'sourceSha': source}) + '\n')
+          print('PAGES_BUILD_SOURCE_VERIFIED=' + source)
+          PY
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+  regressions:
+    name: regression (${{ matrix.shard }})
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["core", "learning", "gameplay", "browser-security", "generated", "creative", "studio", "coach"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify immutable merged regression source and stage reviewed helper
+        env:
+          REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+          FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
+          FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
+        run: |
+          set -euo pipefail
+          [[ "$REVIEWED_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor "$REVIEWED_SOURCE_SHA" "$GITHUB_SHA"
+          test "$FACTORY_PUBLIC_GATEWAY" = "https://factory-gateway-ola734esta-ul.a.run.app"
+          test "$FACTORY_PUBLIC_PREVIEW" = "https://factory-preview-ola734esta-ul.a.run.app"
+          # Tooling belongs to the reviewed dispatch commit; the application may
+          # be any explicitly selected, reviewed ancestor of that commit.
+          git show "$GITHUB_SHA:scripts/deployment/regressions.py" > "$RUNNER_TEMP/jems-regressions.py"
+          git checkout --detach "$REVIEWED_SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$REVIEWED_SOURCE_SHA"
+          python3 "$RUNNER_TEMP/jems-regressions.py" --source . --check
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install pinned dependencies
+        run: npm ci --ignore-scripts
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build selected production source
+        run: npm run build
+      - name: Browser and contract regression tests
+        env:
+          REGRESSION_SHARD: ${{ matrix.shard }}
+        run: python3 "$RUNNER_TEMP/jems-regressions.py" --source . --shard "$REGRESSION_SHARD"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pages-regression-${{ matrix.shard }}
+          path: test-results/
+          if-no-files-found: ignore
   deploy:
-    needs: build
+    needs: [build, regressions]
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.regressions.result == 'success' }}
     runs-on: ubuntu-24.04
     permissions:
       pages: write

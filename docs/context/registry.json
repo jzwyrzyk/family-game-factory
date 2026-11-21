@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T00:33:29.000Z",
-      "sourceDigest": "e80e3c47855c3b5e6c184caab0f576abe22596a49c399c69387ca79611476688",
+      "reviewedAt": "2026-11-21T01:26:15.709Z",
+      "sourceDigest": "bd955eb23010ecaa58596bc7f67754f6642bf97a08393055ba5689916322cb85",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual PR98 merge d93ed92c against tested head 73a872a: identical Git tree and 14 passing checks; preserved the failed publisher 44837433067 and pending production acceptance. Updated the delivery ledger and existing sandbox handoff with the authenticated Cloud Shell dispatch step, exact fixed workflow-blob guard and disabled-generation check. Only post-merge evidence and handoff prose changed; runtime/workflow bytes, private worker pin, cloud configuration and activation remain unchanged. Delivery includes the ledger itself, so this records review of the new receipt against the independently computed hosted source digest.",
+      "reviewReason": "Reviewed the actual cancelled production smoke44846112054 logs: isolation fixtures passed but serial application regressions exceeded the25-minute job limit; preserved failure and unknown cleanup. Pages now requires the exact-source build plus all8 regression shards, with complete25-suite/39-command coverage, negative omission/failure tests, clean artifact source verification and no added cloud/model authority. Updated delivery, sandbox handoff and continuity contract; source application/image remain unchanged and companion private pin rotation is separately gated.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
