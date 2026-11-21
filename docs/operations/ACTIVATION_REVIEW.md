@@ -76,6 +76,15 @@ resources and non-secret workflow variables. Its output always has
 | Inert merge and exact-main OIDC claim proofs | Separate later steps; this preparation does not perform either |
 | Production enrollment and owner approval | Required explicitly; no service is enrolled by this report |
 
+After scoped Logging enrollment and its privacy proof, the managed environment
+can use `python3 scripts/ops/log_summary.py --hours 2 --identity-alias jems-diagnostics`.
+This is a separate read-only diagnostic, not part of account activation. It uses
+the documented managed selectors and normal CLI without extracting a token or
+resetting credential/guard settings. The exact-view, fixed-filter request returns
+only a private metadata projection; the report contains at most 500 counted
+entries and an explicit truncation flag. A successful count still does not verify
+the actual account identity or its effective privilege ceiling.
+
 The earlier one-line production permission summary omitted
 `run.operations.get`. The controller polls the operation returned by an update,
 so the review now identifies that permission as a separate project-level,

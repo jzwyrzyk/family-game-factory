@@ -162,8 +162,9 @@ class ReleaseTests(unittest.TestCase):
 class LogSummaryTests(unittest.TestCase):
     def test_only_fixed_metadata_is_emitted(self):
         entry = {
-            "resource": {"type": "cloud_run_revision", "labels": {"service_name": "factory-gateway"}},
-            "logName": "projects/example/logs/run.googleapis.com%2Frequests",
+            "resource": {"type": "cloud_run_revision", "labels": {
+                "service_name": "factory-gateway", "project_id": log_summary.PROJECT, "location": log_summary.REGION}},
+            "logName": f"projects/{log_summary.PROJECT}/logs/run.googleapis.com%2Frequests",
             "severity": "ERROR", "textPayload": "private", "httpRequest": {"requestUrl": "private"},
         }
         unrelated = {**entry, "logName": "projects/example/logs/run.googleapis.com%2Fstderr"}

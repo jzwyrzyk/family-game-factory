@@ -698,10 +698,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T17:22:45.160Z",
-      "sourceDigest": "e43f4cad14c447d88895ef452e9bb8c48b00721ad3b6b2f4f54ac03b48f0b452",
+      "reviewedAt": "2026-11-21T17:46:23.280Z",
+      "sourceDigest": "977656174d80c64856a11d8d4fe82c3cb9cbf167b7581ca949afc7cfed8226ba",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled PR100 and held PR107 with current main6cc9c3 while preserving all runtime and release history. Reviewed exact diagnostic-account rejection, revision-only scaling-status exclusion, isolated-registry reader scope and guarded readback, local-only preflight and non-executable activation review. Updated the operations runbooks, architecture and dated ledger with 79 deployment and 64 operations tests, source-only evidence limits, actual account setup interruption and the explicit no-merge boundary; no cloud activation is claimed.",
+      "reviewReason": "Reviewed the integrated documented-selector correction and bounded scoped Logging client. The client now preserves managed auth/proxy/CA guards, uses exact-view normal gcloud with private metadata projection, counts at most500 entries and suppresses raw failures; actual account and permission acceptance remain unverified. Updated runbooks and ledger with 79 deployment plus74 operations passes, the prior exact-head Pal image-decode failure and its unresolved cause, preserved assertions and current-main application source, and the explicit no-merge/no-activation boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -772,6 +772,20 @@
           "sourceDigest": "adfbbd0ca7cd17d7932b5b4ca42f51449df19b1a31ac51a46015ac8e9b306abf",
           "reviewOutcome": "updated",
           "reviewReason": "Reconciled PR100 metadata-only tooling with main 6cc9c3 while preserving current application, deployment workflows, policy foundation and complete delivery history. Added exact diagnostics-account rejection and reviewed its negative tests, the offline bootstrap and unchanged metadata/redaction boundaries. Recorded 79 deployment and 47 combined operations passes, initial missing-dependency failure, current no-gcloud/no-manifest limitation, prior conversation evidence separately and the explicit no-merge hold. PR107 cloud activation remains pending."
+        },
+        {
+          "sourceCommit": "6a69bff3c4b3ac4f8ff03ff95c0a4badf2cc0679",
+          "reviewedAt": "2026-11-21T17:22:45.160Z",
+          "sourceDigest": "e43f4cad14c447d88895ef452e9bb8c48b00721ad3b6b2f4f54ac03b48f0b452",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled PR100 and held PR107 with current main6cc9c3 while preserving all runtime and release history. Reviewed exact diagnostic-account rejection, revision-only scaling-status exclusion, isolated-registry reader scope and guarded readback, local-only preflight and non-executable activation review. Updated the operations runbooks, architecture and dated ledger with 79 deployment and 64 operations tests, source-only evidence limits, actual account setup interruption and the explicit no-merge boundary; no cloud activation is claimed."
+        },
+        {
+          "sourceCommit": "dc5771e5528a8f5872abe3a3b39ef0fe636eabb0",
+          "reviewedAt": "2026-11-21T17:41:31.936Z",
+          "sourceDigest": "f94fd642a9061b2862b9ef6e39792290cb39c8b3d0e5baf8554429ab56e0958d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Corrected the unsupported mandatory service_account_email manifest assumption using the installed provider runtime networking guide, which documents managed CLI selectors but no required account field. Selector-only fixtures now pass, wrong present declarations fail, and all reports keep account identity unverified. Reviewed preserved no-fallback/override/resource/command boundaries and made live selected-account plus denied-write acceptance explicit. Recorded 79 deployment and 48 operations passes, actual no-gcloud self-check, earlier hosted receipts scoped to b981b9c and the continuing no-merge hold."
         }
       ]
     },
@@ -843,6 +857,20 @@
         },
         {
           "sourceCommit": "b981b9c12970d0c46c86e2e03079912d7699348b",
+          "reviewedAt": "2026-11-21T17:18:14.369Z",
+          "sourceDigest": "6af7ed23017d0ee2212376611ba04656150a3dfdd6c5efb9a0c3733099e72d14",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved current main source routing and all unrelated review records; registered the PR100 access runbook and operating decision under existing delivery/operations link coverage. Reviewed AGENTS, Project retrieval instructions, docs index and ADR for direct work only within approved scope, explicit preparation/no-merge holds, exact managed identity selection, and separation of previous connection evidence from current-task access. No checker or existing protection was weakened."
+        },
+        {
+          "sourceCommit": "6a69bff3c4b3ac4f8ff03ff95c0a4badf2cc0679",
+          "reviewedAt": "2026-11-21T17:22:45.601Z",
+          "sourceDigest": "3080c42251cd4d49620f86401b6b9b8d141612a20fe87b8a3b8e3b5245158579",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved both source histories and current main feature-area reviews. Registered Phase2 and activation-review documents using existing operations link/source coverage, retained advisory CODEOWNERS routing, and updated task entry points for exact-account metadata diagnostics and the read-only owner handoff. AGENTS and Project instructions retain authorization scope and the explicit no-merge hold; checker enforcement is unchanged."
+        },
+        {
+          "sourceCommit": "dc5771e5528a8f5872abe3a3b39ef0fe636eabb0",
           "reviewedAt": "2026-11-21T17:18:14.369Z",
           "sourceDigest": "6af7ed23017d0ee2212376611ba04656150a3dfdd6c5efb9a0c3733099e72d14",
           "reviewOutcome": "updated",

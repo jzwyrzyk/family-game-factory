@@ -46,11 +46,27 @@ journeys and real-device acceptance. Those remain distinct gates.
 
 ## Diagnostics
 
-`python3 scripts/ops/log_summary.py --hours 2` uses the existing managed diagnostic
-connection and reads one bounded page from a dedicated Cloud Logging view. It emits
-only counts by fixed service, request/system category and severity. A truncated
-page is reported explicitly. Cloud Run service and revision metadata can supply
-deployment readiness when a revision fails to start.
+`python3 scripts/ops/log_summary.py --hours 2 --identity-alias jems-diagnostics`
+uses the shared managed-connection selector and normal `gcloud logging read`.
+It preserves inherited proxy, certificate, credential and guard bindings; it does
+not extract an access token or replace the managed authentication configuration.
+The request fixes the dedicated log-view resource and project, error severity,
+recent time window, region, three service names and request/system log names.
+It requests at most 501 entries, reports counts for the first 500, and marks the
+sample truncated when the extra entry exists. The CLI projects only the metadata
+needed to validate scope and count categories, with its private-output format;
+payloads and raw CLI errors are never printed or written by this client.
+Malformed, oversized or unexpectedly long responses fail with sanitized errors.
+The shared selector does not require an undocumented service-account field;
+account identity and effective privilege limits remain explicitly unverified.
+Cloud Run service and revision metadata can supply deployment readiness when a
+revision fails to start. See Google's [scoped Logging command](https://docs.cloud.google.com/sdk/gcloud/reference/logging/read)
+and [private projected formats](https://docs.cloud.google.com/sdk/gcloud/reference/topic/formats).
+
+This source does not prove that the view exists, its payload restrictions are
+effective, or the current managed environment can reach it. The permissions and
+privacy proof below remain prerequisites. The client returns exit 0 for a valid
+summary and exit 2 for CLI, identity, access, transport or metadata failure.
 
 Provision a regional bucket `jems-diagnostics` in `us-east5`, a dedicated view
 `cloud-run-errors`, and a project log-router sink whose inclusion filter is
