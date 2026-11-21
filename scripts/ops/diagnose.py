@@ -63,8 +63,10 @@ def identity_environment(alias=None, environ=None):
     selected = candidates[0]
     if not isinstance(selected.get("alias"), str) or not selected["alias"]:
         raise DiagnosticError("IDENTITY_MANIFEST_UNSUPPORTED: The GCP connection has no alias.")
-    if selected.get("service_account_email") != DIAGNOSTICS_ACCOUNT:
-        raise DiagnosticError("IDENTITY_OUTSIDE_SCOPE: Select the managed Jems diagnostics service account; the connection does not name the approved identity.")
+    # The provider documents managed selectors, not a required account field.
+    # Honor an optional declaration if present without treating it as live proof.
+    if "service_account_email" in selected and selected["service_account_email"] != DIAGNOSTICS_ACCOUNT:
+        raise DiagnosticError("IDENTITY_OUTSIDE_SCOPE: The selected connection declares an unexpected diagnostics service account.")
     setup = selected.get("setup")
     outcome = setup if isinstance(setup, str) else (setup.get("status", setup.get("state", setup.get("outcome"))) if isinstance(setup, dict) else None)
     if isinstance(outcome, str) and outcome.lower() in {"failed", "failure", "error", "not_ready"}:
@@ -228,6 +230,7 @@ def report(environ=None, alias=None, self_check=False, read=describe):
     services = (SERVICES[0],) if self_check else SERVICES
     result = {"project": PROJECT, "region": REGION, "mode": "self_check" if self_check else "diagnose",
               "mutations": 0, "private_config_contents": "not_read", "logs": "not_read",
+              "identity_account_verification": "not_verified",
               "identity_privilege_ceiling": "not_verified",
               "scope": "Cloud Run metadata only; provider and application readiness are not verified", "services": []}
     for name in services:
@@ -248,7 +251,7 @@ def human_report(result):
         if "error" in service:
             lines.append(service["service"] + ": " + service["error"])
         elif result["mode"] == "self_check":
-            lines.append(service["service"] + ": configured-connection metadata read passed; privilege ceiling not verified")
+            lines.append(service["service"] + ": configured-connection metadata read passed; account identity and privilege ceiling not verified")
         else:
             traffic = ", ".join(f'{t["revision"]} {t["percent"]}%' for t in service["traffic"]) or "unknown"
             lines.append(f'{service["service"]}: {service["health"]}; reconciled={service["configuration_reconciled"]}; latest={service["latest_created_revision_health"]}; traffic={traffic}')
@@ -256,7 +259,7 @@ def human_report(result):
                 lines.append(f'  {revision["name"]}: {revision["health"]}; image={revision["resolved_image_digest"] or "unknown"}; config reference={revision["private_config_reference_present"]}')
                 if revision["flags"]:
                     lines.append("    " + ", ".join(f"{k}={str(v).lower() if v is not None else 'unknown'}" for k, v in revision["flags"].items()))
-    lines.append("No Secret Manager payloads, application/child records or logs fetched. Metadata does not verify application/provider readiness or identity privilege limits. No cloud mutations.")
+    lines.append("No Secret Manager payloads, application/child records or logs fetched. Metadata does not verify application/provider readiness, selected-account identity or effective privilege limits. No cloud mutations.")
     return "\n".join(lines)
 
 
@@ -269,9 +272,11 @@ def main(argv=None):
     try:
         result = report(alias=args.identity_alias, self_check=args.self_check)
     except DiagnosticError as error:
-        result = {"error": str(error), "exit_code": 2, "mutations": 0}
+        result = {"error": str(error), "exit_code": 2, "mutations": 0,
+                  "identity_account_verification": "not_verified"}
     except (AttributeError, KeyError, TypeError, ValueError):
-        result = {"error": "INVALID_METADATA: Unsupported response structure; raw output is suppressed.", "exit_code": 2, "mutations": 0}
+        result = {"error": "INVALID_METADATA: Unsupported response structure; raw output is suppressed.", "exit_code": 2, "mutations": 0,
+                  "identity_account_verification": "not_verified"}
     print(json.dumps(result, indent=2) if args.json else result["error"] if "error" in result else human_report(result))
     return result["exit_code"]
 

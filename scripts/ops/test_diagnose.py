@@ -56,7 +56,6 @@ class DiagnosticsTests(unittest.TestCase):
 
     def connection(self, alias="jems-read", **extra):
         return {"alias": alias, "provider_kind": "gcp", "config_dir": "/managed/gcp",
-                "service_account_email": diag.DIAGNOSTICS_ACCOUNT,
                 "setup": {"status": "ready"}, **extra}
 
     def write_manifest(self, connections, version=1):
@@ -77,7 +76,19 @@ class DiagnosticsTests(unittest.TestCase):
         with self.assertRaisesRegex(diag.DiagnosticError, "IDENTITY_NOT_CONFIGURED"):
             diag.identity_environment(environ={"CLOUDSDK_CONFIG": "/owner"})
 
-    def test_alias_or_default_cannot_select_an_unapproved_service_account(self):
+    def test_supported_selectors_need_no_optional_account_field_and_do_not_prove_identity(self):
+        for declaration in ({}, {"service_account_email": diag.DIAGNOSTICS_ACCOUNT}):
+            with self.subTest(declaration=declaration):
+                self.write_manifest([self.connection(**declaration)])
+                self.assertEqual(diag.identity_environment("jems-read", self.env)["CLOUDSDK_CONFIG"], "/managed/gcp")
+                with patch.object(diag.shutil, "which", return_value="/managed/bin/gcloud"):
+                    result = diag.report(self.env, alias="jems-read", self_check=True,
+                                         read=lambda kind, name, env: service(name))
+                self.assertEqual(result["exit_code"], 0)
+                self.assertEqual(result["identity_account_verification"], "not_verified")
+                self.assertIn("account identity and privilege ceiling not verified", diag.human_report(result))
+
+    def test_alias_or_default_rejects_a_wrong_optional_account_declaration(self):
         for account in (None, "", LEAK, "other@family-game-factory-jzw.iam.gserviceaccount.com"):
             for alias in (None, "jems-read"):
                 with self.subTest(account=account, alias=alias):
@@ -126,8 +137,7 @@ class DiagnosticsTests(unittest.TestCase):
         self.assertNotIn(LEAK, str(caught.exception))
 
     def test_adc_file_alone_cannot_select_unrelated_gcloud_identity(self):
-        self.write_manifest([{"alias": "adc-only", "provider_kind": "gcp", "credentials_file": "/managed/adc.json",
-                              "service_account_email": diag.DIAGNOSTICS_ACCOUNT}])
+        self.write_manifest([{"alias": "adc-only", "provider_kind": "gcp", "credentials_file": "/managed/adc.json"}])
         with self.assertRaisesRegex(diag.DiagnosticError, "IDENTITY_CLI_SELECTOR_MISSING"):
             diag.identity_environment(environ=self.env)
 
@@ -267,6 +277,7 @@ class DiagnosticsTests(unittest.TestCase):
             self.assertEqual(diag.main(["--json"]), 1)
         self.assertNotIn(LEAK, output.getvalue())
         self.assertEqual(json.loads(output.getvalue())["mutations"], 0)
+        self.assertEqual(json.loads(output.getvalue())["identity_account_verification"], "not_verified")
         with patch.object(diag, "report", side_effect=ValueError(LEAK)), contextlib.redirect_stdout(io.StringIO()) as output:
             self.assertEqual(diag.main([]), 2)
         self.assertNotIn(LEAK, output.getvalue())

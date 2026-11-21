@@ -1,6 +1,18 @@
 # jems delivery state
 
+## November 21, 2026 — PR100 managed-selector compatibility corrected
+
+Review of the installed provider runtime guide (`cloud-environment` 0.2.1, `runtime/references/networking.md`, **Use a configured identity**) established the documented version-1 managed selectors but no required `service_account_email` field. The earlier PR100 reconciliation inferred that requirement from repository code and synthetic fixtures, which did not establish the provider schema. This correction removes that unsupported mandatory-field assumption; it does not change Google permissions or loosen the existing command/resource scope.
+
+The client accepts the documented uniquely selected managed connection and preserves its CLI, authentication and proxy selectors. If an optional account declaration is present and disagrees with the dedicated diagnostics account, it still rejects the connection. With or without a matching declaration, every report keeps `identity_account_verification: "not_verified"`; metadata success is not proof of the actual principal. The [access runbook](docs/operations/ASSISTANT_ACCESS.md) now explicitly requires separate live selected-account and denied-write acceptance. Missing connections, ambiguous selectors, inherited credential/endpoint overrides and owner-login fallback retain their existing failure boundaries. No managed manifest was fabricated or edited.
+
+**Local verification:** all 79 deployment and 48 combined operations tests passed. Default diagnostic fixtures omit the optional account field; focused cases verify selector-only compatibility, wrong-present rejection before execution and the unchanged unknown account status after a successful synthetic read. The actual local self-check still returns `GCLOUD_NOT_INSTALLED`, exit 2, `mutations:0` and account verification `not_verified`. No new live identity or permission acceptance is claimed.
+
+All nine hosted PR workflows for the earlier published head `b981b9c12970d0c46c86e2e03079912d7699348b` passed, with [Arcade run44929471680](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44929471680) completing its creative job at `2026-11-21T17:35:04Z`. Those receipts retain that source scope and do not validate this subsequent correction; fresh exact-head hosted checks remain necessary. Preparation remains authorized and merging remains withheld. No cloud/network/permission setting, workflow dispatch, production service or provider was changed by this correction.
+
 ## November 21, 2026 — PR100 diagnostic source reconciled; preparation only
+
+**Historical candidate:** its mandatory manifest-account requirement is superseded by the compatibility correction above; its earlier test evidence remains scoped to that candidate.
 
 The owner authorized finishing the shell-access preparation without further intervention and explicitly withheld merging. This local candidate reconciles [PR100](https://github.com/jzwyrzyk/family-game-factory/pull/100) at `241d59d93a102591b9bc96d1ac2d46d8611ff6c5` with current main `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`. It preserves all newer application, artwork, deployment and policy-foundation files. Conflict resolution retains main's registry routes and review history, the complete delivery ledger, and the current guided-creation test command. The actual commit and hosted results belong in the PR receipt; this entry does not assert a merge or new hosted pass.
 

@@ -695,10 +695,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T17:18:09.166Z",
-      "sourceDigest": "adfbbd0ca7cd17d7932b5b4ca42f51449df19b1a31ac51a46015ac8e9b306abf",
+      "reviewedAt": "2026-11-21T17:41:31.936Z",
+      "sourceDigest": "f94fd642a9061b2862b9ef6e39792290cb39c8b3d0e5baf8554429ab56e0958d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled PR100 metadata-only tooling with main 6cc9c3 while preserving current application, deployment workflows, policy foundation and complete delivery history. Added exact diagnostics-account rejection and reviewed its negative tests, the offline bootstrap and unchanged metadata/redaction boundaries. Recorded 79 deployment and 47 combined operations passes, initial missing-dependency failure, current no-gcloud/no-manifest limitation, prior conversation evidence separately and the explicit no-merge hold. PR107 cloud activation remains pending.",
+      "reviewReason": "Corrected the unsupported mandatory service_account_email manifest assumption using the installed provider runtime networking guide, which documents managed CLI selectors but no required account field. Selector-only fixtures now pass, wrong present declarations fail, and all reports keep account identity unverified. Reviewed preserved no-fallback/override/resource/command boundaries and made live selected-account plus denied-write acceptance explicit. Recorded 79 deployment and 48 operations passes, actual no-gcloud self-check, earlier hosted receipts scoped to b981b9c and the continuing no-merge hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
