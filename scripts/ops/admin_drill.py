@@ -67,13 +67,13 @@ def isolated_plan(plan, root, head, project, number):
                          "add-iam-policy-binding", project, f"--member={account_member}", f"--role={poll_role}",
                          "--condition=None")
     cloud.registry(plan, project, "jems-drill")
-    api = Http("https://run.googleapis.com", cloud.flags_off_config())
+    api = Http("https://run.googleapis.com", cloud.admin_token())
     existing = api.call("GET", "v2/" + resource, missing=True)
     if existing:
         try:
             drill.validate_service(existing, resource)
             evidence = release.inspect_service(drill.SERVICE, release.cloud_api(
-                cloud.flags_off_config(), project=project, project_number=number), location=location)
+                cloud.admin_token(), project=project, project_number=number), location=location)
         except release.ReleaseError as error:
             raise SetupError(str(error)) from None
         require(evidence["matchesServingConfiguration"], "Existing isolated template drifted")
@@ -153,7 +153,7 @@ def wait_create(api, location, project, number, operation):
 def provision_and_run(root, head, project, number, role):
     location = drill.location_for(project, number)
     path = f"v2/{location}/services/{drill.SERVICE}"
-    auth = cloud.flags_off_config()
+    auth = cloud.admin_token()
     api = Http("https://run.googleapis.com", auth)
     operator = f"{OPERATOR}@{project}.iam.gserviceaccount.com"
     runtime = f"{RUNTIME}@{project}.iam.gserviceaccount.com"
@@ -200,7 +200,7 @@ def provision_and_run(root, head, project, number, role):
 def verify_baseline(project, head):
     number = cloud.project_check(project)
     location = drill.location_for(project, number)
-    token = cloud.flags_off_config()
+    token = cloud.admin_token()
     api = release.cloud_api(token, project=project, project_number=number)
     resource = f"{location}/services/{drill.SERVICE}"
     state = api("GET", resource)
@@ -220,7 +220,7 @@ def print_json(data):
 
 
 def synthetic_log_check(project, view, reader):
-    auth = cloud.flags_off_config()
+    auth = cloud.admin_token()
     admin = Http("https://logging.googleapis.com", auth)
     limited = Http("https://logging.googleapis.com", impersonated_token(reader))
     marker = "jems-synthetic-" + uuid.uuid4().hex

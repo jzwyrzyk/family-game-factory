@@ -42,7 +42,7 @@ def egress_status():
     return status
 
 
-def flags_off_config():
+def admin_token():
     # gcloud ADC and CLI account are different. Never copy configured tokens or
     # use a protected workload identity to obtain administrator authority.
     return command(["gcloud", "auth", "print-access-token", "--quiet"])
@@ -241,6 +241,13 @@ def logging_plan(plan, project, number, bucket_id, view_id, sink_id, log_filter,
         plan.add(f"Verify sink writer and grant destination-only access if needed for {sink_id}",
                  {"project": project, "bucket": bucket_name, "role": "roles/logging.bucketWriter",
                   "condition": f'resource.name == "{bucket_name}"'}, scope_writer)
+    if apply_reader and reader == DIAGNOSTICS:
+        if bucket:
+            require_no_broad_logging(admin_token(), project, number, reader, bucket=bucket_id)
+        elif ("roles/logging.viewAccessor", member) not in grants:
+            plan.add("Verify effective denial of restricted fields on the new bucket before granting access",
+                     {"project": project, "bucket": bucket_name, "principal": reader},
+                     lambda: require_no_broad_logging(admin_token(), project, number, reader, bucket=bucket_id))
     if apply_reader and ("roles/logging.viewAccessor", member) not in grants:
         add_gcloud(plan, project, f"Grant exact view read on {view_id}", "logging", "views", "add-iam-policy-binding",
                    view_id, *details, f"--member={member}", "--role=roles/logging.viewAccessor")
@@ -253,7 +260,7 @@ class Cloud:
         self.head = head
 
     def serving(self):
-        api = release.cloud_api(flags_off_config())
+        api = release.cloud_api(admin_token())
         evidence = {}
         for name in release.SERVICES:
             path = f"{release.LOCATION}/services/{name}"
@@ -295,13 +302,15 @@ class Cloud:
         if not approve:
             plan.notes.append("Pass --acknowledge-isolated-cost only after approving the existing isolated project and drill cost.")
             return plan
+        billing = gcloud(project, "billing", "projects", "describe", project)
+        require(billing.get("billingEnabled") is True, "The isolated project does not report active billing")
 
         from admin_drill import isolated_plan, synthetic_log_check
         isolated_plan(plan, self.root, self.head, project, number)
         if log_gib_day is not None:
             reader, _ = account(plan, project, "jems-log-probe-reader",
                                 expected_bindings={("roles/iam.serviceAccountTokenCreator", isolated_owner())})
-            require_no_broad_logging(flags_off_config(), PROJECT, NUMBER, DIAGNOSTICS)
+            require_no_broad_logging(admin_token(), PROJECT, NUMBER, DIAGNOSTICS)
             test_view = logging_plan(plan, project, number, "jems-log-probe", "synthetic", "jems-log-probe",
                 'LOG_ID("jems-redaction-probe")', 'LOG_ID("jems-redaction-probe")', reader, apply_reader=True)
             owner_binding(plan, project, reader)
@@ -319,7 +328,7 @@ class Cloud:
         inactive_lane(check, "publish", "jems-image-publisher")
         inactive_lane(check, "release", "jems-cloud-run-release")
         if logs and project:
-            require_no_broad_logging(flags_off_config(), PROJECT, NUMBER, DIAGNOSTICS)
+            require_no_broad_logging(admin_token(), PROJECT, NUMBER, DIAGNOSTICS)
             logging_plan(check, PROJECT, NUMBER, BUCKET, VIEW, SINK,
                          (self.root / "ops/cloud-run-log-filter.txt").read_text().strip(), LOG_FILTER,
                          DIAGNOSTICS, apply_reader=True)
@@ -370,14 +379,16 @@ def owner_binding(plan, project, email):
                    "--role=roles/iam.serviceAccountTokenCreator", "--condition=None")
 
 
-def require_no_broad_logging(token, project, number, email):
+def require_no_broad_logging(token, project, number, email, *, bucket=None):
     troubleshoot = Http("https://policytroubleshooter.googleapis.com", token)
-    for resource, permission in [
+    targets = [
         (f"//cloudresourcemanager.googleapis.com/projects/{number}", "logging.logEntries.list"),
         (f"//cloudresourcemanager.googleapis.com/projects/{number}", "logging.privateLogEntries.list"),
-        (f"//logging.googleapis.com/projects/{project}/locations/{REGION}/buckets/{BUCKET}",
-         "logging.fields.access"),
-    ]:
+    ]
+    if bucket:
+        targets.append((f"//logging.googleapis.com/projects/{project}/locations/{REGION}/buckets/{bucket}",
+                        "logging.fields.access"))
+    for resource, permission in targets:
         result = troubleshoot.call("POST", "v1/iam:troubleshoot", {"accessTuple": {
             "principal": email, "fullResourceName": resource, "permission": permission,
         }})

@@ -201,7 +201,7 @@ class SyntheticLogTests(unittest.TestCase):
                 if method != "POST" or not re.fullmatch(r"v2/entries:(?:write|list)", path):
                     raise AssertionError(path)
 
-        with patch("admin_drill.Http", Api), patch("admin_cloud.flags_off_config", return_value="administrator"),              patch("admin_drill.impersonated_token", return_value="scoped"):
+        with patch("admin_drill.Http", Api), patch("admin_cloud.admin_token", return_value="administrator"),              patch("admin_drill.impersonated_token", return_value="scoped"):
             return admin_drill.synthetic_log_check(project, view, "scoped@example.com")
 
     def test_probe_proves_both_entries_and_scoped_denial(self):

@@ -620,10 +620,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T06:50:11.788Z",
-      "sourceDigest": "adea32a447ee03ad0221d46ec437c4af18bfe085edd5a6b72beb0ba8c5fdd080",
+      "reviewedAt": "2026-11-21T06:52:14.203Z",
+      "sourceDigest": "3a35a540a96f187bdefedf3258b1e4205db93c7d64de4508bc25724c0718f543",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the reproducible owner plan, guarded GitHub and isolated cloud setup, synthetic metadata privacy checks and disabled production activation.",
+      "reviewReason": "Verified guarded setup, checked isolated billing explicitly and moved the future Logging bucket field-access test before the reader grant.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
