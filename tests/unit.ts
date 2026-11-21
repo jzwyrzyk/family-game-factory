@@ -8,6 +8,7 @@ import './game-intelligence.test';
 import './factory.test';
 import './backend-contracts.test';
 import './pipeline.test';
+import './build-submission-recovery.test';
 import './assignment-002.test';
 
 import './construction.test';

@@ -58,6 +58,7 @@ const iconEl=(tag:string,className:string,name:IconName,label:string,iconClass='
 const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',moon:'🌙',robot:'🤖',factory:'💎',new:'✨'};
 const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',moon:'Moon Donut Dash',robot:'Robot Route Lab',factory:'Gem Factory',new:'A brand-new idea'};
 const busy=(s:StudioSession)=>!!s.job&&['queued','building','testing'].includes(s.job.status);
+const needsReadyRecovery=(s:StudioSession)=>s.job?.status==='ready'&&!!s.job.revisionId&&(Boolean(s.pendingExperiment)||!s.experiments?.some(e=>e.candidate.remoteId===s.job!.revisionId));
 const human=(v:number|boolean)=>typeof v==='boolean'?(v?'On':'Off'):String(v);
 // Unknown responses and test fixtures never verify a real generated experiment.
 const isRealAdapter=(adapter:string|undefined)=>adapter==='metered-api'||adapter==='codex-subscription'||adapter==='local-rule';
@@ -90,9 +91,8 @@ export async function installStudio(){
  const clients=new Map<string,BuilderClient>();
  const unknownJobs=new Set<string>();
  const retryBlocks=new Map<string,{jobId:string;reason:string}>();
- // A lost first acknowledgement has no job ID to check. Never mistake an
- // older failed job for this new request or replay it from a recovery button.
- const unconfirmedSubmissions=new Set<string>();
+ // Unacknowledged initial requests live in the notebook, so reload/profile
+ // changes cannot discard their identity or authorize a second paid build.
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'journey'|'rewards'|'pals'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
@@ -663,12 +663,12 @@ export async function installStudio(){
   if(!activeId)return;
   const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value})):null;
-  const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id);
+  const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||Boolean(s.pendingSubmission)||needsReadyRecovery(s);
   $<HTMLButtonElement>('studioSend').hidden=false;
   $<HTMLButtonElement>('studioSend').disabled=pending||!reflecting&&uncertain||creating&&(busy(s)||!readiness?.ready);
   const hasIdea=s.messages.some(message=>message.role==='child');
   const reconnect=['limited','unavailable','sign-in'].includes(coachConnection);
-  buildReason.textContent=creating?(pending?'Getting your build ready…':unconfirmedSubmissions.has(s.id)?'The workshop has not confirmed this request. Your idea is safe.':uncertain?'Check your last build before starting another.':busy(s)?'Your game is already building.':readiness?.ready?'':
+  buildReason.textContent=creating?(pending?'Getting your build ready…':s.pendingSubmission?'The workshop has not confirmed this request. Your idea is safe.':uncertain?'Check your last build before starting another.':busy(s)?'Your game is already building.':readiness?.ready?'':
    !hasIdea?'Tell me your game idea first.':$<HTMLTextAreaElement>('studioPrompt').value.trim()?'Send your new thought first.':
    reconnect?'Chat needs to reconnect to check your idea.':readiness?.reason||'Let’s check your idea together.') : '';
   checkIdea.hidden=!creating||pending||busy(s)||uncertain||!!readiness?.ready||!coaching?.canReassess();
@@ -929,7 +929,7 @@ export async function installStudio(){
   stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
   const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper');coaching?.openSession();$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();setTab('game');focusView($('studioTitle'));
   if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;setTab('talk');}}
-  if(s.job&&busy(s)&&remote.mode==='remote'&&s.job.api===remote.apiBaseUrl&&!clients.has(s.id))resume(s);
+  if(remote.mode==='remote'&&!clients.has(s.id)&&(s.pendingSubmission?.api===remote.apiBaseUrl||s.job?.api===remote.apiBaseUrl&&(busy(s)||needsReadyRecovery(s))))resume(s);
  }
  function renderConversation(){
   if(!activeId)return;const s=current(),box=$('studioMessages');
@@ -977,7 +977,7 @@ export async function installStudio(){
   connectionHint.textContent=!configReady||coachConnection==='checking'?'Checking chat…':coachConnection==='sign-in'?'Chat needs a grown-up to reconnect.':['limited','unavailable'].includes(coachConnection)?'Chat is disconnected. Your idea is saved.':'';
   connectionHint.hidden=!connectionHint.textContent;
   workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
-  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id));
+  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id)||Boolean(s.pendingSubmission)||needsReadyRecovery(s));
   progressBanner.hidden=!progress;
   arcadeButton.hidden=!busy(s);
   progressBanner.dataset.phase=progress?.phase||'';
@@ -996,10 +996,10 @@ export async function installStudio(){
   // The coach's saved review, not the presence of a first idea, enables Build.
   $<HTMLTextAreaElement>('studioPrompt').required=!(creating&&s.messages.some(m=>m.role==='child'));
   setIconLabel($('studioSend'),reflecting?'save':creating?'add':'arrow',reflecting?'Save thought':creating?'Build my game':'Try a change');
-  $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=unconfirmedSubmissions.has(s.id)||!s.job||(s.job.status!=='failed'&&!unknownJobs.has(s.id));
-  setIconLabel($('studioRetry'),unknownJobs.has(s.id)?'clock':'retry',unknownJobs.has(s.id)?'Check build status':'Try build again');
+  $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=!s.pendingSubmission&&!needsReadyRecovery(s)&&(!s.job||(s.job.status!=='failed'&&!unknownJobs.has(s.id)));
+  setIconLabel($('studioRetry'),s.pendingSubmission||needsReadyRecovery(s)||unknownJobs.has(s.id)?'clock':'retry',s.pendingSubmission||needsReadyRecovery(s)||unknownJobs.has(s.id)?'Check build status':'Try build again');
   const retryBlock=retryBlocks.get(s.id);
-  $<HTMLButtonElement>('studioRetry').disabled=sending.has(s.id)||saving||!unknownJobs.has(s.id)&&retryBlock?.jobId===s.job?.id;
+  $<HTMLButtonElement>('studioRetry').disabled=sending.has(s.id)||saving||!s.pendingSubmission&&!needsReadyRecovery(s)&&!unknownJobs.has(s.id)&&!!retryBlock&&retryBlock.jobId===s.job?.id;
   $('studioRetry').title=retryBlock&&retryBlock.jobId===s.job?.id?retryBlock.reason:'';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
   page.classList.toggle('studio-has-build',!!progress);
@@ -1079,7 +1079,7 @@ export async function installStudio(){
    render();if(achievement){updateProfile();celebrateProgress(achievement);}return;
   }
   if(sending.has(s.id)){status('Sending the earlier request. Your ideas and game are safe.');return;}
-  if(unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id)){status('The last request is not confirmed. Your new thought is saved; no second build was sent.');return;}
+  if(unknownJobs.has(s.id)||s.pendingSubmission||needsReadyRecovery(s)){status('The last request is not confirmed. Your new thought is saved; no second build was sent.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
   if(mathRequest){message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`);clearConsumedDraft();}render();return;}
   if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started))return;
@@ -1121,7 +1121,7 @@ export async function installStudio(){
  }
  function clientFor(s:StudioSession){
   let c=clients.get(s.id);if(c)return c;
-  c=new BuilderClient(remote,job=>{void onJob(s,job).catch(e=>{if(activeId===s.id&&owner()===s.owner){updateBuildHandoff(s,{phase:'uncertain'});status('Could not save the build status. Keep this page open. Your current game is safe.',true);}});});clients.set(s.id,c);return c;
+  c=new BuilderClient(remote,(job,submissionId)=>onJob(s,job,submissionId));clients.set(s.id,c);return c;
  }
  async function build(s:StudioSession,prompt:string,continueTest=false){
   sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
@@ -1130,7 +1130,15 @@ export async function installStudio(){
   const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
   // Request admission ends at the durable ACK, not when a game finishes building.
   // Continue status polling independently while a child plays or makes other edits.
-  void clientFor(s).submit(input).catch(error=>{
+  let submissionId:string|undefined;
+  void clientFor(s).submit(input,request=>{
+   if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)throw Error('PROFILE_CHANGED');
+   notebook.update(s.id,s.owner,x=>{
+    if(x.pendingSubmission)throw Error('UNCONFIRMED_BUILD_RESPONSE');
+    x.pendingSubmission={owner:s.owner,workspace:s.id,api:remote.apiBaseUrl!,request};
+   });
+   submissionId=request.clientRequestId;
+  }).catch(error=>{
    if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)return;
    const saved=notebook.get(s.id,s.owner);
    if(saved.job&&busy(saved)&&saved.job.api===remote.apiBaseUrl&&saved.job.id!==s.job?.id){
@@ -1140,16 +1148,15 @@ export async function installStudio(){
      status('Connection interrupted. The builder may still be working; checking again.');
    }else{
     const code=error instanceof Error?error.message:undefined;
-    const knownRejection=isKnownBuildRejection(error);
+    const knownRejection=isKnownBuildRejection(error)||!submissionId;
     const explanation=buildErrorCopy(knownRejection?code:undefined);
     if(knownRejection&&saved.job?.id===s.job?.id){
      // No new job accepted this request. Keep the saved failed job's exact
      // experiment metadata for its retry, and leave the rejected draft alone.
-     notebook.update(s.id,s.owner,x=>{x.pendingExperiment=s.pendingExperiment||null;});
+     notebook.update(s.id,s.owner,x=>{x.pendingExperiment=s.pendingExperiment||null;if(x.pendingSubmission?.request.clientRequestId===submissionId)x.pendingSubmission=null;});
      submittedDrafts.delete(s.id);
     }
-    if(!knownRejection)unconfirmedSubmissions.add(s.id);
-    updateBuildHandoff(s,{phase:knownRejection?'unavailable':'uncertain'});
+    updateBuildHandoff(s,{phase:knownRejection?'unavailable':'uncertain',...(!knownRejection?{recovery:'check' as const}:{})});
     if(activeId===s.id&&owner()===s.owner)status(explanation,true);
    }
   }).finally(()=>{
@@ -1161,7 +1168,9 @@ export async function installStudio(){
  }
  async function recoverBuild(action:'retry'|'check'){
   if(guardMath())return;stopSpeech();flushDraft();const s=current();
-  if(!s.job||sending.has(s.id)||saving||unconfirmedSubmissions.has(s.id))return;
+  if(sending.has(s.id)||saving)return;
+  if(s.pendingSubmission){await recoverSubmission(s,true);return;}
+  if(!s.job)return;
   if(action==='retry'&&s.job.status!=='failed')action='check';
   const retryBlock=retryBlocks.get(s.id);
   if(action==='retry'&&retryBlock?.jobId===s.job.id){status(retryBlock.reason,true);return;}
@@ -1194,14 +1203,16 @@ export async function installStudio(){
    if(owner()===s.owner&&activeId===s.id&&route==='studio')render();
   }
  }
- async function onJob(captured:StudioSession,job:JobView){
+ async function onJob(captured:StudioSession,job:JobView,submissionId?:string){
   if(owner()!==captured.owner)return;
-  const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);unconfirmedSubmissions.delete(captured.id);
+  const prior=notebook.get(captured.id,captured.owner);
+  if(prior.pendingSubmission&&prior.pendingSubmission.request.clientRequestId!==submissionId)return;
+  unknownJobs.delete(captured.id);
   if(retryBlocks.get(captured.id)?.jobId!==job.jobId||job.status!=='failed')retryBlocks.delete(captured.id);
   let celebratedLevel=false;
   const phase=typeof job.phase==='string'&&/^[a-z-]{1,32}$/.test(job.phase)?job.phase:undefined;
-   if(prior.job?.id!==job.jobId||prior.job.status!==job.status||prior.job.revisionId!==job.revisionId||prior.job.phase!==phase)
-    notebook.update(captured.id,captured.owner,s=>{s.job={id:job.jobId,api:remote.apiBaseUrl||'',status:job.status as PendingJob['status'],...(job.revisionId?{revisionId:job.revisionId}:{}),...(phase?{phase}:{})};});
+   if(prior.pendingSubmission||prior.job?.id!==job.jobId||prior.job.status!==job.status||prior.job.revisionId!==job.revisionId||prior.job.phase!==phase)
+    notebook.update(captured.id,captured.owner,s=>{s.job={id:job.jobId,api:remote.apiBaseUrl||'',status:job.status as PendingJob['status'],...(job.revisionId?{revisionId:job.revisionId}:{}),...(phase?{phase}:{})};if(job.status!=='ready')s.pendingSubmission=null;});
   // A job acknowledgment ends the *submission* wait even while generation runs.
    // Unlock quick local edits only after the job ID and source revision are durable.
    if(sending.has(captured.id)){sending.delete(captured.id);}
@@ -1211,9 +1222,9 @@ export async function installStudio(){
     const pending=prior.pendingExperiment;const c:Candidate={id:crypto.randomUUID(),baseId:pending?pending.baseId:null,remoteId:job.revisionId,prompt:pending?.prompt||prior.draft,summary:job.adapter==='mock'?'New test-builder preview (mock)':'New AI-built preview'};
     const before=progressSnapshot(prior);
     notebook.saveExperiment(captured.id,captured.owner,c,pending?.parents||[],pending?.depth||'redesign',pending?.origin||'helper',false,isRealAdapter(job.adapter));
-    notebook.update(captured.id,captured.owner,s=>{s.pendingExperiment=null;});
     if(owner()===captured.owner){const achievement=gemAchievement(before,notebook.get(captured.id,captured.owner));updateProfile();if(achievement&&!FG.learning.active){celebrateProgress(achievement);celebratedLevel=true;}}
   }
+  if(job.status==='ready'&&job.revisionId&&(prior.pendingSubmission||prior.pendingExperiment))notebook.update(captured.id,captured.owner,s=>{s.pendingSubmission=null;s.pendingExperiment=null;});
   if(waitProject?.id===captured.id&&waitProject.owner===captured.owner&&waitArcade.isOpen()){
    const latest=notebook.get(captured.id,captured.owner);
    if(latest.job)waitArcade.update(latest.job.status as WorkshopStatus,!!readyExperiment(latest));
@@ -1235,7 +1246,38 @@ export async function installStudio(){
    }
  }
  const retryTimers=new Map<string,ReturnType<typeof setTimeout>>();
+ async function recoverSubmission(s:StudioSession,interactive=false){
+  const pending=s.pendingSubmission;
+  if(!pending||sending.has(s.id))return;
+  if(remote.mode!=='remote'||pending.api!==remote.apiBaseUrl){
+   if(activeId===s.id)status('Reconnect this game’s workshop to check your saved request.',true);return;
+  }
+  if(interactive)beginBuildHandoff(s,{phase:'checking'});
+  const client=clientFor(s),isCurrent=()=>owner()===s.owner&&clients.get(s.id)===client;
+  sending.add(s.id);if(activeId===s.id&&route==='studio')render();
+  try{
+   const job=await client.lookupSubmission(pending.request);
+   if(!isCurrent())return;
+   const latest=notebook.get(s.id,s.owner);
+   if(job&&!latest.pendingSubmission){if(busy(latest))resume(latest);return;}
+   if(latest.pendingSubmission?.request.clientRequestId!==pending.request.clientRequestId)return;
+   unknownJobs.add(s.id);
+   updateBuildHandoff(s,{phase:'uncertain',recovery:'check'});
+   if(activeId===s.id&&route==='studio')status('Your request is still unconfirmed. Check again; your idea is saved.',true);
+  }catch{
+   if(!isCurrent())return;
+   unknownJobs.add(s.id);updateBuildHandoff(s,{phase:'uncertain',recovery:'check'});
+   if(activeId===s.id&&route==='studio')status('Could not check your request. Your idea is saved. Try checking again.',true);
+  }finally{
+   if(isCurrent()){
+    const latest=notebook.get(s.id,s.owner);
+    if(!latest.pendingSubmission||latest.pendingSubmission.request.clientRequestId===pending.request.clientRequestId)sending.delete(s.id);
+    refreshShelf();if(activeId===s.id&&route==='studio')render();
+   }
+  }
+ }
   function resume(s:StudioSession){
+   if(s.pendingSubmission){void recoverSubmission(s);return;}
    if(!s.job||remote.mode!=='remote'||s.job.api!==remote.apiBaseUrl)return;
    void clientFor(s).resume(s.job.id).catch(()=>{
     if(owner()!==s.owner)return;
@@ -1249,7 +1291,7 @@ export async function installStudio(){
   }
   function resumeOutstanding(){
    if(remote.mode!=='remote')return;
-   for(const s of notebook.list(owner()).filter(s=>busy(s)&&s.job?.api===remote.apiBaseUrl).slice(0,8))
+   for(const s of notebook.list(owner()).filter(s=>s.pendingSubmission?.api===remote.apiBaseUrl||(busy(s)||needsReadyRecovery(s))&&s.job?.api===remote.apiBaseUrl).slice(0,8))
     if(!clients.has(s.id))resume(s);
   }
  async function showRemote(s:StudioSession,id:string,view:typeof showing=showing,selectTest?:string){
@@ -1418,7 +1460,7 @@ export async function installStudio(){
   if(guardMath())return;
   const s=current();
   if(saving){status('Let this version finish saving before clearing chat.',true);return;}
-  if(busy(s)||s.pendingExperiment){status('Finish or cancel this build before clearing chat.',true);return;}
+  if(busy(s)||s.pendingExperiment||s.pendingSubmission){status('Finish or cancel this build before clearing chat.',true);return;}
   if(!confirm('Clear this chat and its design notes on this device? Removing making evidence can lower your maker level and change your outfit. Your lifetime gems, saved game versions and any remote copies will remain.'))return;
   stopSpeech();coaching?.reset();chatOptions.open=false;
   notebook.clearConversation(s.id,s.owner);
@@ -1435,13 +1477,13 @@ export async function installStudio(){
  $('studioPrompt').oninput=()=>{refreshBuildAction();clearTimeout(draftTimer);$('studioDraftStatus').textContent='Saving draft…';draftTimer=setTimeout(()=>act(()=>{flushDraft();$('studioDraftStatus').textContent='Draft saved on this device';}),180);};
  $('studioReflectAnswer').onclick=()=>act(()=>{if(guardMath())return;reflecting=true;setTab('talk');render();focusView($('studioPrompt'));});$('studioReflectSkip').onclick=()=>act(()=>{const s=current();notebook.update(s.id,s.owner,x=>{x.reflection=false;});coaching?.pauseReflection();reflecting=false;render();void playViewed();});
  $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});
- $('studioRetry').onclick=()=>act(()=>recoverBuild(unknownJobs.has(current().id)?'check':'retry'));
+ $('studioRetry').onclick=()=>act(()=>recoverBuild(current().pendingSubmission||needsReadyRecovery(current())||unknownJobs.has(current().id)?'check':'retry'));
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
  window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail){handoff.close();if(route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}}refreshStudioGuide();});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();handoff.close();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
- window.addEventListener('factory-profile',()=>{welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();waitArcade.close();waitProject=null;stopSpeech();hideJourney();
+ window.addEventListener('factory-profile',()=>{welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();sending.clear();waitArcade.close();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   const conversation=$('studioMessages');conversation.replaceChildren();delete conversation.dataset.session;delete conversation.dataset.signature;$('coachProposals').replaceChildren();

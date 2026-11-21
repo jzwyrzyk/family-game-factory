@@ -2172,6 +2172,113 @@
         ],
         "description": "Reuses the saved revision family, trusted-device and adult-profile audience checks. Returns manifest:null for old games and games without an authored companion; it never analyzes or executes game JavaScript. A manifest is bounded jems.creation.v1 data, with reviewed local asset IDs only, no source code, external URLs, credentials or private preview capabilities. It is a separate editable companion, not an assertion that game artwork or arbitrary mechanics were translated. All generated blocks are marked assisted. Exact recursive validation is implemented in src/creation/model.ts and src/creation/projects.ts. Responses are no-store."
       }
+    },
+    "/v1/job-requests/{clientRequestId}": {
+      "get": {
+        "summary": "Recover an initial submission by its saved request identity without submitting or dispatching work",
+        "responses": {
+          "200": {
+            "description": "Accepted job, or an unresolved identity with no visible admission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "job"
+                  ],
+                  "properties": {
+                    "job": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/Job"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Unauthorized, forbidden, validation, unavailable or quota failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "clientRequestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w-]{1,100}$"
+            }
+          },
+          {
+            "name": "payloadHash",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/OptionalAllowedOrigin"
+          }
+        ],
+        "security": [
+          {
+            "familySession": [],
+            "adultCookie": [],
+            "adultProof": []
+          },
+          {
+            "familySession": []
+          }
+        ],
+        "description": "Authenticate the same family/adult workspace, find the original clientRequestId, and verify the SHA-256 payload identity. The hash covers the fixed JSON tuple [\"build\", clientRequestId, gameId, baseRevisionId, normalized prompt]. A matching accepted request returns its authorized job view, including any retry successor. job:null means no matching admission is currently visible; it is still uncertain because the original POST may commit later. Never treat absence or a network failure as authorization to submit a second paid build. This GET does not reserve allowance, call providers, create retries or run dispatch. Expired/revoked sessions and foreign audiences remain denied or undisclosed."
+      }
     }
   },
   "components": {

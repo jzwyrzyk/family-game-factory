@@ -105,7 +105,7 @@ class ServiceBuildTests(unittest.TestCase):
             git('init','-q')
             files=['package.json','package-lock.json','.dockerignore','server/Dockerfile.gateway','server/Dockerfile.preview',
                    'server/gateway.ts','server/private-config.ts','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
-                   'src/studio/creation-readiness.ts','src/studio/conversation-view.ts',
+                   'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts',
                    'src/creation/model.ts','src/creation/projects.ts',
                    'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts',
                    'server/key.pem','server/config.json','server/config.private.json','server/service-account.json','server/credentials.json',
@@ -124,7 +124,7 @@ class ServiceBuildTests(unittest.TestCase):
                     archive,digest=b.source_archive(root,staged,sha);hashes.append(digest)
                     with tarfile.open(archive) as tar:
                         names=tar.getnames()
-                        self.assertEqual(set(names),set(files[:16]))
+                        self.assertEqual(set(names),set(files[:17]))
                         self.assertEqual(tar.extractfile('server/gateway.ts').read(),b'reviewed server/gateway.ts')
             self.assertEqual(hashes[0],hashes[1])
 
@@ -145,7 +145,7 @@ class ServiceBuildTests(unittest.TestCase):
                     'server/coach/private-executor.ts','server/trusted-devices.ts','server/privacy/parent-consent.ts',
                     'server/adult-pilot.ts','server/pipeline/auth.ts',
                     'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
-                    'src/studio/creation-readiness.ts','src/studio/conversation-view.ts',
+                    'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts',
                     'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts',
                     'src/creation/model.ts','src/creation/projects.ts']
             for name in inputs:write(name,'reviewed '+name)
@@ -189,8 +189,8 @@ class ServiceBuildTests(unittest.TestCase):
             # must stay publishable; its own Dockerfiles determine the inputs.
             for kind,content in dockerfiles.items():
                 if kind=='coach':(root/'server/Dockerfile.coach').unlink();continue
-                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/creation/' not in line and 'src/pals/' not in line and 'src/studio/creation-readiness.ts' not in line)+'\n')
-            for name in [*inputs[-2:],'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts']:(root/name).unlink()
+                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/builder/' not in line and 'src/creation/' not in line and 'src/pals/' not in line and 'src/studio/creation-readiness.ts' not in line)+'\n')
+            for name in [*inputs[-2:],'src/builder/submission.ts','src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts']:(root/name).unlink()
             older=commit()
             with tempfile.TemporaryDirectory() as staged:
                 archive,_=b.source_archive(root,staged,older)

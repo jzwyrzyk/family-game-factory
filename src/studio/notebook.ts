@@ -6,6 +6,7 @@ import { builderJourney } from '../brand/gem-progress';
 import { createRewardFact, enqueueRewardFact, rewardFactId, validateRewardOutbox, type RewardFact } from '../rewards/model';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 import { freshGuidance, isGuideTipId, validateGuidePreferences, type GuidePreferences, type GuideTipId } from './guidance';
+import {validateBuildSubmission,type PendingBuildSubmission} from '../builder/submission';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -24,6 +25,7 @@ export interface StudioSession {
   job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
   design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
+  pendingSubmission?:PendingBuildSubmission|null;
   archived?:boolean; resumeDismissed?:boolean;
   keptExperiments?:KeptExperiment[]; verifiedRemoteExperiments?:string[];
   /** Canonical source project, retained through copies and local/remote transitions. */
@@ -72,10 +74,15 @@ export function validateNotebook(input: unknown): Notebook {
     if((s.archived!==undefined&&typeof s.archived!=='boolean')||(s.resumeDismissed!==undefined&&typeof s.resumeDismissed!=='boolean'))throw Error('Invalid home visibility state.');
     if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
     if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || s.job.phase!==undefined&&(typeof s.job.phase!=='string'||!/^[a-z-]{1,32}$/.test(s.job.phase)) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
+    if(s.pendingSubmission!==undefined&&s.pendingSubmission!==null){
+      const pending=s.pendingSubmission;
+      if(Object.keys(pending).some(key=>!['owner','workspace','api','request'].includes(key))||pending.owner!==s.owner||pending.workspace!==s.id||!safeText(pending.api,500)||!pending.api)throw Error('Invalid pending submission.');
+      validateBuildSubmission(pending.request);
+    }
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   if(n.rewardOutbox!==undefined){
     const facts=validateRewardOutbox(n.rewardOutbox);
@@ -139,7 +146,7 @@ export class StudioNotebook {
   get(id:string,owner:string):StudioSession {const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return s;}
   last(owner:string):StudioSession|null {const n=this.read(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?s:null;}
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
-  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
+  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.pendingSubmission)throw Error('Check your saved request before putting this jem away.');if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
   create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
     return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
@@ -160,7 +167,7 @@ export class StudioNotebook {
    */
   clearConversation(id:string,owner:string):StudioSession {
     const result=this.update(id,owner,s=>{
-      if(s.job&&['queued','building','testing'].includes(s.job.status)||s.pendingExperiment)
+      if(s.job&&['queued','building','testing'].includes(s.job.status)||s.pendingExperiment||s.pendingSubmission)
         throw Error('Finish or cancel the current build before clearing this chat.');
       s.messages=[];s.draft='';s.hypothesis='';s.reflection=false;
       s.design=freshDesign();
@@ -177,7 +184,7 @@ export class StudioNotebook {
     // Prior observations remain truthful history. Their old tests are not on the new shelf,
     // so keep the text, author/source, identifiers and dates while detaching those links.
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
-    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    return this.write(n=>{const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,pendingSubmission:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true,verifiedRemote=false):Experiment {
     let result:Experiment;

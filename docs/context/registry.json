@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewedAt": "2026-11-21T18:33:27.356Z",
+      "sourceDigest": "b00adadc8fa1d4ce1c68b6e8f75f21d84f7f8aa85780f0f54b53bebc2f26f484",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed updated continuity and first-creation contracts against the product doctrine. Durable lookup implements the existing honest-unknown-state and no-automatic-paid-replay principles while preserving child ownership, explicit Build/Play/Keep, learning authority and rewards; no product entitlement or retention policy changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -229,10 +229,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.352Z",
-      "sourceDigest": "fe2798829c213e3c2515a4dff46c256408d3aa8f6aa5a7de9b1ad7427ed14bc0",
+      "reviewedAt": "2026-11-21T18:33:24.134Z",
+      "sourceDigest": "6e9f71af93063f45e844b0372feddf99f9a39b17f971877a02113553e372fb92",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected combined Studio diff: PR115 reconnect, visible Build, saved-job retry and owner guards are preserved, with only the Pal earned-form callback added; both UI contracts and scoped hosted visual evidence remain documented.",
+      "reviewReason": "Reviewed saved-before-POST identity, awaited acknowledgement persistence, Ready-without-candidate recovery, legacy failed-job retention and captured-client profile guards. Architecture and journey/continuity contracts now describe read-only recovery, unresolved null results, preserved drafts and explicit Play/Keep.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -475,10 +475,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T18:33:24.978Z",
+      "sourceDigest": "f7539df1b3697b46b1a0ec9c27ace6e4c9bee1d19ec926e2303c89d0b5d4a41c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Reviewed the additive authenticated job-requests GET and OpenAPI response/hash contract. Architecture and server guide document snapshot-only lookup, family/adult and trusted-device checks, payload binding, no dispatch or reservation, and the pure helper required in the gateway image.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -517,10 +517,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.976Z",
-      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
+      "reviewedAt": "2026-11-21T18:33:25.418Z",
+      "sourceDigest": "bf41ff1f87f84993aff4cabd8f6d2e2a426c68b915621b03653b548e2708251c",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
+      "reviewReason": "Reviewed JobService lookup and shared job-view extraction against existing submit/retry admission. Documented that initial-request reconciliation does not run generation, reserve allowance, renew authority or replay a paid POST; existing exact failed-job successor recovery remains explicit."
     },
     {
       "id": "coach",
@@ -566,10 +566,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
-      "reviewedAt": "2026-11-21T14:34:24.173Z",
+      "sourceDigest": "505253c7e26531e85b7be28fb99ffaa2b6a95a5f33172541049f5f4ebfaa1333",
+      "reviewedAt": "2026-11-21T18:33:26.035Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
+      "reviewReason": "Reviewed lookup audience filtering and adult-workspace regression changes, including the same request ID in child and separate adult namespaces. Architecture records current session/device/adult checks, local owner/API binding and stale-client isolation; no consent, grant duration, spending entitlement or cross-profile access is added.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:01:33.009Z",
-      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
+      "reviewedAt": "2026-11-21T18:33:26.485Z",
+      "sourceDigest": "55f92fd21ef156b3092b8b1d066bbdea54d002cddcc834836d184d202487af41",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
+      "reviewReason": "Reviewed new unit/HTTP and desktop/phone browser recovery cases plus affected adult and learning harness changes. Architecture links the regressions for lost initial ACK, save-before-POST, failed ACK/Ready persistence, stale callbacks and no duplicate admission; source fixtures and packaging checks are explicitly distinguished from hosted or live-provider acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:01:33.314Z",
-      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
+      "reviewedAt": "2026-11-21T18:33:26.936Z",
+      "sourceDigest": "1dda2b34e72cf8b089e2d0afba58fe76b8a08f0b79d72883eefe2f989be34058",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
+      "reviewReason": "Reviewed gateway Docker COPY, Docker context inclusion, exact-source archive scope/tests and guided-creation suite registration for the pure submission helper. Architecture records gateway-before-web ordering, directional notebook-v1 rollback compatibility and unchanged private-worker scope; no publication, deployment or activation is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -33,15 +33,25 @@ The default public factory config is still `mode:unavailable`. Novel builds must
 
 ## Async experience contract
 
-- **Acknowledgment:** before a real job ID, say "sending" rather than "building". On acceptance, persist the job ID under the owning child and project.
+This contract reflects the current source, including durable initial-request recovery. The original PR #25 status and acceptance evidence above remain historical.
+
+- **Acknowledgment:** before a real job ID, say "sending" rather than "building". Save the exact initial request identity under its owner, project and API before sending the paid POST; a failed local save prevents submission. On acceptance, await persistence of the job ID before continuing polling.
 - **Working:** nonmodal shelf remains visible on every Studio route. Show grounded stages (queued/building/testing/repairing) without fabricated percent or estimated finish time.
 - **Keep playing:** children can open any of the six favorites, continue their existing game, or use the clearly optional My Powers practice. Extra practice uses the same learner and never consumes or replaces a required in-game checkpoint.
 - **Parallel local edits:** do not block supported local edits while a remote experiment is pending. Keep the original remote job, pending experiment base and metadata; local edits create their own immutable alternatives.
-- **While away:** polling continues while navigating projects and the page reattaches to saved current-child jobs after restart. The initially resumed set is bounded to eight active jobs to avoid stampeding the server; other saved jobs remain available when opened.
+- **While away:** polling continues while navigating projects and the page reattaches to saved current-child work after restart. The initially resumed set is bounded to eight records: active jobs, unconfirmed initial requests or Ready jobs whose candidate has not been saved. Other saved work remains available when opened.
 - **Finish:** save an unselected independent test. The working game remains unchanged. Open the preview only by explicit child action; do not steal keyboard focus, hide math or overwrite a newer draft.
-- **Recovery:** failure, cancellation, stale callback, client disconnect or save failure must not overwrite the working revision. A failed status poll is *not* proof of build failure; read-only recovery uses the authoritative job ID. A saved failed job can be explicitly retried after reopening without temporary browser request data. Its one authorized successor is recovered after a lost retry acknowledgement before any further explicit retry; no uncertain paid request is automatically replayed.
+- **Recovery:** failure, cancellation, stale callback, client disconnect or save failure must not overwrite the working revision. A failed status poll is *not* proof of build failure. Read-only recovery uses the authoritative job ID or the exact saved initial request identity; it never replays an uncertain paid POST. A saved failed job can be explicitly retried after reopening without temporary browser request data. Its one authorized successor is recovered after a lost retry acknowledgement before any further explicit retry.
 - **Costs:** poll approximately once a second for the first 15 seconds, then every 3 seconds until the first minute, then about 8 seconds, rather than every 250 ms. Server/backend usage and worker time remain metered separately.
-- **Switch child:** disconnect status subscriptions for the prior profile; reopen only the new profile's jobs. Local profiles are not themselves secure parental authentication.
+- **Switch child:** disconnect status subscriptions and invalidate captured clients for the prior profile; reopen only the new profile's records against their saved API. A late success or failure cannot overwrite recovery after a switch away and back. Local profiles are not themselves secure parental authentication.
+
+### Initial request and local-save recovery
+
+Studio and the legacy builder save an initial request identity before submission. After a lost response, **Check build status** looks for that exact request in its original profile and workshop. An empty result remains uncertain because the original POST may commit later; retain the record and block another initial Build. An older failed job is not evidence about this request.
+
+If saving the acknowledgement fails, retain the request identity across reload and recover by lookup. For a Ready response, retain it until Studio saves the independent candidate experiment; also recover a saved Ready job missing that experiment. A failed candidate write must not be presented as a saved playable result. Rechecking preserves the newer draft and current game and cannot select or Keep a result. The legacy builder also retains acknowledged failed IDs for explicit retry after reopening.
+
+The [architecture contract](../../ARCHITECTURE-CURRENT.md#conversation-led-creation-readiness-and-build-handoff) specifies lookup authorization, additive notebook compatibility and gateway-before-web rollout. Recovery cannot reconstruct identities absent from pre-upgrade storage or guarantee resolution of a request never admitted. Full-notebook capacity, retention and general cross-store creation recovery remain separate work.
 
 ## Learning and design-coach rules
 
@@ -63,6 +73,8 @@ Creative coaching remains child-authored: a clear build request is not turned in
 Automated tests should exercise: exactly six distinct starter games; native win/retry/pause/resume; atomic multi-edits; a simulated delayed build while a child makes a separate quick edit; testing/ready callback while an unrelated game or math opportunity is active; ready preview stays unselected; background status after navigation and reload; stale preview response; session/profile switches; save failure; timeout and network-unknown states.
 
 Synthetic pending durations to inject: **1s, 5s, 15s, 60s, 180s, 600s**. Simulate failure before server acknowledgement, mid-generation, at test, during repair, during preview and after a device restart. Use isolated fixtures only; no paid AI call is needed to exercise these UX transitions.
+
+The [submission unit cases](../../tests/build-submission-recovery.test.ts) cover save-before-POST ordering, lost acknowledgement, exact payload and audience checks, stale callbacks and lookup without dispatch. The [browser fixtures](../../tests/build-submission-recovery-browser.cjs) exercise reload with an unknown initial outcome, failed acknowledgement persistence and failed Ready candidate persistence while retaining a newer draft and exactly one initial POST. These are synthetic source regressions, not live-provider or physical-device acceptance.
 
 For a parent-approved pilot, collect observed **submit-to-ready p50/p95**, time blocked by UI, project return rate, fraction of builds opened after ready, version choice comprehension, task interruption count, save/restore errors, and model/worker cost per completed game. Do not optimize simply for more minutes on screen or more paid AI calls.
 

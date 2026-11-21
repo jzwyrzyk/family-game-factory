@@ -4,6 +4,14 @@ Start with [Current architecture](../ARCHITECTURE-CURRENT.md), [Delivery state](
 
 The original contract snapshot below is retained as historical rationale. Its statements about an unimplemented backend, missing deployment scripts and proposed endpoints describe that early assignment; **they are not current status or a complete API specification**. The implemented generation API is `/v1/jobs`, not the proposed `/v1/generations`. [openapi.json](openapi.json) covers jobs/revisions/worker operations but still needs reconciliation with newer coach/speech/device routes.
 
+## Current source: initial build request recovery
+
+`GET /v1/job-requests/:clientRequestId?payloadHash=...` recovers an initial request whose identity the browser saved before `POST /v1/jobs`. [JobService.lookupSubmission](pipeline/service.ts) checks the existing family/adult audience, session and applicable trusted-device authority, then verifies the stored payload hash. It returns `{job: <authorized job view>}` or `{job: null}` without admission, dispatch, allowance reservation or provider calls. Duplicate matches, retry identities and mismatched hashes fail closed.
+
+`job:null` remains uncertain because the original POST may still commit later. The browser preserves the record and offers read-only checks without replaying the POST. Failed acknowledgement or Ready-candidate writes also remain recoverable. The [canonical architecture contract](../ARCHITECTURE-CURRENT.md#conversation-led-creation-readiness-and-build-handoff) defines the exact identity, profile/API binding, notebook compatibility and remaining limits; [openapi.json](openapi.json) defines the route shape.
+
+Deploy and verify the gateway contract before its web client. The gateway Docker context and exact-source archive include the pure `src/builder/submission.ts` dependency. The private generation worker and source pin are unchanged. Local regressions and packaging checks are source evidence, not a deployment or live-generation receipt.
+
 ## Historical snapshot — managed backend contracts
 
 `contracts/api.ts` defines versioned Cloud Run boundary types, tenant authorization and parent release gates, strict generation input validation, job transitions, private Firestore/Cloud Storage ports, atomic budget reservations, isolated-worker and server-only AI provider interfaces. The unconfigured adapter fails explicitly. These files are not imported by the browser and contain no cloud credentials, SDK initialization or mock generation success.

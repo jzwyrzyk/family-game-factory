@@ -12,6 +12,7 @@ import {assertActiveTrustedDevice} from '../trusted-devices';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotJobAllowed} from '../adult-pilot';
 import {requireResourceAudience} from './audience';
+import {buildIdentityText} from '../../src/builder/submission';
 import { isGameId,validateConfig } from '../../src/runtime/manifests';
 import { validateArtifact } from './artifacts';
 import type { AgentAdapter,AuditEvent,BuildRequest,BuiltRevision,Job,JobStatus,PipelineState,Repository,PlayableGame,AgentInput } from './types';
@@ -124,10 +125,31 @@ export class JobService {
    ledger.reserved+=maxUnits;const job:Job={...r,...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
   });
  }
- async get(session:VerifiedSession,id:string){
-  const state=await this.repo.snapshot(),j=state.jobs.find(job=>job.id===id);if(!j)throw Error('NOT_FOUND');requireResourceAudience(state,session,j);
+ private jobView(state:PipelineState,session:VerifiedSession,j:Job){
+  requireResourceAudience(state,session,j);
   const next=this.retrySuccessor(state,session,j);
   return {jobId:j.id,status:j.status,revisionId:j.revisionId,errorCode:j.errorCode,adapter:j.adapter,phase:j.phase,attempts:j.attempts,...(next?{retryJobId:next.id}:{})};
+ }
+ async get(session:VerifiedSession,id:string){
+  const state=await this.repo.snapshot(),job=state.jobs.find(job=>job.id===id);if(!job)throw Error('NOT_FOUND');
+  return this.jobView(state,session,job);
+ }
+ /** Read-only recovery for an initial POST whose acknowledgement was lost.
+  * Absence is not a rejection: a concurrent admission may still commit later.
+  */
+ async lookupSubmission(session:VerifiedSession,clientRequestId:string,payloadHash:string){
+  requireFamily(session,{id:'request-lookup',familyId:session.familyId});
+  if(!safeId(clientRequestId)||typeof payloadHash!=='string'||!/^[a-f0-9]{64}$/.test(payloadHash))throw Error('INVALID_REQUEST');
+  const state=await this.repo.snapshot();
+  assertActiveTrustedDevice(state,session);
+  if((session.adultSessionId||session.adultProfileId)&&!adultPilotAllowed(state,session))throw Error('FORBIDDEN');
+  const matches=state.jobs.filter(job=>job.familyId===session.familyId&&job.clientRequestId===clientRequestId&&
+   (job.adultPilotProfileId||(job.adultPilotDeviceId?`adult:${job.adultPilotDeviceId}`:undefined))===session.adultProfileId);
+  if(matches.length>1)throw Error('IDEMPOTENCY_CONFLICT');
+  const job=matches[0];if(!job)return {job:null};
+  const view=this.jobView(state,session,job);
+  if(job.retryOf||createHash('sha256').update(buildIdentityText(job)).digest('hex')!==payloadHash)throw Error('IDEMPOTENCY_CONFLICT');
+  return {job:view};
  }
  async retry(session:VerifiedSession,id:string,clientRequestId:string){const j=await this.authorized(session,id);return this.submit(session,{gameId:j.gameId,baseRevisionId:j.baseRevisionId,prompt:j.prompt,clientRequestId,retryOf:j.id});}
  async cancel(session:VerifiedSession,id:string){const result=await this.repo.transaction(s=>{const job=s.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(s,session,job);if(['queued','building','testing'].includes(job.status)){audit(s,job,'cancelled');s.ledgers[job.familyId].reserved-=job.maxUnits;job.usedUnits=job.maxUnits;s.ledgers[job.familyId].used+=job.maxUnits;if(job.execution){delete job.execution.candidate;delete job.execution.qualityEvidence;}}return {jobId:id,status:job.status};});this.controllers.get(id)?.abort();return result;}
