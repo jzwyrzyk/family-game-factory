@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 20, 2026 — development environment design prepared
+
+The owner agreed to lightweight DEV and requested the layout. The [implementation plan](docs/development/ENVIRONMENTS.md) records source baseline `aeb3fdb953fd5812e9fec0b4b5f6b1288c45666c`, disconnected per-PR application previews, separate shared DEV data/identities, an independent private DEV worker target, and candidate reservation/promotion through the existing release work. [The decision](docs/decisions/2026-11-20-development-environments.md) distinguishes accepted direction from proposed hosting/setup details.
+
+Read-only inspection confirmed the exact production Pages destination checks, single-app-origin gateway and private-worker main/tag/SHA coupling. [PR45](https://github.com/jzwyrzyk/family-game-factory/pull/45) is still draft/open with merge conflicts at inspected head `f9062d4ed116b2d7516da4dddd4e9232584284f0`; [issue46](https://github.com/jzwyrzyk/family-game-factory/issues/46) remains open. Separate direct-access work was under preparation and was not treated as an active release capability. This entry records a documentation/design candidate only: no preview, DEV resource, cloud identity, secret, workflow dispatch, provider request, production configuration or deployment was created. The ongoing production rollout retains its own evidence and authorization.
+
 ## November 20, 2026 — PR98 merged; replacement publication pending
 
 [PR98](https://github.com/jzwyrzyk/family-game-factory/pull/98) merged at **7:29:14 p.m. America/New_York** (`2026-11-21T00:29:14Z`) as [`d93ed92c61f603ddecdbc922187664b2b25c244b`](https://github.com/jzwyrzyk/family-game-factory/commit/d93ed92c61f603ddecdbc922187664b2b25c244b), following the owner's instruction to merge the deployment prerequisites and continue. Its reviewed head was `73a872a6dfdf2f53a1da7d614c32be80816146e2`; all **14** returned check runs passed. The merged Git tree `a4ccab0628060b295c0d4c90237b397fd439a1e8` exactly matches that tested head. The browser job [136639286290](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44837989211/job/136639286290) ran all 51 deployment tests, including the real TypeScript fixture-loader regression. The merged-main [documentation run 44844136244](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44844136244) also passed.

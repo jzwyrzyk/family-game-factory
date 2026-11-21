@@ -64,7 +64,9 @@
     "docs/decisions/2026-11-20-pal-expression-runtime.md",
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
-    "docs/brand/previews/learning-readability-20261120/README.md"
+    "docs/brand/previews/learning-readability-20261120/README.md",
+    "docs/development/ENVIRONMENTS.md",
+    "docs/decisions/2026-11-20-development-environments.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -95,7 +97,8 @@
     "docs/pals/*.md",
     "skills/gem-pal-studio/*.md",
     "docs/drawings/*.md",
-    "docs/pals/previews/*.md"
+    "docs/pals/previews/*.md",
+    "docs/development/*.md"
   ],
   "areas": [
     {
@@ -602,7 +605,9 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/development/*.md",
+        "docs/decisions/2026-11-20-development-environments.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -613,13 +618,15 @@
         "vite.config.ts",
         ".dockerignore",
         ".gitignore",
-        "DELIVERY-STATE.md"
+        "DELIVERY-STATE.md",
+        "docs/development/*.md",
+        "docs/decisions/2026-11-20-development-environments.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T00:33:29.000Z",
-      "sourceDigest": "e80e3c47855c3b5e6c184caab0f576abe22596a49c399c69387ca79611476688",
+      "reviewedAt": "2026-11-21T01:15:04.280Z",
+      "sourceDigest": "120abe1542f1f176060a76fed4862bbcf2ba3c5bb83fa1008be158dc2ad6c520",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual PR98 merge d93ed92c against tested head 73a872a: identical Git tree and 14 passing checks; preserved the failed publisher 44837433067 and pending production acceptance. Updated the delivery ledger and existing sandbox handoff with the authenticated Cloud Shell dispatch step, exact fixed workflow-blob guard and disabled-generation check. Only post-merge evidence and handoff prose changed; runtime/workflow bytes, private worker pin, cloud configuration and activation remain unchanged. Delivery includes the ledger itself, so this records review of the new receipt against the independently computed hosted source digest.",
+      "reviewReason": "Reviewed current Pages/source and exact worker identity/dispatcher restrictions, production-specific deployment tooling, release-continuity contract, PR45 and issue46. Added the phased DEV plan and dated direction with public-preview limits, separate nonprod data/worker authority, verified-artifact promotion and direct-operations dependencies; no runtime or cloud state changed. Independent source/security/hosting reviews resolved publisher WIF trust and browser-domain wording. Updated canonical links and the scoped design delivery receipt.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -684,10 +691,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
+      "reviewedAt": "2026-11-21T01:15:04.542Z",
+      "sourceDigest": "b2ed4ceeeba3dd97773015e18f42a969f8f70fb53bbdea1d62712c596c40b7fb",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
+      "reviewReason": "Reviewed the registry diff and maintenance contract. Registered the development environment plan and decision as required documents, linked both from task/decision indexes, added development links to checking scope and routed these plan sources to the existing delivery area. Existing areas, approval policy and checker implementation are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
