@@ -26,7 +26,7 @@ The compact generated artwork lookup derives from the existing approved manifest
 
 ## Compatibility and release
 
-This is a frontend behavior change with no new service route, credential, AI scope or spending permission. Gateway/preview packaging includes the new pure catalog dependencies because the trusted scene validator shares the asset catalog. The frontend continues using the existing reviewed production origins.
+This is a frontend behavior change with no new service route, credential, AI scope or spending permission. Gateway/preview packaging includes the new pure catalog dependencies because the trusted scene validator shares the asset catalog. The frontend continues using the existing reviewed production origins. New Pal scenes and backups remain local, so this website cutover does not require new server readers. A future generation worker using the expanded provider scene enum must coordinate gateway/preview reader support before emitting those IDs; the existing worker stays pinned for this release.
 
 Older collections and backups remain valid without a destructive migration. An older application build cannot recognize a newly earned roster ID or new scene asset; a rollback must preserve stored bytes and use a compatible forward repair rather than erase data. A clean legacy-only profile still has its original IDs.
 

@@ -94,6 +94,8 @@ const vm=require('node:vm');
   assert.match(await page.locator('#studioNavHome use').getAttribute('href'),/\/arcade\/jems-art\/icons\/jems-icons\.svg#jems-home$/,'offline navigation resolves the same sprite below the site base');
   await page.waitForFunction(()=>!!FG.pals?.view());
   await navigate(page,'#studioNavPals');
+  await page.locator('#page-jems-pals').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.getElementById('page-jems-pals')?.getAttribute('aria-busy')==='false');
   const naviCard=page.locator('.pals-card[data-pal="navi"]');
   await naviCard.scrollIntoViewIfNeeded();
   await page.waitForFunction(hash=>{

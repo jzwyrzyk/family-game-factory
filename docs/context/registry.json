@@ -273,10 +273,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "efedda883044960402cd6dfcc66d2e941c8a910334c6519e86276cce692723d6",
-      "reviewedAt": "2026-11-21T14:33:40.904Z",
+      "sourceDigest": "fb1df0689646fb4bba34e7554a34797347e713eaac036b7ae07f826510cc84b5",
+      "reviewedAt": "2026-11-21T14:48:51.947Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented current earned-form insertion, immutable character/form/version scene references, preserved legacy token scenes, local loading recovery and unchanged Keep/owner/source guards.",
+      "reviewReason": "Reviewed the spending-only fixture correction with every original assertion retained and all 77 creation tests passing; clarified that local Pal IDs do not cross an outgoing API and any future worker emission requires coordinated server readers.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -555,10 +555,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:33:41.926Z",
-      "sourceDigest": "81150d38bc326eb716e572c926e568d206de7578dd8fededd9b35a693b4b5f31",
+      "reviewedAt": "2026-11-21T14:48:52.425Z",
+      "sourceDigest": "c5cd3007ab5a921535b6540594762df4f471fefab850d3d3a3923d9756c15b2f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded passing local build, Pal/creation/asset/packaging contracts and explicit Chromium execution restriction; added exact identity, fallback/retry, lifecycle and scene compatibility browser coverage pending hosted execution.",
+      "reviewReason": "Recorded the first hosted Pal component/app pass and two broader fixture failures; documented the unchanged runtime, exact spending/input separation, offline collection-readiness wait and required fresh hosted run.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T14:33:42.370Z",
-      "sourceDigest": "7708f99e4fe43b8831331927db340fa73349e96412d199e58602a385749edb88",
+      "reviewedAt": "2026-11-21T14:48:52.871Z",
+      "sourceDigest": "d5afb5d10890f5b1927c019b1081e79ef8c25b0fd88680a6e448427f5afd193d",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the prepared candidate from c03287a, existing authorized Pages release route and prior live source, pending hosted merge/deploy gates and data-preserving rollback limitations without claiming deployment.",
+      "reviewReason": "Recorded PR114 head 1c252233 and run44914760266 as partial hosted evidence, retained failed gate status, documented test-only corrections and the website-only release boundary without claiming merge or deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
