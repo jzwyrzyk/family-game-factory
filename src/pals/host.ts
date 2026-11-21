@@ -1,4 +1,4 @@
-import { createPalsPage, createPalsWidget, createPalCameo } from './ui';
+import { createPalsPage, createPalsWidget, createPalCameo, createPalPortrait } from './ui';
 import { palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsController, PalsNotice } from './service';
 import { setIconLabel } from '../brand/icons';
@@ -112,6 +112,9 @@ export function installPalsInterface(host: PalsHost) {
       : notice.activities.includes('scene.challenge') ? 'coding' : 'practice';
     cameo.say(kind, ++quip);
     const copy = node('div', 'pals-reward-note');
+    const portraitId = available ?? active;
+    const portraitStage = state.profile?.owned.find(pal => pal.id === portraitId)?.stage ?? 1;
+    copy.append(createPalPortrait(portraitId, portraitStage, 'pals-reward-portrait', 'celebrate', true));
     if (available) copy.append(node('strong', '', `${palDefinition(available).name} is ready to join!`));
     else if (gained) copy.append(node('strong', '', `${palDefinition(active).name} has grown!`));
     copy.append(node('p', '', `${palDefinition(active).name}: ${palLine(active, kind, quip)}`));

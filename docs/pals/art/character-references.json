@@ -1,7 +1,7 @@
 {
   "reference_index_id": "jems-gem-pals-character-references",
-  "revision": 4,
-  "date": "2026-11-20",
+  "revision": 5,
+  "date": "2026-11-21",
   "timezone": "America/New_York",
   "scope": "All 23 original profiles reconciled to approved package 2.9: 46 exact neutral sources and 138 approved expressions, with lossless repository exports. Brio retains two approved neutrals and six expressions in review; all prior asset records remain historical evidence.",
   "growth_form_policy": {
@@ -24,7 +24,7 @@
     "intermediate_visual_stage": null,
     "applies_to": "23 roster entries and 24 individual profiles including Brio; the original core is 22 entries and 23 profiles, with F1 Navi and F2 Mote separate.",
     "progression_threshold": "Existing ADR0013 derives Base at 0–4 adventures and Grown from five; this art reconciliation does not change earning, receipts, ownership or backups.",
-    "runtime_mapping_status": "Core versioned export bindings use exact character_key with base/mature and neutral plus three approved expressions. Existing collection IDs, saved-scene compatibility and in-game acceptance remain separate implementation evidence.",
+    "runtime_mapping_status": "All 24 profiles have explicit application_mapping entries for the earned collection. The original 23 use core-2026-11-20; Brio uses only his two approved neutrals. Existing inventory aliases and legacy token scene IDs are preserved. Live acceptance is recorded separately.",
     "saved_data_policy": "Preserve committed activity receipts, per-Pal adventure counts, ownership, selections and backups. Derive displayed form without resetting history."
   },
   "counts": {
@@ -3860,7 +3860,23 @@
           "display_name": "Luma",
           "roster_alias": "A",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "glim",
+            "display_name": "Luma",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/luma/base/neutral-93fde3101e62.webp",
+                "scene_asset_id": "pal-luma-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/luma/mature/neutral-6b3ffa07f571.webp",
+                "scene_asset_id": "pal-luma-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "retains_existing_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -4149,7 +4165,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -4175,7 +4191,23 @@
           "display_name": "Nook",
           "roster_alias": "B",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "kip",
+            "display_name": "Nook",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/nook/base/neutral-458c3fb0fc44.webp",
+                "scene_asset_id": "pal-nook-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/nook/mature/neutral-be860de47216.webp",
+                "scene_asset_id": "pal-nook-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "retains_existing_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -4454,7 +4486,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -4480,7 +4512,23 @@
           "display_name": "Mizzle",
           "roster_alias": "D",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "mizzle",
+            "display_name": "Mizzle",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/mizzle/base/neutral-37e57f8937e6.webp",
+                "scene_asset_id": "pal-mizzle-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/mizzle/mature/neutral-e978474ddffa.webp",
+                "scene_asset_id": "pal-mizzle-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -4769,7 +4817,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -4795,7 +4843,23 @@
           "display_name": "Tumble",
           "roster_alias": "E",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "tumble",
+            "display_name": "Tumble",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/tumble/base/neutral-a75baf959eda.webp",
+                "scene_asset_id": "pal-tumble-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/tumble/mature/neutral-8279cc081987.webp",
+                "scene_asset_id": "pal-tumble-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -5084,7 +5148,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -5110,7 +5174,23 @@
           "display_name": "Navi",
           "roster_alias": "F",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "navi",
+            "display_name": "Navi",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/navi/base/neutral-f0d1f53e54dd.webp",
+                "scene_asset_id": "pal-navi-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/navi/mature/neutral-ed4534b76918.webp",
+                "scene_asset_id": "pal-navi-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -5423,7 +5503,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -5444,7 +5524,23 @@
           "display_name": "Mote",
           "roster_alias": "F",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "mote",
+            "display_name": "Mote",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/mote/base/neutral-4dc984ce0f70.webp",
+                "scene_asset_id": "pal-mote-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/mote/mature/neutral-2db6976032b2.webp",
+                "scene_asset_id": "pal-mote-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -5740,7 +5836,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -5766,7 +5862,23 @@
           "display_name": "Sivo",
           "roster_alias": "G",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "sivo",
+            "display_name": "Sivo",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/sivo/base/neutral-b3600e7cc722.webp",
+                "scene_asset_id": "pal-sivo-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/sivo/mature/neutral-7837cf6380f8.webp",
+                "scene_asset_id": "pal-sivo-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -6057,7 +6169,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -6083,7 +6195,23 @@
           "display_name": "Furl",
           "roster_alias": "H",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "furl",
+            "display_name": "Furl",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/furl/base/neutral-b6ba89248449.webp",
+                "scene_asset_id": "pal-furl-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/furl/mature/neutral-c689f2256e41.webp",
+                "scene_asset_id": "pal-furl-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -6372,7 +6500,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -6398,7 +6526,23 @@
           "display_name": "Tessit",
           "roster_alias": "I",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "tessit",
+            "display_name": "Tessit",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/tessit/base/neutral-114b74de9e72.webp",
+                "scene_asset_id": "pal-tessit-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/tessit/mature/neutral-a50b4cddf9b2.webp",
+                "scene_asset_id": "pal-tessit-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -6687,7 +6831,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -6713,7 +6857,23 @@
           "display_name": "Flick",
           "roster_alias": "K",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "flick",
+            "display_name": "Flick",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/flick/base/neutral-09e10c435dcd.webp",
+                "scene_asset_id": "pal-flick-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/flick/mature/neutral-bd0f358d1012.webp",
+                "scene_asset_id": "pal-flick-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -7002,7 +7162,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -7028,7 +7188,23 @@
           "display_name": "Clasp",
           "roster_alias": "L",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "clasp",
+            "display_name": "Clasp",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/clasp/base/neutral-b0b8aba2bb28.webp",
+                "scene_asset_id": "pal-clasp-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/clasp/mature/neutral-a6c9939e3eed.webp",
+                "scene_asset_id": "pal-clasp-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -7307,7 +7483,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -7333,7 +7509,23 @@
           "display_name": "Skiff",
           "roster_alias": "M",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "skiff",
+            "display_name": "Skiff",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/skiff/base/neutral-ff5d636dbdce.webp",
+                "scene_asset_id": "pal-skiff-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/skiff/mature/neutral-006e15bba0a9.webp",
+                "scene_asset_id": "pal-skiff-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -7616,7 +7808,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -7642,7 +7834,23 @@
           "display_name": "Peep",
           "roster_alias": "N",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "peep",
+            "display_name": "Peep",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/peep/base/neutral-e5fb86581cc8.webp",
+                "scene_asset_id": "pal-peep-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/peep/mature/neutral-6afc004481ee.webp",
+                "scene_asset_id": "pal-peep-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -7937,7 +8145,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -7963,7 +8171,23 @@
           "display_name": "Weft",
           "roster_alias": "O",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "weft",
+            "display_name": "Weft",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/weft/base/neutral-ce8ebc0adae5.webp",
+                "scene_asset_id": "pal-weft-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/weft/mature/neutral-d8a6165d9fa1.webp",
+                "scene_asset_id": "pal-weft-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -8254,7 +8478,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -8280,7 +8504,23 @@
           "display_name": "Cache",
           "roster_alias": "P",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "cache",
+            "display_name": "Cache",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/cache/base/neutral-9dac020556a5.webp",
+                "scene_asset_id": "pal-cache-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/cache/mature/neutral-9fffd1f08a0f.webp",
+                "scene_asset_id": "pal-cache-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -8564,7 +8804,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -8590,7 +8830,23 @@
           "display_name": "Brim",
           "roster_alias": "Q",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "brim",
+            "display_name": "Brim",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/brim/base/neutral-ecfe4d863199.webp",
+                "scene_asset_id": "pal-brim-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/brim/mature/neutral-e1deceb1c58f.webp",
+                "scene_asset_id": "pal-brim-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -8874,7 +9130,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -8900,7 +9156,23 @@
           "display_name": "Wink",
           "roster_alias": "R",
           "species_id": null,
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "riff",
+            "display_name": "Wink",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/wink/base/neutral-42c9a2c10602.webp",
+                "scene_asset_id": "pal-wink-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/wink/mature/neutral-7c83c99e39f5.webp",
+                "scene_asset_id": "pal-wink-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "retains_existing_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -9194,7 +9466,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -9220,7 +9492,23 @@
           "display_name": "Poff",
           "roster_alias": "S",
           "species_id": "GP-S019",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "poff",
+            "display_name": "Poff",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/poff/base/neutral-147c13ba7e6c.webp",
+                "scene_asset_id": "pal-poff-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/poff/mature/neutral-8504050f12e9.webp",
+                "scene_asset_id": "pal-poff-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -9506,7 +9794,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -9532,7 +9820,23 @@
           "display_name": "Chimi",
           "roster_alias": "T",
           "species_id": "GP-S020",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "chimi",
+            "display_name": "Chimi",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/chimi/base/neutral-2dc6024a8f92.webp",
+                "scene_asset_id": "pal-chimi-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/chimi/mature/neutral-839afb70a7e3.webp",
+                "scene_asset_id": "pal-chimi-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -9837,7 +10141,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -9863,7 +10167,23 @@
           "display_name": "Pleeko",
           "roster_alias": "U",
           "species_id": "GP-S021",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "pleeko",
+            "display_name": "Pleeko",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/pleeko/base/neutral-acf9007b0389.webp",
+                "scene_asset_id": "pal-pleeko-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/pleeko/mature/neutral-3c0b43f73d21.webp",
+                "scene_asset_id": "pal-pleeko-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -10151,7 +10471,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -10177,7 +10497,23 @@
           "display_name": "Talli",
           "roster_alias": "V",
           "species_id": "GP-S022",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "talli",
+            "display_name": "Talli",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/talli/base/neutral-e86fa909bb99.webp",
+                "scene_asset_id": "pal-talli-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/talli/mature/neutral-0785af1c21ae.webp",
+                "scene_asset_id": "pal-talli-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -10465,7 +10801,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -10491,7 +10827,23 @@
           "display_name": "Zippa",
           "roster_alias": "W",
           "species_id": "GP-S023",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "zippa",
+            "display_name": "Zippa",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/zippa/base/neutral-b0f8aca344a3.webp",
+                "scene_asset_id": "pal-zippa-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/zippa/mature/neutral-df295181dbce.webp",
+                "scene_asset_id": "pal-zippa-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -10777,7 +11129,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -10803,7 +11155,23 @@
           "display_name": "Whorl",
           "roster_alias": "X",
           "species_id": "GP-S024",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "whorl",
+            "display_name": "Whorl",
+            "asset_version": "core-2026-11-20",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals/whorl/base/neutral-6c3dfbd80b7c.webp",
+                "scene_asset_id": "pal-whorl-base-core-2026-11-20"
+              },
+              "mature": {
+                "neutral_url": "jems-pals/whorl/mature/neutral-bcca0e4f1289.webp",
+                "scene_asset_id": "pal-whorl-mature-core-2026-11-20"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "forms": {
             "base": {
               "status": "approved_art_reference",
@@ -11091,7 +11459,7 @@
             "isolated_assets": "eight single-image lossless WebP exports; approved source backgrounds and alpha retained",
             "expressions": "three_core_states_approved_for_each_form",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified",
             "asset_manifest_binding": {
               "manifest_path": "../../../public/jems-pals/manifest.json",
@@ -11118,7 +11486,23 @@
           "roster_alias": "brio",
           "board_aliases": [],
           "species_id": "GP-S025",
-          "application_mapping": null,
+          "application_mapping": {
+            "collection_id": "brio",
+            "display_name": "Brio",
+            "asset_version": "neutral-2026-11-21",
+            "forms": {
+              "base": {
+                "neutral_url": "jems-pals-extra/brio/base/neutral-a7324e9903e5.png",
+                "scene_asset_id": "pal-brio-base-neutral-2026-11-21"
+              },
+              "mature": {
+                "neutral_url": "jems-pals-extra/brio/mature/neutral-647287b06502.png",
+                "scene_asset_id": "pal-brio-mature-neutral-2026-11-21"
+              }
+            },
+            "compatibility": "new_collection_id",
+            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+          },
           "profile_path": "characters/brio/README.md",
           "design": {
             "inspiration": "Owner-supplied acoustic guitar: plucked vibration, spring tension, resonant curved surfaces, and warm honey/mahogany colors. The private source photograph is not included.",
@@ -11341,7 +11725,7 @@
             "isolated_assets": "pending; concept portraits retain ivory backgrounds",
             "expressions": "six_form_specific_candidates_in_review",
             "animation_rig": "pending",
-            "runtime_stage_mapping": null,
+            "runtime_stage_mapping": "Application binding is recorded in application_mapping: Base from 0–4 earned adventures and Grown from five. Scene references pin the chosen form/version; live acceptance is separate.",
             "in_game_verification": "not_verified"
           }
         }
@@ -11377,6 +11761,12 @@
         "manifest_path": "../../../public/jems-pals/manifest.json",
         "manifest_version": "core-2026-11-20",
         "manifest_sha256": "4135c90c543b134395af1b9bba24b98722057d24ee64ba3435025482125a44ca"
+      },
+      {
+        "date": "2026-11-21",
+        "scope": "Bind all 24 approved character neutrals to the actual earned collection, retaining legacy inventory aliases and adding explicit form/version scene assets. No artwork approval or source pixels changed.",
+        "decision": "../../decisions/2026-11-21-approved-pal-collection.md",
+        "generated_lookup": "../../../src/pals/catalog-artwork.generated.ts"
       }
     ]
   },

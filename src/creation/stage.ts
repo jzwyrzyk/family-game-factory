@@ -17,9 +17,13 @@ export class CreationStage {
   constructor(readonly canvas: HTMLCanvasElement,private privateArt?:PrivateArtResolver,private artError?:(message:string)=>void) {
     this.context = canvas.getContext('2d')!;
   }
-  clear() { this.artEpoch++;this.requestedArt.clear();this.failedArt.clear();this.scene = null; this.snapshot = null; this.selected = ''; this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); }
+  clear() { this.artEpoch++;this.requestedArt.clear();this.images.clear();this.failedArt.clear();this.scene = null; this.snapshot = null; this.selected = ''; this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); }
   render(scene: CreationProject, snapshot: SceneSnapshot, selected = '') {
     this.scene = scene; this.snapshot = snapshot; this.selected = selected;
+    // Approved portraits are large. Retain only this scene's pinned pictures,
+    // not every Pal/form visited across the whole collection.
+    const assets = new Set(scene.actors.map(actor => actor.assetId));
+    for (const id of this.images.keys()) if (!assets.has(id)) { this.images.delete(id); this.failedArt.delete(id); }
     if (this.canvas.width !== scene.width) this.canvas.width = scene.width;
     if (this.canvas.height !== scene.height) this.canvas.height = scene.height;
     const c = this.context, w = scene.width, h = scene.height;
@@ -125,13 +129,28 @@ export class CreationStage {
     } else if (asset?.url) {
       let img = this.images.get(asset.id);
       if (!img) {
-        img = new Image(); img.onload = () => { if (this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected); };
+        img = new Image(); img.onload = () => { if (this.images.get(asset.id) === img && this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected); };
+        if (asset.palForm) img.onerror = () => {
+          if (this.images.get(asset.id) !== img) return;
+          this.failedArt.add(asset.id);
+          if (this.scene?.actors.some(item => item.assetId === asset.id) && this.snapshot) {
+            this.artError?.(`${asset.label}'s picture could not load. Reopen this scene to try again.`);
+            this.render(this.scene, this.snapshot, this.selected);
+          }
+        };
         img.src = new URL(asset.url, document.baseURI).href; this.images.set(asset.id, img);
       }
       if (img.complete && img.naturalWidth) {
         const scale = s / Math.max(img.naturalWidth, img.naturalHeight);
         const iw = img.naturalWidth * scale, ih = img.naturalHeight * scale;
         c.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      } else if (asset.palForm) {
+        // A delayed approved creature must not appear to turn into a gem token.
+        c.fillStyle = '#F5F1FA'; c.strokeStyle = '#786489'; c.lineWidth = 2;
+        c.beginPath(); c.roundRect(-s * .46, -s * .4, s * .92, s * .8, 10); c.fill(); c.stroke();
+        c.fillStyle = '#4C3C61'; c.font = '600 ' + Math.max(10, Math.min(14, s * .12)) + 'px system-ui';
+        c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText(this.failedArt.has(asset.id) ? 'Picture unavailable' : 'Loading picture…', 0, 0, s * .85);
       } else this.gem(s, '#B79DE7');
     } else if (asset?.kind === 'vector') drawCreationVector(c, asset.id, 0, 0, s);
     else if (asset?.emoji) { c.font = `${s * .76}px system-ui`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(asset.emoji, 0, 0); }

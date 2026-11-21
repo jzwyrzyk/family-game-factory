@@ -14,6 +14,8 @@ on:
       - 'src/studio/conversation-view.ts'
       - 'src/creation/model.ts'
       - 'src/creation/projects.ts'
+      - 'src/pals/catalog.ts'
+      - 'src/pals/catalog-artwork.generated.ts'
       - 'scripts/deployment/build.py'
       - 'scripts/deployment/test_build.py'
   pull_request:
@@ -30,6 +32,8 @@ on:
       - 'src/studio/conversation-view.ts'
       - 'src/creation/model.ts'
       - 'src/creation/projects.ts'
+      - 'src/pals/catalog.ts'
+      - 'src/pals/catalog-artwork.generated.ts'
       - 'scripts/deployment/build.py'
       - 'scripts/deployment/test_build.py'
 permissions:

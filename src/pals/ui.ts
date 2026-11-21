@@ -1,6 +1,6 @@
-import { PAL_CATALOG, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
+import { PAL_CATALOG, palArtworkPath, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
-import { createPalExpressionExplorer } from './expression-explorer';
+import type { PalArtworkExpression } from './artwork';
 import './pals.css';
 
 /** Read-only presentation. Only the trusted coordinator changes ownership or growth. */
@@ -39,24 +39,75 @@ const button = (label: string, key: string, className = 'pals-button') => {
 const owned = (state: PalsViewState, id: PalId | null | undefined) => state.profile?.owned.find(item => item.id === id);
 const ready = (state: PalsViewState) => !state.loading && !!state.profile && state.profile.owner === state.owner;
 const count = (value: number) => new Intl.NumberFormat('en-US').format(value);
+const portraitRequests = new WeakMap<HTMLElement, number>();
+const portraitTimeouts = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
-/** Existing, approved gem tokens. Character designs and evolved portraits remain separate artwork work. */
-export function createPalPortrait(id: PalId, stage: PalStage = 1, className = ''): HTMLElement {
+/** Exact approved character/form artwork. Cards load on demand; a failed reaction
+ * falls back only to this same character's same-form neutral. */
+export function createPalPortrait(id: PalId, stage: PalStage = 1, className = '', expression: PalArtworkExpression = 'neutral', eager = false): HTMLElement {
   const definition = palDefinition(id);
   const portrait = el('span', `pals-portrait ${className}`);
   portrait.dataset.pal = id;
   portrait.dataset.stage = String(stage);
   portrait.dataset.form = stage === 2 ? 'mature' : 'base';
   portrait.dataset.artwork = definition.artwork.status;
+  portrait.dataset.characterKey = definition.artwork.characterKey;
+  portrait.dataset.assetVersion = definition.artwork.assetVersion;
   portrait.setAttribute('aria-hidden', 'true');
   const image = el('img');
-  image.src = new URL(definition.artPath, document.baseURI).href;
   image.alt = '';
   image.width = 240;
   image.height = 240;
   image.decoding = 'async';
-  portrait.append(image);
+  image.loading = eager ? 'eager' : 'lazy';
+  const unavailable = el('span', 'pals-picture-unavailable', 'Picture unavailable');
+  unavailable.hidden = true;
+  portrait.append(image, unavailable);
+  setPortraitExpression(portrait, expression);
   return portrait;
+}
+
+function setPortraitExpression(portrait: HTMLElement, expression: PalArtworkExpression) {
+  const id = portrait.dataset.pal as PalId, form = portrait.dataset.form === 'mature' ? 'mature' : 'base';
+  const image = portrait.querySelector('img')!, unavailable = portrait.querySelector<HTMLElement>('.pals-picture-unavailable')!;
+  const neutral = new URL(palArtworkPath(id, form), document.baseURI).href;
+  const requested = new URL(palArtworkPath(id, form, expression), document.baseURI).href;
+  const request = (portraitRequests.get(portrait) ?? 0) + 1;
+  portraitRequests.set(portrait, request);
+  const clearLoadTimeout = () => { clearTimeout(portraitTimeouts.get(portrait)); portraitTimeouts.delete(portrait); };
+  clearLoadTimeout();
+  image.hidden = false; unavailable.hidden = true;
+  portrait.dataset.expression = requested === neutral ? 'neutral' : expression;
+  portrait.dataset.state = 'loading';
+  const changed = () => portrait.dispatchEvent(new Event('pal-picture-state', { bubbles: true }));
+  const boundLoad = () => {
+    // Offscreen lazy cards must not time out before the browser requests them.
+    // The selected detail is eager and has the same bounded wait as previews.
+    if (image.loading === 'eager') portraitTimeouts.set(portrait, setTimeout(() => failed(), 8000));
+  };
+  const failed = (failedURL = image.src) => {
+    if (portraitRequests.get(portrait) !== request || image.src !== failedURL) return;
+    clearLoadTimeout();
+    if (image.src !== neutral) {
+      portrait.dataset.expression = 'neutral'; image.src = neutral; boundLoad();
+    } else {
+      image.hidden = true; unavailable.hidden = false; portrait.dataset.state = 'unavailable';
+    }
+    changed();
+  };
+  image.onload = () => {
+    const decodedURL = image.src;
+    void image.decode().then(() => {
+      if (portraitRequests.get(portrait) !== request || image.src !== decodedURL) return;
+      clearLoadTimeout();
+      image.hidden = false; unavailable.hidden = true;
+      portrait.dataset.state = 'ready'; changed();
+    }).catch(() => failed(decodedURL));
+  };
+  image.onerror = () => failed();
+  changed();
+  image.src = requested;
+  boundLoad();
 }
 
 function progress(value: number, max: number, label: string) {
@@ -84,30 +135,53 @@ export function createPalsPage(options: PalsPageOptions) {
   let playLine = '';
   let playPal: PalId | null = null;
   let playTimer: ReturnType<typeof setTimeout> | undefined;
+  let playGeneration = 0;
+  let pendingReaction: { generation: number; id: PalId; owner: string; form: string } | null = null;
   let optionsOpen = false;
   let growthOpen = false;
+  let expressionsOpen = false;
+  let expression: PalArtworkExpression = 'neutral';
 
   const element = el('section', 'page hidden jems-pals');
   element.id = 'page-jems-pals';
   element.hidden = true;
   element.setAttribute('aria-labelledby', 'jemsPalsTitle');
+  element.addEventListener('pal-picture-state', event => {
+    if (disposed || element.hidden) return;
+    const portrait = event.target;
+    if (!(portrait instanceof HTMLElement) || !portrait.classList.contains('pals-hero-portrait')) return;
+    expression = portrait.dataset.expression as PalArtworkExpression;
+    syncExpressionControls();
+    const pending = pendingReaction;
+    if (!pending || portrait.dataset.state === 'loading') return;
+    pendingReaction = null;
+    if (portrait.dataset.state !== 'ready' || expression !== 'celebrate' || element.hidden || disposed
+      || pending.generation !== playGeneration || pending.owner !== state.owner || pending.id !== selection
+      || pending.form !== owned(state, selection)?.form) return;
+    const toy = element.querySelector<HTMLElement>('#jemsPalPlay');
+    if (toy) { void toy.offsetWidth; toy.classList.add('is-playing'); }
+    // A slow first request gets the same visible hold as a cached reaction.
+    playTimer = setTimeout(() => {
+      toy?.classList.remove('is-playing');
+      if (!disposed && pending.generation === playGeneration && pending.owner === state.owner
+        && pending.id === selection && pending.form === owned(state, selection)?.form) previewExpression('neutral');
+    }, 1600);
+  });
 
   const header = el('div', 'pals-page-heading');
   const titleBlock = el('div');
   const back = button('← My games', 'back', 'pals-button pals-quiet');
   back.id = 'jemsPalsBack';
   back.onclick = () => { void perform(() => options.onBack()); };
-  const eyebrow = el('span', 'pals-eyebrow', 'A LITTLE SPARKLE. A LOT OF IDEAS.');
   const heading = el('h1', '', 'My Pals');
   heading.id = 'jemsPalsTitle';
   heading.tabIndex = -1;
-  const intro = el('p', 'pals-lead', 'Meet your crew. Make something together.');
-  titleBlock.append(eyebrow, heading, intro);
+  const intro = el('p', 'pals-lead');
+  titleBlock.append(heading, intro);
   const total = el('span', 'pals-collection-count');
   total.id = 'jemsPalsCount';
   header.append(titleBlock, total);
 
-  const notice = el('p', 'pals-art-note', 'Meet the Gem Pals in the expression playground.');
   const message = el('div', 'pals-status');
   message.id = 'jemsPalsStatus';
   message.setAttribute('role', 'status');
@@ -116,8 +190,7 @@ export function createPalsPage(options: PalsPageOptions) {
   const retry = button('Try again', 'retry');
   retry.onclick = () => { void perform(options.onRetry); };
   const content = el('div', 'pals-content');
-  const expressions = createPalExpressionExplorer(state.owner);
-  element.append(back, header, notice, message, retry, expressions.element, content);
+  element.append(back, header, message, retry, content);
 
   function focusKey() {
     const target = document.activeElement;
@@ -127,6 +200,11 @@ export function createPalsPage(options: PalsPageOptions) {
     if (!key || element.hidden) return;
     const target = Array.from(element.querySelectorAll<HTMLElement>('[data-pals-focus]')).find(item => item.dataset.palsFocus === key);
     if (target && !('disabled' in target && target.disabled)) target.focus({ preventScroll: true });
+    else if (/^(starter|equip|equip-detail)-/.test(key)) element.querySelector<HTMLElement>('#jemsPalDetailTitle')?.focus();
+    else if (key.startsWith('collect-')) {
+      const detailKey = `details-${key.slice('collect-'.length)}`;
+      Array.from(element.querySelectorAll<HTMLElement>('[data-pals-focus]')).find(item => item.dataset.palsFocus === detailKey)?.focus({ preventScroll: true });
+    }
   }
   async function perform(action: () => Action) {
     if (disposed || localSaving || state.saving) return;
@@ -154,7 +232,7 @@ export function createPalsPage(options: PalsPageOptions) {
     return result;
   }
   function select(id: PalId) {
-    if (selection !== id) { playLine = ''; playPal = null; }
+    if (selection !== id) { cancelReaction(); playLine = ''; playPal = null; expression = 'neutral'; expressionsOpen = false; }
     selection = id;
     render();
   }
@@ -163,13 +241,30 @@ export function createPalsPage(options: PalsPageOptions) {
     playPal = id;
     playLine = palLine(id, 'play', playCount++);
     const line = element.querySelector<HTMLElement>('#jemsPalPlayLine');
-    if (line) line.textContent = playLine;
+    if (line) { line.textContent = playLine; line.hidden = false; }
     const toy = element.querySelector<HTMLElement>('#jemsPalPlay');
-    if (playTimer) clearTimeout(playTimer);
+    cancelReaction();
     toy?.classList.remove('is-playing');
-    // Force a fresh finite reaction only after an intentional tap.
-    if (toy) { void toy.offsetWidth; toy.classList.add('is-playing'); }
-    playTimer = setTimeout(() => toy?.classList.remove('is-playing'), 650);
+    pendingReaction = { generation: playGeneration, id, owner: state.owner, form: owned(state, id)!.form };
+    previewExpression('celebrate', true);
+  }
+
+  function cancelReaction() {
+    if (playTimer) clearTimeout(playTimer);
+    playTimer = undefined; pendingReaction = null; playGeneration++;
+    element.querySelector('#jemsPalPlay')?.classList.remove('is-playing');
+  }
+  function previewExpression(next: PalArtworkExpression, fromTap = false) {
+    if (!fromTap) cancelReaction();
+    expression = next;
+    const portrait = element.querySelector<HTMLElement>('.pals-hero-portrait');
+    if (portrait) setPortraitExpression(portrait, next);
+    syncExpressionControls();
+  }
+  function syncExpressionControls() {
+    element.querySelectorAll<HTMLButtonElement>('[data-expression]').forEach(control => {
+      control.setAttribute('aria-pressed', String(control.dataset.expression === expression));
+    });
   }
 
   function render() {
@@ -186,6 +281,9 @@ export function createPalsPage(options: PalsPageOptions) {
     retry.hidden = !error;
     retry.disabled = busy || state.loading;
     total.textContent = isReady ? `${state.profile!.owned.length} / ${PAL_CATALOG.length} Pals` : 'Your collection';
+    heading.textContent = isReady && !state.profile!.starterId ? 'Choose your Pal' : 'My Pals';
+    intro.textContent = isReady && !state.profile!.starterId ? 'Your first Pal is free.' : '';
+    intro.hidden = !intro.textContent;
     content.replaceChildren();
     if (!isReady) {
       content.append(el('div', 'pals-loading', state.loading ? 'Your crew will be right here.' : 'Your saved collection has not been replaced.'));
@@ -195,18 +293,19 @@ export function createPalsPage(options: PalsPageOptions) {
     const profile = state.profile!;
     if (selection === null || !PAL_CATALOG.some(pal => pal.id === selection)) selection = profile.activeId;
     const selectedOwned = owned(state, selection);
-    if (!profile.starterId) {
-      const welcome = el('section', 'pals-welcome');
-      welcome.append(el('span', 'pals-kicker', 'YOUR FIRST PAL IS FREE'), el('h2', '', 'Who’s coming on your adventure?'), el('p', '', 'Choose Glim or Kip. You can collect the other Pal as you earn gems.'));
-      content.append(welcome);
-    } else if (selectedOwned) {
+    if (profile.starterId && selectedOwned) {
       content.append(detail(selectedOwned));
     }
+
+    const starterGrid = el('div', 'pals-grid pals-starter-grid');
+    starterGrid.setAttribute('role', 'group');
+    starterGrid.setAttribute('aria-label', 'Free starter Pals');
+    if (!profile.starterId) content.append(starterGrid);
 
     const shelf = el('section', 'pals-shelf');
     shelf.setAttribute('aria-labelledby', 'jemsPalsShelfTitle');
     const shelfHeading = el('div', 'pals-section-heading');
-    const h2 = el('h2', '', profile.starterId ? 'Your growing crew' : 'Meet the Pals');
+    const h2 = el('h2', '', profile.starterId ? 'Meet the Pals' : 'More Pals to meet');
     h2.id = 'jemsPalsShelfTitle';
     const gemCount = el('span', 'pals-gem-count', state.lifetimeGems === null ? 'Gems are loading…' : `${count(state.lifetimeGems)} lifetime gems`);
     shelfHeading.append(h2, gemCount);
@@ -219,7 +318,7 @@ export function createPalsPage(options: PalsPageOptions) {
       card.dataset.owned = String(!!pal);
       card.dataset.active = String(profile.activeId === definition.id);
       card.classList.toggle('is-selected', selection === definition.id && !!pal);
-      const badge = el('span', 'pals-card-badge', starter ? 'Free starter' : pal ? profile.activeId === pal.id ? 'Along for the adventure' : pal.stageName : available ? 'Ready to meet' : `Meet at ${definition.unlockGems} gems`);
+      const badge = el('span', 'pals-card-badge', starter ? 'Free starter' : pal ? profile.activeId === pal.id ? 'Your active Pal' : pal.stageName : available ? 'Ready to meet' : `${definition.unlockGems} gems`);
       const art = pal ? button('', `details-${definition.id}`, 'pals-card-art') : el('div', 'pals-card-art');
       art.append(createPalPortrait(definition.id, pal?.stage ?? 1));
       if (art instanceof HTMLButtonElement) {
@@ -228,13 +327,13 @@ export function createPalsPage(options: PalsPageOptions) {
         art.disabled = busy;
         art.onclick = () => {
           select(definition.id);
-          element.querySelector<HTMLElement>('#jemsPalDetailTitle')?.focus({ preventScroll: true });
+          // A large roster can put the chosen card far below its detail. This
+          // explicit inspection brings the selected character into view.
+          element.querySelector<HTMLElement>('#jemsPalDetailTitle')?.focus();
         };
       }
       const name = el('h3', '', definition.name);
-      const tagline = el('p', 'pals-card-tagline', definition.tagline);
-      const description = el('p', 'pals-card-description', definition.description);
-      card.append(badge, art, name, tagline, description);
+      card.append(badge, art, name);
       const actions = el('div', 'pals-card-actions');
       if (starter) {
         actions.append(actionButton(`Choose ${definition.name}`, `starter-${definition.id}`, () => options.onChooseStarter(definition.id, state.owner), true));
@@ -250,15 +349,12 @@ export function createPalsPage(options: PalsPageOptions) {
         actions.append(actionButton('Create with this Pal', `create-card-${definition.id}`, () => options.onCreate(definition.id, state.owner), true));
       } else if (available) {
         actions.append(actionButton(`Welcome ${definition.name}`, `collect-${definition.id}`, () => options.onCollect(definition.id, state.owner), true));
-        actions.append(el('small', '', 'Your gems stay yours.'));
       } else {
         const remaining = state.lifetimeGems === null ? null : Math.max(0, definition.unlockGems - state.lifetimeGems);
-        actions.append(el('p', 'pals-unlock-copy', !profile.starterId ? starter ? 'Choose your first Pal above.' : 'Choose a starter, then grow your crew.' : remaining === null ? 'Checking your gems…' : `${count(remaining)} more gems to meet ${definition.name}`));
-        if (state.lifetimeGems !== null) actions.append(progress(state.lifetimeGems, definition.unlockGems, `${definition.name} unlocks at ${definition.unlockGems} lifetime gems`));
-        if (profile.starterId) actions.append(actionButton('Find an adventure', `adventure-${definition.id}`, options.onBack));
+        if (profile.starterId) actions.append(el('p', 'pals-unlock-copy', remaining === null ? 'Checking your gems…' : `${count(remaining)} more gems`));
       }
       card.append(actions);
-      grid.append(card);
+      (starter ? starterGrid : grid).append(card);
     }
     shelf.append(shelfHeading, grid);
     content.append(shelf);
@@ -278,23 +374,40 @@ export function createPalsPage(options: PalsPageOptions) {
     toy.textContent = '';
     toy.setAttribute('aria-label', `Tap ${definition.name} for a playful reaction`);
     toy.disabled = localSaving || !!state.saving;
-    toy.append(createPalPortrait(pal.id, pal.stage, 'pals-hero-portrait'));
+    const portrait = createPalPortrait(pal.id, pal.stage, 'pals-hero-portrait', expression, true);
+    toy.append(portrait);
     toy.onclick = () => play(pal.id);
+    const pictureRetry = button('Retry picture', `picture-retry-${pal.id}`);
+    pictureRetry.hidden = true;
+    let retryingPicture = false;
+    pictureRetry.onclick = () => {
+      if (retryingPicture) return;
+      retryingPicture = true; previewExpression('neutral');
+    };
+    portrait.addEventListener('pal-picture-state', () => {
+      const status = portrait.dataset.state;
+      if (status === 'ready' || status === 'unavailable') retryingPicture = false;
+      // Only the keyboard user still on this retry returns to the Pal. A late
+      // image response cannot steal focus from navigation or another control.
+      if (status === 'ready' && document.activeElement === pictureRetry && !element.hidden && portrait.isConnected) {
+        toy.focus({ preventScroll: true });
+      }
+      pictureRetry.hidden = status !== 'unavailable' && !(retryingPicture && document.activeElement === pictureRetry);
+      pictureRetry.setAttribute('aria-disabled', String(retryingPicture));
+    });
     const hint = el('span', 'pals-tap-hint', `Tap ${definition.name}`);
-    const speech = el('p', 'pals-play-line', playPal === pal.id && playLine ? playLine : profile.preferences.encouragement ? palLine(pal.id, 'welcome', state.owner) : `Ready when you are. Tap ${definition.name} to play.`);
+    const speech = el('p', 'pals-play-line', playPal === pal.id && playLine ? playLine : '');
+    speech.hidden = !speech.textContent;
     speech.id = 'jemsPalPlayLine';
     speech.setAttribute('role', 'status');
     speech.setAttribute('aria-live', 'polite');
     speech.setAttribute('aria-atomic', 'true');
-    playground.append(toy, hint, speech);
+    playground.append(toy, hint, pictureRetry, speech);
     const info = el('div', 'pals-detail-copy');
-    info.append(el('span', 'pals-kicker', profile.activeId === pal.id ? 'YOUR ADVENTURE BUDDY' : 'PART OF YOUR CREW'));
     const title = el('h2', '', definition.name);
     title.id = 'jemsPalDetailTitle';
     title.tabIndex = -1;
-    info.append(title, el('p', 'pals-detail-tagline', definition.tagline));
-    const stage = el('span', 'pals-stage-label', pal.stageName);
-    info.append(stage);
+    info.append(title);
     const trail = el('ol', 'pals-growth-stages');
     trail.setAttribute('aria-label', `${definition.name}'s growth stages`);
     for (const [index, label] of ['Base', 'Grown'].entries()) {
@@ -310,13 +423,32 @@ export function createPalsPage(options: PalsPageOptions) {
     growth.append(el('strong', '', growthCopy(pal)));
     if (pal.nextStageAt !== null) {
       growth.append(progress(pal.adventures, pal.nextStageAt, `${definition.name} growth: ${pal.adventures} of ${pal.nextStageAt} adventures`));
-      growth.append(el('span', 'pals-growth-detail', `${count(pal.adventures)} / ${pal.nextStageAt} adventures · ${pal.practiceToNextAdventure} learning ${pal.practiceToNextAdventure === 1 ? 'activity' : 'activities'} to the next adventure`));
-    } else growth.append(el('p', 'pals-growth-detail', 'Grown form reached. Keep making new memories together.'));
+    }
     info.append(growth);
     const actions = el('div', 'pals-detail-actions');
-    actions.append(actionButton('Make something with this Pal', `create-${pal.id}`, () => options.onCreate(pal.id, state.owner), true));
+    actions.append(actionButton(`Create with ${definition.name}`, `create-${pal.id}`, () => options.onCreate(pal.id, state.owner), true));
     if (profile.activeId !== pal.id) actions.append(actionButton(`Take ${definition.name} along`, `equip-detail-${pal.id}`, () => options.onEquip(pal.id, state.owner)));
-    info.append(actions, el('p', 'pals-creation-hint', 'A playable scene, ready for your ideas.'));
+    info.append(actions);
+    const expressionChoices = [
+      ['neutral', 'Ready'], ['celebrate', 'Celebrate'], ['thinking', 'Think'], ['encouraging_retry', 'Try again'],
+    ] as const;
+    if (expressionChoices.some(([value]) => palArtworkPath(pal.id, pal.form, value) !== palArtworkPath(pal.id, pal.form))) {
+      const expressions = el('details', 'pals-expression-options');
+      expressions.open = expressionsOpen;
+      expressions.addEventListener('toggle', () => { if (expressions.isConnected) expressionsOpen = expressions.open; });
+      const summary = el('summary', '', 'Try expressions');
+      summary.dataset.palsFocus = 'expressions';
+      const controls = el('div', 'pals-expression-controls');
+      controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', `${definition.name}'s expressions`);
+      for (const [value, label] of expressionChoices) {
+        const control = button(label, `expression-${value}`);
+        control.dataset.expression = value;
+        control.setAttribute('aria-pressed', String(value === expression));
+        control.onclick = () => { previewExpression(value); };
+        controls.append(control);
+      }
+      expressions.append(summary, controls); info.append(expressions);
+    }
     hero.append(playground, info);
     return hero;
   }
@@ -368,6 +500,7 @@ export function createPalsPage(options: PalsPageOptions) {
     update(next: PalsViewState) {
       if (disposed) return;
       if (next.owner !== state.owner) {
+        cancelReaction();
         epoch++;
         selection = next.profile?.activeId ?? null;
         localSaving = false;
@@ -376,16 +509,18 @@ export function createPalsPage(options: PalsPageOptions) {
         playLine = '';
         playPal = null;
         playCount = 0;
-        optionsOpen = growthOpen = false;
+        optionsOpen = growthOpen = expressionsOpen = false;
+        expression = 'neutral';
         if (playTimer) clearTimeout(playTimer);
-      } else if (state.profile?.activeId !== next.profile?.activeId && next.profile?.activeId) selection = next.profile.activeId;
+      } else if (state.profile?.activeId !== next.profile?.activeId && next.profile?.activeId) {
+        cancelReaction(); selection = next.profile.activeId; expression = 'neutral'; expressionsOpen = false;
+      } else if (owned(state, selection)?.form !== owned(next, selection)?.form) { cancelReaction(); expression = 'neutral'; }
       state = next;
-      expressions.setScope(next.owner);
       render();
     },
-    show() { element.hidden = false; element.classList.remove('hidden'); expressions.setVisible(true); render(); heading.focus({ preventScroll: true }); },
-    hide() { element.hidden = true; element.classList.add('hidden'); expressions.setVisible(false); if (playTimer) clearTimeout(playTimer); },
-    dispose() { disposed = true; epoch++; if (playTimer) clearTimeout(playTimer); expressions.dispose(); element.remove(); },
+    show() { element.hidden = false; element.classList.remove('hidden'); render(); heading.focus({ preventScroll: true }); },
+    hide() { cancelReaction(); element.hidden = true; element.classList.add('hidden'); expressionsOpen = false; expression = 'neutral'; },
+    dispose() { disposed = true; epoch++; cancelReaction(); element.remove(); },
   };
 }
 
@@ -406,9 +541,9 @@ export function createPalsWidget(options: { state: PalsViewState; onOpen: () => 
     if (ready(state) && pal) {
       const definition = palDefinition(pal.id);
       open.append(createPalPortrait(pal.id, pal.stage));
-      copy.append(el('strong', '', `${definition.name} is coming along`), el('span', '', `${pal.stageName} · ${growthCopy(pal)}`));
+      copy.append(el('strong', '', definition.name), el('span', '', pal.stageName));
     } else {
-      copy.append(el('strong', '', 'My Pals'), el('span', '', state.loading ? 'Opening your crew…' : state.error ? 'Open your collection to retry' : 'Choose a free Pal to join your adventures'));
+      copy.append(el('strong', '', 'My Pals'), el('span', '', state.loading ? 'Opening your crew…' : state.error ? 'Open your collection to retry' : 'Choose your free Pal'));
     }
     open.append(copy, el('span', 'pals-widget-arrow', '→'));
     make.hidden = !options.onCreate || !pal || !ready(state);
@@ -439,7 +574,11 @@ export function createPalCameo(options: { state: PalsViewState; onOpen: () => vo
   help.onclick = () => options.onHelp?.();
   element.append(open, copy, speech, help);
   function visibility() { element.hidden = !allowed || !ready(state) || !state.profile?.activeId || !state.profile.preferences.showCompanion; }
-  function clear() { if (timer) clearTimeout(timer); speech.textContent = ''; speech.hidden = true; }
+  function clear() {
+    if (timer) clearTimeout(timer); speech.textContent = ''; speech.hidden = true;
+    const portrait = open.querySelector<HTMLElement>('.pals-portrait');
+    if (portrait && portrait.dataset.expression !== 'neutral') setPortraitExpression(portrait, 'neutral');
+  }
   function update(next: PalsViewState) {
     if (state.owner !== next.owner || state.profile?.activeId !== next.profile?.activeId || !next.profile?.preferences.encouragement || !next.profile.preferences.showCompanion) clear();
     state = next;
@@ -463,6 +602,8 @@ export function createPalCameo(options: { state: PalsViewState; onOpen: () => vo
       clear();
       speech.textContent = palLine(state.profile.activeId, kind, seed);
       speech.hidden = false;
+      const portrait = open.querySelector<HTMLElement>('.pals-portrait');
+      if (portrait) setPortraitExpression(portrait, kind === 'retry' ? 'encouraging_retry' : ['growth', 'practice', 'making', 'coding'].includes(kind) ? 'celebrate' : 'neutral');
       timer = setTimeout(clear, 8000);
       return true;
     },

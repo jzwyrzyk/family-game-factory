@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:37.392Z",
-      "sourceDigest": "540a37c8973af219599963da90a95ab555fe3182a3ae7003d21f9e0ad7a26514",
+      "reviewedAt": "2026-11-21T14:33:39.241Z",
+      "sourceDigest": "912413e3f658a7f0d7b09f36a7a4413f4a35dcd47315fde8c3d59c85c44331c3",
       "reviewOutcome": "updated",
-      "reviewReason": "Clarified the accepted guided-creation decision with actual gateway/private-coach/web dependency and asymmetric notebook rollback compatibility. Child ownership, readiness, explicit Build and Keep remain unchanged; no new release authorization is invented.",
+      "reviewReason": "Documented the owner-authorized 24-character collection, Luma/Nook starters, preserved saved aliases, explicit initial eligibility schedule and unchanged two-form earning rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -215,10 +215,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T05:39:45.557Z",
-      "sourceDigest": "b45a8d9a467688f1dc9986a00e3d8ba49dfa1329916968bffc527ebcb04120b2",
+      "reviewedAt": "2026-11-21T14:33:39.836Z",
+      "sourceDigest": "30e3e1282523676186475dbd92e0c42420b5e2d3542b9acc23e3fcd7e39b9ed1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Studio UI, coaching, readiness, transcript presentation and focused handoff changes with final desktop/phone captures. Documented current-child evidence and staleness gates, collapsed tools, compiled-request separation, draft/profile recovery, truthful submission phases and noninterrupting completion.",
+      "reviewReason": "Reviewed the actual starter/detail/gallery/notice/cameo changes against child-interface targets; documented exact portraits, owned expression controls, recovery and pending hosted phone visual evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -273,10 +273,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2a0b6b36cc5606d12a2f4bff2f8e9f5aa9f7caa0fe4bf70b3d1a21fba297058a",
-      "reviewedAt": "2026-11-21T05:39:46.677Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "This area's source change is only the new tests/creation-readiness.test.ts matched by the existing tests/creation-* wildcard. It tests Studio first-game readiness, not Create & code. No scene engine, generated creation schema, program ownership, practice evidence or scene storage changed; Studio behavior is documented in architecture and the guided-chat decision.",
+      "sourceDigest": "efedda883044960402cd6dfcc66d2e941c8a910334c6519e86276cce692723d6",
+      "reviewedAt": "2026-11-21T14:33:40.904Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented current earned-form insertion, immutable character/form/version scene references, preserved legacy token scenes, local loading recovery and unchanged Keep/owner/source guards.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -433,10 +433,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:37.941Z",
-      "sourceDigest": "dd4bd3d500e0151bc5e433b5fb2b809f9e387eb581c303a2573a71a6dab1e14f",
+      "reviewedAt": "2026-11-21T14:33:41.488Z",
+      "sourceDigest": "52681ffe5f9a832251d0899c3a66f9109e395807cd65b45c023cd0fe489f88f9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed gateway Docker dependency failure and fixed the archive, Docker ignore allowlist and image COPY graph. Updated service-image guidance for all three archive-built images and backend-first creation-context compatibility. No provider configuration, worker pin, IAM or production service mutation is included."
+      "reviewReason": "Documented pure catalog dependencies in gateway/preview archives and Docker COPY inputs; no new route, provider permission or service traffic change is introduced."
     },
     {
       "id": "generation",
@@ -555,10 +555,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T07:54:10.809Z",
-      "sourceDigest": "92ecfcc2c8aab4e3af77628e47e74d7f7dfb9d3fc170ab8bc8da57eed81cb1b6",
+      "reviewedAt": "2026-11-21T14:33:41.926Z",
+      "sourceDigest": "81150d38bc326eb716e572c926e568d206de7578dd8fededd9b35a693b4b5f31",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the seven new regression cases and 43 passing focused tests; the quality contract and delivery record distinguish synthetic transport, malformed input, terminal provenance, repaired acceptance, and unchanged accounting from unobserved live game success.",
+      "reviewReason": "Recorded passing local build, Pal/creation/asset/packaging contracts and explicit Chromium execution restriction; added exact identity, fallback/retry, lifecycle and scene compatibility browser coverage pending hosted execution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T13:24:45.322Z",
-      "sourceDigest": "61a5b11f11fea9368b06e8020368d60d9be6503c93aca327c52f1fc27cedffb8",
+      "reviewedAt": "2026-11-21T14:33:42.370Z",
+      "sourceDigest": "7708f99e4fe43b8831331927db340fa73349e96412d199e58602a385749edb88",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated unchanged PR111 gateway repair and its tests with the unchanged real operations policy foundation in PR112, preserving both source and delivery histories. Confirmed 43 focused and 21 operations tests plus typecheck on the combined tree. Recorded successful PR108 Pages run44906553925 and public source marker at c43a181; current authenticated backend baselines and the new gateway rollout remain unverified, and historical PR109 promotion must not be replayed. Privileged workflows and Phase2 activation remain excluded.",
+      "reviewReason": "Recorded the prepared candidate from c03287a, existing authorized Pages release route and prior live source, pending hosted merge/deploy gates and data-preserving rollback limitations without claiming deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -689,10 +689,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T13:18:52.237Z",
-      "sourceDigest": "85bfd72a406e676b3a44e0ec57dc9475613ea48db0b8157226619f10945abf70",
-      "reviewOutcome": "updated",
-      "reviewReason": "Registered the policy-foundation contract and operations links, and routed scripts/ops and ops assets through delivery. The documentation map explicitly separates the real CI check from uninstalled privileged workflows; existing coverage, fingerprint checks and review requirements are preserved.",
+      "reviewedAt": "2026-11-21T14:33:42.892Z",
+      "sourceDigest": "ebd564a2e3fe8d4256e42e76f568e11490bfcdaa08616de70e02f79d1d1a1d67",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed routing additions for the generator, supplemental approved art and integration decision; existing maintenance, evidence and PR review procedures already govern this additive feature and remain accurate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -794,7 +794,8 @@
         "docs/decisions/2026-11-19-pal-base-design-adoption.md",
         "docs/decisions/2026-11-19-pal-form-reconciliation.md",
         "docs/pals/art/characters/brio/README.md",
-        "docs/decisions/2026-11-19-brio-art-adoption.md"
+        "docs/decisions/2026-11-19-brio-art-adoption.md",
+        "docs/decisions/2026-11-21-approved-pal-collection.md"
       ],
       "sources": [
         "docs/pals/*.md",
@@ -802,13 +803,15 @@
         "skills/gem-pal-studio/**",
         "docs/pals/art/character-references.json",
         "scripts/export-pal-assets.py",
-        "public/jems-pals/**"
+        "public/jems-pals/**",
+        "scripts/generate-pal-catalog.mjs",
+        "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "bddf3cf9b7d22c12e18142c5c679a18457f65b23535ba7406ef3da77a0169d30",
-      "reviewedAt": "2026-11-20T19:16:54.972Z",
+      "sourceDigest": "4943660550545f439dbbaefc38baafccff37efe4c8a8fa706f005eacda216700",
+      "reviewedAt": "2026-11-21T14:33:43.324Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled package 2.9 exact selected assets for all 23 original profiles, Navi R2, retained historical references and separate in-review Brio expressions."
+      "reviewReason": "Bound all 24 approved profiles in the canonical index, retained art approvals and historical references, excluded Brio review expressions and documented exact immutable manifest plus byte-identical supplemental neutrals."
     },
     {
       "id": "art-studio",
@@ -851,7 +854,8 @@
         "docs/decisions/0012-pals-from-earned-activity.md",
         "docs/pals/previews/*.md",
         "docs/decisions/0013-two-form-pals-and-current-main.md",
-        "docs/pals/art/README.md"
+        "docs/pals/art/README.md",
+        "docs/decisions/2026-11-21-approved-pal-collection.md"
       ],
       "sources": [
         "src/pals/**",
@@ -859,13 +863,15 @@
         "docs/pals/*.md",
         "scripts/verify-pal-assets.mjs",
         "public/jems-pals/**",
-        "scripts/tests/verify-pal-assets.test.mjs"
+        "scripts/tests/verify-pal-assets.test.mjs",
+        "scripts/generate-pal-catalog.mjs",
+        "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "1346d9e94ee9face9cfddf762365eb6033a5068949275ff1b3b93828874f4d49",
-      "reviewedAt": "2026-11-20T20:22:00.000Z",
+      "sourceDigest": "516b63d8e314c6036200e3c27eea2cab6ccaeeb9c43a0d1a74e9cd818a60dc50",
+      "reviewedAt": "2026-11-21T14:33:44.077Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Wink Base finite opacity transition and controller's reduced-motion cancellation in the exact combined-main failure. PR92 changes asynchronous browser assertion timing only; Palette, forms, collection, art and motion policy remain unchanged. Recorded the narrow observation in ADR0013."
+      "reviewReason": "Reconciled the feature contract with the full approved catalog, stable inventory aliases, five-adventure Grown art, actual collection expression controls, saved-scene compatibility and offline/recovery boundaries."
     }
   ]
 }
