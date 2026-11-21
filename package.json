@@ -8,7 +8,7 @@
     "build": "npm run typecheck && vite build",
     "test:unit": "node --import tsx tests/unit.ts",
     "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts",
-    "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts && npm run test:parent-dashboard",
+    "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts && npm run test:parent-dashboard && npm run test:learning-profile-browser",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser && npm run test:generated-art && npm run test:quality-capture",
     "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:art && npm run test:art-browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent && npm run test:pals && npm run test:pals-browser",
     "test:child-journey": "npm run test:guided-creation && npm run test:first-creation && node tests/child-journey.cjs && node tests/build-continuity.cjs",
@@ -22,7 +22,7 @@
     "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
     "test:quality": "node tests/quality-browser.cjs && node tests/sticker-builder-browser.cjs",
     "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
-    "test:studio": "npm run test:brand-assets && node --import tsx tests/studio-unit.ts && node tests/homepage-entry.cjs && node tests/brand-browser.cjs && node tests/jems-delight-browser.cjs && node tests/mind-your-jems-browser.cjs && node tests/studio-journey.cjs && node tests/favorites-browser.cjs && node tests/parent-privacy-browser.cjs && node tests/adult-profile-browser.cjs && npm run test:gem-factory",
+    "test:studio": "npm run test:play-view && npm run test:brand-assets && node --import tsx tests/studio-unit.ts && node tests/homepage-entry.cjs && node tests/brand-browser.cjs && node tests/jems-delight-browser.cjs && node tests/mind-your-jems-browser.cjs && node tests/studio-journey.cjs && node tests/favorites-browser.cjs && node tests/parent-privacy-browser.cjs && node tests/adult-profile-browser.cjs && npm run test:gem-factory",
     "test:coach": "npm run test:read-aloud && node --import tsx tests/design-coach-unit.ts && node --import tsx tests/design-coach-http.ts && node --import tsx tests/issue-28-private-coach.test.ts && node --import tsx tests/issue-28-evaluation.test.ts && node --import tsx tests/studio-experience.test.ts && node --import tsx tests/studio-voice-unit.ts && node tests/design-coach-browser.cjs && node tests/studio-experience-browser.cjs && node --import tsx tests/issue-28-speech.test.ts && node --import tsx tests/private-speech-unit.ts && node tests/private-speech-browser.cjs",
     "test:language-ui": "node --import tsx --test tests/language-activity.test.ts",
     "test:language-integration": "node --import tsx tests/language-integration.ts && npm run test:learning-readability",
@@ -61,9 +61,11 @@
     "test:pals-assets": "node scripts/verify-pal-assets.mjs && node --test scripts/tests/verify-pal-assets.test.mjs && node scripts/generate-pal-catalog.mjs --check",
     "test:pals-expressions": "node --import tsx --test tests/pals-expressions.test.ts",
     "test:pals-expressions-browser": "node tests/pals-expressions-browser.cjs",
-    "test:read-aloud": "node --import tsx --test tests/friendly-narrator.test.ts",
+    "test:read-aloud": "node --import tsx --test tests/friendly-narrator.test.ts tests/natural-narration.test.ts tests/natural-narration-http.test.ts tests/metadata-token.test.ts tests/private-narration-client.test.ts",
     "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
-    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs"
+    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs",
+    "test:learning-profile-browser": "node tests/learning-profile-browser.cjs",
+    "test:play-view": "node tests/play-view-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

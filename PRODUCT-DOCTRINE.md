@@ -37,6 +37,8 @@ Use demonstrated behavior, predictions, experiments, and revisions as specific f
 
 ## 2. Deliver the actual playable experience
 
+Games opened through the child journey should occupy a consistent visible play area with an easy exit, readable controls and explicit fullscreen where supported. Accidental page scrolling must not lose the game. The trusted learning activity remains available inside the same view. [The profile, play and reading decision](docs/decisions/2026-11-21-profile-play-and-reading.md) records the owner's November 21 refinement.
+
 The requested player action must produce the intended visible consequence, and the essential payoff must happen. Collection without the requested growth, assembly without the launch, or a changed label without a changed mechanic does not fulfill an idea. Open-ended play can be complete without a manufactured win condition.
 
 A ready experiment must combine correct function with deliberate presentation, responsive controls, visible consequences and appropriate variation or expression. Polish is part of that acceptance floor, not work deferred until after a compile pass has made a game Ready. Keep idea fidelity, game-form fit, technical playability, presentation and observed player experience as separate judgments. Record missing evidence explicitly instead of averaging it into a reassuring score.
@@ -75,6 +77,8 @@ The coach helps understand intentions, examine friction and explore choices. The
 
 The approved voice interaction is **Speak → finish/transcribe → editable draft → explicit Send to jems → a normal text reply**. Build/Try a change is separate. Hear reply is optional and user initiated. Preserve the draft through cancellation, errors and navigation; late results must not appear in another player's project. Availability and fallback must be truthful.
 
+Read-aloud stays discoverable across child interactions, including saved replies, questions, revealed help and Creator. A speaker requests reading; a microphone requests dictation. The target voice is natural, caring and clearly spoken by a young adult female voice. Hosted narration has separate approval and spending boundaries; choosing a device voice cannot authorize it. [The reading contract](docs/speech/READ_ALOUD.md) records implementation and its device-listening limits.
+
 A healthy service check establishes availability. Only a successful validated conversation reply establishes that chat connected. Do not erase a failed conversation result with a healthy status response, or describe an incomplete technical response as a refusal of the child's idea.
 
 Continuous listening, automatic send, voice-triggered builds and automatic favorite selection are outside this decision. See [the voice decision](docs/decisions/0003-explicit-voice-and-build.md) and [detailed acceptance contract](docs/issue-28/PUSH_TO_TALK_MVP.md). The active pilot and provider permissions belong in delivery state, not in this durable product contract.
@@ -82,6 +86,8 @@ Continuous listening, automatic send, voice-triggered builds and automatic favor
 ## 6. Learning belongs to the trusted host and needs honest evidence
 
 The parent-selected subject, grade boundary and learning settings travel with the child across games and versions. Game difficulty is separate from learning difficulty. The selected Math or Language Arts host controls activities, answers, assistance and progress; generated code cannot grade the child, bypass checkpoints or award proficiency. Additional practice while waiting is optional and does not replace ordinary required checkpoints.
+
+Make the current profile's grade and learning difficulty explicit. An unconfigured child starts conservatively; age or game progress must not infer a higher grade. Stretch varies challenge within the chosen ceiling. Preserve intentionally saved settings and prior learning evidence when introducing a clearer setup flow.
 
 Keep Math and Language Arts evidence distinct. Preserve independent responses, hints, corrections, read-aloud support, interrupted tasks and delayed retrieval as different observations. A grade is a content ceiling, not a diagnosis. A supported answer is not unaided recall; listening is not independent reading; creative writing is not a single right/wrong response.
 

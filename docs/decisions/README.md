@@ -68,3 +68,5 @@ Never copy private child content, credentials or restricted evidence into this p
 - [Private Art Studio and explicit reusable art versions](2026-11-19-private-art-studio.md) — dedicated creation space, original preservation, pinned game/scene use and private portability.
 
 - [November 20: readable learning surfaces and friendly narration](2026-11-20-learning-readability-and-narration.md) — question-first copy, semantic light/dark separation, readable type and deliberate local female voice selection.
+
+- [November 21: explicit profile levels, fitted play and persistent reading](2026-11-21-profile-play-and-reading.md) — conservative per-profile learning setup, common viewport/fullscreen, shared read-aloud and separately approved natural narration.

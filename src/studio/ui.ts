@@ -10,6 +10,9 @@ import {iconMarkup, createIcon, setIconLabel, type IconName} from '../brand/icon
 import {createMindYourJems, type WorkshopStatus} from '../games/mind-your-jems';
 import {installStudioVoice} from './voice';
 import {installStudioPrivateSpeech} from './private-speech';
+import {createReadAloudControl} from '../speech/read-aloud-control';
+import {configureNaturalNarration} from '../speech/friendly-narrator';
+import {createPrivateNarration} from '../speech/private-narration';
 import {freshDesign} from './design';
 import {buildErrorCopy,buildProgressCopy,builderReadinessCopy,coachConnectionCopy,canCompareExperiments,type BuilderReadiness,type CoachConnection} from './experience';
 import {familyFetch} from '../builder/session';
@@ -24,6 +27,7 @@ import { installQualityCards } from '../quality/cards';
 import { StudioNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
 import { StudioGames, isGeneratedRemoteKind } from './adapter';
 import { installStudioRemixRouting } from './host-navigation';
+import { installPlayView } from './play-view';
 import { defaults, manifests, validateConfig } from '../runtime/manifests';
 import { interpret } from '../factory/interpreter';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
@@ -87,6 +91,7 @@ export async function installStudio(){
  try{games.export();}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
+ configureNaturalNarration(createPrivateNarration(()=>remote,owner));
  const clients=new Map<string,BuilderClient>();
  const unknownJobs=new Set<string>();
  const retryBlocks=new Map<string,{jobId:string;reason:string}>();
@@ -102,7 +107,9 @@ export async function installStudio(){
  let voice:ReturnType<typeof installStudioVoice>|undefined;
  let privateSpeech:ReturnType<typeof installStudioPrivateSpeech>|undefined;
  let artEntries:ReturnType<typeof installArtEntryPoints>|undefined;
- const stopSpeech=()=>{voice?.cancel();privateSpeech?.cancel();};
+ let conversationReaders:ReturnType<typeof createReadAloudControl>[]=[];
+ let helpReading:ReturnType<typeof createReadAloudControl>|undefined;
+ const stopSpeech=()=>{voice?.cancel();privateSpeech?.cancel();conversationReaders.forEach(reader=>reader.stop());helpReading?.stop();};
  const sending=new Set<string>();
  const submittedDrafts=new Map<string,string>();
  let panel:'game'|'talk'|'versions'='game';
@@ -203,6 +210,8 @@ export async function installStudio(){
  voiceDetails.append(el('summary','','Voice & accessibility options'));
  $('studioPromptForm').querySelector('.studio-voice-row')!.before(voiceDetails);
  voiceDetails.append($('studioPromptForm').querySelector('.studio-voice-row')!, $('studioPromptForm').querySelector('.studio-voice-note')!);
+ // Reading the current question is an ordinary child action, not an advanced option.
+ $('studioPrompt').after($('studioHear'));$('studioHear').classList.add('studio-read-current');
  // Optional tools stay outside the conversation. The child supplies the ideas;
  // the coach guides them, and Build enables only after a grounded review.
  const moreChoices=el('details','studio-more-choices') as HTMLDetailsElement;moreChoices.id='studioMoreChoices';
@@ -259,6 +268,7 @@ export async function installStudio(){
  // The subject switch belongs to the player's header, not below the game shelf.
  for(const [id,name,label] of [['studioSubjectMath','grid','Math'],['studioSubjectLanguage','book','English']] as const)setIconLabel(learningChoice.querySelector<HTMLElement>('#'+id)!,name,label);
  const nativeStage=$('page-game');
+ const playView=installPlayView(page,$('studioGameHost'));
  const originalNav=document.querySelector('.site-header nav') as HTMLElement;
  originalNav.hidden=true;
  const nav=el('nav','studio-nav');nav.setAttribute('aria-label','Main navigation');
@@ -704,7 +714,7 @@ export async function installStudio(){
   $('page-studio').querySelector('.studio-workspace')!.setAttribute('data-mobile-panel',tab);
   document.querySelectorAll('[data-studio-tab]').forEach(b=>b.setAttribute('aria-pressed',String((b as HTMLElement).dataset.studioTab===tab)));
   if(tab==='versions'){$('studioVersions').hidden=false;renderVersions();focusView($('studioVersionsTitle'));}else $('studioVersions').hidden=true;
-  if(tab==='talk'){focusView($('studioPromptLabel'));void privateSpeech?.refresh();}
+  if(tab==='talk'){renderConversation();focusView($('studioPromptLabel'));void privateSpeech?.refresh();}
   refreshStudioGuide();refreshShelf();
   return true;
  }
@@ -734,6 +744,7 @@ export async function installStudio(){
   pausedPreview.append(scene,caption);pausedPreview.hidden=false;
  }
  function disposeGame(keepScene=false){
+  playView.leave();
   if(keepScene&&(mounted||iframe))capturePausedPreview();else clearPausedPreview();
   if(!keepScene){pausedForTools=false;$('studioHelpPanel').hidden=true;}
   ++epoch;previewLearning?.dispose();previewLearning=null;FG.learning.dispose();iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
@@ -935,9 +946,11 @@ export async function installStudio(){
   if(!activeId)return;const s=current(),box=$('studioMessages');
   const atEnd=box.scrollHeight-box.scrollTop-box.clientHeight<40;
   const messages=visibleConversation(s.messages).filter(m=>!(s.game==='new'&&m.role==='helper'&&m.text.startsWith('Tell jems what you imagine. One sentence is enough.')));
+  voice?.reply(messages.filter(m=>m.role==='helper').at(-1)?.text||'Tell me your game idea. What would you like to make?');
   const signature=JSON.stringify(messages.map(m=>[m.id,m.text]));
   if(box.dataset.session===s.id&&box.dataset.signature===signature)return;
   const sameSession=box.dataset.session===s.id,earlierWasOpen=sameSession&&box.querySelector<HTMLDetailsElement>('.studio-earlier-messages')?.open;
+  conversationReaders.forEach(reader=>reader.dispose());conversationReaders=[];
   box.replaceChildren();box.dataset.session=s.id;box.dataset.signature=signature;
   const earlier=el('details','studio-earlier-messages') as HTMLDetailsElement;
   earlier.append(el('summary','','Earlier ideas'));earlier.open=!!earlierWasOpen;
@@ -949,6 +962,7 @@ export async function installStudio(){
    article.append(el('p','',text.lead));
    if(text.question)article.append(el('p','studio-chat-question',text.question));
    if(text.more){const more=el('details','studio-message-more');more.append(el('summary','','More'),el('p','',text.more));article.append(more);}
+   if(m.role==='helper'){const reader=createReadAloudControl({text:()=>m.text,buttonClass:'studio-button',canRead:()=>route==='studio'&&panel==='talk'&&!FG.learning.active&&activeId===s.id&&owner()===s.owner});conversationReaders.push(reader);article.append(reader.element);}
    (index<messages.length-4?earlier:box).append(article);
   }
   if(!sameSession||atEnd)box.scrollTop=box.scrollHeight;
@@ -1032,7 +1046,7 @@ export async function installStudio(){
     if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
     announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`,false,playedTest);
   }});
-  mounted=true;showStudio();render();setTab('game');status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
+  mounted=true;showStudio();render();setTab('game');playView.enter();status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
  }
  async function playWorking(){const s=current();if(!canChangePlay(s))return;if(s.remoteId){await showRemote(s,s.remoteId,'working');return;}if(!s.projectId){disposeGame();showing='working';$('studioEmpty').hidden=false;showStudio();render();return;}const r=games.revision(s.projectId,s.owner);playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'working',r.id);}
  async function playCandidate(){const s=current(),c=s.candidate;if(!canChangePlay(s))return;if(!c)return playWorking();if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate');}
@@ -1271,12 +1285,12 @@ export async function installStudio(){
   const url=new URL(preview.url);url.searchParams.set('channel',previewChannel);iframe.src=url.href;host.replaceChildren(iframe);
   previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onReadyChange:()=>queueMicrotask(()=>{if(sameView(s,generation))render();}),onRound:d=>announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest)});
   $('studioPlayNote').textContent=preview.adapter==='mock'?'Test builder (mock)—not a real AI generation.':'Private preview. Your working game stays unchanged until you keep it.';
-  render();setTab('game');
+  render();setTab('game');playView.enter();
  }
  window.addEventListener('message',event=>{
   if(!iframe||event.source!==iframe.contentWindow||previewOwner!==owner()||route!=='studio')return;
   const d=event.data;if(!d||d.type!=='factory-preview'||d.channel!==previewChannel||d.artifactId!==previewArtifact)return;
-  if(d.event==='ready'&&Number.isInteger(d.height)&&d.height>=300&&d.height<=1000)iframe.style.height=`${Math.max(400,d.height+12)}px`;
+  if(!playView.active&&d.event==='ready'&&Number.isInteger(d.height)&&d.height>=300&&d.height<=1000)iframe.style.height=`${Math.max(400,d.height+12)}px`;
 
  });
  async function keep(){
@@ -1399,7 +1413,9 @@ export async function installStudio(){
  $('studioPrompt').addEventListener('keydown',event=>event.stopPropagation());
  [nav,profileMenu,page.querySelector('.studio-actions')!,page.querySelector('.studio-mobile-tabs')!,page.querySelector('.studio-heading')!].forEach(control=>control.addEventListener('keydown',event=>event.stopPropagation()));
  $('studioMore').addEventListener('keydown',event=>{if(event.key==='Escape'){$<HTMLDetailsElement>('studioMore').open=false;focusView($('studioMore').querySelector('summary')!);}});
- $('studioHelp').onclick=()=>act(showHelp);$('studioCloseHelp').onclick=()=>{$('studioHelpPanel').hidden=true;focusView($('studioReturnToPlay')||$('studioHelp'));};
+ helpReading=createReadAloudControl({text:()=>[$('studioHelpGoal').textContent,$('studioHelpControls').textContent,$('studioHelpKeyboard').textContent].join('. '),label:'Read the instructions',buttonClass:'studio-button',canRead:()=>route==='studio'&&!FG.learning.active&&!$('studioHelpPanel').hidden});
+ helpReading.button.id='studioReadInstructions';$('studioCloseHelp').before(helpReading.element);
+ $('studioHelp').onclick=()=>act(showHelp);$('studioCloseHelp').onclick=()=>{helpReading?.stop();$('studioHelpPanel').hidden=true;focusView($('studioReturnToPlay')||$('studioHelp'));};
  $('studioReady').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;const ready=readyExperiment(s);if(ready?.candidate.remoteId)await showRemote(s,ready.candidate.remoteId,'candidate',ready.id);});
  $('studioMore').querySelector('summary')!.addEventListener('click',event=>{if(guardMath())event.preventDefault();});
  $('studioHome').onclick=()=>act(home);$('studioNavHome').onclick=()=>act(homeFromNavigation);$('studioNew').onclick=()=>act(newIdea);$('studioNavCreate').onclick=()=>act(newIdea);$('studioChooseStarter').onclick=()=>act(home);
@@ -1444,6 +1460,7 @@ export async function installStudio(){
  window.addEventListener('factory-profile',()=>{welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();waitArcade.close();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
+  conversationReaders.forEach(reader=>reader.dispose());conversationReaders=[];
   const conversation=$('studioMessages');conversation.replaceChildren();delete conversation.dataset.session;delete conversation.dataset.signature;$('coachProposals').replaceChildren();
   $('coachModeStatus').textContent='';$<HTMLTextAreaElement>('studioPrompt').value='';
   $('studioVoiceStatus').textContent='';
@@ -1480,6 +1497,7 @@ export async function installStudio(){
   microphone:$<HTMLButtonElement>('studioMic'),installPack:$<HTMLButtonElement>('studioVoicePack'),
   renderMicrophone:(state,label)=>{const button=$('studioMic');setIconLabel(button,state==='idle'?'mic':state==='recording'?'stop':'close',label);button.setAttribute('aria-label',state==='idle'?'Speak to jems using the microphone when supported':label);},
   hearReply:$<HTMLButtonElement>('studioHear'),status:$('studioVoiceStatus'),
+  renderReading:(active,waiting)=>setIconLabel($('studioHear'),active?'stop':'volume',waiting?'Play reading':active?'Stop reading':'Read this to me'),
   scope:()=>activeId?owner()+':'+activeId:'',
   canListen:()=>route==='studio'&&panel==='talk'&&!FG.learning.active,
   onTranscript:appendSpeechDraft

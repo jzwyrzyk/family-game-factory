@@ -33,6 +33,12 @@ All mutations must be followed by persistence. The browser adapter wraps these c
 
 A `LearningContext` carries `sessionId`, `gameId`, `versionId`, `projectId`, and mode. It contains no game-derived estimate of intelligence or mathematical correctness. Profile ownership is captured when the activity begins; stale callbacks cannot write into another child's active UI.
 
+## Profile settings compatibility
+
+`grade` and `intensity` remain the authoritative fields in the existing v1 profile. An optional boolean `learningSetupComplete` records an explicit successful setup save; older saved profiles without it display the setup reminder while retaining their valid grade/difficulty. It is additive metadata: the previous v1 reader accepts extra profile fields. No learning history version, profile ID, child age, project or game version is rewritten. Missing or malformed grades passed to the shared engine return Grade 1 rather than using age or coercing arbitrary values. Invalid grades in persisted family data still follow the existing preserved-data recovery path.
+
+The shared `profileGrade` function is used by both Math and English selection and attempt admission. `changeProfile` rejects unsupported grade/difficulty edits before mutating the current profile and rolls back a failed save. Successful edits emit `factory-learning-settings` so the player-menu summary and the parent form show the same saved level. `src/learning/profile-setup.ts` owns the optional short editor; it attaches after the existing Studio/profile menus and never opens automatically or changes another profile.
+
 ## Activity contract
 
 `mountMathActivity(target, options)` returns `{item, attemptId, dispose}`. Options supply the profile/context, optional explicit item, mode, save callback, completion callback, and optional legacy IDs/challenge behavior.

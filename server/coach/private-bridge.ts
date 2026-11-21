@@ -7,6 +7,7 @@
 import type {CoachContext} from '../../src/studio/design';
 import {validateAudio,type AudioMime,type SpeechProvider,AUDIO_MAX_BYTES} from './speech';
 import type {CoachProvider} from './service';
+import {readMetadataText} from './metadata-body';
 
 const METADATA_BASE='http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity';
 export function privateCoachOrigin(raw:string):string {
@@ -22,12 +23,12 @@ export function privateCoachOrigin(raw:string):string {
 export type IdentityTokenSource=(audience:string,signal:AbortSignal)=>Promise<string>;
 export function metadataIdentityToken(transport:typeof fetch=fetch):IdentityTokenSource{
  return async(audience,signal)=>{
+  signal.throwIfAborted();
   // Full-format identity token includes the verified service-account email claim
   // required by privateCoachHandler; standard format can omit that claim.
   const uri=METADATA_BASE+'?audience='+encodeURIComponent(audience)+'&format=full';
   const response=await transport(uri,{method:'GET',headers:{'Metadata-Flavor':'Google'},signal,redirect:'error'});
-  if(!response.ok)throw Error('COACH_UNAVAILABLE');
-  const token=(await response.text()).trim();
+  const token=(await readMetadataText(response,12000,signal,'COACH_UNAVAILABLE')).trim();
   if(token.length<100||token.length>12000||!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token))throw Error('COACH_UNAVAILABLE');
   return token;
  };

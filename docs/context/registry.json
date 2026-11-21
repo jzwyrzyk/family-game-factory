@@ -65,7 +65,10 @@
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
     "docs/brand/previews/learning-readability-20261120/README.md",
-    "docs/operations/POLICY_FOUNDATION.md"
+    "docs/operations/POLICY_FOUNDATION.md",
+    "docs/speech/READ_ALOUD.md",
+    "docs/speech/NATURAL_NARRATION.md",
+    "docs/decisions/2026-11-21-profile-play-and-reading.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -97,7 +100,8 @@
     "skills/gem-pal-studio/*.md",
     "docs/drawings/*.md",
     "docs/pals/previews/*.md",
-    "docs/operations/*.md"
+    "docs/operations/*.md",
+    "docs/speech/*.md"
   ],
   "areas": [
     {
@@ -118,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
+      "reviewedAt": "2026-11-21T20:28:19.313Z",
+      "sourceDigest": "7bea02a0bb2fa568a417622019fff59fb790e93111cb7340eaed05a02b926a50",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewReason": "Updated doctrine and the accepted decision for explicit grade ceilings, caring explicit reading and consistent fitted play; preserved learning evidence and permission boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -208,7 +212,9 @@
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
         "docs/brand/CHILD_INTERFACE.md",
-        "docs/decisions/2026-11-20-learning-readability-and-narration.md"
+        "docs/decisions/2026-11-20-learning-readability-and-narration.md",
+        "docs/speech/*.md",
+        "docs/decisions/2026-11-21-profile-play-and-reading.md"
       ],
       "sources": [
         "src/main.ts",
@@ -229,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.352Z",
-      "sourceDigest": "fe2798829c213e3c2515a4dff46c256408d3aa8f6aa5a7de9b1ad7427ed14bc0",
+      "reviewedAt": "2026-11-21T20:28:19.568Z",
+      "sourceDigest": "d86ef55144f5e0ebfae68813ae732bc1bad33ffc46398afcd2ba1dd3f391e4f4",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected combined Studio diff: PR115 reconnect, visible Build, saved-job retry and owner guards are preserved, with only the Pal earned-form callback added; both UI contracts and scoped hosted visual evidence remain documented.",
+      "reviewReason": "Updated architecture, child interface, fitted-play and reading contracts for profile setup, persistent speakers, mobile playback recovery and viewport navigation; native device acceptance remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -301,10 +307,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d6cb0d3686e70962d79396acab7912fe36f7622858fcd432dfe91c7faf487843",
-      "reviewedAt": "2026-11-21T15:39:46.199Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Combined source preserves the validated Pal scene catalog, fixed form/version references, ownership and legacy readers; PR115 matching creation-readiness tests concern conversation only. Focused combined generation-budget and saved-scene checks pass without runtime cap changes.",
+      "sourceDigest": "6e476a89b86751014aa99b487a22cbbe7f10ae3e7b1b401b88e2edff4b973d7d",
+      "reviewedAt": "2026-11-21T20:28:20.411Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Updated the Creator contract for persistent current-step reading, changing hints and dialog lifecycle; scene schema, authored behavior and saved drafts remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -397,7 +403,8 @@
         "docs/game-quality/*.md",
         "docs/brand/GEM_FACTORY.md",
         "docs/mind-your-jems/*.md",
-        "docs/archetypes/*.md"
+        "docs/archetypes/*.md",
+        "docs/homepage/PLAY_VIEW.md"
       ],
       "sources": [
         "src/games/**",
@@ -412,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:11.591Z",
-      "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
+      "reviewedAt": "2026-11-21T20:28:20.664Z",
+      "sourceDigest": "ddaeb7a9958bea48df0ddc0526a38ce72b944220843216c9256c14cfdbddf5ef",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+      "reviewReason": "Updated the play-view game adapter contract and architecture for actual canvas resizing, shadow-host fitting and contained trays; removed the misleading fixed grade caption without changing game mechanics.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -450,10 +457,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:57.591Z",
-      "sourceDigest": "0d75fe89ba7b485648a6bf2cf1f8e84447401bc98358b793a95ff49bbfd8cfb7",
+      "reviewedAt": "2026-11-21T20:28:20.947Z",
+      "sourceDigest": "7a29e1ae8b763657ea3002efad103c42cfc42f3d44e1d3c554920a4aa0597fdb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed question-first Math/Language rendering, 18px controls, 20px task text, disabled instructional text, form labels and recovery colors. Documented playback-start assistance with no credit for unavailable voices; curriculum, grading, subject permissions and checkpoint policy remain unchanged."
+      "reviewReason": "Updated Math and Language integration and acceptance for explicit saved grade and learning difficulty, conservative missing values, visible profile setup and assistance-aware read-aloud."
     },
     {
       "id": "services",
@@ -475,10 +482,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T20:28:21.181Z",
+      "sourceDigest": "1520f240217b7658bb22926b832101aafce70e69a61cd7f7104511a007098a52",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Updated architecture for the independently authorized narration gateway endpoints, bounded binary transport and default-off deployment scope; existing trusted session and privacy checks remain authoritative.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -517,10 +524,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.976Z",
-      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
+      "reviewedAt": "2026-11-21T20:28:21.503Z",
+      "sourceDigest": "e49e6802ee50ad0c7a75c035d934b77b70dfd2d8501ad8a349dee92bb1d61da1",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
+      "reviewReason": "Updated architecture for optional metadata-only narration receipts in shared PipelineState; worker selection, generated artifacts, budgets and generation execution remain unchanged."
     },
     {
       "id": "coach",
@@ -530,7 +537,8 @@
         "docs/design-coach/*.md",
         "docs/issue-28/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/speech/NATURAL_NARRATION.md"
       ],
       "sources": [
         "server/coach/**",
@@ -539,10 +547,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:04:40.003Z",
-      "sourceDigest": "6332be601023663f7b36b4f7c363566a47455c77a1391233e4913893e82cd1ec",
+      "reviewedAt": "2026-11-21T20:28:21.995Z",
+      "sourceDigest": "bdc4846f463b362a7fa75880e3f1c400a13325be0dadc2759a3e54963288545b",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented exact content-free private failure event, unchanged public errors and inference gates, and source-only limits after the observed four-second 503s."
+      "reviewReason": "Updated natural narration authorization, accounting, private Google transport and rollout handoff; preserved newly merged content-free chat failure diagnostics and bounded metadata-token reads."
     },
     {
       "id": "adult-privacy",
@@ -613,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T19:43:59.746Z",
-      "sourceDigest": "5fd2ff6f7a8fb7ca4e6df5ed7089cfac005ea70cf53dee915547c8aedbea0810",
+      "reviewedAt": "2026-11-21T20:28:22.282Z",
+      "sourceDigest": "bdbc744bb46fcf042a826a9e258cb545add4549cf27bd7ee17a043d12e8e9098",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the observed exact-tree tablet Add Bottle failure and strengthened the one-real-tap test with a bounded trusted-activation receipt, unchanged blueprint/capability assertions and bounded failure evidence; local harness/review are distinct from pending Chromium CI and the unproved historical cause.",
+      "reviewReason": "Updated delivery and architecture evidence boundaries with synthetic narration checks and new production profile/play browser fixtures; local browser launch is blocked and hosted screenshots remain required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T19:44:00.253Z",
-      "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+      "reviewedAt": "2026-11-21T20:28:22.576Z",
+      "sourceDigest": "6711e5f28e170f45b61687c2f686aad74712a1efd7c349e8f05876e3c59f4103",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified.",
+      "reviewReason": "Updated candidate delivery state and wired existing CI commands to profile, fitted-play and narration regressions; no workflow permissions, deployment, runtime flags or worker pins changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -775,10 +783,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:33:42.892Z",
-      "sourceDigest": "ebd564a2e3fe8d4256e42e76f568e11490bfcdaa08616de70e02f79d1d1a1d67",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed routing additions for the generator, supplemental approved art and integration decision; existing maintenance, evidence and PR review procedures already govern this additive feature and remain accurate.",
+      "reviewedAt": "2026-11-21T20:28:22.967Z",
+      "sourceDigest": "8a0bea67cbda0c2a7c2f3e1d1112b9b3e45c92c81d295735b24b71b593cb630b",
+      "reviewOutcome": "updated",
+      "reviewReason": "Added the feature decision and speech contracts to the documentation index and registry; reviewed their required-file, area ownership and local-link routes without weakening freshness enforcement.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

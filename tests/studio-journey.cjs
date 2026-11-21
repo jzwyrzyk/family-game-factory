@@ -176,7 +176,7 @@ const {start}=require('./browser-server.cjs');
   else data={errorCode:'NOT_FOUND'};
   await route.fulfill({status:data.errorCode?404:200,headers,contentType:'application/json',body:JSON.stringify(data)});
  });
- await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script>`}));
+ await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:1000,learningProtocol:1},'*')});<\/script>`}));
  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);await exploreWelcome(page);
  await page.click('#studioNavCreate');await sendChildMessage(page,childIdea);
  assert.equal(await page.locator('#studioSend').isDisabled(),true,'an initial idea does not unlock Build');
@@ -191,6 +191,15 @@ const {start}=require('./browser-server.cjs');
  await page.click('#studioBuildHandoffPlay');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');
+ // A generated game's preferred height cannot push the shared player offscreen.
+ for(const size of [{width:1280,height:720},{width:390,height:844},{width:844,height:390}]){
+  await page.setViewportSize(size);
+  await page.waitForFunction(()=>{const frame=document.querySelector('#studioRemoteHost iframe'),r=frame.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight+1&&r.left>=0&&r.right<=innerWidth+1&&r.height>100;});
+  assert.equal(await page.locator('#page-studio').evaluate(e=>e.classList.contains('studio-play-mode')),true);
+  assert.equal(await page.locator('#studioHome').isVisible(),true,'remote preview keeps the same exit');
+  assert.equal(await page.locator('#studioFullScreen').isVisible(),true,'remote preview keeps the same fullscreen control');
+ }
+ await page.setViewportSize({width:1280,height:720});
  assert.match(await page.textContent('#studioPlayNote'),/mock/);assert.equal(kept,0);
  assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'signed preview capabilities must not persist');
  await page.click('#studioKeep');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.remoteId==='fixture-rev'&&!s.candidate));assert.equal(kept,1);

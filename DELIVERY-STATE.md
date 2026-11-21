@@ -1,5 +1,15 @@
 # jems delivery state
 
+## November 21, 2026 — profile, play and reading implementation candidate
+
+The owner requested explicit grade/difficulty per profile, consistent screen-fitting games/fullscreen, a caring natural female voice and persistent read-aloud including Creator. The isolated candidate is based on main `b4734b1323de87dfee96bb91769cbab3cff432e6`, including merged PR124 chat diagnostics; it is unmerged and undeployed. [The accepted decision](docs/decisions/2026-11-21-profile-play-and-reading.md) and [natural narration handoff](docs/speech/NATURAL_NARRATION.md) record the scope.
+
+The source adds the profile editor/safe defaults, bounded native/remote play view, shared speaker controls and a separately gated Google IAM TTS route. Existing explicit profile levels, learning history, game versions and microphone/chat permissions remain authoritative. Natural narration defaults off; no cloud resources, paid calls, permissions, runtime flags, worker pins or production traffic were changed.
+
+Focused learning/store checks, TypeScript, Vite and narration authorization/accounting/HTTP fixtures have passed locally. Local Chromium cannot open a page because this executor rejects its socket operation; the new desktop/phone profile and play suites and extended reading journeys require hosted execution and screenshot review. Mocked audio is not an audition. Physical-device playback and actual natural-voice tone remain unverified. The PR records the eventual exact published head and CI results.
+
+The candidate preserves merged private chat diagnostics (#124), including content-free failure reporting and the tablet input receipt check. Current audit stabilization (#123) and access preparation (#107) have overlapping shared source; reconcile their then-current heads without losing either behavior before a combined merge/release. This candidate does not consume or change their deployment authorization.
+
 ## November 21, 2026 — diagnostic release approved; tablet input evidence corrected
 
 The owner approved merging [PR124](https://github.com/jzwyrzyk/family-game-factory/pull/124) after required checks pass and deploying only its private-coach diagnostic change. The original head `a4dc8c5841f631029be0faa16ee11c475d68c28d` and the refreshed PR merge checkout have the same tree `00f586a6b5a8d7aca1f67c7bea7321072bdd2eae`; both complete PR workflow sets passed. Repository protection nevertheless required the original push checks, which shared push/PR concurrency had canceled. Their legitimate rerun passed browser, learning, private-coach image and service packaging, but [creative job136956230056](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44937329470/job/136956230056) failed the portrait tablet's first **Add Bottle** assertion at `2026-11-21T19:23:04Z`: zero parts instead of one. Its other independent suites passed. This is an observed input assertion failure, not a demonstrated infrastructure fault or a confirmed application regression.

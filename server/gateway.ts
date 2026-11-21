@@ -2,6 +2,9 @@ import {CoachService} from './coach/service';
 import {PrivateCoachBridge,PrivateSpeechBridge,privateCoachOrigin} from './coach/private-bridge';
 import {CoachAudioService,speechConfig,type SpeechProvider} from './coach/speech';
 import {speechHttpHandler} from './coach/audio-http';
+import {NarrationService,narrationConfig,type NarrationProvider} from './coach/narration';
+import {narrationHttpHandler} from './coach/narration-http';
+import {PrivateNarrationBridge} from './coach/private-narration-bridge';
 import {coachConfig,coachHandler} from './coach/http';
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {createServer} from 'node:http';
@@ -68,6 +71,9 @@ export async function createGateway(config:GatewayConfig){
  const offlineSpeech:SpeechProvider={readiness:async()=>false,transcribe:async()=>{throw Error('AUDIO_UNAVAILABLE');}};
  const audio=speechHttpHandler(new CoachAudioService(repo,{...speechConfig(process.env),requireVerifiedParentPrivacy:!adult.enabled},
    coachTarget?new PrivateSpeechBridge(coachTarget):offlineSpeech),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
+ const offlineNarration:NarrationProvider={readiness:async()=>false,read:async()=>{throw Error('NARRATION_UNAVAILABLE');}};
+ const narration=narrationHttpHandler(new NarrationService(repo,{...narrationConfig(process.env),requireVerifiedParentPrivacy:!adult.enabled},
+   coachTarget?new PrivateNarrationBridge(coachTarget):offlineNarration),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
  const api=apiHandler(service,http,repo),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey}),trusted=trustedDeviceHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey,adultPilot:adult,eraseCoachReceipts:session=>coachService.eraseFamilyReceipts(session)});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
@@ -79,6 +85,7 @@ export async function createGateway(config:GatewayConfig){
    try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
   }
   if(url.pathname==='/v1/coach/audio'||url.pathname==='/v1/coach/audio/status'){await audio(req,res);return;}
+  if(url.pathname==='/v1/coach/narration'||url.pathname==='/v1/coach/narration/status'){await narration(req,res);return;}
   if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'||url.pathname==='/v1/coach/erase'){await coach(req,res);return;}
   if(url.pathname==='/v1/sessions'){await sessions(req,res);return;}
   if(['/v1/sessions/enroll','/v1/sessions/renew','/v1/sessions/status'].includes(url.pathname)||url.pathname.startsWith('/v1/sessions/adult/')||url.pathname==='/v1/devices'||url.pathname.startsWith('/v1/devices/')){await trusted(req,res);return;}

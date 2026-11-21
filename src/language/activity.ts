@@ -3,7 +3,7 @@ import {beginLanguageAttempt,finishLanguageAttempt,recordLanguageReadAloud,saveC
   selectLanguageItem,submitLanguageAnswer,useLanguageHint,type LanguageAttempt} from './engine';
 import type {LanguageContext,LanguageItem,LanguageProfile,LanguageResult} from './types';
 import type {LearningMode} from '../learning/types';
-import {createFriendlyNarrator} from '../speech/friendly-narrator';
+import {createReadAloudControl} from '../speech/read-aloud-control';
 
 export interface LanguageActivityOptions {
   profile:LanguageProfile;context?:LanguageContext;item?:LanguageItem;mode?:LearningMode;
@@ -20,7 +20,6 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   const item=options.item||selectLanguageItem(options.profile,options.context);
   const attempt=beginLanguageAttempt(options.profile,item,{...options.context,mode});
   let disposed=false,done=false,locked=false,wrong=0,hintDepth=0;
-  const narrator=createFriendlyNarrator(()=>!disposed&&!done&&!locked&&root.isConnected);
   let timer:ReturnType<typeof setTimeout>|undefined;
   const listeners=new AbortController();
   const on=(node:EventTarget,event:string,handler:EventListener)=>node.addEventListener(event,handler,{signal:listeners.signal});
@@ -43,29 +42,15 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     story.append(passageLabel,make('p','language-story-text',item.passage));
     root.append(story);
   }
-  const support=make('div','language-reading-row');
-  const readBtn=button('Read this to me','language-secondary','volume');
-  readBtn.dataset.action='read-aloud';
-  const speechAvailable=typeof window.speechSynthesis!=='undefined'&&typeof window.SpeechSynthesisUtterance!=='undefined';
-  if(speechAvailable) {
-    on(readBtn,'click',()=>{
-      if(disposed||done||locked)return;
-      if(narrator.active){narrator.cancel();return;}
-      const choices=item.choices?.map((choice,index)=>
-        ' Option '+(index+1)+': '+choice.label+'.').join('')||'';
-      readingNotice.textContent='';
-      setIconLabel(readBtn,'volume','Stop reading');
-      narrator.speak((item.passage?item.passage+'. ':'')+item.question+'.'+choices,{
-        onStarted:()=>{recordLanguageReadAloud(options.profile,attempt.id);save();},
-        onUnavailable:()=>{readingNotice.textContent='Voice is not ready here. Ask a grown-up to read with you.';},
-        onFinished:()=>setIconLabel(readBtn,'volume','Read this to me'),
-      });
-    });
-    support.append(readBtn);
-  }
-  const readingNotice=make('p','language-reading-notice');
-  readingNotice.setAttribute('role','status');readingNotice.setAttribute('aria-live','polite');
-  root.append(support,readingNotice);
+  const questionReading=createReadAloudControl({
+    text:()=> (item.passage?item.passage+'. ':'')+item.question+'. '+(item.choices||[]).map((choice,index)=>'Option '+(index+1)+': '+choice.label+'.').join(' '),
+    canRead:()=>!disposed&&!done&&!locked,
+    buttonClass:'language-secondary',
+    onStarted:()=>{recordLanguageReadAloud(options.profile,attempt.id);save();},
+  });
+  questionReading.element.classList.add('language-reading-row');
+  questionReading.notice.classList.add('language-reading-notice');
+  root.append(questionReading.element);
   const work=make('div','language-work');root.append(work);
   const feedback=make('p','language-feedback');feedback.id=prefix+'-feedback';
   feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
@@ -78,6 +63,10 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   const hintPanel=make('section','language-hint');hintPanel.hidden=true;
   const hintTitle=make('h3');hintTitle.id=prefix+'-hint-title';hintTitle.tabIndex=-1;
   const hintText=make('p');hintPanel.append(hintTitle,hintText);
+  const hintReading=createReadAloudControl({text:()=>hintTitle.textContent+'. '+hintText.textContent,
+    label:'Read the help',buttonClass:'language-secondary',canRead:()=>!disposed&&!done&&!locked&&!hintPanel.hidden});
+  hintReading.button.dataset.action='read-help';
+  const stopReading=()=>{questionReading.stop();hintReading.stop();};
   root.append(hintPanel);
   const saving=make('p','language-save-warning','Practice could not be saved. Ask a grown-up before leaving this page.');
   saving.hidden=true;saving.setAttribute('role','alert');root.append(saving);
@@ -100,15 +89,15 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const state=outcome==='explored'?'explored':outcome==='shown'?'shown':outcome==='incorrect'?'incorrect':'completed';
     finishLanguageAttempt(options.profile,attempt.id,state);save();
     root.querySelectorAll<HTMLButtonElement|HTMLInputElement|HTMLTextAreaElement>('button,input,textarea').forEach(n=>n.disabled=true);
-    narrator.cancel();
+    stopReading();
     options.onComplete({independent,outcome,attemptId:attempt.id,item,mode});
   }
   function showWorked(){
     if(disposed||done||locked)return;
-    hintDepth=4;useLanguageHint(options.profile,attempt.id,4);save();
+    stopReading();hintDepth=4;useLanguageHint(options.profile,attempt.id,4);save();
     hintPanel.hidden=false;hintTitle.textContent='Here is how to solve it';hintText.textContent=item.explanation;
     const go=button('Continue my game','language-primary','play');go.dataset.action='continue-supported';
-    on(go,'click',()=>complete('shown',false));hintPanel.replaceChildren(hintTitle,hintText,go);
+    on(go,'click',()=>complete('shown',false));hintPanel.replaceChildren(hintTitle,hintText,go,hintReading.element);
     hintButton.disabled=true;showButton.disabled=true;
     feedback.dataset.state='support';feedback.textContent='You explored this idea. You can try a new one another time.';
     focus(hintTitle);
@@ -116,16 +105,16 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   function hint(explicit=true){
     if(disposed||done||locked)return;
     if(hintDepth>=3){showWorked();return;}
-    hintDepth++;useLanguageHint(options.profile,attempt.id,hintDepth);save();
+    stopReading();hintDepth++;useLanguageHint(options.profile,attempt.id,hintDepth);save();
     hintPanel.hidden=false;hintTitle.textContent='Hint '+hintDepth+' of 3';
-    hintText.textContent=item.hints[hintDepth-1];hintPanel.replaceChildren(hintTitle,hintText);
+    hintText.textContent=item.hints[hintDepth-1];hintPanel.replaceChildren(hintTitle,hintText,hintReading.element);
     setIconLabel(hintButton,'help',hintDepth>=3?'Show how':'Another hint');
     if(explicit)focus(hintTitle);
   }
   on(hintButton,'click',()=>hint());
   on(showButton,'click',showWorked);
   function submit(raw:string){
-    if(disposed||done||locked)return;
+    if(disposed||done||locked)return;stopReading();
     const result=submitLanguageAnswer(options.profile,attempt.id,raw);save();
     if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Choose an answer first.';return;}
     if(result.correct){
@@ -211,7 +200,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     dispose(reason:'interrupted'='interrupted'){
       if(disposed)return;disposed=true;
       if(timer)clearTimeout(timer);listeners.abort();
-      narrator.cancel();
+      questionReading.dispose();hintReading.dispose();
       if(!done){finishLanguageAttempt(options.profile,attempt.id,reason);save();}
       root.remove();
     },

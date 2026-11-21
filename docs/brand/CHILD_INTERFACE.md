@@ -45,7 +45,13 @@ The target is a warm, cheerful adult female voice with clear, natural pacing. Av
 
 Speech starts only after an explicit tap and can be stopped. Pending or active speech must cancel on navigation, disposal, profile changes or a replacement request. Language records listening support when audio actually starts; an unavailable voice must not manufacture assistance evidence. Written instructions remain available.
 
-Browser voices expose no standardized gender, quality or emotion field. Installed voice names guide selection, not a guarantee of expressive quality. Device listening acceptance remains separate from mocked voice tests. If a suitable local voice is unavailable, show a short truthful notice. A future consistent hosted voice would need an explicit architecture and data-policy decision; this change adds no provider service or microphone permission.
+Browser voices expose no standardized gender, quality or emotion field. Installed voice names guide selection, not a guarantee of expressive quality. The owner's [November 21 refinement](../decisions/2026-11-21-profile-play-and-reading.md) adds the separate, default-off [natural narration architecture](../speech/NATURAL_NARRATION.md) and [shared read-aloud contract](../speech/READ_ALOUD.md). No live provider or microphone permission is activated by that implementation. Device listening acceptance remains separate from mocked voice tests. If a suitable voice is unavailable, retain the speaker control with a short truthful notice and keep the text visible.
+
+Keep the reading button available through chat replies, learning questions, revealed hints and Creator interactions. A speaker icon means reading; a microphone means dictation. Natural speech is preferred only when its authenticated session capability is available. Preserve an explicit previewable device backup and report its actual mode in Grown-ups. Reading must be stoppable, and a mobile playback-permission retry reuses its already downloaded transient audio rather than creating another synthesis.
+
+## Fit the child’s game to the screen
+
+The playable view owns the available viewport and contains required learning overlays. Always retain a clear way to leave and a Full screen / Exit full screen control. Browser refusal uses a truthful expanded view. Avoid outer-page scrolling during play; allow readable help, learning cards and optional tool trays to scroll within bounded areas. Keep touch targets and text readable instead of scaling an entire web page down. Rotation and the mobile browser bar must resize the real game area. See the [fitted-play contract](../homepage/README.md#games-stay-in-view).
 
 ## Evidence and scope
 
