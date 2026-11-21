@@ -9,6 +9,7 @@ const { createHash } = require('node:crypto');
 const { once } = require('node:events');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
+const playwrightVersion = require('playwright/package.json').version;
 const { start } = require('./browser-server.cjs');
 const { exploreWelcome, navigate } = require('./studio-entry.cjs');
 
@@ -67,6 +68,97 @@ async function readablePalText(page, selector) {
     return { text: element.textContent, color, contrastAgainstWhite: 1.05 / (luminance + 0.05) };
   }));
   assert.ok(readings.length && readings.every(reading => reading.contrastAgainstWhite >= 4.5), `Pal text stays readable inside the production shell: ${JSON.stringify(readings)}`);
+}
+function installPalImageHistory({ urls }) {
+  // Passive, current-document evidence only. No image/source/style mutation,
+  // layout reads, retries, fetches, or per-event browser-protocol round trips.
+  const allowed = new Set(urls), ids = new WeakMap(), pendingByImage = new WeakMap(), history = [];
+  const limit = 2000, states = new Set(['loading', 'ready', 'unavailable']);
+  const errorNames = new Set(['EncodingError', 'AbortError', 'InvalidStateError', 'TypeError', 'NotSupportedError']);
+  let nextImageId = 0, nextDecodeId = 0, dropped = 0, diagnosticErrors = 0;
+  let pendingDecodes = 0, peakPendingDecodes = 0;
+  const decodeTotals = { started: 0, resolved: 0, rejected: 0, threw: 0 };
+  const approvedUrl = value => allowed.has(value) ? value : null;
+  const tracked = image => image instanceof HTMLImageElement && (allowed.has(image.src) || allowed.has(image.currentSrc) || ids.has(image));
+  const picture = image => {
+    if (!tracked(image)) return null;
+    if (!ids.has(image)) ids.set(image, ++nextImageId);
+    const portrait = image.closest('.pals-portrait');
+    return { imageId: ids.get(image), src: approvedUrl(image.src), currentSrc: approvedUrl(image.currentSrc),
+      connected: image.isConnected, complete: image.complete, hidden: image.hidden,
+      naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight,
+      portraitState: states.has(portrait?.dataset.state) ? portrait.dataset.state : null,
+      hero: !!portrait?.classList.contains('pals-hero-portrait') };
+  };
+  const record = (type, image, detail = {}) => {
+    try {
+      const state = picture(image);
+      if (!state) return;
+      history.push({ type, atMs: Math.round(performance.now() * 1000) / 1000, ...state,
+        pendingDecodes, peakPendingDecodes, imagePendingDecodes: pendingByImage.get(image) || 0, ...detail });
+      if (history.length > limit) { history.shift(); dropped += 1; }
+    } catch { diagnosticErrors += 1; }
+  };
+  const errorName = error => errorNames.has(error?.name) ? error.name : 'Other';
+  const descriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'decode');
+  const nativeDecode = descriptor?.value, nativeThen = Promise.prototype.then;
+  if (typeof nativeDecode === 'function') {
+    Object.defineProperty(HTMLImageElement.prototype, 'decode', { ...descriptor, value: function decode(...args) {
+      if (!tracked(this)) return Reflect.apply(nativeDecode, this, args);
+      const image = this, decodeId = ++nextDecodeId, startSrc = approvedUrl(image.src);
+      decodeTotals.started += 1; pendingDecodes += 1;
+      peakPendingDecodes = Math.max(peakPendingDecodes, pendingDecodes);
+      pendingByImage.set(image, (pendingByImage.get(image) || 0) + 1);
+      const settled = outcome => {
+        decodeTotals[outcome] += 1; pendingDecodes -= 1;
+        pendingByImage.set(image, pendingByImage.get(image) - 1);
+      };
+      record('decode-start', image, { decodeId, startSrc });
+      let promise;
+      try { promise = Reflect.apply(nativeDecode, image, args); }
+      catch (error) { settled('threw'); record('decode-throw', image, { decodeId, startSrc, errorName: errorName(error) }); throw error; }
+      // Observe the native result; never return this observation's Promise.
+      // Rejections remain rejections for every original application/test caller.
+      Reflect.apply(nativeThen, promise, [
+        () => { settled('resolved'); record('decode-resolve', image, { decodeId, startSrc }); },
+        error => { settled('rejected'); record('decode-reject', image, { decodeId, startSrc, errorName: errorName(error) }); },
+      ]);
+      return promise;
+    } });
+  }
+  document.addEventListener('load', event => record('load', event.target), { capture: true, passive: true });
+  document.addEventListener('error', event => record('error', event.target), { capture: true, passive: true });
+  document.addEventListener('pal-picture-state', event => {
+    if (event.target instanceof Element && event.target.matches('.pals-portrait')) record('portrait-state', event.target.querySelector('img'));
+  }, { capture: true, passive: true });
+  const recordTree = (type, node) => {
+    if (!(node instanceof Element)) return;
+    if (node instanceof HTMLImageElement) record(type, node);
+    else for (const image of node.querySelectorAll('img')) record(type, image);
+  };
+  new MutationObserver(records => {
+    try {
+      for (const mutation of records) {
+        if (mutation.type === 'childList') {
+          for (const node of mutation.removedNodes) recordTree('dom-removed', node);
+          for (const node of mutation.addedNodes) recordTree('dom-added', node);
+        } else if (mutation.attributeName === 'data-state' && mutation.target.matches('.pals-portrait')) {
+          record('portrait-state-mutation', mutation.target.querySelector('img'), {
+            previousState: states.has(mutation.oldValue) ? mutation.oldValue : null,
+          });
+        } else if (mutation.target instanceof HTMLImageElement) {
+          record(mutation.attributeName === 'src' ? 'src-mutation' : 'hidden-mutation', mutation.target);
+        }
+      }
+    } catch { diagnosticErrors += 1; }
+  }).observe(document, { subtree: true, childList: true, attributes: true, attributeOldValue: true,
+    attributeFilter: ['src', 'hidden', 'data-state'] });
+  Object.defineProperty(window, '__readPalImageHistory', { value: () => ({
+    scope: 'Current document only; reload starts a new history. Approved Pal image metadata, no text or payloads.',
+    timeOrigin: performance.timeOrigin, limit, dropped, diagnosticErrors,
+    pendingDecodes, peakPendingDecodes, decodeTotals: { ...decodeTotals },
+    nativeDecodeObserved: typeof nativeDecode === 'function', events: history.slice(),
+  }) });
 }
 async function palImageDiagnostics(page, base) {
   // Failure evidence only: inspect attached pictures and existing public cache
@@ -200,6 +292,7 @@ async function installReceiptFixture(page) {
   try {
     browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
     const context = await browser.newContext({ viewport: { width: 1440, height: 1080 }, reducedMotion: 'reduce', acceptDownloads: true });
+    await context.addInitScript(installPalImageHistory, { urls: [...allowedPalUrls] });
     await context.route('**/factory-config.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ version: 1, mode: 'unavailable' }) }));
     page = await context.newPage(); page.setDefaultTimeout(15000);
     page.on('pageerror', error => errors.push(error.message));
@@ -507,6 +600,13 @@ async function installReceiptFixture(page) {
     assert.deepEqual(paidRequests, [], 'No provider generation or coach request');
     fs.writeFileSync(path.join(outputs, 'pals-app-results.json'), JSON.stringify({
       scope: 'Production application UI; higher unlock/stage states are explicitly synthetic trusted-source receipt fixtures.',
+      browserVersion: browser.version(), playwrightVersion,
+      imageDecodeSummary: await page.evaluate(() => {
+        const history = window.__readPalImageHistory?.();
+        return history ? { pendingDecodes: history.pendingDecodes, peakPendingDecodes: history.peakPendingDecodes,
+          decodeTotals: history.decodeTotals, dropped: history.dropped, diagnosticErrors: history.diagnosticErrors,
+          scope: history.scope } : { unavailable: true };
+      }).catch(() => ({ unavailable: true })),
       checks, errors, consoleErrors, paidRequests, fixtures, expressionRequests,
       observedUiLearning: { completions: 5, assistedCompletions: 1, earnedGems: 10, adventures: 1 },
       finalView: await view(page),
@@ -514,10 +614,11 @@ async function installReceiptFixture(page) {
     console.log(`PASS: ${checks.length} integrated Pal browser groups.`);
   } catch (error) {
     if (page) {
+      const imageHistory = await page.evaluate(() => window.__readPalImageHistory?.() || { unavailable: true }).catch(() => ({ unavailable: true }));
       const imageDiagnostics = await palImageDiagnostics(page, base).catch(diagnosticError => ({ error: String(diagnosticError) }));
       await page.screenshot({ path: path.join(outputs, 'pals-app-failure.png'), fullPage: true }).catch(() => {});
       fs.writeFileSync(path.join(outputs, 'pals-app-failure.json'), JSON.stringify({ phase, error: String(error), checks, errors, consoleErrors, paidRequests,
-        imageNetwork, imageDiagnostics,
+        browserVersion: browser.version(), playwrightVersion, imageHistory, imageNetwork, imageDiagnostics,
         state: await page.evaluate(() => ({ pals: window.FG?.pals?.view(), activeLearning: window.FG?.learning?.active, scene: window.FG?.creation?.scene(), visiblePages: [...document.querySelectorAll('main > .page')].filter(element => element.getClientRects().length).map(element => element.id) })).catch(() => null),
       }, null, 2) + '\n');
     }
