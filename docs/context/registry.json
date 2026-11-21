@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T23:35:32.000Z",
-      "sourceDigest": "14f7d10ac5bc2c19c21996a0582938f6e395161bb890f4fafb858871f292c7d0",
+      "reviewedAt": "2026-11-21T00:33:29.000Z",
+      "sourceDigest": "e80e3c47855c3b5e6c184caab0f576abe22596a49c399c69387ca79611476688",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first GitHub-hosted manual sandbox publication run 44837433067: approved source staged, image built, packaged source hashes passed; synthetic TypeScript CJS fixture failed with ESM named import, causing empty stdin to sandbox. No GHCR image published, no paid activation, no VM. Corrected manual workflow to real require()-based TSX fixture and positive pre-Docker validated JSON envelope, added executable regression in deployment tests. Updated sandbox handoff, incident evidence and delivery ledger; publishing remains separately manual after merge.",
+      "reviewReason": "Reviewed the actual PR98 merge d93ed92c against tested head 73a872a: identical Git tree and 14 passing checks; preserved the failed publisher 44837433067 and pending production acceptance. Updated the delivery ledger and existing sandbox handoff with the authenticated Cloud Shell dispatch step, exact fixed workflow-blob guard and disabled-generation check. Only post-merge evidence and handoff prose changed; runtime/workflow bytes, private worker pin, cloud configuration and activation remain unchanged. Delivery includes the ledger itself, so this records review of the new receipt against the independently computed hosted source digest.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
