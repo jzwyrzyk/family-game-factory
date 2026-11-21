@@ -235,6 +235,57 @@ async function workspaceIntegrityJourney(browser,base){
  finally{await context.close();}
 }
 
+async function notebookCapacityJourney(browser,base){
+ const {context,page,errors,posts}=await prepare(browser,base,{width:1280,height:900});
+ const notebook=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)),NOTEBOOK);
+ try{
+  await page.click('[data-starter="buckets"]');await page.click('#studioNavHome');
+  const sourceId=await page.evaluate(key=>{
+   const n=JSON.parse(localStorage.getItem(key)),s=n.sessions[0];s.playOnly=false;s.draft='My next unsent idea';
+   s.messages=Array.from({length:200},(_,i)=>({id:'capacity-turn-'+i,role:i%2?'helper':'child',text:'Original saved words '+i,at:'2026-11-21T00:00:00Z'}));
+   localStorage.setItem(key,JSON.stringify(n));return s.id;
+  },NOTEBOOK);
+  await page.reload();await ready(page);await exploreWelcome(page);
+  await page.locator(`[data-session="${sourceId}"] .studio-saved-open`).click();
+  await page.locator('#studioMore summary').click();await page.click('#studioCopy');
+  await page.fill('#studioCopyName','Full chat copy');await page.locator('#studioCopyForm button[type="submit"]').click();
+  await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)).sessions.some(s=>s.name==='Full chat copy'),NOTEBOOK);
+  const copied=(await notebook()).sessions.find(s=>s.name==='Full chat copy');
+  assert.equal(copied.messages.length,200,'ordinary copy preserves the whole conversation without failing on an extra helper note');
+  await page.click('#studioChange');await page.locator('#studioContinueChat').waitFor({state:'visible'});
+  await page.click('#studioContinueChat');
+  assert.equal(await page.inputValue('#studioPrompt'),'My next unsent idea','continuation preserves the unsent draft');
+  const continued=await notebook(),chapter=continued.conversationChapters[0];
+  assert.deepEqual(chapter.messages,continued.sessions.find(s=>s.id===sourceId).messages);
+  assert.equal(continued.sessions.find(s=>s.id===copied.id).messages.length,0);
+  const next='I want a moon above the buckets.';await page.fill('#studioPrompt',next);await page.click('#studioTalk');
+  await page.waitForFunction(({key,id,text})=>{const s=JSON.parse(localStorage.getItem(key)).sessions.find(s=>s.id===id);return s.messages.length>=2&&s.messages.some(m=>m.role==='child'&&m.text===text)&&!document.getElementById('coachModeStatus').classList.contains('is-thinking');},{key:NOTEBOOK,id:copied.id,text:next});
+  assert.deepEqual((await notebook()).conversationChapters[0],chapter,'the next exchange does not rewrite the saved chapter');
+  await page.reload();await ready(page);
+  assert.deepEqual((await notebook()).conversationChapters[0],chapter,'the exact earlier words survive reload');
+
+  // Fill only synthetic notebook records. The existing native games become
+  // unlisted here, exercising the capacity-safe legacy recovery entrance too.
+  await page.evaluate(key=>{
+   const n=JSON.parse(localStorage.getItem(key)),template=n.sessions[0],owner=template.owner;
+   n.sessions=Array.from({length:80},(_,i)=>({...template,id:'full-session-'+i,name:'Saved idea '+i,game:'new',projectId:null,remoteId:null,rewardProjectId:'full-session-'+i,messages:[],draft:'',candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,pendingExperiment:null,playOnly:false,archived:true,previousConversationId:undefined}));
+   n.active={[owner]:n.sessions[0].id};delete n.conversationChapters;n.rewardOutbox=[];localStorage.setItem(key,JSON.stringify(n));
+  },NOTEBOOK);
+  await page.reload();await ready(page);await exploreWelcome(page);
+  await page.locator('#studioNotebookCapacity').waitFor({state:'visible'});
+  const before=await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE});
+  await page.click('[data-starter="robot"]');
+  assert.deepEqual(await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE}),before,'full notebook fails before writing an orphan native game');
+  await page.locator('#studioArchived summary').click();await page.getByRole('button',{name:'Bring back Saved idea 0',exact:true}).click();
+  const full=await notebook();assert.equal(full.sessions.length,80);assert.equal(full.sessions.filter(s=>!s.archived).length,1);
+  await page.locator('#studioNotebookCapacity summary').click();assert.match(await page.textContent('#studioNotebookCapacity'),/80 of 80.*1 open jems, 79 put-away jems/s);
+  await page.getByRole('button',{name:'Open saved remixes',exact:true}).click();await page.locator('#savedRemixes button').first().waitFor({state:'visible'});
+  assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);
+  console.log('PASS notebook capacity: full copy, explicit continuation, next exchange, exact history reload, truthful full archive and preflight without orphan games');
+ }catch(error){await page.screenshot({path:'test-results/navigation-notebook-capacity-failure.png',fullPage:true}).catch(()=>{});throw error;}
+ finally{await context.close();}
+}
+
 async function legacyReturn(browser,base){
  for(const modes of ['arcade=1','studio=0','arcade=1&studio=0']){
   const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage(),errors=[];
@@ -267,6 +318,7 @@ async function legacyReturn(browser,base){
   await collectionJourney(browser,base,'phone',{width:390,height:844});
   await recoveryJourney(browser,base);
   await workspaceIntegrityJourney(browser,base);
+  await notebookCapacityJourney(browser,base);
   await legacyReturn(browser,base);
  }finally{await browser?.close();server.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

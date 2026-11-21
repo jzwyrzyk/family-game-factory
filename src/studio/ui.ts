@@ -23,6 +23,7 @@ import '../brand/art-library.css';
 import { installQualityCards } from '../quality/cards';
 import { StudioNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
 import { StudioGames, isGeneratedRemoteKind } from './adapter';
+import { saveLocalStudioProject } from './local-project';
 import { installStudioRemixRouting } from './host-navigation';
 import { defaults, manifests, validateConfig } from '../runtime/manifests';
 import { interpret } from '../factory/interpreter';
@@ -163,6 +164,10 @@ export async function installStudio(){
  clearChat.id='studioClearChat';clearChat.type='button';
  chatOptions.append(chatSummary,clearChat);
  $('studioConversation').querySelector('.studio-helper-heading')!.append(chatOptions);
+ const continueChat=el('button','studio-button','Continue chat') as HTMLButtonElement;
+ continueChat.id='studioContinueChat';continueChat.type='button';continueChat.hidden=true;
+ const chatCapacity=el('p','studio-capacity-notice');chatCapacity.id='studioChatCapacity';chatCapacity.hidden=true;
+ $('studioPromptForm').before(chatCapacity,continueChat);
  const sendRow=$('studioPromptForm').querySelector('.studio-send-row')!;
  sendRow.prepend($('studioMic'));
  const privateMic=iconEl('button','studio-button','mic','Speak') as HTMLButtonElement;
@@ -808,7 +813,20 @@ export async function installStudio(){
   refreshLearningChoice();
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
   // Import references to existing local remixes without copying or migrating their data.
-  for(const p of games.list(owner())) if(!entries.some(s=>s.projectId===p.id))entries.push({...notebook.create(owner(),p.game,p.name,p.id)});
+  const unlisted=games.list(owner()).filter(p=>!entries.some(s=>s.projectId===p.id));
+  let importFailure='';
+  for(const p of unlisted){
+   if(!notebook.capacity().available)break;
+   try{entries.push(notebook.create(owner(),p.game,p.name,p.id));}
+   catch(error){importFailure=error instanceof Error?error.message:'Could not add this saved game to the notebook.';break;}
+  }
+  const capacity=notebook.capacity();
+  let capacityNotice=$('studioNotebookCapacity');
+  if(!capacityNotice){capacityNotice=el('div','studio-capacity-notice');capacityNotice.id='studioNotebookCapacity';$('studioSavedSection').before(capacityNotice);}
+  capacityNotice.hidden=capacity.available>0&&!importFailure;
+  capacityNotice.textContent=importFailure||(!capacity.available?'Your notebook is full. Open a saved jem to keep working. Putting it away keeps it saved.':'');
+  if(!capacity.available){const detail=el('details');detail.append(el('summary','','Saved space'),el('p','',`${capacity.retained} of ${capacity.limit} spaces: ${capacity.active} open jems, ${capacity.archived} put-away jems and ${capacity.chapters} earlier chat pages. They all count toward saved space.`));capacityNotice.append(detail);}
+  if((!capacity.available||importFailure)&&unlisted.some(p=>!entries.some(s=>s.projectId===p.id))){const openRemixes=el('button','studio-button','Open saved remixes') as HTMLButtonElement;openRemixes.type='button';openRemixes.onclick=()=>act(openSavedIdeas);capacityNotice.append(openRemixes);}
   const next=recommendNext(entries,owner(),notebook.last(owner())?.id);$('studioContinue').replaceChildren();
   const last=next?entries.find(session=>session.id===next.sessionId):null;
   if(last&&next){
@@ -912,8 +930,10 @@ export async function installStudio(){
  }
  function start(game:GameId){
   const existing=notebook.list(owner()).find(s=>s.game===game&&s.playOnly);if(existing)return open(existing.id);
-  const p=games.create(owner(),game,`My ${names[game]}`,defaults(game,FG.store.current().remixes?.[game]||'classic'));
-  const s=notebook.create(owner(),game,p.name,p.id);notebook.update(s.id,s.owner,x=>{x.playOnly=true;});message(s,'helper','Play first. When you want to test an idea, your original game stays safe.');return open(s.id);
+  const s=saveLocalStudioProject(profileStorage(localStorage),FG,owner(),(stagedGames,stagedNotebook)=>{
+   const p=stagedGames.create(owner(),game,`My ${names[game]}`,defaults(game,FG.store.current().remixes?.[game]||'classic'));
+   return stagedNotebook.create(owner(),game,p.name,p.id,{playOnly:true,message:'Play first. When you want to test an idea, your original game stays safe.'});
+  },notifyRewardSourceSaved);return open(s.id);
  }
  function leaveCreationForStudio(){
   if(guardMath())return false;
@@ -923,7 +943,7 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
- function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
+ function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea',null,{message:'Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.'});return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
   stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
@@ -991,6 +1011,12 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&(!working||!games.history(s.projectId!,s.owner).some(r=>r.parentId===working.id)));
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
   refreshBuildAction();
+  const chatPage=notebook.conversationPage(s.id,s.owner);
+  continueChat.hidden=chatPage.available>=4;
+  const hasChatSpace=continueChat.hidden||notebook.capacity().available>0;
+  continueChat.disabled=!hasChatSpace||saving||busy(s)||!!s.pendingExperiment||!!coaching?.busy()||'pendingSubmission' in s&&!!s.pendingSubmission;
+  chatCapacity.hidden=continueChat.hidden;
+  chatCapacity.textContent=hasChatSpace?'Keep your earlier words. Continue on a new chat page.':'Your notebook is full. This chat stays saved. Open another saved jem, or ask a grown-up to export a backup.';
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
   $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?(hasIdea?'Your answer or idea':'Tell me your game idea'):'What would you like to change?';
   // The coach's saved review, not the presence of a first idea, enables Build.
@@ -1064,6 +1090,7 @@ export async function installStudio(){
  async function submit(request?:{prompt:string;displayText?:string;compiledPlan?:boolean}){
   if(guardMath())return;stopSpeech();flushDraft();const s=current(),typed=s.draft.trim(),started=epoch;
   let prompt=request?.prompt||typed||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':'');if(!prompt)return;
+  notebook.assertMessageCapacity(s.id,s.owner,reflecting?1:2);
   const consumedDraft=!request||request.compiledPlan||request.prompt.trim()===typed?s.draft:undefined;
   const clearConsumedDraft=()=>{
    if(consumedDraft===undefined)return;
@@ -1376,11 +1403,13 @@ export async function installStudio(){
  }
  async function copyGame(name:string){
   if(saving)return;const s=current(),at=epoch;if(!canChangePlay(s,at))return;saving=true;const sourceMode=FG.learning.modeFor(s.id);render();
-  try{let projectId:string|null=null,remoteId:string|null=null;
-    if(s.remoteId||showing==='candidate'&&s.candidate?.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(remoteViewedId||(showing==='candidate'?s.candidate?.remoteId:undefined)||s.remoteId!)+'/fork',{name});remoteId=r.revisionId;}
-    else if(s.projectId){const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?games.revision(s.projectId,s.owner,viewedRevisionId):null;const p=games.fork(s.owner,s.projectId,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);projectId=p.id;}
-    const saved=notebook.fork(s.id,s.owner,name,projectId,remoteId);const learner=FG.store.data.profiles.find((p:any)=>p.id===s.owner);if(learner){const before=learner.mathModes;setMode(learner,saved.id,sourceMode);if(!FG.store.save()){learner.mathModes=before;throw Error('Your separate game was saved, but its learning format could not be copied.');}}$<HTMLDialogElement>('studioCopyDialog').close();
-    if(canChangePlay(s,at)){message(saved,'helper','Saved as a separate game. Your original game is unchanged.');await open(saved.id);celebrateJem('copied','studioStatus');}
+  try{let saved:StudioSession;
+    notebook.assertCanCreate();
+    if(s.remoteId||showing==='candidate'&&s.candidate?.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(remoteViewedId||(showing==='candidate'?s.candidate?.remoteId:undefined)||s.remoteId!)+'/fork',{name});if(!canChangePlay(s,at))return;saved=notebook.fork(s.id,s.owner,name,null,r.revisionId);}
+    else if(s.projectId){saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,stagedNotebook)=>{const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?stagedGames.revision(s.projectId!,s.owner,viewedRevisionId):null;const p=stagedGames.fork(s.owner,s.projectId!,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);return stagedNotebook.fork(s.id,s.owner,name,p.id,null);},notifyRewardSourceSaved);}
+    else saved=notebook.fork(s.id,s.owner,name,null,null);
+    const learner=FG.store.data.profiles.find((p:any)=>p.id===s.owner);if(learner){const before=learner.mathModes;setMode(learner,saved.id,sourceMode);if(!FG.store.save()){learner.mathModes=before;throw Error('Your separate game was saved, but its learning format could not be copied.');}}$<HTMLDialogElement>('studioCopyDialog').close();
+    if(canChangePlay(s,at)){await open(saved.id);status('Saved as a separate game. Your original game is unchanged.');celebrateJem('copied','studioStatus');}
   }finally{saving=false;render();}
  }
  // Route all child entry points to one workspace. Legacy screens remain available without ?studio=1.
@@ -1414,12 +1443,18 @@ export async function installStudio(){
  $('studioCopy').onclick=()=>{if(guardMath())return;stopSpeech();++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;} $<HTMLInputElement>('studioCopyName').value=current().name+' copy';$<HTMLDialogElement>('studioCopyDialog').showModal();$('studioCopyName').focus();};$('studioCopyCancel').onclick=()=>$<HTMLDialogElement>('studioCopyDialog').close();$<HTMLDialogElement>('studioCopyDialog').addEventListener('close',()=>{if(route==='studio'&&!FG.learning.active)focusView($('studioCopy'));});
  $('studioCopyForm').onsubmit=e=>{e.preventDefault();act(()=>copyGame($<HTMLInputElement>('studioCopyName').value.trim()));};
  $('studioPromptForm').onsubmit=e=>{e.preventDefault();act(submit);};
+ continueChat.onclick=()=>act(()=>{
+  if(guardMath())return;
+  const s=current();if(saving||coaching?.busy())throw Error('Let this reply finish before continuing chat.');
+  flushDraft();notebook.continueConversation(s.id,s.owner);render();
+  status('Your earlier chat is saved. Keep going on this page.');focusView($('studioPrompt'));
+ });
  $('studioClearChat').onclick=()=>act(()=>{
   if(guardMath())return;
   const s=current();
   if(saving){status('Let this version finish saving before clearing chat.',true);return;}
   if(busy(s)||s.pendingExperiment){status('Finish or cancel this build before clearing chat.',true);return;}
-  if(!confirm('Clear this chat and its design notes on this device? Removing making evidence can lower your maker level and change your outfit. Your lifetime gems, saved game versions and any remote copies will remain.'))return;
+  if(!confirm('Clear this chat, its earlier pages and design notes on this device? Removing making evidence can lower your maker level and change your outfit. Your lifetime gems, saved game versions and other copies will remain.'))return;
   stopSpeech();coaching?.reset();chatOptions.open=false;
   notebook.clearConversation(s.id,s.owner);
   updateProfile();
@@ -1573,12 +1608,14 @@ export async function installStudio(){
    // leaving it behind and creating another copy on every retry.
    const listed=new Set(notebook.list(capturedOwner).map(item=>item.projectId));
    const pending=games.list(capturedOwner).find(item=>item.game==='hill'&&!listed.has(item.id)&&games.revision(item.id,capturedOwner).drawingRigId===rig.id);
-   const p=pending??games.create(capturedOwner,'hill',(source.name+' Rally').slice(0,60),defaults('hill'),rig.id);
-   const session=notebook.create(capturedOwner,'hill',p.name,p.id);
+   let projectId='';
+   const session=saveLocalStudioProject(profileStorage(localStorage),FG,capturedOwner,(stagedGames,stagedNotebook)=>{
+    const p=pending??stagedGames.create(capturedOwner,'hill',(source.name+' Rally').slice(0,60),defaults('hill'),rig.id);projectId=p.id;
+    return stagedNotebook.create(capturedOwner,'hill',p.name,p.id,{message:'Your own drawing is driving this game. Its saved movement version stays with this adventure. Try it, then decide what you want to change.'});
+   },notifyRewardSourceSaved);
    // Actual retained game revisions are authoritative for art usage. Index
    // repair is supplementary and cannot strand an already-saved game.
-   void registerArtUsage(capturedOwner,{targetId:p.id,targetKind:'game',drawingId:source.id,rigId:rig.id},()=>owner()===capturedOwner&&rewardSourceWritable()).catch(()=>{});
-   try{message(session,'helper','Your own drawing is driving this game. Its saved movement version stays with this adventure. Try it, then decide what you want to change.');}catch{/* The saved game remains available even if the optional welcome note cannot be written. */}
+   void registerArtUsage(capturedOwner,{targetId:projectId,targetKind:'game',drawingId:source.id,rigId:rig.id},()=>owner()===capturedOwner&&rewardSourceWritable()).catch(()=>{});
    await open(session.id);
   },
  });

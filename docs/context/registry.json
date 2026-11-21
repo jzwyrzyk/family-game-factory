@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:04:48.577Z",
-      "sourceDigest": "615fbbe4533b865db20d53e75bbd03e7c7736779cc32cb85524b3589ac20a5f9",
+      "reviewedAt": "2026-11-21T18:26:19.153Z",
+      "sourceDigest": "e68052c4b7446361dbff2c06962e92b909c65909b15fd19f6ac08fc45df44ca2",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the workspace continuity follow-up against immutable work, explicit Keep and backup recovery doctrine. Refreshing current storage and refusing stale source heads implements the existing promise without changing product intent, authority or retention limits.",
+      "reviewReason": "Reviewed linked chat continuation and partial capacity repair against child authorship, explicit Keep and recovery doctrine. Original words, plan provenance, game identity and existing explicit erasure semantics are preserved. The 80-item bound is retained and long-term project cleanup remains explicitly deferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -229,10 +229,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:04:57.552Z",
-      "sourceDigest": "398554c81ca9f4571972bf90b8119c579ff609d8d379a20d2c96cec6c3cc08c2",
+      "reviewedAt": "2026-11-21T18:26:19.608Z",
+      "sourceDigest": "82be299900b1cee0e1e24885f563e5086ac4adc67339f4a418eb227ffb3ab40c",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the actual Live Remix and Studio shared-storage boundary: fresh reads, in-transaction owner/revision/head checks, copied-construction source binding, conditional rollback, stable v1 migration and explicit corrupt-source replacement. Schema, namespaces and source-writer guards remain unchanged.",
+      "reviewReason": "Documented immutable linked chat pages, original-word read views, same-session identity, full-copy confirmation, truthful active/put-away/chapter capacity and staged local creation with conditional compensation. Recorded reader rollback compatibility, preflight versus reservation limits, and remaining crash/remote-copy/retention work.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -367,10 +367,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "46276557b98b0399551a4e1a57c65b7f758f45950e5d128131edce84fabd47d7",
-      "reviewedAt": "2026-11-21T05:39:47.126Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed cosmetic suppression of reward and rank popups while the creation conversation is visible. Updated rewards and joy-layer contracts: committed receipts, gems, levels and normal Play/Keep/versions celebrations remain unchanged. Final Gem Journey and delight browser checks passed.",
+      "sourceDigest": "a27f13c3351bcea2dc3f3b5a31c160cf37905c2514ca006304585a94bf371e8b",
+      "reviewedAt": "2026-11-21T18:26:20.675Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the new whole-family chapter restore test and notebook progress reads against the existing reward-source contract. Continuation retains canonical project identity and original evidence, staged creation defers notifications until both sources save, and no reward policy, amount or ledger behavior changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:04:58.394Z",
-      "sourceDigest": "fd03a7e2fb0e3c996a72f0a8cfc2d26d9c11553f00fe5abfdd24af39ee62bd2f",
+      "reviewedAt": "2026-11-21T18:26:21.103Z",
+      "sourceDigest": "bed4d694bc8b8d6b5b6e783cc75b5db0d3049f93d4d315a9759e452cc53085c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed 23 new real-adapter consistency cases/subcases and the ordinary-URL saved-collection Keep regression. Recorded 410 unit, 31 Studio and 58 rewards/backup passes plus build/typecheck; Chromium failed before page creation with denied socket creation, so browser execution remains outstanding.",
+      "reviewReason": "Recorded 18 new notebook/creation consistency tests, actual whole-family chapter restore and source-level browser regressions. Combined local unit, rewards, Studio, readiness/maker and coach suites plus build pass; Chromium again failed before page creation. Independent review found no scoped blocker and clarified the capacity preflight limitation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T18:04:58.835Z",
-      "sourceDigest": "96905cf62f96aace6f335f3c2b65a52ec8b7abc293501a7d573217d2bf77a037",
+      "reviewedAt": "2026-11-21T18:26:21.513Z",
+      "sourceDigest": "ccb72f60323a2476527343e173e5baafc780a0becbb7fa369c8586f28eba2788",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded isolated workspace-integrity preparation from main6cc9c380, actual local suite/build results and the Chromium launch blocker. The owner explicitly prohibited merging; this change performs no merge, deployment, live setting change or paid request and makes no hosted acceptance claim.",
+      "reviewReason": "Recorded the unmerged notebook branch on workspace fix1f2a2fd, actual local verification and blocked browser execution. F05 continuation is implemented; F06 remains partial with retained cleanup, crash-safe journaling and remote-copy reconciliation outstanding. No merge, deployment or live provider claim is made.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

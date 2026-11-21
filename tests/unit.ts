@@ -7,6 +7,7 @@ import './child-intent.test';
 import './game-intelligence.test';
 import './factory.test';
 import './workspace-consistency.test';
+import './notebook-capacity.test';
 import './backend-contracts.test';
 import './pipeline.test';
 import './assignment-002.test';

@@ -1,10 +1,10 @@
 /** Existing game engines, learning host and revision storage remain authoritative. */
-import { RevisionStore } from '../factory/workspace';
+import { RevisionStore, type StoragePort } from '../factory/workspace';
 import type { Mechanics, GameId } from '../runtime/types';
 /** Both generated formats use the generated revision endpoint; neither is a star catcher. */
 export function isGeneratedRemoteKind(kind: unknown): boolean { return kind === 'generated-module-v1' || kind === 'generated-module-v2'; }
 export class StudioGames {
-  constructor(private storage: Storage, private fg: any) {}
+  constructor(private storage: StoragePort, private fg: any) {}
   private store(){return new RevisionStore(this.storage);}
   list(owner:string){return this.store().list(owner);}
   create(owner:string,game:GameId,name:string,config:Mechanics,drawingRigId?:string){return this.store().create(owner,game,name,config,undefined,drawingRigId);}

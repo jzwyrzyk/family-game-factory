@@ -1,5 +1,5 @@
 import {freshDesign, PLAN_FIELDS, PLAN_LABELS,localCoach,validateCoachReply,type CoachContext,type CoachReply,type Experiment,type Origin,type PlanField,type DesignField} from './design';
-import type {StudioNotebook,StudioSession} from './notebook';
+import {ConversationCapacityError,type StudioNotebook,type StudioSession} from './notebook';
 import {familyFetch} from '../builder/session';
 import type {BuilderConfig} from '../builder/client';
 import {conversationDisposition} from './experience';
@@ -115,7 +115,7 @@ export function installCoaching(h:Hooks){
  function saveLiteralChoices(s:StudioSession,text:string,prior?:CoachContext['plan'],source:Origin='child',modelFields:readonly PlanField[]=[]){
   const expressed=explicitPlanChoices(text);if(!Object.keys(expressed).length)return;
   const correction=isExplicitPlanRevision(text);
-  h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();let changed=false;const accepted=creationPlan(x);for(const key of PLAN_FIELDS){
+  h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();let changed=false;const accepted=creationPlan(h.notebook.withConversation(x));for(const key of PLAN_FIELDS){
    const current=x.design.plan[key],unchanged=prior===undefined||JSON.stringify(current)===JSON.stringify(prior[key]);
    if(expressed[key]&&!modelFields.includes(key)&&unchanged&&(correction||!accepted[key]?.accepted||current?.delegated)){x.design.plan[key]={...expressed[key]!,origin:source};changed=true;}
   }if(changed)x.design.approvedPlan=false;});
@@ -166,14 +166,14 @@ export function installCoaching(h:Hooks){
    for(const d of reply.childDecisions||[]){
     const previous=s.design.plan[d.field],unchanged=!turn||JSON.stringify(previous)===JSON.stringify(turn.prior[d.field]);
     const correction=!!turn&&isExplicitPlanRevision(turn.text)&&turn.text.includes(d.quote);
-    if(unchanged&&(!creationPlan(s)[d.field]?.accepted||previous?.delegated||correction)){
+    if(unchanged&&(!creationPlan(h.notebook.withConversation(s))[d.field]?.accepted||previous?.delegated||correction)){
      s.design.plan[d.field]={value:d.quote,origin:turn?.text.includes(d.quote)?turn.origin:sourceOf(s,d.quote),accepted:true,delegated:false};changed=true;
     }
    }
    for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:false};changed=true;}}
    // Remember only turns fully represented by a saved field. A later revision
    // may replace that answer without reviving it as an unrelated extra rule.
-   for(const message of s.messages){
+   for(const message of h.notebook.withConversation(s).messages){
     if(message.role!=='child'||!Object.values(s.design.plan).some(choice=>choice?.accepted&&!choice.delegated&&choice.value.trim()===message.text.trim()))continue;
     const id='plan-answer:'+message.id;
     if(!s.design.ideas.some(idea=>idea.id===id))s.design.ideas.push({id,text:message.text.slice(0,1000),origin:sourceOf(s,message.text),adopted:true});
@@ -183,7 +183,7 @@ export function installCoaching(h:Hooks){
    }
    if(changed)s.design.approvedPlan=false;
    if(mode==='model'&&turn?.reviewCurrent&&isNewIdea(s)&&reply.creationReadiness){
-    try{s.design.creationReview=recordCreationReview(s,reply.creationReadiness);}catch{delete s.design.creationReview;reviewUnavailable=true;}
+    try{s.design.creationReview=recordCreationReview(h.notebook.withConversation(s),reply.creationReadiness);}catch{delete s.design.creationReview;reviewUnavailable=true;}
    }
   });
   h.onSavedDesignChange?.(before,h.notebook.get(captured.id,captured.owner));
@@ -208,6 +208,9 @@ export function installCoaching(h:Hooks){
    const submittedOrigin=sourceOf(captured,text);
    // Stop/play are immediate child requests, never interpreted as build consent.
    const disposition=conversationDisposition(text);
+   // A child turn plus text, suggestions and a question may take four slots.
+   // Check room before any paid request or partial conversation update.
+   h.notebook.assertMessageCapacity(captured.id,captured.owner,disposition!=='continue'&&!reviewOnly?2:reviewOnly?3:4);
    if(disposition!=='continue'&&!reviewOnly){
     if((window as any).FG?.learning?.active){h.status('Finish the current learning activity before leaving the conversation.');return;}
     cancelDiscussion();
@@ -277,7 +280,7 @@ export function installCoaching(h:Hooks){
    // The model may understand an indirect wish to play that did not match our
    // narrow immediate-skip vocabulary. Navigating back is not a build action.
    if(reply.move==='play'&&captured.game!=='new'&&(captured.projectId||captured.remoteId||captured.candidate))await h.playMain();
-  }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent='Your reply could not be saved. Your draft is still here.';report(error,captured);}}
+  }catch(error){if(captured&&isCurrent(captured)&&(!seq||seq===generation)){$('coachModeStatus').textContent=error instanceof ConversationCapacityError?'Your draft is still here. Continue chat to make room.':'Your reply could not be saved. Your draft is still here.';report(error,captured);}}
   finally{if(seq&&seq===generation){thinking=false;$('coachModeStatus').classList.remove('is-thinking');if(controller===turn)controller=null;renderPlan();h.render();}}
  }
  async function intercept(prompt:string,explicitTry=false):Promise<boolean>{
@@ -322,5 +325,5 @@ export function installCoaching(h:Hooks){
   $<HTMLInputElement>('designPrediction').value=s.hypothesis;$<HTMLSelectElement>('coachSupport').value=s.design?.support||'balanced';$<HTMLInputElement>('coachFriction').value=s.design?.friction||'';
   renderPlan(true);
  }
- return {intercept,buildPrompt,buildReadiness,canReassess,reassess,details,renderShelf,renderPlan,flushDrafts,openSession,discuss,tryPreset:(prompt:string)=>request(prompt,'helper','tune'),reset:()=>{cancelDiscussion();cancelRequest();helperFields.clear();pendingFields.clear();reviewUnavailable=false;},afterOutcome:(text:string,testId:string|null)=>{const s=h.current();h.notebook.observe(s.id,s.owner,text,'runtime',testId);},pauseReflection:()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;});}};
+ return {intercept,buildPrompt,buildReadiness,canReassess,reassess,details,renderShelf,renderPlan,flushDrafts,openSession,discuss,busy:()=>thinking||requestInFlight,tryPreset:(prompt:string)=>request(prompt,'helper','tune'),reset:()=>{cancelDiscussion();cancelRequest();helperFields.clear();pendingFields.clear();reviewUnavailable=false;},afterOutcome:(text:string,testId:string|null)=>{const s=h.current();h.notebook.observe(s.id,s.owner,text,'runtime',testId);},pauseReflection:()=>{const s=h.current();h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.paused=true;});}};
 }
