@@ -56,6 +56,21 @@ export function normalizeSpec(spec) {
   return result;
 }
 
+export function sameTemplateAndRevision(templateSpec, revisionSpec) {
+  const template = normalizeSpec(templateSpec);
+  const revision = normalizeSpec(revisionSpec);
+  // Observed on the reconciled single-container production gateway: the
+  // template omits the optional name and Cloud Run's revision supplies it.
+  // Explicit template names and revision-to-revision names remain strict.
+  const generatedName = revision.containers[0].name;
+  if (!Object.hasOwn(template.containers[0], 'name') &&
+      typeof generatedName === 'string' &&
+      /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(generatedName)) {
+    delete revision.containers[0].name;
+  }
+  return same(template, revision);
+}
+
 export function runtimeAnnotations(metadata) {
   const ignored = new Set(['run.googleapis.com/client-name',
     'run.googleapis.com/client-version', 'run.googleapis.com/operation-id']);
@@ -129,7 +144,7 @@ export async function repair({apply = false, cloud, transport = fetch, report = 
       ['FACTORY_ACTIONS_APPROVED','FACTORY_ADULT_PILOT_MODE',
         'FACTORY_ADULT_PILOT_OWNER_APPROVED','FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED']
         .every(k => env[k] === 'true'), 'ADULT_RUNTIME_UNEXPECTED');
-    ensure(same(normalizeSpec(original.spec.template.spec), normalizeSpec(oldRevision.spec)),
+    ensure(sameTemplateAndRevision(original.spec.template.spec, oldRevision.spec),
       'SERVICE_TEMPLATE_DRIFT');
     emit('PREVIOUS_REVISION',previous);
     emit('PREVIOUS_CONFIG_VERSION',oldBinding.version);

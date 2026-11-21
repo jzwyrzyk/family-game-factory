@@ -6,6 +6,10 @@ The owner-run diagnostic on November 21, 2026 authenticated the gateway's existi
 
 This is configuration evidence, not a successful generation receipt. The reviewed public application remains `b472c224f7e8ef8ab0986ce6f755728d7cc63d46`; private worker main/tag remain `52729ad231179d633b2f15fa910aa2b23273a2d6`. The fix does not edit either application or worker source.
 
+### Initial repair preflight correction
+
+The first repair at `e116a2673bf5f42eaeee57aa6826cf89a3115b29` stopped with `SERVICE_TEMPLATE_DRIFT` before cloud writes. The owner's subsequent read-only comparison established that `factory-gateway-00011-vdf` was Ready and the service generation was fully reconciled. The only normalized specification difference was `containers[0].name`: absent from the service template, present on the serving revision. The helper now accepts only this omitted-name versus valid DNS-label representation for the single-container template-to-revision comparison. Explicit template names, all other settings, and subsequent old/new revision names remain strictly compared. Tests reproduce this observed API shape and reject explicit renames and unrelated setting changes. This correction is not evidence of a completed repair.
+
 ## Targeted repair
 
 `scripts/deployment/repair_github_installation.mjs` reads the actual 100% serving revision and its consumed numeric config/key secret versions. It copies the complete live private config and changes only `githubInstallationId` to the repository-verified installation. Before cloud writes, it verifies the installation, repository-scoped token issuance, active worker workflow and exact token-visible main/tag pins.

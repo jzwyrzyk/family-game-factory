@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {generateKeyPairSync} from 'node:crypto';
-import {binding, normalizeSpec, repairedConfig, repair, PROJECT, SERVICE,
+import {binding, normalizeSpec, sameTemplateAndRevision, repairedConfig, repair, PROJECT, SERVICE,
   ORIGIN, CONFIG_FILE, CONFIG_SECRET, REPO, PIN, INSTALLATION} from './repair_github_installation.mjs';
 
 const OLD = SERVICE+'-old';
@@ -41,11 +41,14 @@ function harness(options={}) {
     'autoscaling.knative.dev/maxScale':'1', 'run.googleapis.com/client-name':'old-cli'};
   const oldRevision={metadata:{name:OLD,annotations:copy(annotations)},spec:spec(),
     status:{conditions:[{type:'Ready',status:'True'}],imageDigest:'sha256:'+'a'.repeat(64)}};
+  oldRevision.spec.containers[0].name='gateway-1';
   const revisions=new Map([[OLD,oldRevision]]);
   let service={metadata:{resourceVersion:'1',annotations:{'run.googleapis.com/ingress':'all'}},
     spec:{template:{metadata:{annotations:copy(annotations)},spec:copy(oldRevision.spec)}},
     status:{url:ORIGIN,latestCreatedRevisionName:OLD,latestReadyRevisionName:OLD,
       traffic:[{revisionName:OLD,percent:100}]}};
+  // Cloud Run materializes a name on the revision although the template omits it.
+  delete service.spec.template.spec.containers[0].name;
   let stagedName;
   const json = value => JSON.stringify(value);
   function cloud(args,input) {
@@ -77,11 +80,14 @@ function harness(options={}) {
       staged.metadata.name=stagedName;
       staged.metadata.annotations['run.googleapis.com/client-name']='new-cli';
       staged.spec=spec('8','config-new-name');
+      staged.spec.containers[0].name='gateway-1';
       if(options.drift==='env') staged.spec.containers[0].env[1].value='false';
       if(options.drift==='key') staged.spec.volumes.find(v=>v.name==='key-mount').secret.items[0].key='4';
       if(options.drift==='image') staged.spec.containers[0].image='example.test/changed@sha256:'+'b'.repeat(64);
+      if(options.drift==='name') staged.spec.containers[0].name='unrelated-renamed-container';
       revisions.set(stagedName,staged);
       service.spec.template.spec=copy(staged.spec);
+      delete service.spec.template.spec.containers[0].name;
       service.spec.template.metadata.annotations=copy(staged.metadata.annotations);
       service.metadata.resourceVersion='2';
       service.status.latestCreatedRevisionName=stagedName;
@@ -153,6 +159,34 @@ test('normalization permits config mount churn while retaining unrelated credent
   assert.notDeepEqual(normalizeSpec(before),normalizeSpec(env));
 });
 
+test('template comparison accepts only the valid name materialized on a previously unnamed container',()=>{
+  const template=spec(),revision=copy(template);
+  revision.containers[0].name='gateway-1';
+  assert.equal(sameTemplateAndRevision(template,revision),true);
+  assert.equal(sameTemplateAndRevision(template,template),true);
+  assert.equal(Object.hasOwn(template.containers[0],'name'),false);
+  assert.notDeepEqual(normalizeSpec(template),normalizeSpec(revision));
+  const explicit=copy(template); explicit.containers[0].name='gateway-1';
+  assert.equal(sameTemplateAndRevision(explicit,revision),true);
+  explicit.containers[0].name='operator-selected-name';
+  assert.equal(sameTemplateAndRevision(explicit,revision),false);
+  assert.equal(sameTemplateAndRevision(explicit,template),false);
+});
+
+test('template comparison rejects malformed generated names and unrelated runtime drift',()=>{
+  const template=spec();
+  for(const name of ['',null,42,'Gateway','bad_name','-gateway','gateway-','a'.repeat(64)]) {
+    const revision=copy(template); revision.containers[0].name=name;
+    assert.equal(sameTemplateAndRevision(template,revision),false,String(name));
+  }
+  for(const drift of ['env','image']) {
+    const revision=copy(template); revision.containers[0].name='gateway-1';
+    if(drift==='env') revision.containers[0].env[1].value='false';
+    else revision.containers[0].image='example.test/other@sha256:'+'b'.repeat(64);
+    assert.equal(sameTemplateAndRevision(template,revision),false,drift);
+  }
+});
+
 test('default plan verifies corrected credentials without cloud writes or game dispatch',async()=>{
   const h=harness(); await repair(h);
   assert.deepEqual(h.writes,[]);
@@ -178,8 +212,8 @@ test('successful repair stages without traffic, preserves all config, then promo
     assert.ok(!h.lines.join('\n').includes(secret));
 });
 
-test('staged environment, signing-key, or image drift stops before promotion',async()=>{
-  for(const drift of ['env','key','image']) {
+test('staged environment, signing-key, image, or explicit container-name drift stops before promotion',async()=>{
+  for(const drift of ['env','key','image','name']) {
     const h=harness({drift});
     await assert.rejects(repair({...h,apply:true}),{code:'REPAIR_STOPPED'});
     assert.deepEqual(h.writes,['secret-add','stage']);
