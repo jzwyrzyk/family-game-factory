@@ -23,14 +23,51 @@ export interface ActionExecution {
  candidate?:CandidateArtifact;qualityEvidence?:GameQualityEvidence;diagnostics?:string;repairCategory?:RepairCategory;
  claimAt?:number;generateReport?:string;testReport?:string;reviewReport?:string;
  lastFailure?:ActionFailure;
+ /** Fixed phase deadlines advance only on authenticated work transitions. */
+ lease?:{phase:'queued'|WorkerStage|'provisioning'|'review-queued';expiresAt:number};
+ deadlineAt?:number;
 }
 const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_REQUIRED','SPENDING_CUTOFF','INPUT_TOKEN_LIMIT',
  'GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','IMAGE_APPROVAL_REQUIRED','IMAGE_ALLOWANCE_EXCEEDED',
  'IMAGE_PROVIDER_RATE_LIMIT','IMAGE_PROVIDER_FAILED','QUALITY_REVIEW_REQUIRED'];
+const WORKFLOW_STAGE_MS=12*60*1000,WORKFLOW_PREPARE_MS=18*60*1000,MAX_ATTEMPTS=3;
 
 export class ActionCoordinator {
  constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false){}
- async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution)j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};return true;});}
+ private get stageMs(){return Math.min(this.leaseMs,WORKFLOW_STAGE_MS);}
+ private get testHandoffMs(){return Math.min(2*this.leaseMs,WORKFLOW_PREPARE_MS+WORKFLOW_STAGE_MS);}
+ private initializeLease(s:PipelineState,j:Job){
+  const e=j.execution!;
+  // Legacy rows have no phase timestamp for an accepted report. Their original
+  // claim bounds the whole handoff; reading a row never gives it a fresh lease.
+  const timestamps=[e.queuedAt,e.claimAt,Date.parse(s.audit.find(a=>a.jobId===j.id)?.at||'')].filter((at):at is number=>typeof at==='number'&&Number.isFinite(at));
+  const anchor=timestamps.length?Math.min(...timestamps):0;
+  // Queue + generation + preparation/test + review, at most three attempts.
+  // Test/review claims share the preceding handoff deadline instead of adding
+  // another full job allowance after setup has already consumed that time.
+  e.deadlineAt??=anchor+MAX_ATTEMPTS*(this.leaseMs+2*this.stageMs+this.testHandoffMs);
+  if(e.lease)return;
+  const claim=e.claimAt??anchor;
+  if(!e.runId)e.lease={phase:'queued',expiresAt:(e.queuedAt??anchor)+this.leaseMs};
+  else if(e.stage==='generate'&&e.generateReport)e.lease={phase:'provisioning',expiresAt:claim+this.stageMs+this.testHandoffMs};
+  else if(e.stage==='test'&&e.testReport&&j.phase==='reviewing')e.lease={phase:'review-queued',expiresAt:claim+2*this.stageMs};
+  else e.lease={phase:e.stage||'generate',expiresAt:claim+this.stageMs};
+  e.lease.expiresAt=Math.min(e.lease.expiresAt,e.deadlineAt);
+ }
+ private advanceLease(j:Job,phase:NonNullable<ActionExecution['lease']>['phase']){
+  const e=j.execution!;
+  // The private workflow allows 18 minutes to provision and 12 minutes for test
+  // setup/execution. Keep that handoff separate from time spent generating.
+  const sharesHandoff=phase==='test'&&e.lease?.phase==='provisioning'||phase==='review'&&e.lease?.phase==='review-queued';
+  const duration=phase==='queued'?this.leaseMs:phase==='provisioning'?this.testHandoffMs:this.stageMs;
+  e.lease={phase,expiresAt:Math.min(Date.now()+duration,sharesHandoff?e.lease!.expiresAt:Infinity,e.deadlineAt!)};
+ }
+ private leaseError(s:PipelineState,j:Job):string|undefined {
+  this.initializeLease(s,j);const e=j.execution!;
+  if(Date.now()>=e.deadlineAt!)return 'WORKER_LEASE_EXPIRED';
+  if(Date.now()>=e.lease!.expiresAt)return e.lease!.phase==='queued'?'WORKER_QUEUE_EXPIRED':'WORKER_LEASE_EXPIRED';
+ }
+ async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution){j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};this.initializeLease(s,j);}return true;});}
  private permissionError(s:PipelineState,j:Job):string|undefined {
   if(this.requireVerifiedParentPrivacy&&!verifiedParentScope(s,j.familyId,'generation'))return 'GUARDIAN_CONSENT_REQUIRED';
   if((this.adultPilotMode||j.adultPilotDeviceId||j.adultPilotSessionId||j.adultPilotProfileId)&&
@@ -48,7 +85,7 @@ export class ActionCoordinator {
   return {gameManifest:{id:j.gameId,allowedMechanics:['generated-module-v1','generated-module-v2']},
    baseRevision:{id:base?.id||'new',game:base?.game||undefined,config:base?.config,sourceGame:base?.sourceGame,projectId:base?.projectId},
    childIntent:j.prompt,allowedCapabilities:['generated-module-v1','generated-module-v2'],
-   budget:{maxUnits:j.maxUnits-j.usedUnits,timeoutMs:600000}};
+   budget:{maxUnits:j.maxUnits-j.usedUnits,timeoutMs:Math.min(600000,Math.max(1,(j.execution?.lease?.expiresAt??Date.now()+600000)-Date.now()))}};
  }
  private ready(s:PipelineState,j:Job,game:GeneratedGame){
   // Review cannot publish under a replacement unlock or a consent/grant that
@@ -72,6 +109,7 @@ export class ActionCoordinator {
   if(e.attempt>=2){this.failure(s,j,safeFinalRepairCode(diagnostics,j.independentIntentPlan));return;}
   e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.reviewReport=undefined;
   e.claimAt=undefined;e.dispatchedAt=undefined;e.dispatchPending=true;e.diagnostics=safe.feedback;e.repairCategory=safe.category;
+  this.advanceLease(j,'queued');
   // Retain rejected candidate evidence for a targeted private repair. A new
   // candidate report discards the old screenshots; they never enter a revision.
   j.status='building';j.phase='repairing';
@@ -85,8 +123,7 @@ export class ActionCoordinator {
     const e=j.execution;if(!e||['ready','failed','cancelled'].includes(j.status))continue;
     if(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled){this.failure(s,j,'OWNER_APPROVAL_REQUIRED');continue;}
     const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);continue;}
-    if(!e.runId&&e.queuedAt&&Date.now()-e.queuedAt>this.leaseMs){this.failure(s,j,'WORKER_QUEUE_EXPIRED');continue;}
-    if(e.claimAt&&Date.now()-e.claimAt>this.leaseMs){this.failure(s,j,'WORKER_LEASE_EXPIRED');continue;}
+    const expired=this.leaseError(s,j);if(expired){this.failure(s,j,expired);continue;}
     if(e.dispatchPending&&(!e.dispatchedAt||Date.now()-e.dispatchedAt>30000)){
      e.dispatchPending=false;e.dispatchedAt=Date.now();ids.push({id:j.id,attempt:e.attempt});
     }else if(!e.runId&&e.dispatchedAt&&Date.now()-e.dispatchedAt>60000)e.dispatchPending=true;
@@ -101,11 +138,13 @@ export class ActionCoordinator {
    const j=s.jobs.find(x=>x.id===id),e=j?.execution;
    if(identity.stage!==stage||!j||!e||e.attempt!==attempt||['ready','failed','cancelled'].includes(j.status)||e.runId&&e.runId!==identity.runId)throw Error('WORKER_CLAIM_REJECTED');
    const denied=this.permissionError(s,j);if(denied)throw Error(denied);
+   const expired=this.leaseError(s,j);if(expired)throw Error(expired);
    applyCurrentQualityPolicy(j,s.revisions.find(r=>r.id===j.baseRevisionId)?.game);
    if(stage==='generate'){
     if(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled)throw Error('OWNER_APPROVAL_REQUIRED');
     if(e.stage||!['queued','building'].includes(j.status))throw Error('WORKER_CLAIM_REJECTED');
     e.runId=identity.runId;e.stage=stage;e.claimAt=Date.now();j.status='building';j.phase=attempt?'repairing':'generating';j.attempts=attempt+1;
+    this.advanceLease(j,stage);
     s.audit.push({jobId:id,familyId:j.familyId,status:'building',at:new Date().toISOString()});
     return {input:this.input(s,j),approval:this.approval,previous:e.candidate?.game,diagnostics:e.diagnostics,qualityEvidence:e.qualityEvidence,independentIntentPlan:undefined};
    }
@@ -114,6 +153,7 @@ export class ActionCoordinator {
     if(!j.qualityRequired||j.status!=='testing'||j.phase!=='reviewing'||e.stage!=='test'||!e.testReport||!isGeneratedGame(e.candidate?.game)||!e.qualityEvidence)throw Error('WORKER_CLAIM_REJECTED');
     const game=e.candidate.game,evidence=validateQualityEvidence(game,e.qualityEvidence);
     requireProductionCandidate(j,game);e.stage=stage;e.claimAt=Date.now();
+    this.advanceLease(j,stage);
     const denied=this.permissionError(s,j);if(denied)throw Error(denied);
     return {input:this.input(s,j),approval:this.approval,game,qualityEvidence:evidence,independentIntentPlan:undefined};
    }
@@ -126,6 +166,7 @@ export class ActionCoordinator {
     independentIntentPlan=validateFunctionalGameContract(j.independentIntentPlan,intent,chooseGameForm(intent));
    }
    e.stage=stage;e.claimAt=Date.now();
+   this.advanceLease(j,stage);
    return {game:e.candidate.game,captureQuality:!!j.qualityRequired,...(independentIntentPlan?{independentIntentPlan}:{})};
   });
  }
@@ -142,7 +183,10 @@ export class ActionCoordinator {
    if(!existing&&(terminal||e.stage!==stage))throw Error('WORKER_REPORT_REJECTED');
    // An idempotent receipt cannot keep a still-pending review alive after its
    // original grant is lost. Terminal receipts remain harmless acknowledgments.
-   if(!terminal){const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);return receipt();}}
+   if(!terminal){
+    const denied=this.permissionError(s,j)||(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled?'OWNER_APPROVAL_REQUIRED':undefined)||this.leaseError(s,j);
+    if(denied){this.failure(s,j,denied);return receipt();}
+   }
    if(existing)return receipt();
    if(stage==='generate'||stage==='review'){
     if(!report||report.errorCode){
@@ -156,6 +200,7 @@ export class ActionCoordinator {
     requireProductionCandidate(j,game);
     j.usedUnits+=report.usageUnits;e.candidate={format:'generated-source-v1',game};delete e.qualityEvidence;
     e.generateReport=fingerprint;j.status='testing';j.phase='testing';
+    this.advanceLease(j,'provisioning');
     s.audit.push({jobId:id,familyId:j.familyId,status:'testing',at:new Date().toISOString()});return receipt();
    }
    if(stage==='review'){
@@ -173,13 +218,19 @@ export class ActionCoordinator {
     if(j.qualityRequired){
      const evidence=validateQualityEvidence(game,report.qualityEvidence);
      e.candidate={format:'generated-source-v1',game};e.qualityEvidence=evidence;e.testReport=fingerprint;j.phase='reviewing';
+     this.advanceLease(j,'review-queued');
     }else{e.testReport=fingerprint;this.ready(s,j,game);}
    }else this.repair(s,j,'test',report?.diagnostics);
    return receipt();
   });
  }
  async status(id:string,identity:WorkerIdentity){
-  const j=(await this.repo.snapshot()).jobs.find(x=>x.id===id);
-  if(!j||j.execution?.runId!==identity.runId)throw Error('WORKER_FORBIDDEN');return {status:j.status,phase:j.phase};
+  const s=await this.repo.snapshot(),j=s.jobs.find(x=>x.id===id);
+  if(!j||j.execution?.runId!==identity.runId)throw Error('WORKER_FORBIDDEN');
+  if(!['ready','failed','cancelled'].includes(j.status)){
+   const denied=this.permissionError(s,j)||(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled?'OWNER_APPROVAL_REQUIRED':undefined)||this.leaseError(s,j);
+   if(denied)return {status:'failed',phase:'failed'};
+  }
+  return {status:j.status,phase:j.phase};
  }
 }

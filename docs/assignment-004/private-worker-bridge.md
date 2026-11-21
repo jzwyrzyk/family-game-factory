@@ -46,6 +46,27 @@ Owner can use `scripts/deployment/private_worker_config.py --input /secure/old.j
 - GCP: update Workload Identity Federation trust conditions (only when separately authorized) to organization owner ID `357047835`, repo ID `1458899834`, exact trusted `workflow_ref@refs/heads/main`, `factory-infrastructure` environment and reviewed private SHA. No new credentials or VM provisioned by PRs.
 - Future owner-authorized redeployment: update the **existing gateway only** using owner-reviewed immutable image and new private secret version, preserving Cloud Run hostname, service account, request/instance controls, current preview, Firestore workspace and signing secrets. No deployment or configuration change performed here.
 
+## Bounded workflow leases
+
+The coordinator now records deadlines separately from `claimAt`. Previously a valid generation report left generation's 15-minute clock running while infrastructure was provisioned, so 9 minutes generating followed by 7 minutes preparing could expire before test claimed its work. The accepted generation report now enters a bounded preparation/test handoff.
+
+The default budgets reflect the reviewed private workflow's 12-minute generation, 18-minute preparation, 12-minute test and 12-minute review job limits:
+
+| Boundary | Maximum coordinator window | What advances it |
+| --- | --- | --- |
+| Dispatch queue | 15 minutes | Initial enqueue or one of the two permitted repairs |
+| Generation | 12 minutes | Authenticated generation claim |
+| Preparation and test handoff | 30 minutes total | Validated generation report |
+| Test execution | At most 12 minutes, also bounded by the existing 30-minute handoff deadline | Authenticated test claim |
+| Review handoff and execution | 12 minutes total | Validated successful test report; review claim retains that same deadline |
+| Whole job, including repairs | 207 minutes: `(15 + 12 + 30 + 12) × 3` | Fixed once; never extended by repair or worker traffic |
+
+The job-wide number is an outer bound, not a target wait. A missed phase deadline, lost grant, disabled paid approval or cancellation can stop work earlier. Existing shorter coordinator lease configuration shortens these windows. Provider input timeout is also capped by the current deadline. A late claim cannot create a new lease, and a late new report cannot publish a candidate. Status reads and duplicate reports never extend time, consent or spending authority. The scheduler settles expired jobs using the existing conservative reservation policy; status can tell an active worker to stop immediately without scheduling or writing from a read.
+
+Persisted executions without the new deadline fields remain readable. Migration derives an absolute deadline from the earliest stored queue/claim/audit time. Because old rows did not record report acceptance time, a pending test handoff is conservatively bounded from the old generation claim plus generation and handoff budgets; it does not restart at migration or polling time.
+
+`tests/worker-lifecycle.test.ts` uses a synthetic clock and synthetic game/evidence fixtures to verify slow valid work, shared setup budgets, non-renewing polls/reports, late callbacks, repair/global limits and legacy migration. It makes no paid calls and proves no live latency or deployment acceptance. This source change does not alter the private workflow, its approved SHA, the public source pin or any live configuration. The coordinator change can serve the existing callback shape; activating revised worker code still requires the separately reviewed cross-repository release process.
+
 ## Security evidence and limits
 
 Public CI includes branch/tag-drift and strict organization OIDC negative tests, plus existing child's desktop/mobile mocked creation, repair, play, keep, undo and fork journeys. Private PR supplies `scripts/runner/verify_group_policy.py`: read-only query of actual organization runner-group and selected-repository access; offline tests reject extra repositories, extra workflows, public access and tag-ref substitutions.
