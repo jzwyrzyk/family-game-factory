@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewedAt": "2026-11-21T19:01:23.610Z",
+      "sourceDigest": "2bbe73ab114feef4c596671b449b114cb9e8ea9df3333fd119a2e633ad766cc8",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the page-local portrait reuse and documented failure recovery against the existing companion doctrine. This removes repeated image work without changing approved identities/forms, ownership, growth, engagement rules, child choice or native-decoding readiness; explicit retry and honest unavailable feedback remain required.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -617,10 +617,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:21:40.814Z",
-      "sourceDigest": "89303ef5f921f6b68779ffa931f1f45b9e4de0457b91f2e8b434ad4ed4b1b92e",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Added bounded passive Pal-image failure tracing after repeated hosted decode failures. Reviewed exact original Promise and error preservation, one native invocation, no new retries/refetches/waits/assertion changes, allowed-field filtering and current-document limits. Three focused attempts and the full creative Pal step passed on the separate probe; timing effects mean no product repair is claimed.",
+      "reviewedAt": "2026-11-21T19:01:24.165Z",
+      "sourceDigest": "6bb01be7bf23848c3693e57e34fc535e3a0967ec568098ab83cdd714a1108345",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the measured 1097-decode/210-pending trace and its unknown native cause separately from the prepared workload correction. Extended the actual browser fixture for retained image/source identity, ready-hero decode counts, retired load/native callbacks, owner/form/reset/dispose isolation and focused retry. Strengthened the integrated native assertion with current connected visible identity and added a pre-reload scalar checkpoint; local build and 65 existing tests passed, new hosted browser assertions remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -698,10 +698,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T18:21:42.958Z",
-      "sourceDigest": "cb88e86fb835c6d7b64bb729e5b4482ed0e2bbfcda10e8bae8d65acb4389135f",
+      "reviewedAt": "2026-11-21T19:01:24.665Z",
+      "sourceDigest": "40632ad55db4acd3e37047e8ed67f9cd48145aa07260281805292a8336f227cd",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained the intermittent Pal failure evidence and added the scoped diagnostic follow-up during access preparation. Original access implementation and its79deployment/74operations results are unchanged. The test tracer is bounded and preserves native results; the separate diagnostic workflow is not included. Exact-head CI remains required, the cause is unresolved, both PRs remain drafts and no account activation/merge is claimed.",
+      "reviewReason": "Added a scoped preparation receipt for current-page portrait workload correction, local build and 65 existing non-browser Pal passes, asset/catalog checks and unexecuted hosted browser gates. The native decoder cause remains unknown; this source work claims no browser repair, merge, deployment, permission grant, provider action or CI rerun.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -955,10 +955,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4943660550545f439dbbaefc38baafccff37efe4c8a8fa706f005eacda216700",
-      "reviewedAt": "2026-11-21T14:33:43.324Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Bound all 24 approved profiles in the canonical index, retained art approvals and historical references, excluded Brio review expressions and documented exact immutable manifest plus byte-identical supplemental neutrals."
+      "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
+      "reviewedAt": "2026-11-21T19:01:25.124Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the loading-contract update: approved character references, exact Base/Grown image bytes, expression bindings, art approvals and scene asset versions are unchanged. The page reuses current presentation nodes and retires callbacks; no visual redesign, substitute artwork or new form is introduced."
     },
     {
       "id": "art-studio",
@@ -1015,10 +1015,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "9534c50430eb8b08e1a80d414b621664855d37c1840edd5b1e4c4ea21feb8133",
-      "reviewedAt": "2026-11-21T18:21:41.306Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the unchanged Pal collection, growth, profile, expression and native image-decoding contracts. Only test-side bounded lifecycle diagnostics and version/count evidence were added; no artwork, runtime source, interaction or success criterion changed. Repeated hosted failures and subsequent instrumented passes remain distinct evidence in the delivery ledger."
+      "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
+      "reviewedAt": "2026-11-21T19:01:26.034Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented bounded owner/surface/Pal/form reuse, unchanged-URL state retention, request retirement and the inability to cancel an active native decode. Reviewed fresh-container retry listeners, focused in-progress retry, unready-owner/dispose cleanup and actual-browser regressions. Explicit same-image detail recovery remains native; gallery failures do not silently retry on ordinary refresh or hide/show, and hosted acceptance is pending."
     }
   ]
 }

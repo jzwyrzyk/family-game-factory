@@ -285,6 +285,7 @@ async function installReceiptFixture(page) {
   const base = `http://127.0.0.1:${server.address().port}/arcade/`;
   const allowedPalUrls = new Set([...palArtworkPaths].map(value => new URL(value, base).href));
   let browser, page, phase = 'opening the integrated app';
+  let responsiveImageDecodeSummary = null;
   const checks = [], errors = [], consoleErrors = [], paidRequests = [], fixtures = [], expressionRequests = [];
   const imageNetwork = [];
   const recordImageNetwork = entry => { imageNetwork.push(entry); if (imageNetwork.length > 160) imageNetwork.shift(); };
@@ -555,7 +556,20 @@ async function installReceiptFixture(page) {
     mark('explicit receipt fixtures verify 50/150 gem collection, Base/Grown growth with no third form, no spending and no replay on equip');
 
     phase = 'responsive integrated collection and owned-Pal picker';
-    await page.locator('.pals-hero-portrait img').evaluate(image => image.decode());
+    const decodedHero = await page.locator('.pals-hero-portrait img').evaluate(async image => {
+      const expected = document.querySelector('.pals-hero-portrait img'), source = image.src;
+      await image.decode();
+      return { sameImage: image === expected && image === document.querySelector('.pals-hero-portrait img'),
+        connected: image.isConnected, sameSource: image.src === source && image.currentSrc === source,
+        visible: !image.hidden && image.getClientRects().length > 0 && getComputedStyle(image).visibility !== 'hidden' };
+    });
+    assert.deepEqual(decodedHero, { sameImage: true, connected: true, sameSource: true, visible: true }, 'Native decode must succeed for the same current, connected, visible hero and source');
+    responsiveImageDecodeSummary = await page.evaluate(phase => {
+      const history = window.__readPalImageHistory?.();
+      return history ? { phase, pendingDecodes: history.pendingDecodes, peakPendingDecodes: history.peakPendingDecodes,
+        decodeTotals: history.decodeTotals, dropped: history.dropped, diagnosticErrors: history.diagnosticErrors,
+        scope: history.scope } : { phase, unavailable: true };
+    }, phase).catch(() => ({ phase, unavailable: true }));
     await page.screenshot({ path: path.join(outputs, 'pals-app-fixture-desktop.png'), fullPage: true });
     for (const width of [1440, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 1000 }); await noOverflow(page, `${width}px My Pals`);
@@ -601,6 +615,7 @@ async function installReceiptFixture(page) {
     fs.writeFileSync(path.join(outputs, 'pals-app-results.json'), JSON.stringify({
       scope: 'Production application UI; higher unlock/stage states are explicitly synthetic trusted-source receipt fixtures.',
       browserVersion: browser.version(), playwrightVersion,
+      responsiveImageDecodeSummary,
       imageDecodeSummary: await page.evaluate(() => {
         const history = window.__readPalImageHistory?.();
         return history ? { pendingDecodes: history.pendingDecodes, peakPendingDecodes: history.peakPendingDecodes,
