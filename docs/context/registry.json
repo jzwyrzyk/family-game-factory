@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:04:40.239Z",
-      "sourceDigest": "dc7fcd4c52d8420dbc761b03ff367bb69a139626200087be7d190bf6b6487a5a",
+      "reviewedAt": "2026-11-21T19:43:59.746Z",
+      "sourceDigest": "5fd2ff6f7a8fb7ca4e6df5ed7089cfac005ea70cf53dee915547c8aedbea0810",
       "reviewOutcome": "updated",
-      "reviewReason": "Added loopback failure-stage and redaction assertions, unchanged-response and no-retry coverage, reporter failure isolation, and serving-revision inspector tests; recorded synthetic/live evidence boundaries.",
+      "reviewReason": "Recorded the observed exact-tree tablet Add Bottle failure and strengthened the one-real-tap test with a bounded trusted-activation receipt, unchanged blueprint/capability assertions and bounded failure evidence; local harness/review are distinct from pending Chromium CI and the unproved historical cause.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T18:04:40.572Z",
-      "sourceDigest": "a2d2db17cc8ca54d48aa790a42e78ae592c9dc3342f79a12614e639ef83f02ac",
+      "reviewedAt": "2026-11-21T19:44:00.253Z",
+      "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-supplied PR115 request metadata and an unmerged private-coach diagnostic candidate with fixed-scope read-only inspector; no release, access grant or root cause is claimed.",
+      "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

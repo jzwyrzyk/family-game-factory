@@ -2,6 +2,45 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {chromium}=require('playwright');
 
+// Observe one real tap without replaying input or changing event delivery.
+// Playwright's tap acknowledgement covers touch events, not the button's click.
+function armTabletTap(button){
+ const doc=button.ownerDocument,win=doc.defaultView,started=win.performance.now();
+ const types=['pointerdown','pointerup','pointercancel','touchstart','touchend','touchcancel','click'];
+ const receipt={ready:false,clicks:0,cancelled:0,redirectedInput:0,redirectedClicks:0,untrustedClicks:0,events:[],eventsTruncated:0};
+ const describe=node=>node?.nodeType===1?{tag:node.tagName,id:(node.id||'').slice(0,64),label:(node.getAttribute('aria-label')||'').slice(0,80)}:null;
+ const geometry=()=>{const r=button.getBoundingClientRect();return {rect:{x:r.x,y:r.y,width:r.width,height:r.height},scroll:{x:win.scrollX,y:win.scrollY},connected:button.isConnected};};
+ const state=()=>{
+  const s=win.FG?.runtime?.snapshot()?.state;
+  return s?{mode:s.mode,partCount:s.parts?.length,parts:s.parts?.slice(0,3).map(p=>({id:p.id,kind:p.kind,angle:p.angle})),selected:s.selected,paused:s.paused}:null;
+ };
+ const before={...geometry(),state:state()};
+ const record=event=>{
+  const path=event.composedPath(),targetButton=path.find(node=>node?.nodeType===1&&node.tagName==='BUTTON');
+  const onButton=targetButton===button,point=event.changedTouches?.[0]||event;
+  if(receipt.events.length<32)receipt.events.push({type:event.type,ms:Math.round(win.performance.now()-started),trusted:event.isTrusted,onButton,target:describe(event.target),button:describe(targetButton),pointerType:event.pointerType||null,point:{x:point.clientX,y:point.clientY},...geometry()});
+  else receipt.eventsTruncated++;
+  if(event.isTrusted&&(event.type==='pointercancel'||event.type==='touchcancel')){receipt.cancelled++;receipt.ready=true;}
+  if(event.isTrusted&&!onButton&&['pointerdown','pointerup','touchstart','touchend'].includes(event.type)){receipt.redirectedInput++;receipt.ready=true;}
+  if(event.type==='click'){
+   if(!event.isTrusted)receipt.untrustedClicks++;
+   else if(onButton)receipt.clicks++;
+   else receipt.redirectedClicks++;
+   receipt.ready=true;
+  }
+ };
+ for(const type of types)doc.addEventListener(type,record,{capture:true,passive:true});
+ let finalEvidence;
+ receipt.finish=()=>{
+  if(!finalEvidence){
+   for(const type of types)doc.removeEventListener(type,record,true);
+   finalEvidence={button:{...describe(button),name:(button.getAttribute('aria-label')||button.textContent||'').trim().slice(0,80)},elapsedMs:Math.round(win.performance.now()-started),clicks:receipt.clicks,cancelled:receipt.cancelled,redirectedInput:receipt.redirectedInput,redirectedClicks:receipt.redirectedClicks,untrustedClicks:receipt.untrustedClicks,before,after:{...geometry(),state:state()},events:receipt.events,eventsTruncated:receipt.eventsTruncated};
+  }
+  return finalEvidence;
+ };
+ return receipt;
+}
+
 // Representative emulated tablet viewports, not evidence from actual family hardware.
 (async()=>{
  const server=require('./browser-server.cjs').start();
@@ -12,9 +51,22 @@ const {chromium}=require('playwright');
    const context=await browser.newContext({viewport,hasTouch:true,isMobile:true,deviceScaleFactor:2});
    const page=await context.newPage(),errors=[];
    page.on('pageerror',error=>errors.push(error.message));
+   let lastTouchEvidence;
    // Keep real touch input and wait for the control's actionability and stable
-   // position instead of dispatching at separately measured coordinates.
-   const touch=async locator=>{await locator.tap();};
+   // position, then observe its one trusted activation before reading game state.
+   const touch=async locator=>{
+    const receipt=await locator.evaluateHandle(armTabletTap);
+    try{
+     await locator.tap();
+     await page.waitForFunction(r=>r.ready,receipt,{timeout:2000});
+     lastTouchEvidence=await receipt.evaluate(r=>r.finish());
+     const {clicks,cancelled,redirectedInput,redirectedClicks,untrustedClicks}=lastTouchEvidence;
+     assert.deepEqual({clicks,cancelled,redirectedInput,redirectedClicks,untrustedClicks},{clicks:1,cancelled:0,redirectedInput:0,redirectedClicks:0,untrustedClicks:0},'one tablet tap activates exactly its requested button once');
+    }finally{
+     lastTouchEvidence=await receipt.evaluate(r=>r.finish()).catch(error=>({observationError:String(error.message).slice(0,200)}));
+     await receipt.dispose().catch(()=>{});
+    }
+   };
    const assertTouch=async phase=>{
     const capability=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarse:matchMedia('(pointer: coarse)').matches,anyCoarse:matchMedia('(any-pointer: coarse)').matches,innerWidth,innerHeight}));
     assert.ok(capability.maxTouchPoints>0&&capability.coarse&&capability.anyCoarse,`${orientation} ${phase}: real tablet touch emulation remains active: ${JSON.stringify(capability)}`);
@@ -97,6 +149,9 @@ const {chromium}=require('playwright');
     await capture('rally',go);
     assert.deepEqual(errors,[]);
     console.log(`PASS tablet ${orientation}: touch piece-picker/rotate, landscape stage, large pedal, held driving and release`);
+   }catch(error){
+    console.error(`Tablet ${orientation} input evidence: ${JSON.stringify({lastButtonTap:lastTouchEvidence,pageErrors:errors.slice(-4).map(message=>message.slice(0,200)),pageErrorsTruncated:Math.max(0,errors.length-4)})}`);
+    throw error;
    }finally{await context.close();}
   }
  }finally{await browser.close();server.close();}

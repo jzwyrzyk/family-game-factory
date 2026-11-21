@@ -1,5 +1,13 @@
 # jems delivery state
 
+## November 21, 2026 — diagnostic release approved; tablet input evidence corrected
+
+The owner approved merging [PR124](https://github.com/jzwyrzyk/family-game-factory/pull/124) after required checks pass and deploying only its private-coach diagnostic change. The original head `a4dc8c5841f631029be0faa16ee11c475d68c28d` and the refreshed PR merge checkout have the same tree `00f586a6b5a8d7aca1f67c7bea7321072bdd2eae`; both complete PR workflow sets passed. Repository protection nevertheless required the original push checks, which shared push/PR concurrency had canceled. Their legitimate rerun passed browser, learning, private-coach image and service packaging, but [creative job136956230056](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44937329470/job/136956230056) failed the portrait tablet's first **Add Bottle** assertion at `2026-11-21T19:23:04Z`: zero parts instead of one. Its other independent suites passed. This is an observed input assertion failure, not a demonstrated infrastructure fault or a confirmed application regression.
+
+The tablet test previously read the synchronous game state immediately after the touch protocol returned, without an explicit receipt that the intended button received its trusted activation. The narrow test correction observes that one activation within a bounded deadline, retains every exact count/type/selection and touch-capability assertion, and records bounded input/target/layout/state evidence on failure. It sends one normal real tap, without forced or synthetic activation or another input attempt. A dropped, redirected or double activation remains a failure. This closes an input-completion evidence gap; it does not prove that delayed activation caused the historical failed run. The application's game code and the private diagnostic runtime are unchanged by this follow-up.
+
+Syntax, whitespace and independent review passed for the test correction. A focused passive-event harness covered delayed completion, missing/canceled/redirected/untrusted input, duplicate activation, cleanup and the event bound; it is not a Chromium reproduction. Fresh hosted checks on the corrected source remain required before merge. The approved rollout still preserves current service configuration, model and budgets, approved audience and dictation settings; it changes only the private-coach image. The owner-supplied serving inspection still shows the PR115 gateway and private-coach revisions. No new build, revision, traffic change or successful conversation is claimed here.
+
 ## November 21, 2026 — private chat failures observed; diagnostics prepared
 
 The owner supplied Cloud Run request metadata for two failed real chat turns at
