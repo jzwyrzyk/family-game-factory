@@ -51,7 +51,74 @@ def gateway_mount():
                      "items": [{"key": "4", "path": "config.json"}]}}]}}}}
 
 
+def revision_service(name, created=None, ready=None, retired=False):
+    ready = ready or name + "-00002-48r"
+    created = created or ready
+    conditions = [{"type": "Ready", "status": "True"},
+                  {"type": "ConfigurationsReady", "status": "True",
+                   "reason": "Retired" if retired else None}]
+    return {"status": {"latestCreatedRevisionName": created,
+                       "latestReadyRevisionName": ready,
+                       "conditions": conditions,
+                       "traffic": [{"revisionName": ready, "percent": 100}]}}
+
+
+def imported_continuity():
+    spec = importlib.util.spec_from_file_location("continuity", Path(__file__).with_name("continuity.py"))
+    continuity = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(continuity)
+    return continuity
+
+
 class AuditFixtures(unittest.TestCase):
+
+    def test_known_retired_coach_candidate_does_not_block_healthy_serving_coach(self):
+        c = imported_continuity()
+        value = revision_service("factory-coach-private",
+            created="factory-coach-private-00003-dqb",
+            ready="factory-coach-private-00002-48r", retired=True)
+        self.assertEqual(a.serving_revision_summary("factory-coach-private", value, c),
+                         {"revision": "factory-coach-private-00002-48r", "readyAt100Percent": True,
+                          "knownRetiredNonServingCoachRevision": True})
+        # A stale non-serving entry is not live traffic.
+        value["status"]["traffic"].insert(0,
+            {"revisionName": "factory-coach-private-00003-dqb", "percent": None})
+        self.assertTrue(a.serving_revision_summary("factory-coach-private", value, c)
+                        ["knownRetiredNonServingCoachRevision"])
+
+    def test_only_the_exact_known_retired_coach_state_is_accepted(self):
+        c = imported_continuity()
+        for name in ("factory-gateway", "factory-preview", "factory-coach-private"):
+            normal = revision_service(name)
+            self.assertFalse(a.serving_revision_summary(name, normal, c)
+                             ["knownRetiredNonServingCoachRevision"])
+        known = revision_service("factory-coach-private",
+            created="factory-coach-private-00003-dqb",
+            ready="factory-coach-private-00002-48r", retired=True)
+        bad = []
+        for name in ("factory-gateway", "factory-preview"):
+            bad.append((name, known))
+        no_retired = json.loads(json.dumps(known))
+        no_retired["status"]["conditions"][1]["reason"] = None
+        bad.append(("factory-coach-private", no_retired))
+        unexpected_created = json.loads(json.dumps(known))
+        unexpected_created["status"]["latestCreatedRevisionName"] = "factory-coach-private-00004-new"
+        bad.append(("factory-coach-private", unexpected_created))
+        unexpected_ready = json.loads(json.dumps(known))
+        unexpected_ready["status"]["latestReadyRevisionName"] = "factory-coach-private-00001-old"
+        bad.append(("factory-coach-private", unexpected_ready))
+        unready = json.loads(json.dumps(known))
+        unready["status"]["conditions"][0]["status"] = "False"
+        bad.append(("factory-coach-private", unready))
+        split = json.loads(json.dumps(known))
+        split["status"]["traffic"] = [{"revisionName": "factory-coach-private-00002-48r", "percent": 90},
+                                       {"revisionName": "factory-coach-private-00003-dqb", "percent": 10}]
+        bad.append(("factory-coach-private", split))
+        for name, service in bad:
+            with self.subTest(name=name, service=service), self.assertRaisesRegex(
+                    a.AuditError, "SERVICE_NOT_SINGLE_READY_REVISION"):
+                a.serving_revision_summary(name, service, c)
+
     def test_gateway_consumes_exact_active_file_and_ignores_unmounted_history(self):
         value = gateway_mount()
         self.assertIsNone(a.require_consumed_config_mount(value))

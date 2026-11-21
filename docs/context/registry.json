@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T02:40:29.928Z",
-      "sourceDigest": "dfb9123ba5cb2940ad29e6b7c3423c6b295c60011abf9210093705260abbcc18",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful production-image smoke 44855232144 and owner cleanup/reset evidence. Added and reviewed a sanitized read-only activation inventory with explicit runtime configuration mount proof, consistent Firestore reads, current allowance and adult access status. Existing application and sandbox pins are preserved; activation and Pages remain pending.",
+      "reviewedAt": "2026-11-21T02:47:00.000Z",
+      "sourceDigest": "495a11b13c98bc3fed96d5e6bc3c54d0fe0a81a02439609c46a820a71b3576cf",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the exact retired non-serving private coach exception and its fail-closed tests. Delivery state still correctly distinguishes accepted smoke from inactive adult AI and pending Pages release; no documented deployment contract changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
