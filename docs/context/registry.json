@@ -643,10 +643,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:18:34.730Z",
-      "sourceDigest": "37460578f5ac58dbd80d43ddf0e33ff62a85af1f00b5c894d1d66ffbec43422a",
+      "reviewedAt": "2026-11-21T18:45:21.493Z",
+      "sourceDigest": "e402153afc2dbd5794507e22b3d212e3ee7d4b20413e5b2a1bec301414563254",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed both transport commits and preserved their independent review receipts. All 24 new regressions are registered together; the prior pilot test now distinguishes the first durable read from later background recovery. The combined tree passes 411 unit tests and production build/typecheck. UTF-8/private concurrency, browser cancellation, token/dispatch deadlines and auth-before-read remain covered; no paid inference, live GitHub, actual-device or deployment claim is made.",
+      "reviewReason": "Documented the exact PR121 browser failure and baseline/current immutable-runtime ordering reproduction. The Actions fixture now awaits the unchanged real-pixel predicate with a 4.5-second bound and terminal diagnostics, retaining movement and gameplay assertions; typecheck and delayed/blank/error synthetic helper checks pass while hosted browser proof remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -737,10 +737,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T18:28:14.380Z",
-      "sourceDigest": "4fdbc432c5deae030baebd8e3f7f33cd2c0a9fdae03d952fcaf46caf870adc66",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the isolated service-archive fixture against the actual coach Dockerfile: added server/http-json.ts to the synthetic repository so COPY verification exercises the complete current input set. SERVICE_SCOPE already includes server; production packaging, approval rules and deployment settings are unchanged. All 79 deployment tests pass, including older-source and missing-input rejection checks. Existing architecture and private-coach documentation already describe the shared reader and explicit image input.",
+      "reviewedAt": "2026-11-21T18:44:21.030Z",
+      "sourceDigest": "c85f07e1fd4d0fcd4f9c88fd768383be537ef4f6bf5c7c04fd6ff4d4537cc325",
+      "reviewOutcome": "updated",
+      "reviewReason": "Delivery records the failed PR121 Actions job, later screenshot limits, unchanged archived runtime hash and deterministic ordering evidence. The local test-only synchronization correction has no runtime, source-pin, service or activation effect; its next hosted browser result remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
