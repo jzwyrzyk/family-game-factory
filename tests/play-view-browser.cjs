@@ -77,8 +77,13 @@ async function checkGameContent(page, game, label) {
     for (const button of await page.locator('.gum-tray button').all()) {
       await button.scrollIntoViewIfNeeded();
       const box = await button.boundingBox(), tray = await page.locator('.gum-tray').boundingBox();
-      assert.ok(box && tray && box.y >= tray.y - 1 && box.y + box.height <= tray.y + tray.height + 1,
+      assert.ok(box && tray && box.width >= 48 && box.height >= 48 && box.x >= tray.x - 1 && box.x + box.width <= tray.x + tray.width + 1 &&
+        box.y >= tray.y - 1 && box.y + box.height <= tray.y + tray.height + 1,
         label + ': each sticker and GO is reachable inside its tray');
+      if (await button.evaluate(node => node.classList.contains('gum-sticker'))) assert.equal(await button.evaluate(node => {
+        const text = node.querySelector('span');
+        return parseFloat(getComputedStyle(text).fontSize) >= 18 && node.scrollWidth <= node.clientWidth + 1;
+      }), true, label + ': sticker names remain readable without overlapping neighboring stickers');
       assert.equal(await page.locator('.gum-scene').evaluate(node => node.getBoundingClientRect().top), sceneTop,
         label + ': tray scrolling keeps the invention still');
     }
@@ -90,9 +95,101 @@ async function checkGameContent(page, game, label) {
     // Playwright selectors pierce the recovered game's real shadow root.
     await insideHost(page, '#game-mount canvas#game', label + ' native canvas', 100);
     await insideHost(page, game === 'dragon' ? '#game-mount #touch button' : '#game-mount .touch button:not([hidden])', label + ' native touch controls', 48);
+  } else if (game === 'robot') {
+    await insideHost(page, '.favorite-robot .favorite-canvas', label + ' robot canvas', 200);
+    const board = page.locator('.favorite-robot .favorite-canvas'), tools = page.locator('.robot-plan-tools');
+    const boardTop = await board.evaluate(node => node.getBoundingClientRect().top), pageY = await page.evaluate(() => scrollY);
+    const imageHeight = await board.evaluate(node => {
+      const css = getComputedStyle(node), width = node.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight);
+      const height = node.clientHeight - parseFloat(css.paddingTop) - parseFloat(css.paddingBottom);
+      return Math.min(width / node.width, height / node.height) * node.height;
+    });
+    assert.ok(imageHeight >= 200, label + ': the contained robot image remains useful, not an 80px strip: ' + imageHeight);
+    await insideHost(page, '.robot-plan-tools', label + ' bounded direction tools', 72);
+    await insideHost(page, '.robot-plan-actions button', label + ' persistent Run, Undo and Clear actions', 48);
+    for (const button of await page.locator('.robot-plan-tools button').all()) {
+      await button.scrollIntoViewIfNeeded();
+      assert.equal(await button.evaluate(node => {
+        const r = node.getBoundingClientRect(), tray = node.closest('.robot-plan-tools').getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return r.width >= 48 && r.height >= 48 && r.left >= tray.left - 1 && r.right <= tray.right + 1 &&
+          r.top >= tray.top - 1 && r.bottom <= tray.bottom + 1 && parseFloat(getComputedStyle(node).fontSize) >= 18 &&
+          node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit));
+      }), true, label + ': every direction is readable and reachable inside its own tool panel');
+      assert.equal(await board.evaluate(node => node.getBoundingClientRect().top), boardTop, label + ': tools scrolling keeps the board still');
+      assert.equal(await page.evaluate(() => scrollY), pageY, label + ': tools scrolling cannot move the page');
+    }
+    for (const button of await page.locator('.robot-plan-actions button').all()) assert.equal(await button.evaluate(node => {
+      const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return r.width >= 48 && parseFloat(getComputedStyle(node).fontSize) >= 18 && node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit));
+    }), true, label + ': Run, Undo and Clear remain readable and reachable while the tool panel scrolls');
+    await tools.evaluate(node => { node.scrollTop = 0; });
   } else {
     await insideHost(page, '.favorite-canvas', label + ' canvas', 80);
     await insideHost(page, '.favorite-controls button', label + ' essential controls', 48);
+  }
+}
+
+async function checkDragonIntro(page, label) {
+  const start = page.locator('#game-mount #startBtn'), choices = page.locator('#game-mount .heroCard');
+  await start.waitFor({ state: 'visible', timeout: 5000 });
+  await page.waitForFunction(() => FG.runtime.snapshot()?.state.mode === 'menu', null, { timeout: 10000 });
+  assert.equal(await start.isEnabled(), true, label + ': Start becomes available after native artwork is ready');
+  await insideHost(page, '#game-mount #startBtn', label + ' visible Start action', 48);
+  assert.equal(await start.evaluate(node => {
+    const r = node.getBoundingClientRect(), hit = node.getRootNode().elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return parseFloat(getComputedStyle(node).fontSize) >= 18 && (hit === node || node.contains(hit));
+  }), true, label + ': Start is readable and usable before scrolling the hero choices');
+  assert.equal(await choices.count(), 4, label + ': all four hero choices remain available');
+  const pageY = await page.evaluate(() => scrollY), startY = await start.evaluate(node => node.getBoundingClientRect().top);
+  for (const choice of await choices.all()) {
+    await choice.scrollIntoViewIfNeeded();
+    assert.equal(await choice.evaluate(node => {
+      const r = node.getBoundingClientRect(), tray = node.parentElement.getBoundingClientRect();
+      const hit = node.getRootNode().elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return node.tagName === 'BUTTON' && r.height >= 48 && r.width >= 48 &&
+        r.top >= tray.top - 1 && r.bottom <= tray.bottom + 1 &&
+        parseFloat(getComputedStyle(node.querySelector('strong')).fontSize) >= 18 && (hit === node || node.contains(hit));
+    }), true, label + ': each hero is a readable, reachable choice inside its own panel');
+    assert.equal(await start.evaluate(node => node.getBoundingClientRect().top), startY, label + ': hero scrolling keeps Start still');
+    assert.equal(await page.evaluate(() => scrollY), pageY, label + ': hero scrolling cannot move the page');
+  }
+  assert.equal(await choices.nth(1).getAttribute('aria-pressed'), 'false', label + ': the second hero starts unselected');
+  await choices.nth(1).scrollIntoViewIfNeeded();
+  await choices.nth(1).focus(); await page.keyboard.press('Space');
+  assert.equal(await choices.nth(1).getAttribute('aria-pressed'), 'true', label + ': Space selects a different hero');
+  assert.equal(await choices.first().getAttribute('aria-pressed'), 'false', label + ': selection moved from the first hero');
+  await choices.first().scrollIntoViewIfNeeded();
+  await choices.first().focus(); await page.keyboard.press('Enter');
+  assert.equal(await choices.first().getAttribute('aria-pressed'), 'true', label + ': keyboard selection uses the real hero control');
+  await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-intro.png` });
+  await start.click();
+  await page.locator('#game-mount #menu').waitFor({ state: 'hidden' });
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  if (label.startsWith('desktop ')) {
+    const sound = page.locator('#game-mount #soundBtn'), pause = page.locator('#game-mount #pauseBtn');
+    const soundBefore = await sound.getAttribute('aria-pressed');
+    await sound.focus(); await page.keyboard.press('Space');
+    assert.notEqual(await sound.getAttribute('aria-pressed'), soundBefore, 'native Sound keeps Space activation during gameplay');
+    async function moveFromToolbar() {
+      const before = await page.evaluate(() => FG.runtime.snapshot().state.player.x);
+      await page.keyboard.down('ArrowRight');
+      try { await page.waitForFunction(x => FG.runtime.snapshot().state.player.x > x + 2, before, { timeout: 2000 }); }
+      finally { await page.keyboard.up('ArrowRight'); }
+    }
+    await moveFromToolbar();
+    await pause.click();
+    assert.equal(await page.evaluate(() => FG.runtime.snapshot().state.mode), 'pause');
+    await pause.click();
+    assert.equal(await page.evaluate(() => FG.runtime.snapshot().state.mode), 'playing');
+    await moveFromToolbar(); await page.keyboard.press('Escape');
+    assert.equal(await page.evaluate(() => FG.runtime.snapshot().state.mode), 'pause', 'Escape works after the native pause toolbar resumes play');
+    await page.locator('#game-mount #resumeBtn').click();
+    assert.equal(await page.evaluate(() => FG.runtime.snapshot().state.mode), 'playing');
+    const beforeY = await page.evaluate(() => FG.runtime.snapshot().state.player.y);
+    await page.locator('#game-mount #touch [data-key="ArrowUp"]').focus(); await page.keyboard.down('Space');
+    try { await page.waitForFunction(y => FG.runtime.snapshot().state.player.y < y - 2, beforeY, { timeout: 2000 }); }
+    finally { await page.keyboard.up('Space'); }
   }
 }
 
@@ -102,10 +199,13 @@ async function checkMore(page, label) {
   const result = await action.evaluate(node => {
     const r = node.getBoundingClientRect(), target = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
     return { onScreen: r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth,
-      reachable: !!target && node.contains(target) };
+      reachable: !!target && node.contains(target), action: { top: r.top, bottom: r.bottom },
+      hit: target?.id || target?.className || target?.tagName,
+      menuScroll: node.closest('.studio-more-actions').scrollTop };
   });
   assert.equal(result.onScreen, true, label + ': More tools fit the viewport');
-  assert.equal(result.reachable, true, label + ': the toolbar does not clip or cover More tools');
+  assert.equal(result.reachable, true, label + ': the toolbar does not clip or cover More tools: ' + JSON.stringify(result));
+  if (label.endsWith('factory')) await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-tools-menu.png` });
   await summary.focus();
   for (let index = 0; index < 8 && !await action.evaluate(node => document.activeElement === node); index++) await page.keyboard.press('Tab');
   assert.equal(await action.evaluate(node => document.activeElement === node), true, label + ': More supports keyboard navigation');
@@ -124,6 +224,7 @@ async function checkPlayerMenu(page, label) {
     return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && r.height >= 48 &&
       parseFloat(getComputedStyle(node).fontSize) >= 18 && (hit === node || node.contains(hit));
   }), true, label + ': the existing player choices remain readable and reachable inside More');
+  await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-player-menu.png` });
   await page.locator('#studioProfileMenu > summary').click();
   await page.locator('#studioMore > summary').click();
 }
@@ -173,6 +274,7 @@ async function checkPlayerMenu(page, label) {
             await page.locator(`[data-starter="${game}"]`).scrollIntoViewIfNeeded();
             await page.locator(`[data-starter="${game}"]`).click();
             await checkFrame(page, `${device} ${game}`);
+            if (game === 'dragon') await checkDragonIntro(page, `${device} ${game}`);
             await checkGameContent(page, game, `${device} ${game}`);
             await checkMore(page, `${device} ${game}`);
             if (game === 'factory') await checkPlayerMenu(page, `${device} ${game}`);

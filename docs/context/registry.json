@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:51:46.703Z",
-      "sourceDigest": "eb209e66730a46d1924e30c854d8944dfabb939fe95877ce53d04df35eb970b3",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated Idea Workshop narration and Art Studio entry contracts to match the shared explicit speaker and dedicated play screen; durable grade, ownership and evidence principles remain unchanged.",
+      "reviewedAt": "2026-11-21T21:16:29.187Z",
+      "sourceDigest": "b968a8e2f41e1d6b61e18d6a5510148e7b29acd2c48fbc1f99132eacb34c8d6a",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the portrait lifecycle contract and game presentation corrections; approved product intent, child ownership, grade ceilings, earning rules and narration approval boundaries remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:51:47.001Z",
-      "sourceDigest": "903c29d1f3b429e6cff50a3d393026c0c08eed04f888c0187e89c79fbc2cf59b",
+      "reviewedAt": "2026-11-21T21:16:29.695Z",
+      "sourceDigest": "f9be7239dda38092d9a409d4a9e2b1c3e9c4a97e0d40f25441205f15c4e5d50a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed initial hosted captures and simplified active play into its own screen; documented contained profile, picture and build tools, ready cue, real control geometry and restoration after exit.",
+      "reviewReason": "Updated the play contract after actual second-head captures: visible Dragon initialization and hero controls, More scroll reset, readable sticker tray and a stable Robot board with persistent actions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:20.664Z",
-      "sourceDigest": "ddaeb7a9958bea48df0ddc0526a38ce72b944220843216c9256c14cfdbddf5ef",
+      "reviewedAt": "2026-11-21T21:16:31.613Z",
+      "sourceDigest": "d9702344816df23b93b97f2ce474a824dddbbc5e11588669e064495301025a3b",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the play-view game adapter contract and architecture for actual canvas resizing, shadow-host fitting and contained trays; removed the misleading fixed grade caption without changing game mechanics.",
+      "reviewReason": "Documented native Dragon initialization and keyboard handling, bounded shadow-menu refitting and Robot board/tool separation; game goals, saved routes and learning authority are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:51:48.409Z",
-      "sourceDigest": "115b7f35fa1c8320b427f1e684336d01564e3cd17408d51f44ffdb9d56f37cc2",
+      "reviewedAt": "2026-11-21T21:16:32.078Z",
+      "sourceDigest": "ffde966ad8a3d0381c211d4f70520421c043e41af13467c4c4c4be85a01386ad",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded initial hosted passes and actual failures; preserved all geometric and learning assertions, added fast independent captures, explicit older-sibling setup and actual visible navigation paths.",
+      "reviewReason": "Recorded second-head passes and exact failed geometry/menu findings; strengthened board-size, label/target, tray, Start and keyboard checks while retaining existing saved-work and owner assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T20:51:48.694Z",
-      "sourceDigest": "37791c952c940f05ff9c9e1ed0353c4bea02419c45cc221d761984ecc0dfcaf0",
+      "reviewedAt": "2026-11-21T21:16:32.559Z",
+      "sourceDigest": "92cf2874cdfad7d712db3c7c523badf303e921005a34b0b93f9f2389a8127a64",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded initial PR125 source, hosted evidence and unresolved prior Pal decode failure; this follow-up remains draft and undeployed with natural narration off and no workflow or cloud changes.",
+      "reviewReason": "Recorded initial and second-head evidence, the narrow previously verified Pal extraction and new source corrections; combined hosted verification remains required and the candidate is draft, undeployed, with narration off.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -902,10 +902,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4943660550545f439dbbaefc38baafccff37efe4c8a8fa706f005eacda216700",
-      "reviewedAt": "2026-11-21T14:33:43.324Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Bound all 24 approved profiles in the canonical index, retained art approvals and historical references, excluded Brio review expressions and documented exact immutable manifest plus byte-identical supplemental neutrals."
+      "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
+      "reviewedAt": "2026-11-21T21:16:32.993Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Portrait reuse and retirement change only runtime lifecycle; all approved character identities, two forms, artwork bytes, framing and expression approvals are preserved."
     },
     {
       "id": "art-studio",
@@ -962,10 +962,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b734e7783f81ca8f947f67615961eb46db1ccac12414ca7d925d79b4f810363",
-      "reviewedAt": "2026-11-21T16:01:33.583Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected actual unavailable-picture screenshot and runtime loader guards; no speculative artwork/runtime workaround is justified. Added failure-only bounded public-asset diagnostics; approved identities, forms, ownership, recovery and acceptance assertions remain unchanged."
+      "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
+      "reviewedAt": "2026-11-21T21:16:34.042Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented bounded owner/surface/Pal/form image reuse, stale callback retirement, unchanged native decode and explicit retries; retained stronger same-current-image browser assertions and provenance."
     }
   ]
 }

@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 /* Play the actual Gem Factory through the production Studio and learning host. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -16,8 +16,7 @@ async function finishLearning(page){
 }
 
 async function chooseProfile(page,index){
- const summary=page.locator('#studioProfileMenu summary');
- if(await summary.count())await summary.click();
+ await openProfiles(page);
  await page.locator('.profile-choice').nth(index).click();
  await exploreWelcome(page);
 }
@@ -255,12 +254,12 @@ async function packAndWait(page,last,device,paper){
     await chooseGem(page,device,device==='desktop');
     assert.equal((await snapshot(page)).collected.filter(Boolean).length,1,'only the exact next gem fills the pattern gap');
     assert.ok((await snapshot(page)).sortingReturns>=1,'the supply includes a distractor that belongs in the return bucket');
-    await page.locator('#studioNavHome').click();
+    await navigate(page,'#studioNavHome');
     assert.equal(await page.locator('.gem-factory').count(),0,'leaving disposes the game scene');
     await chooseProfile(page,1);await openFactory(page);
     assert.equal((await snapshot(page)).coins,0,'another child has a separate factory');
     assert.equal((await snapshot(page)).level,1);
-    await page.locator('#studioNavHome').click();await chooseProfile(page,0);await openFactory(page);
+    await navigate(page,'#studioNavHome');await chooseProfile(page,0);await openFactory(page);
     assert.equal((await snapshot(page)).coins,finished.coins,'returning restores the original child’s earned coins');
     assert.equal((await snapshot(page)).level,2,'returning restores the original child’s unlocked day');
     assert.deepEqual(errors,[],device+' has no browser errors');

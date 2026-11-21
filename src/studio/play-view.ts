@@ -22,10 +22,12 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
   let previousOverflow: { html: string; body: string } | null = null;
   const labels: { element: HTMLElement; nodes: Node[]; aria: string | null }[] = [];
   const moved: { element: HTMLElement; anchor: Comment }[] = [];
+  const nativeMenus = new Map<Element, MutationObserver>();
   let frame = 0;
 
   function simplifyTools() {
     const menu = page.querySelector<HTMLElement>('#studioMore .studio-more-actions')!;
+    menu.scrollTop = 0;
     for (const id of ['studioMakeScene', 'studioUseDrawing', 'studioMathOptions', 'studioProfileMenu', 'studioBuildShelf', 'studioReady']) {
       const element = document.getElementById(id);
       if (!element) continue;
@@ -85,6 +87,12 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
   // canvas and touch controls must fit together; changing only outer CSS cannot
   // resize that content. Keep the original aspect ratio and all button sizes.
   function fitNative() {
+    for (const [menu, observer] of nativeMenus) {
+      const root = menu.getRootNode();
+      if (!menu.isConnected || !(root instanceof ShadowRoot) || !host.contains(root.host)) {
+        observer.disconnect(); nativeMenus.delete(menu);
+      }
+    }
     for (const element of host.querySelectorAll<HTMLElement>('#game-mount > *')) {
       const root = element.shadowRoot;
       if (!root) continue;
@@ -92,6 +100,15 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       const stage = root.querySelector<HTMLElement>('.wrap, .frame');
       const canvas = stage?.querySelector<HTMLCanvasElement>('#game');
       if (!app || !stage || !canvas) continue;
+      const menu = root.querySelector('#menu');
+      if (menu && !nativeMenus.has(menu)) {
+        // Host observers cannot see through a shadow root. Refit immediately
+        // after leaving or reopening the native hero chooser, when its HUD
+        // changes between overlay and ordinary gameplay layout.
+        const menuObserver = new MutationObserver(scheduleResize);
+        menuObserver.observe(menu, { attributes: true, attributeFilter: ['class', 'hidden'] });
+        nativeMenus.set(menu, menuObserver);
+      }
       let style = root.querySelector<HTMLStyleElement>('[data-jems-play-fit]');
       if (!style) {
         style = document.createElement('style');
@@ -104,6 +121,17 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
           #touch,.touch{flex:none;margin:8px 0 0;gap:6px}#touch button,.touch button{min-height:48px;font-size:18px}
           .sound{min-height:44px;min-width:44px;font-size:18px}.top button{font-size:18px}
           .footer,.eyebrow{display:none}.panel{max-height:100%;overscroll-behavior:contain}
+          .wrap:has(#menu:not(.hidden)){width:100%!important;height:var(--jems-native-space)}
+          .wrap:has(#menu:not(.hidden))>canvas{height:100%;object-fit:contain}
+          .wrap:has(#menu:not(.hidden))>#hud{position:absolute;inset:10px 10px auto}
+          #menu{padding:10px}#menu .panel{height:100%;padding:12px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px;overflow:hidden}
+          #menu .panel h1{font-size:24px;line-height:1.1;margin:0}#menu .panel p{font-size:20px;line-height:1.25;margin:0}
+          #menu .heroes{min-height:0;overflow:auto;overscroll-behavior:contain;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(100px,1fr);align-content:start;margin:0;padding:4px;gap:8px}
+          #menu .heroCard{min-width:0;min-height:100px;padding:6px;gap:4px}#menu .heroCard img,#menu .heroCard canvas{height:56px}#menu .heroCard strong{font-size:18px}#menu .heroCard>div{display:none}
+          #menu #startBtn{min-height:48px;font-size:18px}#menu .inst{display:none}
+          @media(max-width:599px){#menu .panel{grid-template-rows:auto minmax(0,1fr) auto}#menu .panel>h1{display:none}#menu .heroCard img,#menu .heroCard canvas{height:40px}}
+          @media(min-width:600px){#menu .heroes{grid-template-columns:repeat(4,minmax(0,1fr))}}
+          @media(max-height:550px) and (min-width:600px){#menu{padding:4px}#menu .panel{padding:6px;gap:4px;grid-template-rows:minmax(0,1fr) auto}#menu .panel>h1,#menu .panel>p{display:none}#menu .heroes{grid-auto-rows:minmax(76px,1fr)}#menu .heroCard{min-height:76px}#menu .heroCard img,#menu .heroCard canvas{height:32px}}
           @media(max-height:550px) and (min-width:600px){.top .title{display:none}.top{justify-content:flex-end}.top button{min-height:44px;padding:5px 10px}#touch button,.touch button{min-height:48px;height:48px}.top{margin:0 0 4px}}
         `;
         root.append(style);
@@ -118,6 +146,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       const hud = [...stage.children].filter(child => child !== canvas && getComputedStyle(child).position === 'relative')
         .reduce((sum, child) => sum + (child as HTMLElement).getBoundingClientRect().height, 0);
       const height = Math.max(100, available - fixed - border - hud - 22);
+      stage.style.setProperty('--jems-native-space', `${Math.max(100, available - fixed - 22)}px`);
       stage.style.width = `${Math.min(app.clientWidth - 12, height * canvas.width / canvas.height)}px`;
     }
   }
@@ -163,6 +192,14 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
     resize();
   }
   button.onclick = () => { void toggleFullscreen(); };
+  const more = page.querySelector<HTMLDetailsElement>('#studioMore')!;
+  more.addEventListener('toggle', () => {
+    if (!active || !more.open) return;
+    // A previous visit to profiles or a long build shelf must not reopen the
+    // tool menu partway down, hiding its first actions above the scrollport.
+    more.querySelector<HTMLElement>('.studio-more-actions')!.scrollTop = 0;
+    scheduleResize();
+  });
   page.addEventListener('keydown', event => {
     if (event.key !== 'Escape' || !active || !expanded || document.fullscreenElement === page || page.querySelector('#studioMore[open]')) return;
     event.preventDefault(); event.stopPropagation();
@@ -209,6 +246,8 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       }
       page.style.removeProperty('--jems-play-top'); page.style.removeProperty('--jems-play-height');
       page.style.removeProperty('--jems-play-menu-top');
+      for (const observer of nativeMenus.values()) observer.disconnect();
+      nativeMenus.clear();
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
     },
     setReady(value: boolean) { ready = value; updateReady(); },

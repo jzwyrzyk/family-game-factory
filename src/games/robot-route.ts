@@ -1,5 +1,6 @@
 import {setIconLabel,type IconName} from '../brand/icons';
 import type {GameContext,GameInstance} from '../runtime/types';
+import './robot-route.css';
 
 /** Curated original logic game: children author the route, the game never supplies a solution. */
 type Point={x:number;y:number};
@@ -34,7 +35,7 @@ export default class RobotRoute implements GameInstance {
   this.root.setAttribute('aria-label','Robot Route Lab');
   const title=make('h2','favorite-title','🤖 Robot Route Lab');
   const subtitle=make('p','favorite-subtitle','Plan a path. Test it. Figure out what to change.');
-  const controls=make('div','favorite-controls'),actions=make('div','favorite-controls');
+  const controls=make('div','favorite-controls robot-directions'),actions=make('div','favorite-controls robot-plan-actions');
   for(const [direction,label] of [['up','↑ Up'],['left','← Left'],['down','↓ Down'],['right','Right →']] as const){
    const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';
    b.dataset.direction=direction;b.addEventListener('click',()=>this.add(direction),{signal:this.abort.signal});controls.append(b);
@@ -47,7 +48,12 @@ export default class RobotRoute implements GameInstance {
   action('Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();this.save();}},'undo');
   action('Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();this.save();}},'close');
   this.canvas.addEventListener('keydown',e=>{const direction:Record<string,Direction>={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};if(direction[e.key]){e.preventDefault();this.add(direction[e.key]);}},{signal:this.abort.signal});
-  this.root.append(title,subtitle,this.hud,this.canvas,this.instructions,controls,this.commands,actions);target.replaceChildren(this.root);
+  // The board has its own space. Longer directions and arrow tools can scroll
+  // without moving the board or the persistent Run/Undo/Clear actions.
+  const workspace=make('div','robot-workspace'),panel=make('div','robot-controls-panel'),tools=make('div','robot-plan-tools');
+  tools.setAttribute('role','region');tools.setAttribute('aria-label','Robot directions and arrows');tools.tabIndex=0;
+  tools.append(this.instructions,controls);panel.append(tools,this.commands,actions);workspace.append(this.canvas,panel);
+  this.root.append(title,subtitle,this.hud,workspace);target.replaceChildren(this.root);
   this.reset();
   // Reopening a test restores the child's route, not a fabricated solved result.
   const saved=context.persistence?.load() as any;
