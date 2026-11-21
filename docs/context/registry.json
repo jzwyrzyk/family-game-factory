@@ -116,10 +116,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:52.837Z",
-      "sourceDigest": "85327b2e1ba932d3003a30dc36470442b56e0c2f8761e333411ad5bb9a41515a",
+      "reviewedAt": "2026-11-21T06:51:37.392Z",
+      "sourceDigest": "540a37c8973af219599963da90a95ab555fe3182a3ae7003d21f9e0ad7a26514",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the complete approved core artwork package, separate Brio status, and preview-only collection authority in product doctrine. Additional reconciled review: Recorded the owner-requested minimal child copy, 18px labels and 20px task text, actual-surface contrast, and friendly female narration. Kept broader unmerged library/art/default/exit work separate from this scoped repair.",
+      "reviewReason": "Clarified the accepted guided-creation decision with actual gateway/private-coach/web dependency and asymmetric notebook rollback compatibility. Child ownership, readiness, explicit Build and Keep remain unchanged; no new release authorization is invented.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -213,10 +213,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:53.191Z",
-      "sourceDigest": "6a02fbe6f633ac890ad6cbddb6f807338b338bcdc3bb9f8dfeb12f6fd96c7d6b",
+      "reviewedAt": "2026-11-21T05:39:45.557Z",
+      "sourceDigest": "b45a8d9a467688f1dc9986a00e3d8ba49dfa1329916968bffc527ebcb04120b2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled current My Pals expression controls, exact approved portraits, retry focus recovery and optional offline caching in architecture and feature documentation. Additional reconciled review: Separated native learning from dark result modal selectors; fixed writing-label and save-warning colors; preserved dark Math. Reviewed compact navigation type sizing and shared local narrator across Studio, Language and reasoning, including actual-start evidence and microphone cancellation race.",
+      "reviewReason": "Reviewed Studio UI, coaching, readiness, transcript presentation and focused handoff changes with final desktop/phone captures. Documented current-child evidence and staleness gates, collapsed tools, compiled-request separation, draft/profile recovery, truthful submission phases and noninterrupting completion.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -271,10 +271,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b7b8757e9fe3b072f3ee1ffe0ebfad9a5504e4ce3cdea72aba0866c9d517464e",
-      "reviewedAt": "2026-11-20T17:11:53.838Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed changed Creation browser entry helpers and original scene handlers. Documented Create and code under Menu while preserving draft flush, learning interruption, exact source bindings, private art, recovery and explicit Keep; no engine, storage or generation adapter changes.",
+      "sourceDigest": "2a0b6b36cc5606d12a2f4bff2f8e9f5aa9f7caa0fe4bf70b3d1a21fba297058a",
+      "reviewedAt": "2026-11-21T05:39:46.677Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "This area's source change is only the new tests/creation-readiness.test.ts matched by the existing tests/creation-* wildcard. It tests Studio first-game readiness, not Create & code. No scene engine, generated creation schema, program ownership, practice evidence or scene storage changed; Studio behavior is documented in architecture and the guided-chat decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -323,10 +323,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "03ef1d50b31189fb51f608602c875d79345724f5a97718cfea8ba646b30e030c",
-      "reviewedAt": "2026-11-20T17:31:13.846Z",
+      "sourceDigest": "46276557b98b0399551a4e1a57c65b7f758f45950e5d128131edce84fabd47d7",
+      "reviewedAt": "2026-11-21T05:39:47.126Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the isolated Rewards assertion against the accepted selected-character contract; Delivery State records the old paired-human expectation, the neutral-gem regression and the passing complete component/application command.",
+      "reviewReason": "Reviewed cosmetic suppression of reward and rank popups while the creation conversation is visible. Updated rewards and joy-layer contracts: committed receipts, gems, levels and normal Play/Keep/versions celebrations remain unchanged. Final Gem Journey and delight browser checks passed.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -431,10 +431,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:50.701Z",
-      "sourceDigest": "993d1bc5ede9a3befd153f0c288c33901280d9cc60e39b879035c0aa119f8183",
+      "reviewedAt": "2026-11-21T06:51:37.941Z",
+      "sourceDigest": "dd4bd3d500e0151bc5e433b5fb2b809f9e387eb581c303a2573a71a6dab1e14f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the authenticated read-only companion endpoint and gateway/preview COPY inputs against merged quality artifacts. It returns bounded scene data through the existing revision audience check with no-store, while approved game art and private capture storage retain main's contracts."
+      "reviewReason": "Reviewed gateway Docker dependency failure and fixed the archive, Docker ignore allowlist and image COPY graph. Updated service-image guidance for all three archive-built images and backend-first creation-context compatibility. No provider configuration, worker pin, IAM or production service mutation is included."
     },
     {
       "id": "generation",
@@ -479,10 +479,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:57.871Z",
-      "sourceDigest": "8939dd9b318ffc535db5f7166ad77a57f5768f8044706ad0536e990891be0643",
+      "reviewedAt": "2026-11-21T06:51:38.389Z",
+      "sourceDigest": "21de22fb6e723f266423e2a5789455e0b256a75390abda620d3a096e034018fb",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the shared recognized local female voice policy for optional Hear reply, delayed discovery, cancellation and unavailable output. Input recording, explicit Send, provider configuration, budgets and existing privacy boundaries are unchanged."
+      "reviewReason": "Reviewed shared gateway/private-executor validation and private coach archive dependencies. Documented old-client response compatibility, new-context live acceptance and compatible notebook-reader requirements for frontend fallback; status probes alone do not certify the new contract."
     },
     {
       "id": "adult-privacy",
@@ -553,10 +553,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T20:22:00.000Z",
-      "sourceDigest": "59e9b072b5a88458bdc1de8d9eaaf6722732e7753fd10ec07736d38102672f2b",
+      "reviewedAt": "2026-11-21T05:39:48.031Z",
+      "sourceDigest": "7227f6641dcb852b12a7356e53baf4eacb2cdb4340aec1f25987515b6b6f5318",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact-main reduced-motion failure against the actual Wink portrait event listener: Playwright media emulation precedes asynchronous matchMedia change notification. PR92 waits for controller state and retains zero active-animation assertion. Documented test-only scope in validation evidence; no product/approval or physical-device acceptance is inferred.",
+      "reviewReason": "Reviewed new readiness/compiler/transcript contracts, current-source handoff checks and corrected actual-Send browser fixtures. Recorded exact final bundles and synthetic coach/job limits in delivery and capture evidence. New guided-creation gate is included in child-journey and existing complete release coverage; old chip/delegation receipts are not reused as final evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T02:40:29.928Z",
-      "sourceDigest": "dfb9123ba5cb2940ad29e6b7c3423c6b295c60011abf9210093705260abbcc18",
+      "reviewedAt": "2026-11-21T06:51:38.849Z",
+      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful production-image smoke 44855232144 and owner cleanup/reset evidence. Added and reviewed a sanitized read-only activation inventory with explicit runtime configuration mount proof, consistent Firestore reads, current allowance and adult access status. Existing application and sandbox pins are preserved; activation and Pages remain pending.",
+      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -823,10 +823,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d13510b92f7f9dcd2ae5b644781134a4e36e981c808e7a7ec371e74a85b799ac",
-      "reviewedAt": "2026-11-20T18:12:45.000Z",
+      "sourceDigest": "e40f7771e964582539cd6ed734a89e9f1cacf1d93f92acde43b164385cc6effe",
+      "reviewedAt": "2026-11-21T05:39:49.111Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the retained local Art Studio upload, focused saved artwork, private owner isolation, app startup before delayed remote configuration and image-to-scene path. Corrected the browser test to select Nova before creating, without changing any application implementation or authorization.",
+      "reviewReason": "Reviewed the retained guarded Use my picture action moving to collapsed More choices for new ideas, with existing-game toolbar unchanged. Updated Art Studio and architecture references; final-bundle art-entry checks passed delayed/rejected config, mobile upload/drawing/focus, owner isolation and read-only recovery without paid replay.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

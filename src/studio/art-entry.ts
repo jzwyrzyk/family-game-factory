@@ -26,12 +26,12 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
 
   const picture=button('studioUseDrawing','Use my picture');
   picture.setAttribute('aria-label','Use my picture in Art Studio');
-  const composer=byId('studioPromptForm'),gameHelp=byId('studioHelp');
+  const composer=byId('studioExtraTools'),gameHelp=byId('studioHelp');
   gameHelp.after(picture);
   return {
     setCreating(creating:boolean){
-      // The new-idea layout hides the game toolbar. Move the existing action
-      // into the composer, preserving one callback and the current draft.
+      // Creation has one optional tool section. Reuse the same guarded art
+      // entrance there, preserving the callback and the current draft.
       if(creating){if(picture.parentElement!==composer)composer.prepend(picture);}
       else if(picture.parentElement!==gameHelp.parentElement)gameHelp.after(picture);
     },
