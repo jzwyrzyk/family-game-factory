@@ -1,0 +1,75 @@
+name: Jems immutable service images
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['ops/publish-images.txt']
+
+permissions:
+  contents: read
+concurrency:
+  group: jems-service-images-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Build from existing publication archive
+        run: |
+          set -euo pipefail
+          PYTHONPATH=scripts/deployment python3 -c 'import build, os; build.source_archive(os.getcwd(), os.environ["RUNNER_TEMP"], os.environ["GITHUB_SHA"])'
+          for kind in gateway preview coach; do
+            docker build --pull --file "server/Dockerfile.$kind" --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+              --tag "jems-$kind:ci" - < "$RUNNER_TEMP/source.tgz"
+          done
+          docker save jems-gateway:ci jems-preview:ci jems-coach:ci | gzip -1 > "$RUNNER_TEMP/images.tar.gz"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: service-images
+          path: ${{ runner.temp }}/images.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: jems-image-publication
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: service-images
+          path: ${{ runner.temp }}
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ vars.JEMS_PUBLISH_WIF_PROVIDER }}
+          service_account: ${{ vars.JEMS_PUBLISH_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Push immutable candidates without running image code
+        run: |
+          set -euo pipefail
+          registry=us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services
+          gcloud auth configure-docker us-east5-docker.pkg.dev --quiet
+          docker load --input "$RUNNER_TEMP/images.tar.gz"
+          : > "$RUNNER_TEMP/subjects"
+          for kind in gateway preview coach; do
+            tag="$registry/$kind:ci-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+            docker tag "jems-$kind:ci" "$tag"
+            docker push "$tag"
+            digest="$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "$tag" | jq -er 'select(test("^sha256:[a-f0-9]{64}$"))')"
+            printf "%s  %s\n" "${digest#sha256:}" "$registry/$kind" >> "$RUNNER_TEMP/subjects"
+            echo "$registry/$kind@$digest" >> "$GITHUB_STEP_SUMMARY"
+          done
+          mv "$RUNNER_TEMP/subjects" "$RUNNER_TEMP/subject-checksums.txt"
+      - uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
+        with:
+          subject-checksums: ${{ runner.temp }}/subject-checksums.txt

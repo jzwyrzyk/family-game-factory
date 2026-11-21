@@ -1,0 +1,5 @@
+resource.type = "cloud_run_revision"
+resource.labels.location = "us-east5"
+(resource.labels.service_name = "factory-gateway" OR resource.labels.service_name = "factory-preview" OR resource.labels.service_name = "factory-coach-private")
+(LOG_ID("run.googleapis.com/requests") OR LOG_ID("run.googleapis.com/varlog/system"))
+severity >= ERROR

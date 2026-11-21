@@ -1,0 +1,8 @@
+/.github/CODEOWNERS @jzwyrzyk
+/.github/workflows/ @jzwyrzyk
+/ops/ @jzwyrzyk
+/scripts/ops/ @jzwyrzyk
+/scripts/deployment/ @jzwyrzyk
+/server/Dockerfile* @jzwyrzyk
+/.dockerignore @jzwyrzyk
+/package-lock.json @jzwyrzyk

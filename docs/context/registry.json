@@ -602,11 +602,15 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
+        "docs/operations/*.md",
         "docs/mind-your-jems/*.md"
       ],
       "sources": [
         ".github/workflows/**",
         "scripts/deployment/**",
+        "scripts/ops/**",
+        "ops/**",
+        ".github/CODEOWNERS",
         "package.json",
         "package-lock.json",
         "tsconfig.json",
@@ -616,10 +620,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T02:40:29.928Z",
-      "sourceDigest": "dfb9123ba5cb2940ad29e6b7c3423c6b295c60011abf9210093705260abbcc18",
+      "reviewedAt": "2026-11-21T04:34:51.175Z",
+      "sourceDigest": "1f1d24bd630dcac69299166e13709ad7807f07054faa9d79970eb72fb6ea1d3c",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful production-image smoke 44855232144 and owner cleanup/reset evidence. Added and reviewed a sanitized read-only activation inventory with explicit runtime configuration mount proof, consistent Firestore reads, current allowance and adult access status. Existing application and sandbox pins are preserved; activation and Pages remain pending.",
+      "reviewReason": "Reviewed release transitions, pinned tag preservation, drift guards, isolated publication, scoped diagnostic clients and explicit account activation prerequisites.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -684,10 +688,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
+      "reviewedAt": "2026-11-21T04:33:05.445Z",
+      "sourceDigest": "e6c617a2f9bf051254bfcaab47c2fc2df233e8c3804ca818d9af673e8bffbf3a",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
+      "reviewReason": "Added the owner-reviewed Phase 2 operations route and source coverage to the canonical delivery registry.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

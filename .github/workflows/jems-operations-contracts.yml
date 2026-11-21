@@ -1,0 +1,25 @@
+name: Jems operations contracts
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: jems-operations-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    name: Jems operations policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s scripts/ops -p 'test_*.py' -v
+      - name: Validate proposed release intent
+        run: |
+          if ! jq -e '. == {}' ops/release.json >/dev/null; then
+            python3 scripts/ops/release.py ops/release.json
+          fi
