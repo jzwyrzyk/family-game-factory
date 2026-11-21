@@ -617,7 +617,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-21T13:39:27.658Z",
-      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
+      "sourceDigest": "a4b4a3f5dfd22e5f1becd9319f4358a525e9c402ed833c5a969d231da9797e54",
       "reviewOutcome": "updated",
       "reviewReason": "Inspected merged PR108 app and coach/readiness contracts, actual Nov 21 Pages source-build and deploy logs, private worker source checkout, full smoke result, failed real adult-game quality job, and pending PR109/110/111/112 diffs. Updated current source/deployment evidence and historical PR81/PR68 dispositions; live service identity, activation and child/device acceptance remain unknown.",
       "reviewHistory": [
