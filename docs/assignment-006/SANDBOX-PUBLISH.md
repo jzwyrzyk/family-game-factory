@@ -1,5 +1,28 @@
 # Rebuild the accepted sandbox contract — manual GHCR publication
 
+## Current handoff — publisher fix merged
+
+[PR98](https://github.com/jzwyrzyk/family-game-factory/pull/98) merged as `d93ed92c61f603ddecdbc922187664b2b25c244b` on November 20, 2026, at 7:29:14 p.m. America/New_York (`2026-11-21T00:29:14Z`). All 14 check runs passed on reviewed head `73a872a6dfdf2f53a1da7d614c32be80816146e2`; its Git tree exactly matches the merge. [Delivery state](../../DELIVERY-STATE.md) records the merge evidence separately from publication and production acceptance.
+
+**Next:** make one new manual publisher dispatch from the owner's already authenticated Cloud Shell. The following block verifies that PR98 is merged, the workflow file is exactly the reviewed fixed blob, and private paid generation remains disabled. It then starts publication and lists recent runs. Run it once; if it stops or the result is uncertain, inspect the existing run before dispatching again. Do not rerun failed run 44837433067, which uses the older workflow.
+
+```bash
+(
+  set -euo pipefail
+  JEMS_PUBLIC="jzwyrzyk/family-game-factory"
+  JEMS_WORKER="family-game-factory-lab/family-game-factory-worker"
+
+  test "$(gh pr view 98 --repo "$JEMS_PUBLIC" --json state --jq .state)" = "MERGED"
+  test "$(gh api "repos/$JEMS_PUBLIC/contents/.github/workflows/sandbox-publish.yml?ref=main" --jq .sha)" = "c834ea78a065a55ed498acad447f2c7bea052c8e"
+  test "$(gh api "repos/$JEMS_WORKER/actions/variables/FACTORY_ACTIONS_APPROVED" --jq .value)" = "false"
+
+  gh workflow run sandbox-publish.yml --repo "$JEMS_PUBLIC" --ref main
+  gh run list --repo "$JEMS_PUBLIC" --workflow sandbox-publish.yml --limit 3
+)
+```
+
+The expected workflow blob is `c834ea78a065a55ed498acad447f2c7bea052c8e`, from PR98's merge. A later documentation-only commit does not change this value. If a guard fails, inspect the changed fact rather than removing the guard. The run list can briefly lag dispatch acceptance; an absent new row is not a reason to dispatch twice. Capture the successful run's `PUBLISHED_SANDBOX_IMAGE` digest before the acceptance sequence below. This block publishes only the reviewed sandbox image; it does not start a VM, change private configuration, activate generation or deploy the website.
+
 ## November 20 manual-publication dry-run failure and repair
 
 The initial manual `sandbox-publish.yml` run [44837433067](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44837433067) verified exact approved source `b472c224...`, staged all committed sandbox inputs, built the Docker image and compared actual packaged `worker.cjs`, `source-validator.cjs` and `quality-capture.cjs` SHA-256 bytes. It then **failed safely before GHCR publication**, during the local synthetic `{game:hopper}` protocol check: the fixture loader attempted `import {hopper}` from the repository's TypeScript module compiled as CommonJS, resulting in `SyntaxError: ... does not provide an export named 'hopper'`. Consequently the no-network container received no input and emitted `Unexpected end of JSON input`. **This is a fixture-loading defect in the publishing workflow, not evidence of an image or sandbox runtime failure. No new digest exists from this run.**
