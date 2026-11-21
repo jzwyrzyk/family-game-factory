@@ -15,6 +15,12 @@ The historical `scripts/deployment/deploy.py` always constructs **inactive** gat
 
 An existing production gateway/preview image change must use a separately reviewed, in-place, rollback-capable procedure that preserves current service identity, exact mounted secret versions, environment, origins, family/workspace, signing keys, budgets, permits, private worker pin and traffic until new revisions pass acceptance. Do not create a substitute helper that forcefully resets AI to false. An inactive bootstrap cannot be repurposed as an updater.
 
+### PR115 coordinated conversation-service release
+
+The owner-authorized [PR115 production handoff](../child-journey/PR115-PRODUCTION.md) uses `release_services.py` to update the gateway and private coach together from an exact tested source. Its default is a remote-read-only plan; explicit execution preserves fresh serving templates/IAM/pinned secrets and uses conditional, journaled writes. The selected source's actual coach policy/configuration arithmetic must fit the unchanged serving limits before any image build. Both images are staged at zero traffic, then coach and gateway are promoted in that order. Interrupted attempts recover by reads, and an explicit traffic rollback restores gateway before coach. Existing generation-worker and sandbox identities remain unchanged.
+
+This helper does not publish Pages or certify actual inference. Its serving receipt explicitly requires an authenticated creation-context conversation before the separate website cutover. Retain the original private journal; do not create another release state to bypass uncertainty or a newer concurrent service source. The historical PR109 fixed-source release and PR113 gateway-only/old-coach compatibility pin are not substitutes for this coordinated update.
+
 The existing Pages workflow makes no Cloud Run/IAM/Secret Manager writes. CI tests now guard the bootstrap boundary. The read-only `scripts/deployment/continuity.py` compares the **current** service readiness and 100% traffic, adult flags, private main/tag/variable, the independent worker approval switch, and live WIF condition—not a volatile immediate before/after WIF snapshot. It prints only sanitized statuses, never credentials or private config contents.
 
 ## Complete parallel release regressions
