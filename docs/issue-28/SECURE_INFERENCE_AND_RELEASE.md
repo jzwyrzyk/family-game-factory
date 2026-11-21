@@ -39,6 +39,57 @@ The gateway's `FACTORY_COACH_API_KEY` / `FACTORY_OPENAI_API_KEY` environment
 variables now cause startup failure. The gateway image excludes the private
 provider and private executor modules.
 
+## Private conversation diagnostics
+
+An HTTP 503 from the private coach previously hid several distinct failures.
+The private executor now emits one structured `jems_private_coach_failure`
+record when an exact `POST /v1/private-coach/complete` fails. The fixed version-1
+record contains only:
+
+| Field | Meaning and boundary |
+| --- | --- |
+| `stage` | A fixed category for caller verification, configuration/readiness, input validation, budget, input moderation, inference, output moderation, usage or reply validation; unknown failures remain unknown. |
+| `reason` | An allowlisted category, including an HTTP rejection, transport failure, output limit, invalid reply or missing creation-readiness verdict. Original exception messages are never copied. |
+| `elapsedMs` | Nonnegative integer duration, bounded to one hour. |
+| `providerHttpStatus` | Optional integer HTTP status from the failed provider call. Provider error bodies are not read for diagnostics. |
+| `incompleteReason` | Optional `max_output_tokens`, `content_filter` or `other`; arbitrary provider text cannot enter this field. |
+
+The record also has the fixed event name and `version:1`. No prompt, response
+text, headers, URLs, child/profile/family identifier, request ID, model key,
+exception object, stack or cause is logged. Errors are tagged in private process
+memory; the metadata is not added to gateway/browser responses or saved
+conversation receipts. Logging failures cannot change the original request
+result. Successful turns, health/status probes and speech calls do not produce
+this event. Existing auth, consent, deadlines, call order, spending admission,
+conservative settlement, refusal behavior and explicit retry remain unchanged.
+
+This identifies a failing step without claiming more than the evidence. For
+example, an inference `http_error` with status 400 establishes a rejected API
+request but does not by itself identify the invalid parameter. A private-service
+503 can also result from a thrown caller-verification error before inference.
+HTTP status 200 on a readiness request does not reveal the returned `available`
+value and never proves a successful model reply.
+
+The standalone [read-only inspector](../../scripts/deployment/inspect_coach_runtime.py)
+uses the operator's existing `gcloud` identity, fixed project
+`family-game-factory-jzw` and region `us-east5`. It reads only gateway/private-coach
+service descriptions, their positive-traffic revision descriptions, and bounded
+request-log metadata. It reports allowlisted flags/model/limits, key-reference
+presence/pinning booleans, network configuration categories and recent chat/status
+request results. It does not read secret contents or the mounted private JSON
+configuration, call a model, mint an identity, change configuration or deploy.
+Missing explicit environment values are unknown/default, not inferred false.
+Run `python3 scripts/deployment/inspect_coach_runtime.py` from the reviewed source;
+retain the exact source identity with the returned private operational receipt.
+
+After the diagnostic runtime is deployed through the existing reviewed
+private-coach image procedure, inspect one explicitly requested conversation.
+Read `jsonPayload.event="jems_private_coach_failure"` in that service's logs and
+project only the fields above. An absent event on older code is not a healthy-chat
+signal. A provider/configuration correction and a successful authenticated
+conversation remain separate acceptance; this diagnostic change activates
+neither child AI nor another provider.
+
 The gateway contains no provider API key. The `coachPrivateOrigin` property in
 the existing privately mounted gateway configuration is **only an exact
 HTTPS endpoint selector**; adding an origin alone does not enable the coach.

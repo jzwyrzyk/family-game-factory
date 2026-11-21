@@ -1,5 +1,60 @@
 # jems delivery state
 
+## November 21, 2026 — access candidate reconciled locally with diagnostic main
+
+This preparation combines the exact [PR124 main merge](https://github.com/jzwyrzyk/family-game-factory/commit/b4734b1323de87dfee96bb91769cbab3cff432e6) with the access and Pal lifecycle candidate published as [PR107 head `4ed4263`](https://github.com/jzwyrzyk/family-game-factory/commit/4ed426345772fbe970add7409b889aa37479a893). The diagnostic main tree is `d50cd56848fd3f31ad3eab323d5e4fbc36e111a9`; the already tested access tree is `baccbb1c32669b29ce01ba0704022b46e2fe6a69`. Private-coach diagnostic source, its inspector and tablet activation assertions are preserved byte-for-byte from main. Operations/access source and the Pal lifecycle implementation/tests are preserved byte-for-byte from the access candidate. The only manual conflicts were additive delivery history and overlapping validation/delivery review records; both histories are retained.
+
+The published access head remains unchanged while its owner-reviewed account plan is being handled. This local integration is not a remote PR update, merge to main, account mutation, deployment or activation. Prior hosted passes apply to their original source; this new combination requires fresh hosted checks after publication. Local integration checks are recorded in the handoff rather than relabeling the earlier browser or live-service evidence. The owner's **do not merge yet** instruction remains in force.
+
+## November 21, 2026 — diagnostic release approved; tablet input evidence corrected
+
+The owner approved merging [PR124](https://github.com/jzwyrzyk/family-game-factory/pull/124) after required checks pass and deploying only its private-coach diagnostic change. The original head `a4dc8c5841f631029be0faa16ee11c475d68c28d` and the refreshed PR merge checkout have the same tree `00f586a6b5a8d7aca1f67c7bea7321072bdd2eae`; both complete PR workflow sets passed. Repository protection nevertheless required the original push checks, which shared push/PR concurrency had canceled. Their legitimate rerun passed browser, learning, private-coach image and service packaging, but [creative job136956230056](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44937329470/job/136956230056) failed the portrait tablet's first **Add Bottle** assertion at `2026-11-21T19:23:04Z`: zero parts instead of one. Its other independent suites passed. This is an observed input assertion failure, not a demonstrated infrastructure fault or a confirmed application regression.
+
+The tablet test previously read the synchronous game state immediately after the touch protocol returned, without an explicit receipt that the intended button received its trusted activation. The narrow test correction observes that one activation within a bounded deadline, retains every exact count/type/selection and touch-capability assertion, and records bounded input/target/layout/state evidence on failure. It sends one normal real tap, without forced or synthetic activation or another input attempt. A dropped, redirected or double activation remains a failure. This closes an input-completion evidence gap; it does not prove that delayed activation caused the historical failed run. The application's game code and the private diagnostic runtime are unchanged by this follow-up.
+
+Syntax, whitespace and independent review passed for the test correction. A focused passive-event harness covered delayed completion, missing/canceled/redirected/untrusted input, duplicate activation, cleanup and the event bound; it is not a Chromium reproduction. Fresh hosted checks on the corrected source remain required before merge. The approved rollout still preserves current service configuration, model and budgets, approved audience and dictation settings; it changes only the private-coach image. The owner-supplied serving inspection still shows the PR115 gateway and private-coach revisions. No new build, revision, traffic change or successful conversation is claimed here.
+
+## November 21, 2026 — private chat failures observed; diagnostics prepared
+
+The owner supplied Cloud Run request metadata for two failed real chat turns at
+**12:49 p.m. America/New_York** (`2026-11-21T17:49Z`). Private coach
+`factory-coach-private-pr115-19f5e46ae114-fb5fa6` returned HTTP 503 in
+4.266 and 3.737 seconds, with matching gateway
+`factory-gateway-pr115-19f5e46ae114-fb5fa6` HTTP 503 responses in 4.472 and
+3.912 seconds. These are owner-provided log observations, not a successful
+conversation receipt. They narrow the failure to the private-service path and
+occur before the explicit 25-second inference deadline. They do not establish
+whether caller verification, a provider call, an allowance or reply validation
+failed. The earlier generic error handling discarded that distinction.
+
+The diagnostic candidate starts from merged main
+`6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`, preserving PR115 and the approved
+Pal integration. It adds one content-free, allowlisted private error event per
+failed conversation POST and a standalone read-only configuration/request
+inspector. Its [contract](docs/issue-28/SECURE_INFERENCE_AND_RELEASE.md#private-conversation-diagnostics)
+documents the exact privacy and interpretation limits. Public error responses,
+provider request payloads, model/token/price settings, deadlines, approved
+audiences, authorization and accounting behavior remain unchanged. No automatic
+paid retry is introduced, and normal-profile AI remains subject to the existing
+adult-pilot/guardian gates.
+
+Source verification covers real loopback HTTP calls with synthetic provider
+responses, failure-stage identification, logging redaction, unchanged public
+errors, no additional provider calls, logger-failure isolation and the read-only
+inspector's serving-revision/redaction boundaries. Exact local and hosted results
+belong to the published PR; none establishes the live failure's root cause.
+
+**Prepared and unmerged. No deployment or configuration change is claimed.**
+The runtime delta affects the private-coach image only; the gateway, browser,
+preview, generation worker and sandbox need no change for these diagnostics.
+Before any approved rollout, verify the actual serving source/configuration and
+use the current immutable private-coach image procedure. Do not replay PR109,
+PR113 or PR116's fixed-source rollout commands. [PR116](https://github.com/jzwyrzyk/family-game-factory/pull/116)
+retains the preceding backend rollout evidence, while
+[PR117](https://github.com/jzwyrzyk/family-game-factory/pull/117) tracks the separate
+Pal website cutover. A safe diagnostic record followed by the appropriate
+correction and a validated real reply is still required to close this incident.
+
 ## November 21, 2026 — current-page Pal portrait workload correction prepared
 
 The retained final [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107) failure trace from head `d12983d` recorded **1,097 native decode starts**, a peak of **210 pending**, and **95 already-detached images among the 340 retained start events**. It also recorded a native failure on a current, connected image with the same source. These observations establish discarded/repeated portrait work alongside a real decoding failure; they do not identify the browser decoder's internal cause or establish that lifecycle churn caused that failure.

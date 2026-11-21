@@ -543,10 +543,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:36:52.129Z",
-      "sourceDigest": "ebaea1ce57ffb0ec47757d2378241f5eebd03970856d9e8f751e2c2f18e53731",
+      "reviewedAt": "2026-11-21T18:04:40.003Z",
+      "sourceDigest": "6332be601023663f7b36b4f7c363566a47455c77a1391233e4913893e82cd1ec",
       "reviewOutcome": "updated",
-      "reviewReason": "Coaching standard and architecture distinguish playable creative gaps from optional polish, retain original authored intent, require opted-in readiness, remove scripted outage interviews, and separate technical output failures from refusals."
+      "reviewReason": "Documented exact content-free private failure event, unchanged public errors and inference gates, and source-only limits after the observed four-second 503s."
     },
     {
       "id": "adult-privacy",
@@ -617,10 +617,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T19:01:24.165Z",
-      "sourceDigest": "6bb01be7bf23848c3693e57e34fc535e3a0967ec568098ab83cdd714a1108345",
+      "reviewedAt": "2026-11-21T20:58:22.701Z",
+      "sourceDigest": "60cf47e1f1d6aea925724a58c675df556a9c0861d0a3366f8d6e6adf18146869",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the measured 1097-decode/210-pending trace and its unknown native cause separately from the prepared workload correction. Extended the actual browser fixture for retained image/source identity, ready-hero decode counts, retired load/native callbacks, owner/form/reset/dispose isolation and focused retry. Strengthened the integrated native assertion with current connected visible identity and added a pre-reload scalar checkpoint; local build and 65 existing tests passed, new hosted browser assertions remain pending.",
+      "reviewReason": "Reconciled the independently reviewed Pal lifecycle assertions and main PR124 private diagnostic/tablet assertions without changing either implementation. Preserved both historical source review stamps and failure records; the combined candidate still needs its own hosted browser acceptance after publication.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -670,6 +670,20 @@
           "sourceDigest": "9a1a08691b7a59def8f11da367d02f1882aec03aae21fb560efeda5f77584d3b",
           "reviewOutcome": "updated",
           "reviewReason": "Delivery and feature contracts record readiness/history/reconnect, exact saved-job/lost-ack retry and adult banner fixture coverage, local executable passes and Chromium startup restriction; live provider, device and child acceptance remain unverified."
+        },
+        {
+          "sourceCommit": "4ed426345772fbe970add7409b889aa37479a893",
+          "reviewedAt": "2026-11-21T19:01:24.165Z",
+          "sourceDigest": "6bb01be7bf23848c3693e57e34fc535e3a0967ec568098ab83cdd714a1108345",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented the measured 1097-decode/210-pending trace and its unknown native cause separately from the prepared workload correction. Extended the actual browser fixture for retained image/source identity, ready-hero decode counts, retired load/native callbacks, owner/form/reset/dispose isolation and focused retry. Strengthened the integrated native assertion with current connected visible identity and added a pre-reload scalar checkpoint; local build and 65 existing tests passed, new hosted browser assertions remain pending."
+        },
+        {
+          "sourceCommit": "b4734b1323de87dfee96bb91769cbab3cff432e6",
+          "reviewedAt": "2026-11-21T19:43:59.746Z",
+          "sourceDigest": "5fd2ff6f7a8fb7ca4e6df5ed7089cfac005ea70cf53dee915547c8aedbea0810",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the observed exact-tree tablet Add Bottle failure and strengthened the one-real-tap test with a bounded trusted-activation receipt, unchanged blueprint/capability assertions and bounded failure evidence; local harness/review are distinct from pending Chromium CI and the unproved historical cause."
         }
       ]
     },
@@ -698,10 +712,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T19:01:24.665Z",
-      "sourceDigest": "40632ad55db4acd3e37047e8ed67f9cd48145aa07260281805292a8336f227cd",
+      "reviewedAt": "2026-11-21T20:58:23.001Z",
+      "sourceDigest": "e4e24f3cbb5dfa137e58055995910e35df2bcdb1d6f9774f9940367541aed9c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Added a scoped preparation receipt for current-page portrait workload correction, local build and 65 existing non-browser Pal passes, asset/catalog checks and unexecuted hosted browser gates. The native decoder cause remains unknown; this source work claims no browser repair, merge, deployment, permission grant, provider action or CI rerun.",
+      "reviewReason": "Recorded the local-only integration of exact main b4734b1 with the tested access candidate while preserving its published head for the owner's source-bound account plan. Retained both complete delivery histories and review records; no remote merge, account mutation, deployment or new hosted acceptance is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -786,6 +800,20 @@
           "sourceDigest": "f94fd642a9061b2862b9ef6e39792290cb39c8b3d0e5baf8554429ab56e0958d",
           "reviewOutcome": "updated",
           "reviewReason": "Corrected the unsupported mandatory service_account_email manifest assumption using the installed provider runtime networking guide, which documents managed CLI selectors but no required account field. Selector-only fixtures now pass, wrong present declarations fail, and all reports keep account identity unverified. Reviewed preserved no-fallback/override/resource/command boundaries and made live selected-account plus denied-write acceptance explicit. Recorded 79 deployment and 48 operations passes, actual no-gcloud self-check, earlier hosted receipts scoped to b981b9c and the continuing no-merge hold."
+        },
+        {
+          "sourceCommit": "4ed426345772fbe970add7409b889aa37479a893",
+          "reviewedAt": "2026-11-21T19:01:24.665Z",
+          "sourceDigest": "40632ad55db4acd3e37047e8ed67f9cd48145aa07260281805292a8336f227cd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added a scoped preparation receipt for current-page portrait workload correction, local build and 65 existing non-browser Pal passes, asset/catalog checks and unexecuted hosted browser gates. The native decoder cause remains unknown; this source work claims no browser repair, merge, deployment, permission grant, provider action or CI rerun."
+        },
+        {
+          "sourceCommit": "b4734b1323de87dfee96bb91769cbab3cff432e6",
+          "reviewedAt": "2026-11-21T19:44:00.253Z",
+          "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified."
         }
       ]
     },
