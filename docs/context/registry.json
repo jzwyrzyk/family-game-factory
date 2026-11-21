@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:34:04.568Z",
-      "sourceDigest": "e9a423a0bc688d5f1f4e2a6a819352d8b2211da96649677836d95b1f9de44e34",
+      "reviewedAt": "2026-11-21T15:41:42.914Z",
+      "sourceDigest": "c5db73e17d5d944f91e398bdf5cdb9b45c0fb3a10cdb6f9daf0be8a8c6b000b8",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the PR115 production handoff against doctrine and accepted guided-creation intent. It preserves child-authored readiness, explicit paid actions and Keep, unchanged approved limits, separate availability and real conversation evidence, and notebook-compatible rollback; it adds an operator procedure without a new product policy.",
+      "reviewReason": "Reviewed the later owner instruction moving actual chat acceptance after website cutover. This changes release sequencing only; child-owned intent, coherent readiness before Build, explicit Keep, existing adult/child access boundaries and spending authority remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T15:34:10.359Z",
-      "sourceDigest": "73fa888bab500ed6a67b2a2831415effd3bb8f7fdda5382eeac56970753d1c15",
+      "reviewedAt": "2026-11-21T15:41:43.206Z",
+      "sourceDigest": "16d0c248674eb67a99746670fbe1379ff62e650b0cc63a7dd2c7e687e0859c81",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified PR115 merge19f5e46/tree equality, all hosted application workflows and the legitimate cancelled-check rerun. Reviewed coordinated image-only source/CI/config/IAM/budget gates, staged promotion, immutable provenance, no-replay journals, gateway-first rollback and pinned Cloud Shell/bootstrap handoff. Local113 deployment tests are separate from unavailable live cloud authority, actual conversation acceptance and pending Pages publication.",
+      "reviewReason": "Updated the PR116 handoff, release continuity and latest PR115 delivery receipt to follow the later owner instruction: verified backend deployment, selected-source Pages with all required automated checks, then actual chat/game acceptance. Marked the previous pre-cutover chat gate as superseded without modifying the pinned helper, journal, permissions, budgets or deployment evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

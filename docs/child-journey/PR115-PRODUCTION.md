@@ -2,9 +2,11 @@
 
 This is the bounded production handoff for [PR115](https://github.com/jzwyrzyk/family-game-factory/pull/115). The owner authorized its merge and rollout on November 21, 2026. Source integration, backend delivery, an actual conversation, and the website cutover each need their own receipt. The operator below does not claim that any of them has already happened.
 
+**Updated release order, November 21, 2026:** while awaiting the Cloud Shell result, the owner directed website cutover immediately after successful backend deployment, followed by diagnosing and checking the actual conversation on the released interface. This supersedes this handoff's earlier requirement to complete the chat check before Pages. The [PR116 operator](https://github.com/jzwyrzyk/family-game-factory/pull/116), its existing recovery journal and all required automated release checks remain unchanged.
+
 ## Release scope
 
-Update the gateway and private coach from the exact reviewed application source, preserving their currently serving configuration. Publish the website only after those backends are verified and an authenticated creation conversation succeeds. Preserve the newer PR112 gateway repair and any subsequently merged Pal packaging dependencies. The existing generation worker, sandbox, preview service, permissions, approvals, model, token limits, spending limits and numeric secret versions remain outside this image-only update.
+Update the gateway and private coach from the exact reviewed application source, preserving their currently serving configuration. After the successful backend receipt, proceed directly to the selected-source Pages release with its required automated checks. Check the authenticated creation conversation after website cutover. Preserve the newer PR112 gateway repair and any subsequently merged Pal packaging dependencies. The existing generation worker, sandbox, preview service, permissions, approvals, model, token limits, spending limits and numeric secret versions remain outside this image-only update.
 
 The earlier PR109 release pins PR108 and must not be replayed over the newer gateway. The PR113 gateway-only operator pins the older coach, so it cannot coordinate this two-service change.
 
@@ -70,22 +72,22 @@ Use the exact three reviewed SHAs supplied with the release receipt. The followi
 
 Omit `--execute` for a remote-read-only plan. The executing form is covered by the owner's release authorization; it does not require a second approval merely because it uses a helper. If a command fails, preserve the same directories and report its sanitized fixed error or status. Do not start a fresh journal to bypass an uncertain attempt or a failed configuration/source gate.
 
-A successful backend result is `PR115_BACKENDS_SERVING_CONTEXT_CHECK_REQUIRED`. It includes exact source/build/image/revision/rollback identities and truthfully retains `conversationVerified:false` and `pagesDispatched:false`. Share that sanitized result, not `release.json`, SDK credential output, private configuration, passphrases or session headers.
+A successful backend result is `PR115_BACKENDS_SERVING_CONTEXT_CHECK_REQUIRED`. It includes exact source/build/image/revision/rollback identities and truthfully retains `conversationVerified:false` and `pagesDispatched:false`. The receipt name is unchanged in the already pinned helper; under the owner's updated order, its outstanding conversation check follows Pages cutover. Share that sanitized result, not `release.json`, SDK credential output, private configuration, passphrases or session headers.
 
-## Actual conversation gate before the website
+## Website cutover
 
-Use the existing authorized adult profile through the ordinary Jems interface. The currently deployed PR108 interface already sends the version-1 creation context, so the new backend can be checked before publishing the new browser bundle. A health response is insufficient. Require the authenticated coach status to report available before spending either bounded synthetic turn.
+After the successful backend receipt, inspect current main, related PRs and running/pending Pages runs again, then proceed to the authorized website release. A concurrently merged Pal change must be preserved; the manual workflow serializes releases but does not itself prevent an older selected source from becoming the final website. Resolve the combined source and any changed service archive before dispatching.
+
+Dispatch `.github/workflows/pages.yml` on `main` once, using the full merged reviewed `source_sha`, gateway origin `https://factory-gateway-ola734esta-ul.a.run.app`, and preview origin `https://factory-preview-ola734esta-ul.a.run.app`. Recover an uncertain dispatch by finding its existing run instead of dispatching again. The exact-source artifact build and all eight complete regression shards must pass before deploy. Then verify the public release marker and build information identify that exact clean source and the correct origins.
+
+## Conversation and game checks after cutover
+
+Use the existing authorized adult profile through the released Jems interface. The chat check is post-cutover acceptance, not an additional prerequisite for the authorized Pages release. A health response does not establish actual conversation success. Require the authenticated coach status to report available before spending either bounded synthetic turn.
 
 1. Send one complete synthetic idea: **I tilt a sleepy owl to keep it balanced on a branch while its lantern charges. If the owl falls, the round ends.**
 2. Only after a validated model response, inspect its readiness and wording. It should recognize a playable first version, retain the chosen action/stakes and avoid another optional-detail interview. Then send the explicit correction: **Make the owl a sleepy fox instead; keep the same balancing game and lantern.** Verify that the correction is retained without losing the mechanic.
 
-Use at most these two explicit metered admissions within the existing allowance. Stop after the first unavailable, refused, malformed, timed-out or indeterminate reply; do not automatically repeat a POST. There is no game Build in this chat check. Record source/revision, authenticated status, validated model mode/readiness, observed continuity and outcome without credentials or private transcripts. A failed connection needs its specific diagnosis before website cutover.
-
-## Website cutover and acceptance
-
-After the backend receipt and actual chat check, inspect current main, related PRs and running/pending Pages runs again. A concurrently merged Pal change must be preserved; the manual workflow serializes releases but does not itself prevent an older selected source from becoming the final website. Resolve the combined source and any changed service archive before dispatching.
-
-Dispatch `.github/workflows/pages.yml` on `main` once, using the full merged reviewed `source_sha`, gateway origin `https://factory-gateway-ola734esta-ul.a.run.app`, and preview origin `https://factory-preview-ola734esta-ul.a.run.app`. Recover an uncertain dispatch by finding its existing run instead of dispatching again. The exact-source artifact build and all eight complete regression shards must pass before deploy. Then verify the public release marker and build information identify that exact clean source and the correct origins.
+Use at most these two explicit metered admissions within the existing allowance. Stop the chat check after the first unavailable, refused, malformed, timed-out or indeterminate reply; do not automatically repeat a POST. There is no game Build in this chat check. Record source/revision, authenticated status, validated model mode/readiness, observed continuity and outcome without credentials or private transcripts. Diagnose any failed connection on the released interface while preserving existing access, permissions and spending limits.
 
 On the released interface, verify actual connected chat, readiness, visible Build, and an explicit bounded build/recovery journey. A successful fixture, health check, image deployment or chat turn alone does not close [issue93](https://github.com/jzwyrzyk/family-game-factory/issues/93): its real Build → Review → Play → Edit/Keep → Reload continuity remains separate evidence. Append the observed receipts to [Delivery state](../../DELIVERY-STATE.md).
 
