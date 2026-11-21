@@ -475,10 +475,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T18:04:57.691Z",
+      "sourceDigest": "5a431c187c61900209be92ceec25b5db5a89990694ce04bd1ffc6fad340aa6d2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Reviewed all JSON-reader replacements, exact raw-byte limits and pre-body auth order. Documented shared UTF-8 decoding, existing empty/error policies and the legacy invitation guard measuring bytes in server/README and architecture. No session, ownership, consent or persistence policy changed.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -517,10 +517,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.976Z",
-      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
+      "reviewedAt": "2026-11-21T18:04:58.137Z",
+      "sourceDigest": "1ba63770029bc8b362e8059ffc945e2bde6c6674cdae1c8bf0c31a7e32402ab2",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
+      "reviewReason": "Reviewed pipeline and authenticated worker callback reader changes. Architecture and server transport contract record raw-byte enforcement and chunk-safe UTF-8 decoding; request schemas, callback identity validation, job dispatch, artifact limits and public rejection mappings remain unchanged."
     },
     {
       "id": "coach",
@@ -539,10 +539,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:36:52.129Z",
-      "sourceDigest": "ebaea1ce57ffb0ec47757d2378241f5eebd03970856d9e8f751e2c2f18e53731",
+      "reviewedAt": "2026-11-21T18:04:58.561Z",
+      "sourceDigest": "182792ddc1577ea8194f45de224bd96ff2413b1c796b6f0cf5c3f1e0ca00a120",
       "reviewOutcome": "updated",
-      "reviewReason": "Coaching standard and architecture distinguish playable creative gaps from optional polish, retain original authored intent, require opted-in readiness, remove scripted outage interviews, and separate technical output failures from refusals."
+      "reviewReason": "Documented post-validation atomic provider admission shared by text/audio, abort and finally release behavior, private envelope byte caps, isolated Docker COPY input and synthetic regression boundaries. Gateway spending and provider approval contracts remain unchanged."
     },
     {
       "id": "adult-privacy",
@@ -566,10 +566,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
-      "reviewedAt": "2026-11-21T14:34:24.173Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
+      "sourceDigest": "4c5b347ef689c2eace952444c0622c3d6fe9d712290ed97785f7a48ef5e02d2c",
+      "reviewedAt": "2026-11-21T18:04:59.082Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed trusted-device readBody replacement only: existing Origin/CSRF checks, 2048-byte cap, object shape, INVALID_REQUEST mapping, parent passphrase checks, device renewal and adult grant checks are retained. The shared reader preserves split UTF-8 credentials; no authorization, consent, erasure or audience contract changed.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:01:33.009Z",
-      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
+      "reviewedAt": "2026-11-21T18:04:59.533Z",
+      "sourceDigest": "729467296c3c5fd0586fed3ce93f563c32b999716249cf112bce39bf7d357588",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
+      "reviewReason": "Registered 13 transport/admission regressions in the existing unit entrypoint. Documented every-byte UTF-8 splits, exact endpoint caps, auth-before-read, delayed-body over-concurrency, shared text/audio slots and malformed/disconnect/provider-failure recovery. 400 unit tests, build/typecheck, existing coach HTTP/private/speech tests and isolated Docker-input bundling passed; no live provider or container rollout is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

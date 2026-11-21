@@ -1,6 +1,8 @@
 import './intent-repair.test';
 import './intent-worker-binding.test';
 import './private-generation-preflight.test';
+import './http-json.test';
+import './private-coach-concurrency.test';
 import './working-game-contract.test';
 import './game-form.test';
 import './child-intent.test';

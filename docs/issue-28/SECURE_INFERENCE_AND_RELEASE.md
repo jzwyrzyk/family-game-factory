@@ -134,6 +134,10 @@ Important current distinction:
 
 ## Technical acceptance evidence required
 
+The private handler's provider concurrency is shared by text and audio, with four slots per process by default. It may reject a request immediately when full, then independently rechecks and increments the count synchronously after the bounded body and context/audio validation, immediately before provider work. There is no queued retry. Bodies still being read, malformed input and disconnected clients do not consume a provider slot. A response disconnect is checked before admission and aborts an admitted provider's signal; the slot remains counted until that provider promise settles and the `finally` block releases it. This process-local bound supplements Cloud Run admission and the gateway's atomic spending reservation; it is not a global spending or concurrency limit across instances.
+
+Both private JSON envelopes use the shared bounded UTF-8 reader (40,000 bytes for text and 440,000 for audio). Authenticated caller verification, schema/PII checks, provider approvals, usage validation and existing public error codes still apply. The dedicated image explicitly copies the shared reader before bundling. [HTTP transport tests](../../tests/http-json.test.ts) and [private concurrency tests](../../tests/private-coach-concurrency.test.ts) are registered in the unit suite and use synthetic streams/providers, including delayed-body races, text/audio contention, byte limits and malformed/aborted/failing-request recovery. These tests make no paid request and do not establish container, IAM, network or live-provider acceptance.
+
 - Security unit/HTTP tests of fake/expired identity, wrong audience,
   browser Origin, CSRF, oversized/malformed input, PII, schema spoofing,
   unsafe responses, over-budget usage and no generated code or job dispatch.

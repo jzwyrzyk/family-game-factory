@@ -4,6 +4,22 @@ Start with [Current architecture](../ARCHITECTURE-CURRENT.md), [Delivery state](
 
 The original contract snapshot below is retained as historical rationale. Its statements about an unimplemented backend, missing deployment scripts and proposed endpoints describe that early assignment; **they are not current status or a complete API specification**. The implemented generation API is `/v1/jobs`, not the proposed `/v1/generations`. [openapi.json](openapi.json) covers jobs/revisions/worker operations but still needs reconciliation with newer coach/speech/device routes.
 
+## Current JSON transport
+
+[http-json.ts](http-json.ts) counts raw request bytes and decodes once after the bounded body is complete, preserving multi-byte UTF-8 characters split across chunks. It performs JSON parsing; each route still owns authentication, schema validation and its existing public error response. It does not trust `Content-Length` to enforce the limit. The gateway audio upload remains a separate bounded binary reader.
+
+| JSON route family | Maximum body bytes | Empty body |
+| --- | ---: | --- |
+| Pipeline jobs/revisions | 12,000 | Parsed as `{}`, then route validation |
+| Coach conversation | 50,000 | Invalid JSON |
+| Coach receipt erasure | 1,024 | Invalid request |
+| Trusted-device/session/parent/adult operations | 2,048 | Parsed as `{}`, then route validation |
+| Legacy invitation session | 1,000 | Invalid invitation |
+| Authenticated worker claim/report/status | 10,485,760 | Parsed as `{}`, then route validation |
+| Private coach text / audio envelope | 40,000 / 440,000 | Invalid request |
+
+The legacy invitation reader now measures its 1,000 limit in bytes instead of JavaScript characters; valid invitation values are still ASCII. Raw JSON padding contributes to every limit. [Transport tests](../tests/http-json.test.ts) cover UTF-8 splits, inclusive limits, malformed/empty input and authentication before body consumption. [Private admission tests](../tests/private-coach-concurrency.test.ts) cover shared text/audio slots and delayed or disconnected clients. Source implementation and local fixtures are separate from service deployment and live acceptance.
+
 ## Historical snapshot — managed backend contracts
 
 `contracts/api.ts` defines versioned Cloud Run boundary types, tenant authorization and parent release gates, strict generation input validation, job transitions, private Firestore/Cloud Storage ports, atomic budget reservations, isolated-worker and server-only AI provider interfaces. The unconfigured adapter fails explicitly. These files are not imported by the browser and contain no cloud credentials, SDK initialization or mock generation success.

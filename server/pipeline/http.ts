@@ -7,9 +7,10 @@ import {verifyBrowserSession} from '../trusted-devices';
 import type {Repository} from './types';
 import { renderPreview } from './artifacts';
 import { JobService } from './service';
+import {readJsonBody} from '../http-json';
 interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>}
 function json(response:ServerResponse,status:number,value:unknown){response.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});response.end(JSON.stringify(value));}
-async function body(request:IncomingMessage){let text='';for await(const chunk of request){text+=chunk;if(Buffer.byteLength(text)>12000)throw Error('REQUEST_TOO_LARGE');}return JSON.parse(text||'{}');}
+const body=(request:IncomingMessage)=>readJsonBody(request,12000,{limitError:'REQUEST_TOO_LARGE',emptyObject:true});
 const signature=(key:string,fields:string)=>createHmac('sha256',key).update(fields).digest('base64url');
 const equal=(a:string,b:string)=>{const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&timingSafeEqual(x,y);};
 export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository){
