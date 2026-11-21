@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T07:35:26.612Z",
-      "sourceDigest": "c168831d63bb423458036ae8320f9269c101ac7984d1bedb7afb1e0cf2dba6fd",
+      "reviewedAt": "2026-11-21T07:51:48.265Z",
+      "sourceDigest": "8f73e649f35aa163847818db2da938ea467df14a99a0dc8c580b06edf5d30138",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the read-only build-status helper extension that emits only allowlisted saved quality findings with explicit previous-attempt provenance. Verified bounded parsing, omission of unknown/free-text values, boolean report-fingerprint presence and side-effect-free imports in six passing synthetic tests. Existing cloud reads, deployment permissions, runtime behavior and canonical in-progress-game evidence are unchanged.",
+      "reviewReason": "Recorded the owner-confirmed three-attempt REPAIR_EXHAUSTED_QUALITY outcome, verified cleanups and exact diagnostic publication while preserving earlier authorization, runtime and input failures. Extended only the read-only status helper for optional typed last-rejection metadata, with independent stage/attempt provenance, bounded category/code/finding enums and review axes; twelve synthetic tests cover malformed data, redaction and Ready/cancel history. Prior repair feedback and report-fingerprint presence remain distinct, and no gateway deployment or PR109 staging outcome is inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

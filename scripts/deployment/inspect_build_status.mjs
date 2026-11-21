@@ -30,7 +30,8 @@ export const statusProgram=[
   'attempt=e.get("attempt"); attempt=attempt if type(attempt) is int and 0<=attempt<=2 else None',
   // Only enumerate the bounded FINDINGS field of saved sanitized repair feedback.
   // The existing from-attempt field identifies its provenance; this is not a new review.
-  'finding_codes={"VISUAL_STYLE_MISMATCH","VISUAL_INCOHERENT_ART","VISUAL_UNREADABLE_LAYOUT","VISUAL_PLACEHOLDER_APPEARANCE","VISUAL_OCCLUSION_OR_SCALE","INTENT_ACTION_MISSING","INTENT_PAYOFF_MISSING","GAMEPLAY_NO_CONSEQUENCE","GAMEPLAY_NO_VARIATION","GAMEPLAY_NO_RECOVERY","INPUT_UNCLEAR_OR_INACCESSIBLE","QUALITY_EVIDENCE_INCOMPLETE"}',
+  'finding_order=("VISUAL_STYLE_MISMATCH","VISUAL_INCOHERENT_ART","VISUAL_UNREADABLE_LAYOUT","VISUAL_PLACEHOLDER_APPEARANCE","VISUAL_OCCLUSION_OR_SCALE","INTENT_ACTION_MISSING","INTENT_PAYOFF_MISSING","GAMEPLAY_NO_CONSEQUENCE","GAMEPLAY_NO_VARIATION","GAMEPLAY_NO_RECOVERY","INPUT_UNCLEAR_OR_INACCESSIBLE","QUALITY_EVIDENCE_INCOMPLETE")',
+  'finding_codes=set(finding_order)',
   'findings=[]',
   'if code and attempt in (1,2) and isinstance(feedback,str):',
   ' field=re.match(r"^[A-Z][A-Z0-9_]+;FINDINGS=([^.;\\r\\n]{1,1024})(?:[.;]|\\Z)",feedback[:2000])',
@@ -38,8 +39,27 @@ export const statusProgram=[
   '  for entry in field.group(1).split(","):',
   '   entry=entry.strip()',
   '   if entry in finding_codes and entry not in findings: findings.append(entry)',
+  // New producer metadata is last rejection history, not an inferred final cause.
+  // Reconstruct only the typed enum fields; raw reports and extra keys stay private.
+  'category_codes={"intent-missing":{"INTENT_REQUIREMENT_FAILED"},"input-unresponsive":{"INPUT_RESPONSE_FAILED","INPUT_PRESENTATION_FAILED"},"runtime-failed":{"GAME_RUNTIME_FAILED"},"replay-failed":{"GAME_CONTINUITY_FAILED"},"syntax-invalid":{"GENERATED_SOURCE_INVALID"},"limits-failed":{"GAME_RESOURCE_LIMIT"},"test-unverified":{"GAME_TEST_FAILED"},"presentation-failed":{"GAME_PRESENTATION_FAILED"},"gameplay-shallow":{"GAMEPLAY_DESIGN_FAILED"},"quality-unverified":{"GAME_QUALITY_UNVERIFIED"}}',
+  'def safe_last_failure(raw):',
+  ' if not isinstance(raw,dict) or attempt is None: return None',
+  ' failed_stage=raw.get("stage"); failed_attempt=raw.get("attempt")',
+  ' category=raw.get("category"); failure_code=raw.get("code"); saved_findings=raw.get("findings")',
+  ' if failed_stage not in ("test","review") or type(failed_attempt) is not int or not 0<=failed_attempt<=attempt: return None',
+  ' if not isinstance(category,str) or not isinstance(failure_code,str) or failure_code not in category_codes.get(category,()): return None',
+  ' if not isinstance(saved_findings,list) or len(saved_findings)>len(finding_order): return None',
+  ' if any(not isinstance(f,str) or f not in finding_codes for f in saved_findings) or len(set(saved_findings))!=len(saved_findings): return None',
+  ' result={"stage":failed_stage,"attempt":failed_attempt,"category":category,"code":failure_code,"findings":[f for f in finding_order if f in saved_findings]}',
+  ' if "qualityAxes" in raw:',
+  '  axes=raw["qualityAxes"]; names=("visual","intent","gameplay","input")',
+  '  if failed_stage!="review" or not isinstance(axes,dict) or set(axes)!=set(names): return None',
+  '  if any(axes[name] not in ("pass","fail","not-tested") for name in names): return None',
+  '  result["qualityAxes"]={name:axes[name] for name in names}',
+  ' return result',
+  'last_failure=safe_last_failure(e.get("lastFailure"))',
   'run_id=str(e.get("runId") or "")',
-  'print(json.dumps({"jobId":payload["jobId"],"status":token(j.get("status")),"phase":token(j.get("phase")),"errorCode":token(j.get("errorCode")),"attempt":attempt,"runId":run_id if re.fullmatch(r"[0-9]{1,20}",run_id) else None,"stage":token(e.get("stage")),"lastStoredRepairCategory":token(e.get("repairCategory")),"lastStoredRepairCode":code,"lastStoredRepairFromAttempt":attempt-1 if code and attempt in (1,2) else None,"lastStoredRepairFindings":findings,"qualityRequired":j.get("qualityRequired")=="game-quality-v1","candidatePresent":bool(e.get("candidate")),"testReportPresent":bool(e.get("testReport")),"reviewReportPresent":bool(e.get("reviewReport"))}))',
+  'print(json.dumps({"jobId":payload["jobId"],"status":token(j.get("status")),"phase":token(j.get("phase")),"errorCode":token(j.get("errorCode")),"attempt":attempt,"runId":run_id if re.fullmatch(r"[0-9]{1,20}",run_id) else None,"stage":token(e.get("stage")),"lastStoredRepairCategory":token(e.get("repairCategory")),"lastStoredRepairCode":code,"lastStoredRepairFromAttempt":attempt-1 if code and attempt in (1,2) else None,"lastStoredRepairFindings":findings,"lastFailure":last_failure,"qualityRequired":j.get("qualityRequired")=="game-quality-v1","candidatePresent":bool(e.get("candidate")),"testReportPresent":bool(e.get("testReport")),"reviewReportPresent":bool(e.get("reviewReport"))}))',
 ].join('\n');
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
 try {
