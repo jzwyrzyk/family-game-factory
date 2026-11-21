@@ -20,7 +20,7 @@ async function shot(page,device,name){
  report.screenshots.push({device,name,file:rel});
  console.log('CAPTURED '+rel);
 }
-async function home(page){await page.locator('#studioNavHome').click();await page.locator('#page-studio-library').waitFor({state:'visible'});}
+async function home(page){await navigate(page,'#studioNavHome');await page.locator('#page-studio-library').waitFor({state:'visible'});}
 async function pages(device,viewport){
  report.viewports[device]=viewport;
  const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce',serviceWorkers:'block'}),p=await ctx.newPage();
@@ -43,8 +43,7 @@ async function pages(device,viewport){
   // New invention deliberately hides old-game tools; compare versions from a playable game.
   await home(p);await p.locator('[data-starter="gum"]').click();
   await p.locator('.gum-play').waitFor({state:'visible'});
-  if(device==='mobile')await p.locator('[data-studio-tab="versions"]').click();
-  else {await p.locator('#studioMore summary').click();await p.locator('#studioCompare').click();}
+  await p.locator('#studioMore > summary').click();await p.locator('#studioCompare').click();
   await p.locator('#studioVersions').waitFor({state:'visible'});await shot(p,device,'03-versions-and-tests');
   await home(p);await shot(p,device,'04-saved-idea-home');
   for(const [num,game] of [['05','dragon'],['06','gum'],['07','moon']]){

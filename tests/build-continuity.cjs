@@ -3,9 +3,9 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
 async function switchProfile(page,index){
- if(!await page.locator('#studioProfileMenu').evaluate(node=>node.open))await page.click('#studioProfileMenu summary');
+ await openProfiles(page);
  await page.locator('.profile-choice').nth(index).click();
 }
 async function moreChoices(page){
@@ -133,6 +133,8 @@ async function stayAfterBuild(page,phase){
     assert.equal(await page.locator('.favorite-robot .favorite-canvas').isVisible(),true,'completion did not replace the game being played');
     assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'no preview automatically opened');
     assert.equal(previewRequests,0);
+    await page.locator('#studioMore > summary').filter({hasText:'ready'}).waitFor({state:'visible'});
+    await page.locator('#studioMore > summary').click();
     await page.locator('#studioBuildShelf').getByRole('button',{name:'Try ready test'}).click();
     await page.waitForFunction(()=>document.querySelector('#studioStatus')?.textContent?.includes('UNEXPECTED_PREVIEW'));
     const returned=await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]);

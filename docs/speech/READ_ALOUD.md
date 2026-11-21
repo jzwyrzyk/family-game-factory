@@ -14,6 +14,7 @@ The shared narrator cancels pending voice discovery, availability checks, synthe
 | Math | Current question and displayed choices; separate control for the revealed hint or worked example |
 | English | Current passage, question and displayed choices; separate control for revealed help |
 | Game help | The actual native/generated host instructions and controls shown in Help |
+| Idea Workshop | Current authored reasoning directions and any already revealed hint, with the same Read / Stop / Play recovery and actual-start access-support rule |
 | Creation Studio | Persistent reading toolbar for current directions, scene challenge, visible hint or scene-check feedback; a control remains available inside the character picker |
 | Grown-ups | Explicit Jems voice preview with displayed natural/device mode; separate preview and selection of an eligible installed device backup voice |
 

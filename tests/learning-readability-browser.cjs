@@ -105,6 +105,11 @@ async function journey(browser, base, device, viewport) {
     await page.locator(`${language} [data-action="hint"]`).click();
     await assertTextContrast(page, `${language} .language-hint h3, ${language} .language-hint p`, `${device} English hint`);
     await page.screenshot({ path: `test-results/learning-readable-language-hint-${device}.png`, fullPage: false });
+    await exit.scrollIntoViewIfNeeded();
+    assert.equal(await exit.evaluate(button => {
+      const rect = button.getBoundingClientRect(), hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return hit === button || button.contains(hit);
+    }), true, 'the learning exit stays reachable after scrolling through help');
     await exit.click();
     assert.equal(await page.evaluate(() => FG.learning.active), false);
     assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'leaving closes the native checkpoint');

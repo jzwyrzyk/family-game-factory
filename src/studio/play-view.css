@@ -2,31 +2,28 @@
    their own bounds; a stray swipe cannot scroll the game off the page. */
 body.studio-playing { overscroll-behavior: none; }
 body.studio-playing > footer { display: none; }
-body.studio-review.studio-playing .site-header { padding-top: 4px; padding-bottom: 4px; }
-body.studio-review.studio-playing .site-header .brand { display: none; }
+body.studio-review.studio-playing .site-header { display: none !important; }
 body.studio-review #page-studio.studio-play-mode {
   position: fixed; top: var(--jems-play-top, 0px); left: 0; right: 0;
   height: var(--jems-play-height, 100dvh); min-height: 0; max-width: none;
   padding: 6px max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
-  display: grid; grid-template-rows: auto auto auto minmax(0, 1fr);
-  grid-template-areas: 'heading' 'tools' 'tabs' 'game'; gap: 5px;
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-areas: 'heading' 'tools' 'game'; gap: 5px;
   background: #f7f8fd; overflow: hidden; z-index: 30;
 }
 body.studio-review #page-studio.studio-play-mode:fullscreen,
 body.studio-review #page-studio.studio-play-expanded { top: 0; height: 100dvh; z-index: 1100; }
-body.studio-review .studio-play-mode > .studio-heading { grid-area: heading; margin: 0; gap: 12px; min-width: 0; flex-wrap: nowrap; align-items: center; }
+body.studio-review #page-studio.studio-play-mode > .studio-heading { display: flex; grid-area: heading; margin: 0; gap: 12px; min-width: 0; flex-wrap: nowrap; align-items: center; }
 body.studio-review .studio-play-mode .studio-title-wrap h1 { font-size: 22px; margin: 0; line-height: 1.2; }
 body.studio-review .studio-play-mode .studio-title-wrap h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-body.studio-review .studio-play-mode #studioFullScreen { font-size: 18px; min-height: 48px; padding: 8px 12px; flex: none; }
+body.studio-review .studio-play-mode #studioFullScreen { font-size: 18px; min-height: 48px; padding: 8px 12px; flex: none; white-space: normal; }
 body.studio-review .studio-play-mode .studio-heading .studio-back { font-size: 18px; min-height: 48px; padding: 8px; flex: none; }
-body.studio-review .studio-play-mode :is(#studioStorage, #studioDoneForNow, .studio-version, #studioGuideHost, #studioPlayNote) { display: none !important; }
+body.studio-review .studio-play-mode :is(#studioStorage, #studioDoneForNow, .studio-version, #studioGuideHost, #studioPlayNote, #studioPlay, .studio-mobile-tabs) { display: none !important; }
 body.studio-review .studio-play-mode > .studio-topbar { grid-area: tools; display: block; margin: 0; min-width: 0; }
-body.studio-review .studio-play-mode .studio-actions { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; padding: 2px 3px 5px; }
-body.studio-review .studio-play-mode .studio-actions > :is(button, details) { flex: 1 1 0; min-width: 0; order: 0; }
+body.studio-review .studio-play-mode .studio-actions { display: flex; gap: 6px; flex-wrap: wrap; overflow: visible; padding: 2px 3px 5px; }
+body.studio-review .studio-play-mode .studio-actions > :is(button, details, #studioChange, #studioKeep) { flex: 1 0 auto; min-width: 0; order: 0; }
 body.studio-review .studio-play-mode .studio-actions > details > summary { justify-content: center; }
-body.studio-review .studio-play-mode .studio-actions :is(button, summary) { font-size: 18px; min-height: 48px; padding: 8px 12px; white-space: nowrap; flex: none; }
-body.studio-review .studio-play-mode .studio-mobile-tabs { grid-area: tabs; display: flex; margin: 0; min-width: 0; flex: none; }
-body.studio-review .studio-play-mode .studio-mobile-tabs button { min-height: 44px; font-size: 18px; padding: 6px 12px; }
+body.studio-review .studio-play-mode .studio-actions :is(button, summary) { font-size: 18px; min-height: 48px; padding: 8px 12px; white-space: normal; }
 body.studio-review .studio-play-mode > .studio-workspace { grid-area: game; display: block; height: 100%; min-height: 0; min-width: 0; }
 body.studio-review .studio-play-mode #studioCanvas { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 body.studio-review .studio-play-mode #studioConversation { display: none; }
@@ -50,6 +47,12 @@ body.studio-review .studio-play-mode #studioMore .studio-more-actions {
   overflow: auto; overscroll-behavior: contain;
 }
 body.studio-review .studio-play-mode #studioMore .studio-more-actions button { white-space: normal; }
+body.studio-review .studio-play-mode #studioProfileMenu { position: static; margin: 0; max-width: 100%; }
+body.studio-review .studio-play-mode #studioProfileMenu > summary { min-height: 48px; font-size: 18px; max-width: none; }
+body.studio-review .studio-play-mode #studioProfileMenu .profile-choices { position: static; width: 100%; max-width: none; max-height: none; margin: 6px 0 0; box-shadow: none; }
+body.studio-review .studio-play-mode #studioProfileMenu .profile-choice { min-height: 48px; font-size: 18px; }
+body.studio-review .studio-play-mode #studioBuildShelf { margin: 0; min-width: 0; }
+body.studio-review .studio-play-mode #studioBuildShelf :is(.studio-build-items, .studio-build-item, .studio-build-item-actions) { display: flex; flex-direction: column; min-width: 0; }
 body.studio-review .studio-play-mode #page-game,
 body.studio-review .studio-play-mode #page-game .game-stage,
 body.studio-review .studio-play-mode #game-mount,
@@ -58,6 +61,12 @@ body.studio-review .studio-play-mode #game-mount { overflow: auto; overscroll-be
 body.studio-review .studio-play-mode #studioRemoteHost iframe { width: 100% !important; height: 100% !important; min-height: 0; max-height: 100%; }
 body.studio-review .studio-play-mode :is(.stage-overlay, .learning-preview-cover) { overflow-y: auto; overscroll-behavior: contain; align-items: safe center; }
 body.studio-review .studio-play-mode .learning-modal-card { max-height: 100%; overflow: auto; }
+/* The legacy Language host uses a viewport-fixed overlay. Inside the fitted
+   player its stacking context would put that overlay beneath the site header.
+   Use the real game boundary instead, including its own readable scroll card. */
+body.studio-review .studio-play-mode .stage-overlay:has(.language-activity) {
+  position: absolute; inset: 0; width: auto; height: auto; z-index: 20;
+}
 
 /* Canvas favorites reserve room for their real touch controls. No transform
    shrinks labels or changes pointer coordinates. */
@@ -93,21 +102,29 @@ body.studio-review .studio-play-mode .quality-game .q-stage { flex: 1 1 0; min-h
 body.studio-review .studio-play-mode .quality-game canvas.q-canvas { height: 100%; min-height: 0; aspect-ratio: auto; }
 body.studio-review .studio-play-mode .quality-game .q-topbar { padding: 6px 12px; gap: 8px; }
 body.studio-review .studio-play-mode .quality-game .q-title { font-size: 22px; margin: 0; }
-body.studio-review .studio-play-mode .quality-game :is(.q-eyebrow, .q-footer) { display: none; }
+body.studio-review .studio-play-mode .quality-game .q-eyebrow,
+body.studio-review .studio-play-mode .quality-hill .q-footer { display: none; }
+body.studio-review .studio-play-mode .quality-builder .q-footer { display: flex; flex-wrap: wrap; padding: 6px 10px; }
+body.studio-review .studio-play-mode .quality-builder .q-footer > div { display: flex; flex-wrap: wrap; gap: 6px; }
+body.studio-review .studio-play-mode .quality-builder .q-footer :is(button, select) { min-height: 48px; font-size: 18px; padding: 6px 10px; }
+body.studio-review .studio-play-mode .quality-builder .q-footer > span { font-size: 18px; }
 body.studio-review .studio-play-mode .quality-game .q-topbar .q-subtitle { display: none; }
 body.studio-review .studio-play-mode .quality-game .q-mission { margin: 0; padding: 5px 10px; }
 body.studio-review .studio-play-mode .quality-game .q-toolbar { padding: 6px 10px; }
 body.studio-review .studio-play-mode .quality-game .q-garage[open] { max-height: 45%; overflow-y: auto; overscroll-behavior: contain; }
 
 @media (max-width: 760px) {
-  body.studio-review.studio-playing .site-header .studio-nav { order: 0; flex-basis: auto; }
-  body.studio-review.studio-playing .site-header .studio-header-tools { order: 1; flex: 0 1 auto; }
-  body.studio-review .studio-play-mode .studio-heading { gap: 6px; }
+  body.studio-review #page-studio.studio-play-mode .studio-heading { gap: 6px; }
   body.studio-review .studio-play-mode .studio-title-wrap h1 { font-size: 20px; }
   body.studio-review .studio-play-mode .studio-actions :is(button, summary) { padding: 8px; }
   body.studio-review .studio-play-mode .studio-actions > button .jems-icon { display: none; }
   body.studio-review .studio-play-mode .gum-play-layout { display: grid; grid-template-columns: 1fr; grid-template-rows: minmax(150px, 1fr) minmax(130px, 1fr); }
   body.studio-review .studio-play-mode .gum-tray { border-top: 1px solid #e7defa; }
+}
+@media (max-width: 420px) {
+  body.studio-review .studio-play-mode .studio-title-wrap { display: none; }
+  body.studio-review #page-studio.studio-play-mode .studio-heading { justify-content: space-between; }
+  body.studio-review .studio-play-mode #studioFullScreen { max-width: 46%; }
 }
 @media (max-height: 600px) and (min-width: 600px) {
   body.studio-review #page-studio.studio-play-mode { grid-template-rows: auto minmax(0,1fr); grid-template-columns: auto minmax(0,1fr); grid-template-areas: 'heading tools' 'game game'; }
@@ -119,4 +136,8 @@ body.studio-review .studio-play-mode .quality-game .q-garage[open] { max-height:
   body.studio-review .studio-play-mode .favorite-game { display: grid; grid-template-columns: minmax(0,1fr) minmax(230px,.55fr); grid-auto-rows: auto; gap: 4px 10px; align-items: center; }
   body.studio-review .studio-play-mode .favorite-canvas { grid-row: 1 / span 8; grid-column: 1; height: 100%; min-height: 0; }
   body.studio-review .studio-play-mode .favorite-game > :not(canvas) { grid-column: 2; margin: 0; }
+  body.studio-review .studio-play-mode .gf-sorting-board { top: auto; bottom: 12px; }
+  body.studio-review .studio-play-mode .gf-helper { display: none; }
+  body.studio-review .studio-play-mode .gf-wrap-options { top: auto; bottom: 10px; }
+  body.studio-review .studio-play-mode .gf-gift-action { top: 20%; }
 }

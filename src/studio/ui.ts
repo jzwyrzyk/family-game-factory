@@ -455,9 +455,11 @@ export async function installStudio(){
  }
  function refreshShelf(){
   const inConversation=route==='studio'&&activeId&&(panel==='talk'||notebook.list(owner()).some(s=>s.id===activeId&&s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate));
-  if(inConversation){if(buildShelf.parentElement!==extraTools)extraTools.append(buildShelf);}
+  if(playView.active){const menu=$('studioMore').querySelector('.studio-more-actions')!;if(buildShelf.parentElement!==menu)menu.append(buildShelf);}
+  else if(inConversation){if(buildShelf.parentElement!==extraTools)extraTools.append(buildShelf);}
   else if(buildShelf.parentElement!==globalStatus.parentElement)globalStatus.after(buildShelf);
   const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
+  playView.setReady(jobs.some(s=>!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
   buildShelf.append(iconEl('strong','','clock','My builds & tests'));
   const items=el('div','studio-build-items');

@@ -71,6 +71,17 @@ async function assertScrollRestored(journey){
  assert.equal(await journey.page.evaluate(()=>document.body.style.overflow),journey.bodyOverflow,'closing restores the previous document scroll style');
 }
 
+async function assertPlayHandoffScroll(journey){
+ const {page}=journey;
+ assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'the chosen game owns the play view after the mining dialog closes');
+ assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden','active play keeps the outer page still');
+ const frame=await page.locator('#studioRemoteHost iframe').boundingBox(),size=page.viewportSize();
+ assert.ok(frame&&frame.y>=0&&frame.y+frame.height<=size.height+1,'the generated game fits its new scroll owner');
+ await page.locator('#studioHome').click();
+ assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),false,'leaving releases the play view');
+ await assertScrollRestored(journey);
+}
+
 async function helpPause(journey,device,review){
  const {arcade}=journey;
  await journey.phase('mining');
@@ -205,7 +216,7 @@ async function exercise(journey,device,review){
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
  assert.equal(await preview.locator('#result').innerText(),'Game started','handoff reaches an interactive preview fixture');
  assert.equal(await arcade.isVisible(),false);assert.equal(journey.counters.previewRequests,1);
- await assertScrollRestored(journey);
+ await assertPlayHandoffScroll(journey);
  assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'preview capability does not enter saved projects');
  review.check(device.name,'complete-journey',{motion:device.motion,loadedArt:journey.assets.length,buildRequests:journey.counters.submitted,previewRequests:journey.counters.previewRequests});
 }
@@ -222,6 +233,7 @@ async function existingRemoteHandoff(journey,review){
  assert.equal(journey.counters.previewRequests,2,'handoff loads only the chosen new revision, not the old game followed by the new game');
  assert.ok(journey.counters.previewPaths[0].includes('myj-existing-revision'));
  assert.ok(journey.counters.previewPaths[1].includes('myj-ready-revision'));
+ await assertPlayHandoffScroll(journey);
  review.check('remote-handoff','existing-generated-project',{previewPaths:journey.counters.previewPaths});
 }
 

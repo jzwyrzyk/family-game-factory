@@ -1,4 +1,4 @@
-const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 /* Production-dist user journeys. COACH_INLINE_REVIEW is an explicit, non-CI local
  * harness for environments blocking browser HTTP: trusted built bundle + memory
  * storage fixture. It is NOT origin/security/service-worker/live-provider evidence. */
@@ -22,7 +22,7 @@ async function load(page,url,saved={}){
   // budget. Math stays enabled; these design actions must not alter its evidence.
   const mathBefore=await page.evaluate(()=>{FG.store.changeProfile({rate:1});const p=FG.store.current();p.mathWindow=[Date.now()];FG.store.save();return JSON.stringify({skills:p.skills,learning:p.learning??null,grade:p.grade,focus:p.focus,intensity:p.intensity,rate:p.rate});});
   const gameTool=async id=>{if(!await page.locator('#studioMore').evaluate(el=>el.open))await page.locator('#studioMore > summary').click();await page.click(id);};
-  const chooseProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(el=>el.open))await page.locator('#studioProfileMenu > summary').click();await page.locator('.profile-choice').nth(index).click();};
+  const chooseProfile=async index=>{await openProfiles(page);await page.locator('.profile-choice').nth(index).click();};
   const session=()=>page.evaluate(()=>FG.studio.exportNotebook().sessions.at(-1));const projects=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects);
   await page.click('[data-starter="gum"]');
   await page.evaluate(()=>{

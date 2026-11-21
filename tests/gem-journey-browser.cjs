@@ -1,4 +1,4 @@
-const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 /* Production-browser checks for the earned, owner-scoped illustrated journey.
  * Notebook fixtures below use the production schema/API; they are isolated test
  * data, never demo progress in the application. The final milestone is exercised
@@ -110,10 +110,10 @@ function visualFixture(){
   assert.equal(await page.locator('#page-jems-journey').getAttribute('data-level'),String(level),'journey displays the earned level');
  };
  const profiles=async(page,index)=>{
-  if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.click('#studioProfileMenu summary');
+  await openProfiles(page);
   await page.locator('.profile-choice').nth(index).click();
  };
- const more=async page=>{if(!await page.locator('#studioMore').evaluate(element=>element.open))await page.click('#studioMore summary');};
+ const more=async page=>{if(!await page.locator('#studioMore').evaluate(element=>element.open))await page.click('#studioMore > summary');};
  const events=page=>page.evaluate(()=>[...window.__jemsMilestones,...window.__jemsRewardPopups]);
  const levelEventCount=async(page,level)=>(await events(page)).filter(event=>event.kind==='reward-popup'&&event.rewardIds.includes(`maker.milestone:level%3A${level}`)).length;
  const waitForLevelPopup=(page,level)=>page.waitForFunction(level=>window.__jemsRewardPopups.some(popup=>popup.rewardIds.includes(`maker.milestone:level%3A${level}`)),level);
@@ -432,10 +432,10 @@ function visualFixture(){
    // Putting a project away preserves its real history; clearing the current
    // chat removes its exact keep receipts without deleting the working game.
    const hill=(await notebook(page)).sessions.find(session=>session.game==='hill');
-   await page.click('#studioNavHome');
+   await navigate(page,'#studioNavHome');
    await page.locator(`[data-session="${hill.id}"] .studio-put-away`).click();
    await openJourney(page);await assertLevel(page,4);
-   await page.click('#studioNavHome');await page.locator('.studio-archived-details summary').click();
+   await navigate(page,'#studioNavHome');await page.locator('.studio-archived-details summary').click();
    await page.getByRole('button',{name:'Bring back '+hill.name,exact:true}).click();
    await page.locator(`[data-session="${hill.id}"] .studio-saved-open`).click();
    await page.click('#studioChange');
@@ -454,7 +454,7 @@ function visualFixture(){
    assert.deepEqual(await events(page),beforeErasing,'a stage downgrade never emits a cut celebration');
    await openJourney(page);await assertLevel(page,3);
    assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-level'),'3');
-   await page.click('#studioNavHome');await page.locator(`[data-session="${hill.id}"] .studio-saved-open`).click();
+   await navigate(page,'#studioNavHome');await page.locator(`[data-session="${hill.id}"] .studio-saved-open`).click();
    await page.click('#studioChange');
    const gemsBeforeClear=(await page.evaluate(()=>FG.rewards.summary())).lifetimeGems;
    if(!await page.locator('#studioMoreChoices').evaluate(element=>element.open))await page.click('#studioMoreChoices > summary');

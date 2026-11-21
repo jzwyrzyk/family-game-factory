@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:19.313Z",
-      "sourceDigest": "7bea02a0bb2fa568a417622019fff59fb790e93111cb7340eaed05a02b926a50",
+      "reviewedAt": "2026-11-21T20:51:46.703Z",
+      "sourceDigest": "eb209e66730a46d1924e30c854d8944dfabb939fe95877ce53d04df35eb970b3",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated doctrine and the accepted decision for explicit grade ceilings, caring explicit reading and consistent fitted play; preserved learning evidence and permission boundaries.",
+      "reviewReason": "Updated Idea Workshop narration and Art Studio entry contracts to match the shared explicit speaker and dedicated play screen; durable grade, ownership and evidence principles remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:19.568Z",
-      "sourceDigest": "d86ef55144f5e0ebfae68813ae732bc1bad33ffc46398afcd2ba1dd3f391e4f4",
+      "reviewedAt": "2026-11-21T20:51:47.001Z",
+      "sourceDigest": "903c29d1f3b429e6cff50a3d393026c0c08eed04f888c0187e89c79fbc2cf59b",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated architecture, child interface, fitted-play and reading contracts for profile setup, persistent speakers, mobile playback recovery and viewport navigation; native device acceptance remains pending.",
+      "reviewReason": "Reviewed initial hosted captures and simplified active play into its own screen; documented contained profile, picture and build tools, ready cue, real control geometry and restoration after exit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -307,10 +307,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "6e476a89b86751014aa99b487a22cbbe7f10ae3e7b1b401b88e2edff4b973d7d",
-      "reviewedAt": "2026-11-21T20:28:20.411Z",
+      "sourceDigest": "492a9a95124943cf48a1c1f450cea26f35051dda2e0690fc72a0033dc955fcad",
+      "reviewedAt": "2026-11-21T20:51:48.024Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the Creator contract for persistent current-step reading, changing hints and dialog lifecycle; scene schema, authored behavior and saved drafts remain unchanged.",
+      "reviewReason": "Reviewed hosted passing Creator reading journeys and adapted profile/navigation fixtures to visible play controls; creation schemas, saved versions and authored scene behavior remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:22.282Z",
-      "sourceDigest": "bdbc744bb46fcf042a826a9e258cb545add4549cf27bd7ee17a043d12e8e9098",
+      "reviewedAt": "2026-11-21T20:51:48.409Z",
+      "sourceDigest": "115b7f35fa1c8320b427f1e684336d01564e3cd17408d51f44ffdb9d56f37cc2",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated delivery and architecture evidence boundaries with synthetic narration checks and new production profile/play browser fixtures; local browser launch is blocked and hosted screenshots remain required.",
+      "reviewReason": "Recorded initial hosted passes and actual failures; preserved all geometric and learning assertions, added fast independent captures, explicit older-sibling setup and actual visible navigation paths.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T20:28:22.576Z",
-      "sourceDigest": "6711e5f28e170f45b61687c2f686aad74712a1efd7c349e8f05876e3c59f4103",
+      "reviewedAt": "2026-11-21T20:51:48.694Z",
+      "sourceDigest": "37791c952c940f05ff9c9e1ed0353c4bea02419c45cc221d761984ecc0dfcaf0",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated candidate delivery state and wired existing CI commands to profile, fitted-play and narration regressions; no workflow permissions, deployment, runtime flags or worker pins changed.",
+      "reviewReason": "Recorded initial PR125 source, hosted evidence and unresolved prior Pal decode failure; this follow-up remains draft and undeployed with natural narration off and no workflow or cloud changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -856,10 +856,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "38e06c1fb6f9a642044a3c0a7d48edd5f148b96fb0ceccd5e25783e4dcf33943",
-      "reviewedAt": "2026-11-20T19:05:58.979Z",
+      "sourceDigest": "2890e60e4c7977e59258c6aba7796aa5e0428c1c2249a219047eaeb805798edd",
+      "reviewedAt": "2026-11-21T20:51:48.987Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed local female narration with current owner/episode/phase cancellation and access support recorded only on playback start. Sized its speech status/help controls for child readability without changing authored tasks, grading, competence evidence or storage.",
+      "reviewReason": "Updated authored-practice reading contract for shared natural or device narration, explicit gesture resume and actual-start support; browser fixtures select Grade3 deliberately and preserve reasoning bands and outcomes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -925,10 +925,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e40f7771e964582539cd6ed734a89e9f1cacf1d93f92acde43b164385cc6effe",
-      "reviewedAt": "2026-11-21T05:39:49.111Z",
+      "sourceDigest": "9efbe64048501e489ca125afb433b15562cefec636ff987c4dac0f9027fd4b37",
+      "reviewedAt": "2026-11-21T20:51:49.228Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the retained guarded Use my picture action moving to collapsed More choices for new ideas, with existing-game toolbar unchanged. Updated Art Studio and architecture references; final-bundle art-entry checks passed delayed/rejected config, mobile upload/drawing/focus, owner isolation and read-only recovery without paid replay.",
+      "reviewReason": "Updated the Art Studio entry contract for More during dedicated play and retained the same guarded picture route; navigation fixture changes preserve original art, immutable scene bindings and ownership checks.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

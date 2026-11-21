@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
 /* Production-dist tablet voice journey. All requests are browser fixtures;
  * no microphone, Google speech service, model or real child data is processed. */
 const {chromium}=require('playwright');
@@ -74,8 +74,7 @@ const {start}=require('./browser-server.cjs');
    assert.equal(await page.evaluate(()=>Object.values(localStorage).some(t=>String(t).includes('GkXfo')||String(t).includes('data:audio/'))),false,'never persist raw audio');
    const childOne=await page.evaluate(()=>FG.store.current().id);
    await page.click('#studioPrivateMic');await page.waitForFunction(()=>window.__privateStarts===2);
-   const profile=page.locator('#studioProfileMenu');
-   if(!await profile.evaluate(e=>e.open))await page.click('#studioProfileMenu summary');
+   await openProfiles(page);
    await page.locator('.profile-choice').nth(1).click();
    assert.ok(await page.evaluate(()=>window.__privateTracksStopped)>=2,'switching child releases microphone');
    assert.notEqual(await page.evaluate(()=>FG.store.current().id),childOne);

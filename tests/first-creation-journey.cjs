@@ -6,7 +6,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,waitForWelcome,completeWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,waitForWelcome,completeWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 
 const NOTEBOOK='family-game-factory-studio-v1';
 const devices=[['desktop',{width:1280,height:900}],['phone',{width:390,height:844}]];
@@ -22,6 +22,11 @@ async function moreChoices(page){
  if(!await details.evaluate(node=>node.open))await details.locator(':scope > summary').click();
 }
 async function doneForNow(page){
+ // The fitted play view exposes My Games as its visible, host-owned exit.
+ // Done for now remains in the conversation tools outside an active game.
+ if(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode'))){
+  await page.locator('#studioHome').click();return;
+ }
  if(!await page.locator('#studioDoneForNow').isVisible())await moreChoices(page);
  await page.click('#studioDoneForNow');
 }
@@ -31,8 +36,7 @@ async function capture(page,name,device){
  await page.screenshot({path:`test-results/first-creation-${name}-${device}.png`,fullPage:false});
 }
 async function choosePlayer(page,index){
- const menu=page.locator('#studioProfileMenu');
- if(!await menu.evaluate(node=>node.open))await menu.locator('summary').click();
+ await openProfiles(page);
  await page.locator('#profile-choices .profile-choice').nth(index).click();
  await page.waitForFunction(value=>FG.store.current().id==='player'+(value+1),index);
  await waitForWelcome(page);
@@ -261,7 +265,7 @@ async function firstImprovement(browser,url,device,viewport){
   }
   await doneForNow(page);
   await page.locator('#page-studio-library').waitFor({state:'visible'});
-  assert.equal(await page.evaluate(()=>FG.learning.active),false,'Done leaves through the host lifecycle');
+  assert.equal(await page.evaluate(()=>FG.learning.active),false,'the visible exit leaves through the host lifecycle');
   const outcome=await page.evaluate(({owner,id})=>{
    const record=FG.store.data.profiles.find(p=>p.id===owner).learning.attempts.find(a=>a.id===id);
    return {outcome:record.outcome,answers:record.answers.length,correct:record.correct};
@@ -364,7 +368,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
     assert.equal(preferences.dismissedTips.includes('waiting'),false,'the stale waiting hint is never dismissed by the later keypress');
     assert.equal(opened,0);assert.equal(kept,0);
    }
-   await page.click('#studioNavHome');
+   await navigate(page,'studioNavHome');
    await capture(page,'ready',variant);
    await page.click('#studioContinuePlaying');
   }

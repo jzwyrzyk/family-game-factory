@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
 /* Real production-dist journeys. All program edits use the public UI; FG.creation is read-only inspection. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -60,7 +60,7 @@ const {start}=require('./browser-server.cjs');
       });
       const more=async()=>{if(!await page.locator('#creationMore').evaluate(element=>element.open))await activate('#creationMore summary');};
       const profiles=async()=>{
-        if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await activate('#studioProfileMenu summary');
+        await openProfiles(page,activate);
         const bounds=await page.locator('.profile-choice').evaluateAll(elements=>elements.map(element=>{
           const box=element.getBoundingClientRect();return {name:element.textContent,left:box.left,right:box.right,viewport:innerWidth};
         }));

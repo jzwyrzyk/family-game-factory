@@ -18,7 +18,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
   page.querySelector('.studio-heading')!.append(button);
   page.querySelector('.studio-heading')!.after(notice);
   const header = document.querySelector<HTMLElement>('.site-header');
-  let active = false, expanded = false, request = 0;
+  let active = false, expanded = false, ready = false, request = 0;
   let previousOverflow: { html: string; body: string } | null = null;
   const labels: { element: HTMLElement; nodes: Node[]; aria: string | null }[] = [];
   const moved: { element: HTMLElement; anchor: Comment }[] = [];
@@ -26,9 +26,10 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
 
   function simplifyTools() {
     const menu = page.querySelector<HTMLElement>('#studioMore .studio-more-actions')!;
-    for (const id of ['studioMakeScene', 'studioMathOptions']) {
-      const element = page.querySelector<HTMLElement>(`#${id}`);
+    for (const id of ['studioMakeScene', 'studioUseDrawing', 'studioMathOptions', 'studioProfileMenu', 'studioBuildShelf', 'studioReady']) {
+      const element = document.getElementById(id);
       if (!element) continue;
+      if (id === 'studioProfileMenu') (element as HTMLDetailsElement).open = false;
       const anchor = document.createComment('play tool returns here');
       element.before(anchor); moved.push({ element, anchor }); menu.append(element);
     }
@@ -44,12 +45,21 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       element.textContent = label; element.setAttribute('aria-label', aria);
     }
   }
+  function updateReady() {
+    if (!active) return;
+    const summary = page.querySelector<HTMLElement>('#studioMore > summary')!;
+    summary.textContent = ready ? 'More · ready' : 'More';
+    summary.setAttribute('aria-label', ready ? 'More game tools. A game is ready.' : 'More game tools');
+  }
   function restoreTools() {
     for (const { element, nodes, aria } of labels.splice(0)) {
       element.replaceChildren(...nodes);
       if (aria === null) element.removeAttribute('aria-label'); else element.setAttribute('aria-label', aria);
     }
-    for (const { element, anchor } of moved.splice(0)) { anchor.replaceWith(element); }
+    for (const { element, anchor } of moved.splice(0)) {
+      if (element.id === 'studioProfileMenu') (element as HTMLDetailsElement).open = false;
+      anchor.replaceWith(element);
+    }
     const more = page.querySelector<HTMLDetailsElement>('#studioMore');
     if (more) more.open = false;
   }
@@ -179,6 +189,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
         simplifyTools();
       }
       document.body.classList.add('studio-playing'); page.classList.add('studio-play-mode');
+      updateReady();
       button.hidden = false;
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       resize(); scheduleResize();
@@ -200,6 +211,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       page.style.removeProperty('--jems-play-menu-top');
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
     },
+    setReady(value: boolean) { ready = value; updateReady(); },
     get active() { return active; },
   };
   return controller;

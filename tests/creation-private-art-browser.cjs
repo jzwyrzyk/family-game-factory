@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 
 async function records(page,store,owner){
   return page.evaluate(async({store,owner})=>{
@@ -14,7 +14,7 @@ async function records(page,store,owner){
   },{store,owner});
 }
 async function profile(page,index){
-  const menu=page.locator('#studioProfileMenu');if(!await menu.evaluate(element=>element.open))await menu.locator('summary').click();
+  await openProfiles(page);
   await page.locator('#profile-choices .profile-choice').nth(index).click();
   await page.waitForFunction(id=>FG.store.current().id===id,'player'+(index+1));
   await exploreWelcome(page);

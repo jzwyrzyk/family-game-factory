@@ -4,14 +4,11 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {navigate}=require('./studio-entry.cjs');
+const {navigate,openProfiles}=require('./studio-entry.cjs');
 const KEY='family-game-factory-state-v1';
 
-async function openMenu(page){
-  if(!await page.locator('#studioProfileMenu').evaluate(node=>node.open))await page.locator('#studioProfileMenu > summary').click();
-}
-async function editLevel(page){await openMenu(page);await page.locator('#learningProfileEdit').click();await page.locator('#learningProfileDialog').waitFor({state:'visible'});}
-async function choose(page,index){await openMenu(page);await page.locator('#profile-choices .profile-choice').nth(index).click();}
+async function editLevel(page){await openProfiles(page);await page.locator('#learningProfileEdit').click();await page.locator('#learningProfileDialog').waitFor({state:'visible'});}
+async function choose(page,index){await openProfiles(page);await page.locator('#profile-choices .profile-choice').nth(index).click();}
 
 (async()=>{
   let server,browser;
@@ -46,7 +43,7 @@ async function choose(page,index){await openMenu(page);await page.locator('#prof
         assert.deepEqual(first,{grade:1,intensity:'stretch',confirmed:true});
 
         await page.reload();await page.waitForFunction(()=>window.FG?.learningProfiles);
-        await openMenu(page);assert.match(await page.locator('#learningProfileSummary').textContent(),/Grade 1 · Stretch/);
+        await openProfiles(page);assert.match(await page.locator('#learningProfileSummary').textContent(),/Grade 1 · Stretch/);
         await choose(page,1);await editLevel(page);
         assert.match(await page.locator('#learningProfileTitle').textContent(),/Explorer 2/);
         assert.equal(await page.locator('#learningProfileGrade').inputValue(),'1','the second child does not inherit an older demo grade');
