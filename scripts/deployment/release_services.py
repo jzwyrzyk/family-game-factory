@@ -41,6 +41,14 @@ HEALTH = 'https://factory-gateway-ola734esta-ul.a.run.app/health'
 CHECKS = {'Jems operations policy', 'Documentation references', 'browser',
           'learning', 'creative', 'private-coach-image', 'service-images'}
 ROOT = Path(__file__).resolve().parents[2]
+# One reviewed recovery of the already accepted PR115 build. This is not a
+# general journal re-pinning option or permission to submit another build.
+RECOVERABLE_BUILD = {
+    'originalTool': '698c641188b1bf57378ea37d53bfe0073c20136b',
+    'source': '19f5e46ae1141da3df7bf14d682757de7e9aec69',
+    'tested': '986a9118674e1bbd1d4b0873b1993dac245627e9',
+    'buildId': '5ef640d8-46a7-4bd5-ae41-d00e8296ed2c',
+}
 READ_ONLY_ANNOTATIONS = {'serving.knative.dev/creator', 'serving.knative.dev/lastModifier',
     'run.googleapis.com/operation-id', 'run.googleapis.com/ingress-status',
     'run.googleapis.com/urls', 'run.googleapis.com/startupProbeType'}
@@ -501,11 +509,23 @@ def verify_build_shape(actual, config):
             options['pool'].pop(key, None)
         if not options['pool']:
             options.pop('pool')
+    # Observed on the already accepted PR115 build. Cloud Build documents
+    # legacy as the omitted-selection default until March 28, 2027.
+    # https://docs.cloud.google.com/build/docs/release-channels
+    if 'workerRelease' not in config['options'] and options.get('workerRelease') == 'legacy':
+        options.pop('workerRelease')
     need(options == config['options'] and actual.get('timeout') == config['timeout'],
          'BUILD_EXECUTION_OPTIONS_DIFFER')
     # A matching Docker command alone does not bind machine/pool/env settings,
     # substitutions, extra artifact publication or a trigger's execution config.
-    need(not any(actual.get(key) for key in ('substitutions', 'artifacts', 'secrets', 'availableSecrets',
+    # The API may echo the same declared images in Artifacts.images. Permit
+    # exactly that duplicate declaration, with no other artifact destinations.
+    # Primary implementation: cloud-build-local validate.CheckArtifacts copies
+    # Images into Artifacts.Images and requires equality when both are present.
+    # https://github.com/GoogleCloudPlatform/cloud-build-local/blob/master/validate/validate.go
+    artifacts = actual.get('artifacts')
+    need(artifacts in (None, {}) or artifacts == {'images': config['images']}, 'UNEXPECTED_BUILD_ARTIFACTS')
+    need(not any(actual.get(key) for key in ('substitutions', 'secrets', 'availableSecrets',
              'buildTriggerId', 'gitConfig', 'dependencies')), 'UNEXPECTED_BUILD_EXECUTION_CONFIGURATION')
     need(actual.get('queueTtl') in (None, '', '3600s'), 'UNREVIEWED_BUILD_QUEUE_TTL')
     read_only = {'id', 'name', 'projectId', 'status', 'statusDetail', 'createTime', 'startTime', 'finishTime',
@@ -595,6 +615,34 @@ def validate_journal(state):
             if key == 'gateway':
                 need(state['services']['coach'].get('promotion', {}).get('phase') == 'verified',
                      'JOURNAL_GATEWAY_PROMOTED_BEFORE_COACH')
+
+
+def recovery_provenance(state, proof, recover_from):
+    """Keep the original tool identity; authorize only the reviewed existing build.
+
+    A first adoption must precede every service attempt. Once recorded, the
+    same recovery-tool SHA can resume journaled phases without replaying them.
+    """
+    if state['tool'] == proof['tool']:
+        need(recover_from is None and 'buildRecovery' not in state, 'UNEXPECTED_RECOVERY_OVERRIDE')
+        return None
+    expected = RECOVERABLE_BUILD
+    need(recover_from == expected['originalTool'] == state['tool']
+         and state['source'] == expected['source'] and state['tested'] == expected['tested']
+         and state['build'].get('id') == expected['buildId']
+         and state['build'].get('phase') in ('attempted', 'verified'), 'JOURNAL_TOOL_RECOVERY_NOT_REVIEWED')
+    need(re.fullmatch('[a-f0-9]{40}', proof['tool']) and proof['tool'] != expected['originalTool'], 'RECOVERY_TOOL_IDENTITY_INVALID')
+    receipt = {**expected, 'version': 1, 'recoveryTool': proof['tool'],
+        'nonce': state['nonce'], 'archiveSha256': state['build']['archive'],
+        'candidates': {key: state['services'][key]['candidate'] for key in ORDER},
+        'reason': 'verified-cloud-build-legacy-default-and-declared-image-echo'}
+    if 'buildRecovery' in state:
+        need(state['buildRecovery'] == receipt, 'RECOVERY_TOOL_OR_ORIGINAL_IDENTITY_CHANGED')
+    else:
+        need(not state.get('rollbackRequested')
+             and all(not any(step in state['services'][key] for step in ('stage', 'promotion', 'rollback')) for key in ORDER),
+             'RECOVERY_ADOPTION_REQUIRES_NO_SERVICE_ATTEMPTS')
+    return receipt
 
 
 def publish(root, application, cloud, state, path):
@@ -752,16 +800,19 @@ def rollback(cloud, state, path):
         'revisions': {key: record['baseline']['revision']['metadata']['name'] for key, record in state['services'].items()}}), flush=True)
 
 
-def run(root, application, directory, source, tested, execute=False, restore=False):
+def run(root, application, directory, source, tested, execute=False, restore=False, recover_from=None):
     proof = local_source(root, source, tested) if restore else verify_source(root, source, tested)
     need(str(publisher.cloud('projects', 'describe', PROJECT).get('projectNumber')) == NUMBER, 'PROJECT_IDENTITY_CHANGED')
     cloud, path = Cloud(), directory / 'release.json'
+    recovery = None
     if path.exists():
         need(not path.is_symlink() and path.stat().st_mode & 0o077 == 0, 'PRIVATE_JOURNAL_REQUIRED')
         state = json.loads(path.read_text())
-        need(state['source'] == source and state['tested'] == tested and state['tool'] == proof['tool'], 'JOURNAL_SOURCE_DIFFERS')
+        need(state['source'] == source and state['tested'] == tested, 'JOURNAL_SOURCE_DIFFERS')
         validate_journal(state)
+        recovery = recovery_provenance(state, proof, recover_from)
     else:
+        need(recover_from is None, 'RECOVERY_REQUIRES_THE_ORIGINAL_PRIVATE_JOURNAL')
         need(not restore, 'ROLLBACK_REQUIRES_THE_ORIGINAL_PRIVATE_JOURNAL')
         application_checkout(application, source)
         baselines = {key: snapshot(cloud, key) for key in ORDER}
@@ -795,12 +846,20 @@ def run(root, application, directory, source, tested, execute=False, restore=Fal
         'candidates': {key: record['candidate'] for key, record in state['services'].items()},
         'archiveSha256': state['build']['archive'], 'journal': str(path), 'execute': execute,
         'steps': ['publish two images', 'stage both at zero traffic', 'promote coach', 'promote gateway',
-                  'verify serving configuration and health', 'separate authenticated context check before website']}), flush=True)
+                  'verify serving configuration and health', 'verify released conversation after website cutover']}), flush=True)
     if not execute:
         return
     # Even a verified journal must match the immutable Cloud Build and registry
     # receipt again. publish() submits only a never-attempted prepared build.
     publish(root, application, cloud, state, path)
+    if recovery:
+        if 'buildRecovery' not in state:
+            verify_peers(cloud, state)
+            state['buildRecovery'] = recovery
+            save(path, state)
+        print(json.dumps({'status': 'PR115_EXISTING_BUILD_RECOVERY_VERIFIED',
+                          'originalTool': state['tool'], 'recoveryTool': proof['tool'],
+                          'source': source, 'tested': tested, 'buildId': state['build']['id']}), flush=True)
     if not any('promotion' in record for record in state['services'].values()):
         for key in ORDER:
             if state['services'][key].get('stage', {}).get('phase') != 'verified':
@@ -811,7 +870,8 @@ def run(root, application, directory, source, tested, execute=False, restore=Fal
     verify_peers(cloud, state)
     need(cloud.health() == state['health'], 'HEALTH_OR_PAID_ACTIVE_STATE_CHANGED_ROLLBACK_REQUIRED')
     print(json.dumps({'status': 'PR115_BACKENDS_SERVING_CONTEXT_CHECK_REQUIRED', 'source': source,
-        'tested': tested, 'buildId': state['build']['id'], 'archiveSha256': state['build']['archive'],
+        'tested': tested, 'originalTool': state['tool'], 'executingTool': proof['tool'],
+        'buildId': state['build']['id'], 'archiveSha256': state['build']['archive'],
         'services': {key: {'revision': record['candidate'], 'image': state['build']['images'][key],
                           'rollbackRevision': record['baseline']['revision']['metadata']['name']}
                      for key, record in state['services'].items()},
@@ -827,6 +887,8 @@ def main(argv=None):
     parser.add_argument('--state-dir', required=True, help='Private directory outside both checkouts; retain for recovery')
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--rollback', action='store_true')
+    parser.add_argument('--recover-build-from-tool', choices=[RECOVERABLE_BUILD['originalTool']],
+                        help='Explicit reviewed recovery of the existing PR115 build and original private journal; never creates a release or resubmits a build')
     args = parser.parse_args(argv)
     need(not (args.execute and args.rollback), 'SELECT_EXECUTE_OR_ROLLBACK')
     root = Path(__file__).resolve().parents[2]
@@ -838,7 +900,8 @@ def main(argv=None):
     descriptor = os.open(directory / 'release.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     with os.fdopen(descriptor, 'w') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        run(root, application, directory, args.reviewed_source_sha, args.tested_source_sha, args.execute, args.rollback)
+        run(root, application, directory, args.reviewed_source_sha, args.tested_source_sha,
+            args.execute, args.rollback, args.recover_build_from_tool)
 
 
 if __name__ == '__main__':

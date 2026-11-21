@@ -1,8 +1,8 @@
 # PR115: release creation chat and failed-build recovery
 
-This is the bounded production handoff for [PR115](https://github.com/jzwyrzyk/family-game-factory/pull/115). The owner authorized its merge and rollout on November 21, 2026. Source integration, backend delivery, an actual conversation, and the website cutover each need their own receipt. The operator below does not claim that any of them has already happened.
+This is the bounded production handoff for [PR115](https://github.com/jzwyrzyk/family-game-factory/pull/115). The owner authorized its merge and rollout on November 21, 2026. Source integration, image publication, backend delivery, an actual conversation, and the website cutover each need their own receipt. The [delivery record](../../DELIVERY-STATE.md) distinguishes the completed merge and owner-reported successful image build from the still-pending backend recovery and cutover.
 
-**Updated release order, November 21, 2026:** while awaiting the Cloud Shell result, the owner directed website cutover immediately after successful backend deployment, followed by diagnosing and checking the actual conversation on the released interface. This supersedes this handoff's earlier requirement to complete the chat check before Pages. The [PR116 operator](https://github.com/jzwyrzyk/family-game-factory/pull/116), its existing recovery journal and all required automated release checks remain unchanged.
+**Updated release order, November 21, 2026:** while awaiting the Cloud Shell result, the owner directed website cutover immediately after successful backend deployment, followed by diagnosing and checking the actual conversation on the released interface. This supersedes this handoff's earlier requirement to complete the chat check before Pages. All required automated release checks remain. The later Cloud Build verifier stop requires the [PR116 operator's](https://github.com/jzwyrzyk/family-game-factory/pull/116) explicit recovery bridge below, retaining the original tool identity and private journal while executing a separately pinned corrected tool.
 
 ## Release scope
 
@@ -34,7 +34,7 @@ Before each attempted mutation, the private journal is written atomically. An in
 
 ## Stable Cloud Shell bootstrap
 
-Use the exact three reviewed SHAs supplied with the release receipt. The following bootstrap deliberately retains one directory for that application source. A mismatched or dirty existing checkout stops instead of resetting it.
+Use the exact three reviewed SHAs supplied with the release receipt. The following is the original bootstrap and deliberately retains one directory for that application source. A mismatched or dirty existing checkout stops instead of resetting it. **The observed release already has a successful build and an existing journal: continue through the recovery section below, not by replacing this bootstrap's tool pin or creating a new state directory.**
 
 ```bash
 (
@@ -72,6 +72,23 @@ Use the exact three reviewed SHAs supplied with the release receipt. The followi
 
 Omit `--execute` for a remote-read-only plan. The executing form is covered by the owner's release authorization; it does not require a second approval merely because it uses a helper. If a command fails, preserve the same directories and report its sanitized fixed error or status. Do not start a fresh journal to bypass an uncertain attempt or a failed configuration/source gate.
 
+## Recover the existing successful build
+
+The owner ran original operator `698c641188b1bf57378ea37d53bfe0073c20136b` against application `19f5e46ae1141da3df7bf14d682757de7e9aec69` and tested source `986a9118674e1bbd1d4b0873b1993dac245627e9`. The returned receipt reports build **`5ef640d8-46a7-4bd5-ae41-d00e8296ed2c` as `SUCCESS`**, journal build phase `attempted`, and **`serviceStagingStarted:false`**. The operator stopped at `BUILD_EXECUTION_OPTIONS_DIFFER` before staging either service. Backend promotion and website cutover remain unverified.
+
+The planned machine, logging and timeout matched the actual build. The mismatch was Cloud Build's implicit `workerRelease:"legacy"` returned for an omitted selector; its additional empty pool was already normalized. The correction accepts only that implicit `legacy` value, preserving exact checks on any explicit worker selection. A server `artifacts.images` echo is accepted only when its complete object equals the declared image list; additional artifact fields or different/reordered images remain rejected. The comparator does not generally ignore execution options or artifact destinations.
+
+Use the immutable recovery-tool pin supplied in the owner command to create a **separate clean checkout**, for example `tool-recovery-<full recovery-tool SHA>` alongside the original `tool` directory. Preserve the original tool checkout, application checkout and private `state` directory. Do not edit `release.json`, reset its phase or change the source, nonce, build, archive or candidate identities. The corrected tool requires the explicit flag below while using the same existing application and state paths:
+
+```bash
+python3 "$JEMS_RECOVERY_TOOL_DIR/scripts/deployment/release_services.py" \
+  --reviewed-source-sha "$JEMS_APP_SHA" --tested-source-sha "$JEMS_TESTED_SHA" \
+  --application-dir "$JEMS_APP_DIR" --state-dir "$JEMS_STATE_DIR" \
+  --recover-build-from-tool 698c641188b1bf57378ea37d53bfe0073c20136b --execute
+```
+
+This bridge accepts only the exact original tool, application/tested sources and existing build above. It rejects a fresh journal, a prepared build or a changed build identity. It re-reads the successful build, exact source/archive/image evidence and current service baselines before recording separate recovery provenance and printing `PR115_EXISTING_BUILD_RECOVERY_VERIFIED`. It retains the original `tool` identity and never resubmits this build. The same recovery-tool checkout and flag can resume later recorded staging or promotion phases; an uncertain service operation is observed rather than submitted again. The intermediate recovery message is not a deployment receipt.
+
 A successful backend result is `PR115_BACKENDS_SERVING_CONTEXT_CHECK_REQUIRED`. It includes exact source/build/image/revision/rollback identities and truthfully retains `conversationVerified:false` and `pagesDispatched:false`. The receipt name is unchanged in the already pinned helper; under the owner's updated order, its outstanding conversation check follows Pages cutover. Share that sanitized result, not `release.json`, SDK credential output, private configuration, passphrases or session headers.
 
 ## Website cutover
@@ -95,8 +112,12 @@ On the released interface, verify actual connected chat, readiness, visible Buil
 
 Run the same pinned operator with the same source, tested source, application directory and private state directory, replacing `--execute` with `--rollback`. This performs traffic rollback **gateway first, coach second**, verifying the previous active revision before proceeding. It requires the original private journal and cloud authority, but no fresh CI, image build, npm installation or healthy coach endpoint. It does not reset configuration or silently retry a failed rollout. After rollback the journal rejects automatic re-promotion.
 
+For the recovered original-`698c641` journal, use the same pinned recovery-tool checkout and retain `--recover-build-from-tool 698c641188b1bf57378ea37d53bfe0073c20136b` when changing `--execute` to `--rollback`.
+
 Backend rollback does not undo saved browser data or publish a website. Older notebook readers reject saved creation-readiness fields, and old Pal readers can reject newly saved roster IDs. After new browser data exists, any frontend fallback needs a compatible reader or separately verified no-loss migration; restoring an old bundle alone is not a safe data rollback.
 
 ## Verification boundary
 
 Local operator fixtures cover source/CI gates, full-template preservation, pinned secrets, configuration and IAM drift, staged versus active revisions, exact build provenance, interrupted submission/promotion, derived journal fields and reverse-order rollback. The budget fixtures use the real selected policy and validators to check cap rejection, valid arithmetic, adult approvals, source/dirty-checkout rejection, ambiguous key references and sanitized output. These tests make no cloud writes or provider calls. Hosted source checks and real owner execution must be recorded separately.
+
+After the narrow Cloud Build correction, the complete local deployment suite passed **122 tests**, including **42 operator cases** and the Python adapter that executes **five Node budget fixtures**. The **42 operator cases also passed an independent rerun**. They cover the successful build still journaled as `attempted`, narrow legacy/artifact normalization, rejected mismatches, preserved original identities, no replacement submission, and interruptions around recovery adoption and service staging. The initial full-suite attempt lacked local `tsx`; restoring dependencies from an existing checkout with the identical lockfile resolved that environment failure before the passing rerun. These are local executable checks, not evidence that the owner has resumed or promoted the services.

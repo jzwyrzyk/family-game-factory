@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:41:42.914Z",
-      "sourceDigest": "c5db73e17d5d944f91e398bdf5cdb9b45c0fb3a10cdb6f9daf0be8a8c6b000b8",
+      "reviewedAt": "2026-11-21T15:58:42.806Z",
+      "sourceDigest": "aa758e5adecf1611de293407ffa881605e8f6fc0df1458bd0af7303942b58aac",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the later owner instruction moving actual chat acceptance after website cutover. This changes release sequencing only; child-owned intent, coherent readiness before Build, explicit Keep, existing adult/child access boundaries and spending authority remain unchanged.",
+      "reviewReason": "Reviewed the successful-build receipt and recovery handoff: the narrow Cloud Build default normalization and original-journal bridge change only deployment recovery, preserving idea readiness, explicit paid actions, child ownership, access and evidence boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T15:41:43.206Z",
-      "sourceDigest": "16d0c248674eb67a99746670fbe1379ff62e650b0cc63a7dd2c7e687e0859c81",
+      "reviewedAt": "2026-11-21T15:58:43.143Z",
+      "sourceDigest": "5472e4b6bb2192bb172a59ddd732cf9b29b52884b6d11aa91b0e467396b39ddd",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the PR116 handoff, release continuity and latest PR115 delivery receipt to follow the later owner instruction: verified backend deployment, selected-source Pages with all required automated checks, then actual chat/game acceptance. Marked the previous pre-cutover chat gate as superseded without modifying the pinned helper, journal, permissions, budgets or deployment evidence.",
+      "reviewReason": "Recorded owner-reported successful build5ef640d8 stopped before staging, exact legacy/default and artifact-image normalization, explicit original-tool recovery bridge, 122 local deployment tests and 42 independent operator cases, preserving authorized backend then Pages then live acceptance order.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

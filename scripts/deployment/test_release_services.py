@@ -338,11 +338,11 @@ class CoordinatedReleaseTests(unittest.TestCase):
 
     def build_result(self):
         result = copy.deepcopy(self.state['build']['config'])
-        result.update({'id': '12345678-1234-1234-1234-123456789abc', 'status': 'SUCCESS',
+        result.update({'id': self.state['build'].get('id', '12345678-1234-1234-1234-123456789abc'), 'status': 'SUCCESS',
             'source': {'storageSource': {'bucket': self.state['bucket'], 'object': 'source/' + NONCE + '/archive.tgz'}},
             'sourceProvenance': {'resolvedStorageSource': {'bucket': self.state['bucket'],
                                  'object': 'source/' + NONCE + '/archive.tgz', 'generation': '123'}},
-            'results': {'images': [{'name': release.REGISTRIES[key] + ':' + SOURCE,
+            'results': {'images': [{'name': release.REGISTRIES[key] + ':' + self.state['source'],
                                    'digest': NEW[key].split('@')[1]} for key in release.ORDER]}})
         return result
 
@@ -403,7 +403,7 @@ class CoordinatedReleaseTests(unittest.TestCase):
         release.save(self.path, self.state)
         self.assertEqual(self.path.stat().st_mode & 0o077, 0)
 
-    def run_existing(self, restore=False):
+    def run_existing(self, restore=False, recover_from=None, executing_tool=TOOL, observed_defaults=False):
         release.save(self.path, self.state)
         calls = []
         def cloud(*args):
@@ -411,12 +411,17 @@ class CoordinatedReleaseTests(unittest.TestCase):
             if args[:2] == ('projects', 'describe'):
                 return {'projectNumber': release.NUMBER}
             if args[:2] == ('builds', 'describe'):
-                return self.build_result()
+                result = self.build_result()
+                if observed_defaults:
+                    result['options'].update({'workerRelease': 'legacy', 'pool': {}})
+                    result['artifacts'] = {'images': result['images']}
+                return result
             if args[:4] == ('artifacts', 'docker', 'images', 'describe'):
                 return {'image_summary': {'digest': args[4].split('@')[1]}}
             raise AssertionError(args)
         output = io.StringIO()
-        proof = {'source': SOURCE, 'tested': TESTED, 'tool': TOOL}
+        source, tested = self.state['source'], self.state['tested']
+        proof = {'source': source, 'tested': tested, 'tool': executing_tool}
         with (patch.object(release, 'verify_source', return_value=proof),
               patch.object(release, 'local_source', return_value=proof),
               patch.object(release, 'Cloud', return_value=self.cloud),
@@ -425,7 +430,8 @@ class CoordinatedReleaseTests(unittest.TestCase):
               patch.object(release.publisher, 'source_archive', return_value=(Path(self.tmp.name) / 'archive', 'a' * 64)),
               patch.object(release.publisher, 'cloud', side_effect=cloud),
               contextlib.redirect_stdout(output)):
-            release.run(Path('.'), Path('.'), Path(self.tmp.name), SOURCE, TESTED, execute=not restore, restore=restore)
+            release.run(Path('.'), Path('.'), Path(self.tmp.name), source, tested,
+                        execute=not restore, restore=restore, recover_from=recover_from)
         self.state = json.loads(self.path.read_text())
         return calls, output.getvalue()
 
@@ -510,6 +516,135 @@ class CoordinatedReleaseTests(unittest.TestCase):
         actual['options']['workerRelease'] = 'chosen-unreviewed-release'
         with self.assertRaisesRegex(release.Stop, 'BUILD_EXECUTION_OPTIONS_DIFFER'):
             release.verify_build_shape(actual, self.state['build']['config'])
+
+    def test_observed_legacy_default_and_exact_declared_image_echo_are_equivalent(self):
+        actual = self.build_result()
+        actual['options'].update({'workerRelease': 'legacy', 'pool': {}})
+        actual['artifacts'] = {'images': copy.deepcopy(actual['images'])}
+        before = copy.deepcopy(actual)
+        release.verify_build_shape(actual, self.state['build']['config'])
+        self.assertEqual(actual, before, 'normalization must not rewrite the received evidence')
+        for selector in ('regular', 'stable', 'rapid', 'LEGACY', '', False):
+            changed = copy.deepcopy(actual)
+            changed['options']['workerRelease'] = selector
+            with self.subTest(selector=selector), self.assertRaisesRegex(release.Stop, 'BUILD_EXECUTION_OPTIONS_DIFFER'):
+                release.verify_build_shape(changed, self.state['build']['config'])
+        explicit = copy.deepcopy(self.state['build']['config'])
+        explicit['options']['workerRelease'] = 'regular'
+        with self.assertRaisesRegex(release.Stop, 'BUILD_EXECUTION_OPTIONS_DIFFER'):
+            release.verify_build_shape(actual, explicit)
+
+    def test_artifact_echo_cannot_change_images_or_add_any_destination(self):
+        for artifact in (
+            {'images': list(reversed(self.state['build']['config']['images']))},
+            {'images': self.state['build']['config']['images'] + ['unreviewed/image:tag']},
+            {'images': self.state['build']['config']['images'], 'objects': {}},
+            {'images': self.state['build']['config']['images'], 'npmPackages': []},
+            {'images': []},
+        ):
+            actual = self.build_result()
+            actual['artifacts'] = artifact
+            with self.subTest(artifact=artifact), self.assertRaisesRegex(release.Stop, 'UNEXPECTED_BUILD_ARTIFACTS'):
+                release.verify_build_shape(actual, self.state['build']['config'])
+
+    def legacy_attempt(self):
+        profile = release.RECOVERABLE_BUILD
+        self.state.update({'tool': profile['originalTool'], 'source': profile['source'], 'tested': profile['tested']})
+        self.state['build'].update({'phase': 'attempted', 'id': profile['buildId'],
+            'config': release.build_config(profile['source'], self.state['build']['archive'], self.state['nonce'])})
+        self.state['build'].pop('images', None)
+        self.state['build'].pop('resolvedSource', None)
+        for key in release.ORDER:
+            self.state['services'][key]['candidate'] = release.SERVICES[key] + '-pr115-' + profile['source'][:12] + '-' + self.state['nonce'][:6]
+        return profile['originalTool']
+
+    def test_exact_existing_successful_build_recovers_without_submission_or_identity_repin(self):
+        original = self.legacy_attempt()
+        identity = {key: copy.deepcopy(self.state[key]) for key in ('tool', 'source', 'tested', 'nonce')}
+        build_identity = {key: copy.deepcopy(self.state['build'][key]) for key in ('id', 'archive', 'config')}
+        candidates = {key: self.state['services'][key]['candidate'] for key in release.ORDER}
+        calls, output = self.run_existing(recover_from=original, observed_defaults=True)
+        self.assertFalse(any(call[:2] == ('builds', 'submit') for call in calls))
+        self.assertEqual({key: self.state[key] for key in identity}, identity)
+        self.assertEqual({key: self.state['build'][key] for key in build_identity}, build_identity)
+        self.assertEqual({key: self.state['services'][key]['candidate'] for key in release.ORDER}, candidates)
+        self.assertEqual(self.state['buildRecovery']['originalTool'], original)
+        self.assertEqual(self.state['buildRecovery']['recoveryTool'], TOOL)
+        self.assertEqual(self.state['build']['phase'], 'verified')
+        receipts = [json.loads(line) for line in output.strip().splitlines()]
+        self.assertTrue(any(row['status'] == 'PR115_EXISTING_BUILD_RECOVERY_VERIFIED' for row in receipts))
+        self.assertEqual(receipts[-1]['originalTool'], original)
+        self.assertEqual(receipts[-1]['executingTool'], TOOL)
+        self.assertEqual(len(self.cloud.writes), 4)
+
+    def test_bridge_rejects_missing_flag_changed_profile_or_prepared_build(self):
+        original = self.legacy_attempt()
+        proof = {'tool': TOOL}
+        for change in ('flag', 'tool', 'source', 'tested', 'id', 'phase'):
+            state = copy.deepcopy(self.state)
+            flag = original
+            if change == 'flag':
+                flag = None
+            elif change in ('tool', 'source', 'tested'):
+                state[change] = 'd' * 40
+            elif change == 'id':
+                state['build']['id'] = '12345678-1234-1234-1234-123456789abc'
+            else:
+                state['build']['phase'] = 'prepared'
+            with self.subTest(change=change), self.assertRaisesRegex(release.Stop, 'JOURNAL_TOOL_RECOVERY_NOT_REVIEWED'):
+                release.recovery_provenance(state, proof, flag)
+        self.assertEqual(self.cloud.writes, [])
+
+    def test_bridge_requires_original_journal_and_cannot_start_a_new_release(self):
+        profile = release.RECOVERABLE_BUILD
+        proof = {'source': profile['source'], 'tested': profile['tested'], 'tool': TOOL}
+        with (patch.object(release, 'verify_source', return_value=proof),
+              patch.object(release.publisher, 'cloud', return_value={'projectNumber': release.NUMBER}),
+              patch.object(release, 'application_checkout') as checkout,
+              self.assertRaisesRegex(release.Stop, 'RECOVERY_REQUIRES_THE_ORIGINAL_PRIVATE_JOURNAL')):
+            release.run(Path('.'), Path('.'), Path(self.tmp.name), profile['source'], profile['tested'],
+                        execute=True, recover_from=profile['originalTool'])
+        checkout.assert_not_called()
+        self.assertFalse(self.path.exists())
+
+    def test_bridge_resume_after_lost_stage_response_keeps_current_tool_and_never_repeats_put(self):
+        original = self.legacy_attempt()
+        self.cloud.fail_after = ('coach', 'stage')
+        with self.assertRaisesRegex(release.Stop, 'LOST_AFTER'):
+            self.run_existing(recover_from=original, observed_defaults=True)
+        self.state = json.loads(self.path.read_text())
+        self.assertIn('buildRecovery', self.state)
+        self.assertEqual(self.state['services']['coach']['stage']['phase'], 'attempted')
+        calls, _ = self.run_existing(recover_from=original, observed_defaults=True)
+        self.assertEqual([(key, phase) for key, phase, _ in self.cloud.writes],
+                         [('coach', 'stage'), ('gateway', 'stage'), ('coach', 'promotion'), ('gateway', 'promotion')])
+        self.assertFalse(any(call[:2] == ('builds', 'submit') for call in calls))
+        with self.assertRaisesRegex(release.Stop, 'RECOVERY_TOOL_OR_ORIGINAL_IDENTITY_CHANGED'):
+            self.run_existing(recover_from=original, executing_tool='d' * 40, observed_defaults=True)
+
+    def test_verified_build_saved_before_bridge_marker_can_resume_without_resubmission(self):
+        original = self.legacy_attempt()
+        self.state['build'].update({'phase': 'verified', 'images': copy.deepcopy(NEW),
+            'resolvedSource': {'bucket': self.state['bucket'], 'object': 'source/' + self.state['nonce'] + '/archive.tgz', 'generation': '123'}})
+        calls, _ = self.run_existing(recover_from=original, observed_defaults=True)
+        self.assertFalse(any(call[:2] == ('builds', 'submit') for call in calls))
+        self.assertIn('buildRecovery', self.state)
+
+    def test_unrecorded_bridge_cannot_adopt_an_unrelated_service_attempt(self):
+        original = self.legacy_attempt()
+        self.state['services']['coach']['stage'] = {'phase': 'attempted'}
+        with self.assertRaisesRegex(release.Stop, 'RECOVERY_ADOPTION_REQUIRES_NO_SERVICE_ATTEMPTS'):
+            release.recovery_provenance(self.state, {'tool': TOOL}, original)
+
+    def test_original_build_recovery_rollback_preserves_original_tool_identity(self):
+        original = self.legacy_attempt()
+        self.run_existing(recover_from=original, observed_defaults=True)
+        calls, _ = self.run_existing(restore=True, recover_from=original)
+        self.assertEqual(self.state['tool'], original)
+        self.assertEqual(self.state['buildRecovery']['recoveryTool'], TOOL)
+        self.assertFalse(any(call[:2] == ('builds', 'describe') for call in calls))
+        self.assertEqual([(key, phase) for key, phase, _ in self.cloud.writes[-2:]],
+                         [('gateway', 'rollback'), ('coach', 'rollback')])
 
 
 class SourceGateTests(unittest.TestCase):
