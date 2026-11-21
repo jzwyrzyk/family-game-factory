@@ -139,6 +139,69 @@ test('style and shallow-play rejection reuse the bounded repair loop with exact 
  await assert.rejects(h.coordinator.claim(h.id,3,'generate',identity('generate','quality-run-3')),/WORKER_CLAIM_REJECTED/);
 });
 
+test('failure receipts retain each rejected attempt and the final unobserved axes without changing prior repair provenance',async()=>{
+ const h=await setup(),g=await generated(h);await h.coordinator.claim(h.id,0,'test',identity('test'));
+ await h.coordinator.report(h.id,0,'test',identity('test'),{ok:false,diagnostics:'NO_MEANINGFUL_INPUT_EFFECT source=SECRET'});
+ let state=await h.repo.snapshot();
+ assert.deepEqual(state.jobs[0].execution?.lastFailure,{stage:'test',attempt:0,category:'input-unresponsive',code:'INPUT_RESPONSE_FAILED',findings:[]});
+ assert.equal(state.jobs[0].execution?.attempt,1);
+ await generated(h,g.game,1);const second=await tested(h,g.game,1);await h.coordinator.claim(h.id,1,'review',identity('review','quality-run-1'));
+ const answer=syntheticReviewAnswer(),mixed=bindQualityReview(second.compiled,second.evidence,{...answer,
+  axes:{...answer.axes,visual:'fail',gameplay:'fail',input:'not-tested'},
+  findings:['VISUAL_STYLE_MISMATCH','GAMEPLAY_NO_CONSEQUENCE','QUALITY_EVIDENCE_INCOMPLETE']});
+ await h.coordinator.report(h.id,1,'review',identity('review','quality-run-1'),{review:mixed,usageUnits:7});
+ state=await h.repo.snapshot();const historical=state.jobs[0].execution!.diagnostics;
+ assert.deepEqual(state.jobs[0].execution?.lastFailure,{stage:'review',attempt:1,category:'presentation-failed',code:'GAME_PRESENTATION_FAILED',
+  findings:['VISUAL_STYLE_MISMATCH','GAMEPLAY_NO_CONSEQUENCE','QUALITY_EVIDENCE_INCOMPLETE'],qualityAxes:mixed.axes});
+ assert.equal(state.jobs[0].execution?.attempt,2);
+ const claim=await h.coordinator.claim(h.id,2,'generate',identity('generate','quality-run-2'));
+ assert.ok('diagnostics'in claim);assert.equal(claim.diagnostics,historical);assert.match(claim.diagnostics||'',/GAMEPLAY_NO_CONSEQUENCE/);assert.match(claim.diagnostics||'',/input:not-tested/);
+ await h.coordinator.report(h.id,2,'generate',identity('generate','quality-run-2'),{candidate:{format:'generated-source-v1',game:g.game},usageUnits:11});
+ const third=await tested(h,g.game,2);await h.coordinator.claim(h.id,2,'review',identity('review','quality-run-2'));
+ const finalReview=bindQualityReview(third.compiled,third.evidence,{...answer,axes:{...answer.axes,gameplay:'not-tested'}});
+ const report={review:finalReview,usageUnits:7};await h.coordinator.report(h.id,2,'review',identity('review','quality-run-2'),report);
+ state=await h.repo.snapshot();const job=state.jobs[0];
+ assert.equal(job.status,'failed');assert.equal(job.errorCode,'REPAIR_EXHAUSTED_QUALITY');assert.equal(job.attempts,3);
+ assert.deepEqual(job.execution?.lastFailure,{stage:'review',attempt:2,category:'quality-unverified',code:'GAME_QUALITY_UNVERIFIED',findings:['QUALITY_EVIDENCE_INCOMPLETE'],qualityAxes:finalReview.axes});
+ assert.equal(job.execution?.diagnostics,historical);assert.equal(job.execution?.repairCategory,'presentation-failed');
+ assert.equal(job.execution?.candidate,undefined);assert.equal(job.execution?.qualityEvidence,undefined);assert.equal(state.revisions.length,0);
+ assert.equal(state.audit.filter(e=>e.code==='AUTOMATIC_REPAIR').length,2);assert.equal(state.ledgers[actor.familyId].used,job.maxUnits);assert.equal(state.ledgers[actor.familyId].reserved,0);
+ const persisted=JSON.parse(JSON.stringify(job.execution!.lastFailure));assert.deepEqual(persisted,job.execution?.lastFailure);assert.doesNotMatch(JSON.stringify(persisted),/SECRET|source|prompt|capture|artifact|evidenceHash/);
+ await h.coordinator.report(h.id,2,'review',identity('review','quality-run-2'),report);assert.deepEqual(await h.repo.snapshot(),state,'duplicate terminal review cannot charge or overwrite its receipt');
+ await assert.rejects(h.coordinator.report(h.id,2,'review',identity('review','quality-run-2'),{...report,usageUnits:8}),/WORKER_REPORT_CONFLICT/);
+ await assert.rejects(h.coordinator.claim(h.id,3,'generate',identity('generate','quality-run-3')),/WORKER_CLAIM_REJECTED/);
+});
+
+test('a final technical rejection replaces prior review metadata and drops its axes',async()=>{
+ const h=await setup(),g=await generated(h);await h.coordinator.claim(h.id,0,'test',identity('test'));
+ await h.coordinator.report(h.id,0,'test',identity('test'),{ok:false,diagnostics:'NO_MEANINGFUL_INPUT_EFFECT'});
+ await generated(h,g.game,1);const second=await tested(h,g.game,1);await h.coordinator.claim(h.id,1,'review',identity('review','quality-run-1'));
+ await h.coordinator.report(h.id,1,'review',identity('review','quality-run-1'),{review:rejectedReview(second.compiled,second.evidence,'visual','VISUAL_STYLE_MISMATCH'),usageUnits:7});
+ const historical=(await h.repo.snapshot()).jobs[0].execution!.diagnostics;
+ await generated(h,g.game,2);await h.coordinator.claim(h.id,2,'test',identity('test','quality-run-2'));
+ await h.coordinator.report(h.id,2,'test',identity('test','quality-run-2'),{ok:false,diagnostics:'RUNTIME_FAILED privateSource=SECRET'});
+ const state=await h.repo.snapshot(),job=state.jobs[0];assert.equal(job.status,'failed');assert.equal(job.errorCode,'REPAIR_EXHAUSTED');
+ assert.deepEqual(job.execution?.lastFailure,{stage:'test',attempt:2,category:'runtime-failed',code:'GAME_RUNTIME_FAILED',findings:[]});
+ assert.equal(job.execution?.diagnostics,historical);assert.equal(job.execution?.candidate,undefined);assert.equal(job.execution?.qualityEvidence,undefined);assert.equal(state.revisions.length,0);
+});
+
+test('only a validated rejection creates metadata and a repaired all-axis pass still becomes Ready normally',async()=>{
+ const h=await setup(),g=await generated(h),first=await tested(h,g.game);await h.coordinator.claim(h.id,0,'review',identity('review'));
+ const rejected=rejectedReview(first.compiled,first.evidence,'gameplay','GAMEPLAY_NO_CONSEQUENCE');
+ await assert.rejects(h.coordinator.report(h.id,0,'review',identity('review'),{review:{...rejected,evidenceHash:'0'.repeat(64)},usageUnits:7}),/QUALITY_REVIEW_BINDING/);
+ assert.equal((await h.repo.snapshot()).jobs[0].execution?.lastFailure,undefined);
+ await h.coordinator.report(h.id,0,'review',identity('review'),{review:rejected,usageUnits:7});
+ const historical=(await h.repo.snapshot()).jobs[0].execution!.lastFailure;
+ await generated(h,g.game,1);const second=await tested(h,g.game,1);await h.coordinator.claim(h.id,1,'review',identity('review','quality-run-1'));
+ const passed=syntheticQualityReview(second.compiled,second.evidence);
+ await h.coordinator.report(h.id,1,'review',identity('review','quality-run-1'),{review:passed,usageUnits:7});
+ const state=await h.repo.snapshot(),job=state.jobs[0];assert.equal(job.status,'ready');assert.equal(job.errorCode,undefined);
+ assert.deepEqual(job.execution?.lastFailure,historical,'the previous rejection remains explicitly historical');
+ assert.equal(state.revisions.length,1);assert.deepEqual((state.revisions[0].game as GeneratedGame).compiled?.quality,passed);assert.equal(state.active[state.revisions[0].projectId],undefined);
+ assert.equal(job.execution?.candidate,undefined);assert.equal(job.execution?.qualityEvidence,undefined);assert.equal(job.usedUnits,36);assert.equal(state.ledgers[actor.familyId].used,36);assert.equal(state.ledgers[actor.familyId].reserved,0);
+ assert.equal((await h.svc.get(actor,h.id) as any).lastFailure,undefined,'private diagnostic metadata is not added to the public job response');
+});
+
 test('stale artifacts, stale evidence, wrong runs and cross-stage identities cannot approve a candidate',async()=>{
  const h=await setup();await assert.rejects(h.coordinator.claim(h.id,0,'review',identity('review')),/WORKER_CLAIM_REJECTED/);
  const g=await generated(h);await assert.rejects(h.coordinator.claim(h.id,0,'test',identity('generate')),/WORKER_CLAIM_REJECTED/);await assert.rejects(h.coordinator.claim(h.id,0,'test',identity('test','other-run')),/WORKER_CLAIM_REJECTED/);

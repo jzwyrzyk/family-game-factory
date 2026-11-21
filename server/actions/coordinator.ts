@@ -4,9 +4,9 @@ import {adultPilotJobAllowed} from '../adult-pilot';
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
-import {safeRepairDiagnostic,safeFinalRepairCode,type RepairCategory} from '../quality/repair-diagnostics';
+import {safeRepairDiagnostic,safeFinalRepairCode,type RepairCategory,type RepairCode,type QualityRepairAxes} from '../quality/repair-diagnostics';
 import {applyCurrentQualityPolicy,requireProductionCandidate} from '../quality/quality-policy';
-import {validateQualityEvidence,validateQualityReview,type GameQualityEvidence} from '../quality/game-quality';
+import {validateQualityEvidence,validateQualityReview,type GameQualityEvidence,type QualityFinding} from '../quality/game-quality';
 import {validateArtifact} from '../pipeline/artifacts';
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
 import type {AgentApproval} from '../agent/openai';
@@ -14,10 +14,15 @@ import type {Repository,Job,PipelineState,CandidateArtifact,AgentInput} from '..
 import type {WorkerIdentity,WorkerStage} from './identity';
 import type {DispatchPort} from './dispatcher';
 
+export interface ActionFailure {
+ stage:'test'|'review';attempt:0|1|2;category:RepairCategory;code:RepairCode;
+ findings:QualityFinding[];qualityAxes?:QualityRepairAxes;
+}
 export interface ActionExecution {
  attempt:number;dispatchPending:boolean;queuedAt?:number;dispatchedAt?:number;runId?:string;stage?:WorkerStage;
  candidate?:CandidateArtifact;qualityEvidence?:GameQualityEvidence;diagnostics?:string;repairCategory?:RepairCategory;
  claimAt?:number;generateReport?:string;testReport?:string;reviewReport?:string;
+ lastFailure?:ActionFailure;
 }
 const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_REQUIRED','SPENDING_CUTOFF','INPUT_TOKEN_LIMIT',
  'GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','IMAGE_APPROVAL_REQUIRED','IMAGE_ALLOWANCE_EXCEEDED',
@@ -56,10 +61,15 @@ export class ActionCoordinator {
   const ledger=s.ledgers[j.familyId];ledger.reserved-=j.maxUnits;ledger.used+=j.usedUnits;
   s.audit.push({jobId:j.id,familyId:j.familyId,status:'ready',at:new Date().toISOString()});
  }
- private repair(s:PipelineState,j:Job,diagnostics:unknown){
+ private repair(s:PipelineState,j:Job,stage:'test'|'review',diagnostics:unknown,reviewContext?:unknown){
   const e=j.execution!;
+  const safe=safeRepairDiagnostic(diagnostics,j.independentIntentPlan,stage==='review'?reviewContext:undefined);
+  // Record the actual rejected attempt before exhaustion or retry changes its
+  // identity. Existing diagnostics remain the previous repair's feedback.
+  if(e.attempt===0||e.attempt===1||e.attempt===2)e.lastFailure={stage,attempt:e.attempt,
+   category:safe.category,code:safe.code,findings:[...(safe.findings||[])],
+   ...(safe.qualityAxes?{qualityAxes:{...safe.qualityAxes}}:{})};
   if(e.attempt>=2){this.failure(s,j,safeFinalRepairCode(diagnostics,j.independentIntentPlan));return;}
-  const safe=safeRepairDiagnostic(diagnostics,j.independentIntentPlan);
   e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.reviewReport=undefined;
   e.claimAt=undefined;e.dispatchedAt=undefined;e.dispatchPending=true;e.diagnostics=safe.feedback;e.repairCategory=safe.category;
   // Retain rejected candidate evidence for a targeted private repair. A new
@@ -153,7 +163,7 @@ export class ActionCoordinator {
     const game=e.candidate.game,review=validateQualityReview(game,e.qualityEvidence,report.review);
     j.usedUnits+=report.usageUnits;e.reviewReport=fingerprint;
     if(review.verdict==='pass')this.ready(s,j,{...game,compiled:{...game.compiled!,quality:review}});
-    else this.repair(s,j,'QUALITY_REVIEW_FAILED:'+review.findings.join(','));
+    else this.repair(s,j,'review','QUALITY_REVIEW_FAILED:'+review.findings.join(','),{axes:review.axes,findings:review.findings});
     return receipt();
    }
    if(report.ok){
@@ -164,7 +174,7 @@ export class ActionCoordinator {
      const evidence=validateQualityEvidence(game,report.qualityEvidence);
      e.candidate={format:'generated-source-v1',game};e.qualityEvidence=evidence;e.testReport=fingerprint;j.phase='reviewing';
     }else{e.testReport=fingerprint;this.ready(s,j,game);}
-   }else this.repair(s,j,report?.diagnostics);
+   }else this.repair(s,j,'test',report?.diagnostics);
    return receipt();
   });
  }

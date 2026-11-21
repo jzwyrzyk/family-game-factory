@@ -48,6 +48,8 @@ flowchart TD
 
 The gateway's existing coordinator owns dispatch, retries and acceptance. New real metered games and current v2 revisions require the review path shown above; existing generated v1 revisions retain their legacy compatibility gate. New output cannot select v1 to evade current policy. The server re-applies the policy to older queued real jobs. New game families, intent analysis or repair research must integrate with this path rather than introduce a competing generation or repair pipeline. A tested or Ready candidate remains separate from a kept revision.
 
+Actions repair feedback preserves all allowlisted quality findings and the validated review's four axis statuses within the existing worker's 1,500-character limit. The optional private execution `lastFailure` record retains the latest test/review rejection's stage, attempt, stable category/code, finding enums and review axes before retry advancement or final exhaustion. It contains no source, prompt, capture or free-form error, and is not exposed through the browser job response. Earlier repair feedback and this rejection record have separate provenance; a later Ready result or unrelated terminal error must be read from the current job status. The [quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md#four-independent-review-judgments) describes the unchanged acceptance and retention boundaries.
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |
@@ -290,6 +292,8 @@ The private-session UI is installed even when the public workshop configuration 
 Detailed operation, temporary-feature removal and deployment acceptance are in the [adult release guide](docs/adult-pilot/VOICE_RELEASE_AND_UAT.md) and [parent privacy contract](docs/privacy/PARENT_CONSENT_AND_ADULT_PILOT.md). The changes do not alter explicit Send, Build or Keep, or claim actual child/provider/device acceptance.
 
 ## Cross-repository and release coupling
+
+The [operations policy foundation](docs/operations/POLICY_FOUNDATION.md) installs the real read-only CI check and its complete operational source/test dependencies. The privileged image-publication and Cloud Run rollout workflows remain in draft PR107; this foundation adds no automatic service, traffic, IAM or provider changes. Existing protected merges and deployment paths can deliver game fixes independently of that later access activation.
 
 The companion [private worker repository](https://github.com/family-game-factory-lab/family-game-factory-worker) owns workflow orchestration and runner control. The inspected worker `main` was [`21203a6dcedc19fb18e23795cd9377b20f5f81e3`](https://github.com/family-game-factory-lab/family-game-factory-worker/commit/21203a6dcedc19fb18e23795cd9377b20f5f81e3). Its [exact workflow](https://github.com/family-game-factory-lab/family-game-factory-worker/blob/21203a6dcedc19fb18e23795cd9377b20f5f81e3/.github/workflows/factory-private.yml) checks out public source `3b5e0a9d8ec48d3a8d27f0be914269ff95cddc75`. That is the **repository's configured source**, not proof of which workflow or image is currently active in production. A newer source proposal is tracked by [worker PR #13](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/13); its current status belongs in [Delivery state](DELIVERY-STATE.md).
 
