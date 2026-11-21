@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 21, 2026 — real operations CI separated to unblock game fixes
+
+The owner directed that the game-generation fixes ship now. The active [main ruleset](https://github.com/jzwyrzyk/family-game-factory/rules/27785865) already requires `Jems operations policy`, while its implementation existed only in conflicted draft [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107) at `2ced4fb227b94c9ad216ad58aed41b35072e7e23`. The [policy foundation](docs/operations/POLICY_FOUNDATION.md) extracts that unchanged workflow, complete operational source/test dependencies and fixed fixtures onto main `c43a18148421ea22edfba5f7e891530678ad4f4f`. It leaves both privileged release workflows out and preserves all PR108 application and packaging files.
+
+All 21 operational fixture tests passed locally, including the GitHub server-default normalization regression and rejected configuration/permission changes. Docker is unavailable in this executor, so both synthetic-image boots remain required hosted CI evidence; the workflow runs them without skips. Fresh full hosted checks and a protected merge remain required. No live cloud drill, image publication, service update or game acceptance is claimed by this entry. PR109's coordinated cutover and PR111's gateway repair retain their existing release boundaries; PR110 is supporting receipts/tooling. PR107's cloud activation work remains pending; both release enable flags must remain unset.
+
 ## November 21, 2026 — PR108 release approved; service packaging correction before merge
 
 The owner approved merging [PR108](https://github.com/jzwyrzyk/family-game-factory/pull/108) and moving it to production when ready. Readiness review at published head `1a7a37214fe88e929f7a1539ff5cd829d90264df` found a real packaging failure: [Service image packaging run 44872267165](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44872267165), job `136749207536`, could build the gateway image but could not import its entrypoint because `src/studio/design.ts` now imports `creation-readiness.ts`. The earlier push run `44872206322` failed identically. All seven other PR workflows completed successfully, including all four [Arcade jobs in run 44872267291](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44872267291); those results do not erase the packaging failure.

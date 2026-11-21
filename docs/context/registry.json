@@ -64,7 +64,8 @@
     "docs/decisions/2026-11-20-pal-expression-runtime.md",
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
-    "docs/brand/previews/learning-readability-20261120/README.md"
+    "docs/brand/previews/learning-readability-20261120/README.md",
+    "docs/operations/POLICY_FOUNDATION.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -95,7 +96,8 @@
     "docs/pals/*.md",
     "skills/gem-pal-studio/*.md",
     "docs/drawings/*.md",
-    "docs/pals/previews/*.md"
+    "docs/pals/previews/*.md",
+    "docs/operations/*.md"
   ],
   "areas": [
     {
@@ -602,11 +604,14 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
+        "docs/operations/*.md",
         "docs/mind-your-jems/*.md"
       ],
       "sources": [
         ".github/workflows/**",
         "scripts/deployment/**",
+        "scripts/ops/**",
+        "ops/**",
         "package.json",
         "package-lock.json",
         "tsconfig.json",
@@ -616,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T06:51:38.849Z",
-      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
+      "reviewedAt": "2026-11-21T13:19:37.586Z",
+      "sourceDigest": "1f9e2c6a7ab356387f9397876dd662e05cc544f7499640e0cb1e81a7011baae4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
+      "reviewReason": "Reviewed the exact PR107 policy workflow, all 21 operational tests and source dependencies on current main. Documented source-only CI integration, omitted privileged workflows, unchanged existing production paths and still-pending cloud activation; preserved PR108 packaging and all existing delivery evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -684,10 +689,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
+      "reviewedAt": "2026-11-21T13:18:52.237Z",
+      "sourceDigest": "85bfd72a406e676b3a44e0ec57dc9475613ea48db0b8157226619f10945abf70",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
+      "reviewReason": "Registered the policy-foundation contract and operations links, and routed scripts/ops and ops assets through delivery. The documentation map explicitly separates the real CI check from uninstalled privileged workflows; existing coverage, fingerprint checks and review requirements are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
