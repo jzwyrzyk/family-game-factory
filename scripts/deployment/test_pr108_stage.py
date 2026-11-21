@@ -9,6 +9,16 @@ from unittest.mock import patch
 import pr108_stage as stage
 
 
+def active_revision_conditions():
+    return [{'type': name, 'status': 'True'}
+            for name in ('Ready', 'Active', 'ContainerReady', 'ResourcesAvailable')]
+
+
+def ready_service_conditions():
+    return [{'type': name, 'status': 'True'}
+            for name in ('Ready', 'ConfigurationsReady', 'RoutesReady')]
+
+
 def fixture(service='factory-coach-private'):
     target = copy.deepcopy(stage.TARGETS[service])
     kind = 'coach' if service.endswith('private') else 'gateway'
@@ -16,6 +26,7 @@ def fixture(service='factory-coach-private'):
     revision = {
         'metadata': {
             'name': target['baseline'],
+            'generation': 1,
             'labels': {'family-component': kind, 'serving.knative.dev/service': service},
             'annotations': {
                 'autoscaling.knative.dev/minScale': '0',
@@ -47,8 +58,8 @@ def fixture(service='factory-coach-private'):
             'volumes': [{'name': 'config', 'secret': {
                 'secretName': 'fixture-config', 'items': [{'key': '3', 'path': 'config.json'}]}}],
         },
-        'status': {'imageDigest': old_image,
-                   'conditions': [{'type': 'Ready', 'status': 'True'}]},
+        'status': {'imageDigest': old_image, 'observedGeneration': 1,
+                   'conditions': active_revision_conditions()},
     }
     target['specHash'] = stage.digest(stage.spec_without_image(revision))
     latest = copy.deepcopy(revision)
@@ -72,7 +83,7 @@ def fixture(service='factory-coach-private'):
                    'latestCreatedRevisionName': target['latestCreated'],
                    'latestReadyRevisionName': target['latestReady'],
                    'traffic': [{'revisionName': target['baseline'], 'percent': 100}],
-                   'conditions': [{'type': 'Ready', 'status': 'True'}]},
+                   'conditions': ready_service_conditions()},
     }
     return service_doc, revision, target
 
@@ -262,12 +273,14 @@ class FakeCloud:
             'latestCreatedRevisionName': self.target['candidate'],
             'latestReadyRevisionName': self.target['candidate'],
             'traffic': copy.deepcopy(body['spec']['traffic']),
-            'conditions': [{'type': 'Ready', 'status': 'True'}],
+            'conditions': ready_service_conditions(),
         }
         self.candidate = copy.deepcopy(body['spec']['template'])
+        self.candidate['metadata']['generation'] = 1
         self.candidate['status'] = {
             'imageDigest': self.target['image'],
-            'conditions': [{'type': 'Ready', 'status': 'True'}],
+            'observedGeneration': 1,
+            'conditions': active_revision_conditions(),
         }
         if self.lose_write_response:
             raise stage.CloudError('CLOUD_RESPONSE_UNKNOWN', uncertain=True)

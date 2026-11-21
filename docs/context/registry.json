@@ -116,10 +116,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T07:32:15.243Z",
-      "sourceDigest": "8aecdcf916f362de641040f74735e48d769ada0637ffd6d3d171fede171e5269",
+      "reviewedAt": "2026-11-21T07:54:38.657Z",
+      "sourceDigest": "49dcadbcf420021dca946d3dc1f61434440090e55819af37223f19b57237cfcf",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected the PR108 staging helper and handoff: only the exact prepared service images are staged from existing serving configuration at zero traffic; child-led coaching, build readiness, explicit Build and Keep, and paid audience/budget policy are unchanged.",
+      "reviewReason": "Reviewed retired-state staging recovery, traffic-only promotion and immediate Pages dispatch. The child-led conversation, enough-understanding gate, explicit Build and Keep, compatible notebooks, and existing paid audience/budget policy remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T07:32:14.748Z",
-      "sourceDigest": "d77db1da7d8430c59ff4c25d6acf5f28cb8805882bdfb4a99aa83787d289b267",
+      "reviewedAt": "2026-11-21T07:54:38.970Z",
+      "sourceDigest": "81d2a354729db3c07bcefa2e09cf81d8f199f6581626c7cd42ce266eadf6b8a1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-returned PR108 image and serving-baseline receipts and documented exact-image zero-traffic staging, original-version conditional writes, private recovery journals, no replay, 96 deployment tests, and remaining backend/web acceptance.",
+      "reviewReason": "Recorded owner-returned retired coach metadata, configuration-only staging recovery without PUT replay, strict active promotion, immediate normal Pages dispatch after backend health, private journal recovery, and 127 passing offline deployment tests. Live promotion, publication and conversation acceptance remain unobserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -3,6 +3,7 @@
 
 Preserves the serving configuration; no promotion, IAM/secret writes,
 activation changes, paid inference, or preview deployment.
+Retired zero-traffic acceptance verifies stored configuration, not startup.
 Raw service metadata stays in memory or the private local recovery journal.
 An attempted PUT is never automatically repeated, including after interruption.
 """
@@ -217,7 +218,8 @@ def service_envelope(service):
     return {'name':metadata.get('name'),'namespace':metadata.get('namespace'),
             'labels':metadata.get('labels',{}),'annotations':clean_annotations(metadata),'spec':spec}
 
-def verify_candidate(service, candidate, journal):
+def verify_candidate_configuration(service, candidate, journal):
+    """Verify immutable identity/configuration and exact routes, not startup."""
     target = journal['target']
     require(service_envelope(service)==service_envelope(journal['baselineService']), 'SERVICE_POLICY_CHANGED')
     require(canonical_traffic(pinned_traffic(service))==canonical_traffic(journal['request']['spec']['traffic']),
@@ -240,9 +242,75 @@ def verify_candidate(service, candidate, journal):
     actual = template_from_revision(candidate,target['image'],target['candidate'])
     require(actual==expected, 'CANDIDATE_CONFIGURATION_MISMATCH')
     require(template_from_revision(template,target['image'],target['candidate'])==expected, 'LATEST_TEMPLATE_CHANGED')
-    return (service.get('metadata',{}).get('generation')==service.get('status',{}).get('observedGeneration')
-            and service.get('status',{}).get('latestCreatedRevisionName')==target['candidate']
-            and service.get('status',{}).get('latestReadyRevisionName')==target['candidate'])
+    return True
+
+def generation_observed(resource):
+    generation = resource.get('metadata',{}).get('generation')
+    observed = resource.get('status',{}).get('observedGeneration')
+    return type(generation) is int and generation>0 and type(observed) is int and observed==generation
+
+def conditions_by_type(resource):
+    rows = resource.get('status',{}).get('conditions',[])
+    require(isinstance(rows,list) and all(isinstance(row,dict) and isinstance(row.get('type'),str)
+                                        for row in rows), 'INVALID_CONDITIONS')
+    result = {row['type']:row for row in rows}
+    require(len(result)==len(rows), 'DUPLICATE_CONDITION')
+    return result
+
+def service_reconciled(service, target):
+    conditions = conditions_by_type(service)
+    return (generation_observed(service) and conditions.get('Ready',{}).get('status')=='True'
+            and all(row.get('status')=='True' for row in conditions.values())
+            and service.get('status',{}).get('latestCreatedRevisionName')==target['candidate'])
+
+def active_candidate_ready(service, candidate, target):
+    """Strict active readiness; never accepts the retired zero-traffic branch."""
+    conditions = conditions_by_type(candidate)
+    return (service_reconciled(service,target) and generation_observed(candidate)
+            and service.get('status',{}).get('latestReadyRevisionName')==target['candidate']
+            and all(row.get('reason') not in ('Retired','Retiring')
+                    for row in conditions_by_type(service).values())
+            and all(conditions.get(name,{}).get('status')=='True'
+                    for name in ('Ready','Active','ResourcesAvailable'))
+            and all(row.get('status')=='True' and row.get('reason') not in ('Retired','Retiring')
+                    for row in conditions.values()))
+
+def retired_zero_traffic_configuration(service, candidate, journal):
+    """Recognize the observed stored/retired lifecycle, without startup proof."""
+    target = journal['target']
+    conditions = conditions_by_type(candidate)
+    service_conditions = conditions_by_type(service)
+    expected = canonical_traffic(pinned_traffic(journal['baselineService']))
+    if not (service_reconciled(service,target) and generation_observed(candidate)
+            and service.get('status',{}).get('latestReadyRevisionName')==target['baseline']
+            and desired_traffic(service)==expected
+            and canonical_traffic(pinned_traffic(service))==expected):
+        return False
+    # Even if a caller supplies a different expected route, the exception can
+    # only describe the exact original 100% route with no candidate tag/traffic.
+    positive = [row for row in expected if row['percent']>0]
+    if not (len(positive)==1 and positive[0]['revisionName']==target['baseline']
+            and positive[0]['percent']==100
+            and all(row['revisionName']!=target['candidate'] for row in expected)):
+        return False
+    required = {'Ready':('True','Retired'),'Active':('False','Retired'),
+                'ResourcesAvailable':('Unknown','Retired')}
+    return (all((conditions.get(name,{}).get('status'),conditions.get(name,{}).get('reason'))==values
+                for name,values in required.items())
+            and conditions.get('ContainerReady',{}).get('status')=='True'
+            and service_conditions.get('ConfigurationsReady',{}).get('reason')=='Retired'
+            and service_conditions.get('RoutesReady',{}).get('status')=='True'
+            and all(row.get('status')=='True' for name,row in conditions.items() if name not in required))
+
+def verify_candidate(service, candidate, journal):
+    return (verify_candidate_configuration(service,candidate,journal)
+            and active_candidate_ready(service,candidate,journal['target']))
+
+def staged_candidate_status(service, candidate, journal):
+    if not verify_candidate_configuration(service,candidate,journal): return None
+    if active_candidate_ready(service,candidate,journal['target']): return 'STAGED_READY_VERIFIED'
+    if retired_zero_traffic_configuration(service,candidate,journal): return 'STAGED_CONFIGURATION_VERIFIED'
+    return None
 
 def verify_planned_shape(service, journal):
     expected = journal['request']['spec']['template']
@@ -341,14 +409,18 @@ def observe(cloud, journal):
             'DESIRED_TRAFFIC_CHANGED')
     candidate = cloud.request('revisions',target['candidate'],missing=True)
     if candidate is None: return False
-    return verify_candidate(current,candidate,journal)
+    return staged_candidate_status(current,candidate,journal)
 
 def report(service, target, status):
     return {'service':service,'status':status,'servingRevision':target['baseline'],'servingPercent':100,
             'candidateRevision':target['candidate'],'candidatePercent':0,'candidateImage':target['image'],
             'promoted':False}
 
+def progress(message):
+    print('PR108: '+message,file=sys.stderr,flush=True)
+
 def stage(cloud, directory, service, execute=False, wait_seconds=600):
+    progress('Checking staged configuration for '+service+'.')
     target = TARGETS[service]
     path = directory/(service+'.json')
     if path.exists():
@@ -382,6 +454,7 @@ def stage(cloud, directory, service, execute=False, wait_seconds=600):
         require(cloud.request('revisions',target['candidate'],missing=True) is None, 'CANDIDATE_ALREADY_EXISTS')
         journal['phase'] = 'attempted'
         save_journal(path,journal)
+        progress('Storing '+service+' candidate at zero traffic; existing route stays pinned.')
         try:
             cloud.request('services',service,journal['request'])
         except CloudError as error:
@@ -393,17 +466,25 @@ def stage(cloud, directory, service, execute=False, wait_seconds=600):
         require(not execute, 'PRIOR_MUTATION_REJECTED_NO_RETRY')
         observe(cloud,journal)
         return report(service,target,'REJECTED_READ_ONLY_INSPECTION_NO_RETRY')
-    require(journal['phase'] in ('attempted','uncertain','verified'), 'PRIOR_MUTATION_REJECTED_NO_RETRY')
+    require(journal['phase'] in ('attempted','uncertain','verified','configuration_verified'),
+            'PRIOR_MUTATION_REJECTED_NO_RETRY')
     # Existing journals always recover by reads. Even --execute cannot replay a
     # mutation whose response was lost or whose client stopped after submission.
-    deadline = time.monotonic()+wait_seconds
+    deadline, notice = time.monotonic()+wait_seconds, time.monotonic()+30
     while True:
-        if observe(cloud,journal):
-            journal['phase'] = 'verified'
+        status = observe(cloud,journal)
+        if status:
+            journal['phase'] = 'verified' if status=='STAGED_READY_VERIFIED' else 'configuration_verified'
             save_journal(path,journal)
-            return report(service,target,'STAGED_READY_VERIFIED')
+            progress(service+(' stored configuration verified at zero traffic; startup is not proven.'
+                              if status=='STAGED_CONFIGURATION_VERIFIED'
+                              else ' active candidate verified at zero traffic.'))
+            return report(service,target,status)
         if time.monotonic()>=deadline:
             return report(service,target,'PENDING_OR_UNCERTAIN_READ_ONLY_RECOVERY')
+        if time.monotonic()>=notice:
+            progress('Waiting for '+service+' staging status; checking by reads only.')
+            notice = time.monotonic()+30
         time.sleep(5)
 
 def main(argv=None):
@@ -423,13 +504,13 @@ def main(argv=None):
         # attempt is inspected by reads and must resolve before any new stage.
         for service in TARGETS:
             outcome = stage(cloud,directory,service,False,0)
-            if outcome['status'] not in ('STAGED_READY_VERIFIED','PREPARED_NO_MUTATION'):
+            if outcome['status'] not in ('STAGED_READY_VERIFIED','STAGED_CONFIGURATION_VERIFIED','PREPARED_NO_MUTATION'):
                 print(json.dumps(outcome),flush=True)
                 return 2
     for service in TARGETS:
         outcome = stage(cloud,directory,service,args.execute,args.wait_seconds)
         print(json.dumps(outcome),flush=True)
-        if outcome['status'] not in ('STAGED_READY_VERIFIED','PREPARED_NO_MUTATION'): return 2
+        if outcome['status'] not in ('STAGED_READY_VERIFIED','STAGED_CONFIGURATION_VERIFIED','PREPARED_NO_MUTATION'): return 2
     return 0
 
 if __name__=='__main__':
