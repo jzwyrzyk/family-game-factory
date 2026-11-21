@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:01:33.314Z",
-      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
+      "reviewedAt": "2026-11-21T16:37:28.688Z",
+      "sourceDigest": "e12385c8a65c2e5450e709b947c9a2b6c8a8b34cba6607f816b7913ea9335729",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
+      "reviewReason": "Recorded protected PR114 merge and exact matching tree, two successful exact-head Arcade runs and full 24-Pal visual review; retained unresolved intermittent image evidence and reconciled fresh PR116 backend/Pages receipts to a Pages-only Pal cutover pending authenticated dispatch.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
