@@ -632,10 +632,10 @@
         "server/Dockerfile.dev-site-source"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T02:58:06.686Z",
-      "sourceDigest": "768a3435e73891531790c814485c3410fee910c8810fb9a036f45ad3574aee85",
+      "reviewedAt": "2026-11-21T03:06:55.701Z",
+      "sourceDigest": "d5828aee92d7d5f4bbe909539e588cd0781c010bb52bdd70edc88b1e3eeee3b0",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented one shared DEV stack, finite foundation/config/secret/image/release commands, source-verified receipts, bounded service scaling and separate private runner setup/recovery. Preserved main d0d05944 production smoke acceptance and preactivation audit; DEV live access and activation remain pending actual admin connections.",
+      "reviewReason": "Recorded public PR106 and its exact reviewed tree, successful hosted DEV source-image build/import and scoped compatibility checks, separate private review/export PR16, and closure of superseded design PR101. Both implementation drafts remain unmerged; no shared DEV deployment, paid activation or full browser acceptance is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
