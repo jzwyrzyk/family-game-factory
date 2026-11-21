@@ -59,7 +59,14 @@ class Github:
                 rules.append({"id": 100, "target": "branch", "name": "Unknown branch", "enforcement": "active"})
             return rules + ([self.rules] if self.rules else [])
         if path == "rulesets/4":
-            return self.rules
+            # GitHub returns this Copilot setting as true by default, despite
+            # having zero mandatory approvals in the reviewed sole-owner rule.
+            observed = copy.deepcopy(self.rules)
+            for rule in observed["rules"]:
+                if rule["type"] == "pull_request":
+                    rule["parameters"]["require_extra_approval_for_unattributed_changes"] = True
+                    rule["parameters"]["required_reviewers"] = []
+            return observed
         if path == "rules/branches/main":
             return [{**rule, "ruleset_id": 4} for rule in (self.rules or {}).get("rules", [])]
         if path.endswith("variables"):
