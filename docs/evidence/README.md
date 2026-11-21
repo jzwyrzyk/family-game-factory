@@ -1,5 +1,10 @@
 # Synthetic validation evidence
 
+## November 20, 2026 — manual GHCR publication run 44837433067
+
+[Run 44837433067](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44837433067) used the correct public-source pin and successfully validated the packaged Docker image's entrypoint/source/quality code hashes. Its pre-publication wire test **did not actually execute gameplay**: a CommonJS TypeScript fixture caused `import {hopper}` to fail, and the container subsequently rejected empty stdin. The publish step was skipped and **no replacement image was pushed**. Follow-up adds a real Node `tsx` fixture-import regression and validates the synthetic envelope before Docker execution; passing that offline test is not evidence of production gVisor acceptance.
+
+
 ## November 20, 2026 — failed production sandbox image smoke
 
 [Private run 44830655674](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44830655674) ran the configured GHCR image on an actual isolated gVisor runner. Host/full readiness, image pull, and explicit network egress denial passed. `npm run test:sandbox` then failed on the first generated-game fixture with `PLAYTEST_FAILED:GENERATED_ARTIFACT_REJECTED`; later browser and hostile-source checks did not complete. The owner reported `CLEANUP_STATUS=VERIFIED` and `SMOKE_AUTH_STATUS=VERIFIED`, but **`FINAL_STATUS=FAILED`**. The image was published from older source `31f8c463…`, whose bare-game stdin contract is incompatible with current worker-approved `b472c224…` (`{game,...}` envelope). A new [manual source-pinned GHCR publisher](../assignment-006/SANDBOX-PUBLISH.md) adds pre-publication package/source hash and envelope smoke gates. No new image or real passing production acceptance is claimed by this code PR.

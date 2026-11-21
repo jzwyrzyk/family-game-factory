@@ -104,16 +104,36 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           # This is a wire/packaging check on the GitHub-hosted Docker runner.
           # It is NOT gVisor production security or full acceptance.
-          node --import tsx --input-type=module -e '
-            import {hopper} from "./server/testing/generated-fixtures.ts";
+          # This TS fixture is compiled as CommonJS in the reviewed Node
+          # package. ESM named import fails even though the fixture is valid.
+          # Validate and write the synthetic envelope BEFORE opening Docker:
+          # an invalid fixture must never be mistaken for a sandbox failure.
+          umask 077
+          node --import tsx -e '
+            const {hopper} = require("./server/testing/generated-fixtures.ts");
+            if (!hopper || hopper.kind !== "generated-module-v1" ||
+                !Array.isArray(hopper.controls) ||
+                typeof hopper.source !== "string" ||
+                !hopper.source.includes("createGame")) {
+              throw Error("SANDBOX_SYNTHETIC_FIXTURE_INVALID");
+            }
             process.stdout.write(JSON.stringify({game:hopper}));
-          ' | timeout 90s docker run --rm -i --pull=never \
+          ' > "$RUNNER_TEMP/jems-sandbox-wire-input.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const x=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/jems-sandbox-wire-input.json","utf8"));
+            if (!x.game || x.game.kind!=="generated-module-v1") throw Error("INVALID_WIRE_INPUT");
+            console.log("SANDBOX_FIXTURE_ENVELOPE_VALIDATED");
+          '
+          timeout 90s docker run --rm -i --pull=never \
               --network=none --read-only --cap-drop=ALL \
               --security-opt=no-new-privileges --pids-limit=128 \
               --memory=1536m --memory-swap=1536m --cpus=1 \
               --user=1000:1000 --tmpfs=/tmp:rw,nosuid,nodev,size=256m \
               --shm-size=128m jems-sandbox:prepublish \
+              < "$RUNNER_TEMP/jems-sandbox-wire-input.json" \
               > "$RUNNER_TEMP/jems-sandbox-wire-receipt.json"
+          rm "$RUNNER_TEMP/jems-sandbox-wire-input.json"
           node --input-type=module -e '
             import {readFileSync,rmSync} from "node:fs";
             const path=process.env.RUNNER_TEMP+"/jems-sandbox-wire-receipt.json";

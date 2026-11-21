@@ -1,6 +1,8 @@
 """Offline release-boundary checks for the manual, source-pinned GHCR publisher."""
 from pathlib import Path
 import importlib.util
+import json
+import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -52,6 +54,38 @@ class ManualSandboxPublisherTests(unittest.TestCase):
         self.assertIn('source-$REVIEWED_SANDBOX_SHA-run-$GITHUB_RUN_ID-attempt-$GITHUB_RUN_ATTEMPT',text)
         self.assertIn('PUBLISHED_SANDBOX_IMAGE=$ref',text)
         self.assertIn('NOT YET PRODUCTION-ACCEPTED',text)
+
+    def test_fixture_loader_from_real_typescript_package(self):
+        # Regression for run 44837433067: named ESM import of a TS fixture
+        # compiled as CommonJS failed before the Docker envelope test.
+        # npm ci is run by CI before deployment tests.
+        result=subprocess.run([
+            'node','--import','tsx','-e',
+            'const {hopper}=require("./server/testing/generated-fixtures.ts");'
+            'if(!hopper||hopper.kind!=="generated-module-v1"||'
+            '!Array.isArray(hopper.controls)||'
+            'typeof hopper.source!=="string"||'
+            '!hopper.source.includes("createGame"))'
+            'throw Error("SANDBOX_SYNTHETIC_FIXTURE_INVALID");'
+            'process.stdout.write(JSON.stringify({game:hopper}));'
+        ],cwd=ROOT,text=True,capture_output=True,timeout=25)
+        self.assertEqual(result.returncode,0,
+                         'TYPE_SCRIPT_FIXTURE_LOAD_FAILED')
+        value=json.loads(result.stdout)
+        self.assertEqual(value['game']['kind'],'generated-module-v1')
+        self.assertGreater(len(value['game']['source']),40)
+
+    def test_wire_input_is_validated_before_docker_container(self):
+        text=self.source()
+        self.assertIn('const {hopper} = require("./server/testing/generated-fixtures.ts")',text)
+        self.assertNotIn('import {hopper} from',text)
+        self.assertIn('SANDBOX_FIXTURE_ENVELOPE_VALIDATED',text)
+        self.assertIn('SANDBOX_SYNTHETIC_FIXTURE_INVALID',text)
+        self.assertLess(text.index('SANDBOX_FIXTURE_ENVELOPE_VALIDATED'),
+                        text.index('timeout 90s docker run --rm -i'))
+        self.assertIn('< "$RUNNER_TEMP/jems-sandbox-wire-input.json"',text)
+        self.assertLess(text.index('SANDBOX_ENVELOPE_WIRE_CONTRACT_PASSED'),
+                        text.index('docker push "$tag"'))
 
     def test_local_builder_has_required_source_files(self):
         spec=importlib.util.spec_from_file_location('build',ROOT/'scripts/deployment/build.py')

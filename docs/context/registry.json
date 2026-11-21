@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-20T22:49:33.000Z",
-      "sourceDigest": "e9a721604795209962a4c5802d453d0f4b26d2622c79a3886618de6c74c4c0a0",
+      "reviewedAt": "2026-11-20T23:35:32.000Z",
+      "sourceDigest": "14f7d10ac5bc2c19c21996a0582938f6e395161bb890f4fafb858871f292c7d0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed actual failed old-image gVisor smoke 44830655674 and independently verified resource cleanup: old GHCR digest from public 31f8c463 accepts bare game, whereas reviewed worker public b472c224 transmits {game,...} and needs source-bound quality evidence. New manual-only pinned SHA GitHub-hosted GHCR publishing workflow validates committed build context, packaged worker/source/quality hashes, current envelope and a no-network wire test before any package write; fixes local build.py dependency staging with missing-input regression. Updated release publication handoff, evidence and delivery ledger; no new image, model activation, private WIF or Cloud Run changes claimed.",
+      "reviewReason": "Reviewed first GitHub-hosted manual sandbox publication run 44837433067: approved source staged, image built, packaged source hashes passed; synthetic TypeScript CJS fixture failed with ESM named import, causing empty stdin to sandbox. No GHCR image published, no paid activation, no VM. Corrected manual workflow to real require()-based TSX fixture and positive pre-Docker validated JSON envelope, added executable regression in deployment tests. Updated sandbox handoff, incident evidence and delivery ledger; publishing remains separately manual after merge.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
