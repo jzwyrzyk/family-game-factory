@@ -16,6 +16,7 @@ const vm=require('node:vm');
  for(const asset of palAssets)assert.ok(allowedPaths.includes(asset.url),asset.url+' remains available for on-demand offline caching');
  assert.ok(!precachePaths.some(asset=>asset.startsWith('jems-pals/')&&asset.endsWith('.webp')),'service-worker installation must not download the 184-image Gem Pal library');
  assert.ok(precachePaths.includes('jems-pals/manifest.json'),'small versioned Pal metadata remains available offline');
+ assert.ok(!precachePaths.some(asset=>asset.startsWith('jems-pals-extra/')),'Brio neutral artwork is also requested on demand');
  // Exercise the built worker's fetch handler with unavailable cache capacity.
  // A network response remains usable even when saving it for offline use fails.
  let fetchHandler,networkRequests=0,cacheWrites=0;
@@ -93,15 +94,14 @@ const vm=require('node:vm');
   assert.match(await page.locator('#studioNavHome use').getAttribute('href'),/\/arcade\/jems-art\/icons\/jems-icons\.svg#jems-home$/,'offline navigation resolves the same sprite below the site base');
   await page.waitForFunction(()=>!!FG.pals?.view());
   await navigate(page,'#studioNavPals');
-  await page.locator('.pal-expression-explorer summary').click();
-  await page.locator('[data-pal-expression-character]').waitFor({state:'visible'});
-  assert.equal(await page.locator('[data-pal-expression-character] option').count(),23,'the real application loader resolves the manifest on its first offline open');
-  await page.locator('[data-pal-expression-character]').selectOption(palManifest.characters.find(character=>character.slug==='navi').characterKey);
+  const naviCard=page.locator('.pals-card[data-pal="navi"]');
+  await naviCard.scrollIntoViewIfNeeded();
   await page.waitForFunction(hash=>{
-   const portrait=document.querySelector('.pal-expression-explorer .pal-artwork-view');
-   return portrait?.dataset.state==='ready'&&portrait.dataset.sourceHash===hash;
+   const image=document.querySelector('.pals-card[data-pal="navi"] img');
+   return image?.complete&&image.naturalWidth>0&&image.src.includes(hash.slice(0,12));
   },selectedPal.sourceSHA256);
-  assert.equal(await page.locator('.pal-expression-explorer .pal-artwork-view').getAttribute('aria-label'),'Navi, Base, Ready','the real offline renderer decodes the previously viewed approved image');
+  assert.match(await naviCard.locator('img').getAttribute('src'), /jems-pals\/navi\/base\/neutral-/,'the actual collection renders previously viewed approved pixels offline');
+  assert.equal(await page.locator('[data-pals-focus="starter-glim"]').count(),1,'offline collection still offers the free starter');
   await page.locator('#jemsPalsBack').click();
   await navigate(page,'#studioNavCreate');
   await page.waitForFunction(()=>document.querySelector('[data-helper-pose="wave"]')?.naturalWidth>0);

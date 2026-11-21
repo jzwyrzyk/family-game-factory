@@ -5,6 +5,7 @@ RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY --chown=node:node server ./server
 COPY --chown=node:node src/runtime/types.ts src/runtime/manifests.ts ./src/runtime/
 COPY --chown=node:node src/creation/model.ts src/creation/projects.ts ./src/creation/
+COPY --chown=node:node src/pals/catalog.ts src/pals/catalog-artwork.generated.ts ./src/pals/
 ENV NODE_ENV=production
 USER node
 CMD ["node", "--import", "tsx", "server/preview-server.ts"]

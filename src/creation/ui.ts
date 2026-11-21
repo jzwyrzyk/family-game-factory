@@ -13,6 +13,7 @@ import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
+import { palSceneAssetId, type PalForm } from '../pals/catalog';
 import './style.css';
 
 type Host = {
@@ -21,6 +22,7 @@ type Host = {
   openGame(sessionId: string): void | Promise<void>;
   ownedPals?(): readonly string[];
   activePal?(): string | null;
+  palForm?(id: CreationPalId): PalForm;
   openPals?(): void;
   onRewardSourceSaved?(owner: string): void;
   guidance?: GuideHost;
@@ -262,6 +264,7 @@ export function installCreationStudio(host: Host) {
     if (latest) loadScene(latest.id); else challenge(id);
   }
   function ownedPals(): CreationPalId[] { return [...new Set(host.ownedPals?.() ?? [])].filter(isCreationPalId); }
+  function ownedPalForm(id: CreationPalId): PalForm { return host.palForm?.(id) === 'mature' ? 'mature' : 'base'; }
   function requireOwnedPal(id: string): CreationPalId {
     if (!isCreationPalId(id) || !ownedPals().includes(id)) throw Error('Choose a Pal from your collection first.');
     return id;
@@ -276,7 +279,7 @@ export function installCreationStudio(host: Host) {
     // Read before leaving the current page so damaged scene history cannot be
     // replaced with an apparently successful new empty collection.
     const collection = store(); collection.read();
-    const project = createPalPlayground(palId);
+    const project = createPalPlayground(palId, ownedPalForm(palId));
     if (!enter()) return false;
     const saved = collection.create(owner(), project); loadScene(saved.id);
     // Show the child's editable tap script immediately; Play and Keep are still
@@ -290,7 +293,7 @@ export function installCreationStudio(host: Host) {
     if (challengeId) throw Error('Finish your challenge, then choose “Make it my own” to add your Pal.');
     const palId = requireOwnedPal(id);
     mutation(project => {
-      const added = addPalToProject(project, palId);
+      const added = addPalToProject(project, palId, ownedPalForm(palId));
       Object.assign(project, added.scene); selectedActor = added.actorId; selectedProgram = added.programId; insert = null;
     });
     $<HTMLDialogElement>('creationActorDialog').close();
@@ -304,7 +307,7 @@ export function installCreationStudio(host: Host) {
     palShelf.append(copy);
     const choices = node('div', 'creation-pal-starts');
     for (const id of ownedPals()) {
-      const asset = creationAsset('pal-' + id)!;
+      const asset = creationAsset(palSceneAssetId(id, ownedPalForm(id)))!;
       const button = node('button', 'creation-pal-starter'); button.type = 'button'; button.dataset.creationPal = id;
       const label = node('span'); label.append(node('strong', '', asset.label), node('small', '', 'Make a scene →'));
       button.append(art(asset.id), label); button.onclick = () => act(() => openWithPal(id)); choices.append(button);
@@ -328,7 +331,7 @@ export function installCreationStudio(host: Host) {
       else { saveVersion(); host.openPals?.(); }
     });
     palTools.append(button);
-    if (id) palTools.append(node('span', '', `${creationAsset('pal-' + id)!.label} brings a tap-to-dance script. You can change every block.`));
+    if (id) palTools.append(node('span', '', `${creationAsset(palSceneAssetId(id, ownedPalForm(id)))!.label} brings a tap-to-dance script. You can change every block.`));
     if (ids.length > 1) {
       const choose = node('button', 'creation-text-button', 'Choose another'); choose.type = 'button'; choose.id = 'creationChoosePal';
       choose.onclick = () => act(() => { assertEditing(); renderActorChoices(true); $<HTMLDialogElement>('creationActorDialog').showModal(); });
@@ -346,7 +349,11 @@ export function installCreationStudio(host: Host) {
         preview.getContext('2d')!.drawImage(resolved.image,(128-w)/2,(128-h)/2,w,h);
         preview.style.cssText='width:100%;height:100%;object-fit:contain';wrap.replaceChildren(preview);
       }).catch(()=>{if(capturedOwner===owner()&&capturedView===viewEpoch&&wrap.isConnected)wrap.textContent='Art unavailable';});
-    }else if (asset?.url) { const img = node('img'); img.src = asset.url; img.alt = ''; wrap.append(img); }
+    }else if (asset?.url) {
+      const img = node('img'); img.alt = ''; img.decoding = 'async';
+      if (asset.palForm) img.onerror = () => { wrap.textContent = 'Picture unavailable'; };
+      img.src = asset.url; wrap.append(img);
+    }
     else { wrap.classList.add('creation-art-' + (asset?.shape || 'gem')); wrap.style.setProperty('--actor-color', asset?.color || '#9473D3'); wrap.textContent = asset?.emoji || (asset?.shape === 'robot' ? '▰' : asset?.shape === 'bucket' ? '◡' : '◆'); }
     return wrap;
   }
@@ -745,7 +752,7 @@ export function installCreationStudio(host: Host) {
     const box = $('creationActorChoices'), ids = ownedPals(); box.replaceChildren();
     $('creationActorDialogTitle').textContent = palsOnly ? 'Which Pal is joining?' : 'Who’s joining your scene?';
     for (const asset of CREATION_ASSETS) {
-      if (asset.palId ? challengeId || !ids.includes(asset.palId) : palsOnly) continue;
+      if (asset.palId ? challengeId || !ids.includes(asset.palId) || asset.id !== palSceneAssetId(asset.palId, ownedPalForm(asset.palId)) : palsOnly) continue;
       const b = node('button', 'creation-character-choice'); b.type = 'button'; b.dataset.creationAsset = asset.id;
       b.append(art(asset.id), node('strong', '', asset.label));
       b.onclick = () => act(() => {
@@ -805,7 +812,7 @@ export function installCreationStudio(host: Host) {
     refreshPals: () => {
       // Recheck ownership each time the picker is opened or a Pal is added;
       // stale cards cannot introduce a previous profile's collection.
-      const key = JSON.stringify([owner(), ownedPals(), host.activePal?.() ?? null]);
+      const key = JSON.stringify([owner(), ownedPals().map(id => [id, ownedPalForm(id)]), host.activePal?.() ?? null]);
       if (key === renderedPalsKey) return;
       renderedPalsKey = key;
       // A background reward refresh must not dismiss an art chooser or move
