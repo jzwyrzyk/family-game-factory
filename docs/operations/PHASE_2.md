@@ -5,6 +5,26 @@ operation requires a maintainer-reviewed intent on protected main. The repositor
 Google grants are initially absent. Existing Pages, sandbox publication, smoke,
 worker trust and provider approval retain their current release paths.
 
+## Integration split: policy checks and game fixes
+
+[PR112](https://github.com/jzwyrzyk/family-game-factory/pull/112) carries the
+[policy foundation](POLICY_FOUNDATION.md) and the game-quality repair from PR111.
+It extracts the real operations workflow, complete operational source/tests and
+fixed fixtures from PR107 at `2ced4fb227b94c9ad216ad58aed41b35072e7e23` without
+changing their assertions or behavior. This resolves the missing required-check
+dependency without installing either privileged release workflow. Keep the
+newer application, packaging, quality-repair and documentation changes when
+updating this draft from that integration.
+
+PR107 retains the proposed image-publication and Cloud Run release workflows,
+advisory CODEOWNERS coverage and this activation runbook. Their account grants,
+actual OIDC claim proofs, scoped Logging validation and isolated live rollout
+drill remain separate work. The draft hold and all activation requirements below
+still apply to that remainder. Merging the policy/game-fix source does not
+satisfy them, authorize cloud mutations or validate an old administrator review
+code. Preserve both unset release flags and use a fresh plan bound to the current
+reviewed PR107 head for any later administrator action.
+
 [PR #100](https://github.com/jzwyrzyk/family-game-factory/pull/100) established the
 metadata diagnostics identity. [PR #45](https://github.com/jzwyrzyk/family-game-factory/pull/45)
 proposed separate Pages build and publication jobs. This implementation applies that

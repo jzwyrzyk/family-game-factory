@@ -19,7 +19,7 @@ SANDBOX='ghcr.io/jzwyrzyk/family-game-factory-sandbox'
 SANDBOX_SCOPE=['.dockerignore','server/sandbox','server/agent/game-assets.cjs','server/quality/game-quality-evidence.cjs']
 REQUIRED_SANDBOX_FILES=['server/sandbox/Dockerfile','server/sandbox/worker.cjs','server/sandbox/quality-capture.cjs','server/sandbox/source-validator.cjs','server/agent/game-assets.cjs','server/quality/game-quality-evidence.cjs']
 BUILDER='factory-service-builder@'+PROJECT+'.iam.gserviceaccount.com'
-SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/creation/model.ts','src/creation/projects.ts']
+SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts','src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/creation/model.ts','src/creation/projects.ts']
 REQUIRED_APIS={'cloudbuild.googleapis.com','artifactregistry.googleapis.com','logging.googleapis.com','storage.googleapis.com','iam.googleapis.com'}
 
 
@@ -102,8 +102,10 @@ def preflight(region,bucket):
 def verify_service_copy_inputs(context):
     # Validate the selected source's Dockerfiles, not the publisher's checkout:
     # older reviewed releases legitimately have no Creation source dependency.
-    for kind in ('gateway','preview'):
+    for kind in ('gateway','preview','coach'):
         dockerfile=context/('server/Dockerfile.'+kind)
+        # Older reviewed rollback sources predate the separate coach image.
+        if kind=='coach' and not dockerfile.is_file():continue
         for line in dockerfile.read_text().replace('\\\n',' ').splitlines():
             tokens=shlex.split(line,comments=True)
             if not tokens or tokens[0].upper()!='COPY':continue

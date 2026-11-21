@@ -33,3 +33,27 @@ exports.navigate=async function navigate(page,id){
  if(!await target.isVisible())await page.locator('#studioNavMenu').click();
  await target.click();
 };
+/** Send the fixture child's own words through the same composer they use.
+ * Reading the notebook verifies durability; this helper never changes a plan,
+ * approves a build, supplies a coach answer, or bypasses a readiness decision.
+ */
+exports.sendChildMessage=async function sendChildMessage(page,text){
+ const before=await page.evaluate(()=>{
+  const notebook=FG.studio.exportNotebook(),owner=FG.store.current().id;
+  const session=notebook.sessions.find(item=>item.owner===owner&&item.id===notebook.active[owner]);
+  if(!session)throw Error('Open a creation conversation before sending a child message');
+  return {owner,id:session.id,messageIds:session.messages.map(message=>message.id)};
+ });
+ await page.locator('#studioPrompt').fill(text);
+ await page.locator('#studioTalk').click();
+ await page.waitForFunction(({before,text})=>{
+  const notebook=FG.studio.exportNotebook();
+  if(FG.store.current().id!==before.owner||notebook.active[before.owner]!==before.id)return false;
+  const session=notebook.sessions.find(item=>item.owner===before.owner&&item.id===before.id);
+  const turn=session?.messages.findIndex(message=>message.role==='child'&&message.text===text.trim()&&!before.messageIds.includes(message.id));
+  if(turn===undefined||turn<0)return false;
+  const answered=session.messages.slice(turn+1).some(message=>message.role==='helper');
+  return answered&&!document.getElementById('coachModeStatus')?.classList.contains('is-thinking');
+ },{before,text});
+ return page.evaluate(({owner,id})=>FG.studio.exportNotebook().sessions.find(item=>item.owner===owner&&item.id===id),before);
+};

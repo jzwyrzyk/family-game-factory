@@ -58,7 +58,7 @@ Lifetime totals recognize **50, 150, 300, 600 and 1,000 gems**, then each additi
 2. The source persists the completed activity and its outbox in the same write. A failed source save cannot grant gems.
 3. The rewards coordinator projects pending facts into [RewardsStore](../../src/rewards/store.ts). One IndexedDB read/write transaction adds all new receipts and any newly earned practice-count bonuses.
 4. The source acknowledges only facts whose ledger transaction succeeded. An acknowledgement failure leaves pending facts available to retry; retry does not award them again.
-5. The UI displays the committed total and a compact nonblocking celebration for newly granted work. Loading, importing or retrying previously granted facts does not replay a reward.
+5. The UI displays the committed total and a compact nonblocking celebration for newly granted work. During the [guided creation conversation](../decisions/2026-11-20-guided-chat-creation.md), the total and receipt still update, but cosmetic toasts are suppressed so they cannot cover the child's answer or actions. Entering chat clears an earlier toast. Loading, importing or retrying previously granted facts does not replay a reward.
 
 The semantic activity key is **kind + source ID**, scoped to an owner and a captured browser workspace namespace. Maker keys are normalized to the level; practice bonus keys use the threshold. Keys deliberately exclude timestamps, UI sessions, policy versions and amounts. The receipt records its policy version and fixed amount so a later schedule cannot silently reprice old work. A future rule change needs a new supported policy and explicit migration policy, while retaining those stable identities.
 

@@ -78,11 +78,25 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  }
  await page.locator('#studioChange').click();
  await page.locator('#studioPrompt').fill('Make my rocket a bouncing rainbow potato spaceship');
- await page.locator('#coachTry').click();
+ // Capture the style before either modal owns scrolling. The handoff restores
+ // it before the selected wait arcade takes over the same page.
+ const bodyOverflow=await page.evaluate(nonDefault=>{
+  if(nonDefault)document.body.style.overflow='auto';
+  return document.body.style.overflow;
+ },!!device.recoveryTerminal||!!device.profileReset);
+ await page.locator('#studioSend').click();
  await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='building'));
  assert.equal(counters.submitted,1);
- const launch=page.locator('#studioBuildProgress .studio-wait-arcade-button');
- await launch.waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.getElementById('studioBuildHandoff')?.open&&document.getElementById('studioBuildHandoff')?.dataset.phase==='building');
+ assert.equal(await page.locator('#studioBuildHandoffPlay').isEnabled(),true,'the acknowledged build offers explicit play');
+ assert.equal(await page.locator('dialog.myj-arcade').isVisible(),false,'the popup never starts a game for the child');
+ // Re-entry after leaving the arcade uses the existing optional progress
+ // action. First entry below exercises the new focused Build handoff.
+ const launch={async click(){
+  const choices=page.locator('#studioMoreChoices');
+  if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();
+  await page.locator('#studioBuildProgress .studio-wait-arcade-button').click();
+ }};
  const project=await page.evaluate(()=>{
   const owner=FG.store.current().id,id=FG.studio.exportNotebook().active[owner];
   return {owner,id,otherOwner:FG.store.familyProfiles().find(profile=>profile.id!==owner).id};
@@ -90,12 +104,8 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  // Leave ample transport time before pausing; a 20ms margin can already be in
  // the past on a busy CI runner. The arcade has not opened or started timers.
  if(!recordVideo)await page.clock.pauseAt(await page.evaluate(()=>Date.now()+10000));
- // Exercise restoration of an existing style, not just the default empty one.
- const bodyOverflow=await page.evaluate(nonDefault=>{
-  if(nonDefault)document.body.style.overflow='auto';
-  return document.body.style.overflow;
- },!!device.recoveryTerminal||!!device.profileReset);
- await launch.click();
+ await page.locator('#studioBuildHandoffPlay').click();
+ assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'the handoff closes before the arcade opens');
  const arcade=page.locator('dialog.myj-arcade');
  await arcade.waitFor({state:'visible'});
  const assets=[];

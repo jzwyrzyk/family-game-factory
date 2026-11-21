@@ -8,6 +8,8 @@ RUN rm -f /app/server/coach/private-provider.ts /app/server/coach/private-execut
     /app/server/coach/private-speech-provider.ts /app/server/coach/cloud-token.ts
 COPY --chown=node:node src/runtime/types.ts src/runtime/manifests.ts ./src/runtime/
 COPY --chown=node:node src/studio/design.ts ./src/studio/
+# Shared coach validation imports only these pure readiness/display helpers.
+COPY --chown=node:node src/studio/creation-readiness.ts src/studio/conversation-view.ts ./src/studio/
 COPY --chown=node:node src/creation/model.ts src/creation/projects.ts ./src/creation/
 ENV NODE_ENV=production
 USER node
