@@ -39,7 +39,13 @@ def comparable_rules(ruleset):
 def normalize_parameters(params):
     # GitHub can return server defaults for newer, disabled review settings.
     result = dict(params)
-    for key in ("require_extra_approval_for_unattributed_changes", "required_reviewers", "dismissal_restriction"):
+    # GitHub may default this Copilot-only switch to true. With zero required
+    # approvals it has no effect and must not be treated as configuration drift.
+    if result.get("required_approving_review_count") == 0:
+        result.pop("require_extra_approval_for_unattributed_changes", None)
+    elif not result.get("require_extra_approval_for_unattributed_changes"):
+        result.pop("require_extra_approval_for_unattributed_changes", None)
+    for key in ("required_reviewers", "dismissal_restriction"):
         if not result.get(key):
             result.pop(key, None)
     for key in ("allowed_merge_methods", "required_status_checks"):
