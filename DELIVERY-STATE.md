@@ -1,5 +1,32 @@
 # jems delivery state
 
+## November 20, 2026 — production sandbox accepted; adult activation and Pages pending
+
+Corrected production [smoke 44855232144](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44855232144) completed successfully at **9:28:36 p.m. America/New_York** (`2026-11-21T02:28:36Z`). GitHub independently reports all **nine required jobs successful**: the isolated `sandbox-smoke` and the eight hosted regression shards (`core`, `learning`, `gameplay`, `browser-security`, `generated`, `creative`, `studio`, `coach`). The isolated job passed immutable-image preparation, actual gVisor no-egress verification, and full sandbox/hostile-source fixtures. Each regression job verified its pinned source and complete coverage assignment, built the production bundle, and passed its assigned browser/contract suites.
+
+| Accepted identity | Exact value |
+| --- | --- |
+| Private workflow `P` | `52729ad231179d633b2f15fa910aa2b23273a2d6` |
+| Public application `S` | `b472c224f7e8ef8ab0986ce6f755728d7cc63d46` |
+| Production sandbox image | `ghcr.io/jzwyrzyk/family-game-factory-sandbox@sha256:83be22b96cdd83eaefa80c0ae321208bdff63f4ee926cc5ae28d064f91cee089` |
+
+The owner supplied the launcher's separate final receipt:
+
+```text
+SMOKE_STATUS=PASSED
+CLEANUP_STATUS=VERIFIED
+SMOKE_AUTH_STATUS=VERIFIED
+SMOKE_CANCEL_STATUS=NOT_NEEDED
+FINAL_STATUS=SUCCESS
+```
+
+This establishes the exact production-image and regression acceptance above, with owner-reported VM/disk/runner cleanup and one-use smoke authorization reset. The earlier timeout and incompatible-image runs retain their failed/cancelled outcomes. The accepted application and image require no rebuild or repeat smoke for this documentation/audit follow-up.
+
+**Current next step:** run the accompanying [sanitized read-only preactivation audit](scripts/deployment/preactivation_audit.py) from the reviewed tooling source to inspect current gateway/configuration, private trust, model/allowance and adult-access state. Use that current receipt to reconcile the new private `P` with WIF and the mounted gateway configuration while preserving the existing family/workspace, identities, budget history and prior working revision. Adult-only activation remains pending; no paid provider journey or new website publication is established by this receipt.
+
+After authorized adult activation, immediately dispatch the corrected manual Pages workflow from `main` with **`source_sha=b472c224f7e8ef8ab0986ce6f755728d7cc63d46`** and the existing gateway/preview origins. The application source stays fixed while the release workflow uses the merged parallel regression correction. Require its artifact build and all eight regression jobs before publication, then verify the public release marker and the real Adult **Build → Test → Review → Play → Edit → Keep → Reload** journey. Keep child paid AI off and [issue #93](https://github.com/jzwyrzyk/family-game-factory/issues/93) open until live acceptance and ordinary-release continuity are proven.
+
+
 ## November 20, 2026 — parallel release repairs merged; corrected smoke pending
 
 [Private worker PR15](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/15) merged at **8:31:56 p.m. America/New_York** (`2026-11-21T01:31:56Z`) as **`52729ad231179d633b2f15fa910aa2b23273a2d6`**. Its tree `884bebe05e36b92bd5659a7f158cb3b5b56f3967` exactly matches reviewed head `5843c06a3990836cd25f491467634e0644b89308`. Both jobs in [private CI44850463347](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44850463347) passed: offline security/coverage tests and the unchanged-source service/sandbox build with inactive-service refusal checks. The final local suite passed **166 tests**. The complete smoke now requires the isolated job and all eight hosted regression jobs, with independently verified cleanup and authorization reset.
