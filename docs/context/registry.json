@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:25:57.445Z",
-      "sourceDigest": "ce9591f4bb96dbeb78d507a210274fbf0253aa476bd2d6e445c31058ebe6cec3",
+      "reviewedAt": "2026-11-21T16:27:13.436Z",
+      "sourceDigest": "fb5e4bc0370f53dae1bf7d5ddeca2e8a33b4f46ede6eadd3be40a1a350b5babf",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed owner-supplied backend rollout, completed Pages deployment and live browser update evidence: no product policy, access, spending, readiness or child-ownership change; real authenticated chat and game acceptance remain explicitly unverified.",
+      "reviewReason": "Reviewed the final cutover receipt and narrow notebook-title evidence clarification: this is deployment and visible-interface evidence only, with product policy, access and authenticated chat/game acceptance unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:25:57.735Z",
-      "sourceDigest": "c20bc3ada737db0b4becd6d2975180ee44620f984803922dee00f9e79974ca97",
+      "reviewedAt": "2026-11-21T16:27:13.696Z",
+      "sourceDigest": "b3d9997d6683ad52b1c52ac1745e5510a7651778e26ff8356db6275e59adf43b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact serving backend images and recovery identities, Pages44923270613 successful build/eight regression shards/deploy, clean public19f5 source and reviewed origins, successful cached-shell Update jems path, and the testing browsers missing family connection.",
+      "reviewReason": "Recorded completed PR115 backend and Pages delivery, exact public source/origins, visible updated Build controls, and explicitly limited cached-update continuity to the existing notebook title; marked earlier pending receipt as historical.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
