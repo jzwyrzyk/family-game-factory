@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T01:26:15.709Z",
-      "sourceDigest": "bd955eb23010ecaa58596bc7f67754f6642bf97a08393055ba5689916322cb85",
+      "reviewedAt": "2026-11-21T01:34:18.496Z",
+      "sourceDigest": "ced3746678c5f597e5868433322c6d5c942f1a0183886d51c719851c1011b4c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual cancelled production smoke44846112054 logs: isolation fixtures passed but serial application regressions exceeded the25-minute job limit; preserved failure and unknown cleanup. Pages now requires the exact-source build plus all8 regression shards, with complete25-suite/39-command coverage, negative omission/failure tests, clean artifact source verification and no added cloud/model authority. Updated delivery, sandbox handoff and continuity contract; source application/image remain unchanged and companion private pin rotation is separately gated.",
+      "reviewReason": "Recorded the observed private PR15 and public PR102 merge identities and exact reviewed-tree matches, successful scoped hosted checks and final local166-test result. Preserved broader application CI as pending at merge, cancelled smoke failure, unknown cleanup, unchanged application/image pins and no activation/deployment claims. Updated the existing sandbox handoff to the actual newly merged private pin; this follow-up changes only delivery evidence and operator instructions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
