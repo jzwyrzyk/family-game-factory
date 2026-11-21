@@ -65,6 +65,30 @@ export function installAdultProfile(config:BuilderConfig){
  setIconLabel(banner.querySelector<HTMLButtonElement>('#adultProfileExit')!,'lock','Exit Adult profile');
  const tools=banner.querySelector<HTMLElement>('#adultProfileTools')!;
  const toolStates=['adultConversationState','adultBuildingState','adultDictationState'].map(id=>dialog.querySelector<HTMLElement>('#'+id)!);
+ type CoachOutcome='connected'|'limited'|'sign-in'|'unavailable';
+ let connectionSequence=0,capabilitiesAt=0;
+ let conversationOutcome:{version:number;state:CoachOutcome;at:number}|null=null;
+ let capabilityLabels=['Checking…','Checking…','Checking…'];
+ function renderCapabilities(){
+  const active=activeSession(),outcome=conversationOutcome?.version===adultSessionVersion()?conversationOutcome:null;
+  const labels=[...capabilityLabels];
+  // Configuration and a health check establish availability, not a successful
+  // conversation. Preserve the latest actual result across healthy rechecks.
+  if(active&&outcome&&(labels[0]==='available'||labels[0]==='Checking…'||outcome.at>capabilitiesAt)){
+   labels[0]=outcome.state==='connected'?'connected':outcome.state==='sign-in'?'unlock needed':'needs reconnect';
+  }
+  const names=['AI conversation','AI game building','Private dictation'];
+  tools.textContent=labels.map((label,i)=>{
+   toolStates[i].textContent=label;toolStates[i].dataset.ready=String(['available','connected','ready'].includes(label));
+   return `${names[i]}: ${label}`;
+  }).join(' · ');
+ }
+ window.addEventListener('factory-coach-connection',event=>{
+  const active=activeSession(),detail=(event as CustomEvent).detail;
+  if(!active||FG.store.current().id!==active.profileId||detail?.ownerId!==active.profileId
+    ||!['connected','limited','sign-in','unavailable'].includes(detail?.state))return;
+  conversationOutcome={version:adultSessionVersion(),state:detail.state,at:++connectionSequence};renderCapabilities();
+ });
  function renderChoice(){
   button.hidden=!enabled;setIconLabel(button,'settings','Adult (development)');
   const active=!!activeSession();button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
@@ -84,8 +108,9 @@ export function installAdultProfile(config:BuilderConfig){
   renderChoice();
  }
  function resetCapabilities(){
-  ++capabilityRequest;tools.textContent='Checking AI tools…';
-  for(const state of toolStates){state.textContent='Checking…';delete state.dataset.ready;}
+  ++capabilityRequest;capabilityLabels=['Checking…','Checking…','Checking…'];
+  if(!activeSession()||conversationOutcome?.version!==adultSessionVersion())conversationOutcome=null;
+  renderCapabilities();
  }
  function refreshProfile(){FG.app.refreshProfiles();window.dispatchEvent(new Event('factory-profile'));renderAccess();}
  function revoke(session:AdultProfileSession|null){
@@ -131,16 +156,14 @@ export function installAdultProfile(config:BuilderConfig){
  }
  async function capabilities(){
   const active=activeSession();if(!active)return;
-  resetCapabilities();const at=capabilityRequest;
+  resetCapabilities();const at=capabilityRequest,checkedAt=++connectionSequence;
   const results=await Promise.allSettled(['/v1/coach/status','/v1/builder/status','/v1/coach/audio/status'].map(checkStatus));
   if(at!==capabilityRequest||activeSession()?.sessionToken!==active.sessionToken)return;
-  const names=['AI conversation','AI game building','Private dictation'];
-  tools.textContent=results.map((r,i)=>{
+  capabilitiesAt=checkedAt;capabilityLabels=results.map((r,i)=>{
    const ready=r.status==='fulfilled'&&r.value?.available===true;
-   const label=ready?'ready':r.status==='fulfilled'&&r.value?.reason==='ALLOWANCE_REQUIRED'?'allowance needed':'unavailable';
-   toolStates[i].textContent=label;toolStates[i].dataset.ready=String(ready);
-   return `${names[i]}: ${label}`;
-  }).join(' · ');
+   return ready?(i===0?'available':'ready'):r.status==='fulfilled'&&r.value?.reason==='ALLOWANCE_REQUIRED'?'allowance needed':'unavailable';
+  });
+  renderCapabilities();
  }
  async function refresh(focusInput=false){
   if(!base){access='unconfigured';renderAccess();return;}

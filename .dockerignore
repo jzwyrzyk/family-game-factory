@@ -14,6 +14,9 @@
 !src/creation/
 !src/creation/model.ts
 !src/creation/projects.ts
+!src/pals/
+!src/pals/catalog.ts
+!src/pals/catalog-artwork.generated.ts
 server/**/node_modules
 server/**/.env*
 server/**/*.pem

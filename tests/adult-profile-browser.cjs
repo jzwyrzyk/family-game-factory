@@ -7,7 +7,7 @@ const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const PROFILE='adult:12345678-1234-4123-8123-123456789abc',TOKEN='a'.repeat(43),PASSPHRASE='a long adult passphrase';
 const until=async(predicate)=>{const end=Date.now()+10000;while(!predicate()){if(Date.now()>end)throw Error('Timed out waiting for fixture request');await new Promise(resolve=>setTimeout(resolve,10));}};
-const reply={move:'listen',text:'Your adult test idea is ready to explore.',question:'What should happen next?',suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
+const reply={move:'listen',text:'Your adult test idea is ready to explore.',question:'What should happen next?',suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[],creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:''},unresolved:['The player action and its consequence need clarification.']}};
 (async()=>{
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{
@@ -15,7 +15,7 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',reducedMotion:'reduce'}),errors=[],calls=[];
    let page=await ctx.newPage();
    page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push('Primary tab: '+(error.stack||error.message)));
-   let configured=true,connected=true,enabled=true,eligible=true,statusUnavailable=false,builderReady=true,dictationReady=true;
+   let configured=true,connected=true,enabled=true,eligible=true,statusUnavailable=false,builderReady=true,dictationReady=true,coachUnavailable=false;
    let grant=false,holdReply=false,releaseReply,holdUnlock=false,releaseUnlock,holdStatus=false,releaseStatus,ttl=3_600_000;
    await ctx.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify(configured?{version:1,mode:'remote',apiBaseUrl:'https://adult-api.test',previewOrigin:'https://adult-preview.test'}:{version:1,mode:'unavailable'})}));
    await ctx.route('https://adult-api.test/**',async route=>{
@@ -45,6 +45,7 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
     if(path==='/v1/creations')return send([]);
     if(path==='/v1/coach'){
      if(!active)return send({errorCode:'ADULT_PILOT_ACCESS_REQUIRED'},403);
+     if(coachUnavailable)return send({errorCode:'COACH_UNAVAILABLE'},503);
      if(holdReply)await new Promise(resolve=>{releaseReply=resolve;});
      return send({mode:'model',reply});
     }
@@ -65,7 +66,7 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    await page.waitForFunction(()=>document.getElementById('adultProfileStatus').textContent.includes('Could not switch'));
    assert.equal(await page.evaluate(()=>FG.store.current().id),'player1');assert.equal(await page.locator('#adultProfileBanner').isVisible(),false);
    await page.fill('#adultProfilePassphrase',PASSPHRASE);await page.click('#adultProfileSubmit');await page.waitForFunction(id=>FG.store.current().id===id,PROFILE);
-   await page.waitForFunction(()=>document.getElementById('adultProfileTools').textContent.includes('AI conversation: ready'));await exploreWelcome(page);
+   await page.waitForFunction(()=>document.getElementById('adultProfileTools').textContent.includes('AI conversation: available'));await exploreWelcome(page);
    assert.equal(await page.locator('#adultProfileDialog').isVisible(),false,'profile switch itself unlocks tools');
    assert.equal(await page.locator('#adultProfileBanner').isVisible(),true);
    assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),0,'adult starts with a separate notebook');
@@ -73,7 +74,7 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    builderReady=false;dictationReady=false;
    await page.evaluate(()=>window.dispatchEvent(new Event('factory-open-parent-session')));
    await page.waitForFunction(()=>document.getElementById('adultBuildingState').textContent==='unavailable');
-   assert.equal(await page.textContent('#adultConversationState'),'ready','an authorized session does not imply every provider is ready');
+   assert.equal(await page.textContent('#adultConversationState'),'available','a healthy status endpoint establishes availability, not a successful conversation');
    assert.equal(await page.textContent('#adultDictationState'),'unavailable');
    await capture('active');
    await page.click('#adultProfileCancel');builderReady=true;dictationReady=true;
@@ -83,8 +84,18 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    assert.equal(await second.locator('main').evaluate(element=>Boolean(element.closest('[inert]'))),true);
    assert.equal(await second.evaluate(()=>FG.store.current().id),'player1','another tab does not inherit an adult profile');
    assert.equal(await second.locator('#adultProfileBanner').isVisible(),false);
+   coachUnavailable=true;
    await page.click('#studioNavCreate');await page.fill('#studioPrompt','An adult test game with floating islands');await page.click('#studioTalk');
+   await page.waitForFunction(()=>document.getElementById('adultConversationState').textContent==='needs reconnect');
+   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('factory-coach-connection',{detail:{ownerId:'player1',state:'connected'}})));
+   assert.equal(await page.textContent('#adultConversationState'),'needs reconnect','another owner cannot overwrite the active conversation result');
+   await page.evaluate(()=>window.dispatchEvent(new Event('factory-open-parent-session')));
+   await page.waitForFunction(()=>document.getElementById('adultBuildingState').textContent==='ready');
+   assert.equal(await page.textContent('#adultConversationState'),'needs reconnect','a healthy service recheck must not hide an actual conversation failure');
+   await page.click('#adultProfileCancel');coachUnavailable=false;
+   await page.click('#studioCheckIdea');
    await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Connected AI coach'));
+   assert.equal(await page.textContent('#adultConversationState'),'connected','only an actual validated model response establishes a connection');
    const sent=calls.filter(c=>c.path==='/v1/coach'&&c.method==='POST').at(-1);
    assert.equal(sent.proof,TOKEN);assert.doesNotMatch(sent.body,/CHILD NOTEBOOK SENTINEL/);
    assert.equal(await page.evaluate(token=>Object.values(localStorage).some(value=>value.includes(token)),TOKEN),false,'proof is never persisted');
@@ -105,6 +116,8 @@ const reply={move:'listen',text:'Your adult test idea is ready to explore.',ques
    assert.doesNotMatch(await page.textContent('#studioMessages'),/adult test idea/);
    await page.locator('#studioLibrary .studio-saved-open').first().click();assert.match(await page.inputValue('#studioPrompt'),/CHILD NOTEBOOK SENTINEL/);
    await unlock();assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.length),1,'adult work persists only in its separate workspace');
+   await page.waitForFunction(()=>document.getElementById('adultConversationState').textContent==='available');
+   assert.equal(await page.textContent('#adultConversationState'),'available','a new unlock does not inherit the previous session’s connection claim');
    // Keep the same browser context and its saved family/adult workspaces. A tab
    // taking over from an authorized adult still needs its own explicit unlock.
    await page.close();

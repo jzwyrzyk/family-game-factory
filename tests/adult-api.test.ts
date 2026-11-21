@@ -100,6 +100,30 @@ test('one-site API: cookie alone stays child; a verified profile switch activate
  }finally{await close(server);}
 });
 
+test('adult retry API exposes an existing successor by read and never redispatches a recovered terminal job',async()=>{
+ const f=await fixture(),dispatches:string[]=[];
+ const original=await f.jobs.submit(f.adult,{gameId:'new',baseRevisionId:null,prompt:'Catch five stars',clientRequestId:'retry-api-original'});
+ await f.repo.transaction(state=>{state.jobs.find(job=>job.id===original.jobId)!.status='failed';return true;});
+ const config={appOrigin:origin,previewOrigin,sessionKey:signing,previewKey,dispatch:async(id:string)=>{dispatches.push(id);}};
+ const api=await listen((req,res)=>void apiHandler(f.jobs,config,f.repo)(req,res));
+ const headers={Origin:origin,Cookie:f.cookies,'X-Factory-Request':'1','Content-Type':'application/json','X-Factory-Adult-Session':f.unlocked.sessionToken};
+ try{
+  const first=await fetch(api.url+'/v1/jobs/'+original.jobId+'/retry',{method:'POST',headers,body:JSON.stringify({clientRequestId:'retry-api-lost-ack'})});
+  assert.equal(first.status,202);const retry=await first.json();assert.equal(retry.status,'queued');
+  assert.deepEqual(dispatches,[retry.jobId]);
+  const before=await f.repo.snapshot();
+  const recovery=await fetch(api.url+'/v1/jobs/'+original.jobId,{headers});assert.equal(recovery.status,200);
+  const status=await recovery.json();assert.equal(status.status,'failed');assert.equal(status.retryJobId,retry.jobId);
+  assert.equal(status.prompt,undefined,'status recovery never copies private game instructions into a response');
+  assert.deepEqual(await f.repo.snapshot(),before);
+  await f.repo.transaction(state=>{state.jobs.find(job=>job.id===retry.jobId)!.status='failed';return true;});
+  const again=await fetch(api.url+'/v1/jobs/'+original.jobId+'/retry',{method:'POST',headers,body:JSON.stringify({clientRequestId:'retry-api-after-reload'})});
+  assert.equal(again.status,202);assert.deepEqual(await again.json(),{jobId:retry.jobId,status:'failed',adapter:'mock'});
+  assert.deepEqual(dispatches,[retry.jobId],'recovering a terminal successor cannot dispatch another worker');
+  assert.equal((await f.repo.snapshot()).jobs.length,2);
+ }finally{await close(api.server);}
+});
+
 test('adult preview capabilities are audience-bound, revoked immediately on profile lock, and never renewed by reopening a URL',async()=>{
  const f=await fixture();
  const job=await f.jobs.submit(f.adult,{gameId:'new',baseRevisionId:null,prompt:'Catch five stars',clientRequestId:'preview-adult'});

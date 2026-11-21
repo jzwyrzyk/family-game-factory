@@ -3,10 +3,11 @@ import { test } from 'node:test';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { addPalToProject, createPalPlayground, CREATION_PAL_IDS } from '../src/pals/creation';
-import { palDefinition } from '../src/pals/catalog';
-import { creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest, privateArtId } from '../src/creation/projects';
+import { palArtworkPath, palDefinition, palSceneAssetId } from '../src/pals/catalog';
+import { CREATION_ASSETS, creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest, privateArtId } from '../src/creation/projects';
 import { SceneEngine } from '../src/creation/engine';
 import { CreationStore } from '../src/creation/storage';
+import { CreationStage } from '../src/creation/stage';
 
 class MemoryStorage implements Storage {
   data = new Map<string, string>(); fail = false;
@@ -18,21 +19,92 @@ class MemoryStorage implements Storage {
   clear() { this.data.clear(); }
 }
 
-test('all Pal scene assets resolve to existing bundled art and have stable saved IDs', () => {
+test('all new Pal scenes pin the approved character, form and artwork version', () => {
+  const ids = new Set<string>();
   for (const id of CREATION_PAL_IDS) {
-    const asset = creationAsset('pal-' + id)!;
     const pal = palDefinition(id);
-    assert.equal(asset.palId, id);
-    assert.equal(asset.id, pal.assetId);
-    assert.equal(asset.label, pal.name);
-    assert.equal(asset.url, './' + pal.artPath);
-    assert.equal(asset.kind, 'image');
-    assert.match(asset.url!, /^\.\/jems-art\/gem_(blue|mint|coral)\.webp$/);
-    assert.ok(existsSync(resolve('public', asset.url!)));
-    const scene = createPalPlayground(id);
-    assert.equal(scene.actors[0].assetId, asset.id);
-    assert.deepEqual(validateEditableProject(scene), scene);
+    for (const form of ['base', 'mature'] as const) {
+      const asset = creationAsset(palSceneAssetId(id, form))!;
+      assert.ok(asset, `${pal.name} ${form} has a trusted scene asset`);
+      assert.equal(asset.palId, id);
+      assert.equal(asset.palForm, form);
+      assert.equal(asset.label, pal.name);
+      assert.equal(asset.url, './' + palArtworkPath(id, form));
+      assert.equal(asset.kind, 'image');
+      assert.doesNotMatch(asset.url!, /\/jems-art\/gem_/);
+      assert.ok(existsSync(resolve('public', asset.url!)));
+      assert.ok(!ids.has(asset.id), 'Every character/form has a separate pinned reference'); ids.add(asset.id);
+      const scene = createPalPlayground(id, form);
+      assert.equal(scene.actors[0].assetId, asset.id);
+      assert.equal(scene.actors[0].name, pal.name);
+      assert.deepEqual(validateEditableProject(scene), scene);
+    }
+    assert.equal(createPalPlayground(id).actors[0].assetId, pal.assetId, 'The default is this character’s approved Base form');
   }
+  assert.equal(new Set(CREATION_ASSETS.map(asset => asset.id)).size, CREATION_ASSETS.length);
+});
+
+test('legacy token scenes keep their exact historical assets through edit, Keep, import and reload', () => {
+  const legacy = [
+    { id: 'pal-glim', label: 'Glim', kind: 'image', url: './jems-art/gem_blue.webp', palId: 'glim' },
+    { id: 'pal-kip', label: 'Kip', kind: 'image', url: './jems-art/gem_mint.webp', palId: 'kip' },
+    { id: 'pal-riff', label: 'Riff', kind: 'image', url: './jems-art/gem_coral.webp', palId: 'riff' },
+  ];
+  for (const token of legacy) {
+    assert.deepEqual(creationAsset(token.id), token);
+    const storage = new MemoryStorage(), store = new CreationStore(storage);
+    const original = createStarterProject('blank');
+    original.actors[0] = { ...original.actors[0], name: token.label, assetId: token.id };
+    const saved = store.create('one', original); store.keep(saved.id, 'one', saved.headId);
+    const combined = addPalToProject(original, 'glim', 'mature').scene;
+    assert.deepEqual(combined.actors[0], original.actors[0]);
+    assert.equal(combined.actors.at(-1)!.assetId, palSceneAssetId('glim', 'mature'));
+    const updated = store.save(saved.id, 'one', combined, saved.headId); store.keep(saved.id, 'one', updated.id);
+    const reopened = new CreationStore(storage).load(saved.id, 'one').scene;
+    assert.deepEqual(reopened, combined);
+    assert.equal(validateGeneratedCreationManifest(reopened).actors[0].assetId, token.id);
+  }
+});
+
+test('approved scene artwork stays identifiable during loading, retries after reopening and keeps its aspect ratio', t => {
+  const originals = new Map(['Image', 'document'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => {
+    for (const [key, descriptor] of originals) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete (globalThis as any)[key];
+    }
+  });
+  const images: TestImage[] = [], labels: string[] = [], draws: unknown[][] = [], errors: string[] = [];
+  class TestImage {
+    complete = false; naturalWidth = 0; naturalHeight = 0; src = '';
+    onload: (() => void) | null = null; onerror: (() => void) | null = null;
+    constructor() { images.push(this); }
+  }
+  Object.defineProperty(globalThis, 'Image', { configurable: true, value: TestImage });
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://example.test/jems/' } });
+  const context = new Proxy({
+    createLinearGradient: () => ({ addColorStop() {} }), measureText: (text: string) => ({ width: text.length * 8 }),
+    fillText: (text: string) => labels.push(text), drawImage: (...args: unknown[]) => draws.push(args),
+  } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
+  const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
+  const stage = new CreationStage(canvas, undefined, message => errors.push(message));
+  const scene = createPalPlayground('glim', 'mature'), snapshot = new SceneEngine(scene).snapshot();
+  stage.render(scene, snapshot);
+  assert.equal(images.length, 1);
+  assert.equal(images[0].src, new URL(palArtworkPath('glim', 'mature'), 'https://example.test/jems/').href);
+  assert.ok(labels.includes('Loading picture…'));
+  images[0].complete = true; images[0].onerror!();
+  assert.ok(labels.includes('Picture unavailable'));
+  assert.match(errors[0], /Luma.*Reopen this scene/);
+  assert.equal(draws.length, 0, 'A failed portrait cannot substitute a different approved image');
+  stage.clear(); stage.render(scene, snapshot);
+  assert.equal(images.length, 2, 'Reopening performs a new load of the exact saved asset');
+  const recovered = images[1]; recovered.complete = true; recovered.naturalWidth = 400; recovered.naturalHeight = 600; recovered.onload!();
+  const draw = draws.at(-1)!;
+  assert.equal(draw[0], recovered);
+  assert.ok(Math.abs((draw[3] as number) / (draw[4] as number) - 400 / 600) < 1e-12);
+  assert.equal(draw[4], scene.actors[0].size);
+  assert.equal(scene.actors[0].assetId, palSceneAssetId('glim', 'mature'));
 });
 
 test('each playground visibly jumps, dances and tells a joke on tap; it does not infer mastery', () => {
@@ -49,7 +121,8 @@ test('each playground visibly jumps, dances and tells a joke on tap; it does not
     assert.equal(engine.advance(300).actors[0].jumpOffset, 0);
     assert.notEqual(engine.advance(10).actors[0].rotation, 0);
     const speaking = engine.advance(790);
-    assert.match(speaking.actors[0].speech!, /dance|Wobble/);
+    const expectedLine = scene.programs.find(program => program.trigger.type === 'tap')!.actions.find(action => action.type === 'say')!;
+    assert.equal(speaking.actors[0].speech, expectedLine.type === 'say' ? expectedLine.text : '');
     assert.equal(speaking.actors[0].x, initialX);
     const done = engine.advance(1800);
     assert.equal(done.status, 'completed');
@@ -91,6 +164,8 @@ test('Pal insertions remain bounded, validate before mutation, and fit smaller v
   assert.throws(() => addPalToProject(full, 'glim'), /cast is full/);
   assert.deepEqual(full, before);
   assert.throws(() => createPalPlayground('invalid' as any), /available Pal/);
+  assert.throws(() => createPalPlayground('glim', 'future' as any), /available Pal form/);
+  assert.throws(() => addPalToProject(scene, 'glim', 'future' as any), /available Pal form/);
 });
 
 test('Pal scenes preserve explicit Keep, drafts, owner isolation and failed-write recovery', () => {
@@ -110,13 +185,15 @@ test('Pal scenes preserve explicit Keep, drafts, owner isolation and failed-writ
   assert.deepEqual(storage.data, before);
 });
 
-test('an imported Pal scene is reusable creative content and is attributed as assisted', () => {
-  const original = createPalPlayground('glim'), imported = validateGeneratedCreationManifest(original);
-  assert.deepEqual(imported.provenance, { createdBy: 'assisted' });
-  assert.ok(imported.programs.flatMap(program => program.actions).every(action => action.origin === 'assisted'));
-  assert.equal(imported.actors[0].assetId, 'pal-glim');
-  assert.equal(Object.hasOwn(imported, 'ownedPals'), false);
-  assert.equal(Object.hasOwn(imported, 'lifetimeGems'), false);
+test('imported approved Pal scenes in either form remain creative content with assisted attribution', () => {
+  for (const id of CREATION_PAL_IDS) for (const form of ['base', 'mature'] as const) {
+    const original = createPalPlayground(id, form), imported = validateGeneratedCreationManifest(original);
+    assert.deepEqual(imported.provenance, { createdBy: 'assisted' });
+    assert.ok(imported.programs.flatMap(program => program.actions).every(action => action.origin === 'assisted'));
+    assert.equal(imported.actors[0].assetId, palSceneAssetId(id, form));
+    assert.equal(Object.hasOwn(imported, 'ownedPals'), false);
+    assert.equal(Object.hasOwn(imported, 'lifetimeGems'), false);
+  }
 });
 
 test('adding a Pal keeps private original/cutout hashes, exact source pins and prior saved revisions intact', () => {

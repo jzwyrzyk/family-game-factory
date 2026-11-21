@@ -89,6 +89,27 @@ class ReleaseTests(unittest.TestCase):
         f.transition("rollback")
         self.assertTrue(all(tag in patch["traffic"] for _, patch in f.patches))
 
+    def test_effective_scaling_status_does_not_change_reviewed_configuration(self):
+        f = CloudRunFixture()
+        f.revisions[f.baseline]["scalingStatus"] = {"desiredMinInstanceCount": 0}
+        self.assertEqual(f.transition("stage"), "STAGED")
+        f.revisions[f.candidate]["scalingStatus"] = {"desiredMinInstanceCount": 1}
+        self.assertEqual(f.transition("canary"), "CANARY")
+        self.assertEqual(f.transition("promote"), "PROMOTED")
+        f.revisions[f.baseline]["scalingStatus"] = {"desiredMinInstanceCount": 2}
+        self.assertEqual(f.transition("rollback"), "ROLLED_BACK")
+        self.assertEqual(release.traffic(f.state), {f.baseline: 100})
+
+    def test_desired_scaling_change_still_blocks_before_write(self):
+        for target in ("template", "baseline"):
+            with self.subTest(target=target):
+                f = CloudRunFixture()
+                resource = f.state["template"] if target == "template" else f.revisions[f.baseline]
+                resource["scaling"] = {"minInstanceCount": 2}
+                with self.assertRaisesRegex(release.ReleaseError, "configuration"):
+                    f.transition("stage")
+                self.assertEqual(f.patches, [])
+
     def test_promote_requires_canary(self):
         f = CloudRunFixture()
         f.transition("stage")

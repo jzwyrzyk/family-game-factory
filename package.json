@@ -19,7 +19,7 @@
     "start:preview": "node --import tsx server/preview-server.ts",
     "setup:owner": "node --import tsx server/owner-setup.ts",
     "setup:device": "node --import tsx server/device-owner.ts",
-    "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v",
+    "test:deployment": "python3 -m unittest discover -s scripts/deployment -p \"test_*.py\" -v && npm run test:ops",
     "test:quality": "node tests/quality-browser.cjs && node tests/sticker-builder-browser.cjs",
     "benchmark:quality": "node --import tsx tools/quality-benchmark.ts",
     "test:studio": "npm run test:brand-assets && node --import tsx tests/studio-unit.ts && node tests/homepage-entry.cjs && node tests/brand-browser.cjs && node tests/jems-delight-browser.cjs && node tests/mind-your-jems-browser.cjs && node tests/studio-journey.cjs && node tests/favorites-browser.cjs && node tests/parent-privacy-browser.cjs && node tests/adult-profile-browser.cjs && npm run test:gem-factory",
@@ -58,12 +58,13 @@
     "test:pals": "node --import tsx --test tests/pals.test.ts tests/pals-service.test.ts tests/pals-controller.test.ts tests/pals-backup.test.ts tests/pals-creation.test.ts && npm run test:pals-expressions && npm run test:pals-assets",
     "test:pals-browser": "node tests/pals-ui-browser.cjs && node tests/pals-browser.cjs && npm run test:pals-expressions-browser",
     "test:navigation-shell": "node tests/navigation-shell.cjs",
-    "test:pals-assets": "node scripts/verify-pal-assets.mjs && node --test scripts/tests/verify-pal-assets.test.mjs",
+    "test:pals-assets": "node scripts/verify-pal-assets.mjs && node --test scripts/tests/verify-pal-assets.test.mjs && node scripts/generate-pal-catalog.mjs --check",
     "test:pals-expressions": "node --import tsx --test tests/pals-expressions.test.ts",
     "test:pals-expressions-browser": "node tests/pals-expressions-browser.cjs",
     "test:read-aloud": "node --import tsx --test tests/friendly-narrator.test.ts",
     "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
-    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs"
+    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs",
+    "test:ops": "python3 -m unittest discover -s scripts/ops -p \"test_*.py\" -v"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

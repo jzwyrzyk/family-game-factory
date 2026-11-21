@@ -5,6 +5,7 @@ import { defaults, validateConfig } from '../runtime/manifests';
 import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
 import type { StudioSession } from '../studio/notebook';
+import { PAL_CATALOG, palArtworkPath, palSceneAssetId, type PalForm, type PalId } from '../pals/catalog';
 import { validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
 export {parsePrivateArtId};
 export type {PrivateArtReference};
@@ -19,8 +20,15 @@ export interface CreationAsset {
   readonly emoji?: string;
   readonly sourceGame?: 'dragon' | 'buckets' | 'robot';
   /** A reusable scene asset is not evidence of collection ownership. */
-  readonly palId?: 'glim' | 'kip' | 'riff';
+  readonly palId?: PalId;
+  /** Only new approved assets carry a form. Legacy token references stay exact. */
+  readonly palForm?: PalForm;
 }
+
+const PAL_SCENE_ASSETS: CreationAsset[] = PAL_CATALOG.flatMap(pal => (['base', 'mature'] as const).map(form => ({
+  id: palSceneAssetId(pal.id, form), label: pal.name, kind: 'image' as const,
+  url: './' + palArtworkPath(pal.id, form), palId: pal.id, palForm: form,
+})));
 
 /** Generated manifests may address only these bundled resources. Local scenes
  * may also carry the strict private-art references defined below. */
@@ -43,6 +51,9 @@ export const CREATION_ASSETS: readonly CreationAsset[] = Object.freeze([
   {id:'pal-glim', label:'Glim', kind:'image', url:'./jems-art/gem_blue.webp', palId:'glim'},
   {id:'pal-kip', label:'Kip', kind:'image', url:'./jems-art/gem_mint.webp', palId:'kip'},
   {id:'pal-riff', label:'Riff', kind:'image', url:'./jems-art/gem_coral.webp', palId:'riff'},
+  // Newly created actors pin the selected approved character, form and version.
+  // These coexist with the three unchanged historical token references above.
+  ...PAL_SCENE_ASSETS,
 ].map(asset=>Object.freeze(asset)) as CreationAsset[]);
 
 export function creationAsset(id: string): CreationAsset | undefined {

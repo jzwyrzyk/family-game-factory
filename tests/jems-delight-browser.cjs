@@ -22,7 +22,7 @@ const {start}=require('./browser-server.cjs');
   assert.deepEqual(await page.evaluate(()=>window.__jemsMilestones),[],'opening blank canvas is not an accomplishment');
   await sendChildMessage(page,'A cat drives a donut spaceship around the moon');
   assert.equal(await page.locator('#coachGuidedChoices').count(),0,'the conversation does not supply answer buttons');
-  assert.equal(await page.locator('#studioSend').isVisible(),false,'an unreviewed first idea does not offer Build');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'an unreviewed first idea does not enable Build');
   assert.equal(await page.locator('#jems-delight-host').evaluate(e=>getComputedStyle(e).pointerEvents),'none');
   assert.equal(await page.locator('.jems-delight-toast[data-kind="idea"]').count(),0,'the first idea stays in the focused conversation without a competing toast');
   assert.ok(await page.evaluate(()=>window.FG.studio.exportNotebook().sessions.some(s=>s.game==='new'&&s.messages.some(m=>m.role==='child'))),'idea actually saved');

@@ -136,6 +136,29 @@ test('adult workspace: expired or locked sessions cannot read saved work or crea
  await assert.rejects(service.list(fresh),/FORBIDDEN/);
  await assert.rejects(service.retry(fresh,pending.jobId,'retry-with-expired-session'),/FORBIDDEN/);
 });
+test('adult retry recovery exposes only the same authorized workspace successor and creates no duplicate job',async()=>{
+ const {repo,child,adult,otherAdult,service,childService}=await fixture();
+ const original=await service.submit(adult,request('adult-retry-original'));
+ await repo.transaction(s=>{s.jobs.find(job=>job.id===original.jobId)!.status='failed';return true;});
+ const retry=await service.retry(adult,original.jobId,'adult-retry-lost-ack');
+ const before=await repo.snapshot();
+ assert.equal((await service.get(adult,original.jobId)).retryJobId,retry.jobId);
+ for(const [session,svc] of [[child,childService],[otherAdult,service]] as const){
+  await assert.rejects(svc.get(session,original.jobId),/FORBIDDEN/);
+  await assert.rejects(svc.get(session,retry.jobId),/FORBIDDEN/);
+  await assert.rejects(svc.retry(session,original.jobId,'foreign-retry-successor'),/FORBIDDEN/);
+ }
+ assert.deepEqual(await repo.snapshot(),before);
+ assert.equal((await service.retry(adult,original.jobId,'same-adult-retry-after-reload')).jobId,retry.jobId);
+ assert.deepEqual(await repo.snapshot(),before,'recovery does not rebind the accepted job to a different session or reserve again');
+ await repo.transaction(s=>{s.adultPilotSessions!.find(item=>item.id===adult.adultSessionId)!.revokedAt=Date.now();return true;});
+ await assert.rejects(service.get(adult,original.jobId),/FORBIDDEN/);
+ const fresh=await unlock(repo,child);
+ assert.equal((await service.get(fresh,original.jobId)).retryJobId,retry.jobId,'a fresh same-profile session can discover its existing retry without running it again');
+ const freshBefore=await repo.snapshot();
+ assert.equal((await service.retry(fresh,original.jobId,'fresh-session-recovery')).jobId,retry.jobId);
+ assert.deepEqual(await repo.snapshot(),freshBefore);
+});
 async function workerFixture(){
  const f=await fixture();
  const adapter:AgentAdapter={kind:'metered-api',available:true,generate:async()=>{throw Error('NO_LIVE_PROVIDER_IN_TEST');}};

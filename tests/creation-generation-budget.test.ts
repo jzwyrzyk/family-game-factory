@@ -126,7 +126,10 @@ test('a 7k repair preserves source, original intent, preflight and bounded diagn
 });
 
 test('remaining spending allowance selects the lean request without another provider call or a cap increase',async()=>{
-  const game=withCompanion(padded(hopper,2000)),original=input(game,32000),h=harness();
+  // The unpadded fixture fits the input cap with the approved Pal asset enum,
+  // so spending alone selects the lean request. Padded-source input fallback is
+  // tested separately above; no production input or spending cap is raised.
+  const game=withCompanion(hopper),original=input(game,32000),h=harness();
   const complete=harness();await complete.agent.generate(input(game));
   assert.ok(complete.requests[0].text.format.schema.properties.creationManifest);
   assert.ok(bound(complete.requests[0])<=24000,'the spending case must fit the input cap');

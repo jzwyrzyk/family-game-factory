@@ -3,19 +3,23 @@ import './build-handoff.css';
 
 /** One explicit Build gesture, independent of the eventual remote job ID. */
 export type BuildHandoffIdentity = { ownerId: string; sessionId: string; attemptId: string };
-export type BuildHandoffPhase = 'sending' | 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled' | 'uncertain' | 'unavailable';
+export type BuildHandoffPhase = 'sending' | 'checking' | 'queued' | 'building' | 'testing' | 'ready' | 'failed' | 'cancelled' | 'uncertain' | 'unavailable';
 export type BuildHandoffState = {
   phase: BuildHandoffPhase;
   /** The host has a durably acknowledged, active job for this same project. */
   canPlayWhileWaiting?: boolean;
   /** The matching ready candidate is saved and can be opened explicitly. */
   canPlayReady?: boolean;
+  /** Only the host can authorize recovery of a saved, acknowledged job. */
+  recovery?: 'retry' | 'check';
+  description?: string;
 };
 export type BuildHandoffActions = {
   /** Includes active owner, project, route and the trusted learning guard. */
   isCurrent(identity: BuildHandoffIdentity): boolean;
   onPlayWhileWaiting(identity: BuildHandoffIdentity): void;
   onPlayReady(identity: BuildHandoffIdentity): void;
+  onRecover?(identity: BuildHandoffIdentity, action: 'retry' | 'check'): void;
   /** Explicit Stay here/Escape may restore a useful composer focus target. */
   onStay?(identity: BuildHandoffIdentity): void;
 };
@@ -25,6 +29,7 @@ const sameAttempt = (left: BuildHandoffIdentity | null, right: BuildHandoffIdent
 
 const COPY: Record<BuildHandoffPhase, { title: string; description: string; art: string }> = {
   sending: { title: 'Here we go!', description: 'Sending your idea to the workshop…', art: 'character_spark_think.webp' },
+  checking: { title: 'Checking your build', description: 'Finding your last build. Your idea is safe.', art: 'character_spark_think.webp' },
   queued: { title: 'Your idea is on its way!', description: 'The workshop has it. Play while you wait?', art: 'spot_work_in_progress.webp' },
   building: { title: 'We’re making your game!', description: 'Play while we bring your idea to life.', art: 'spot_work_in_progress.webp' },
   testing: { title: 'Trying out your game!', description: 'We’re checking how it plays. You can keep playing.', art: 'spot_work_in_progress.webp' },
@@ -48,13 +53,14 @@ export function createBuildHandoff(actions: BuildHandoffActions) {
   element.setAttribute('aria-describedby', 'studioBuildHandoffDescription');
   element.innerHTML = '<div class="studio-handoff-art" aria-hidden="true"><img width="200" height="160" alt="" decoding="async"></div>' +
     '<div class="studio-handoff-copy" aria-live="polite" aria-atomic="true"><h2 id="studioBuildHandoffTitle" tabindex="-1"></h2><p id="studioBuildHandoffDescription"></p></div>' +
-    '<div class="studio-handoff-actions"><button id="studioBuildHandoffPlay" type="button"></button><button id="studioBuildHandoffStay" type="button">Stay here</button></div>';
+    '<div class="studio-handoff-actions"><button id="studioBuildHandoffRecover" type="button" hidden></button><button id="studioBuildHandoffPlay" type="button"></button><button id="studioBuildHandoffStay" type="button">Stay here</button></div>';
   document.body.append(element);
 
   const title = element.querySelector<HTMLElement>('#studioBuildHandoffTitle')!;
   const description = element.querySelector<HTMLElement>('#studioBuildHandoffDescription')!;
   const art = element.querySelector<HTMLImageElement>('img')!;
   const play = element.querySelector<HTMLButtonElement>('#studioBuildHandoffPlay')!;
+  const recover = element.querySelector<HTMLButtonElement>('#studioBuildHandoffRecover')!;
   const stay = element.querySelector<HTMLButtonElement>('#studioBuildHandoffStay')!;
   let identity: BuildHandoffIdentity | null = null;
   let state: BuildHandoffState = { phase: 'sending' };
@@ -78,7 +84,7 @@ export function createBuildHandoff(actions: BuildHandoffActions) {
     const copy = COPY[state.phase];
     const savingReady = state.phase === 'ready' && !state.canPlayReady;
     put(title, savingReady ? 'Saving your game…' : copy.title);
-    put(description, savingReady ? 'Getting it ready to play.' : copy.description);
+    put(description, savingReady ? 'Getting it ready to play.' : state.description || copy.description);
     if (art.dataset.asset !== copy.art) {
       art.dataset.asset = copy.art;
       art.src = new URL('jems-art/' + copy.art, document.baseURI).href;
@@ -86,12 +92,17 @@ export function createBuildHandoff(actions: BuildHandoffActions) {
     element.dataset.phase = state.phase;
     const terminal = ['failed', 'cancelled', 'unavailable'].includes(state.phase);
     const hadPlayFocus = document.activeElement === play;
-    play.hidden = terminal || (state.phase === 'uncertain' && !canWait());
+    const hadRecoverFocus = document.activeElement === recover;
+    const recovery = state.recovery && (state.recovery === 'check' ? ['uncertain', 'failed', 'unavailable'].includes(state.phase) : ['failed', 'unavailable'].includes(state.phase));
+    recover.hidden = !recovery || !actions.onRecover;
+    recover.disabled = false;
+    setIconLabel(recover, state.recovery === 'check' ? 'clock' : 'retry', state.recovery === 'check' ? 'Check build status' : 'Try build again');
+    play.hidden = terminal || state.phase === 'checking' || (state.phase === 'uncertain' && !canWait());
     play.disabled = !(state.phase === 'ready' ? state.canPlayReady === true : canWait());
     setIconLabel(play, state.phase === 'ready' && state.canPlayReady ? 'play' : canWait() ? 'play' : 'clock',
       state.phase === 'ready' ? state.canPlayReady ? 'Play my game' : 'Getting ready…' : state.phase === 'sending' ? 'Sending…' : 'Play while I wait');
     put(stay, terminal ? 'Back to my idea' : 'Stay here');
-    if (hadPlayFocus && play.hidden) stay.focus({ preventScroll: true });
+    if (hadPlayFocus && play.hidden || hadRecoverFocus && recover.hidden) (recover.hidden ? stay : recover).focus({ preventScroll: true });
   }
   function stayHere() {
     const captured = identity;
@@ -100,6 +111,13 @@ export function createBuildHandoff(actions: BuildHandoffActions) {
     if (captured && canRestore && !disposed && actions.isCurrent(captured)) actions.onStay?.({ ...captured });
   }
   stay.onclick = stayHere;
+  recover.onclick = () => {
+    const captured = identity, action = state.recovery;
+    if (!element.open || !captured || !actions.isCurrent(captured)) { close(); return; }
+    if (recover.hidden || recover.disabled || !action || !actions.onRecover) return;
+    recover.disabled = true;
+    actions.onRecover({ ...captured }, action);
+  };
   play.onclick = () => {
     const captured = identity;
     if (!element.open || !captured || !actions.isCurrent(captured)) { close(); return; }

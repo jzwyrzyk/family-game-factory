@@ -5,6 +5,13 @@ operation requires a maintainer-reviewed intent on protected main. The repositor
 Google grants are initially absent. Existing Pages, sandbox publication, smoke,
 worker trust and provider approval retain their current release paths.
 
+**Current preparation boundary (November 21, 2026):** the owner authorized
+completion of work that does not need their intervention and explicitly said
+**do not merge yet**. Prepare and test the source and the read-only account
+handoff; keep both PRs unmerged and production activation withheld. A prepared
+permission proposal, successful fixture test or old connected task does not
+establish access in the current task.
+
 ## Integration split: policy checks and game fixes
 
 [PR112](https://github.com/jzwyrzyk/family-game-factory/pull/112) carries the
@@ -25,8 +32,12 @@ satisfy them, authorize cloud mutations or validate an old administrator review
 code. Preserve both unset release flags and use a fresh plan bound to the current
 reviewed PR107 head for any later administrator action.
 
-[PR #100](https://github.com/jzwyrzyk/family-game-factory/pull/100) established the
-metadata diagnostics identity. [PR #45](https://github.com/jzwyrzyk/family-game-factory/pull/45)
+[PR #100](https://github.com/jzwyrzyk/family-game-factory/pull/100) prepares the
+metadata diagnostic client and connection runbook. Earlier connected-task
+verification was reported separately; it does not mean every chat has that
+identity. This combined preparation includes the reconciled diagnostic source
+so the two access phases can be tested together before merge.
+[PR #45](https://github.com/jzwyrzyk/family-game-factory/pull/45)
 proposed separate Pages build and publication jobs. This implementation applies that
 separation to Cloud Run image publication and traffic control. It uses the current
 service publication archive and existing repositories. [Issue #46](https://github.com/jzwyrzyk/family-game-factory/issues/46)
@@ -105,6 +116,9 @@ lane fetches no worker logs, job names, artifacts, application input or child co
    revision is ready, the digest and configuration match, and the old revision
    retains all traffic. Existing zero-percent tags pinned to exact revisions are
    preserved. The etag prevents overwriting a concurrent update.
+   Configuration fingerprints exclude revision-only output such as
+   `scalingStatus`; the desired `scaling` settings remain part of the reviewed
+   configuration. See Google's [Revision schema](https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services.revisions).
 6. Move to `canary` to send 5% to the same candidate. Check readiness, diagnostic
    errors and the authorized synthetic smoke for that candidate before submitting
    a separate `promote` intent. Promote requires the exact canary allocation
@@ -113,8 +127,15 @@ lane fetches no worker logs, job names, artifacts, application input or child co
    resulting allocation and revision metadata after each operation. These
    checks do not prove functional behavior or approve provider spending.
 7. Submit `rollback` for the same candidate and serving baseline to restore 100%
-   to the verified baseline. Rollback uses traffic-only updates and remains
-   available if current application CI or candidate readiness fails. It refuses
+   to the verified baseline. The rollback job uses traffic-only updates and skips
+   its application-source CI and candidate-readiness gates. A **new rollback
+   intent PR still must pass the protected-main required checks**; a broken
+   current application can therefore block that automatic path. Preserve the
+   existing authenticated operator route under the
+   [preserved-state release contract](../assignment-006/RELEASE-CONTINUITY.md)
+   for that case; verify the exact retained baseline and current traffic before
+   preparing its traffic-only recovery command. Do not bypass branch protection or treat a workflow rerun of a
+   previous promotion as a rollback. The controller refuses
    a changed baseline, unknown traffic split or newer revision. Restore Pages
    separately through the existing owner release path if that component changed.
 
@@ -139,6 +160,13 @@ Shell. The default action plans both accounts without changing them. It requires
 Python 3, `gh` with repository administrator access and `gcloud` with the owner's
 existing Google Cloud authentication. The isolated drill also requires Docker.
 
+Start with the [read-only handoff](ACTIVATION_REVIEW.md#one-read-only-handoff),
+using the full reviewed PR107 SHA. Its local preflight reports missing tools and
+refuses a different or dirty checkout without reading credentials or contacting
+an API. The following account plan independently checks the current remote PR,
+required checks and live account state. A local preflight pass is not evidence
+of authentication, cloud access or setup completion.
+
 ```bash
 python3 scripts/ops/admin_setup.py
 ```
@@ -158,7 +186,7 @@ to Cloud Shell. Completed apply phases save private JSON receipts by default.
 | `plan-gcp` / `apply-gcp` | Require the GitHub protections and draft PR to verify before applying. Prepare the dedicated immutable `jems-release-images` registry and the two disabled, unbound providers and keyless service accounts. An explicitly approved existing isolated project enables the synthetic drill and optional Logging validation. |
 | `verify` | Read back the GitHub protections and GCP preparation. With the same isolated options, verify the exact synthetic baseline image has 100% of its service traffic, verify Logging scope, and check live production serving state. This reads current state. The apply receipt records historical drill and redaction results. |
 | `plan-claims` / `dispatch-claims` / `verify-claims` | After the separately reviewed inert merge, check exact protected-main workflow and probe bytes. Run the claims-only dispatch while both release flags are unset. Verify successful exact-head claim jobs and skipped release jobs. |
-| `plan-production` | Read-only review of the withheld privilege boundaries. Production identity activation requires separate explicit approval after both claim proofs and the isolated drill. This program has no production activation mode. |
+| `plan-production` | Read-only structured review of the exact proposed identities, resources and withheld privileges, including the separate operation-polling scope. It always reports activation as not ready and labels unverified prerequisites. Production identity activation requires separate explicit approval after both claim proofs and the isolated drill. This program has no production activation mode. |
 
 The program cannot publish Codex environment settings. Publish the saved egress
 draft adding `api.github.com` and `logging.googleapis.com` alongside
@@ -202,7 +230,10 @@ synthetic images, creates the private single-instance service with a create-only
 Cloud Run API method, verifies its dedicated IAM, and performs stage, 5% canary,
 promotion and traffic-only rollback using the isolated operator account. The
 operator's update rights bind only to the synthetic service and its act-as
-grant only to the synthetic runtime account. The keeper of the isolated project
+grant only to the synthetic runtime account. Its image-download permission is
+Artifact Registry Reader on only that isolated project's `jems-drill` repository;
+the plan and verification reject extra grants and do not add a production
+registry grant. The keeper of the isolated project
 owns cost and cleanup. The program never creates or deletes that project.
 
 Add `--log-gib-day <estimated-selected-errors>` only after reviewing the gross
@@ -222,5 +253,7 @@ diagnostic client can then verify the actual production view through Codex.
 
 Keep PR #107 in draft until the active GitHub protections and isolated drill
 receipt have been reviewed. Leave both release flags unset when merging the
-inert source and proving the exact GitHub claims. Private coach remains blocked
-while the staged speech settings differ from the serving baseline.
+inert source and proving the exact GitHub claims. Reinspect the private coach's
+actual serving/template state before enrollment; earlier observed speech and
+spending drift is a historical finding, not a current live read. Any remaining
+configuration difference blocks the affected service until separately reconciled.

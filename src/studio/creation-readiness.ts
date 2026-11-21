@@ -1,4 +1,4 @@
-import type {CoachContext} from './design';
+import type {CoachContext,DesignRecord} from './design';
 import type {StudioSession} from './notebook';
 import {visibleConversation} from './conversation-view';
 
@@ -54,16 +54,63 @@ export function validateCreationReview(value:unknown):CreationReview {
 
 function authoredTurns(session:StudioSession){
  return visibleConversation(session.messages).filter(message=>message.role==='child').map(message=>{
-  const source=session.design?.ideas.find(idea=>idea.id==='build-intent:'+message.id)?.origin||
+  const source=session.design?.ideas.find(idea=>idea.id==='build-intent:'+message.id||idea.id==='helper-turn:'+message.id)?.origin||
    (session.design?.ideas.some(idea=>idea.origin==='helper'&&idea.text===message.text)||
     Object.values(session.design?.plan||{}).some(field=>field?.origin==='helper'&&field.value===message.text)?'helper':'child');
   const superseded=session.design?.ideas.some(idea=>idea.id==='superseded-turn:'+message.id&&!idea.adopted)||false;
   const index=session.messages.findIndex(item=>item.id===message.id);
-  const following=session.messages.slice(index+1).find(item=>item.role==='child'||item.role==='helper');
-  const refused=following?.role==='helper'&&following.text.startsWith('I can help with safe game ideas. Let’s try another idea without sharing private details.');
+  let refused=session.design?.ideas.some(idea=>idea.id==='refused-turn:'+message.id&&!idea.adopted)||false;
+  for(const following of session.messages.slice(index+1)){
+   if(following.role==='child')break;
+   if(following.role==='helper'&&following.text.startsWith('I can help with safe game ideas. Let’s try another idea without sharing private details.'))refused=true;
+  }
   return {id:message.id,text:message.text,source,superseded,refused};
  });
 }
+
+/** Keep the source ID when an explicit check revisits an earlier eligible turn. */
+export function lastCreationTurn(session:StudioSession){
+ return authoredTurns(session).filter(turn=>turn.source==='child'&&!turn.superseded&&!turn.refused&&turn.text.length<=2200).at(-1);
+}
+
+/** A later explicit check can refuse a turn after a technical-failure note.
+ * Keep saved work, but do not send its extracted quotes back to the model or
+ * compiler through plan fields. A separate accepted child turn can support them.
+ */
+export function creationPlan(session:StudioSession):DesignRecord['plan'] {
+ const turns=authoredTurns(session),refused=turns.filter(turn=>turn.refused),accepted=turns.filter(turn=>turn.source==='child'&&!turn.refused&&!turn.superseded);
+ return Object.fromEntries(Object.entries(session.design?.plan||{}).filter(([,field])=>!field||field.origin!=='child'||!field.value.trim()||
+  !refused.some(turn=>turn.text.includes(field.value))||accepted.some(turn=>turn.text.includes(field.value))));
+}
+
+/** Keep the original idea and recent authored decisions in the existing bounded
+ * conversation contract. A coach's separate reflection/question must not evict
+ * the child's game after only three or four turns. No paraphrase becomes evidence.
+ * Accepted plan values travel separately; this is a bounded view, not a summary.
+ */
+export function creationConversation(session:StudioSession,maxChars=12000):CoachContext['conversation'] {
+ const visible=visibleConversation(session.messages);
+ const authored=new Set(authoredTurns(session).filter(turn=>turn.source==='child'&&!turn.superseded&&!turn.refused).map(turn=>turn.id));
+ const children=visible.flatMap((message,index)=>message.role==='child'&&authored.has(message.id)?[index]:[]);
+ const helpers=visible.flatMap((message,index)=>message.role==='helper'?[index]:[]);
+ const selected=new Set<number>();let used=2;
+ const add=(index:number|undefined)=>{
+  if(index===undefined||selected.has(index)||selected.size>=16)return;
+  const {role,text}=visible[index],size=JSON.stringify({role,text}).length+1;
+  if(text.length>2200||used+size>maxChars)return;
+  selected.add(index);used+=size;
+ };
+ // The current message also travels as context.message. Reserve the original
+ // first, then recent child decisions, keeping room for the last coach question.
+ add(children[0]);add(children.at(-1));
+ for(const index of children.slice().reverse())if(selected.size<14)add(index);
+ for(const index of helpers.slice(-2).reverse())add(index);
+ for(const index of children.slice().reverse())add(index);
+ return [...selected].sort((left,right)=>left-right).map(index=>({role:visible[index].role,text:visible[index].text}));
+}
+
+export type CreationReadinessIssue='draft'|'thinking'|'unsaved'|'missing-review'|'stale-review'|'invalid-review'|'unresolved'|'review-unavailable';
+export interface CreationBuildReadiness {ready:boolean;reason:string;issue?:CreationReadinessIssue}
 
 /** A change detector, not a signature or a replacement for paid/auth safeguards.
  * Excludes the draft and helper prose; both may change after the reviewed turn. */
@@ -78,20 +125,20 @@ export function creationInputFingerprint(session:StudioSession):string {
 export function recordCreationReview(session:StudioSession,value:unknown):CreationReview {
  const verdict=verdictShape(value);
  const sources=authoredTurns(session).filter(turn=>turn.source==='child'&&!turn.superseded&&!turn.refused).map(turn=>turn.text);
- for(const field of Object.values(session.design?.plan||{}))if(field?.origin==='child'&&field.accepted&&!field.delegated)sources.push(field.value);
+ for(const field of Object.values(creationPlan(session)))if(field?.origin==='child'&&field.accepted&&!field.delegated)sources.push(field.value);
  supported(verdict,sources);
  return {...verdict,version:1,source:'model',fingerprint:creationInputFingerprint(session)};
 }
 
-export function creationBuildReadiness(session:StudioSession):{ready:boolean;reason:string} {
- if(session.draft.trim())return {ready:false,reason:'Send your new thought so we can include it in your game.'};
+export function creationBuildReadiness(session:StudioSession):CreationBuildReadiness {
+ if(session.draft.trim())return {ready:false,reason:'Send your new thought so we can include it in your game.',issue:'draft'};
  const review=session.design?.creationReview;
- if(!review)return {ready:false,reason:'Let’s talk through how your game will play.'};
+ if(!review)return {ready:false,reason:'Let’s check how your game will play.',issue:'missing-review'};
  try{
   validateCreationReview(review);
-  if(review.fingerprint!==creationInputFingerprint(session))return {ready:false,reason:'Let’s check your latest changes together.'};
+  if(review.fingerprint!==creationInputFingerprint(session))return {ready:false,reason:'Let’s check your latest changes together.',issue:'stale-review'};
   recordCreationReview(session,{ready:review.ready,evidence:review.evidence,unresolved:review.unresolved});
- }catch{return {ready:false,reason:'Let’s check your game idea together.'};}
- if(!review.ready)return {ready:false,reason:review.unresolved[0]||'Let’s work out the next part of your game.'};
+ }catch{return {ready:false,reason:'Let’s check your game idea together.',issue:'invalid-review'};}
+ if(!review.ready)return {ready:false,reason:review.unresolved[0]||'Let’s work out the next part of your game.',issue:'unresolved'};
  return {ready:true,reason:''};
 }
