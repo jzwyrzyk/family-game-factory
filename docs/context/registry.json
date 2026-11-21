@@ -116,10 +116,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:37.392Z",
-      "sourceDigest": "540a37c8973af219599963da90a95ab555fe3182a3ae7003d21f9e0ad7a26514",
-      "reviewOutcome": "updated",
-      "reviewReason": "Clarified the accepted guided-creation decision with actual gateway/private-coach/web dependency and asymmetric notebook rollback compatibility. Child ownership, readiness, explicit Build and Keep remain unchanged; no new release authorization is invented.",
+      "reviewedAt": "2026-11-21T07:11:50.802Z",
+      "sourceDigest": "2140d10c0ed6beec8c0ae5c1483a8edc8071c3c7edf31af9a7cdfad8f1e7a104",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the new PR108 production handoff matched by the child-journey documentation source rule. It records already-approved operational preparation, merge evidence and compatibility boundaries; it adds no child-facing policy, reward, learning or creative-ownership change.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T06:51:38.849Z",
-      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
+      "reviewedAt": "2026-11-21T07:11:14.057Z",
+      "sourceDigest": "71c19ca4e4d91ed9d1ba7bc4262869622393b71ab3ea497825353a9bfda7f0d6",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
+      "reviewReason": "Recorded the actual PR108 merge SHA/time, exact tested-tree equality, all eight passing PR workflows and 15 jobs, archive packaging proof, and distinct local joined-protocol evidence. Rechecked the public marker and preserved production as pending authenticated Cloud Shell. Added a source-pinned preparation handoff without deploying, changing credentials, raising budgets or repeating unchanged sandbox acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
