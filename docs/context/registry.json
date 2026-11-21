@@ -475,10 +475,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T18:04:38.089Z",
+      "sourceDigest": "a1912716267bec8d9579e447807e8a7b45fb3a5cd614ac383e7461113cfdb93a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Documented fixed coach/audio receipt leases, recovery at gateway startup and authenticated scheduling/family access, and parent erasure after conservative settlement. Device/session authorization and content-free accounting remain enforced.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -517,10 +517,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.976Z",
-      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
+      "reviewedAt": "2026-11-21T18:04:38.327Z",
+      "sourceDigest": "0bbcb0bd85447b3ceea27a4cfb242838fa1453f0df18eded3405869601b04c7c",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the only pipeline change: optional typed coach/audio usage metadata on AuditEvent. Generation admission, worker state, quality gates, reservation behavior and model execution are unchanged by this PR."
     },
     {
       "id": "coach",
@@ -539,10 +539,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:36:52.129Z",
-      "sourceDigest": "ebaea1ce57ffb0ec47757d2378241f5eebd03970856d9e8f751e2c2f18e53731",
+      "reviewedAt": "2026-11-21T18:04:38.553Z",
+      "sourceDigest": "6b6ad390c36ffb1a643399b4f6338f03c77dd5e64826640fc699600cee6a0ebb",
       "reviewOutcome": "updated",
-      "reviewReason": "Coaching standard and architecture distinguish playable creative gaps from optional polish, retain original authored intent, require opted-in readiness, remove scripted outage interviews, and separate technical output failures from refusals."
+      "reviewReason": "Documented 60-second durable leases, legacy recovery, retained duplicate tombstones, reservation-specific completion fencing, parent erasure, and original-month allowance accounting without provider replay or stored audio/transcripts."
     },
     {
       "id": "adult-privacy",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:01:33.009Z",
-      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
+      "reviewedAt": "2026-11-21T18:04:38.782Z",
+      "sourceDigest": "9763d191348ac383432bb5403c2dcbc68f1a898aafd875cb95b8a46bf4e51dda",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
+      "reviewReason": "Architecture links the new interrupted-request contract; test:coach now runs eight recovery regressions covering file reopen, concurrent recovery, duplicate rejection, erased/reused IDs, late completion, month rollover and family authorization. Existing coach, speech and adult/parent suites pass.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T16:01:33.314Z",
-      "sourceDigest": "a62404145199cdf5dc45ac2b1410f5962aa508b28ca03aa0cc03446e987324bb",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined head aeab9d68 and matching hosted merge tree, two failed browser steps, eight other green workflows and explicit hold on merge/deployment pending image diagnosis; prior successful receipts retain their original source scope.",
+      "reviewedAt": "2026-11-21T18:04:39.024Z",
+      "sourceDigest": "281e3b5b0316a949f030325d0a5ea8b80c0e04c348d47a6f1646cc571954dc31",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed test:coach registration and gateway source implications. No deployment workflow, provider flag, credential, hosted source pin or observed delivery state changed; this remains an unmerged source fix requiring later gateway rollout.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
