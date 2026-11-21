@@ -78,8 +78,8 @@ lane fetches no worker logs, job names, artifacts, application input or child co
    `configuration` (the inspection fingerprint), and `compatibility` (SHA-256
    of the exact compatibility record bytes). CI validates this intent offline.
    Merging the intent on protected main triggers the fixed workflow. The workflow
-   also supports a maintainer rerun from current main. It takes no arbitrary
-   dispatch inputs and fails if main has advanced before the update.
+   also supports a maintainer rerun from current main. Release actions take
+   no dispatch arguments and fail if main has advanced before the update.
 5. Start with `stage`. The workflow pins existing traffic and changes only the
    image and revision name in the existing template. It verifies the new
    revision is ready, the digest and configuration match, and the old revision
@@ -170,9 +170,10 @@ The provider condition must be the following with the row's exact environment
 and workflow substituted. The repository was created after the immutable
 subject rollout cutoff, and both workflows check GitHub's `github.ref_protected`
 context before running their privileged jobs. Confirm the exact immutable
-subject and selected claim values with GitHub's OIDC settings and a controlled
-claims-only test before binding the principal. Never log a token. Stop on any
-difference from the reviewed condition.
+subject configuration with GitHub before merge. After the inert merge, use
+the claims-only dispatch below to verify actual runtime claims before binding
+either principal. Never log a token. Stop on any difference from the reviewed
+condition.
 
 ```text
 assertion.repository_id == '1458033181' &&
@@ -186,7 +187,9 @@ assertion.event_name in ['push', 'workflow_dispatch'] &&
 assertion.sub == 'repo:jzwyrzyk@356692244/family-game-factory@1458033181:environment:<environment>'
 ```
 
-Bind `roles/iam.workloadIdentityUser` on each dedicated service account only to
+Prepare the provider and the service account without an impersonation
+binding. After the claims-only dispatch passes, bind
+`roles/iam.workloadIdentityUser` on each dedicated service account only to
 the exact principal
 
 ```text
@@ -295,7 +298,22 @@ and the [same transition controller](../../scripts/ops/release.py) as production
 4. Record the active ruleset, the two exact-branch environments, OIDC claim
    evidence, grant scope, synthetic log redaction checks and drill receipts.
    `bash ops/drill/smoke.sh` and the fixture tests run on PRs without credentials. They remain separate from a real Cloud Run drill.
-   Return this one evidence set for verification and the readiness recommendation.
-   Keep both production flags unset while these checks are outstanding. Keep
-   the coach release blocked while its staged speech configuration differs from
-   the serving baseline.
+   Return this one evidence set for verification and the inert-merge readiness
+   recommendation. Keep both production flags unset. Keep the coach release
+   blocked while its staged speech configuration differs from the serving baseline.
+
+5. After the reviewed, inert merge, run the two exact workflows from protected
+   main with both flags still unset:
+
+   ```bash
+   gh workflow run jems-service-images.yml --repo jzwyrzyk/family-game-factory --ref main -f verify_identity=true
+   gh workflow run jems-cloud-run-release.yml --repo jzwyrzyk/family-game-factory --ref main -f verify_identity=true
+   ```
+
+   The claims job requests a GitHub OIDC token, compares its non-secret claims
+   with the reviewed trust, and prints only the matched claim values. The
+   publication and rollout jobs skip. There is no Google Cloud authentication
+   or image or service update in this mode. The exact workflow on main must
+   exist before GitHub can issue these claims. After both proofs pass, verify
+   the final IAM bindings and environment variables. The first production use
+   still requires explicit owner authorization.

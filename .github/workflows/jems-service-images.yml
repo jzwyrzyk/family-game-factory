@@ -1,6 +1,11 @@
 name: Jems immutable service images
 on:
   workflow_dispatch:
+    inputs:
+      verify_identity:
+        description: Verify GitHub OIDC claims only while production flags are off
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ['ops/publish-images.txt']
@@ -12,8 +17,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify-identity:
+    if: >-
+      github.repository == 'jzwyrzyk/family-game-factory' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      inputs.verify_identity &&
+      vars.JEMS_IMAGE_PUBLISH_ENABLED != 'true' &&
+      vars.JEMS_CLOUD_RUN_RELEASE_ENABLED != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: jems-image-publication
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 scripts/ops/oidc_claims.py publish
   build:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:

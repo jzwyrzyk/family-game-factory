@@ -239,3 +239,15 @@ class IsolatedDrillTests(unittest.TestCase):
         with self.assertRaisesRegex(release.ReleaseError, "Lost canary"):
             self.run_drill(apply=True)
         self.assertEqual(release.traffic(self.fixture.state), {self.fixture.baseline: 100})
+
+
+class OidcClaimsTests(unittest.TestCase):
+    def test_probe_checks_exact_cloud_route_and_github_identity(self):
+        import oidc_claims
+        publish = oidc_claims.expected_claims("publish")
+        rollout = oidc_claims.expected_claims("release")
+        self.assertEqual(oidc_claims.mismatches(publish, publish), [])
+        self.assertEqual(oidc_claims.mismatches(publish, rollout),
+                         ["aud", "environment", "sub", "workflow_ref"])
+        forged = {**publish, "ref": "refs/heads/other", "runner_environment": "self-hosted"}
+        self.assertEqual(oidc_claims.mismatches(publish, forged), ["ref", "runner_environment"])

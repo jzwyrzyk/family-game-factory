@@ -620,10 +620,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T05:36:11.852Z",
-      "sourceDigest": "c6d58a6bbad7b602abd7942c1106288eb88bf1719d5f339e54f3b36e10122c1e",
+      "reviewedAt": "2026-11-21T05:40:57.950Z",
+      "sourceDigest": "9172d8f5e549198fafd52e1837a9d846eacf7cdc0d1e45400525f6857159931f",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified both synthetic images start as non-root and reject POST, and added the credential-free smoke to required operations CI.",
+      "reviewReason": "Separated premerge drill and branch verification from postmerge claims-only proof; reviewed the disabled-flag dispatch gates and exact OIDC claims.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
