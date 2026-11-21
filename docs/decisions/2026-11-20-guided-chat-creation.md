@@ -33,6 +33,16 @@ The [coaching standard](../design-coach/GOLD_STANDARD.md) already calls for conv
 
 ## Consequences and limits
 
+### November 21 recovery and readiness refinement
+
+The owner subsequently reported that the coach was poor at recognizing a ready idea, a failed build's retry led to a blocking connection dialog, and chat appeared offline and unnatural despite the adult banner reporting ready. These are defects in the intended conversation and recovery path, not a request to remove child authorship or build safeguards.
+
+Assess a playable first version using the original idea and subsequent authored decisions. The chosen action, stakes or free-play purpose may express the desired experience; a separate feeling word, art style, exact controls, score and numerical tuning are optional unless essential to that particular idea. A valid ready verdict ends follow-up questioning. Preserve bounded original and recent child wording instead of allowing separate helper messages to displace the premise after a few exchanges.
+
+Keep **Build my game** visible and disabled with one short reason when the idea needs attention. **Check my idea**, or **Reconnect chat** after a technical failure, explicitly reassesses saved words through the existing coach. It adds no fake child statement and starts no game. A missing required readiness verdict is a failed check. A technical outage must not start a fixed local questionnaire; show that the idea is saved and offer recovery. Health means available, a validated model reply means connected, and a failed reply remains visible across healthy rechecks. Actual safety refusals remain distinct from technical failures.
+
+For a saved failed job, recover authoritative state by its durable ID and explicitly retry the exact accepted request. A failed job has one authorized retry successor; a lost retry acknowledgement, reload or concurrent click must reuse that successor rather than reserve another build. Expose read-only status recovery in the uncertain handoff and a working retry action for known failure. A new submission with no acknowledged job ID still has no lookup mechanism in this change: do not treat an older job as evidence of its outcome or automatically replay its paid request. This bounded repair adds no pending-request storage migration or general request-ID lookup endpoint.
+
 This clarification supersedes the provisional chip/delegation design and the older first-creation assumption that “you decide” may complete missing design decisions. It also replaces a mandatory plan-card review and the passive-banner-only Build handoff. The full plan may remain an optional inspection surface, but it is not an independent readiness authority.
 
 The coach can provide more concrete support when the child is stuck without supplying a menu to tap through. A desire to stop ends optional coaching, and existing games remain available to play. Stopping the conversation does not authorize a new game from insufficient child input. No-loss, no-score and open-ended games remain valid; the coach resolves what matters to that design instead of demanding every conventional rule.
@@ -46,6 +56,8 @@ Preserve the [character-first entrance](2026-11-20-character-first-navigation.md
 ## Acceptance and references
 
 Check genuine multi-turn conversation: an incomplete idea receives a relevant open follow-up; the child's own answer changes the coach's understanding; an answered question is not repeated; a coherent clear idea does not face an arbitrary interview. Verify that requested help scaffolds the child's own reasoning, with no supplied-answer menu or delegation escape.
+
+Check long conversations retaining their premise, a short playable idea with no separate feeling/art-style answer, no extra question after ready, explicit reassessment without transcript pollution, genuine provider failure versus refusal, and healthy status followed by a failed actual reply. Fixture responses establish host behavior; a real successful conversation and natural readiness judgment still need live acceptance.
 
 Check that absent, stale, contradictory or unsupported readiness cannot submit a new game through the public Build button, optional plan controls, model proposals or older saved flags. Verify exact child evidence, corrections, separate unfinished drafts, owner changes and reload recovery. Inspect the visible chat and actual build request so minimal presentation does not lose authored intent.
 

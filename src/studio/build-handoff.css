@@ -61,9 +61,9 @@ dialog.studio-build-handoff #studioBuildHandoffTitle:focus { outline: none; box-
   white-space: normal;
 }
 .studio-build-handoff button[hidden] { display: none !important; }
-.studio-build-handoff #studioBuildHandoffPlay { background: #58349a; color: #fff; border-color: #58349a; box-shadow: 0 5px 0 #38205f; }
-.studio-build-handoff #studioBuildHandoffPlay:enabled:hover { background: #46257f; border-color: #46257f; }
-.studio-build-handoff #studioBuildHandoffPlay:disabled { background: #e9e3f4; color: #51416e; border-color: #e9e3f4; box-shadow: none; opacity: 1; cursor: wait; }
+.studio-build-handoff :is(#studioBuildHandoffPlay, #studioBuildHandoffRecover) { background: #58349a; color: #fff; border-color: #58349a; box-shadow: 0 5px 0 #38205f; }
+.studio-build-handoff :is(#studioBuildHandoffPlay, #studioBuildHandoffRecover):enabled:hover { background: #46257f; border-color: #46257f; }
+.studio-build-handoff :is(#studioBuildHandoffPlay, #studioBuildHandoffRecover):disabled { background: #e9e3f4; color: #51416e; border-color: #e9e3f4; box-shadow: none; opacity: 1; cursor: wait; }
 .studio-build-handoff #studioBuildHandoffStay:hover { background: #f5f0fd; }
 .studio-build-handoff button:focus-visible { outline: 3px solid #2460cf; outline-offset: 4px; }
 .studio-build-handoff button .jems-icon { flex: 0 0 24px; width: 24px; height: 24px; }

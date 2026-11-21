@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:37.392Z",
-      "sourceDigest": "540a37c8973af219599963da90a95ab555fe3182a3ae7003d21f9e0ad7a26514",
+      "reviewedAt": "2026-11-21T14:34:23.184Z",
+      "sourceDigest": "57392b5aa735fe2782a4d43087b2f5cdb4385688b3c77c0d573469431352afbe",
       "reviewOutcome": "updated",
-      "reviewReason": "Clarified the accepted guided-creation decision with actual gateway/private-coach/web dependency and asymmetric notebook rollback compatibility. Child ownership, readiness, explicit Build and Keep remain unchanged; no new release authorization is invented.",
+      "reviewReason": "Clarified faithful playable-first-version readiness, visible Build/check/reconnect actions, true chat outcomes, and explicit recoverable retries in doctrine and the accepted creation decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -215,10 +215,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T05:39:45.557Z",
-      "sourceDigest": "b45a8d9a467688f1dc9986a00e3d8ba49dfa1329916968bffc527ebcb04120b2",
+      "reviewedAt": "2026-11-21T14:36:51.574Z",
+      "sourceDigest": "b4529782d657c425aee734fd7e8edf7a2a5acb55a0e9ebf1c0843f5a1d416396",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Studio UI, coaching, readiness, transcript presentation and focused handoff changes with final desktop/phone captures. Documented current-child evidence and staleness gates, collapsed tools, compiled-request separation, draft/profile recovery, truthful submission phases and noninterrupting completion.",
+      "reviewReason": "Documented bounded authored context, stable disabled Build, explicit reassessment, actual chat state, saved-job retry and actionable handoff recovery while preserving drafts, learning, and owner guards.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -273,10 +273,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2a0b6b36cc5606d12a2f4bff2f8e9f5aa9f7caa0fe4bf70b3d1a21fba297058a",
-      "reviewedAt": "2026-11-21T05:39:46.677Z",
+      "sourceDigest": "412ea1328277c17fbb86ad55f7df22feed1a055bbf3fb24cacdee441049a5692",
+      "reviewedAt": "2026-11-21T14:36:52.019Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "This area's source change is only the new tests/creation-readiness.test.ts matched by the existing tests/creation-* wildcard. It tests Studio first-game readiness, not Create & code. No scene engine, generated creation schema, program ownership, practice evidence or scene storage changed; Studio behavior is documented in architecture and the guided-chat decision.",
+      "reviewReason": "Changes matching tests/creation-* are first-game conversation-readiness regressions. Block-scene authoring, engine, generated manifest adapters, scene persistence and its existing contracts are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -433,10 +433,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:37.941Z",
-      "sourceDigest": "dd4bd3d500e0151bc5e433b5fb2b809f9e387eb581c303a2573a71a6dab1e14f",
+      "reviewedAt": "2026-11-21T14:34:23.868Z",
+      "sourceDigest": "4a80ecec242f911b8871aab86a7e7ae9fdca450a965dea504c08917037ec2e29",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed gateway Docker dependency failure and fixed the archive, Docker ignore allowlist and image COPY graph. Updated service-image guidance for all three archive-built images and backend-first creation-context compatibility. No provider configuration, worker pin, IAM or production service mutation is included."
+      "reviewReason": "OpenAPI and architecture describe authorized optional retryJobId and reuse of one exact same-audience retry successor; session/privacy permissions and existing route authorization stay unchanged."
     },
     {
       "id": "generation",
@@ -459,10 +459,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T07:54:10.516Z",
-      "sourceDigest": "315cd53efa77f0c993a9eaf99c106a5be83fc4c5f11b7989cacee80f77c51004",
+      "reviewedAt": "2026-11-21T14:34:23.976Z",
+      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed coordinator and sanitizer changes: the quality contract and architecture now describe complete finding and axis feedback, final rejected-attempt metadata, existing-worker compatibility, historical provenance, and unchanged acceptance and privacy boundaries."
+      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
     },
     {
       "id": "coach",
@@ -481,10 +481,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T06:51:38.389Z",
-      "sourceDigest": "21de22fb6e723f266423e2a5789455e0b256a75390abda620d3a096e034018fb",
+      "reviewedAt": "2026-11-21T14:36:52.129Z",
+      "sourceDigest": "ebaea1ce57ffb0ec47757d2378241f5eebd03970856d9e8f751e2c2f18e53731",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared gateway/private-executor validation and private coach archive dependencies. Documented old-client response compatibility, new-context live acceptance and compatible notebook-reader requirements for frontend fallback; status probes alone do not certify the new contract."
+      "reviewReason": "Coaching standard and architecture distinguish playable creative gaps from optional polish, retain original authored intent, require opted-in readiness, remove scripted outage interviews, and separate technical output failures from refusals."
     },
     {
       "id": "adult-privacy",
@@ -508,10 +508,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "dc06770f40ed57b93dd2ff664e65bb30d78dab8a88c0555845f66c69930ca272",
-      "reviewedAt": "2026-11-20T17:11:54.080Z",
+      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
+      "reviewedAt": "2026-11-21T14:34:24.173Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed permanent access entry, bounded owner-aware readiness checks, existing passphrase unlock, cancel/expiry cleanup and guarded connection navigation. Updated disabled-pilot removal wording to distinguish gated profile choice from always-visible help; server flags and grants remain unchanged.",
+      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -555,10 +555,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T07:54:10.809Z",
-      "sourceDigest": "92ecfcc2c8aab4e3af77628e47e74d7f7dfb9d3fc170ab8bc8da57eed81cb1b6",
+      "reviewedAt": "2026-11-21T14:36:52.231Z",
+      "sourceDigest": "9a1a08691b7a59def8f11da367d02f1882aec03aae21fb560efeda5f77584d3b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the seven new regression cases and 43 passing focused tests; the quality contract and delivery record distinguish synthetic transport, malformed input, terminal provenance, repaired acceptance, and unchanged accounting from unobserved live game success.",
+      "reviewReason": "Delivery and feature contracts record readiness/history/reconnect, exact saved-job/lost-ack retry and adult banner fixture coverage, local executable passes and Chromium startup restriction; live provider, device and child acceptance remain unverified.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T13:24:45.322Z",
-      "sourceDigest": "61a5b11f11fea9368b06e8020368d60d9be6503c93aca327c52f1fc27cedffb8",
+      "reviewedAt": "2026-11-21T14:34:24.560Z",
+      "sourceDigest": "64860b987176b12c2989d5aa7545db91d586735753fa3be4d24e33f100ad5841",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated unchanged PR111 gateway repair and its tests with the unchanged real operations policy foundation in PR112, preserving both source and delivery histories. Confirmed 43 focused and 21 operations tests plus typecheck on the combined tree. Recorded successful PR108 Pages run44906553925 and public source marker at c43a181; current authenticated backend baselines and the new gateway rollout remain unverified, and historical PR109 promotion must not be replayed. Privileged workflows and Phase2 activation remain excluded.",
+      "reviewReason": "Recorded source repair on merged PR112, observed PR108 Pages marker and separately reported gateway repair, hosted browser/package gate requirement and compatible gateway/private-coach/web rollout with unchanged worker and settings.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {freshDesign,PLAN_FIELDS,validateCoachReply,validateDesign,type CoachContext,type CoachReply} from '../src/studio/design';
 import {StudioNotebook,validateNotebook,type StudioSession} from '../src/studio/notebook';
-import {creationBuildReadiness,creationInputFingerprint,recordCreationReview,validateCreationReadiness,validateCreationReview,type CreationReadinessVerdict} from '../src/studio/creation-readiness';
+import {creationBuildReadiness,creationInputFingerprint,creationConversation,recordCreationReview,validateCreationReadiness,validateCreationReview,type CreationReadinessVerdict} from '../src/studio/creation-readiness';
 
 const evidence={
  action:'I drag the moth from flower to flower',
@@ -176,14 +176,67 @@ test('review serialization survives notebook reload and older notebooks stay com
  assert.throws(()=>validateCreationReview({...saved.design!.creationReview,version:2}),/Invalid/);
 });
 
-test('ordinary coach responses remain compatible without silently granting readiness',()=>{
+test('new creation requires a readiness verdict while old clients keep their reply contract',()=>{
  const f=fixture(),c=context(f.get());
- assert.doesNotThrow(()=>validateCoachReply(reply,c));
+ assert.throws(()=>validateCoachReply(reply,c),/CREATION_REVIEW_MISSING/);
+ assert.throws(()=>validateCoachReply({...reply,creationReadiness:null},c),/CREATION_REVIEW_MISSING/);
  assert.equal(creationBuildReadiness(f.get()).ready,false);
  const withReview={...reply,creationReadiness:ready()};
  assert.deepEqual(validateCoachReply(withReview,c).creationReadiness,ready());
  const old={...c};delete old.creation;
+ assert.doesNotThrow(()=>validateCoachReply(reply,old));
  assert.equal(Object.hasOwn(validateCoachReply(withReview,old),'creationReadiness'),false,'old clients receive their existing reply shape without readiness authority');
  assert.deepEqual(withReview.creationReadiness,ready(),'compatibility filtering does not rewrite the provider response object');
  assert.doesNotThrow(()=>validateDesign(freshDesign()));
+});
+
+test('a ready verdict ends optional follow-up questions without granting automatic Build',()=>{
+ const f=fixture(),c=context(f.get());
+ const checked=validateCoachReply({...reply,question:'What color should each flower be?',creationReadiness:ready()},c);
+ assert.equal(checked.question,null);
+ assert.equal(checked.creationReadiness?.ready,true);
+ assert.equal(f.get().job,null);assert.equal(creationBuildReadiness(f.get()).ready,false);
+});
+
+test('a stated balancing challenge conveys experience without an emotion or art-style field',()=>{
+ const idea='I balance a sleepy lighthouse keeper on a floating rock while the beacon charges. Falling off wakes the sea monster and ends the round.';
+ const f=fixture(idea),verdict:CreationReadinessVerdict={ready:true,evidence:{
+  action:'I balance a sleepy lighthouse keeper on a floating rock',
+  consequence:'Falling off wakes the sea monster and ends the round.',
+  experience:'while the beacon charges',world:'a sleepy lighthouse keeper on a floating rock'
+ },unresolved:[]};
+ assert.deepEqual(f.get().design!.plan,{});
+ assert.equal(creationBuildReadiness(f.save(verdict)).ready,true);
+ assert.equal(f.get().job,null,'the accepted fixture verdict is not a provider or build claim');
+});
+
+test('creation context retains the original idea and older child decisions across helper-heavy turns',()=>{
+ const f=fixture('I balance a lighthouse keeper while the beacon charges.');
+ const own=[];
+ for(let i=0;i<7;i++){
+  f.notebook.message(f.get().id,'player1','helper','Your earlier choice is saved.');
+  f.notebook.message(f.get().id,'player1','helper','What happens in that moment?');
+  const text='My next authored detail '+i+'.';own.push(text);f.notebook.message(f.get().id,'player1','child',text);
+ }
+ const sent=creationConversation(f.get());
+ assert.ok(sent.some(message=>message.text===f.get().messages[0].text));
+ for(const text of own)assert.ok(sent.some(message=>message.role==='child'&&message.text===text));
+ assert.ok(sent.some(message=>message.role==='helper'&&message.text==='What happens in that moment?'));
+ assert.ok(sent.length<=16);assert.ok(JSON.stringify(sent).length<=12000);
+});
+
+test('bounded creation context preserves exact original and newest words without reviving refused or helper turns',()=>{
+ const f=fixture('Original child world. '+ 'o'.repeat(1900));
+ for(let i=0;i<25;i++)f.notebook.message(f.get().id,'player1','child',i+' '+ 'x'.repeat(1900));
+ const final='Newest correction. '+ 'n'.repeat(1900);f.notebook.message(f.get().id,'player1','child',final);
+ const sent=creationConversation(f.get(),9000);
+ assert.ok(sent.some(message=>message.text===f.get().messages[0].text));
+ assert.ok(sent.some(message=>message.text===final));
+ assert.ok(sent.length<=16);assert.ok(JSON.stringify(sent).length<=9000);
+ const snapshot=f.get();const first=snapshot.messages[0];
+ snapshot.design!.ideas.push({id:'helper-turn:'+first.id,text:'Original child world.',origin:'helper',adopted:true});
+ snapshot.messages.push({id:'refused-child',role:'child',text:'Rejected request.',at:new Date().toISOString()},
+  {id:'refusal-note',role:'helper',text:'I can help with safe game ideas. Let’s try another idea without sharing private details.',at:new Date().toISOString()});
+ const safe=creationConversation(snapshot,9000);
+ assert.ok(!safe.some(message=>message.text===first.text||message.text==='Rejected request.'));
 });
