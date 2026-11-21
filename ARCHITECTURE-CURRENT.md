@@ -48,6 +48,8 @@ flowchart TD
 
 The gateway's existing coordinator owns dispatch, retries and acceptance. New real metered games and current v2 revisions require the review path shown above; existing generated v1 revisions retain their legacy compatibility gate. New output cannot select v1 to evade current policy. The server re-applies the policy to older queued real jobs. New game families, intent analysis or repair research must integrate with this path rather than introduce a competing generation or repair pipeline. A tested or Ready candidate remains separate from a kept revision.
 
+Actions repair feedback preserves all allowlisted quality findings and the validated review's four axis statuses within the existing worker's 1,500-character limit. The optional private execution `lastFailure` record retains the latest test/review rejection's stage, attempt, stable category/code, finding enums and review axes before retry advancement or final exhaustion. It contains no source, prompt, capture or free-form error, and is not exposed through the browser job response. Earlier repair feedback and this rejection record have separate provenance; a later Ready result or unrelated terminal error must be read from the current job status. The [quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md#four-independent-review-judgments) describes the unchanged acceptance and retention boundaries.
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |

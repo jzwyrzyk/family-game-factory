@@ -459,10 +459,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:51.403Z",
-      "sourceDigest": "7f85771c47f30cc46436ae0c61338e56c7df2e0ecf3a47e9e179fdd8a5fed79d",
+      "reviewedAt": "2026-11-21T07:54:10.516Z",
+      "sourceDigest": "315cd53efa77f0c993a9eaf99c106a5be83fc4c5f11b7989cacee80f77c51004",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled conflicting generation and Docker paths with merged planning/art/review. Both request modes retain plan, playthrough, approved art and required repair captures; companion remains host-held and unchanged through attestation/publication. Existing quality runtime and resource/spending caps are preserved."
+      "reviewReason": "Reviewed coordinator and sanitizer changes: the quality contract and architecture now describe complete finding and axis feedback, final rejected-attempt metadata, existing-worker compatibility, historical provenance, and unchanged acceptance and privacy boundaries."
     },
     {
       "id": "coach",
@@ -555,10 +555,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T05:39:48.031Z",
-      "sourceDigest": "7227f6641dcb852b12a7356e53baf4eacb2cdb4340aec1f25987515b6b6f5318",
+      "reviewedAt": "2026-11-21T07:54:10.809Z",
+      "sourceDigest": "92ecfcc2c8aab4e3af77628e47e74d7f7dfb9d3fc170ab8bc8da57eed81cb1b6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed new readiness/compiler/transcript contracts, current-source handoff checks and corrected actual-Send browser fixtures. Recorded exact final bundles and synthetic coach/job limits in delivery and capture evidence. New guided-creation gate is included in child-journey and existing complete release coverage; old chip/delegation receipts are not reused as final evidence.",
+      "reviewReason": "Reviewed the seven new regression cases and 43 passing focused tests; the quality contract and delivery record distinguish synthetic transport, malformed input, terminal provenance, repaired acceptance, and unchanged accounting from unobserved live game success.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -621,10 +621,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T13:19:37.586Z",
-      "sourceDigest": "1f9e2c6a7ab356387f9397876dd662e05cc544f7499640e0cb1e81a7011baae4",
+      "reviewedAt": "2026-11-21T13:24:45.322Z",
+      "sourceDigest": "61a5b11f11fea9368b06e8020368d60d9be6503c93aca327c52f1fc27cedffb8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the exact PR107 policy workflow, all 21 operational tests and source dependencies on current main. Documented source-only CI integration, omitted privileged workflows, unchanged existing production paths and still-pending cloud activation; preserved PR108 packaging and all existing delivery evidence.",
+      "reviewReason": "Integrated unchanged PR111 gateway repair and its tests with the unchanged real operations policy foundation in PR112, preserving both source and delivery histories. Confirmed 43 focused and 21 operations tests plus typecheck on the combined tree. Recorded successful PR108 Pages run44906553925 and public source marker at c43a181; current authenticated backend baselines and the new gateway rollout remain unverified, and historical PR109 promotion must not be replayed. Privileged workflows and Phase2 activation remain excluded.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

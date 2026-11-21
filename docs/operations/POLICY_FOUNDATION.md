@@ -53,12 +53,22 @@ No release check is synthesized or replaced with an unconditional success.
 
 ## Game-fix integration
 
-After this foundation passes the actual required checks and merges, update
-the game-fix branches from main and review any combined documentation changes.
-The ordinary protected merge and existing deployment path can then ship the
-game fixes. PR109 owns the coordinated PR108 backend/website cutover; PR111's
-gateway fix must use the serving baseline verified after that cutover. PR110
-preserves repair helpers and receipts and is not a runtime prerequisite.
+The owner requested immediate delivery of the game fixes. [PR112](https://github.com/jzwyrzyk/family-game-factory/pull/112)
+therefore integrates this unchanged policy foundation with the unchanged
+PR111 repair source and tests at `494d54b69acab9363ce59d4b7526766f36672bb7`,
+so the actual gateway correction and its CI prerequisite receive one combined
+set of required checks before the protected merge. This integration changes
+the gateway repair behavior described in the [quality contract](../game-intelligence/PRESENTATION-QUALITY.md);
+the CI foundation itself still grants no deployment authority.
+
+The separately dispatched [PR108 Pages run44906553925](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44906553925)
+completed successfully at source `c43a18148421ea22edfba5f7e891530678ad4f4f`.
+Read the current backend serving state and reconcile PR109's existing private
+journals before deploying the new gateway image; do not replay its historical
+pending-cutover instructions or old-source Pages dispatch. PR111's gateway
+fix must preserve that verified serving configuration and the accepted worker
+and sandbox identities. PR110 preserves repair helpers and receipts and is
+not a runtime prerequisite. The fresh adult game journey remains unverified.
 
 Record actual source merges and deployment results in
 [delivery state](../../DELIVERY-STATE.md). The current split changes the missing

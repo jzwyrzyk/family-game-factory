@@ -7,19 +7,29 @@
  * server-side FunctionalGameContract. No additional inference call.
  */
 import type {FunctionalGameContract,FunctionalCheckpoint,GameObservation} from './functional-game-contract';
+import {QUALITY_AXES,QUALITY_FINDINGS,type QualityAxis,type QualityFinding,type QualityStatus} from './game-quality';
 
 export type RepairCategory=
   'intent-missing'|'input-unresponsive'|'runtime-failed'|
   'replay-failed'|'syntax-invalid'|'limits-failed'|'test-unverified'|
   'presentation-failed'|'gameplay-shallow'|'quality-unverified';
+export type RepairCode=
+  'GAME_PRESENTATION_FAILED'|'GAMEPLAY_DESIGN_FAILED'|'INTENT_REQUIREMENT_FAILED'|
+  'INPUT_PRESENTATION_FAILED'|'GAME_QUALITY_UNVERIFIED'|'INPUT_RESPONSE_FAILED'|
+  'GAME_RUNTIME_FAILED'|'GAME_CONTINUITY_FAILED'|'GENERATED_SOURCE_INVALID'|
+  'GAME_RESOURCE_LIMIT'|'GAME_TEST_FAILED';
+export type QualityRepairAxes=Record<QualityAxis,QualityStatus>;
 export interface SafeRepairDiagnostic{
   category:RepairCategory;
-  code:string;
+  code:RepairCode;
   feedback:string;
+  findings?:QualityFinding[];
+  qualityAxes?:QualityRepairAxes;
   repairable:true;
 }
 const SAFE_ID=/^[a-z][a-z0-9-]{0,39}$/;
 const MAX_INPUT=2000;
+const MAX_FEEDBACK=1500;
 const allowedKeys=(id:string)=>SAFE_ID.test(id);
 const testCode=(x:string)=>/^[A-Z][A-Z0-9_]{2,79}$/.test(x);
 
@@ -44,23 +54,45 @@ function safeRequirements(
 }
 const basic='Preserve the child-authored premise, essential actions, and payoff. Repair real game behavior, not the verdict. Never fake an outcome or change the goal to satisfy a test. Existing math/English, sandbox, touch/pause/replay, and saved-version rules remain mandatory.';
 
-export function safeRepairDiagnostic(raw:unknown,plan?:FunctionalGameContract):SafeRepairDiagnostic {
+// This optional context comes from a bound review, not a sandbox exception.
+// Copy only exact enum data; malformed runtime objects never become feedback.
+function qualityContext(value:unknown):{axes:QualityRepairAxes;findings:QualityFinding[]}|undefined {
+ const record=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v)&&
+  [Object.prototype,null].includes(Object.getPrototypeOf(v))&&Object.values(Object.getOwnPropertyDescriptors(v)).every(d=>'value'in d);
+ if(!record(value)||Object.keys(value).length!==2||!Object.hasOwn(value,'axes')||!Object.hasOwn(value,'findings'))return;
+ const axes=value.axes,findings=value.findings;
+ if(!record(axes)||Object.keys(axes).length!==QUALITY_AXES.length||QUALITY_AXES.some(axis=>!Object.hasOwn(axes,axis)||!['pass','fail','not-tested'].includes(axes[axis] as string)))return;
+ if(!Array.isArray(findings)||findings.length>QUALITY_FINDINGS.length||findings.some(f=>!QUALITY_FINDINGS.includes(f))||new Set(findings).size!==findings.length)return;
+ const statuses=QUALITY_AXES.map(axis=>axes[axis]);
+ if(statuses.every(s=>s==='pass')||statuses.includes('not-tested')&&!findings.includes('QUALITY_EVIDENCE_INCOMPLETE')||statuses.includes('fail')&&!findings.length)return;
+ if(findings.some(f=>{const axis=f.startsWith('VISUAL_')?'visual':f.startsWith('INTENT_')?'intent':f.startsWith('GAMEPLAY_')?'gameplay':f.startsWith('INPUT_')?'input':undefined;return axis&&axes[axis]==='pass';}))return;
+ return {axes:{visual:axes.visual as QualityStatus,intent:axes.intent as QualityStatus,gameplay:axes.gameplay as QualityStatus,input:axes.input as QualityStatus},findings:QUALITY_FINDINGS.filter(f=>findings.includes(f))};
+}
+
+export function safeRepairDiagnostic(raw:unknown,plan?:FunctionalGameContract,reviewContext?:unknown):SafeRepairDiagnostic {
  const input=typeof raw==='string'?raw.slice(0,MAX_INPUT):'';
  // Only these bounded findings from the independently bound reviewer can
  // become instructions. Never relay its free text, pixels or raw API body.
- if(/\b(?:VISUAL_STYLE_MISMATCH|VISUAL_INCOHERENT_ART|VISUAL_UNREADABLE_LAYOUT|VISUAL_PLACEHOLDER_APPEARANCE|VISUAL_OCCLUSION_OR_SCALE)\b/.test(input)){
-  const codes=[...new Set(input.match(/\b(?:VISUAL_STYLE_MISMATCH|VISUAL_INCOHERENT_ART|VISUAL_UNREADABLE_LAYOUT|VISUAL_PLACEHOLDER_APPEARANCE|VISUAL_OCCLUSION_OR_SCALE)\b/g)||[])];
-  return {category:'presentation-failed',code:'GAME_PRESENTATION_FAILED',feedback:'GAME_PRESENTATION_FAILED;FINDINGS='+codes.join(',')+'. Independent review of actual desktop and tablet captures found a presentation defect. Repair the identified style, coherence, composition, scale, occlusion or readability problem. Preserve the requested art family: pixel and flat 2D are valid finished styles. Keep approved characters and working mechanics stable. '+basic,repairable:true};
- }
- if(/\b(?:GAMEPLAY_NO_CONSEQUENCE|GAMEPLAY_NO_VARIATION|GAMEPLAY_NO_RECOVERY)\b/.test(input)){
-  const codes=[...new Set(input.match(/\b(?:GAMEPLAY_NO_CONSEQUENCE|GAMEPLAY_NO_VARIATION|GAMEPLAY_NO_RECOVERY)\b/g)||[])];
-  return {category:'gameplay-shallow',code:'GAMEPLAY_DESIGN_FAILED',feedback:'GAMEPLAY_DESIGN_FAILED;FINDINGS='+codes.join(',')+'. Captured play did not demonstrate the required consequential choice/skill, variation/expression or understandable recovery. Improve the actual rules or interactions appropriately for this child request and play mode; additional counters, sequential confirm buttons or a reskin are insufficient. Preserve successful artwork. '+basic,repairable:true};
- }
- if(/\b(?:INTENT_ACTION_MISSING|INTENT_PAYOFF_MISSING)\b/.test(input)){
-  return {category:'intent-missing',code:'INTENT_REQUIREMENT_FAILED',feedback:'INTENT_REQUIREMENT_FAILED: Independent captured-play review could not establish the child-requested essential action or visible payoff. Implement and expose the real action and consequence with ordinary input; a label, score or claimed win does not establish it. Preserve successful artwork. '+basic,repairable:true};
- }
- if(/\bINPUT_UNCLEAR_OR_INACCESSIBLE\b/.test(input)){
-  return {category:'input-unresponsive',code:'INPUT_PRESENTATION_FAILED',feedback:'INPUT_PRESENTATION_FAILED: Actual desktop/tablet play showed unclear, obscured or unreachable controls or weak action feedback. Repair ordinary touch and keyboard affordances, target size and visible consequence while retaining the intended mechanic. '+basic,repairable:true};
+ const context=qualityContext(reviewContext);
+ const findings=context?.findings||QUALITY_FINDINGS.filter(code=>new RegExp('\\b'+code+'\\b').test(input));
+ if(findings.length){
+  const visual=findings.some(f=>f.startsWith('VISUAL_')),gameplay=findings.some(f=>f.startsWith('GAMEPLAY_')),
+   intent=findings.some(f=>f.startsWith('INTENT_')),inputFinding=findings.includes('INPUT_UNCLEAR_OR_INACCESSIBLE');
+  // Preserve the existing primary category, but do not discard other axes.
+  const category:RepairCategory=visual?'presentation-failed':gameplay?'gameplay-shallow':intent?'intent-missing':inputFinding?'input-unresponsive':'quality-unverified';
+  const code:RepairCode=visual?'GAME_PRESENTATION_FAILED':gameplay?'GAMEPLAY_DESIGN_FAILED':intent?'INTENT_REQUIREMENT_FAILED':inputFinding?'INPUT_PRESENTATION_FAILED':'GAME_QUALITY_UNVERIFIED';
+  const advice:string[]=[];
+  if(visual||context&&context.axes.visual!=='pass')advice.push('Address the identified art, style, layout and readability criteria; show the requested art family clearly on both devices and preserve successful assets.');
+  if(gameplay||context&&context.axes.gameplay!=='pass')advice.push('Demonstrate consequential choices and the required variation or recovery through ordinary play; counters and reskins are insufficient.');
+  if(intent||context&&context.axes.intent!=='pass')advice.push('Expose the requested essential action and payoff with ordinary input; labels or claimed wins are insufficient.');
+  if(inputFinding||context&&context.axes.input!=='pass')advice.push('Make touch and keyboard controls clear, reachable and responsive, with visible effects.');
+  if(findings.includes('QUALITY_EVIDENCE_INCOMPLETE'))advice.push('Make every unobserved criterion observable in the ordinary playthrough; never invent test-only callbacks or fake evidence.');
+  const prefix=code+';FINDINGS='+findings.join(',')+(context?';AXES='+QUALITY_AXES.map(axis=>axis+':'+context.axes[axis]).join(','):'')+'. ';
+  // Older pinned workers forward only the first 1,500 characters. Preserve
+  // all enum criteria and the intent/safety rules before trimming fixed advice.
+  const detail=advice.join(' ').slice(0,Math.max(0,MAX_FEEDBACK-prefix.length-basic.length-1));
+  return {category,code,feedback:prefix+detail+' '+basic,findings,
+   ...(context?{qualityAxes:context.axes}:{}),repairable:true};
  }
  if(/\b(?:QUALITY_EVIDENCE_INCOMPLETE|QUALITY_REVIEW_UNGROUNDED|QUALITY_REVIEW_FAILED)\b/.test(input)){
   return {category:'quality-unverified',code:'GAME_QUALITY_UNVERIFIED',feedback:'GAME_QUALITY_UNVERIFIED: The captured ordinary-input path did not establish every required visual, gameplay, intent or input criterion. Improve the game or its ordinary exploration path so the real behavior is observable. Never add a test-only fast win, generated assertions or a privileged callback. Keep unknowns honest. '+basic,repairable:true};
