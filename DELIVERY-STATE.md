@@ -1,5 +1,15 @@
 # jems delivery state
 
+## November 20, 2026 — Direct diagnostic connection tooling prepared
+
+The owner requested removal of routine ChatGPT ↔ Cloud Shell command/output relay and authorized brief notice followed by continuation for larger fixes within the existing scope. [The accepted operating decision](docs/decisions/2026-11-20-direct-operations.md) records that intent; [the connection runbook](docs/operations/ASSISTANT_ACCESS.md) explains the one-time account setup and remaining work.
+
+This source adds a default-offline GCP OIDC bootstrap and a read-only Cloud Run metadata diagnostic. The planned identity has service/revision reads on the three named Jems services, no log-content or production-write grants. Existing application runtime, deployment workflows, worker WIF and paid-execution configuration are not changed by running the tests or merging these source files.
+
+**Verified starting state:** the local `gh` CLI is not authenticated, `gcloud` is absent and no outbound identity manifest is configured. The connected GitHub tool can read source/PRs but does not expose workflow dispatch. A normal public Git read/clone succeeds; that does not establish authenticated GitHub CLI writes or Google Cloud access.
+
+**Local acceptance:** all 51 existing deployment tests and 25 focused offline bootstrap/diagnostic tests passed. The repository documentation check passed with zero errors or review reminders. The local diagnostic self-check correctly stopped with `GCLOUD_NOT_INSTALLED`; it did not make a cloud call. No bootstrap apply, live GCP identity exchange, service read, denied-write permission check, log retrieval, workflow dispatch or production deployment is claimed. Actual OIDC identifiers and the owner's one-time setup are still required; publish the configured environment and verify from a new task. This entry records tooling preparation and does not supersede the production-release receipts below.
+
 ## November 20, 2026 — PR98 merged; replacement publication pending
 
 [PR98](https://github.com/jzwyrzyk/family-game-factory/pull/98) merged at **7:29:14 p.m. America/New_York** (`2026-11-21T00:29:14Z`) as [`d93ed92c61f603ddecdbc922187664b2b25c244b`](https://github.com/jzwyrzyk/family-game-factory/commit/d93ed92c61f603ddecdbc922187664b2b25c244b), following the owner's instruction to merge the deployment prerequisites and continue. Its reviewed head was `73a872a6dfdf2f53a1da7d614c32be80816146e2`; all **14** returned check runs passed. The merged Git tree `a4ccab0628060b295c0d4c90237b397fd439a1e8` exactly matches that tested head. The browser job [136639286290](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44837989211/job/136639286290) ran all 51 deployment tests, including the real TypeScript fixture-loader regression. The merged-main [documentation run 44844136244](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44844136244) also passed.
