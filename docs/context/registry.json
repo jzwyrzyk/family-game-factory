@@ -617,10 +617,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T16:01:33.009Z",
-      "sourceDigest": "378faa936074613951c4d473ca14c9afd836efa9c6db79e4172522328d41a69e",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed combined run44920474005 and exact artifact; corrected stale offline card scrolling without weakening cache/byte checks, and added bounded read-only current-image/network/cache diagnostics while preserving the failing Pal decode and every acceptance assertion.",
+      "reviewedAt": "2026-11-21T18:21:40.814Z",
+      "sourceDigest": "89303ef5f921f6b68779ffa931f1f45b9e4de0457b91f2e8b434ad4ed4b1b92e",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Added bounded passive Pal-image failure tracing after repeated hosted decode failures. Reviewed exact original Promise and error preservation, one native invocation, no new retries/refetches/waits/assertion changes, allowed-field filtering and current-document limits. Three focused attempts and the full creative Pal step passed on the separate probe; timing effects mean no product repair is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -698,10 +698,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T17:46:23.280Z",
-      "sourceDigest": "977656174d80c64856a11d8d4fe82c3cb9cbf167b7581ca949afc7cfed8226ba",
+      "reviewedAt": "2026-11-21T18:21:42.958Z",
+      "sourceDigest": "cb88e86fb835c6d7b64bb729e5b4482ed0e2bbfcda10e8bae8d65acb4389135f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the integrated documented-selector correction and bounded scoped Logging client. The client now preserves managed auth/proxy/CA guards, uses exact-view normal gcloud with private metadata projection, counts at most500 entries and suppresses raw failures; actual account and permission acceptance remain unverified. Updated runbooks and ledger with 79 deployment plus74 operations passes, the prior exact-head Pal image-decode failure and its unresolved cause, preserved assertions and current-main application source, and the explicit no-merge/no-activation boundary.",
+      "reviewReason": "Retained the intermittent Pal failure evidence and added the scoped diagnostic follow-up during access preparation. Original access implementation and its79deployment/74operations results are unchanged. The test tracer is bounded and preserves native results; the separate diagnostic workflow is not included. Exact-head CI remains required, the cause is unresolved, both PRs remain drafts and no account activation/merge is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1015,10 +1015,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b734e7783f81ca8f947f67615961eb46db1ccac12414ca7d925d79b4f810363",
-      "reviewedAt": "2026-11-21T16:01:33.583Z",
+      "sourceDigest": "9534c50430eb8b08e1a80d414b621664855d37c1840edd5b1e4c4ea21feb8133",
+      "reviewedAt": "2026-11-21T18:21:41.306Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected actual unavailable-picture screenshot and runtime loader guards; no speculative artwork/runtime workaround is justified. Added failure-only bounded public-asset diagnostics; approved identities, forms, ownership, recovery and acceptance assertions remain unchanged."
+      "reviewReason": "Reviewed the unchanged Pal collection, growth, profile, expression and native image-decoding contracts. Only test-side bounded lifecycle diagnostics and version/count evidence were added; no artwork, runtime source, interaction or success criterion changed. Repeated hosted failures and subsequent instrumented passes remain distinct evidence in the delivery ledger."
     }
   ]
 }
