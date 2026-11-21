@@ -16,7 +16,7 @@ This runner App is separate from the gateway App installation `182382304`, whose
 
 ## Coordinated production switch
 
-The owner-run `scripts/deployment/rotate_private_worker_pin.mjs`, alongside `repair_github_installation.mjs`, takes `--private-sha ca2989988fd1cd66d9a858cbf167dd4a995640fc --apply`. Omitting `--apply` is read-only.
+The owner-run helper at immutable public commit `661e5299b2ec1a6602ada6b930c8e11373ae3c36`, alongside `repair_github_installation.mjs`, takes `--private-sha ca2989988fd1cd66d9a858cbf167dd4a995640fc --apply` for this historical permission correction. Omitting `--apply` is read-only. The current helper is scoped to the subsequent [startup timeout repair](RUNNER-STARTUP-RELEASE.md); use each release's exact pinned helper and target.
 
 It verifies the exact new main tree, installed runner grants, unchanged approved flag and sandbox image. It resolves the current config version 7 from the known repaired gateway revision and changes only `workerApprovedSha`. The corrected gateway installation, session keys, adult restrictions, prices, limits and all other settings are preserved.
 
@@ -24,7 +24,7 @@ The helper creates a missing immutable execution tag, stages the same gateway ru
 
 Failed staging leaves the previous serving traffic unchanged. Applied-but-error trust changes are read back before safe restoration. Failed canonical health attempts to restore previous traffic and changes to WIF/variable values. The helper never rewrites main, resets a job, changes approval or recreates session/budget state. Traffic rollback alone is not a coherent release rollback after main has moved; an incomplete receipt must be resolved before another game attempt.
 
-Eight independent offline scenarios verify success, missing grants/identity drift, plan mode, Retired staging, staged and live health failures, ambiguous trust writes and concurrent configuration preservation. These tests make no real cloud/API calls. A production `ROTATION_STATUS=SUCCESS` receipt remains pending at this source publication.
+Eight independent offline scenarios verified success, missing grants/identity drift, plan mode, Retired staging, staged and live health failures, ambiguous trust writes and concurrent configuration preservation. These tests made no real cloud/API calls. A later owner read confirmed serving revision `factory-gateway-workerpin-ca298998-mwq0ps0k-3f57`, config version `8`, and private pin `ca2989988fd1cd66d9a858cbf167dd4a995640fc`. Real run `44875153976` then authenticated, generated, provisioned its runner and passed all seven host-readiness checks. This establishes operation of the corrected runner permissions and current pin; it does not establish a completed game. Its first technical test requested automatic repair, and both that run and failed repair run `44875447537` verified cleanup of instances, disks and runner registrations.
 
 ## Next acceptance
 

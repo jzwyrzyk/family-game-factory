@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {rotate} from './rotate_private_worker_pin.mjs';
-import {PROJECT,SERVICE,ORIGIN,CONFIG_FILE,CONFIG_SECRET,REPO,PIN as OLD_PIN,
+import {rotate,OLD_PIN,REVIEWED_TREE} from './rotate_private_worker_pin.mjs';
+import {PROJECT,SERVICE,ORIGIN,CONFIG_FILE,CONFIG_SECRET,REPO,
   INSTALLATION} from './repair_github_installation.mjs';
 
 const TARGET='b'.repeat(40);
-const TREE='26a00dc72d4b39d12aa1b54dadfd38765b21b662';
-const PREVIOUS='factory-gateway-appfix-mwpzazq8-3406';
+const TREE=REVIEWED_TREE;
+const PREVIOUS='factory-gateway-workerpin-ca298998-mwq0ps0k-3f57';
 const IMAGE='ghcr.io/jzwyrzyk/family-game-factory-sandbox@sha256:83be22b96cdd83eaefa80c0ae321208bdff63f4ee926cc5ae28d064f91cee089';
 const copy=value=>structuredClone(value);
 const flag=(args,key)=>{
@@ -47,7 +47,7 @@ function revision(name,version) {
       {type:'Active',status:name===PREVIOUS?'True':'False',reason:name===PREVIOUS?'Ready':'Retired'}]}};
 }
 function harness(options={}) {
-  const old=revision(PREVIOUS,'7');
+  const old=revision(PREVIOUS,'8');
   const template={metadata:{name:PREVIOUS,annotations:copy(old.metadata.annotations)},spec:copy(old.spec)};
   delete template.spec.containers[0].name;
   const service={metadata:{name:SERVICE,generation:22,resourceVersion:'22',
@@ -64,7 +64,7 @@ function harness(options={}) {
     oidc:{issuerUri:'https://token.actions.githubusercontent.com'},
     attributeMapping:{'google.subject':'assertion.sub','attribute.repository':'assertion.repository'}};
   const initialProvider=copy(provider);
-  const revisions=new Map([[PREVIOUS,old]]),configs=new Map([['7',config()]]);
+  const revisions=new Map([[PREVIOUS,old]]),configs=new Map([['8',config()]]);
   const variables={FACTORY_PRIVATE_WORKER_SHA:OLD_PIN,FACTORY_ACTIONS_APPROVED:'true',
     FACTORY_SANDBOX_IMAGE:IMAGE,FACTORY_RUNNER_APP_ID:'5776342'};
   const permissions={contents:'read',organization_self_hosted_runners:'write'};
@@ -94,8 +94,8 @@ function harness(options={}) {
     }
     if(op==='secrets versions add') {
       assert.equal(args[3],CONFIG_SECRET); assert.ok(args.includes('--data-file=-'));
-      configs.set('8',JSON.parse(input)); writes.push('config-add');
-      return JSON.stringify({name:'projects/1054529152893/secrets/'+CONFIG_SECRET+'/versions/8'});
+      configs.set('9',JSON.parse(input)); writes.push('config-add');
+      return JSON.stringify({name:'projects/1054529152893/secrets/'+CONFIG_SECRET+'/versions/9'});
     }
     if(args[0]==='iam'&&args[1]==='workload-identity-pools'&&args[2]==='providers') {
       assert.equal(args[4],'private-worker');
@@ -113,11 +113,11 @@ function harness(options={}) {
     }
     if(op==='run services update') {
       assert.equal(args[3],SERVICE); assert.ok(args.includes('--no-traffic'));
-      assert.equal(flag(args,'--update-secrets'),CONFIG_FILE+'='+CONFIG_SECRET+':8');
+      assert.equal(flag(args,'--update-secrets'),CONFIG_FILE+'='+CONFIG_SECRET+':9');
       assert.equal(serving(),PREVIOUS);
       candidate=SERVICE+'-'+flag(args,'--revision-suffix');
       assert.ok(candidate.startsWith('factory-gateway-workerpin-'+TARGET.slice(0,8)+'-'));
-      const next=revision(candidate,'8'); revisions.set(candidate,next);
+      const next=revision(candidate,'9'); revisions.set(candidate,next);
       service.spec.template={metadata:copy(next.metadata),spec:copy(next.spec)};
       delete service.spec.template.spec.containers[0].name;
       service.status.latestCreatedRevisionName=candidate;
@@ -205,7 +205,7 @@ test('rotates only worker pin after tagged health and preserves keys, spending, 
   const h=harness(); await rotate(h);
   assert.equal(h.serving(),h.candidate());
   assert.equal(h.variables.FACTORY_PRIVATE_WORKER_SHA,TARGET);
-  assert.deepEqual(h.configs.get('8'),{...config(),workerApprovedSha:TARGET});
+  assert.deepEqual(h.configs.get('9'),{...config(),workerApprovedSha:TARGET});
   assert.deepEqual(h.provider,{...h.initialProvider,
     attributeCondition:h.initialProvider.attributeCondition.replace(OLD_PIN,TARGET)});
   assert.ok(h.requests.some(r=>r.tagged&&r.healthy&&r.serving===PREVIOUS));
@@ -262,4 +262,52 @@ test('concurrent staged configuration change is preserved and prevents promotion
   const h=harness({concurrentChange:true}); await assert.rejects(rotate(h));
   assert.ok(!h.writes.includes('promote')); assert.equal(h.serving(),PREVIOUS);
   assert.ok(h.service.spec.template.spec.containers[0].env.some(e=>e.name==='CONCURRENT_SETTING'));
+});
+
+test('an unexpected currently mounted worker pin stops before every write',async()=>{
+  const h=harness(); h.configs.get('8').workerApprovedSha='c'.repeat(40);
+  await assert.rejects(rotate(h));
+  assert.deepEqual(h.writes,[]);
+  assert.ok(h.lines.includes('ERROR_CODE=CURRENT_CONFIG_UNEXPECTED'));
+});
+
+test('retry resumes the exact existing zero-traffic stage without another config version or revision',async()=>{
+  const options={stagedHealthFailure:true}; const h=harness(options);
+  await assert.rejects(rotate(h));
+  const candidate=h.candidate(); assert.equal(h.serving(),PREVIOUS);
+  options.stagedHealthFailure=false; h.writes.length=0;
+  await rotate(h);
+  assert.equal(h.serving(),candidate);
+  assert.ok(!h.writes.includes('config-add')); assert.ok(!h.writes.includes('stage'));
+  assert.ok(h.lines.includes('EXISTING_STAGE=REUSED'));
+});
+
+test('resume refuses a staged configuration with any extra change',async()=>{
+  const options={stagedHealthFailure:true}; const h=harness(options);
+  await assert.rejects(rotate(h));
+  h.configs.get('9').maxJobMicroUsd=900000;
+  options.stagedHealthFailure=false; h.writes.length=0;
+  await assert.rejects(rotate(h));
+  assert.deepEqual(h.writes,[]); assert.equal(h.serving(),PREVIOUS);
+  assert.ok(h.lines.includes('ERROR_CODE=STAGED_CONFIG_CONTENT_MISMATCH'));
+});
+
+test('completed rotation is verified on a second invocation with zero writes and no historical delta claim',async()=>{
+  const h=harness(); await rotate(h);
+  const current=h.serving(); h.writes.length=0; h.lines.length=0; h.requests.length=0;
+  await rotate(h);
+  assert.deepEqual(h.writes,[]); assert.equal(h.serving(),current);
+  assert.ok(h.lines.includes('CURRENT_RELEASE=CONFIG_TRUST_AND_HEALTH_VERIFIED'));
+  assert.ok(h.lines.includes('ROTATION_STATUS=ALREADY_APPLIED'));
+  assert.ok(!h.lines.some(line=>line.startsWith('ONLY_CONFIG_FIELD_CHANGED=')));
+  assert.deepEqual(h.requests,[{tagged:false,healthy:true,serving:current}]);
+});
+
+test('already-target config with mismatched live trust is rejected without attempting a repair',async()=>{
+  const h=harness(); await rotate(h);
+  const current=h.serving(); h.variables.FACTORY_PRIVATE_WORKER_SHA=OLD_PIN;
+  h.writes.length=0; h.lines.length=0;
+  await assert.rejects(rotate(h));
+  assert.deepEqual(h.writes,[]); assert.equal(h.serving(),current);
+  assert.ok(h.lines.includes('ERROR_CODE=CURRENT_RELEASE_TRUST_MISMATCH'));
 });

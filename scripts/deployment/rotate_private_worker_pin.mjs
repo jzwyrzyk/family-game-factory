@@ -5,13 +5,12 @@ import {execFileSync} from 'node:child_process';
 import {randomBytes} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {PROJECT, REGION, SERVICE, ORIGIN, CONFIG_SECRET, CONFIG_FILE, REPO,
-  PIN as OLD_PIN, INSTALLATION, ensure, binding, normalizeSpec,
+  INSTALLATION, ensure, binding, normalizeSpec,
   runtimeAnnotations, sameTemplateAndRevision, servingRevision} from './repair_github_installation.mjs';
 
-export {OLD_PIN};
-export const REVIEWED_TREE = '26a00dc72d4b39d12aa1b54dadfd38765b21b662';
-export const PREVIOUS = 'factory-gateway-appfix-mwpzazq8-3406';
-export const OLD_CONFIG = '7';
+export const OLD_PIN = 'ca2989988fd1cd66d9a858cbf167dd4a995640fc';
+// Independently reviewed private runner-readiness timeout repair.
+export const REVIEWED_TREE = '649b0418884b7236e82a92fdae91ea426867b7e8';
 export const RUNNER_APP = 5776342;
 export const RUNNER_INSTALLATION = 182384961;
 export const IMAGE = 'ghcr.io/jzwyrzyk/family-game-factory-sandbox@sha256:83be22b96cdd83eaefa80c0ae321208bdff63f4ee926cc5ae28d064f91cee089';
@@ -45,6 +44,7 @@ export function checkWif(wif, pin) {
 export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,report=console.log,
   sleep=ms => new Promise(resolve => setTimeout(resolve,ms)),now=() => Date.now()}) {
   let stage='START', initial, lastService, oldRevision, candidate, candidateRevision, newVersion;
+  let previous, oldConfigVersion;
   let ownTag, tagAttempted=false, promotionAttempted=false, mainHealthy=false;
   let initialWif, nextCondition, initialVariable, wifAttempted=false, variableAttempted=false;
   const emit=(key,value) => report(key+'='+value);
@@ -102,7 +102,7 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
   }
   function runtime(s) {
     ensure(s.status?.latestCreatedRevisionName === candidate && s.spec?.template?.metadata?.name === candidate &&
-      [PREVIOUS,candidate].includes(servingRevision(s)) &&
+      [previous,candidate].includes(servingRevision(s)) &&
       same(runtimeAnnotations(initial.metadata),runtimeAnnotations(s.metadata)), 'STAGED_SERVICE_CHANGED');
     const mounted=binding(s.spec.template.spec,CONFIG_FILE,CONFIG_SECRET);
     ensure(mounted.version === newVersion && sameTemplateAndRevision(s.spec.template.spec,candidateRevision.spec),
@@ -154,6 +154,7 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
   try {
     step('VERIFY_REVIEWED_RELEASE');
     ensure(/^[a-f0-9]{40}$/.test(String(targetPin)) && targetPin !== OLD_PIN,'TARGET_PIN_INVALID');
+    ensure(/^[a-f0-9]{40}$/.test(REVIEWED_TREE),'REVIEWED_TREE_REQUIRED');
     mainRef();
     const commit=api('repos/'+REPO+'/git/commits/'+targetPin);
     ensure(commit.sha === targetPin && commit.tree?.sha === REVIEWED_TREE,'UNREVIEWED_COMMIT_TREE');
@@ -175,14 +176,16 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
     step('READ_CURRENT_RUNTIME');
     initial=describe(); summary(initial);
     ensure(ready(initial) && reconciled(initial),'CURRENT_SERVICE_NOT_RECONCILED');
-    oldRevision=revision(PREVIOUS);
-    ensure(binding(oldRevision.spec,CONFIG_FILE,CONFIG_SECRET).version === OLD_CONFIG &&
+    previous=servingRevision(initial);
+    oldRevision=revision(previous);
+    oldConfigVersion=binding(oldRevision.spec,CONFIG_FILE,CONFIG_SECRET).version;
+    ensure(ready(oldRevision) &&
       typeof oldRevision.status?.imageDigest === 'string' && oldRevision.status.imageDigest.length>0,
       'PREVIOUS_RUNTIME_UNEXPECTED');
-    const current=readConfig(OLD_CONFIG);
+    const current=readConfig(oldConfigVersion);
     ensure(current.projectId === PROJECT && current.gatewayOrigin === ORIGIN && current.workerRepository === REPO &&
       current.workerRepositoryId === '1458899834' && current.workerWorkflow === 'factory-private.yml' &&
-      current.workerApprovedSha === OLD_PIN && String(current.githubInstallationId) === INSTALLATION &&
+      [OLD_PIN,targetPin].includes(current.workerApprovedSha) && String(current.githubInstallationId) === INSTALLATION &&
       current.active === true && current.approval?.enabled === true && !current.localFile,'CURRENT_CONFIG_UNEXPECTED');
     const next={...current,workerApprovedSha:targetPin};
     const env=Object.fromEntries((oldRevision.spec.containers[0].env || [])
@@ -191,9 +194,31 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
       ['FACTORY_ACTIONS_APPROVED','FACTORY_ADULT_PILOT_MODE','FACTORY_ADULT_PILOT_OWNER_APPROVED',
         'FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED'].every(k => env[k] === 'true'),'ADULT_RUNTIME_CHANGED');
     const latest=initial.status?.latestCreatedRevisionName;
-    if(latest === PREVIOUS) {
-      ensure(servingRevision(initial) === PREVIOUS && initial.spec?.template?.metadata?.name === PREVIOUS &&
-        binding(initial.spec.template.spec,CONFIG_FILE,CONFIG_SECRET).version === OLD_CONFIG &&
+    if(current.workerApprovedSha === targetPin) {
+      // Verify the current release on an idempotent invocation. There is no
+      // historical baseline here from which to claim the prior exact delta.
+      ensure(latest === previous && initial.spec?.template?.metadata?.name === previous &&
+        binding(initial.spec.template.spec,CONFIG_FILE,CONFIG_SECRET).version === oldConfigVersion &&
+        sameTemplateAndRevision(initial.spec.template.spec,oldRevision.spec),'CURRENT_TEMPLATE_DRIFT');
+      ensure(hasTag && initialVariable === targetPin,'CURRENT_RELEASE_TRUST_MISMATCH');
+      initialWif=provider(); checkWif(initialWif,targetPin);
+      unchanged(initial);
+      await health(ORIGIN,'LIVE_GATEWAY_HEALTH_FAILED');
+      unchanged(initial); mainRef();
+      ensure(tagState() && variable('FACTORY_PRIVATE_WORKER_SHA') === targetPin &&
+        variable('FACTORY_ACTIONS_APPROVED') === 'true' &&
+        variable('FACTORY_SANDBOX_IMAGE') === IMAGE,'FINAL_GITHUB_TRUST_DRIFT');
+      const verifiedWif=provider(); checkWif(verifiedWif,targetPin);
+      ensure(same(verifiedWif,initialWif),'CONCURRENT_WIF_CHANGE');
+      mainHealthy=true;
+      emit('CURRENT_RELEASE','CONFIG_TRUST_AND_HEALTH_VERIFIED');
+      emit('GATEWAY_HEALTH','READY_ADULT_ENABLED'); emit('SERVING_REVISION',previous);
+      emit('CONFIG_VERSION',oldConfigVersion); emit('PRIVATE_WORKER_SHA',targetPin);
+      emit('ROTATION_STATUS','ALREADY_APPLIED'); return;
+    }
+    if(latest === previous) {
+      ensure(initial.spec?.template?.metadata?.name === previous &&
+        binding(initial.spec.template.spec,CONFIG_FILE,CONFIG_SECRET).version === oldConfigVersion &&
         sameTemplateAndRevision(initial.spec.template.spec,oldRevision.spec),'CURRENT_TEMPLATE_DRIFT');
     } else {
       ensure(typeof latest === 'string' && latest.startsWith(SERVICE+'-workerpin-'+targetPin.slice(0,8)+'-') &&
@@ -207,7 +232,7 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
     checkWif(initialWif,wifPin);
     nextCondition=initialWif.attributeCondition.split(OLD_PIN).join(targetPin);
     checkWif({...initialWif,attributeCondition:nextCondition},targetPin);
-    emit('PREVIOUS_REVISION',PREVIOUS); emit('PREVIOUS_CONFIG_VERSION',OLD_CONFIG);
+    emit('PREVIOUS_REVISION',previous); emit('PREVIOUS_CONFIG_VERSION',oldConfigVersion);
     emit('TARGET_PRIVATE_SHA',targetPin); emit('ONLY_CONFIG_FIELD_CHANGED','workerApprovedSha');
     if(!apply) { emit('ROTATION_STATUS','PLAN_VERIFIED'); return; }
 
@@ -234,14 +259,14 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
       ensure(verifyRevision(candidateRevision,next) === newVersion,'STAGED_CONFIG_VERSION_MISMATCH');
     }
     let checked=await settle();
-    if(servingRevision(checked) === PREVIOUS) {
+    if(servingRevision(checked) === previous) {
       step('VERIFY_TAGGED_CANDIDATE');
       ownTag='workerpin-check-'+randomBytes(6).toString('hex');
       ensure(![...(checked.spec.traffic || []),...(checked.status.traffic || [])].some(t => t.tag === ownTag),
         'TAG_COLLISION');
       unchanged(checked); tagAttempted=true; traffic(['--update-tags='+ownTag+'='+candidate]);
       checked=await settle();
-      ensure(servingRevision(checked) === PREVIOUS,'TRAFFIC_CHANGED_BEFORE_CHECK');
+      ensure(servingRevision(checked) === previous,'TRAFFIC_CHANGED_BEFORE_CHECK');
       const routes=(checked.status.traffic || []).filter(t => t.tag === ownTag);
       ensure(routes.length === 1 && routes[0].revisionName === candidate && !Number(routes[0].percent),'TAG_UNVERIFIED');
       const url=new URL(routes[0].url);
@@ -293,8 +318,8 @@ export async function rotate({targetPin,apply=false,cloud,gh,transport=fetch,rep
       if(promotionAttempted) {
         try {
           const s=describe(); runtime(s); unchanged(s);
-          traffic(['--to-revisions='+PREVIOUS+'=100']);
-          ensure(servingRevision(describe()) === PREVIOUS,'TRAFFIC_ROLLBACK_UNVERIFIED');
+          traffic(['--to-revisions='+previous+'=100']);
+          ensure(servingRevision(describe()) === previous,'TRAFFIC_ROLLBACK_UNVERIFIED');
           emit('TRAFFIC_ROLLBACK','PREVIOUS_REVISION_RESTORED');
         } catch { emit('TRAFFIC_ROLLBACK','OWNER_REVIEW_REQUIRED'); }
       }

@@ -28,7 +28,7 @@ const python=[
   'code=m.group(1) if m and m.group(1) in allowed else None',
   'attempt=e.get("attempt"); attempt=attempt if type(attempt) is int and 0<=attempt<=2 else None',
   'run_id=str(e.get("runId") or "")',
-  'print(json.dumps({"jobId":payload["jobId"],"status":token(j.get("status")),"phase":token(j.get("phase")),"errorCode":token(j.get("errorCode")),"attempt":attempt,"runId":run_id if re.fullmatch(r"[0-9]{1,20}",run_id) else None,"stage":token(e.get("stage")),"lastStoredRepairCategory":token(e.get("repairCategory")),"lastStoredRepairCode":code,"lastStoredRepairFromAttempt":attempt-1 if code and attempt in (1,2) else None,"qualityRequired":j.get("qualityRequired") is True,"candidatePresent":bool(e.get("candidate")),"testReportPresent":bool(e.get("testReport")),"reviewReportPresent":bool(e.get("reviewReport"))}))',
+  'print(json.dumps({"jobId":payload["jobId"],"status":token(j.get("status")),"phase":token(j.get("phase")),"errorCode":token(j.get("errorCode")),"attempt":attempt,"runId":run_id if re.fullmatch(r"[0-9]{1,20}",run_id) else None,"stage":token(e.get("stage")),"lastStoredRepairCategory":token(e.get("repairCategory")),"lastStoredRepairCode":code,"lastStoredRepairFromAttempt":attempt-1 if code and attempt in (1,2) else None,"qualityRequired":j.get("qualityRequired")=="game-quality-v1","candidatePresent":bool(e.get("candidate")),"testReportPresent":bool(e.get("testReport")),"reviewReportPresent":bool(e.get("reviewReport"))}))',
 ].join('\n');
 try {
   ensure(/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(job),'JOB_ID_INVALID');
