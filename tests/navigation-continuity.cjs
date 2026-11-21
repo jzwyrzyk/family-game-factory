@@ -239,22 +239,29 @@ async function notebookCapacityJourney(browser,base){
  const {context,page,errors,posts}=await prepare(browser,base,{width:1280,height:900});
  const notebook=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)),NOTEBOOK);
  try{
-  await page.click('[data-starter="buckets"]');await page.click('#studioNavHome');
+  const draft='My next unsent idea';
+  await page.click('[data-starter="buckets"]');await page.click('#studioChange');
+  await page.fill('#studioPrompt',draft);await page.click('#studioNavHome');
+  assert.equal((await notebook()).sessions[0].draft,draft,'the real composer saves the unsent draft before historical messages are seeded');
   const sourceId=await page.evaluate(key=>{
-   const n=JSON.parse(localStorage.getItem(key)),s=n.sessions[0];s.playOnly=false;s.draft='My next unsent idea';
+   // Reload flushes the live composer. Seed only retained history; replacing
+   // its draft behind that editor would correctly be overwritten on unload.
+   const n=JSON.parse(localStorage.getItem(key)),s=n.sessions[0];s.playOnly=false;
    s.messages=Array.from({length:200},(_,i)=>({id:'capacity-turn-'+i,role:i%2?'helper':'child',text:'Original saved words '+i,at:'2026-11-21T00:00:00Z'}));
    localStorage.setItem(key,JSON.stringify(n));return s.id;
   },NOTEBOOK);
   await page.reload();await ready(page);await exploreWelcome(page);
   await page.locator(`[data-session="${sourceId}"] .studio-saved-open`).click();
+  assert.equal(await page.inputValue('#studioPrompt'),draft,'the saved draft survives reload before copying');
   await page.locator('#studioMore summary').click();await page.click('#studioCopy');
   await page.fill('#studioCopyName','Full chat copy');await page.locator('#studioCopyForm button[type="submit"]').click();
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)).sessions.some(s=>s.name==='Full chat copy'),NOTEBOOK);
   const copied=(await notebook()).sessions.find(s=>s.name==='Full chat copy');
   assert.equal(copied.messages.length,200,'ordinary copy preserves the whole conversation without failing on an extra helper note');
+  assert.equal(copied.draft,draft,'ordinary copy preserves the unsent draft');
   await page.click('#studioChange');await page.locator('#studioContinueChat').waitFor({state:'visible'});
   await page.click('#studioContinueChat');
-  assert.equal(await page.inputValue('#studioPrompt'),'My next unsent idea','continuation preserves the unsent draft');
+  assert.equal(await page.inputValue('#studioPrompt'),draft,'continuation preserves the unsent draft');
   const continued=await notebook(),chapter=continued.conversationChapters[0];
   assert.deepEqual(chapter.messages,continued.sessions.find(s=>s.id===sourceId).messages);
   assert.equal(continued.sessions.find(s=>s.id===copied.id).messages.length,0);

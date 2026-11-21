@@ -204,16 +204,39 @@ for(const existing of [false,true])test(`a notebook write failure restores ${exi
 
 test('local copy stages all native revisions and the full notebook before writing either source',()=>{
   const storage=new Memory(),original=start(storage),book=new StudioNotebook(storage),before=book.get(original.id,owner);
-  book.update(original.id,owner,s=>{s.messages=messages();});
+  const draft='My next unsent copy idea';
+  book.update(original.id,owner,s=>{s.messages=messages();s.draft=draft;});
   const copied=saveLocalStudioProject(storage,host(),owner,(games,staged)=>{
     const p=games.fork(owner,original.projectId!,'My copy');
     return staged.fork(original.id,owner,'My copy',p.id,null);
   });
   assert.equal(new RevisionStore(storage).list(owner).length,2);
   assert.equal(book.get(copied.id,owner).messages.length,200);
+  assert.equal(book.get(copied.id,owner).draft,draft);
   assert.equal(book.get(original.id,owner).projectId,before.projectId);
   book.continueConversation(copied.id,owner);book.message(copied.id,owner,'child','New copy idea');
   assert.equal(book.get(copied.id,owner).messages.length,201);
+  assert.equal(new StudioNotebook(storage).get(copied.id,owner).draft,draft);
+  assert.equal(book.get(original.id,owner).draft,draft);
+});
+
+test('an older unlisted drawing game survives failed notebook recovery and is linked exactly once on retry',()=>{
+  const storage=new Memory(),workspace=new RevisionStore(storage),rigId='saved-car-movement';
+  const original=workspace.create(owner,'hill','Saved drawing Rally',defaults('hill'),undefined,rigId);
+  const before=new Map(storage.values);
+  const recover=()=>saveLocalStudioProject(storage,host(),owner,(games,book)=>{
+    const saved=games.project(original.id,owner);
+    return book.create(owner,'hill',saved.name,saved.id,{message:'Your own drawing is driving this game.'});
+  });
+  storage.beforeSet=key=>{if(key===STUDIO_KEY)throw Error('QuotaExceededError');};
+  assert.throws(recover,/earlier work is unchanged/);
+  assert.deepEqual(storage.values,before,'recovery never erases a project retained by an older partial save');
+  storage.beforeSet=undefined;
+  const recovered=recover(),book=new StudioNotebook(storage);
+  assert.deepEqual(workspace.snapshot().projects,[original]);
+  assert.equal(workspace.revision(original.id,owner).drawingRigId,rigId);
+  assert.equal(book.list(owner).length,1);
+  assert.equal(book.get(recovered.id,owner).projectId,original.id);
 });
 
 test('compensation preserves another writer’s edit and reports incomplete recovery honestly',()=>{

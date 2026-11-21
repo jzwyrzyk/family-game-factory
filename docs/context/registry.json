@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:37:22.463Z",
-      "sourceDigest": "65b33350826d184455c4c69c39ce1253a3bed34734340421f63f9786babe74ee",
+      "reviewedAt": "2026-11-21T18:48:49.185Z",
+      "sourceDigest": "3276525a3b4dacf6ff2e8b9ac4fafada8833408ca653671a0a7a10e71af29d20",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the combined continuation, capacity and submission-recovery contracts against product doctrine. They preserve child authorship, explicit Build and Keep, independent saved games and truthful uncertainty without automatic paid replay; they introduce no new consent, earning, learning or publication policy.",
+      "reviewReason": "Reviewed the integrated PR120 fixture corrections against draft ownership, retained artwork and recovery doctrine. The change adds real-editor setup, exact preservation assertions and one adapter regression; no product source, approval boundary or retention policy changes. Existing worker, recovery and transport policies remain as reviewed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -229,10 +229,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:37:22.926Z",
+      "reviewedAt": "2026-11-21T18:48:49.739Z",
       "sourceDigest": "cba5d48cf312f21ce42bf1281fbba61aa4dbef39e232f5c18c9211a32828f20a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined workspace, notebook, builder and session diff. Architecture and child-continuity contracts now cover latest-source transactions, retained conversation chapters, capacity preflight, durable initial-request identity, awaited acknowledgement publication, profile fencing and bounded request transport. Explicit game selection and newer drafts remain protected.",
+      "reviewReason": "Added the PR120 unload-save fixture diagnosis and corrected real-composer draft checks through reload, copy and continuation. The integrated pendingSubmission guards and linked chapters are unchanged. No runtime draft semantics change; corrected hosted journeys remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:37:26.257Z",
-      "sourceDigest": "e2f9802ba845b4213e9e5859b1b975a8c886f8c5a9b595bf509ca9aa566daae3",
+      "reviewedAt": "2026-11-21T18:49:14.890Z",
+      "sourceDigest": "93106ebb6a7823674ec920c2ff806de0975a4c7f6bfce57eb91d102b842a51f8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed all combined test additions and their entrypoints. Delivery records the exact integrated runtime source with 485 passing unit tests, eight paid-receipt recovery tests, 79 deployment tests and production build/typecheck. Existing fixture limitations, Chromium launch failures and missing combined browser/live-provider acceptance remain explicit.",
+      "reviewReason": "Integrated PR120 fixture correction 79ccb6f while preserving the Actions first-paint fix and all product source. Full combined unit passes 486/486; component notebook/workspace/backup 60/60 and art 24/24, build/typecheck/syntax checks pass. Stronger draft, compensation and legacy-art recovery assertions remain; Chromium is launch-blocked and corrected hosted browser gates are pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T18:37:41.932Z",
-      "sourceDigest": "7500d72416ca0e0820a703a967da6c90a6907528ff2a76e7cc52da209bacd977",
+      "reviewedAt": "2026-11-21T18:49:15.496Z",
+      "sourceDigest": "cb9663a46fb3c1e33052de6851a4ea612349a12a0de5a7bc319992b708f58212",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed gateway and coach Docker inputs, Docker exclusions, exact-source packaging scope, both archive fixture additions and test scripts. Delivery records local integration evidence separately from component receipts, with no merge, deployment, pin update or provider activation. Both shared JSON and build-submission modules are included.",
+      "reviewReason": "Added exact PR120 hosted failure evidence and narrow fixture corrections on integration base 2ccd585, preserving previous combined and Actions synchronization entries. Recorded full combined unit 486/486, scoped local verification and browser launch limitation. Hosted reruns and the separate baseline Pal decode issue remain unresolved; no merge or deployment is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -917,10 +917,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e40f7771e964582539cd6ed734a89e9f1cacf1d93f92acde43b164385cc6effe",
-      "reviewedAt": "2026-11-21T05:39:49.111Z",
+      "sourceDigest": "61ee87115e1225f2f03cd1fd65e8a1fdf11637bbca613006006cd3e70a3ee892",
+      "reviewedAt": "2026-11-21T18:48:50.627Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the retained guarded Use my picture action moving to collapsed More choices for new ideas, with existing-game toolbar unchanged. Updated Art Studio and architecture references; final-bundle art-entry checks passed delayed/rejected config, mobile upload/drawing/focus, owner isolation and read-only recovery without paid replay.",
+      "reviewReason": "Documented native/notebook compensation for Rally creation, exact project and rig preservation when recovering older unlisted games, and nonblocking supplementary usage indexing. Browser assertions now require unchanged raw stores after quota failure and exactly one linked game on retry. Original art and owner protections remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
