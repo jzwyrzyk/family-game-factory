@@ -294,7 +294,7 @@ and the [same transition controller](../../scripts/ops/release.py) as production
 
 4. Record the active ruleset, the two exact-branch environments, OIDC claim
    evidence, grant scope, synthetic log redaction checks and drill receipts.
-   Local smoke and fixture tests remain separate from a real Cloud Run drill.
+   `bash ops/drill/smoke.sh` and the fixture tests run on PRs without credentials. They remain separate from a real Cloud Run drill.
    Return this one evidence set for verification and the readiness recommendation.
    Keep both production flags unset while these checks are outstanding. Keep
    the coach release blocked while its staged speech configuration differs from

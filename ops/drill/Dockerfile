@@ -2,6 +2,6 @@ FROM docker.io/library/node:22-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8
 ARG DRILL_MARKER=baseline
 ENV DRILL_MARKER=$DRILL_MARKER
 WORKDIR /app
-COPY server.cjs .
+COPY --chmod=0444 server.cjs .
 USER node
 CMD ["node", "/app/server.cjs"]
