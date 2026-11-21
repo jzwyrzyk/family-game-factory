@@ -43,11 +43,12 @@ body.studio-review .studio-play-mode #studioMore[open] { position: static; }
 body.studio-review .studio-play-mode #studioMore .studio-more-actions {
   position: fixed; top: var(--jems-play-menu-top, 140px); right: max(12px, env(safe-area-inset-right)); left: auto;
   width: min(340px, calc(100vw - 24px)); z-index: 50;
+  grid-template-columns: minmax(0, 1fr);
   max-height: calc(100dvh - var(--jems-play-menu-top, 140px) - 12px);
   overflow: auto; overscroll-behavior: contain; overflow-anchor: none;
 }
 body.studio-review .studio-play-mode #studioMore .studio-more-actions button { white-space: normal; }
-body.studio-review .studio-play-mode #studioProfileMenu { position: static; margin: 0; max-width: 100%; }
+body.studio-review .studio-play-mode #studioProfileMenu { position: static; margin: 0; width: 100%; min-width: 0; max-width: 100%; }
 body.studio-review .studio-play-mode #studioProfileMenu > summary { min-height: 48px; font-size: 18px; max-width: none; }
 body.studio-review .studio-play-mode #studioProfileMenu .profile-choices { position: static; width: 100%; min-width: 0; max-width: none; max-height: none; margin: 6px 0 0; box-shadow: none; }
 body.studio-review .studio-play-mode #studioProfileMenu .profile-choice { min-height: 48px; font-size: 18px; }

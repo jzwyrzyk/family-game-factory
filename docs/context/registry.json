@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:36:55.413Z",
-      "sourceDigest": "60d76c6f9083ff71e302036a62cae29673830c67e82c15a84c878a8069ec1901",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The scoped profile-menu min-width correction enforces the existing documented containment inside More; profile handlers, ownership, learning levels and navigation behavior remain unchanged.",
+      "reviewedAt": "2026-11-21T21:58:30.182Z",
+      "sourceDigest": "654bc7190eb4665f1e83f9c4dbcb5ce9904897087ebe6c7ac0ba9085f059bb76",
+      "reviewOutcome": "updated",
+      "reviewReason": "The fitted-play contract now forbids horizontal More/profile overflow and records the captured evidence; profile ownership, native activation and learning guards are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:34:49.477Z",
-      "sourceDigest": "0e21cdff6e77ab119bfc348e63ba2eaa26f85f938d4db5b194ade1978225c0aa",
+      "reviewedAt": "2026-11-21T21:58:31.296Z",
+      "sourceDigest": "23a7ada2adcd0482d1e28fac46f6c32d5760136bc55370c241b5d4b66d23ad8f",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the play contract for two-column Robot directions without changing board size, action visibility, game handlers, saved routes or scoring.",
+      "reviewReason": "Documented persistent Robot directions and compact action labels outside scrolling status/plan text, with unchanged board geometry and the dark-wall rule retained in shared Help.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:36:56.441Z",
-      "sourceDigest": "11b25ef33d7b0304b25cc99c2966cfb23ec51a665ed89086c53dad4fc7c43ad5",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The existing player-menu contract now checks every actual profile choice for whole-pill viewport/menu containment, typography, target size and hit testing; no acceptance criterion or documented behavior was weakened.",
+      "reviewedAt": "2026-11-21T21:58:31.644Z",
+      "sourceDigest": "f170726c641995ac6cbc7d8d14188187c5abc015016a7261d338c399ca2f9c84",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded why prior per-choice reachability missed captured defects and added initial/24-arrow/feedback visibility plus zero horizontal menu overflow assertions without weakening board, labels or hit tests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T21:34:50.615Z",
-      "sourceDigest": "5b70e44a5cabf9b0ec0042bad9ebf0b2de3044d4289fc90fe4b6958e738fe7ea",
+      "reviewedAt": "2026-11-21T21:58:31.976Z",
+      "sourceDigest": "998e160f8d5d5653a4833f8c067e543836ceae9abe2880d9ec5d420bdc032f99",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact third-head passing workflows, learning/reading and combined Pal evidence alongside the failed Studio matrix; final source remains unmerged, undeployed and separately gated from natural voice activation.",
+      "reviewReason": "Recorded all ten passing prior-head workflows and exact artifacts alongside the two visual blockers; the follow-up requires its own hosted evidence and remains unmerged, undeployed and narration-disabled.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

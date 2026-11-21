@@ -96,38 +96,55 @@ async function checkGameContent(page, game, label) {
     await insideHost(page, '#game-mount canvas#game', label + ' native canvas', 100);
     await insideHost(page, game === 'dragon' ? '#game-mount #touch button' : '#game-mount .touch button:not([hidden])', label + ' native touch controls', 48);
   } else if (game === 'robot') {
-    await insideHost(page, '.favorite-robot .favorite-canvas', label + ' robot canvas', 200);
     const board = page.locator('.favorite-robot .favorite-canvas'), tools = page.locator('.robot-plan-tools');
-    const boardTop = await board.evaluate(node => node.getBoundingClientRect().top), pageY = await page.evaluate(() => scrollY);
-    const imageHeight = await board.evaluate(node => {
-      const css = getComputedStyle(node), width = node.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight);
-      const height = node.clientHeight - parseFloat(css.paddingTop) - parseFloat(css.paddingBottom);
-      return Math.min(width / node.width, height / node.height) * node.height;
-    });
-    assert.ok(imageHeight >= 200, label + ': the contained robot image remains useful, not an 80px strip: ' + imageHeight);
-    await insideHost(page, '.robot-plan-tools', label + ' bounded direction tools', 72);
-    await insideHost(page, '.robot-plan-actions button', label + ' persistent Run, Undo and Clear actions', 48);
-    for (const button of await page.locator('.robot-plan-tools button').all()) {
-      await button.scrollIntoViewIfNeeded();
-      const direction = await button.evaluate(node => {
-        const r = node.getBoundingClientRect(), tray = node.closest('.robot-plan-tools').getBoundingClientRect();
-        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-        return { text: node.textContent, rect: {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height},
-          tray: {left:tray.left,right:tray.right,top:tray.top,bottom:tray.bottom}, hit:hit?.id||hit?.className||hit?.tagName,
-          font:parseFloat(getComputedStyle(node).fontSize),scrollWidth:node.scrollWidth,clientWidth:node.clientWidth,
-          usable: r.width >= 48 && r.height >= 48 && r.left >= tray.left - 1 && r.right <= tray.right + 1 &&
-          r.top >= tray.top - 1 && r.bottom <= tray.bottom + 1 && parseFloat(getComputedStyle(node).fontSize) >= 18 &&
-          node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit)) };
+    const boardBounds = await board.boundingBox(), pageY = await page.evaluate(() => scrollY);
+    const directions = page.locator('.robot-directions button'), actions = page.locator('.robot-plan-actions button');
+    assert.equal(await directions.count(), 4, label + ': all four directions are present');
+    assert.equal(await actions.count(), 3, label + ': Run, Undo and Clear are present');
+    async function checkRobotState(state) {
+      await insideHost(page, '.favorite-robot .favorite-canvas', label + ' ' + state + ' robot canvas', 200);
+      const imageHeight = await board.evaluate(node => {
+        const css = getComputedStyle(node), width = node.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight);
+        const height = node.clientHeight - parseFloat(css.paddingTop) - parseFloat(css.paddingBottom);
+        return Math.min(width / node.width, height / node.height) * node.height;
       });
-      assert.equal(direction.usable, true, label + ': every direction is readable and reachable inside its own tool panel: '+JSON.stringify(direction));
-      assert.equal(await board.evaluate(node => node.getBoundingClientRect().top), boardTop, label + ': tools scrolling keeps the board still');
-      assert.equal(await page.evaluate(() => scrollY), pageY, label + ': tools scrolling cannot move the page');
+      assert.ok(imageHeight >= 200, label + ': ' + state + ' keeps a useful contained robot image: ' + imageHeight);
+      await insideHost(page, '.robot-plan-tools', label + ' ' + state + ' bounded instructions', 32);
+      await insideHost(page, '.robot-directions button,.robot-plan-actions button', label + ' ' + state + ' persistent controls', 48);
+      // Never scroll a primary control into view to make this assertion pass.
+      // All directions and actions must be present together from initial play.
+      for (const button of await page.locator('.robot-directions button,.robot-plan-actions button').all()) {
+        const control = await button.evaluate(node => {
+          const r = node.getBoundingClientRect(), panel = node.closest('.robot-controls-panel').getBoundingClientRect();
+          const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return { text: node.textContent, rect: {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height},
+            panel: {left:panel.left,right:panel.right,top:panel.top,bottom:panel.bottom}, hit:hit?.id||hit?.className||hit?.tagName,
+            font:parseFloat(getComputedStyle(node).fontSize),scrollWidth:node.scrollWidth,clientWidth:node.clientWidth,
+            usable: r.width >= 48 && r.height >= 48 && r.left >= panel.left - 1 && r.right <= panel.right + 1 &&
+            r.top >= panel.top - 1 && r.bottom <= panel.bottom + 1 && parseFloat(getComputedStyle(node).fontSize) >= 18 &&
+            node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit)) };
+        });
+        assert.equal(control.usable, true, label + ': ' + state + ' shows every direction and action without scrolling: '+JSON.stringify(control));
+      }
+      assert.deepEqual(await board.boundingBox(), boardBounds, label + ': ' + state + ' keeps the board position and size fixed');
+      assert.equal(await page.evaluate(() => scrollY), pageY, label + ': ' + state + ' keeps the outer page still');
     }
-    for (const button of await page.locator('.robot-plan-actions button').all()) assert.equal(await button.evaluate(node => {
-      const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      return r.width >= 48 && parseFloat(getComputedStyle(node).fontSize) >= 18 && node.scrollWidth <= node.clientWidth + 1 && (hit === node || node.contains(hit));
-    }), true, label + ': Run, Undo and Clear remain readable and reachable while the tool panel scrolls');
+    await checkRobotState('initial');
+    await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-initial.png` });
+    assert.equal(await page.evaluate(() => FG.runtime.snapshot().state.planLength), 0, label + ': this fresh route starts empty');
+    for (let index = 0; index < 24; index++) await page.locator('.robot-directions [data-direction="left"]').click();
+    assert.equal(await page.evaluate(() => FG.runtime.snapshot().state.planLength), 24, label + ': real arrow controls fill a complete plan');
+    assert.match(await tools.textContent(), /long route/i);
+    await checkRobotState('24-arrow plan');
+    await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-plan.png` });
+    await page.locator('.favorite-robot').getByRole('button', { name: 'Run my plan', exact: true }).click();
+    await page.waitForFunction(() => { const state = FG.runtime.snapshot().state; return !state.running && state.index > 0; }, null, { timeout: 3000 });
+    assert.match(await tools.textContent(), /Bonk!/);
+    await checkRobotState('route feedback');
+    await tools.evaluate(node => { node.scrollTop = node.scrollHeight; });
+    await checkRobotState('reading feedback');
     await tools.evaluate(node => { node.scrollTop = 0; });
+    await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-feedback.png` });
   } else {
     await insideHost(page, '.favorite-canvas', label + ' canvas', 80);
     await insideHost(page, '.favorite-controls button', label + ' essential controls', 48);
@@ -237,10 +254,18 @@ async function checkMore(page, label) {
 async function checkPlayerMenu(page, label) {
   await page.locator('#studioMore > summary').click();
   await page.locator('#studioProfileMenu > summary').click();
+  const menu = page.locator('#studioMore .studio-more-actions');
+  async function checkHorizontalContainment() {
+    const bounds = await menu.evaluate(node => ({ left: node.scrollLeft, width: node.clientWidth, contentWidth: node.scrollWidth }));
+    assert.equal(bounds.left, 0, label + ': choosing players cannot scroll More sideways: '+JSON.stringify(bounds));
+    assert.ok(bounds.contentWidth <= bounds.width + 1, label + ': all player tools fit the menu width: '+JSON.stringify(bounds));
+  }
+  await checkHorizontalContainment();
   const choices = page.locator('#studioProfileMenu .profile-choice');
   assert.ok(await choices.count() > 0, label + ': the existing player choices are present');
   for (const [index, choice] of (await choices.all()).entries()) {
     await choice.scrollIntoViewIfNeeded();
+    await checkHorizontalContainment();
     assert.equal(await choice.evaluate(node => {
       const r = node.getBoundingClientRect(), menu = node.closest('.studio-more-actions').getBoundingClientRect();
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);

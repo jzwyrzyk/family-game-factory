@@ -27,7 +27,7 @@ export const plugins: Record<GameId, GamePlugin> = {
 const details = {
   factory: {type:'SPARKLE WORKSHOP',instructions:'Find the next gem in the pattern, make it sparkle, and wrap a gift your way!',controls:'Tap a bucket · Tap the glowing cutter · Rub the gem · Pick your paper · Tap your gift'},
   moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
-  robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route that leads your robot to the star.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},
+  robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route to the star. The dark squares are walls.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},
   gum: { type: 'BUILD & DISCOVER', instructions: 'Build a silly machine. Watch it move. Try your next idea.', controls: 'Choose a sticker and a bubble, or drag a sticker onto the machine · Make it GO!' },
   buckets: { type: 'GUESS & SURVIVE', instructions: 'Pick a bucket. Can you stay dry?', controls: 'Tap a numbered bucket or use left/right and Space to choose.' },
   dragon: { type: 'SHIELD ADVENTURE', instructions: 'Jump into falling fireballs to reflect them. Only your hero can save the island.', controls: '← → move · ↑ jump · Space jump / shield · touch controls below' },

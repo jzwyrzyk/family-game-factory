@@ -40,19 +40,19 @@ export default class RobotRoute implements GameInstance {
    const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';
    b.dataset.direction=direction;b.addEventListener('click',()=>this.add(direction),{signal:this.abort.signal});controls.append(b);
   }
-  const action=(label:string,fn:()=>void,icon:IconName)=>{
-   const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';setIconLabel(b,icon,label);
+  const action=(label:string,accessibleLabel:string,fn:()=>void,icon:IconName)=>{
+   const b=make('button','favorite-control',label) as HTMLButtonElement;b.type='button';setIconLabel(b,icon,label);b.setAttribute('aria-label',accessibleLabel);
    b.addEventListener('click',fn,{signal:this.abort.signal});actions.append(b);return b;
   };
-  const run=action('Run my plan',()=>this.run(),'play');run.classList.add('favorite-control-primary');
-  action('Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();this.save();}},'undo');
-  action('Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();this.save();}},'close');
+  const run=action('Run','Run my plan',()=>this.run(),'play');run.classList.add('favorite-control-primary');
+  action('Undo','Undo arrow',()=>{if(!this.running&&!this.hostPaused&&this.plan.length&&!this.ended){this.plan.pop();this.renderPlan();this.save();}},'undo');
+  action('Clear','Clear arrows',()=>{if(!this.hostPaused){this.plan=[];this.running=false;this.position={...this.mission().start};this.index=0;this.trail=[{...this.position}];this.renderPlan();this.save();}},'close');
   this.canvas.addEventListener('keydown',e=>{const direction:Record<string,Direction>={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};if(direction[e.key]){e.preventDefault();this.add(direction[e.key]);}},{signal:this.abort.signal});
-  // The board has its own space. Longer directions and arrow tools can scroll
-  // without moving the board or the persistent Run/Undo/Clear actions.
+  // The board and every action keep their own space. Only longer instruction
+  // text and the child's arrow plan may scroll inside their bounded regions.
   const workspace=make('div','robot-workspace'),panel=make('div','robot-controls-panel'),tools=make('div','robot-plan-tools');
-  tools.setAttribute('role','region');tools.setAttribute('aria-label','Robot directions and arrows');tools.tabIndex=0;
-  tools.append(this.instructions,controls);panel.append(tools,this.commands,actions);workspace.append(this.canvas,panel);
+  tools.setAttribute('role','region');tools.setAttribute('aria-label','Robot instructions');tools.tabIndex=0;
+  tools.append(this.instructions);panel.append(tools,controls,this.commands,actions);workspace.append(this.canvas,panel);
   this.root.append(title,subtitle,this.hud,workspace);target.replaceChildren(this.root);
   this.reset();
   // Reopening a test restores the child's route, not a fabricated solved result.
@@ -75,7 +75,7 @@ export default class RobotRoute implements GameInstance {
   this.plan.push(d);this.renderPlan();this.save();
  }
  private renderPlan(){
-  this.commands.textContent=this.plan.length?'My arrows: '+this.plan.map(d=>({up:'↑',down:'↓',left:'←',right:'→'}[d])).join(' '):'Choose arrows for your robot.';
+  this.commands.textContent=this.plan.length?'My arrows: '+this.plan.map(d=>({up:'↑',down:'↓',left:'←',right:'→'}[d])).join(' '):'My arrows';
   if(this.plan.length===24)this.instructions.textContent='That is a long route! Run it, undo arrows, or start again.';
   this.draw();
  }
@@ -83,7 +83,7 @@ export default class RobotRoute implements GameInstance {
   this.ended=false;this.hostPaused=false;this.running=false;this.index=0;this.last=0;this.accumulator=0;
   this.plan=[];this.position={...this.mission().start};this.trail=[{...this.position}];
   this.hud.textContent='Mission '+this.level+' · '+this.mission().name;
-  this.instructions.textContent='Guide your robot to the ⭐. The dark squares are walls. You invent the path!';
+  this.instructions.textContent='Reach the ⭐.';
   this.renderPlan();
  }
  private run(){
