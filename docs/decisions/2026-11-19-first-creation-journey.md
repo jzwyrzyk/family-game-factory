@@ -31,6 +31,10 @@ At the original decision, this increment did not include integration of the para
 
 [Art Studio PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23) subsequently merged, with [PR82](https://github.com/jzwyrzyk/family-game-factory/pull/82) recording that source and its acceptance. The first-creation branch now preserves that merged capability when reconciling with main `90743ab2b1da098188db15dc5e40c3dfd799e291`. This updates the integration scope, not the child's ownership, optional-guidance or explicit-Keep policy. Art Studio remains a creation subdestination in the existing shell, with local private art and supported adapters; it does not imply arbitrary same-game code round trips. Gem Pal runtime/artwork remain separate. The combined source requires its own verification; earlier checks and captures retain their original scope in [delivery state](../../DELIVERY-STATE.md).
 
+### Refinement — November 20, 2026 (America/New_York)
+
+The owner subsequently requested character choice as the first action, selected-character imagery throughout the host, simpler navigation and permanent private parent-session access. [The refinement decision](2026-11-20-character-first-navigation.md) supersedes this record’s Explore-first invitation and avatar-optional opening. Small hints, saved-state recovery, meaningful return, explicit Build/Keep and acknowledged-build play remain in force. The earlier decision and captures retain their historical scope.
+
 ## References
 
 - [First-creation contract](../child-journey/FIRST-CREATION.md)

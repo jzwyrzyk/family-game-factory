@@ -107,14 +107,28 @@ class DeploymentTests(unittest.TestCase):
         self.assertNotIn(cloud.secrets[d.CONFIGS['gateway']]['sessionKey'],out.getvalue())
         config=copy.deepcopy(cloud.secrets)
         cloud.calls=[]
-        with patch.object(d,'health'),redirect_stdout(io.StringIO()):d.main(args,cloud)
+        # This script is now strictly first-time bootstrap. Even an inactive
+        # existing production service must not have its approvals reset.
+        with self.assertRaisesRegex(d.SafeError,'EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE'):
+            d.main(args,cloud)
         self.assertEqual(cloud.secrets,config)
-        self.assertEqual(len([x for x in cloud.calls if x[0][:2]==('run','deploy')]),2)
-        for arguments,data in cloud.calls:
-            self.assertFalse(any('--set-env-vars'==a and 'PRIVATE_KEY' in arguments[i+1] for i,a in enumerate(arguments)))
-        # Active configs and unmanaged services are never silently replaced.
+        self.assertFalse(any(x[0][:2]==('run','deploy') for x in cloud.calls))
+        self.assertFalse(any(x[0][:3]==('secrets','versions','add') for x in cloud.calls))
+        # An active configuration is likewise protected before any mutation.
         cloud.secrets[d.CONFIGS['gateway']]['active']=True
-        with self.assertRaises(d.SafeError):d.main(args,cloud)
+        cloud.calls=[]
+        with self.assertRaisesRegex(d.SafeError,'EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE'):
+            d.main(args,cloud)
+        self.assertFalse(any(x[0][:2]==('run','deploy') for x in cloud.calls))
+
+    def test_existing_gateway_or_preview_blocks_inactive_bootstrap_before_mutation(self):
+        args=['deploy','--execute','--region','europe-west1','--gateway-image',IMAGE,'--preview-image',PREVIEW]
+        for name in ('factory-gateway','factory-preview'):
+            cloud=FakeCloud()
+            cloud.services[name]={'metadata':{'name':name}}
+            with self.assertRaisesRegex(d.SafeError,'EXISTING_RELEASE_MUST_USE_IN_PLACE_UPGRADE'):
+                d.main(args,cloud)
+            self.assertFalse(any(x[0][:2]==('run','deploy') or x[0][:3]==('secrets','versions','add') for x in cloud.calls))
 
     def test_drift_rejected(self):
         cloud=FakeCloud()
@@ -161,17 +175,39 @@ class BuildSafetyTests(unittest.TestCase):
         module=self.builder();seen=[];sha='c'*40
         def fake(args,cwd=None):
             seen.append(args)
-            if args[:3]==['git','ls-tree','-r']:return b'.dockerignore\nserver/sandbox/Dockerfile\nserver/sandbox/worker.cjs\nserver/sandbox/key.pem\n'
+            if args[:3]==['git','ls-tree','-r']:return (
+                b'.dockerignore\nserver/sandbox/Dockerfile\nserver/sandbox/worker.cjs\n'
+                b'server/sandbox/quality-capture.cjs\nserver/sandbox/source-validator.cjs\n'
+                b'server/agent/game-assets.cjs\nserver/quality/game-quality-evidence.cjs\n'
+                b'server/sandbox/key.pem\n')
             if args[:2]==['git','show']:
                 self.assertTrue(args[2].startswith(sha+':'));return b'tracked fixture'
             if args[0]=='env':
                 self.assertIn('DOCKER_BUILDKIT=1',args)
                 self.assertTrue((Path(cwd)/'server/sandbox/worker.cjs').exists())
+                for name in module.REQUIRED_SANDBOX_FILES:
+                    self.assertTrue((Path(cwd)/name).is_file(),name)
                 self.assertFalse((Path(cwd)/'server/sandbox/key.pem').exists())
             return b''
         with patch.object(module,'run',side_effect=fake),patch('sys.argv',['build.py','--sandbox','--execute','--reviewed-source-sha',sha]),redirect_stdout(io.StringIO()) as output:module.main()
         self.assertIn('NOT published',output.getvalue())
         self.assertFalse(any(args[0]=='gcloud' or args[:2]==['docker','push'] for args in seen))
+
+    def test_sandbox_build_refuses_missing_quality_dependency_before_docker(self):
+        module=self.builder();seen=[];sha='c'*40
+        def fake(args,cwd=None):
+            seen.append(args)
+            if args[:3]==['git','ls-tree','-r']:
+                return (b'.dockerignore\nserver/sandbox/Dockerfile\n'
+                        b'server/sandbox/worker.cjs\n'
+                        b'server/sandbox/source-validator.cjs\n')
+            if args[:2]==['git','show']:return b'fixture'
+            return b''
+        with patch.object(module,'run',side_effect=fake),patch('sys.argv',[
+            'build.py','--sandbox','--execute','--reviewed-source-sha',sha]):
+            with self.assertRaisesRegex(RuntimeError,'Reviewed sandbox source incomplete'):
+                module.main()
+        self.assertFalse(any('docker' in args or 'gcloud' in args for args in seen))
 
     def builder(self):
         spec=importlib.util.spec_from_file_location('build_deployment',Path(__file__).with_name('build.py'))

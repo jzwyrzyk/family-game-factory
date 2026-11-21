@@ -9,10 +9,11 @@ const { once } = require('node:events');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
-const { exploreWelcome } = require('./studio-entry.cjs');
+const { exploreWelcome, navigate } = require('./studio-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const outputs = path.join(root, 'test-results');
+const approvedArtwork = JSON.parse(fs.readFileSync(path.join(root, 'public/jems-pals/manifest.json'), 'utf8'));
 const ready = page => page.waitForFunction(() => window.FG?.pals?.view()?.owner === FG.store.current().id && !!FG.creation && !!FG.studio);
 const view = page => page.evaluate(() => FG.pals.view());
 const scene = page => page.evaluate(() => FG.creation.scene());
@@ -24,7 +25,7 @@ const activeMath = page => page.locator('.math-activity:visible');
 const set = async (locator, value) => { await locator.fill(String(value)); await locator.press('Tab'); };
 
 async function openPals(page) {
-  await page.click('#studioNavPals');
+  await navigate(page,'#studioNavPals');
   await page.locator('#page-jems-pals').waitFor({ state: 'visible' });
   await idle(page);
 }
@@ -104,7 +105,7 @@ async function installReceiptFixture(page) {
   process.chdir(root); fs.mkdirSync(outputs, { recursive: true });
   const server = start(); if (!server.listening) await once(server, 'listening');
   let browser, page, phase = 'opening the integrated app';
-  const checks = [], errors = [], consoleErrors = [], paidRequests = [], fixtures = [];
+  const checks = [], errors = [], consoleErrors = [], paidRequests = [], fixtures = [], expressionRequests = [];
   const mark = name => { checks.push(name); console.log(`PASS: ${name}`); };
   try {
     browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
@@ -115,6 +116,7 @@ async function installReceiptFixture(page) {
     page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
     page.on('dialog', dialog => void dialog.accept());
     page.on('request', request => { if (request.method() === 'POST' && /\/v1\/(jobs|coach)(\/|$)|api\.openai\.com/.test(request.url())) paidRequests.push(request.url()); });
+    page.on('request', request => { if (/\/jems-pals\//.test(request.url())) expressionRequests.push(request.url()); });
     const base = `http://127.0.0.1:${server.address().port}/arcade/`;
     await page.goto(base); await ready(page); await exploreWelcome(page);
 
@@ -141,6 +143,56 @@ async function installReceiptFixture(page) {
     assert.match(await page.locator('#jemsPalDetailTitle').innerText(), /Glim/);
     assert.match(await page.locator('.pals-card[data-pal="kip"]').innerText(), /50 more gems/);
     mark('free starter, My Pals navigation, home entry and persisted collection');
+
+    phase = 'trying the approved character expressions without changing the collection';
+    assert.deepEqual(expressionRequests, [], 'The collapsed playground does not load its manifest or 184 images');
+    const collectionBeforeExpressions = await view(page), gemsBeforeExpressions = await gems(page);
+    const playground = page.locator('.pal-expression-explorer');
+    const portrait = playground.locator('.pal-artwork-view');
+    await playground.locator('summary').click();
+    await portrait.locator('img').waitFor();
+    await page.waitForFunction(() => document.querySelector('.pal-expression-explorer .pal-artwork-view')?.dataset.state === 'ready');
+    assert.equal(await playground.locator('[data-pal-expression-character] option').count(), 23);
+    assert.deepEqual(await playground.locator('[data-pal-expression-form] option').allTextContents(), ['Base', 'Grown']);
+    assert.equal(expressionRequests.filter(url => url.endsWith('.webp')).length, 1, 'Opening loads only the selected neutral');
+    const navi = approvedArtwork.characters.find(character => character.name === 'Navi');
+    assert.ok(navi, 'Navi has an exact manifest identity');
+    await playground.locator('[data-pal-expression-character]').selectOption(navi.characterKey);
+    for (const form of ['base', 'mature']) {
+      await playground.locator('[data-pal-expression-form]').selectOption(form);
+      for (const expression of ['neutral', 'celebrate', 'thinking', 'encouraging_retry']) {
+        await playground.locator(`button[data-expression="${expression}"]`).click();
+        await page.waitForFunction(({ form, expression, hash }) => {
+          const current = document.querySelector('.pal-expression-explorer .pal-artwork-view');
+          return current?.dataset.state === 'ready' && current.dataset.form === form
+            && current.dataset.expression === expression && current.dataset.sourceHash === hash;
+        }, { form, expression, hash: navi.forms[form].expressions[expression].sourceSHA256 });
+      }
+    }
+    assert.equal(navi.forms.base.expressions.neutral.sourceSHA256, 'f0d1f53e54dd47da4a658ea2252e9c8ab8c54eceb3ba9fff6c978eb9d1bb4e62', 'The corrected gem-bearing Navi Base R2 stays selected');
+    assert.deepEqual(await view(page), collectionBeforeExpressions, 'Previewing every mood and Grown grants or equips nothing');
+    assert.equal(await gems(page), gemsBeforeExpressions);
+    for (const width of [1440, 768, 390, 320]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await noOverflow(page, `${width}px expression playground`);
+      const controls = await playground.locator('button,select,summary').evaluateAll(elements => elements.map(element => ({
+        visible: !!element.getClientRects().length, size: parseFloat(getComputedStyle(element).fontSize), height: element.getBoundingClientRect().height,
+      })).filter(item => item.visible));
+      assert.ok(controls.every(control => control.size >= 18 && control.height >= 48), 'Expression controls retain readable text and touch targets');
+      if (width === 1440 || width === 390) await playground.screenshot({ path: path.join(outputs, `pals-expressions-app-${width === 390 ? 'mobile' : 'desktop'}.png`) });
+    }
+    await page.setViewportSize({ width: 1440, height: 1080 });
+    await chooseFamily(page, 1); await openPals(page);
+    assert.equal(await playground.evaluate(element => element.open), false, 'Another profile does not inherit an open expression or selection');
+    await playground.locator('summary').click();
+    await page.waitForFunction(() => document.querySelector('.pal-expression-explorer .pal-artwork-view')?.dataset.expression === 'neutral');
+    assert.equal(await portrait.getAttribute('data-character-key'), 'first-round-2026-11-19/R');
+    await chooseFamily(page, 0); await openPals(page);
+    assert.equal(await playground.evaluate(element => element.open), false);
+    assert.deepEqual(await view(page), collectionBeforeExpressions, 'Returning preserves the exact original saved collection');
+    assert.equal(await gems(page), gemsBeforeExpressions);
+    assert.ok(expressionRequests.filter(url => url.endsWith('.webp')).length < 15, 'Exploration remains lazy instead of downloading the roster');
+    mark('approved 184-asset expression playground: exact Navi R2, both forms, four moods, lazy loading, profile isolation and phone layout without rewards or collection changes');
 
     phase = 'creating, tapping, editing and keeping a Pal playground';
     await pacingFixture(page);
@@ -174,7 +226,7 @@ async function installReceiptFixture(page) {
     assert.equal(await gems(page), 0);
     await noOverflow(page, 'Desktop Pal editor');
     await page.screenshot({ path: path.join(outputs, 'pals-app-playground-desktop.png'), fullPage: true });
-    await page.reload(); await ready(page); await page.click('#studioNavScenes');
+    await page.reload(); await ready(page); await navigate(page,'#studioNavScenes');
     await page.click(`[data-scene="${projectId}"]`);
     const reopened = await scene(page);
     assert.equal(reopened.title, 'Glim and the moon potatoes');
@@ -213,13 +265,13 @@ async function installReceiptFixture(page) {
     phase = 'real learning, delegated Pal hint and collection navigation guard';
     await pacingFixture(page); await page.click('#creationRun'); await page.click('#creationTapActor');
     await page.waitForFunction(() => FG.creation.snapshot()?.status === 'running');
-    await page.click('#studioNavPowers');
+    await navigate(page,'#studioNavPowers');
     if (!await page.evaluate(() => FG.learning.active)) await page.click('#lab-next');
     await activeMath(page).waitFor({ state: 'visible' });
     const paused = await snapshot(page);
     assert.equal(paused.status, 'paused', 'Leaving the running scene for learning pauses its engine');
     await page.waitForTimeout(150); assert.equal((await snapshot(page)).timeMs, paused.timeMs);
-    await page.click('#studioNavPals');
+    await navigate(page,'#studioNavPals');
     assert.equal(await page.locator('#page-jems-pals').isVisible(), false, 'The open learning activity cannot be escaped through the collection');
     assert.equal(await activeMath(page).isVisible(), true);
     assert.equal(await page.locator('#studioPalCameo').isVisible(), false);
@@ -261,7 +313,7 @@ async function installReceiptFixture(page) {
     assert.deepEqual((await view(page)).preferences, { showCompanion: true, encouragement: true });
     await page.click('[data-pals-focus="starter-kip"]');
     await page.waitForFunction(() => FG.pals.view()?.activeId === 'kip'); await idle(page);
-    await page.click('#studioNavScenes');
+    await navigate(page,'#studioNavScenes');
     assert.equal(await page.locator(`[data-scene="${projectId}"]`).count(), 0);
     assert.equal(await page.locator(`[data-scene="${addedProjectId}"]`).count(), 0);
     await chooseFamily(page, 0); await openPals(page);
@@ -325,7 +377,7 @@ async function installReceiptFixture(page) {
       if (width === 390) await page.screenshot({ path: path.join(outputs, 'pals-app-fixture-mobile.png'), fullPage: true });
     }
     await page.setViewportSize({ width: 1440, height: 1080 });
-    await page.click('#studioNavScenes');
+    await navigate(page,'#studioNavScenes');
     await selectedNav(page, 'studioNavScenes');
     assert.equal(await page.locator('[data-creation-pal]').count(), 3);
     await page.click(`[data-scene="${addedProjectId}"]`);
@@ -352,7 +404,7 @@ async function installReceiptFixture(page) {
     assert.deepEqual(paidRequests, [], 'No provider generation or coach request');
     fs.writeFileSync(path.join(outputs, 'pals-app-results.json'), JSON.stringify({
       scope: 'Production application UI; higher unlock/stage states are explicitly synthetic trusted-source receipt fixtures.',
-      checks, errors, consoleErrors, paidRequests, fixtures,
+      checks, errors, consoleErrors, paidRequests, fixtures, expressionRequests,
       observedUiLearning: { completions: 5, assistedCompletions: 1, earnedGems: 10, adventures: 1 },
       finalView: await view(page),
     }, null, 2) + '\n');

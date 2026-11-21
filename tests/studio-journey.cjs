@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,sendChildMessage}=require('./studio-entry.cjs');
 /* Runs against the real production dist and original game host. No paid model calls. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -126,13 +126,26 @@ const {start}=require('./browser-server.cjs');
   await page.click('#studioKeep');assert.notEqual((await workspace()).projects.find(p=>p.game==='hill').headId,hillMain);
   await talk();assert.match(await page.textContent('#studioPausedPreview'),/Junkyard Rally/);
   await page.click('#studioNavCreate');assert.equal(await page.locator('#studioPausedPreview').textContent(),'');assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a new idea clears the previous game preview');
-  await page.fill('#studioPrompt','Build a brand new flying banana universe');await page.click('#studioTalk');await page.waitForFunction(()=>document.getElementById('coachModeStatus').textContent.includes('Local reflection'));assert.match(await page.textContent('#studioMessages'),/Your new game idea is saved/);await page.click('#coachPlanToggle');await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');assert.match(await page.textContent('#studioMessages'),/no build was started/);assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
+  const offlineIdea=await sendChildMessage(page,'Build a brand new flying banana universe');
+  assert.ok(offlineIdea.messages.some(message=>message.role==='child'&&message.text==='Build a brand new flying banana universe'),'the offline idea is saved through Send');
+  assert.equal(await page.locator('#coachGuidedChoices').count(),0,'the child supplies the answers in the conversation');
+  assert.equal(await page.locator('#studioSend').isVisible(),false,'an offline coach cannot approve a new game for Build');
+  assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'discussion does not pretend a build has started');
+  assert.equal(await page.locator('#studioKeep').isDisabled(),true);assert.deepEqual(jobs,[]);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);assert.deepEqual(errors,[]);
   const n=await notebook();assert.ok(n.sessions.some(s=>s.game==='new'&&!s.projectId&&!s.remoteId));
   console.log(`PASS ${device}: production studio, five staged changes, physical construction, optional reflection, static paused preview and cleanup, Hill garage routing, undo/redo/fork, private draft/reload and honest offline AI`);await ctx.close();
  }
  // Transport fixtures exercise in-tool remote states. They are NOT real model inference.
- const ctx=await browser.newContext(),page=await ctx.newPage();let polls=0,phase='ready',kept=0;const errors=[],remoteRequests=[];page.on('pageerror',e=>errors.push(e.message));
+ const ctx=await browser.newContext(),page=await ctx.newPage();let polls=0,phase='ready',kept=0;const errors=[],remoteRequests=[],coachRequests=[];page.on('pageerror',e=>errors.push(e.message));
+ const childIdea='A fox hops between clouds to carry stars to the moon house. Tap to jump.';
+ const childRules='You win when all five stars reach the house. Falling puts the fox back on the last cloud. I want it to feel playful and brave, with time to think. A pink sky, soft cartoon clouds, and gold stars. Each later level adds one moving cloud. No timer, enemies, or extra powers.';
+ const childEvidence={
+  action:'Tap to jump.',
+  consequence:'You win when all five stars reach the house. Falling puts the fox back on the last cloud.',
+  experience:'I want it to feel playful and brave, with time to think.',
+  world:'A pink sky, soft cartoon clouds, and gold stars.'
+ };
  await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:'https://studio-api.test',previewOrigin:'https://studio-preview.test'})}));
  await page.route('https://studio-api.test/**',async route=>{
   const req=route.request(),path=new URL(req.url()).pathname;let data;
@@ -142,6 +155,19 @@ const {start}=require('./browser-server.cjs');
   // endpoint must NEVER silently authorize a paid build.
   if(path==='/v1/sessions/status'&&req.method()==='GET')
    data={connected:true,trusted:true,expiresAt:Date.now()+60000};
+  else if(path==='/v1/coach'&&req.method()==='POST'){
+   const context=req.postDataJSON().context;coachRequests.push(context);
+   assert.deepEqual(context.creation,{version:1},'new-game Send requests a contextual creation review');
+   const complete=context.message===childRules;
+   assert.ok(complete||context.message===childIdea,'the fixture reviews only the words the child sent');
+   if(complete)for(const quote of Object.values(childEvidence))assert.ok([context.message,...context.conversation.filter(message=>message.role==='child').map(message=>message.text)].some(text=>text.includes(quote)),'every ready reason quotes the child');
+   data={mode:'model',reply:{move:complete?'listen':'clarify',
+    text:complete?'Your fox can jump, recover from a fall, and carry stars home. The gentle world and moving clouds fit the way you want to play.':'A fox carrying stars home is a start.',
+    question:complete?null:'How should it feel to jump between the clouds?',
+    suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[],
+    creationReadiness:complete?{ready:true,evidence:childEvidence,unresolved:[]}:
+     {ready:false,evidence:{action:childEvidence.action,consequence:'',experience:'',world:''},unresolved:['We still need to discuss what falling means, how it should feel, and the world around the fox.']}}};
+  }
   else if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
   else if(path==='/v1/jobs/fixture-job'){polls++;data=polls<2?{jobId:'fixture-job',status:'testing',adapter:'mock'}:phase==='failed'?{jobId:'fixture-job',status:'failed',adapter:'mock'}:{jobId:'fixture-job',status:'ready',revisionId:'fixture-rev',adapter:'mock'};}
   else if(path.endsWith('/preview'))data={url:'https://studio-preview.test/game?capability=TEST_ONLY',artifactId:'fixture-artifact',expiresAt:Date.now()+60000,kind:'generated-module-v2',adapter:'mock'};
@@ -152,13 +178,24 @@ const {start}=require('./browser-server.cjs');
  });
  await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script>`}));
  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);await exploreWelcome(page);
- await page.click('#studioNavCreate');await page.fill('#studioPrompt','Create a novel test fixture');await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('designPlan')?.open===true);await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();await page.click('#buildGamePlan');await page.waitForSelector('#studioReady:not([hidden])');await page.click('#studioReady');await page.waitForSelector('#studioRemoteHost iframe');
+ await page.click('#studioNavCreate');await sendChildMessage(page,childIdea);
+ assert.equal(await page.locator('#studioSend').isVisible(),false,'an initial idea does not unlock Build');
+ assert.equal(await page.locator('#coachChooseRest').count(),0,'the child cannot delegate an unfinished game plan');
+ assert.equal(remoteRequests.length,0,'the first conversation turn cannot submit a job');
+ await sendChildMessage(page,childRules);await page.locator('#studioSend').waitFor({state:'visible'});
+ assert.equal(await page.locator('#studioSend').isEnabled(),true,'a fresh grounded review offers an explicit Build');
+ assert.equal(coachRequests.length,2);assert.equal(remoteRequests.length,0,'even a reviewed game still waits for the child to choose Build');
+ await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('studioBuildHandoff')?.dataset.phase==='ready');
+ assert.equal(remoteRequests.length,1);assert.ok(remoteRequests[0].prompt.includes(childIdea)&&remoteRequests[0].prompt.includes(childRules),'the submitted game carries the child’s own plan');
+ assert.doesNotMatch(await page.textContent('#studioMessages'),/Current choices \(these replace|Later ideas, in order|Approved game plan|Choose sensible details for:/,'the build envelope stays out of the child’s conversation');
+ await page.click('#studioBuildHandoffPlay');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');
  assert.match(await page.textContent('#studioPlayNote'),/mock/);assert.equal(kept,0);
  assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'signed preview capabilities must not persist');
  await page.click('#studioKeep');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.remoteId==='fixture-rev'&&!s.candidate));assert.equal(kept,1);
- phase='failed';await page.click('#studioChange');await page.fill('#studioPrompt','Try another fixture revision');await page.click('#coachTry');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='failed'));
+ phase='failed';await page.click('#studioChange');await page.fill('#studioPrompt','Try another fixture revision');await page.click('#studioSend');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='failed'));
+ assert.equal(await page.locator('#studioBuildHandoff').getAttribute('data-phase'),'failed');await page.click('#studioBuildHandoffStay');
  assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions[0].remoteId),'fixture-rev');assert.equal(remoteRequests.at(-1).gameId,'generated-module');assert.equal(kept,1);assert.deepEqual(errors,[]);
  console.log('PASS remote fixture: durable ACK, progress, isolated preview, explicit keep, failed-change preservation, no capability persistence (NO live AI calls)');await ctx.close();
  }finally{await browser.close();await new Promise(r=>server.close(r));}

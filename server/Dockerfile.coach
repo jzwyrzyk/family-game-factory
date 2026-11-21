@@ -12,6 +12,8 @@ COPY server/privacy/parent-consent.ts ./server/privacy/parent-consent.ts
 COPY server/adult-pilot.ts ./server/adult-pilot.ts
 COPY server/pipeline/auth.ts ./server/pipeline/auth.ts
 COPY src/studio/design.ts ./src/studio/design.ts
+# Pure response validation and legacy transcript normalization, without UI/runtime imports.
+COPY src/studio/creation-readiness.ts src/studio/conversation-view.ts ./src/studio/
 # Bundle typed provider + policy + validated private handler. The final image
 # is a single immutable entrypoint, not the general application dependency tree.
 RUN ./node_modules/.bin/esbuild server/coach/private-executor.ts \

@@ -4,10 +4,12 @@
 
 ## The profile switch is the activation
 
-1. On the current Jems site, choose **Adult (development)** from the profile menu.
+1. On the current Jems site, open **Menu → Grown-ups → Private parent session**. The same entry appears in Parent Settings. It remains visible before character selection and when the workshop is disconnected or private testing is disabled. The optional **Adult (development)** profile choice is still shown only when server status enables it.
 2. When locked, enter the existing parent passphrase as part of that switch. The server checks the trusted device and its operator-issued adult permit.
 3. A successful switch opens the adult workspace and enables the configured AI conversation, generated-game and private speech capabilities immediately. There is no second activation button. Missing providers or exhausted allowance still produce an honest unavailable state.
 4. Switch to a child profile or lock the adult profile to remove this tab's adult access immediately and request server revocation. The session also ends after an absolute maximum of 60 minutes; ordinary trusted-device renewal does not extend it. Returning to adult mode requires a new passphrase unlock.
+
+The access dialog distinguishes missing workshop configuration, browser disconnection, disabled testing, missing/expired device approval, a failed access check and readiness to unlock. After unlock, conversation, game building and private dictation report their own current availability. Rechecking access is read-only; opening the entry cannot enable providers or grant a permit. **Open connection settings** uses the existing guarded parent/settings route and retains a failed-to-save draft.
 
 The adult local profile, notebook and game workspace persist in their own device-bound namespace. Child drafts/history are not copied into the adult AI context. Switching profiles clears the current conversation, microphone capture and outstanding UI callbacks before the other workspace opens. The session proof exists only in memory, so a reload or new tab starts locked. Local profile labels and preferences never grant server access.
 
@@ -74,4 +76,4 @@ CI demonstrates source behavior with fixtures; it does not establish a deployed 
 
 ## Disable and remove
 
-Disable `FACTORY_ADULT_PILOT_MODE` on the gateway and private runtime. Refresh the site, confirm the adult entry disappears and new adult unlocks/paid calls are denied, then stop outstanding adult development jobs. Do not change child approval flags during this rollback. After development ends, remove the dedicated adult profile/session module and permit-specific branches while retaining ordinary profiles, parent consent and trusted-device security tests. Local adult development records should be removed according to the chosen test-data retention policy.
+Disable `FACTORY_ADULT_PILOT_MODE` on the gateway and private runtime. Refresh the site, confirm the gated Adult profile choice disappears, the permanent Private parent session entry explains that testing is disabled, and new adult unlocks/paid calls are denied, then stop outstanding adult development jobs. Do not change child approval flags during this rollback. After development ends, remove the dedicated adult profile/session module and permit-specific branches while retaining ordinary profiles, parent consent and trusted-device security tests. Local adult development records should be removed according to the chosen test-data retention policy.

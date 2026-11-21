@@ -126,7 +126,12 @@ window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRew
     assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '0');
     assert.match(await page.locator('#jemsRewardsMakerState').textContent(), /preview/);
     assert.match(await page.locator('#jemsRewardsMakerAction').textContent(), /Choose your maker/);
-    assert.equal(await page.locator('#jemsRewardsMakerArt .jems-character-art').count(), 2, 'No silent default character selection');
+    assert.equal(await page.locator('#jemsRewardsMakerArt .jems-character-art').count(), 0, 'An unselected owner never inherits either human outside the explicit chooser');
+    assert.equal(await page.locator('#jemsRewardsMakerArt .jems-rank-thumbnail').getAttribute('data-character'), 'none', 'Clearing the selection clears the previous Nova portrait');
+    const neutralMaker = page.locator('#jemsRewardsMakerArt .jems-gem-art');
+    assert.equal(await neutralMaker.count(), 1, 'One neutral gem remains instead of a blank or paired-human slot');
+    assert.equal(await neutralMaker.isVisible(), true);
+    assert.equal(await neutralMaker.getAttribute('data-sprite-src'), 'jems-journey/gems.webp', 'The unselected view uses the approved neutral gem artwork');
     assert.equal(await page.locator('#jemsRewardsRecent').isVisible(), false);
     await page.evaluate(() => window.rewardsFixture.page.update({ ...window.rewardsFixture.empty, loading: true }));
     assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '…');

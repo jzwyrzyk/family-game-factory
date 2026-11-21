@@ -8,6 +8,8 @@ The existing verified-event controller remains the host. PR57 adds the [cosmetic
 
 **Later shared rewards:** [ADR0010](../decisions/0010-lifetime-gems-and-shared-rewards.md) adds a separate lifetime engagement-gem ledger and its [Rewards UI](../rewards/README.md). The historical Delight events below remain presentation events and cannot mint gem receipts. The new completion reward accepts supported work without changing the earlier evidence labels or maker-rank criteria.
 
+**Guided creation, November 20, 2026:** the [chat creation decision](../decisions/2026-11-20-guided-chat-creation.md) replaces the first-idea burst with the next useful question. While the conversation is active, shared-reward totals and receipts still update, but their cosmetic toast is suppressed so it cannot cover the input or answer buttons. Entering chat clears an earlier toast. This changes presentation only; earning rules, saved maker progress and explicit build/Keep authority remain unchanged.
+
 ## Original PR33 deliverables · historical scope
 - Local, reusable maker-workbench and four original world-scene SVGs, with existing quality-rendered Gum and Rally thumbnails preserved.
 - World-specific *accent* identities for six favorite game cards; headline readability, small meaningful category chips, focus-visible states and reduced-motion-friendly hover affordances.
@@ -18,7 +20,7 @@ The existing verified-event controller remains the host. PR57 adds the [cosmetic
 ## What qualifies for a celebration
 | Kind | Trigger | Guard |
 |---|---|---|
-| First idea | First actual child message persisted to a newly created game notebook | Never on just opening Create or typing a draft |
+| First idea (historical trigger) | Formerly the first persisted child message in a new game notebook; current guided creation shows the next question instead | Saving the idea and its earned evidence remains separate from displaying a burst |
 | Playable preview | Trusted non-mock backend confirms a new ready revision | No queued, failed, incomplete, or mock builds; never claim published |
 | Kept version | Local or remote version successfully made main | Confirmation, project and learning gates remain unchanged |
 | Copied game | Separate private project and learning settings are saved | No upload, sharing or public achievement |
@@ -33,9 +35,9 @@ The existing verified-event controller remains the host. PR57 adds the [cosmetic
 
 ## Existing code and browser acceptance entry points
 - npm run build, complete browser/creative/learning workflows and existing deployment contract tests pass on the exact PR head.
-- node tests/jems-delight-browser.cjs verifies the six worlds, local art, first saved idea, no repeated message rewards, selectable English when enabled, and reduced motion.
+- node tests/jems-delight-browser.cjs verifies the six worlds, local art, first saved idea with its guided question and no idea toast, selectable English when enabled, and reduced motion. `tests/guided-creation-browser.cjs` checks that earned reward totals remain available while the conversation stays unobscured.
 - tests/homepage-entry.cjs and tests/language-integration.ts keep mandatory grade 1–4 Math/English settings and parent-controlled Both switching intact, with separate histories and active-question guard.
-- tests/brand-review-pages.cjs produces 38 real desktop/mobile screenshots (17 existing journeys plus creator empty state and first verified idea celebration). Visually review screenshots for color, contrast, clipping, empty/failure states and parent calmness.
+- tests/brand-review-pages.cjs produces real desktop/mobile screenshots of existing journeys plus the creator empty state and first guided question. Visually review screenshots for color, contrast, clipping, empty/failure states and parent calmness.
 
 ## Public production gate (separate from a code merge)
 A merge to main is not a public service release. GitHub Pages deployment is intentionally manual. Child-facing public distribution still requires an explicit owner decision on privacy, age/parental-consent processes, safe content, data retention, security, incident response, accessibility and any paid AI/cloud exposure. This work does not enable a model provider, public community features, direct messaging or publication. Keep private child names, learning reports, or voice data out of public artifacts/issues.

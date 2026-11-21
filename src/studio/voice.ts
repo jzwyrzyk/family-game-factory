@@ -8,6 +8,7 @@
  * state is used. System-keyboard dictation remains a separate OS choice.
  * Recognition creates an editable draft ONLY; the child explicitly sends it.
  */
+import {createFriendlyNarrator,stopReadAloud} from '../speech/friendly-narrator';
 type VoiceAvailability = 'available' | 'downloadable' | 'downloading' | 'unavailable';
 interface RecognitionResult {isFinal:boolean;[index:number]:{transcript:string}}
 interface RecognitionLike {
@@ -33,6 +34,8 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  let recognition:RecognitionLike|null=null;
  let generation=0,finalWords='',listening=false,failed=false,finishing=false;
  let spokenReply='';
+ let readingScope='';
+ const narrator=createFriendlyNarrator(()=>readingScope===ui.scope()&&ui.canListen()&&!listening);
  const getCtor=():RecognitionCtor|undefined=>(window as any).SpeechRecognition||(window as any).webkitSpeechRecognition;
  const announce=(message:string)=>{ui.status.textContent=message;};
  const buttons=()=>{
@@ -50,7 +53,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   generation++;finalWords='';spokenReply='';ui.hearReply.disabled=true;failed=true;finishing=false;
   const active=recognition;recognition=null;listening=false;buttons();announce('Microphone off.');
   try{active?.abort();}catch{/* The browser may already have stopped. */}
-  try{window.speechSynthesis?.cancel();}catch{/* Speech output is optional. */}
+  narrator.cancel();
  }
  async function listen(){
   if(recognition){
@@ -61,7 +64,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   }
   if(!ui.canListen()){announce('Finish your current activity before talking.');return;}
   // Avoid the coach's last spoken response being recognized as a new child turn.
-  try{window.speechSynthesis?.cancel();}catch{/* Speech output is optional. */}
+  stopReadAloud();
   const Ctor=getCtor(),scope=ui.scope(),seq=++generation;
   if(!Ctor||typeof Ctor.available!=='function'){
    announce('Private on-device speech is not supported here. Tap the text box and use your device keyboard microphone, or type.');return;
@@ -117,6 +120,8 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   };
   finalWords='';failed=false;finishing=false;recognition=next;listening=true;buttons();
   announce('Listening on this device. Speak one thought, then pause or tap Finish speaking.');
+  // Hear reply may have restarted while the asynchronous availability check ran.
+  stopReadAloud();
   try{next.start();}
   catch{recognition=null;listening=false;buttons();announce('Could not start on-device speech. Use keyboard dictation or type.');}
  }
@@ -132,21 +137,13 @@ export function installStudioVoice(ui:StudioVoiceOptions){
    ui.installPack.hidden=true;
   }catch{if(seq===generation)announce('Voice pack installation is unavailable. Use keyboard dictation or type.');}
  }
- function localVoice():SpeechSynthesisVoice|null {
-  try{return window.speechSynthesis?.getVoices().find(v=>v.localService&&/^en(?:-|$)/i.test(v.lang))||null;}
-  catch{return null;}
- }
  function speak(text:string){
-  const voice=localVoice();
-  if(!voice||typeof SpeechSynthesisUtterance==='undefined'){
-   announce('This device has no verified local speaking voice. The coach reply is shown as text.');return;
-  }
-  try{
-   const utterance=new SpeechSynthesisUtterance(text.slice(0,1800));utterance.voice=voice;utterance.lang=voice.lang;utterance.rate=0.95;
-   window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);
-  }catch{announce('Could not read this reply aloud. It is still shown as text.');}
+  if(narrator.active){narrator.cancel();return;}
+  readingScope=ui.scope();
+  narrator.speak(text.slice(0,1800),{onUnavailable:()=>announce('Voice is not ready here. You can read the reply.')});
  }
  function reply(text:string){
+  narrator.cancel();
   spokenReply=text.slice(0,1800);ui.hearReply.disabled=!spokenReply;
   // Replies are read aloud only when the child explicitly chooses Hear reply.
  }

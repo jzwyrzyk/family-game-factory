@@ -1,0 +1,35 @@
+name: Release regression contracts
+on:
+  push:
+    paths:
+      - '.github/workflows/pages.yml'
+      - '.github/workflows/release-regression-contracts.yml'
+      - 'scripts/deployment/regressions.py'
+      - 'scripts/deployment/test_regressions.py'
+      - 'scripts/deployment/test_pages_regressions.py'
+      - 'package.json'
+  pull_request:
+    paths:
+      - '.github/workflows/pages.yml'
+      - '.github/workflows/release-regression-contracts.yml'
+      - 'scripts/deployment/regressions.py'
+      - 'scripts/deployment/test_regressions.py'
+      - 'scripts/deployment/test_pages_regressions.py'
+      - 'package.json'
+permissions:
+  contents: read
+concurrency:
+  group: release-regressions-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify complete test assignment and release failure paths
+        run: python3 -m unittest discover -s scripts/deployment -p 'test_*regressions.py' -v
+      - name: Check selected source against every required shard
+        run: python3 scripts/deployment/regressions.py --check

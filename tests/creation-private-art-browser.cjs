@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 
 async function records(page,store,owner){
   return page.evaluate(async({store,owner})=>{
@@ -104,7 +104,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
 
     // Another profile cannot see old pixels; a deliberate portable import creates copies.
     await profile(page,1);await pacing(page);
-    await page.locator('#studioNavScenes').click();await page.locator('[data-creation-starter="blank"]').click();
+    await navigate(page,'#studioNavScenes');await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
     await page.waitForFunction(()=>document.getElementById('creationActorArtStatus').textContent.includes('Add one'));
     assert.equal(await page.locator('#creationPrivateActorChoices button').count(),0);await page.locator('#creationCloseActor').click();
@@ -124,7 +124,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await page.locator('#creationActors [data-actor]').nth(1).click();
     await page.locator('#creationRun').click();await page.locator('#creationTapActor').click();
     await page.waitForFunction(()=>FG.creation.snapshot()?.actors[1].speech==='Hello!');
-    await page.reload();await ready(page);await page.locator('#studioNavScenes').click();
+    await page.reload();await ready(page);await navigate(page,'#studioNavScenes');
     await page.locator('[data-scene="'+imported.id+'"]').click();await page.waitForFunction(()=>document.querySelectorAll('#creationActors canvas').length===1);
     assert.equal((await records(page,'drawings','player1'))[0].sha256,source.sha256);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);

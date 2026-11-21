@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 /* Production-browser checks for the earned, owner-scoped illustrated journey.
  * Notebook fixtures below use the production schema/API; they are isolated test
  * data, never demo progress in the application. The final milestone is exercised
@@ -33,6 +33,7 @@ function visualFixture(){
  notebook.setAvatar('player1','spark');
  for(const title of ['Sky garden','Silly workshop','Crystal trail'])polishedFixture(notebook,'player2',title);
  notebook.setAvatar('player2','nova');
+ notebook.dismissWelcome('player3');
  // This is historical source evidence, without a new pending reward handoff.
  // Production-created pending facts are exercised by the real workflow below.
  const historical=notebook.read();delete historical.rewardOutbox;
@@ -48,6 +49,14 @@ function visualFixture(){
  const base='http://127.0.0.1:'+server.address().port+'/arcade/';
  fs.mkdirSync('test-results',{recursive:true});
  const newPage=async({fixture,viewport={width:1400,height:1000},reducedMotion='reduce'}={})=>{
+  // Existing owners may have dismissed the former welcome without choosing a
+  // maker. Their neutral artwork and later choice remain supported; the new
+  // first-time character-first journey has its own browser acceptance suite.
+  if(!fixture){
+   const existing=memoryNotebook();
+   for(const owner of ['player1','player2','player3'])existing.dismissWelcome(owner);
+   fixture=existing.read();
+  }
   const context=await browser.newContext({viewport,reducedMotion});
   await context.addInitScript(({key,fixture})=>{
    if(window.top!==window)return;
@@ -77,7 +86,7 @@ function visualFixture(){
  };
  const openJourney=async page=>{
   await exploreWelcome(page);
-  await page.click('#studioNavJourney');
+  await navigate(page,'#studioNavJourney');
   await page.locator('#page-jems-journey').waitFor({state:'visible'});
   await page.evaluate(async()=>{
    const paths=[...new Set([...document.querySelectorAll('#page-jems-journey [data-sprite-src]')].map(element=>element.dataset.spriteSrc))];
@@ -115,14 +124,21 @@ function visualFixture(){
    art:[...tile.querySelectorAll('.jems-character-art')].map(art=>({character:art.dataset.character,level:Number(art.dataset.level),src:art.dataset.spriteSrc,position:parseFloat(art.style.backgroundPosition),aspect:parseFloat(art.style.aspectRatio)})),
    gems:tile.querySelectorAll('.jems-gem-art').length
   }));
-  assert.equal(actual.character,character??'both');assert.equal(actual.level,level);
-  assert.equal(actual.gems,0,'a rank thumbnail keeps the original held gem inside the maker illustration');
-  assert.deepEqual(actual.art.map(art=>art.character),character?[character]:['spark','nova']);
+  assert.equal(actual.character,character??'none');assert.equal(actual.level,level);
+  assert.equal(actual.gems,character?0:1,'a selected maker retains the held gem; an unselected owner sees neutral art');
+  assert.deepEqual(actual.art.map(art=>art.character),character?[character]:[]);
   for(const art of actual.art){
    assert.equal(art.src,`jems-journey/characters-${art.character}.webp`,'rank art uses the original native maker atlas');
    assert.equal(art.level,level);assert.equal(art.aspect,.75,'native full-figure aspect stays intact');
    assert.ok(Math.abs(art.position-100*(level-1)/3)<.001,'the displayed frame matches the stated rank');
   }
+ };
+ const assertVisibleMaker=async(page,character)=>{
+  const visible=await page.locator('[data-sprite-src^="jems-journey/characters-"]').evaluateAll(elements=>[...new Set(elements.filter(element=>{
+   const rect=element.getBoundingClientRect();
+   return rect.width>0&&rect.height>0&&getComputedStyle(element).visibility!=='hidden';
+  }).map(element=>element.dataset.character))]);
+  assert.deepEqual(visible,character?[character]:[],'only the current selected human appears outside an explicit chooser');
  };
  const preview=async(page,name)=>{
   await page.evaluate(()=>window.scrollTo(0,0));
@@ -138,6 +154,8 @@ function visualFixture(){
   {
    const {page,context,errors}=await newPage();
    await openJourney(page);await assertLevel(page,0);
+   await assertVisibleMaker(page,null);
+   for(let rank=1;rank<=4;rank++)await assertRankThumbnail(page.locator(`[data-journey-level="${rank}"] .jems-rank-thumbnail`),null,rank);
    assert.deepEqual(await events(page),[]);
    assert.equal(await page.locator('[data-journey-level]').count(),4);
    const initial=JSON.stringify(await notebook(page));
@@ -164,10 +182,12 @@ function visualFixture(){
    await page.click('[data-journey-character="nova"]');
    await page.locator('#jemsCharacterDialog').waitFor({state:'hidden'});
    assert.equal((await notebook(page)).avatars.player1,'nova');
+   await assertVisibleMaker(page,'nova');
    await assertLevel(page,0);assert.deepEqual(await events(page),[]);
    await page.reload();await page.waitForFunction(()=>window.FG?.studio);await openJourney(page);
    assert.equal((await notebook(page)).avatars.player1,'nova');await assertLevel(page,0);
    assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-character'),'nova');
+   await assertVisibleMaker(page,'nova');
    await page.screenshot({path:'test-results/jems-journey-empty.png',fullPage:true});
    assert.deepEqual(errors,[]);await context.close();
    console.log('PASS empty journey, honest previews, character persistence and failed-save retry');
@@ -231,18 +251,70 @@ function visualFixture(){
    }
    await profiles(page,1);await openJourney(page);await assertLevel(page,4);
    assert.equal((await notebook(page)).avatars.player2,'nova');
+   await assertVisibleMaker(page,'nova');
    assert.match(await page.locator('#jemsJourneyName').innerText(),/Gem Master/);
    assert.deepEqual(await events(page),[],'loading another profile never replays old milestones');
    if(name==='tablet')await page.screenshot({path:'test-results/jems-journey-master-tablet.png',fullPage:true});
    await profiles(page,2);await openJourney(page);await assertLevel(page,0);
    assert.equal((await notebook(page)).avatars?.player3,undefined);
+   await assertVisibleMaker(page,null);
    await page.click('#jemsChangeCharacter');await page.click('[data-journey-character="spark"]');
    assert.equal((await notebook(page)).avatars.player1,'spark');
    assert.equal((await notebook(page)).avatars.player2,'nova');
    assert.equal((await notebook(page)).avatars.player3,'spark');
    await profiles(page,0);await openJourney(page);await assertLevel(page,3);
+   await assertVisibleMaker(page,'spark');
    assert.deepEqual(errors,[]);await context.close();
    console.log(`PASS ${name}: illustrated journey, owner isolation, keyboard and responsive layout`);
+  }
+
+  // A real storage event from another document refreshes every visible identity,
+  // including Rewards, without changing the receiving tab's route or focus.
+  // The second document is a storage fixture, not another writable Jems app:
+  // the application's existing single-writer lock remains active throughout.
+  {
+   const {page,context,errors}=await newPage({fixture:visualFixture()});
+   await navigate(page,'studioNavRewards');
+   await page.locator('#page-jems-rewards').waitFor({state:'visible'});
+   await assertRankThumbnail(page.locator('#jemsRewardsMakerArt .jems-rank-thumbnail'),'spark',3);
+   const sessions=JSON.stringify((await notebook(page)).sessions);
+   const rewardState=await page.evaluate(()=>JSON.stringify(FG.rewards.summary()));
+   const beforeEvents=await events(page);
+   await page.locator('#jemsRewardsMakerAction').focus();
+   await page.evaluate(key=>{
+    window.__makerStorageEvents=[];
+    window.addEventListener('storage',event=>{if(event.key===key)window.__makerStorageEvents.push(event.isTrusted);});
+   },STUDIO_KEY);
+
+   const other=await context.newPage();
+   other.on('pageerror',error=>errors.push(error.message));
+   const fixtureUrl=new URL('/maker-storage-fixture.html',base).href;
+   await other.route(fixtureUrl,route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><title>External storage fixture</title></head><body>Valid notebook storage fixture</body></html>'}));
+   await other.goto(fixtureUrl);
+   const changed=memoryNotebook(await notebook(page));changed.setAvatar('player1','nova');
+   await other.evaluate(({key,data})=>localStorage.setItem(key,JSON.stringify(data)),{key:STUDIO_KEY,data:changed.read()});
+   await page.waitForFunction(()=>document.querySelector('#jemsRewardsMakerArt .jems-rank-thumbnail')?.getAttribute('data-character')==='nova');
+   await assertVisibleMaker(page,'nova');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'jemsRewardsMakerAction','cross-tab identity refresh keeps focus on the original Rewards action');
+   assert.equal(await page.locator('#page-jems-rewards').isVisible(),true,'cross-tab choice keeps the current destination');
+
+   // A valid legacy/backup state can remove a cosmetic choice. Write it in the
+   // other tab; the browser must deliver the storage event itself, with no
+   // direct call to the receiving app's render functions or event handlers.
+   const restored=memoryNotebook(await notebook(page));restored.setAvatar('player1',null);
+   await other.evaluate(({key,data})=>localStorage.setItem(key,JSON.stringify(data)),{key:STUDIO_KEY,data:restored.read()});
+   await page.waitForFunction(()=>document.querySelector('#jemsRewardsMakerArt .jems-rank-thumbnail')?.getAttribute('data-character')==='none');
+   await assertRankThumbnail(page.locator('#jemsRewardsMakerArt .jems-rank-thumbnail'),null,3);
+   await assertVisibleMaker(page,null);
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'jemsRewardsMakerAction');
+   assert.equal(await page.locator('#studioProfileSummary .jems-character-art').count(),0,'the header removes the former human too');
+   const storageEvents=await page.evaluate(()=>window.__makerStorageEvents);
+   assert.ok(storageEvents.length>=2&&storageEvents.every(Boolean),'identity changes arrived through genuine browser storage events');
+   assert.equal(JSON.stringify((await notebook(page)).sessions),sessions,'cross-tab cosmetic changes do not rewrite projects');
+   assert.equal(await page.evaluate(()=>JSON.stringify(FG.rewards.summary())),rewardState,'cross-tab cosmetic changes do not award gems');
+   assert.deepEqual(await events(page),beforeEvents,'cross-tab refresh does not replay celebrations');
+   assert.deepEqual(errors,[]);await context.close();
+   console.log('PASS native cross-document storage: Rewards/header, neutral restore, focus and reward isolation');
   }
 
   // Actual creation workflow. Keep must credit the exact reflected experiment;
@@ -275,8 +347,18 @@ function visualFixture(){
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'cut');
    assert.equal(session.design.observations.filter(observation=>observation.source==='child'&&observation.experimentId===testId).length,1);
-   await waitForLevelPopup(page,2);
-   assert.equal(await levelEventCount(page,2),1,'one cut-level popup for a durable linked reflection');
+   await page.waitForFunction(async()=>{
+    const owner=FG.store.current().id,summary=await FG.rewards.summary();
+    return summary.recentGrants.some(grant=>grant.id==='maker.milestone:level%3A2')&&
+     !(FG.studio.exportNotebook().rewardOutbox||[]).some(fact=>fact.owner===owner&&fact.kind==='maker.milestone'&&fact.level===2);
+   });
+   assert.equal((await earned(page)).level,2,'the linked chat reflection still earns the same cut level');
+   const cutGrant=await page.evaluate(async()=>(await FG.rewards.summary()).recentGrants.find(grant=>grant.id==='maker.milestone:level%3A2'));
+   assert.equal(cutGrant.amount,10,'the ordinary milestone grant remains durable while chat stays quiet');
+   // Give the normal reward batching interval time to finish. An immediately
+   // empty toast container alone would not prove the chat presentation policy.
+   await page.waitForTimeout(250);
+   assert.equal(await levelEventCount(page,2),0,'a reward popup must not cover the active conversation');
    await openJourney(page);await page.click('#jemsJourneyCreate');
    await page.locator('#studioVersions').waitFor({state:'visible'});
    assert.equal((await notebook(page)).active.player1,session.id,'A cut next step opens the same project’s tests');
@@ -292,7 +374,7 @@ function visualFixture(){
    assert.equal(await levelEventCount(page,3),1,'one polished-level popup for the exact verified keep');
    const polishedPopup=page.locator('.jems-rewards-toast[data-maker-level="3"]');
    await assertRankThumbnail(polishedPopup.locator('.jems-rank-thumbnail'),null,3);
-   assert.equal(await polishedPopup.locator('.jems-gem-art').count(),0,'unselected makers use the two original outfits, never a gem-only reward');
+   assert.equal(await polishedPopup.locator('.jems-gem-art').count(),1,'a legacy unselected maker sees a neutral reward until they choose a character');
    assert.equal(await page.locator('.jems-rewards-toast-host').evaluate(element=>getComputedStyle(element).pointerEvents),'none');
    assert.equal(await polishedPopup.getAttribute('aria-live'),'polite');
    assert.equal(await page.locator('.jems-delight-sparks').count(),0);
@@ -340,8 +422,10 @@ function visualFixture(){
    assert.equal(await levelEventCount(page,4),1);
    await page.click('#jemsChangeCharacter');await page.click('[data-journey-character="spark"]');
    assert.equal(await levelEventCount(page,4),1,'a cosmetic change cannot re-award Master');
+   assert.equal(await page.locator('.jems-rewards-toast,.jems-delight-toast').count(),0,'changing character clears any prior-human celebration without replay');
+   await assertVisibleMaker(page,'spark');
    await profiles(page,1);await openJourney(page);await assertLevel(page,0);
-   assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-character'),'both');
+   assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-character'),'none');
    await profiles(page,0);await openJourney(page);await assertLevel(page,4);
    assert.equal(await levelEventCount(page,4),1,'switching back to a recent Master does not replay its popup');
 
@@ -373,6 +457,7 @@ function visualFixture(){
    await page.click('#studioNavHome');await page.locator(`[data-session="${hill.id}"] .studio-saved-open`).click();
    await page.click('#studioChange');
    const gemsBeforeClear=(await page.evaluate(()=>FG.rewards.summary())).lifetimeGems;
+   if(!await page.locator('#studioMoreChoices').evaluate(element=>element.open))await page.click('#studioMoreChoices > summary');
    await page.click('#studioChatOptions summary');await page.click('#studioClearChat');
    const clearConfirmation=dialogs.filter(dialog=>dialog.type==='confirm').at(-1)?.message||'';
    assert.match(clearConfirmation,/lower your maker level.*change your outfit/i,'Clear chat explains its visible rank and outfit consequence');

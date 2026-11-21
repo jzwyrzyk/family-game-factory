@@ -9,6 +9,7 @@ class Button {
 class Status {textContent='';}
 let active:FakeRecognition|null=null,mode:'available'|'downloadable'|'unavailable'='available';
 let starts=0,stops=0,scope='child-a:game-one',allowed=true;
+let speaking=false,speechAtMicrophoneStart=false;
 let stalledStop=false,delayedAvailability=false,finishAvailability:((value:'available')=>void)|null=null;
 function releaseAvailability(){const release=finishAvailability;if(!release)throw Error('Missing delayed speech result');release('available');}
 const spoken:string[]=[];
@@ -24,7 +25,7 @@ class FakeRecognition {
   lang='';continuous=true;interimResults=false;processLocally=false;
   onresult:((event:any)=>void)|null=null;onerror:((event:any)=>void)|null=null;onend:(()=>void)|null=null;
   constructor(){active=this;}
-  start(){starts++;}
+  start(){starts++;speechAtMicrophoneStart=speaking;}
   stop(){if(!stalledStop)this.onend?.();}
   abort(){stops++;this.onend?.();}
 }
@@ -33,9 +34,9 @@ const savedUtterance=Object.getOwnPropertyDescriptor(globalThis,'SpeechSynthesis
 (globalThis as any).window={
   SpeechRecognition:FakeRecognition,
   speechSynthesis:{
-    getVoices:()=>[{name:'Local English',lang:'en-US',localService:true}],
-    speak:(utterance:any)=>spoken.push(utterance.text),
-    cancel:()=>{}
+    getVoices:()=>[{name:'Samantha',voiceURI:'Samantha',lang:'en-US',localService:true}],
+    speak:(utterance:any)=>{spoken.push(utterance.text);speaking=true;utterance.onstart?.();},
+    cancel:()=>{speaking=false;}
   }
 };
 (globalThis as any).SpeechSynthesisUtterance=class {
@@ -154,6 +155,24 @@ async function run(){
   assert.match(status.textContent,/Transcription canceled/);
   assert.equal(transcripts.length,1,'canceled transcription never sends or modifies a draft');
   stalledStop=false;
+  // Hearing a reply is still possible while the browser checks local speech
+  // availability. Cancel that newer narration before the microphone opens.
+  (window as any).speechSynthesis.getVoices=()=>[
+    {name:'Samantha',voiceURI:'Samantha',lang:'en-US',localService:true},
+  ];
+  delayedAvailability=true;
+  voice.reply('Listen to this reply while speech support is loading.');
+  const startsBeforeDelayedListen=starts;
+  const delayedListen=voice.listen();
+  await Promise.resolve();
+  hearReply.onclick?.();
+  assert.equal(speaking,true,'the reply actually starts during the availability wait');
+  releaseAvailability();
+  await delayedListen;
+  assert.equal(starts,startsBeforeDelayedListen+1,'the requested microphone still opens');
+  assert.equal(speechAtMicrophoneStart,false,'late reply narration must stop before microphone capture starts');
+  assert.equal(speaking,false,'microphone capture and read-aloud must not overlap');
+  voice.cancel();delayedAvailability=false;
   console.log('PASS local-only microphone, speech -> editable draft only, explicit Finish and Hear, profile isolation, microphone denial, local pack and off-device refusal');
 }
 run().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{

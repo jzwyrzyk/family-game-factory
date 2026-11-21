@@ -165,7 +165,7 @@ export function check(root, { base, head, now = new Date() } = {}) {
     for (const pattern of area.documents) if (!paths.some(path => matches(path, pattern))) result.errors.push(`${area.id}: no document matches ${pattern}.`);
     const digest = sourceDigest(root, area, paths, registry);
     const current = digest === area.sourceDigest;
-    if (!current) result.errors.push(`${area.id}: source content or routing changed since documentation review. Inspect the affected docs, then run docs:review for this area.`);
+    if (!current) result.errors.push(`${area.id}: source content or routing changed since documentation review (current SHA-256: ${digest}). Inspect the affected docs, then run docs:review for this area.`);
     const ageDays = (now.getTime() - Date.parse(area.reviewedAt)) / 86400000;
     if (ageDays < -1) result.errors.push(`${area.id}: review timestamp is more than one day in the future.`);
     if (ageDays > area.reviewAfterDays) result.warnings.push(`${area.id}: last reviewed ${Math.floor(ageDays)} days ago (review interval ${area.reviewAfterDays} days). Recheck intent, external evidence and linked decisions; do not just advance the date.`);

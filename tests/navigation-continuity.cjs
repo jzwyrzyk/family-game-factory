@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 
 const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1';
 const IDEAS=[
@@ -120,13 +120,17 @@ async function collectionJourney(browser,base,device,viewport){
   await seedHistoricalRecords(page);
   assert.equal(new URL(page.url()).search,'','the regression starts in ordinary default mode');
   assert.equal(await page.locator('#page-studio-library').isVisible(),true);
-  assert.equal(await page.locator('.studio-nav button').count(),NAV.length,'the modern eight-destination navigation is preserved');
+  assert.equal(await page.locator('.studio-nav > button:visible').count(),3,'the compact shell has three primary actions');
+  for(const id of NAV)assert.equal(await page.locator('#'+id).count(),1,id+' retains one authoritative route control');
   if(device==='phone'){
    const firstGame=await page.locator('#studioStarters [data-starter]').first().boundingBox();
    assert.ok(firstGame&&firstGame.y>=0&&firstGame.y+firstGame.height<=viewport.height,
      'restoring saved collections must not move the first complete playable game below the phone viewport');
   }
-  for(const id of NAV)assert.equal(await page.locator('#'+id).isVisible(),true,id+' is discoverable');
+  for(const id of NAV.slice(0,2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' stays in the primary navigation');
+  await page.click('#studioNavMenu');
+  for(const id of NAV.slice(2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' is discoverable in Menu');
+  await page.click('#studioMenuClose');
   const entry=page.getByRole('button',{name:'Saved ideas & drawings',exact:true});
   assert.equal(await entry.getAttribute('id'),'studioSavedIdeas');
   const target=await entry.boundingBox();assert.ok(target&&target.height>=44,'collection entry is a touch-sized target');
@@ -137,9 +141,9 @@ async function collectionJourney(browser,base,device,viewport){
   await page.screenshot({path:'test-results/navigation-collection-'+device+'.png',fullPage:true});
   await page.click('#studioCollectionBack');
   await page.locator('#page-studio-library').waitFor({state:'visible'});
-  await page.click('#studioNavJourney');await page.locator('#studioNavJourney[aria-current="page"]').waitFor();
-  await page.click('#studioNavRewards');await page.locator('#studioNavRewards[aria-current="page"]').waitFor();
-  await page.click('#studioNavPals');await page.locator('#page-jems-pals').waitFor({state:'visible'});
+  await navigate(page,'#studioNavJourney');await page.locator('#studioNavJourney[aria-current="page"]').waitFor({state:'attached'});
+  await navigate(page,'#studioNavRewards');await page.locator('#studioNavRewards[aria-current="page"]').waitFor({state:'attached'});
+  await navigate(page,'#studioNavPals');await page.locator('#page-jems-pals').waitFor({state:'visible'});
   assert.equal(await page.locator('#studioNavPals').getAttribute('aria-current'),'page');
   assert.deepEqual(await page.locator('.studio-nav button.active').evaluateAll(buttons=>buttons.map(button=>button.id)),['studioNavPals']);
   await page.click('#studioNavHome');await page.click('#studioSavedIdeas');await assertCollection(page,0);

@@ -1,0 +1,164 @@
+/* The application retains its existing destinations and guarded route handlers.
+   Only three primary controls occupy the shell; the remaining controls live in
+   a labelled, native modal drawer rather than wrapping across the header. */
+body.studio-review.jems-compact-navigation .site-header.studio-practice-navigation {
+  display: flex; flex-wrap: nowrap; align-items: center; gap: 12px;
+  /* A backdrop filter would make fixed phone navigation relative to this
+     short header instead of the viewport and cover the profile control. */
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation {
+  display: flex; flex: 0 1 auto; flex-wrap: nowrap; order: 1;
+  width: auto; gap: 6px; margin-left: auto; justify-content: flex-end;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-shell-tools {
+  flex: 0 1 auto; order: 2; margin-left: 0;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 48px; min-width: 48px; padding: 11px 15px;
+  font-size: var(--jems-child-label, 18px); line-height: 1.3; white-space: nowrap;
+}
+body.studio-review.jems-compact-navigation .studio-menu-toggle.has-current-destination {
+  color: #50258c; background: #ede2ff;
+}
+body.studio-review.jems-compact-navigation .studio-menu-dialog {
+  position: fixed; inset: 0 0 0 auto; box-sizing: border-box;
+  width: min(440px, 100%); height: 100dvh; max-height: 100dvh;
+  max-width: 100%; margin: 0; padding: 0; border: 0;
+  border-radius: 24px 0 0 24px; color: #0b1e3b; background: #fff;
+  box-shadow: -12px 0 48px #15244026; overflow: hidden;
+}
+body.studio-review.jems-compact-navigation .studio-menu-dialog:not([open]) { display: none !important; }
+body.studio-review.jems-compact-navigation .studio-menu-dialog[open] {
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+}
+.studio-menu-dialog::backdrop { background: #16223e66; }
+.studio-menu-dialog *, .studio-menu-dialog *::before, .studio-menu-dialog *::after { box-sizing: border-box; }
+.studio-menu-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: max(18px, env(safe-area-inset-top)) 20px 14px;
+  border-bottom: 1px solid #e6e1ee;
+}
+.studio-menu-heading h2 { margin: 0; font: 850 1.75rem/1.2 var(--jems-round, system-ui); }
+.studio-menu-content { overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px max(24px, env(safe-area-inset-bottom)); }
+.studio-menu-group { display: grid; gap: 6px; margin: 0 0 22px; }
+.studio-menu-group:last-child { margin-bottom: 0; }
+.studio-menu-group h3 { margin: 0 0 4px; color: #53338a; font: 800 var(--jems-child-label, 18px)/1.4 var(--jems-body, system-ui); }
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  min-height: 52px; padding: 12px 14px; border: 1px solid transparent;
+  border-radius: 14px; background: #f6f4fa; color: #223653;
+  font: 750 var(--jems-child-label, 18px)/1.4 var(--jems-body, system-ui);
+  text-align: left; justify-content: flex-start; white-space: normal;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #studioNavScenes {
+  font-size: var(--jems-child-label, 18px); padding-inline: 14px;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button .jems-icon { flex: 0 0 24px; }
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button:hover,
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button[aria-current="page"] {
+  color: #4c2389; border-color: #c8b2e8; background: #ece1fb;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog button:focus-visible,
+body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button:focus-visible {
+  outline: 3px solid #7136c9; outline-offset: 3px;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #studioMenuClose {
+  width: auto; flex: none; min-width: 48px;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #jemsRewardsWidget {
+  margin: 5px 0 0; border-color: #d7e4fa; background: #eef5ff;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog #jemsRewardsWidget :is(span, strong, small) {
+  font-size: var(--jems-child-label, 18px);
+}
+body.studio-review.jems-compact-navigation .studio-menu-dialog #studioLearningChoice:not([hidden]) {
+  display: block; margin: 10px 0 0; padding: 0;
+}
+body.studio-review.jems-compact-navigation .studio-menu-dialog .studio-learning-copy { display: none; }
+body.studio-review.jems-compact-navigation .studio-menu-dialog .learning-subject-switch {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px;
+}
+body.studio-review.jems-compact-navigation .site-header .studio-menu-dialog .learning-subject-switch button[aria-pressed="true"] {
+  border-color: #9b75ce; background: #fff; color: #4c2389;
+}
+body.studio-review.jems-compact-navigation .studio-menu-dialog [aria-labelledby="studioMenuGrownupsTitle"] {
+  border-top: 1px solid #e5e0ee; padding-top: 19px;
+}
+/* Parent access and help remain discoverable before a new player chooses a
+   character. The child's other destinations appear after that first choice. */
+body.studio-review.jems-compact-navigation.studio-first-visit .site-header .studio-nav.studio-shell-navigation { display: flex !important; }
+body.studio-review.jems-compact-navigation.studio-first-visit .site-header .studio-nav.studio-shell-navigation > :is(#studioNavHome, #studioNavCreate) { display: none !important; }
+body.studio-review.jems-compact-navigation.studio-first-visit .studio-menu-dialog :is([aria-labelledby="studioMenuMakeTitle"], [aria-labelledby="studioMenuWorldTitle"], [aria-labelledby="studioMenuLearnTitle"]) { display: none; }
+
+@media(max-width: 760px) {
+  body.studio-review.jems-compact-navigation { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  body.studio-review.jems-compact-navigation .site-header { gap: 8px; padding: 10px 12px; }
+  body.studio-review.jems-compact-navigation .site-header .jems-brand-logo {
+    width: clamp(112px, 34vw, 150px); height: 50px;
+  }
+  body.studio-review.jems-compact-navigation .site-header .studio-shell-tools { margin-left: auto; }
+  body.studio-review.jems-compact-navigation .site-header :is(.studio-shell-tools, .studio-profile-menu) { position: static; }
+  body.studio-review.jems-compact-navigation .site-header .studio-profile-menu[open] .profile-choices {
+    /* The first-visit profile sits beside Menu, so its popover must anchor to
+       the whole header instead of extending left from that smaller control. */
+    top: calc(100% + 6px); right: 12px; left: auto;
+    width: min(320px, calc(100vw - 24px)); min-width: 0; max-width: calc(100vw - 24px);
+  }
+  body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation {
+    position: fixed; inset: auto 0 0; z-index: 70;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%; gap: 4px; margin: 0;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+    border-top: 1px solid #d9d3e8; background: #fff; box-shadow: 0 -5px 20px #1424470b;
+  }
+  body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button {
+    min-height: 52px; padding: 9px 5px; gap: 5px; font-size: var(--jems-child-label, 18px);
+  }
+  body.studio-review.jems-compact-navigation .site-header .studio-nav.studio-shell-navigation > button .jems-icon { width: 22px; height: 22px; }
+  /* Work areas keep navigation in the document flow. A fixed app bar must never
+     cover a game's touch buttons, the drawing canvas, or scene editor tools. */
+  body.studio-review.jems-compact-navigation:has(:is(#page-studio, #page-creation, #page-art-studio, #page-lab):not(.hidden)) {
+    padding-bottom: 0;
+  }
+  body.studio-review.jems-compact-navigation:has(:is(#page-studio, #page-creation, #page-art-studio, #page-lab):not(.hidden)) .site-header {
+    flex-wrap: wrap;
+  }
+  body.studio-review.jems-compact-navigation:has(:is(#page-studio, #page-creation, #page-art-studio, #page-lab):not(.hidden)) .site-header .studio-nav.studio-shell-navigation {
+    position: static; order: 3; flex-basis: 100%;
+    padding: 3px 0 0; border: 0; box-shadow: none; background: transparent;
+  }
+  body.studio-review.jems-compact-navigation.studio-first-visit { padding-bottom: 0; }
+  body.studio-review.jems-compact-navigation.studio-first-visit .site-header { gap: 6px; }
+  body.studio-review.jems-compact-navigation.studio-first-visit .site-header .jems-brand-logo { width: 100px; height: 44px; }
+  body.studio-review.jems-compact-navigation.studio-first-visit .site-header .studio-shell-tools { order: 1; }
+  body.studio-review.jems-compact-navigation.studio-first-visit .site-header .studio-profile-menu > summary { max-width: 92px; }
+  body.studio-review.jems-compact-navigation.studio-first-visit .site-header .studio-nav.studio-shell-navigation {
+    position: static; order: 2; flex: 0 0 auto; width: auto;
+    padding: 0; border: 0; box-shadow: none; background: transparent;
+  }
+  body.studio-review.jems-compact-navigation.studio-first-visit .site-header .studio-nav.studio-shell-navigation > #studioNavMenu {
+    padding: 8px; min-height: 48px;
+  }
+  body.studio-review.jems-compact-navigation .jems-rewards-toast-host,
+  body.studio-review.jems-compact-navigation .pals-toast-host {
+    bottom: calc(86px + env(safe-area-inset-bottom));
+  }
+  body.studio-review.jems-compact-navigation > .factory-update-notice,
+  body.studio-review.jems-compact-navigation > .factory-update-notice button {
+    /* The update notice stays in document flow. Keep its focus/scroll target
+       above the dock as well as reserving body padding after the notice. */
+    scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom));
+  }
+  .studio-menu-heading { padding-inline: 16px; }
+  .studio-menu-content { padding-inline: 16px; }
+}
+@media(max-width: 370px) {
+  body.studio-review.jems-compact-navigation:not(.studio-first-visit) .site-header .studio-nav.studio-shell-navigation > button {
+    flex-direction: column; min-height: 60px; padding: 6px 4px; gap: 2px;
+  }
+}
+@media(prefers-reduced-motion: reduce) {
+  .studio-menu-dialog, .studio-menu-dialog * { scroll-behavior: auto !important; }
+}

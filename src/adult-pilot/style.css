@@ -2,6 +2,7 @@
 .adult-profile-dialog { width: min(32rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; border: 2px solid #0b1e3b; border-radius: 1.25rem; padding: 1.5rem; color: #0b1e3b; }
 .adult-profile-dialog::backdrop { background: #0b1e3baa; }
 .adult-profile-dialog h2 { margin-top: 0; }
+.adult-profile-dialog [hidden] { display: none !important; }
 .adult-profile-dialog p { line-height: 1.5; }
 .adult-profile-dialog input { box-sizing: border-box; width: 100%; min-height: 48px; margin-top: .5rem; }
 .adult-profile-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
@@ -10,4 +11,14 @@
 .adult-profile-banner[hidden] { display: none; }
 .adult-profile-banner p { margin: .35rem 0; line-height: 1.5; }
 .adult-profile-banner small { display: block; }
+.adult-parent-session-entry { margin: 1.5rem 0; padding: 1.25rem; border: 1px solid #cbd5e1; border-radius: 1rem; background: #f8fafc; color: #0b1e3b; }
+.adult-parent-session-entry h3 { margin: 0 0 .5rem; }
+.adult-parent-session-entry p { margin: .5rem 0; line-height: 1.5; }
+#adultParentSessionSummary { font-weight: 650; }
+.adult-parent-capabilities { display: grid; gap: .5rem; margin: 1rem 0; }
+.adult-parent-capabilities > div { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; padding: .75rem; border: 1px solid #cbd5e1; border-radius: .75rem; }
+.adult-parent-capabilities dt { font-weight: 650; }
+.adult-parent-capabilities dd { margin: 0; color: #475569; }
+.adult-parent-capabilities dd[data-ready="true"] { color: #17643a; }
+.adult-profile-dialog :focus-visible, .adult-parent-session-entry button:focus-visible { outline: 3px solid #3262d4; outline-offset: 3px; }
 @media(max-width: 600px) { .adult-profile-banner { align-items: stretch; flex-direction: column; } }

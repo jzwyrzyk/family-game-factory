@@ -1,0 +1,174 @@
+name: Publish reviewed Jems sandbox image
+# Manual, source-pinned, cloud-to-cloud release. No private game or model keys.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: jems-reviewed-sandbox-publish
+  cancel-in-progress: false
+env:
+  REVIEWED_SANDBOX_SHA: b472c224f7e8ef8ab0986ce6f755728d7cc63d46
+  SANDBOX_IMAGE: ghcr.io/jzwyrzyk/family-game-factory-sandbox
+jobs:
+  publish-reviewed-sandbox:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact reviewed merged sandbox source
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REVIEWED_SANDBOX_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git merge-base --is-ancestor "$REVIEWED_SANDBOX_SHA" "$GITHUB_SHA"
+          git checkout --detach "$REVIEWED_SANDBOX_SHA"
+          test "$(git rev-parse HEAD)" = "$REVIEWED_SANDBOX_SHA"
+          # This is the reviewed source selected in the private worker's
+          # factory-smoke.yml. Do not rebuild from changing main.
+          test -f server/sandbox/quality-capture.cjs
+          test -f server/agent/game-assets.cjs
+          test -f server/quality/game-quality-evidence.cjs
+          test -f server/sandbox/worker.cjs
+          echo "PINNED_SANDBOX_SOURCE_VERIFIED=$REVIEWED_SANDBOX_SHA"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Stage only committed, reviewed sandbox inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          export STAGE_DIR="$RUNNER_TEMP/jems-sandbox-staged"
+          python3 - <<'PY'
+          import importlib.util
+          import os
+          from pathlib import Path
+          import subprocess
+
+          root = Path.cwd()
+          source = os.environ['REVIEWED_SANDBOX_SHA']
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip() == source
+          spec = importlib.util.spec_from_file_location('sandbox_build',root/'scripts/deployment/build.py')
+          publisher = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(publisher)
+          stage = Path(os.environ['STAGE_DIR'])
+          stage.mkdir()
+          scope = ['.dockerignore','server/sandbox',
+                   'server/agent/game-assets.cjs',
+                   'server/quality/game-quality-evidence.cjs']
+          publisher.stage_sources(root,stage,source,scope)
+          required = ['.dockerignore','server/sandbox/Dockerfile',
+                      'server/sandbox/worker.cjs',
+                      'server/sandbox/source-validator.cjs',
+                      'server/sandbox/quality-capture.cjs',
+                      'server/agent/game-assets.cjs',
+                      'server/quality/game-quality-evidence.cjs']
+          if any(not (stage/name).is_file() for name in required):
+              raise SystemExit('REVIEWED_SANDBOX_INPUTS_INCOMPLETE')
+          print('COMMITTED_SANDBOX_INPUTS_VERIFIED')
+          PY
+      - name: Build and validate sandbox before any publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          source="$REVIEWED_SANDBOX_SHA"
+          stage="$RUNNER_TEMP/jems-sandbox-staged"
+          image="jems-sandbox:prepublish"
+          docker buildx version
+          DOCKER_BUILDKIT=1 docker build --pull \
+            --label "org.opencontainers.image.revision=$source" \
+            --label "org.opencontainers.image.source=https://github.com/jzwyrzyk/family-game-factory" \
+            --file "$stage/server/sandbox/Dockerfile" --tag "$image" "$stage"
+          test "$(docker image inspect "$image" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$source"
+          # An OCI label alone can be forged; compare actual packaged entry and
+          # security/quality validators against Git objects from the pinned source.
+          for file in worker.cjs source-validator.cjs quality-capture.cjs; do
+            expected="$(sha256sum "$stage/server/sandbox/$file" | cut -d' ' -f1)"
+            observed="$(docker run --rm --network none \
+              --entrypoint=sha256sum "$image" "/app/server/sandbox/$file" | cut -d' ' -f1)"
+            test "$observed" = "$expected"
+          done
+          echo "SANDBOX_SOURCE_AND_IMAGE_BYTES_MATCH"
+      - name: Exercise current envelope protocol in isolated no-network container
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          # This is a wire/packaging check on the GitHub-hosted Docker runner.
+          # It is NOT gVisor production security or full acceptance.
+          # This TS fixture is compiled as CommonJS in the reviewed Node
+          # package. ESM named import fails even though the fixture is valid.
+          # Validate and write the synthetic envelope BEFORE opening Docker:
+          # an invalid fixture must never be mistaken for a sandbox failure.
+          umask 077
+          node --import tsx -e '
+            const {hopper} = require("./server/testing/generated-fixtures.ts");
+            if (!hopper || hopper.kind !== "generated-module-v1" ||
+                !Array.isArray(hopper.controls) ||
+                typeof hopper.source !== "string" ||
+                !hopper.source.includes("createGame")) {
+              throw Error("SANDBOX_SYNTHETIC_FIXTURE_INVALID");
+            }
+            process.stdout.write(JSON.stringify({game:hopper}));
+          ' > "$RUNNER_TEMP/jems-sandbox-wire-input.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const x=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/jems-sandbox-wire-input.json","utf8"));
+            if (!x.game || x.game.kind!=="generated-module-v1") throw Error("INVALID_WIRE_INPUT");
+            console.log("SANDBOX_FIXTURE_ENVELOPE_VALIDATED");
+          '
+          timeout 90s docker run --rm -i --pull=never \
+              --network=none --read-only --cap-drop=ALL \
+              --security-opt=no-new-privileges --pids-limit=128 \
+              --memory=1536m --memory-swap=1536m --cpus=1 \
+              --user=1000:1000 --tmpfs=/tmp:rw,nosuid,nodev,size=256m \
+              --shm-size=128m jems-sandbox:prepublish \
+              < "$RUNNER_TEMP/jems-sandbox-wire-input.json" \
+              > "$RUNNER_TEMP/jems-sandbox-wire-receipt.json"
+          rm "$RUNNER_TEMP/jems-sandbox-wire-input.json"
+          node --input-type=module -e '
+            import {readFileSync,rmSync} from "node:fs";
+            const path=process.env.RUNNER_TEMP+"/jems-sandbox-wire-receipt.json";
+            const receipt=JSON.parse(readFileSync(path,"utf8"));
+            rmSync(path);
+            const t=receipt.game?.compiled?.tests;
+            if (receipt.ok!==true || t?.desktop!==true ||
+                t?.mobile!==true || t?.replay!==true || t?.isolation!==true) {
+              throw Error("SANDBOX_ENVELOPE_WIRE_CONTRACT_FAILED");
+            }
+            console.log("SANDBOX_ENVELOPE_WIRE_CONTRACT_PASSED");
+          '
+      - name: Publish to GHCR after protocol validation
+        shell: bash
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Run/attempt specific tag: never move any prior immutable release tag.
+          tag="$SANDBOX_IMAGE:source-$REVIEWED_SANDBOX_SHA-run-$GITHUB_RUN_ID-attempt-$GITHUB_RUN_ATTEMPT"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin >/dev/null
+          docker tag jems-sandbox:prepublish "$tag"
+          docker push "$tag" > "$RUNNER_TEMP/jems-sandbox-push-receipt.txt"
+          digest="$(sed -nE 's/.*digest: (sha256:[a-f0-9]{64}).*/\1/p' "$RUNNER_TEMP/jems-sandbox-push-receipt.txt" | tail -1)"
+          [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
+          ref="$SANDBOX_IMAGE@$digest"
+          docker pull "$ref" >/dev/null
+          test "$(docker image inspect "$ref" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$REVIEWED_SANDBOX_SHA"
+          echo "PUBLISHED_SANDBOX_IMAGE=$ref"
+          {
+            echo '## Reviewed Jems sandbox publication'
+            echo "Public source: \`$REVIEWED_SANDBOX_SHA\`"
+            echo "Immutable image: \`$ref\`"
+            echo 'Packaged source hashes and no-network envelope/fixture smoke passed.'
+            echo '**NOT YET PRODUCTION-ACCEPTED:** a separate actual gVisor/no-egress/full browser/hostile-source owner smoke is mandatory.'
+            echo 'No private worker tag, WIF trust, Cloud Run setting, paid AI approval or website changed.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          docker logout ghcr.io >/dev/null

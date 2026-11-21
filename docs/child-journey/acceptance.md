@@ -4,7 +4,7 @@
 
 All profiles, prompts, and generated examples in tests are synthetic. Remote generation/provider responses are explicitly identified fixtures. No actual child behavior or live paid model output is inferred from them.
 
-The current review's GitHub checks and artifacts are the authority for its tested commit. Local production compilation and targeted unit/contract checks were executed. Local Chromium is unavailable under this workspace's process policy; browser evidence is collected by the existing GitHub Actions workflow without bypassing that restriction.
+Each review's GitHub checks, local receipts and artifacts establish only their tested source. The guided-creation follow-up, corrected after the owner's November 21 clarification, uses local production builds and headless Chromium for its focused and integrated browser suites; [selected captures](previews/README.md) record the exact bundles and fixture limits. The original integrated-journey review could not run Chromium locally and relied on hosted browser evidence; that historical environment limitation does not describe the later run.
 
 | Suite | Important behavior |
 | --- | --- |
@@ -14,11 +14,12 @@ The current review's GitHub checks and artifacts are the authority for its teste
 | `tests/learning-repair.cjs` | Actual native practice/challenge persistence, hints, and pacing |
 | `test:studio` | Durable drafts, independent tests, nonselecting background tests, version promotion/copy/history, construction/ride continuity, profiles, remote fixture readiness |
 | `test:coach` | Child/helper provenance, exact-quote decisions, field autosave, newer input during delayed replies, HTTP/auth/moderation/budget boundaries, desktop/mobile journeys |
+| `test:guided-creation` | Contextual coach questions retain the child's typed answers and corrections; no supplied-answer or delegation controls; grounded current-state readiness gates explicit first Build; optional details stay collapsed; focused truthful handoff preserves drafts, ownership and explicit play; internal instructions stay out of chat; profile-return transcripts and helper attribution survive |
 | `test:quality` | Physical workshop, hill driving, touch/keyboard controls, tablet portrait/landscape selection and held pedals, sound/pause/replay, standalone generated physics and containment |
-| `test:child-journey` | First-screen play, primary target size, current-test help/return, real native math while using mobile panels, explicit ready preview, newer draft retention, visible storage failure and retry |
+| `test:child-journey` | Character-first entry and conversational creation, primary target size, current-test help/return, real native math while using mobile panels, explicit ready preview, newer draft retention, visible storage failure and retry |
 | Existing browser/deployment gates | Arcade, live remix, builder, five generated revisions, worker security, restored original games, offline shell, touch, private drawings, deployment-policy dry runs |
 
-The workflow has `browser`, `learning`, and `creative` jobs. Production build success is required for each job's suites. Failure in one suite does not hide the independent evidence from later suites, and a failed suite still fails the job. Artifacts are `browser-evidence`, `learning-evidence`, and `creative-evidence`.
+The original integrated workflow used `browser`, `learning`, and `creative` jobs with corresponding evidence artifacts. Later release checks also use the complete [parallel regression assignment](../assignment-006/RELEASE-CONTINUITY.md#complete-parallel-release-regressions). Production build success is required for each job's suites. Failure in one suite does not turn another job's passing evidence into a complete-run pass.
 
 Before handoff, inspect the complete run and its mobile/desktop screenshots; do not substitute a targeted unit pass or historical #19/#20 run for the integrated result. See the final PR body for the completed run and any unresolved results.
 
