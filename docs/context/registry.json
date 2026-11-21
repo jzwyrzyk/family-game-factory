@@ -64,7 +64,10 @@
     "docs/decisions/2026-11-20-pal-expression-runtime.md",
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
-    "docs/brand/previews/learning-readability-20261120/README.md"
+    "docs/brand/previews/learning-readability-20261120/README.md",
+    "docs/development/ENVIRONMENTS.md",
+    "docs/decisions/2026-11-20-development-environments.md",
+    "docs/development/DEV-WORKBENCH.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -95,7 +98,8 @@
     "docs/pals/*.md",
     "skills/gem-pal-studio/*.md",
     "docs/drawings/*.md",
-    "docs/pals/previews/*.md"
+    "docs/pals/previews/*.md",
+    "docs/development/*.md"
   ],
   "areas": [
     {
@@ -418,7 +422,8 @@
         "docs/auth/*.md",
         "server/README.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/development/*.md"
       ],
       "sources": [
         "server/*.ts",
@@ -431,10 +436,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:50.701Z",
-      "sourceDigest": "993d1bc5ede9a3befd153f0c288c33901280d9cc60e39b879035c0aa119f8183",
+      "reviewedAt": "2026-11-21T02:58:05.192Z",
+      "sourceDigest": "61557c9b9a9345018a2fec56c1c89aba2dc31dfd8e87d561c4994d234178d46d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the authenticated read-only companion endpoint and gateway/preview COPY inputs against merged quality artifacts. It returns bounded scene data through the existing revision audience check with no-store, while approved game art and private capture storage retain main's contracts."
+      "reviewReason": "Documented explicit DEV project metadata and signed IAP gates, the authenticated same-origin keyless proxy, separate preview audience and exact private coach caller. Existing-site defaults and production release controls remain unchanged."
     },
     {
       "id": "generation",
@@ -445,7 +450,8 @@
         "docs/assignment-005/*.md",
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/development/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -457,10 +463,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:51.403Z",
-      "sourceDigest": "7f85771c47f30cc46436ae0c61338e56c7df2e0ecf3a47e9e179fdd8a5fed79d",
+      "reviewedAt": "2026-11-21T02:58:05.471Z",
+      "sourceDigest": "1c12cef0b653fc5256d56f4767e65d19968e94a9aaa5aca7c068bb63ffdbd769",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled conflicting generation and Docker paths with merged planning/art/review. Both request modes retain plan, playthrough, approved art and required repair captures; companion remains host-held and unchanged through attestation/publication. Existing quality runtime and resource/spending caps are preserved."
+      "reviewReason": "Documented the independently pinned private DEV workflow and jems-dev-execution tag, verified adult synthetic grants through publication, shared maximum-cost admission and preservation of production worker trust. DEV cannot fall back to a production tag."
     },
     {
       "id": "coach",
@@ -470,7 +476,8 @@
         "docs/design-coach/*.md",
         "docs/issue-28/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/development/*.md"
       ],
       "sources": [
         "server/coach/**",
@@ -479,10 +486,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:57.871Z",
-      "sourceDigest": "8939dd9b318ffc535db5f7166ad77a57f5768f8044706ad0536e990891be0643",
+      "reviewedAt": "2026-11-21T02:58:05.796Z",
+      "sourceDigest": "17cc746a39d815999c3f0aee0eef8b9418a6ba9746c8f7bfb1ac01ff3f4a877e",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the shared recognized local female voice policy for optional Hear reply, delayed discovery, cancellation and unavailable output. Input recording, explicit Send, provider configuration, budgets and existing privacy boundaries are unchanged."
+      "reviewReason": "Documented synthetic DEV authorization, one-hour original grants, grant-partitioned receipts and cache, and completion rechecks. Generation, coach and speech share durable admission and one active paid operation; explicit Send, Build and Keep and educational evidence boundaries remain unchanged."
     },
     {
       "id": "adult-privacy",
@@ -491,7 +498,8 @@
         "DELIVERY-STATE.md",
         "docs/decisions/0005-temporary-adult-profile.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/development/*.md"
       ],
       "sources": [
         "src/adult-pilot/**",
@@ -506,10 +514,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "dc06770f40ed57b93dd2ff664e65bb30d78dab8a88c0555845f66c69930ca272",
-      "reviewedAt": "2026-11-20T17:11:54.080Z",
+      "sourceDigest": "0ac5e0630d3c3624b55e16f0c66496876e6946a3216312e89af009e31da43d17",
+      "reviewedAt": "2026-11-21T02:58:06.041Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed permanent access entry, bounded owner-aware readiness checks, existing passphrase unlock, cancel/expiry cleanup and guarded connection navigation. Updated disabled-pilot removal wording to distinguish gated profile choice from always-visible help; server flags and grants remain unchanged.",
+      "reviewReason": "Distinguished operator-confirmed signed-IAP adults and server-only synthetic test grants from existing adult permits, passphrase sessions, guardian choices and provider records. No guardian, coach-consent or ZDR evidence is fabricated; actual child and live-provider acceptance remain unclaimed.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -544,7 +552,8 @@
         "docs/rewards/*.md",
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
-        "docs/pals/previews/*.md"
+        "docs/pals/previews/*.md",
+        "docs/development/*.md"
       ],
       "sources": [
         "tests/**",
@@ -553,10 +562,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T20:22:00.000Z",
-      "sourceDigest": "59e9b072b5a88458bdc1de8d9eaaf6722732e7753fd10ec07736d38102672f2b",
+      "reviewedAt": "2026-11-21T02:58:06.361Z",
+      "sourceDigest": "cad0aabda94c2a91077ee7414f3bb854debf17cc97e36799e650b2ed677fcc9e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact-main reduced-motion failure against the actual Wink portrait event listener: Playwright media emulation precedes asynchronous matchMedia change notification. PR92 waits for controller state and retains zero active-animation assertion. Documented test-only scope in validation evidence; no product/approval or physical-device acceptance is inferred.",
+      "reviewReason": "Recorded the scoped DEV identity, dispatch-tag, cancellation, artifact provenance, budget-race and fake-cloud recovery suites plus existing unit/deployment regressions. Added exact-source image packaging CI and retained local browser versus physical-device, live-IAP and provider evidence limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -602,7 +611,9 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/development/*.md",
+        "docs/decisions/2026-11-20-development-environments.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -613,13 +624,18 @@
         "vite.config.ts",
         ".dockerignore",
         ".gitignore",
-        "DELIVERY-STATE.md"
+        "DELIVERY-STATE.md",
+        "docs/development/*.md",
+        "docs/decisions/2026-11-20-development-environments.md",
+        "scripts/development/**",
+        "server/Dockerfile.dev-site",
+        "server/Dockerfile.dev-site-source"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T02:40:29.928Z",
-      "sourceDigest": "dfb9123ba5cb2940ad29e6b7c3423c6b295c60011abf9210093705260abbcc18",
+      "reviewedAt": "2026-11-21T03:06:55.701Z",
+      "sourceDigest": "d5828aee92d7d5f4bbe909539e588cd0781c010bb52bdd70edc88b1e3eeee3b0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful production-image smoke 44855232144 and owner cleanup/reset evidence. Added and reviewed a sanitized read-only activation inventory with explicit runtime configuration mount proof, consistent Firestore reads, current allowance and adult access status. Existing application and sandbox pins are preserved; activation and Pages remain pending.",
+      "reviewReason": "Recorded public PR106 and its exact reviewed tree, successful hosted DEV source-image build/import and scoped compatibility checks, separate private review/export PR16, and closure of superseded design PR101. Both implementation drafts remain unmerged; no shared DEV deployment, paid activation or full browser acceptance is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -684,10 +700,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:16:54.695Z",
-      "sourceDigest": "ca98be8baa58c6934f4729736ebca3a1b5af7b6863c119c49cc9d6d7615bdfb2",
+      "reviewedAt": "2026-11-21T02:58:07.076Z",
+      "sourceDigest": "ca535165b396b91bd80ec5830413f3b87827c46fb42626323811d597ac93da85",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit runtime and character-design routing for public Pal assets and validation routing for the asset verifier tests. Additional reconciled review: Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved.",
+      "reviewReason": "Routed new development scripts, DEV image/package/deployment contracts and DEV source documentation through the registry; added the workbench to required documents and the index. Reviewed normalized routing and retained explicit semantic review and separate source/integration/deployment evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

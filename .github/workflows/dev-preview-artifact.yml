@@ -1,0 +1,48 @@
+name: Disconnected DEV preview artifact
+# Opt in with the dev-preview label. The 234 MB artwork is retained once per
+# selected head; normal visual iteration uses local HMR, not repeated uploads.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+permissions:
+  contents: read
+concurrency:
+  group: jems-disconnected-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  artifact:
+    if: github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'dev-preview')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run typecheck
+      - name: Build and verify exact disconnected preview
+        env:
+          PREVIEW_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+          PREVIEW_PR_NUMBER: ${{ github.event.pull_request.number }}
+          PREVIEW_RUN_ID: ${{ github.run_id }}
+        run: |
+          npm run dev:preview:build -- --out .factory-deployment/previews/ci \
+            --expected-sha "$PREVIEW_SOURCE_SHA" --pr "$PREVIEW_PR_NUMBER" \
+            --run-id "$PREVIEW_RUN_ID" --require-clean
+          npm run dev:preview:verify -- --dir .factory-deployment/previews/ci \
+            --expected-sha "$PREVIEW_SOURCE_SHA" --pr "$PREVIEW_PR_NUMBER" --run-id "$PREVIEW_RUN_ID"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dev-preview-pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: .factory-deployment/previews/ci
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+# This read-only workflow does not publish a site, acquire cloud credentials,
+# dispatch a worker or execute a model. A future publisher must independently
+# validate the run/PR/source envelope and artifact using reviewed trusted code.

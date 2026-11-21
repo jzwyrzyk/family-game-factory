@@ -3,12 +3,14 @@ import {allowedCoachFamily} from './consent';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotConfigured,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
+import {devTestAllowed,hasAdultSession,devCapacityAvailable,reserveDevSpend} from '../dev-test-policy';
+import type {DevAccessPolicy} from '../dev-access';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
 import type {Repository,PipelineState} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
 export interface CoachConfig {
  enabled:boolean;privacyApproved:boolean;moderationApproved:boolean;zdrVerified:boolean;privateExecutionApproved:boolean;model:string;
- requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
+ requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;devTestPolicy?:DevAccessPolicy;
  maxInputChars:number;maxOutputTokens:number;maxTurnMicroUsd:number;
  inputMicroUsdPerMillion:number;outputMicroUsdPerMillion:number;pricesReviewedAt:string;
 }
@@ -33,8 +35,10 @@ export class CoachService {
  available(){return approved(this.config)&&!!this.provider;}
  private permitted(state:PipelineState,session:VerifiedSession,now=Date.now()):boolean{
   try{assertActiveTrustedDevice(state,session,now);}catch{return false;}
+  if(session.devTestGrantId!==undefined)return devTestAllowed(state,session,this.config.devTestPolicy,now);
+  if(this.config.devTestPolicy&&!hasAdultSession(session))return false;
   if(this.config.adultPilot?.enabled===true)return adultPilotAllowed(state,session,now);
-  if(session.adultSessionId||session.adultProfileId)return false;
+  if(hasAdultSession(session))return false;
   return allowedCoachFamily(state,session,'model',now)&&
    (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'conversation',now));
  }
@@ -50,6 +54,7 @@ export class CoachService {
    const permitted=this.permitted(state,session);
    if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)return false;
+   if(!devCapacityAvailable(state,this.config.devTestPolicy,this.config.maxTurnMicroUsd))return false;
    if(this.provider?.readiness&&!await this.provider.readiness(AbortSignal.timeout(3000)))return false;
    return this.permitted(await this.repo.snapshot(),session);
   }catch{return false;}
@@ -83,7 +88,7 @@ export class CoachService {
   const hash=createHash('sha256').update(serialized).digest('hex');
   // Never reuse a child's cache entry in an adult session, or revive a reply
   // admitted by an adult session that was subsequently locked.
-  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
+  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.devTestGrantId?`${session.subject}:dev:${session.devTestGrantId}`:session.subject;
   const reservation=await this.repo.transaction(state=>{
    // Firestore may wait or retry the transaction; use admission time, not request time.
    const now=Date.now(),month=new Date(now).toISOString().slice(0,7);
@@ -98,6 +103,7 @@ export class CoachService {
    if(list.filter(x=>x.familyId===session.familyId&&x.at>now-60000).length>=10)throw Error('RATE_LIMIT');
    if(list.length>=500)throw Error('COACH_HISTORY_FULL');
    const ledger=state.ledgers[session.familyId];if(!ledger?.paidEnabled||ledger.month!==month||ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
+   reserveDevSpend(state,this.config.devTestPolicy,this.config.maxTurnMicroUsd);
    ledger.reserved+=this.config.maxTurnMicroUsd;list.push({id:input.requestId,familyId:session.familyId,subject,hash,month,reserved:this.config.maxTurnMicroUsd,at:now,state:'running'});
    return {cached:null};
   });

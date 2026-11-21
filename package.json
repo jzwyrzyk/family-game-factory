@@ -62,7 +62,15 @@
     "test:pals-expressions": "node --import tsx --test tests/pals-expressions.test.ts",
     "test:pals-expressions-browser": "node tests/pals-expressions-browser.cjs",
     "test:read-aloud": "node --import tsx --test tests/friendly-narrator.test.ts",
-    "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs"
+    "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
+    "dev:preview": "node --import tsx scripts/development/preview.ts serve",
+    "dev:preview:build": "node --import tsx scripts/development/preview.ts build",
+    "dev:preview:verify": "node --import tsx scripts/development/preview.ts verify",
+    "dev:site:package": "node --import tsx scripts/development/package-site.ts",
+    "dev:plan": "python3 scripts/deployment/dev_bootstrap.py",
+    "dev:release": "python3 scripts/deployment/dev_release.py",
+    "test:dev": "node --import tsx --test tests/dev-*.test.ts && python3 -m unittest discover -s scripts/deployment -p \"test_dev*.py\" -v",
+    "dev:images": "python3 scripts/deployment/dev_images.py"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

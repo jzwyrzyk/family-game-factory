@@ -1,6 +1,8 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotJobAllowed} from '../adult-pilot';
+import {devTestJobAllowed,hasAdultJob,hasDevJob} from '../dev-test-policy';
+import type {DevAccessPolicy} from '../dev-access';
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
@@ -24,11 +26,13 @@ const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_R
  'IMAGE_PROVIDER_RATE_LIMIT','IMAGE_PROVIDER_FAILED','QUALITY_REVIEW_REQUIRED'];
 
 export class ActionCoordinator {
- constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false){}
+ constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private devTestPolicy?:DevAccessPolicy){}
  async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution)j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};return true;});}
  private permissionError(s:PipelineState,j:Job):string|undefined {
+  if(hasDevJob(j))return devTestJobAllowed(s,j,this.devTestPolicy)?undefined:'DEV_TEST_ACCESS_REQUIRED';
+  if(this.devTestPolicy&&!hasAdultJob(j))return 'DEV_TEST_ACCESS_REQUIRED';
   if(this.requireVerifiedParentPrivacy&&!verifiedParentScope(s,j.familyId,'generation'))return 'GUARDIAN_CONSENT_REQUIRED';
-  if((this.adultPilotMode||j.adultPilotDeviceId||j.adultPilotSessionId||j.adultPilotProfileId)&&
+  if((this.adultPilotMode||hasAdultJob(j))&&
     (!this.adultPilotMode||!adultPilotJobAllowed(s,j)))return 'ADULT_PILOT_ACCESS_REQUIRED';
  }
  private failure(s:PipelineState,j:Job,code:string){
@@ -50,7 +54,7 @@ export class ActionCoordinator {
   // expired while its artifact and screenshot bindings were being validated.
   const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);return;}
   const base=s.revisions.find(r=>r.id===j.baseRevisionId);
-  const revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter,...(j.adultPilotProfileId?{adultPilotProfileId:j.adultPilotProfileId}:{})};
+  const revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter,...(j.adultPilotProfileId?{adultPilotProfileId:j.adultPilotProfileId}:{}),...(j.devTestPolicyId?{devTestPolicyId:j.devTestPolicyId}:{})};
   s.revisions.push(revision);j.revisionId=revision.id;j.status='ready';j.phase='ready';
   if(j.execution){delete j.execution.candidate;delete j.execution.qualityEvidence;}
   const ledger=s.ledgers[j.familyId];ledger.reserved-=j.maxUnits;ledger.used+=j.usedUnits;

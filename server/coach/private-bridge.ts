@@ -7,15 +7,16 @@
 import type {CoachContext} from '../../src/studio/design';
 import {validateAudio,type AudioMime,type SpeechProvider,AUDIO_MAX_BYTES} from './speech';
 import type {CoachProvider} from './service';
+import {devServiceOrigin,type DevCloudTarget} from '../dev-access';
 
 const METADATA_BASE='http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity';
-export function privateCoachOrigin(raw:string):string {
+export function privateCoachOrigin(raw:string,development?:DevCloudTarget):string {
  let u:URL;try{u=new URL(raw);}catch{throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');}
  // An operator typo must not turn the audience-bound bearer token and a child's
  // design context into an HTTP request to an unrelated host. Only the exact
  // dedicated service's canonical Cloud Run URL family is authorized.
  if(u.protocol!=='https:'||u.href!==u.origin+'/'||u.username||u.password||u.search||u.hash||u.port||
-  !u.hostname.startsWith('factory-coach-private-')||!u.hostname.endsWith('.run.app')||
+  (development?u.origin!==devServiceOrigin(development,'coach'):!u.hostname.startsWith('factory-coach-private-'))||!u.hostname.endsWith('.run.app')||
   !/^[a-z0-9.-]+$/.test(u.hostname))throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');
  return u.origin;
 }
@@ -34,8 +35,8 @@ export function metadataIdentityToken(transport:typeof fetch=fetch):IdentityToke
 }
 export class PrivateCoachBridge implements CoachProvider{
  readonly endpoint:string;
- constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){
-  this.endpoint=privateCoachOrigin(origin);
+ constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch,development?:DevCloudTarget){
+  this.endpoint=privateCoachOrigin(origin,development);
  }
  /** This is only a reachability/configuration check, not a live model test.
   * No child prompt, family ID, transcript, audio or API key is included.
@@ -81,8 +82,8 @@ export class PrivateCoachBridge implements CoachProvider{
  */
 export class PrivateSpeechBridge implements SpeechProvider{
  readonly endpoint:string;
- constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){
-  this.endpoint=privateCoachOrigin(origin);
+ constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch,development?:DevCloudTarget){
+  this.endpoint=privateCoachOrigin(origin,development);
  }
  async readiness(signal:AbortSignal):Promise<boolean>{
   try{

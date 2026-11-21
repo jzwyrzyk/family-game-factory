@@ -2,6 +2,8 @@
 
 **Code integration; deployment and paid-provider acceptance are separate.** This feature uses the existing Jems frontend, gateway, preview service and private AI execution. It does not need another website or an adult-only frontend hostname.
 
+**Scope update, November 20, 2026 (America/New_York):** the separate [DEV workbench](../development/DEV-WORKBENCH.md) now has source support for verified adults exercising both this normal Adult profile and synthetic child-style product paths. Its additional IAP/project/test-grant requirements are described below. They do not change the existing-site production defaults or establish a live DEV deployment.
+
 ## The profile switch is the activation
 
 1. On the current Jems site, open **Menu → Grown-ups → Private parent session**. The same entry appears in Parent Settings. It remains visible before character selection and when the workshop is disconnected or private testing is disabled. The optional **Adult (development)** profile choice is still shown only when server status enables it.
@@ -62,6 +64,20 @@ Conversation still requires `FACTORY_COACH_APPROVED`, `FACTORY_COACH_PRIVACY_APP
 Remote Google speech still requires `FACTORY_COACH_AUDIO_APPROVED`, `FACTORY_COACH_AUDIO_PRIVACY_APPROVED`, `FACTORY_COACH_AUDIO_PROVIDER_VERIFIED`, approved project/region, restricted Speech IAM, reviewed data-logging configuration and prices, and browser microphone permission. Adult authority is the permit plus recent session; it is not a fabricated value for `FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED`. Recording starts only on request. **Finish → editable transcript → Send** remains the flow.
 
 Game generation retains private worker source/image pins, WIF identities, gVisor isolation, replay/idempotency controls, approvals and spend reservation. Jobs retain their adult authorization binding so later dispatch and completion cannot borrow an unrelated session. Adult-generated games are separated from child access, including reads and previews. Model, speech and infrastructure spending are reviewed separately.
+
+## The separate DEV workbench
+
+DEV is one shared nonproduction stack with its own GCP project, Firestore workspace, artifact bucket, service identities, secrets, private coach and independently versioned private worker. Explicit `FACTORY_ENVIRONMENT=development` and complete validated `devAccess` must agree; production project identifiers and mixed/incomplete configuration fail closed. Cloud Run checks its actual project metadata before cloud state access. Use the [DEV runbook](../development/DEV-WORKBENCH.md), rather than the existing production bootstrap, for this environment.
+
+The DEV app and browser gateway independently validate Google's signed IAP JWT: exact issuer, ES256 Google keys, exact app-service audience, bounded validity and an operator-confirmed adult allowlist of matching subject/email pairs. IAP authentication does not itself verify age. Browser API calls use the app's same-origin proxy; the gateway's direct origin is reserved as the exact machine callback audience. Preview has its own exact IAP audience and still requires the signed artifact ticket and applicable adult audience. Private coach requests use the separate DEV gateway service account and exact coach audience; browser identity headers are not a substitute.
+
+Selecting **Adult (development)** still requires the ordinary trusted-device permit, passphrase unlock, HttpOnly adult cookie, tab-memory proof and unexpired server session described above. IAP does not create that permit or session. The synthetic child-style profile uses a different server-only test grant, issued only to the configured synthetic family on a live trusted device within verified adult IAP access. That grant binds the adult identity hash, device and policy for at most one hour. It is checked at paid admission, asynchronous execution and completion; a replacement grant cannot revive old pending work or a cached reply from an expired grant. Partial or mixed adult/test authorization is rejected.
+
+This synthetic policy allows an adult to exercise generation, conversation and dictation through the child-style UI. Do not enter real child records or copy production data. It creates no guardian consent, child coach consent, adult-profile permit or ZDR approval, and does not establish readiness to process children's data. Normal provider/privacy/safeguarding approvals and dedicated credentials remain required. Actual Adult-profile work retains its existing audience separation.
+
+All DEV AI capabilities share a durable maximum-cost admission counter. The manifest example sets **5,000,000 micro-USD ($5 total)**, alongside the existing family allowance and per-request caps. Only one paid generation/coach/speech request is active at once. The counter consumes the admitted maximum even on failure, cancellation or uncertain provider response; month changes and renewed grants do not refill it. Crashed/running reservations require explicit reconciliation, with no automatic paid-POST replay. Infrastructure costs are outside this model/speech admission bound.
+
+The implementation has local identity, authorization, budget and routing fixtures; no live project, IAP, paid provider, independent worker or device acceptance is claimed. Native-origin embedded preview access must be tested in the actual authorized adult's browser. Opening the preview host for login is a setup aid, not support for blocked third-party cookies, Safari or incognito. The runbook keeps those live checks separate from source tests and from the existing-site acceptance list below.
 
 ## Acceptance on the existing site
 

@@ -1,0 +1,83 @@
+name: Isolated DEV contracts
+on:
+  push:
+    paths:
+      - '.github/workflows/dev-environments.yml'
+      - 'scripts/development/**'
+      - 'scripts/deployment/dev*'
+      - 'scripts/deployment/test_dev*'
+      - 'server/**'
+      - 'tests/dev-*'
+      - 'tools/offline-build.ts'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - '.github/workflows/dev-environments.yml'
+      - 'scripts/development/**'
+      - 'scripts/deployment/dev*'
+      - 'scripts/deployment/test_dev*'
+      - 'server/**'
+      - 'tests/dev-*'
+      - 'tools/offline-build.ts'
+      - 'package.json'
+      - 'package-lock.json'
+permissions:
+  contents: read
+concurrency:
+  group: jems-isolated-dev-contracts-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run typecheck
+      - name: DEV access, isolation, proxy, preview and deployment contracts
+        run: npm run test:dev
+      - name: Package the exact clean authenticated site without cloud credentials
+        env:
+          REVIEWED_SOURCE_SHA: ${{ github.sha }}
+        run: npm run dev:site:package -- --expected-sha "$REVIEWED_SOURCE_SHA" --out .factory-deployment/dev-site/ci
+      - name: Build the exact source archive used by Cloud Build
+        env:
+          REVIEWED_SOURCE_SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path.cwd() / "scripts/deployment"))
+          from dev_images import app_source_archive
+          destination = Path(".factory-deployment/dev-site/source-ci")
+          destination.mkdir(parents=True)
+          archive, digest = app_source_archive(Path.cwd(), destination, os.environ["REVIEWED_SOURCE_SHA"])
+          print(f"Exact Git source archive SHA256: {digest}")
+          PY
+          docker build --build-arg "REVIEWED_SOURCE_SHA=$REVIEWED_SOURCE_SHA" \
+            --label "org.opencontainers.image.revision=$REVIEWED_SOURCE_SHA" \
+            --tag jems-dev-site:ci --file server/Dockerfile.dev-site-source \
+            - < .factory-deployment/dev-site/source-ci/source.tgz
+      - name: Import the source-built keyless site without network access
+        run: |
+          docker run --rm --network none --entrypoint node jems-dev-site:ci \
+            --input-type=module -e '
+              if (process.getuid() === 0) throw new Error("Non-root runtime required");
+              await import("/app/dev-site.mjs");
+              console.log("DEV site packaged runtime loaded without cloud or model credentials");
+            '
+      - name: Retain package identity only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: jems-dev-package-identity
+          path: .factory-deployment/dev-site/ci/jems-dev-package.json
+          retention-days: 7
+          if-no-files-found: error
