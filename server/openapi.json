@@ -1852,6 +1852,9 @@
           },
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          },
+          "503": {
+            "description": "Worker coordination service unavailable. A lost claim acknowledgment must not trigger automatic claim or paid generation replay."
           }
         },
         "parameters": [
@@ -1872,10 +1875,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Authorized job-scoped stage result"
+            "description": "Accepted report receipt, or the original receipt for an identical job/attempt/run/stage fingerprint, including after repair changes the active attempt."
           },
           "403": {
-            "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+            "description": "Untrusted, foreign, unclaimed or conflicting worker report rejected"
+          },
+          "503": {
+            "description": "Worker coordination service unavailable. The identical serialized report may be reconciled within the worker's bounded retry window; paid work must not be repeated."
           }
         },
         "parameters": [
@@ -1896,10 +1902,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Authorized job-scoped stage result"
+            "description": "Read-only current state or stop indication for an expired/revoked job. Status does not renew a phase lease, permission or payment authority."
           },
           "403": {
             "description": "Untrusted/stale/foreign/duplicate worker claim rejected"
+          },
+          "503": {
+            "description": "Temporary worker coordination failure, distinct from authoritative cancellation or authentication rejection."
           }
         },
         "parameters": [

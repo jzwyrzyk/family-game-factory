@@ -18,6 +18,9 @@ export interface ActionFailure {
  stage:'test'|'review';attempt:0|1|2;category:RepairCategory;code:RepairCode;
  findings:QualityFinding[];qualityAxes?:QualityRepairAxes;
 }
+interface ReportReceipt {
+ attempt:number;runId:string;repositoryId:string;sha:string;stage:WorkerStage;fingerprint:string;reviewRequired:boolean;
+}
 export interface ActionExecution {
  attempt:number;dispatchPending:boolean;queuedAt?:number;dispatchedAt?:number;runId?:string;stage?:WorkerStage;
  candidate?:CandidateArtifact;qualityEvidence?:GameQualityEvidence;diagnostics?:string;repairCategory?:RepairCategory;
@@ -26,6 +29,8 @@ export interface ActionExecution {
  /** Fixed phase deadlines advance only on authenticated work transitions. */
  lease?:{phase:'queued'|WorkerStage|'provisioning'|'review-queued';expiresAt:number};
  deadlineAt?:number;
+ /** At most three stages per permitted attempt; survives repair identity changes. */
+ reportReceipts?:ReportReceipt[];
 }
 const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_REQUIRED','SPENDING_CUTOFF','INPUT_TOKEN_LIMIT',
  'GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','IMAGE_APPROVAL_REQUIRED','IMAGE_ALLOWANCE_EXCEEDED',
@@ -174,20 +179,34 @@ export class ActionCoordinator {
   const fingerprint=createHash('sha256').update(JSON.stringify(report)).digest('hex');
   return this.repo.transaction(s=>{
    const j=s.jobs.find(x=>x.id===id),e=j?.execution;
-   if(identity.stage!==stage||!j||!e||e.attempt!==attempt||e.runId!==identity.runId)throw Error('WORKER_REPORT_REJECTED');
+   if(identity.stage!==stage||!j||!e)throw Error('WORKER_REPORT_REJECTED');
+   const recorded=e.reportReceipts?.find(r=>r.attempt===attempt&&r.stage===stage&&r.runId===identity.runId);
+   if(recorded&&(recorded.repositoryId!==identity.repositoryId||recorded.sha!==identity.sha))throw Error('WORKER_REPORT_REJECTED');
+   if(recorded&&recorded.fingerprint!==fingerprint)throw Error('WORKER_REPORT_CONFLICT');
+   if(!recorded&&(e.attempt!==attempt||e.runId!==identity.runId))throw Error('WORKER_REPORT_REJECTED');
    applyCurrentQualityPolicy(j,s.revisions.find(r=>r.id===j.baseRevisionId)?.game);
-   const receipt=()=>({accepted:true,reviewRequired:stage==='test'&&j.phase==='reviewing'});
+   const receipt=()=>{
+    if(recorded)return {accepted:true,reviewRequired:recorded.reviewRequired};
+    const reviewRequired=stage==='test'&&j.phase==='reviewing';
+    e.reportReceipts=[...(e.reportReceipts||[]),{attempt,runId:identity.runId,repositoryId:identity.repositoryId,sha:identity.sha,stage,fingerprint,reviewRequired}].slice(-MAX_ATTEMPTS*3);
+    return {accepted:true,reviewRequired};
+   };
    const existing=stage==='generate'?e.generateReport:stage==='test'?e.testReport:e.reviewReport;
-   if(existing&&existing!==fingerprint)throw Error('WORKER_REPORT_CONFLICT');
+   if(!recorded&&existing&&existing!==fingerprint)throw Error('WORKER_REPORT_CONFLICT');
    const terminal=['failed','cancelled','ready'].includes(j.status);
-   if(!existing&&(terminal||e.stage!==stage))throw Error('WORKER_REPORT_REJECTED');
+   if(!recorded&&!existing&&(terminal||e.stage!==stage))throw Error('WORKER_REPORT_REJECTED');
    // An idempotent receipt cannot keep a still-pending review alive after its
    // original grant is lost. Terminal receipts remain harmless acknowledgments.
    if(!terminal){
     const denied=this.permissionError(s,j)||(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled?'OWNER_APPROVAL_REQUIRED':undefined)||this.leaseError(s,j);
-    if(denied){this.failure(s,j,denied);return receipt();}
+    if(denied){
+     this.failure(s,j,denied);
+     // Preserve acknowledgments already accepted under valid authority, but
+     // never create a new replay receipt for a late or unauthorized result.
+     return {accepted:true,reviewRequired:recorded?.reviewRequired??false};
+    }
    }
-   if(existing)return receipt();
+   if(recorded||existing)return receipt();
    if(stage==='generate'||stage==='review'){
     if(!report||report.errorCode){
      if(stage==='generate')e.generateReport=fingerprint;else e.reviewReport=fingerprint;

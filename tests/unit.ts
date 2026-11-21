@@ -9,6 +9,8 @@ import './factory.test';
 import './backend-contracts.test';
 import './pipeline.test';
 import './assignment-002.test';
+import './worker-lifecycle.test';
+import './worker-transport.test';
 
 import './construction.test';
 

@@ -67,6 +67,30 @@ Persisted executions without the new deadline fields remain readable. Migration 
 
 `tests/worker-lifecycle.test.ts` uses a synthetic clock and synthetic game/evidence fixtures to verify slow valid work, shared setup budgets, non-renewing polls/reports, late callbacks, repair/global limits and legacy migration. It makes no paid calls and proves no live latency or deployment acceptance. This source change does not alter the private workflow, its approved SHA, the public source pin or any live configuration. The coordinator change can serve the existing callback shape; activating revised worker code still requires the separately reviewed cross-repository release process.
 
+## Bounded worker coordination and report reconciliation
+
+`server/actions/worker-transport.ts` separates coordination transport from the CLI's one execution of generation, testing or review. Its default bounds are:
+
+| Operation | Bound and behavior |
+| --- | --- |
+| OIDC plus one gateway operation | 15 seconds total, including response-body streaming; external process cancellation propagates to both requests |
+| Response bytes | OIDC: 32 KiB; claim: 10 MiB; status/report receipt: 16 KiB; count actual streamed bytes before parsing |
+| Heartbeat | One status request at a time, with 3 seconds between completed polls |
+| Lost status visibility | At most 45 seconds since the last confirmed active response; temporary transport/408/429/5xx errors do not mean cancellation |
+| Terminal/authentication response | Stop active work immediately; a received cancelled/failed/ready state is distinct from an unreachable gateway |
+| Claim | One request; an unknown claim outcome cannot authorize execution or an automatic second claim |
+| Finished report | Serialize once; at most three identical attempts and 45 seconds total, with bounded backoff; no replacement error report after an uncertain result |
+
+Each accepted report stores a compact receipt containing its attempt/run/stage/repository/SHA identity, SHA-256 report fingerprint and original `reviewRequired` decision. At most three stages across three attempts can be retained. A matching replay returns that original receipt even after test or review rejection has already queued repair and changed the current run. A different payload, workflow identity or stage is rejected. The receipt stores no prompt, game source, image or provider credential. Existing stored stage hashes remain compatible for retries within their original attempt; receipts cannot reconstruct a lost pre-upgrade report whose old repair already erased those hashes.
+
+Before handling a pending callback, current consent, paid approval and fixed deadlines still apply. An unauthorized or late new result cannot create a new accepted receipt. Previously accepted receipts acknowledge completed coordination only; they cannot renew a grant, add spending, publish another revision or schedule another repair. Heartbeat polling stops before report reconciliation so a successful repair transition cannot make an obsolete status identity abort its own acknowledgment recovery.
+
+The worker HTTP adapter retains generic 403 responses for authentication and named contract rejection, and uses a generic 503 for unexpected service failures, including temporary Firestore/gRPC and key-fetch failures. Private diagnostics are not returned. A report still unconfirmed after its bounded reconciliation exits with an explicit uncertain-acknowledgment log; it never repeats the provider call. If the process is terminated or all acknowledgments are lost, the remaining stage can still expire under the fixed lease. This is not an exactly-once delivery claim.
+
+`tests/worker-transport.test.ts` injects stalled requests/bodies, oversized replies, cancellation, transient outages and lost acknowledgments. The lifecycle suite also exercises the real coordinator with synthetic transport loss after generation acceptance, repair scheduling and passing/failing review. It verifies one execution, one charge, one revision/repair and immutable report identity. These suites are included in `npm run test:unit`.
+
+Deploy compatible gateway code before relying on new worker reconciliation across repair attempts. The old worker request/receipt shape remains supported. Activating the CLI change requires the private repository's public source pin and its reviewed workflow identity to be updated through the established release process; those pins, environments, infrastructure and live services are unchanged by this implementation.
+
 ## Security evidence and limits
 
 Public CI includes branch/tag-drift and strict organization OIDC negative tests, plus existing child's desktop/mobile mocked creation, repair, play, keep, undo and fork journeys. Private PR supplies `scripts/runner/verify_group_policy.py`: read-only query of actual organization runner-group and selected-repository access; offline tests reject extra repositories, extra workflows, public access and tag-ref substitutions.

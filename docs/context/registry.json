@@ -475,10 +475,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T18:16:59.977Z",
+      "sourceDigest": "f957a82e520f4ecb9505f3465b747bd1be3e8f2a829aa4a8c2c2d1bd36556490",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Updated worker HTTP and OpenAPI contracts to distinguish private service outages from authentication rejection while preserving read-only status and bounded report reconciliation.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -517,10 +517,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:02:24.663Z",
-      "sourceDigest": "e26788d3b2a12f599f754269de9f7593c951a38607f5c1caef43080123dc3cd6",
+      "reviewedAt": "2026-11-21T18:16:59.321Z",
+      "sourceDigest": "da61ea554121d7133061aaa587e0177bf6f399c87fd8c512b1326592d64af9f6",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented fixed worker phase and job deadlines, shared setup budgets, legacy migration, and unchanged grant/payment authority in architecture and worker bridge."
+      "reviewReason": "Documented bounded worker coordination, serialized heartbeat, immutable report reconciliation across repairs, original-authority checks and gateway-first source-pin release dependency."
     },
     {
       "id": "coach",
@@ -566,10 +566,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
-      "reviewedAt": "2026-11-21T14:34:24.173Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
+      "sourceDigest": "02d7fc48ebe48a4138cef21d948e0fad249f1f511edd724222ac7541a9fbff5b",
+      "reviewedAt": "2026-11-21T18:17:00.394Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed worker OpenAPI additions against parent and adult contracts; original grants and consent remain mandatory, and no new accepted receipt is created for an unauthorized result.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T18:02:28.924Z",
-      "sourceDigest": "d960a71e61986125e89803fed651601fd4382363291d2c7baa2853534dea442c",
+      "reviewedAt": "2026-11-21T18:17:00.818Z",
+      "sourceDigest": "a08a915edf8b53f25214aa8184b832ec954602eabe521063bf9b05757e106f5b",
       "reviewOutcome": "updated",
-      "reviewReason": "Added synthetic-clock worker lifecycle regression coverage and documented its scope, preserving real-provider and live deployment evidence distinctions.",
+      "reviewReason": "Documented synthetic transport and lifecycle regressions, included them in the unit entry point, and verified lost acknowledgments cannot duplicate execution, usage, repair or publication.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
