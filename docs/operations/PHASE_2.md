@@ -101,41 +101,120 @@ migrations, paid activation, or privately authenticated runtime smoke.
 
 ## Consolidated account-level activation
 
-1. Configure a main ruleset requiring pull requests and current, successful
-   **Jems operations policy**, **Documentation references**, and the existing
-   **browser** application job. Confirm the exact GitHub check names from a PR
-   run. Keep path-filtered jobs outside the universal ruleset. Require resolved
-   conversations, block force pushes/deletion, and require code-owner review on
-   protected release files. Configure the owner or another authorized reviewer
-   so authored PRs can receive a valid review. Keep a documented emergency
-   rollback path available without granting routine bypass to automation.
-2. Create environments `jems-image-publication` and `jems-cloud-run-production`
-   restricted to protected main. Choose reviewers for first activation and
-   decide whether reviewing each intent PR is sufficient for routine releases.
-   Use a repository-scoped GitHub connection that can create branches and PRs,
-   read checks, and merge when rules are satisfied. This trigger design requires
-   no repo-wide Actions-write token or reusable operator Cloud Shell session.
-3. Provision separate, keyless publication and rollout service accounts. For each,
-   use a dedicated GitHub OIDC trust restricted to repository ID `1458033181`,
-   numeric owner ID verified by the administrator, exact repository, protected
-   `refs/heads/main`, the named environment, allowed event types `push` and
-   `workflow_dispatch`, and the corresponding exact `workflow_ref` ending
-   `@refs/heads/main`. Bind only the matched external subject. The publisher needs
-   write access to the fixed Artifact Registry repository. The rollout account
-   needs read access to that repository for provenance, revision/service reads,
-   service updates on the three existing services, and any operation polling
-   permission Google requires at its supported scope. If Cloud Run requires
-   `iam.serviceAccounts.actAs`, grant it only on the exact existing runtime
-   identities after reviewing their privilege. A workflow with service-update
-   and act-as access could change a runtime despite the controller's software
-   checks. Review that trust boundary before granting it. No IAM-write,
-   Secret Manager accessor, runtime service account keys or worker grants are
-   required by this design.
-4. Set environment variables `JEMS_PUBLISH_WIF_PROVIDER`,
-   `JEMS_PUBLISH_SERVICE_ACCOUNT`, `JEMS_RELEASE_WIF_PROVIDER`, and
-   `JEMS_RELEASE_SERVICE_ACCOUNT` in the corresponding protected environments.
-   Leave `JEMS_IMAGE_PUBLISH_ENABLED` and `JEMS_CLOUD_RUN_RELEASE_ENABLED` unset
-   until separate approval covers registry cost, release scope and the first
-   staging and rollback drill. Add only the diagnostic view and read-network
-   bindings described above. Keep paid flags, worker OIDC, active revisions
-   and secret references outside this setup.
+Keep PR #107 in draft and leave `JEMS_IMAGE_PUBLISH_ENABLED` and
+`JEMS_CLOUD_RUN_RELEASE_ENABLED` unset through this checklist. This setup
+authorizes identities and review controls only. The first hosted build,
+staging and rollback drill need a separate approved release intent.
+
+### GitHub administration
+
+1. Create an **Active** repository branch ruleset for `refs/heads/main`. Require
+   a pull request, one approval, code-owner approval for the paths in
+   [.github/CODEOWNERS](../../.github/CODEOWNERS), dismissal of stale approvals,
+   approval of the latest reviewable push, resolved conversations, and protection
+   against deletion and force pushes. Set no automation bypass. Check that the
+   owner and an independent reviewer can approve the privileged files. If the
+   current owner is the PR author, add the independently approved reviewer to
+   CODEOWNERS in the draft first. Avoid an unreviewable owner-only rule.
+2. Require GitHub Actions checks **Jems operations policy**,
+   **Documentation references**, **browser**, **learning**, **creative** and
+   **private-coach-image**. Select them from the PR's reported status checks.
+   These are always scheduled on PRs. Leave path-filtered suites out of the
+   global required list. Verify a draft check cannot substitute for the final
+   head and inspect the active rule before marking this PR ready.
+3. Create `jems-image-publication` and `jems-cloud-run-production` under
+   Settings → Environments. Select only `main` as a deployment branch,
+   enable required reviewers and prevent self-review. Verify protection by
+   inspecting the settings while the workflow opt-ins remain unset. Plan a
+   documented, independently authorized emergency rollback path.
+4. Publish the Codex egress draft containing `api.github.com` and
+   `logging.googleapis.com` alongside the existing Cloud Run hosts. Use a
+   repository-scoped GitHub connection with Contents/PR write and check read
+   on the application repo, and Actions read on the worker only. No Actions
+   write token is needed. Confirm these reads before relying on automated
+   incident triage.
+
+### Google Cloud administration
+
+Use project `family-game-factory-jzw` (number `1054529152893`) and region
+`us-east5`. First inspect existing resource names, effective IAM, API state,
+and the projected Logging ingestion and storage cost. Stop on a name collision
+or broader inherited grant. Enable required APIs only under explicit approval.
+
+| Environment | Dedicated pool | Provider | Service account ID | Exact workflow |
+| --- | --- | --- | --- | --- |
+| `jems-image-publication` | `jems-github-image-publish` | `github-main` | `jems-image-publisher` | `.github/workflows/jems-service-images.yml` |
+| `jems-cloud-run-production` | `jems-github-cloud-run` | `github-main` | `jems-cloud-run-release` | `.github/workflows/jems-cloud-run-release.yml` |
+
+For each row create one keyless service account and one pool with a single OIDC
+provider. Use issuer `https://token.actions.githubusercontent.com`, Google's
+default provider-resource audience, and map `google.subject=assertion.sub`.
+The provider condition must be the following with the row's exact environment
+and workflow substituted. The repository was created after the immutable
+subject rollout cutoff, and both workflows check GitHub's `github.ref_protected`
+context before running their privileged jobs. Confirm the exact immutable
+subject and selected claim values with GitHub's OIDC settings and a controlled
+claims-only test before binding the principal. Never log a token. Stop on any
+difference from the reviewed condition.
+
+```text
+assertion.repository_id == '1458033181' &&
+assertion.repository_owner_id == '356692244' &&
+assertion.repository == 'jzwyrzyk/family-game-factory' &&
+assertion.ref == 'refs/heads/main' &&
+assertion.runner_environment == 'github-hosted' &&
+assertion.environment == '<environment>' &&
+assertion.workflow_ref == 'jzwyrzyk/family-game-factory/<workflow>@refs/heads/main' &&
+assertion.event_name in ['push', 'workflow_dispatch'] &&
+assertion.sub == 'repo:jzwyrzyk@356692244/family-game-factory@1458033181:environment:<environment>'
+```
+
+Bind `roles/iam.workloadIdentityUser` on each dedicated service account only to
+the exact principal
+
+```text
+principal://iam.googleapis.com/projects/1054529152893/locations/global/workloadIdentityPools/<pool>/subject/repo:jzwyrzyk@356692244/family-game-factory@1458033181:environment:<environment>
+```
+
+- Bind `roles/artifactregistry.writer` for
+  `jems-image-publisher@family-game-factory-jzw.iam.gserviceaccount.com` on
+  the regional `factory-services` repository only. Bind
+  `roles/artifactregistry.reader` there for
+  `jems-cloud-run-release@family-game-factory-jzw.iam.gserviceaccount.com`.
+- Create the custom role `jemsCloudRunRelease` with `run.services.get`,
+  `run.services.update`, and `run.revisions.get`. Bind it on
+  `factory-preview`, `factory-gateway`, and `factory-coach-private`
+  individually. If operation polling requires `run.operations.get` at the
+  project boundary, review and bind a separate one-permission role
+  `jemsCloudRunOperationReader`. If Cloud Run requires
+  `iam.serviceAccounts.actAs`, bind `roles/iam.serviceAccountUser` only on
+  the exact current runtime service accounts after recording and reviewing
+  their effective privileges. Service update plus act-as permits config changes
+  if the protected workflow is compromised. Approve that trust boundary before
+  granting either capability. Keep the publisher free of rollout rights.
+- Set `JEMS_PUBLISH_WIF_PROVIDER` and `JEMS_RELEASE_WIF_PROVIDER` in the
+  respective GitHub environments to
+  `projects/1054529152893/locations/global/workloadIdentityPools/<pool>/providers/github-main`.
+  Set `JEMS_PUBLISH_SERVICE_ACCOUNT` or `JEMS_RELEASE_SERVICE_ACCOUNT` to
+  the corresponding account email. Leave the two enable flags unset.
+- Create the dedicated log bucket and restricted fields described in
+  [Diagnostics](#diagnostics), with proposed retention of **7 days**. Create
+  view `cloud-run-errors` filtered to `resource.type="cloud_run_revision"`.
+  After the synthetic field restriction test succeeds, create project sink
+  `jems-cloud-run-errors` to
+  `logging.googleapis.com/projects/family-game-factory-jzw/locations/us-east5/buckets/jems-diagnostics`
+  with the checked-in [inclusion filter](../../ops/cloud-run-log-filter.txt).
+  If the same-project sink reports a writer that needs a grant, bind
+  `roles/logging.bucketWriter` on the project with an IAM condition restricted
+  to `resource.name == "projects/family-game-factory-jzw/locations/us-east5/buckets/jems-diagnostics"`.
+  Verify the condition works for the exact destination. Grant the existing diagnostics account
+  `roles/logging.viewAccessor` on this view only. Verify effective reader and
+  writer access with the approved synthetic markers before relying on the view.
+  Keep existing subscriptions, sinks, log retention and worker trust intact.
+
+Record the active ruleset, eligible reviewer, environment protections, identity
+provider conditions, exact resource bindings, and synthetic redaction checks.
+After those are reviewed, the first separately approved release should rehearse
+staging and rollback on an isolated equivalent before permitting production
+canary operations. Keep the coach release blocked while its staged speech
+configuration differs from the serving baseline.

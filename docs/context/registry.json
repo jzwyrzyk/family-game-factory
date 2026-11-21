@@ -620,10 +620,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T04:34:51.175Z",
-      "sourceDigest": "1f1d24bd630dcac69299166e13709ad7807f07054faa9d79970eb72fb6ea1d3c",
+      "reviewedAt": "2026-11-21T05:02:53.799Z",
+      "sourceDigest": "0efe7b101c9d3f6e290e47db7cc166d217885c1785bea1993117fb9b6c5e3358",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed release transitions, pinned tag preservation, drift guards, isolated publication, scoped diagnostic clients and explicit account activation prerequisites.",
+      "reviewReason": "Reviewed the protected-ref job guard, documented current GitHub immutable OIDC subjects, and retained narrow sink-writer verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -688,10 +688,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T04:33:05.445Z",
+      "reviewedAt": "2026-11-21T05:02:07.215Z",
       "sourceDigest": "e6c617a2f9bf051254bfcaab47c2fc2df233e8c3804ca818d9af673e8bffbf3a",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the owner-reviewed Phase 2 operations route and source coverage to the canonical delivery registry.",
+      "reviewReason": "Added the Phase 2 operational diagnostics, release controls and account checklist to the contributor documentation map.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

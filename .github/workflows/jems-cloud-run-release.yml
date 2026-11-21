@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   plan:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected
     runs-on: ubuntu-24.04
     outputs:
       operation: ${{ steps.plan.outputs.operation }}
