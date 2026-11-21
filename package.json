@@ -11,7 +11,7 @@
     "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts && npm run test:parent-dashboard",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser && npm run test:generated-art && npm run test:quality-capture",
     "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:art && npm run test:art-browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent && npm run test:pals && npm run test:pals-browser",
-    "test:child-journey": "npm run test:first-creation && node tests/child-journey.cjs && node tests/build-continuity.cjs",
+    "test:child-journey": "npm run test:guided-creation && npm run test:first-creation && node tests/child-journey.cjs && node tests/build-continuity.cjs",
     "test:navigation-continuity": "npm run test:navigation-shell && node tests/navigation-continuity.cjs",
     "test:real-agent": "node tests/real-agent-status.cjs",
     "test:sandbox": "node --import tsx tests/generated-sandbox.ts",
@@ -58,11 +58,12 @@
     "test:pals": "node --import tsx --test tests/pals.test.ts tests/pals-service.test.ts tests/pals-controller.test.ts tests/pals-backup.test.ts tests/pals-creation.test.ts && npm run test:pals-expressions && npm run test:pals-assets",
     "test:pals-browser": "node tests/pals-ui-browser.cjs && node tests/pals-browser.cjs && npm run test:pals-expressions-browser",
     "test:navigation-shell": "node tests/navigation-shell.cjs",
-    "test:pals-assets": "node scripts/verify-pal-assets.mjs && node --test scripts/tests/verify-pal-assets.test.mjs",
+    "test:pals-assets": "node scripts/verify-pal-assets.mjs && node --test scripts/tests/verify-pal-assets.test.mjs && node scripts/generate-pal-catalog.mjs --check",
     "test:pals-expressions": "node --import tsx --test tests/pals-expressions.test.ts",
     "test:pals-expressions-browser": "node tests/pals-expressions-browser.cjs",
     "test:read-aloud": "node --import tsx --test tests/friendly-narrator.test.ts",
     "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
+    "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs",
     "test:ops": "python3 -m unittest discover -s scripts/ops -p \"test_*.py\" -v"
   },
   "devDependencies": {

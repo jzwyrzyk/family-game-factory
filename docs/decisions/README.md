@@ -6,7 +6,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
-| [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; initial diagnostic tooling, live connection pending | Owner's November 20 access-efficiency discussion and request to make direct troubleshooting real |
+| [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
 | [0003](0003-explicit-voice-and-build.md) | Editable dictation, explicit Send and separate Build | Accepted, retrospectively documented | November 18, 2026 push-to-talk decision |
@@ -27,7 +27,10 @@ These records explain durable choices without turning chat history into another 
 | [0012](0012-pals-from-earned-activity.md) | Collectible Pals from shared saved activity, with editable local scenes and separate collection ownership | Accepted for development; original three-stage point superseded by 0013 | Owner companion implementation follow-up; final character artwork remains separate |
 | [0013](0013-two-form-pals-and-current-main.md) | Exactly two Pal forms with earned-progress compatibility and current-main integration | Two forms are owner directed; five-adventure transition is explicit compatibility policy | Owner two-form handoff and request to finish PR81/68 for merge |
 | [Character-first navigation](2026-11-20-character-first-navigation.md) | Character choice before creation, selected human throughout host imagery, compact Menu and permanent private parent-session access | Accepted for implementation; source and production evidence separate | Owner's November 20 deployed-site review and explicit instruction to fix all four points |
+| [Conversation-led creation](2026-11-20-guided-chat-creation.md) | Contextual coach guides the child's own answers; no answer chips/delegate-rest; evidence-bound readiness before explicit Build, optional tools and a focused truthful handoff | Owner direction clarified; provisional chip/delegation design rejected; source verification and delivery separate | Owner's November 20 request and November 21 correction |
 | [Gem Pal expression runtime](2026-11-20-pal-expression-runtime.md) | Versioned 184-image original-roster exports, isolated expression previews and a finite Wink Base opacity pilot | Accepted for implementation; release acceptance separate | Owner approved the completed core artwork and integration work, November 20, 2026 |
+
+| [Approved Pal collection](2026-11-21-approved-pal-collection.md) | Connect all 24 approved character neutrals to actual collection, two free starter choices, earned forms and versioned scene use while retaining saved IDs | Accepted for implementation and release after verification | Owner confirmed the starter-art gap and authorized the complete fix and subsequent cutover, November 21 |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 

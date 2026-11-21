@@ -1,12 +1,12 @@
 # Direct diagnostics and fewer operational handoffs
 
-**Status:** Accepted operating intent; initial connection tooling prepared, cloud access and automated release operation unverified.
+**Status:** Accepted operating intent; metadata tooling prepared and reconciled with current main for review. Prior environment verification and current task access are separate evidence; controlled release activation remains pending in PR107.
 **Recorded:** November 20, 2026, America/New_York.
 **Decision source:** Owner's access-efficiency discussion: routine development/merges/deployments should be less constrained while preserving protection from external compromise and large accidents; the owner should not copy commands/results between ChatGPT and Cloud Shell. For a bigger fix within scope, give a brief heads-up and continue. Owner involvement remains appropriate for initial credentials, major consequential decisions and strategy.
 
 ## Context
 
-The connected GitHub tools can operate source/PRs and inspect workflow evidence, but the current chat has no configured Google Cloud outbound identity. The shell has no `gcloud` CLI and its `gh` command is unauthenticated. Existing Cloud Shell authentication does not automatically transfer. This is a connection/capability gap, not something a repeated conversational approval fixes.
+At the original November 20 preparation, connected GitHub tools could operate source/PRs and inspect workflow evidence, but that task had no configured Google Cloud outbound identity or `gcloud` CLI, and its `gh` command was unauthenticated. Existing Cloud Shell authentication does not automatically transfer. This is a connection/capability gap, not something a repeated conversational approval fixes. The November 21 reconciliation also lacks `gcloud` and an outbound identity manifest; earlier reported reads from a configured task do not establish access in this one.
 
 ## Decision
 
@@ -14,7 +14,9 @@ Prepare a reusable Jems cloud environment and a dedicated, short-lived Google Cl
 
 Within an authorized task, the assistant investigates errors, prepares permitted corrections, verifies results and completes routine implementation steps. Explain larger in-scope changes briefly and continue. Escalate for expanded authority/trust, increased spending, destructive production-data actions, expanded sensitive-data exposure or a product/strategic decision. Preserve prior explicit authorization and current safety boundaries.
 
-Broader release automation follows through the existing [PR45](https://github.com/jzwyrzyk/family-game-factory/pull/45)/[issue46](https://github.com/jzwyrzyk/family-game-factory/issues/46) work after reconciliation with current main. No ordinary application change should silently gain authority to redefine the privileged release verifier.
+A preparation/review request does not authorize a merge, deployment or access expansion. The owner's November 21 continuation explicitly authorizes completing source preparation without merging; that hold remains binding after tests pass.
+
+Broader Cloud Run release automation is now prepared in [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107). The [policy foundation](../operations/POLICY_FOUNDATION.md) on main supplies read-only checks without activating its privileged workflows. The earlier [PR45](https://github.com/jzwyrzyk/family-game-factory/pull/45)/[issue46](https://github.com/jzwyrzyk/family-game-factory/issues/46) work retains its Pages and wider continuity scope. No ordinary application change should silently gain authority to redefine the privileged release verifier.
 
 ## Consequences and limits
 

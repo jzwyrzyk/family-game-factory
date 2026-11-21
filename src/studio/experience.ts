@@ -25,7 +25,7 @@ export function builderReadinessCopy(state:BuilderReadiness):string {
  };
  return copy[state];
 }
-export function buildErrorCopy(code:string|undefined):string {
+export function buildErrorCopy(code:string|undefined,confirmedFailure=false):string {
  switch(code){
   case 'UNAUTHENTICATED':return 'The workshop needs a grown-up to reconnect. Your idea is saved; nothing was built.';
   case 'FORBIDDEN':return 'The workshop denied access. Ask a grown-up to check the device or connection permissions. Your idea is safe.';
@@ -33,13 +33,20 @@ export function buildErrorCopy(code:string|undefined):string {
   case 'BUILDER_UNAVAILABLE':return 'The workshop is not available right now. Your idea is saved; no game build started.';
   case 'RATE_LIMIT':return 'The workshop needs a short break before another try. Your idea is safe.';
   case 'PRIVATE_INFORMATION':return 'That request needs a safer description. Your idea is saved; no game build started.';
-  case 'REQUEST_REJECTED': case 'INVALID_REQUEST':return 'The workshop could not accept that change. Nothing was built; your original is safe.';
-  default:return 'The workshop did not confirm a build. Your idea is saved and your working game is safe.';
+  case 'RETRY_LIMIT':return 'This build has reached its retry limit. Your idea is saved. You can change it and try a new build.';
+  case 'ADULT_PILOT_ACCESS_REQUIRED': case 'GUARDIAN_CONSENT_REQUIRED':return 'A grown-up needs to reconnect the workshop. Your idea is saved.';
+  case 'NOT_FOUND':return 'The workshop could not find that saved build. Your idea is still here.';
+  case 'IDEMPOTENCY_CONFLICT':return 'The workshop could not confirm this request. Your idea is safe; check the build status.';
+  case 'GAME_FORM_UNSUPPORTED': case 'GAME_FORM_REVIEW_REQUIRED': case 'GAME_FORM_BASE_UNVERIFIED':return 'The workshop cannot build that game yet. Your idea is saved so you can change it.';
+  case 'INVALID_REQUEST':return 'The workshop could not accept that change. Nothing was built; your original is safe.';
+  case 'REQUEST_REJECTED':return confirmedFailure?'The build did not finish. Your idea and last working game are safe.':'The workshop did not confirm this request. Your idea and last working game are safe.';
+  default:return confirmedFailure?'The build did not finish. Your idea and last working game are safe.':'The workshop did not confirm a build. Your idea is saved and your working game is safe.';
  }
 }
 export function buildProgressCopy(job:BuildView|undefined, sending:boolean, uncertain=false){
  if(uncertain)return {title:'Checking the workshop connection',description:'A build might still be running. We have not confirmed its latest state.',phase:'uncertain' as const};
- if(!job)return sending?{title:'Sending your idea…',description:'Waiting for the workshop to accept it. No build is confirmed yet.',phase:'sending' as const}:null;
+ if(sending)return {title:'Sending your idea…',description:'Waiting for the workshop to accept it. No build is confirmed yet.',phase:'sending' as const};
+ if(!job)return null;
  switch(job.status){
   case 'queued':return {title:'Your idea reached the workshop!',description:'Your build was accepted and is waiting to start.',phase:'queued' as const};
   case 'building':return {title:'jems is building your game!',description:job.phase==='repairing'?'The workshop is repairing a test version.':'Your new game is being created in the workshop.',phase:'building' as const};

@@ -25,9 +25,9 @@ import { StudioNotebook, type StudioSession, type Candidate, type PendingJob } f
 import { StudioGames, isGeneratedRemoteKind } from './adapter';
 import { installStudioRemixRouting } from './host-navigation';
 import { defaults, manifests, validateConfig } from '../runtime/manifests';
-import { interpret, examples } from '../factory/interpreter';
+import { interpret } from '../factory/interpreter';
 import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
-import { BuilderClient, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
+import { BuilderClient, isKnownBuildRejection, validateBuilderConfig, type BuilderConfig, type JobView } from '../builder/client';
 import { installCreationStudio } from '../creation/ui';
 import { installCreationProgress } from '../creation/progress';
 import { installArtStudio } from '../drawing/studio';
@@ -47,6 +47,10 @@ import {GUIDE_TIPS, hasMeaningfulCreation, recommendNext, readyGuidedExperiment,
 import {CreationStore} from '../creation/storage';
 import {installPals} from '../pals/service';
 import {installPalsInterface} from '../pals/host';
+import {createBuildHandoff, type BuildHandoffIdentity, type BuildHandoffState} from './build-handoff';
+import {visibleConversation, helperPreview} from './conversation-view';
+import {creationBuildReadiness} from './creation-readiness';
+import './guided-creation.css';
 
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
@@ -85,6 +89,10 @@ export async function installStudio(){
  let remote:BuilderConfig={version:1,mode:'unavailable'};
  const clients=new Map<string,BuilderClient>();
  const unknownJobs=new Set<string>();
+ const retryBlocks=new Map<string,{jobId:string;reason:string}>();
+ // A lost first acknowledgement has no job ID to check. Never mistake an
+ // older failed job for this new request or replay it from a recovery button.
+ const unconfirmedSubmissions=new Set<string>();
  let iframe:HTMLIFrameElement|null=null, previewChannel='',previewArtifact='',previewOwner='';
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'journey'|'rewards'|'pals'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
@@ -96,6 +104,7 @@ export async function installStudio(){
  let artEntries:ReturnType<typeof installArtEntryPoints>|undefined;
  const stopSpeech=()=>{voice?.cancel();privateSpeech?.cancel();};
  const sending=new Set<string>();
+ const submittedDrafts=new Map<string,string>();
  let panel:'game'|'talk'|'versions'='game';
  let keptInThisView:string|null=null;
  let guideSignature='',currentGuide:GuideCard|null=null;
@@ -104,6 +113,22 @@ export async function installStudio(){
  // Local arcade state never owns build readiness, saved games or learning evidence.
  const waitArcade=createMindYourJems();
  let waitProject:{id:string;owner:string}|null=null;
+ const buildAttempts=new Map<string,BuildHandoffIdentity>();
+ const handoff=createBuildHandoff({
+  isCurrent:identity=>owner()===identity.ownerId&&activeId===identity.sessionId&&route==='studio'&&!FG.learning.active,
+  onPlayWhileWaiting:identity=>act(()=>playWhileBuilding(notebook.get(identity.sessionId,identity.ownerId))),
+  onPlayReady:identity=>act(()=>openReadySession(identity.sessionId,identity.ownerId)),
+  onRecover:(_identity,action)=>act(()=>recoverBuild(action)),
+  onStay:identity=>{if(owner()===identity.ownerId&&activeId===identity.sessionId&&route==='studio'&&!FG.learning.active)$('studioPrompt').focus({preventScroll:true});}
+ });
+ function beginBuildHandoff(s:StudioSession,state:BuildHandoffState){
+  const identity={ownerId:s.owner,sessionId:s.id,attemptId:crypto.randomUUID()};
+  buildAttempts.set(s.id,identity);handoff.begin(identity,state);
+  return identity;
+ }
+ function updateBuildHandoff(s:StudioSession,state:BuildHandoffState){
+  const identity=buildAttempts.get(s.id);if(identity&&identity.ownerId===s.owner)handoff.update(identity,state);
+ }
 
  const page=el('section','page hidden');page.id='page-studio';
  page.innerHTML=`<div class="studio-heading"><button type="button" class="studio-back" id="studioHome">${iconMarkup('arrow','jems-icon--back')} My Games</button><div class="studio-title-wrap"><h1 id="studioTitle" tabindex="-1">Let's make something.</h1></div><span class="studio-storage" id="studioStorage">Saved on this device</span></div>
@@ -129,7 +154,7 @@ export async function installStudio(){
  const creationHero=el('section','studio-creation-hero');
  creationHero.id='studioCreationHero';
  // Decode the hidden workshop hero with its reveal frame; async decoding can leave a blank keyboard-entry frame.
- creationHero.innerHTML='<img src="./jems-art/hero_workshop.webp" width="1536" height="1024" alt="" aria-hidden="true" decoding="sync"><div><span class="studio-creation-kicker">Any idea can start here</span><h2>What game can you dream up?</h2><p>A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!</p></div>';
+ creationHero.innerHTML='<img src="./jems-art/hero_workshop.webp" width="1536" height="1024" alt="" aria-hidden="true" decoding="sync"><div><h2>What game shall we make?</h2></div>';
  $('studioConversation').querySelector('.studio-helper-heading')!.after(creationHero);
  const chatOptions=el('details','studio-chat-options') as HTMLDetailsElement;
  chatOptions.id='studioChatOptions';
@@ -149,6 +174,13 @@ export async function installStudio(){
  const workshopNote=el('span','studio-workshop-availability');
  workshopNote.id='studioWorkshopAvailability';
  $('studioSend').after(workshopNote);
+ const buildGuidance=el('div','studio-build-guidance');buildGuidance.id='studioBuildGuidance';buildGuidance.hidden=true;
+ const buildReason=el('p','studio-build-reason');buildReason.id='studioBuildReason';buildReason.setAttribute('role','status');
+ const checkIdea=iconEl('button','studio-button','retry','Check my idea') as HTMLButtonElement;
+ checkIdea.id='studioCheckIdea';checkIdea.type='button';checkIdea.hidden=true;
+ checkIdea.onclick=()=>act(async()=>{stopSpeech();flushDraft();if(coachConnection==='sign-in'||remote.mode!=='remote'){openParent(true);return;}await coaching?.reassess();});
+ buildGuidance.append(buildReason,checkIdea);$('studioSend').after(buildGuidance);
+ $('studioSend').setAttribute('aria-describedby','studioBuildReason');
  const progressBanner=el('section','studio-progress-banner');
  progressBanner.id='studioBuildProgress';progressBanner.hidden=true;
  progressBanner.setAttribute('role','status');progressBanner.setAttribute('aria-live','polite');
@@ -157,23 +189,12 @@ export async function installStudio(){
  arcadeButton.type='button';arcadeButton.hidden=true;
  progressBanner.append(progressTitle,progressDetails,arcadeButton);
  arcadeButton.onclick=()=>act(()=>{if(activeId)playWhileBuilding(current());});
- page.querySelector('.studio-workspace')!.before(progressBanner);
+ $('studioMessages').before(progressBanner);
  progressBanner.append($('studioReady'),$('studioPromptForm').querySelector('.studio-build-controls')!);
  const ideaSparks=el('details','studio-idea-sparks') as HTMLDetailsElement;ideaSparks.id='studioIdeaSparks';
  ideaSparks.append(iconEl('summary','','help','Need a spark of inspiration?'));
  const sparkOptions=el('div','studio-idea-spark-options');
- for(const [label,idea] of [
-  ['🦭 Bouncing seal','Make a game where a seal jumps across icy platforms to reach the end.'],
-  ['🐱 Moon cat','Make a game where a cat eats donuts on the moon.'],
-  ['🫧 Bubblegum world','Make a game where you build wild machines out of bubblegum.']
- ]){
-  const b=el('button','studio-chip',label) as HTMLButtonElement;
-  b.type='button';b.onclick=()=>{
-   const input=$<HTMLTextAreaElement>('studioPrompt');input.value=idea;
-   input.dispatchEvent(new Event('input',{bubbles:true}));ideaSparks.open=false;input.focus();
-  };sparkOptions.append(b);
- }
- const askIdeas=el('button','studio-chip','Ask jems for ideas') as HTMLButtonElement;
+ const askIdeas=el('button','studio-chip','Help me think of an idea') as HTMLButtonElement;
  askIdeas.type='button';askIdeas.onclick=()=>act(()=>coaching?.discuss('ideas'));
  sparkOptions.append(askIdeas);ideaSparks.append(sparkOptions);
  $('studioPromptForm').after(ideaSparks);
@@ -182,6 +203,28 @@ export async function installStudio(){
  voiceDetails.append(el('summary','','Voice & accessibility options'));
  $('studioPromptForm').querySelector('.studio-voice-row')!.before(voiceDetails);
  voiceDetails.append($('studioPromptForm').querySelector('.studio-voice-row')!, $('studioPromptForm').querySelector('.studio-voice-note')!);
+ // Optional tools stay outside the conversation. The child supplies the ideas;
+ // the coach guides them, and Build enables only after a grounded review.
+ const moreChoices=el('details','studio-more-choices') as HTMLDetailsElement;moreChoices.id='studioMoreChoices';
+ moreChoices.append(el('summary','','More choices'));
+ const extraTools=el('div','studio-extra-tools');extraTools.id='studioExtraTools';moreChoices.append(extraTools);
+ extraTools.append(ideaSparks,voiceDetails,chatOptions);
+ const connectionOptions=el('details','studio-connection-options');connectionOptions.append(el('summary','','Connection & saving'),$('studioAvailability'),workshopNote,$('studioStorage'));
+ extraTools.append(connectionOptions);$('studioPromptForm').after(moreChoices);
+ const connectionHint=el('p','studio-connection-hint');connectionHint.id='studioConnectionHint';connectionHint.hidden=true;
+ $('studioConversation').querySelector('.studio-helper-heading h2')!.after(connectionHint);
+ $('studioConversation').querySelector('.studio-helper-heading h2')!.textContent='Let’s make a game';
+ $<HTMLTextAreaElement>('studioPrompt').rows=2;setIconLabel($('studioTalk'),'send','Send');
+ // Idle narration and save notices do not compete with the child's question.
+ // Actual recording, access errors and failed saves stay beside the composer.
+ const voiceStatus=$('studioVoiceStatus');$('studioDraftStatus').after(voiceStatus);
+ const quietStatus=()=>{
+  const text=voiceStatus.textContent||'';
+  voiceStatus.hidden=!text||text==='Microphone off.'||text.startsWith('Tap Speak, review')||text.startsWith('A family-approved private speech service');
+  const draft=$('studioDraftStatus');draft.hidden=!/could not|check your words/i.test(draft.textContent||'');
+ };
+ new MutationObserver(quietStatus).observe(voiceStatus,{childList:true,characterData:true,subtree:true});
+ new MutationObserver(quietStatus).observe($('studioDraftStatus'),{childList:true,characterData:true,subtree:true});quietStatus();
  const pausedPreview=el('section','studio-paused-preview');pausedPreview.id='studioPausedPreview';pausedPreview.hidden=true;
  pausedPreview.setAttribute('aria-label','Paused game preview');$('studioGameHost').append(pausedPreview);
  const library=el('section','page');library.id='page-studio-library';
@@ -340,14 +383,17 @@ export async function installStudio(){
  const rewardToastHost=el('div','jems-rewards-toast-host');rewardToastHost.id='jemsRewardCelebrations';document.body.append(rewardToastHost);
  let rewardToastTimer:ReturnType<typeof setTimeout>|undefined,rewardBatchTimer:ReturnType<typeof setTimeout>|undefined,pendingGrants:RewardGrant[]=[];
  function clearRewardCelebration(){clearTimeout(rewardToastTimer);clearTimeout(rewardBatchTimer);pendingGrants=[];rewardToastHost.replaceChildren();}
+ function chatIsVisible(){return route==='studio'&&panel==='talk'&&!page.classList.contains('hidden');}
  function renderRewards(){rewardsWidget.update(rewards.state.summary,rewards.state);rewardsPage.update({...rewards.state,journey:rewardJourney()});}
  rewards.subscribe((state,grants)=>{
   renderRewards();
+  // Earned totals still update; decorative popups must not cover a chat answer.
+  if(chatIsVisible()){clearRewardCelebration();return;}
   if(!grants.length||state.summary.owner!==owner()||document.hidden)return;
   pendingGrants.push(...grants);clearTimeout(rewardBatchTimer);
   const capturedOwner=owner();
   rewardBatchTimer=setTimeout(()=>{
-   if(owner()!==capturedOwner||document.hidden){pendingGrants=[];return;}
+   if(owner()!==capturedOwner||document.hidden||chatIsVisible()){pendingGrants=[];return;}
    const batch=pendingGrants;pendingGrants=[];
    const earned=batch.reduce((total,grant)=>total+grant.amount,0),summary=rewards.state.summary;
    const reached=summary.reachedGemMilestones.filter(goal=>goal>summary.lifetimeGems-earned).at(-1);
@@ -364,7 +410,7 @@ export async function installStudio(){
   window.scrollTo(0,0);void rewards.refresh().catch(()=>{});
  }
  rewards.setOpen(()=>act(openRewards));
- window.addEventListener('factory-page',()=>{rewardsPage.hide();document.body.classList.remove('studio-first-visit');closeJourneyMap();globalStatus.textContent='';globalStatus.classList.remove('is-error');globalStatus.setAttribute('role','status');});
+ window.addEventListener('factory-page',()=>{handoff.close();rewardsPage.hide();document.body.classList.remove('studio-first-visit');closeJourneyMap();globalStatus.textContent='';globalStatus.classList.remove('is-error');globalStatus.setAttribute('role','status');});
  window.addEventListener('factory-profile',()=>{clearRewardCelebration();rewardsPage.hide();});
  window.addEventListener('pagehide',clearRewardCelebration);
  // Background builds are visible on every Studio screen without taking focus.
@@ -375,7 +421,7 @@ export async function installStudio(){
   if(owner()!==s.owner||guardMath())return;
   const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
   if(!latest.job||(!busy(latest)&&!ready))return;
-  stopSpeech();flushDraft();++viewIntent;
+  stopSpeech();flushDraft();handoff.close();++viewIntent;
   if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;render();}
   waitProject={id:s.id,owner:s.owner};
   waitArcade.open({
@@ -398,6 +444,9 @@ export async function installStudio(){
   });
  }
  function refreshShelf(){
+  const inConversation=route==='studio'&&activeId&&(panel==='talk'||notebook.list(owner()).some(s=>s.id===activeId&&s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate));
+  if(inConversation){if(buildShelf.parentElement!==extraTools)extraTools.append(buildShelf);}
+  else if(buildShelf.parentElement!==globalStatus.parentElement)globalStatus.after(buildShelf);
   const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
   buildShelf.append(iconEl('strong','','clock','My builds & tests'));
@@ -500,10 +549,10 @@ export async function installStudio(){
   const signature=JSON.stringify([s.owner,s.id,tip,copy,action?.label]);
   // Keep guidance after the task it explains and inside the visible phone panel.
   const nearComposer=panel==='talk'||s.game==='new'&&!hasGame&&!s.candidate;
-  const moveGuide=studioGuideHost.parentElement!==(nearComposer?$('studioConversation'):$('studioCanvas'));
+  const moveGuide=studioGuideHost.parentElement!==(nearComposer?extraTools:$('studioCanvas'));
   let focusedGuideControl:'action'|'dismiss'|undefined;
   if((moveGuide||signature!==guideSignature)&&currentGuide?.contains(document.activeElement))focusedGuideControl=document.activeElement?.id==='studioGuideCardAction'?'action':'dismiss';
-  if(moveGuide){if(nearComposer)$('studioPromptForm').after(studioGuideHost);else $('studioGameHost').after(studioGuideHost);}
+  if(moveGuide){if(nearComposer)extraTools.append(studioGuideHost);else $('studioGameHost').after(studioGuideHost);}
   if(signature!==guideSignature){
    // A background status change may replace this hint while its controls have
    // keyboard focus. Preserve that position without pulling focus from play.
@@ -562,7 +611,7 @@ export async function installStudio(){
  }
  function celebrateProgress(kind:JemMilestone,anchorId='studioVersion'){
   // Persisted gem grants and a newly earned maker rank share one celebration.
-  if(notebook.pendingRewards(owner()).length)return;
+  if(chatIsVisible()||notebook.pendingRewards(owner()).length)return;
   celebrateJem(kind,anchorId,{character:notebook.avatar(owner()),level:levelForOwner().level});
  }
  function renderJourney(){
@@ -605,11 +654,27 @@ export async function installStudio(){
   const previous=notebook.list(before.owner).map(s=>s.id===before.id?before:s);
   const achievement=gemAchievement({stage:stageFor(before),level:builderJourney(previous,before.owner).level},after);
   // Update decoration only: typing in a test note or plan must retain focus.
-  renderGemBadge(after);updateProfile();
+  renderGemBadge(after);updateProfile();refreshBuildAction();
   if(route==='journey')renderJourney();else if(route==='library')renderHomeProgress();
   if(achievement&&!FG.learning.active)celebrateProgress(achievement);
  }
  function current(){if(!activeId)throw Error('Choose a project first.');return notebook.get(activeId,owner());}
+ function refreshBuildAction(){
+  if(!activeId)return;
+  const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
+  const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value})):null;
+  const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id);
+  $<HTMLButtonElement>('studioSend').hidden=false;
+  $<HTMLButtonElement>('studioSend').disabled=pending||!reflecting&&uncertain||creating&&(busy(s)||!readiness?.ready);
+  const hasIdea=s.messages.some(message=>message.role==='child');
+  const reconnect=['limited','unavailable','sign-in'].includes(coachConnection);
+  buildReason.textContent=creating?(pending?'Getting your build ready…':unconfirmedSubmissions.has(s.id)?'The workshop has not confirmed this request. Your idea is safe.':uncertain?'Check your last build before starting another.':busy(s)?'Your game is already building.':readiness?.ready?'':
+   !hasIdea?'Tell me your game idea first.':$<HTMLTextAreaElement>('studioPrompt').value.trim()?'Send your new thought first.':
+   reconnect?'Chat needs to reconnect to check your idea.':readiness?.reason||'Let’s check your idea together.') : '';
+  checkIdea.hidden=!creating||pending||busy(s)||uncertain||!!readiness?.ready||!coaching?.canReassess();
+  setIconLabel(checkIdea,'retry',reconnect?'Reconnect chat':'Check my idea');
+  buildGuidance.hidden=!creating||(!buildReason.textContent&&checkIdea.hidden);
+ }
  function act(action:()=>void|Promise<void>){const actor=owner();try{const result=action(),project=activeId,view=route;Promise.resolve(result).catch(error=>{if(owner()===actor&&activeId===project&&route===view)status((error as Error).message,true);});}catch(error){if(owner()===actor)status((error as Error).message,true);}}
  function status(text:string,error=false){const target=route==='studio'?$('studioStatus'):globalStatus;target.textContent=text;target.classList.toggle('is-error',error);target.setAttribute('role',error?'alert':'status');}
  function sameView(s:StudioSession,at=epoch){return at===epoch&&owner()===s.owner&&activeId===s.id&&route==='studio';}
@@ -630,17 +695,17 @@ export async function installStudio(){
  }
  function setTab(tab:'game'|'talk'|'versions'){
   if(tab!=='game'&&guardMath())return false;
-  if(tab!=='talk')stopSpeech();
+  if(tab!=='talk'){stopSpeech();handoff.close();}
   if(tab!=='game'){
    ++viewIntent;flushDraft();
    if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;status('Your game is waiting. Your build is saved; action games start a new round when you return.');}
   }
-  panel=tab;document.body.classList.toggle('studio-designing',tab==='talk');
+  panel=tab;if(tab==='talk'){clearRewardCelebration();document.getElementById('jems-delight-host')?.replaceChildren();}document.body.classList.toggle('studio-designing',tab==='talk');
   $('page-studio').querySelector('.studio-workspace')!.setAttribute('data-mobile-panel',tab);
   document.querySelectorAll('[data-studio-tab]').forEach(b=>b.setAttribute('aria-pressed',String((b as HTMLElement).dataset.studioTab===tab)));
   if(tab==='versions'){$('studioVersions').hidden=false;renderVersions();focusView($('studioVersionsTitle'));}else $('studioVersions').hidden=true;
   if(tab==='talk'){focusView($('studioPromptLabel'));void privateSpeech?.refresh();}
-  refreshStudioGuide();
+  refreshStudioGuide();refreshShelf();
   return true;
  }
  function showStudio(){
@@ -729,7 +794,11 @@ export async function installStudio(){
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
   if(actor!==owner()||at!==epoch)return;
-  if(coach.status==='fulfilled')coachConnection=coach.value?.available?'available':'unavailable';
+  if(coach.status==='fulfilled'){
+   // A healthy route cannot erase a failed model turn or certify a live reply.
+   if(!coach.value?.available)coachConnection='unavailable';
+   else if(!['connected','limited'].includes(coachConnection))coachConnection='available';
+  }
   else coachConnection=coach.reason instanceof Error&&coach.reason.message==='UNAUTHENTICATED'?'sign-in':'unavailable';
   if(builder.status==='fulfilled')builderReadiness=builder.value?.available?'available':builder.value?.reason==='ALLOWANCE_REQUIRED'?'allowance-required':'unavailable';
   else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unverified';
@@ -829,7 +898,7 @@ export async function installStudio(){
    b.append(art,info);b.onclick=()=>act(()=>start(game));starters.append(b);
   });installQualityCards();updateCreationNote();refreshWelcome();
  }
- function home(){stopSpeech();flushDraft();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
+ function home(){stopSpeech();flushDraft();handoff.close();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
  function homeFromNavigation(){
   // The first invitation has no competing Explore action. After choosing a
   // character, an intentional Home action can still open the ordinary library.
@@ -857,7 +926,7 @@ export async function installStudio(){
  function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
-  stopSpeech();flushDraft();disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
+  stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
   const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper');coaching?.openSession();$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();setTab('game');focusView($('studioTitle'));
   if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;setTab('talk');}}
   if(s.job&&busy(s)&&remote.mode==='remote'&&s.job.api===remote.apiBaseUrl&&!clients.has(s.id))resume(s);
@@ -865,16 +934,24 @@ export async function installStudio(){
  function renderConversation(){
   if(!activeId)return;const s=current(),box=$('studioMessages');
   const atEnd=box.scrollHeight-box.scrollTop-box.clientHeight<40;
-  const same=box.dataset.session===s.id&&box.childElementCount<=s.messages.length&&Array.from(box.children).every((node,i)=>(node as HTMLElement).dataset.message===s.messages[i]?.id);
-  if(!same){box.replaceChildren();box.dataset.session=s.id;}
-  for(const m of s.messages.slice(box.childElementCount)){
+  const messages=visibleConversation(s.messages).filter(m=>!(s.game==='new'&&m.role==='helper'&&m.text.startsWith('Tell jems what you imagine. One sentence is enough.')));
+  const signature=JSON.stringify(messages.map(m=>[m.id,m.text]));
+  if(box.dataset.session===s.id&&box.dataset.signature===signature)return;
+  const sameSession=box.dataset.session===s.id,earlierWasOpen=sameSession&&box.querySelector<HTMLDetailsElement>('.studio-earlier-messages')?.open;
+  box.replaceChildren();box.dataset.session=s.id;box.dataset.signature=signature;
+  const earlier=el('details','studio-earlier-messages') as HTMLDetailsElement;
+  earlier.append(el('summary','','Earlier ideas'));earlier.open=!!earlierWasOpen;
+  if(messages.length>4)box.append(earlier);
+  for(const [index,m] of messages.entries()){
    const article=el('div',`studio-message ${m.role}`);article.dataset.message=m.id;
-   // The original welcome line is already explained by the hero. Keep it in
-   // the durable notebook, but do not take first-screen space repeating it.
-   if(s.game==='new'&&m.role==='helper'&&m.text.startsWith('Tell jems what you imagine. One sentence is enough.'))article.classList.add('studio-intro-message');
-   article.append(el('span','studio-message-author',m.role==='child'?'You':m.role==='reflection'?'Your observation':'jems'),el('p','',m.text));box.append(article);
+   article.setAttribute('aria-label',m.role==='child'?'You':m.role==='reflection'?'Your observation':'jems');
+   const text=m.role==='helper'?helperPreview(m.text):{lead:m.text,question:'',more:''};
+   article.append(el('p','',text.lead));
+   if(text.question)article.append(el('p','studio-chat-question',text.question));
+   if(text.more){const more=el('details','studio-message-more');more.append(el('summary','','More'),el('p','',text.more));article.append(more);}
+   (index<messages.length-4?earlier:box).append(article);
   }
-  if(!same||atEnd)box.scrollTop=box.scrollHeight;
+  if(!sameSession||atEnd)box.scrollTop=box.scrollHeight;
  }
  function render(){
   if(!activeId)return;const s=current(),working=s.projectId?games.revision(s.projectId,s.owner):null;refreshShelf();
@@ -891,14 +968,16 @@ export async function installStudio(){
   artEntries?.setCreating(creating);
   page.classList.toggle('studio-idea-unstarted',creating&&!hasIdea);
   page.classList.toggle('studio-idea-started',creating&&hasIdea);
-  creationHero.hidden=!creating;
+  creationHero.hidden=!creating||hasIdea;
   ideaSparks.hidden=!creating;
   if(!creating)ideaSparks.open=false;
-  creationHero.querySelector('h2')!.textContent=hasIdea?'Your game is taking shape!':'What game can you dream up?';
-  creationHero.querySelector('p')!.textContent=hasIdea?'Keep sharing your ideas, then build when you are ready.':'A seal hopping on icebergs? A cat on the moon? Tell jems what you imagine!';
+  if(creating){$('studioTitle').textContent='Make a game';if(doneForNow.parentElement!==extraTools)extraTools.append(doneForNow);}
+  else if(doneForNow.parentElement!==page.querySelector('.studio-heading'))page.querySelector('.studio-heading')!.append(doneForNow);
   $('studioAvailability').textContent=coachConnectionCopy(configReady?coachConnection:'checking');
+  connectionHint.textContent=!configReady||coachConnection==='checking'?'Checking chat…':coachConnection==='sign-in'?'Chat needs a grown-up to reconnect.':['limited','unavailable'].includes(coachConnection)?'Chat is disconnected. Your idea is saved.':'';
+  connectionHint.hidden=!connectionHint.textContent;
   workshopNote.textContent=builderReadinessCopy(configReady?builderReadiness:'checking');
-  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id));
+  const progress=buildProgressCopy(s.job?{status:s.job.status,phase:s.job.phase}:undefined,sending.has(s.id),unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id));
   progressBanner.hidden=!progress;
   arcadeButton.hidden=!busy(s);
   progressBanner.dataset.phase=progress?.phase||'';
@@ -911,15 +990,19 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioUndo').disabled=!s.candidate&&!working?.parentId&&!s.remoteId;
   $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&(!working||!games.history(s.projectId!,s.owner).some(r=>r.parentId===working.id)));
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
-  $<HTMLButtonElement>('studioSend').disabled=sending.has(s.id)||saving;
+  refreshBuildAction();
   $<HTMLButtonElement>('studioTalk').disabled=reflecting;
-  $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?(hasIdea?'What happens next in your game?':'Tell jems your game idea'):'Tell jems what you want to discuss or change';
-  // A child who already told jems an idea can choose Build without repeating it.
+  $('studioPromptLabel').textContent=reflecting?'What did you notice?':creating?(hasIdea?'Your answer or idea':'Tell me your game idea'):'What would you like to change?';
+  // The coach's saved review, not the presence of a first idea, enables Build.
   $<HTMLTextAreaElement>('studioPrompt').required=!(creating&&s.messages.some(m=>m.role==='child'));
   setIconLabel($('studioSend'),reflecting?'save':creating?'add':'arrow',reflecting?'Save thought':creating?'Build my game':'Try a change');
-  $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=s.job?.status!=='failed';
+  $('studioReflection').hidden=!s.reflection;$('studioCancel').hidden=!busy(s);$('studioRetry').hidden=unconfirmedSubmissions.has(s.id)||!s.job||(s.job.status!=='failed'&&!unknownJobs.has(s.id));
+  setIconLabel($('studioRetry'),unknownJobs.has(s.id)?'clock':'retry',unknownJobs.has(s.id)?'Check build status':'Try build again');
+  const retryBlock=retryBlocks.get(s.id);
+  $<HTMLButtonElement>('studioRetry').disabled=sending.has(s.id)||saving||!unknownJobs.has(s.id)&&retryBlock?.jobId===s.job?.id;
+  $('studioRetry').title=retryBlock&&retryBlock.jobId===s.job?.id?retryBlock.reason:'';
   const suggestions=$('studioSuggestions');suggestions.replaceChildren();
-  if(s.projectId&&!s.remoteId)(examples[s.game as GameId]||[]).slice(0,2).forEach(text=>{const b=el('button','studio-chip',text);b.setAttribute('type','button');b.onclick=()=>{reflecting=false;$<HTMLTextAreaElement>('studioPrompt').value=text;flushDraft();render();$('studioPrompt').focus();};suggestions.append(b);});
+  page.classList.toggle('studio-has-build',!!progress);
   renderConversation();refreshStudioGuide();if(panel==='versions'&&!document.activeElement?.closest('#experimentShelf'))coaching?.renderShelf();
  }
  function mountNative(){
@@ -978,9 +1061,16 @@ export async function installStudio(){
   $('studioHelpKeyboard').textContent=stickerConstruction?'Press Tab to choose a sticker, Enter to select it, then Tab and Enter to place it on a bubble.':physicalConstruction?'Use Tab to reach parts and tools, Enter to select them, arrow keys to move a chosen part, and R to rotate it.':oldConstruction?'Use Tab and Enter to choose parts and construction controls.':'Use Tab to reach controls and Enter to choose. How a character moves depends on this game.';
   focusView($('studioHelpTitle'));
  }
- async function submit(){
-  if(guardMath())return;stopSpeech();flushDraft();const s=current(),prompt=s.draft.trim()||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':''),started=epoch;if(!prompt)return;
-  if(reflecting){
+ async function submit(request?:{prompt:string;displayText?:string;compiledPlan?:boolean}){
+  if(guardMath())return;stopSpeech();flushDraft();const s=current(),typed=s.draft.trim(),started=epoch;
+  let prompt=request?.prompt||typed||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':'');if(!prompt)return;
+  const consumedDraft=!request||request.compiledPlan||request.prompt.trim()===typed?s.draft:undefined;
+  const clearConsumedDraft=()=>{
+   if(consumedDraft===undefined)return;
+   notebook.update(s.id,s.owner,x=>{if(x.draft===consumedDraft)x.draft='';});
+   if(sameView(s,started)&&$<HTMLTextAreaElement>('studioPrompt').value===consumedDraft)$<HTMLTextAreaElement>('studioPrompt').value='';
+  };
+  if(reflecting&&!request){
    const before=progressSnapshot(s);
    notebook.observe(s.id,s.owner,prompt,'child',s.design?.observations.filter(o=>o.source==='runtime').at(-1)?.experimentId||null);
    message(s,'reflection',prompt);notebook.update(s.id,s.owner,x=>{x.draft='';x.reflection=false;});
@@ -989,11 +1079,21 @@ export async function installStudio(){
    render();if(achievement){updateProfile();celebrateProgress(achievement);}return;
   }
   if(sending.has(s.id)){status('Sending the earlier request. Your ideas and game are safe.');return;}
+  if(unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id)){status('The last request is not confirmed. Your new thought is saved; no second build was sent.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
-  if(mathRequest){message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`);notebook.update(s.id,s.owner,x=>{x.draft='';});$<HTMLTextAreaElement>('studioPrompt').value='';}render();return;}
+  if(mathRequest){message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;});if(mathRequest.kind==='required'){message(s,'helper',mathRequest.message);}else{FG.learning.setMode(s.id,mathRequest.mode);message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`);clearConsumedDraft();}render();return;}
   if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started))return;
   const decision=coaching?.details()||{continueTest:false,parents:[],depth:'tune' as const,origin:'child' as const};
-  message(s,'child',prompt);notebook.update(s.id,s.owner,x=>{x.reflection=false;x.playOnly=false;});
+  const firstBuild=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
+  if(firstBuild){
+   const readiness=coaching?.buildReadiness()||creationBuildReadiness(current());
+   if(!readiness.ready){status(readiness.reason);return;}
+   prompt=coaching?.buildPrompt(request?.compiledPlan?typed:request?.prompt||typed)||prompt;
+   // The request contains the full agreed plan; the conversation contains only
+   // the child's words. A Build gesture is already acknowledged by its handoff.
+   if(!request&&typed&&!current().messages.some(m=>m.role==='child'&&m.text===typed))message(s,'child',typed);
+  }else message(s,'child',request?.displayText||prompt);
+  notebook.update(s.id,s.owner,x=>{x.reflection=false;x.playOnly=false;});
   if(s.projectId&&!s.remoteId&&!s.candidate?.remoteId){
     const working=games.revision(s.projectId,s.owner),config=decision.continueTest&&s.candidate?.config?s.candidate.config:working.config;
     const intent=interpret(s.game as GameId,config,prompt);
@@ -1004,65 +1104,109 @@ export async function installStudio(){
       notebook.saveExperiment(s.id,s.owner,c,decision.parents,decision.depth,decision.origin);
       const achievement=gemAchievement(before,notebook.get(s.id,s.owner));if(achievement){updateProfile();celebrateProgress(achievement);}
       // Keep the concurrent AI build and its exact starting revision.
-       notebook.update(s.id,s.owner,x=>{x.draft='';});$<HTMLTextAreaElement>('studioPrompt').value='';
+       clearConsumedDraft();
       message(s,'helper',`${intent.summary}. This is a test. Play it before choosing Make this my main game.`);await playCandidate();return;
     }
     if(intent.kind!=='generation-needed'){message(s,'helper',intent.message);render();return;}
   }
-  if(busy(s)){message(s,'helper','Your big edit is building. This new idea is saved for later; quick edits still work.');status('Background build active · idea saved');render();return;}
+  if(busy(s)){status('Your game is still building. This idea is saved.');render();return;}
    if(remote.mode!=='remote'){
-    message(s,'helper','That request needs the AI builder, which is not connected yet. Your idea is saved here; no build was started and your working game is unchanged. You can still try the local examples.');status('Idea saved · no AI job queued');render();return;
+    status('Building is offline. Your idea is saved.',true);beginBuildHandoff(s,{phase:'unavailable'});render();return;
   }
   const chosenBase=decision.continueTest?s.candidate:null;
   const baseId=chosenBase?.remoteId||s.remoteId||(chosenBase?.config?chosenBase.id:s.projectId?games.revision(s.projectId,s.owner).id:null);
   notebook.update(s.id,s.owner,x=>{x.pendingExperiment={parents:decision.parents,depth:decision.depth,origin:decision.origin,baseId,prompt};});
+  if(consumedDraft!==undefined)submittedDrafts.set(s.id,consumedDraft);else submittedDrafts.delete(s.id);
   await build(s,prompt,decision.continueTest);
  }
  function clientFor(s:StudioSession){
   let c=clients.get(s.id);if(c)return c;
-  c=new BuilderClient(remote,job=>{void onJob(s,job).catch(e=>{if(activeId===s.id&&owner()===s.owner)status(e.message,true);});});clients.set(s.id,c);return c;
+  c=new BuilderClient(remote,job=>{void onJob(s,job).catch(e=>{if(activeId===s.id&&owner()===s.owner){updateBuildHandoff(s,{phase:'uncertain'});status('Could not save the build status. Keep this page open. Your current game is safe.',true);}});});clients.set(s.id,c);return c;
  }
  async function build(s:StudioSession,prompt:string,continueTest=false){
-  sending.add(s.id);render();status('Sending your request. No job has been queued yet.');
+  sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
   const r=s.projectId?games.revision(s.projectId,s.owner):null;
   const chosen=continueTest?s.candidate:null;
   const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
   // Request admission ends at the durable ACK, not when a game finishes building.
   // Continue status polling independently while a child plays or makes other edits.
   void clientFor(s).submit(input).catch(error=>{
-   if(owner()!==s.owner)return;
+   if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)return;
    const saved=notebook.get(s.id,s.owner);
-   if(busy(saved)&&saved.job?.api===remote.apiBaseUrl){
+   if(saved.job&&busy(saved)&&saved.job.api===remote.apiBaseUrl&&saved.job.id!==s.job?.id){
     unknownJobs.add(s.id);refreshShelf();resume(saved);
+    updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:true,recovery:'check'});
     if(activeId===s.id&&owner()===s.owner)
      status('Connection interrupted. The builder may still be working; checking again.');
    }else{
     const code=error instanceof Error?error.message:undefined;
-    const explanation=buildErrorCopy(code);
-    message(s,'helper',explanation);
+    const knownRejection=isKnownBuildRejection(error);
+    const explanation=buildErrorCopy(knownRejection?code:undefined);
+    if(knownRejection&&saved.job?.id===s.job?.id){
+     // No new job accepted this request. Keep the saved failed job's exact
+     // experiment metadata for its retry, and leave the rejected draft alone.
+     notebook.update(s.id,s.owner,x=>{x.pendingExperiment=s.pendingExperiment||null;});
+     submittedDrafts.delete(s.id);
+    }
+    if(!knownRejection)unconfirmedSubmissions.add(s.id);
+    updateBuildHandoff(s,{phase:knownRejection?'unavailable':'uncertain'});
     if(activeId===s.id&&owner()===s.owner)status(explanation,true);
    }
   }).finally(()=>{
-   sending.delete(s.id);
+   if(buildAttempts.get(s.id)?.attemptId===identity.attemptId)sending.delete(s.id);
    if(activeId===s.id&&owner()===s.owner)render();
   }).catch(error=>{
    if(activeId===s.id&&owner()===s.owner)status('Could not save the builder status. Your current game is safe.',true);
   });
  }
+ async function recoverBuild(action:'retry'|'check'){
+  if(guardMath())return;stopSpeech();flushDraft();const s=current();
+  if(!s.job||sending.has(s.id)||saving||unconfirmedSubmissions.has(s.id))return;
+  if(action==='retry'&&s.job.status!=='failed')action='check';
+  const retryBlock=retryBlocks.get(s.id);
+  if(action==='retry'&&retryBlock?.jobId===s.job.id){status(retryBlock.reason,true);return;}
+  if(remote.mode!=='remote'||s.job.api!==remote.apiBaseUrl){status('Reconnect this game’s workshop before checking its build. Your idea is saved.',true);return;}
+  const identity=beginBuildHandoff(s,{phase:'checking'});
+  sending.add(s.id);render();status('Checking your saved build…');
+  try{
+   const client=clientFor(s);
+   if(action==='check'){
+    const job=await client.check(s.job.id);
+    if(job&&owner()===s.owner&&['queued','building','testing'].includes(job.status))resume(notebook.get(s.id,s.owner));
+   }else await client.retry(s.job.id);
+  }catch(error){
+   if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)return;
+   const latest=notebook.get(s.id,s.owner),code=error instanceof Error?error.message:undefined;
+   const rejected=action==='retry'&&!busy(latest)&&isKnownBuildRejection(error);
+   if(rejected){
+    unknownJobs.delete(s.id);
+    const canRetry=!['RETRY_LIMIT','NOT_FOUND','IDEMPOTENCY_CONFLICT','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED'].includes(code||'');
+    if(!canRetry)retryBlocks.set(s.id,{jobId:latest.job!.id,reason:buildErrorCopy(code,true)});
+    updateBuildHandoff(s,{phase:'failed',...(canRetry?{recovery:'retry' as const}:{}),description:buildErrorCopy(code,true)});
+   }else{
+    unknownJobs.add(s.id);
+    updateBuildHandoff(s,{phase:'uncertain',recovery:'check',canPlayWhileWaiting:busy(latest)});
+   }
+   if(activeId===s.id&&route==='studio')status(rejected?buildErrorCopy(code,true):'The connection interrupted our check. Check build status to find your last attempt. Your idea is safe.',true);
+   refreshShelf();
+  }finally{
+   if(buildAttempts.get(s.id)?.attemptId===identity.attemptId)sending.delete(s.id);
+   if(owner()===s.owner&&activeId===s.id&&route==='studio')render();
+  }
+ }
  async function onJob(captured:StudioSession,job:JobView){
   if(owner()!==captured.owner)return;
-  const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);
+  const prior=notebook.get(captured.id,captured.owner);unknownJobs.delete(captured.id);unconfirmedSubmissions.delete(captured.id);
+  if(retryBlocks.get(captured.id)?.jobId!==job.jobId||job.status!=='failed')retryBlocks.delete(captured.id);
   let celebratedLevel=false;
-  const terminal=['ready','failed','cancelled'].includes(job.status);
   const phase=typeof job.phase==='string'&&/^[a-z-]{1,32}$/.test(job.phase)?job.phase:undefined;
    if(prior.job?.id!==job.jobId||prior.job.status!==job.status||prior.job.revisionId!==job.revisionId||prior.job.phase!==phase)
     notebook.update(captured.id,captured.owner,s=>{s.job={id:job.jobId,api:remote.apiBaseUrl||'',status:job.status as PendingJob['status'],...(job.revisionId?{revisionId:job.revisionId}:{}),...(phase?{phase}:{})};});
   // A job acknowledgment ends the *submission* wait even while generation runs.
    // Unlock quick local edits only after the job ID and source revision are durable.
    if(sending.has(captured.id)){sending.delete(captured.id);}
-   if(job.status==='queued'&&prior.pendingExperiment){if(activeId===captured.id&&owner()===captured.owner)flushDraft();const submitted=prior.pendingExperiment.prompt;notebook.update(captured.id,captured.owner,s=>{if(s.draft===submitted)s.draft='';});if(activeId===captured.id&&owner()===captured.owner&&$<HTMLTextAreaElement>('studioPrompt').value===submitted)$<HTMLTextAreaElement>('studioPrompt').value='';}
+   if(prior.pendingExperiment&&submittedDrafts.has(captured.id)){if(activeId===captured.id&&owner()===captured.owner)flushDraft();const submitted=submittedDrafts.get(captured.id)!;notebook.update(captured.id,captured.owner,s=>{if(s.draft===submitted)s.draft='';});if(activeId===captured.id&&owner()===captured.owner&&$<HTMLTextAreaElement>('studioPrompt').value===submitted)$<HTMLTextAreaElement>('studioPrompt').value='';submittedDrafts.delete(captured.id);}
   const texts:Record<string,string>={queued:'Your request is queued.',building:'Building a separate preview…',testing:job.phase==='repairing'?'Repairing the preview…':'Testing the preview…',ready:'Your new preview is ready.',failed:'The build did not work. Your current game is safe.',cancelled:'Build cancelled. Your current game is unchanged.'};
-  if(terminal&&prior.job?.status!==job.status)message(captured,'helper',(job.adapter==='mock'?'Test builder (mock): ':'')+(job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]));
   if(job.status==='ready'&&job.revisionId&&!prior.experiments?.some(e=>e.candidate.remoteId===job.revisionId)){
     const pending=prior.pendingExperiment;const c:Candidate={id:crypto.randomUUID(),baseId:pending?pending.baseId:null,remoteId:job.revisionId,prompt:pending?.prompt||prior.draft,summary:job.adapter==='mock'?'New test-builder preview (mock)':'New AI-built preview'};
     const before=progressSnapshot(prior);
@@ -1074,8 +1218,10 @@ export async function installStudio(){
    const latest=notebook.get(captured.id,captured.owner);
    if(latest.job)waitArcade.update(latest.job.status as WorkshopStatus,!!readyExperiment(latest));
   }
+  const latest=notebook.get(captured.id,captured.owner);
+  if(job.status!=='draft')updateBuildHandoff(captured,{phase:job.status,canPlayWhileWaiting:busy(latest),canPlayReady:!!readyExperiment(latest),...(job.status==='failed'?{...(retryBlocks.has(captured.id)?{}:{recovery:'retry' as const}),description:retryBlocks.get(captured.id)?.reason||buildErrorCopy(job.errorCode,true)}:{})});
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){
-   status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode):texts[job.status]||'Your working game is safe.');render();
+   status(job.status==='ready'?'Your new test is saved. Choose Try your ready test when you are ready.':job.status==='failed'?buildErrorCopy(job.errorCode,true):texts[job.status]||'Your working game is safe.');render();
    // Only a confirmed new real revision earns the playable burst; never a mock or queued job.
    if(job.status==='ready'&&job.revisionId&&isRealAdapter(job.adapter)&&prior.job?.status!=='ready'&&!FG.learning.active&&!celebratedLevel)
     celebrateJem('playable','studioReady');
@@ -1094,8 +1240,9 @@ export async function installStudio(){
    void clientFor(s).resume(s.job.id).catch(()=>{
     if(owner()!==s.owner)return;
     unknownJobs.add(s.id);refreshShelf();
+    updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:busy(s),recovery:'check'});
     if(waitProject?.id===s.id&&waitProject.owner===s.owner&&waitArcade.isOpen())waitArcade.update('reconnecting',false);
-     if(activeId===s.id)status('Connection interrupted. The build may still be running. We will check again.');
+     if(activeId===s.id){status('Connection interrupted. The build may still be running. We will check again.');if(route==='studio')render();}
     if(retryTimers.has(s.id))clearTimeout(retryTimers.get(s.id)!);
     retryTimers.set(s.id,setTimeout(()=>{retryTimers.delete(s.id);try{const latest=notebook.get(s.id,s.owner);if(busy(latest))resume(latest);}catch{/* original work remains */}},15000));
    });
@@ -1285,18 +1432,19 @@ export async function installStudio(){
   if(!$<HTMLTextAreaElement>('studioPrompt').value.trim()){status('Type a message or choose Speak first.');return;}
   return coaching?.discuss('discuss');
  });
- $('studioPrompt').oninput=()=>{clearTimeout(draftTimer);$('studioDraftStatus').textContent='Saving draft…';draftTimer=setTimeout(()=>act(()=>{flushDraft();$('studioDraftStatus').textContent='Draft saved on this device';}),180);};
+ $('studioPrompt').oninput=()=>{refreshBuildAction();clearTimeout(draftTimer);$('studioDraftStatus').textContent='Saving draft…';draftTimer=setTimeout(()=>act(()=>{flushDraft();$('studioDraftStatus').textContent='Draft saved on this device';}),180);};
  $('studioReflectAnswer').onclick=()=>act(()=>{if(guardMath())return;reflecting=true;setTab('talk');render();focusView($('studioPrompt'));});$('studioReflectSkip').onclick=()=>act(()=>{const s=current();notebook.update(s.id,s.owner,x=>{x.reflection=false;});coaching?.pauseReflection();reflecting=false;render();void playViewed();});
- $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});$('studioRetry').onclick=()=>act(async()=>{const s=current();await clientFor(s).retry();});
+ $('studioCancel').onclick=()=>act(async()=>{const s=current();await clientFor(s).cancel();});
+ $('studioRetry').onclick=()=>act(()=>recoverBuild(unknownJobs.has(current().id)?'check':'retry'));
  page.querySelectorAll<HTMLElement>('[data-studio-tab]').forEach(b=>b.onclick=()=>act(()=>{const tab=b.dataset.studioTab as 'game'|'talk'|'versions';if(tab==='game'&&pausedForTools)return playViewed();setTab(tab);}));
- window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail&&route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}refreshStudioGuide();});
+ window.addEventListener('factory-learning-active',event=>{refreshGameSubject();if((event as CustomEvent).detail){handoff.close();if(route==='studio'){$<HTMLDetailsElement>('studioMore').open=false;setTab('game');}}refreshStudioGuide();});
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
- window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
- window.addEventListener('factory-profile',()=>{welcomeArt=null;waitArcade.close();waitProject=null;stopSpeech();hideJourney();
+ window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();handoff.close();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
+ window.addEventListener('factory-profile',()=>{welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();waitArcade.close();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
-  $('studioMessages').replaceChildren();$('coachProposals').replaceChildren();
+  const conversation=$('studioMessages');conversation.replaceChildren();delete conversation.dataset.session;delete conversation.dataset.signature;$('coachProposals').replaceChildren();
   $('coachModeStatus').textContent='';$<HTMLTextAreaElement>('studioPrompt').value='';
   $('studioVoiceStatus').textContent='';
   coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';updateProfile();$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();act(home);void refreshServiceReadiness();resumeOutstanding();});
@@ -1309,10 +1457,10 @@ export async function installStudio(){
  coaching=installCoaching({notebook,current,owner,message,render,status,config:()=>remote,
   onSavedDesignChange,
   onCoachReply:text=>voice?.reply(text),
-  onCoachState:state=>{coachConnection=state;if(activeId)render();},
+  onCoachState:state=>{coachConnection=state;if(activeId)render();window.dispatchEvent(new CustomEvent('factory-coach-connection',{detail:{ownerId:owner(),state}}));},
   rules:()=>{const s=current();if(s.game==='new')return 'New game: rules are being agreed; do not invent recorded outcomes.';const r=s.projectId?games.revision(s.projectId,s.owner):null;return JSON.stringify({game:s.game,instructions:FG.games[s.game]?.instructions,controls:FG.games[s.game]?.controls,settings:r?.config,learningSubject:FG.learning.subject,editable:manifests[s.game as GameId]?.mechanics.map(m=>({key:m.key,label:m.label}))}).slice(0,2000);},
   localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details();return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:games.revision(s.projectId,s.owner).config,prompt).kind==='supported';},
-  tryRequest:async(prompt)=>{$<HTMLTextAreaElement>('studioPrompt').value=prompt;flushDraft();await submit();},
+  tryRequest:async(prompt,_origin,_depth,displayText,compiledPlan)=>{await submit({prompt,displayText,compiledPlan});},
   playTest:async id=>{const s=current();if(!canChangePlay(s))return;const test=s.experiments?.find(e=>e.id===id);if(test?.candidate.remoteId){await showRemote(s,test.candidate.remoteId,'candidate',id);return;}notebook.selectExperiment(s.id,s.owner,id);await playCandidate();},playMain:playViewed,combineTests,
   pauseForThinking:()=>{if(guardMath())return false;++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;status('Your game is waiting. Your build is saved; action games start a new round when you return.');}return true;},
   showTalk:()=>{showStudio();if(setTab('talk'))focusView($('studioPrompt'));}
@@ -1403,6 +1551,7 @@ export async function installStudio(){
   home,openGame:id=>open(id),onRewardSourceSaved:notifyRewardSourceSaved,
   ownedPals:()=>pals.state.profile?.owned.map(pal=>pal.id)??[],
   activePal:()=>pals.state.profile?.activeId??null,
+  palForm:id=>pals.state.profile?.owned.find(pal=>pal.id===id)?.form??'base',
   openPals:()=>palsInterface.open(),
  });
  const artStudio=installArtStudio({

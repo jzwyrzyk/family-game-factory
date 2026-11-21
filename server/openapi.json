@@ -980,7 +980,7 @@
             "familySession": []
           }
         ],
-        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant."
+        "description": "The family-only security alternative accesses family-audience resources. The adult alternative requires familySession AND adultCookie AND adultProof and accesses only the authenticated device adult workspace. The gateway enforces resource audience independently of local profile selection; one audience cannot read, preview, cancel, fork, keep or overwrite the other audience resources. Adult access is rechecked against its live grant and operator permit. A valid Adult profile can reopen its earlier workspace with a new grant, but an old job cannot continue under the replacement grant. A failed job may include retryJobId identifying its already accepted retry in the same authorized audience. Follow that ID through read-only status requests to recover a lost acknowledgement; reading never creates a retry or reserves allowance."
       }
     },
     "/v1/jobs/{id}/cancel": {
@@ -1743,7 +1743,7 @@
         "summary": "Retry an authorized failed job after reload without copying its prompt",
         "responses": {
           "202": {
-            "description": "Bounded retry acknowledged under current applicable permission",
+            "description": "One bounded retry successor acknowledged or an already accepted successor recovered under current applicable permission",
             "content": {
               "application/json": {
                 "schema": {
@@ -1813,7 +1813,7 @@
             "familySession": []
           }
         ],
-        "description": "Runtime audience policy: with FACTORY_ADULT_PILOT_MODE=true, paid admission requires familySession AND adultCookie AND adultProof, an active owner-enrolled trusted device and its current 60-minute adult grant. With adult mode off, only the family-session path is available and current server-verified guardian generation permission is required. These alternatives are selected by server configuration, not caller role/profile JSON. Existing provider, private worker, budget and quota gates remain required. Admission and asynchronous worker claim/report/Ready publication recheck the applicable permission; adult jobs retain the exact grant that admitted them. Do not automatically replay an uncertain paid POST.",
+        "description": "Runtime audience policy: with FACTORY_ADULT_PILOT_MODE=true, paid admission requires familySession AND adultCookie AND adultProof, an active owner-enrolled trusted device and its current 60-minute adult grant. With adult mode off, only the family-session path is available and current server-verified guardian generation permission is required. These alternatives are selected by server configuration, not caller role/profile JSON. Existing provider, private worker, budget and quota gates remain required. Admission and asynchronous worker claim/report/Ready publication recheck the applicable permission; adult jobs retain the exact grant that admitted them. Do not automatically replay an uncertain paid POST. A failed job has one retry successor. A repeated explicit retry for that same parent, including one with a different clientRequestId after reload, returns the accepted successor without another reservation or job. Recover an uncertain acknowledgement by reading the parent and following retryJobId. A failed successor requires a separate explicit retry against its own ID and still obeys the configured retry-chain limit.",
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
@@ -2304,6 +2304,11 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 3
+          },
+          "retryJobId": {
+            "type": "string",
+            "pattern": "^[\\w-]{1,100}$",
+            "description": "Optional authorized retry successor returned by GET job status. This is an existing job ID for read-only recovery, not permission to submit another build."
           }
         }
       },

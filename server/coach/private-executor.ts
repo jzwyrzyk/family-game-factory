@@ -49,7 +49,8 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    const token=req.headers.authorization?.match(/^Bearer ([A-Za-z0-9._-]{40,12000})$/)?.[1];
    if(!token||!await runtime.verifyCaller(token))throw Error('FORBIDDEN');
    const available=runtime.enabled&&approved(runtime.config)&&
-    !!runtime.config.apiKey&&runtime.config.apiKey.length>=16;
+    !!runtime.config.apiKey&&runtime.config.apiKey.length>=16&&
+    (!runtime.provider.readiness||await runtime.provider.readiness(AbortSignal.any([aborted.signal,AbortSignal.timeout(3000)])).catch(()=>false));
    // Both readiness probes authenticate the exact gateway identity.
    // No prompt, child ID, audio or provider request is included.
    if(path==='/v1/private-coach/status'&&req.method==='GET')

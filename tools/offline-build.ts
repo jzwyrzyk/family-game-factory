@@ -10,7 +10,7 @@ export function offlineBuild():Plugin{return {name:'reviewed-offline-shell',clos
  // selection can resolve already-viewed assets. Private APIs stay excluded.
  const coreArt=new Set(['hero_workshop','spot_first_idea','character_spark_wave','character_spark_think','character_spark_rest','character_spark_celebrate','character_spark_recover','spot_work_in_progress','spot_reconnect','spot_safe_storage'].map(id=>'jems-art/'+id+'.webp'));
  coreArt.add('jems-art/icons/jems-icons.svg');
- const precache=list.filter(f=>(!f.startsWith('jems-art/')||coreArt.has(f))&&(!f.startsWith('jems-pals/')||f==='jems-pals/manifest.json'));
+ const precache=list.filter(f=>(!f.startsWith('jems-art/')||coreArt.has(f))&&(!f.startsWith('jems-pals/')||f==='jems-pals/manifest.json')&&!f.startsWith('jems-pals-extra/'));
  fs.writeFileSync(path.join(dir,'sw.js'),`const paths=${JSON.stringify(list)},precachePaths=${JSON.stringify(precache)},version=${JSON.stringify(version)};
 const prefix='family-arcade:'+new URL(self.registration.scope).pathname+':',key=prefix+version;
 const urls=paths.map(p=>new URL(p,self.registration.scope).href);

@@ -1,6 +1,6 @@
 # Direct Jems diagnostic access
 
-**Status:** connection tooling and operating method; an account connection and live verification are still required. A passing local test or a merged PR does not activate Google Cloud access.
+**Status:** PR100 source reconciled with main `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d` for review. Earlier operational discussion reported successful metadata reads in a configured environment; that is prior evidence, not a live check from this task. This task has neither `gcloud` nor a managed outbound identity manifest. A passing local test, merged PR or connection in another task does not activate access here. See [delivery state](../../DELIVERY-STATE.md) for the scoped observations.
 
 ## Outcome and operating scope
 
@@ -8,7 +8,11 @@ The owner should not relay routine commands and terminal output between ChatGPT 
 
 Engage the owner for initial authentication, a new privilege or trust boundary, increased spending, destructive production-data work, a change in sensitive-data exposure, or a product/strategic choice. An escalation should include the diagnosis, options, recommendation and specific decision needed. Existing authorization remains valid; do not ask again for each implementation step.
 
-This first implementation enables **Cloud Run metadata diagnostics**. It does not implement log retrieval, private configuration reads, paid provider checks, workflow dispatch, production promotion or rollback. Those capabilities require their own verified connection and controls. The existing release-automation work in [PR45](https://github.com/jzwyrzyk/family-game-factory/pull/45) and [issue46](https://github.com/jzwyrzyk/family-game-factory/issues/46) remains the follow-on integration point; do not merge or deploy that older branch blindly.
+A preparation or status-review request is not approval to merge, deploy or expand access. Preserve an explicit hold even after tests pass. The owner's November 21 continuation authorizes source preparation and leaves merging unapproved.
+
+This first implementation enables **Cloud Run metadata diagnostics**. It does not implement log retrieval, private configuration reads, paid provider checks, workflow dispatch, production promotion or rollback. Main now contains the [read-only policy foundation](POLICY_FOUNDATION.md), including testable scoped-log and release-controller modules. The privileged workflow installation, identities, actual claim proofs, restricted Logging access and isolated live rollout drill remain in [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107). Keep these distinct from this metadata connection. [PR45](https://github.com/jzwyrzyk/family-game-factory/pull/45) and [issue46](https://github.com/jzwyrzyk/family-game-factory/issues/46) retain their separate Pages/continuity scope; do not replay an older release branch.
+
+The assistant runs commands in its selected managed environment and uses the approved cloud APIs. It does not inherit or attach to the owner's existing Cloud Shell session. Cloud Shell remains the initial administrator setup route when the required account authority is unavailable in the assistant's environment.
 
 ## One-time connection setup
 
@@ -91,7 +95,7 @@ The bootstrap itself necessarily uses the owner's setup authority to create this
 
 ## Diagnostic output and limits
 
-`diagnose.py` accepts `--self-check`, `--identity-alias` and `--json`. It fixes the project, region and three service names; it does not accept arbitrary shell text or cloud resources. It requires a managed version-1 outbound identity manifest and fails when the requested identity cannot be selected. It does not manufacture a new credential or fall back to a manual owner login when the managed connection is absent.
+`diagnose.py` accepts `--self-check`, `--identity-alias` and `--json`. It fixes the project, region and three service names; it does not accept arbitrary shell text or cloud resources. It requires a managed version-1 outbound identity manifest and fails when the requested identity cannot be selected or its `service_account_email` is not exactly `jems-codex-diagnostics@family-game-factory-jzw.iam.gserviceaccount.com`. An alias/default marker is not a substitute for that identity. The check confirms the managed manifest's declared account; it does not independently audit the credential issuer or effective inherited rights. It does not manufacture a new credential or fall back to a manual owner login when the managed connection is absent.
 
 Service/revision metadata is read in memory. Only an allowlist is reported: readiness, generation reconciliation status, latest and serving revision names, traffic percentages, image digests, known approval flags as booleans/unknown, and counts/presence of secret references. Raw metadata, credential bindings, secret values, arbitrary environment values and raw command errors are not printed. Secret Manager payloads, application/child data and log entries are not fetched.
 
@@ -105,10 +109,10 @@ An absent CLI, missing connection, denied service permission and unhealthy deplo
 
 ## Remaining work after connection
 
-1. Inspect actual logging configuration and add a reviewed log-access path. A view name or a merely nonempty filter does not prove narrow access, and a log view does not redact payloads.
-2. Integrate the existing release-controller work with a separate deployment identity and a callable, restricted trigger. This diagnostic identity cannot deploy.
-3. Enforce required branch checks and protect privileged release changes through the appropriate administrator path.
-4. Verify permitted diagnostic operations and denied write permissions from the new environment, then prove the controlled release path separately.
+1. Complete source review of PR100 against current main. This preparation preserves the owner's no-merge instruction; it does not install or activate any connection.
+2. Reuse the intended managed environment, publish any reviewed environment changes, and verify permitted metadata reads and denied write permissions from a new task there. Earlier verification in another task remains scoped to that observation.
+3. Complete PR107's restricted Logging setup and isolated redaction proof. A view name or merely nonempty filter does not prove narrow access, and a log view alone does not redact payloads.
+4. Complete the remaining PR107 account setup, protected-main claim proofs, isolated stage/canary/promote/rollback drill and separately approved release activation. Main's policy check and its six required-check protections already have separate recorded evidence; do not recreate them merely because this earlier PR was unmerged. The diagnostic identity cannot deploy, and the new publication/release enable flags remain unset until the controlled path is accepted.
 
 The end-state acceptance criterion is an ordinary investigation and permitted repair completed without owner-relayed terminal output. This initial metadata connection is one prerequisite, not a claim that the entire goal is already live.
 

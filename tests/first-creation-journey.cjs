@@ -17,6 +17,14 @@ const current=page=>page.evaluate(()=>{
 });
 const unavailable=route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})});
 const snapshot=page=>page.evaluate(()=>FG.runtime.snapshot());
+async function moreChoices(page){
+ const details=page.locator('#studioMoreChoices');
+ if(!await details.evaluate(node=>node.open))await details.locator(':scope > summary').click();
+}
+async function doneForNow(page){
+ if(!await page.locator('#studioDoneForNow').isVisible())await moreChoices(page);
+ await page.click('#studioDoneForNow');
+}
 async function capture(page,name,device){
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true,name+' fits the '+device+' viewport');
  // Keep touch emulation intact during an active journey (Playwright #42607).
@@ -126,12 +134,16 @@ async function localFirstJourney(browser,url,device,viewport){
   await page.locator('#page-studio').waitFor({state:'visible'});
   assert.equal((await notebook(page)).sessions.length,1,'the primary action creates exactly one idea');
   assert.equal((await current(page)).job,null,'a welcome action never submits a build');
-  if(device==='phone')for(const selector of ['#studioTalk','#studioSend']){
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'new creation waits for enough child-provided intent before enabling Build');
+  if(device==='phone')for(const selector of ['#studioPrompt','#studioTalk']){
    const box=await page.locator(selector).boundingBox();
    assert.ok(box&&box.y>=0&&box.y+box.height<=viewport.height,selector+' remains visible in the first phone composer');
   }
-  await page.locator('#studioGuideCard').waitFor({state:'visible'});
   await capture(page,'idea',device);
+  assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'extra tools start collapsed beside the guided conversation');
+  assert.equal(await page.locator('#studioGuideCard').isVisible(),false,'the current chat is not surrounded by a second guidance card');
+  await moreChoices(page);
+  await page.locator('#studioGuideCard').waitFor({state:'visible'});
   const beforeHint=await page.evaluate(key=>localStorage.getItem(key),NOTEBOOK);
   await failWrites(page,true);await page.click('#studioGuideCardDismiss');
   assert.equal(await page.locator('#studioGuideCard').isVisible(),true,'a failed preference write leaves the hint available');
@@ -142,12 +154,13 @@ async function localFirstJourney(browser,url,device,viewport){
   const draft='Fixture: a purple cat jumps between jelly moons.';
   await page.fill('#studioPrompt',draft);
   await page.waitForFunction(text=>FG.studio.exportNotebook().sessions.some(s=>s.draft===text),draft);
-  await page.click('#studioDoneForNow');
+  await doneForNow(page);
   await page.locator('#page-studio-library').waitFor({state:'visible'});
   await page.reload();await ready(page);
   assert.equal(await page.locator('#studioWelcome').isVisible(),false,'returning to a saved idea does not repeat the welcome');
   await page.click('#studioContinuePlaying');
   assert.equal(await page.inputValue('#studioPrompt'),draft,'the next visit resumes the exact idea');
+  await moreChoices(page);
   assert.equal(await page.locator('#studioGuideCard').isVisible(),false,'hint dismissal survives reload');
   await navigate(page,'studioJourneyHelp');
   await page.locator('#studioJourneyMap').waitFor({state:'visible'});
@@ -164,11 +177,11 @@ async function localFirstJourney(browser,url,device,viewport){
   const unsaved='Fixture: preserve these new words even when browser storage is full.';
   await page.fill('#studioPrompt',unsaved);
   await page.waitForFunction(()=>document.getElementById('studioDraftStatus').textContent.includes('Could not save'));
-  await page.click('#studioDoneForNow');
+  await doneForNow(page);
   assert.equal(await page.locator('#page-studio').isVisible(),true,'Done for now stops when the current draft cannot be saved');
   assert.equal(await page.inputValue('#studioPrompt'),unsaved);
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),NOTEBOOK),durable,'failed departure preserves the last durable notebook');
-  await failWrites(page,false);await page.click('#studioDoneForNow');
+  await failWrites(page,false);await doneForNow(page);
   await page.locator('#page-studio-library').waitFor({state:'visible'});
   await page.click('#studioContinuePlaying');
   assert.equal(await page.inputValue('#studioPrompt'),unsaved,'a retry saves and resumes the exact newer draft');
@@ -185,7 +198,7 @@ async function localFirstJourney(browser,url,device,viewport){
   assert.equal(await page.inputValue('#studioPrompt'),unsaved);
   // Simulate a valid notebook from before optional guidance existed. Actual work,
   // rather than an onboarding flag, must still identify a returning creator.
-  await page.click('#studioDoneForNow');
+  await doneForNow(page);
   const previousSessions=(await notebook(page)).sessions;
   await page.evaluate(key=>{const value=JSON.parse(localStorage.getItem(key));delete value.guidance;localStorage.setItem(key,JSON.stringify(value));},NOTEBOOK);
   await page.reload();await ready(page);
@@ -224,7 +237,7 @@ async function firstImprovement(browser,url,device,viewport){
   });
   assert.notEqual(await head(),before,'only explicit Keep chooses the new main version');
   const kept=await head();
-  await page.click('#studioDoneForNow');await page.locator('#page-studio-library').waitFor({state:'visible'});
+  await doneForNow(page);await page.locator('#page-studio-library').waitFor({state:'visible'});
   await capture(page,'return',device);
   await page.reload();await ready(page);await page.click('#studioContinuePlaying');
   await page.waitForSelector('.favorite-robot .favorite-canvas');
@@ -246,7 +259,7 @@ async function firstImprovement(browser,url,device,viewport){
    assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt.id);
    assert.equal(await page.locator('#stage-overlay .math-activity').isVisible(),true,'a guide action cannot hide a required learning activity');
   }
-  await page.click('#studioDoneForNow');
+  await doneForNow(page);
   await page.locator('#page-studio-library').waitFor({state:'visible'});
   assert.equal(await page.evaluate(()=>FG.learning.active),false,'Done leaves through the host lifecycle');
   const outcome=await page.evaluate(({owner,id})=>{
@@ -265,7 +278,10 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
  const variant=focusedGuide?`${device}-${focusedGuide}`:device;
  const api='https://first-creation-api.test',preview='https://first-creation-preview.test';
  const cors={'Access-Control-Allow-Origin':new URL(url).origin,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
- let phase='testing',submitted=0,opened=0,kept=0;
+ let phase='testing',submitted=0,opened=0,kept=0,coachTurns=0;
+ const firstIdea='I want a purple cat game on the moon.';
+ const ownDetails='I tap to jump to a donut. Each donut makes the cat bigger. It should feel silly and springy.';
+ const evidence={action:'I tap to jump to a donut',consequence:'Each donut makes the cat bigger',experience:'silly and springy',world:'a purple cat game on the moon'};
  try{
   await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:api,previewOrigin:preview})}));
   await page.route(api+'/**',async route=>{
@@ -274,7 +290,17 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
    let body;
    if(path==='/v1/sessions/status')body={connected:true,trusted:true,expiresAt:Date.now()+60000};
    else if(path==='/v1/builder/status')body={available:true};
-   else if(path==='/v1/coach/status')body={available:false};
+   else if(path==='/v1/coach/status')body={available:true};
+   else if(path==='/v1/coach/audio/status')body={available:false};
+   else if(path==='/v1/coach'&&request.method()==='POST'){
+    coachTurns++;const context=request.postDataJSON().context;
+    assert.equal(context.creation?.version,1,'first creation explicitly requests the readiness-capable conversation contract');
+    const enough=context.message===ownDetails;
+    body={mode:'model',reply:{move:enough?'listen':'clarify',text:enough?'Your cat grows when it reaches a donut.':'Let’s work out how your moon cat plays.',
+     question:enough?null:'What should happen when you help your cat move?',suggestions:[],proposedChange:null,planSuggestions:[],
+     childDecisions:enough?[{field:'action',quote:evidence.action},{field:'goal',quote:evidence.consequence},{field:'fun',quote:evidence.experience}]:[],evidenceIds:[],
+     creationReadiness:{ready:enough,evidence:enough?evidence:{action:'',consequence:'',experience:'',world:evidence.world},unresolved:enough?[]:['The player action and its result are still unclear.']}}};
+   }
    else if(path==='/v1/jobs'&&request.method()==='POST'){submitted++;body={jobId:'first-job',status:'queued',adapter:'mock'};}
    else if(path==='/v1/jobs/first-job')body={jobId:'first-job',status:phase,adapter:'mock',...(phase==='ready'?{revisionId:'first-revision'}:{})};
    else if(path==='/v1/revisions/first-revision/preview'){
@@ -286,26 +312,39 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   await page.route(preview+'/**',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><html><body><h1>First creation transport fixture</h1><p>This is a synthetic game response, not an AI output.</p><button>Play fixture</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='first-artifact';addEventListener('message',event=>{if(event.source===parent&&event.data.type==='factory-learning'&&event.data.channel===channel&&event.data.artifactId===artifactId&&event.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script></body></html>`}));
   await page.goto(url);await ready(page);await page.waitForFunction(()=>FG.studio.mode()==='remote');
   await completeWelcome(page);
-  await page.fill('#studioPrompt','Make a game where a purple cat jumps to collect donuts on the moon');await page.click('#studioSend');
-  await page.waitForFunction(()=>document.getElementById('designPlan')?.open===true);
-  await page.getByRole('button',{name:'You choose the remaining details',exact:true}).click();
-  await page.click('#buildGamePlan');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true,'Build stays disabled before the child’s idea is understood');
+  await page.fill('#studioPrompt',firstIdea);await page.click('#studioTalk');
+  await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('What should happen when you help your cat move?'));
+  assert.equal(await page.locator('#designPlan').isVisible(),false,'the useful next question stays in conversation');
+  assert.equal(await page.locator('#coachGuidedChoices button, #coachChooseRest, #coachChooseForMe').count(),0,'the child supplies an answer without suggestions or delegation chips');
+  assert.equal(await page.locator('#studioSend').isDisabled(),true);
+  assert.equal(submitted,0,'talking through an incomplete idea does not start generation');
+  await page.fill('#studioPrompt',ownDetails);await page.click('#studioTalk');
+  await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
+  assert.equal(coachTurns,2,'the child’s own next turn supplies the material missing details');
+  assert.equal(submitted,0,'a ready review still waits for explicit Build');
+  await page.click('#studioSend');
+  await page.locator('#studioBuildHandoff').waitFor({state:'visible'});
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.status==='testing'));
   const ownId=(await current(page)).id;
   assert.equal(submitted,1,'one explicit build has one durable submission');
   assert.equal(opened,0);assert.equal(kept,0);
+  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Approved game plan|Choose sensible details for:/,'compiled instructions stay out of the child conversation');
   await capture(page,'waiting',variant);
+  await page.click('#studioBuildHandoffStay');
+  assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'the child can stay with the idea after acknowledging the build');
   let waitingGameId=ownId;
   const focusedControl=focusedGuide?`#studioGuideCard${focusedGuide==='action'?'Action':'Dismiss'}`:'#studioChange';
   if(!focusedGuide){
    await page.click('#studioNavHome');await page.click('[data-starter="robot"]');
    await page.waitForSelector('.favorite-robot .favorite-canvas');
    waitingGameId=(await current(page)).id;assert.notEqual(waitingGameId,ownId);
-  }
+  }else await moreChoices(page);
   await page.locator(focusedControl).focus();
   phase='ready';
   await page.waitForFunction(id=>FG.studio.exportNotebook().sessions.find(s=>s.id===id)?.job?.status==='ready',ownId);
   assert.equal((await current(page)).id,waitingGameId,'completion does not take the child away from their chosen activity');
+  assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'background completion cannot reopen a dismissed Build handoff');
   if(focusedGuide)await page.locator('#studioGuideCard[data-guide-tip="ready"]').waitFor({state:'visible'});
   assert.equal(await page.locator(focusedControl).evaluate(node=>document.activeElement===node),true,'completion preserves keyboard focus on the visible control');
   if(!focusedGuide)assert.equal(await page.locator('.favorite-robot .favorite-canvas').isVisible(),true);
@@ -342,7 +381,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   await page.click('#studioKeep');
   await page.waitForFunction(id=>FG.studio.exportNotebook().sessions.find(s=>s.id===id)?.remoteId==='first-revision',ownId);
   assert.equal(kept,1,'only the explicit keep action selects the generated revision');
-  await page.click('#studioDoneForNow');await page.locator('#page-studio-library').waitFor({state:'visible'});
+  await doneForNow(page);await page.locator('#page-studio-library').waitFor({state:'visible'});
   await page.reload();await ready(page);await page.waitForFunction(()=>FG.studio.mode()==='remote');
   await page.click('#studioContinuePlaying');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal((await current(page)).id,ownId);assert.equal((await current(page)).remoteId,'first-revision');

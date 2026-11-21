@@ -66,7 +66,7 @@ const {start}=require('./browser-server.cjs');
    assert.equal(await page.locator('#studioMessages').textContent().then(t=>t.includes('The robot sneezes rainbow spaghetti!')),false,'transcription must not auto-send');
    await page.click('#studioTalk');
    await page.waitForFunction(()=>document.getElementById('studioMessages').textContent.includes('The robot sneezes rainbow spaghetti!'));
-   await page.waitForFunction(()=>document.getElementById('coachModeStatus')?.textContent.includes('Local reflection help'));
+   await page.waitForFunction(()=>document.getElementById('coachModeStatus')?.textContent.includes('Chat could not check your idea'));
    assert.equal(modelRequests,1,'one explicit Send makes a coach request');
    assert.equal(buildRequests,0,'Send never starts a game build');
    assert.equal(await page.locator('#studioPrivateMic').getAttribute('aria-pressed'),'false');

@@ -129,7 +129,7 @@ export class PalsStore {
   }
   async chooseStarter(owner: string, id: PalId, input: PalRewardSnapshot): Promise<PalsMutation> {
     this.owner(owner); const snapshot = validatePalRewardSnapshot(input, owner);
-    if (!isPalId(id) || !palDefinition(id).starter) throw Error('Choose Glim or Kip as your first Pal.');
+    if (!isPalId(id) || !palDefinition(id).starter) throw Error('Choose Luma or Nook as your first Pal.');
     return this.update(owner, profile => {
       if (profile.starterId !== null) throw Error('You already chose a starter. Take along a Pal from your collection.');
       // Baseline every older receipt before the first selection, including a

@@ -1,27 +1,14 @@
 # Rebuild the accepted sandbox contract — manual GHCR publication
 
-## Current handoff — publisher fix merged
+## Current handoff — production image accepted; adult activation next
 
-[PR98](https://github.com/jzwyrzyk/family-game-factory/pull/98) merged as `d93ed92c61f603ddecdbc922187664b2b25c244b` on November 20, 2026, at 7:29:14 p.m. America/New_York (`2026-11-21T00:29:14Z`). All 14 check runs passed on reviewed head `73a872a6dfdf2f53a1da7d614c32be80816146e2`; its Git tree exactly matches the merge. [Delivery state](../../DELIVERY-STATE.md) records the merge evidence separately from publication and production acceptance.
+Corrected production [smoke 44855232144](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44855232144) passed on November 20, 2026, at **9:28:36 p.m. America/New_York** (`2026-11-21T02:28:36Z`). All nine required jobs passed: the actual isolated gVisor/no-egress/full sandbox job and all eight hosted application regression shards. The owner also supplied `SMOKE_STATUS=PASSED`, `CLEANUP_STATUS=VERIFIED`, `SMOKE_AUTH_STATUS=VERIFIED`, `SMOKE_CANCEL_STATUS=NOT_NEEDED`, and `FINAL_STATUS=SUCCESS`. [Delivery state](../../DELIVERY-STATE.md) records the complete identities and evidence scope.
 
-**Next:** make one new manual publisher dispatch from the owner's already authenticated Cloud Shell. The following block verifies that PR98 is merged, the workflow file is exactly the reviewed fixed blob, and private paid generation remains disabled. It then starts publication and lists recent runs. Run it once; if it stops or the result is uncertain, inspect the existing run before dispatching again. Do not rerun failed run 44837433067, which uses the older workflow.
+The accepted release uses private `P=52729ad231179d633b2f15fa910aa2b23273a2d6`, public `S=b472c224f7e8ef8ab0986ce6f755728d7cc63d46`, and `ghcr.io/jzwyrzyk/family-game-factory-sandbox@sha256:83be22b96cdd83eaefa80c0ae321208bdff63f4ee926cc5ae28d064f91cee089`. Retain this application/image pair and the successful smoke receipt. The earlier timeout run remains cancelled; its repair is now accepted.
 
-```bash
-(
-  set -euo pipefail
-  JEMS_PUBLIC="jzwyrzyk/family-game-factory"
-  JEMS_WORKER="family-game-factory-lab/family-game-factory-worker"
+**Next:** use the [read-only preactivation audit](../../scripts/deployment/preactivation_audit.py) to obtain current sanitized configuration, trust, model/allowance and adult-access evidence. Reconcile the new private pin with WIF and the mounted gateway configuration, complete authorized adult-only activation, and immediately publish the reviewed website with **`source_sha=b472c224f7e8ef8ab0986ce6f755728d7cc63d46`** through the corrected workflow on `main`. Actual activation and website publication remain pending. Finish with real Adult **Build → Test → Review → Play → Edit → Keep → Reload** acceptance; keep child paid AI off and issue #93 open through continuity acceptance.
 
-  test "$(gh pr view 98 --repo "$JEMS_PUBLIC" --json state --jq .state)" = "MERGED"
-  test "$(gh api "repos/$JEMS_PUBLIC/contents/.github/workflows/sandbox-publish.yml?ref=main" --jq .sha)" = "c834ea78a065a55ed498acad447f2c7bea052c8e"
-  test "$(gh api "repos/$JEMS_WORKER/actions/variables/FACTORY_ACTIONS_APPROVED" --jq .value)" = "false"
-
-  gh workflow run sandbox-publish.yml --repo "$JEMS_PUBLIC" --ref main
-  gh run list --repo "$JEMS_PUBLIC" --workflow sandbox-publish.yml --limit 3
-)
-```
-
-The expected workflow blob is `c834ea78a065a55ed498acad447f2c7bea052c8e`, from PR98's merge. A later documentation-only commit does not change this value. If a guard fails, inspect the changed fact rather than removing the guard. The run list can briefly lag dispatch acceptance; an absent new row is not a reason to dispatch twice. Capture the successful run's `PUBLISHED_SANDBOX_IMAGE` digest before the acceptance sequence below. This block publishes only the reviewed sandbox image; it does not start a VM, change private configuration, activate generation or deploy the website.
+The publisher history and reuse contract below remain historical evidence. This release already has its published and production-accepted replacement image; the remaining work does not require republishing it or rerunning the accepted smoke.
 
 ## November 20 manual-publication dry-run failure and repair
 
@@ -62,8 +49,8 @@ Check the exact run conclusion and copy the **new immutable digest**, not the `s
 ## Acceptance after publication (separate, billable)
 
 1. Verify published image source label/actual entrypoint hash and anonymous pullability from the exact approved digest. Preserve the historical digest as a rollback reference.
-2. **Intentionally update only** the private repo's `FACTORY_SANDBOX_IMAGE` variable to the new digest; preserve `P=21c1b0ee593a9472395ff8a34ef830050d7e5068` and exact WIF, tags, runner group, gateway config and separate approval switches. Record the old variable for restoration if acceptance fails.
+2. **For an image-only change**, intentionally update only the private `FACTORY_SANDBOX_IMAGE` variable, retaining its old value for rollback. The current replacement digest is already set. The separate regression-workflow repair requires a fresh private main/tag/variable pin; preserve the existing public source, image, group policy and disabled paid-generation switch while that repair is accepted.
 3. Run the reviewed private `scripts/runner/owner_smoke.sh --production-image NEW_DIGEST` **once** with its one-use smoke approval, billing authorization, group policy, full source/identity validation, gVisor/network/hostile gameplay/browser tests and cleanup. Require `SMOKE_STATUS=PASSED`, `CLEANUP_STATUS=VERIFIED`, `SMOKE_AUTH_STATUS=VERIFIED`, `FINAL_STATUS=SUCCESS`. A green GitHub-hosted packaging/wire test alone cannot establish this.
-4. Only after full smoke succeeds, perform bounded private Adult (development) provider/allowance acceptance and the real Build → Test → Review → Play → Keep → Reload. Routine frontend deployments must preserve the approved backend. Keep child paid AI off.
+4. Only after full smoke succeeds, complete adult-only backend activation with the correct private trust pin, immediately publish the reviewed website, then perform the real Build → Test → Review → Play → Edit → Keep → Reload. Routine frontend deployments must preserve the approved backend. Keep child paid AI off.
 
 This is **one sandbox-image release step**, not something to repeat for each cosmetic Pages deployment. It does not authorize continuously recreating Cloud VMs or unnecessary worker SHA/WIF rotations.

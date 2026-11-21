@@ -177,7 +177,7 @@ async function currentNavigation(page,id){
     const r=img.getBoundingClientRect(),style=getComputedStyle(img);
     return r.width>0&&r.height>0&&style.visibility==='visible'&&style.opacity==='1'&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===img;
    }),true,'the decoded hero stays visible and unobscured');
-   assert.match(await page.locator('#studioTalk').innerText(),/Send to jems/,'text composer clearly sends');
+   assert.equal(await page.locator('#studioTalk').innerText(),'Send','the focused composer uses the short Send label');
    assert.match(await page.locator('#studioMic').innerText(),/Speak/,'microphone has a separate voice affordance');
    assert.equal(await page.locator('#studioTalk').getAttribute('aria-label'),'Send your written message to jems');
    assert.match(await page.locator('#studioMic').getAttribute('aria-label')||'',/microphone/);

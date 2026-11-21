@@ -19,6 +19,7 @@ import sys
 
 PROJECT = "family-game-factory-jzw"
 REGION = "us-east5"
+DIAGNOSTICS_ACCOUNT = f"jems-codex-diagnostics@{PROJECT}.iam.gserviceaccount.com"
 SERVICES = ("factory-gateway", "factory-preview", "factory-coach-private")
 FLAGS = (
     "FACTORY_ACTIONS_APPROVED", "FACTORY_BOOTSTRAP", "FACTORY_ADULT_PILOT_MODE",
@@ -62,6 +63,8 @@ def identity_environment(alias=None, environ=None):
     selected = candidates[0]
     if not isinstance(selected.get("alias"), str) or not selected["alias"]:
         raise DiagnosticError("IDENTITY_MANIFEST_UNSUPPORTED: The GCP connection has no alias.")
+    if selected.get("service_account_email") != DIAGNOSTICS_ACCOUNT:
+        raise DiagnosticError("IDENTITY_OUTSIDE_SCOPE: Select the managed Jems diagnostics service account; the connection does not name the approved identity.")
     setup = selected.get("setup")
     outcome = setup if isinstance(setup, str) else (setup.get("status", setup.get("state", setup.get("outcome"))) if isinstance(setup, dict) else None)
     if isinstance(outcome, str) and outcome.lower() in {"failed", "failure", "error", "not_ready"}:

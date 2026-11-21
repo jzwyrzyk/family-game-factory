@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { PAL_CATALOG, palDefinition, palLine, type PalId, type PalLineKind } from '../src/pals/catalog';
+import { PAL_CATALOG, palDefinition, palLine, palArtworkPath, palSceneAssetId, type PalId, type PalLineKind } from '../src/pals/catalog';
 import {
   copyPals, emptyPalsWorkspace, validatePalRewardSnapshot, validatePalsWorkspace,
   type PalActivity, type PalRewardSnapshot,
@@ -33,12 +33,22 @@ function fixture() {
 }
 const owned = (view: Awaited<ReturnType<PalsStore['view']>>, id: PalId = 'glim') => view.owned.find(pal => pal.id === id)!;
 
-test('catalog is stable, locally illustrated and carries bounded funny reactions', () => {
-  assert.deepEqual(PAL_CATALOG.map(pal => pal.id), ['glim', 'kip', 'riff']);
+test('approved roster has real two-form portraits, stable legacy identities and bounded reactions', () => {
+  assert.equal(PAL_CATALOG.length, 24);
+  assert.deepEqual(PAL_CATALOG.filter(pal => pal.starter).map(pal => [pal.id, pal.name]), [['glim', 'Luma'], ['kip', 'Nook']]);
+  assert.equal(palDefinition('riff').name, 'Wink');
+  assert.equal(new Set(PAL_CATALOG.map(pal => pal.artwork.characterKey)).size, PAL_CATALOG.length);
   for (const pal of PAL_CATALOG) {
     assert.ok(existsSync(resolve('public', pal.artPath)), `${pal.id} artwork exists`);
-    assert.equal(pal.assetId, `pal-${pal.id}`);
-    assert.deepEqual(pal.artwork, { status: 'preview', speciesId: null, characterKey: null, forms: { base: null, mature: null } });
+    assert.equal(pal.assetId, palSceneAssetId(pal.id, 'base'));
+    assert.equal(pal.artwork.status, 'approved');
+    assert.equal(pal.artPath, palArtworkPath(pal.id, 'base'));
+    assert.notEqual(palArtworkPath(pal.id, 'base'), palArtworkPath(pal.id, 'mature'), `${pal.name} has a distinct approved Grown image`);
+    assert.notEqual(palSceneAssetId(pal.id, 'base'), palSceneAssetId(pal.id, 'mature'));
+    for (const form of ['base', 'mature'] as const) {
+      assert.ok(existsSync(resolve('public', palArtworkPath(pal.id, form))));
+      assert.doesNotMatch(palArtworkPath(pal.id, form), /jems-art\/gem_/);
+    }
     for (const kind of ['welcome', 'practice', 'making', 'coding', 'growth', 'play', 'rest', 'retry'] as PalLineKind[]) {
       const first = palLine(pal.id, kind, 0), second = palLine(pal.id, kind, 1);
       assert.ok(first.length > 10 && first.length < 180); assert.notEqual(first, second);
@@ -58,7 +68,7 @@ test('free starter persists without gems and the other starter is a deterministi
   assert.equal(owned(await new PalsStore(PALS_DB_NAME, persistence).view(owner)).source, 'starter');
   await assert.rejects(store.chooseStarter(owner, 'kip', snapshot()), /already chose/);
   await assert.rejects(store.collect(owner, 'kip', snapshot([], 49)), /lifetime gems/);
-  await assert.rejects(store.chooseStarter('child-two', 'riff', snapshot([], 0, 'child-two')), /Glim or Kip/);
+  await assert.rejects(store.chooseStarter('child-two', 'riff', snapshot([], 0, 'child-two')), /Luma or Nook/);
   const ready = await store.sync(owner, snapshot([], 50));
   assert.deepEqual(ready.newlyAvailable, ['kip']);
   const second = await store.collect(owner, 'kip', snapshot([], 50));
@@ -68,6 +78,35 @@ test('free starter persists without gems and the other starter is a deterministi
   assert.equal((await store.collect(owner, 'riff', snapshot([], 150))).profile.owned.length, 3);
   assert.equal((await store.export()).data.profiles[0].owned.length, 3);
   assert.ok(!JSON.stringify(await store.export()).includes('lifetimeGems'), 'no duplicate currency counter');
+});
+
+test('the complete roster can be earned, equipped, grown and restored without spending gems', async () => {
+  const { store, clock } = fixture();
+  await store.chooseStarter(owner, 'glim', snapshot());
+  const lifetimeGems = Math.max(...PAL_CATALOG.map(pal => pal.unlockGems));
+  const funded = snapshot([], lifetimeGems);
+  await store.sync(owner, funded);
+  for (const pal of PAL_CATALOG.filter(pal => pal.id !== 'glim')) {
+    await store.collect(owner, pal.id, funded);
+  }
+  assert.equal((await store.view(owner)).owned.length, PAL_CATALOG.length);
+  assert.equal((await store.view(owner)).activeId, 'glim', 'welcoming a Pal does not equip it');
+  clock(500);
+  await store.equip(owner, 'navi', funded);
+  const receipts = Array.from({ length: 5 }, (_, i) => activity(`navi-adventure-${i}`, 'scene.challenge', 600 + i));
+  const grown = await store.sync(owner, snapshot(receipts, lifetimeGems));
+  assert.equal(owned(grown.profile, 'navi').form, 'mature');
+  assert.deepEqual(grown.growth, [{ palId: 'navi', from: 1, to: 2 }]);
+  const backup = await store.export();
+  const restored = new PalsStore(PALS_DB_NAME, new MemoryPersistence());
+  await restored.restore(backup, { mode: 'replace', allowedOwners: [owner] });
+  assert.deepEqual(await restored.export(), backup);
+  const replayed = await restored.sync(owner, snapshot(receipts, lifetimeGems));
+  assert.deepEqual(replayed.growth, []);
+  assert.deepEqual(replayed.newlyAvailable, []);
+  assert.equal(replayed.profile.activeId, 'navi');
+  assert.equal(owned(replayed.profile, 'navi').adventures, 5);
+  assert.ok(!JSON.stringify(backup).includes('lifetimeGems'));
 });
 
 test('learning adventures group five receipts, while one coding or making receipt is one adventure', async () => {

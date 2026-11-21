@@ -55,7 +55,9 @@ class DiagnosticsTests(unittest.TestCase):
         self.write_manifest([self.connection()])
 
     def connection(self, alias="jems-read", **extra):
-        return {"alias": alias, "provider_kind": "gcp", "config_dir": "/managed/gcp", "setup": {"status": "ready"}, **extra}
+        return {"alias": alias, "provider_kind": "gcp", "config_dir": "/managed/gcp",
+                "service_account_email": diag.DIAGNOSTICS_ACCOUNT,
+                "setup": {"status": "ready"}, **extra}
 
     def write_manifest(self, connections, version=1):
         self.manifest.write_text(json.dumps({"version": version, "connections": connections}), encoding="utf-8")
@@ -74,6 +76,18 @@ class DiagnosticsTests(unittest.TestCase):
     def test_missing_manifest_never_falls_back_to_owner_cli(self):
         with self.assertRaisesRegex(diag.DiagnosticError, "IDENTITY_NOT_CONFIGURED"):
             diag.identity_environment(environ={"CLOUDSDK_CONFIG": "/owner"})
+
+    def test_alias_or_default_cannot_select_an_unapproved_service_account(self):
+        for account in (None, "", LEAK, "other@family-game-factory-jzw.iam.gserviceaccount.com"):
+            for alias in (None, "jems-read"):
+                with self.subTest(account=account, alias=alias):
+                    self.write_manifest([self.connection(service_account_email=account, is_default=True)])
+                    with patch.object(diag.shutil, "which", return_value="/managed/bin/gcloud"), \
+                            patch.object(diag.subprocess, "run") as run:
+                        with self.assertRaisesRegex(diag.DiagnosticError, "IDENTITY_OUTSIDE_SCOPE") as caught:
+                            diag.report(self.env, alias=alias, self_check=True)
+                    run.assert_not_called()
+                    self.assertNotIn(LEAK, str(caught.exception))
 
     def test_ambient_auth_and_endpoint_overrides_fail_closed_without_disclosure(self):
         for key in ("CLOUDSDK_CORE_ACCOUNT", "CLOUDSDK_AUTH_ACCESS_TOKEN",
@@ -112,7 +126,8 @@ class DiagnosticsTests(unittest.TestCase):
         self.assertNotIn(LEAK, str(caught.exception))
 
     def test_adc_file_alone_cannot_select_unrelated_gcloud_identity(self):
-        self.write_manifest([{"alias": "adc-only", "provider_kind": "gcp", "credentials_file": "/managed/adc.json"}])
+        self.write_manifest([{"alias": "adc-only", "provider_kind": "gcp", "credentials_file": "/managed/adc.json",
+                              "service_account_email": diag.DIAGNOSTICS_ACCOUNT}])
         with self.assertRaisesRegex(diag.DiagnosticError, "IDENTITY_CLI_SELECTOR_MISSING"):
             diag.identity_environment(environ=self.env)
 

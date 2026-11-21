@@ -2,6 +2,7 @@
  * No credentials, executable code, learning scores or inferred emotions belong here.
  */
 import type {Candidate} from './notebook';
+import {validateCreationReadiness,validateCreationReview,type CreationReadinessVerdict,type CreationReview} from './creation-readiness';
 export const PLAN_FIELDS = ['fun','action','goal','setback','score','style','progression','special'] as const;
 export type PlanField = typeof PLAN_FIELDS[number];
 export type Origin = 'child'|'helper';
@@ -12,6 +13,7 @@ export interface DesignRecord {
  version:1; plan:Partial<Record<PlanField,DesignField>>; friction:string;
  ideas:Idea[]; observations:Observation[]; helpLevel:number;
  support:'brief'|'balanced'|'detailed'; paused:boolean; approvedPlan:boolean;
+ creationReview?:CreationReview;
 }
 export interface Experiment {
  id:string; label:string; title:string; baseId:string|null; parents:string[];
@@ -23,12 +25,15 @@ export interface CoachContext {
  plan:DesignRecord['plan']; rules?:string; friction:string; helpLevel:number; support:DesignRecord['support'];
  conversation:{role:'child'|'helper'|'reflection';text:string}[];
  observations:Observation[]; tests:{label:string;title:string;prediction:string;notes:string}[];
+ /** Opt-in keeps older browser clients compatible with the same coach route. */
+ creation?:{version:1};
 }
 export interface CoachReply {
  move:'listen'|'clarify'|'inspire'|'explain'|'reflect'|'propose'|'repair'|'play';
  text:string; question:string|null; suggestions:string[];
  proposedChange:{title:string;request:string;depth:'tune'|'redesign'|'rethink'}|null;
  planSuggestions:{field:PlanField;value:string}[]; childDecisions?:{field:PlanField;quote:string}[]; evidenceIds:string[];
+ creationReadiness?:CreationReadinessVerdict|null;
 }
 const text=(x:unknown,n:number):x is string=>typeof x==='string'&&x.length<=n;
 const id=(x:unknown):x is string=>text(x,160)&&/^[\w:-]+$/.test(x)&&!['__proto__','constructor','prototype'].includes(x);
@@ -37,7 +42,8 @@ const keys=(v:object,allowed:string[])=>Object.keys(v).every(k=>allowed.includes
 export function freshDesign():DesignRecord {return {version:1,plan:{},friction:'',ideas:[],observations:[],helpLevel:0,support:'balanced',paused:false,approvedPlan:false};}
 export function validateDesign(input:unknown):DesignRecord {
  const d=input as DesignRecord;
- if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
+ if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan','creationReview'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
+ if(d.creationReview!==undefined)validateCreationReview(d.creationReview);
  for(const field of Object.values(d.plan)){if(!field||!keys(field,['value','origin','accepted','delegated'])||!text(field.value,700)||!['child','helper'].includes(field.origin)||typeof field.accepted!=='boolean'||typeof field.delegated!=='boolean')throw Error('Invalid plan field.');}
  if(!Array.isArray(d.ideas)||d.ideas.length>100||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
  if(!Array.isArray(d.observations)||d.observations.length>300||!d.observations.every(o=>o&&keys(o,['id','experimentId','text','source','at'])&&id(o.id)&&(o.experimentId===null||id(o.experimentId))&&text(o.text,1200)&&['runtime','child'].includes(o.source)&&text(o.at,40)&&Number.isFinite(Date.parse(o.at)))||new Set(d.observations.map(o=>o.id)).size!==d.observations.length)throw Error('Invalid observation.');
@@ -66,13 +72,22 @@ export function missingPlan(d:DesignRecord):PlanField[] {
 export function planBrief(d:DesignRecord):string {return PLAN_FIELDS.map(k=>`${k}: ${d.plan[k]?.value|| (d.plan[k]?.delegated?'Choose a sensible option and report it.':'Not specified.')}`).join('\n');}
 export function validateCoachReply(value:unknown,context:CoachContext):CoachReply {
  const r=value as CoachReply;
- if(!r||!keys(r,['move','text','question','suggestions','proposedChange','planSuggestions','childDecisions','evidenceIds'])||!['listen','clarify','inspire','explain','reflect','propose','repair','play'].includes(r.move)||!text(r.text,1800)||!(r.question===null||text(r.question,350))||!Array.isArray(r.suggestions)||r.suggestions.length>4||!r.suggestions.every(t=>text(t,500))||!Array.isArray(r.planSuggestions)||r.planSuggestions.length>8||!r.planSuggestions.every(p=>p&&keys(p,['field','value'])&&PLAN_FIELDS.includes(p.field)&&text(p.value,700))||!Array.isArray(r.evidenceIds)||r.evidenceIds.length>8||!r.evidenceIds.every(x=>context.observations.some(o=>o.id===x)))throw Error('Invalid coach response.');
+ if(!r||!keys(r,['move','text','question','suggestions','proposedChange','planSuggestions','childDecisions','evidenceIds','creationReadiness'])||!['listen','clarify','inspire','explain','reflect','propose','repair','play'].includes(r.move)||!text(r.text,1800)||!(r.question===null||text(r.question,350))||!Array.isArray(r.suggestions)||r.suggestions.length>4||!r.suggestions.every(t=>text(t,500))||!Array.isArray(r.planSuggestions)||r.planSuggestions.length>8||!r.planSuggestions.every(p=>p&&keys(p,['field','value'])&&PLAN_FIELDS.includes(p.field)&&text(p.value,700))||!Array.isArray(r.evidenceIds)||r.evidenceIds.length>8||!r.evidenceIds.every(x=>context.observations.some(o=>o.id===x)))throw Error('Invalid coach response.');
  if(r.proposedChange!==null&&(!r.proposedChange||!keys(r.proposedChange,['title','request','depth'])||!text(r.proposedChange.title,120)||!text(r.proposedChange.request,2000)||!['tune','redesign','rethink'].includes(r.proposedChange.depth)))throw Error('Invalid proposed experiment.');
  if(r.childDecisions!==undefined&&(!Array.isArray(r.childDecisions)||r.childDecisions.length>8||!r.childDecisions.every(d=>d&&keys(d,['field','quote'])&&PLAN_FIELDS.includes(d.field)&&text(d.quote,700)&&d.quote.trim().length>0&&[context.message,...context.conversation.filter(m=>m.role==='child').map(m=>m.text)].some(t=>t.includes(d.quote)))))throw Error('Child decision needs an exact child-authored quote.');
  // No response can mutate a game, promote a version, or assert secret tool execution.
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)throw Error('Missing proposal.');
  if(((r.text+' '+(r.question||'')).match(/\?/g)||[]).length>1)throw Error('Ask one useful question at a time.');
- return copy(r);
+ const reply=copy(r);
+ if(context.creation?.version===1){
+  if(reply.creationReadiness===undefined||reply.creationReadiness===null)throw Error('CREATION_REVIEW_MISSING');
+  reply.creationReadiness=validateCreationReadiness(reply.creationReadiness,context);
+  // A successful review means no material question remains. Do not send a
+  // child into another optional design turn after inviting their explicit Build.
+  if(reply.creationReadiness.ready)reply.question=null;
+ }
+ else delete reply.creationReadiness;
+ return reply;
 }
 export const PLAN_LABELS:Record<PlanField,string>={fun:'What would make it fun?',action:'What does the player do?',goal:'What is the goal?',setback:'What happens when things go wrong?',score:'Points or rewards — or none?',style:'How should it look and feel?',progression:'What changes as you get better?',special:'Any special rules — or none?'};
 /** A deliberately limited offline aid, not an LLM and never a build command. */
