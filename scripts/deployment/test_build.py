@@ -107,6 +107,7 @@ class ServiceBuildTests(unittest.TestCase):
                    'server/gateway.ts','server/private-config.ts','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
                    'src/studio/creation-readiness.ts','src/studio/conversation-view.ts',
                    'src/creation/model.ts','src/creation/projects.ts',
+                   'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts',
                    'server/key.pem','server/config.json','server/config.private.json','server/service-account.json','server/credentials.json',
                    'server/token.json','server/api-key.json','server/.env','server/.private/config.json','server/node_modules/p/index.js',
                    'server/testing/fixture.ts','unrelated.txt']
@@ -123,7 +124,7 @@ class ServiceBuildTests(unittest.TestCase):
                     archive,digest=b.source_archive(root,staged,sha);hashes.append(digest)
                     with tarfile.open(archive) as tar:
                         names=tar.getnames()
-                        self.assertEqual(set(names),set(files[:14]))
+                        self.assertEqual(set(names),set(files[:16]))
                         self.assertEqual(tar.extractfile('server/gateway.ts').read(),b'reviewed server/gateway.ts')
             self.assertEqual(hashes[0],hashes[1])
 
@@ -145,6 +146,7 @@ class ServiceBuildTests(unittest.TestCase):
                     'server/adult-pilot.ts','server/pipeline/auth.ts',
                     'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
                     'src/studio/creation-readiness.ts','src/studio/conversation-view.ts',
+                    'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts',
                     'src/creation/model.ts','src/creation/projects.ts']
             for name in inputs:write(name,'reviewed '+name)
             write('.dockerignore',dockerignore)
@@ -183,17 +185,18 @@ class ServiceBuildTests(unittest.TestCase):
                     with self.assertRaisesRegex(RuntimeError,'src/unstaged.ts.*Dockerfile.'+kind+' COPY'):b.source_archive(root,staged,missing)
                     cloud.assert_not_called()
 
-            # Rollback source predating Creation, readiness and private coach
+            # Rollback source predating Creation, Pals, readiness and private coach
             # must stay publishable; its own Dockerfiles determine the inputs.
             for kind,content in dockerfiles.items():
                 if kind=='coach':(root/'server/Dockerfile.coach').unlink();continue
-                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/creation/' not in line and 'src/studio/creation-readiness.ts' not in line)+'\n')
-            for name in [*inputs[-2:],'src/studio/creation-readiness.ts','src/studio/conversation-view.ts']:(root/name).unlink()
+                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/creation/' not in line and 'src/pals/' not in line and 'src/studio/creation-readiness.ts' not in line)+'\n')
+            for name in [*inputs[-2:],'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts']:(root/name).unlink()
             older=commit()
             with tempfile.TemporaryDirectory() as staged:
                 archive,_=b.source_archive(root,staged,older)
                 with tarfile.open(archive) as tar:
                     self.assertFalse(any(name.startswith('src/creation/') for name in tar.getnames()))
+                    self.assertFalse(any(name.startswith('src/pals/') for name in tar.getnames()))
                     self.assertNotIn('server/Dockerfile.coach',tar.getnames())
                     self.assertNotIn('src/studio/creation-readiness.ts',tar.getnames())
 

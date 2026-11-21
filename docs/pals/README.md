@@ -4,21 +4,21 @@
 
 The owner requested the complementary companion system, then authorized implementation with funny encouragement, a useful collection, visible progress and easy use in children's games. The owner also asked for a practical balance between engagement and the heavy subscription/addiction patterns of comparable products. Character artwork remains a separate development conversation. [ADR0012](../decisions/0012-pals-from-earned-activity.md) records this scope alongside the existing [shared Rewards contract](../rewards/README.md).
 
-The [Gem Pal artwork reference library](art/README.md) binds the complete approved original roster to exact Base/Grown neutral and expression images, while preserving historical references and Brio's separately marked expression candidates. Those art identities do not reassign saved collection identities. The earned collection retains its provisional token portraits and stable saved-scene IDs until an explicit creature-to-collection mapping is implemented.
+The [Gem Pal artwork reference library](art/README.md) supplies the actual collection under the [November 21 integration decision](../decisions/2026-11-21-approved-pal-collection.md). The 23 original profiles have approved Base/Grown neutral and expression images; Brio joins as the 24th Pal with his two approved neutrals. His six expression candidates remain in review and are not shipped as approved reactions.
 
-The [approved core expression library](EXPRESSIONS.md) supplies 184 versioned still images for 23 original individual profiles. **Try Pal expressions** is a read-only preview independent of Glim/Kip/Riff ownership; choosing Grown or a reaction there cannot unlock or equip a companion. The separate [Brio reference](art/characters/brio/README.md) retains two approved neutrals and six expressions in review. The explorer follows the existing Menu → Your world → My Pals route; it loads only after opening and resets its temporary choice across owner changes.
+## Collection and eligibility
 
-## Launch collection and eligibility
+The [catalog](../../src/pals/catalog.ts) uses the approved names and exact form artwork. Its [generated lookup](../../src/pals/catalog-artwork.generated.ts) is checked against the existing manifest and character index by `scripts/generate-pal-catalog.mjs --check`.
 
-The first collection contains three equal-capability companions. Their names, IDs, personalities, thresholds and temporary art mappings are defined in [catalog.ts](../../src/pals/catalog.ts).
+| Visible Pal / group | Saved identity | Collection rule |
+| --- | --- | --- |
+| **Luma** | `glim` compatibility alias | Free first-Pal choice; otherwise available at **50 lifetime gems** |
+| **Nook** | `kip` compatibility alias | Free first-Pal choice; otherwise available at **50 lifetime gems** |
+| **Wink** | `riff` compatibility alias | Available at **150 lifetime gems** |
+| Other 20 original profiles | Their explicit character slug | Manifest order, starting at **200**, increasing by **50**, through **1,150 lifetime gems** |
+| **Brio** | `brio` | Available at **1,200 lifetime gems** |
 
-| Pal | Personality and family | Collection rule | Creative asset ID | Current portrait |
-| --- | --- | --- | --- | --- |
-| **Glim** | Curious Explorer; experiments, discoveries and imaginary maps | A free first-Pal choice, or available at **50 lifetime gems** after choosing Kip | `pal-glim` | Existing approved `gem_blue.webp` |
-| **Kip** | Enthusiastic Maker; testing, building and useful wobbles | A free first-Pal choice, or available at **50 lifetime gems** after choosing Glim | `pal-kip` | Existing approved `gem_mint.webp` |
-| **Riff** | Playful Story companion; expressive jokes and unexpected plot twists | Available at **150 lifetime gems**, after a starter is chosen | `pal-riff` | Existing approved `gem_coral.webp` |
-
-The child explicitly chooses Glim or Kip as their starter. That choice creates ownership and makes the Pal active. Reaching another Pal's threshold makes it available; **Welcome** adds it to the collection, and **Take along** separately changes the active Pal. Welcoming a Pal does not silently replace the current companion. Each profile has one starter choice and one active Pal at a time.
+The first choice offers Luma or Nook and makes the selected Pal active. Existing `glim`/`kip`/`riff` inventories show their assigned real character without rewriting receipts or histories. Reaching another Pal's threshold makes it available; **Welcome** adds it to the collection, and **Take along** separately changes the active Pal. Welcoming never silently replaces the active companion. All 24 Pals have equal creative capabilities.
 
 These are lifetime earning thresholds, not prices. **No gems are spent.** Collecting, equipping, playing with or creating with a Pal leaves the shared gem total unchanged. Previously earned gems can qualify the other companions when the child first chooses a starter. Thresholds are initial product settings, not research-calibrated claims about motivation or learning.
 
@@ -28,7 +28,7 @@ Ownership and availability are persisted. Ordinary breaks, changing the active P
 
 | Surface | Actual interaction and value |
 | --- | --- |
-| **My Pals** | Choose a starter, inspect the three-Pal library, see owned/available/locked states, view growth and remaining progress, welcome an eligible Pal, choose who comes along, or create a scene. Open **Try Pal expressions** to preview the approved original-roster artwork independently of ownership. |
+| **My Pals** | Choose between two free starters, browse all 24 approved characters, see owned/available/locked states, welcome an eligible Pal, take it along, or create a scene. Optional expression play belongs to the selected owned Pal and its earned form. |
 | **Pal detail playground** | Tap an owned portrait for a short finite visual reaction and a scripted funny line. Taps are play, with no gems or growth awarded. |
 | **Home entry** | Open the collection or start creating with the active owned Pal. The entry follows the existing playable game shelf and creation entrance. |
 | **Studio cameo** | A small trusted-host companion beside the game surface, with collection access and the host's existing Help action. It is not injected into a game's iframe and does not change the game's score, physics or difficulty. |
@@ -41,7 +41,7 @@ The [page and components](../../src/pals/ui.ts) are presentation only. The [host
 
 ### Creating something with a Pal
 
-**Make something with this Pal** opens a new 800×450 meadow scene in the existing Creation Studio. It contains the chosen Pal, a start greeting, and an editable **When tapped** script: jump for 600 ms, dance for 800 ms, and say a short joke for 1,800 ms. The child can immediately press **Play**, tap the character repeatedly, and see those actions execute. The tap script is selected in the editor so its first changes are easy to find. The three companions have the same available mechanics; their initial speech differs.
+**Make something with this Pal** opens a new 800×450 meadow scene in the existing Creation Studio. It contains the chosen Pal, a start greeting, and an editable **When tapped** script: jump for 600 ms, dance for 800 ms, and say a short joke for 1,800 ms. The child can immediately press **Play**, tap the character repeatedly, and see those actions execute. The tap script is selected in the editor so its first changes are easy to find. All companions have the same available mechanics; their initial speech can differ. New actors capture the current earned Base/Grown form.
 
 In a free scene, **Add your Pal** inserts the active owned Pal with its tap script. **Choose another** opens the owned-Pal picker. The ordinary character picker also offers currently owned Pals. Each insertion gives the actor and script independent IDs; repeated uses of the same portrait do not share runtime state. Existing actors, programs, variables, exact source-game references and private-art image/rig/hash bindings survive the addition. The normal scene capacity and execution limits still apply. See [creation.ts](../../src/pals/creation.ts), the [creation UI](../../src/creation/ui.ts), and the [Creation Studio contract](../creation-studio/README.md).
 
@@ -53,7 +53,7 @@ This implementation makes Pals usable in actual local playable scenes. It does n
 
 ### Creative assets do not confer ownership
 
-The three portrait assets are in the trusted scene allowlist. A valid imported scene or generated companion manifest may therefore contain `pal-glim`, `pal-kip` or `pal-riff` and remain playable. **Importing a scene, copying a project, receiving a creative backup or seeing a portrait does not add that Pal to the collection.** Creative files contain actor references and programs, not the companion inventory or a lifetime gem balance. The special creation entrances check current-profile ownership independently.
+Both approved form/version assets and the three legacy token assets are in the trusted scene allowlist. A valid imported scene can retain its exact selected image without owning the collectible. **Importing a scene, copying a project, receiving a creative backup or seeing a portrait does not add that Pal to the collection.** Creative files contain actor references and programs, not the companion inventory or a lifetime gem balance. The special creation entrances check current-profile ownership independently.
 
 The separate validated Pal backup is the format for restoring collection ownership. A scene-only backup and a full family backup are not interchangeable authorities. Generated games receive no companion collection, reward ledger or award capability through this feature.
 
@@ -80,13 +80,13 @@ There are exactly two forms and one transition. These forms do not grant stronge
 
 [ADR0013](../decisions/0013-two-form-pals-and-current-main.md) deliberately retains the existing first growth threshold at five adventures so an older Bright or Radiant history is not demoted. This is implementation compatibility policy, not a numerical choice inferred from artwork approval. Existing ownership, receipts, selections, learning remainders and backup schema are unchanged: the saved workspace never contained a stage number. Startup/restore derives the current form quietly; 14→15 does not create another growth celebration. A new 4→5 transition can celebrate once.
 
-The catalog records explicit `base`/`mature` form slots and preview readiness. Species, character and selected-art bindings remain null until the separate artwork mapping is established. Current gem-token portraits do not represent approved Base/Grown creature art. Existing `pal-glim`, `pal-kip` and `pal-riff` scene references stay stable; future selected art needs explicit form/version bindings and cannot silently replace a saved scene’s chosen image.
+The catalog's `base`/`mature` slots bind exact approved artwork. Five adventures switches the live companion to its Grown portrait. New scenes use `pal-{slug}-{form}-{assetVersion}` to pin their current form; existing `pal-glim`, `pal-kip` and `pal-riff` scene tokens remain unchanged. Later growth never replaces an existing scene actor's chosen picture.
 
 ### Assignment and replay rules
 
 The shared receipt ID is assigned once. Reopening, retrying synchronization or re-equipping a Pal cannot replay the same work. The store retains ordered active-Pal selection boundaries; a delayed receipt follows the Pal active at its recorded occurrence time, even if another Pal is now active.
 
-Learning remainders remain with their own Pal. For example, four saved learning activities with Glim and four with Kip give each Pal four toward its own next adventure. Returning to Glim and completing one more gives Glim an adventure; Kip's progress stays at four. Switching does not move partial groups or duplicate completed groups.
+Learning remainders remain with their own Pal. For example, four saved learning activities with Luma and four with Nook give each Pal four toward its own next adventure. Returning to Luma and completing one more gives Luma an adventure; Nook's progress stays at four. Switching does not move partial groups or duplicate completed groups.
 
 Before the first starter selection, existing receipts are recorded with no Pal assignment. This includes unusually future-dated receipts already present in the ledger, so choosing a starter does not turn old work into new growth. New receipts whose occurrence precedes the first selection also have no Pal assignment. Earlier gems can unlock collection eligibility, while earlier work does not retrospectively grow a newly chosen companion.
 
@@ -133,9 +133,9 @@ An unsupported or damaged collection remains available through the recovery expo
 | [ui.ts](../../src/pals/ui.ts) / [pals.css](../../src/pals/pals.css) | Collection page, progress, local tap toy, home widget, cameo and accessible presentation |
 | [host.ts](../../src/pals/host.ts) | Application navigation, existing hint/help delegation, parent options and coordinated notices |
 | [creation.ts](../../src/pals/creation.ts) | Validated playable starter and additive scene insertion using the existing engine |
-| [Expression modules](EXPRESSIONS.md) | Exact approved art resolution, transient expression state, lazy image loading, own-form fallback and the independent My Pals playground |
+| [Expression modules](EXPRESSIONS.md) | Exact approved art resolution, transient expression state, lazy image loading, own-form fallback and owned-Pal expression controls |
 
-`installCreationStudio` accepts optional `ownedPals(): readonly string[]`, `activePal(): string | null`, and `openPals(): void` host hooks. Its returned `openWithPal(id): boolean` preserves current work and creates the selected owned-Pal scene synchronously; `refreshPals()` refreshes the owned choices without altering the current program. These hooks contain host-owned selection data and are not a generated-game inventory interface.
+`installCreationStudio` accepts optional `ownedPals(): readonly string[]`, `activePal(): string | null`, `palForm(id): 'base' | 'mature'`, and `openPals(): void` host hooks. Its returned `openWithPal(id): boolean` preserves current work and creates the selected owned-Pal scene synchronously; `refreshPals()` refreshes the owned choices without altering the current program. These hooks contain host-owned selection data and are not a generated-game inventory interface.
 
 ## Verification and remaining work
 
@@ -152,4 +152,6 @@ The [component browser checks](../../tests/pals-ui-browser.cjs) use explicit syn
 
 [Receipt-bridge tests](../../tests/pals-service.test.ts) use validated shared-ledger exports to check eligible activity mapping, bonuses without extra adventures, foreign/corrupt data, historical baselines and delayed attribution. [Backup fault tests](../../tests/pals-backup.test.ts) inject database and source-storage failures to verify full rollback, legacy/reset behavior, crash recovery, unsupported recovery namespaces and preservation of damaged originals. These test local contracts, not actual-device reliability or engagement outcomes.
 
-The original-roster artwork and form/expression bindings are complete for the independent expression playground. Explicit mapping into earned collection IDs, articulated rigs, richer animation and companion behavior inside arbitrary generated-game mechanics remain separate integration work; this runtime preparation does not reopen settled art choices. New art should preserve the existing IDs and source ownership rules. New earning policies, paid features, trading, cross-device synchronization or a generated-game companion API require an explicit new contract; none is implied by the catalog or the provisional artwork.
+The real collection now uses the approved roster. Articulated rigs, richer animation and companion behavior inside arbitrary generated-game mechanics remain separate. New art must preserve exact existing scene references and receipt ownership. Paid features, trading, cross-device synchronization or a generated-game companion API are outside this feature.
+
+The v1 saved collection accepts all 24 IDs. Older application builds do not understand newly earned IDs or new versioned scene assets; preserve storage during rollback and use a compatible forward repair. The existing three saved aliases and their historical scenes remain readable.

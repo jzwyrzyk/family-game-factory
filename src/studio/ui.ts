@@ -1551,6 +1551,7 @@ export async function installStudio(){
   home,openGame:id=>open(id),onRewardSourceSaved:notifyRewardSourceSaved,
   ownedPals:()=>pals.state.profile?.owned.map(pal=>pal.id)??[],
   activePal:()=>pals.state.profile?.activeId??null,
+  palForm:id=>pals.state.profile?.owned.find(pal=>pal.id===id)?.form??'base',
   openPals:()=>palsInterface.open(),
  });
  const artStudio=installArtStudio({
