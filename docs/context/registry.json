@@ -457,10 +457,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-19T07:03:51.403Z",
-      "sourceDigest": "7f85771c47f30cc46436ae0c61338e56c7df2e0ecf3a47e9e179fdd8a5fed79d",
+      "reviewedAt": "2026-11-21T07:54:10.516Z",
+      "sourceDigest": "315cd53efa77f0c993a9eaf99c106a5be83fc4c5f11b7989cacee80f77c51004",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled conflicting generation and Docker paths with merged planning/art/review. Both request modes retain plan, playthrough, approved art and required repair captures; companion remains host-held and unchanged through attestation/publication. Existing quality runtime and resource/spending caps are preserved."
+      "reviewReason": "Reviewed coordinator and sanitizer changes: the quality contract and architecture now describe complete finding and axis feedback, final rejected-attempt metadata, existing-worker compatibility, historical provenance, and unchanged acceptance and privacy boundaries."
     },
     {
       "id": "coach",
@@ -553,10 +553,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T05:39:48.031Z",
-      "sourceDigest": "7227f6641dcb852b12a7356e53baf4eacb2cdb4340aec1f25987515b6b6f5318",
+      "reviewedAt": "2026-11-21T07:54:10.809Z",
+      "sourceDigest": "92ecfcc2c8aab4e3af77628e47e74d7f7dfb9d3fc170ab8bc8da57eed81cb1b6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed new readiness/compiler/transcript contracts, current-source handoff checks and corrected actual-Send browser fixtures. Recorded exact final bundles and synthetic coach/job limits in delivery and capture evidence. New guided-creation gate is included in child-journey and existing complete release coverage; old chip/delegation receipts are not reused as final evidence.",
+      "reviewReason": "Reviewed the seven new regression cases and 43 passing focused tests; the quality contract and delivery record distinguish synthetic transport, malformed input, terminal provenance, repaired acceptance, and unchanged accounting from unobserved live game success.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -616,10 +616,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T06:51:38.849Z",
-      "sourceDigest": "df50347c068594495e68c2cbfff3c6c86d0c419bf4e818cb6bed43645c8607a7",
+      "reviewedAt": "2026-11-21T07:54:11.094Z",
+      "sourceDigest": "3cb4e9574cf5f98982c942917de23c505ca0254a8f205a16b2c3280641c4965a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR108 owner-authorized merge/production scope, exact failed packaging and passed workflow receipts, narrow repair, 79 local deployment tests and pending new hosted checks. Verified public Pages/health state, separated reuse of unchanged worker/sandbox from service/web gates, and recorded unavailable authenticated Cloud Run access without modifying current production.",
+      "reviewReason": "Recorded the owner-confirmed terminal quality failure for job86227, all three verified cleanup receipts, the confirmed information-loss defects and scoped gateway-only correction; deployment and real acceptance remain pending coordination with PR109.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
