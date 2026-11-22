@@ -312,7 +312,7 @@ test('missing required model properties are never manufactured by metadata recov
  assert.equal(result.status,503);
  assert.deepEqual(result.body,{errorCode:'COACH_UNAVAILABLE'});
  assert.equal(result.failures.length,1);
- assert.equal(result.failures[0].reason,'reply_shape_invalid');
+ assert.equal(result.failures[0].reason,'reply_proposal_invalid');
  assert.equal(result.calls.filter(call=>call==='inference').length,1);
 });
 
