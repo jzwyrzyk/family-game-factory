@@ -124,7 +124,7 @@ function starter(kind:CreationStarter,title:string,config?:Mechanics):CreationPr
       action({type:'move',dx:120,durationMs:duration} as Omit<CreationBlock,'id'>),
     ]}];
   }else{
-    scene.actors=[{id:'gem',name:'My gem',assetId:'gem',x:400,y:225,size:90}];
+    scene.actors=[{id:'gem',name:'My jem',assetId:'gem',x:400,y:225,size:90}];
     scene.programs=[{id:uid(),actorId:'gem',trigger:{type:'start'},actions:[]}];
   }
   return validateEditableProject(scene);
