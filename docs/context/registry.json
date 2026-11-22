@@ -618,9 +618,9 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-22T22:30:12.846Z",
-      "sourceDigest": "d24e95db50fe53b7848bb7664f64b0ee079d603246bc8e58d4d830fd5ff2619b",
+      "sourceDigest": "650738219188f0e8fae9a5f97d19e89b9b622b28c088576a6731c3a07a614ef2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR126's bounded tablet focus/scroll diagnostic assertions together with merged PR131's private creation-wire tests. No assertion was relaxed; historical missed-tap and portrait-decoding failures remain recorded. The exact combined fingerprint and hosted validation are pending.",
+      "reviewReason": "Reviewed PR126's bounded tablet focus/scroll diagnostic assertions together with merged PR131's private creation-wire tests. No assertion was relaxed; historical missed-tap and portrait-decoding failures remain recorded. Full combined-source digest observed in hosted documentation job 137379759144; browser acceptance remains separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -727,9 +727,9 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-22T22:30:12.846Z",
-      "sourceDigest": "4ad4208748e1d100a14d644e2c46e4b7bb3bdce764e1a52b360cd406d182c49b",
+      "sourceDigest": "16c5eac1c30b4eec7e9ab92068d21e918ca831a58d9880ef56e5f02da2432c75",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR126's receipt hardening and guarded cloud operations alongside merged PR131's private coach readiness tests, package test wiring and the recovered read-only access receipt. This is a source-only integration, not a production rollout; the exact combined fingerprint and hosted validation are pending.",
+      "reviewReason": "Reviewed PR126's receipt hardening and guarded cloud operations alongside merged PR131's private coach readiness tests, package test wiring and the recovered read-only access receipt. This is a source-only integration, not a production rollout; the full combined-source digest was observed in hosted documentation job 137379759144. Other hosted acceptance remains separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
