@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:44:22.710Z",
-      "sourceDigest": "267055d18b9d4dd5e6c283ac5628baf8a26a8e9ee6daa3813e531e38372e498c",
+      "reviewedAt": "2026-11-22T19:48:18.740Z",
+      "sourceDigest": "d5fb43bb9f4a8b3733342b9c5c7787e44561b10a0f404ac6738c16c851315e87",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery records exact203 ten-case and host-integration success separately from the final visual defects. The same responsive journeys now measure actual title and distance text fragments so overlapping painted words fail; no cases, inputs or timing assertions were removed.",
+      "reviewReason": "The legacy design-coach journey now reopens its exact saved physical session instead of the current catalogue starter. Existing project, experiment, voice and learning assertions remain; the same journey is included in focused host integration to verify the compatibility boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:44:23.229Z",
-      "sourceDigest": "4ad37d56f848b65daaa5d8e5a218d425eefda770928c4b3c01e4111d6d3d65cc",
+      "reviewedAt": "2026-11-22T19:48:19.095Z",
+      "sourceDigest": "c1660fb233b5792b628762193f470d06d1a7df16db996994f4ee5d3210343c13",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact203 source, ten passing browser cases,64 actual captures, full normal-motion recording and successful private Site deployment, while explicitly retaining pending acceptance for the bounded visual follow-up and the coordinated merge hold.",
+      "reviewReason": "Recorded the observed203 broad creative failure and its stale legacy-fixture entry cause, preserving passed browser and learning jobs separately. The fixture-only correction and pending focused coach acceptance do not claim product coaching or full Arcade success.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

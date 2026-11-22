@@ -25,15 +25,18 @@ async function load(page,url,saved={}){
   const chooseProfile=async index=>{await openProfiles(page);await page.locator('.profile-choice').nth(index).click();};
   const session=()=>page.evaluate(()=>FG.studio.exportNotebook().sessions.at(-1));const projects=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects);
   await page.click('[data-starter="gum"]');
-  await page.evaluate(()=>{
+  // These experiments belong to the preserved physical workshop. Its saved
+  // My jems card resumes that exact engine; Ready to Play opens current assembly.
+  const physicalSessionId=await page.evaluate(()=>{
     const key='family-game-factory-workspace-v2',workspace=JSON.parse(localStorage.getItem(key));
     const project=workspace?.projects.find(p=>p.game==='gum'),revision=workspace?.revisions.find(r=>r.id===project?.headId);
     if(!revision)throw Error('Missing physics fixture project');
     revision.config.qualityVersion=1;localStorage.setItem(key,JSON.stringify(workspace));
+    return FG.studio.exportNotebook().sessions.find(s=>s.projectId===project.id).id;
   });
   await page.reload();await page.waitForFunction(()=>window.FG?.studio);
-  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');assert.equal(await page.locator('#studioPrompt').isVisible(),false,'play-first hides design tools');
-  await page.click('#studioHome');await page.click('[data-starter="gum"]');assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
+  await page.locator(`#studioLibrary [data-session="${physicalSessionId}"] .studio-saved-open`).click();await page.waitForSelector('.quality-builder');assert.equal(await page.locator('#studioPrompt').isVisible(),false,'play-first hides design tools');
+  await page.click('#studioHome');await page.locator(`#studioLibrary [data-session="${physicalSessionId}"] .studio-saved-open`).click();assert.equal((await projects()).length,1,'repeated play creates no duplicate project');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();const baseline=(await projects())[0].headId;
   const moreChoices=async()=>{if(!await page.locator('#studioMoreChoices').evaluate(el=>el.open))await page.locator('#studioMoreChoices > summary').click();};
   const talk=async()=>{await page.click('#studioChange');};const tryLocal=async text=>{await talk();await page.fill('#studioPrompt',text);await page.click('#studioSend');await page.waitForSelector('.quality-builder');};

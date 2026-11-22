@@ -43,6 +43,9 @@ jobs:
       - name: Preserve legacy workshop and Studio histories
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/studio-journey.cjs
+      - name: Preserve legacy workshop coaching and experiments
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/design-coach-browser.cjs
       - name: Verify earned gem journeys through assembly completion
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:gem-journey
