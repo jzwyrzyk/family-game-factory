@@ -47,17 +47,16 @@ export function normalizePrivateCoachReply(value:unknown,context:CoachContext):u
   r.proposedChange=null;
  // A second question is not a reason to discard a moderated conversation.
  // Keep the first complete question, rather than joining several into a quiz.
- if(typeof r.text==='string'){
-  const first=r.text.indexOf('?');
-  if(first!==-1){
-   if(r.text.indexOf('?',first+1)!==-1)r.text=r.text.slice(0,first+1);
-   r.question=null;
-  }
+ const keepOneQuestion=(text:string)=>{
+  let seen=false;
+  return text.replace(/\\?/g,()=>{if(seen)return '.';seen=true;return '?';});
+ };
+ if(typeof r.text==='string'&&r.text.includes('?')){
+  r.text=keepOneQuestion(r.text);
+  r.question=null;
  }
  if(typeof r.question==='string'){
-  let question=r.question;
-  const first=question.indexOf('?');
-  if(first!==-1&&question.indexOf('?',first+1)!==-1)question=question.slice(0,first+1);
+  const question=keepOneQuestion(r.question);
   r.question=question.length>350?null:question;
  }
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)r.move='reflect';

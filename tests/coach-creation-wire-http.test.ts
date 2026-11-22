@@ -267,7 +267,7 @@ test('a real completed reply with optional invented metadata and two questions s
  assert.equal(result.status,200);assert.deepEqual(result.failures,[]);
  assert.deepEqual(result.calls,['moderation','inference','moderation']);
  const checked=validateCoachReply(validateCoachReply(result.body.reply,c),c);
- assert.equal(checked.text,'What does your paper boat do?');
+ assert.equal(checked.text,'What does your paper boat do? Does it move between the stars.');
  assert.equal(checked.question,null);
  assert.deepEqual(checked.childDecisions,[]);
  assert.deepEqual(checked.evidenceIds,[]);
@@ -314,4 +314,17 @@ test('missing required model properties are never manufactured by metadata recov
  assert.equal(result.failures.length,1);
  assert.equal(result.failures[0].reason,'reply_shape_invalid');
  assert.equal(result.calls.filter(call=>call==='inference').length,1);
+});
+
+test('extra punctuation cannot remove a safety caveat from a moderated reply',async()=>{
+ const c=context(incomplete);
+ const result=await invoke(c,()=>({...notReady(),
+  text:'Could the boat steal another player’s code? No. We should keep it a safe imaginary adventure. What else could it deliver?',
+  question:'Maybe another idea?'
+ }));
+ assert.equal(result.status,200);
+ assert.equal(result.body.reply.text,
+  'Could the boat steal another player’s code? No. We should keep it a safe imaginary adventure. What else could it deliver.');
+ assert.equal(result.body.reply.question,null);
+ assert.deepEqual(result.failures,[]);
 });
