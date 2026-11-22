@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:05:22.275Z",
-      "sourceDigest": "ed27456c2a2261fd8b039a6b0fdc423d60e265dd0937a113d8a75b06005d8a74",
+      "reviewedAt": "2026-11-22T18:20:33.433Z",
+      "sourceDigest": "b934859eb186b26843fc552f39260364dc9e5899121abc590dae423a2dcb2550",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed uniform crystal-value and ten-capacity rules tests and integrated HUD assertions while preserving native-host controls, real-input fixtures,13 configurations and unchanged visual tolerances;403combinedunits pass.",
+      "reviewReason": "Reviewed all nine exact one-jem/ten-pocket native captures and normal-motion evidence after all 13 functional configurations passed; imported unedited references with verified provenance and unchanged visual tolerance, retaining two original ready-state mismatches.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:05:22.584Z",
-      "sourceDigest": "dc424a9ccb5f9a51748ed348890caab1c91a31df5622a68129a90e7a946541d3",
+      "reviewedAt": "2026-11-22T18:20:33.782Z",
+      "sourceDigest": "f2943bad5379997006694e733d5f8ec9a53372b4d4cff3f7d67c91802af462ac",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined build and403unit pass separately from396phase-one units; kept fresh hosted acceptance pending and the user-directed merge hold explicit.",
+      "reviewReason": "Recorded exact PR128 passing focused evidence and PR129 functional pass with two reviewed reference differences; retained observed broader Arcade failure and explicit owner merge hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
