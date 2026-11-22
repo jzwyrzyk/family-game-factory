@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:32:03.547Z",
-      "sourceDigest": "ce1368ed82123386337ecd3740faeb0b54341d9157c30dcc7c0c71b7431ca817",
+      "reviewedAt": "2026-11-22T18:01:56.107Z",
+      "sourceDigest": "6f4750054d606f15de04ee7516edc8bb64d95062a766fb00323ee4da89f3760a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the hosted 13-configuration mining evidence and nine original-byte baseline captures; documented explicit verified artifact import and the scoped recovery-button color correction.",
+      "reviewReason": "Owner requested uniform one-jem pickups and ten-jem pockets after play review; updated active mining contract and decision, removed weighted visual badges, and preserved all artwork and hazard rules.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:32:03.824Z",
-      "sourceDigest": "ef281b2b03707fa934eeed0c7c43f8e67a1c473429032e9404fb048e8dd63439",
+      "reviewedAt": "2026-11-22T18:01:56.384Z",
+      "sourceDigest": "4134708b99e5f0f5d81c3106d0fc3d0aedbcbca1a79a3fbd13558e767c254688",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact hosted browser artifact and per-image provenance, retained historical failures, and added visible recovery-action contrast coverage without changing visual tolerances.",
+      "reviewReason": "Reviewed focused uniform-value and ten-capacity negative/deposit tests plus actual-input browser fixtures and HUD fitting assertions; previous screenshot receipts remain historical until fresh candidate review.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T16:32:04.107Z",
-      "sourceDigest": "45ab08eb54929b734794ad2bf6ac09511080177028ff6c5516bdbfcfdacf1402",
+      "reviewedAt": "2026-11-22T18:03:05.136Z",
+      "sourceDigest": "9ac6fb1f753a46e7831958fb4b3c5a77ceacf611429a6b47086060fae36441ba",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded e19dd gameplay evidence and manually reviewed baseline adoption while retaining unmerged, undeployed and pending final comparison status.",
+      "reviewReason": "Recorded 396 passing units and the production build for this isolated refinement; distinguished pending hosted evidence and the explicit merge hold until chat, shell and other corrections are ready.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -8,9 +8,11 @@ Mind Your Jems is a prebuilt, local arcade game. Its **Saved** score and bucket 
 
 The child runs left and right across the giant's head to collect sporadically appearing jems. When a shake approaches, the child chooses between reaching safety with the bag or holding on and spilling it. Filling the bucket completes a level.
 
+**Owner refinement, November 22, 2026:** every jem counts as one, and the pocket holds ten. This replaces the earlier weighted crystals and eight-jem capacity. The owner requested preparation of this refinement while holding its merge until the chat and shared shell corrections are complete.
+
 | Action or event | Required consequence |
 | --- | --- |
-| Run into a jem | Collect it into the bag. Clicking a distant crystal cannot collect it. Ordinary crystals are worth 1; golden and sunset crystals are worth 3. |
+| Run into a jem | Collect it into the bag. Clicking a distant crystal cannot collect it. Every crystal counts as exactly 1 jem, including golden and sunset variants. |
 | Reach the bucket | Deposit automatically. The bag empties, **Saved** increases, and the current bucket fills. There is no remote Bank button. |
 | Notice the warning | A visible countdown and the giant's expression precede the shake. Sound is optional; the warning remains clear without it. |
 | Hold while exposed | The miner clings and stops moving. The shake spills the bag; holding protects the miner, not the carried jems. Hold must remain pressed throughout exposure to the shake. |
@@ -19,18 +21,19 @@ The child runs left and right across the giant's head to collect sporadically ap
 | Any shake | Active crystals on the head fall away. The next calm period spawns new opportunities. |
 | Fill the bucket | Show **Bucket full!** and wait for **Next level**. Later levels change the actual bucket target and hazard timing. |
 
-The bag holds eight. A three-jem crystal that cannot fit remains on the head rather than being partly discarded. The accounting invariant is `mined = banked + loose + lost`. Depositing beyond a level's target retains the entire deposit in the session's **Saved** score. The next level starts a new empty bucket; it does not remove that saved score.
+The bag holds ten jems. Each pickup uses one pocket space; when all ten spaces are full, further crystals remain on the head until there is room. The accounting invariant is `mined = banked + loose + lost`. Depositing beyond a level's target retains the entire deposit in the session's **Saved** score. The next level starts a new empty bucket; it does not remove that saved score.
 
 Retry begins safely at the bucket on the same level. It does not reset saved bucket progress, spend anything, grant a reward, or start another game build. Leaving the mining session resets its score; this implementation adds no persistence or economy.
 
-### Initial tuning
+### Current tuning
 
-These numbers are implementation tuning, not proof of fun or a fixed owner-specified difficulty schedule.
+The one-jem value and ten-jem pocket are owner-specified requirements. The remaining numbers are implementation tuning, not proof of fun or a fixed owner-specified difficulty schedule.
 
-| Parameter | Initial behavior |
+| Parameter | Current behavior |
 | --- | --- |
+| Jem value | 1 per crystal, for every color |
 | First bucket goal | 12 jems; later goals increase by 4, capped at 60 |
-| Bag capacity | 8 |
+| Pocket capacity | 10 jems |
 | Movement | 22 world units per second; the head spans 80 world units |
 | First-level calm interval | Seeded variation between 10 and 14 seconds |
 | Warning | 3 seconds at level 1, decreasing gradually to a 2-second minimum |
@@ -124,3 +127,5 @@ The dedicated **Mind Your Jems art and gameplay review** workflow remains the se
 [The recovery checkpoint](RECOVERY-CHECKPOINT.md) preserves how the earlier illustrated rebuild was recovered from local work while its remote PR still held an SVG implementation. It is historical evidence, not the current gameplay specification. A live PR head and its scoped results establish what reached GitHub.
 
 The gameplay overhaul is a source change. Passing local checks or updating artwork baselines does not merge or deploy it. Production release follows the existing repository process; the ordered navigation work and actual child playtesting retain their own acceptance requirements.
+
+The owner has held the merge of this refinement until the chat and shared shell corrections are complete. Earlier test counts and capture receipts retain their original source scope; they do not establish acceptance of this refinement.

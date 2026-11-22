@@ -28,10 +28,12 @@ async function geometry(journey,device,review){
   const rect=element=>{const r=element.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
   const visible=element=>element.getClientRects().length&&getComputedStyle(element).visibility==='visible'&&!element.closest('[inert]');
   const stage=dialog.querySelector('.myj-stage'),targets=[...dialog.querySelectorAll('button')].filter(visible),rock=rect(dialog.querySelector('.myj-rock'));
+  const bag=dialog.querySelector('.myj-score-loose');
   const overlays=[...dialog.querySelectorAll('.myj-ready,.myj-build-problem,.myj-notice-visible')].filter(visible).map(element=>({name:element.className,...rect(element)}));
   return {phase:dialog.dataset.phase,ready:!dialog.querySelector('[data-myj="ready"]').hidden,
    viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
    player:rect(dialog.querySelector('.myj-miner-anchor')),overlays,
+   scoring:{capacity:bag.querySelector('small').textContent.trim(),loose:Number(bag.querySelector('[data-myj="loose"]').textContent),weightedMarkers:dialog.querySelectorAll('.myj-gem-value').length,...rect(bag)},
    eyes:{x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65},
    gems:[...dialog.querySelectorAll('[data-crystal]')].filter(visible).map(gem=>({id:gem.dataset.crystal,...rect(gem)})),
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
@@ -41,6 +43,10 @@ async function geometry(journey,device,review){
     primary:['left','right','grab'].includes(element.dataset.myj),reachable:hit===element||element.contains(hit)};})};
  });
  review.check(device.name,'layout-and-hit-targets',details);
+ assert.match(details.scoring.capacity,/^\/\s*10$/,device.name+' pocket visibly holds ten jems');
+ assert.equal(details.scoring.weightedMarkers,0,device.name+' all jem colours use the same one-jem value without weighted badges');
+ assert.ok(Number.isInteger(details.scoring.loose)&&details.scoring.loose>=0&&details.scoring.loose<=10,device.name+' carried jem count stays within the ten-jem pocket');
+ assert.ok(details.scoring.x>=details.stage.x-1&&details.scoring.right<=details.stage.right+1,device.name+' two-digit pocket readout fits the visible stage');
  assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' game fits viewport');
  assert.ok(details.overflow.horizontal<=2,device.name+' has no horizontal clipping');
  assert.ok(details.overflow.vertical<=2,device.name+' main game fits without scrolling');
