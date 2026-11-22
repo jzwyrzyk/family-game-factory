@@ -49,7 +49,7 @@ export function normalizePrivateCoachReply(value:unknown,context:CoachContext):u
  // Keep the first complete question, rather than joining several into a quiz.
  const keepOneQuestion=(text:string)=>{
   let seen=false;
-  return text.replace(/\\?/g,()=>{if(seen)return '.';seen=true;return '?';});
+  return text.replace(/\?/g,()=>{if(seen)return '.';seen=true;return '?';});
  };
  if(typeof r.text==='string'&&r.text.includes('?')){
   r.text=keepOneQuestion(r.text);
