@@ -27,7 +27,7 @@
 .native-mining .myj-mission strong { font-size:18px; line-height:1.2; white-space:normal; }
 .native-mining .myj-actions { grid-area:actions; min-width:0; gap:8px; }
 .native-mining .myj-action {
-  flex:1; min-width:0; min-height:48px; padding:8px 10px; font-size:18px!important; white-space:normal;
+  flex:1; min-width:0; min-height:48px; padding:6px 10px; font-size:18px!important; white-space:normal;
   gap:6px; border-width:2px;
 }
 .native-mining .myj-action-bank > svg:last-child { display:none; }

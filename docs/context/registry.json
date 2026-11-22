@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:53:31.357Z",
-      "sourceDigest": "6ed944334ed1f79a785c987f2fdc0d4d505a09588f1bf5b251d38f233634317a",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed native Mining holding and shaking actions after the 360px capture exposed footer overflow; documented wrapping at unchanged 18px text and 48px targets, with original rules and artwork preserved.",
+      "reviewedAt": "2026-11-22T20:03:03.665Z",
+      "sourceDigest": "b947ab850b3b54c8521edf8d3271d270b226858cee999f5c60dce0813a4c79b2",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the measured 294.125px smallest-phone holding scene against the unchanged 294.4px requirement; reducing only native action padding restores scene allowance while the documented 18px text and 48px target contract remains unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:53:32.425Z",
-      "sourceDigest": "99d8788ab7ae757a97fac393db3dcf772181f96c6b1e3af9e68269abd487ca20",
+      "reviewedAt": "2026-11-22T20:02:44.840Z",
+      "sourceDigest": "3093bc371957a9d6fbc49c1d0ac4310dc2a5712bc7347699944dd91d74f46137",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact fourth-candidate hosted outcomes, artifact digests and the two remaining corrections without treating failed fixtures or unaccepted native references as a passing release gate.",
+      "reviewReason": "Recorded exact fifth-head successes, the remaining measured holding-stage failure, fresh artifact provenance and the narrow padding follow-up without accepting references or asserting a complete Arcade pass.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
