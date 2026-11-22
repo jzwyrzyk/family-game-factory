@@ -191,10 +191,11 @@ test('a plan-only source may support readiness but cannot be invented as a fresh
   const forged=await invoke(c,captured=>{
    const wire=readyWire(captured);wire.childDecisions[0].quote=quote(captured);return wire;
   });
-  assert.equal(forged.status,503);assert.deepEqual(forged.body,{errorCode:'COACH_UNAVAILABLE'});
+  assert.equal(forged.status,200,'invalid optional child attribution must not disconnect an otherwise valid reply');
+  assert.deepEqual(forged.body.reply.childDecisions,[],'a forged child choice is removed rather than saved');
+  assert.equal(forged.body.reply.creationReadiness.ready,true,'independently verified readiness remains unchanged');
   assert.equal(forged.calls.filter(call=>call==='inference').length,1);
-  assert.equal(forged.failures.length,1);assert.equal(forged.failures[0].stage,'reply_validation');
-  assert.equal(forged.failures[0].reason,'reply_invalid','only an exact child-message quote can become a fresh decision; source IDs remain private readiness metadata');
+  assert.deepEqual(forged.failures,[],'optional metadata recovery is not a failed request');
  }
 });
 
@@ -223,6 +224,21 @@ test('actual indexed input and dynamic schema are budgeted before any provider c
  assert.equal(exact.calls.filter(call=>call==='inference').length,1);
 });
 
+test('valid conversational question and literal child decision are preserved byte-for-byte',async()=>{
+ const c=context();
+ const response=await invoke(c,captured=>({
+  ...readyWire(captured),
+  text:'You steer the boat between the stars.',
+  question:null,
+  childDecisions:[{field:'action',quote:action}]
+ }));
+ assert.equal(response.status,200);
+ assert.deepEqual(response.body.reply.childDecisions,[{field:'action',quote:action}]);
+ assert.equal(response.body.reply.text,'You steer the boat between the stars.');
+ assert.equal(response.body.reply.question,null);
+ assert.deepEqual(response.failures,[]);
+});
+
 test('legacy requests keep their provider input and public reply contract',async()=>{
  const c=context();delete c.creation;
  const result=await invoke(c,captured=>{
@@ -235,4 +251,56 @@ test('legacy requests keep their provider input and public reply contract',async
  assert.equal(Object.hasOwn(checked,'creationReadiness'),false);
  assert.equal(checked.question,ordinaryReply().question);
  assert.equal(result.calls.filter(call=>call==='inference').length,1);
+});
+
+test('a real completed reply with optional invented metadata and two questions stays conversational, not build-ready',async()=>{
+ const c=context(incomplete),before=structuredClone(c);
+ const result=await invoke(c,captured=>{
+  source(captured,incomplete);
+  return {...notReady(),
+   text:'What does your paper boat do? Does it move between the stars?',
+   question:'Can you explain your idea?',
+   childDecisions:[{field:'action',quote:'I invented a rocket'}],
+   evidenceIds:['fabricated-observation'],
+   planSuggestions:[{field:'goal',value:'Deliver letters'}, {field:'unknown',value:'Unsafe guessed choice'}]};
+ });
+ assert.equal(result.status,200);assert.deepEqual(result.failures,[]);
+ assert.deepEqual(result.calls,['moderation','inference','moderation']);
+ const checked=validateCoachReply(validateCoachReply(result.body.reply,c),c);
+ assert.equal(checked.text,'What does your paper boat do?');
+ assert.equal(checked.question,null);
+ assert.deepEqual(checked.childDecisions,[]);
+ assert.deepEqual(checked.evidenceIds,[]);
+ assert.deepEqual(checked.planSuggestions,[{field:'goal',value:'Deliver letters'}],'helper proposal is never an accepted child decision');
+ assert.equal(checked.creationReadiness?.ready,false);
+ const saved=saveReview(c,checked);
+ assert.equal(creationBuildReadiness(saved).ready,false);
+ assert.equal(saved.job,null);assert.equal(saved.candidate,null);
+ assert.deepEqual(c,before,'the provider boundary cannot mutate the authored context');
+});
+
+test('invalid nonessential model metadata cannot bypass a missing or forged readiness verdict',async()=>{
+ const c=context(),base={...ordinaryReply(),text:'How could the boat steer? Maybe it could fly?',
+  question:'What do you think?',childDecisions:[{field:'action',quote:'not a child quote'}],
+  evidenceIds:['made-up-id']};
+ for(const readiness of [
+  null,
+  {ready:true,evidence:{action:'an invented action',consequence:'',experience:'',world:''},unresolved:[]}
+ ]){
+  const attempt=await invoke(c,()=>({...base,creationReadiness:readiness}));
+  assert.equal(attempt.status,503);assert.deepEqual(attempt.body,{errorCode:'COACH_UNAVAILABLE'});
+  assert.equal(attempt.calls.filter(item=>item==='inference').length,1);
+  assert.equal(attempt.failures.length,1);
+  assert.equal(attempt.failures[0].stage,'reply_validation');
+  assert.ok(['readiness_missing','readiness_inconsistent','readiness_reference_invalid'].includes(attempt.failures[0].reason));
+ }
+});
+
+test('unknown top-level model fields still fail closed with a specific private category',async()=>{
+ const attempt=await invoke(context(),()=>({...notReady(),unrequestedCommand:'run arbitrary code'}));
+ assert.equal(attempt.status,503);
+ assert.deepEqual(attempt.body,{errorCode:'COACH_UNAVAILABLE'});
+ assert.equal(attempt.calls.filter(item=>item==='inference').length,1);
+ assert.equal(attempt.failures[0].reason,'reply_shape_invalid');
+ assert.equal(attempt.failures[0].stage,'reply_validation');
 });

@@ -119,7 +119,7 @@ async function failureDiagnostics(){
   assert.deepEqual(await invoke({}, {version:1,context:{...context,creation:{version:1}}}),unavailable);
   assertEvent('reply_validation','readiness_missing');
   assert.deepEqual(await invoke({provider:{complete:async()=>({reply:{...reply,text:secret,unexpected:secret},usedMicroUsd:1})}}),unavailable);
-  assertEvent('reply_validation','reply_invalid');
+  assertEvent('reply_validation','reply_shape_invalid');
   assert.deepEqual(await invoke({provider:{complete:async()=>({reply,usedMicroUsd:-1})}}),unavailable);
   assertEvent('usage_validation','invalid_usage');
 
