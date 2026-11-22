@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T20:03:03.665Z",
-      "sourceDigest": "b947ab850b3b54c8521edf8d3271d270b226858cee999f5c60dce0813a4c79b2",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the measured 294.125px smallest-phone holding scene against the unchanged 294.4px requirement; reducing only native action padding restores scene allowance while the documented 18px text and 48px target contract remains unchanged.",
+      "reviewedAt": "2026-11-22T20:14:53.324Z",
+      "sourceDigest": "9348c0652f14446ba146decb9be84409f363eba4ee6a857a472aebda679e7424",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed all nine actual native reference views and required holding, shaking, recovery and normal-motion evidence after 13 passing configurations; documented explicit exact-byte acceptance and preserved original rules, artwork and tolerances.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:53:31.896Z",
-      "sourceDigest": "1b98c3063aeaab44f8af7d854dfdeff856de9ed2dc1dca95d4061d66246ba75c",
+      "reviewedAt": "2026-11-22T20:14:53.855Z",
+      "sourceDigest": "4ba9ec51c463acef14cb9f2e21c1ab161789129da8ba2cfae20e437ef66920f2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed disabled-action geometry and the real Keep reward fixture against clear fitted play; retained genuine Home outbox recovery artwork, accessibility, grant and replay assertions, with fresh hosted evidence still required.",
+      "reviewReason": "Verified the accepted native reference PNG hashes against the clean hosted source and artifact; retained all functional and geometry assertions, with final CI required to compare all nine committed images without regeneration.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T20:02:44.840Z",
-      "sourceDigest": "3093bc371957a9d6fbc49c1d0ac4310dc2a5712bc7347699944dd91d74f46137",
+      "reviewedAt": "2026-11-22T20:14:54.464Z",
+      "sourceDigest": "c58d97165e9719a6c732c4b7e639bb82b8747c277c2566534b13fb7307c9697b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact fifth-head successes, the remaining measured holding-stage failure, fresh artifact provenance and the narrow padding follow-up without accepting references or asserting a complete Arcade pass.",
+      "reviewReason": "Recorded the sixth candidate source-tree identity, complete Mining and visual evidence, cleared smallest-phone defect and explicit reference acceptance; final-head workflow outcome remains distinct from source/capture approval.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
