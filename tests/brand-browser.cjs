@@ -74,7 +74,8 @@ async function currentNavigation(page,id){
    const title=await page.title();assert.match(title,/^jems/);
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
-   assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
+   assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
+   assert.deepEqual(await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'original games retain their own visible group');
    // Keep three primary actions in one row, every secondary route in the drawer,
    // and the selected maker clear of home actions even at a narrow 320px width.
    if(label==='mobile'){

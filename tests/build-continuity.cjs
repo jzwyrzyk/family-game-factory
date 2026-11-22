@@ -134,6 +134,9 @@ async function stayAfterBuild(page,phase){
     assert.equal(await page.evaluate(id=>FG.studio.exportNotebook().sessions.find(s=>s.id===id)?.job?.status,initial),'testing','reload resumes the saved testing job');
     // A sibling must not see another child\'s private job or test.
     await switchProfile(page,1);
+    // A new sibling first chooses their own character before the ordinary
+    // Your world menu becomes available. Use that visible guarded journey.
+    await exploreWelcome(page);
     await notifications(page);
     assert.equal(await notification.count(),0,'the sibling cannot see the other child’s private build');
     await switchProfile(page,0);

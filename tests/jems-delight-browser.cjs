@@ -11,8 +11,11 @@ const {start}=require('./browser-server.cjs');
   await ctx.addInitScript(()=>{window.__jemsMilestones=[];window.addEventListener('jems:milestone',e=>window.__jemsMilestones.push(e.detail.kind));});
   const page=await ctx.newPage();page.on('dialog',d=>void d.accept());
   await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('jems-delight-host'));await exploreWelcome(page);
-  assert.equal(await page.locator('[data-starter]').count(),7);
-  assert.equal(await page.locator('.jems-world-scene').count(),5,'5 illustrated worlds + 2 existing quality-game canvases');
+  assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
+  assert.deepEqual(await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'original games retain their own visible group');
+  assert.equal(await page.locator('.jems-world-scene').count(),3,'Factory and the two Originals use illustrated world images');
+  assert.equal(await page.locator('#studioStarters canvas[data-quality-card]').count(),2,'Gum and Hill retain their quality-game canvases');
+  assert.equal(await page.locator('[data-starter="mining"] .studio-mining-preview img').count(),4,'Mining uses its layered local scene artwork');
   for(const asset of ['jems-workbench.svg','jems-world-buckets.svg','jems-world-dragon.svg','jems-world-moon.svg','jems-world-robot.svg']){
    assert.equal(await page.evaluate(p=>fetch('./'+p).then(r=>r.ok),asset),true,asset+' must be local');
   }

@@ -32,18 +32,34 @@ async function geometry(journey,device,review){
   const stage=dialog.querySelector('.myj-stage'),targets=[...dialog.querySelectorAll('button')].filter(element=>
    element.getClientRects().length&&getComputedStyle(element).visibility==='visible'&&!element.closest('[inert]'));
   const notice=dialog.querySelector('.myj-notice-visible'),rock=rect(dialog.querySelector('.myj-rock'));
+  const speech=dialog.querySelector('.myj-speech'),speechStyle=getComputedStyle(speech);
+  const eyes={x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65};
   const compactScene=(innerWidth<=600&&innerHeight<=720&&innerHeight>=innerWidth)||(innerHeight<=600&&innerWidth>innerHeight);
   // The illustrated eye region has stable coordinates in every atlas frame.
   // Check visible overlap explicitly: pointer-events:none feedback can still
   // hide a crystal while the native hit-target test reports it reachable.
   const feedback=compactScene&&notice&&notice.textContent.trim()?{text:notice.textContent.trim(),...rect(notice),
-   eyes:{x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65}}:null;
+   fontSize:parseFloat(getComputedStyle(notice).fontSize),textFits:notice.scrollWidth<=notice.clientWidth+1,
+   eyes}:null;
+  const contrast=element=>{
+   const style=getComputedStyle(element),rgb=value=>value.match(/[\d.]+/g)?.map(Number);
+   const front=rgb(style.color),back=rgb(style.backgroundColor),filter=style.filter;
+   const brightness=filter==='none'?1:Number(filter.match(/^brightness\(([\d.]+)\)$/)?.[1]);
+   if(style.backgroundImage!=='none'||!front||!back||(front[3]??1)!==1||(back[3]??1)!==1||!Number.isFinite(brightness))
+    return {ratio:null,color:style.color,background:style.backgroundColor,image:style.backgroundImage,filter};
+   const light=channels=>channels.slice(0,3).map(value=>Math.min(255,value*brightness)/255)
+    .map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4)
+    .reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
+   const a=light(front),b=light(back);
+   return {ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),color:style.color,background:style.backgroundColor,filter};
+  };
   return {phase:dialog.dataset.phase,viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
-   feedback,
+   feedback,speech:speechStyle.display!=='none'&&Number(speechStyle.opacity)>0?{...rect(speech),eyes}:null,
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
    targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {
     label:element.getAttribute('aria-label')||element.textContent.trim(),...box,enabled:!element.disabled,
-    reachable:hit===element||element.contains(hit),crystal:element.hasAttribute('data-crystal')};})};
+    reachable:hit===element||element.contains(hit),crystal:element.hasAttribute('data-crystal'),
+    contrast:!element.disabled&&element.matches('.myj-action,.myj-native-tools button,[data-myj="help-done"]')?contrast(element):null};})};
  });
  review.check(device.name,'layout-and-hit-targets',details);
  assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' shared native game fits viewport');
@@ -57,13 +73,22 @@ async function geometry(journey,device,review){
    const visibleWidth=Math.min(target.right,details.viewport.width)-Math.max(target.x,0),visibleHeight=Math.min(target.bottom,details.viewport.height)-Math.max(target.y,0);
    assert.ok(visibleWidth>=43.5&&visibleHeight>=43.5,device.name+' available control has a visible 44px target: '+target.label);
   }
+  if(target.contrast)assert.ok(target.contrast.ratio!==null&&target.contrast.ratio>=4.5,
+   device.name+' active '+target.label+' has readable contrast: '+JSON.stringify(target.contrast));
   if(target.crystal)assert.ok(target.x>=details.stage.x-1&&target.y>=details.stage.y-1&&target.right<=details.stage.right+1&&target.bottom<=details.stage.bottom+1,device.name+' crystal remains inside the visible scene');
  }
  if(details.feedback){
   const toast=details.feedback,intersects=box=>Math.min(toast.right,box.right)-Math.max(toast.x,box.x)>1&&Math.min(toast.bottom,box.bottom)-Math.max(toast.y,box.y)>1;
+  assert.ok(toast.fontSize>=18&&toast.textFits&&toast.x>=details.stage.x&&toast.right<=details.stage.right&&toast.y>=details.stage.y&&toast.bottom<=details.stage.bottom,
+   device.name+' keeps meaningful feedback readable inside the scene: '+JSON.stringify(toast));
   for(const target of details.targets.filter(target=>target.crystal&&target.enabled))assert.ok(!intersects(target),device.name+' feedback leaves active crystal art visible: '+target.label);
   assert.ok(!intersects(toast.eyes),device.name+' feedback leaves the rock eyes visible');
   review.check(device.name,'feedback-clearance',{text:toast.text,crystals:details.targets.filter(target=>target.crystal&&target.enabled).length,eyesClear:true});
+ }
+ if(details.speech){
+  const bubble=details.speech,intersects=box=>Math.min(bubble.right,box.right)-Math.max(bubble.x,box.x)>1&&Math.min(bubble.bottom,box.bottom)-Math.max(bubble.y,box.y)>1;
+  for(const target of details.targets.filter(target=>target.crystal&&target.enabled))assert.ok(!intersects(target),device.name+' decorative warning leaves crystal art visible: '+target.label);
+  assert.ok(!intersects(bubble.eyes),device.name+' decorative warning leaves the rock eyes visible');
  }
 }
 

@@ -31,6 +31,8 @@
   gap:6px; border-width:2px;
 }
 .native-mining .myj-action-bank > svg:last-child { display:none; }
+.native-mining .myj-action-bank:not(:disabled) { background:#087d57; }
+.native-mining .myj-action-grab:not(:disabled) { background:#7435d5; }
 .native-mining .myj-native-tools { grid-area:tools; display:flex; align-items:center; gap:6px; }
 .native-mining .myj-native-tools > button {
   position:static; flex:none; width:48px; height:48px; min-height:48px;
@@ -65,6 +67,7 @@
   .native-mining .myj-title { top:3%; }
   .native-mining .myj-title h2 { font-size:clamp(32px,9cqw,47px); }
   .native-mining .myj-cart-hit { width:32cqw; min-width:96px; bottom:4cqh; }
+  .native-mining .myj-speech { left:auto; right:16px; top:16px; }
 }
 @container myj-player (min-aspect-ratio:1/1) and (max-height:450px) {
   .native-mining .myj-controls {
@@ -83,4 +86,7 @@
   .native-mining .myj-title { top:4%; left:3%; }
   .native-mining .myj-title h2 { font-size:30px; }
   .native-mining .myj-speech { display:none; }
+  /* The short scene has open space beside the mountain. Keep feedback there
+     so a readable warning cannot cover its eyes or crystal targets. */
+  .native-mining .myj-notice { left:8px; transform:none; max-width:min(28cqw,220px); }
 }

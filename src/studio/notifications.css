@@ -30,6 +30,7 @@
 .studio-notification-new{padding:3px 10px;border-radius:999px;background:#eee7fb;color:#6032ad;font-size:18px}
 .studio-review .studio-notification-item h2{font-size:26px;line-height:1.25;color:#122444;margin:0 0 10px;overflow-wrap:anywhere}
 .studio-review .studio-notification-description{font-size:20px;line-height:1.5;color:#455372;margin:0;overflow-wrap:anywhere}
+.studio-review .studio-notification-idea{font-size:20px;line-height:1.5;color:#455372;margin:0 0 12px;overflow-wrap:anywhere}
 .studio-notification-actions{display:flex;flex-direction:column;align-items:stretch;gap:10px}
 .studio-review .studio-notifications .studio-button{min-height:48px;min-width:48px;max-width:100%;font-size:18px;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
 .studio-notification-actions .jems-read-aloud{display:flex;flex-direction:column;align-items:stretch}

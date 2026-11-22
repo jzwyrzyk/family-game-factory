@@ -44,6 +44,8 @@ Help and a hidden browser tab cancel an approaching hazard without silently losi
 - Build failure or cancellation is shown with a route back to the affected project's Studio idea composer, including when the arcade was opened from My Games; optional mining may continue. The composer remains visible on phones even when a first build has no playable game yet.
 - A native `mining` project uses the existing local game/notebook stores. Round scores remain transient and do not grant lifetime gems. Compatible strict readers are required for the new game ID; no analytics, third-party SDK, AI request or child-data collection is introduced. Artwork is built ahead of time and ships locally.
 
+The native player's short-landscape feedback occupies clear lower-left scene space. Portrait decoration stays away from active crystals, and enabled Bank/Grab plus native tool/help labels must meet 4.5:1 measured contrast at their actual surfaces, including hover brightness. These layout refinements do not alter the legacy dialog or artwork/rules. They follow observed first-head capture failures and require fresh native reference review.
+
 The [consolidation decision](../decisions/2026-11-22-unified-game-notifications.md) and [Notifications contract](../homepage/NOTIFICATIONS.md) describe modern navigation, source boundaries and rollout. Prior modal captures below remain historical. Native-host screenshots use a separately reviewed reference directory with the existing comparison tolerances; the old modal references are retained.
 
 ## Verification commands

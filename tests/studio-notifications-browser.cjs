@@ -97,7 +97,7 @@ async function capture(page,device,name){
 
 async function recoveryGuards(browser,url){
  const context=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
- const page=await context.newPage(),errors=[],mutations=[],foreignRequests=[];
+ const page=await context.newPage(),errors=[],mutations=[],foreignRequests=[],narration=[];
  const foreignAPI='https://older-notifications-workshop.test';
  const notebook={version:1,active:{player1:'notice-stop-target'},avatars:{player1:'spark'},sessions:[
   session('notice-foreign','An idea from the other workshop',{
@@ -106,14 +106,28 @@ async function recoveryGuards(browser,url){
   session('notice-stop','A garden build I can stop',{
    draft:'My garden has a purple gate.',job:{id:'notice-stop-job',api:API,status:'building'},
   }),
+  session('notice-reading-other','Another game that becomes ready',{
+   draft:'My robot finds a flower.',job:{id:'notice-reading-other-job',api:API,status:'building'},
+  }),
   session('notice-stop-target','My next picnic idea',{draft:'The picnic is under a willow tree.'}),
  ]};
- let releaseCancel;
+ let releaseCancel,readingOtherPhase='building';
  const cancelGate=new Promise(resolve=>{releaseCancel=resolve;});
  const headers={'Access-Control-Allow-Origin':new URL(url).origin,'Access-Control-Allow-Credentials':'true',
   'Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
  page.setDefaultTimeout(12000);page.on('pageerror',error=>errors.push(error.message));
- await page.addInitScript(({key,notebook})=>localStorage.setItem(key,JSON.stringify(notebook)),{key:KEY,notebook});
+ await page.addInitScript(({key,notebook})=>{
+  if(window!==window.top)return;
+  localStorage.setItem(key,JSON.stringify(notebook));
+  window.__notificationRetainedAudio=[];
+  window.Audio=class {
+   preload='';src='';onplaying=null;onended=null;onerror=null;plays=0;paused=false;
+   constructor(){window.__notificationRetainedAudio.push(this);}
+   async play(){this.plays++;if(this.plays===1)throw new DOMException('Fixture requires another tap','NotAllowedError');}
+   pause(){this.paused=true;}
+   removeAttribute(){this.src='';}
+  };
+ },{key:KEY,notebook});
  await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',
   body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:API,previewOrigin:PREVIEW})}));
  await page.route(foreignAPI+'/**',route=>{
@@ -124,6 +138,11 @@ async function recoveryGuards(browser,url){
   const request=route.request(),path=new URL(request.url()).pathname;
   const reply=(body,status=200)=>route.fulfill({status,headers,contentType:'application/json',body:JSON.stringify(body)});
   if(request.method()==='OPTIONS')return route.fulfill({status:204,headers});
+  if(path==='/v1/coach/narration/status')return reply({available:true,mode:'natural'});
+  if(path==='/v1/coach/narration'&&request.method()==='POST'){
+   narration.push(request.postDataJSON());const audio=Buffer.alloc(128);audio.write('ID3');
+   return route.fulfill({headers,contentType:'audio/mpeg',body:audio});
+  }
   if(request.method()!=='GET')mutations.push(path);
   if(path==='/v1/sessions/status')return reply({connected:true,trusted:true,expiresAt:Date.now()+3600000});
   if(path==='/v1/jobs/notice-stop-job/cancel'&&request.method()==='POST'){
@@ -131,6 +150,8 @@ async function recoveryGuards(browser,url){
   }
   if(request.method()!=='GET')return reply({errorCode:'UNEXPECTED_NOTIFICATION_MUTATION'},503);
   if(path==='/v1/jobs/notice-stop-job')return reply({jobId:'notice-stop-job',status:'building',adapter:'mock'});
+  if(path==='/v1/jobs/notice-reading-other-job')return reply({jobId:'notice-reading-other-job',status:readingOtherPhase,adapter:'mock',
+   ...(readingOtherPhase==='ready'?{revisionId:'notice-reading-other-revision'}:{})});
   return reply({available:false,mode:'unavailable'});
  });
  try{
@@ -145,6 +166,29 @@ async function recoveryGuards(browser,url){
   assert.deepEqual((await page.evaluate(()=>FG.studio.exportNotebook())).sessions.find(s=>s.id==='notice-foreign'),foreignBefore,
    'a refused stop leaves the foreign job and the child’s saved words intact');
   assert.equal(await item(page,'notice-foreign').getAttribute('data-notification-kind'),'unknown');
+
+  // A different project becoming ready reorders the list, but the unchanged
+  // row must retain its reader, focus and downloaded mobile Play state.
+  assert.equal(narration.length,0,'opening Notifications does not synthesize cards');
+  const retainedReader=item(page,'notice-foreign').locator('[data-action="read-aloud"]');
+  await retainedReader.click();await retainedReader.filter({hasText:'Play reading'}).waitFor({state:'visible'});
+  assert.equal(await item(page,'notice-foreign').locator('.studio-notification-idea').textContent(),'Keep my saved comet idea.');
+  assert.ok(narration[0].text.includes('Keep my saved comet idea.'),'reading includes the visible child-authored reminder');
+  await retainedReader.evaluate(node=>{window.__notificationRetainedButton=node;});
+  readingOtherPhase='ready';
+  await page.waitForFunction(()=>document.querySelector('[data-notification-session="notice-reading-other"]')?.getAttribute('data-notification-kind')==='ready');
+  assert.equal(await retainedReader.evaluate(node=>node===window.__notificationRetainedButton&&document.activeElement===node),true,
+   'another ready row preserves the reading control and its focus');
+  assert.match(await retainedReader.textContent(),/Play reading/);
+  assert.equal(await page.evaluate(()=>window.__notificationRetainedAudio.length===1&&!window.__notificationRetainedAudio[0].paused&&window.__notificationRetainedAudio[0].src.startsWith('blob:')),true,
+   'the unchanged reading keeps its pending audio when another row changes');
+  assert.equal(narration.length,1,'a background ready transition never repeats synthesis');
+  await retainedReader.click();assert.equal(narration.length,1,'the next explicit Play reuses the retained audio');
+  await page.evaluate(()=>window.__notificationRetainedAudio[0].onplaying());
+  assert.match(await retainedReader.textContent(),/Stop reading/);
+  await retainedReader.click();
+  assert.equal(await page.evaluate(()=>window.__notificationRetainedAudio[0].paused&&window.__notificationRetainedAudio[0].src===''),true,
+   'the retained reader still stops and releases its audio explicitly');
 
   // A real Stop click authorizes one cancel, but its delayed result belongs to
   // this notification view. A later project must never receive the old status.
@@ -171,8 +215,8 @@ async function recoveryGuards(browser,url){
   assert.equal(await item(page,'notice-foreign').getAttribute('data-notification-kind'),'unknown');
   assert.equal(await item(page,'notice-stop').getAttribute('data-notification-kind'),'draft','the confirmed stop keeps the saved idea recoverable');
   assert.deepEqual(mutations,['/v1/jobs/notice-stop-job/cancel'],'only the explicit same-workshop Stop sends one cancel');
-  assert.deepEqual(foreignRequests,[]);assert.deepEqual(errors,[]);
-  console.log('PASS Notifications recovery guards: foreign-workshop Stop makes no request; a delayed authorized cancel preserves the later project and its status');
+  assert.equal(narration.length,1);assert.deepEqual(foreignRequests,[]);assert.deepEqual(errors,[]);
+  console.log('PASS Notifications recovery guards: foreign-workshop Stop makes no request; another ready row retains mobile Play and audio; a delayed authorized cancel preserves the later project and its status');
  }catch(error){await page.screenshot({path:'test-results/notifications-recovery-guards-failure.png',fullPage:true}).catch(()=>{});throw error;}
  finally{releaseCancel();await context.close();}
 }
@@ -186,6 +230,7 @@ async function journey(browser,url,device,viewport){
  const headers={'Access-Control-Allow-Origin':new URL(url).origin,'Access-Control-Allow-Credentials':'true',
   'Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
  await page.addInitScript(({key,notebook})=>{
+  if(window!==window.top)return;
   if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(notebook));
   window.__noticeAudio=[];window.__noticeRevoked=[];window.__noticeSpoken=[];window.__noticeSpeaking=false;
   const revoke=URL.revokeObjectURL.bind(URL);

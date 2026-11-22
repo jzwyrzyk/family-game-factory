@@ -461,7 +461,7 @@ export async function installStudio(){
   let suggestion:StudioContinuation|null=null;
   if(item){
    const session=sessions.find(session=>session.id===item.sessionId)!;
-   suggestion={sessionId:session.id,ownerId:session.owner,name:session.name,art:icon[session.game],kind:item.kind,title:item.title,description:item.description,actionLabel:item.actionLabel,notification:item};
+   suggestion={sessionId:session.id,ownerId:session.owner,name:session.name,art:icon[session.game],kind:item.kind,title:item.title,description:item.idea||item.description,actionLabel:item.actionLabel,notification:item};
   }else{
    // A dismissed notification cannot reappear through the recent-play fallback.
    const represented=new Set(items.map(item=>item.sessionId));

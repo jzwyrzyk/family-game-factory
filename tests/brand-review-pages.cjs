@@ -27,7 +27,8 @@ async function pages(device,viewport){
  p.setDefaultTimeout(14000);p.on('dialog',d=>void d.accept());
  try{
   await p.goto(base);await p.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);await exploreWelcome(p);
-  assert.equal(await p.locator('#studioStarters [data-starter]').count(),7);
+  assert.deepEqual(await p.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
+  assert.deepEqual(await p.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'both original games are available in their own group');
   await shot(p,device,'01-studio-home');
   await p.locator('#studioNew').click();await p.locator('#page-studio').waitFor({state:'visible'});
   await p.locator('#studioCreationHero').waitFor({state:'visible'});
@@ -46,7 +47,7 @@ async function pages(device,viewport){
   await p.locator('#studioMore > summary').click();await p.locator('#studioCompare').click();
   await p.locator('#studioVersions').waitFor({state:'visible'});await shot(p,device,'03-versions-and-tests');
   await home(p);await shot(p,device,'04-saved-idea-home');
-  for(const [num,game] of [['05','dragon'],['06','gum'],['07','moon']]){
+  for(const [num,game] of [['05','dragon'],['06','gum'],['07','buckets']]){
    await p.locator('[data-starter="'+game+'"]').click();await p.locator('#page-studio').waitFor({state:'visible'});
    await p.waitForTimeout(300);await shot(p,device,num+'-play-'+game);await home(p);
   }

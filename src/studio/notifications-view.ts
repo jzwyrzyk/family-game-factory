@@ -40,9 +40,10 @@ export function createStudioNotificationsView(options: NotificationsViewOptions)
   const introduction = node('p', 'studio-notifications-intro', 'Games to try and ideas to finish.');
   const list = node('div', 'studio-notifications-list'); list.id = 'studioNotificationsList';
   page.append(heading, introduction, list);
-  let readers: ReturnType<typeof createReadAloudControl>[] = [];
+  type CachedRow = { signature: string; row: HTMLElement; reader: ReturnType<typeof createReadAloudControl> };
+  let rows = new Map<string, CachedRow>();
   let pageSignature = '', homeSignature = '';
-  const clearReaders = () => { readers.forEach(reader => reader.dispose()); readers = []; };
+  const clearReaders = () => { rows.forEach(({reader}) => reader.dispose()); rows.clear(); };
 
   function entry(id: string) {
     const element = button(id, 'Notifications', 'clock'); element.onclick = options.onOpenPage;
@@ -118,27 +119,30 @@ export function createStudioNotificationsView(options: NotificationsViewOptions)
       focused?.dataset.action === 'read-aloud' ? '[data-action="read-aloud"]' :
       focused?.classList.contains('studio-stop-build') ? '.studio-stop-build' :
       focused?.classList.contains('studio-wait-arcade-button') ? '.studio-wait-arcade-button' : null;
-    clearReaders(); list.replaceChildren();
-    if (!items.length) {
-      const empty = node('div', 'studio-notifications-empty');
-      empty.append(createIcon('check'), node('h2', '', 'All caught up'), node('p', '', 'New games and unfinished ideas will appear here.'));
-      list.append(empty);
-    }
+    const nextRows = new Map<string, CachedRow>();
     for (const item of items) {
+      const key = JSON.stringify([ownerId, item.sessionId]);
+      const rowSignature = JSON.stringify([item, busySessionIds.has(item.sessionId)]);
+      const previous = rows.get(key);
+      // Another project's arrival or new state must not discard a child's
+      // current reading or its already downloaded, gesture-required audio.
+      if (previous?.signature === rowSignature) { nextRows.set(key, previous); continue; }
       const row = node('article', 'studio-notification-item'); row.dataset.notificationSession = item.sessionId;
       row.dataset.notificationKind = item.kind;
       const copy = node('div', 'studio-notification-copy');
       const kind = node('p', 'studio-notification-kind', item.title);
       if (item.unread) kind.append(node('span', 'studio-notification-new', 'New'));
-      copy.append(kind, node('h2', '', item.projectName), node('p', 'studio-notification-description', item.description));
+      copy.append(kind, node('h2', '', item.projectName));
+      if (item.idea) copy.append(node('p', 'studio-notification-idea', item.idea));
+      copy.append(node('p', 'studio-notification-description', item.description));
       const actions = node('div', 'studio-notification-actions');
       const primary = button('', item.actionLabel, item.action === 'open-ready' || item.kind === 'experiment' ? 'play' : 'edit', 'studio-button studio-primary');
       primary.removeAttribute('id'); primary.dataset.notificationOpen = '';
       primary.onclick = () => options.onOpen(item, 'notifications'); actions.append(primary);
       const reader = createReadAloudControl({
-        text: () => `${item.title}. ${item.projectName}. ${item.description}`,
+        text: () => [item.title, item.projectName, item.idea, item.description].filter(Boolean).join('. '),
         buttonClass: 'studio-button', canRead: () => options.canRead(item.ownerId) && row.isConnected,
-      }); readers.push(reader); actions.append(reader.element);
+      }); actions.append(reader.element);
       if (busySessionIds.has(item.sessionId)) {
         const wait = button('', 'Play while I wait', 'play', 'studio-button studio-wait-arcade-button'); wait.removeAttribute('id');
         wait.onclick = () => options.onPlayWhileWaiting(item);
@@ -151,7 +155,24 @@ export function createStudioNotificationsView(options: NotificationsViewOptions)
         };
         actions.append(wait, stop);
       }
-      row.append(copy, actions); list.append(row);
+      row.append(copy, actions);
+      nextRows.set(key, { signature: rowSignature, row, reader });
+    }
+    for (const [key, previous] of rows) {
+      if (nextRows.get(key) !== previous) { previous.reader.dispose(); previous.row.remove(); }
+    }
+    rows = nextRows;
+    if (!items.length) {
+      const empty = node('div', 'studio-notifications-empty');
+      empty.append(createIcon('check'), node('h2', '', 'All caught up'), node('p', '', 'New games and unfinished ideas will appear here.'));
+      list.replaceChildren(empty);
+    } else {
+      list.querySelector('.studio-notifications-empty')?.remove();
+      let index = 0;
+      for (const {row} of rows.values()) {
+        const at = list.children[index++];
+        if (at !== row) list.insertBefore(row, at ?? null);
+      }
     }
     if (focusedSession && focusedAction && !page.classList.contains('hidden')) {
       const row = [...list.querySelectorAll<HTMLElement>('[data-notification-session]')]
@@ -161,7 +182,7 @@ export function createStudioNotificationsView(options: NotificationsViewOptions)
   }
   return {
     page, menuEntry, playEntry, renderHome, renderPage, updateBadges,
-    stopReading() { readers.forEach(reader => reader.stop()); },
+    stopReading() { rows.forEach(({reader}) => reader.stop()); },
     clear() { clearReaders(); list.replaceChildren(); options.homeHost.replaceChildren(); pageSignature = ''; homeSignature = ''; },
   };
 }

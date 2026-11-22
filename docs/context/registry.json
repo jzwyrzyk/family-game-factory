@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:47:22.108Z",
-      "sourceDigest": "cd9329dd086d4b89db2964d77255522bcf1ddb97fadb08476a8643c032da89da",
+      "reviewedAt": "2026-11-22T19:05:57.966Z",
+      "sourceDigest": "02fd208f13aec653b67715d3b9360d6aa37400ce89d117ad02533fcd61956329",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Home Notifications, shared native Mining and speech boundaries after reviewing source against PR129; preserves saved drafts, owner checks, required learning and original gameplay rules.",
+      "reviewReason": "Reviewed authored reminder snippets and keyed notification readers: another project changing state preserves current audio and focus, while changed or removed rows retain cancellation and owner guards.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:47:23.130Z",
-      "sourceDigest": "3e8321fbdc984b1cac665d21e0c04390d914e63eb98f63abcdd217464fde6165",
+      "reviewedAt": "2026-11-22T19:05:58.705Z",
+      "sourceDigest": "15185a6db02feb7bf9b6b3fd975a4015c60941f6fe5cb6b6291854107e247013",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed original PR125 Mining mount extraction and eight-runtime catalog compatibility; rules artwork and old visual references stay unchanged while new native host acceptance is pending.",
+      "reviewReason": "Actual first hosted native captures exposed landscape eye overlap, portrait crystal obstruction and low contrast; documented native-only fixes and strengthened readable feedback and contrast assertions, with fresh capture acceptance pending.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:47:23.374Z",
-      "sourceDigest": "d46704f963867d500c63b3e113d4787c3a5bf95cf1dcb5088dbef9b8195ea4f1",
+      "reviewedAt": "2026-11-22T19:05:58.957Z",
+      "sourceDigest": "374d44deed0b79c78c1620432ffbb53108e618cced6422db4d68afc45414a5b5",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 394 unit, 26 notification and 52 narration contracts plus preserved saved legacy game coverage; independent hosted Notifications and forty viewport cases still require actual capture review.",
+      "reviewReason": "Preserved first-head failure receipts and all40 viewport plus5 lifecycle passes; corrected obsolete catalogue and top-frame/welcome fixture setup, retained error assertions, added authored snippet and independent-reader continuity coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:47:23.626Z",
-      "sourceDigest": "de9e74f3a52c3d01906a4ddcf2cd230147a5ccabafc13d4ea2df6bf2bc3f823b",
+      "reviewedAt": "2026-11-22T19:05:59.204Z",
+      "sourceDigest": "04d6cb672df74d64f34d8bdfc4b797c71ec90017dd8374ec02e2b92a826418a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded draft-only consolidation after shell and Conversation Coach, compatible mining and notebook readers for release or rollback, and exact regression partition adding Notifications without dropping suites.",
+      "reviewReason": "Recorded exact first candidate and equivalent CI merge tree, verified artifact hashes, actual Mining visual defects and fixture failures; follow-up remains draft and requires new hosted captures before reference acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

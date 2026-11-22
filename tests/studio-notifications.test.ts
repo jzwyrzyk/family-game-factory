@@ -68,6 +68,62 @@ test('projection is owner scoped, deduplicated and excludes archives, empty star
   assert.deepEqual(deriveStudioNotifications(sources, 'another-child'), []);
 });
 
+test('default project names retain distinct child-authored idea reminders within their owner', () => {
+  const first = ready('first', { name: 'My new idea', draft: '  A cat\n who rides a comet.  ' });
+  const second = ready('second', { name: 'My new idea', messages: [
+    { id: 'idea', role: 'child', text: 'A tiny train carries\tblue flowers.', at: AT },
+    { id: 'helper', role: 'helper', text: 'Compile all agreed mechanics.', at: AT },
+  ] });
+  const sibling = ready('first', { owner: OTHER, name: 'My new idea', draft: 'My sibling-only dragon.' });
+  const sources = freeze([sibling, first, second]);
+  const rows = deriveStudioNotifications(sources, OWNER);
+  assert.deepEqual(rows.map(row => [row.projectName, row.idea]), [
+    ['My new idea', 'A cat who rides a comet.'],
+    ['My new idea', 'A tiny train carries blue flowers.'],
+  ]);
+  assert.deepEqual(deriveStudioNotifications(sources, OTHER).map(row => row.idea), ['My sibling-only dragon.']);
+});
+
+test('idea reminders prefer the draft, fall back only to meaningful child messages and remain bounded', () => {
+  const messages: StudioSession['messages'] = [
+    { id: 'first', role: 'child', text: 'My first idea.', at: AT },
+    { id: 'latest', role: 'child', text: '  Let the turtle\n\t skate. ', at: AT },
+    { id: 'blank', role: 'child', text: ' \n\t ', at: AT },
+    { id: 'helper', role: 'helper', text: 'Compile the scene and all plan fields.', at: AT },
+    { id: 'reflection', role: 'reflection', text: 'I liked the last test.', at: AT },
+  ];
+  const source = session('draft', { draft: '  My fresh\n idea. ', messages,
+    pendingExperiment: { ...pending(), prompt: 'COMPILED BUILD INSTRUCTIONS: create runtime modules.' } });
+  assert.equal(item(source).idea, 'My fresh idea.');
+  assert.equal(item({ ...source, draft: ' \t ' }).idea, 'Let the turtle skate.');
+  const compiledOnly = item({ ...source, draft: '', messages: messages.slice(2) });
+  assert.equal(compiledOnly.idea, undefined);
+  assert.equal(Object.hasOwn(compiledOnly, 'idea'), false);
+  const long = item({ ...source, draft: 'a'.repeat(158) + '🚀' + 'z'.repeat(20) }).idea!;
+  assert.equal(long, 'a'.repeat(158) + '…');
+  assert.ok(long.length <= 160);
+  assert.equal(item({ ...source, draft: 'b'.repeat(160) }).idea, 'b'.repeat(160));
+});
+
+test('idea reminders leave job transition tokens and stable polling order unchanged', () => {
+  const first = session('a-project', { draft: 'A jumping comet.',
+    job: { id: 'job-a', api: 'https://builder.test', status: 'queued' } });
+  const second = session('b-project', { messages: [{ id: 'child', role: 'child', text: 'A dancing train.', at: AT }],
+    job: { id: 'job-b', api: 'https://builder.test', status: 'building' } });
+  const before = deriveStudioNotifications([second, first], OWNER);
+  first.updated = '2026-11-22T17:00:00.000Z'; first.job!.status = 'testing'; second.job!.phase = 'repairing';
+  assert.deepEqual(deriveStudioNotifications([first, second], OWNER), before);
+  for (const source of [ready('ready'), first, session('failed', {
+    job: { id: 'failed-job', api: 'https://builder.test', status: 'failed' },
+  })]) {
+    const initial = item(source);
+    const revised = item({ ...source, draft: 'A newer child-authored reminder.' });
+    assert.equal(revised.token, initial.token);
+    assert.equal(revised.idea, 'A newer child-authored reminder.');
+    if (revised.kind === 'failed') assert.equal(revised.title, 'The build needs help');
+  }
+});
+
 test('one current item per project prioritizes ready, recovery, failure, pending and unfinished work without truncating', () => {
   const result = experiment('local-test', { baseId: 'main', remoteId: undefined, config: { jump: 4 } });
   const sources = [session('draft', { draft: 'A new idea' }),
@@ -221,6 +277,7 @@ test('projection and preferences are pure and save only inert bounded version to
   const original = JSON.stringify(source), prefs = freeze(freshStudioNotificationPreferences()), row = item(source, prefs);
   const changed = acknowledgeStudioNotificationItems(prefs, OWNER, [freeze(row)], true);
   assert.equal(JSON.stringify(source), original); assert.deepEqual(prefs, { acknowledgements: [] });
+  assert.equal(row.idea, 'A secret child-authored cat story');
   assert.match(row.token, /^v1:unknown:[a-f0-9]{16}$/);
   assert.deepEqual(Object.keys(changed.acknowledgements[0]).sort(), ['dismissed', 'sessionId', 'token']);
   assert.doesNotMatch(JSON.stringify(changed), /secret|cat story|https:|prompt|api/);

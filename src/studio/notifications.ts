@@ -7,6 +7,8 @@ export type StudioNotification = {
   ownerId: string;
   sessionId: string;
   projectName: string;
+  /** A short reminder in the child's own words, never compiled build instructions. */
+  idea?: string;
   token: string;
   kind: StudioNotificationKind;
   priority: number;
@@ -86,6 +88,18 @@ function authoredVersion(session: StudioSession): readonly unknown[] {
     session.design?.observations.filter(observation => observation.source === 'child').map(observation => observation.id) ?? []];
 }
 
+function authoredIdea(session: StudioSession): string | undefined {
+  // Drafts and child messages preserve the child's words. Pending prompts and
+  // experiment descriptions can contain a compiled plan, so are not fallbacks.
+  const source = session.draft.trim() || [...session.messages].reverse()
+    .find(message => message.role === 'child' && message.text.trim())?.text;
+  if (!source) return undefined;
+  const singleLine = source.replace(/\s+/g, ' ').trim();
+  if (singleLine.length <= 160) return singleLine;
+  // Stay within 160 UTF-16 units without leaving half of an emoji at the edge.
+  return singleLine.slice(0, 159).replace(/[\uD800-\uDBFF]$/, '').trimEnd() + '…';
+}
+
 /** Derive one current row per owned project. Reading has no storage, network,
  * clock, reward, Build, cancel, selection or Keep side effects.
  *
@@ -146,7 +160,7 @@ export function deriveStudioNotifications(
       version = [job?.id ?? null, 'submission', pendingVersion(session)];
     } else if (job?.status === 'failed') {
       kind = 'failed';
-      title = 'Your idea is still here';
+      title = 'The build needs help';
       description = 'The build did not finish. Open your idea for help.';
       actionLabel = 'Open my idea';
       version = [job.id];
@@ -179,8 +193,10 @@ export function deriveStudioNotifications(
     const actionable = kind === 'ready' || kind === 'unknown' || kind === 'failed';
     const dismissed = acknowledgement?.dismissed ??
       (!!session.resumeDismissed && (kind === 'draft' || kind === 'experiment'));
+    const idea = authoredIdea(session);
     projected.push({
       id: session.id, ownerId, sessionId: session.id, projectName: session.name, token, kind,
+      ...(idea ? { idea } : {}),
       priority: kinds.indexOf(kind), title, description, action, actionLabel,
       unread: actionable && !acknowledgement, pending: kind === 'building' || kind === 'unknown', dismissed,
     });
