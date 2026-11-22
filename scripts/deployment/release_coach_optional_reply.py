@@ -6,7 +6,7 @@ stages it with zero traffic, verifies the preserved serving configuration and
 promotes only factory-coach-private. Reuse the same private state directory to
 recover an interrupted operation; an attempted mutation is never resubmitted.
 --rollback restores the captured coach traffic without a build or provider call.
-Use a fresh coach-reply-repair-<source>/state journal; the previous diagnostics
+Use a fresh coach-reply-repair-<source>/state journal; the earlier readiness
 journal remains the recovery authority for its own pinned release. No model
 request, secret-value read, gateway write, Pages or worker release occurs.
 """
