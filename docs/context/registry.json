@@ -239,10 +239,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:17:52.578Z",
+      "reviewedAt": "2026-11-22T19:25:30.499Z",
       "sourceDigest": "bd67eebc50accd5320fdd8d7837faea8d328591e21226d280c55abed061c3f98",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated current-game Help and responsive launch/result presentation while retaining the shared player and legacy help.",
+      "reviewReason": "Reviewed the shared game controls and assembly Help for consistent neutral targets and pink joins.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -424,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:20:24.386Z",
-      "sourceDigest": "477155f83f3d473e884a4dc11bedefb67321ab5fb658ffd9bf014b39a785d0af",
+      "reviewedAt": "2026-11-22T19:25:30.112Z",
+      "sourceDigest": "15217dc6fd005c2a127da38f2ef02f9bd18a6795cadf3a8a20d28298ae042848",
       "reviewOutcome": "updated",
-      "reviewReason": "Finalized owner feedback including world launch art, tube exhaust orientation and deterministic part-dependent travel.",
+      "reviewReason": "Aligned generic game instructions with neutral plus targets, single pink gum and the part-dependent adventure.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:20:44.762Z",
-      "sourceDigest": "2c99651c68b4ec8caa2c70dc669584fb0f7934e012b2583c7ab7e32cb37dd814",
+      "reviewedAt": "2026-11-22T19:25:31.560Z",
+      "sourceDigest": "a32375f64c0a445e8fe308c755cd21fbb0c5ba9677892337a4108feb66ed4891",
       "reviewOutcome": "updated",
-      "reviewReason": "Finalized feature assertions and a same-contact stopped-drag control without changing product input handlers.",
+      "reviewReason": "Adopted the independently proven stationary-before-release touch gesture and exact remaining adventure clock advancement.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:20:55.766Z",
-      "sourceDigest": "d3a92dc0b7f2ceb63abf80ab7a56f5cc96215e29c6f0710c23d8e9fc7606e758",
+      "reviewedAt": "2026-11-22T19:25:31.969Z",
+      "sourceDigest": "48b9401b3c3296209c601d1cdf402c92048e058cbe74ff82d5d10228738f21c5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final owner-feedback source and validation workflow with pending hosted acceptance and retained merge hold.",
+      "reviewReason": "Recorded new 29-second host integration passes and decisive trusted touch evidence while requiring final exact-source browser review.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

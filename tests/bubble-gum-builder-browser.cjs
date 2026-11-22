@@ -19,6 +19,7 @@ const { BLUEPRINTS, TOUR_DURATION_MS, GUM_BUDGET, createBuild, getBlueprint } = 
 const { LAUNCH_DURATION_MS } = require('../src/games/bubble-gum-journey.ts');
 const { defaults } = require('../src/runtime/manifests.ts');
 const ADVENTURE_DURATION_MS = LAUNCH_DURATION_MS + TOUR_DURATION_MS;
+const TOUCH_DRAG_SETTLE_MS = 120;
 const WEAK_ROCKET = { body: 'can', nose: 'cup', 'left-wing': 'ruler', 'right-wing': 'ruler', booster: 'cup' };
 const STRONG_ROCKET = { body: 'bottle', nose: 'funnel', 'left-wing': 'paper-wing', 'right-wing': 'paper-wing', booster: 'tube' };
 
@@ -30,11 +31,16 @@ const manifest = { schema: 'bubble-gum-browser-review-v1', startedAt: new Date()
   source: git('rev-parse', 'HEAD'), tree: git('rev-parse', 'HEAD^{tree}'),
   dirty: !!git('status', '--porcelain'), realAdventureMs: ADVENTURE_DURATION_MS,
   launchDurationMs: LAUNCH_DURATION_MS, journeyDurationMs: TOUR_DURATION_MS,
-  touchTransport: 'One retained CDP session per journey; implicit touch id matching Playwright; subsequent tap uses Locator.tap',
+  touchTransport: 'One retained CDP session per journey; implicit touch id; same finger rests 120ms before release; subsequent tap uses Locator.tap once',
+  touchDriverEvidence: { dragSettleMs: TOUCH_DRAG_SETTLE_MS, source: 'c0054bdd1ec68a422a83ec4cb5cdba1674adc176',
+    workflowRun: 45060265952, artifact: 14768413900,
+    artifactSha256: 'fe7058a253acb6000bcf3b44ff1275dc20981265d20e924861ffacd1a069ffce',
+    control: 'implicit-0-drag-settle-120ms', observedControlMoveToUpMs: 121.2,
+    meaning: 'One deliberate drop and one trusted follow-up click; no application workaround or input retry' },
   sources: Object.fromEntries(['src/games/bubble-gum-builder.ts', 'src/games/bubble-gum-builder.css',
     'src/games/bubble-gum-rules.ts', 'src/games/bubble-gum-art.ts', 'src/games/bubble-gum-journey.ts', 'tests/bubble-gum-builder-browser.cjs']
     .map(file => [file, fs.existsSync(file) ? hash(fs.readFileSync(file)) : null])),
-  cases: [], captures: [], videos: [], contrast: [], touchReceipts: [], launchReceipts: [], viabilityComparisons: [], failures: [] };
+  cases: [], captures: [], videos: [], contrast: [], touchDrags: [], touchReceipts: [], launchReceipts: [], viabilityComparisons: [], failures: [] };
 const saveManifest = () => fs.writeFileSync(path.join(output, 'review.json'), JSON.stringify(manifest, null, 2) + '\n');
 saveManifest();
 
@@ -131,6 +137,10 @@ async function dragPart(journey, object, slot) {
     for (const fraction of [.15, .35, .55, .75, 1]) await session.send('Input.dispatchTouchEvent', {
       type: 'touchMove', touchPoints: [{ x: start.x + (end.x - start.x) * fraction,
         y: start.y + (end.y - start.y) * fraction }] });
+    // Keep the same finger still at the target before lifting. The isolated
+    // browser probe proves a flick-speed release suppresses the next tap,
+    // while this deliberate placement preserves one ordinary trusted click.
+    await journey.page.waitForTimeout(TOUCH_DRAG_SETTLE_MS);
     await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     // The touch controller commits on the next frame after touchend, keeping
     // the captured source alive until the browser completes that gesture.
@@ -141,7 +151,18 @@ async function dragPart(journey, object, slot) {
     await journey.page.mouse.move(end.x, end.y, { steps: 10 }); await journey.page.mouse.up();
   }
   await waitPlaced(journey.page, slot, object);
-  if (journey.touch) journey.pendingTouchDrag = { part: object, slot };
+  if (journey.touch) {
+    const timing = await journey.page.evaluate(part => {
+      const events = (window.__gumInputReceipts || []).filter(event => event.part === part && event.pointerType === 'touch');
+      const up = events.filter(event => event.type === 'pointerup').at(-1);
+      const move = events.filter(event => event.type === 'pointermove' && event.pointerId === up?.pointerId).at(-1);
+      return { pointerId: up?.pointerId, finalMoveEventTime: move?.eventTime, releaseEventTime: up?.eventTime,
+        observedMoveToUpMs: up && move ? up.eventTime - move.eventTime : null };
+    }, object);
+    assert.ok(timing.observedMoveToUpMs >= 100, 'the actual dragged contact rests before its one release');
+    journey.pendingTouchDrag = { part: object, slot, requestedSettleMs: TOUCH_DRAG_SETTLE_MS, ...timing };
+    manifest.touchDrags.push({ case: journey.name, ...journey.pendingTouchDrag });
+  }
 }
 
 async function nextConstructionAction(journey, input, parts = {}) {
@@ -354,7 +375,10 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
   if (captureWorld) await capture(journey.page, journey.name + '-' + before.blueprint + '-adventure');
   assert.equal(await recordCount(journey.page), initialRecords, 'the showcase does not submit a premature host result');
   if (realTime) await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase', null, { timeout: 25000 });
-  else await journey.page.clock.runFor(TOUR_DURATION_MS);
+  else {
+    const remaining = Math.max(0, ADVENTURE_DURATION_MS - (await snapshot(journey.page)).adventureElapsedMs);
+    await journey.page.clock.runFor(remaining + 250);
+  }
   await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase');
   const after = await snapshot(journey.page);
   assert.ok(after.tourElapsedMs >= TOUR_DURATION_MS, 'all motion preferences receive the full adventure duration');
@@ -402,14 +426,15 @@ async function createJourney(browser, base, name, viewport, { touch = false, mot
     if (clock) await page.clock.install();
     await page.addInitScript(() => {
       window.__gumInputReceipts = [];
-      for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'touchstart', 'touchend', 'click']) {
+      for (const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'touchstart', 'touchend', 'click']) {
         document.addEventListener(type, event => {
           const target = event.target instanceof Element ? event.target.closest('button') : null;
           if (!target || !target.closest('.gum-builder') && !target.matches('[data-gum-part]')) return;
+          if (type === 'pointermove' && (event.pointerType !== 'touch' || !target.dataset.gumPart)) return;
           let state;
           try { state = window.FG?.runtime?.snapshot()?.state; } catch { /* pre-mount event */ }
           const point = event.changedTouches?.[0] || event;
-          const receipt = { time: performance.now(), type, trusted: event.isTrusted, target: target.className,
+          const receipt = { time: performance.now(), eventTime: event.timeStamp, type, trusted: event.isTrusted, target: target.className,
             part: target.dataset.gumPart || null, slot: target.dataset.gumSlot || null,
             joint: target.dataset.gumJoint || null, gum: target.dataset.gumColor || null,
             pointerId: event.pointerId ?? null, pointerType: event.pointerType || null,

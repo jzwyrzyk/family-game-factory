@@ -32,7 +32,7 @@ const details = {
   factory: {type:'SPARKLE WORKSHOP',instructions:'Find the next gem in the pattern, make it sparkle, and wrap a gift your way!',controls:'Tap a bucket · Tap the glowing cutter · Rub the gem · Pick your paper · Tap your gift'},
   moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
   robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route to the star. The dark squares are walls.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},
-  gum: { type: 'BUILD & DISCOVER', instructions: 'Fit real objects together. Stick the joins with gum. Take your invention on an adventure!', controls: 'Choose a piece, then tap its outline. Tap a glowing join to add gum. Test, launch, and play with your invention.' },
+  gum: { type: 'BUILD & DISCOVER', instructions: 'Fit real objects together. Stick the joins with pink gum. See how far your invention can go!', controls: 'Choose a piece, then tap the glowing +. Tap the pink gum at a join. Wiggle, launch, and try a different piece for a new adventure.' },
   buckets: { type: 'GUESS & SURVIVE', instructions: 'Pick a bucket. Can you stay dry?', controls: 'Tap a numbered bucket or use left/right and Space to choose.' },
   dragon: { type: 'SHIELD ADVENTURE', instructions: 'Jump into falling fireballs to reflect them. Only your hero can save the island.', controls: '← → move · ↑ jump · Space jump / shield · touch controls below' },
   hill: { type: 'DRIVE & TINKER', instructions: 'Find your rhythm over the hills. Change your ride and feel what happens.', controls: 'Right / D accelerates · Left / A brakes · R retries · P pauses · touch pedals below' },
