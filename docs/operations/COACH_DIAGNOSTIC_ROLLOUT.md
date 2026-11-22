@@ -1,4 +1,6 @@
-# Private-coach diagnostic rollout
+# Historical PR124 private-coach diagnostic rollout
+
+This records the completed diagnostic operation using [operator source 9986ab4](https://github.com/jzwyrzyk/family-game-factory/blob/9986ab4be38680cc8f2a9cc29f823b440ce03319/scripts/deployment/release_coach_diagnostics.py). The later readiness correction uses a new operator pin and a separate journal; follow [Private-coach readiness repair rollout](COACH_READINESS_ROLLOUT.md) for that operation. The commands and baseline below retain their original PR124 scope.
 
 This is the owner-approved, narrowly scoped rollout of [PR124](https://github.com/jzwyrzyk/family-game-factory/pull/124)'s conversation-failure diagnostics. It publishes one private-coach image and updates only `factory-coach-private` in `family-game-factory-jzw`, `us-east5`. It does not establish that the original conversation failure is repaired.
 

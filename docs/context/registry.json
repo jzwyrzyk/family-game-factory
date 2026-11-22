@@ -694,10 +694,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T20:16:37.339Z",
-      "sourceDigest": "7f603b275336c750dc81d5e765be2dadc398c9b0b275761c8eddeed2fb6ea55f",
+      "reviewedAt": "2026-11-22T18:41:50.155Z",
+      "sourceDigest": "15e6ebaa432444e78d4fd856d95c728a28f99c57d2353e9a8e3d3e8a8406b456",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR124 merge b4734b1323de87dfee96bb91769cbab3cff432e6 at20:15:43UTC, exact equality to tested5688 tree, seven passing PR workflows and successful canceled-push rerun; retained the original tablet failure and prepared but unexecuted coach-only rollout boundary.",
+      "reviewReason": "Documented the PR131 coach-only operator with exact tested/tree and chatdiag baseline pins, three-file runtime scope, fresh journal purpose, dynamic budget proof and25offline checks. Clarified forward gateway/source guards versus cached rollback and separate low-space bootstrap/live acceptance; preserved the historical PR124 record.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

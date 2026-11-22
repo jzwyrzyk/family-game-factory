@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""PR124 coach-only rollout using the pinned, previously exercised release primitives.
+"""PR131 readiness repair using the pinned, previously exercised release primitives.
 
 Default is a read-only cloud plan. --execute publishes one immutable coach image,
 stages it with zero traffic, verifies the preserved serving configuration and
 promotes only factory-coach-private. Reuse the same private state directory to
 recover an interrupted operation; an attempted mutation is never resubmitted.
 --rollback restores the captured coach traffic without a build or provider call.
-No model request, secret-value read, gateway write, Pages or worker release occurs.
+Use a fresh coach-readiness-<source>/state journal; the previous diagnostics
+journal remains the recovery authority for its own pinned release. No model
+request, secret-value read, gateway write, Pages or worker release occurs.
 """
 import argparse
 import fcntl
@@ -21,16 +23,18 @@ import tempfile
 import uuid
 
 PRIMITIVES_SHA = '804574895d8ab86fe270e590ecfa05fa5d4bc290'
-APPROVED_TESTED_SOURCE = '5688bb3f6a01a766af8b78c783faccd8cce8f89c'
-DEPLOYED_SOURCE = '19f5e46ae1141da3df7bf14d682757de7e9aec69'
-DEPLOYED_COACH = 'factory-coach-private-pr115-19f5e46ae114-fb5fa6'
+APPROVED_TESTED_SOURCE = 'ae084f6b2b0364830adc9ae47c87046cbf7c2d72'
+DEPLOYED_SOURCE = 'b4734b1323de87dfee96bb91769cbab3cff432e6'
+DEPLOYED_COACH = 'factory-coach-private-chatdiag-b4734b1323de-a14b8b'
+RELEASE_PURPOSE = 'coach-readiness-repair'
 # PR117's three Pal COPY allowlist entries, already on the approved main base.
 APPROVED_DOCKERIGNORE_BLOB = 'a1dc71d4b19121f33ca69d9e65fa3f8c5251f858'
 PRIVATE_SCOPE = ('server/coach', 'server/Dockerfile.coach', 'server/trusted-devices.ts',
     'server/privacy/parent-consent.ts', 'server/adult-pilot.ts', 'server/pipeline/auth.ts',
     'src/studio/design.ts', 'src/studio/creation-readiness.ts', 'src/studio/conversation-view.ts',
     'package-lock.json', '.dockerignore')
-ALLOWED_DIAGNOSTIC_FILES = {'server/coach/private-provider.ts', 'server/coach/private-executor.ts'}
+ALLOWED_READINESS_FILES = {'server/coach/private-provider.ts', 'server/coach/policy.ts',
+    'server/coach/private-creation-wire.ts'}
 
 
 class Stop(RuntimeError):
@@ -95,7 +99,7 @@ def libraries(root, primitives):
             'run', '--rm', '--network', 'none', '--entrypoint', 'node', tag,
             '--input-type=module', '-e',
             'if(process.getuid()===0)throw Error("NON_ROOT_REQUIRED");await import("./private-executor.mjs");']})
-        config['tags'] = ['jems-coach-diagnostics', 'source-' + source, 'release-' + nonce]
+        config['tags'] = ['jems-coach-readiness', 'source-' + source, 'release-' + nonce]
         return config
 
     def source_current(source, operator=root):
@@ -132,10 +136,10 @@ def package_runtime(root, sha):
 
 def scope(root, source):
     changed = set(git(root, 'diff', '--name-only', DEPLOYED_SOURCE, source, '--', *PRIVATE_SCOPE).splitlines())
-    need(changed <= ALLOWED_DIAGNOSTIC_FILES | {'.dockerignore'}
+    need(changed <= ALLOWED_READINESS_FILES | {'.dockerignore'}
          and git(root, 'rev-parse', source + ':.dockerignore') == APPROVED_DOCKERIGNORE_BLOB
          and package_runtime(root, DEPLOYED_SOURCE) == package_runtime(root, source),
-         'SOURCE_EXCEEDS_PRIVATE_DIAGNOSTIC_SCOPE')
+         'SOURCE_EXCEEDS_PRIVATE_READINESS_SCOPE')
     # The selected source's archiver must match the reviewed operator's archiver.
     for name in ('build.py', 'build_coach.py'):
         expected = git(root, 'show', source + ':scripts/deployment/' + name)
@@ -143,11 +147,18 @@ def scope(root, source):
 
 
 def candidate(source, nonce):
-    return 'factory-coach-private-chatdiag-' + source[:12] + '-' + nonce[:6]
+    return 'factory-coach-private-chatready-' + source[:12] + '-' + nonce[:6]
+
+
+def require_state_directory(directory, source):
+    need(re.fullmatch('[a-f0-9]{40}', source) and directory.name == 'state'
+         and directory.parent.name == 'coach-readiness-' + source,
+         'READINESS_SOURCE_KEYED_STATE_DIRECTORY_REQUIRED')
 
 
 def validate(guards, state):
-    need(state.get('version') == 1 and state.get('primitives') == PRIMITIVES_SHA
+    need(state.get('version') == 1 and state.get('purpose') == RELEASE_PURPOSE
+         and state.get('primitives') == PRIMITIVES_SHA
          and re.fullmatch('[a-f0-9]{32}', state.get('nonce', '')), 'JOURNAL_IDENTITY_INVALID')
     need(set(state.get('services', {})) == {'coach'}
          and state.get('bucket') == f'{guards.PROJECT}-service-builds-{guards.REGION}', 'JOURNAL_SCOPE_INVALID')
@@ -211,7 +222,8 @@ def identity(guards, gateway, coach):
 
 
 def run(root, application, primitives, directory, source, tested, execute=False, restore=False):
-    need(tested == APPROVED_TESTED_SOURCE, 'EXACT_PR124_TESTED_SOURCE_REQUIRED')
+    need(tested == APPROVED_TESTED_SOURCE, 'EXACT_PR131_TESTED_SOURCE_REQUIRED')
+    require_state_directory(directory, source)
     guards, publisher, Cloud = libraries(root, primitives)
     proof = guards.local_source(root, source, tested) if restore else guards.verify_source(root, source, tested)
     need(str(publisher.cloud('projects', 'describe', guards.PROJECT).get('projectNumber')) == guards.NUMBER, 'PROJECT_IDENTITY_CHANGED')
@@ -228,11 +240,14 @@ def run(root, application, primitives, directory, source, tested, execute=False,
         before, gateway = guards.snapshot(cloud, 'coach'), guards.snapshot(cloud, 'gateway')
         need(before['revision']['metadata']['name'] == DEPLOYED_COACH, 'APPROVED_SERVING_BASELINE_CHANGED')
         identity(guards, gateway, before)
-        guards.budget_preflight(primitives, application, source, before['revision'])
+        # PR131 projects input and varies its response schema by source catalog.
+        # The historical primitive's static-schema helper cannot prove this cost.
+        guards.budget_preflight(root, application, source, before['revision'])
         with tempfile.TemporaryDirectory(prefix='jems-coach-plan-') as temporary:
             _, archive = publisher.source_archive(application, temporary, source)
         nonce = uuid.uuid4().hex
-        state = {**proof, 'version': 1, 'primitives': PRIMITIVES_SHA, 'nonce': nonce, 'gatewayGuard': gateway,
+        state = {**proof, 'version': 1, 'purpose': RELEASE_PURPOSE,
+            'primitives': PRIMITIVES_SHA, 'nonce': nonce, 'gatewayGuard': gateway,
             'services': {'coach': {'baseline': before, 'candidate': candidate(source, nonce)}},
             'bucket': f'{guards.PROJECT}-service-builds-{guards.REGION}',
             'build': {'phase': 'prepared', 'archive': archive, 'config': guards.build_config(source, archive, nonce)}}
@@ -243,7 +258,7 @@ def run(root, application, primitives, directory, source, tested, execute=False,
         state['rollbackRequested'] = True
         guards.save(path, state)
         guards.rollback_one(cloud, state, path, 'coach')
-        print(json.dumps({'status': 'COACH_DIAGNOSTICS_ROLLED_BACK', 'revision': DEPLOYED_COACH}))
+        print(json.dumps({'status': 'COACH_READINESS_ROLLED_BACK', 'revision': DEPLOYED_COACH}))
         return
     need(not state.get('rollbackRequested'), 'ROLLED_BACK_RELEASE_CANNOT_REPROMOTE')
     scope(root, source)
@@ -251,7 +266,7 @@ def run(root, application, primitives, directory, source, tested, execute=False,
     with tempfile.TemporaryDirectory(prefix='jems-coach-recheck-') as temporary:
         _, archive = publisher.source_archive(application, temporary, source)
     need(archive == state['build']['archive'], 'JOURNAL_SOURCE_ARCHIVE_DIFFERS')
-    print(json.dumps({'status': 'COACH_DIAGNOSTICS_PLAN', 'source': source, 'tested': tested,
+    print(json.dumps({'status': 'COACH_READINESS_PLAN', 'source': source, 'tested': tested,
         'baseline': DEPLOYED_COACH, 'candidate': state['services']['coach']['candidate'],
         'archiveSha256': archive, 'execute': execute, 'gatewayWrite': False, 'providerCall': False}), flush=True)
     if not execute:
@@ -263,7 +278,7 @@ def run(root, application, primitives, directory, source, tested, execute=False,
         if state['services']['coach'].get(step, {}).get('phase') != 'verified':
             guards.transition(root, cloud, state, path, 'coach', promoted)
     guards.verify_peers(cloud, state)
-    print(json.dumps({'status': 'COACH_DIAGNOSTICS_SERVING', 'source': source, 'tested': tested,
+    print(json.dumps({'status': 'COACH_READINESS_SERVING', 'source': source, 'tested': tested,
         'tool': state['tool'], 'primitives': PRIMITIVES_SHA, 'buildId': state['build']['id'],
         'archiveSha256': archive, 'revision': state['services']['coach']['candidate'],
         'image': state['build']['images']['coach'], 'rollbackRevision': DEPLOYED_COACH,
@@ -281,6 +296,7 @@ def main(argv=None):
     root = Path(__file__).resolve().parents[2]
     application, primitives = Path(args.application_dir).resolve(), Path(args.primitives_dir).resolve()
     directory = Path(args.state_dir).absolute()
+    require_state_directory(directory, args.reviewed_source_sha)
     need(not directory.is_symlink() and all(not directory.is_relative_to(path) for path in (root, application, primitives)),
          'PRIVATE_EXTERNAL_STATE_DIRECTORY_REQUIRED')
     directory.mkdir(mode=0o700, parents=True, exist_ok=True)

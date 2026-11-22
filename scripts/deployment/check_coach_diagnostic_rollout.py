@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 import io
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -26,11 +27,13 @@ BUILD_ID = '12345678-1234-1234-1234-123456789abc'
 guards = publisher = Cloud = fixtures = APPLICATION = PRIMITIVES = None
 
 
-class CoachDiagnosticRolloutTests(unittest.TestCase):
+class CoachReadinessRolloutTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
-        self.path = Path(temporary.name) / 'release.json'
+        directory = Path(temporary.name) / ('coach-readiness-' + SOURCE) / 'state'
+        directory.mkdir(mode=0o700, parents=True)
+        self.path = directory / 'release.json'
         self.cloud = fixtures.FakeCloud(self.path)
         old_name = guards.COACH + '-baseline'
         revision = self.cloud.revisions.pop(old_name)
@@ -44,7 +47,8 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
             for route in service[section]['traffic']:
                 route['revisionName'] = operator.DEPLOYED_COACH
         self.state = {
-            'version': 1, 'source': SOURCE, 'tested': TESTED, 'tool': TOOL,
+            'version': 1, 'purpose': operator.RELEASE_PURPOSE,
+            'source': SOURCE, 'tested': TESTED, 'tool': TOOL,
             'primitives': operator.PRIMITIVES_SHA, 'nonce': NONCE,
             'bucket': f'{guards.PROJECT}-service-builds-{guards.REGION}',
             'gatewayGuard': guards.snapshot(self.cloud, 'gateway'),
@@ -143,8 +147,61 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
 
     def test_other_tested_source_stops_before_libraries_or_cloud(self):
         with patch.object(operator, 'libraries', side_effect=AssertionError('unexpected import or network')):
-            with self.assertRaisesRegex(operator.Stop, 'EXACT_PR124_TESTED_SOURCE_REQUIRED'):
-                operator.run(ROOT, ROOT, ROOT, self.path.parent, SOURCE, 'b' * 40, True)
+            with self.assertRaisesRegex(operator.Stop, 'EXACT_PR131_TESTED_SOURCE_REQUIRED'):
+                operator.run(ROOT, ROOT, ROOT, self.path.parent, SOURCE,
+                             '5688bb3f6a01a766af8b78c783faccd8cce8f89c', True)
+
+    def test_previous_diagnostic_state_directory_is_rejected_before_cloud(self):
+        original = self.path.parents[2] / ('coach-diagnostics-' + operator.DEPLOYED_SOURCE) / 'state'
+        original.mkdir(mode=0o700, parents=True)
+        journal = original / 'release.json'
+        journal.write_bytes(b'{"original":"completed diagnostic receipt"}\n')
+        before = journal.read_bytes(), journal.stat().st_ino
+        with patch.object(operator, 'libraries', side_effect=AssertionError('unexpected import or network')):
+            with self.assertRaisesRegex(operator.Stop, 'READINESS_SOURCE_KEYED_STATE_DIRECTORY_REQUIRED'):
+                operator.run(ROOT, ROOT, ROOT, original, SOURCE, TESTED, True)
+        self.assertEqual((journal.read_bytes(), journal.stat().st_ino), before)
+
+    def test_state_directory_must_match_the_full_new_source(self):
+        operator.require_state_directory(self.path.parent, SOURCE)
+        for source, directory in (('b' * 40, self.path.parent),
+                                  (SOURCE[:12], self.path.parent),
+                                  (SOURCE, self.path.parent / 'nested')):
+            with self.subTest(source=source, directory=directory), self.assertRaises(operator.Stop):
+                operator.require_state_directory(directory, source)
+
+    def test_journal_source_tested_tool_and_purpose_cannot_be_reassigned(self):
+        proof = {'source': SOURCE, 'tested': TESTED, 'tool': TOOL}
+        for field, value in (('source', 'd' * 40), ('tested', 'd' * 40),
+                             ('tool', 'd' * 40), ('purpose', 'coach-diagnostics')):
+            state = copy.deepcopy(self.state)
+            state[field] = value
+            guards.save(self.path, state)
+            before = self.path.read_bytes(), self.path.stat().st_ino
+            expected = 'JOURNAL_IDENTITY_INVALID' if field == 'purpose' else 'JOURNAL_SOURCE_OR_TOOL_DIFFERS'
+            with self.subTest(field=field), \
+                    patch.object(operator, 'libraries', return_value=(guards, publisher, lambda: self.cloud)), \
+                    patch.object(guards, 'verify_source', return_value=proof), \
+                    patch.object(publisher, 'cloud', return_value={'projectNumber': guards.NUMBER}), \
+                    self.assertRaisesRegex(operator.Stop, expected):
+                operator.run(ROOT, ROOT, ROOT, self.path.parent, SOURCE, TESTED, True)
+            self.assertEqual((self.path.read_bytes(), self.path.stat().st_ino), before)
+            self.assertEqual(self.cloud.writes, [])
+
+    def test_pr115_baseline_is_not_a_valid_start_for_readiness_repair(self):
+        proof = {'source': SOURCE, 'tested': TESTED, 'tool': TOOL}
+        before = copy.deepcopy(self.state['services']['coach']['baseline'])
+        before['revision']['metadata']['name'] = 'factory-coach-private-pr115-19f5e46ae114-fb5fa6'
+        with patch.object(operator, 'libraries', return_value=(guards, publisher, lambda: self.cloud)), \
+                patch.object(guards, 'verify_source', return_value=proof), \
+                patch.object(publisher, 'cloud', return_value={'projectNumber': guards.NUMBER}), \
+                patch.object(operator, 'scope'), patch.object(guards, 'application_checkout'), \
+                patch.object(guards, 'snapshot', side_effect=[before, self.state['gatewayGuard']]), \
+                patch.object(guards, 'budget_preflight', side_effect=AssertionError('unapproved baseline reached budget')):
+            with self.assertRaisesRegex(operator.Stop, 'APPROVED_SERVING_BASELINE_CHANGED'):
+                operator.run(ROOT, ROOT, ROOT, self.path.parent, SOURCE, TESTED, True)
+        self.assertFalse(self.path.exists())
+        self.assertEqual(self.cloud.writes, [])
 
     def test_arbitrary_exception_text_is_never_printed(self):
         for error in (RuntimeError('PRIVATE_CANARY'), RuntimeError('private body'), StopIteration('PRIVATE_CANARY')):
@@ -199,6 +256,9 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
         self.assertIn('--network', config['steps'][1]['args'])
         self.assertIn('none', config['steps'][1]['args'])
         self.assertIn('NON_ROOT_REQUIRED', config['steps'][1]['args'][-1])
+        self.assertIn('jems-coach-readiness', config['tags'])
+        self.assertTrue(operator.candidate(SOURCE, NONCE).startswith('factory-coach-private-chatready-'))
+        self.assertLessEqual(len(operator.candidate(SOURCE, NONCE)), 63)
 
     def test_real_reviewed_source_scope_and_exact_packaging(self):
         source = operator.git(APPLICATION, 'rev-parse', 'HEAD')
@@ -206,8 +266,27 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
         real_git = operator.git
         def changed_packaging(root, *args):
             return 'f' * 40 if args == ('rev-parse', source + ':.dockerignore') else real_git(root, *args)
-        with patch.object(operator, 'git', side_effect=changed_packaging), self.assertRaisesRegex(operator.Stop, 'SOURCE_EXCEEDS_PRIVATE_DIAGNOSTIC_SCOPE'):
+        with patch.object(operator, 'git', side_effect=changed_packaging), self.assertRaisesRegex(operator.Stop, 'SOURCE_EXCEEDS_PRIVATE_READINESS_SCOPE'):
             operator.scope(ROOT, source)
+
+    def test_readiness_runtime_allowlist_rejects_executor_shared_contract_and_dependency_changes(self):
+        source = operator.git(APPLICATION, 'rev-parse', 'HEAD')
+        expected = {'server/coach/private-provider.ts', 'server/coach/policy.ts',
+                    'server/coach/private-creation-wire.ts'}
+        actual = set(operator.git(ROOT, 'diff', '--name-only', operator.DEPLOYED_SOURCE, source,
+                                  '--', *operator.PRIVATE_SCOPE).splitlines())
+        self.assertEqual(actual, expected)
+        self.assertEqual(operator.ALLOWED_READINESS_FILES, expected)
+        real_git = operator.git
+        for extra in ('server/coach/private-executor.ts', 'server/coach/service.ts',
+                      'src/studio/creation-readiness.ts', 'server/Dockerfile.coach', 'package-lock.json'):
+            def changed_scope(root, *args):
+                if args[:2] == ('diff', '--name-only'):
+                    return '\n'.join(sorted(expected | {extra}))
+                return real_git(root, *args)
+            with self.subTest(extra=extra), patch.object(operator, 'git', side_effect=changed_scope), \
+                    self.assertRaisesRegex(operator.Stop, 'SOURCE_EXCEEDS_PRIVATE_READINESS_SCOPE'):
+                operator.scope(ROOT, source)
 
     def test_actual_budget_helper_with_current_source_and_reported_limits(self):
         source = operator.git(APPLICATION, 'rev-parse', 'HEAD')
@@ -224,10 +303,23 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
             'valueFrom': {'secretKeyRef': {'name': 'synthetic-canary-secret', 'key': '9'}}})
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
-            proof = guards.budget_preflight(PRIMITIVES, APPLICATION, source, revision)
+            proof = guards.budget_preflight(ROOT, APPLICATION, source, revision)
         self.assertTrue(proof['arithmeticPass'])
+        self.assertEqual(proof['wireBudgetVersion'], 1)
+        self.assertNotIn('contextByteAllowance', proof)
+        self.assertNotEqual(proof['synthetic'][0]['schemaBytes'], proof['fixed']['baseSchemaBytes'])
+        self.assertNotEqual(proof['synthetic'][0]['modelInputBytes'], proof['synthetic'][0]['contextBytes'])
         self.assertEqual(proof['limits'], {'maxInputChars': 16000, 'maxOutputTokens': 800, 'maxTurnMicroUsd': 30000})
         self.assertNotIn('synthetic-canary-secret', output.getvalue())
+
+    def test_dynamic_budget_matches_actual_provider_boundary_without_network(self):
+        source = operator.git(APPLICATION, 'rev-parse', 'HEAD')
+        result = subprocess.run(['node', '--import', 'tsx',
+            str(ROOT / 'scripts/deployment/check_coach_readiness_budget.cjs'), str(APPLICATION), source],
+            cwd=APPLICATION, capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout), {'status': 'DYNAMIC_BUDGET_OFFLINE_CHECKS_PASSED',
+                                                    'networkCalls': 0, 'syntheticTurns': 2})
 
     def test_full_run_replays_journal_then_rolls_back_without_secret_or_provider_read(self):
         proof = {'source': SOURCE, 'tested': TESTED, 'tool': TOOL}
@@ -259,11 +351,12 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
 
         output = io.StringIO()
         with contextlib.ExitStack() as stack:
+            budget = stack.enter_context(patch.object(guards, 'budget_preflight'))
             for target, name, arguments in (
                 (operator, 'libraries', {'return_value': (guards, publisher, lambda: self.cloud)}),
                 (operator, 'scope', {}), (guards, 'verify_source', {'return_value': proof}),
                 (guards, 'local_source', {'return_value': proof}), (guards, 'application_checkout', {}),
-                (guards, 'budget_preflight', {}), (publisher, 'preflight', {}),
+                (publisher, 'preflight', {}),
                 (publisher, 'source_archive', {'side_effect': archive}), (publisher, 'cloud', {'side_effect': fake_cloud}),
                 (guards, 'binding', {'side_effect': AssertionError('secret access forbidden')}),
                 (guards, 'verify_binding', {'side_effect': AssertionError('secret access forbidden')})):
@@ -275,11 +368,13 @@ class CoachDiagnosticRolloutTests(unittest.TestCase):
             operator.run(ROOT, ROOT, ROOT, self.path.parent, SOURCE, TESTED, restore=True)
             with self.assertRaisesRegex(operator.Stop, 'ROLLED_BACK_RELEASE_CANNOT_REPROMOTE'):
                 operator.run(ROOT, ROOT, ROOT, self.path.parent, SOURCE, TESTED, True)
+            budget.assert_called_once_with(ROOT, ROOT, SOURCE,
+                                           self.state['services']['coach']['baseline']['revision'])
         self.assertEqual(calls.count(('builds', 'submit')), 1)
         self.assertEqual([(key, phase) for key, phase, _ in self.cloud.writes], [('coach', 'stage'), ('coach', 'promotion'), ('coach', 'rollback')])
         for line in output.getvalue().splitlines():
             result = json.loads(line)
-            if result['status'] == 'COACH_DIAGNOSTICS_SERVING':
+            if result['status'] == 'COACH_READINESS_SERVING':
                 self.assertFalse(result['providerCall'])
                 self.assertFalse(result['conversationVerified'])
         self.assertNotIn('secretKeyRef', output.getvalue())
@@ -371,7 +466,7 @@ def main():
             sys.modules.pop('release_services', None)
         else:
             sys.modules['release_services'] = previous
-    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(CoachDiagnosticRolloutTests))
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(CoachReadinessRolloutTests))
     return 0 if result.wasSuccessful() else 1
 
 
