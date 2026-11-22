@@ -61,9 +61,17 @@ async function readableSurface(page,label){
       const minimum=element.matches('#creationRun,#creationKeep,[data-add-block]')?48:44;
       if(rect.width<43.5||rect.height<minimum-.5)undersized.push({text:element.getAttribute('aria-label')||element.textContent.trim().slice(0,55),width:rect.width,height:rect.height,minimum});
     }
-    return {small,undersized,overflow:document.documentElement.scrollWidth>innerWidth+1};
+    const overflow=document.documentElement.scrollWidth>innerWidth+1;
+    const overflowing=overflow?[...document.querySelectorAll('body *')].filter(element=>{
+      const rect=element.getBoundingClientRect(),style=getComputedStyle(element);
+      return style.display!=='none'&&style.visibility!=='hidden'&&rect.width>0&&rect.height>0&&
+        (rect.left< -1||rect.right>innerWidth+1);
+    }).slice(0,16).map(element=>({name:element.tagName.toLowerCase(),id:element.id,
+      className:typeof element.className==='string'?element.className.slice(0,90):'',
+      left:Math.round(element.getBoundingClientRect().left),right:Math.round(element.getBoundingClientRect().right)})):[];
+    return {small,undersized,overflow,overflowing,documentWidth:document.documentElement.scrollWidth};
   });
-  assert.equal(result.overflow,false,label+': no page-wide horizontal overflow');
+  assert.equal(result.overflow,false,label+': no page-wide horizontal overflow '+JSON.stringify({width:result.documentWidth,offenders:result.overflowing}));
   assert.deepEqual(result.small,[],label+': visible child text stays at least 18px');
   assert.deepEqual(result.undersized,[],label+': controls retain usable touch targets');
 }
@@ -147,6 +155,7 @@ const complexScene={
         assert.equal(await page.locator('#creationVariables').isVisible(),false,'variables do not crowd the beginner');
         assert.equal(await page.locator('#creationAddScript').isVisible(),false,'extra script management is optional');
         assert.equal(await page.locator('#creationRead').isVisible(),true,'read-aloud remains discoverable');
+        assert.equal(await page.locator('.site-header.studio-practice-navigation').isVisible(),false,'shared shell header must not intercept child editor controls');
         for(const action of ['move','jump','say','dance','wait','repeat'])assert.equal(await page.locator(`[data-add-block="${action}"]`).isVisible(),true,'simple action available: '+action);
         for(const action of ['emit','set','change'])assert.equal(await page.locator(`[data-add-block="${action}"]`).isVisible(),false,'advanced action is optional: '+action);
         const stage=await fittedStage(page,name+' beginner',minimumStage[name]);
