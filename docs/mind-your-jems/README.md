@@ -104,17 +104,21 @@ The revised browser acceptance must exercise real controls against the bundled c
 
 Lifecycle evidence must cover simultaneous touch, key release after focus changes, late-warning/shake pause and resume, help, hidden tabs, art failure/retry, resize/orientation, close/reopen, build reconnection/failure/cancellation, owner changes and stale-ready suppression. Inspect focus, composed text contrast, control reachability, scene contacts and continued play when a build-ready or recovery message is visible. Browser viewports are not physical-device tests.
 
-### Historical visual evidence
+### Reviewed visual evidence
 
 The original illustrated click-to-mine implementation retains art provenance and earlier layout, wait-build, recovery and profile fixtures. Its ten main browser configurations, three supplementary fixtures and idle/warning/ready baselines describe that earlier implementation. Those earlier checks and pictures do not validate the new movement game.
 
-The existing `tests/visual/mind-your-jems/` files are historical comparison material until the new composition has been reviewed. Before accepting replacement baselines:
+The current nine files in `tests/visual/mind-your-jems/` are the manually reviewed native-player captures from PR129 head `e314bab19607fffabe09a3815d0bc92c83bf78ed`. Their [review receipt](../../tests/visual/mind-your-jems/review.json) identifies the exact hosted build, run, artifact archive, manifest and individual image hashes, plus the reviewed normal-motion clip. The source run completed all 13 functional configurations and failed only its nine comparisons with the superseded click-to-mine pictures. Importing the reviewed captures does not change that historical result or establish a passing comparison for the final candidate.
+
+Before accepting replacement baselines:
 
 1. Inspect actual browser captures beside the storyboard for proportions, material, lighting, scene contacts, composition, legibility and branding.
 2. Inspect desktop, tablet and phone layouts, including narrow portrait and short landscape.
 3. Review running, collection, banking, warning, holding, shaking, falling, retry, level completion and build-ready states. Review a normal-motion clip as well as reduced-motion stills.
 4. Correct the implementation before accepting its screenshots.
-5. Only then run `MYJ_UPDATE_BASELINES=1 node tests/mind-your-jems-browser.cjs` locally and retain the reviewed baselines with the source. CI must not silently regenerate them.
+5. Only after that review, explicitly accept the complete nine-image set locally. The usual path is `MYJ_UPDATE_BASELINES=1 node tests/mind-your-jems-browser.cjs`. If local Chromium cannot launch, an explicit local import of verified hosted captures is permitted: verify the source head and clean build, run and artifact identity, archive and manifest checksums, all nine image dimensions and checksums, and the complete functional result; record the still and normal-motion review in `review.json`. A run whose only failures are the known superseded-baseline comparisons can supply candidates, but any functional failure blocks acceptance. Preserve its original manifest and failed conclusion. CI must not regenerate or approve baselines, and the comparison tolerance remains 20 channel levels with a maximum changed ratio of 0.008.
+
+6. Run the existing hosted comparison against the accepted images on the final candidate. Baseline import, a passing functional journey and a passing visual comparison are separate observations.
 
 The dedicated **Mind Your Jems art and gameplay review** workflow remains the separate visual/gameplay gate. Functional tests, visual comparisons and observed child play answer different questions; none substitutes for the others.
 

@@ -17,7 +17,7 @@ This README describes the source capabilities. Consult the delivery ledger and c
 
 ## Studio-first homepage
 
-The normal website route enters the child's **Studio library**, not the separate Arcade wizard. Six Factory Favorites, a clear **Invent a game** action, recent work, and saved creations lead into one Studio experience. The original Arcade remains available through `?arcade=1` for comparison or rollback; `?studio=1` remains a supported Studio alias. When the builder is unavailable, the homepage accurately describes ideas as saveable rather than promising a generated game. Frontend navigation does not activate providers or publish a release. GitHub Pages publishing is a separate manual workflow in this source baseline.
+The normal website route enters the child's **Studio library**, not the separate Arcade wizard. Four ready-made games, including Gem Factory and Mind Your Jems together, a separate Original jems group, a clear **Invent a game** action, recent work, and saved creations lead into one Studio experience. The original Arcade remains available through `?arcade=1` for comparison or rollback; `?studio=1` remains a supported Studio alias. When the builder is unavailable, the homepage accurately describes ideas as saveable rather than promising a generated game. Frontend navigation does not activate providers or publish a release. GitHub Pages publishing is a separate manual workflow in this source baseline.
 
 ## Integrated child journey
 

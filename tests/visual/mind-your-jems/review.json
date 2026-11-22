@@ -1,10 +1,12 @@
 {
   "build": {
-    "sha": "75e888ee2910dcaf285f3c6b8c73d63e098c3919",
+    "sha": "c91940f9ae29b117e27ab6f40f598e1bcea45fb2",
     "dirty": false
   },
   "browser": "141.0.7390.37",
-  "acceptedBy": "Explicit MYJ_UPDATE_BASELINES command after visual review",
+  "acceptedBy": "Explicit local import of verified GitHub-hosted captures after manual still and normal-motion review",
+  "acceptedAt": "2026-11-22T16:31:10+00:00",
+  "surface": "shared native play view",
   "states": [
     "idle",
     "warning",
@@ -16,5 +18,96 @@
     "mobile"
   ],
   "channelTolerance": 20,
-  "maximumChangedRatio": 0.008
+  "maximumChangedRatio": 0.008,
+  "source": {
+    "head": "e314bab19607fffabe09a3815d0bc92c83bf78ed",
+    "tree": "056f19287c2909d771be14ad283482a3473b76d2",
+    "pullRequest": "https://github.com/jzwyrzyk/family-game-factory/pull/129",
+    "runId": 45043194170,
+    "jobId": 137271977327,
+    "runUrl": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45043194170",
+    "artifactId": 14762282490,
+    "artifactName": "mind-your-jems-browser-screenshots",
+    "archiveSha256": "730009154dd4adfafbca09ac8f551f56d628e20226d9fcb41d7786636793cb02",
+    "manifestSha256": "8a9e6d72b4d0d0766400a52bd709025554e0ad1588778b998812de31ad2a2be3"
+  },
+  "review": {
+    "functionalConfigurationsPassed": 13,
+    "captures": 138,
+    "originalRunConclusion": "failure",
+    "originalFailureScope": "Exactly nine old-baseline visual mismatches; no functional errors. The original hosted manifest remains unchanged.",
+    "inspected": "All nine full-resolution baseline states; narrow portrait and short landscape, Help, ready and cancelled recovery; full normal-motion sequence with detailed hold/shake and fall/retry review.",
+    "reviewers": "Implementation review and independent visual reviewer",
+    "localBrowser": "Chromium startup blocked by executor socket restriction; no local browser run claimed.",
+    "followup": "A later shared CSS specificity correction changes only the standalone terminal footer button, which is hidden in this native surface and absent from these nine states. Fresh hosted comparison must validate the final candidate.",
+    "limits": "Synthetic browser/device viewports and mocked build statuses; not physical-device, child-enjoyment, paid-provider, merge or deployment acceptance."
+  },
+  "video": {
+    "file": "mind-your-jems-gameplay.webm",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "motion": "normal",
+    "source": "real browser movement, collection, bank, held spill, unheld fall and retry; mocked build statuses",
+    "sha256": "661014122ba48140ce226520cd282d21b635c050cd17556e59ac2435a0164514",
+    "durationSeconds": 42.36,
+    "framesPerSecond": 25
+  },
+  "files": [
+    {
+      "file": "desktop-idle.png",
+      "sha256": "1c9a807cc7ea95d56945ebe3b29a5f67d43900200a35f58695f4a89f4e874bbd",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "desktop-warning.png",
+      "sha256": "3929dc1f07bffeb6b2243636b2f125943a1c6c9fc080ccefe9c3be78b59d0167",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "desktop-ready.png",
+      "sha256": "9e079c8d629b03e370f793421794ab166ec2d90921f318cef64b55feb617c40d",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "tablet-portrait-idle.png",
+      "sha256": "c0f6a913f457f6bcd109f3d069e27851d636f0c330a3c2f8710bcf79bba0da84",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "tablet-portrait-warning.png",
+      "sha256": "d4133479e3196185ca95e3b8b5cba622ce31bb0a33d333e928c89e4732d5d9ee",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "tablet-portrait-ready.png",
+      "sha256": "f75faae5f84c93fbb122bb95b1a1506486cd62ebe6346752adad71bb804d93c6",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "mobile-idle.png",
+      "sha256": "a71ecd1ef42ba984b5d8b64c3472af612c7d441d04d3e6286ec4c27abf189526",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "mobile-warning.png",
+      "sha256": "aad1e949953448531913a7ed3c4a75f3d470ee54d5071a358a629b06245fbc4f",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "mobile-ready.png",
+      "sha256": "4f8a8ca604ce517f181296cf5e5a3786591b71cb314847b04219ebbae2d78488",
+      "width": 390,
+      "height": 844
+    }
+  ]
 }

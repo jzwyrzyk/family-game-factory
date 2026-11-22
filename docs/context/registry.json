@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:17:45.496Z",
-      "sourceDigest": "7f548bad2df8ae1ef968e89099544174de6ced2df49fefba6b06c8f1fd91db47",
+      "reviewedAt": "2026-11-22T16:34:10.776Z",
+      "sourceDigest": "382b71dae036f7570f4072aa4ca7306d3ec091f380f4646db0943cf7eea138bf",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the shared Help lifecycle, constrained native grid, readable narrow controls, short-landscape footer and cart-label reflow, and portrait centering against the rules and illustrated composition contract; documented current behavior without claiming corrected browser or visual acceptance.",
+      "reviewReason": "Reviewed the shared standalone terminal-button specificity correction and the native scene evidence. Documented the exact manually reviewed native baselines and the verified hosted-import path without changing gameplay rules or claiming a final visual comparison pass.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:17:45.752Z",
-      "sourceDigest": "0ba2c68bafba01e332fb932bbe6d52201007e7b0d3f57150a9190e775dc74ffe",
+      "reviewedAt": "2026-11-22T16:34:11.066Z",
+      "sourceDigest": "465a3fa1c2801c2b182af3bc164cdbf4748cd20ce1a0e2f7c1468899d656b161",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded combined TypeScript/build success and unchanged pure rules; preserved first-PR129 exact layout failures, catalogue artwork/decode coverage and all geometry/input/ownership gates. Independent review corrected resize readiness to use current viewport dimensions after both native event receipts, with bounded timeout and historical diagnostics; corrected hosted execution remains required.",
+      "reviewReason": "Verified the hosted archive and original manifest, all nine imported PNG hashes and dimensions, and the reviewed normal-motion clip. Preserved the nine historical comparison failures, functional gate, CI non-update guard and unchanged 20-channel/.008 thresholds; final candidate comparison remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T16:18:31.266Z",
-      "sourceDigest": "3559cc6fe097cef933724070099f9ca8621769c5150cb751accc7b1f3cc9aac1",
+      "reviewedAt": "2026-11-22T16:34:11.595Z",
+      "sourceDigest": "f2b6e4faddd33139b0fd1188c96fb7d16db4c8c0be75eb20af2f25bbdc2687ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled exact shared core PR128e19dd23/local a1d8d84 and native fixture repairs with first-PR129 focused/visual/Arcade results and artifact digests. Retained failed observations and downstream Studio commands that did not run. Combined build passed; the earlier 402-unit result is historical, rules are unchanged, and no unit rerun or merge/deployment is claimed.",
+      "reviewReason": "Recorded exact e314/056f source and c91940f hosted build evidence: all 13 mining configurations passed, nine old-baseline comparisons failed, reviewed captures imported, and all five full-visual jobs passed. Retained initial failures and current pending Arcade status; no local browser, merge, deployment or final comparison success is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -783,10 +783,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:22.967Z",
-      "sourceDigest": "8a0bea67cbda0c2a7c2f3e1d1112b9b3e45c92c81d295735b24b71b593cb630b",
+      "reviewedAt": "2026-11-22T16:34:11.359Z",
+      "sourceDigest": "ff4353c95423d19e35c2f9819abb3dab3d519633ff53a3eedfe9c5013d5e4402",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the feature decision and speech contracts to the documentation index and registry; reviewed their required-file, area ownership and local-link routes without weakening freshness enforcement.",
+      "reviewReason": "Corrected the main README entry-point catalogue summary to four ready-made games with mining beside Factory and a separate Original jems group. Reviewed the feature and delivery links; registry policy, coverage, documentation rules and release boundaries remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
