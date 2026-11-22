@@ -23,7 +23,7 @@ import tempfile
 import uuid
 
 PRIMITIVES_SHA = '804574895d8ab86fe270e590ecfa05fa5d4bc290'
-APPROVED_TESTED_SOURCE = 'd0e967ecd32fff3a8b7b1567ddc153c43b67747c'
+APPROVED_TESTED_SOURCE = '1a65b65928d5dca3fdc4261247861317bf9b76fb'
 DEPLOYED_SOURCE = '1996c1b382a797a6052ee1304867fdb5b620c3d3'
 DEPLOYED_COACH = 'factory-coach-private-chatready-1996c1b382a7-9c98a0'
 RELEASE_PURPOSE = 'coach-optional-reply-repair'
