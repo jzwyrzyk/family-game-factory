@@ -328,3 +328,15 @@ test('extra punctuation cannot remove a safety caveat from a moderated reply',as
  assert.equal(result.body.reply.question,null);
  assert.deepEqual(result.failures,[]);
 });
+
+test('missing required question stays malformed even when the text contains a question mark',async()=>{
+ const incompleteReply=notReady() as Record<string,unknown>;
+ incompleteReply.text='What would your paper boat do?';
+ delete incompleteReply.question;
+ const attempt=await invoke(context(),()=>incompleteReply);
+ assert.equal(attempt.status,503);
+ assert.deepEqual(attempt.body,{errorCode:'COACH_UNAVAILABLE'});
+ assert.equal(attempt.failures.length,1);
+ assert.equal(attempt.failures[0].reason,'reply_shape_invalid');
+ assert.equal(attempt.calls.filter(item=>item==='inference').length,1);
+});

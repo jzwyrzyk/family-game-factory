@@ -53,7 +53,7 @@ export function normalizePrivateCoachReply(value:unknown,context:CoachContext):u
  };
  if(typeof r.text==='string'&&r.text.includes('?')){
   r.text=keepOneQuestion(r.text);
-  r.question=null;
+  if(typeof r.question==='string'||r.question===null)r.question=null;
  }
  if(typeof r.question==='string'){
   const question=keepOneQuestion(r.question);
