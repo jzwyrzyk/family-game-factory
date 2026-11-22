@@ -1,19 +1,33 @@
-# Gem Factory
+# Jem Factory
 
-A complete, cheerful starter game: find the next gem in a pattern, route it into
+A complete, cheerful starter game: find the next jem in a pattern, route it into
 a gift, work the machines on the factory line, and choose its wrapping paper.
 It appears first
 in **Ready to Play jems**. This game has its own local play progress and does not
 depend on mining, achievements, or GemBots.
 
+**November 22, 2026 refinement:** the owner requested clearer first-time play,
+more prominent pattern matching, a sorter mounted above the hopper, a gentle
+consequence for missed cuts and faster difficulty progression. The
+[accepted decision](../decisions/2026-11-22-factory-play-clarity.md) records that
+scope. This contract describes the new behavior; execution, merge and release
+evidence belong in [delivery state](../../DELIVERY-STATE.md).
+
 ## Child-facing design
 
-The owner's latest direction is to make the illustrated factory itself the
-interface. The two buckets are directly clickable; the cutter, gem polisher and
-gift are the controls for their own actions. The former right-hand instructions,
-separate Drop/recovery controls, numbered stepper and Sort/Cut/Polish/Pack signs
-are removed. A short contextual prompt and an active-station cue explain the
-next action without covering the production line with a control panel.
+The illustrated factory itself is the interface. A larger pictured pattern is
+the primary sorting task. A transparent sorting mechanism sits above the
+hopper opening, and **Keep** and **Return** controls are attached to the green
+machine. The mechanism must not read as an opaque pop-out panel covering the
+hopper or conveyor. The candidate, ramp and receiving paths show where the jem
+will go. Keep the physical world and the visible ramp/trays aligned.
+
+The cutter, jem polisher and gift remain the controls for their own actions.
+A short contextual prompt and an active-station cue explain the next action.
+Avoid a mandatory tutorial, detached control console or repeated instructions.
+Apply [Child interface: clear at six](CHILD_INTERFACE.md): large visible labels,
+usable touch targets and a clue that fits narrow phones without horizontal
+scrolling. Readable reflow takes priority over shrinking the pictured jems.
 
 Pattern completion replaces the earlier one-to-one order match. Wrapping is an
 expressive choice: its result must remain visible on the actual gift, rather than
@@ -23,46 +37,63 @@ benefit.
 
 ## Play
 
-- Read the pictured gem sequence on the taped card and work out what belongs in
-  its **?** slot. Four to six examples establish a repeating pattern. The
-  required gem is the exact next position, not any color already in the sequence.
-- The hopper presents one candidate. Tap the actual **Order** bucket if it is
-  next in the pattern, or the actual **Return** bucket if it is a distractor.
-  This one action aims the ramp and releases the gem; there is no separate Drop
-  button. The bucket buttons also support ordinary keyboard activation.
+- Read the larger pictured jem sequence and work out what belongs in its **?**
+  slot. Six or seven examples establish the repeating rule. The required jem is
+  the exact next position, not any color already in the sequence.
+- The hopper presents one candidate. Use **Keep** if it belongs next in the
+  pattern, or **Return** if it is a distractor. Each machine control aims the
+  ramp and releases the jem in one action. Both are ordinary accessible buttons;
+  left/right keys remain available without requiring a precision lever drag.
 - Gravity, ramp contact and tray sensors determine the physical journey. One gem
-  moves at a time, and both buckets remain locked during its flight so another
+  moves at a time, and both controls remain locked during its flight so another
   tap cannot accidentally redirect it. A correct distractor return presents the
-  next candidate. A correct Order arrival fills the gap and moves the gem to the
+  next candidate. A correct Keep arrival fills the gap and moves the jem to the
   cutter.
 - A wrong bucket leaves the pattern unsolved, reduces the bounded sorting bonus
   and automatically presents that candidate for another try. It never awards
   coins or requires a separate recovery control.
-- Tap the cutter on the line as its pointer crosses the mint stripe. Every cut
-  succeeds; timing earns one, two or three stars and changes the coins awarded
-  for the packed gem.
-- Rub or hold the gem at the polisher to make it shine. Repeated activation also
+- Tap the cutter while its pointer is in the broad green middle zone, from
+  **26% through 74%** of the track. This accepts an ordinary good cut; the
+  central **38.5% through 61.5%** gives a perfect cut and the existing higher
+  packed-gift reward. The pictured zone and the checked bounds must agree.
+- A cut outside that zone briefly shows the current jem being recycled, then
+  returns to sorting for a fresh candidate. This transition uses active game
+  time, so manual and host pauses freeze it. Keep the current pattern and
+  difficulty, previously packed gifts, their paper and earned coins. A miss
+  awards nothing and never advances to polishing or completes the day. Waiting
+  without tapping is not a failure; the pointer continues to cycle.
+- Rub or hold the jem at the polisher to make it shine. Repeated activation also
   works with a keyboard or assistive technology. The physical gem is the input
   target, and its shine shows progress.
 - At the gift station, choose **hearts**, **stripes** or **stars** from the three
   paper rolls. The gift preview changes immediately. Tap the gift to wrap and
   send it; its selected paper stays visible during shipping and in the finished
   gift collection. Each gift can have a different paper.
-- Complete the day's order to reach the existing required learning activity.
-  The normal host **Next level** action opens the next day.
-- Day one introduces alternating **AB** patterns. Day two introduces **AAB**;
-  day three uses **ABC**. Later days vary the sequence and palette. A sequence
+- The default order contains **two gifts**. Complete it to reach the existing
+  required learning activity. The normal host **Next level** action opens the
+  next day. Explicit remixes can still select two through five gifts per day.
+- Pattern difficulty advances after **two completed pattern-to-gift cycles**,
+  including within longer custom orders. Only shipping the completed gift
+  counts: rejecting distractors, correcting a wrong route or repeating a cut
+  retry cannot accelerate difficulty. Preserve the current puzzle's tier while
+  retrying it and carry partial progress across days, including odd-sized orders.
+- The first tier introduces alternating **AB** patterns. The second introduces
+  **AAB**; the third uses **ABC**. Later tiers vary the sequence and palette.
+  With the default two-gift order these changes coincide with the next day.
+  A sequence
   may stop at a different position in its repeating unit, so the answer is not
   always the first color. Supplies include distractors, and an incorrect gem
-  cannot complete the gap merely by reaching Order.
+  cannot complete the gap merely by reaching Keep.
 - Sound is opt-in. Pause, reduced motion, touch cancellation, and host learning
   pauses are supported. Reduced motion removes decorative movement while the
-  essential physical sorting remains playable. Day and earned coins save
-  separately for each profile.
+  essential physical sorting remains playable. Day, earned coins and pattern
+  progression use the same profile-separated local game persistence. Preserve
+  older saved day/coin records when adding the progression field.
 
 The game exposes three real remix settings: gifts per day, cutter speed, and
 extra sparkle power. There is no shared gem currency, purchase system, network
-call, new achievement database, or new child data field.
+call or new achievement database. The progression counter is local gameplay
+state, not an educational score or a change to Math/Language difficulty.
 
 ## Artwork
 
@@ -94,19 +125,28 @@ so normal mouse/touch activation remains stable while the visual cue moves.
 
 ## Verification
 
-The updated `npm run test:gem-factory` contract plays the actual Studio starter
-at desktop, tablet and phone widths in normal motion, plus a reduced-motion
-phone pass. It checks direct bucket taps, the one-gem flight lock, actual tray
-contact, exact next-pattern acceptance, wrong-choice recovery, keyboard input,
-on-line machine actions and three visibly different wrapped gifts. It preserves
-pointer-cancellation, both pause paths, required learning, next-day progression,
-profile isolation, persistence and scene-coverage checks. Captures go to
+The November 22 candidate requires the actual Studio starter browser contract,
+`npm run test:gem-factory`, at desktop, tablet and phone widths, with a narrow
+phone layout and reduced-motion coverage. Retain actual tray contact, exact
+next-pattern acceptance, the one-jem flight lock, wrong-route recovery,
+keyboard/touch input, pointer cancellation, both pause paths, required learning,
+profile isolation and scene coverage. Exercise all three paper previews even
+though a default day now ships only two gifts. Captures go to
 `test-results/gem-factory/`; the visual-review workflow retains them as
 `gem-factory-gameplay`.
 
-That browser contract has been updated for this redesign; its presence is not a
-claim that it has run successfully. Current interactive Site verification and
-executed source checks must be reported separately in the delivery receipt.
+The new acceptance cases are deliberate out-of-zone cuts, paused recovery,
+successful retry, preservation of an already packed gift and its coins/paper,
+and progression after two completed cycles. Include longer and odd-sized custom
+orders so changing **gifts per day** cannot silently slow, repeat or regress the
+pattern tier. Inspect the composed clue, candidate, physical sorter and machine
+controls together, including at narrow phone widths. Code must check the same
+cut bounds that the interface depicts.
+
+These are acceptance requirements, not an assertion of successful execution.
+Report exact source checks, reviewed captures and any live-site verification
+separately in the delivery receipt. The earlier captures below predate this
+overhaul and do not establish its layout or behavior.
 
 `tests/gem-factory-physics.test.ts` separately checks route differences for the
 same released gem, a mid-flight tilt, collisions between live gems, fixed-step
@@ -123,7 +163,7 @@ also supports pixel, flat 2D, dimensional and realistic games without copying
 this room, palette or mascot into every game. Child-uploaded artwork remains a
 separate future task.
 
-## Current Gem companion
+## Preserved companion artwork — earlier verification
 
 The actual Site preview loaded the exact 1254 × 1254 transparent master and
 was visually checked with the new helper anchored beside the existing hint.

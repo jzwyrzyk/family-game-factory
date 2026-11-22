@@ -49,6 +49,7 @@ import './presentation-quality.test';
 import './quality-pipeline.test';
 import './gem-factory-physics.test';
 import './gem-factory-pattern.test';
+import './gem-factory-cut.test';
 import './parent-privacy.test';
 
 import './parent-privacy-paid.test';

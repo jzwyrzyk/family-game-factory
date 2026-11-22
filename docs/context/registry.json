@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
+      "reviewedAt": "2026-11-22T15:14:06.030Z",
+      "sourceDigest": "f8f655f11445fad1e1c586e4bd8eedbc0b6e617821be7d7d34977229a121ab90",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewReason": "Recorded the owner-requested Factory refinement in doctrine and its accepted decision: clearer pattern focus, machine controls, gentle failed cuts and two completed gifts per pattern tier.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:11.591Z",
-      "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
+      "reviewedAt": "2026-11-22T15:16:01.503Z",
+      "sourceDigest": "3d23f6d67a303896cae2710d399a436f0c6068e933629c4fd0cc35bea84a8c50",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+      "reviewReason": "Reviewed final Factory geometry and copy including medium-width candidate/HUD separation, readable mounted controls, contained paper tray and a single cutter prompt, plus progression persistence and current-jem recovery; artwork and learning ownership remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T19:43:59.746Z",
-      "sourceDigest": "5fd2ff6f7a8fb7ca4e6df5ed7089cfac005ea70cf53dee915547c8aedbea0810",
+      "reviewedAt": "2026-11-22T15:14:06.571Z",
+      "sourceDigest": "2e522a95e912cb6d0b605f83bb384dce273e896d98db0df2a1bdd2829535ea81",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the observed exact-tree tablet Add Bottle failure and strengthened the one-real-tap test with a bounded trusted-activation receipt, unchanged blueprint/capability assertions and bounded failure evidence; local harness/review are distinct from pending Chromium CI and the unproved historical cause.",
+      "reviewReason": "Reviewed focused cutoff, pattern and config tests plus the real host journeys and native custom-order fixture; documentation distinguishes passing local Node checks from pending hosted browser and screenshot acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T19:44:00.253Z",
-      "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+      "reviewedAt": "2026-11-22T15:14:06.857Z",
+      "sourceDigest": "dbf3ffe2ba970e4bb9ee643b52c65ff27536c382ed4d509147ef5dd6c13660cf",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified.",
+      "reviewReason": "Recorded this isolated browser-only Factory candidate on b4734b1, local verification scope, blocked local Chromium launch, pending hosted captures and PR125 integration overlap without claiming merge or deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

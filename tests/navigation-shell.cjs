@@ -132,7 +132,7 @@ async function shellJourney(browser, base, viewport) {
     await page.locator('#page-parent').waitFor({ state: 'visible' });
     await navigate(page, '#studioNavHome');
     await page.locator('[data-starter="factory"]').click();
-    await page.waitForFunction(() => window.FG.runtime.snapshot()?.config.orderSize === 3);
+    await page.waitForFunction(() => window.FG.runtime.snapshot()?.config.orderSize === 2);
     if (viewport.width <= 760) {
       assert.equal(await page.locator('.studio-shell-navigation').evaluate(element => getComputedStyle(element).position), 'static',
         'navigation returns to header flow for game and work controls');
