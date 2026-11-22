@@ -117,6 +117,24 @@ function visualFixture(){
  const events=page=>page.evaluate(()=>[...window.__jemsMilestones,...window.__jemsRewardPopups]);
  const levelEventCount=async(page,level)=>(await events(page)).filter(event=>event.kind==='reward-popup'&&event.rewardIds.includes(`maker.milestone:level%3A${level}`)).length;
  const waitForLevelPopup=(page,level)=>page.waitForFunction(level=>window.__jemsRewardPopups.some(popup=>popup.rewardIds.includes(`maker.milestone:level%3A${level}`)),level);
+ const waitForLevelGrant=async(page,level)=>{
+  await page.waitForFunction(async level=>{
+   const owner=FG.store.current().id,summary=await FG.rewards.summary();
+   return summary.recentGrants.some(grant=>grant.id===`maker.milestone:level%3A${level}`)&&
+    !(FG.studio.exportNotebook().rewardOutbox||[]).some(fact=>fact.owner===owner&&fact.kind==='maker.milestone'&&fact.level===level);
+  },level);
+  const summary=await page.evaluate(()=>FG.rewards.summary());
+  const grants=summary.recentGrants.filter(grant=>grant.id===`maker.milestone:level%3A${level}`);
+  assert.equal(grants.length,1,'the earned level has one committed receipt');
+  assert.equal(grants[0].amount,({1:5,2:10,3:20,4:40})[level],'presentation changes preserve the ordinary milestone amount');
+  return summary;
+ };
+ const assertQuietPlay=async(page,level)=>{
+  await page.waitForFunction(()=>document.body.classList.contains('studio-playing'));
+  await page.waitForTimeout(300); // Cross the actual 180ms reward batching window.
+  assert.equal(await page.locator('#jemsRewardCelebrations, #jems-delight-host').evaluateAll(hosts=>hosts.reduce((count,host)=>count+host.childElementCount,0)),0,'earned progress cannot cover fitted game controls');
+  assert.equal(await levelEventCount(page,level),0,'the suppressed milestone never creates a transient reward popup');
+ };
  const noOverflow=async page=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'layout fits the viewport without horizontal scrolling');
  const assertRankThumbnail=async(locator,character,level)=>{
   const actual=await locator.evaluate(tile=>({
@@ -317,6 +335,53 @@ function visualFixture(){
    console.log('PASS native cross-document storage: Rewards/header, neutral restore, focus and reward isolation');
   }
 
+  // A saved, schema-valid source outbox can be recovered on Home. The real
+  // projector produces its ordinary receipt and non-play presentation; these
+  // fixtures do not claim that loading historical work is a new accomplishment.
+  // Keep below separately proves the actual child workflow stays quiet in play.
+  for(const [level,character,projects] of [[3,null,1],[4,'nova',3]]){
+   const initial=memoryNotebook();
+   for(const owner of ['player1','player2','player3'])initial.dismissWelcome(owner);
+   if(character)initial.setAvatar('player1',character);
+   const {page,context,errors}=await newPage({fixture:initial.read()});
+   await page.evaluate(()=>FG.rewards.refresh());
+   assert.equal((await page.evaluate(()=>FG.rewards.summary())).lifetimeGems,0);
+   const pending=memoryNotebook(await notebook(page));
+   for(let index=0;index<projects;index++)polishedFixture(pending,'player1','Recoverable project '+(index+1));
+   const source=validateNotebook(pending.read());
+   assert.ok(source.rewardOutbox.some(fact=>fact.kind==='maker.milestone'&&fact.level===level));
+   await page.evaluate(async({key,data})=>{
+    localStorage.setItem(key,JSON.stringify(data));
+    await FG.rewards.refresh({celebrate:true});
+   },{key:STUDIO_KEY,data:source});
+   await waitForLevelPopup(page,level);
+   const projected=await waitForLevelGrant(page,level);
+   assert.equal(await levelEventCount(page,level),1,'recovering a saved outbox presents its newly committed milestone once on Home');
+   assert.equal(await page.locator('#page-studio-library').isVisible(),true);
+   assert.equal(await page.evaluate(()=>document.body.classList.contains('studio-playing')),false);
+   const popup=page.locator(`.jems-rewards-toast[data-maker-level="${level}"]`);
+   await assertRankThumbnail(popup.locator('.jems-rank-thumbnail'),character,level);
+   assert.equal(await popup.locator('.jems-gem-art').count(),character?0:1,'a legacy unselected maker keeps neutral reward art until choosing a character');
+   assert.equal(await page.locator('.jems-rewards-toast-host').evaluate(element=>getComputedStyle(element).pointerEvents),'none');
+   assert.equal(await popup.getAttribute('aria-live'),'polite');
+   assert.equal(await page.locator('.jems-delight-sparks').count(),0);
+   assert.equal(await popup.evaluate(element=>getComputedStyle(element).animationName),'none');
+   if(level===4){
+    assert.equal(await popup.locator('.jems-rank-thumbnail').evaluate(tile=>Math.round(tile.getBoundingClientRect().width)),96,'the approved compact Master popup tile is 96px');
+    await popup.screenshot({path:'test-results/jems-gem-master-toast.png'});
+    await openJourney(page);await assertLevel(page,4);
+    await page.screenshot({path:'test-results/jems-journey-master-popup.png',fullPage:true});
+   }
+   await page.evaluate(async()=>{await FG.rewards.refresh({celebrate:true});await FG.rewards.refresh({celebrate:true});});
+   assert.deepEqual(await page.evaluate(()=>FG.rewards.summary()),projected,'re-reading the recovered source cannot change its total or receipts');
+   assert.equal(await levelEventCount(page,level),1,'the consumed recovery outbox cannot replay a milestone');
+   await page.reload();await page.waitForFunction(()=>window.FG?.rewards&&window.FG?.studio);
+   await page.evaluate(()=>FG.rewards.refresh());
+   assert.deepEqual(await page.evaluate(()=>FG.rewards.summary()),projected);
+   assert.deepEqual(await events(page),[],'recovered rewards remain quiet on reload');
+   assert.deepEqual(errors,[]);await context.close();
+  }
+
   // Actual creation workflow. Keep must credit the exact reflected experiment;
   // repeated views, reloads and character choices never replay that transition.
   {
@@ -370,22 +435,18 @@ function visualFixture(){
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'polished');
    assert.ok(session.keptExperiments.some(kept=>kept.experimentId===testId&&kept.baseId===baseId));
-   await waitForLevelPopup(page,3);
-   assert.equal(await levelEventCount(page,3),1,'one polished-level popup for the exact verified keep');
-   const polishedPopup=page.locator('.jems-rewards-toast[data-maker-level="3"]');
-   await assertRankThumbnail(polishedPopup.locator('.jems-rank-thumbnail'),null,3);
-   assert.equal(await polishedPopup.locator('.jems-gem-art').count(),1,'a legacy unselected maker sees a neutral reward until they choose a character');
-   assert.equal(await page.locator('.jems-rewards-toast-host').evaluate(element=>getComputedStyle(element).pointerEvents),'none');
-   assert.equal(await polishedPopup.getAttribute('aria-live'),'polite');
-   assert.equal(await page.locator('.jems-delight-sparks').count(),0);
-   assert.equal(await polishedPopup.evaluate(element=>getComputedStyle(element).animationName),'none');
+   const polishedRewards=await waitForLevelGrant(page,3);
+   await assertQuietPlay(page,3);
    await page.click('#studioChange');await page.fill('#studioPrompt','An idea to try when I come back');
    await openJourney(page);await assertLevel(page,3);
    assert.equal((await notebook(page)).sessions.find(session=>session.game==='gum').draft,'An idea to try when I come back','opening the journey flushes the unfinished draft');
    assert.equal(await page.evaluate(()=>FG.runtime.snapshot().disposed),true,'the dedicated journey safely disposes the game');
-   assert.equal(await levelEventCount(page,3),1);
+   assert.equal(await levelEventCount(page,3),0,'opening Journey does not replay the in-play milestone');
+   assert.deepEqual(await page.evaluate(()=>FG.rewards.summary()),polishedRewards,'Journey keeps the full earned total and receipt history');
+   await assertRankThumbnail(page.locator('[data-journey-level="3"] .jems-rank-thumbnail'),null,3);
    await page.reload();await page.waitForFunction(()=>window.FG?.studio);await openJourney(page);
    assert.deepEqual(await events(page),[],'reload is not an accomplishment');
+   assert.deepEqual(await page.evaluate(()=>FG.rewards.summary()),polishedRewards);
 
    // Add one schema-validated historical project as a test fixture, then earn
    // the third polished project by using the real Hill preview and notes UI.
@@ -409,25 +470,23 @@ function visualFixture(){
    await assertRankThumbnail(page.locator('.jems-delight-toast .jems-rank-thumbnail'),'nova',3);
    assert.equal(await page.locator('.jems-delight-toast').getAttribute('data-kind'),'gem-cut','a second project Cut event keeps the already earned Polisher outfit');
    await page.click('#studioCloseVersions');await page.click('#studioKeep');
-   await waitForLevelPopup(page,4);
-   assert.equal(await levelEventCount(page,4),1,'the third distinct polished project shows one committed Gem Master popup');
+   const masterRewards=await waitForLevelGrant(page,4);
+   await assertQuietPlay(page,4);
    assert.equal((await earned(page)).level,4);
-   const masterPopup=page.locator('.jems-rewards-toast[data-maker-level="4"]');
-   await assertRankThumbnail(masterPopup.locator('.jems-rank-thumbnail'),'nova',4);
-   assert.equal(await masterPopup.locator('.jems-rank-thumbnail').evaluate(tile=>Math.round(tile.getBoundingClientRect().width)),96,'the approved compact popup tile is 96px');
    await openJourney(page);await assertLevel(page,4);
-   await masterPopup.screenshot({path:'test-results/jems-gem-master-toast.png'});
-   await page.screenshot({path:'test-results/jems-journey-master-popup.png',fullPage:true});
+   await assertRankThumbnail(page.locator('[data-journey-level="4"] .jems-rank-thumbnail'),'nova',4);
    await preview(page,'jems-journey-master-preview');
-   assert.equal(await levelEventCount(page,4),1);
+   assert.equal(await levelEventCount(page,4),0,'Journey does not replay the in-play Master milestone');
+   assert.deepEqual(await page.evaluate(()=>FG.rewards.summary()),masterRewards);
    await page.click('#jemsChangeCharacter');await page.click('[data-journey-character="spark"]');
-   assert.equal(await levelEventCount(page,4),1,'a cosmetic change cannot re-award Master');
+   assert.equal(await levelEventCount(page,4),0,'a cosmetic change cannot replay or re-award Master');
    assert.equal(await page.locator('.jems-rewards-toast,.jems-delight-toast').count(),0,'changing character clears any prior-human celebration without replay');
    await assertVisibleMaker(page,'spark');
    await profiles(page,1);await openJourney(page);await assertLevel(page,0);
    assert.equal(await page.locator('#jemsJourneyCharacters').getAttribute('data-character'),'none');
    await profiles(page,0);await openJourney(page);await assertLevel(page,4);
-   assert.equal(await levelEventCount(page,4),1,'switching back to a recent Master does not replay its popup');
+   assert.equal(await levelEventCount(page,4),0,'switching back to a recent Master does not replay its popup');
+   assert.deepEqual(await page.evaluate(()=>FG.rewards.summary()),masterRewards,'profile changes preserve the exact earned Master receipts');
 
    // Putting a project away preserves its real history; clearing the current
    // chat removes its exact keep receipts without deleting the working game.
@@ -468,12 +527,12 @@ function visualFixture(){
    await page.evaluate(()=>FG.rewards.refresh());
    assert.equal((await page.evaluate(()=>FG.rewards.summary())).lifetimeGems,gemsBeforeClear,'The disclosed lifetime rewards survive clearing chat');
    await openJourney(page);await assertLevel(page,3);
-   assert.equal(await levelEventCount(page,4),1);
+   assert.equal(await levelEventCount(page,4),0);
    assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills)),learning,'cosmetic progression never changes learning records');
    assert.deepEqual(network,[],'this local workflow never starts a paid build');
    assert.deepEqual(errors,[]);await context.close();
   }
-  console.log('PASS gem journey: four illustrated stages, empty state, owner-isolated persistent characters, storage failures, preview honesty, real reflection/keep/Master, no replay, archive/clear, accessible modal, responsive layouts and reduced motion');
+  console.log('PASS gem journey: four illustrated stages, empty state, owner-isolated persistent characters, storage failures, preview honesty, real reflection/keep/Master with quiet play, recovered Home reward artwork, no replay, archive/clear, accessible modal, responsive layouts and reduced motion');
  }finally{
   try{await browser?.close();}
   finally{await new Promise(resolve=>server.close(resolve));}

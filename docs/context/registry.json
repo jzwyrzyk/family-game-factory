@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:26:18.310Z",
-      "sourceDigest": "15185a6db02feb7bf9b6b3fd975a4015c60941f6fe5cb6b6291854107e247013",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the captured normal-motion saturation transition and isolated contrast sampler repair; native gameplay, CSS, art and controls are unchanged, while unknown rendering and 4.5:1 contrast remain failing gates and fresh 13-of-13 evidence is still required.",
+      "reviewedAt": "2026-11-22T19:53:31.357Z",
+      "sourceDigest": "6ed944334ed1f79a785c987f2fdc0d4d505a09588f1bf5b251d38f233634317a",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed native Mining holding and shaking actions after the 360px capture exposed footer overflow; documented wrapping at unchanged 18px text and 48px targets, with original rules and artwork preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:34:37.244Z",
-      "sourceDigest": "ff5c30fb507d550ccad50fa38406d5534f1a8aad5dfc7683a3b1c086c0575403",
+      "reviewedAt": "2026-11-22T19:53:31.896Z",
+      "sourceDigest": "1b98c3063aeaab44f8af7d854dfdeff856de9ed2dc1dca95d4061d66246ba75c",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved seven-route exact menu identities and saturation math checks; added visible-overlay assertions to all Mining and fitted-player cases plus real-grant retention and no-replay journeys. Existing Home/Lab celebration and reward ownership assertions remain.",
+      "reviewReason": "Reviewed disabled-action geometry and the real Keep reward fixture against clear fitted play; retained genuine Home outbox recovery artwork, accessibility, grant and replay assertions, with fresh hosted evidence still required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:34:37.492Z",
-      "sourceDigest": "f7ab0839af08253b0cbcb87bbab13c36e9a03a614e83f8c708def261b7cd141b",
+      "reviewedAt": "2026-11-22T19:53:32.425Z",
+      "sourceDigest": "99d8788ab7ae757a97fac393db3dcf772181f96c6b1e3af9e68269abd487ca20",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified third-candidate captures, complete40-plus5 viewport/lifecycle and later voice/continuity passes, remaining downstream legacy coverage, normal-motion reward obstruction, and the changed follow-up requiring new hosted evidence.",
+      "reviewReason": "Recorded exact fourth-candidate hosted outcomes, artifact digests and the two remaining corrections without treating failed fixtures or unaccepted native references as a passing release gate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

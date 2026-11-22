@@ -58,9 +58,12 @@ async function geometry(journey,device,review){
   return {phase:dialog.dataset.phase,viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
    feedback,cosmeticToasts,speech:speechStyle.display!=='none'&&Number(speechStyle.opacity)>0?{...rect(speech),eyes}:null,
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
-   targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {
+   targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2),copy=element.querySelector('span');return {
     label:element.getAttribute('aria-label')||element.textContent.trim(),...box,enabled:!element.disabled,
     reachable:hit===element||element.contains(hit),crystal:element.hasAttribute('data-crystal'),
+    action:element.matches('.myj-action'),fontSize:parseFloat(getComputedStyle(element).fontSize),
+    textFits:element.scrollWidth<=element.clientWidth+1&&element.scrollHeight<=element.clientHeight+1&&
+     (!copy||(copy.scrollWidth<=copy.clientWidth+1&&copy.scrollHeight<=copy.clientHeight+1)),
     colors:!element.disabled&&element.matches('.myj-action,.myj-native-tools button,[data-myj="help-done"]')?colors(element):null};})};
  });
  for(const target of details.targets)target.contrast=target.colors?filteredContrast(target.colors):null;
@@ -72,6 +75,9 @@ async function geometry(journey,device,review){
  assert.ok(details.stage.height>=Math.min(300,device.viewport.height*.46),device.name+' gives the illustrated play area useful space');
  for(const target of details.targets){
   assert.ok(target.width>=43.5&&target.height>=43.5,device.name+' target is at least 44px: '+target.label);
+  if(target.action)assert.ok(target.height>=48&&target.fontSize>=18&&target.textFits&&
+   target.x>=details.dialog.x&&target.right<=details.dialog.right&&target.y>=details.dialog.y&&target.bottom<=details.dialog.bottom,
+   device.name+' '+details.phase+' action stays fully readable and inside the game even when disabled: '+JSON.stringify(target));
   if(target.enabled){
    assert.ok(target.reachable,device.name+' available control is not covered: '+target.label);
    const visibleWidth=Math.min(target.right,details.viewport.width)-Math.max(target.x,0),visibleHeight=Math.min(target.bottom,details.viewport.height)-Math.max(target.y,0);
@@ -171,10 +177,12 @@ async function exercise(journey,device,review){
  await capture('warning');await journey.activate(arcade.locator('[data-myj="grab"]'));
  assert.equal(await arcade.getAttribute('data-holding'),'true');
  assert.equal(await arcade.locator('.myj-miner').getAttribute('data-pose'),'holding');
+ await geometry(journey,device,review);
  await capture('holding');await journey.phase('shaking');
  assert.equal(await journey.score('banked'),13,'banked Jems survive shaking');
  assert.equal(await journey.score('loose'),0,'holding protects the miner, not loose cargo');
  assert.equal(await arcade.locator('.myj-miner').getAttribute('data-pose'),'holding');
+ await geometry(journey,device,review);
  await capture('shaking');await journey.phase('mining');
  if(device.name==='desktop'||device.name==='mobile-motion'){
   await mine(3);await journey.advance(450);await journey.phase('warning');await journey.phase('shaking');
