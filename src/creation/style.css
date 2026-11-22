@@ -74,7 +74,8 @@
 /* The workspace owns the viewport; only the coding dock and disclosed tools
    scroll. The stage and the exits cannot be swiped off the page. */
 body.creation-editing { overflow:hidden; overscroll-behavior:none; }
-body.creation-editing>.site-header,body.creation-editing>footer { display:none!important; }
+/* The shared navigation header can be wrapped by the studio shell; its high stacking context must not cover the editor exits. */
+body.creation-editing .site-header.studio-practice-navigation,body.creation-editing>footer { display:none!important; }
 #page-creation.has-scene { position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; max-width:none; padding:10px max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); background:radial-gradient(ellipse at 5% 0,#ebe3ff,transparent 50%),#f6f8fd; overflow:hidden; }
 #page-creation.has-scene .creation-heading { flex:none; gap:12px; margin:0 0 8px; }
 #page-creation.has-scene .creation-heading h1 { font-size:24px; letter-spacing:-.5px; }
@@ -90,7 +91,8 @@ body.creation-editing>.site-header,body.creation-editing>footer { display:none!i
 .creation-more-content>button { width:100%; justify-content:flex-start; white-space:normal; text-align:left; }
 .creation-save-state { color:#315b48; padding:4px; }
 .creation-source { display:flex; flex-wrap:wrap; gap:8px; padding:12px; background:#f2effb; border-radius:12px; color:#4a3968; }
-#creationGuideSlot :is(p,button,summary,span) { font-size:18px!important; }
+#creationGuideSlot :is(p,button,summary,span),#creationPracticeGuideSlot :is(p,button,summary,span) { font-size:18px!important; }
+#page-creation .jems-guide-card .jems-guide-copy h2 { font-size:20px!important; }
 .creation-recovery { flex:none; display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:12px; margin-bottom:10px; border:2px solid #d4a44f; border-radius:14px; background:#fff4da; color:#533c18; }
 .creation-workspace-grid { flex:1; min-height:0; min-width:0; display:grid; grid-template-rows:minmax(0,1fr) minmax(255px,.46fr); gap:12px; }
 .creation-stage-column { min-width:0; min-height:0; }
