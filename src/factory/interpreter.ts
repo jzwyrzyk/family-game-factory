@@ -89,6 +89,7 @@ export function interpret(game: GameId, current: Mechanics, prompt: string): Int
   } catch (err) { return { kind: 'invalid', message: (err as Error).message + ' Your last working version is safe.' }; }
 }
 export const examples: Record<GameId, string[]> = {
+  mining: [],
   factory: ['Make the cutter slower','Add extra sparkles','Pack 4 gems per order','Make the cutter faster and add extra sparkles'],
   moon: ['Give me 8 donuts','Add bounce pads','Make moon gravity lower','Add bounce pads and make meteors faster'],
   robot: ['Make robot faster','Add portals','Show my path','Add portals and make robot slower'],

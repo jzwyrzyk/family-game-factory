@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
 const { exploreWelcome } = require('./studio-entry.cjs');
+const { openSavedNative } = require('./saved-native-fixture.cjs');
 
 async function checkFrame(page, label) {
   // Await a mount and the controller's resize frame, never eventual correctness.
@@ -64,7 +65,14 @@ async function insideHost(page, selector, label, minHeight = 1) {
 }
 
 async function checkGameContent(page, game, label) {
-  if (game === 'factory') {
+  if (game === 'mining') {
+    await page.locator('.native-mining[data-assets="ready"]').waitFor();
+    await insideHost(page, '.native-mining .myj-stage', label + ' illustrated mine', 140);
+    await insideHost(page, '.native-mining .myj-action', label + ' mining controls', 48);
+    await insideHost(page, '.native-mining .myj-miner-anchor', label + ' visible miner', 48);
+    await insideHost(page, '.native-mining .myj-cart-hit', label + ' safe bucket', 48);
+    assert.equal(await page.locator('dialog.myj-arcade[open]').count(),0,'mining uses the shared game frame');
+  } else if (game === 'factory') {
     await insideHost(page, '.gf-world', label + ' factory scene', 140);
     await insideHost(page, '.gf-sort-basket', label + ' sorting buttons', 48);
   } else if (game === 'gum') {
@@ -319,10 +327,13 @@ async function checkPlayerMenu(page, label) {
         // case below resets it and uses the actual learning host.
         await page.evaluate(() => { FG.store.current().mathWindow = [Date.now()]; FG.store.current().rate = 1; FG.store.save(); });
         let canContinue = true;
-        for (const game of ['factory', 'gum', 'hill', 'buckets', 'dragon', 'moon', 'robot']) {
+        for (const game of ['factory', 'mining', 'gum', 'hill', 'buckets', 'dragon', 'moon', 'robot']) {
           try {
-            await page.locator(`[data-starter="${game}"]`).scrollIntoViewIfNeeded();
-            await page.locator(`[data-starter="${game}"]`).click();
+            if(game==='moon'||game==='robot')await openSavedNative(page,game);
+            else {
+              await page.locator(`[data-starter="${game}"]`).scrollIntoViewIfNeeded();
+              await page.locator(`[data-starter="${game}"]`).click();
+            }
             await checkFrame(page, `${device} ${game}`);
             if (game === 'dragon') await checkDragonIntro(page, `${device} ${game}`);
             await checkGameContent(page, game, `${device} ${game}`);

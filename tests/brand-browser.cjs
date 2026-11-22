@@ -74,7 +74,7 @@ async function currentNavigation(page,id){
    const title=await page.title();assert.match(title,/^jems/);
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
-   assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
+   assert.equal(await page.locator('#studioStarters [data-starter]').count(),4);
    // Keep three primary actions in one row, every secondary route in the drawer,
    // and the selected maker clear of home actions even at a narrow 320px width.
    if(label==='mobile'){

@@ -238,7 +238,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       button.hidden = false;
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       resize(); scheduleResize();
-      host.focus({ preventScroll: true });
+      (host.querySelector<HTMLElement>('[data-game-entry-focus]') || host).focus({ preventScroll: true });
     },
     leave() {
       if (!active) return;

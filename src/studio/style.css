@@ -237,6 +237,12 @@ body.studio-review>.notice{color:#f7f5ff}
 .studio-art-dragon{background:linear-gradient(145deg,#eee1ff,#d9d3ff)}
 .studio-art-moon{background:linear-gradient(145deg,#dadfff,#e6e4fc)}
 .studio-art-robot{background:linear-gradient(145deg,#daf5e8,#d3edfa)}
+.studio-mining-preview{isolation:isolate;background:#b7e2f4}
+.studio-mining-preview .studio-mining-sky{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.studio-mining-preview .studio-mining-rock{position:absolute;left:12%;top:12%;width:62%;aspect-ratio:1;overflow:hidden}
+.studio-mining-preview .studio-mining-miner{position:absolute;left:25%;top:0;width:27%;aspect-ratio:1;overflow:hidden}
+.studio-mining-preview .studio-mining-rock img,.studio-mining-preview .studio-mining-miner img{position:absolute;left:0;top:0;width:200%;max-width:none;height:200%}
+.studio-mining-preview .studio-mining-cart{position:absolute;right:4%;bottom:5%;width:30%;height:auto}
 .studio-game-art::before{content:'';position:absolute;left:-39px;top:-90px;width:220px;height:220px;border-radius:50%;border:1px solid #ffffff9c;pointer-events:none}
 .studio-game-art::after{content:'';position:absolute;right:-60px;bottom:-135px;width:220px;height:220px;border-radius:50%;border:1px solid #ffffffac;pointer-events:none}
 .studio-game-art .quality-card-art{width:100%;height:100%;min-height:100%;object-fit:cover;border-radius:0;display:block;position:relative;z-index:1}

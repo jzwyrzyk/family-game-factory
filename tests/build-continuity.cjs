@@ -125,12 +125,12 @@ async function stayAfterBuild(page,phase){
     await switchProfile(page,0);
     assert.equal(await page.evaluate(()=>FG.store.current().id),owner);
     await page.waitForSelector('#studioBuildShelf:not([hidden])');
-    await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot');
+    await page.click('[data-starter="mining"]');await page.waitForSelector('.native-mining[data-assets="ready"]');
     const current=await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]);
     assert.notEqual(current,initial);
     state='ready';
     await page.waitForFunction(id=>FG.studio.exportNotebook().sessions.find(s=>s.id===id)?.job?.status==='ready',initial,{timeout:10000});
-    assert.equal(await page.locator('.favorite-robot .favorite-canvas').isVisible(),true,'completion did not replace the game being played');
+    assert.equal(await page.locator('.native-mining .myj-stage').isVisible(),true,'completion did not replace the game being played');
     assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'no preview automatically opened');
     assert.equal(previewRequests,0);
     await page.locator('#studioMore > summary').filter({hasText:'ready'}).waitFor({state:'visible'});

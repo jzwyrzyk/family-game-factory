@@ -7,7 +7,7 @@ import {installGemJourney, createJourneyGem, createJourneyRankThumbnail} from '.
 import {createMakerIdentity} from '../brand/maker-identity';
 import {installStudioNavigation} from './navigation';
 import {iconMarkup, createIcon, setIconLabel, type IconName} from '../brand/icons';
-import {createMindYourJems, type WorkshopStatus} from '../games/mind-your-jems';
+import {PREMADE_GAMES,ORIGINAL_GAMES,isRetiredStarter} from './catalogue';
 import {installStudioVoice} from './voice';
 import {installStudioPrivateSpeech} from './private-speech';
 import {createReadAloudControl} from '../speech/read-aloud-control';
@@ -59,8 +59,8 @@ import './guided-creation.css';
 const $ = <T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el = (tag:string, className='', text='')=>{const n=document.createElement(tag);n.className=className;n.textContent=text;return n;};
 const iconEl=(tag:string,className:string,name:IconName,label:string,iconClass='')=>{const target=el(tag,className);setIconLabel(target,name,label,iconClass);return target;};
-const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',moon:'🌙',robot:'🤖',factory:'💎',new:'✨'};
-const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',moon:'Moon Donut Dash',robot:'Robot Route Lab',factory:'Gem Factory',new:'A brand-new idea'};
+const icon:Record<StudioSession['game'],string>={gum:'🚀',hill:'🚙',buckets:'🪣',dragon:'🐉',moon:'🌙',robot:'🤖',factory:'💎',mining:'💎',new:'✨'};
+const names:Record<StudioSession['game'],string>={gum:'Bubble Gum Builders',hill:'Junkyard Rally',buckets:'Splash or Pass',dragon:'Dragon Island Rescue',moon:'Moon Donut Dash',robot:'Robot Route Lab',factory:'Gem Factory',mining:'Mind Your Jems!',new:'A brand-new idea'};
 const busy=(s:StudioSession)=>!!s.job&&['queued','building','testing'].includes(s.job.status);
 const human=(v:number|boolean)=>typeof v==='boolean'?(v?'On':'Off'):String(v);
 // Unknown responses and test fixtures never verify a real generated experiment.
@@ -117,8 +117,8 @@ export async function installStudio(){
  let guideSignature='',currentGuide:GuideCard|null=null;
  let welcomeArt:{owner:string;hasArt:boolean;pending:Promise<void>|null;deferredView:number|null}|null=null;
  let pausedForTools=false,viewIntent=0;
- // Local arcade state never owns build readiness, saved games or learning evidence.
- const waitArcade=createMindYourJems();
+ // The game being built remains separate from the native game played while waiting.
+ // This binding is transient; the notebook remains the authority for each job.
  let waitProject:{id:string;owner:string}|null=null;
  const buildAttempts=new Map<string,BuildHandoffIdentity>();
  const handoff=createBuildHandoff({
@@ -258,6 +258,10 @@ export async function installStudio(){
  const savedIdeas=iconEl('button','studio-button','grid','Saved ideas & drawings') as HTMLButtonElement;
  savedIdeas.id='studioSavedIdeas';savedIdeas.type='button';savedIdeas.onclick=()=>act(openSavedIdeas);
  libraryTools.append(savedIdeas);library.querySelector('#studioFavoritesSection')!.after(libraryTools);
+ const originals=el('section','studio-home-favorites');originals.id='studioOriginalsSection';
+ originals.setAttribute('aria-labelledby','studioOriginalsTitle');
+ originals.innerHTML='<div class="studio-section-heading"><h2 id="studioOriginalsTitle">Original jems</h2></div><div id="studioOriginals" class="studio-library-grid"></div>';
+ library.querySelector('#studioFavoritesSection')!.after(originals);
  const collectionBack=iconEl('button','studio-button','arrow','My Games','jems-icon--back') as HTMLButtonElement;
  collectionBack.id='studioCollectionBack';collectionBack.type='button';collectionBack.onclick=()=>act(home);
  $('page-creations').querySelector('.page-head')!.prepend(collectionBack);
@@ -427,53 +431,41 @@ export async function installStudio(){
  const buildShelf=el('aside','studio-build-shelf');buildShelf.id='studioBuildShelf';
  buildShelf.setAttribute('aria-label','Background game builds');buildShelf.hidden=true;globalStatus.after(buildShelf);
 
- function playWhileBuilding(s:StudioSession){
+ async function playWhileBuilding(s:StudioSession){
   if(owner()!==s.owner||guardMath())return;
   const latest=notebook.get(s.id,s.owner),ready=readyExperiment(latest);
   if(!latest.job||(!busy(latest)&&!ready))return;
-  stopSpeech();flushDraft();handoff.close();++viewIntent;
-  if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;render();}
-  waitProject={id:s.id,owner:s.owner};
-  waitArcade.open({
-   projectName:s.name,status:unknownJobs.has(s.id)?'reconnecting':latest.job.status as WorkshopStatus,
-   isReady:!!ready,
-   onClose:()=>{waitProject=null;if(activeId&&owner()===s.owner&&route==='studio')render();},
-   onBackToStudio:()=>act(async()=>{
-    if(owner()!==s.owner)return;
-    await open(s.id,false);
-    if(owner()===s.owner&&activeId===s.id&&route==='studio')setTab('talk');
-   }),
-   onPlayReady:()=>act(async()=>{
-    if(owner()!==s.owner)return;
-    const fresh=notebook.get(s.id,s.owner),candidate=readyExperiment(fresh);
-    if(!candidate?.candidate.remoteId)return;
-    await open(s.id,false);
-    const newest=notebook.get(s.id,s.owner),selected=readyExperiment(newest);
-    if(selected?.candidate.remoteId)await showRemote(newest,selected.candidate.remoteId,'candidate',selected.id);
-   })
-  });
+  stopSpeech();flushDraft();handoff.close();
+  await start('mining');
+  if(owner()!==s.owner||route!=='studio'||!activeId||current().game!=='mining')return;
+  waitProject={id:s.id,owner:s.owner};refreshShelf();
  }
  function refreshShelf(){
   const inConversation=route==='studio'&&activeId&&(panel==='talk'||notebook.list(owner()).some(s=>s.id===activeId&&s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate));
   if(playView.active){const menu=$('studioMore').querySelector('.studio-more-actions')!;if(buildShelf.parentElement!==menu)menu.append(buildShelf);}
   else if(inConversation){if(buildShelf.parentElement!==extraTools)extraTools.append(buildShelf);}
   else if(buildShelf.parentElement!==globalStatus.parentElement)globalStatus.after(buildShelf);
-  const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)));
+  const jobs=notebook.list(owner()).filter(s=>!s.archived&&s.job&&(busy(s)||s.job.status==='failed'||!!readyExperiment(s)||s.job.status==='cancelled'&&waitProject?.id===s.id&&waitProject.owner===s.owner));
+  // Keep the originating build reachable even if other background work exists.
+  if(waitProject?.owner===owner())jobs.sort((a,b)=>Number(b.id===waitProject!.id)-Number(a.id===waitProject!.id));
   playView.setReady(jobs.some(s=>!!readyExperiment(s)));
   buildShelf.replaceChildren();buildShelf.hidden=!jobs.length;if(!jobs.length)return;
   buildShelf.append(iconEl('strong','','clock','My builds & tests'));
   const items=el('div','studio-build-items');
   for(const s of jobs.slice(0,4)){
-   const state=readyExperiment(s)?s.projectId||s.remoteId?'Your change is ready':'Your game is ready':s.job!.status==='failed'?'Build needs help · current game safe':
+   const state=readyExperiment(s)?s.projectId||s.remoteId?'Your change is ready':'Your game is ready':s.job!.status==='failed'?'Build needs help · current game safe':s.job!.status==='cancelled'?'Build stopped · your idea is saved':
     unknownJobs.has(s.id)||remote.mode!=='remote'?'Status unknown · checking connection':s.job!.status==='queued'?'Waiting for builder':s.job!.phase==='repairing'?'Trying a fix':
     s.job!.status==='testing'?'Testing your game':'Building your idea';
    const item=el('div','studio-build-item'),copy=el('div','studio-build-copy'),controls=el('div','studio-build-item-actions');
    copy.append(el('strong','',s.name),el('span','',state));
    const openButton=iconEl('button','studio-button','play',readyExperiment(s)?s.projectId||s.remoteId?'Try ready test':'Play my game':'Open game') as HTMLButtonElement;
    openButton.type='button';openButton.onclick=()=>act(async()=>{
-    if(guardMath())return;
+    if(owner()!==s.owner||guardMath())return;
     const latest=notebook.get(s.id,s.owner);
-    if(readyExperiment(latest))await openReadySession(s.id,s.owner);else await open(s.id);
+    if(readyExperiment(latest))await openReadySession(s.id,s.owner);else {
+     await open(s.id,false);
+     if(owner()===s.owner&&activeId===s.id&&route==='studio')setTab('talk');
+    }
    });controls.append(openButton);
    if(busy(s)){
     const stop=iconEl('button','studio-button studio-stop-build','stop','Stop build') as HTMLButtonElement;
@@ -747,6 +739,7 @@ export async function installStudio(){
  }
  function disposeGame(keepScene=false){
   playView.leave();
+  if(!keepScene)waitProject=null;
   if(keepScene&&(mounted||iframe))capturePausedPreview();else clearPausedPreview();
   if(!keepScene){pausedForTools=false;$('studioHelpPanel').hidden=true;}
   ++epoch;previewLearning?.dispose();previewLearning=null;FG.learning.dispose();iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
@@ -822,7 +815,10 @@ export async function installStudio(){
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
   // Import references to existing local remixes without copying or migrating their data.
   for(const p of games.list(owner())) if(!entries.some(s=>s.projectId===p.id))entries.push({...notebook.create(owner(),p.game,p.name,p.id)});
-  const next=recommendNext(entries,owner(),notebook.last(owner())?.id);$('studioContinue').replaceChildren();
+  // Retired starter visits no longer keep advertising the old default games.
+  // Actual child experiments and saved revisions remain available below.
+  const recommended=entries.filter(s=>!isRetiredStarter(s.game)||hasMeaningfulCreation([s],owner()));
+  const next=recommendNext(recommended,owner(),notebook.last(owner())?.id);$('studioContinue').replaceChildren();
   const last=next?entries.find(session=>session.id===next.sessionId):null;
   if(last&&next){
    const banner=el('div','studio-continue'),art=el('span','studio-continue-art',icon[last.game]),description=el('div','studio-continue-copy');
@@ -837,7 +833,7 @@ export async function installStudio(){
    dismiss.onclick=()=>act(()=>{notebook.dismissResume(last.id,last.owner);renderLibrary();});
    banner.append(art,description,continueButton,dismiss);$('studioContinue').append(banner);
   }
-  const saved=entries.filter(s=>!s.archived&&(!s.playOnly||s.experiments?.length||s.candidate));
+  const saved=entries.filter(s=>!s.archived&&(!s.playOnly||s.experiments?.length||s.candidate||isRetiredStarter(s.game)&&hasMeaningfulCreation([s],owner())));
   renderHomeProgress();
   const archived=entries.filter(s=>s.archived);
   $('studioSavedSection').hidden=!saved.length&&!archived.length;
@@ -882,33 +878,38 @@ export async function installStudio(){
    details.append(list);archivedBox.append(details);
   }
   refreshShelf();
-  const starters=$('studioStarters');starters.replaceChildren();
+  const starters=$('studioStarters'),originalGames=$('studioOriginals');starters.replaceChildren();originalGames.replaceChildren();
   const descriptions:Record<GameId,string>={
    gum:'Build wild machines with bubble gum.',hill:'Race over hills in a junkyard ride.',
    buckets:'Pick a bucket. Dodge the splat!',dragon:'Bounce fireballs back at a dragon.',
    moon:'Chase donuts through moonlight.',robot:'Guide your robot through tricky routes.',
-   factory:'A little polish. A whole lot of sparkle!'
+   factory:'A little polish. A whole lot of sparkle!',mining:'Run. Collect. Hold on!'
   };
-  const companions:Record<GameId,string>={gum:'🫧',hill:'⚙️',buckets:'🍅',dragon:'🛡️',moon:'🍩',robot:'🧩',factory:'✨'};
-  const worldLabels:Record<GameId,string>={gum:'BUILD',hill:'RACE',buckets:'SURPRISE',dragon:'DRAGON',moon:'SPACE',robot:'ROBOT',factory:'MAKE IT SPARKLE'};
+  const companions:Partial<Record<GameId,string>>={gum:'🫧',hill:'⚙️',buckets:'🍅',dragon:'🛡️',factory:'✨'};
+  const worldLabels:Partial<Record<GameId,string>>={gum:'BUILD',hill:'RACE',buckets:'SURPRISE',dragon:'DRAGON',factory:'MAKE IT SPARKLE'};
   const worldScenes:Partial<Record<GameId,string>>={
    buckets:'./jems-world-buckets.svg',dragon:'./jems-world-dragon.svg',
    moon:'./jems-world-moon.svg',robot:'./jems-world-robot.svg',factory:'./gem-factory-workshop.webp'
   };
-  (['factory','gum','hill','buckets','dragon','moon','robot'] as GameId[]).forEach(game=>{
+  [...PREMADE_GAMES,...ORIGINAL_GAMES].forEach(game=>{
    const b=el('button',`studio-library-card studio-starter ${game}`) as HTMLButtonElement;
    b.type='button';b.setAttribute('data-starter',game);
    const art=el('span',`studio-game-art studio-art-${game}`);art.setAttribute('aria-hidden','true');
-   if(game==='gum'||game==='hill'){const canvas=document.createElement('canvas');canvas.className='quality-card-art';canvas.dataset.qualityCard=game;art.append(canvas);}
+   if(game==='mining'){
+    art.classList.add('studio-mining-preview');
+    art.innerHTML='<img class="studio-mining-sky" src="./art/mind-your-jems/scene-sky.webp" alt=""><span class="studio-mining-rock"><img src="./art/mind-your-jems/rock-expressions.webp" alt=""></span><span class="studio-mining-miner"><img src="./art/mind-your-jems/miner-poses.webp" alt=""></span><img class="studio-mining-cart" src="./art/mind-your-jems/cart-empty.webp" alt="">';
+   }
+   else if(game==='gum'||game==='hill'){const canvas=document.createElement('canvas');canvas.className='quality-card-art';canvas.dataset.qualityCard=game;art.append(canvas);}
    else {
     const image=el('img','jems-world-scene') as HTMLImageElement;
     image.src=worldScenes[game]!;image.alt='';image.setAttribute('aria-hidden','true');
     art.append(image,el('span','studio-art-halo'),el('span','studio-art-symbol',icon[game]),el('span','studio-art-companion',companions[game]));
    }
-   art.append(el('span','jems-world-chip',worldLabels[game]));
+   if(worldLabels[game])art.append(el('span','jems-world-chip',worldLabels[game]));
    const info=el('span','studio-card-info');
-   info.append(el('span','studio-card-name',names[game]),el('span','studio-card-state',descriptions[game]),iconEl('span','studio-card-link','play','Play & make it yours'));
-   b.append(art,info);b.onclick=()=>act(()=>start(game));starters.append(b);
+   info.append(el('span','studio-card-name',names[game]),el('span','studio-card-state',descriptions[game]),iconEl('span','studio-card-link','play','Play'));
+   b.append(art,info);b.onclick=()=>act(()=>start(game));
+   (ORIGINAL_GAMES.includes(game)?originalGames:starters).append(b);
   });installQualityCards();updateCreationNote();refreshWelcome();
  }
  function home(){stopSpeech();flushDraft();handoff.close();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
@@ -1041,7 +1042,10 @@ export async function installStudio(){
  function playLocal(s:StudioSession,config:Mechanics,key:string,view:typeof showing,revisionId?:string){
   if(!canChangePlay(s))return false;
   const playedTest=view==='candidate'?s.candidate?.id||s.selectedTest||null:null;
-  disposeGame();lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
+  // Returning from shared Help/Change keeps the originating build reachable.
+  // Opening another session or leaving the player already clears this binding.
+  const waiting=s.game==='mining'&&waitProject?.owner===s.owner?waitProject:null;
+  disposeGame();waitProject=waiting;lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
   const boundRevision=s.projectId?games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined)):null;
   FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
@@ -1068,7 +1072,7 @@ export async function installStudio(){
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
   const native=!remoteViewedId&&s.game!=='new';
   $('studioHelpGoal').textContent=native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
-  const touchHelp:Record<string,string>={factory:'Find the next gem in the pattern. Tap a bucket, use the glowing machines, then choose paper and send your gift!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
+  const touchHelp:Record<string,string>={mining:'Hold Left or Right to run into jems. Bring your bag to the bucket. Hold on during a shake, or run to the safe platform.',factory:'Find the next gem in the pattern. Tap a bucket, use the glowing machines, then choose paper and send your gift!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
   const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined).config:undefined;
   const oldConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===0;
   const physicalConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===1;
@@ -1230,10 +1234,6 @@ export async function installStudio(){
     notebook.update(captured.id,captured.owner,s=>{s.pendingExperiment=null;});
     if(owner()===captured.owner){const achievement=gemAchievement(before,notebook.get(captured.id,captured.owner));updateProfile();if(achievement&&!FG.learning.active){celebrateProgress(achievement);celebratedLevel=true;}}
   }
-  if(waitProject?.id===captured.id&&waitProject.owner===captured.owner&&waitArcade.isOpen()){
-   const latest=notebook.get(captured.id,captured.owner);
-   if(latest.job)waitArcade.update(latest.job.status as WorkshopStatus,!!readyExperiment(latest));
-  }
   const latest=notebook.get(captured.id,captured.owner);
   if(job.status!=='draft')updateBuildHandoff(captured,{phase:job.status,canPlayWhileWaiting:busy(latest),canPlayReady:!!readyExperiment(latest),...(job.status==='failed'?{...(retryBlocks.has(captured.id)?{}:{recovery:'retry' as const}),description:retryBlocks.get(captured.id)?.reason||buildErrorCopy(job.errorCode,true)}:{})});
   if(activeId===captured.id&&owner()===captured.owner&&route==='studio'){
@@ -1257,7 +1257,6 @@ export async function installStudio(){
     if(owner()!==s.owner)return;
     unknownJobs.add(s.id);refreshShelf();
     updateBuildHandoff(s,{phase:'uncertain',canPlayWhileWaiting:busy(s),recovery:'check'});
-    if(waitProject?.id===s.id&&waitProject.owner===s.owner&&waitArcade.isOpen())waitArcade.update('reconnecting',false);
      if(activeId===s.id){status('Connection interrupted. The build may still be running. We will check again.');if(route==='studio')render();}
     if(retryTimers.has(s.id))clearTimeout(retryTimers.get(s.id)!);
     retryTimers.set(s.id,setTimeout(()=>{retryTimers.delete(s.id);try{const latest=notebook.get(s.id,s.owner);if(busy(latest))resume(latest);}catch{/* original work remains */}},15000));
@@ -1459,7 +1458,7 @@ export async function installStudio(){
  window.addEventListener('factory-learning-subject',()=>{refreshLearningChoice();if(route==='studio'&&activeId){refreshGameSubject();FG.learning.modeControl($('studioMathMode'),activeId);}});
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{try{stopSpeech();flushDraft();handoff.close();disposeGame();}catch(error){event.preventDefault();status((error as Error).message,true);}});
- window.addEventListener('factory-profile',()=>{welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();waitArcade.close();waitProject=null;stopSpeech();hideJourney();
+ window.addEventListener('factory-profile',()=>{welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   conversationReaders.forEach(reader=>reader.dispose());conversationReaders=[];

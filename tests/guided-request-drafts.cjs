@@ -1,3 +1,4 @@
+const {openSavedNative}=require('./saved-native-fixture.cjs');
 /* Real bundled controls with synthetic authenticated coach/builder transport.
  * These fixtures establish request/draft ownership, not live-provider quality.
  */
@@ -57,7 +58,7 @@ async function localProposal(browser,url){
  const f=await fixture(browser,url,message=>message.includes('slower')?proposal('Slower robot','Make robot slower'):proposal('Faster robot','Make robot faster'));
  const {page}=f;
  try{
-  await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot .favorite-canvas');
+  await openSavedNative(page,'robot');await page.waitForSelector('.favorite-robot .favorite-canvas');
   const initial=await page.evaluate(()=>FG.runtime.snapshot().config.robotSpeed);
   await page.click('#studioChange');await askForProposal(page,'Help me think about robot speed.','Faster robot');
   const draft='After this, make the robot blue.';
@@ -94,7 +95,7 @@ async function remoteProposal(browser,url){
  const f=await fixture(browser,url,()=>proposal('Flying doughnut',request,'redesign'));
  const {page}=f;
  try{
-  await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot .favorite-canvas');
+  await openSavedNative(page,'robot');await page.waitForSelector('.favorite-robot .favorite-canvas');
   await page.click('#studioChange');await askForProposal(page,'Suggest a new way to play.','Flying doughnut');
   const draft='Save a rainbow trail for my next version.';
   await page.fill('#studioPrompt',draft);

@@ -24,7 +24,7 @@ const {start}=require('./browser-server.cjs');
   const talk=async()=>{await page.click('#studioChange');};
   const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore > summary');};
   const profiles=()=>openProfiles(page);
-  assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
+  assert.equal(await page.locator('#studioStarters [data-starter]').count(),4);
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
   await page.click('[data-starter="gum"]');
   // This suite exercises the preserved physical builder; newly created games

@@ -11,7 +11,7 @@ See the [first-creation contract](../child-journey/FIRST-CREATION.md) for small 
 ## Child mental model
 
 1. **I have an idea:** “Invent a game” opens the existing conversational Studio. Talking or saving an idea must not imply a build was completed; “Try a change” remains separate.
-2. **I want to have fun now:** seven illustrated developer favorites are playable from whole-card targets on a responsive desktop and mobile shelf.
+2. **I want to have fun now:** four illustrated ready-made games are playable from whole-card targets on a responsive desktop and mobile shelf. Gem Factory and Mind Your Jems appear together, followed by Bubble Gum Builders and Junkyard Rally. Dragon Island Rescue and Splash or Pass have their own **Original jems** group.
 3. **I already started something:** a compact, recognizable Continue row prioritizes ready results and unfinished creative intentions before ordinary recent play. Saved creations remain selectable and segregated by the active player; an archived or dismissed-resume item is not recommended.
 4. **I want to keep exploring:** the Studio's My Games button always returns here. My Powers and family settings remain available, without becoming competing first-screen calls to action.
 5. **Something takes time or is unavailable:** the existing nonmodal build shelf preserves play during an actual pending build; the homepage never promises new AI builds when the private builder is unavailable.
@@ -19,6 +19,12 @@ See the [first-creation contract](../child-journey/FIRST-CREATION.md) for small 
 7. **I have a picture:** **Art Studio** sits beside **Invent a game** before the catalogue. It opens the current player's upload, camera, drawing and reusable-art space. An unavailable online builder does not block this local destination.
 
 ## Saved ideas and drawings remain reachable
+
+The [mining navigation decision](../decisions/2026-11-22-mining-game-navigation.md) separates the curated shelf from saved-runtime compatibility. Moon Donut Dash and Robot Route Lab no longer appear as default cards. Their native IDs, validated settings, stored revisions, existing child work and backup support remain intact. An unmodified visit to a retired starter is excluded from the Continue recommendation. Saved child work, including unfinished drafts and conversations before any experiment exists, remains in My jems and eligible for Continue under the existing owner/archive/dismissal rules. Catalogue order is defined in [`catalogue.ts`](../../src/studio/catalogue.ts), not by deleting game implementations.
+
+The first mining launch uses the existing native project's persistence. Once a save contains `mining`, rollback must keep a compatible ID/config reader and runtime or use a verified no-loss migration; an older browser's unknown-game validation must not be worked around by erasing saved work.
+
+Mind Your Jems uses the same native play host whether opened here or through an acknowledged build's explicit **Play while I wait** action. During waiting, **More → My builds & tests** keeps the original project first with its current status and explicit ready/recovery action. A finished build does not switch the game or take focus. A failed or cancelled original build opens its own saved idea workspace. **My Games** and **Full screen** remain the common player controls; leaving mining does not cancel the build.
 
 The ordinary shell has **My Games**, **Create** and a labelled **Menu**. The menu groups **Create & code** and **Art Studio** under Make; **My journey**, **My rewards** and **My Pals** under Your world; **My Powers**, **Try an idea** and subject choice under Learn & explore; parent dashboard and **Private parent session** under Grown-ups; and Journey help under Help. Parent access and help remain visible during first character selection. Existing route handlers retain their save and learning guards. **Saved ideas & drawings** is a supporting action on the homepage, below the Continue area. It opens the existing My Creations page through the guarded Studio navigation; it does not require a legacy URL or replace the modern navigation.
 

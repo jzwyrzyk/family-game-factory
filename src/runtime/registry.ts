@@ -7,6 +7,7 @@ import Hill from '../games/quality-hill';
 import MoonDonutDash from '../games/moon-donut-dash';
 import RobotRoute from '../games/robot-route';
 import GemFactory from '../games/gem-factory';
+import NativeMining from '../games/mind-your-jems-native';
 import '../quality/quality.css';
 import Builder from '../games/builder.js';
 import Buckets from '../games/buckets.js';
@@ -16,6 +17,7 @@ import { createLifecycle } from './lifecycle';
 import type { GameId, GamePlugin, GameContext, GameLifecycle, Difficulty, Mechanics, PlayOutcome } from './types';
 
 export const plugins: Record<GameId, GamePlugin> = {
+  mining: {manifest:manifests.mining,mount:(target,context)=>new NativeMining(target,context)},
   factory: {manifest:manifests.factory,mount:(target,context)=>new GemFactory(target,context)},
   moon: {manifest:manifests.moon,mount:(target,context)=>new MoonDonutDash(target,context)},
   robot: {manifest:manifests.robot,mount:(target,context)=>new RobotRoute(target,context)},
@@ -25,6 +27,7 @@ export const plugins: Record<GameId, GamePlugin> = {
   hill: {manifest: manifests.hill, mount: (target, context) => new Hill(target, context)},
 };
 const details = {
+  mining: {type:'MINING ADVENTURE',instructions:'Run to jems and save them in the bucket. Fill it to reach the next level. Hold on when the giant shakes!',controls:'← → or A / D to run · Hold Space to cling · Hold the touch controls below'},
   factory: {type:'SPARKLE WORKSHOP',instructions:'Find the next gem in the pattern, make it sparkle, and wrap a gift your way!',controls:'Tap a bucket · Tap the glowing cutter · Rub the gem · Pick your paper · Tap your gift'},
   moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
   robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route to the star. The dark squares are walls.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},

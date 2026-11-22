@@ -1,3 +1,4 @@
+const {openSavedNative}=require('./saved-native-fixture.cjs');
 /* The first creation, one real local improvement, and the next visit.
  * Remote responses are explicitly authenticated synthetic transport fixtures;
  * no model, provider budget, production data, or cloud account is exercised.
@@ -221,7 +222,7 @@ async function firstImprovement(browser,url,device,viewport){
  try{
   await page.route('**/factory-config.json',unavailable);
   await page.goto(url);await ready(page);await exploreWelcome(page);
-  await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot .favorite-canvas');
+  await openSavedNative(page,'robot');await page.waitForSelector('.favorite-robot .favorite-canvas');
   const original=(await snapshot(page)).config.robotSpeed;
   const head=()=>page.evaluate(()=>{
    const n=FG.studio.exportNotebook(),s=n.sessions.find(x=>x.id===n.active[FG.store.current().id]);
@@ -340,7 +341,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   let waitingGameId=ownId;
   const focusedControl=focusedGuide?`#studioGuideCard${focusedGuide==='action'?'Action':'Dismiss'}`:'#studioChange';
   if(!focusedGuide){
-   await page.click('#studioNavHome');await page.click('[data-starter="robot"]');
+   await page.click('#studioNavHome');await openSavedNative(page,'robot');
    await page.waitForSelector('.favorite-robot .favorite-canvas');
    waitingGameId=(await current(page)).id;assert.notEqual(waitingGameId,ownId);
   }else await moreChoices(page);

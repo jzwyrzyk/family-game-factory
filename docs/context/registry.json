@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:16:29.187Z",
-      "sourceDigest": "b968a8e2f41e1d6b61e18d6a5510148e7b29acd2c48fbc1f99132eacb34c8d6a",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the portrait lifecycle contract and game presentation corrections; approved product intent, child ownership, grade ceilings, earning rules and narration approval boundaries remain unchanged.",
+      "reviewedAt": "2026-11-22T15:45:05.982Z",
+      "sourceDigest": "09a760f962afc24389cbcac0c2c3077a7706dadfc7cff6c0438f5ca06767c09a",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded the owner-directed mining stakes and common catalogue/player journey while preserving local-score separation, saved authored work and explicit build readiness.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:58:30.182Z",
-      "sourceDigest": "654bc7190eb4665f1e83f9c4dbcb5ce9904897087ebe6c7ac0ba9085f059bb76",
+      "reviewedAt": "2026-11-22T15:45:06.445Z",
+      "sourceDigest": "9fd74dd29d6ae05468617b09555de3508f8e74853b56ae5706510e4ed647b7e7",
       "reviewOutcome": "updated",
-      "reviewReason": "The fitted-play contract now forbids horizontal More/profile overflow and records the captured evidence; profile ownership, native activation and learning guards are preserved.",
+      "reviewReason": "Documented the four premades and Original jems group, shared native mining entry/exit and More build handoff, outside-tool pause, Help return and retained retired-game drafts/conversations.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:58:31.296Z",
-      "sourceDigest": "23a7ada2adcd0482d1e28fac46f6c32d5760136bc55370c241b5d4b66d23ad8f",
+      "reviewedAt": "2026-11-22T15:45:07.364Z",
+      "sourceDigest": "cc22b55b65a54b27581ffdac29920990b3fbdc565054a860c7fe5253d94d70ab",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented persistent Robot directions and compact action labels outside scrolling status/plan text, with unchanged board geometry and the dark-wall rule retained in shared Help.",
+      "reviewReason": "Reconciled the native mining adapter with the exact phase1 movement/contact/holding controller and geometry; documented timed host learning, local level results, saved runtime IDs and honest empty local tuning.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:58:31.644Z",
-      "sourceDigest": "f170726c641995ac6cbc7d8d14188187c5abc015016a7261d338c399ca2f9c84",
+      "reviewedAt": "2026-11-22T15:57:48.192Z",
+      "sourceDigest": "1ebbfa819bc2c46e709096e4aba73410278a0c20b2ad9c0a4ed1d84bd38f2ce1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded why prior per-choice reachability missed captured defects and added initial/24-arrow/feedback visibility plus zero horizontal menu overflow assertions without weakening board, labels or hit tests.",
+      "reviewReason": "Ported Chromium released-contact touchEnd semantics with exact simultaneous Left/Hold assertions intact; native shared-player failure captures and independent viewport evidence accumulation retain nonzero failure and block baseline acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T21:58:31.976Z",
-      "sourceDigest": "998e160f8d5d5653a4833f8c067e543836ceae9abe2880d9ec5d420bdc032f99",
+      "reviewedAt": "2026-11-22T15:57:48.523Z",
+      "sourceDigest": "35dba22f2acd552578f03c17a5456d9029a134dc0e5c86568ae4b52a3aa0d0e1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded all ten passing prior-head workflows and exact artifacts alongside the two visual blockers; the follow-up requires its own hosted evidence and remains unmerged, undeployed and narration-disabled.",
+      "reviewReason": "Retained run45040267569 complete desktop evidence and failed tablet multi-touch observation, recorded the scoped fixture correction and required corrected hosted configurations without claiming combined acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
