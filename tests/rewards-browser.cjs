@@ -264,6 +264,7 @@ async function installAuthFixture(context) {
     assert.equal(await page.locator('#creationChallengeMode').getAttribute('aria-pressed'), 'true');
     assert.equal(await page.locator('#creationFreeShelf').isVisible(), false, 'Coding rewards opens challenges directly');
     await page.click('[data-challenge="robot-taps"]');
+    await page.click('#creationFullMode');
     await page.getByRole('combobox', { name: 'When', exact: true }).selectOption('tap');
     await page.click('[data-add-block="move"]');
     const scene = await page.evaluate(() => FG.creation.scene());
@@ -277,6 +278,7 @@ async function installAuthFixture(context) {
     assert.equal((await summary(page)).counts.coding, 1);
 
     // Parent UI exports the actual ledger; restoring it twice remains idempotent.
+    await page.click('#creationHome');
     await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     const downloadPromise = page.waitForEvent('download'); await page.click('#exportData');
     const download = await downloadPromise, backupPath = path.resolve('test-results/rewards-family-backup.json');

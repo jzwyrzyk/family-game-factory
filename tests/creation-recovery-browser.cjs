@@ -31,9 +31,16 @@ const clone=value=>JSON.parse(JSON.stringify(value));
   fs.mkdirSync('test-results',{recursive:true});
   const ready=()=>page.waitForFunction(()=>window.FG?.creation&&window.FG?.studio&&document.getElementById('creationParentProgress'));
   const pacing=()=>page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture did not save');});
-  const parent=async()=>{await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();await page.locator('[data-parent-tab="settings"]').click();};
+  const parent=async()=>{if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();await page.locator('footer [data-page="parent"]').click();await page.locator('#page-parent:not(.hidden)').waitFor();await page.locator('[data-parent-tab="settings"]').click();};
   const switchProfile=async index=>{if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await page.locator('#studioProfileMenu summary').click();await page.locator('.profile-choice').nth(index).click();};
-  const reopenUnfinished=async id=>{await page.locator('#studioNavHome').click();await switchProfile(1);await switchProfile(0);await navigate(page,'#studioNavScenes');await page.locator(`[data-scene="${id}"]`).click();};
+  const reopenUnfinished=async id=>{
+    // A normal visible exit flushes a version. Preserve the real UI-written
+    // autosave bytes to model a browser crash before that orderly flush.
+    const crashedWorkspace=await page.evaluate(key=>localStorage.getItem(key),CREATION_KEY);
+    await page.locator('#creationHome').click();await switchProfile(1);await switchProfile(0);
+    await page.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:CREATION_KEY,raw:crashedWorkspace});
+    await page.reload();await ready();await navigate(page,'#studioNavScenes');await page.locator(`[data-scene="${id}"]`).click();
+  };
   const raw=()=>page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),STATE_KEYS);
   const ledger=()=>page.evaluate(()=>new Promise((resolve,reject)=>{
     const opened=indexedDB.open('family-game-factory-rewards-v1',1);opened.onerror=()=>reject(opened.error);
@@ -64,7 +71,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     await navigate(page,'#studioNavScenes');await page.locator('#creationChallengeMode').click();
     await page.locator('[data-challenge="robot-route"]').click();
     await page.locator('#creationTitle').fill('My backup robot experiment');await page.locator('#creationTitle').press('Tab');
-    await page.locator('#creationHint').click();await page.locator('#creationCheck').click();
+    await page.locator('.creation-goal-help summary').click();await page.locator('#creationHint').click();await page.locator('#creationCheck').click();
     await page.waitForFunction(()=>FG.creation.export().attempts.length===1);
     await page.locator('#creationKeep').click();const projectId=await page.evaluate(()=>FG.creation.scene().id);
     await parent();assert.match(await page.locator('#creationParentProgress').textContent(),/My backup robot experiment/);
@@ -123,6 +130,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.deepEqual(await page.evaluate(()=>FG.creation.export()),backup.factoryCreation);
     assert.equal(await page.evaluate(()=>Object.hasOwn(FG.store.data,'factoryCreation')||Object.hasOwn(FG.store.data,'factoryCreationRecoveryRaw')),false);
     await pacing();await page.locator(`[data-scene="${projectId}"]`).click();
+    await page.locator('.creation-goal-help summary').click();
     assert.equal(await page.getByRole('button',{name:'See my hint again',exact:true}).count(),1);
     await page.locator('#creationCheck').click();await page.waitForFunction(()=>FG.creation.export().attempts.length===2);
     assert.ok((await page.evaluate(()=>FG.creation.export().attempts)).every(attempt=>attempt.hintUsed));
@@ -145,8 +153,8 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     assert.equal(await page.evaluate(()=>FG.creation.export().projects[0].challengeId),'retired-goal');
     checks.push('a retired challenge reopens its preserved scene for free editing without fabricating a goal');
 
-    // Global navigation can retain a recovery draft without creating a revision.
-    // Reopening that draft must require the explicit Resume / Use saved decision.
+    // Abrupt browser loss can retain a recovery draft without a version flush.
+    // Reopening those exact autosave bytes requires Resume / Use saved.
     await page.locator('#creationBack').click();await page.locator('#creationChallengeMode').click();
     await page.locator('[data-challenge="robot-route"]').click();await page.locator('[data-add-block="say"]').click();
     const unfinishedId=await page.evaluate(()=>FG.creation.scene().id);await reopenUnfinished(unfinishedId);
@@ -154,6 +162,8 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     const untouched=await page.evaluate(()=>FG.creation.export());
     assert.deepEqual(untouched.drafts.find(draft=>draft.projectId===unfinishedId).scene.programs[0].actions.map(action=>action.type),['say']);
     assert.deepEqual(await page.evaluate(()=>FG.creation.scene().programs[0].actions),[]);
+    // Recovery guards still cover the optional debugger, after opening it explicitly.
+    await page.locator('#creationFullMode').click();
     for(const selector of ['[data-add-block="move"]','#creationKeep','#creationCheck','#creationRun','#creationStep','#creationReset','#creationAddActor']){
       await page.locator(selector).click();assert.match(await page.locator('#creationStatus').textContent(),/Resume my draft.*Use saved version/);
       assert.deepEqual(await page.evaluate(()=>FG.creation.export()),untouched,'Unresolved recovery survives '+selector);

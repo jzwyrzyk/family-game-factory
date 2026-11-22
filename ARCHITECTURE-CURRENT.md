@@ -20,6 +20,8 @@ This is a map of the **implemented source architecture**, not an assertion that 
 
 **Formative evidence source integration, November 19, 2026:** [PR64](https://github.com/jzwyrzyk/family-game-factory/pull/64) merged as `09e43beb4405526117493ab27688b076136078f4`, preserving main `28c18cdae8bf958ef01f6e622e9c4ef6e2035e5c` and its branding, parent-reporting and lifetime-rewards contracts. The merged tree `62893dc035abdf589533de6e4ad9a21dd48f7963` exactly matches the final tested feature head. The sections below describe the formative feature and [ADR0011](docs/decisions/0011-formative-problem-solving-evidence.md); its [implementation record](docs/problem-solving/IMPLEMENTATION.md) and [delivery receipt](DELIVERY-STATE.md#pr64-formative-problem-solving--merged) record the five passing workflows and scoped visual review. Source integration does not establish deployment, standardized assessment or validated learning improvement.
 
+**First-learner coding candidate, November 22, 2026:** the isolated change stacked on PR125 keeps `jems.creation.v1`, the deterministic engine, ownership, draft/Keep history, and challenge evidence unchanged. A fitted stage and progressive First steps / More tools views share those existing controls. Pal-only transient canvas compositing is bounded to the active scene and preserves approved source files and saved asset IDs; it adds no asset service, stored derivative or entitlement. The [Creation contract](docs/creation-studio/README.md) and [rendering contract](docs/creation-studio/PAL_SCENE_RENDERING.md) record scope and validation limits.
+
 ## System boundaries
 
 ### Profile, play and reading candidate — November 21, 2026

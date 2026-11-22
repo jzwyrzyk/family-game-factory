@@ -389,6 +389,9 @@ async function installReceiptFixture(page) {
     const tapProgram = original.programs.find(program => program.trigger.type === 'tap');
     assert.deepEqual(tapProgram.actions.map(action => action.type), ['jump', 'dance', 'say']);
     assert.ok(original.programs.every(program => program.actions.every(action => action.origin === 'starter')));
+    // Exact trigger fields belong to the optional full editor. Starter playback
+    // and its simple controls are covered separately by the learner journey.
+    await page.click('#creationFullMode');
     assert.equal(await page.getByRole('combobox', { name: 'When', exact: true }).inputValue(), 'tap');
     await page.click('#creationRun');
     await page.waitForFunction(() => FG.creation.snapshot()?.status === 'completed');
@@ -422,7 +425,7 @@ async function installReceiptFixture(page) {
     phase = 'adding a Pal to another scene';
     await page.click('#creationBack'); await page.click('[data-creation-starter="blank"]');
     const beforeAdd = await scene(page);
-    await page.click('#creationAddPal');
+    await page.click('#creationAddActor');await page.click('#creationAddPal');
     const afterAdd = await scene(page);
     assert.equal(afterAdd.actors.length, beforeAdd.actors.length + 1);
     assert.deepEqual(afterAdd.actors.slice(0, beforeAdd.actors.length), beforeAdd.actors);
@@ -585,7 +588,7 @@ async function installReceiptFixture(page) {
     await page.click(`[data-scene="${addedProjectId}"]`);
     const beforeKip = await scene(page);
     assert.equal(beforeKip.actors.at(-1).assetId, 'pal-luma-base-core-2026-11-20', 'Growing the companion never rewrites an existing scene’s pinned Base picture');
-    await page.click('#creationChoosePal');
+    await page.click('#creationAddActor');await page.click('#creationChoosePal');
     assert.equal(await page.locator('#creationActorDialog').isVisible(), true);
     assert.equal(await page.locator('#creationActorDialog [data-creation-asset]').count(), 3);
     assert.deepEqual(await page.locator('#creationActorDialog [data-creation-asset]').evaluateAll(choices => choices.map(choice => choice.dataset.creationAsset).sort()), [
@@ -595,7 +598,7 @@ async function installReceiptFixture(page) {
     const withKip = await scene(page);
     assert.equal(withKip.actors.at(-1).assetId, 'pal-nook-base-core-2026-11-20');
     assert.deepEqual(withKip.actors.slice(0, beforeKip.actors.length), beforeKip.actors);
-    await page.click('#creationAddPal');
+    await page.click('#creationAddActor');await page.click('#creationAddPal');
     const withGrown = await scene(page);
     assert.equal(withGrown.actors.at(-1).assetId, 'pal-luma-mature-core-2026-11-20');
     assert.deepEqual(withGrown.actors.slice(0, withKip.actors.length), withKip.actors, 'Adding a Grown Pal preserves all prior character/form versions');

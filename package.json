@@ -41,8 +41,8 @@
     "test:gem-factory": "node tests/gem-factory-browser.cjs",
     "test:generated-art": "node --import tsx tests/generated-art-browser.ts",
     "test:quality-capture": "node --import tsx tests/quality-capture-browser.ts",
-    "test:creation": "node --import tsx --test tests/creation-engine.test.ts tests/creation-challenges.test.ts tests/creation-storage.test.ts tests/creation-generated.test.ts tests/creation-generation-budget.test.ts",
-    "test:creation-browser": "node tests/creation-browser.cjs && node tests/creation-recovery-browser.cjs",
+    "test:creation": "node --import tsx --test tests/creation-engine.test.ts tests/creation-challenges.test.ts tests/creation-storage.test.ts tests/creation-generated.test.ts tests/creation-generation-budget.test.ts tests/creation-learner-controls.test.ts",
+    "test:creation-browser": "node tests/creation-browser.cjs && node tests/creation-recovery-browser.cjs && npm run test:creation-learner",
     "test:gem-progress": "node --import tsx tests/gem-progress.test.ts",
     "test:gem-journey": "node --import tsx tests/gem-journey-browser.cjs",
     "test:brand-assets": "node scripts/verify-brand-assets.mjs",
@@ -55,7 +55,7 @@
     "test:art": "node --import tsx --test tests/drawing-engine.test.ts tests/drawing-bindings.test.ts tests/creation-private-art.test.ts",
     "test:art-browser": "node tests/art-entry-readiness.cjs && node tests/art-storage-browser.cjs && node tests/art-studio-browser.cjs && node tests/picture-tools-browser.cjs && node tests/drawing-engine-browser.cjs && node tests/creation-private-art-browser.cjs",
     "test:first-creation": "node --import tsx --test tests/studio-guidance.test.ts && node tests/first-creation-journey.cjs",
-    "test:pals": "node --import tsx --test tests/pals.test.ts tests/pals-service.test.ts tests/pals-controller.test.ts tests/pals-backup.test.ts tests/pals-creation.test.ts && npm run test:pals-expressions && npm run test:pals-assets",
+    "test:pals": "node --import tsx --test tests/pals.test.ts tests/pals-service.test.ts tests/pals-controller.test.ts tests/pals-backup.test.ts tests/pals-creation.test.ts tests/pal-scene-image.test.ts && npm run test:pals-expressions && npm run test:pals-assets",
     "test:pals-browser": "node tests/pals-ui-browser.cjs && node tests/pals-browser.cjs && npm run test:pals-expressions-browser",
     "test:navigation-shell": "node tests/navigation-shell.cjs",
     "test:pals-assets": "node scripts/verify-pal-assets.mjs && node --test scripts/tests/verify-pal-assets.test.mjs && node scripts/generate-pal-catalog.mjs --check",
@@ -65,7 +65,8 @@
     "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
     "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs",
     "test:learning-profile-browser": "node tests/learning-profile-browser.cjs",
-    "test:play-view": "node tests/play-view-browser.cjs"
+    "test:play-view": "node tests/play-view-browser.cjs",
+    "test:creation-learner": "node tests/creation-learner-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

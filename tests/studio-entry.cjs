@@ -33,6 +33,7 @@ exports.navigate=async function navigate(page,id){
  // Active play has its own visible exit. Global destinations return after the
  // child leaves through that guarded, save-aware route.
  if(await page.locator('#page-studio.studio-play-mode').isVisible())await page.locator('#studioHome').click();
+ if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();
  if(!await target.isVisible())await page.locator('#studioNavMenu').click();
  await target.click();
 };

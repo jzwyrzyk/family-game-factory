@@ -1,5 +1,15 @@
 # jems delivery state
 
+## November 22, 2026 — first-learner coding overhaul candidate
+
+The owner requested a comprehensive coding UI overhaul: a larger scene, readable Jems styling, simpler beginner controls, and Pal artwork without opaque cream rectangles. This isolated candidate is stacked on PR125 source `1340d041145ffba4322ccb8262188b7cf2c7b6c4`; it preserves its profile, fitted-player and persistent narration foundation. The [accepted decision](docs/decisions/2026-11-22-first-learner-coding.md) and [Creation acceptance](docs/creation-studio/ACCEPTANCE.md) record the scope. No merge or deployment is claimed.
+
+First steps exposes six visual actions with one expanded action editor, exact direction/distance controls, separate On Play/On tap programs, and an optional More tools view for the full existing language. The stage remains visible while code scrolls; explicit Keep/Undo/exits, draft recovery, learning guards and the evaluator remain authoritative. Challenge feedback appears over the stage without document scrolling. Readable DOM speech/counts supplement the scaled canvas. Pal-only transient scene compositing removes the outer paper from 47 portraits and retains Navi Base's existing alpha, with ten reviewed maps for enclosed paper regions; the approved files and all saved IDs remain intact.
+
+Local production build/typecheck, 393 existing unit contracts, 85 Creation contracts and the Pal suite passed, including 22 focused Pal scene/compositing cases and eight learner-control cases. All 48 actual neutral images were composed with the implementation and inspected against dark and meadow backgrounds; retained ground/props and Navi's original fringe are documented in the [rendering evidence](docs/creation-studio/PAL_SCENE_RENDERING.md). These canvases are not browser screenshots. Local Chromium cannot launch because the execution environment rejects its socket operation. The dedicated five-layout browser workflow and existing Creation/art/Pal journeys remain pending on the published source; source checks do not establish mobile usability or child acceptance.
+
+This is frontend-only work. No provider request, cloud configuration, production traffic, stored child-data format, generation-worker pin or source-art replacement was changed. Reconcile the then-current shared UI/chat release stack before a later merge; do not treat this candidate as already live.
+
 ## November 21, 2026 — profile, play and reading implementation candidate
 
 The owner requested explicit grade/difficulty per profile, consistent screen-fitting games/fullscreen, a caring natural female voice and persistent read-aloud including Creator. The isolated candidate is based on main `b4734b1323de87dfee96bb91769cbab3cff432e6`, including merged PR124 chat diagnostics; it is unmerged and undeployed. [The accepted decision](docs/decisions/2026-11-21-profile-play-and-reading.md) and [natural narration handoff](docs/speech/NATURAL_NARRATION.md) record the scope.

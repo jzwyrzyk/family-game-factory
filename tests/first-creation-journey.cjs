@@ -433,9 +433,13 @@ async function hintsAcrossModes(browser,url){
   await page.click('#creationPracticeGuideDismiss');
   assert.deepEqual(await page.evaluate(()=>FG.creation.export()),empty,'dismissing navigation help records no challenge attempt, hint usage or scene');
   await page.click('[data-challenge="robot-route"]');
+  await page.click('#creationMore summary');
   assert.equal(await page.locator('#creationGuide').isVisible(),false,'the same practice tip remains dismissed in the editor');
   const sceneBefore=await page.evaluate(()=>FG.creation.export());
+  const sceneId=await page.evaluate(()=>FG.creation.scene().id);
   await navigate(page,'studioJourneyHelp');await page.click('#studioGuideReset');
+  await navigate(page,'studioNavScenes');await page.locator(`[data-scene="${sceneId}"]`).click();
+  await page.click('#creationMore summary');
   await page.locator('#creationGuide').waitFor({state:'visible'});
   assert.deepEqual(await page.evaluate(()=>FG.creation.export()),sceneBefore,'Show tips again does not edit the program or claim supported/independent evidence');
   await capture(page,'practice-guide','phone');

@@ -14,6 +14,7 @@ async function records(page,store,owner){
   },{store,owner});
 }
 async function profile(page,index){
+  if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();
   await openProfiles(page);
   await page.locator('#profile-choices .profile-choice').nth(index).click();
   await page.waitForFunction(id=>FG.store.current().id===id,'player'+(index+1));
@@ -94,6 +95,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(assetId=>FG.creation.scene().actors.some(actor=>actor.assetId===assetId),first.actors[0].assetId);
     const sourceActions=page.locator('#creationSource');
+    if(!await page.locator('#creationMore').evaluate(element=>element.open))await page.locator('#creationMore summary').click();
     assert.equal(await sourceActions.getByRole('button',{name:'Art Studio',exact:true}).isVisible(),true,'a game-derived scene keeps its private-art action');
     const backToGame=sourceActions.getByRole('button',{name:'Back to my game',exact:true});
     assert.equal(await backToGame.isVisible(),true,'adding private art keeps the source-game return action');
