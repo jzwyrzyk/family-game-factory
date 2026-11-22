@@ -626,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T23:25:28.510Z",
-      "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
+      "reviewedAt": "2026-11-22T23:26:52.768Z",
+      "sourceDigest": "34cf87d62732972e53271a121d8dbca2121d5bbcb32992ffe0f6d805b7c61c39",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR126's existing real-tap, Pal image lifecycle and receipt regressions alongside merged PR133's private-provider optional-evidence fallback tests and unchanged visual baselines. Previous 0.8%-threshold Mind Your Jems screenshot flake is tracked in issue #76; the test-only capture experiment was reverted. Exact combined-source fingerprint and hosted acceptance remain pending.",
+      "reviewReason": "Reviewed retained Pal lifecycle/native decoding and tablet input regressions with current private-coach provider/tests and the unchanged independent Mind Your Jems visual baseline. Previously observed screenshot phase flake remains tracked in issue #76; no blanket acceptance or weakening of assertions. Exact validation digest from hosted documentation job 137395774437. Full newest combined CI remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -721,6 +721,13 @@
           "sourceDigest": "650738219188f0e8fae9a5f97d19e89b9b622b28c088576a6731c3a07a614ef2",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed PR126's bounded tablet focus/scroll diagnostic assertions together with merged PR131's private creation-wire tests. No assertion was relaxed; historical missed-tap and portrait-decoding failures remain recorded. Full combined-source digest observed in hosted documentation job 137379759144; browser acceptance remains separate."
+        },
+        {
+          "sourceCommit": "611e05cca73d55addc2038a1118402a9dc6144d5",
+          "reviewedAt": "2026-11-22T23:25:28.510Z",
+          "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed PR126's existing real-tap, Pal image lifecycle and receipt regressions alongside merged PR133's private-provider optional-evidence fallback tests and unchanged visual baselines. Previous 0.8%-threshold Mind Your Jems screenshot flake is tracked in issue #76; the test-only capture experiment was reverted. Exact combined-source fingerprint and hosted acceptance remain pending."
         }
       ]
     },
@@ -749,10 +756,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T22:30:12.846Z",
-      "sourceDigest": "16c5eac1c30b4eec7e9ab92068d21e918ca831a58d9880ef56e5f02da2432c75",
+      "reviewedAt": "2026-11-22T23:26:52.768Z",
+      "sourceDigest": "adf654212391bd7c66f0fd35e2f89dba0c829fa361988f1994af5a5b6158fc2a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR126's receipt hardening and guarded cloud operations alongside merged PR131's private coach readiness tests, package test wiring and the recovered read-only access receipt. This is a source-only integration, not a production rollout; the full combined-source digest was observed in hosted documentation job 137379759144. Other hosted acceptance remains separate.",
+      "reviewReason": "Reviewed the actual inert-merge authorization and bounded source scope after reconciling PR100/107/126 access and receipt tooling with current main. Confirmed release workflows remain gated by disabled GitHub flags, no new deployment/IAM binding, Cloud Shell receipt is temporary, and service-specific activation gates stay independent. Observed exact full-source delivery fingerprint in GitHub documentation job 137395774437; hosted final-head gates remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -865,6 +872,13 @@
           "sourceDigest": "05cd855f146a31be67e89ec9432ecfe14c381e0b3a3e9f4b54a22764dc1913d4",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the receipt-storage guard and its 85 offline fixture tests: reserve and sync private space before account actions, preserve incomplete evidence, refuse path reuse and report late receipt failure separately. Updated operations, architecture and delivery records for the seven owner-applied inactive resources, unchanged serving metadata and ENOSPC uncertainty. Recovery remains read-only from pinned PR107; PR126 carries the follow-up, with no merge, identity acceptance, activation or deployment claim."
+        },
+        {
+          "sourceCommit": "611e05cca73d55addc2038a1118402a9dc6144d5",
+          "reviewedAt": "2026-11-22T22:30:12.846Z",
+          "sourceDigest": "16c5eac1c30b4eec7e9ab92068d21e918ca831a58d9880ef56e5f02da2432c75",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed PR126's receipt hardening and guarded cloud operations alongside merged PR131's private coach readiness tests, package test wiring and the recovered read-only access receipt. This is a source-only integration, not a production rollout; the full combined-source digest was observed in hosted documentation job 137379759144. Other hosted acceptance remains separate."
         }
       ]
     },
