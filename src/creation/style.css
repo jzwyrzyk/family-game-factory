@@ -236,6 +236,9 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 }
 @media (max-width:390px) {
   #page-creation:not(.has-scene) .creation-heading { flex-wrap:wrap; }
+  /* On the narrowest phones the secondary Scenes row makes the scene too
+     small. My Games remains visible; My scenes stays under More. */
+  #page-creation.has-scene .creation-project-bar>#creationBack { display:none!important; }
   /* At 320px the Read and My Games buttons do not fit on one line. Let the
      heading action row wrap inside the screen rather than widen the page. */
   #page-creation:not(.has-scene) .creation-heading-actions { flex:1 1 100%; width:100%; min-width:0; flex-wrap:wrap; justify-content:flex-start; }
