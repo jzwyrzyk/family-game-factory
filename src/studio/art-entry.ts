@@ -33,7 +33,11 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
       // Creation has one optional tool section. Reuse the same guarded art
       // entrance there, preserving the callback and the current draft.
       if(creating){if(picture.parentElement!==composer)composer.prepend(picture);}
-      else if(picture.parentElement!==gameHelp.parentElement)gameHelp.after(picture);
+      else {
+        const playMenu=byId('page-studio').classList.contains('studio-play-mode')?byId('studioMore').querySelector('.studio-more-actions'):null;
+        if(playMenu){if(picture.parentElement!==playMenu)playMenu.append(picture);}
+        else if(picture.parentElement!==gameHelp.parentElement)gameHelp.after(picture);
+      }
     },
   };
 }

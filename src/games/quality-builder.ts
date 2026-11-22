@@ -325,7 +325,9 @@ export default class QualityBuilder implements GameInstance {
         // A touch tablet with an attached mouse may report a fine pointer mid-session.
         const compactLandscape = window.innerWidth > window.innerHeight
             && window.innerHeight >= 600 && window.innerHeight <= 900 && w >= 600;
-        const h = compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
+        const fitted = this.root.closest('.studio-play-mode') && rect.height > 0;
+        const h = fitted ? Math.max(140, rect.height)
+            : compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
         this.canvas.style.height = h + 'px';
         const dpr = Math.min(2, devicePixelRatio || 1);
         this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);

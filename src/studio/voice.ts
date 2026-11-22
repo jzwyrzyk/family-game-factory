@@ -29,15 +29,20 @@ export interface StudioVoiceOptions {
   onTranscript:(text:string)=>void|Promise<void>;
   /** The host owns visual branding; the voice adapter supplies truthful labels. */
   renderMicrophone?:(state:'idle'|'recording'|'finishing',label:string)=>void;
+  renderReading?:(active:boolean,waiting?:boolean)=>void;
 }
 export function installStudioVoice(ui:StudioVoiceOptions){
  let recognition:RecognitionLike|null=null;
  let generation=0,finalWords='',listening=false,failed=false,finishing=false;
- let spokenReply='';
+ let spokenReply='',replyScope='';
  let readingScope='';
  const narrator=createFriendlyNarrator(()=>readingScope===ui.scope()&&ui.canListen()&&!listening);
  const getCtor=():RecognitionCtor|undefined=>(window as any).SpeechRecognition||(window as any).webkitSpeechRecognition;
  const announce=(message:string)=>{ui.status.textContent=message;};
+ const readingButton=(active:boolean,waiting=false)=>{
+  ui.hearReply.setAttribute('aria-pressed',String(active));
+  if(ui.renderReading)ui.renderReading(active,waiting);else ui.hearReply.textContent=waiting?'Play reading':active?'Stop reading':'Hear reply';
+ };
  const buttons=()=>{
   const state=listening?(finishing?'finishing':'recording'):'idle';
   const label=state==='idle'?'Speak':state==='recording'?'Finish speaking':'Cancel transcription';
@@ -50,7 +55,7 @@ export function installStudioVoice(ui:StudioVoiceOptions){
  // Prefer full-thought dictation over the API's short-command default.
  const voiceOptions={langs:['en-US'],processLocally:true as const,quality:'dictation' as const};
  function cancel(){
-  generation++;finalWords='';spokenReply='';ui.hearReply.disabled=true;failed=true;finishing=false;
+  generation++;finalWords='';spokenReply='';replyScope='';ui.hearReply.disabled=true;failed=true;finishing=false;
   const active=recognition;recognition=null;listening=false;buttons();announce('Microphone off.');
   try{active?.abort();}catch{/* The browser may already have stopped. */}
   narrator.cancel();
@@ -138,18 +143,22 @@ export function installStudioVoice(ui:StudioVoiceOptions){
   }catch{if(seq===generation)announce('Voice pack installation is unavailable. Use keyboard dictation or type.');}
  }
  function speak(text:string){
+  if(narrator.waitingToPlay){announce('');readingButton(true);narrator.resume();return;}
   if(narrator.active){narrator.cancel();return;}
   readingScope=ui.scope();
-  narrator.speak(text.slice(0,1800),{onUnavailable:()=>announce('Voice is not ready here. You can read the reply.')});
+  readingButton(true);
+  narrator.speak(text,{onStarted:()=>{announce('');readingButton(true);},onPlayRequired:()=>{readingButton(false,true);announce('Tap Play reading to hear it.');},onFinished:()=>{readingButton(false);if(ui.status.textContent==='Tap Play reading to hear it.')announce('');},onUnavailable:()=>announce('Voice is not ready here. You can read the reply.')});
  }
  function reply(text:string){
-  narrator.cancel();
-  spokenReply=text.slice(0,1800);ui.hearReply.disabled=!spokenReply;
+  const next=text,scope=ui.scope();
+  if(next===spokenReply&&scope===replyScope){ui.hearReply.disabled=!next;return;}
+  narrator.cancel();readingButton(false);
+  spokenReply=next;replyScope=scope;ui.hearReply.disabled=!spokenReply;
   // Replies are read aloud only when the child explicitly chooses Hear reply.
  }
  ui.microphone.onclick=()=>{void listen();};
  ui.installPack.onclick=()=>{void installPack();};
  ui.hearReply.onclick=()=>{if(spokenReply)speak(spokenReply);};
- ui.hearReply.disabled=true;buttons();
+ ui.hearReply.disabled=true;readingButton(false);buttons();
  return {cancel,reply,listen};
 }

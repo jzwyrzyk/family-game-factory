@@ -107,7 +107,7 @@ function populateSkills(){
  $('parentFacts').disabled=!multiplication;if(!multiplication&&['times8','mul','div'].includes($('parentFocus').value))$('parentFocus').value='adaptive';
 }
 function loadParent(){
- const p=FG.store.current();$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
+ const p=FG.store.current();$('parentLearningProfile').textContent='Learning settings for '+p.name;$('parentLearningSummary').textContent='Grade '+p.grade+' · '+({gentle:'Gentle',balanced:'Balanced',stretch:'Stretch'}[p.intensity]||'Gentle')+(p.learningSetupComplete?'':' · Choose a level and save to finish setup.');$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
  populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(JSON.parse(JSON.stringify(p)));$('parentStats').after($('copyFeedback'));setIconLabel($('copyFeedback'),'book','Copy saved game ideas for a developer');
  FG.parentDashboard?.refresh();
 }
@@ -129,7 +129,7 @@ function renderParentReports(p){
 function saveParent(){
  const grade=Number($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.learning.subject:choice,facts=choice!=='language'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
  if(facts.length>20||facts.some(x=>!/^(?:[1-9]|1[0-2])x(?:[1-9]|1[0-2])$/.test(x))){alert('Use up to 20 facts like 8x7, with numbers from 1 to 12. Settings have not changed.');return;}
- try{FG.store.changeProfile({name:$('parentNickname').value,grade,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,allowSubjectSwitch:choice==='both',languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
+ try{FG.store.changeProfile({name:$('parentNickname').value,grade,learningSetupComplete:true,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,allowSubjectSwitch:choice==='both',languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
 }
 function download(text,name){const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200)}
 let wizardStep=0;
@@ -162,4 +162,5 @@ FG.app={page,openGame:gameOpen,refreshProfiles:profiles};
 // Adult entry/expiry uses the profile event without the family chooser's callback.
 // Refresh original controls as well as reports so no prior learner's values remain.
 window.addEventListener('factory-profile',loadParent);
+window.addEventListener('factory-learning-settings',loadParent);
 })();

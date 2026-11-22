@@ -7,7 +7,7 @@ import {generateItem} from '../src/learning/content';
 import type {MathItem,LearningMode} from '../src/learning/types';
 
 let browser:Browser,bundle:string;
-const styles=readFileSync('src/learning/activity.css','utf8');
+const styles=readFileSync('src/learning/activity.css','utf8')+'\n'+readFileSync('src/speech/read-aloud.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8');
 before(async()=>{
   const output=await build({stdin:{contents:"export * from './src/learning/activity'; export * from './src/learning/visuals';",resolveDir:process.cwd(),loader:'ts'},bundle:true,format:'iife',globalName:'LearningUITest',platform:'browser',write:false});
   bundle=output.outputFiles[0].text;
@@ -17,7 +17,8 @@ after(async()=>{await browser?.close();});
 
 async function mount(item:MathItem,mode:LearningMode='checkpoint',hints=false,challenge=false,layout:{offset?:number;height?:number}={}) {
   const page=await browser.newPage({viewport:{width:390,height:layout.height||850}});
-  await page.setContent(`<style>html{scroll-behavior:smooth}body{margin:0;background:#10132d;font-family:system-ui}button,input{font:inherit}*{box-sizing:border-box}${styles}</style><header style="height:${layout.offset||0}px"></header><main id="mount"></main><footer style="height:200px"></footer>`);
+  await page.route('http://jems.test/**',route=>route.fulfill({contentType:'image/svg+xml',body:readFileSync('public/jems-art/icons/jems-icons.svg','utf8')}));
+  await page.setContent(`<base href="http://jems.test/"><style>html{scroll-behavior:smooth}body{margin:0;background:#10132d;font-family:system-ui}button,input{font:inherit}*{box-sizing:border-box}${styles}</style><header style="height:${layout.offset||0}px"></header><main id="mount"></main><footer style="height:200px"></footer>`);
   await page.addScriptTag({content:bundle});
   await page.evaluate(({item,mode,hints,challenge})=>{
     const w=window as any;w.profile={id:'test-child',grade:4,age:9,skills:{},hints};w.results=[];w.saves=0;
@@ -37,6 +38,7 @@ test('a below-fold question receives visible heading focus without opening a tex
     });
     assert.equal(state.focused,true);assert.ok(state.scroll>0);assert.ok(state.top>=0&&state.bottom<=state.height,'the actual question is in the mobile viewport');
     assert.equal(await page.locator('#math-answer').evaluate(node=>document.activeElement===node),false,'entry does not request the software keyboard');
+    await page.keyboard.press('Tab');assert.equal(await page.locator('[data-action=read-aloud]').evaluate(node=>document.activeElement===node),true,'the optional speaker is the first action after the question');
     await page.keyboard.press('Tab');assert.equal(await page.locator('#math-answer').evaluate(node=>document.activeElement===node),true,'the next keyboard step reaches the answer');
     const e=await evidence(page);assert.equal(e.profile.learning.attempts.length,1);assert.equal(e.profile.learning.attempts[0].answers.length,0);
   }finally{await page.close();}
@@ -171,7 +173,8 @@ test('a disposed activity cannot call back into another game after its success d
 
 test('dense number lines keep every exact tick label readable at mobile widths',async()=>{
   const page=await browser.newPage({viewport:{width:390,height:844}});try{
-    await page.setContent(`<style>body{margin:0;background:#10132d;font-family:system-ui}main{padding:0 24px}${styles}</style><main><div class="math-activity" id="diagrams"></div></main>`);
+    await page.route('http://jems.test/**',route=>route.fulfill({contentType:'image/svg+xml',body:readFileSync('public/jems-art/icons/jems-icons.svg','utf8')}));
+  await page.setContent(`<base href="http://jems.test/"><style>body{margin:0;background:#10132d;font-family:system-ui}main{padding:0 24px}${styles}</style><main><div class="math-activity" id="diagrams"></div></main>`);
     await page.addScriptTag({content:bundle});
     await page.evaluate(()=>{
       const w=window as any,host=document.getElementById('diagrams')!;
@@ -213,5 +216,26 @@ test('diagrams are mathematical, mobile-safe and curriculum text is never HTML',
     assert.equal((result.rectangle[1][0]-result.rectangle[0][0])/(result.rectangle[2][1]-result.rectangle[1][1]),2);
     assert.match(result.line||'',/1\/3/);assert.doesNotMatch(result.line||'',/0\.3333/);
     assert.equal(result.plotMarks,7);assert.match(result.plot||'',/1\/4 m/);
+  }finally{await page.close();}
+});
+
+
+test('Math question and help share explicit read-aloud without reading the answer or adding a hint',async()=>{
+  const item=multiply(),page=await mount(item);
+  try{
+    await page.evaluate(()=>{
+      const w=window as any;w.spoken=[];w.SpeechSynthesisUtterance=class {constructor(public text:string){};onstart:(()=>void)|null=null;};
+      window.speechSynthesis.getVoices=()=>[{name:'Samantha (Enhanced)',voiceURI:'Samantha',lang:'en-US',localService:true,default:false}] as SpeechSynthesisVoice[];
+      window.speechSynthesis.speak=utterance=>{w.spoken.push(utterance.text);utterance.onstart?.call(utterance,new Event('start') as SpeechSynthesisEvent);};window.speechSynthesis.cancel=()=>{};
+    });
+    await page.locator('[data-action=read-aloud]').click();
+    assert.equal(await page.evaluate(()=>(window as any).spoken[0]),item.question);
+    assert.equal((await evidence(page)).profile.learning.attempts[0].hintLevel,0);
+    await page.getByRole('button',{name:'Give me a hint',exact:true}).click();
+    await page.locator('[data-action=read-help]').click();
+    assert.ok((await page.evaluate(()=>(window as any).spoken.at(-1))).includes(item.hints[0].text));
+    assert.equal((await evidence(page)).profile.learning.attempts[0].hintLevel,1);
+    await page.evaluate(()=>(window as any).activity.dispose());
+    assert.equal(await page.locator('[data-action=read-aloud]').count(),0);
   }finally{await page.close();}
 });

@@ -1,4 +1,4 @@
-const {exploreWelcome,sendChildMessage}=require('./studio-entry.cjs');
+const {exploreWelcome,sendChildMessage,navigate,openProfiles}=require('./studio-entry.cjs');
 /* Runs against the real production dist and original game host. No paid model calls. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -22,9 +22,10 @@ const {start}=require('./browser-server.cjs');
   const bottles=async()=>(await runtime()).state.parts.filter(p=>p.kind==='bottle').length;
   const budget=async expected=>{await page.waitForFunction(n=>FG.runtime.snapshot().config.gumBudget===n,expected);const r=await runtime();assert.equal(r.state.gumRemaining,expected-r.state.joints.length);};
   const talk=async()=>{await page.click('#studioChange');};
-  const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore summary');};
-  const profiles=async()=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await page.click('#studioProfileMenu summary');};
-  assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
+  const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore > summary');};
+  const profiles=()=>openProfiles(page);
+  assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
+  assert.deepEqual(await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'both original games retain visible entry points');
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
   await page.click('[data-starter="gum"]');
   // This suite exercises the preserved physical builder; newly created games
@@ -39,11 +40,15 @@ const {start}=require('./browser-server.cjs');
   await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
   // A replay/version control must retain an active host activity; leaving the game may interrupt it.
   const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
-  assert.ok(guardedAttempt);await page.click('#studioPlay');
+  assert.ok(guardedAttempt);assert.equal(await page.locator('#studioPlay').isVisible(),false,'active play has no redundant restart control');
+  await page.click('#studioChange');
+  // A stale queued replay activation must still respect the same host guard,
+  // even though the ordinary play screen no longer displays this button.
+  await page.evaluate(()=>document.getElementById('studioPlay').click());
   assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),guardedAttempt);
   assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'open');
   await page.screenshot({path:`test-results/math-studio-${device}.png`,fullPage:true});
-  await page.click('#studioNavHome');assert.equal(await page.evaluate(()=>FG.learning.active),false);
+  await page.click('#studioHome');assert.equal(await page.evaluate(()=>FG.learning.active),false);
   assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id).outcome,guardedAttempt),'interrupted');
   assert.deepEqual(await page.evaluate(id=>{const a=FG.store.current().learning.attempts.find(a=>a.id===id);return {answers:a.answers.length,correct:a.correct,independent:a.independent};},guardedAttempt),{answers:0,correct:false,independent:false});
   assert.equal(await page.evaluate(()=>JSON.stringify(FG.store.current().skills['mul:8x7'])),seededSkill);
@@ -125,7 +130,7 @@ const {start}=require('./browser-server.cjs');
   ride=await runtime();rideSession=(await notebook()).sessions.find(s=>s.game==='hill');assert.equal(ride.config.wheelSize,.57);assert.equal(ride.state.paint,'#50a89a');assert.deepEqual(rideSession.experiments.at(-1).parents,[firstRideTest]);
   await page.click('#studioKeep');assert.notEqual((await workspace()).projects.find(p=>p.game==='hill').headId,hillMain);
   await talk();assert.match(await page.textContent('#studioPausedPreview'),/Junkyard Rally/);
-  await page.click('#studioNavCreate');assert.equal(await page.locator('#studioPausedPreview').textContent(),'');assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a new idea clears the previous game preview');
+  await navigate(page,'#studioNavCreate');assert.equal(await page.locator('#studioPausedPreview').textContent(),'');assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'a new idea clears the previous game preview');
   const offlineIdea=await sendChildMessage(page,'Build a brand new flying banana universe');
   assert.ok(offlineIdea.messages.some(message=>message.role==='child'&&message.text==='Build a brand new flying banana universe'),'the offline idea is saved through Send');
   assert.equal(await page.locator('#coachGuidedChoices').count(),0,'the child supplies the answers in the conversation');
@@ -176,9 +181,9 @@ const {start}=require('./browser-server.cjs');
   else data={errorCode:'NOT_FOUND'};
   await route.fulfill({status:data.errorCode?404:200,headers,contentType:'application/json',body:JSON.stringify(data)});
  });
- await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')});<\/script>`}));
+ await page.route('https://studio-preview.test/**',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><h1>Explicit test fixture</h1><button>Play</button><script>const channel=new URLSearchParams(location.search).get('channel'),artifactId='fixture-artifact';window.addEventListener('message',e=>{if(e.source===parent&&e.data.type==='factory-learning'&&e.data.channel===channel&&e.data.artifactId===artifactId&&e.data.action==='connect')parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:1000,learningProtocol:1},'*')});<\/script>`}));
  await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio);await exploreWelcome(page);
- await page.click('#studioNavCreate');await sendChildMessage(page,childIdea);
+ await navigate(page,'#studioNavCreate');await sendChildMessage(page,childIdea);
  assert.equal(await page.locator('#studioSend').isDisabled(),true,'an initial idea does not unlock Build');
  assert.equal(await page.locator('#coachChooseRest').count(),0,'the child cannot delegate an unfinished game plan');
  assert.equal(remoteRequests.length,0,'the first conversation turn cannot submit a job');
@@ -191,6 +196,15 @@ const {start}=require('./browser-server.cjs');
  await page.click('#studioBuildHandoffPlay');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');
+ // A generated game's preferred height cannot push the shared player offscreen.
+ for(const size of [{width:1280,height:720},{width:390,height:844},{width:844,height:390}]){
+  await page.setViewportSize(size);
+  await page.waitForFunction(()=>{const frame=document.querySelector('#studioRemoteHost iframe'),r=frame.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight+1&&r.left>=0&&r.right<=innerWidth+1&&r.height>100;});
+  assert.equal(await page.locator('#page-studio').evaluate(e=>e.classList.contains('studio-play-mode')),true);
+  assert.equal(await page.locator('#studioHome').isVisible(),true,'remote preview keeps the same exit');
+  assert.equal(await page.locator('#studioFullScreen').isVisible(),true,'remote preview keeps the same fullscreen control');
+ }
+ await page.setViewportSize({width:1280,height:720});
  assert.match(await page.textContent('#studioPlayNote'),/mock/);assert.equal(kept,0);
  assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'signed preview capabilities must not persist');
  await page.click('#studioKeep');await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.remoteId==='fixture-rev'&&!s.candidate));assert.equal(kept,1);

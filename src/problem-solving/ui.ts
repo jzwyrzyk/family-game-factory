@@ -65,7 +65,7 @@ export function installProblemSolvingPractice(host: Host) {
     const next = clone(active);
     next.episode.observations.push({ id: `${kind}-${phase}`, skill: phase === 'interpret' ? 'interpret_evidence' : phase === 'revise' ? 'revise' : 'plan_test',
       outcome: 'unobserved', authorship: 'unknown', support: kind === 'hint' ? 'strategy' : 'access-only', elicitation: 'prompted',
-      observedAt: iso(), responseId: kind + ':' + phase, note: kind === 'hint' ? `A strategy hint was opened during ${phase}.` : `Local read-aloud started during ${phase}.` });
+      observedAt: iso(), responseId: kind + ':' + phase, note: kind === 'hint' ? `A strategy hint was opened during ${phase}.` : `Read-aloud started during ${phase}.` });
     save(next);
   }
   function choose(phase: PracticePhase, id: string) {
@@ -172,24 +172,35 @@ export function installProblemSolvingPractice(host: Host) {
     }
     return stage;
   }
-  function narration(text: string, phase: PracticePhase) {
+  function readingButton(hear: HTMLButtonElement, state: 'idle' | 'reading' | 'waiting') {
+    setIconLabel(hear, state === 'reading' ? 'stop' : 'volume', state === 'waiting' ? 'Play reading' : state === 'reading' ? 'Stop reading' : 'Read this to me');
+    hear.setAttribute('aria-pressed', String(state === 'reading'));
+  }
+  function narration(text: string, phase: PracticePhase, hear: HTMLButtonElement) {
     assertCurrent();
+    if (narrator.waitingToPlay) { status(''); readingButton(hear, 'reading'); narrator.resume(); return; }
     if (narrator.active) { stopSpeech(); return; }
     readingEpisode = active?.episode.id || ''; readingPhase = phase;
+    status(''); readingButton(hear, 'reading');
     narrator.speak(text, {
       onStarted: () => {
+        status(''); readingButton(hear, 'reading');
         try { addSupport('narration', phase); }
         catch (error) { stopSpeech(); status((error as Error).message, true); }
       },
+      onPlayRequired: () => { readingButton(hear, 'waiting'); status('Tap Play reading to hear it.'); },
+      onFinished: () => { readingButton(hear, 'idle'); if ($('psStatus').textContent === 'Tap Play reading to hear it.') status(''); },
+      onMode: mode => { hear.dataset.voiceMode = mode; },
       onUnavailable: () => status('Voice is not ready here. Ask a grown-up to read with you.'),
     });
   }
   function toolsFor(phase: PracticePhase, copy: string) {
-    const tools = node('div', 'ps-support'), hint = button('A little hint', 'ps-text-button', 'help'), hear = button('Hear this', 'ps-text-button', 'volume');
+    const tools = node('div', 'ps-support'), hint = button('A little hint', 'ps-text-button', 'help'), hear = button('Read this to me', 'ps-text-button', 'volume');
     hint.id = 'psHint'; hear.id = 'psHear';
+    readingButton(hear, 'idle');
     const hintText = node('p', 'ps-hint'); hintText.id = 'psHintText'; hintText.hidden = true;
-    hint.onclick = () => act(() => { assertCurrent(); addSupport('hint', phase); hintText.hidden = false; hintText.textContent = taskNow().hints[phase]; });
-    hear.onclick = () => act(() => narration(copy, phase));
+    hint.onclick = () => act(() => { assertCurrent(); stopSpeech(); addSupport('hint', phase); hintText.hidden = false; hintText.textContent = taskNow().hints[phase]; });
+    hear.onclick = () => act(() => narration([copy, hintText.hidden ? '' : hintText.textContent].filter(Boolean).join('. '), phase, hear));
     tools.append(hint, hear); return { tools, hintText };
   }
   function renderActive(focus = false) {

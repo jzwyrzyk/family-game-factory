@@ -4,6 +4,10 @@
 
 A child's local profile has a learningSubject of math or language, with absent legacy values defaulting to math. The parent interface and state mutation reject Off/none/invalid subjects. Every game uses the host-owned checkpoint. The existing 1–8 question rolling budget persists **across both subjects** and every game version; switching the subject must not restart or bypass it. Game-design prompts may change the three permitted presentation modes (checkpoint, interaction, both) but cannot disable learning or change the parent's subject choice.
 
+## Shared profile level
+
+The player menu's **Set learning level / Change learning level** and **Grown-ups → Settings** edit the same per-profile grade and learning difficulty used by Math. New or grade-missing profiles start at Grade 1 with Gentle difficulty; age does not choose a grade. Existing explicit grade/difficulty and all language evidence are preserved. Both English selection and attempt admission reject items beyond the selected ceiling, even when Stretch or older focus/history points at a later grade. The optional `learningSetupComplete` reminder flag changes no evidence or subject permission. See [profile setup and migration](../adaptive-math/README.md#profile-grade-and-difficulty-setup).
+
 ## State and recovery
 
 The original browser-local family-game-factory-state-v1 root key and Math v2 history are preserved. Language Arts state is stored separately within the same child profile at language.version=1. Existing exports, existing game versions and legacy Math data are never zeroed when ELA is enabled. State validation rejects future or malformed Language Arts history before normalizing profiles. A bad existing load keeps raw data exportable and blocks new saves; invalid imported backups are rejected without replacing the current state. Creative drafts are local sensitive child data, up to 1,200 characters.

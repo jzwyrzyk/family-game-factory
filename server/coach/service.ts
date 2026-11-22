@@ -1,5 +1,6 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {allowedCoachFamily} from './consent';
+import {reconcileNarrationReceipts} from './narration';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotConfigured,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
@@ -63,14 +64,17 @@ export class CoachService {
   if(!session||session.expiresAt<=Date.now()||session.role!=='parent')throw Error('FORBIDDEN');
   return this.repo.transaction(state=>{
    assertActiveTrustedDevice(state,session);
+   reconcileNarrationReceipts(state);
    if((state.coachReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running')||
+      (state.narrationReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running')||
       (state.audioReceipts||[]).some(r=>r.familyId===session.familyId&&r.state==='running'))
     throw Error('COACH_REQUEST_EXISTS');
-   const prior=state.coachReceipts||[],audio=state.audioReceipts||[];
+   const prior=state.coachReceipts||[],audio=state.audioReceipts||[],narration=state.narrationReceipts||[];
    state.coachReceipts=prior.filter(r=>r.familyId!==session.familyId);
    state.audioReceipts=audio.filter(r=>r.familyId!==session.familyId);
+   state.narrationReceipts=narration.filter(r=>r.familyId!==session.familyId);
    // Aggregate usage/audit accounting is retained without message/audio content.
-   return {erased:prior.length-state.coachReceipts.length+audio.length-state.audioReceipts.length};
+   return {erased:prior.length-state.coachReceipts.length+audio.length-state.audioReceipts.length+narration.length-state.narrationReceipts.length};
   });
  }
  async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'}>{

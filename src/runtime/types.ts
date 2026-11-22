@@ -1,4 +1,4 @@
-export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill' | 'moon' | 'robot' | 'factory';
+export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill' | 'moon' | 'robot' | 'factory' | 'mining';
 export type Difficulty = 'gentle' | 'classic' | 'stretch';
 export type Mechanics = Record<string, number | boolean>;
 export interface Mechanic {

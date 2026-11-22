@@ -68,7 +68,7 @@ export function validateFamilyRewardBackup(raw:string,validateBase:(raw:string)=
   const problemSolving=own(input,'factoryProblemSolving')?validateProblemSolvingWorkspace(input.factoryProblemSolving):emptyProblemSolvingWorkspace();
   if(workspace.projects.some(project=>!allowed.has(project.owner))||notebook.sessions.some(session=>!allowed.has(session.owner))||
     Object.keys(notebook.active).some(owner=>!allowed.has(owner))||Object.keys(notebook.avatars??{}).some(owner=>!allowed.has(owner))||
-    Object.keys(notebook.guidance??{}).some(owner=>!allowed.has(owner))||creation.projects.some(project=>!allowed.has(project.owner))||
+    Object.keys(notebook.guidance??{}).some(owner=>!allowed.has(owner))||Object.keys(notebook.notifications??{}).some(owner=>!allowed.has(owner))||creation.projects.some(project=>!allowed.has(project.owner))||
     problemSolving.episodes.some(episode=>!allowed.has(episode.owner))||problemSolving.drafts.some(draft=>!allowed.has(draft.episode.owner))||Object.keys(problemSolving.discardedByOwner).some(owner=>!allowed.has(owner)))throw Error('This backup contains saved work belonging to a player outside this family.');
   for(const session of notebook.sessions){
     if(session.projectId&&!workspace.projects.some(project=>project.id===session.projectId&&project.owner===session.owner))throw Error('A Studio game is missing its matching saved workspace.');

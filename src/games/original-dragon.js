@@ -15,6 +15,8 @@ export default class Original { constructor(mount,host){
  const iconStyle=nativeDocument.createElement('style');iconStyle.textContent=iconStyles;root.append(iconStyle);
  for(const [id,icon,label] of [['soundBtn','volume','Sound on'],['pauseBtn','pause','Pause'],['startBtn','play','Start Game'],['resumeBtn','play','Resume'],['againBtn','retry','Try Again']])setIconLabel(root.getElementById(id),icon,label);
  root.getElementById('soundBtn').setAttribute('aria-pressed','true');
+ const introPrompt=root.querySelector('#menu .panel > p');introPrompt.textContent='Your game is getting ready.';introPrompt.setAttribute('role','status');
+ const startButton=root.getElementById('startBtn');startButton.disabled=true;startButton.setAttribute('aria-busy','true');setIconLabel(startButton,'play','Getting ready…');
  setIconLabel(root.querySelector('#pausePanel h1'),'pause','Paused');
  for(const [key,label,icon,variant] of [['ArrowLeft','Move left','arrow','jems-icon--back'],['ArrowRight','Move right','arrow',''],['ArrowDown','Duck','arrow','jems-icon--down'],['ArrowUp','Jump','arrow','jems-icon--up'],['Space','Shield hop','shield','']]){
   const control=root.querySelector(`[data-key="${key}"]`);control.replaceChildren(createIcon(icon,variant));control.setAttribute('aria-label',label);
@@ -91,13 +93,29 @@ let muted=false;
 const keys={};
 let clock; let jumpBuffer=0;
 const clearInput=()=>{Object.keys(keys).forEach(k=>delete keys[k]);jumpBuffer=0};
-listen('keydown',e=>{ if(hostPaused)return; if(/INPUT|TEXTAREA/.test(e.target.tagName))return; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault(); if(!e.repeat&&(e.code==='Space'||e.code==='ArrowUp'))jumpBuffer=.12; keys[e.code]=true; if(e.code==='Space') keys.Space=true; if(e.code==='Escape'&&mode==='playing') pause();});
+listen('keydown',e=>{
+  if(hostPaused||mode!=='playing')return;
+  // Shadow events retarget to the host. Text/editor controls retain every key;
+  // native sound/pause tools retain Space/Enter while movement and Escape keep
+  // working after those buttons are used. Outside-game UI owns its own keys.
+  const path=e.composedPath().filter(target=>target instanceof HTMLElement);
+  if(path.some(target=>target.matches('input,textarea,select,[contenteditable]')))return;
+  const control=path.find(target=>target.matches('button,a[href],summary'));
+  const nativeControl=control&&root.contains(control)&&(['soundBtn','pauseBtn','resumeBtn'].includes(control.id)||control.matches('#touch button'));
+  if(control&&(!nativeControl||['Space','Enter'].includes(e.code)))return;
+  if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code))e.preventDefault();
+  if(!e.repeat&&(e.code==='Space'||e.code==='ArrowUp'))jumpBuffer=.12;
+  keys[e.code]=true;if(e.code==='Space')keys.Space=true;if(e.code==='Escape')pause();
+});
 listen('keyup',e=>{ keys[e.code]=false; if(e.code==='Space') keys.Space=false;});
 document.querySelectorAll('#touch button').forEach(btn=>{
   const key=btn.dataset.key;
-  const down=e=>{e.preventDefault(); if(hostPaused)return; if(key==='Space'||key==='ArrowUp')jumpBuffer=.12; keys[key]=true; if(key==='Space') keys.Space=true;};
+  const down=e=>{e.preventDefault(); if(hostPaused||mode!=='playing')return; if(key==='Space'||key==='ArrowUp')jumpBuffer=.12; keys[key]=true; if(key==='Space') keys.Space=true;};
   const up=e=>{e.preventDefault(); keys[key]=false; if(key==='Space') keys.Space=false;};
   btn.addEventListener('pointerdown',down); btn.addEventListener('pointerup',up); btn.addEventListener('pointerleave',up); btn.addEventListener('pointercancel',up);
+  btn.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();e.stopPropagation();if(!e.repeat)down(e);}});
+  btn.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();e.stopPropagation();up(e);}});
+  btn.addEventListener('blur',up);
 });
 
 function playTone(freq=440,dur=.08,type='sine',vol=.04){ if(muted||!window.AudioContext) return; try{ const ac=playTone.ac||(playTone.ac=new AudioContext()); const o=ac.createOscillator(), gn=ac.createGain(); o.type=type; o.frequency.value=freq; gn.gain.value=vol; o.connect(gn); gn.connect(ac.destination); o.start(); gn.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+dur); o.stop(ac.currentTime+dur); }catch(e){} }
@@ -128,7 +146,7 @@ function buildHeroes(){
 }
 function showToast(txt,t=1.7){ const el=$('#toast'); el.textContent=txt; el.classList.remove('hidden'); game.toastT=t; }
 function setMode(m){ mode=m; setIconLabel($('#pauseBtn'),m==='pause'?'play':'pause',m==='pause'?'Resume':'Pause'); $('#menu').classList.toggle('hidden',m!=='menu'); $('#pausePanel').classList.toggle('hidden',m!=='pause'); $('#victoryPanel').classList.toggle('hidden',m!=='victoryPanel'); $('#losePanel').classList.toggle('hidden',m!=='losePanel'); clock?.invalidate(); }
-function startGame(resetLevel=true){ if(hostPaused)return; clock?.resume('user'); clearInput(); if(resetLevel){ game.level=1; } game.levelSeed=Math.random(); game.bg=randomBg(); game.heroes=buildHeroes(); game.leader=game.heroes[0]; startLevel(game.level); setMode('playing'); }
+function startGame(resetLevel=true){ if(hostPaused||mode==='loading')return; clock?.resume('user'); clearInput(); if(resetLevel){ game.level=1; } game.levelSeed=Math.random(); game.bg=randomBg(); game.heroes=buildHeroes(); game.leader=game.heroes[0]; startLevel(game.level); setMode('playing'); }
 function startLevel(lv){ game.timer=0; game.islandHP=host.config.groundResilience; game.dragonMax = Math.min(6, 2 + Math.floor((lv-1)/2)); game.dragonHP = game.dragonMax; game.dragonX=1035; game.dragonY=342; game.dragonFireT=2.2; game.fireballs=[]; game.sparks=[]; game.sauceDrops=[]; game.cracks=[]; game.loseT=0; game.victoryT=0; game.bg=randomBg(); game.heroes.forEach((h,idx)=>{ h.x=300+idx*78; h.y=548; h.previousX=h.x; h.previousY=h.y; h.vx=0; h.vy=0; h.grounded=true; h.jumpCooldown=0; h.sauce=0; }); updateHUD(); showToast('Level '+lv+'!'); playTone(660,.11,'triangle'); }
 function updateHUD(){ $('#heroHUD').textContent = HERO_DEFS.find(h=>h.id===selected).label; $('#levelHUD').textContent = 'Level '+game.level; $('#islandHUD').textContent = Math.max(0,Math.round(game.islandHP))+'%'; $('#dragonBar').style.width = (100*game.dragonHP/game.dragonMax)+'%'; $('#bestHUD').textContent = best; }
 function pause(){ clearInput(); if(mode==='playing'){setMode('pause'); clock?.pause('user');} }
@@ -140,14 +158,15 @@ $('#pickBtn').onclick=()=>{ mode='menu'; setMode('menu'); };
 $('#soundBtn').onclick=()=>{ muted=!muted; setIconLabel($('#soundBtn'),'volume',muted?'Sound off':'Sound on'); $('#soundBtn').setAttribute('aria-pressed',String(!muted)); };
 
 function makeHeroCard(def){
-  const card=document.createElement('div'); card.className='heroCard'+(def.id===selected?' selected':'');
+  const card=document.createElement('button'); card.type='button'; card.className='heroCard'+(def.id===selected?' selected':'');
+  card.setAttribute('aria-label','Choose '+def.label); card.setAttribute('aria-pressed',String(def.id===selected));
   const cv=document.createElement('canvas'); cv.width=130; cv.height=120; card.append(cv);
   const g=cv.getContext('2d');
   const img=processed[def.id+'_menu'];
   if(img){ const s=Math.min(cv.width/img.width,cv.height/img.height)*0.9; const w=img.width*s,h=img.height*s; g.drawImage(img,(cv.width-w)/2,(cv.height-h)/2,w,h); }
   const title=document.createElement('strong'); title.textContent=def.label; card.append(title);
   const sub=document.createElement('div'); sub.textContent='You control this hero'; sub.style.fontWeight='900'; sub.style.fontSize='13px'; card.append(sub);
-  card.onclick=()=>{ selected=def.id; renderHeroCards(); };
+  card.onclick=()=>{ selected=def.id; renderHeroCards(); $('#heroCards').querySelector('[aria-pressed="true"]')?.focus({preventScroll:true}); };
   return card;
 }
 function renderHeroCards(){ const box=$('#heroCards'); box.innerHTML=''; HERO_DEFS.forEach(def=>box.append(makeHeroCard(def))); [...box.children].forEach((el,i)=>el.classList.toggle('selected', HERO_DEFS[i].id===selected)); }
@@ -341,7 +360,8 @@ clock=createFixedClock({update,render,onPause:()=>{clearInput();playTone.ac?.sus
   game.bg=randomBg(); game.heroes=buildHeroes(); game.leader=game.heroes[0];
   setMode('menu'); mode='menu';
   clock.start();
-})().catch(()=>{if(alive)root.getElementById('toast').textContent='Artwork could not load. Reopen the game to retry.'});
+  introPrompt.textContent='Pick your hero!';setIconLabel(startButton,'play','Start Game');startButton.removeAttribute('aria-busy');startButton.disabled=false;
+})().catch(()=>{if(alive){introPrompt.textContent='The artwork could not load. Go back and reopen this game.';startButton.textContent='Game unavailable';startButton.removeAttribute('aria-busy');startButton.disabled=true;}});
 
 this.isPlaying=()=>alive&&mode==='playing'&&!hostPaused&&!clock.paused;this.pause=()=>{if(!alive||hostPaused)return false;hostPaused=true;clearInput();clock.pause('host');return true;};this.resume=()=>{if(!hostPaused)return;hostPaused=false;clearInput();clock.resume('host');};this.next=()=>{clock.resume('user');clearInput();game.level++;startLevel(game.level);setMode('playing')};this.restart=()=>{clock.resume('user');clearInput();startLevel(game.level);setMode('playing')};this.snapshot=()=>({level:game.level,mode,time:game.timer,paused:clock.paused,clock:clock.stats,islandHP:game.islandHP,dragonHP:game.dragonHP,player:game.leader,fireballs:game.fireballs,cracks:game.cracks.length,assets:Object.keys(processed).length});this.unmount=()=>{alive=false;clock.dispose();clearInput();cancelAnimationFrame(raf);listeners.forEach(([t,f])=>window.removeEventListener(t,f));timers.forEach(clearTimeout);playTone.ac?.close();mount.replaceChildren()};
 }

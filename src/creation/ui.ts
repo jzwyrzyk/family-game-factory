@@ -14,6 +14,7 @@ import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportS
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
 import { palSceneAssetId, type PalForm } from '../pals/catalog';
+import {createReadAloudControl} from '../speech/read-aloud-control';
 import './style.css';
 
 type Host = {
@@ -105,6 +106,25 @@ export function installCreationStudio(host: Host) {
   let recording: Recording | null = null;
   let targetInputs = 0;
   const status = (message: string, error = false) => { $('creationStatus').textContent = message; $('creationStatus').classList.toggle('is-error', error); };
+  const readingTools=node('div','creation-reading-tools'); readingTools.id='creationReadingTools';
+  function readingText() {
+    const message=$('creationStatus').textContent?.trim();
+    const feedback=$('creationFeedback');
+    if(scene && !feedback.hidden && feedback.textContent?.trim())return [message,feedback.textContent,$('creationChallengeBrief').querySelector('.creation-hint')?.textContent].filter(Boolean).join('. ');
+    if(challengeId){const goal=getCreationChallenge(challengeId)!;return [message,goal.title,goal.brief,...goal.requirements,$('creationChallengeBrief').querySelector('.creation-hint')?.textContent].filter(Boolean).join('. ');}
+    if(scene){const actor=scene.actors.find(actor=>actor.id===selectedActor);return [message,'Choose a character, add an action, then press Play to see what happens.',actor?'You are editing '+actor.name+'.':''].filter(Boolean).join(' ');}
+    return [message,$('creationSubtitle').textContent,$('creationChallengeShelf').hidden?'Choose a world or open one of your saved scenes.':'Choose a scene challenge. Watch it, then rebuild it your way.'].filter(Boolean).join('. ');
+  }
+  const sceneReading=createReadAloudControl({text:readingText,canRead:()=>visible&&!FG.learning.active});
+  sceneReading.button.id='creationRead';sceneReading.button.dataset.action='read-creation';
+  readingTools.append(sceneReading.element);$('creationStatus').before(readingTools);
+  const actorReading=createReadAloudControl({text:()=>[$('creationActorDialogTitle').textContent,$('creationActorArtStatus').textContent,'Choose a character to add it to your scene.'].filter(Boolean).join('. '),canRead:()=>visible&&!FG.learning.active&&$<HTMLDialogElement>('creationActorDialog').open});
+  actorReading.button.dataset.action='read-character-picker';
+  $('creationActorDialogTitle').closest('.creation-shelf-heading')!.after(actorReading.element);
+  for(const event of ['close','cancel'])$('creationActorDialog').addEventListener(event,()=>actorReading.stop());
+  const stopReading=()=>{sceneReading.stop();actorReading.stop();};
+  window.addEventListener('factory-learning-active',event=>{const active=(event as CustomEvent).detail===true;if(active)stopReading();readingTools.hidden=active;});
+
   function renderGuide(mode: 'scene' | 'practice') {
     const capturedOwner = owner(), capturedEpoch = viewEpoch;
     const slot = mode === 'practice' && !scene ? $('creationPracticeGuideSlot') : $('creationGuideSlot');
@@ -151,7 +171,7 @@ export function installCreationStudio(host: Host) {
   const recoveryMessage = 'Choose “Resume my draft” or “Use saved version” before changing this scene.';
   function assertEditing(options: { resolvingRecovery?: boolean } = {}) { if (!isCurrent()) throw Error('Reopen your scene in your own profile.'); if (locked()) throw Error('Your learning activity is still open.'); if (recoveryPending && !options.resolvingRecovery) throw Error(recoveryMessage); }
   function freshEngine() { if (!scene) return; engine = new SceneEngine(scene); targetMode = false; $('creationTargetBadge').hidden = true; $('creationPreviewLabel').textContent = 'YOUR STAGE'; paint(); }
-  function stop(clearRecording = true) { cancelAnimationFrame(frame); frame = 0; last = 0; engine?.pause(); if (clearRecording) cancelRecording(); $<HTMLButtonElement>('creationPause').disabled = true; }
+  function stop(clearRecording = true) { stopReading(); cancelAnimationFrame(frame); frame = 0; last = 0; engine?.pause(); if (clearRecording) cancelRecording(); $<HTMLButtonElement>('creationPause').disabled = true; }
   function paint() {
     if (!scene || !engine) return;
     const snapshot = engine.snapshot();
@@ -774,6 +794,8 @@ export function installCreationStudio(host: Host) {
   canvas.onpointermove = event => { if (!drag || !scene || !engine) return; const point = stage.point(event); if (Math.hypot(point.x - drag.x, point.y - drag.y) < 3 && !drag.moved) return; drag.moved = true; const snapshot = engine.snapshot(); const actor = snapshot.actors.find(a => a.id === drag!.id)!; actor.x = Math.max(0, Math.min(scene.width, point.x)); actor.y = Math.max(0, Math.min(scene.height, point.y)); stage.render(scene, snapshot, selectedActor); };
   canvas.onpointerup = event => { const moving = drag; drag = null; if (!moving?.moved) return; const point = stage.point(event); act(() => mutation(project => { const actor = project.actors.find(a => a.id === moving.id)!; actor.x = Math.max(0, Math.min(project.width, point.x)); actor.y = Math.max(0, Math.min(project.height, point.y)); })); };
   canvas.onpointercancel = () => { drag = null; paint(); };
+  page.addEventListener('click',event=>{if(!(event.target as HTMLElement).closest('.jems-read-aloud'))stopReading();},true);
+  page.addEventListener('change',stopReading);
   page.addEventListener('keydown', event => { event.stopPropagation(); if (event.key === 'Escape' && targetMode && !FG.learning.active) { stop(); freshEngine(); } });
   window.addEventListener('factory-page', event => { if ((event as CustomEvent).detail !== 'creation') leave(); });
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return; try { saveVersion(); stop(); } catch (error) { event.preventDefault(); status((error as Error).message, true); } });

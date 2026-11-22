@@ -1,6 +1,7 @@
 import { beginAttempt, finishAttempt, selectItem, submitAnswer, useHint, type Attempt } from './engine';
 import type { LearnerProfile, LearningContext, LearningMode, MathItem } from './types';
 import { interactionKind, quantityPlaces, renderMathVisual } from './visuals';
+import {createReadAloudControl} from '../speech/read-aloud-control';
 
 export interface MathActivityResult {
   independent: boolean;
@@ -54,6 +55,11 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   root.setAttribute('role','group'); root.setAttribute('aria-labelledby',`${prefix}-question`);
   const title = el('h2',undefined,item.question); title.id = `${prefix}-question`; title.tabIndex = -1;
   root.append(title);
+  const questionReading = createReadAloudControl({
+    text: () => [item.question,...(item.choices || []).map((choice,index) => `Option ${index+1}: ${choice.label}.`)].join(' '),
+    canRead: () => !disposed && !done && !locked,
+  });
+  root.append(questionReading.element);
   // Keep the useful format instruction when this item has no construction mode.
   if(kind==='answer'&&mode==='interaction')root.append(el('p','math-prompt','Write your answer. Hints can help.'));
   if(item.visual)root.append(renderMathVisual(item.visual));
@@ -71,6 +77,10 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   hintButton.dataset.action='hint';showButton.dataset.action='show-solution';support.append(hintButton,showButton);root.append(support);
   const hintPanel=el('section','math-hint');hintPanel.hidden=true;
   const hintTitle=el('h3'),hintText=el('p'),helpActions=el('div','math-help-actions');
+  const hintReading=createReadAloudControl({text:()=>hintTitle.textContent+'. '+hintText.textContent,
+    label:'Read the help',canRead:()=>!disposed&&!done&&!locked&&!hintPanel.hidden});
+  hintReading.button.dataset.action='read-help';
+  const stopReading=()=>{questionReading.stop();hintReading.stop();};
   hintTitle.id=`${prefix}-help-title`;hintTitle.tabIndex=-1;hintText.id=`${prefix}-help-text`;
   hintTitle.setAttribute('aria-describedby',hintText.id);hintPanel.setAttribute('aria-labelledby',hintTitle.id);
   // Automatic hints announce their reasoning without moving an answer control.
@@ -110,14 +120,14 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     if(control)focusAndReveal(control);else focusQuestion();
   }
   function presentHelp(heading:string,text:string) {
-    hintPanel.hidden=false;hintTitle.textContent=heading;hintText.textContent=text;
+    stopReading();hintPanel.hidden=false;hintTitle.textContent=heading;hintText.textContent=text;
     helpActions.replaceChildren();hintPanel.replaceChildren(hintTitle,hintText);
     const back=button('Back to my answer');back.dataset.action='back-to-answer';
     on(back,'click',returnToAnswer);helpActions.append(back);
   }
   function complete(outcome:MathActivityResult['outcome'], independent=false) {
     if(disposed||done)return;
-    done=true;locked=true;
+    done=true;locked=true;stopReading();
     if(completionTimer)clearTimeout(completionTimer);
     finishAttempt(options.profile,attempt.id,outcome==='shown'?'shown':'completed');save();
     root.querySelectorAll<HTMLButtonElement|HTMLInputElement>('button,input').forEach(node=>node.disabled=true);
@@ -131,7 +141,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     const visual=item.hints.at(-1)?.visual;
     if(visual)hintPanel.append(renderMathVisual(visual));
     const continueButton=button('Continue playing','math-primary');continueButton.dataset.action='continue-supported';
-    on(continueButton,'click',()=>complete('shown',false));helpActions.prepend(continueButton);hintPanel.append(helpActions);
+    on(continueButton,'click',()=>complete('shown',false));helpActions.prepend(continueButton);hintPanel.append(helpActions,hintReading.element);
     feedback.textContent='You can use this example. We’ll try a related idea another time.';feedback.dataset.state='support';
     hintButton.disabled=true;showButton.disabled=true;
     helpAnnouncement.textContent='';focusAndReveal(hintTitle,'start');
@@ -142,13 +152,13 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     const hint=item.hints[hintDepth++];useHint(options.profile,attempt.id,hintDepth);save();
     presentHelp(`Hint ${hintDepth} of ${item.hints.length}`,hint.text);
     if(hint.visual)hintPanel.append(renderMathVisual(hint.visual));
-    hintPanel.append(helpActions);
+    hintPanel.append(helpActions,hintReading.element);
     hintButton.textContent=hintDepth<item.hints.length?'Another hint':'Show how to finish';
     if(requested){helpAnnouncement.textContent='';focusAndReveal(hintTitle,'start');}
     else helpAnnouncement.textContent=`Hint ${hintDepth}. ${hint.text}`;
   }
   function submit(raw:string) {
-    if(disposed||done||locked)return;
+    if(disposed||done||locked)return;stopReading();
     const result=submitAnswer(options.profile,attempt.id,raw);save();
     if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Enter an answer, then check it.';return;}
     if(result.correct){
@@ -221,7 +231,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   return {
     item, attemptId:attempt.id, focus:focusQuestion,
     dispose(reason:'interrupted'='interrupted') {
-      if(disposed)return;disposed=true;if(completionTimer)clearTimeout(completionTimer);listeners.abort();
+      if(disposed)return;disposed=true;if(completionTimer)clearTimeout(completionTimer);listeners.abort();questionReading.dispose();hintReading.dispose();
       if(!done){finishAttempt(options.profile,attempt.id,reason);save();}
       root.remove();
     },

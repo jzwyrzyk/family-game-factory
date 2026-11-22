@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {installStudioPrivateSpeech} from '../src/studio/private-speech';
+import {createFriendlyNarrator,stopReadAloud} from '../src/speech/friendly-narrator';
 
 class Button {
  hidden=false;textContent='';onclick:(()=>void)|null=null;attrs:Record<string,string>={};
@@ -9,16 +10,18 @@ class Status {textContent='';}
 let mediaStarts=0,trackStops=0,captureAllowed=true,availability=true,scope='player:game-one';
 let learning=false,privateUploads=0,drafts:string[]=[];
 let resolveTranscript:((text:string)=>void)|undefined;
+let permission:Promise<typeof stream>|null=null;
+const playbackAtCapture:boolean[]=[];
 const audio=new Uint8Array(150);audio.set([0x1a,0x45,0xdf,0xa3],0);
 const saved=new Map<string,PropertyDescriptor|undefined>();
-for(const key of ['window','navigator','document'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
+for(const key of ['window','navigator','document','SpeechSynthesisUtterance'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
 const windowEvents=new Map<string,()=>void>(),documentEvents=new Map<string,()=>void>();
 class FakeRecorder {
  state='inactive';mimeType='audio/webm;codecs=opus';ondataavailable:((event:{data:Blob})=>void)|null=null;
  onstop:(()=>void)|null=null;onerror:(()=>void)|null=null;
  static isTypeSupported(type:string){return type==='audio/webm;codecs=opus';}
  constructor(_stream:MediaStream,options:{mimeType:string}){assert.equal(options.mimeType,this.mimeType);}
- start(){mediaStarts++;this.state='recording';}
+ start(){playbackAtCapture.push(!!(window as any).speechSynthesis?.speaking);mediaStarts++;this.state='recording';}
  stop(){this.state='inactive';this.ondataavailable?.({data:new Blob([audio],{type:this.mimeType})});this.onstop?.();}
 }
 const stream={getTracks:()=>[{stop(){trackStops++;}}]};
@@ -26,7 +29,7 @@ Object.defineProperty(globalThis,'window',{configurable:true,value:{
  MediaRecorder:FakeRecorder,addEventListener:(name:string,cb:()=>void)=>windowEvents.set(name,cb)
 }});
 Object.defineProperty(globalThis,'navigator',{configurable:true,value:{
- mediaDevices:{getUserMedia:async()=>{if(!captureAllowed)throw Error('PERMISSION_DENIED');return stream;}}
+ mediaDevices:{getUserMedia:async()=>{if(!captureAllowed)throw Error('PERMISSION_DENIED');return permission??stream;}}
 }});
 Object.defineProperty(globalThis,'document',{configurable:true,value:{
  hidden:false,addEventListener:(name:string,cb:()=>void)=>documentEvents.set(name,cb)
@@ -116,9 +119,56 @@ async function main(){
   resolveTranscript?.('Late text after explicit Cancel');await tick();
   assert.equal(drafts.length,1,'late canceled speech must not change the draft');
  });
+ await test('private capture stops saved-message reading before and after a delayed microphone permission',async()=>{
+  class Utterance {
+   onstart:(()=>void)|null=null;onend:(()=>void)|null=null;onerror:(()=>void)|null=null;
+   constructor(public text:string){}
+  }
+  class Synth extends EventTarget {
+   speaking=false;spoken:Utterance[]=[];
+   getVoices(){return [{name:'Samantha (Enhanced)',voiceURI:'Samantha',lang:'en-US',localService:true}];}
+   speak(utterance:Utterance){this.spoken.push(utterance);this.speaking=true;utterance.onstart?.();}
+   cancel(){this.speaking=false;}
+  }
+  const synth=new Synth();(window as any).speechSynthesis=synth;
+  Object.defineProperty(globalThis,'SpeechSynthesisUtterance',{configurable:true,value:Utterance});
+  let allow!:(value:typeof stream)=>void;
+  permission=new Promise(resolve=>{allow=resolve;});
+  const savedMessage=createFriendlyNarrator(()=>true),laterMessage=createFriendlyNarrator(()=>true);
+  const beforeStarts=mediaStarts,beforeUploads=privateUploads;
+  try{
+   await speech.refresh();
+   savedMessage.speak('A saved helper reply.');
+   assert.equal(savedMessage.active,true);assert.equal(synth.speaking,true);
+   button.onclick?.();await tick();
+   assert.equal(savedMessage.active,false,'the independent saved-message reader stops before requesting permission');
+   assert.equal(synth.speaking,false);assert.equal(mediaStarts,beforeStarts,'permission is still pending');
+   laterMessage.speak('Another reply while permission is pending.');
+   assert.equal(laterMessage.active,true);assert.equal(synth.speaking,true);
+   allow(stream);await tick();
+   assert.equal(mediaStarts,beforeStarts+1,'one explicit tap starts one recorder');
+   assert.equal(playbackAtCapture.at(-1),false,'the recorder starts only after all read-aloud audio stops');
+   assert.equal(laterMessage.active,false);assert.equal(synth.speaking,false);
+   speech.cancel();await tick();
+   assert.equal(privateUploads,beforeUploads,'cancelling the recording cannot upload or send a message');
+   // A stale permission result must release its stream without interrupting a
+   // new profile's separate reading or starting the former profile's recorder.
+   permission=new Promise(resolve=>{allow=resolve;});
+   await speech.refresh();button.onclick?.();await tick();
+   speech.cancel();scope='other-player:game-two';
+   laterMessage.speak('The other player chose this reading.');
+   const stopsBefore=trackStops;
+   allow(stream);await tick();
+   assert.equal(mediaStarts,beforeStarts+1,'stale permission cannot start another recorder');
+   assert.equal(trackStops,stopsBefore+1,'the stale permission stream is released');
+   assert.equal(laterMessage.active,true,'stale capture cannot cancel the new profile reading');
+   assert.equal(synth.speaking,true);
+  }finally{permission=null;scope='player:game-one';speech.cancel();stopReadAloud();delete (window as any).speechSynthesis;}
+ });
  assert.equal(drafts.length,1,'no cross-child audio transcript; no automatic chat turn or build');
  console.log(count+' private voice interaction tests passed; no live microphone or cloud STT was used.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{
+ stopReadAloud();
  for(const [key,descriptor]of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete (globalThis as any)[key];}
 });

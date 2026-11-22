@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {BAG_CAPACITY,newMineState,moveMine} from '../src/games/mind-your-jems-rules';
+import {filteredContrast} from './mind-your-jems-contrast.cjs';
 
 test('Mind Your Jems starts empty, with no child data or build assumptions',()=>{
  assert.deepEqual(newMineState(),{banked:0,loose:0,lost:0,mined:0,shakes:0,holding:false,phase:'mining'});
@@ -64,4 +65,30 @@ test('all mining value remains accounted for across 200 deterministic rounds',()
    assert.equal(s.mined,s.banked+s.loose+s.lost);
    assert.ok(s.loose>=0&&s.loose<=BAG_CAPACITY);
  }
+});
+test('mining contrast follows known sRGB saturation and ordered clipping values',()=>{
+ const sample=(backgroundColor:string,filter:string)=>filteredContrast({color:'rgb(255, 255, 255)',backgroundColor,filter});
+ const channels=(value:number[]|null)=>{assert.ok(value);return value.map(channel=>Number(channel.toFixed(5)));};
+ assert.deepEqual(channels(sample('rgb(255, 0, 0)','saturate(0)').filteredBackground),[54.315,54.315,54.315]);
+ assert.deepEqual(channels(sample('rgb(8, 125, 87)','saturate(1)').filteredBackground),[8,125,87]);
+ // This exact intermediate filter was captured on the newly enabled Bank
+ // button in both normal-motion browser journeys.
+ assert.deepEqual(channels(sample('rgb(8, 125, 87)','saturate(0.65)').filteredBackground),[39.27005,115.32005,90.62005]);
+ assert.deepEqual(channels(sample('rgb(8, 125, 87)','brightness(105%)').filteredBackground),[8.4,131.25,91.35]);
+ assert.deepEqual(channels(sample('rgb(255, 0, 0)','brightness(0.5) saturate(2)').filteredBackground),[227.8425,0,0]);
+ assert.deepEqual(channels(sample('rgb(255, 0, 0)','saturate(2) brightness(0.5)').filteredBackground),[127.5,0,0]);
+});
+test('mining contrast retains its threshold and rejects unmodelled rendering',()=>{
+ const style={color:'rgb(255, 255, 255)',backgroundColor:'rgb(8, 125, 87)',backgroundImage:'none',filter:'none'};
+ assert.equal(filteredContrast({...style,backgroundColor:'rgb(0, 0, 0)'}).ratio,21);
+ for(const filter of ['none','brightness(1.05)','saturate(0.65)','saturate(0.65) brightness(1.05)']){
+  const result=filteredContrast({...style,filter});
+  assert.ok(result.ratio!==null&&result.ratio>=4.5,filter+' retains measured readable control colors');
+ }
+ const oldBright=filteredContrast({...style,backgroundColor:'rgb(22, 206, 145)'});
+ assert.ok(oldBright.ratio!==null&&oldBright.ratio<4.5,'the former light green still fails');
+ for(const filter of ['blur(1px)','brightness(1) opacity(.5)','saturate(-1)','brightness(NaN)'])
+  assert.equal(filteredContrast({...style,filter}).ratio,null,filter+' cannot silently pass');
+ assert.equal(filteredContrast({...style,backgroundColor:'rgba(8, 125, 87, 0.5)'}).ratio,null);
+ assert.equal(filteredContrast({...style,backgroundImage:'linear-gradient(#16ce91, #04a575)'}).ratio,null);
 });

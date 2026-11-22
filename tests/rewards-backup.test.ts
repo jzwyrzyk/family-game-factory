@@ -4,6 +4,7 @@ import { before, test } from 'node:test';
 import { RevisionStore, WORKSPACE_KEY } from '../src/factory/workspace';
 import { StudioNotebook, STUDIO_KEY } from '../src/studio/notebook';
 import { hasMeaningfulCreation } from '../src/studio/guidance';
+import { deriveStudioNotifications, freshStudioNotificationPreferences } from '../src/studio/notifications';
 import { CreationStore, CREATION_KEY } from '../src/creation/storage';
 import { createChallengeStarter } from '../src/creation/challenges';
 import { createRewardFact } from '../src/rewards/model';
@@ -91,6 +92,8 @@ test('invalid family ownership, linked games, namespace and recovery-only files 
   invalid.push({...valid,factoryStudio:{...valid.factoryStudio,avatars:{[OTHER]:'spark'}}});
   invalid.push({...valid,factoryStudio:{...valid.factoryStudio,guidance:{[OTHER]:{welcomeDismissed:true,dismissedTips:['idea']}}}});
   invalid.push({...valid,factoryStudio:{...valid.factoryStudio,guidance:{'adult:foreign':{welcomeDismissed:true,dismissedTips:[]}}}});
+  invalid.push({...valid,factoryStudio:{...valid.factoryStudio,notifications:{[OTHER]:freshStudioNotificationPreferences()}}});
+  invalid.push({...valid,factoryStudio:{...valid.factoryStudio,notifications:{'adult:foreign':freshStudioNotificationPreferences()}}});
   invalid.push({...valid,factoryRewards:{...valid.factoryRewards,namespace:'foreign-workspace'}});
   invalid.push({...valid,factoryRewardsRecovery:{namespace:REWARDS_DB_NAME,raw:{damaged:true}}});
   invalid.push({...valid,factoryProblemSolvingRecoveryRaw:'preserved damaged evidence'});
@@ -115,6 +118,49 @@ test('family restoration carries optional guide preferences without creating wor
   assert.equal(hasMeaningfulCreation(restored.list(OWNER),OWNER),false,'dismissal is not a completed creation');
   assert.deepEqual(restored.read().sessions,[]);assert.deepEqual(restored.pendingRewards(OWNER),[]);
   assert.equal((await rewards.summary(OWNER)).lifetimeGems,0);
+});
+
+test('family restoration preserves notification acknowledgements and pending work without replay or rewards',async()=>{
+  const source=new StudioNotebook(new SourceMemory()),project=source.create(OWNER,'new','My saved cat');
+  source.update(project.id,OWNER,session=>{
+    session.draft='Let the cat jump';
+    session.pendingExperiment={parents:[],depth:'tune',origin:'child',baseId:null,prompt:'Let the cat jump'};
+    session.job={id:'acknowledged-job',api:'https://builder.test',status:'building'};
+  });
+  const notification=deriveStudioNotifications(source.list(OWNER),OWNER)[0];
+  source.dismissNotification(OWNER,notification);
+  const saved=source.read(),{storage,rewards,pals}=stores();
+  const plan=validateFamilyRewardBackup(JSON.stringify({...base(),factoryStudio:saved}),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
+  const restored=new StudioNotebook(storage),row=deriveStudioNotifications(restored.list(OWNER),OWNER,{},restored.notificationPreferences(OWNER))[0];
+  assert.deepEqual(restored.read(),saved);
+  assert.equal(row.dismissed,true);assert.equal(row.pending,true);assert.equal(row.unread,false);
+  assert.equal(restored.get(project.id,OWNER).job?.id,'acknowledged-job');
+  assert.deepEqual(restored.notificationPreferences(OTHER),freshStudioNotificationPreferences());
+  assert.equal((await rewards.summary(OWNER)).lifetimeGems,0);
+});
+
+test('backup rollback restores exact prior notification metadata and a legacy replacement remains optional',async()=>{
+  const {storage,rewards,pals}=stores(),source=new StudioNotebook(storage),project=source.create(OWNER,'new','Unconfirmed cat');
+  source.update(project.id,OWNER,session=>{
+    session.draft='Let the cat jump';
+    session.pendingExperiment={parents:[],depth:'tune',origin:'child',baseId:null,prompt:'Let the cat jump'};
+  });
+  source.acknowledgeNotifications(OWNER,deriveStudioNotifications(source.list(OWNER),OWNER));
+  storage.data.set(STUDIO_KEY,' '+storage.getItem(STUDIO_KEY)+'\n');
+  const raw=storage.getItem(STUDIO_KEY),before=source.read();
+  const legacy={...base(),factoryStudio:{version:1,sessions:[],active:{}}};
+  const plan=validateFamilyRewardBackup(JSON.stringify(legacy),validateBase,rewards,pals);
+  assert.equal(Object.hasOwn(plan.notebook,'notifications'),false);
+  storage.failKeys=[CREATION_KEY];
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/original progress was restored/);
+  assert.equal(storage.getItem(STUDIO_KEY),raw);assert.deepEqual(new StudioNotebook(storage).read(),before);
+  await recoverRewardBackupJournal(storage,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
+  const restored=new StudioNotebook(storage);
+  assert.equal(Object.hasOwn(restored.read(),'notifications'),false);
+  assert.deepEqual(restored.notificationPreferences(OWNER),freshStudioNotificationPreferences());
+  assert.deepEqual(restored.list(OWNER),[]);
 });
 
 test('native remote sessions and remote copies restore without inventing a local project reference',()=>{
