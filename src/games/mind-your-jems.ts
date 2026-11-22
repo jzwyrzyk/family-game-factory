@@ -161,7 +161,7 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
     for(const [id,node] of gemNodes)if(!live.has(id)){node.remove();gemNodes.delete(id);}
     for(const gem of state.gems){
       let node=gemNodes.get(gem.id);
-      if(!node){node=document.createElement('span');node.className='myj-gem';node.dataset.crystal=String(gem.id);node.dataset.x=String(gem.x);node.innerHTML=sprite('props-atlas.webp',gem.frame)+(gem.value===3?'<span class="myj-gem-value">+3</span>':'');el('.myj-gems').append(node);gemNodes.set(gem.id,node);}
+      if(!node){node=document.createElement('span');node.className='myj-gem';node.dataset.crystal=String(gem.id);node.dataset.x=String(gem.x);node.innerHTML=sprite('props-atlas.webp',gem.frame);el('.myj-gems').append(node);gemNodes.set(gem.id,node);}
       const p=point(gem.x),size=Math.max(26,Math.min(geometry.headSize*.10,64));place(node,p.x-size/2,p.y-size*.94,size);
     }
   }

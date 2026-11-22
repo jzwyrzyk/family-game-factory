@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:34:10.776Z",
-      "sourceDigest": "382b71dae036f7570f4072aa4ca7306d3ec091f380f4646db0943cf7eea138bf",
+      "reviewedAt": "2026-11-22T18:05:22.011Z",
+      "sourceDigest": "84d4f2ce55b8910d68fdd3bc76e81277ce4e03df5ced5cf6a7422ee62b2e4983",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the shared standalone terminal-button specificity correction and the native scene evidence. Documented the exact manually reviewed native baselines and the verified hosted-import path without changing gameplay rules or claiming a final visual comparison pass.",
+      "reviewReason": "Integrated the owner-requested one-jem and ten-pocket shared engine into the native mining player; preserved all approved artwork and updated the active mining contract and decision.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:34:11.066Z",
-      "sourceDigest": "465a3fa1c2801c2b182af3bc164cdbf4748cd20ce1a0e2f7c1468899d656b161",
+      "reviewedAt": "2026-11-22T18:05:22.275Z",
+      "sourceDigest": "ed27456c2a2261fd8b039a6b0fdc423d60e265dd0937a113d8a75b06005d8a74",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the hosted archive and original manifest, all nine imported PNG hashes and dimensions, and the reviewed normal-motion clip. Preserved the nine historical comparison failures, functional gate, CI non-update guard and unchanged 20-channel/.008 thresholds; final candidate comparison remains required.",
+      "reviewReason": "Reviewed uniform crystal-value and ten-capacity rules tests and integrated HUD assertions while preserving native-host controls, real-input fixtures,13 configurations and unchanged visual tolerances;403combinedunits pass.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T16:34:11.595Z",
-      "sourceDigest": "f2b6e4faddd33139b0fd1188c96fb7d16db4c8c0be75eb20af2f25bbdc2687ae",
+      "reviewedAt": "2026-11-22T18:05:22.584Z",
+      "sourceDigest": "dc424a9ccb5f9a51748ed348890caab1c91a31df5622a68129a90e7a946541d3",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact e314/056f source and c91940f hosted build evidence: all 13 mining configurations passed, nine old-baseline comparisons failed, reviewed captures imported, and all five full-visual jobs passed. Retained initial failures and current pending Arcade status; no local browser, merge, deployment or final comparison success is claimed.",
+      "reviewReason": "Recorded combined build and403unit pass separately from396phase-one units; kept fresh hosted acceptance pending and the user-directed merge hold explicit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
