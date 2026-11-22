@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T19:44:00.253Z",
+      "reviewedAt": "2026-11-22T14:30:30.746Z",
       "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified.",
+      "reviewReason": "Reviewed PR111/112 quality repair, PR114/115 Pal/coach integration, PR124 main diagnostic merge, PR125 draft profile/read-aloud contract, the exact Pages 44932334132 build/deploy job and worker source pin. Corrected present-vs-historical status for PR124 and PR81/68, linked PR117's unmerged Pal release receipt and documented unverified live services, actual chat/game acceptance, voice, child devices and consent. Architecture review found no new boundary decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -753,6 +753,13 @@
           "sourceDigest": "64860b987176b12c2989d5aa7545db91d586735753fa3be4d24e33f100ad5841",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded source repair on merged PR112, observed PR108 Pages marker and separately reported gateway repair, hosted browser/package gate requirement and compatible gateway/private-coach/web rollout with unchanged worker and settings."
+        },
+        {
+          "sourceCommit": "5688bb3f6a01a766af8b78c783faccd8cce8f89c",
+          "reviewedAt": "2026-11-21T19:44:00.253Z",
+          "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified."
         }
       ]
     },
