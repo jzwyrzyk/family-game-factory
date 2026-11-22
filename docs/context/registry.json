@@ -539,10 +539,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:28:47.707Z",
-      "sourceDigest": "55a4c78234ef73b8927e2d51db9f3da9e04f847d3a6f91c512d1ffb209a43545",
+      "reviewedAt": "2026-11-22T21:59:42.641Z",
+      "sourceDigest": "213cbc4ce51bb9f7ad5b2cad7abac7972525a8c556d0fe30ae2890f10f52927b",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the provider-only readiness source references, exact public quote restoration, literal child decisions, dynamic pre-call budget and specific content-free failure reasons; reviewed design, Adult/privacy and doctrine contracts without changing audience, semantic readiness, Build or model settings."
+      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified."
     },
     {
       "id": "adult-privacy",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:28:47.828Z",
-      "sourceDigest": "d24e95db50fe53b7848bb7664f64b0ee079d603246bc8e58d4d830fd5ff2619b",
+      "reviewedAt": "2026-11-22T22:14:44.270Z",
+      "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 51 focused Node22 tests including the new 21 wire/loopback groups, existing 77 coach unit and eight gateway HTTP checks, private security/diagnostics, typecheck and bundle import; synthetic provider, hosted image/browser and live reply evidence remain distinct.",
+      "reviewReason": "Reviewed the corrected private loopback failure taxonomy assertion: a missing mandatory proposedChange reports reply_proposal_invalid, rejects with 503 and makes no extra model request; all existing readiness and Build gates remain strict.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

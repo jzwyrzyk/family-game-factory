@@ -7,7 +7,7 @@
 import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
 import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {approved,validateCoachContext,type CoachProvider} from './service';
-import {OpenAICoachProvider,coachFailureEvent,tagCoachFailure,type PrivateCoachConfig,type CoachFailureEvent,type CoachFailureStage} from './private-provider';
+import {OpenAICoachProvider,coachFailureEvent,tagCoachFailure,normalizePrivateCoachReply,type PrivateCoachConfig,type CoachFailureEvent,type CoachFailureStage} from './private-provider';
 import {validateCoachReply} from '../../src/studio/design';
 import {privateCoachOrigin} from './private-bridge';
 import {speechApproved,speechConfig,validateAudio,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
@@ -120,7 +120,7 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
     if(!Number.isSafeInteger(usedMicroUsd)||usedMicroUsd<0||usedMicroUsd>runtime.config.maxTurnMicroUsd)
      throw Error('COACH_PROVIDER_FAILED');
     stage='reply_validation';
-    const validated=validateCoachReply(reply,context);
+    const validated=validateCoachReply(normalizePrivateCoachReply(reply,context),context);
     return send(res,200,{reply:validated,usedMicroUsd});
    }finally{active--;}
   }catch(error){
