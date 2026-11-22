@@ -45,6 +45,8 @@ A ready experiment must combine correct function with deliberate presentation, r
 
 Hold pixel art, flat digital 2D, illustration, dimensional art and realistic treatment to equivalent standards of craft in their own styles. Preserve the child's chosen appearance and the identity of saved artwork through unrelated mechanic changes. Gem Factory can set a reference for finish without becoming every game's palette, theme or loop. A simple complete game can meet the standard; an open-ended toy does not need a forced win, and a beautiful static scene does not establish meaningful play.
 
+The owner's [November 22 Factory refinement](docs/decisions/2026-11-22-factory-play-clarity.md) applies this principle within the existing illustrated workshop: make pattern matching the clear focus, attach sorting controls to the machine, give a missed cut a gentle current-jem consequence, and advance pattern difficulty after two completed gifts while preserving the expressive polishing and wrapping stages.
+
 See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0006-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
 
 ## 3. Choose the simplest method that preserves the intent

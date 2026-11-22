@@ -207,6 +207,13 @@
           "sourceDigest": "a40c8773795d110b03b554ac55fdd7130112a08ee17a56ea26186de4af0d7ab3",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the first-learner decision and architecture against existing child-owned creation doctrine; the new presentation preserves scene language, Keep, formative evidence and artwork identity."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:32:53.699Z",
+          "sourceDigest": "bbc7163734e6cbead17471a255e625af47573a1eb9718622abb12d579236db79",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Read the added Factory phone-layout paragraph against product doctrine: reusing the current instruction area and keeping the active machine in view implement the existing clear, physical-game interface requirement. No new product policy, reward or learning behavior is introduced."
         }
       ]
     },
@@ -469,6 +476,13 @@
           "sourceDigest": "5b18489a65280cba1c0085101d05d33ea21e6fa131ccccd3fd9f2dec8a507bd3",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the tablet evidence contract against the unchanged game and builder runtime. Updated game-quality and architecture guidance for the latest three tap receipts, bounded input/focus/scroll/viewport observations and geometry that distinguishes document scrolling from control movement. The single real tap, trusted activation counters, deadlines and construction-state assertions remain intact. The cause of the earlier redirected click and physical-device acceptance remain unverified; passive instrumentation is not a product repair. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c, including the reference assets unavailable locally."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:31:22.210Z",
+          "sourceDigest": "a91d1db892d110f8e28c5ab337348b419a625bbd0b3363edf3b2fb3da01258a0",
+          "reviewOutcome": "updated",
+          "reviewReason": "Inspected the Factory phone captures: the scene frame now clips without internal focus scrolling, and later-stage instructions occupy the former clue area so wrapping controls remain visible. These changes preserve the documented clear-phone and physical-control contract."
         }
       ]
     },
@@ -785,6 +799,13 @@
           "sourceDigest": "c3b75e616c9420f86a457329f51a62f1d2f3788b7f3c9b7e9fdc253a00f077fe",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed existing rewards, problem-solving, guidance and private-art journeys to use the visible My Games exit and optional More tools. All original data, authority and outcome assertions remain."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:32:41.666Z",
+          "sourceDigest": "7129b791b1fd6b62c03761edda1c4d37c12f0010c7dc5d262f2aeed46c24c93f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the hosted phone failure and final browser diff: a real timed input now follows camera/actionability preparation and observes activation completion once; assertions reject hidden scene scrolling and phone hints over wrapping controls. This candidate still requires hosted execution."
         }
       ]
     },
@@ -950,6 +971,13 @@
           "sourceDigest": "2179d1f3bd579cc243da92252fd5eab0e84d8a12c7cb44b8e20db3f76d3b272b",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded the isolated PR125-based coding candidate and exact local test scope; new hosted workflow collects independent five-layout evidence and no merge or deployment is claimed."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:50:53.805Z",
+          "sourceDigest": "68546fa89eb91c376a3ac872d8300924ee73b2b90e978d81fe4a70c5930dc14d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Verified all nine PR workflows on d82174e, including all four Arcade jobs, and confirmed the PR merge checkout has the same tree. Recorded the exact visual artifact, inspected states and initial failures. This final receipt changes documentation only and does not claim merge or deployment."
         }
       ]
     },

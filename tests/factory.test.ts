@@ -42,7 +42,7 @@ test('eight native game manifests and transactional composed changes stay bounde
  assert.equal(robot.kind,'supported');if(robot.kind==='supported'){assert.equal(robot.config.robotSpeed,1.25);assert.equal(robot.config.showTrail,false);}
 });
 test('Gem Factory presets and remixes stay within playable settings',()=>{
- assert.deepEqual(defaults('factory'),{orderSize:3,cutterSpeed:1,sparkleBoost:false});
+ assert.deepEqual(defaults('factory'),{orderSize:2,cutterSpeed:1,sparkleBoost:false});
  assert.deepEqual(defaults('factory','gentle'),{orderSize:2,cutterSpeed:.75,sparkleBoost:false});
  assert.deepEqual(defaults('factory','stretch'),{orderSize:5,cutterSpeed:1.25,sparkleBoost:false});
  const change=interpret('factory',defaults('factory'),'Pack 4 gems per order and add extra sparkles');

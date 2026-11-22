@@ -28,7 +28,7 @@ export const plugins: Record<GameId, GamePlugin> = {
 };
 const details = {
   mining: {type:'MINING ADVENTURE',instructions:'Tap crystals to collect Jems. Bank them in the cart. Grab on before the mountain shakes!',controls:'Tap a crystal · Bank Jems · Grab on during a warning · Tab and Enter on a keyboard'},
-  factory: {type:'SPARKLE WORKSHOP',instructions:'Find the next gem in the pattern, make it sparkle, and wrap a gift your way!',controls:'Tap a bucket · Tap the glowing cutter · Rub the gem · Pick your paper · Tap your gift'},
+  factory: {type:'SPARKLE WORKSHOP',instructions:'Find the next jem, tap the cutter in the green, and wrap your gift!',controls:'Keep or Return · Tap in the green · Rub the jem · Pick your paper · Tap your gift'},
   moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
   robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route to the star. The dark squares are walls.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},
   gum: { type: 'BUILD & DISCOVER', instructions: 'Build a silly machine. Watch it move. Try your next idea.', controls: 'Choose a sticker and a bubble, or drag a sticker onto the machine · Make it GO!' },

@@ -34,6 +34,7 @@ These records explain durable choices without turning chat history into another 
 
 | [Approved Pal collection](2026-11-21-approved-pal-collection.md) | Connect all 24 approved character neutrals to actual collection, two free starter choices, earned forms and versioned scene use while retaining saved IDs | Accepted for implementation and release after verification | Owner confirmed the starter-art gap and authorized the complete fix and subsequent cutover, November 21 |
 | [First-learner coding](2026-11-22-first-learner-coding.md) | Put a larger scene before a compact beginner action dock; disclose fuller controls without rewriting saved programs; composite approved Pal paper backgrounds in the scene renderer | Accepted for implementation; candidate verification and release separate | Owner's November 22 coding-learning usability and Pal-background overhaul request |
+| [Jem Factory play clarity](2026-11-22-factory-play-clarity.md) | Make patterns prominent, mount sorting controls on the machine, recycle missed cuts and increase pattern difficulty after two completed cycles | Accepted for implementation; verification and release separate | Owner's November 22 request to preserve the Factory's beauty and finishing play while making its actions clearer and consequential |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 

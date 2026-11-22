@@ -2,10 +2,11 @@ import {iconMarkup} from '../brand/icons';
 import type { GameContext, GameInstance } from '../runtime/types';
 import { GemSortingSimulation, SORTING_WORLD, type FactoryGemColor } from './gem-factory-physics';
 import { factoryPattern, factorySupply, type FactoryPattern } from './gem-factory-pattern';
+import { FACTORY_CUT_ZONE, factoryCutRating } from './gem-factory-cut';
 import './gem-factory.css';
 
 type Color = FactoryGemColor;
-type Stage = 'pick' | 'cut' | 'polish' | 'pack' | 'ship' | 'done';
+type Stage = 'pick' | 'cut' | 'recycle' | 'polish' | 'pack' | 'ship' | 'done';
 const colors: Record<Color, { name: string; shape: string; light: string; mid: string; dark: string }> = {
   ruby: { name: 'Ruby', shape: 'heart', light: '#ffcae1', mid: '#ff548c', dark: '#bb1f65' },
   sapphire: { name: 'Sapphire', shape: 'diamond', light: '#b8f4ff', mid: '#3cafff', dark: '#2754c5' },
@@ -71,6 +72,10 @@ export default class GemFactory implements GameInstance {
   private abort = new AbortController();
   private stage: Stage = 'pick';
   private level = 1;
+  private patternsCompleted = 0;
+  private roundStartPatternsCompleted = 0;
+  private patternLevel = 1;
+  private patternIndex = 0;
   private shipped = 0;
   private coins = 0;
   private roundCoins = 0;
@@ -78,6 +83,8 @@ export default class GemFactory implements GameInstance {
   private polish = 0;
   private selected: Color | null = null;
   private cutTime = 0;
+  private recycleTime = 0;
+  private cutMisses = 0;
   private shipTime = 0;
   private last = 0;
   private raf = 0;
@@ -113,21 +120,24 @@ export default class GemFactory implements GameInstance {
   private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   constructor(target: HTMLElement, private context: GameContext) {
-    this.orderSize = Math.min(5, Math.max(2, Number(context.config.orderSize) || 3));
+    this.orderSize = Math.min(5, Math.max(2, Math.round(Number(context.config.orderSize) || 2)));
     this.cutterSpeed = Math.min(1.5, Math.max(.5, Number(context.config.cutterSpeed) || 1));
     this.sparkleBoost = Boolean(context.config.sparkleBoost);
     const saved = context.persistence?.load() as Record<string, unknown> | undefined;
     if (saved?.schema === 'gem-factory-v1' && Number.isInteger(saved.level) && Number(saved.level) >= 1 && Number(saved.level) <= 999
       && Number.isInteger(saved.coins) && Number(saved.coins) >= 0 && Number(saved.coins) <= 1000000) {
       this.level = Number(saved.level); this.coins = Number(saved.coins);
+      this.patternsCompleted = Number.isSafeInteger(saved.patternsCompleted) && Number(saved.patternsCompleted) >= 0
+        ? Number(saved.patternsCompleted) : (this.level - 1) * 2;
     }
-    this.root.setAttribute('aria-label', 'Gem Factory');
-    this.root.innerHTML = `<header class="gf-topbar"><div class="gf-brand"><img src="./jems-mark.svg" alt="jems"><h2>Gem Factory<span class="gf-title-star" aria-hidden="true">✦</span></h2></div><div class="gf-top-actions"><button type="button" class="gf-icon-button" data-action="sound" aria-label="Turn sound on" aria-pressed="false">${controlIcon('sound-off')}</button><button type="button" class="gf-icon-button" data-action="pause" aria-label="Pause game">${controlIcon('pause')}</button></div></header>
+    this.roundStartPatternsCompleted = this.patternsCompleted;
+    this.root.setAttribute('aria-label', 'Jem Factory');
+    this.root.innerHTML = `<header class="gf-topbar"><div class="gf-brand"><img src="./jems-mark.svg" alt="jems"><h2>Jem Factory<span class="gf-title-star" aria-hidden="true">✦</span></h2></div><div class="gf-top-actions"><button type="button" class="gf-icon-button" data-action="sound" aria-label="Turn sound on" aria-pressed="false">${controlIcon('sound-off')}</button><button type="button" class="gf-icon-button" data-action="pause" aria-label="Pause game">${controlIcon('pause')}</button></div></header>
       <div class="gf-world"><div class="gf-room"><img class="gf-backdrop" src="./gem-factory-workshop.webp" alt=""><div class="gf-belt-motion" aria-hidden="true"></div><div class="gf-machine-glow" aria-hidden="true"></div><div class="gf-live-gem" aria-hidden="true"></div><div class="gf-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><section class="gf-line" aria-label="Factory line"></section></div>
       <div class="gf-hud"><div class="gf-day"><strong></strong></div><div class="gf-wallet"><span class="gf-coin" aria-hidden="true">✦</span><strong>0</strong></div></div>
-      <section class="gf-order" aria-label="Gem pattern"></section><div class="gf-progress" aria-label="Gifts packed"></div>
-      <div class="gf-helper"><img src="./jems-gem-companion.png" alt="Your cheerful Jems gem companion"><p class="gf-helper-hint" aria-hidden="true"></p></div>
-      <div class="gf-effects" aria-hidden="true"></div><div class="gf-pause-overlay" hidden><div class="gf-pause-card"><span class="gf-pause-gem" aria-hidden="true">✦</span><h3>Tea break!</h3><p>Your gems can wait.</p><button type="button" class="gf-primary" data-action="resume">${iconMarkup('play')} Let's play</button></div></div></div><p class="gf-screen-reader" role="status" aria-live="polite"></p>`;
+      <section class="gf-order" aria-label="Jem pattern"></section><div class="gf-progress" aria-label="Gifts packed"></div>
+      <div class="gf-helper"><img src="./jems-gem-companion.png" alt="Your cheerful Jems companion"><p class="gf-helper-hint" aria-hidden="true"></p></div>
+      <div class="gf-effects" aria-hidden="true"></div><div class="gf-pause-overlay" hidden><div class="gf-pause-card"><span class="gf-pause-gem" aria-hidden="true">✦</span><h3>Tea break!</h3><p>Your jems can wait.</p><button type="button" class="gf-primary" data-action="resume">${iconMarkup('play')} Let's play</button></div></div></div><p class="gf-screen-reader" role="status" aria-live="polite"></p>`;
     this.world = this.root.querySelector('.gf-world')!;
     this.console = this.root.querySelector('.gf-line')!;
     this.liveGem = this.root.querySelector('.gf-live-gem')!;
@@ -203,23 +213,26 @@ export default class GemFactory implements GameInstance {
   private release() { this.holding = false; this.pointerId = null; this.polishingPointer = null; }
   private prepareSorting() {
     this.sorter.dispose(); this.sorter = new GemSortingSimulation(); this.sortingNodes.clear();
-    this.pattern = factoryPattern(this.level, this.shipped); this.recipe = [this.pattern.next]; this.filled = [false]; this.feedCursor = 0;
+    const previousLevel = this.patternLevel;
+    this.patternLevel = Math.min(999, 1 + Math.floor(this.patternsCompleted / 2)); this.patternIndex = this.patternsCompleted;
+    this.pattern = factoryPattern(this.patternLevel, this.patternIndex); this.recipe = [this.pattern.next]; this.filled = [false]; this.feedCursor = 0;
     this.returned = []; this.sortingMistakes = 0; this.sortingRecoveries = 0; this.sortingReturns = 0; this.sortingBonus = 0;
     this.sortingReadyAt = null; this.sortingSettledAt = 0; this.sortingControlKey = '';
-    this.sortingHint = 'What comes next? Tap a bucket.';
+    this.sortingHint = this.patternLevel > previousLevel ? 'New pattern! What comes next?' : 'Keep if it fits. Return if it doesn’t.';
   }
-  private nextGem(): Color { const supply = factorySupply(this.pattern, this.level, this.shipped); return supply[this.feedCursor % supply.length]; }
+  private nextGem(): Color { const supply = factorySupply(this.pattern, this.patternLevel, this.patternIndex); return supply[this.feedCursor % supply.length]; }
   private sortingBusy() { const state = this.sorter.snapshot(); return this.sortingReadyAt !== null || state.time < this.sortingSettledAt || state.gems.some(g => g.state === 'moving'); }
   private route(direction: -1 | 1) {
     if (this.stage !== 'pick' || !this.active() || this.sortingBusy()) return;
     this.sorter.setDirection(direction);
     if (this.sorter.release(this.nextGem()) === null) return;
+    this.console.dataset.route = direction === -1 ? 'keep' : 'return';
     this.sortingHint = 'Here it goes!'; this.updateSortingControls(); this.chime([440]);
   }
   private renderPattern() {
     this.order.hidden = this.stage !== 'pick';
     if (this.order.hidden) return;
-    this.order.innerHTML = `<h3>What comes next?</h3><div class="gf-pattern" role="img" aria-label="${this.pattern.sequence.map(c => colors[c].name).join(', ')}, then the missing gem">${this.pattern.sequence.map(c => `<span class="gf-pattern-gem" data-color="${c}" aria-label="${colors[c].name}">${gemArt(c)}</span>`).join('')}<span class="gf-pattern-missing ${this.filled[0] ? 'gf-pattern-solved' : ''}" aria-label="${this.filled[0] ? `${colors[this.pattern.next].name} added` : 'Missing next gem'}">${this.filled[0] ? gemArt(this.pattern.next) : '?'}</span></div>`;
+    this.order.innerHTML = `<h3>What comes next?</h3><div class="gf-pattern" style="--pattern-slots:${this.pattern.sequence.length + 1}" role="img" aria-label="${this.pattern.sequence.map(c => `${colors[c].name} ${colors[c].shape}`).join(', ')}, then ${this.filled[0] ? `${colors[this.pattern.next].name} ${colors[this.pattern.next].shape} added` : 'the missing jem'}">${this.pattern.sequence.map(c => `<span class="gf-pattern-gem" data-color="${c}" aria-hidden="true">${gemArt(c)}</span>`).join('')}<span class="gf-pattern-missing ${this.filled[0] ? 'gf-pattern-solved' : ''}" aria-hidden="true">${this.filled[0] ? gemArt(this.pattern.next) : '?'}</span></div>`;
   }
   private updateSortingControls() {
     if (this.stage !== 'pick') return;
@@ -228,10 +241,10 @@ export default class GemFactory implements GameInstance {
     this.sortingControlKey = key; this.console.dataset.sortingBusy = String(busy);
     for (const action of ['route-order', 'route-return']) {
       const button = this.console.querySelector<HTMLButtonElement>(`[data-action="${action}"]`);
-      if (button) { button.disabled = busy; button.setAttribute('aria-label', `${action === 'route-order' ? 'Order' : 'Return'} bucket: send the ${colors[color].name} gem`); }
+      if (button) { button.disabled = busy; button.setAttribute('aria-label', `${action === 'route-order' ? 'Keep' : 'Return'} the ${colors[color].name} ${colors[color].shape} jem`); }
     }
     const candidate = this.console.querySelector<HTMLElement>('.gf-candidate');
-    if (candidate) { candidate.hidden = busy; candidate.innerHTML = gemArt(color, true); candidate.dataset.color = color; candidate.setAttribute('aria-label', `${colors[color].name} ${colors[color].shape} gem in the hopper`); }
+    if (candidate) { candidate.hidden = busy; candidate.innerHTML = gemArt(color, true); candidate.dataset.color = color; candidate.setAttribute('aria-label', `${colors[color].name} ${colors[color].shape} jem ready to sort`); }
     this.hint(this.sortingHint);
   }
   private animateSorter(delta: number) {
@@ -260,7 +273,7 @@ export default class GemFactory implements GameInstance {
         this.context.emit?.({ type: 'mechanic', name: 'gem-sorted', value: 1 });
       } else if (event.bin === 'return' && !needed) {
         if (this.returned.length) this.sortingRecoveries++;
-        this.returned = []; this.feedCursor++; this.sortingReturns++; this.sortingHint = 'Try this gem!'; this.chime([440, 523]);
+        this.returned = []; this.feedCursor++; this.sortingReturns++; this.sortingHint = 'Good return! Check this jem.'; this.chime([440, 523]);
       } else {
         this.sortingMistakes++; this.returned = [event.color];
         this.sortingHint = 'Look at the pattern. Try again!'; this.chime([330, 392]);
@@ -273,11 +286,19 @@ export default class GemFactory implements GameInstance {
   }
   private cutterPosition() { return (Math.sin(this.cutTime * Math.PI / 1200 * this.cutterSpeed - Math.PI / 2) + 1) / 2; }
   private cut() {
-    if (this.stage !== 'cut') return;
-    const distance = Math.abs(this.cutterPosition() - .5);
-    this.rating = distance <= .115 ? 3 : distance <= .24 ? 2 : 1;
+    if (this.stage !== 'cut' || !this.active()) return;
+    this.rating = factoryCutRating(this.cutterPosition());
+    if (!this.rating) {
+      this.stage = 'recycle'; this.recycleTime = 0; this.cutMisses++; this.release(); this.render(); this.chime([392, 330]);
+      this.focusAction('pause');
+      return;
+    }
     this.stage = 'polish'; this.polish = 0; this.render(); this.burst(38, 58, this.rating === 3 ? 25 : 15);
     this.chime(this.rating === 3 ? [659, 784, 1047] : [523, 659]); this.focusAction('polish');
+  }
+  private finishRecycling() {
+    this.stage = 'pick'; this.selected = null; this.rating = 0; this.polish = 0;
+    this.prepareSorting(); this.sortingHint = 'A new jem! Keep if it fits.'; this.render(); this.focusAction('route-order');
   }
   private addPolish(amount: number) {
     if (this.stage !== 'polish' || !this.active()) return;
@@ -292,13 +313,15 @@ export default class GemFactory implements GameInstance {
     this.paper = paper;
     for (const b of this.console.querySelectorAll<HTMLButtonElement>('[data-action="paper"]')) b.setAttribute('aria-pressed', String(b.dataset.paper === paper));
     const present = this.console.querySelector<HTMLButtonElement>('.gf-gift-action');
-    if (present) { present.dataset.paper = paper; present.innerHTML = giftArt(paper); present.setAttribute('aria-label', `Wrap and send your gem in ${papers[paper].name.toLowerCase()} paper`); }
+    if (present) { present.dataset.paper = paper; present.innerHTML = giftArt(paper); present.setAttribute('aria-label', `Wrap and send your jem in ${papers[paper].name.toLowerCase()} paper`); }
     this.hint('Lovely! Tap your gift to send it.'); this.chime([659]);
   }
   private pack() {
     if (this.stage !== 'pack') return;
     this.stage = 'ship'; this.shipTime = 0; const earned = 15 + this.rating * 5 + this.sortingBonus;
-    this.coins += earned; this.roundCoins += earned; this.wrappedPapers.push(this.paper); this.shipped++; this.render();
+    this.coins += earned; this.roundCoins += earned; this.wrappedPapers.push(this.paper); this.shipped++;
+    // Finish this pattern's whole journey once. A cut retry cannot farm levels.
+    this.patternsCompleted = Math.min(Number.MAX_SAFE_INTEGER, this.patternsCompleted + 1); this.render();
     this.burst(85, 55, 34); this.chime([523, 659, 784, 1047]);
     this.announce(`Your ${papers[this.paper].name.toLowerCase()} gift is ready! ${this.shipped} of ${this.orderSize} gifts made.`);
     this.context.emit?.({ type: 'mechanic', name: 'gem-packed', value: this.shipped });
@@ -306,41 +329,42 @@ export default class GemFactory implements GameInstance {
   private finishShipping() {
     if (this.shipped >= this.orderSize) {
       this.stage = 'done'; this.render(); this.save();
-      this.context.finish({ won: true, level: this.level, title: 'A box full of happy!', description: `You finished ${this.orderSize} gem patterns and made ${this.orderSize} beautiful gifts. ${this.level === 1 ? 'Next up: a new repeating pattern!' : 'Ready for another day at the factory?'}` });
+      this.context.finish({ won: true, level: this.level, title: 'A box full of happy!', description: `You made ${this.orderSize} beautiful gifts. ${this.patternsCompleted % 2 === 0 ? 'A new pattern is ready!' : 'One more gift to a new pattern!'}` });
     } else { this.stage = 'pick'; this.selected = null; this.rating = 0; this.polish = 0; this.prepareSorting(); this.render(); this.focusAction('route-order'); }
   }
   private focusAction(action: string) { this.root.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)?.focus({ preventScroll: true }); }
   private render() {
     this.root.dataset.stage = this.stage;
-    const stageIndex = ['pick', 'cut', 'polish', 'pack', 'ship', 'done'].indexOf(this.stage);
+    const stageIndex = ['pick', 'cut', 'polish', 'pack', 'ship', 'done'].indexOf(this.stage === 'recycle' ? 'cut' : this.stage);
     this.world.style.setProperty('--station', String(Math.min(stageIndex, 3)));
     this.world.style.setProperty('--gem-x', `${[16, 38, 62, 85, 85, 85][stageIndex]}%`);
     this.world.style.setProperty('--mobile-pan', `${[0, -20, -44, -64.286, -64.286, -64.286][stageIndex]}%`);
     this.world.style.setProperty('--shine', String(this.polish / 100));
-    this.dayLabel.textContent = `Day ${this.level}`; this.coinsLabel.textContent = this.coins.toLocaleString();
+    this.dayLabel.textContent = `Level ${this.patternLevel}`; this.coinsLabel.textContent = this.coins.toLocaleString();
     this.coinsLabel.parentElement!.setAttribute('aria-label', `${this.coins} happy coins`);
     this.progress.innerHTML = `<span>${Array.from({ length: this.orderSize }, (_, i) => `<i class="${i < this.shipped ? 'gf-gift-filled' : ''}" data-paper="${this.wrappedPapers[i] || 'hearts'}">${giftArt(this.wrappedPapers[i] || 'hearts')}</i>`).join('')}</span>`;
     this.progress.setAttribute('aria-label', `${this.shipped} of ${this.orderSize} gifts packed`);
     this.renderPattern();
     const shipping = this.stage === 'ship' || this.stage === 'done';
-    this.liveGem.innerHTML = shipping ? `<div class="gf-packed-present" data-paper="${this.paper}">${giftArt(this.paper)}</div>` : this.stage === 'cut' && this.selected ? gemArt(this.selected, true) : '';
+    this.liveGem.innerHTML = shipping ? `<div class="gf-packed-present" data-paper="${this.paper}">${giftArt(this.paper)}</div>` : (this.stage === 'cut' || this.stage === 'recycle') && this.selected ? gemArt(this.selected, true) : '';
     this.liveGem.style.setProperty('--shine', String(this.polish / 100));
     let inner = '';
     if (this.stage === 'pick') {
-      inner = `<div class="gf-sorting-board" aria-label="Choose a bucket for the gem"><div class="gf-sorting-chute" aria-hidden="true"><i></i></div><div class="gf-candidate" role="img"></div><div class="gf-ramp-pivot" aria-hidden="true"></div><div class="gf-sorting-ramp" aria-hidden="true"><i></i><i></i><i></i></div><div class="gf-sorting-gems" aria-hidden="true"></div><button type="button" class="gf-sort-basket gf-order-basket" data-action="route-order"><span class="gf-basket-symbol" aria-hidden="true">${iconMarkup('check')}</span><span>Order</span></button><button type="button" class="gf-sort-basket gf-return-basket" data-action="route-return"><span class="gf-basket-symbol" aria-hidden="true">${iconMarkup('retry')}</span><span>Return</span></button></div>`;
-    } else if (this.stage === 'cut') {
-      inner = `<button type="button" class="gf-machine-action gf-cut-action" data-action="cut" aria-label="Tap the cutter when the pointer is in the glowing mint stripe"><span class="gf-machine-halo" aria-hidden="true"></span><span class="gf-tap-spark" aria-hidden="true">✦</span><span class="gf-timing-track" aria-hidden="true"><span class="gf-good-zone"></span><span class="gf-perfect-zone"></span><i class="gf-cutter-needle"></i></span></button>`;
+      inner = `<div class="gf-sorting-board" aria-label="Jem sorter above the hopper"><div class="gf-sorting-chute" aria-hidden="true"><i></i></div><div class="gf-candidate" role="img"></div><div class="gf-ramp-pivot" aria-hidden="true"></div><div class="gf-sorting-ramp" aria-hidden="true"><i></i><i></i><i></i></div><div class="gf-sorting-gems" aria-hidden="true"></div><div class="gf-sort-bin gf-keep-bin" aria-hidden="true">${iconMarkup('check')}</div><div class="gf-sort-bin gf-return-bin" aria-hidden="true">${iconMarkup('retry')}</div></div><div class="gf-sort-controls" role="group" aria-label="Keep the next jem in the pattern, or return a different jem"><span class="gf-route-lever" aria-hidden="true"></span><button type="button" class="gf-sort-basket gf-order-basket" data-action="route-order"><span class="gf-basket-symbol" aria-hidden="true">${iconMarkup('check')}</span><span>Keep</span></button><button type="button" class="gf-sort-basket gf-return-basket" data-action="route-return"><span class="gf-basket-symbol" aria-hidden="true">${iconMarkup('retry')}</span><span>Return</span></button></div>`;
+    } else if (this.stage === 'cut' || this.stage === 'recycle') {
+      const missed = this.stage === 'recycle';
+      inner = `<button type="button" class="gf-machine-action gf-cut-action${missed ? ' gf-cut-miss' : ''}" data-action="cut" ${missed ? 'disabled' : ''} aria-label="Tap the cutter while the pointer is in the green middle. A miss needs a new jem."><span class="gf-machine-halo" aria-hidden="true"></span><span class="gf-tap-spark" aria-hidden="true">✦</span><span class="gf-timing-track" style="--cut-good-start:${FACTORY_CUT_ZONE.goodStart * 100}%;--cut-good-width:${(FACTORY_CUT_ZONE.goodEnd - FACTORY_CUT_ZONE.goodStart) * 100}%;--cut-perfect-start:${FACTORY_CUT_ZONE.perfectStart * 100}%;--cut-perfect-width:${(FACTORY_CUT_ZONE.perfectEnd - FACTORY_CUT_ZONE.perfectStart) * 100}%" aria-hidden="true"><span class="gf-good-zone"></span><span class="gf-perfect-zone"></span><i class="gf-cutter-needle" style="left:${this.cutterPosition() * 100}%"></i></span><span class="gf-cut-label" aria-hidden="true">${missed ? 'New jem!' : 'Tap in the green'}</span></button>`;
     } else if (this.stage === 'polish') {
-      inner = `<button type="button" class="gf-machine-action gf-polish-action gf-polish-stone" data-action="polish" aria-label="Rub or hold the ${colors[this.selected!].name} gem to make it shine. Hold Space or press Enter with a keyboard."><span class="gf-machine-halo" aria-hidden="true"></span>${gemArt(this.selected!)}<span class="gf-polish-cloud" aria-hidden="true"></span><span class="gf-polish-spark" aria-hidden="true">✦</span></button><div class="gf-polish-track" role="progressbar" aria-label="Gem shine" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="gf-polish-fill"></span></div>`;
+      inner = `<button type="button" class="gf-machine-action gf-polish-action gf-polish-stone" data-action="polish" aria-label="Rub or hold the ${colors[this.selected!].name} jem to make it shine. Hold Space or press Enter with a keyboard."><span class="gf-machine-halo" aria-hidden="true"></span>${gemArt(this.selected!)}<span class="gf-polish-cloud" aria-hidden="true"></span><span class="gf-polish-spark" aria-hidden="true">✦</span></button><div class="gf-polish-track" role="progressbar" aria-label="Jem shine" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="gf-polish-fill"></span></div>`;
     } else if (this.stage === 'pack') {
-      inner = `<div class="gf-wrap-options" role="group" aria-label="Choose wrapping paper">${(Object.keys(papers) as Paper[]).map(paper => `<button type="button" class="gf-paper-roll gf-paper-${paper}" data-action="paper" data-paper="${paper}" aria-label="${papers[paper].name} wrapping paper" aria-pressed="${this.paper === paper}"><span class="gf-paper-swatch" aria-hidden="true"></span><span class="gf-paper-name">${paper[0].toUpperCase() + paper.slice(1)}</span><span class="gf-paper-check" aria-hidden="true">${iconMarkup('check')}</span></button>`).join('')}</div><button type="button" class="gf-machine-action gf-gift-action" data-action="pack" data-paper="${this.paper}" aria-label="Wrap and send your gem in ${papers[this.paper].name.toLowerCase()} paper">${giftArt(this.paper)}</button>`;
+      inner = `<div class="gf-wrap-options" role="group" aria-label="Choose wrapping paper">${(Object.keys(papers) as Paper[]).map(paper => `<button type="button" class="gf-paper-roll gf-paper-${paper}" data-action="paper" data-paper="${paper}" aria-label="${papers[paper].name} wrapping paper" aria-pressed="${this.paper === paper}"><span class="gf-paper-swatch" aria-hidden="true"></span><span class="gf-paper-name">${paper[0].toUpperCase() + paper.slice(1)}</span><span class="gf-paper-check" aria-hidden="true">${iconMarkup('check')}</span></button>`).join('')}</div><button type="button" class="gf-machine-action gf-gift-action" data-action="pack" data-paper="${this.paper}" aria-label="Wrap and send your jem in ${papers[this.paper].name.toLowerCase()} paper">${giftArt(this.paper)}</button>`;
     } else {
       inner = `<div class="gf-delivery-spark" aria-hidden="true">✦</div>`;
     }
-    this.console.innerHTML = inner; this.console.inert = this.userPaused || this.hostPaused;
+    this.console.innerHTML = inner; this.console.inert = this.userPaused || this.hostPaused; delete this.console.dataset.route;
     this.sortingControlKey = ''; this.sortingNodes.clear();
     if (this.stage === 'pick') { this.updateSortingControls(); this.animateSorter(0); }
-    else this.hint(this.stage === 'cut' ? 'Tap when it glows!' : this.stage === 'polish' ? 'Rub the gem. Make it shine!' : this.stage === 'pack' ? 'Pick a paper. Tap your gift!' : this.stage === 'done' ? 'A little happiness, delivered!' : `A gift for ${customers[(this.shipped + this.level - 2) % customers.length]}!`);
+    else this.hint(this.stage === 'cut' ? 'Tap in the green. A miss needs a new jem.' : this.stage === 'recycle' ? 'Missed! Let’s try a new jem.' : this.stage === 'polish' ? 'Rub the jem. Make it shine!' : this.stage === 'pack' ? 'Pick a paper. Tap your gift!' : this.stage === 'done' ? 'A little happiness, delivered!' : `A gift for ${customers[(this.shipped + this.level - 2) % customers.length]}!`);
     this.pauseButton.disabled = this.stage === 'done';
   }
   private setUserPause(paused: boolean) {
@@ -349,12 +373,12 @@ export default class GemFactory implements GameInstance {
     this.pauseOverlay.hidden = !paused; this.root.classList.toggle('gf-paused', paused || this.hostPaused);
     this.console.inert = paused || this.hostPaused; this.pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game'); this.pauseButton.innerHTML = controlIcon(paused ? 'play' : 'pause');
     this.context.emit?.({ type: paused ? 'pause' : 'resume', name: 'factory-break' });
-    if (paused) this.focusAction('resume'); else { const action = this.stage === 'pick' ? 'route-order' : this.stage === 'ship' ? '' : this.stage; if (action) this.focusAction(action); }
+    if (paused) this.focusAction('resume'); else { const action = this.stage === 'pick' ? 'route-order' : this.stage === 'ship' || this.stage === 'recycle' ? 'pause' : this.stage; this.focusAction(action); }
   }
   private togglePause() { if (!this.hostPaused) this.setUserPause(!this.userPaused); }
   private save() {
-    const saved = this.context.persistence?.save({ schema: 'gem-factory-v1', level: this.level, coins: this.coins });
-    if (saved === false) this.announce('Your gem factory could not be saved. You can keep playing here.');
+    const saved = this.context.persistence?.save({ schema: 'gem-factory-v1', level: this.level, coins: this.coins, patternsCompleted: this.patternsCompleted });
+    if (saved === false) this.announce('Your jem factory could not be saved. You can keep playing here.');
   }
   private chime(notes: number[]) {
     if (!this.sound || this.stopped) return;
@@ -386,8 +410,11 @@ export default class GemFactory implements GameInstance {
       if (this.stage === 'cut') {
         this.cutTime += delta;
         const needle = this.console.querySelector<HTMLElement>('.gf-cutter-needle'); if (needle) needle.style.left = `${this.cutterPosition() * 100}%`;
-        this.console.querySelector('.gf-cut-action')?.classList.toggle('gf-cut-ready', Math.abs(this.cutterPosition() - .5) <= .115);
+        const rating = factoryCutRating(this.cutterPosition());
+        this.console.querySelector('.gf-cut-action')?.classList.toggle('gf-cut-ready', rating > 0);
+        this.console.querySelector('.gf-cut-action')?.classList.toggle('gf-cut-perfect', rating === 3);
       }
+      if (this.stage === 'recycle') { this.recycleTime += delta; if (this.recycleTime >= 900) this.finishRecycling(); }
       if (this.stage === 'polish' && this.holding) this.addPolish(delta / 28);
       if (this.stage === 'ship') { this.shipTime += delta; if (this.shipTime >= (this.reducedMotion ? 650 : 1300)) this.finishShipping(); }
       for (const p of this.particles) {
@@ -402,18 +429,18 @@ export default class GemFactory implements GameInstance {
   };
   private reset() {
     if (this.userPaused) { this.userPaused = false; this.context.emit?.({ type: 'resume', name: 'factory-break' }); }
-    this.stage = 'pick'; this.shipped = 0; this.roundCoins = 0; this.selected = null; this.rating = 0; this.polish = 0; this.wrappedPapers = [];
+    this.stage = 'pick'; this.shipped = 0; this.roundCoins = 0; this.selected = null; this.rating = 0; this.polish = 0; this.wrappedPapers = []; this.cutMisses = 0; this.recycleTime = 0;
     this.prepareSorting(); this.hostPaused = false; this.release(); this.last = 0; this.cutTime = 0; this.shipTime = 0;
     this.particles.forEach(p => p.el.remove()); this.particles = []; this.pauseOverlay.hidden = true; this.console.inert = false;
     this.root.classList.remove('gf-paused'); this.pauseButton.innerHTML = controlIcon('pause'); this.pauseButton.setAttribute('aria-label', 'Pause game'); this.render();
   }
-  next() { if (this.stopped || this.hostPaused) return; this.level = Math.min(999, this.level + 1); this.reset(); this.save(); }
-  restart() { if (this.stopped || this.hostPaused) return; this.coins -= this.roundCoins; this.reset(); this.save(); }
+  next() { if (this.stopped || this.hostPaused || this.stage !== 'done') return; this.level = Math.min(999, this.level + 1); this.roundStartPatternsCompleted = this.patternsCompleted; this.reset(); this.save(); }
+  restart() { if (this.stopped || this.hostPaused) return; this.coins -= this.roundCoins; this.patternsCompleted = this.roundStartPatternsCompleted; this.reset(); this.save(); }
   retry() { this.restart(); }
   isPlaying() { return !this.stopped && this.stage !== 'done' && !this.hostPaused && !this.userPaused; }
   pause() { if (!this.isPlaying()) return false; this.hostPaused = true; this.release(); this.console.inert = true; this.root.classList.add('gf-paused'); return true; }
   resume() { if (!this.stopped) { this.hostPaused = false; this.last = 0; this.console.inert = this.userPaused; this.root.classList.toggle('gf-paused', this.userPaused); } }
-  snapshot() { return { stage: this.stage, level: this.level, order: this.wanted(), completed: this.shipped, orderSize: this.orderSize, coins: this.coins, polish: Math.round(this.polish), rating: this.rating, hostPaused: this.hostPaused, userPaused: this.userPaused, holding: this.holding,
+  snapshot() { return { stage: this.stage, level: this.level, patternLevel: this.patternLevel, patternIndex: this.patternIndex, patternsCompleted: this.patternsCompleted, cutMisses: this.cutMisses, cutterPosition: this.cutterPosition(), order: this.wanted(), completed: this.shipped, orderSize: this.orderSize, coins: this.coins, polish: Math.round(this.polish), rating: this.rating, hostPaused: this.hostPaused, userPaused: this.userPaused, holding: this.holding,
     recipe: [...this.recipe], collected: [...this.filled], pattern: { cycle: [...this.pattern.cycle], sequence: [...this.pattern.sequence], next: this.pattern.next }, nextGem: this.nextGem(), returns: [...this.returned], sortingMistakes: this.sortingMistakes, sortingRecoveries: this.sortingRecoveries, sortingReturns: this.sortingReturns, sortingBonus: this.sortingBonus, sortingBusy: this.sortingBusy(), paper: this.paper, wrappedPapers: [...this.wrappedPapers], sorting: this.sorter.snapshot() }; }
   unmount() {
     this.save(); this.stopped = true; this.release(); this.sorter.dispose(); cancelAnimationFrame(this.raf); this.abort.abort();

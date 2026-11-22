@@ -133,7 +133,7 @@ async function shellJourney(browser, base, viewport) {
     await page.locator('#page-parent').waitFor({ state: 'visible' });
     await navigate(page, '#studioNavHome');
     await page.locator('[data-starter="factory"]').click();
-    await page.waitForFunction(() => window.FG.runtime.snapshot()?.config.orderSize === 3);
+    await page.waitForFunction(() => window.FG.runtime.snapshot()?.config.orderSize === 2);
     assert.equal(await page.locator('.site-header').isVisible(), false, 'active play replaces duplicate global navigation');
     assert.equal(await page.locator('#studioHome').isVisible(), true, 'the game retains a visible My Games exit');
     await openProfiles(page);
