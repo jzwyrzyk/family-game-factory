@@ -25,7 +25,7 @@ const git = (...args) => { try { return execFileSync('git', args, { encoding: 'u
 const manifest = { schema: 'bubble-gum-browser-review-v1', startedAt: new Date().toISOString(),
   source: git('rev-parse', 'HEAD'), tree: git('rev-parse', 'HEAD^{tree}'),
   dirty: !!git('status', '--porcelain'), realAdventureMs: TOUR_DURATION_MS,
-  touchTransport: 'One retained CDP session per journey; explicit touch id 1; subsequent tap uses Locator.tap',
+  touchTransport: 'One retained CDP session per journey; implicit touch id matching Playwright; subsequent tap uses Locator.tap',
   sources: Object.fromEntries(['src/games/bubble-gum-builder.ts', 'src/games/bubble-gum-builder.css',
     'src/games/bubble-gum-rules.ts', 'src/games/bubble-gum-art.ts', 'tests/bubble-gum-builder-browser.cjs']
     .map(file => [file, fs.existsSync(file) ? hash(fs.readFileSync(file)) : null])),
@@ -86,10 +86,10 @@ async function dragPart(journey, object, slot) {
     // Retain the transport until this journey closes so detaching a second
     // emulation session cannot change how the following ordinary tap behaves.
     const session = journey.touchSession ||= await journey.context.newCDPSession(journey.page);
-    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...start, id: 1 }] });
+    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [start] });
     for (const fraction of [.15, .35, .55, .75, 1]) await session.send('Input.dispatchTouchEvent', {
       type: 'touchMove', touchPoints: [{ x: start.x + (end.x - start.x) * fraction,
-        y: start.y + (end.y - start.y) * fraction, id: 1 }] });
+        y: start.y + (end.y - start.y) * fraction }] });
     await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     // The touch controller commits on the next frame after touchend, keeping
     // the captured source alive until the browser completes that gesture.

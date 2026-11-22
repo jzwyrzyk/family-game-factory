@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:58:57.685Z",
-      "sourceDigest": "8b546a2213d06b25d3e3320e97ed5b9a5dacff969d884b361c5a69fcf949015b",
+      "reviewedAt": "2026-11-22T19:05:38.672Z",
+      "sourceDigest": "d4f61ea9281c170567ee325e68f7e650f747bc76edefe2ee279cce3d23788dab",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded contrary touch evidence and isolated retained versus detached test transports on unchanged plain controls, while the full ten-case game suite keeps one client alive and preserves every gesture and assertion.",
+      "reviewReason": "Isolated the touch driver with stable-DOM protocol probes and retained exact saved-workshop entry assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -27,6 +27,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  host-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+        id: build
+      - name: Preserve legacy workshop and Studio histories
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/studio-journey.cjs
+      - name: Verify earned gem journeys through assembly completion
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:gem-journey
+      - name: Verify rewards layout, earning and persistence
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/rewards-browser.cjs
+      - name: Upload host integration captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bubble-gum-host-integration-evidence
+          path: test-results/
+          if-no-files-found: error
+          retention-days: 14
   touch-transport-probe:
     runs-on: ubuntu-24.04
     timeout-minutes: 5

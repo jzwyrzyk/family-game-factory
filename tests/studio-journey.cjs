@@ -28,15 +28,17 @@ const {start}=require('./browser-server.cjs');
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
   await page.click('[data-starter="gum"]');
   // This suite exercises the preserved physical builder; newly created games
-  // default to sticker mode and are tested in sticker-builder-browser.cjs.
-  await page.evaluate(()=>{
+  // use assembly and are tested in bubble-gum-builder-browser.cjs. Resume this
+  // older project from its own My jems card, preserving its engine and history.
+  const physicalSessionId=await page.evaluate(()=>{
     const key='family-game-factory-workspace-v2',w=JSON.parse(localStorage.getItem(key));
     const p=w.projects.find(p=>p.game==='gum'),r=w.revisions.find(r=>r.id===p.headId);
     r.config.qualityVersion=1;
     localStorage.setItem(key,JSON.stringify(w));
+    return FG.studio.exportNotebook().sessions.find(s=>s.projectId===p.id).id;
   });
   await page.reload();await page.waitForFunction(()=>FG.studio);
-  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+  await page.locator(`#studioLibrary [data-session="${physicalSessionId}"] .studio-saved-open`).click();await page.waitForSelector('.quality-builder');
   // A replay/version control must retain an active host activity; leaving the game may interrupt it.
   const guardedAttempt=await page.evaluate(()=>{const overlay=document.getElementById('stage-overlay'),target=document.createElement('div');overlay.replaceChildren(target);overlay.classList.remove('hidden');FG.store.current().mathWindow=[];const s=FG.studio.exportNotebook().sessions[0];FG.learning.checkpoint(target,{gameId:'gum',projectId:s.id,versionId:'replay-guard'},()=>{},{roundId:'replay-guard'});return FG.learning.activeAttemptId;});
   assert.ok(guardedAttempt);assert.equal(await page.locator('#studioPlay').isVisible(),false,'active play has no redundant restart control');
@@ -65,7 +67,7 @@ const {start}=require('./browser-server.cjs');
   // The intentional presentation may create a zero-count legacy fact. Subsequent
   // design/history actions must preserve this post-checkpoint learning baseline.
   const original=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
-  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+  await page.locator(`#studioLibrary [data-session="${physicalSessionId}"] .studio-saved-open`).click();await page.waitForSelector('.quality-builder');
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();assert.equal(await bottles(),1);
   const base=(await workspace()).projects[0].headId;
   await talk();await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');

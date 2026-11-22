@@ -1,7 +1,7 @@
-/* Isolated browser-transport diagnostic, not product acceptance. Both contexts
- * keep the DOM unchanged: one captured touch drag, then one normal Locator.tap.
- * The only difference is whether its auxiliary CDP session is detached between
- * those gestures. A missing click is recorded as evidence, never called a pass.
+/* Isolated browser-transport diagnostic, not product acceptance. Fresh contexts
+ * keep the DOM unchanged: one captured touch drag, then exactly one tap. The
+ * independent controls vary touch ID, session lifetime and tap transport; the
+ * baseline only taps. A missing click is evidence, never called a product pass.
  */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -13,11 +13,12 @@ fs.mkdirSync(output, { recursive: true });
 const evidence = { schema: 'bubble-gum-touch-transport-probe-v1', startedAt: new Date().toISOString(), cases: [] };
 const save = () => fs.writeFileSync(path.join(output, 'review.json'), JSON.stringify(evidence, null, 2) + '\n');
 
-async function probe(browser, detach) {
+async function probe(browser, options) {
+  const { name, detach = false, dragId = 'explicit-1', tap = 'locator', drag = true } = options;
   const context = await browser.newContext({ viewport: { width: 820, height: 1024 }, hasTouch: true });
   const page = await context.newPage();
   let session;
-  const result = { name: detach ? 'detach-after-drag' : 'retain-through-tap' };
+  const result = { name, parameters: { detach, dragId, tap, drag, tapId: 'implicit-0' }, protocol: [] };
   evidence.cases.push(result);
   try {
     await page.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -53,25 +54,49 @@ async function probe(browser, detach) {
       finePointer: matchMedia('(pointer: fine)').matches, anyCoarse: matchMedia('(any-pointer: coarse)').matches,
       hover: matchMedia('(hover: hover)').matches }));
     result.beforeSession = await signals();
-    session = await context.newCDPSession(page);
-    const source = await page.locator('#source').boundingBox();
-    const drop = await page.locator('#drop').boundingBox();
-    assert.ok(source && drop, 'the isolated source and target are visible');
-    const start = { x: source.x + source.width / 2, y: source.y + source.height / 2 };
-    const end = { x: drop.x + drop.width / 2, y: drop.y + drop.height / 2 };
-    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...start, id: 1 }] });
-    for (const fraction of [.15, .35, .55, .75, 1]) {
-      await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{
-        x: start.x + (end.x - start.x) * fraction, y: start.y + (end.y - start.y) * fraction, id: 1,
-      }] });
+    const dispatch = (type, touchPoints) => {
+      const parameters = { type, touchPoints };
+      result.protocol.push({ time: Date.now(), method: 'Input.dispatchTouchEvent', parameters });
+      return session.send('Input.dispatchTouchEvent', parameters);
+    };
+    if (drag) {
+      session = await context.newCDPSession(page);
+      const source = await page.locator('#source').boundingBox();
+      const drop = await page.locator('#drop').boundingBox();
+      assert.ok(source && drop, 'the isolated source and target are visible');
+      const start = { x: source.x + source.width / 2, y: source.y + source.height / 2 };
+      const end = { x: drop.x + drop.width / 2, y: drop.y + drop.height / 2 };
+      const point = value => dragId === 'implicit-0' ? value : { ...value, id: 1 };
+      await dispatch('touchStart', [point(start)]);
+      for (const fraction of [.15, .35, .55, .75, 1]) {
+        await dispatch('touchMove', [point({
+          x: start.x + (end.x - start.x) * fraction, y: start.y + (end.y - start.y) * fraction,
+        })]);
+      }
+      await dispatch('touchEnd', []);
     }
-    await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     result.afterDrag = await signals();
     if (detach) { await session.detach(); session = null; }
     result.beforeTap = await signals();
-    // Exactly one normal tap: no retry, forced click, synthetic DOM event,
+    // Exactly one tap: no retry, forced click, synthetic DOM event,
     // compatibility-mouse injection, or game/controller method invocation.
-    await page.locator('#next').tap();
+    result.tapStartedAt = Date.now();
+    if (tap === 'locator') {
+      result.protocol.push({ time: Date.now(), method: 'Locator.tap', parameters: { selector: '#next' } });
+      await page.locator('#next').tap();
+    } else {
+      assert.ok(session, 'the raw tap uses the same retained drag session');
+      const next = await page.locator('#next').boundingBox();
+      const point = { x: next.x + next.width / 2, y: next.y + next.height / 2 };
+      if (tap === 'same-session-parallel') {
+        // Matches Playwright 1.56 crInput.js's normal tap dispatch ordering.
+        await Promise.all([dispatch('touchStart', [point]), dispatch('touchEnd', [])]);
+      } else {
+        await dispatch('touchStart', [point]);
+        await dispatch('touchEnd', []);
+      }
+    }
+    result.tapAcknowledgedAt = Date.now();
     await page.waitForFunction(() => window.probe.clicks > 0, undefined, { timeout: 500 }).catch(error => {
       if (!String(error).includes('Timeout')) throw error;
     });
@@ -79,7 +104,7 @@ async function probe(browser, detach) {
     Object.assign(result, await page.evaluate(() => ({ events: window.probe.events, drops: window.probe.drops,
       clicks: window.probe.clicks, sourceUnchanged: window.probe.source === document.getElementById('source'),
       nextUnchanged: window.probe.next === document.getElementById('next') })));
-    assert.equal(result.drops, 1, 'one real captured drag reached pointerup');
+    assert.equal(result.drops, drag ? 1 : 0, 'only the requested real captured drag reached pointerup');
     assert.ok(result.sourceUnchanged && result.nextUnchanged, 'no DOM lifecycle change can explain this diagnostic');
     assert.equal(result.events.filter(event => event.type === 'pointerdown' && event.target === 'next' && event.trusted).length, 1,
       'the one normal follow-up tap reached the next button');
@@ -104,9 +129,19 @@ async function probe(browser, detach) {
       (!process.env.CI && fs.existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined),
     headless: true, args: ['--no-sandbox'] });
     evidence.browser = browser.version();
-    await probe(browser, false);
-    await probe(browser, true);
-    assert.equal(evidence.cases.length, 2, 'both independent diagnostic contexts ran');
+    const cases = [
+      { name: 'locator-only-baseline', drag: false },
+      { name: 'explicit-1-retain-locator' },
+      { name: 'explicit-1-detach-locator', detach: true },
+      { name: 'implicit-0-retain-locator', dragId: 'implicit-0' },
+      { name: 'implicit-0-detach-locator', dragId: 'implicit-0', detach: true },
+      { name: 'explicit-1-same-session-parallel', tap: 'same-session-parallel' },
+      { name: 'implicit-0-same-session-parallel', dragId: 'implicit-0', tap: 'same-session-parallel' },
+      { name: 'explicit-1-same-session-sequential', tap: 'same-session-sequential' },
+      { name: 'implicit-0-same-session-sequential', dragId: 'implicit-0', tap: 'same-session-sequential' },
+    ];
+    for (const options of cases) await probe(browser, options);
+    assert.equal(evidence.cases.length, cases.length, 'every independent diagnostic context ran');
   } catch (error) {
     evidence.error = String(error.stack || error);
     throw error;
