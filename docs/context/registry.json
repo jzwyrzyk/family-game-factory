@@ -539,10 +539,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:28:47.707Z",
-      "sourceDigest": "55a4c78234ef73b8927e2d51db9f3da9e04f847d3a6f91c512d1ffb209a43545",
+      "reviewedAt": "2026-11-22T21:55:10.548Z",
+      "sourceDigest": "b6091655ed6b53486598ed3631fca8cf8547f77802cdbecfdee942a42f643a68",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the provider-only readiness source references, exact public quote restoration, literal child decisions, dynamic pre-call budget and specific content-free failure reasons; reviewed design, Adult/privacy and doctrine contracts without changing audience, semantic readiness, Build or model settings."
+      "reviewReason": "Reviewed private-only optional metadata recovery against the existing coach and creation-readiness contracts. Documented strict validation remaining after bounded quote, evidence and question cleanup; no real deployment or successful conversation is asserted."
     },
     {
       "id": "adult-privacy",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:28:47.828Z",
-      "sourceDigest": "d24e95db50fe53b7848bb7664f64b0ee079d603246bc8e58d4d830fd5ff2619b",
+      "reviewedAt": "2026-11-22T21:55:10.548Z",
+      "sourceDigest": "2b317e33c1221f35d67542d8e6fe97dca6b97dd3749af562476dacc771d7be39",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 51 focused Node22 tests including the new 21 wire/loopback groups, existing 77 coach unit and eight gateway HTTP checks, private security/diagnostics, typecheck and bundle import; synthetic provider, hosted image/browser and live reply evidence remain distinct.",
+      "reviewReason": "Reviewed the new synthetic private HTTP regressions for invented optional metadata, one-question normalization, preserved safety explanation, missing mandatory fields, strict readiness and explicit Build; documented their limitations without claiming production acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
