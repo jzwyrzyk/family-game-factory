@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:38:48.345Z",
-      "sourceDigest": "4e62e2d86442a0ff58ec699c54bb17ef9ec3203287528f335d1104d247f7218f",
+      "reviewedAt": "2026-11-22T15:40:46.642Z",
+      "sourceDigest": "ddbbb5715b38ef236a94ece8203e7646cc5e772f3638649f4c1d9b3e33659d5e",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected hosted desktop art and traced rock contact points, glove anchors and safe grass edge; updated face fitting and scoped embedded keyboard handling require fresh visual captures.",
+      "reviewReason": "Independent geometry review corrected narrow landscape clearance so small stages retain the giant and aligned drawn bridge endpoints exactly with the walking transition.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:38:48.798Z",
+      "reviewedAt": "2026-11-22T15:40:47.129Z",
       "sourceDigest": "15a15e409ef6d53a85c73e682b1cf6c2e199c0746459c3732a6e06079f57f710",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed first hosted deposit evidence and corrected platform sampling while retaining thirteen real-input cases, exact score assertions and unchanged visual tolerances.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed geometry follow-up against retained short landscape and rotation browser cases; exact accounting, real held input and visual mismatch gates remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

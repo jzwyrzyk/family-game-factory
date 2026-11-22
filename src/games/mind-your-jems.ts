@@ -122,7 +122,8 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   function place(node:HTMLElement,x:number,y:number,size:number){node.style.left=x+'px';node.style.top=y+'px';node.style.width=size+'px';node.style.height=size+'px';}
   function layout(){
     const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;
-    const portrait=w<600||w<h*1.15,shallow=h<300,shortPortrait=portrait&&h<440;
+    const landscape=window.matchMedia('(orientation: landscape)').matches;
+    const portrait=!landscape&&(w<600||w<h*1.15),shallow=h<300,shortPortrait=portrait&&h<440;
     const bottomExtent=shallow||shortPortrait?.84:portrait?.90:.94;
     const topClear=portrait?132:shallow?20:40;
     const playerAt=(size:number)=>Math.max(64,Math.min(size*(portrait?.25:.225),shallow?83:portrait?104:174));
@@ -141,7 +142,7 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
     geometry={left:start,headTop,headSize:size,cartX,cartSize,cartFoot,playerSize};
     place(el('.myj-head-anchor'),headLeft,headTop,size);
     place(cart,cartX,cartFoot-cartSize*.66,cartSize);
-    const bridge=el('.myj-bridge'),from=point(79),to=point(90),dx=to.x-from.x,dy=to.y-from.y;
+    const bridge=el('.myj-bridge'),from=point(80),to=point(88),dx=to.x-from.x,dy=to.y-from.y;
     bridge.style.left=from.x+'px';bridge.style.top=from.y+'px';bridge.style.width=Math.hypot(dx,dy)+'px';bridge.style.transform='rotate('+Math.atan2(dy,dx)+'rad)';
     renderPosition();renderGems();
   }
