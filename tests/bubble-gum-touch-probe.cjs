@@ -18,7 +18,8 @@ async function probe(browser, options) {
   const context = await browser.newContext({ viewport: { width: 820, height: 1024 }, hasTouch: true });
   const page = await context.newPage();
   let session;
-  const result = { name, parameters: { detach, dragId, tap, drag, tapId: 'implicit-0' }, protocol: [] };
+  const result = { name, parameters: { detach, dragId, tap, drag, tapId: 'implicit-0',
+    contactDurationMs: tap === 'same-session-held' ? 100 : 0 }, protocol: [] };
   evidence.cases.push(result);
   try {
     await page.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -93,6 +94,10 @@ async function probe(browser, options) {
         await Promise.all([dispatch('touchStart', [point]), dispatch('touchEnd', [])]);
       } else {
         await dispatch('touchStart', [point]);
+        // One physical contact held for 100ms; it is not a delayed retry or
+        // an additional tap. Compare its trusted click with the zero-duration
+        // controls above while keeping the same captured drag and target.
+        if (tap === 'same-session-held') await page.waitForTimeout(100);
         await dispatch('touchEnd', []);
       }
     }
@@ -110,6 +115,15 @@ async function probe(browser, options) {
       'the one normal follow-up tap reached the next button');
     assert.equal(result.events.filter(event => event.type === 'touchend' && event.target === 'next' && event.trusted).length, 1,
       'the one normal follow-up tap completed on the next button');
+    const contact = result.events.filter(event => event.target === 'next' && event.trusted &&
+      (event.type === 'pointerdown' || event.type === 'pointerup'));
+    assert.deepEqual(contact.map(event => event.type), ['pointerdown', 'pointerup'],
+      'the follow-up contact contains exactly one trusted press and release');
+    result.observedContactMs = contact[1].time - contact[0].time;
+    if (tap === 'same-session-held') assert.ok(result.observedContactMs >= 80,
+      'the physical-contact control actually holds the same finger before release');
+    if (result.clicks === 1) assert.equal(result.events.filter(event => event.type === 'click' &&
+      event.target === 'next' && event.trusted).length, 1, 'a reported click is one real trusted browser click');
     result.observed = result.clicks === 1 ? 'one-click' : result.clicks === 0 ? 'no-click' : 'multiple-clicks';
     console.log(`TRANSPORT PROBE ${result.name}: ${result.observed}; maxTouchPoints ${result.beforeSession.maxTouchPoints} -> ${result.beforeTap.maxTouchPoints}`);
   } catch (error) {
@@ -139,6 +153,7 @@ async function probe(browser, options) {
       { name: 'implicit-0-same-session-parallel', dragId: 'implicit-0', tap: 'same-session-parallel' },
       { name: 'explicit-1-same-session-sequential', tap: 'same-session-sequential' },
       { name: 'implicit-0-same-session-sequential', dragId: 'implicit-0', tap: 'same-session-sequential' },
+      { name: 'implicit-0-same-session-held-100ms', dragId: 'implicit-0', tap: 'same-session-held' },
     ];
     for (const options of cases) await probe(browser, options);
     assert.equal(evidence.cases.length, cases.length, 'every independent diagnostic context ran');
