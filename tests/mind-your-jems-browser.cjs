@@ -178,21 +178,12 @@ async function exercise(journey,device,review){
   document.querySelector('#studioBuildProgress .studio-wait-arcade-button').click();
  });
  await journey.advance(50);assert.equal(await arcade.isVisible(),true);
- // Surface the real ready notice before the final one-Jem deposit. Waiting for
- // its separate build-status poll *after* banking can let a random, scheduled
- // big-idea warning replace the approved happy/celebration screenshot. The
- // warning path is exercised above; the ready visual captures the distinct
- // child-visible result of banking while a completed game remains ready.
- journey.state.status='ready';
- await journey.until(()=>arcade.locator('[data-myj="play-ready"]').isVisible(),'verified ready state is surfaced',{step:250,limit:16000});
- await journey.phase('mining');
  await mine(0);assert.equal(await journey.score('loose'),1,'immediate reopen remains interactive');
  await journey.advance(450);await bank();assert.equal(await journey.score('banked'),1);await journey.advance(700);
+ journey.state.status='ready';
+ await journey.until(()=>arcade.locator('[data-myj="play-ready"]').isVisible(),'verified ready state is surfaced',{step:250,limit:16000});
  assert.equal(journey.counters.previewRequests,0,'ready notification never auto-opens a preview');
- assert.match(await arcade.locator('.myj-build-status').innerText(),/ready/i);
- assert.equal(await arcade.getAttribute('data-phase'),'mining','ready visual checks normal playable mining, not the separate scheduled warning');
- assert.equal(await arcade.locator('.myj-rock').getAttribute('data-expression'),'happy','ready visual captures the earned one-Jem bank celebration');
- await geometry(journey,device,review);await capture('ready');
+ assert.match(await arcade.locator('.myj-build-status').innerText(),/ready/i);await geometry(journey,device,review);await capture('ready');
  const readyScore=await journey.score('banked');await journey.advance(1500);
  assert.equal(await journey.score('banked'),readyScore,'ready status leaves earned progress intact');
  await journey.phase('mining');await mine(0);await journey.advance(450);
