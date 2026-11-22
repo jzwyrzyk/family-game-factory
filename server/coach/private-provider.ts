@@ -55,9 +55,10 @@ export function normalizePrivateCoachReply(value:unknown,context:CoachContext):u
   }
  }
  if(typeof r.question==='string'){
-  const first=r.question.indexOf('?');
-  if(first!==-1&&r.question.indexOf('?',first+1)!==-1)r.question=r.question.slice(0,first+1);
-  if(r.question.length>350)r.question=null;
+  let question=r.question;
+  const first=question.indexOf('?');
+  if(first!==-1&&question.indexOf('?',first+1)!==-1)question=question.slice(0,first+1);
+  r.question=question.length>350?null:question;
  }
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)r.move='reflect';
  // Crucially, never adjust creationReadiness, its sources or unresolved gaps.
