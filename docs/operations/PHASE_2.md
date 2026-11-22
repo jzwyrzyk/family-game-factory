@@ -5,12 +5,15 @@ operation requires a maintainer-reviewed intent on protected main. The repositor
 Google grants are initially absent. Existing Pages, sandbox publication, smoke,
 worker trust and provider approval retain their current release paths.
 
-**Current preparation boundary (November 21, 2026):** the owner authorized
-completion of work that does not need their intervention and explicitly said
-**do not merge yet**. Prepare and test the source and the read-only account
-handoff; keep both PRs unmerged and production activation withheld. A prepared
-permission proposal, successful fixture test or old connected task does not
-establish access in the current task.
+**Integration authorization (November 22, 2026):** The November 21
+preparation-only hold has been superseded by the owner's explicit instruction to
+merge and finish this access-source work, subject to the protected-main checks
+and exact reconciled source. This authorizes the inert source integration, not
+privileged identity enablement, new IAM bindings, the managed diagnostics connection,
+Cloud Logging access, an isolated paid drill, release flags or production traffic.
+The seven inactive GCP resources were created and verified; the read-only
+verification receipt was recovered under temporary /tmp storage. Live effective
+permissions and end-to-end assistant access remain unverified.
 
 ## Integration split: policy checks and game fixes
 
@@ -26,8 +29,7 @@ updating this draft from that integration.
 PR107 retains the proposed image-publication and Cloud Run release workflows,
 advisory CODEOWNERS coverage and this activation runbook. Their account grants,
 actual OIDC claim proofs, scoped Logging validation and isolated live rollout
-drill remain separate work. The draft hold and all activation requirements below
-still apply to that remainder. Merging the policy/game-fix source does not
+drill remain separate work. All activation requirements below continue to apply independently after the inert source integration. Merging the policy/game-fix source does not
 satisfy them, authorize cloud mutations or validate an old administrator review
 code. Preserve both unset release flags and use a fresh plan bound to the current
 reviewed PR107 head for any later administrator action.

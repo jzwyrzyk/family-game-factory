@@ -543,10 +543,19 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:28:47.707Z",
-      "sourceDigest": "55a4c78234ef73b8927e2d51db9f3da9e04f847d3a6f91c512d1ffb209a43545",
+      "reviewedAt": "2026-11-22T21:59:42.641Z",
+      "sourceDigest": "213cbc4ce51bb9f7ad5b2cad7abac7972525a8c556d0fe30ae2890f10f52927b",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the provider-only readiness source references, exact public quote restoration, literal child decisions, dynamic pre-call budget and specific content-free failure reasons; reviewed design, Adult/privacy and doctrine contracts without changing audience, semantic readiness, Build or model settings."
+      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
+          "reviewedAt": "2026-11-22T18:28:47.707Z",
+          "sourceDigest": "55a4c78234ef73b8927e2d51db9f3da9e04f847d3a6f91c512d1ffb209a43545",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented the provider-only readiness source references, exact public quote restoration, literal child decisions, dynamic pre-call budget and specific content-free failure reasons; reviewed design, Adult/privacy and doctrine contracts without changing audience, semantic readiness, Build or model settings."
+        }
+      ]
     },
     {
       "id": "adult-privacy",
@@ -617,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T22:30:12.846Z",
-      "sourceDigest": "650738219188f0e8fae9a5f97d19e89b9b622b28c088576a6731c3a07a614ef2",
+      "reviewedAt": "2026-11-22T23:25:28.510Z",
+      "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed PR126's bounded tablet focus/scroll diagnostic assertions together with merged PR131's private creation-wire tests. No assertion was relaxed; historical missed-tap and portrait-decoding failures remain recorded. Full combined-source digest observed in hosted documentation job 137379759144; browser acceptance remains separate.",
+      "reviewReason": "Reviewed PR126's existing real-tap, Pal image lifecycle and receipt regressions alongside merged PR133's private-provider optional-evidence fallback tests and unchanged visual baselines. Previous 0.8%-threshold Mind Your Jems screenshot flake is tracked in issue #76; the test-only capture experiment was reverted. Exact combined-source fingerprint and hosted acceptance remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -698,6 +707,20 @@
           "sourceDigest": "59d746b674b130ab70db62f75ce7a82385ae31ddddf6a04f3091126a23d8b2cc",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the tablet instrumentation diff and independent review: one real tap, the original two-second activation wait, unchanged trusted/redirected/cancelled counters and construction-state assertions, complete listener cleanup, and bounds of three tap receipts and 32 retained events per tap. Updated architecture and delivery records to preserve the original redirected-click failure and distinguish syntax validation from unavailable local Chromium acceptance. New hosted results must be evaluated on their own source; a pass alone does not identify or repair the earlier failure. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c."
+        },
+        {
+          "sourceCommit": "4de78af41f788974e2c5f349be563810b1b809e4",
+          "reviewedAt": "2026-11-22T22:14:44.270Z",
+          "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the corrected private loopback failure taxonomy assertion: a missing mandatory proposedChange reports reply_proposal_invalid, rejects with 503 and makes no extra model request; all existing readiness and Build gates remain strict."
+        },
+        {
+          "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
+          "reviewedAt": "2026-11-22T22:30:12.846Z",
+          "sourceDigest": "650738219188f0e8fae9a5f97d19e89b9b622b28c088576a6731c3a07a614ef2",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed PR126's bounded tablet focus/scroll diagnostic assertions together with merged PR131's private creation-wire tests. No assertion was relaxed; historical missed-tap and portrait-decoding failures remain recorded. Full combined-source digest observed in hosted documentation job 137379759144; browser acceptance remains separate."
         }
       ]
     },

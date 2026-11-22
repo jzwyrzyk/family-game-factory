@@ -5,14 +5,71 @@
 import {COACH_POLICY,COACH_SCHEMA} from './policy';
 import {prepareCreationWire} from './private-creation-wire';
 import {approved,type CoachConfig,type CoachProvider} from './service';
-import type {CoachContext} from '../../src/studio/design';
+import {PLAN_FIELDS,type CoachContext} from '../../src/studio/design';
 export type PrivateCoachConfig = CoachConfig & {apiKey:string};
+
+/** Lossy recovery for non-authoritative model metadata only.
+ * Text has already passed output moderation when it reaches this boundary.
+ * Never infer child intent, alter readiness evidence, invent a plan or retry inference.
+ * Public host validation still runs AFTER this; malformed mandatory fields fail shut.
+ */
+export function normalizePrivateCoachReply(value:unknown,context:CoachContext):unknown {
+ if(!value||typeof value!=='object'||Array.isArray(value))return value;
+ const r=structuredClone(value) as Record<string,unknown>;
+ const object=(item:unknown):item is Record<string,unknown>=>!!item&&typeof item==='object'&&!Array.isArray(item);
+ const exact=(item:Record<string,unknown>,allowed:string[])=>Object.keys(item).length===allowed.length&&
+  allowed.every(key=>Object.hasOwn(item,key));
+ const authored=[context.message,...context.conversation.filter(turn=>turn.role==='child').map(turn=>turn.text)];
+ const childQuote=(item:unknown):item is {field:typeof PLAN_FIELDS[number];quote:string}=>
+  object(item)&&exact(item,['field','quote'])&&PLAN_FIELDS.includes(item.field as any)&&
+  typeof item.quote==='string'&&!!item.quote.trim()&&item.quote.length<=700&&
+  authored.some(text=>text.includes(item.quote as string));
+ const suggestion=(item:unknown):item is {field:typeof PLAN_FIELDS[number];value:string}=>
+  object(item)&&exact(item,['field','value'])&&PLAN_FIELDS.includes(item.field as any)&&
+  typeof item.value==='string'&&item.value.length<=700;
+ // False observations and nonliteral child choices cannot be promoted into
+ // authored decisions. Dropping them is safer than losing the entire reply.
+ if(Array.isArray(r.evidenceIds)){
+  const ids=new Set(context.observations.map(item=>item.id));
+  r.evidenceIds=r.evidenceIds.filter((item):item is string=>typeof item==='string'&&ids.has(item)).slice(0,8);
+ }
+ if(Array.isArray(r.childDecisions))
+  r.childDecisions=r.childDecisions.filter(childQuote).slice(0,8);
+ if(Array.isArray(r.planSuggestions))
+  r.planSuggestions=r.planSuggestions.filter(suggestion).slice(0,8);
+ if(Array.isArray(r.suggestions))
+  r.suggestions=r.suggestions.filter((item):item is string=>typeof item==='string'&&item.length<=500).slice(0,4);
+ if(Object.hasOwn(r,'proposedChange')&&r.proposedChange!==null&&(!object(r.proposedChange)||
+   !exact(r.proposedChange,['title','request','depth'])||
+   typeof r.proposedChange.title!=='string'||r.proposedChange.title.length>120||
+   typeof r.proposedChange.request!=='string'||r.proposedChange.request.length>2000||
+   !['tune','redesign','rethink'].includes(String(r.proposedChange.depth))))
+  r.proposedChange=null;
+ // A second question is not a reason to discard a moderated conversation.
+ // Keep the first complete question, rather than joining several into a quiz.
+ const keepOneQuestion=(text:string)=>{
+  let seen=false;
+  return text.replace(/\?/g,()=>{if(seen)return '.';seen=true;return '?';});
+ };
+ if(typeof r.text==='string'&&r.text.includes('?')){
+  r.text=keepOneQuestion(r.text);
+  if(typeof r.question==='string'||r.question===null)r.question=null;
+ }
+ if(typeof r.question==='string'){
+  const question=keepOneQuestion(r.question);
+  r.question=question.length>350?null:question;
+ }
+ if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)r.move='reflect';
+ // Crucially, never adjust creationReadiness, its sources or unresolved gaps.
+ return r;
+}
+
 
 const failureStages=['caller_verification','configuration','readiness','input_validation','budget',
  'input_moderation','inference','output_moderation','usage_validation','reply_validation','unknown'] as const;
 const failureReasons=['denied','verification_failed','unavailable','invalid_request','input_limit','private_information',
  'turn_budget','rate_limit','http_error','transport_error','timeout','cancelled','invalid_json','invalid_shape',
- 'response_limit','refused','incomplete','output_limit','provider_failed','invalid_usage','reply_invalid',
+ 'response_limit','refused','incomplete','output_limit','provider_failed','invalid_usage','reply_invalid','reply_shape_invalid','reply_proposal_invalid','reply_quote_invalid','reply_question_invalid',
  'readiness_missing','readiness_invalid','readiness_shape_invalid','readiness_evidence_invalid',
  'readiness_inconsistent','readiness_context_invalid','readiness_reference_invalid','unknown'] as const;
 export type CoachFailureStage=typeof failureStages[number];
@@ -59,6 +116,11 @@ function failureReason(error:unknown,stage:CoachFailureStage,signal?:AbortSignal
    case 'RATE_LIMIT':return 'rate_limit';
    case 'COACH_REFUSED':return 'refused';
    case 'CREATION_REVIEW_MISSING':return 'readiness_missing';
+   case 'Invalid coach response.':return 'reply_shape_invalid';
+   case 'Invalid proposed experiment.':return 'reply_proposal_invalid';
+   case 'Child decision needs an exact child-authored quote.':return 'reply_quote_invalid';
+   case 'Missing proposal.':return 'reply_proposal_invalid';
+   case 'Ask one useful question at a time.':return 'reply_question_invalid';
    case 'Invalid creation review.':return 'readiness_shape_invalid';
    case 'Creation review was not requested.':return 'readiness_context_invalid';
    case 'Creation review needs exact child-authored evidence.':return 'readiness_evidence_invalid';

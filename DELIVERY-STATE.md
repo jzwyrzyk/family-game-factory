@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 22, 2026 — inert operations integration authorized, activation still withheld
+
+The owner explicitly authorized merging the prepared diagnostic/controlled-operations source after the required protected-main checks. This supersedes the historical November 21 no-merge hold only for source integration. The dependency chain is combined in [draft PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126), which preserves PR100/107 access tooling, existing Pal and tablet diagnostics, receipt hardening, and the newly merged private-coach changes from current main. This record is a *pre-merge authorization*, not a claim that a PR was merged or production access enabled; final CI and the actual merge receipt remain separate evidence.
+
+The owner's read-only verification confirmed the seven inactive preparation resources with a private `phase=verify` receipt saved at `/tmp/jems-access-recovery.CbqLURFt/verification.json`. This is ephemeral evidence, not off-machine archival. Cloud Shell home remains effectively full (24 MB available), so preserve recovery artifacts and complete the separate non-destructive storage audit before cleanup. No `apply-gcp` replay is authorized. Both WIF providers and release flags must stay disabled/unset pending separately approved identity, effective-permission, logging-redaction, isolated-live-drill and service-rollout gates. No new spend, IAM grant or production deployment was authorized by the merge instruction.
+
 ## November 22, 2026 — Access preparation read-only verification receipt recovered
 
 After the earlier seven inactive setup creations succeeded but Cloud Shell's home storage filled before a complete local apply receipt could be saved, the owner ran the pinned PR107 read-only `verify` from clean head `4ed426345772fbe970add7409b889aa37479a893`. No prior valid temporary receipt was found. The new verification returned empty GitHub and GCP action sets and `immutable_registry_and_disabled_unbound_wif`; the separate parser accepted the `phase=verify` receipt. The output ended `ACCESS PREPARATION RECEIPT CONFIRMED`. This is a fresh state verification; it does not reconstruct the historical apply receipt or establish effective/inherited IAM.
