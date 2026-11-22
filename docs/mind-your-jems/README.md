@@ -62,6 +62,7 @@ Production artwork lives in `public/art/mind-your-jems/`. [Scene provenance](../
 ### Composition and animation acceptance
 
 - The visible running path follows the illustrated head and bridge into the bucket platform. Foot contacts, crystal positions and pickup distance must agree with the visible scene.
+- The renderer interpolates measured contact points on the common rock silhouette. Holding anchors the existing raised gloves to that surface; the platform's grass edge matches the rules' safe boundary. Viewport fitting reserves the miner and the giant's mouth, with only lower chin cropping on constrained screens. These geometry choices still require screenshot and motion review.
 - The miner has visible running/collection, holding, falling and celebration states. The head must visibly shake during an unheld fall as well as a successful hold. Placement, facing and animation transforms remain separate.
 - The face retains idle, warning, happy and recovery expressions. Deposits add to the cart's visible pile and animate a transfer from the bag.
 - Desktop, tablet portrait/landscape and short/narrow phone layouts retain the giant, miner, reachable bucket and readable controls. Reflow the composition rather than shrinking all content into a single landscape image.

@@ -11,6 +11,13 @@ export type MiningGame = {
 };
 type MountOptions = {onExit?:()=>void;onPlayReady?:()=>void;onBackToStudio?:()=>void;onLevelComplete?:(level:number)=>void};
 const ART='./art/mind-your-jems/';
+// Contact points traced on the shared silhouette of the four approved rock frames.
+// Coordinates are fractions of the sprite square, not a generic circular arc.
+const HEAD_SURFACE=[
+  [.16,.172],[.20,.153],[.24,.142],[.28,.140],[.32,.107],[.36,.099],[.40,.102],
+  [.44,.118],[.48,.150],[.50,.198],[.52,.201],[.56,.196],[.60,.220],
+  [.64,.192],[.68,.169],[.72,.158],[.76,.161],[.80,.177],[.84,.220],[.86,.230],
+] as const;
 const icon=(name:'close'|'left'|'right'|'grip'|'sound'|'muted'|'pause'|'play')=>{
   const paths={close:'M7 7l10 10M17 7 7 17',left:'M19 12H5m6-6-6 6 6 6',right:'M5 12h14m-6-6 6 6-6 6',
     grip:'M8 13V7a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v7-4a2 2 0 0 1 4 0v7c0 5-3 7-7 7-3 0-5-2-7-5l-3-4a2 2 0 0 1 3-3l2 3Z',
@@ -78,11 +85,11 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   const abort=new AbortController(),signal=abort.signal,reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   let state=newMineState(Math.floor(Math.random()*0x7fffffff)+1),disposed=false,paused=false,helpWasPaused=false;
   let assets:'loading'|'ready'|'failed'='loading',artworkPromise:Promise<void>|null=null;
-  let frame=0,lastTime=0,resumeGrace=0,noticeUntil=0,noticeText='',celebrateUntil=0,collectUntil=0;
+  let frame=0,lastTime=0,resumeGrace=0,noticeUntil=0,noticeText='',celebrateUntil=0,collectUntil=0,fallFromHold=false;
   let ready=false,soundOn=false,audioContext:AudioContext|null=null;
   const keys=new Set<string>(),pointers=new Map<number,'left'|'right'|'hold'>(),gemNodes=new Map<number,HTMLElement>();
   let enterAction:string|null=null;
-  let geometry={left:0,span:1,headTop:0,headSize:1,cartFoot:0,playerSize:1};
+  let geometry={left:0,headTop:0,headSize:1,cartX:0,cartSize:1,cartFoot:0,playerSize:1};
   let lastRender='',lastAnnouncement='';
   const listen=(target:EventTarget,name:string,fn:EventListener,extra:AddEventListenerOptions={})=>target.addEventListener(name,fn,{...extra,signal});
   const input=()=>({left:keys.has('ArrowLeft')||keys.has('KeyA')||[...pointers.values()].includes('left'),right:keys.has('ArrowRight')||keys.has('KeyD')||[...pointers.values()].includes('right'),hold:keys.has('Space')||[...pointers.values()].includes('hold')});
@@ -99,22 +106,39 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
       });
     }catch{/* Optional sound never blocks play. */}
   }
-  function point(x:number){
-    const {left,span,headTop,headSize,cartFoot}=geometry,t=Math.min(1,x/80);
-    const headY=headTop+headSize*(.24-.12*Math.sin(t*Math.PI));
-    return {x:left+span*x/100,y:x<=80?headY:headY+(cartFoot-headY)*Math.min(1,(x-80)/8)};
+  function point(x:number):{x:number;y:number}{
+    const {left,headTop,headSize,cartX,cartSize,cartFoot}=geometry;
+    if(x<=80){
+      const u=Math.min(.86,.16+.00875*x);
+      const index=Math.max(1,HEAD_SURFACE.findIndex(([at])=>at>=u));
+      const [a,b]=[HEAD_SURFACE[index-1],HEAD_SURFACE[index]];
+      const v=a[1]+(b[1]-a[1])*(u-a[0])/(b[0]-a[0]);
+      return {x:left+.00875*headSize*x,y:headTop+(v+.006)*headSize};
+    }
+    const edge={x:cartX+.13*cartSize,y:cartFoot};
+    if(x<88){const from=point(80),t=(x-80)/8;return {x:from.x+(edge.x-from.x)*t,y:from.y+(edge.y-from.y)*t};}
+    return {x:edge.x+((x-88)/12)*.69*cartSize,y:cartFoot};
   }
   function place(node:HTMLElement,x:number,y:number,size:number){node.style.left=x+'px';node.style.top=y+'px';node.style.width=size+'px';node.style.height=size+'px';}
   function layout(){
     const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;
-    const portrait=w<h*1.15,shallow=h<300;
-    const cartSize=Math.min(w*(portrait?.35:.22),h*(shallow?.62:.5));
-    const size=Math.min(portrait?Math.min(w*1.19,h*1.08):Math.min(w*.68,h*1.12),(w-32-cartSize*.44)/.875);
-    const start=(w-size*.875-cartSize*.44)/2,headLeft=start-size*.16;
-    const headTop=portrait?Math.max(130,h-size*.83):Math.max(shallow?50:112,h-size*.88);
-    const end=start+size*.875,cartX=end-cartSize*.56,cartFoot=headTop+size*.29;
-    const playerSize=Math.max(64,Math.min(portrait?w*.25:size*.225,shallow?83:174));
-    geometry={left:start,span:end-start,headTop,headSize:size,cartFoot,playerSize};
+    const portrait=w<600||w<h*1.15,shallow=h<300,shortPortrait=portrait&&h<440;
+    const bottomExtent=shallow||shortPortrait?.84:portrait?.90:.94;
+    const topClear=portrait?132:shallow?20:40;
+    const playerAt=(size:number)=>Math.max(64,Math.min(size*(portrait?.25:.225),shallow?83:portrait?104:174));
+    const cartAt=(size:number)=>Math.max(72,size*(portrait?.36:.32));
+    const widthAt=(size:number)=>.76*playerAt(size)+24+.75*size+Math.max(.87*cartAt(size),.69*cartAt(size)+.52*playerAt(size));
+    // Fit the standing miner, complete mouth and visible safe ledge together.
+    // Short screens may crop the chin; the face and controls stay readable.
+    let low=0,high=Math.min(w*(portrait?1.19:.68),h*1.12);
+    for(let i=0;i<20;i++){
+      const size=(low+high)/2;
+      if(widthAt(size)<=w&&topClear+.94*playerAt(size)+(bottomExtent-.10)*size+8<=h)low=size;else high=size;
+    }
+    const size=low,playerSize=playerAt(size),cartSize=cartAt(size);
+    const start=(w-widthAt(size))/2+.76*playerSize+12,headLeft=start-size*.16;
+    const headTop=h-8-bottomExtent*size,cartX=start+.75*size-.13*cartSize,cartFoot=headTop+size*.29;
+    geometry={left:start,headTop,headSize:size,cartX,cartSize,cartFoot,playerSize};
     place(el('.myj-head-anchor'),headLeft,headTop,size);
     place(cart,cartX,cartFoot-cartSize*.66,cartSize);
     const bridge=el('.myj-bridge'),from=point(79),to=point(90),dx=to.x-from.x,dy=to.y-from.y;
@@ -123,10 +147,11 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   }
   function renderPosition(){
     const p=point(state.playerX),size=geometry.playerSize;
-    place(player,p.x-size*.48,p.y-size*.94,size);
+    const gripping=state.holding||fallFromHold&&['falling','retry'].includes(state.phase);
+    place(player,p.x-size*(gripping?(state.facing===1?.76:.24):.48),p.y-size*(gripping?.33:.94),size);
     player.style.setProperty('--facing',String(state.facing));
     player.dataset.safe=String(isMineSafe(state.playerX));
-    el('.myj-carry').hidden=state.loose===0;el('.myj-carry').textContent=String(state.loose);
+    const carry=el('.myj-carry');carry.hidden=state.loose===0;if(carry.textContent!==String(state.loose))carry.textContent=String(state.loose);
   }
   function renderGems(){
     const live=new Set(state.gems.map(g=>g.id));
@@ -185,6 +210,7 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
       if(resumeGrace>0)resumeGrace=Math.max(0,resumeGrace-dt);
       else {
         const before=state;state=stepMine(state,input(),dt);
+        if(state.phase==='falling'&&before.phase!=='falling')fallFromHold=before.holding;
         if(state.mined>before.mined){collectUntil=state.elapsedMs+260;sound('collect');}
         if(state.banked>before.banked){const p=point(before.playerX);particles(Array.from({length:before.loose},(_,i)=>({...p,frame:i%6})),true);notice('+'+(state.banked-before.banked)+' saved!');celebrateUntil=state.elapsedMs+650;sound('bank');}
         if(state.phase==='warning'&&before.phase!=='warning')sound('warn');
@@ -197,7 +223,7 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   }
   function pause(){if(disposed)return;paused=true;clearInput();stopSound();render();}
   function resume(){if(disposed)return;paused=false;lastTime=0;resumeGrace=['warning','shaking'].includes(state.phase)&&!isMineSafe(state.playerX)?900:0;render();stage.focus({preventScroll:true});}
-  function restart(){state=newMineState();clearInput();paused=false;resumeGrace=0;noticeUntil=celebrateUntil=collectUntil=0;el('.myj-effects').replaceChildren();render();}
+  function restart(){state=newMineState();clearInput();paused=false;resumeGrace=0;fallFromHold=false;noticeUntil=celebrateUntil=collectUntil=0;el('.myj-effects').replaceChildren();render();}
   function setHelp(open:boolean){
     if(open){helpWasPaused=paused;clearInput();stopSound();help.hidden=false;stage.inert=true;button('help-done').focus({preventScroll:true});}
     else {help.hidden=true;stage.inert=false;if(!helpWasPaused)resume();else button('resume').focus({preventScroll:true});}
@@ -219,7 +245,13 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
     listen(b,'keydown',event=>{const e=event as KeyboardEvent;if(e.code==='Enter'&&!b.disabled){e.preventDefault();enterAction=action==='left'?'ArrowLeft':action==='right'?'ArrowRight':'Space';keys.add(enterAction);}});
     listen(b,'blur',()=>{if(enterAction){keys.delete(enterAction);enterAction=null;}});
   }
-  function acceptsKeys(event:KeyboardEvent){const node=event.target as HTMLElement|null;return help.hidden&&!disposed&&assets==='ready'&&!node?.matches('input,textarea,select,[contenteditable=true]')&&(!node?.closest('button')||!!node.closest('.myj-actions')||event.code!=='Space');}
+  function acceptsKeys(event:KeyboardEvent){
+    const node=event.target instanceof Element?event.target:null;
+    if(!help.hidden||disposed||assets!=='ready')return false;
+    if(root.tagName!=='DIALOG'&&(!node||!root.contains(node)))return false;
+    if(node?.closest('input,textarea,select,[contenteditable=true]'))return false;
+    return !node?.closest('button')||!!node.closest('.myj-actions');
+  }
   listen(window,'keydown',event=>{const e=event as KeyboardEvent;if(!['ArrowLeft','ArrowRight','KeyA','KeyD','Space'].includes(e.code)||!acceptsKeys(e))return;e.preventDefault();keys.add(e.code);});
   listen(window,'keyup',event=>{const e=event as KeyboardEvent;if(e.code==='Enter'&&enterAction){keys.delete(enterAction);enterAction=null;e.preventDefault();}if(keys.delete(e.code))e.preventDefault();});
   listen(window,'blur',()=>{if(!disposed)pause();});

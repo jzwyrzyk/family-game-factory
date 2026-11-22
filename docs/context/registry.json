@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:17:17.850Z",
-      "sourceDigest": "1ce60f75da46dd247fec38c348b43cf4a1df93b18ff13c1c89ed516cad3d6c13",
+      "reviewedAt": "2026-11-22T15:38:48.345Z",
+      "sourceDigest": "4e62e2d86442a0ff58ec699c54bb17ef9ec3203287528f335d1104d247f7218f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the mining engine and controller diff: movement/contact replaces click collection, physical deposits preserve saved value, sustained hold/spill/fall/retry and bounded bucket levels are now specified; feature contract and accepted decision preserve unchanged artwork and phase-one wrapper scope.",
+      "reviewReason": "Inspected hosted desktop art and traced rock contact points, glove anchors and safe grass edge; updated face fitting and scoped embedded keyboard handling require fresh visual captures.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:17:18.147Z",
-      "sourceDigest": "ecee10d61c82ffb8cbf489db69731426a56eec89674a2ff3781d81716227263f",
+      "reviewedAt": "2026-11-22T15:38:48.798Z",
+      "sourceDigest": "15a15e409ef6d53a85c73e682b1cf6c2e199c0746459c3732a6e06079f57f710",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed 14 deterministic mechanics contracts and rewritten 13-configuration browser fixtures: real sustained input, banking/accounting, hold release, falls, progression, focus, pause, recovery and owner lifecycle remain explicit. Visual mismatches now defer failure only until all captures; tolerance and approval boundary remain unchanged. No local browser pass is claimed.",
+      "reviewReason": "Recorded failed first hosted deposit evidence and corrected platform sampling while retaining thirteen real-input cases, exact score assertions and unchanged visual tolerances.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T15:17:18.459Z",
-      "sourceDigest": "d5c959af1feb19e84b4600d4163583713863457e96900ae9b259a17bd08f2d59",
+      "reviewedAt": "2026-11-22T15:38:49.289Z",
+      "sourceDigest": "35c34d0d273af7deb47f48398d6d85623fe3a29be111d59267a6190973e07d36",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery now separate the mountable mining controller from the existing build-wait wrapper and pending PR125 navigation follow-on. Records actual local compilation and 395 unit passes, unchanged assets, socket-blocked local browser, and pending hosted visual acceptance without asserting merge/deployment.",
+      "reviewReason": "Documented draft PR128 desktop art defects and separate unresolved generated resume failure with exact run links; complete browser acceptance and deployment remain unclaimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

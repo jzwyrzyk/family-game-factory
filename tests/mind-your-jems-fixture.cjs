@@ -217,8 +217,11 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    await this.walkTo(96);await this.freshCalm();
    const before=await this.score('banked');
    await this.collect(8);
+   assert.ok(await this.score('loose')>0,'a mining trip must physically collect a jem');
+   // New crystals can be collected on the return journey. Observe the bag
+   // after reaching safety, before crossing the physical bucket threshold.
+   await this.walkTo(90);
    const carried=await this.score('loose');
-   assert.ok(carried>0,'a mining trip must physically collect a jem');
    await this.walkTo(96);
    assert.equal(await this.score('loose'),0,'reaching the bucket deposits the carried jems');
    assert.equal(await this.score('banked'),before+carried,'every carried jem reaches the bucket once');
