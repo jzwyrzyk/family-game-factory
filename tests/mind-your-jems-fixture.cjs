@@ -166,8 +166,11 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
     touches.set(action,{id:touchIds[action],x:point.x,y:point.y,radiusX:4,radiusY:4,force:1});
     await touchSession.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:await touchPoints()});
    }else if(!pressed&&touches.has(action)){
+    // Chromium's native touchEnd list names the contacts being released.
+    // Sending the survivors would release Left while leaving Hold pressed.
+    const released=touches.get(action);
+    await touchSession.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:touches.size>1?[released]:[]});
     touches.delete(action);
-    await touchSession.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:await touchPoints()});
    }
   },
   async releaseInputs(){

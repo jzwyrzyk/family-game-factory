@@ -418,9 +418,11 @@ async function recordGameplay(browser,base,review){
    // Recovery fixtures intentionally start outside a fully loaded layout.
    (process.env.MYJ_LAYOUT_ONLY!=='1'||!device.recoveryTerminal&&!device.profileReset));
   assert.ok(selected.length,'MYJ_DEVICES must name a supported viewport');
+  const failures=[];
   for(const device of selected){
-   review.manifest.viewports.push(device);const journey=await createJourney(browser,base,device);
+   review.manifest.viewports.push(device);const previousContexts=new Set(browser.contexts());let journey;
    try{
+    journey=await createJourney(browser,base,device);
     if(process.env.MYJ_LAYOUT_ONLY==='1'){await geometry(journey,device,review);await review.capture(journey.page,journey.arcade,device.name,'idle');}
     else if(device.existingRemote)await existingRemoteHandoff(journey,review);
     else if(device.recoveryTerminal)await recovery(journey,device,review);
@@ -428,12 +430,16 @@ async function recordGameplay(browser,base,review){
     else await exercise(journey,device,review);
     await journey.finish();
    }catch(error){
-    if(await journey.arcade.isVisible())await journey.arcade.screenshot({path:path.join(review.directory,device.name+'-failure.png'),animations:'disabled'}).catch(()=>{});
-    await journey.context.close();throw error;
+    const detail=device.name+': '+(error.stack||String(error));
+    failures.push(new Error(detail));review.manifest.errors.push(detail);console.error('FAIL '+detail);
+    if(journey&&await journey.arcade.isVisible())await journey.arcade.screenshot({path:path.join(review.directory,device.name+'-failure.png'),animations:'disabled'}).catch(()=>{});
+    for(const context of browser.contexts())if(!previousContexts.has(context))await context.close();
+    continue;
    }
    console.log('PASS '+device.name+': '+(process.env.MYJ_LAYOUT_ONLY==='1'?'layout and loaded artwork':device.existingRemote?'existing generated-project handoff':device.recoveryTerminal?'failure, recovery, continued play and exit':device.profileReset?'profile teardown, reset and stale callback isolation':'art, layout, native input, bank, warning, hold, shake, reset, ready and playable handoff'));
   }
   if(process.env.MYJ_CAPTURE_VIDEO==='1')await recordGameplay(browser,base,review);
+  if(failures.length)throw new AggregateError(failures,'Mind Your Jems failed in '+failures.length+' independent configuration(s); all available evidence is retained.');
  }catch(error){if(review)review.manifest.errors.push(error.stack||String(error));throw error;}
  finally{
   try{if(review)await review.finish();}

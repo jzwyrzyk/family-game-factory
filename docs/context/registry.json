@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:47:06.128Z",
-      "sourceDigest": "6c901207a36ebebef2d11c6b5da47c47ed5cbeeb64b556179af5962c42fd62f3",
+      "reviewedAt": "2026-11-22T15:55:20.960Z",
+      "sourceDigest": "6aaf51c452a7f6a264491eebae5d099fd9df4a3b681547007f571163a5cbc374",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained reopened-input timeout evidence, now wait for actual decoded artwork before held input, record bounded failure state and verify resume grace with both keyboard and touch.",
+      "reviewReason": "Audited Chromium native partial touch release and corrected the fixture contact list; independent viewport failures now retain all evidence while exact assertions and final failure status remain mandatory.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T15:47:06.683Z",
-      "sourceDigest": "2e048c2f2aac56ae519729d4af324ec13e03deacc3a292051e1a6d07cbe9233d",
+      "reviewedAt": "2026-11-22T15:55:21.515Z",
+      "sourceDigest": "6b9d134baa6c6d4db12cdac22e673055f6abbf2f16d589cb2004c54204644e72",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded second hosted desktop progression and pause success followed by reopen timeout, distinguishing readiness hypothesis from verified correction and keeping full acceptance pending.",
+      "reviewReason": "Recorded full desktop pass on the changed candidate and tablet partial-touch fixture failure, retaining both evidence and pending corrected multi-device acceptance without waivers.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
