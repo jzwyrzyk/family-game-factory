@@ -27,6 +27,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  touch-transport-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Isolate touch transport on plain controls
+        run: node tests/bubble-gum-touch-probe.cjs
+      - name: Upload touch transport event evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bubble-gum-touch-probe-evidence
+          path: test-results/bubble-gum-touch-probe/
+          if-no-files-found: error
+          retention-days: 14
   gameplay:
     runs-on: ubuntu-24.04
     timeout-minutes: 15

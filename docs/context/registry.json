@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:47:30.665Z",
-      "sourceDigest": "36f9c51af540ab93aecfd20d895c20e0d5ae5a7885f9246753061f6bcc0f209b",
+      "reviewedAt": "2026-11-22T18:58:57.685Z",
+      "sourceDigest": "8b546a2213d06b25d3e3320e97ed5b9a5dacff969d884b361c5a69fcf949015b",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained mandatory ten-case play acceptance and added bounded success receipts for the same touch drag and following gum tap, preserving all existing exact-state, real-input and timing assertions.",
+      "reviewReason": "Recorded contrary touch evidence and isolated retained versus detached test transports on unchanged plain controls, while the full ten-case game suite keeps one client alive and preserves every gesture and assertion.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:46:46.729Z",
-      "sourceDigest": "add1d40f947b7f0301b11d778e6ff2fc9d9c0f35871a7ebcb6ae8209b61f480e",
+      "reviewedAt": "2026-11-22T18:58:57.866Z",
+      "sourceDigest": "97400c9c6f1fa59e62ddeef414b6fe7b43769d2d25c2e629b1cc2294b65730e7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact second hosted head and artifact, observed learning and compatibility passes, measured hover contrast and remaining touch repair requiring fresh source verification before preview handoff.",
+      "reviewReason": "Recorded the third exact hosted candidate and counterevidence that deferred source rendering alone does not restore the next click; test transport is now isolated without additional product patches.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
