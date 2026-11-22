@@ -17,6 +17,16 @@ export type WaitArcade = {
   close:()=>void;
   isOpen:()=>boolean;
 };
+export type MiningController = {
+  pause:()=>boolean;resume:()=>void;restart:()=>void;dispose:()=>void;
+  isPlaying:()=>boolean;snapshot:()=>MineState;
+  update:(status:WorkshopStatus,isReady:boolean)=>void;
+};
+type MiningMountOptions = {
+  workshop?:Pick<ArcadeLaunch,'status'|'isReady'>;
+  onExit?:()=>void;onPlayReady?:()=>void;onBackToStudio?:()=>void;
+  onPauseChange?:(paused:boolean)=>void;
+};
 
 const ART='./art/mind-your-jems/';
 const gemShapes=[
@@ -27,7 +37,7 @@ const gemShapes=[
   {x:57,y:26,frame:4,value:1,label:'Mint'},
   {x:44,y:29,frame:5,value:3,label:'Sunset'}
 ] as const;
-const icon=(name:'close'|'arrow'|'spark'|'grip'|'cart'|'sound'|'muted')=>{
+const icon=(name:'close'|'arrow'|'spark'|'grip'|'cart'|'sound'|'muted'|'pause'|'play')=>{
   const paths={
     close:'<path d="m7 7 10 10M17 7 7 17"/>',
     arrow:'<path d="M4 12h15m-6-6 6 6-6 6"/>',
@@ -35,7 +45,8 @@ const icon=(name:'close'|'arrow'|'spark'|'grip'|'cart'|'sound'|'muted')=>{
     grip:'<path d="M8 13V7a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v7-4a2 2 0 0 1 4 0v7c0 5-3 7-7 7-3 0-5-2-7-5l-3-4a2 2 0 0 1 3-3l2 3Z"/>',
     cart:'<path d="M3 5h2l2 11h12l2-8H6M9 20h.01M18 20h.01"/>',
     sound:'<path d="M4 9h4l5-4v14l-5-4H4ZM17 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/>',
-    muted:'<path d="M4 9h4l5-4v14l-5-4H4Zm13 0 5 6m0-6-5 6"/>'
+    muted:'<path d="M4 9h4l5-4v14l-5-4H4Zm13 0 5 6m0-6-5 6"/>',
+    pause:'<path d="M8 5v14M16 5v14"/>',play:'<path d="m8 5 11 7-11 7Z"/>'
   };
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths[name]+'</svg>';
 };
@@ -80,35 +91,43 @@ const html=[
  '</div></div>'
 ].join('');
 
-export function createMindYourJems():WaitArcade {
-  const dialog=document.createElement('dialog');
-  dialog.className='myj-arcade';
-  dialog.setAttribute('aria-labelledby','myjTitle');
-  dialog.setAttribute('aria-describedby','myjInstructions');
-  dialog.innerHTML=html;
-  document.body.append(dialog);
-  const el=<T extends Element=HTMLElement>(selector:string)=>dialog.querySelector<T>(selector)!;
+/** The original crystal-tap game mounted inside either host. Its rules, art,
+ * scores and hazard timings stay independent of the surrounding navigation. */
+export function mountMindYourJems(root:HTMLElement,options:MiningMountOptions={}):MiningController {
+  root.innerHTML=html;
+  const native=root.tagName!=='DIALOG',abort=new AbortController();
+  const el=<T extends Element=HTMLElement>(selector:string)=>root.querySelector<T>(selector)!;
   const btn=(selector:string)=>el<HTMLButtonElement>(selector);
   const bank=btn('[data-myj="bank"]'),grab=btn('[data-myj="grab"]'),cart=btn('[data-myj="bank-cart"]');
-  const crystals=Array.from(dialog.querySelectorAll<HTMLButtonElement>('[data-crystal]'));
+  const crystals=Array.from(root.querySelectorAll<HTMLButtonElement>('[data-crystal]'));
   const stage=el('.myj-stage'),miner=el('.myj-miner'),rock=el('.myj-rock');
-  const timers=new Set<number>();
-  let state:MineState=newMineState(),current:ArcadeLaunch|null=null;
+  type Timer={handle:number|null;remaining:number;due:number;run:()=>void;session:number};
+  const timers=new Map<number,Timer>();
+  let state:MineState=newMineState(),current=options.workshop?{...options.workshop,isReady:false}:null;
   let session=0,noticeTimer=0,poseTimer=0,shakeTimer=0;
+  let timerId=0,disposed=false,paused=false;
   let pose:'idle'|'mining'|'holding'|'slipping'|'celebrate'='idle';
   let assets:'idle'|'loading'|'ready'|'failed'='idle';
-  let artworkPromise:Promise<void>|null=null,bodyOverflow='';
+  let artworkPromise:Promise<void>|null=null;
   let soundOn=false,audioContext:AudioContext|null=null;
   const activeTones=new Set<OscillatorNode>();
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const canTick=()=>!disposed&&!paused&&!document.hidden&&help.hidden;
+  function armTimer(id:number,timer:Timer){
+    if(!canTick())return;
+    timer.due=performance.now()+timer.remaining;
+    timer.handle=window.setTimeout(()=>{
+      timers.delete(id);
+      if(timer.session===session&&canTick())timer.run();
+    },timer.remaining);
+  }
   const later=(fn:()=>void,delay:number)=>{
-    const at=session;
-    const id=window.setTimeout(()=>{timers.delete(id);if(at===session&&dialog.open&&!document.hidden)fn();},delay);
-    timers.add(id);return id;
+    const id=++timerId,timer:Timer={handle:null,remaining:delay,due:0,run:fn,session};
+    timers.set(id,timer);armTimer(id,timer);return id;
   };
-  function cancelTimer(id:number){clearTimeout(id);timers.delete(id);}
+  function cancelTimer(id:number){const timer=timers.get(id);if(timer&&timer.handle!==null)clearTimeout(timer.handle);timers.delete(id);}
   function clearEffects(){el('.myj-effects').replaceChildren();crystals.forEach(c=>c.classList.remove('myj-picked'));cart.classList.remove('myj-banked');}
-  function cancelTimers(){timers.forEach(id=>clearTimeout(id));timers.clear();noticeTimer=poseTimer=shakeTimer=0;clearEffects();}
+  function cancelTimers(){timers.forEach(timer=>{if(timer.handle!==null)clearTimeout(timer.handle);});timers.clear();noticeTimer=poseTimer=shakeTimer=0;clearEffects();}
   function stopSound(){
     activeTones.forEach(tone=>{try{tone.stop();}catch{/* Already ended. */}});activeTones.clear();
     const context=audioContext;audioContext=null;if(context)void context.close().catch(()=>{});
@@ -137,7 +156,7 @@ export function createMindYourJems():WaitArcade {
   function notice(message:string,duration=2800){
     const alert=el('[data-myj="alert"]'),tips=el('[data-myj="tips"]');
     // Short portrait phones move ready-state messages into the footer.
-    const compactReady=dialog.dataset.ready==='true'&&(
+    const compactReady=root.dataset.ready==='true'&&(
       window.matchMedia('(max-width:600px) and (max-height:720px) and (orientation:portrait)').matches||
       window.matchMedia('(max-height:600px) and (orientation:landscape)').matches
     );
@@ -157,13 +176,13 @@ export function createMindYourJems():WaitArcade {
     if(duration)poseTimer=later(()=>{pose='idle';draw();},duration);
   }
   function draw(){
-    dialog.dataset.phase=state.phase;dialog.dataset.holding=String(state.holding);dialog.dataset.assets=assets;
-    dialog.classList.toggle('myj-is-warning',state.phase==='warning');dialog.classList.toggle('myj-is-shaking',state.phase==='shaking');
+    root.dataset.phase=state.phase;root.dataset.holding=String(state.holding);root.dataset.assets=assets;root.dataset.paused=String(paused);
+    root.classList.toggle('myj-is-warning',state.phase==='warning');root.classList.toggle('myj-is-shaking',state.phase==='shaking');
     stage.setAttribute('aria-busy',String(assets==='loading'));
     el('[data-myj="banked"]').textContent=String(state.banked);el('[data-myj="loose"]').textContent=String(state.loose);
-    const busy=assets!=='ready'||state.phase==='shaking'||!help.hidden;
+    const busy=paused||assets!=='ready'||state.phase==='shaking'||!help.hidden;
     bank.disabled=busy||state.loose===0;cart.disabled=bank.disabled;
-    grab.hidden=state.phase==='mining';grab.disabled=assets!=='ready'||state.phase!=='warning'||state.holding;
+    grab.hidden=state.phase==='mining';grab.disabled=paused||assets!=='ready'||state.phase!=='warning'||state.holding;
     grab.querySelector('span')!.textContent=state.holding?'Holding tight!':'Grab on!';
     for(const crystal of crystals)crystal.disabled=busy||state.loose>=BAG_CAPACITY;
     const actualPose=state.phase==='shaking'?(state.holding?'holding':'slipping'):state.holding?'holding':pose;
@@ -182,8 +201,14 @@ export function createMindYourJems():WaitArcade {
     el('.myj-loading').hidden=assets==='ready';
     el('[data-myj="loading-copy"]').textContent=assets==='failed'?'The artwork needs another try.':'Opening the crystal garden…';
     btn('[data-myj="retry-art"]').hidden=assets!=='failed';
+    if(native){
+      el('.myj-pause-cover').hidden=!paused||assets!=='ready'||!help.hidden;
+      btn('.myj-native-pause').setAttribute('aria-pressed',String(paused));
+      btn('.myj-native-pause').setAttribute('aria-label',paused?'Resume game':'Pause game');
+      btn('.myj-native-pause').innerHTML=icon(paused?'play':'pause');
+    }
   }
-  function move(action:MineAction){const before=state;state=moveMine(state,action);draw();return before!==state;}
+  function move(action:MineAction){if(disposed||paused)return false;const before=state;state=moveMine(state,action);draw();return before!==state;}
   function particle(from:DOMRect,to:DOMRect,frame:number,delay=0){
     if(reduced.matches)return;
     const bounds=stage.getBoundingClientRect();
@@ -195,7 +220,7 @@ export function createMindYourJems():WaitArcade {
   }
   function nextShake(){
     cancelTimer(shakeTimer);
-    if(!dialog.open||document.hidden||assets!=='ready'||!help.hidden)return;
+    if(!canTick()||assets!=='ready')return;
     shakeTimer=later(()=>{
       if(!move({type:'warn'}))return;
       pose='idle';draw();sound('warn');notice('Ooh, a BIG idea! Bank, then grab on!',3600);
@@ -212,15 +237,15 @@ export function createMindYourJems():WaitArcade {
     if(assets==='ready')return Promise.resolve();
     if(artworkPromise)return artworkPromise;
     assets='loading';draw();
-    const images=Array.from(dialog.querySelectorAll<HTMLImageElement>('img'));
+    const images=Array.from(root.querySelectorAll<HTMLImageElement>('img'));
     images.forEach(img=>{img.loading='eager';});
-    artworkPromise=Promise.all(images.map(img=>img.decode())).then(()=>{assets='ready';}).catch(()=>{assets='failed';}).finally(()=>{artworkPromise=null;if(dialog.open){draw();if(assets==='ready')nextShake();}});
+    artworkPromise=Promise.all(images.map(img=>img.decode())).then(()=>{assets='ready';}).catch(()=>{assets='failed';}).finally(()=>{artworkPromise=null;if(!disposed){draw();if(assets==='ready')nextShake();}});
     return artworkPromise;
   }
   function update(status:WorkshopStatus,isReady:boolean){
     if(!current)return;
     const becameReady=!current.isReady&&isReady;
-    current={...current,status,isReady};dialog.dataset.build=status;dialog.dataset.ready=String(isReady);
+    current={...current,status,isReady};root.dataset.build=status;root.dataset.ready=String(isReady);
     const copy:Record<WorkshopStatus,string>={queued:'Your game is in the queue',building:'Your game is building',testing:'Testing your game',ready:isReady?'Your game is ready!':'Checking your game',failed:'Your build needs a hand',cancelled:'Your build was cancelled',reconnecting:'Reconnecting to your build'};
     el('.myj-build-status').textContent=copy[status];
     el('[data-myj="ready"]').hidden=!isReady;
@@ -228,23 +253,33 @@ export function createMindYourJems():WaitArcade {
     problem.querySelector('span')!.textContent=status==='failed'?'Your other game needs a hand. You can keep mining.':'Your other build was cancelled. You can keep mining.';
     if(becameReady){setPose('celebrate',2100);sound('ready');notice('');}
   }
-  function stop(){
-    ++session;cancelTimers();stopSound();
-    pose='idle';state=newMineState();current=null;dialog.classList.remove('myj-is-warning','myj-is-shaking','myj-is-paused');
-    document.body.style.overflow=bodyOverflow;
+  // Host pauses retain the exact phase and remaining hazard time. The legacy
+  // Help/background behavior below still cancels an approaching shake.
+  function pause(){
+    if(disposed||paused)return false;
+    paused=true;
+    for(const timer of timers.values())if(timer.handle!==null){
+      clearTimeout(timer.handle);timer.handle=null;timer.remaining=Math.max(0,timer.due-performance.now());
+    }
+    stopSound();root.classList.add('myj-is-paused');draw();options.onPauseChange?.(true);return true;
   }
-  function close(){
-    if(!dialog.open)return;
-    const onClose=current?.onClose;stop();dialog.close();onClose?.();
+  function resume(){
+    if(disposed||!paused)return;
+    paused=false;root.classList.remove('myj-is-paused');draw();
+    for(const [id,timer] of timers)if(timer.handle===null)armTimer(id,timer);
+    if(!timers.has(shakeTimer))nextShake();
+    options.onPauseChange?.(!help.hidden);
+    if(native)stage.focus({preventScroll:true});
   }
-  // Cleanup is synchronous. A delayed native close event cannot reset a reopened session.
-  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
-  dialog.addEventListener('close',()=>{if(!dialog.open&&current){const onClose=current.onClose;stop();onClose?.();}});
-  btn('.myj-close').addEventListener('click',close);
-  btn('.myj-exit').addEventListener('click',()=>{
-    const callback=current?.onBackToStudio;
-    close();callback?.();
-  });
+  function restart(){
+    if(disposed)return;
+    ++session;cancelTimers();stopSound();state=newMineState();pose='idle';paused=false;
+    help.hidden=true;stage.inert=false;el('.myj-controls').inert=false;helpToggle.setAttribute('aria-expanded','false');root.classList.remove('myj-is-paused');
+    notice('');draw();nextShake();options.onPauseChange?.(false);
+  }
+  btn('.myj-close').hidden=!options.onExit;
+  btn('.myj-close').addEventListener('click',()=>options.onExit?.());
+  btn('.myj-exit').addEventListener('click',()=>options.onBackToStudio?.());
   bank.addEventListener('click',()=>{
     const count=state.loose,before=state.banked;if(!move({type:'bank'}))return;
     const from=el('.myj-score-loose').getBoundingClientRect(),to=cart.getBoundingClientRect();
@@ -264,11 +299,12 @@ export function createMindYourJems():WaitArcade {
     if(state.loose===BAG_CAPACITY)notice('Bag full! Time to bank your Jems.');
     else if(earned===3)notice('A brilliant find! +3 Jems',1400);
   }));
-  btn('[data-myj="play-ready"]').addEventListener('click',()=>{const callback=current?.isReady?current.onPlayReady:null;if(callback){close();callback();}});
-  btn('[data-myj="retry-art"]').addEventListener('click',()=>{dialog.querySelectorAll<HTMLImageElement>('img').forEach(img=>{if(!img.naturalWidth)img.src=img.src;});void prepareArtwork();});
+  btn('[data-myj="play-ready"]').addEventListener('click',()=>{if(current?.isReady)options.onPlayReady?.();});
+  btn('[data-myj="retry-art"]').addEventListener('click',()=>{root.querySelectorAll<HTMLImageElement>('img').forEach(img=>{if(!img.naturalWidth)img.src=img.src;});void prepareArtwork();});
   const help=el('#myjHelp'),helpToggle=btn('.myj-help-toggle');
   function setHelp(open:boolean){
     help.hidden=!open;helpToggle.setAttribute('aria-expanded',String(open));stage.inert=open;
+    if(native)el('.myj-controls').inert=open;
     if(open){
       cancelTimers();stopSound();pose='idle';
       if(state.phase==='warning')state={...state,phase:'mining',holding:false};
@@ -276,6 +312,7 @@ export function createMindYourJems():WaitArcade {
       el('[data-myj="alert"]').textContent='';el('[data-myj="alert"]').classList.remove('myj-notice-visible');
       btn('[data-myj="help-done"]').focus();
     }else{helpToggle.focus();nextShake();}
+    options.onPauseChange?.(paused||open);
     draw();
   }
   helpToggle.addEventListener('click',()=>setHelp(help.hidden));btn('[data-myj="help-done"]').addEventListener('click',()=>setHelp(false));
@@ -284,24 +321,60 @@ export function createMindYourJems():WaitArcade {
     if(soundOn)sound('mine');else stopSound();
   });
   document.addEventListener('visibilitychange',()=>{
-    if(!dialog.open)return;
-    dialog.classList.toggle('myj-is-paused',document.hidden);
+    if(disposed)return;
+    if(native){if(document.hidden)pause();return;}
+    root.classList.toggle('myj-is-paused',document.hidden);
     if(document.hidden){
       cancelTimers();pose='idle';stopSound();
       if(state.phase==='warning')state={...state,phase:'mining',holding:false};
       else if(state.phase==='shaking')state=moveMine(state,{type:'settle'});
       el('[data-myj="alert"]').textContent='';el('[data-myj="alert"]').classList.remove('myj-notice-visible');draw();
     }else{nextShake();notice('Welcome back! Your banked Jems are safe.',1800);}
-  });
-  return {
-    open(launch){
-      if(dialog.open){current={...launch,isReady:current?.isReady??false};update(launch.status,launch.isReady);return;}
-      ++session;cancelTimers();bodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
-      current={...launch,isReady:false};state=newMineState();pose='idle';
-      help.hidden=true;stage.inert=false;helpToggle.setAttribute('aria-expanded','false');dialog.classList.remove('myj-is-paused');
-      el('[data-myj="alert"]').textContent='';el('[data-myj="alert"]').classList.remove('myj-notice-visible');draw();
-      dialog.showModal();update(launch.status,launch.isReady);btn('.myj-close').focus({preventScroll:true});
-      if(assets==='ready')nextShake();else void prepareArtwork();
-    },update,close,isOpen:()=>dialog.open
+  },{signal:abort.signal});
+  if(native){
+    stage.tabIndex=0;stage.dataset.gameEntryFocus='';
+    el('.myj-header').hidden=true;
+    const tools=document.createElement('div');tools.className='myj-native-tools';
+    const pauseButton=document.createElement('button');pauseButton.type='button';pauseButton.className='myj-icon-button myj-native-pause';pauseButton.addEventListener('click',()=>paused?resume():pause());
+    tools.append(btn('.myj-sound'),pauseButton,helpToggle);el('.myj-controls').append(tools);
+    el('.myj-controls').prepend(el('.myj-score'));
+    el('.myj-main').append(help);
+    el('.myj-score-banked > span:last-child').firstChild!.textContent='Saved';
+    el('.myj-score-loose > span:last-child').firstChild!.textContent='Bag';
+    bank.querySelector('span')!.textContent='Bank Jems';
+    help.querySelector('p:last-of-type')!.textContent='Use Tab and Enter on a keyboard.';
+    root.addEventListener('keydown',event=>{
+      if(event.key==='Escape'&&!help.hidden){event.preventDefault();event.stopPropagation();setHelp(false);}
+    },{signal:abort.signal});
+    const cover=document.createElement('div');cover.className='myj-pause-cover';cover.hidden=true;
+    cover.innerHTML='<strong>Paused</strong><button type="button">Keep playing</button>';
+    cover.querySelector('button')!.addEventListener('click',resume);stage.append(cover);
+    // Build status belongs to the shared navigation, not a second game HUD.
+    el('[data-myj="ready"]').hidden=true;el('.myj-build-problem').hidden=true;
+  }
+  draw();if(options.workshop)update(options.workshop.status,options.workshop.isReady);void prepareArtwork();
+  return {pause,resume,restart,update,isPlaying:()=>canTick()&&assets==='ready',snapshot:()=>({...state}),
+    dispose(){if(disposed)return;disposed=true;++session;cancelTimers();stopSound();abort.abort();root.replaceChildren();}
   };
+}
+
+/** Retained compatibility wrapper; the ordinary Studio route uses the native host. */
+export function createMindYourJems():WaitArcade {
+  const dialog=document.createElement('dialog');dialog.className='myj-arcade';
+  dialog.setAttribute('aria-labelledby','myjTitle');dialog.setAttribute('aria-describedby','myjInstructions');document.body.append(dialog);
+  let current:ArcadeLaunch|null=null,game:MiningController|null=null,bodyOverflow='';
+  function cleanup(){game?.dispose();game=null;document.body.style.overflow=bodyOverflow;}
+  function close(){if(!dialog.open)return;const onClose=current?.onClose;current=null;cleanup();dialog.close();onClose?.();}
+  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+  // A queued close event must not dispose an immediately reopened session.
+  dialog.addEventListener('close',()=>{if(!dialog.open&&current){const onClose=current.onClose;current=null;cleanup();onClose?.();}});
+  return {open(launch){
+    if(dialog.open){current={...launch};game?.update(launch.status,launch.isReady);return;}
+    current=launch;bodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal();
+    game=mountMindYourJems(dialog,{workshop:launch,onExit:close,
+      onBackToStudio:()=>{const callback=current?.onBackToStudio;close();callback?.();},
+      onPlayReady:()=>{const callback=current?.isReady?current.onPlayReady:null;if(callback){close();callback();}}
+    });
+    dialog.querySelector<HTMLElement>('.myj-close')!.focus({preventScroll:true});
+  },update(status,isReady){if(current){current={...current,status,isReady};game?.update(status,isReady);}},close,isOpen:()=>dialog.open};
 }

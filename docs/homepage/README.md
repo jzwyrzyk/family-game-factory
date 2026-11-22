@@ -8,19 +8,21 @@ The [first-creation decision](../decisions/2026-11-19-first-creation-journey.md)
 
 See the [first-creation contract](../child-journey/FIRST-CREATION.md) for small contextual hints, Journey help, **Done for now**, and the return priority. A ready requested result takes precedence over the ready-made game played during its build; unfinished creative work takes precedence over ordinary recent play. The action rechecks current saved state and owner before opening it. The same hint preferences travel in existing notebook backups and can be reset independently of work and progress.
 
+The [Notifications contract](NOTIFICATIONS.md) supersedes the former duplicate build shelf: one Home card links to all pending/review work, with unread badges in the card, Menu and game More. The [consolidation decision](../decisions/2026-11-22-unified-game-notifications.md) keeps this source after shell and Conversation Coach rollout, before the separate gameplay overhauls.
+
 ## Child mental model
 
 1. **I have an idea:** “Invent a game” opens the existing conversational Studio. Talking or saving an idea must not imply a build was completed; “Try a change” remains separate.
-2. **I want to have fun now:** seven illustrated developer favorites are playable from whole-card targets on a responsive desktop and mobile shelf.
+2. **I want to have fun now:** four Ready to Play jems (Factory, Mining, Bubble Gum and Rally) and two Original jems (Dragon and Buckets) are playable from whole-card targets. Saved authored Moon/Robot games remain supported without default tiles.
 3. **I already started something:** a compact, recognizable Continue row prioritizes ready results and unfinished creative intentions before ordinary recent play. Saved creations remain selectable and segregated by the active player; an archived or dismissed-resume item is not recommended.
 4. **I want to keep exploring:** the Studio's My Games button always returns here. My Powers and family settings remain available, without becoming competing first-screen calls to action.
-5. **Something takes time or is unavailable:** the existing nonmodal build shelf preserves play during an actual pending build; the homepage never promises new AI builds when the private builder is unavailable.
+5. **Something takes time or is unavailable:** the single continuation card and Notifications page keep pending work discoverable without interrupting play; the homepage never promises new AI builds when the private builder is unavailable.
 6. **I want an earlier idea or drawing:** **Saved ideas & drawings** opens the retained collection, with an explicit **My Games** button to return.
 7. **I have a picture:** **Art Studio** sits beside **Invent a game** before the catalogue. It opens the current player's upload, camera, drawing and reusable-art space. An unavailable online builder does not block this local destination.
 
 ## Saved ideas and drawings remain reachable
 
-The ordinary shell has **My Games**, **Create** and a labelled **Menu**. The menu groups **Create & code** and **Art Studio** under Make; **My journey**, **My rewards** and **My Pals** under Your world; **My Powers**, **Try an idea** and subject choice under Learn & explore; parent dashboard and **Private parent session** under Grown-ups; and Journey help under Help. Parent access and help remain visible during first character selection. Existing route handlers retain their save and learning guards. **Saved ideas & drawings** is a supporting action on the homepage, below the Continue area. It opens the existing My Creations page through the guarded Studio navigation; it does not require a legacy URL or replace the modern navigation.
+The ordinary shell has **My Games**, **Create** and a labelled **Menu**. The menu groups **Create & code** and **Art Studio** under Make; **Notifications**, **My journey**, **My rewards** and **My Pals** under Your world; **My Powers**, **Try an idea** and subject choice under Learn & explore; parent dashboard and **Private parent session** under Grown-ups; and Journey help under Help. Parent access and help remain visible during first character selection. Existing route handlers retain their save and learning guards. **Saved ideas & drawings** is a supporting action on the homepage, below the Continue area. It opens the existing My Creations page through the guarded Studio navigation; it does not require a legacy URL or replace the modern navigation.
 
 Preserve the collection's existing ownership semantics. **Our idea notebook** remains shared among family profiles, including older ideas without an assigned profile. **My drawings** remains specific to the current player. Modern Studio games continue to use their existing per-player notebook and revision storage. Restoring this route does not migrate records, assign ownership to older ideas, or change their stored text.
 

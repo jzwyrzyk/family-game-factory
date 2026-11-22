@@ -3,14 +3,17 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 async function switchProfile(page,index){
  await openProfiles(page);
  await page.locator('.profile-choice').nth(index).click();
 }
-async function moreChoices(page){
- const choices=page.locator('#studioMoreChoices');
- if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();
+async function notifications(page){
+ if(await page.locator('#page-studio.studio-play-mode').isVisible()){
+  if(!await page.locator('#studioMore').evaluate(node=>node.open))await page.locator('#studioMore > summary').click();
+  await page.locator('#studioPlayNotifications').click();
+ }else await navigate(page,'#studioNavNotifications');
+ await page.locator('#studioNotifications').waitFor({state:'visible'});
 }
 async function stayAfterBuild(page,phase){
  await page.waitForFunction(value=>document.getElementById('studioBuildHandoff')?.open&&document.getElementById('studioBuildHandoff')?.dataset.phase===value,phase);
@@ -96,13 +99,22 @@ async function stayAfterBuild(page,phase){
     assert.equal(submitted,1);
     assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'accepted job polling never reopens a dismissed popup');
     assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'optional build details do not expand automatically');
-    await moreChoices(page);
-    assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'background build controls remain reachable by choice');
+    await notifications(page);
+    const notification=page.locator(`#studioNotificationsList [data-notification-session="${initial}"]`);
+    assert.equal(await notification.getAttribute('data-notification-kind'),'building','background build controls remain reachable by choice');
+    assert.equal(await page.locator('#studioBuildShelf').count(),0,'the old shelf is not duplicated');
+    await notification.locator('[data-notification-open]').click();
+    await progress('testing','spot_work_in_progress');
     statusUnavailable=true;await progress('uncertain','spot_reconnect');
     assert.equal(await page.evaluate(()=>navigator.onLine),true,'an unavailable status endpoint does not prove the browser is offline');
     assert.match(await page.locator('#studioBuildProgress').textContent(),/not confirmed its latest state/);
+    await notifications(page);
+    assert.equal(await notification.getAttribute('data-notification-kind'),'unknown','an interrupted status read remains uncertain in Notifications');
+    await notification.locator('[data-notification-open]').click();await page.locator('#studioPrompt').waitFor({state:'visible'});
+    assert.equal(submitted,1,'opening uncertain work does not replay its submission');
     statusUnavailable=false;
-    // A background-build shortcut must stop on-device recording before leaving Studio.
+    // Ordinary Home -> Menu -> My Powers replaces the duplicate practice link;
+    // departure still must stop recording while the build continues separately.
     await page.evaluate(()=>{
      class LocalSpeech {
       static async available(options){if(options.processLocally!==true)throw Error('Remote speech forbidden');return 'available';}
@@ -114,35 +126,38 @@ async function stayAfterBuild(page,phase){
     });
     await page.click('#studioMic');
     await page.waitForFunction(()=>window.__continuityMic?.processLocally===true);
-    await page.locator('#studioBuildShelf').getByRole('button',{name:/Extra practice/}).click();
+    await navigate(page,'#studioNavHome');await navigate(page,'#studioNavPowers');
     assert.equal(await page.evaluate(()=>window.__continuityMic.aborted),true,'extra-practice navigation must release microphone');
     await page.reload();await page.waitForFunction(()=>FG.studio&&FG.studio.mode()==='remote');
-    await page.waitForSelector('#studioBuildShelf:not([hidden])');
-    assert.match(await page.textContent('#studioBuildShelf'),/Testing your game/);
+    await notifications(page);
+    assert.equal(await notification.getAttribute('data-notification-kind'),'building');
+    assert.equal(await page.evaluate(id=>FG.studio.exportNotebook().sessions.find(s=>s.id===id)?.job?.status,initial),'testing','reload resumes the saved testing job');
     // A sibling must not see another child\'s private job or test.
     await switchProfile(page,1);
-    assert.equal(await page.locator('#studioBuildShelf').isVisible(),false);
+    await notifications(page);
+    assert.equal(await notification.count(),0,'the sibling cannot see the other child’s private build');
     await switchProfile(page,0);
     assert.equal(await page.evaluate(()=>FG.store.current().id),owner);
-    await page.waitForSelector('#studioBuildShelf:not([hidden])');
-    await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot');
+    await notifications(page);await notification.waitFor({state:'visible'});await page.locator('#studioNotificationsBack').click();
+    await page.click('[data-starter="factory"]');await page.waitForSelector('.gem-factory');
     const current=await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]);
     assert.notEqual(current,initial);
     state='ready';
     await page.waitForFunction(id=>FG.studio.exportNotebook().sessions.find(s=>s.id===id)?.job?.status==='ready',initial,{timeout:10000});
-    assert.equal(await page.locator('.favorite-robot .favorite-canvas').isVisible(),true,'completion did not replace the game being played');
+    assert.equal(await page.locator('.gem-factory').isVisible(),true,'completion did not replace the game being played');
     assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'no preview automatically opened');
     assert.equal(previewRequests,0);
-    await page.locator('#studioMore > summary').filter({hasText:'ready'}).waitFor({state:'visible'});
-    await page.locator('#studioMore > summary').click();
-    await page.locator('#studioBuildShelf').getByRole('button',{name:'Try ready test'}).click();
+    await notifications(page);
+    assert.equal(await notification.getAttribute('data-notification-kind'),'ready');
+    assert.equal(previewRequests,0,'opening all-project Notifications cannot open a preview automatically');
+    await notification.locator('[data-notification-open]').click();
     await page.waitForFunction(()=>document.querySelector('#studioStatus')?.textContent?.includes('UNEXPECTED_PREVIEW'));
     const returned=await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]);
     assert.equal(returned,initial,'the child can find the saved original project');
     assert.equal(previewRequests,1,'only the explicit child click asks for a private preview');
     assert.equal(await page.locator('#studioRemoteHost iframe').count(),0,'a failed preview never becomes an unverified playable game');
     // Play and conversation now have separate focused surfaces. The saved
-    // result remains reachable from the play shelf and the conversation.
+    // result remains reachable from Notifications and the conversation.
     if(!await page.locator('#studioReady').isVisible())await page.click('#studioChange');
     assert.equal(await page.locator('#studioReady').isVisible(),true,'the ready test is still accessible for another try');
     await progress('ready','character_spark_celebrate');

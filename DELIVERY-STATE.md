@@ -1,5 +1,15 @@
 # jems delivery state
 
+## November 22, 2026 — unified experience and Notifications consolidation
+
+The owner asked to review the unified-game-experience PR, remove the duplicate dark build shelf shown in their Home capture, keep the white continuation card, and add a Notifications page with menu/card badges. This work stays in [PR125](https://github.com/jzwyrzyk/family-game-factory/pull/125), initially based on its verified head `1340d041145ffba4322ccb8262188b7cf2c7b6c4`; it is unmerged and undeployed. [The accepted decision](docs/decisions/2026-11-22-unified-game-notifications.md) records the scope and release order.
+
+The actual comparison source is PR129 head `d7ba7a828278a90f324bc12e1ba2592265f48095`. Its navigation is entangled with PR128 Mining gameplay. This candidate adopts the catalogue/shared-player intent by mounting the existing PR125 tap/bank/grab game, preserving its rules and assets. It does not include the later Factory, Mining or Bubble Gum overhauls. All current owned projects remain reachable in Notifications; the home card and unread badges replace the blue shelf without automatic preview/Build/retry/Keep. Private dictation now cancels every narrator around the permission boundary, and the page/saved replies use the shared reading control.
+
+**Required order:** shell/chat and storage-removal changes, then Conversation Coach, then this combined UI/navigation/Notifications PR, then the three gameplay overhauls. Preserve upstream conversation history, request identity and save/owner guards when resolving shared files. PR129 and PR130 still contain later gameplay dependencies; this review does not merge, close or delete them. The new `mining` ID and optional `notifications` notebook metadata require compatible readers in source consumers and rollback. No cloud resource, paid narration/AI activation, runtime setting, worker pin or production traffic change is made.
+
+Local production build/typecheck, all **394 unit contracts** and **26 notification model/preference contracts** passed. Chromium was rejected before page load by the executor's socket restriction; no local browser or visual pass is claimed. Hosted production-dist Notifications, migrated continuity/voice tests, the expanded game viewport matrix and separately reviewed native Mining captures remain acceptance gates for the published source. Exact new-head results will be recorded in PR125; earlier passing PR125/129 runs below are historical evidence only.
+
 ## November 21, 2026 — profile, play and reading implementation candidate
 
 The owner requested explicit grade/difficulty per profile, consistent screen-fitting games/fullscreen, a caring natural female voice and persistent read-aloud including Creator. The isolated candidate is based on main `b4734b1323de87dfee96bb91769cbab3cff432e6`, including merged PR124 chat diagnostics; it is unmerged and undeployed. [The accepted decision](docs/decisions/2026-11-21-profile-play-and-reading.md) and [natural narration handoff](docs/speech/NATURAL_NARRATION.md) record the scope.

@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:16:29.187Z",
-      "sourceDigest": "b968a8e2f41e1d6b61e18d6a5510148e7b29acd2c48fbc1f99132eacb34c8d6a",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the portrait lifecycle contract and game presentation corrections; approved product intent, child ownership, grade ceilings, earning rules and narration approval boundaries remain unchanged.",
+      "reviewedAt": "2026-11-22T18:47:21.850Z",
+      "sourceDigest": "85a26e80e15ed336715d19048fcdd48c196c2c4d0ae09f76742e4964612b8fad",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed owner November22 consolidation: one continuation card, owner scoped Notifications and explicit pending-work actions; retained child authorship and separate gameplay rollout.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:58:30.182Z",
-      "sourceDigest": "654bc7190eb4665f1e83f9c4dbcb5ce9904897087ebe6c7ac0ba9085f059bb76",
+      "reviewedAt": "2026-11-22T18:47:22.108Z",
+      "sourceDigest": "cd9329dd086d4b89db2964d77255522bcf1ddb97fadb08476a8643c032da89da",
       "reviewOutcome": "updated",
-      "reviewReason": "The fitted-play contract now forbids horizontal More/profile overflow and records the captured evidence; profile ownership, native activation and learning guards are preserved.",
+      "reviewReason": "Updated Home Notifications, shared native Mining and speech boundaries after reviewing source against PR129; preserves saved drafts, owner checks, required learning and original gameplay rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -373,10 +373,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "46276557b98b0399551a4e1a57c65b7f758f45950e5d128131edce84fabd47d7",
-      "reviewedAt": "2026-11-21T05:39:47.126Z",
+      "sourceDigest": "100d283ab6aff77a325e67323ca0d2e9f3f3ec6522f23e4f8f2a55366ae21edc",
+      "reviewedAt": "2026-11-22T18:47:22.897Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed cosmetic suppression of reward and rank popups while the creation conversation is visible. Updated rewards and joy-layer contracts: committed receipts, gems, levels and normal Play/Keep/versions celebrations remain unchanged. Final Gem Journey and delight browser checks passed.",
+      "reviewReason": "Documented bounded notification preferences in the existing notebook backup domain, family owner validation and exact byte rollback; seen and dismissed metadata grants no rewards.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:58:31.296Z",
-      "sourceDigest": "23a7ada2adcd0482d1e28fac46f6c32d5760136bc55370c241b5d4b66d23ad8f",
+      "reviewedAt": "2026-11-22T18:47:23.130Z",
+      "sourceDigest": "3e8321fbdc984b1cac665d21e0c04390d914e63eb98f63abcdd217464fde6165",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented persistent Robot directions and compact action labels outside scrolling status/plan text, with unchanged board geometry and the dark-wall rule retained in shared Help.",
+      "reviewReason": "Reviewed original PR125 Mining mount extraction and eight-runtime catalog compatibility; rules artwork and old visual references stay unchanged while new native host acceptance is pending.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T21:58:31.644Z",
-      "sourceDigest": "f170726c641995ac6cbc7d8d14188187c5abc015016a7261d338c399ca2f9c84",
+      "reviewedAt": "2026-11-22T18:47:23.374Z",
+      "sourceDigest": "d46704f963867d500c63b3e113d4787c3a5bf95cf1dcb5088dbef9b8195ea4f1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded why prior per-choice reachability missed captured defects and added initial/24-arrow/feedback visibility plus zero horizontal menu overflow assertions without weakening board, labels or hit tests.",
+      "reviewReason": "Recorded 394 unit, 26 notification and 52 narration contracts plus preserved saved legacy game coverage; independent hosted Notifications and forty viewport cases still require actual capture review.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T21:58:31.976Z",
-      "sourceDigest": "998e160f8d5d5653a4833f8c067e543836ceae9abe2880d9ec5d420bdc032f99",
+      "reviewedAt": "2026-11-22T18:47:23.626Z",
+      "sourceDigest": "de9e74f3a52c3d01906a4ddcf2cd230147a5ccabafc13d4ea2df6bf2bc3f823b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded all ten passing prior-head workflows and exact artifacts alongside the two visual blockers; the follow-up requires its own hosted evidence and remains unmerged, undeployed and narration-disabled.",
+      "reviewReason": "Recorded draft-only consolidation after shell and Conversation Coach, compatible mining and notebook readers for release or rollback, and exact regression partition adding Notifications without dropping suites.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

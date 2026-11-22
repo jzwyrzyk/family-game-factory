@@ -1,6 +1,6 @@
-# Mind Your Jems! — the illustrated wait-time arcade
+# Mind Your Jems! — shared native play
 
-Mind Your Jems is a prebuilt, local mini-game available only after Studio has acknowledged a background game build. Its **This round** score and stars belong to the current mini-game session, separate from the lifetime gems shown in **My rewards**. They do not represent learning progress, influence build progress, or change the child's saved game.
+Mind Your Jems is a prebuilt local game available from Ready to Play and, after an acknowledged build, through Play while I wait. Both modern entries use the same native runtime and fitted player. The November 22 navigation consolidation preserves the original tap/crystal/bank/grab rules described here; PR128's later movement/contact/level gameplay is separate. Its **This round** score and stars belong to the current mini-game session, separate from the lifetime gems shown in **My rewards**. They do not represent learning progress, influence build progress, or change the child's saved game.
 
 ## Visual contract
 
@@ -28,7 +28,7 @@ Production assets live in `public/art/mind-your-jems/`. They are reusable illust
 3. **Notice:** after 11–18 seconds, the mountain has a big idea. A 3.6-second warning gives time to bank and grab.
 4. **Grab:** visibly hold the hair to avoid a funny slide. All unbanked Jems still fly away in the shake; banking is the only way to preserve them.
 5. **Continue:** shaking lasts 1.25 seconds, followed by a fresh mining period. There is no death, payment or recovery purchase.
-6. **Return:** a verified playable revision enables **Play my game**. The child chooses when to leave. Readiness never interrupts a turn or opens a preview automatically.
+6. **Return:** verified build readiness updates the shared More cue and Notifications. The child explicitly opens the originating project's result. Readiness never interrupts a turn or opens a preview automatically.
 
 Closing resets this mini-game's scores; reopening starts a fresh round. The Help panel explicitly explains that these Jems and stars are round scores and do not add to My rewards. This wording clarifies the existing session boundary without adding rewards, persistence, conversion or a new economy.
 
@@ -36,13 +36,15 @@ Help and a hidden browser tab cancel an approaching hazard without silently losi
 
 ## Studio integration
 
-- The launch control appears after a durable queued/building/testing job is acknowledged. An already-open arcade receives confirmed readiness and offers the explicit handoff. Typing an idea alone does not offer the arcade.
-- This remains a wait-time activity, launched from the active build banner or background-build shelf. It has no standalone tile in the ordinary Ready to Play collection and is not offered there when no eligible build is active.
+- The direct catalogue tile opens ordinary native play. The separate Play while I wait action appears after a durable queued/building/testing job is acknowledged; it remembers the originating saved project separately. Typing an idea alone never claims a build was accepted.
+- The active build banner, focused handoff and Notifications may offer the same native game. There is no duplicate modern modal. The legacy dialog wrapper remains compatible.
 - Learning activity guards still apply. Launch stops speech and pauses the previous game using Studio's existing saved-scene mechanism.
 - Studio owns job polling, retry, cancellation and the authoritative `readyExperiment` check. Labels show observed phases, including interrupted connections; no invented percentages or completion times.
 - The ready handoff opens the chosen project without first loading its older working preview, then revalidates and opens the ready candidate once.
 - Build failure or cancellation is shown with a route back to the affected project's Studio idea composer, including when the arcade was opened from My Games; optional mining may continue. The composer remains visible on phones even when a first build has no playable game yet.
-- No new storage keys, analytics, third-party SDK, AI request or child-data collection is introduced. Artwork is built ahead of time and ships locally.
+- A native `mining` project uses the existing local game/notebook stores. Round scores remain transient and do not grant lifetime gems. Compatible strict readers are required for the new game ID; no analytics, third-party SDK, AI request or child-data collection is introduced. Artwork is built ahead of time and ships locally.
+
+The [consolidation decision](../decisions/2026-11-22-unified-game-notifications.md) and [Notifications contract](../homepage/NOTIFICATIONS.md) describe modern navigation, source boundaries and rollout. Prior modal captures below remain historical. Native-host screenshots use a separately reviewed reference directory with the existing comparison tolerances; the old modal references are retained.
 
 ## Verification commands
 

@@ -5,7 +5,9 @@ const fs=require('node:fs');
 const path=require('node:path');
 
 const directory=path.resolve('test-results/mind-your-jems');
-const baselineDirectory=path.resolve('tests/visual/mind-your-jems');
+// Native shared framing is a separate reviewed surface. Keep the legacy
+// dialog references unchanged; never compare two intentionally different hosts.
+const baselineDirectory=path.resolve('tests/visual/mind-your-jems-native');
 const baselineStates=new Set(['idle','warning','ready']);
 const baselineDevices=new Set(['desktop','tablet-portrait','mobile']);
 
@@ -37,6 +39,7 @@ exports.createReview=async browser=>{
  fs.mkdirSync(directory,{recursive:true});
  const manifest={build:JSON.parse(fs.readFileSync('dist/build-info.json','utf8')),browser:browser.version(),
   artifactKind:'actual-browser-capture',backend:'deterministic mocked build statuses; no paid AI generation',
+  surface:'shared native play view; original crystal-tap rules',
   viewports:[],captures:[],checks:[],errors:[]};
  const comparisonPage=await browser.newPage({viewport:{width:32,height:32}});
  const update=process.env.MYJ_UPDATE_BASELINES==='1',compare=process.env.MYJ_VISUAL_COMPARE==='1';
@@ -51,8 +54,9 @@ exports.createReview=async browser=>{
    const file=device+'-'+state+'.png';
    // Native pointer captures and keyboard captures are separate evidence.
    // Keep focus visibility intact; never remove the focus outline for a test.
-   const bytes=await arcade.screenshot({path:path.join(directory,file),animations:'disabled',caret:'hide'});
-   const box=await arcade.boundingBox();
+   const surface=page.locator('#page-studio.studio-play-mode');
+   const bytes=await surface.screenshot({path:path.join(directory,file),animations:'disabled',caret:'hide'});
+   const box=await surface.boundingBox();
    manifest.captures.push({device,state,file,width:Math.round(box.width),height:Math.round(box.height)});
    if(state==='idle'&&['desktop','tablet-portrait','mobile'].includes(device)){
     fs.copyFileSync(path.join(directory,file),'test-results/mind-your-jems-'+(device==='tablet-portrait'?'tablet':device)+'.png');
@@ -61,14 +65,17 @@ exports.createReview=async browser=>{
    const baseline=path.join(baselineDirectory,file);
    if(update){baselineCandidates.set(file,bytes);return;}
    if(!compare)return;
-   assert.ok(fs.existsSync(baseline),'Missing reviewed visual baseline '+file+'. Review actual art and explicitly run MYJ_UPDATE_BASELINES=1.');
+   if(!fs.existsSync(baseline)){
+    manifest.errors.push('Missing reviewed native visual baseline '+file+'. Review the actual shared player capture before explicitly accepting a native reference.');
+    return;
+   }
    const result=await compareImages(comparisonPage,bytes,fs.readFileSync(baseline));
    comparisonCount++;
    const {diff,...metrics}=result;manifest.checks.push({device,state,kind:'visual-regression',...metrics});
    if(!result.dimensions||result.ratio>0.008){
     if(diff)fs.writeFileSync(path.join(directory,file.replace('.png','-diff.png')),Buffer.from(diff.split(',')[1],'base64'));
     fs.copyFileSync(baseline,path.join(directory,file.replace('.png','-expected.png')));
-    throw new Error('Visual regression '+file+': '+JSON.stringify(metrics));
+    manifest.errors.push('Visual regression '+file+': '+JSON.stringify(metrics));
    }
   },
   check(device,kind,details){manifest.checks.push({device,kind,...details});},
@@ -85,6 +92,7 @@ exports.createReview=async browser=>{
     },null,2)+'\n');
    }
    if(compare&&process.env.MYJ_DEVICES===undefined&&!manifest.errors.length)assert.equal(comparisonCount,9,'all nine approved views must be compared');
+   assert.deepEqual(manifest.errors,[],'all independent native journeys and reviewed visual comparisons must pass');
   }
  };
 };

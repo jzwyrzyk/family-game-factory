@@ -65,6 +65,8 @@ Keep the current playable game and earlier editions safe while a new experiment 
 
 While a build runs, the child can keep playing, make supported local edits and choose optional practice. A ready result must not seize focus, replace a newer decision or interrupt the learning host. Failure, cancellation, disconnection or a stale callback must not destroy the last working version. Report save failures honestly.
 
+The [November 22 continuation decision](docs/decisions/2026-11-22-unified-game-notifications.md) puts important results and unfinished work in one Home card and an owner-scoped Notifications page. Menu/card counts indicate unseen changes that need attention, not every poll or saved thought. Reading or dismissing an alert does not complete, cancel or delete its work. Keep results discoverable without automatic navigation or repeated banners.
+
 An explicit Build receives an immediate focused handoff: acknowledge submission truthfully, then offer **Play while I wait** and **Stay here** after a job is accepted. Dismissing that handoff does not cancel the job. Polling and background completion must not reopen it; the child explicitly opens a ready result. Keep the distinction between a submitted request, an acknowledged job and a saved playable result.
 
 A known failed build offers a working explicit retry, including after reopening its saved idea. An uncertain connection offers a status check when the job is known; neither uncertainty nor closing a dialog authorizes another paid build. Recover an already accepted retry before creating another one, and preserve the exact accepted request and owner.

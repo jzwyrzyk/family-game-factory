@@ -1,5 +1,7 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
+  // The original mining game exposes no supported local tuning controls.
+  mining: {version:1,id:'mining',name:'Mind Your Jems!',mechanics:[]},
   factory: {version:1,id:'factory',name:'Gem Factory',mechanics:[
     {key:'orderSize',label:'Gifts per day',type:'number',default:3,min:2,max:5,step:1},
     {key:'cutterSpeed',label:'Cutting speed',type:'number',default:1,min:0.5,max:1.5,step:0.25},
@@ -65,6 +67,7 @@ export function validateConfig(game: GameId, value: unknown): Mechanics {
 }
 export function defaults(game: GameId, difficulty: Difficulty = 'classic'): Mechanics {
   const config = Object.fromEntries(manifests[game].mechanics.map(m => [m.key, m.default]));
+  if (game === 'mining') return validateConfig(game,config);
   if (game === 'factory') {
     if (difficulty === 'gentle') Object.assign(config,{orderSize:2,cutterSpeed:0.75});
     if (difficulty === 'stretch') Object.assign(config,{orderSize:5,cutterSpeed:1.25});

@@ -52,8 +52,6 @@ body.studio-review .studio-play-mode #studioProfileMenu { position: static; marg
 body.studio-review .studio-play-mode #studioProfileMenu > summary { min-height: 48px; font-size: 18px; max-width: none; }
 body.studio-review .studio-play-mode #studioProfileMenu .profile-choices { position: static; width: 100%; min-width: 0; max-width: none; max-height: none; margin: 6px 0 0; box-shadow: none; }
 body.studio-review .studio-play-mode #studioProfileMenu .profile-choice { min-height: 48px; font-size: 18px; }
-body.studio-review .studio-play-mode #studioBuildShelf { margin: 0; min-width: 0; }
-body.studio-review .studio-play-mode #studioBuildShelf :is(.studio-build-items, .studio-build-item, .studio-build-item-actions) { display: flex; flex-direction: column; min-width: 0; }
 body.studio-review .studio-play-mode #page-game,
 body.studio-review .studio-play-mode #page-game .game-stage,
 body.studio-review .studio-play-mode #game-mount,

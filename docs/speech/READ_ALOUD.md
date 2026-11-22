@@ -2,6 +2,8 @@
 
 The November 21, 2026 owner request extends read-aloud across child interactions and asks for a sensible, caring young adult female voice. A speaker with **Read this to me** means listening; the separate microphone means dictation. Neither reading nor dictation sends a conversation or builds a game automatically.
 
+Notifications uses the same speaker control on every current item. Unchanged polling preserves an active reader or gesture-required Play reading. Starting private dictation cancels global reading before microphone permission and immediately before recording, after the existing scope check. Saved-reply and current-question readers refuse to start while local/private dictation is active. A late permission result for a former profile releases its stream without cancelling the new profile's reader.
+
 ## Shared behavior
 
 `src/speech/read-aloud-control.ts` supplies a visible control, a **Stop reading** state, a short unavailable notice and the common narrator. The control remains discoverable when voices are absent; missing browser support does not remove the written text or pretend audio started.

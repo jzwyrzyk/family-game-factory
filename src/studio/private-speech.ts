@@ -7,6 +7,8 @@
  * service-worker cache, audio analytics, or silent provider switch. The
  * child explicitly chooses Speak and reviews the draft before pressing Send.
  */
+import {stopReadAloud} from '../speech/friendly-narrator';
+
 interface RecorderChunkEvent { data:Blob }
 interface RecorderLike {
  state:string;mimeType:string;
@@ -96,6 +98,9 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
     return;
    }
    allowUntil=Date.now()+30000;
+   // Saved-message readers share the narrator but are separate from the
+   // composer's voice adapter. None may speak into the child's microphone.
+   stopReadAloud();
    h.onRecordingStart?.();
    const media=await navigator.mediaDevices.getUserMedia({video:false,
     audio:{echoCancellation:true,noiseSuppression:true}});
@@ -129,6 +134,9 @@ export function installStudioPrivateSpeech(h:PrivateSpeechHooks){
       if(current===seq)status('Private speech could not finish. No new message was sent. You can type instead.');
      }).finally(()=>{if(request===controller){request=null;button(false);}});
    };
+   // Permission can take time. A second explicit read during that wait must
+   // also stop before capture actually begins.
+   stopReadAloud();
    next.start(300);
    timeout=setTimeout(()=>{if(current===seq&&recording)finish();},12000);
   }catch{

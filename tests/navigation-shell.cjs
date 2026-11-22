@@ -8,7 +8,7 @@ const { waitForWelcome, exploreWelcome, navigate, openProfiles } = require('./st
 
 const NOTEBOOK = 'family-game-factory-studio-v1';
 const SECONDARY = [
-  'studioNavScenes', 'studioNavJourney', 'studioNavRewards',
+  'studioNavNotifications', 'studioNavScenes', 'studioNavJourney', 'studioNavRewards',
   'studioNavPals', 'studioNavPowers', 'studioNavProblemSolving',
 ];
 
@@ -113,6 +113,7 @@ async function shellJourney(browser, base, viewport) {
     await page.screenshot({ path: `test-results/navigation-menu-${viewport.width}.png`, fullPage: false });
 
     for (const [id, target] of [
+      ['studioNavNotifications', '#studioNotifications'],
       ['studioNavJourney', '#page-jems-journey'],
       ['studioNavRewards', '#page-jems-rewards'],
       ['studioNavPals', '#page-jems-pals'],

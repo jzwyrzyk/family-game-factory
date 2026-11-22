@@ -7,6 +7,7 @@ import { RevisionStore, migrateWorkspace, WORKSPACE_KEY, validateWorkspace } fro
 import { DesignCoach } from '../src/factory/coach';
 import { createLifecycle } from '../src/runtime/lifecycle';
 import { manifests } from '../src/runtime/manifests';
+import {PREMADE_GAMES,ORIGINAL_GAMES,isRetiredStarter} from '../src/studio/catalogue';
 import type { GamePlugin, GameContext, PlayOutcome } from '../src/runtime/types';
 const physicsGum=()=>({...defaults('gum'),qualityVersion:1});
 const memory=()=>{const values=new Map<string,string>();return {getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{values.set(key,value);}};};
@@ -22,8 +23,8 @@ test('honest interpreter accepts bounded child language, rejects mixed/novel ins
  assert.equal(interpret('buckets',defaults('buckets'),'Give me 99 buckets').kind,'invalid');assert.equal(interpret('buckets',defaults('buckets'),'Give me three buckets').kind,'unchanged');
  assert.equal(interpret('gum',physicsGum(),'Give me six gum sticks').kind,'supported');assert.equal(interpret('dragon',defaults('dragon'),'Give the island 120 resilience').kind,'supported');
 });
-test('seven native game manifests and transactional composed changes stay bounded',()=>{
- assert.equal(Object.keys(manifests).length,7);
+test('eight native game manifests and transactional composed changes stay bounded',()=>{
+ assert.equal(Object.keys(manifests).length,8);
  assert.equal(defaults('moon').donutGoal,6);assert.equal(defaults('robot','gentle').robotSpeed,.75);
  assert.throws(()=>validateConfig('moon',{...defaults('moon'),meteorRate:5}));
  assert.throws(()=>validateConfig('robot',{...defaults('robot'),script:true}));
@@ -51,6 +52,20 @@ test('Gem Factory presets and remixes stay within playable settings',()=>{
  assert.equal(interpret('factory',defaults('factory'),'Pack 99 gems per order').kind,'invalid');
  assert.equal(interpret('factory',defaults('factory'),'Turn off learning').kind,'generation-needed');
  assert.throws(()=>validateConfig('factory',{...defaults('factory'),cutterSpeed:0}));
+});
+test('mining catalogue preserves saved runtimes without inventing local edits',()=>{
+ assert.deepEqual(PREMADE_GAMES,['factory','mining','gum','hill']);
+ assert.deepEqual(ORIGINAL_GAMES,['dragon','buckets']);
+ assert.equal(isRetiredStarter('moon'),true);assert.equal(isRetiredStarter('robot'),true);
+ assert.equal(isRetiredStarter('mining'),false);assert.equal(isRetiredStarter('new'),false);
+ for(const difficulty of ['gentle','classic','stretch'] as const)assert.deepEqual(defaults('mining',difficulty),{});
+ assert.throws(()=>validateConfig('mining',{mathDifficulty:4}));
+ assert.equal(interpret('mining',{},'Make the giant purple').kind,'generation-needed');
+ const storage=memory(),store=new RevisionStore(storage);
+ for(const game of ['moon','robot','mining'] as const)store.create('player1',game,'Saved '+game,defaults(game));
+ assert.deepEqual(validateWorkspace(store.snapshot()).projects.map(p=>p.game),['moon','robot','mining']);
+ const reopened=new RevisionStore(storage);
+ for(const project of reopened.list('player1'))assert.deepEqual(reopened.revision(project.id,'player1').config,defaults(project.game));
 });
 test('background build polling slows down rather than querying every quarter-second',()=>{
  assert.equal(buildPollDelay(0),1000);

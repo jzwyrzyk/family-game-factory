@@ -5,6 +5,20 @@ const fs = require('node:fs');
 const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
 const { exploreWelcome } = require('./studio-entry.cjs');
+require('tsx/cjs');
+const { RevisionStore, WORKSPACE_KEY } = require('../src/factory/workspace.ts');
+const { StudioNotebook, STUDIO_KEY } = require('../src/studio/notebook.ts');
+
+function savedLegacyGames() {
+  const data = new Map(), storage = { getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, value) };
+  const workspace = new RevisionStore(storage), notebook = new StudioNotebook(storage), sessions = {};
+  for (const [game, name] of [['moon', 'Saved Moon experiment'], ['robot', 'Saved Robot experiment']]) {
+    const project = workspace.create('player1', game, name), session = notebook.create('player1', game, name, project.id);
+    notebook.message(session.id, 'player1', 'child', game === 'moon' ? 'I want to collect more moon donuts.' : 'I want to plan a route to the star.');
+    sessions[game] = session.id;
+  }
+  return { workspace: workspace.snapshot(), notebook: notebook.read(), sessions };
+}
 
 async function checkFrame(page, label) {
   // Await a mount and the controller's resize frame, never eventual correctness.
@@ -91,6 +105,26 @@ async function checkGameContent(page, game, label) {
   } else if (game === 'hill') {
     await insideHost(page, '.quality-hill canvas.q-canvas', label + ' rendered driving canvas', 140);
     await insideHost(page, '.quality-hill .q-pedal', label + ' driving pedals', 48);
+  } else if (game === 'mining') {
+    const mining = page.locator('.native-mining');
+    await page.locator('.native-mining[data-assets="ready"]').waitFor({ state: 'visible', timeout: 10000 });
+    assert.equal(await page.locator('dialog.myj-arcade[open]').count(), 0, label + ': Mining uses the same native game host');
+    await insideHost(page, '.native-mining', label + ' original Mining root', 200);
+    await insideHost(page, '.native-mining .myj-stage', label + ' illustrated Mining scene', Math.min(300, page.viewportSize().height * .46));
+    await insideHost(page, '.native-mining [data-crystal],.native-mining [data-myj="bank"],.native-mining .myj-native-tools button', label + ' native controls', 48);
+    assert.equal(await mining.evaluate(node => node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1), true,
+      label + ': Mining fits without an inner game scrollbar');
+    for (const button of await mining.locator('[data-crystal],.myj-native-tools button').all()) {
+      const bounds = await button.evaluate(node => {
+        const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return { label: node.getAttribute('aria-label'), width: r.width, height: r.height, enabled: !node.disabled,
+          reachable: hit === node || node.contains(hit), hit: hit?.className || hit?.tagName };
+      });
+      assert.ok(bounds.width >= 48 && bounds.height >= 48 && bounds.enabled && bounds.reachable,
+        label + ': the original crystal and tool controls are initially visible and usable: ' + JSON.stringify(bounds));
+    }
+    assert.equal(await page.evaluate(() => FG.runtime.isPlaying()), true, label + ': native entry focus starts a playable round');
+    await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-initial.png` });
   } else if (game === 'dragon' || game === 'buckets') {
     // Playwright selectors pierce the recovered game's real shadow root.
     await insideHost(page, '#game-mount canvas#game', label + ' native canvas', 100);
@@ -313,21 +347,33 @@ async function checkPlayerMenu(page, label) {
       page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()); });
       await page.route('**/factory-config.json', route => route.fulfill({ contentType: 'application/json', body: '{"version":1,"mode":"unavailable"}' }));
       try {
+        const legacy = savedLegacyGames();
+        await context.addInitScript(({ legacy, workspaceKey, notebookKey }) => {
+          if (window.top !== window) return;
+          if (!localStorage.getItem(workspaceKey)) localStorage.setItem(workspaceKey, JSON.stringify(legacy.workspace));
+          if (!localStorage.getItem(notebookKey)) localStorage.setItem(notebookKey, JSON.stringify(legacy.notebook));
+        }, { legacy, workspaceKey: WORKSPACE_KEY, notebookKey: STUDIO_KEY });
         await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);
         await page.waitForFunction(() => window.FG?.studio); await exploreWelcome(page);
         // A satisfied pacing window isolates layout here. The separate checkpoint
         // case below resets it and uses the actual learning host.
         await page.evaluate(() => { FG.store.current().mathWindow = [Date.now()]; FG.store.current().rate = 1; FG.store.save(); });
         let canContinue = true;
-        for (const game of ['factory', 'gum', 'hill', 'buckets', 'dragon', 'moon', 'robot']) {
+        for (const game of ['factory', 'mining', 'gum', 'hill', 'buckets', 'dragon', 'moon', 'robot']) {
           try {
-            await page.locator(`[data-starter="${game}"]`).scrollIntoViewIfNeeded();
-            await page.locator(`[data-starter="${game}"]`).click();
+            const entry = ['moon', 'robot'].includes(game) ?
+              page.locator(`#studioLibrary [data-session="${legacy.sessions[game]}"] .studio-saved-open`) : page.locator(`[data-starter="${game}"]`);
+            await entry.scrollIntoViewIfNeeded(); await entry.click();
             await checkFrame(page, `${device} ${game}`);
             if (game === 'dragon') await checkDragonIntro(page, `${device} ${game}`);
             await checkGameContent(page, game, `${device} ${game}`);
             await checkMore(page, `${device} ${game}`);
             if (game === 'factory') await checkPlayerMenu(page, `${device} ${game}`);
+            if (game === 'mining') {
+              assert.equal(await page.locator('.native-mining').getAttribute('data-paused'), 'true', 'shared tools pause Mining');
+              await page.locator('.native-mining .myj-pause-cover button').click();
+              assert.equal(await page.evaluate(() => FG.runtime.isPlaying()), true, 'Keep playing explicitly resumes Mining after tools');
+            }
             await page.screenshot({ path: `test-results/play-view/${device}-${game}.png` });
             console.log(`PASS ${device} ${game}: scene, controls, scroll and More`);
           } catch (error) { await recordFailure(page, `${device}-${game}`, error); }

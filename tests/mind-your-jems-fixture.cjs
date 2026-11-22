@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
 const assert=require('node:assert/strict');
 const path=require('node:path');
 
@@ -10,6 +10,7 @@ exports.createJourney=async (browser,base,device,recordVideo=false)=>{
  const page=await context.newPage(),errors=[],assetFailures=[],expectedAssetFailures=[];
  const counters={submitted:0,previewRequests:0,previewPaths:[],jobPolls:0,interruptedPolls:0,blockedArt:0};
  const state={status:'building',artBlocked:!!device.artFailure,networkOffline:false};
+ try{
  page.setDefaultTimeout(10000);
  page.on('pageerror',error=>errors.push(error.message));
  page.on('response',response=>{
@@ -61,7 +62,11 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
 </script></body></html>`}));
  await page.goto(base+'?studio=1',{waitUntil:'domcontentloaded',timeout:30000});
  await page.waitForFunction(()=>window.FG?.studio?.mode()==='remote');await exploreWelcome(page);
- assert.equal(await page.locator('dialog.myj-arcade').isVisible(),false,'mini-game is optional');
+ assert.equal(await page.locator('.native-mining').count(),0,'mining is an explicit choice');
+ assert.equal(await page.locator('dialog.myj-arcade[open]').count(),0,'shared mining does not open a second modal');
+ // Keep this gameplay journey within an already-used one-question window.
+ // The desktop case separately opens the real host checkpoint and checks it.
+ await page.evaluate(()=>{const profile=FG.store.current();profile.rate=1;profile.mathWindow=[Date.now()];FG.store.save();});
  await page.locator('[data-starter="gum"]').click();
  if(device.existingRemote){
   // Seed a valid saved, already-generated project in this isolated fixture.
@@ -78,8 +83,7 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  }
  await page.locator('#studioChange').click();
  await page.locator('#studioPrompt').fill('Make my rocket a bouncing rainbow potato spaceship');
- // Capture the style before either modal owns scrolling. The handoff restores
- // it before the selected wait arcade takes over the same page.
+ // Capture the style before the handoff and selected shared play view own it.
  const bodyOverflow=await page.evaluate(nonDefault=>{
   if(nonDefault)document.body.style.overflow='auto';
   return document.body.style.overflow;
@@ -89,13 +93,14 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  assert.equal(counters.submitted,1);
  await page.waitForFunction(()=>document.getElementById('studioBuildHandoff')?.open&&document.getElementById('studioBuildHandoff')?.dataset.phase==='building');
  assert.equal(await page.locator('#studioBuildHandoffPlay').isEnabled(),true,'the acknowledged build offers explicit play');
- assert.equal(await page.locator('dialog.myj-arcade').isVisible(),false,'the popup never starts a game for the child');
- // Re-entry after leaving the arcade uses the existing optional progress
- // action. First entry below exercises the new focused Build handoff.
+ assert.equal(await page.locator('.native-mining').count(),0,'the handoff never starts a game for the child');
+ // Re-entry uses the same visible catalogue card as ordinary play. The first
+ // entry below exercises the original acknowledged build's explicit handoff.
  const launch={async click(){
-  const choices=page.locator('#studioMoreChoices');
-  if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();
-  await page.locator('#studioBuildProgress .studio-wait-arcade-button').click();
+  if(await page.locator('#page-studio.studio-play-mode').isVisible())await page.locator('#studioHome').click();
+  if(await page.locator('#studioNotificationsList').isVisible())await page.locator('#studioNotificationsBack').click();
+  await page.locator('[data-starter="mining"]').click();
+  await page.locator('.native-mining[data-assets="ready"]').waitFor();
  }};
  const project=await page.evaluate(()=>{
   const owner=FG.store.current().id,id=FG.studio.exportNotebook().active[owner];
@@ -106,13 +111,15 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  if(!recordVideo)await page.clock.pauseAt(await page.evaluate(()=>Date.now()+10000));
  await page.locator('#studioBuildHandoffPlay').click();
  assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'the handoff closes before the arcade opens');
- const arcade=page.locator('dialog.myj-arcade');
+ const arcade=page.locator('.native-mining');
  await arcade.waitFor({state:'visible'});
+ assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'wait play uses the same fitted player');
+ assert.equal(await page.locator('dialog.myj-arcade[open]').count(),0,'there is no separate mining dialog');
  const assets=[];
  async function inspectArtwork(){
   await page.evaluate(async()=>{
    await document.fonts.ready;
-   await Promise.all([...document.querySelectorAll('dialog.myj-arcade img')].map(image=>image.decode()));
+   await Promise.all([...document.querySelectorAll('.native-mining img')].map(image=>image.decode()));
   });
   // Background atlas files must decode too, including poses currently hidden.
   const loaded=await arcade.evaluate(async element=>{
@@ -129,7 +136,7 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
   assert.ok(assets.filter(url=>url.includes('/art/mind-your-jems/')).length>=3,'real illustrated scene, character and prop assets are loaded');
  }
  if(device.artFailure)await arcade.locator('[data-myj="retry-art"]').waitFor({state:'visible'});
- else await inspectArtwork();
+ else {await inspectArtwork();await arcade.locator('.myj-loading').waitFor({state:'hidden'});}
  return {context,page,arcade,launch,project,bodyOverflow,errors,assetFailures,expectedAssetFailures,counters,state,assets,inspectArtwork,
   async advance(milliseconds){if(recordVideo)await page.waitForTimeout(milliseconds);else await page.clock.fastForward(milliseconds);},
   async until(predicate,message,{step=100,limit=20000}={}){
@@ -137,6 +144,26 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    throw new Error(message);
   },
   async phase(phase){await this.until(async()=>await arcade.getAttribute('data-phase')===phase,'Expected game phase '+phase);},
+  async original(){return page.evaluate(id=>FG.studio.exportNotebook().sessions.find(session=>session.id===id),project.id);},
+  async ready(){
+   await this.until(async()=>{const original=await this.original();return original.job?.status==='ready'&&Number(await page.locator('#studioPlayNotifications').getAttribute('data-unread'))>0;},'the original saved ready result has a visible notification',{step:250,limit:16000});
+  },
+  async notification(){
+   const more=page.locator('#studioMore');
+   if(!await more.evaluate(node=>node.open))await this.activate(more.locator(':scope > summary'));
+   await page.locator('#studioPlayNotifications').scrollIntoViewIfNeeded();
+   await this.activate(page.locator('#studioPlayNotifications'));
+   const row=page.locator('#studioNotificationsList [data-notification-session="'+project.id+'"]');
+   await row.waitFor({state:'visible'});return row;
+  },
+  async openOriginal(){const row=await this.notification();await this.activate(row.locator('[data-notification-open]'));},
+  async choose(owner){
+   const index=await page.evaluate(owner=>FG.store.familyProfiles().findIndex(profile=>profile.id===owner),owner);
+   assert.ok(index>=0);await openProfiles(page,target=>this.activate(target));
+   await page.locator('#profile-choices .profile-choice').nth(index).scrollIntoViewIfNeeded();
+   await this.activate(page.locator('#profile-choices .profile-choice').nth(index));
+   assert.equal(await page.evaluate(()=>FG.store.current().id),owner,'the visible profile choice uses the normal owner guards');
+  },
   async activate(locator){
    if(device.motion==='no-preference'){
     // A breathing scene deliberately moves its targets. Locator actions wait
@@ -166,4 +193,8 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    await context.close();
   }
  };
+ }catch(error){
+  await page.screenshot({path:path.resolve('test-results/mind-your-jems/'+device.name+'-setup-failure.png'),animations:'disabled'}).catch(()=>{});
+  await context.close();throw error;
+ }
 };

@@ -72,6 +72,7 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
 
   for (const [id, section] of [
     ['studioNavScenes', make],
+    ['studioNavNotifications', world],
     ['studioNavJourney', world],
     ['studioNavRewards', world],
     ['studioNavPals', world],

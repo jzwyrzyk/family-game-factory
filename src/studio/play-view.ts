@@ -28,7 +28,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
   function simplifyTools() {
     const menu = page.querySelector<HTMLElement>('#studioMore .studio-more-actions')!;
     menu.scrollTop = 0;
-    for (const id of ['studioMakeScene', 'studioUseDrawing', 'studioMathOptions', 'studioProfileMenu', 'studioBuildShelf', 'studioReady']) {
+    for (const id of ['studioMakeScene', 'studioUseDrawing', 'studioMathOptions', 'studioProfileMenu', 'studioReady']) {
       const element = document.getElementById(id);
       if (!element) continue;
       if (id === 'studioProfileMenu') (element as HTMLDetailsElement).open = false;
@@ -238,7 +238,7 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       button.hidden = false;
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       resize(); scheduleResize();
-      host.focus({ preventScroll: true });
+      (host.querySelector<HTMLElement>('[data-game-entry-focus]') ?? host).focus({ preventScroll: true });
     },
     leave() {
       if (!active) return;

@@ -1,5 +1,9 @@
 # Child continuity & six Factory Favorites — implementation review
 
+## November 22 continuation update
+
+The [unified experience decision](../decisions/2026-11-22-unified-game-notifications.md) supersedes the historical shelf/catalogue presentation below. Modern Home now has one white continuation card and a [Notifications page](../homepage/NOTIFICATIONS.md) available from the card, Menu and game More, with one row per owned project and unseen actionable-state badges. Reading or dismissing an alert cannot cancel, retry, select or Keep its work. Pending status never opens a preview or interrupts play. The current-project ready action retains the asynchronous preview/newer-typing race protection. The same native Mining host serves direct play and play while waiting, with the originating saved build kept separate. Moon/Robot remain valid saved games; new default tiles use the four Ready to Play and two Original groups. The earlier implementation and acceptance record follows unchanged.
+
 > **Historical implementation review.** Draft/merge/deployment statements below describe the original PR #25 review and are not current release state. Use [DELIVERY-STATE.md](../../DELIVERY-STATE.md) for current evidence and [PRODUCT-DOCTRINE.md](../../PRODUCT-DOCTRINE.md) for the durable behavior principles. Historical acceptance evidence is retained unchanged.
 
 **Status:** draft PR #25, not merged or deployed. This batch does not enable paid AI, authorize cloud work, publish a child project, or relax security/learning controls.

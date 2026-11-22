@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 const {renderGenerated}=require('../server/sandbox/preview.cjs');
 const {renderGeneratedV2}=require('../server/sandbox/preview-v2.cjs');
 const {runtimeBundle}=require('../server/sandbox/bundle-v2.cjs');
@@ -21,7 +21,6 @@ const currentSession=page=>page.evaluate(()=>{
 const runtime=page=>page.evaluate(()=>FG.runtime.snapshot());
 const mainId=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects[0].headId);
 async function more(page){if(!await page.locator('#studioMore').evaluate(node=>node.open))await page.locator('#studioMore > summary').click();}
-async function moreChoices(page){const choices=page.locator('#studioMoreChoices');if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();}
 async function talk(page){if(!await page.locator('#studioPrompt').isVisible())await page.click('#studioChange');}
 async function player(page,index){await openProfiles(page);await page.locator('.profile-choice').nth(index).click();}
 async function assertTargets(page,selectors){
@@ -214,8 +213,15 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await page.locator('#studioBuildHandoffStay').click();
   assert.equal(requests.length,1);assert.equal(await page.inputValue('#studioPrompt'),'','the submitted idea clears only after the durable acknowledgement');
    assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'extra tools remain optional in chat');
-   await moreChoices(page);
-   assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'the child can inspect background build controls by choice');
+   const buildingSession=(await currentSession(page)).id;
+   await navigate(page,'#studioNavNotifications');
+   await page.locator('#studioNotifications').waitFor({state:'visible'});
+   const buildingNotice=page.locator(`#studioNotificationsList [data-notification-session="${buildingSession}"]`);
+   assert.equal(await buildingNotice.getAttribute('data-notification-kind'),'building','the child can inspect the saved background build by choice');
+   assert.equal(await page.locator('#studioBuildShelf').count(),0,'there is no duplicate blue build shelf');
+   await buildingNotice.locator('[data-notification-open]').click();
+   await page.locator('#studioPrompt').waitFor({state:'visible'});
+   assert.equal((await currentSession(page)).id,buildingSession);assert.equal(requests.length,1,'opening Notifications cannot submit another build');
    // Conversation during a slow remote build must remain child-led and must
    // not dispatch a second job, change the selected game or interrupt learning.
    await talk(page);await page.fill('#studioPrompt','Could the rocket have a funny secret name?');
@@ -237,9 +243,11 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await page.fill('#studioPrompt',laterDraft);await page.click('#studioPlay');await expectBudget(page,12);
   ready=true;await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='ready'));
   assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'background completion never reopens the build handoff over play');
-  await page.locator('#studioMore > summary').filter({hasText:'ready'}).waitFor({state:'visible'});
   await more(page);
-  const readyFromPlay=page.locator('#studioBuildShelf').getByRole('button',{name:'Try ready test',exact:true});
+  assert.equal(await page.locator('#studioPlayNotifications').isVisible(),true,'all-project Notifications stays available in More');
+  // The current project's direct ready action keeps the mounted game available
+  // during its preview GET. Opening the all-project center is a separate route.
+  const readyFromPlay=page.locator('#studioReady');
   await readyFromPlay.waitFor({state:'visible'});
   const completed=await currentSession(page);
   assert.equal(completed.draft,laterDraft,'the later draft survives job completion');assert.equal(await page.inputValue('#studioPrompt'),laterDraft);

@@ -32,13 +32,13 @@ async function geometry(journey,device,review){
   const stage=dialog.querySelector('.myj-stage'),targets=[...dialog.querySelectorAll('button')].filter(element=>
    element.getClientRects().length&&getComputedStyle(element).visibility==='visible'&&!element.closest('[inert]'));
   const notice=dialog.querySelector('.myj-notice-visible'),rock=rect(dialog.querySelector('.myj-rock'));
-  const compactReady=dialog.dataset.ready==='true'&&((innerWidth<=600&&innerHeight<=720&&innerHeight>=innerWidth)||(innerHeight<=600&&innerWidth>innerHeight));
+  const compactScene=(innerWidth<=600&&innerHeight<=720&&innerHeight>=innerWidth)||(innerHeight<=600&&innerWidth>innerHeight);
   // The illustrated eye region has stable coordinates in every atlas frame.
   // Check visible overlap explicitly: pointer-events:none feedback can still
   // hide a crystal while the native hit-target test reports it reachable.
-  const feedback=compactReady&&notice&&notice.textContent.trim()?{text:notice.textContent.trim(),...rect(notice),
+  const feedback=compactScene&&notice&&notice.textContent.trim()?{text:notice.textContent.trim(),...rect(notice),
    eyes:{x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65}}:null;
-  return {phase:dialog.dataset.phase,ready:!dialog.querySelector('[data-myj="ready"]').hidden,viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
+  return {phase:dialog.dataset.phase,viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
    feedback,
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
    targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {
@@ -46,7 +46,7 @@ async function geometry(journey,device,review){
     reachable:hit===element||element.contains(hit),crystal:element.hasAttribute('data-crystal')};})};
  });
  review.check(device.name,'layout-and-hit-targets',details);
- assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' dialog fits viewport');
+ assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' shared native game fits viewport');
  assert.ok(details.overflow.horizontal<=2,device.name+' has no horizontal clipping');
  assert.ok(details.overflow.vertical<=2,device.name+' main game fits without scrolling');
  assert.ok(details.stage.height>=Math.min(300,device.viewport.height*.46),device.name+' gives the illustrated play area useful space');
@@ -61,9 +61,9 @@ async function geometry(journey,device,review){
  }
  if(details.feedback){
   const toast=details.feedback,intersects=box=>Math.min(toast.right,box.right)-Math.max(toast.x,box.x)>1&&Math.min(toast.bottom,box.bottom)-Math.max(toast.y,box.y)>1;
-  for(const target of details.targets.filter(target=>target.crystal&&target.enabled))assert.ok(!intersects(target),device.name+' ready feedback leaves active crystal art visible: '+target.label);
-  assert.ok(!intersects(toast.eyes),device.name+' ready feedback leaves the rock eyes visible');
-  review.check(device.name,'ready-feedback-clearance',{text:toast.text,crystals:details.targets.filter(target=>target.crystal&&target.enabled).length,eyesClear:true});
+  for(const target of details.targets.filter(target=>target.crystal&&target.enabled))assert.ok(!intersects(target),device.name+' feedback leaves active crystal art visible: '+target.label);
+  assert.ok(!intersects(toast.eyes),device.name+' feedback leaves the rock eyes visible');
+  review.check(device.name,'feedback-clearance',{text:toast.text,crystals:details.targets.filter(target=>target.crystal&&target.enabled).length,eyesClear:true});
  }
 }
 
@@ -73,7 +73,7 @@ async function assertScrollRestored(journey){
 
 async function assertPlayHandoffScroll(journey){
  const {page}=journey;
- assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'the chosen game owns the play view after the mining dialog closes');
+ assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'the explicitly chosen preview owns the same play view after Mining unmounts');
  assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden','active play keeps the outer page still');
  const frame=await page.locator('#studioRemoteHost iframe').boundingBox(),size=page.viewportSize();
  assert.ok(frame&&frame.y>=0&&frame.y+frame.height<=size.height+1,'the generated game fits its new scroll owner');
@@ -106,8 +106,9 @@ async function exercise(journey,device,review){
  const mine=index=>journey.activate(arcade.locator('[data-crystal="'+index+'"]'));
  const bank=()=>journey.activate(arcade.locator('[data-myj="bank"]'));
  const capture=state=>review.capture(page,arcade,device.name,state);
- assert.match(await arcade.locator('.myj-build-status').innerText(),/building/i);
- assert.equal(await arcade.locator('[data-myj="ready"]').isVisible(),false,'build does not invent readiness');
+ assert.equal((await journey.original()).job.status,'building');
+ assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-pending'),'1','the acknowledged original build remains in progress');
+ assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-unread'),'0','building does not invent a ready update');
  await geometry(journey,device,review);
  if(device.motion==='reduce'){
   const moving=await arcade.evaluate(element=>element.getAnimations({subtree:true}).filter(animation=>animation.playState==='running'&&animation.effect?.getKeyframes().some(frame=>'transform' in frame||'translate' in frame||'rotate' in frame)).length);
@@ -153,48 +154,52 @@ async function exercise(journey,device,review){
   for(let i=0;i<4;i++){await mine(3);await journey.advance(450);await bank();await journey.advance(700);}
   assert.equal(await journey.score('banked'),25,'repeated deposits reach the actual milestone');await capture('milestone');
  }
- // A simulated visibility transition must cancel the hazard without losing
- // scores, and give a fresh warning period when the child returns.
+ // The shared host preserves the exact phase and remaining timer while its
+ // menu or another browser surface has the child's attention.
  if(device.name==='desktop'){
   await mine(3);await journey.advance(450);await journey.phase('warning');
-  const saved={banked:await journey.score('banked'),loose:await journey.score('loose')};
+  const saved=await page.evaluate(()=>FG.runtime.snapshot().state);
+  await page.locator('#studioMore > summary').click();
+  assert.equal(await arcade.getAttribute('data-paused'),'true');
+  await journey.advance(30000);
+  assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),saved,'More pauses the original hazard and scores exactly');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false,'Escape closes the shared tools');
+  assert.equal(await arcade.getAttribute('data-paused'),'true','closing tools leaves an explicit resume choice');
+  await journey.activate(arcade.locator('.myj-pause-cover button'));
   await page.evaluate(()=>{
    Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
    Object.defineProperty(document,'visibilityState',{configurable:true,get:()=> 'hidden'});
    document.dispatchEvent(new Event('visibilitychange'));
   });
   await journey.advance(30000);
-  assert.equal(await journey.score('banked'),saved.banked);assert.equal(await journey.score('loose'),saved.loose);
-  assert.equal(await arcade.getAttribute('data-phase'),'mining');
+  assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),saved,'background time cannot spend the warning interval');
   await page.evaluate(()=>{delete document.hidden;delete document.visibilityState;document.dispatchEvent(new Event('visibilitychange'));});
-  await journey.advance(2000);assert.equal(await arcade.getAttribute('data-phase'),'mining','no surprise shake on return');
-  review.check(device.name,'visibility-pause',{preserved:saved});
+  await journey.advance(2000);assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),saved,'returning does not resume without the child');
+  await journey.activate(arcade.locator('.myj-pause-cover button'));
+  await journey.advance(2000);assert.equal(await arcade.getAttribute('data-phase'),'warning','resuming preserves the remaining warning time');
+  await journey.phase('mining');
+  review.check(device.name,'shared-menu-and-visibility-pause',{preserved:saved});
  }
  await helpPause(journey,device,review);
  assert.equal(journey.counters.previewRequests,0,'playing the mini-game never opens the generated preview');
- await journey.activate(arcade.locator('.myj-close'));assert.equal(await arcade.isVisible(),false);
+ await journey.activate(page.locator('#studioHome'));assert.equal(await arcade.isVisible(),false);
  await assertScrollRestored(journey);
  await journey.launch.click();await journey.advance(50);
  assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0);
- if(device.name==='desktop'||device.name==='mobile-landscape-small'){
-  await mine(0);await page.keyboard.press('Escape');
-  assert.equal(await arcade.isVisible(),false,'Escape exits the native dialog');await assertScrollRestored(journey);
-  await journey.launch.click();await journey.advance(50);
-  assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0,'Escape teardown resets the next session');
-  review.check(device.name,'escape-and-scroll-restore',{restoredOverflow:journey.bodyOverflow});
- }
- // A queued close event from the old session cannot erase an immediate reopen.
- await page.evaluate(()=>{
-  document.querySelector('dialog.myj-arcade .myj-close').click();
-  document.querySelector('#studioBuildProgress .studio-wait-arcade-button').click();
- });
- await journey.advance(50);assert.equal(await arcade.isVisible(),true);
+ // An old detached control cannot mutate a disposed game or a new mount.
+ const oldCrystal=await arcade.locator('[data-crystal="0"]').elementHandle();
+ await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);
+ await journey.launch.click();await journey.advance(50);
+ await oldCrystal.evaluate(button=>button.click());
+ assert.equal(await journey.score('loose'),0,'detached previous-game callbacks cannot alter the new round');
+ assert.equal(await arcade.isVisible(),true);
  await mine(0);assert.equal(await journey.score('loose'),1,'immediate reopen remains interactive');
  await journey.advance(450);await bank();assert.equal(await journey.score('banked'),1);await journey.advance(700);
  journey.state.status='ready';
- await journey.until(()=>arcade.locator('[data-myj="play-ready"]').isVisible(),'verified ready state is surfaced',{step:250,limit:16000});
+ await journey.ready();
  assert.equal(journey.counters.previewRequests,0,'ready notification never auto-opens a preview');
- assert.match(await arcade.locator('.myj-build-status').innerText(),/ready/i);await geometry(journey,device,review);await capture('ready');
+ assert.match(await page.locator('#studioMore > summary').innerText(),/ready/i);await geometry(journey,device,review);await capture('ready');
  const readyScore=await journey.score('banked');await journey.advance(1500);
  assert.equal(await journey.score('banked'),readyScore,'ready status leaves earned progress intact');
  await journey.phase('mining');await mine(0);await journey.advance(450);
@@ -204,11 +209,7 @@ async function exercise(journey,device,review){
  assert.equal(await journey.score('loose'),0);
  await geometry(journey,device,review);
  await capture('ready-playing');
- if(['mobile-small','mobile-landscape','mobile-landscape-small'].includes(device.name)){
-  assert.equal(await arcade.locator('.myj-notice-visible').count(),0,'compact ready-state art is unobstructed');
-  assert.match(await arcade.locator('[data-myj="tips"]').innerText(),/safe|cart/i,'compact banking feedback appears in footer');
- }
- await journey.activate(arcade.locator('[data-myj="play-ready"]'));
+ await journey.openOriginal();
  // The newly attached sandbox frame has its own animation frames and preview
  // handshake timers. Resume real time after the deterministic game assertions.
  await page.clock.resume();
@@ -217,6 +218,7 @@ async function exercise(journey,device,review){
  assert.equal(await preview.locator('#result').innerText(),'Game started','handoff reaches an interactive preview fixture');
  assert.equal(await arcade.isVisible(),false);assert.equal(journey.counters.previewRequests,1);
  await assertPlayHandoffScroll(journey);
+ if(device.name==='desktop')await learningCheckpoint(journey,review);
  assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'preview capability does not enter saved projects');
  review.check(device.name,'complete-journey',{motion:device.motion,loadedArt:journey.assets.length,buildRequests:journey.counters.submitted,previewRequests:journey.counters.previewRequests});
 }
@@ -225,9 +227,9 @@ async function existingRemoteHandoff(journey,review){
  const {page,arcade}=journey;
  assert.equal(journey.counters.previewRequests,1,'mini-game does not reload an existing generated game');
  journey.state.status='ready';
- await journey.until(()=>arcade.locator('[data-myj="play-ready"]').isVisible(),'ready generated revision',{step:250,limit:16000});
+ await journey.ready();
  assert.equal(journey.counters.previewRequests,1,'readiness itself does not load either preview');
- await journey.activate(arcade.locator('[data-myj="play-ready"]'));await page.clock.resume();
+ await journey.openOriginal();await page.clock.resume();
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
  assert.equal(await preview.locator('#result').innerText(),'Game started');
  assert.equal(journey.counters.previewRequests,2,'handoff loads only the chosen new revision, not the old game followed by the new game');
@@ -235,6 +237,33 @@ async function existingRemoteHandoff(journey,review){
  assert.ok(journey.counters.previewPaths[1].includes('myj-ready-revision'));
  await assertPlayHandoffScroll(journey);
  review.check('remote-handoff','existing-generated-project',{previewPaths:journey.counters.previewPaths});
+}
+
+async function learningCheckpoint(journey,review){
+ const {page,arcade}=journey;
+ await journey.launch.click();
+ await journey.activate(arcade.locator('[data-crystal="3"]'));
+ const before=await page.evaluate(()=>FG.runtime.snapshot().state);
+ await page.evaluate(()=>{
+  FG.store.current().mathWindow=[];
+  window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game:'mining'}}));
+ });
+ await page.waitForFunction(()=>FG.learning.active);
+ const attempt=await page.evaluate(()=>FG.learning.activeAttemptId);
+ assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),true,'the host owns the required learning pause');
+ assert.equal(await arcade.getAttribute('data-paused'),'true');
+ await page.waitForTimeout(1000);
+ assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),before,'required learning cannot spend Mining time or scores');
+ await page.locator('#studioMore > summary').click();
+ assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false,'Notifications and other tools cannot bypass required learning');
+ assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt);
+ await page.locator('#studioFullScreen').click();
+ assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt,'expanded native play retains the same checkpoint');
+ assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),true);
+ await page.locator('#studioHome').click();
+ assert.equal(await page.evaluate(()=>FG.learning.active),false,'the visible exit can interrupt without inventing an answer');
+ assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
+ review.check('desktop','native-host-learning',{attempt,pausedState:before,explicitExit:true});
 }
 
 async function recovery(journey,device,review){
@@ -255,40 +284,37 @@ async function recovery(journey,device,review){
   assert.equal(await arcade.locator('[data-myj="retry-art"]').isVisible(),false);
   await review.capture(page,arcade,device.name,'art-recovered');
  }
- // Background builds also expose the arcade from My Games. Its terminal
- // recovery action must return to the affected project, not just dismiss the
- // dialog onto whichever library page happened to launch it.
- await journey.activate(arcade.locator('.myj-close'));await assertScrollRestored(journey);
- await journey.activate(page.locator('#studioNavHome'));
+ // Re-entry uses the ordinary catalog; the original build keeps its own
+ // notification identity even while a different native project is selected.
+ await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);
  assert.equal(await page.locator('#page-studio-library').isVisible(),true,'recovery fixture starts from My Games');
- const shelfLaunch=page.locator('#studioBuildShelf .studio-wait-arcade-button');
- await shelfLaunch.waitFor({state:'visible'});await journey.activate(shelfLaunch);await journey.advance(50);
- assert.equal(await arcade.isVisible(),true,'the acknowledged build can launch its arcade from the global shelf');
- assert.equal(await journey.score('banked'),0,'a reopened shelf session starts cleanly');
+ await journey.launch.click();await journey.advance(50);
+ assert.equal(await arcade.isVisible(),true,'Mining opens through the shared Ready to Play card');
+ assert.equal(await journey.score('banked'),0,'a reopened native round starts cleanly');
  await journey.activate(arcade.locator('[data-crystal="3"]'));await journey.advance(450);
  await journey.activate(arcade.locator('[data-myj="bank"]'));
  assert.equal(await journey.score('banked'),3);
  if(device.artFailure){
   state.networkOffline=true;
-  await journey.until(async()=>await arcade.getAttribute('data-build')==='reconnecting','interrupted polling is shown as reconnecting',{step:500,limit:20000});
+  await journey.until(async()=>counters.interruptedPolls>0&&Number(await page.locator('#studioPlayNotifications').getAttribute('data-unread'))>0,'interrupted polling creates a visible notification count',{step:500,limit:20000});
   assert.ok(counters.interruptedPolls>0,'reconnection is triggered by a real failed fixture request');
-  assert.match(await arcade.locator('.myj-build-status').innerText(),/reconnecting/i);
-  assert.equal(await arcade.locator('[data-myj="play-ready"]').isVisible(),false,'a connection error cannot claim readiness');
+  assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-pending'),'1','unknown build state remains in progress');
+  assert.equal(counters.previewRequests,0,'a connection error cannot claim readiness');
   await geometry(journey,device,review);await review.capture(page,arcade,device.name,'reconnecting');
   await journey.phase('mining');
   await journey.activate(arcade.locator('[data-crystal="0"]'));await journey.advance(450);
   await journey.activate(arcade.locator('[data-myj="bank"]'));
   assert.equal(await journey.score('banked'),4,'local mining stays playable while the build connection recovers');
   state.networkOffline=false;
-  await journey.until(async()=>await arcade.getAttribute('data-build')==='building','the same acknowledged job reconnects',{step:500,limit:20000});
+  const polls=counters.jobPolls;
+  await journey.until(async()=>counters.jobPolls>polls&&await page.locator('#studioPlayNotifications').getAttribute('data-unread')==='0','the same acknowledged job reconnects and clears its unknown update',{step:500,limit:20000});
   assert.equal(counters.submitted,1,'reconnecting never resubmits a build');
   assert.equal(await journey.score('banked'),4,'reconnection preserves local earned progress');
  }
  state.status=device.recoveryTerminal;
- await journey.until(async()=>await arcade.getAttribute('data-build')===device.recoveryTerminal,'terminal build status reaches the mini-game',{step:250,limit:16000});
- assert.equal(await arcade.locator('[data-myj="ready"]').isVisible(),false);
- assert.match(await arcade.locator('.myj-build-problem').innerText(),/keep mining/i);
- assert.match(await arcade.locator('.myj-build-status').innerText(),device.recoveryTerminal==='failed'?/needs a hand/i:/cancelled/i);
+ await journey.until(async()=>(await journey.original()).job?.status===device.recoveryTerminal,'terminal status is saved on the original build',{step:250,limit:16000});
+ assert.equal(counters.previewRequests,0,'a failed or cancelled job never requests a preview');
+ assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-pending'),'0');
  await geometry(journey,device,review);await review.capture(page,arcade,device.name,device.recoveryTerminal);
  await journey.phase('mining');
  const banked=await journey.score('banked');
@@ -309,56 +335,47 @@ async function recovery(journey,device,review){
   await review.capture(page,arcade,device.name,device.recoveryTerminal+'-small-portrait-playing');
   review.check(device.name,'terminal-viewport-change',{viewport:device.portraitViewport,banked:banked+4});
  }
- await journey.activate(arcade.locator('.myj-exit'));
- assert.equal(await arcade.isVisible(),false,'Back to Studio closes the mini-game');await assertScrollRestored(journey);
- assert.equal(await page.locator('#page-studio').isVisible(),true,'Back to Studio opens the affected project from the library');
- assert.equal(await page.locator('#page-studio-library').isVisible(),false,'Back to Studio leaves My Games');
+ const row=await journey.notification();
+ assert.equal(await row.getAttribute('data-notification-kind'),device.recoveryTerminal==='failed'?'failed':'draft','cancelled authored work becomes a draft rather than a permanent job row');
+ await journey.activate(row.locator('[data-notification-open]'));
+ assert.equal(await arcade.isVisible(),false,'opening the original notification unmounts Mining');await assertScrollRestored(journey);
+ assert.equal(await page.locator('#page-studio').isVisible(),true,'the notification opens the affected project');
+ assert.equal(await page.locator('#page-studio-library').isVisible(),false,'recovery leaves My Games');
  assert.equal(await page.locator('#studioConversation').isVisible(),true,'recovery exposes the idea composer on small screens');
  assert.equal(await page.locator('#studioPrompt').isVisible(),true,'the child can revise an idea after a failed or cancelled build');
  assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]),journey.project.id,'terminal recovery opens the project that owns this background build');
  assert.equal(counters.previewRequests,0,'failed and cancelled builds never open a preview');
- review.check(device.name,'build-and-art-recovery',{terminal:device.recoveryTerminal,entry:'global-build-shelf',returnedToProject:journey.project.id,artRetries:device.artFailure?1:0,interruptedPolls:counters.interruptedPolls,buildRequests:counters.submitted,previewRequests:counters.previewRequests});
+ review.check(device.name,'build-and-art-recovery',{terminal:device.recoveryTerminal,entry:'catalogue-and-original-project-notification',returnedToProject:journey.project.id,artRetries:device.artFailure?1:0,interruptedPolls:counters.interruptedPolls,buildRequests:counters.submitted,previewRequests:counters.previewRequests});
 }
 
 async function profileReset(journey,device,review){
  const {page,arcade,project}=journey;
- // Model an application-driven profile event using the same guarded store and
- // notification path as the profile chooser. Native modal inertness correctly
- // prevents clicking the background chooser while the mini-game is open.
- const choose=async owner=>{
-  const changed=await page.evaluate(owner=>{
-   if(!FG.store.choose(owner))return false;
-   FG.app.refreshProfiles();window.dispatchEvent(new Event('factory-profile'));return true;
-  },owner);
-  assert.equal(changed,true,'profile selection passes the application guards');
- };
  await journey.activate(arcade.locator('[data-crystal="3"]'));await journey.advance(450);
  await journey.activate(arcade.locator('[data-myj="bank"]'));
  await journey.activate(arcade.locator('[data-crystal="0"]'));
  assert.equal(await journey.score('banked'),3);assert.equal(await journey.score('loose'),1);
- await choose(project.otherOwner);
+ await journey.choose(project.otherOwner);
  assert.equal(await arcade.isVisible(),false,'profile changes close active mini-game');await assertScrollRestored(journey);
- assert.equal(await page.locator('#studioBuildShelf').isVisible(),false,'other profiles cannot see the previous child’s build');
+ assert.equal(await page.locator('[data-notification-session="'+project.id+'"]').count(),0,'other profiles cannot see the previous child’s build');
  await journey.advance(20000);
  assert.equal(journey.counters.previewRequests,0);
- // The background-build shelf is a real supported entry point after changing
- // profiles and does not auto-open the project's separate generated preview.
- await choose(project.owner);
- const reopen=page.locator('#studioBuildShelf .studio-wait-arcade-button');
- await reopen.waitFor({state:'visible'});await journey.activate(reopen);await journey.advance(50);
+ await journey.choose(project.owner);
+ await journey.launch.click();await journey.advance(50);
  assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0,'profile re-entry starts a fresh mining session');
  assert.equal(await arcade.getAttribute('data-phase'),'mining');
  await journey.activate(arcade.locator('[data-crystal="0"]'));assert.equal(await journey.score('loose'),1,'profile re-entry is still interactive');
  journey.state.status='ready';
- await journey.until(()=>arcade.locator('[data-myj="play-ready"]').isVisible(),'ready callback exists before profile teardown',{step:250,limit:16000});
+ await journey.ready();
+ const notification=await journey.notification();
+ const staleAction=await notification.locator('[data-notification-open]').elementHandle();
  const before=await page.evaluate(id=>{
   const session=FG.studio.exportNotebook().sessions.find(item=>item.id===id);
   return {projectId:session.projectId,remoteId:session.remoteId,selectedTest:session.selectedTest};
  },project.id);
- await choose(project.otherOwner);
+ await journey.choose(project.otherOwner);
  assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
  // A delayed/programmatic activation of the old ready element must be inert.
- await arcade.locator('[data-myj="play-ready"]').evaluate(button=>button.click());await journey.advance(1000);
+ await staleAction.evaluate(button=>button.click());await journey.advance(1000);
  assert.equal(journey.counters.previewRequests,0,'a stale ready callback cannot open another child’s preview');
  const after=await page.evaluate(id=>{
   const session=FG.studio.exportNotebook().sessions.find(item=>item.id===id);
@@ -378,7 +395,7 @@ async function recordGameplay(browser,base,review){
   await journey.activate(arcade.locator('[data-crystal="3"]'));
   await journey.phase('warning');await page.waitForTimeout(500);await journey.activate(arcade.locator('[data-myj="grab"]'));
   await journey.phase('shaking');await journey.phase('mining');journey.state.status='ready';
-  await arcade.locator('[data-myj="play-ready"]').waitFor({state:'visible',timeout:16000});await page.waitForTimeout(1800);
+  await journey.ready();await page.waitForTimeout(1800);
   const video=page.video();await journey.finish();const filename='mind-your-jems-gameplay.webm';
   await video.saveAs(path.join(review.directory,filename));
   review.manifest.video={file:filename,viewport:device.viewport,motion:'normal',source:'real browser with mocked build statuses'};
@@ -400,8 +417,9 @@ async function recordGameplay(browser,base,review){
    (process.env.MYJ_LAYOUT_ONLY!=='1'||!device.recoveryTerminal&&!device.profileReset));
   assert.ok(selected.length,'MYJ_DEVICES must name a supported viewport');
   for(const device of selected){
-   review.manifest.viewports.push(device);const journey=await createJourney(browser,base,device);
+   review.manifest.viewports.push(device);let journey;
    try{
+    journey=await createJourney(browser,base,device);
     if(process.env.MYJ_LAYOUT_ONLY==='1'){await geometry(journey,device,review);await review.capture(journey.page,journey.arcade,device.name,'idle');}
     else if(device.existingRemote)await existingRemoteHandoff(journey,review);
     else if(device.recoveryTerminal)await recovery(journey,device,review);
@@ -409,8 +427,13 @@ async function recordGameplay(browser,base,review){
     else await exercise(journey,device,review);
     await journey.finish();
    }catch(error){
-    if(await journey.arcade.isVisible())await journey.arcade.screenshot({path:path.join(review.directory,device.name+'-failure.png'),animations:'disabled'}).catch(()=>{});
-    await journey.context.close();throw error;
+    review.manifest.errors.push(device.name+': '+(error.stack||String(error)));
+    console.error('FAIL '+device.name+': '+(error.stack||error));
+    if(journey){
+     await journey.page.screenshot({path:path.join(review.directory,device.name+'-failure.png'),animations:'disabled'}).catch(()=>{});
+     await journey.context.close();
+    }
+    continue;
    }
    console.log('PASS '+device.name+': '+(process.env.MYJ_LAYOUT_ONLY==='1'?'layout and loaded artwork':device.existingRemote?'existing generated-project handoff':device.recoveryTerminal?'failure, recovery, continued play and exit':device.profileReset?'profile teardown, reset and stale callback isolation':'art, layout, native input, bank, warning, hold, shake, reset, ready and playable handoff'));
   }

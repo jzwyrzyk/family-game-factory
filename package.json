@@ -10,7 +10,7 @@
     "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts",
     "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts && npm run test:parent-dashboard && npm run test:learning-profile-browser",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser && npm run test:generated-art && npm run test:quality-capture",
-    "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:art && npm run test:art-browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent && npm run test:pals && npm run test:pals-browser",
+    "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:art && npm run test:art-browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:studio-notifications && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent && npm run test:pals && npm run test:pals-browser",
     "test:child-journey": "npm run test:guided-creation && npm run test:first-creation && node tests/child-journey.cjs && node tests/build-continuity.cjs",
     "test:navigation-continuity": "npm run test:navigation-shell && node tests/navigation-continuity.cjs",
     "test:real-agent": "node tests/real-agent-status.cjs",
@@ -65,7 +65,8 @@
     "test:learning-readability": "node tests/learning-surface-contrast.cjs && node tests/learning-readability-browser.cjs",
     "test:guided-creation": "node --import tsx --test tests/guided-planning.test.ts tests/creation-readiness.test.ts tests/conversation-view.test.ts && node tests/build-handoff-browser.cjs && node tests/guided-creation-browser.cjs && node tests/guided-request-drafts.cjs && node tests/build-recovery-browser.cjs",
     "test:learning-profile-browser": "node tests/learning-profile-browser.cjs",
-    "test:play-view": "node tests/play-view-browser.cjs"
+    "test:play-view": "node tests/play-view-browser.cjs",
+    "test:studio-notifications": "node --import tsx --test tests/studio-notifications.test.ts && node tests/studio-notifications-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

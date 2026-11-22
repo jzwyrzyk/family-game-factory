@@ -14,15 +14,28 @@ const {start}=require('./browser-server.cjs');
   const ctx=await browser.newContext({viewport,hasTouch:device==='mobile',isMobile:device==='mobile',reducedMotion:'reduce'});
   const page=await ctx.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
   let audioRequests=0,modelRequests=0,buildRequests=0,authorized=true;
+  const unexpectedPosts=[];
   await page.addInitScript(()=>{
    window.__privateStarts=0;window.__privateTracksStopped=0;
+   window.__privatePermissionDelay=false;window.__grantPrivateMic=null;
+   window.__privateSpoken=[];window.__privateSpeaking=false;window.__privateAudioAtStart=[];
+   window.SpeechSynthesisUtterance=class {constructor(text){this.text=text;}};
+   class Speech extends EventTarget {
+    getVoices(){return [{name:'Samantha (Enhanced)',voiceURI:'Samantha',lang:'en-US',localService:true,default:false}];}
+    speak(utterance){window.__privateSpoken.push(utterance.text);window.__privateSpeaking=true;utterance.onstart?.();}
+    cancel(){window.__privateSpeaking=false;}
+   }
+   Object.defineProperty(window,'speechSynthesis',{configurable:true,value:new Speech()});
    const stream={getTracks(){return [{stop(){window.__privateTracksStopped++;}}];}};
-   Object.defineProperty(navigator,'mediaDevices',{configurable:true,value:{getUserMedia:async()=>stream}});
+   Object.defineProperty(navigator,'mediaDevices',{configurable:true,value:{getUserMedia:async()=>{
+    if(window.__privatePermissionDelay)return new Promise(resolve=>{window.__grantPrivateMic=()=>resolve(stream);});
+    return stream;
+   }}});
    class Recorder {
     static isTypeSupported(type){return type==='audio/webm;codecs=opus';}
     state='inactive';mimeType='audio/webm;codecs=opus';ondataavailable=null;onstop=null;onerror=null;
     constructor(_stream,{mimeType}){this.mimeType=mimeType;}
-    start(){this.state='recording';window.__privateStarts++;}
+    start(){window.__privateAudioAtStart.push(window.__privateSpeaking);this.state='recording';window.__privateStarts++;}
     stop(){this.state='inactive';const arr=new Uint8Array(180);arr.set([0x1a,0x45,0xdf,0xa3]);
      this.ondataavailable?.({data:new Blob([arr],{type:this.mimeType})});this.onstop?.();}
    }
@@ -48,6 +61,7 @@ const {start}=require('./browser-server.cjs');
    }
    if(path==='/v1/coach'){modelRequests++;return reply({errorCode:'COACH_UNAVAILABLE'},503);}
    if(path==='/v1/jobs'){buildRequests++;return reply({errorCode:'UNAVAILABLE'},503);}
+   if(req.method()==='POST')unexpectedPosts.push(path);
    return reply({errorCode:'NOT_FOUND'},404);
   });
   try{
@@ -73,7 +87,23 @@ const {start}=require('./browser-server.cjs');
    assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().sessions.at(-1).job),null);
    assert.equal(await page.evaluate(()=>Object.values(localStorage).some(t=>String(t).includes('GkXfo')||String(t).includes('data:audio/'))),false,'never persist raw audio');
    const childOne=await page.evaluate(()=>FG.store.current().id);
-   await page.click('#studioPrivateMic');await page.waitForFunction(()=>window.__privateStarts===2);
+   // Saved replies have their own narrator, separate from the composer. Private
+   // recording must stop either reader across an asynchronous permission wait.
+   const savedReader=page.locator('.studio-message.helper [data-action="read-aloud"]').last();
+   await savedReader.click();await page.waitForFunction(()=>window.__privateSpeaking);
+   await page.evaluate(()=>{window.__privatePermissionDelay=true;});
+   await page.click('#studioPrivateMic');await page.waitForFunction(()=>!!window.__grantPrivateMic);
+   assert.equal(await page.evaluate(()=>window.__privateSpeaking),false,'opening private microphone permission stops saved-message audio');
+   if(!await savedReader.isDisabled())await savedReader.click();
+   await page.evaluate(()=>window.__grantPrivateMic());
+   await page.waitForFunction(()=>window.__privateStarts===2);
+   assert.equal(await page.evaluate(()=>window.__privateAudioAtStart[1]),false,'actual private capture starts with no reading audio');
+   const spokenBefore=await page.evaluate(()=>window.__privateSpoken.length);
+   if(!await savedReader.isDisabled())await savedReader.click();
+   if(!await page.locator('#studioHear').isDisabled())await page.locator('#studioHear').click();
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   assert.equal(await page.evaluate(()=>window.__privateSpoken.length),spokenBefore,'saved and current-reply reading cannot start during private recording');
+   assert.equal(await page.evaluate(()=>window.__privateSpeaking),false);
    await openProfiles(page);
    await page.locator('.profile-choice').nth(1).click();
    assert.ok(await page.evaluate(()=>window.__privateTracksStopped)>=2,'switching child releases microphone');
@@ -84,8 +114,8 @@ const {start}=require('./browser-server.cjs');
    await page.click('#studioNavCreate');
    await page.waitForFunction(()=>document.getElementById('studioPrivateMic').hidden===true);
    assert.equal(audioRequests,1,'new child cannot capture audio without fresh approval');
-   assert.deepEqual(errors,[]);
-   console.log('PASS '+device+': one Speak control, approved recording to editable draft, explicit Send only, no build, profile cleanup, no raw audio storage');
+   assert.deepEqual(unexpectedPosts,[]);assert.deepEqual(errors,[]);
+   console.log('PASS '+device+': one Speak control, approved recording to editable draft, explicit Send only, reading/capture exclusion through delayed permission, no build, profile cleanup, no raw audio storage');
   }finally{await ctx.close();}
  }}finally{await browser.close();await new Promise(r=>server.close(r));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
