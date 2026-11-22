@@ -39,7 +39,7 @@ export function normalizePrivateCoachReply(value:unknown,context:CoachContext):u
   r.planSuggestions=r.planSuggestions.filter(suggestion).slice(0,8);
  if(Array.isArray(r.suggestions))
   r.suggestions=r.suggestions.filter((item):item is string=>typeof item==='string'&&item.length<=500).slice(0,4);
- if(r.proposedChange!==null&&(!object(r.proposedChange)||
+ if(Object.hasOwn(r,'proposedChange')&&r.proposedChange!==null&&(!object(r.proposedChange)||
    !exact(r.proposedChange,['title','request','depth'])||
    typeof r.proposedChange.title!=='string'||r.proposedChange.title.length>120||
    typeof r.proposedChange.request!=='string'||r.proposedChange.request.length>2000||
