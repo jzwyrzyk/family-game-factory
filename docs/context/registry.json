@@ -416,10 +416,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:11.591Z",
-      "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
+      "reviewedAt": "2026-11-22T00:40:58.790Z",
+      "sourceDigest": "5b18489a65280cba1c0085101d05d33ea21e6fa131ccccd3fd9f2dec8a507bd3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+      "reviewReason": "Reviewed the tablet evidence contract against the unchanged game and builder runtime. Updated game-quality and architecture guidance for the latest three tap receipts, bounded input/focus/scroll/viewport observations and geometry that distinguishes document scrolling from control movement. The single real tap, trusted activation counters, deadlines and construction-state assertions remain intact. The cause of the earlier redirected click and physical-device acceptance remain unverified; passive instrumentation is not a product repair. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c, including the reference assets unavailable locally.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -617,10 +617,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:58:22.701Z",
-      "sourceDigest": "60cf47e1f1d6aea925724a58c675df556a9c0861d0a3366f8d6e6adf18146869",
+      "reviewedAt": "2026-11-22T00:40:58.790Z",
+      "sourceDigest": "59d746b674b130ab70db62f75ce7a82385ae31ddddf6a04f3091126a23d8b2cc",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the independently reviewed Pal lifecycle assertions and main PR124 private diagnostic/tablet assertions without changing either implementation. Preserved both historical source review stamps and failure records; the combined candidate still needs its own hosted browser acceptance after publication.",
+      "reviewReason": "Reviewed the tablet instrumentation diff and independent review: one real tap, the original two-second activation wait, unchanged trusted/redirected/cancelled counters and construction-state assertions, complete listener cleanup, and bounds of three tap receipts and 32 retained events per tap. Updated architecture and delivery records to preserve the original redirected-click failure and distinguish syntax validation from unavailable local Chromium acceptance. New hosted results must be evaluated on their own source; a pass alone does not identify or repair the earlier failure. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
