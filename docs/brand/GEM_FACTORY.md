@@ -29,6 +29,11 @@ Apply [Child interface: clear at six](CHILD_INTERFACE.md): large visible labels,
 usable touch targets and a clue that fits narrow phones without horizontal
 scrolling. Readable reflow takes priority over shrinking the pictured jems.
 
+On phones, the upper pattern area becomes the next-stage instruction after
+sorting, keeping the wrapping choices unobstructed. Focusing a machine control
+must not internally scroll the camera frame or move the active station out of
+view.
+
 Pattern completion replaces the earlier one-to-one order match. Wrapping is an
 expressive choice: its result must remain visible on the actual gift, rather than
 being a selected swatch with no effect. These are native gameplay changes; they

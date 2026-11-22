@@ -1,5 +1,5 @@
 /* The workshop is the controller: every action belongs to a visible toy. */
-.gem-factory{--gf-ink:#253657;--gf-purple:#8061c7;position:relative;container-type:inline-size;width:100%;max-width:1200px;margin:auto;overflow:hidden;border:2px solid #fff5df;border-radius:26px;background:#fff6e8;color:var(--gf-ink);font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;box-shadow:0 12px 38px #77465422;isolation:isolate;text-align:left}
+.gem-factory{--gf-ink:#253657;--gf-purple:#8061c7;position:relative;container-type:inline-size;width:100%;max-width:1200px;margin:auto;overflow:clip;border:2px solid #fff5df;border-radius:26px;background:#fff6e8;color:var(--gf-ink);font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;box-shadow:0 12px 38px #77465422;isolation:isolate;text-align:left}
 .gem-factory *{box-sizing:border-box}
 .gem-factory button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none}
 .gem-factory button:focus-visible{outline:4px solid #274eca;outline-offset:5px}
@@ -20,7 +20,8 @@
 .gf-sound-state{position:absolute;inset:8px;overflow:hidden;font-size:0;pointer-events:none}.gf-sound-state:after{content:"";position:absolute;left:47%;top:0;width:3px;height:100%;background:#7560a5;box-shadow:1px 0 #fffefa;transform:rotate(-40deg)}
 .gf-icon-button:hover{background:#f3eaff}
 .gf-icon-button:active{transform:translateY(2px);box-shadow:0 1px #d9c9e6}
-.gf-world{position:relative;aspect-ratio:3/2;background:#ffd4a0;overflow:hidden;--station:0;--gem-x:16%;--mobile-pan:0%}
+/* The phone camera pans the room; focus must never scroll its clipping frame. */
+.gf-world{position:relative;aspect-ratio:3/2;background:#ffd4a0;overflow:clip;--station:0;--gem-x:16%;--mobile-pan:0%}
 .gf-room{position:absolute;inset:0;overflow:visible;isolation:isolate}
 .gf-backdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
 .gf-line{position:absolute;inset:0;z-index:4;pointer-events:none}
@@ -198,6 +199,12 @@
  .gf-gift-action{left:77%;top:45%;width:16%;height:23%}
  .gf-wrap-options{left:73%;right:auto;top:70%;width:25%;min-width:0;max-width:none;gap:14px;padding:13px 13px 33px}.gf-paper-roll{height:65px;min-width:46px}.gf-paper-name{font-size:18px}
  .gf-helper{left:12px;bottom:2%;width:72px;height:106px}.gf-helper-hint{max-width:calc(100cqw - 105px);min-width:0;width:max-content;padding:10px 13px;bottom:18%;font-size:20px;border-width:2px}
+ /* After sorting, the next action uses the clue's space and leaves the paper rolls clear. */
+ .gem-factory:not([data-stage=pick]) .gf-room{top:172px;height:calc(100% - 172px)}
+ .gem-factory:not([data-stage=pick]) .gf-helper{inset:0;width:auto;height:auto}
+ .gem-factory:not([data-stage=pick]) .gf-helper img{left:12px;bottom:2%;width:72px;height:106px}
+ .gem-factory:not([data-stage=pick]) .gf-helper-hint{display:block;left:10px;right:10px;top:62px;bottom:auto;width:auto;max-width:none;border-radius:19px}
+ .gf-cut-label{display:none}
  .gf-success{left:82%;top:22%;max-width:29%;min-width:245px;padding:13px 18px}.gf-success h3{font-size:24px}.gf-success p{font-size:20px}
  .gf-pause-card{padding:24px 18px}.gf-pause-card h3{font-size:28px}
 }
@@ -207,6 +214,7 @@
  .gf-room{top:252px;height:calc(100% - 252px)}
  .gf-sort-controls{left:3%;width:26%;padding:6px;gap:6px}.gf-sort-basket{font-size:18px!important}.gf-basket-symbol{width:17px;height:17px}
  .gf-helper{width:60px;height:90px;left:8px}.gf-helper-hint{max-width:calc(100cqw - 82px);padding:9px 10px}
+ .gem-factory:not([data-stage=pick]) .gf-helper img{left:8px;width:60px;height:90px}
  .gf-wrap-options{left:72%;width:27%;gap:11px;padding:10px 11px 32px}.gf-paper-roll{height:52px}
 }
 @media(prefers-reduced-motion:reduce){.gem-factory *{animation:none!important;transition:none!important}.gf-effects{display:none}}

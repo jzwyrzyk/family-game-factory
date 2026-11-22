@@ -118,10 +118,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:14:06.030Z",
-      "sourceDigest": "f8f655f11445fad1e1c586e4bd8eedbc0b6e617821be7d7d34977229a121ab90",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-requested Factory refinement in doctrine and its accepted decision: clearer pattern focus, machine controls, gentle failed cuts and two completed gifts per pattern tier.",
+      "reviewedAt": "2026-11-22T15:32:53.699Z",
+      "sourceDigest": "bbc7163734e6cbead17471a255e625af47573a1eb9718622abb12d579236db79",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Read the added Factory phone-layout paragraph against product doctrine: reusing the current instruction area and keeping the active machine in view implement the existing clear, physical-game interface requirement. No new product policy, reward or learning behavior is introduced.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:21:12.819Z",
-      "sourceDigest": "a7374f727674d827e56b9782e2b768210ef094b5079543ad0e86c2e36fd3d493",
+      "reviewedAt": "2026-11-22T15:31:22.210Z",
+      "sourceDigest": "a91d1db892d110f8e28c5ab337348b419a625bbd0b3363edf3b2fb3da01258a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected hosted desktop and tablet captures; desktop gameplay passed and tablet candidate overlapped the level badge. Tightened the readable badge geometry without shrinking pattern pieces or changing gameplay; hosted recheck remains required.",
+      "reviewReason": "Inspected the Factory phone captures: the scene frame now clips without internal focus scrolling, and later-stage instructions occupy the former clue area so wrapping controls remain visible. These changes preserve the documented clear-phone and physical-control contract.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:21:13.113Z",
-      "sourceDigest": "c0563c6a734f126c8feae44e563702fe1d01c35f7c95757ace21ca5d68792965",
+      "reviewedAt": "2026-11-22T15:32:41.666Z",
+      "sourceDigest": "7129b791b1fd6b62c03761edda1c4d37c12f0010c7dc5d262f2aeed46c24c93f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed failed hosted tablet overlap assertion and preserved it; added independent first-view captures at all narrow widths so later failures cannot hide unobserved layouts. Full gameplay assertions and input checks remain intact.",
+      "reviewReason": "Reviewed the hosted phone failure and final browser diff: a real timed input now follows camera/actionability preparation and observes activation completion once; assertions reject hidden scene scrolling and phone hints over wrapping controls. This candidate still requires hosted execution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

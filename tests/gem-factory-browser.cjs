@@ -33,15 +33,46 @@ async function capture(page,device,stage){
  await page.locator('.gem-factory').screenshot({path:`test-results/gem-factory/${device}-${stage}.png`});
 }
 
+async function waitForCamera(page){
+ await page.waitForFunction(()=>{
+  const room=document.querySelector('.gf-room');
+  if(!room)return false;
+  // Flush the new stage's style before checking its finite camera transition.
+  room.getBoundingClientRect();
+  return room.getAnimations().every(animation=>!animation.pending&&animation.playState!=='running');
+ });
+}
+
 async function checkRoomBounds(page,device,stage){
- if(device==='desktop')return;
+ await waitForCamera(page);
  const bounds=await page.evaluate(()=>{
   const room=document.querySelector('.gf-room').getBoundingClientRect();
-  const world=document.querySelector('.gf-world').getBoundingClientRect();
-  return {roomLeft:room.left,roomRight:room.right,worldLeft:world.left,worldRight:world.right};
+  const worldElement=document.querySelector('.gf-world'),world=worldElement.getBoundingClientRect();
+  return {roomLeft:room.left,roomRight:room.right,worldLeft:world.left,worldRight:world.right,scrollLeft:worldElement.scrollLeft};
  });
+ assert.equal(bounds.scrollLeft,0,`${device} ${stage}: input and camera transitions must not scroll the workshop internally`);
+ await checkPhoneHint(page);
+ if(device==='desktop')return;
  assert.ok(bounds.roomRight>=bounds.worldRight-1,`${device} ${stage}: scene covers the right edge: ${JSON.stringify(bounds)}`);
  assert.ok(bounds.roomLeft<=bounds.worldLeft+1,`${device} ${stage}: scene covers the left edge: ${JSON.stringify(bounds)}`);
+}
+
+async function checkPhoneHint(page){
+ const layout=await page.evaluate(()=>{
+  const root=document.querySelector('.gem-factory');
+  if(root.clientWidth>520||root.dataset.stage==='pick')return null;
+  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
+  const hint=document.querySelector('.gf-helper-hint'),style=getComputedStyle(hint);
+  return {stage:root.dataset.stage,world:rect(document.querySelector('.gf-world')),room:rect(document.querySelector('.gf-room')),hint:rect(hint),text:hint.textContent.trim(),font:parseFloat(style.fontSize),visible:style.display!=='none'&&style.visibility!=='hidden',controls:[...document.querySelectorAll('.gf-machine-action,.gf-wrap-options')].map(rect)};
+ });
+ if(!layout)return;
+ const h=layout.hint,w=layout.world;
+ assert.ok(layout.visible&&layout.text&&layout.font>=20&&h.height>0,`${layout.stage}: the phone has a visible, readable next-action hint`);
+ assert.ok(h.left>=w.left-1&&h.right<=w.right+1&&h.top>=w.top,`${layout.stage}: the action hint fits inside the phone workshop`);
+ assert.ok(h.bottom<=layout.room.top+1,`${layout.stage}: the action hint occupies the space above the illustrated machines`);
+ for(const control of layout.controls){
+  assert.ok(h.bottom<=control.top||h.top>=control.bottom||h.right<=control.left||h.left>=control.right,`${layout.stage}: the action hint cannot cover a machine control or wrapping paper`);
+ }
 }
 
 async function activate(page,button,device,keyboard=false){
@@ -76,6 +107,7 @@ async function checkPattern(page){
 }
 
 async function checkSortingLayout(page){
+ await waitForCamera(page);
  const layout=await page.evaluate(()=>{
   const rect=selector=>{const r=document.querySelector(selector).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
   return {
@@ -83,9 +115,15 @@ async function checkSortingLayout(page){
    pieces:[...document.querySelectorAll('.gf-pattern-gem,.gf-pattern-missing')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};}),
    buttons:[...document.querySelectorAll('.gf-sort-controls button')].map(el=>({label:el.textContent,hidden:!!el.closest('[aria-hidden="true"]'),font:parseFloat(getComputedStyle(el).fontSize),height:el.getBoundingClientRect().height,overflow:el.scrollWidth>el.clientWidth+1})),
    titleSize:parseFloat(getComputedStyle(document.querySelector('.gf-order h3')).fontSize),
-   detachedButtons:document.querySelectorAll('.gf-sorting-board button').length
+   detachedButtons:document.querySelectorAll('.gf-sorting-board button').length,
+   scrollLeft:document.querySelector('.gf-world').scrollLeft
   };
  });
+ assert.equal(layout.scrollLeft,0,'sorting and recovery never leave a hidden horizontal scroll offset');
+ for(const name of ['order','controls']){
+  const bounds=layout[name];
+  assert.ok(bounds.left>=layout.world.left-1&&bounds.right<=layout.world.right+1,`${name} stays inside the workshop after a camera transition`);
+ }
  assert.equal(layout.buttons.length,2,'Keep and Return live on the machine control mount');
  assert.ok(layout.buttons.some(b=>/Keep/.test(b.label))&&layout.buttons.some(b=>/Return/.test(b.label)),'both actions say what happens to the candidate');
  assert.equal(layout.detachedButtons,0,'the sorter has no detached control-card buttons');
@@ -124,14 +162,35 @@ async function chooseGem(page,device='desktop',keyboard=false){
 
 async function cutGem(page,device='desktop'){
  for(let checkpoint=0;checkpoint<4;checkpoint++){
+  if(await page.evaluate(()=>FG.learning.active)){await finishLearning(page);continue;}
+  const button=page.locator('.gem-factory .gf-cut-action[data-action="cut"]');
+  await waitForCamera(page);await capture(page,device,'cut');
+  // Finish actionability/scroll work before timing starts. A locator tap after
+  // observing the needle would wait for a moving camera and miss the window.
+  await button.scrollIntoViewIfNeeded();await waitForCamera(page);
+  const target=await button.evaluate(el=>{
+   const r=el.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;
+   return {x,y,width:r.width,height:r.height,disabled:el.disabled,inert:!!el.closest('[inert]'),uncovered:el.contains(document.elementFromPoint(x,y)),scrollLeft:document.querySelector('.gf-world').scrollLeft};
+  });
+  if(await page.evaluate(()=>FG.learning.active)){await finishLearning(page);continue;}
+  assert.ok(target.width>=44&&target.height>=44,'the stable cutter is a child-sized target');
+  assert.ok(!target.disabled&&!target.inert&&target.uncovered,'the stable cutter is enabled and unobscured before timing the input');
+  assert.equal(target.scrollLeft,0,'preparing a timed tap cannot shift the workshop internally');
+  if(device==='desktop')await page.mouse.move(target.x,target.y);
   await page.waitForFunction(()=>{
    const needle=document.querySelector('.gf-cutter-needle');
    const position=parseFloat(needle?.style.left||'0');
    return FG.learning.active||(position>42&&position<58);
   });
   if(await page.evaluate(()=>FG.learning.active)){await finishLearning(page);continue;}
-  await activate(page,page.locator('.gem-factory .gf-cut-action[data-action="cut"]'),device);
-  await page.waitForFunction(()=>FG.runtime.snapshot().state.stage==='polish');return;
+  // Real input at the prepared point; no actionability wait after the observed
+  // timing window, no widened acceptance window, and no retry after a miss.
+  if(device==='desktop')await page.mouse.click(target.x,target.y);
+  else await page.touchscreen.tap(target.x,target.y);
+  await page.waitForFunction(()=>FG.runtime.snapshot().state.stage!=='cut',null,{timeout:1000});
+  const result=await snapshot(page);
+  assert.equal(result.stage,'polish',`a real timed ${device==='desktop'?'click':'tap'} should cut successfully; observed position ${result.cutterPosition}, misses ${result.cutMisses}`);
+  await checkRoomBounds(page,device,'after-cut');return;
  }
  throw Error('The cutter did not resume after learning');
 }
@@ -449,7 +508,7 @@ async function checkCustomCadence(browser,url){
      const bounds={};for(const name of ['world','room','order','candidate','sorting-ramp','sort-controls']){
       const el=document.querySelector('.gf-'+name);if(!el)continue;const r=el.getBoundingClientRect();bounds[name]={x:r.x,y:r.y,w:r.width,h:r.height};
      }
-     return {stage:state?.stage,patternLevel:state?.patternLevel,patternsCompleted:state?.patternsCompleted,completed:state?.completed,cutMisses:state?.cutMisses,hostPaused:state?.hostPaused,userPaused:state?.userPaused,learning:!!window.FG?.learning?.active,bounds};
+     return {stage:state?.stage,patternLevel:state?.patternLevel,patternsCompleted:state?.patternsCompleted,completed:state?.completed,cutMisses:state?.cutMisses,hostPaused:state?.hostPaused,userPaused:state?.userPaused,learning:!!window.FG?.learning?.active,scrollLeft:document.querySelector('.gf-world')?.scrollLeft,bounds};
     }).catch(()=>({unavailable:true}));
     console.error(`${device} failure: ${JSON.stringify(diagnostic)}`);throw error;
    }finally{await context.close();}
