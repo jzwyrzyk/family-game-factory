@@ -239,10 +239,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:36:34.015Z",
-      "sourceDigest": "50996845390394f61fe2431f34aac1ffb58bc06919910b2d4f2fc02269c090bb",
+      "reviewedAt": "2026-11-22T19:17:52.578Z",
+      "sourceDigest": "bd67eebc50accd5320fdd8d7837faea8d328591e21226d280c55abed061c3f98",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed current catalogue routing and Help: separate assembly starter preserves earlier saved workshops in My jems, with actual engine-specific instructions and no revision rewrite.",
+      "reviewReason": "Updated current-game Help and responsive launch/result presentation while retaining the shared player and legacy help.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -424,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:46:46.399Z",
-      "sourceDigest": "85632e1fad3924f29bc7eb06d047f15ad7bac5005ca9ff349884829d0ccafe36",
+      "reviewedAt": "2026-11-22T19:20:24.386Z",
+      "sourceDigest": "477155f83f3d473e884a4dc11bedefb67321ab5fb658ffd9bf014b39a785d0af",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the recorded touch gesture loss and narrow repair: preserve captured source until touchend, commit one drop on the next frame, cancel pending work on pause or teardown and retain all assembly rules.",
+      "reviewReason": "Finalized owner feedback including world launch art, tube exhaust orientation and deterministic part-dependent travel.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:05:38.672Z",
-      "sourceDigest": "d4f61ea9281c170567ee325e68f7e650f747bc76edefe2ee279cce3d23788dab",
+      "reviewedAt": "2026-11-22T19:20:44.762Z",
+      "sourceDigest": "2c99651c68b4ec8caa2c70dc669584fb0f7934e012b2583c7ab7e32cb37dd814",
       "reviewOutcome": "updated",
-      "reviewReason": "Isolated the touch driver with stable-DOM protocol probes and retained exact saved-workshop entry assertions.",
+      "reviewReason": "Finalized feature assertions and a same-contact stopped-drag control without changing product input handlers.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:58:57.866Z",
-      "sourceDigest": "97400c9c6f1fa59e62ddeef414b6fe7b43769d2d25c2e629b1cc2294b65730e7",
+      "reviewedAt": "2026-11-22T19:20:55.766Z",
+      "sourceDigest": "d3a92dc0b7f2ceb63abf80ab7a56f5cc96215e29c6f0710c23d8e9fc7606e758",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the third exact hosted candidate and counterevidence that deferred source rendering alone does not restore the next click; test transport is now isolated without additional product patches.",
+      "reviewReason": "Reviewed final owner-feedback source and validation workflow with pending hosted acceptance and retained merge hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

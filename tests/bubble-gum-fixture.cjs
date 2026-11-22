@@ -6,6 +6,20 @@
 require('tsx/cjs');
 const assert = require('node:assert/strict');
 const { createBuild, getBlueprint, TOUR_DURATION_MS } = require('../src/games/bubble-gum-rules.ts');
+const { LAUNCH_DURATION_MS } = require('../src/games/bubble-gum-journey.ts');
+
+async function advanceAssemblyTour(page, { clockInstalled = false } = {}) {
+  const launched = await page.evaluate(() => FG.runtime.snapshot().state);
+  assert.equal(launched.launchDurationMs, LAUNCH_DURATION_MS);
+  assert.equal(launched.journeyDurationMs, TOUR_DURATION_MS);
+  if (clockInstalled) await page.clock.runFor(LAUNCH_DURATION_MS + TOUR_DURATION_MS + 250);
+  await page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase', null, { timeout: 45000 });
+  const enjoyed = await page.evaluate(() => FG.runtime.snapshot().state);
+  assert.equal(enjoyed.adventureElapsedMs, LAUNCH_DURATION_MS + TOUR_DURATION_MS, 'the real launch and journey both complete');
+  assert.ok(enjoyed.tourElapsedMs >= TOUR_DURATION_MS, 'the actual twenty-four-second journey was completed');
+  return enjoyed;
+}
+exports.advanceAssemblyTour = advanceAssemblyTour;
 
 exports.buildAndRide = async function buildAndRide(page, { touch = false, clockInstalled = false } = {}) {
   const root = page.locator('.gum-builder');
@@ -45,10 +59,7 @@ exports.buildAndRide = async function buildAndRide(page, { touch = false, clockI
   const built = await read();
   await activate(root.locator('.gum-build-launch'));
   await page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'adventure');
-  if (clockInstalled) await page.clock.runFor(TOUR_DURATION_MS + 250);
-  await page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase', null, { timeout: 45000 });
-  const enjoyed = await read();
-  assert.ok(enjoyed.tourElapsedMs >= TOUR_DURATION_MS, 'the actual adventure was completed');
+  const enjoyed = await advanceAssemblyTour(page, { clockInstalled });
   assert.deepEqual(enjoyed.placed, built.placed, 'all chosen objects stay with the invention');
   assert.deepEqual(enjoyed.bonds, built.bonds, 'all gum joints stay with the invention');
   assert.equal(enjoyed.reported, false, 'the host is not credited before the child moves on');

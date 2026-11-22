@@ -16,7 +16,11 @@ const { start } = require('./browser-server.cjs');
 const { exploreWelcome } = require('./studio-entry.cjs');
 const { assertTextContrast } = require('./helpers/text-contrast.cjs');
 const { BLUEPRINTS, TOUR_DURATION_MS, GUM_BUDGET, createBuild, getBlueprint } = require('../src/games/bubble-gum-rules.ts');
+const { LAUNCH_DURATION_MS } = require('../src/games/bubble-gum-journey.ts');
 const { defaults } = require('../src/runtime/manifests.ts');
+const ADVENTURE_DURATION_MS = LAUNCH_DURATION_MS + TOUR_DURATION_MS;
+const WEAK_ROCKET = { body: 'can', nose: 'cup', 'left-wing': 'ruler', 'right-wing': 'ruler', booster: 'cup' };
+const STRONG_ROCKET = { body: 'bottle', nose: 'funnel', 'left-wing': 'paper-wing', 'right-wing': 'paper-wing', booster: 'tube' };
 
 const output = path.resolve('test-results/bubble-gum-builders');
 fs.mkdirSync(output, { recursive: true });
@@ -24,12 +28,13 @@ const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const git = (...args) => { try { return execFileSync('git', args, { encoding: 'utf8' }).trim(); } catch { return null; } };
 const manifest = { schema: 'bubble-gum-browser-review-v1', startedAt: new Date().toISOString(),
   source: git('rev-parse', 'HEAD'), tree: git('rev-parse', 'HEAD^{tree}'),
-  dirty: !!git('status', '--porcelain'), realAdventureMs: TOUR_DURATION_MS,
+  dirty: !!git('status', '--porcelain'), realAdventureMs: ADVENTURE_DURATION_MS,
+  launchDurationMs: LAUNCH_DURATION_MS, journeyDurationMs: TOUR_DURATION_MS,
   touchTransport: 'One retained CDP session per journey; implicit touch id matching Playwright; subsequent tap uses Locator.tap',
   sources: Object.fromEntries(['src/games/bubble-gum-builder.ts', 'src/games/bubble-gum-builder.css',
-    'src/games/bubble-gum-rules.ts', 'src/games/bubble-gum-art.ts', 'tests/bubble-gum-builder-browser.cjs']
+    'src/games/bubble-gum-rules.ts', 'src/games/bubble-gum-art.ts', 'src/games/bubble-gum-journey.ts', 'tests/bubble-gum-builder-browser.cjs']
     .map(file => [file, fs.existsSync(file) ? hash(fs.readFileSync(file)) : null])),
-  cases: [], captures: [], videos: [], contrast: [], touchReceipts: [], failures: [] };
+  cases: [], captures: [], videos: [], contrast: [], touchReceipts: [], launchReceipts: [], viabilityComparisons: [], failures: [] };
 const saveManifest = () => fs.writeFileSync(path.join(output, 'review.json'), JSON.stringify(manifest, null, 2) + '\n');
 saveManifest();
 
@@ -41,6 +46,42 @@ const build = state => getBlueprint(stateForRules(state));
 const recordCount = page => page.evaluate(() => FG.store.current().stats.gum?.played || 0);
 const exactBuild = state => ({ blueprint: state.blueprint, placed: state.placed, bonds: state.bonds,
   gumLeft: state.gumLeft, completedCount: state.completedCount, tourCompleted: state.tourCompleted, reported: state.reported });
+
+async function assertPhysicalPresentation(page, state) {
+  const presentation = await root(page).evaluate(node => ({
+    objects: [...node.querySelector('.gum-build-machine').children].filter(child => child.tagName.toLowerCase() === 'g')
+      .map(child => ({ slot: child.getAttribute('data-built-part'), object: child.getAttribute('data-object') })),
+    targetArtwork: node.querySelectorAll('[data-gum-slot] svg, [data-gum-slot] img, [data-gum-slot] canvas').length,
+    gumChoices: node.querySelectorAll('[data-gum-color]').length,
+    gumStrokes: [...node.querySelectorAll('[data-gum-bond]')].map(path => path.getAttribute('stroke')),
+  }));
+  const bySlot = (a, b) => String(a.slot).localeCompare(String(b.slot));
+  assert.deepEqual(presentation.objects.sort(bySlot), Object.entries(state.placed).map(([slot, object]) => ({ slot, object })).sort(bySlot),
+    'the workbench contains only real placed objects, with no object-shaped slot previews');
+  assert.equal(presentation.targetArtwork, 0, 'empty placement targets do not reveal an object silhouette');
+  assert.equal(presentation.gumChoices, 0, 'gum works directly without a color-selection step');
+  assert.ok(presentation.gumStrokes.every(color => color.toLowerCase() === '#ef80b0'), 'every visible gum connector is pink');
+}
+
+async function assertJourneyDisplay(page, label) {
+  const view = await page.evaluate(() => {
+    const state = FG.runtime.snapshot().state, node = document.querySelector('.gum-builder');
+    return { journey: state.journey, distance: node.querySelector('.gum-build-distance')?.textContent,
+      reach: node.querySelector('[aria-label="Journey reach"]')?.getAttribute('aria-valuenow'),
+      caption: node.querySelector('.gum-build-destination')?.textContent,
+      scene: Number(node.dataset.milestone),
+      reached: [...node.querySelectorAll('.gum-build-route li[data-reached="true"] .gum-build-route-label')].map(item => item.textContent) };
+  });
+  assert.equal(parseInt(view.distance, 10), view.journey.distance, label + ': the visible distance follows the invention');
+  assert.equal(Number(view.reach), view.journey.distance, label + ': the accessible reach meter shows the same distance');
+  assert.deepEqual(view.reached, view.journey.reachedMilestones, label + ': the route marks only destinations actually reached');
+  if (view.journey.currentStop >= 0) {
+    const stop = view.journey.stops[view.journey.currentStop];
+    assert.equal(view.caption, stop.caption, label + ': the current destination is visibly named');
+    assert.equal(view.scene, stop.sceneIndex, label + ': the background changes to the reached destination');
+  }
+  return view.journey;
+}
 
 async function capture(page, label) {
   const name = label.replace(/[^a-zA-Z0-9_-]/g, '-') + '.png';
@@ -103,7 +144,7 @@ async function dragPart(journey, object, slot) {
   if (journey.touch) journey.pendingTouchDrag = { part: object, slot };
 }
 
-async function nextConstructionAction(journey, input) {
+async function nextConstructionAction(journey, input, parts = {}) {
   const before = await snapshot(journey.page);
   if (before.activeJoint) {
     const target = root(journey.page).locator(`[data-gum-joint="${before.activeJoint}"]`);
@@ -119,7 +160,9 @@ async function nextConstructionAction(journey, input) {
     await journey.page.waitForFunction(slot => !!FG.runtime.snapshot().state.bonds[slot], before.activeJoint, { timeout: 2500 });
     const after = await snapshot(journey.page);
     assert.equal(after.gumLeft, before.gumLeft - 1, 'a real seam consumes one gum connector');
+    assert.equal(after.bonds[before.activeJoint], 'pink', 'new joins use ordinary pink gum directly');
     assert.deepEqual(after.placed, before.placed, 'joining leaves the chosen objects intact');
+    await assertPhysicalPresentation(journey.page, after);
     if (journey.pendingTouchDrag) {
       manifest.touchReceipts.push({ case: journey.name, drag: journey.pendingTouchDrag,
         joint: before.activeJoint, gumBefore: before.gumLeft, gumAfter: after.gumLeft,
@@ -131,8 +174,9 @@ async function nextConstructionAction(journey, input) {
   assert.ok(before.activeSlot, 'an unfinished blueprint provides the next object target');
   const slot = build(before).slots.find(item => item.id === before.activeSlot);
   assert.ok(slot, 'the active target belongs to this blueprint');
-  const object = before.availableChoices.find(id => slot.accepts.includes(id));
+  const object = parts[slot.id] || before.availableChoices.find(id => slot.accepts.includes(id));
   assert.ok(object, 'at least one fitting object is reachable in the real tray');
+  assert.ok(before.availableChoices.includes(object) && slot.accepts.includes(object), 'the requested real object is a reachable fitting choice');
   if (input === 'drag') await dragPart(journey, object, slot.id);
   else {
     await activate(journey, await showPart(journey, object, input), input);
@@ -143,10 +187,11 @@ async function nextConstructionAction(journey, input) {
   assert.equal(after.gumLeft, before.gumLeft, 'positioning a part alone never consumes gum');
   assert.equal(Object.keys(after.placed).length, Object.keys(before.placed).length + 1, 'one input places exactly one object');
   assert.equal(await root(journey.page).locator(`[data-built-part="${slot.id}"]`).count(), 1, 'the object is present in the assembled drawing');
+  await assertPhysicalPresentation(journey.page, after);
   return 'part';
 }
 
-async function assemble(journey, { keyboard = false, drag = false } = {}) {
+async function assemble(journey, { keyboard = false, drag = false, parts = {} } = {}) {
   let dragged = !drag;
   for (let step = 0; step < 24; step++) {
     const state = await snapshot(journey.page);
@@ -160,7 +205,7 @@ async function assemble(journey, { keyboard = false, drag = false } = {}) {
     }
     assert.ok(await root(journey.page).locator('.gum-build-launch').isDisabled(), 'unfinished assemblies cannot launch');
     const input = !dragged && state.activeSlot ? 'drag' : keyboard ? 'keyboard' : undefined;
-    await nextConstructionAction(journey, input);
+    await nextConstructionAction(journey, input, parts);
     if (input === 'drag') dragged = true;
   }
   throw Error('Assembly did not complete within its bounded number of child actions');
@@ -233,9 +278,40 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
   await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'adventure');
   if (!realTime) await journey.page.clock.pauseAt(await journey.page.evaluate(() => Date.now() + 500));
   const advance = async milliseconds => realTime ? journey.page.waitForTimeout(milliseconds) : journey.page.clock.runFor(milliseconds);
+  const advanceTo = async elapsed => advance(Math.max(0, elapsed - (await snapshot(journey.page)).adventureElapsedMs) + 32);
+  const launch = [];
+  const observeLaunch = async (phase, text) => {
+    const state = await snapshot(journey.page);
+    assert.equal(state.launchDurationMs, LAUNCH_DURATION_MS);
+    assert.equal(state.journeyDurationMs, TOUR_DURATION_MS);
+    assert.equal(state.launchPhase, phase, 'launch has a visible, sustained ' + phase + ' phase');
+    if (phase !== 'travel') {
+      assert.equal(state.tourElapsedMs, 0, 'the dramatic launch does not consume the twenty-four-second journey');
+      assert.equal(state.journey.distance, 0, 'distance begins when the invention actually starts its journey');
+      assert.equal(await root(journey.page).locator('.gum-build-countdown').textContent(), text);
+    }
+    launch.push({ phase, elapsedMs: state.adventureElapsedMs, journeyMs: state.tourElapsedMs, text });
+  };
+  await observeLaunch('countdown', '3');
+  if (realTime || captureWorld) await capture(journey.page, journey.name + '-' + before.blueprint + '-countdown');
+  await advanceTo(1250); await observeLaunch('countdown', '2');
+  await advanceTo(2250); await observeLaunch('countdown', '1');
+  await advanceTo(3500); await observeLaunch('ignition', build(before).verb);
+  assert.ok(await root(journey.page).locator('.gum-build-launch-effects svg').count(), 'ignition has illustrated launch effects');
+  if (realTime) {
+    assert.ok(await root(journey.page).locator('.gum-build-launch-effects').evaluate(node => Number(getComputedStyle(node).opacity) > 0),
+      'the normal-motion launch effects are actually painted during ignition');
+  }
+  if (realTime || captureWorld) await capture(journey.page, journey.name + '-' + before.blueprint + '-ignition');
+  await advanceTo(LAUNCH_DURATION_MS + 200);
+  await observeLaunch('travel');
+  assert.equal(await root(journey.page).locator('.gum-build-countdown').isVisible(), false, 'countdown clears when travel begins');
+  manifest.launchReceipts.push({ case: journey.name, blueprint: before.blueprint, realTime, observations: launch });
   await advance(2300);
   assert.equal((await snapshot(journey.page)).stage, 'adventure', 'the old 1.85-second cutoff is gone');
   await assertInventionVisible(journey.page, before, journey.name + ' early adventure');
+  const earlyJourney = await assertJourneyDisplay(journey.page, journey.name + ' early journey');
+  assert.ok(earlyJourney.distance > 0, 'the invention makes visible progress after launching');
   const action = root(journey.page).locator('.gum-build-action');
   assert.ok(await action.isEnabled(), 'the ride has a usable context-specific play action');
   if (!journey.touch) {
@@ -272,6 +348,9 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
   }
   await advance(5000);
   await assertInventionVisible(journey.page, before, journey.name + ' middle adventure');
+  const middleJourney = await assertJourneyDisplay(journey.page, journey.name + ' middle journey');
+  assert.ok(middleJourney.distance > earlyJourney.distance, 'visible distance advances throughout the journey');
+  if (captureWorld) await assertFrame(journey.page, journey.name + ' journey');
   if (captureWorld) await capture(journey.page, journey.name + '-' + before.blueprint + '-adventure');
   assert.equal(await recordCount(journey.page), initialRecords, 'the showcase does not submit a premature host result');
   if (realTime) await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase', null, { timeout: 25000 });
@@ -279,6 +358,12 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
   await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase');
   const after = await snapshot(journey.page);
   assert.ok(after.tourElapsedMs >= TOUR_DURATION_MS, 'all motion preferences receive the full adventure duration');
+  assert.equal(after.adventureElapsedMs, ADVENTURE_DURATION_MS, 'launch plus travel lasts the full twenty-nine seconds');
+  assert.equal(after.journey.distance, after.journey.goalDistance, 'the final distance comes from the actual chosen parts');
+  assert.equal(parseInt(await root(journey.page).locator('.gum-build-distance').textContent(), 10), after.journey.distance,
+    'the child can read the finished distance beside the invention');
+  assert.equal(await root(journey.page).locator('.gum-build-result-reason').textContent(), after.journey.reason,
+    'the child sees why these particular objects made this journey');
   assert.equal(after.tourCompleted, true);
   assert.equal(after.reported, false, 'the child controls when to finish');
   assert.equal(await recordCount(journey.page), initialRecords, 'finishing animation alone produces no host result');
@@ -366,6 +451,7 @@ async function createJourney(browser, base, name, viewport, { touch = false, mot
     await root(page).waitFor();
     assert.equal(await page.evaluate(() => FG.runtime.snapshot().config.qualityVersion), 3, 'new workshop uses the construction engine');
     assert.equal((await snapshot(page)).mode, 'assembly');
+    await assertPhysicalPresentation(page, await snapshot(page));
     return journey;
   } catch (error) { error.journey = journey; throw error; }
 }
@@ -387,7 +473,7 @@ async function closeJourney(journey) {
   assert.deepEqual(journey.posts, [], journey.name + ': native assembly needs no remote or paid request');
 }
 
-async function testWrongAndUndo(journey) {
+async function testWrongAndUndo(journey, parts = {}) {
   const state = await snapshot(journey.page), slot = build(state).slots.find(item => item.id === state.activeSlot);
   const decoy = state.availableChoices.find(id => !slot.accepts.includes(id));
   assert.ok(decoy, 'the classic fixture includes a nonmatching piece for the real error-recovery journey');
@@ -396,8 +482,8 @@ async function testWrongAndUndo(journey) {
     await activate(journey, root(journey.page).locator(`[data-gum-slot="${slot.id}"]`));
     assert.deepEqual(exactBuild(await snapshot(journey.page)), exactBuild(state), 'a misplaced piece neither damages the build nor spends gum');
   }
-  await nextConstructionAction(journey, 'keyboard');
-  await nextConstructionAction(journey);
+  await nextConstructionAction(journey, 'keyboard', parts);
+  await nextConstructionAction(journey, undefined, parts);
   const loose = await snapshot(journey.page);
   assert.ok(loose.activeJoint, 'placing a neighboring object does not silently glue it');
   assert.ok(await root(journey.page).locator('.gum-build-launch').isDisabled());
@@ -430,10 +516,14 @@ async function saveAndReenter(journey) {
 async function normalMotion(journey) {
   await assertFrame(journey.page, journey.name);
   await capture(journey.page, journey.name + '-start');
-  await testWrongAndUndo(journey);
-  await assemble(journey, { drag: true });
+  await testWrongAndUndo(journey, STRONG_ROCKET);
+  await assemble(journey, { drag: true, parts: STRONG_ROCKET });
   await capture(journey.page, journey.name + '-assembled');
   await adventure(journey, { realTime: true, captureWorld: true });
+  const finished = await snapshot(journey.page);
+  assert.deepEqual(finished.placed, STRONG_ROCKET, 'the real-time video shows the actual streamlined rocket');
+  assert.equal(finished.journey.tier, 2);
+  assert.equal(finished.journey.reachedMilestones.length, 7, 'the normal-motion film visits every sky destination');
   await capture(journey.page, journey.name + '-showcase');
   await nextBuild(journey);
 }
@@ -441,7 +531,7 @@ async function normalMotion(journey) {
 async function allBlueprints(journey) {
   const seen = [], worlds = new Set(), expectedStart = (await snapshot(journey.page)).completedCount;
   for (let index = 0; index < BLUEPRINTS.length; index++) {
-    const complete = await assemble(journey, { keyboard: index === 0, drag: index === 1 });
+    const complete = await assemble(journey, { keyboard: index === 0, drag: index === 1, parts: index === 0 ? WEAK_ROCKET : {} });
     const blueprint = build(complete);
     assert.equal(seen.includes(complete.blueprint), false, 'no blueprint repeats before the whole catalog is played');
     seen.push(complete.blueprint);
@@ -451,9 +541,14 @@ async function allBlueprints(journey) {
     await adventure(journey, { captureWorld: !worlds.has(blueprint.world), pause: index === 0 });
     worlds.add(blueprint.world);
     if (index === 0) {
+      const weak = await snapshot(journey.page);
+      assert.deepEqual(weak.placed, WEAK_ROCKET, 'the comparison begins with the real heavy, flat-ended rocket');
+      assert.equal(weak.journey.tier, 0);
+      assert.ok(weak.journey.stops.every(stop => stop.sceneIndex <= 1), 'this weaker build stays in the cloud and rainbow neighborhood');
+      await capture(journey.page, 'viability-weak-rocket-showcase');
       const records = await recordCount(journey.page);
       await activate(journey, root(journey.page).locator('.gum-build-replay'));
-      await journey.page.clock.runFor(TOUR_DURATION_MS + 1000);
+      await journey.page.clock.runFor(ADVENTURE_DURATION_MS + 1000);
       await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'showcase');
       assert.equal(await recordCount(journey.page), records, 'watching again cannot duplicate a result');
       assert.deepEqual((await snapshot(journey.page)).placed, complete.placed, 'replay uses the child’s same construction');
@@ -477,6 +572,28 @@ async function allBlueprints(journey) {
       await assemble(journey);
       await adventure(journey);
       assert.equal(await recordCount(journey.page), records, 'tinkering and enjoying another ride do not duplicate a completion');
+      // A second ordinary edit changes the physical design, letting the child
+      // compare the same complete watch duration with more suitable objects.
+      await activate(journey, root(journey.page).locator('.gum-build-tinker'));
+      await activate(journey, root(journey.page).locator('[data-change-part="body"]'));
+      const rebuilding = await snapshot(journey.page);
+      assert.deepEqual(rebuilding.placed, {}, 'changing the supporting body returns its dependent pieces to the tray');
+      assert.equal(rebuilding.gumLeft, GUM_BUDGET, 'all removed seams return their pink gum');
+      await assemble(journey, { parts: STRONG_ROCKET });
+      await adventure(journey);
+      const strong = await snapshot(journey.page);
+      assert.deepEqual(strong.placed, STRONG_ROCKET, 'the improved route belongs to the child’s actual replacement pieces');
+      assert.equal(strong.adventureElapsedMs, weak.adventureElapsedMs, 'both designs receive the same full launch and journey duration');
+      assert.equal(strong.journey.tier, 2);
+      assert.ok(strong.journey.distance > weak.journey.distance, 'more suitable objects visibly travel farther');
+      assert.ok(strong.journey.score > weak.journey.score, 'the evaluated physical choices explain the stronger result');
+      assert.deepEqual(strong.journey.stops.map(stop => stop.sceneIndex), [0, 1, 2, 3, 4, 5, 6], 'the strong rocket reaches all seven distinct sky scenes');
+      assert.equal(strong.journey.reachedMilestones.length, 7);
+      assert.notEqual(strong.journey.reason, weak.journey.reason, 'the explanation responds to the changed parts');
+      await capture(journey.page, 'viability-strong-rocket-showcase');
+      manifest.viabilityComparisons.push({ case: journey.name, durationMs: ADVENTURE_DURATION_MS,
+        weak: { placed: weak.placed, journey: weak.journey }, strong: { placed: strong.placed, journey: strong.journey } });
+      assert.equal(await recordCount(journey.page), records, 'comparing designs cannot fabricate another host completion');
     }
     const after = await nextBuild(journey);
     assert.equal(after.completedCount, expectedStart + index + 1);
@@ -488,7 +605,7 @@ async function allBlueprints(journey) {
   await activate(journey, root(journey.page).locator('.gum-build-launch'));
   await journey.page.clock.runFor(1000);
   await activate(journey, journey.page.locator('#studioHome'));
-  await journey.page.clock.runFor(TOUR_DURATION_MS * 2);
+  await journey.page.clock.runFor(ADVENTURE_DURATION_MS * 2);
   assert.equal(await recordCount(journey.page), BLUEPRINTS.length, 'a disposed adventure cannot submit a late result');
   assert.equal(await journey.page.locator('#native-result-title').count(), 0, 'leaving cannot bring a stale result back');
   assert.equal(await root(journey.page).count(), 0);

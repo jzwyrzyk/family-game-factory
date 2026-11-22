@@ -1,11 +1,12 @@
 import type {GameContext, GameInstance} from '../runtime/types';
-import {OBJECTS, objectArt, objectArtFrame, gumArt, sceneDecor, sceneMoment, type ObjectId} from './bubble-gum-art';
+import {OBJECTS, objectArt, objectArtFrame, gumArt, sceneDecor, sceneMoment, launchArt, type ObjectId} from './bubble-gum-art';
 import {
-  BLUEPRINTS, GUMS, GUM_BUDGET, TOUR_DURATION_MS, createBuild, getBlueprint, nextSlot,
+  BLUEPRINTS, GUM_BUDGET, TOUR_DURATION_MS, createBuild, getBlueprint, nextSlot,
   isConnected, canPlace, placePart, bondPart, removePart, isReady, gumRemaining,
   partChoices, completeTour, markReported, nextBuild, serializeBuild, readBuild,
-  type BuildState, type GumId,
+  type BuildState,
 } from './bubble-gum-rules';
+import {evaluateBuild, LAUNCH_DURATION_MS} from './bubble-gum-journey';
 import './bubble-gum-builder.css';
 
 type Phase = 'build' | 'test' | 'adventure' | 'showcase' | 'done';
@@ -18,12 +19,15 @@ const svg = (tag: string, attrs: Record<string, string | number> = {}) => {
   for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
   return element;
 };
-const WORLD_WORDS = {
-  sky: {action: 'Whoosh!', stops: ['Up through the clouds', 'Hello, rainbow!', 'Past the moon', 'A sky full of stars']},
-  sea: {action: 'Bubbles!', stops: ['Splash into the sea', 'Hello, little fish!', 'Through the coral', 'A bubbly parade']},
-  road: {action: 'Hop!', stops: ['Off down the lane', 'Over the little hill', 'Through the meadow', 'The finish parade']},
-  stage: {action: 'Spin!', stops: ['Step into the spotlight', 'A little wiggle', 'A big happy dance', 'Take a bow!']},
+const ADVENTURE_DURATION_MS = LAUNCH_DURATION_MS + TOUR_DURATION_MS;
+const PINK_GUM = '#ef80b0';
+const WORLD_ICONS = {
+  sky: ['☁', '🌈', '☾', '✦', '🪐', '☄', '✺'],
+  sea: ['≈', '🐟', '♧', '○', '♜', '🐋', '✧'],
+  road: ['➜', '⌃', '❀', '⚑', '⌒', '⌂', '✦'],
+  stage: ['◉', '♪', '♫', '★', '♜', '⚑', '✦'],
 } as const;
+const DISTANCE_UNITS = {sky: 'gum miles', sea: 'bubble miles', road: 'gum miles', stage: 'cheers'} as const;
 
 /** Authored assembly puzzles. Connections are structural rules, not a force simulation.
  * Saved v2 stickers and v1 physics retain their original engines and storage slots. */
@@ -32,7 +36,8 @@ export default class BubbleGumBuilder implements GameInstance {
   private state = createBuild();
   private phase: Phase = 'build';
   private selected: ObjectId | null = null;
-  private gum: GumId = 'pink';
+  private evaluation: ReturnType<typeof evaluateBuild> | null = null;
+  private evaluatedState: BuildState | null = null;
   private history: BuildState[] = [];
   private paused = false;
   private selfPaused = false;
@@ -84,6 +89,24 @@ export default class BubbleGumBuilder implements GameInstance {
     return button;
   }
   private get blueprint() { return getBlueprint(this.state); }
+  private get journey() {
+    if (this.evaluatedState !== this.state || !this.evaluation) {
+      this.evaluatedState = this.state; this.evaluation = evaluateBuild(this.state);
+    }
+    return this.evaluation;
+  }
+  private get journeyElapsed() {
+    return this.phase === 'adventure' ? Math.max(0, this.elapsed - LAUNCH_DURATION_MS)
+      : this.phase === 'showcase' || this.phase === 'done' ? TOUR_DURATION_MS : 0;
+  }
+  private get journeyStop() {
+    if (this.phase === 'adventure' && this.elapsed < LAUNCH_DURATION_MS) return -1;
+    if (!['adventure', 'showcase', 'done'].includes(this.phase)) return -1;
+    return Math.min(this.journey.stops.length - 1, Math.floor(this.journeyElapsed / TOUR_DURATION_MS * this.journey.stops.length));
+  }
+  private get launchPhase() {
+    return this.phase !== 'adventure' ? 'idle' : this.elapsed < 3000 ? 'countdown' : this.elapsed < LAUNCH_DURATION_MS ? 'ignition' : 'travel';
+  }
   private get step() { return nextSlot(this.state); }
   private get choices() {
     const step = this.step;
@@ -104,20 +127,20 @@ export default class BubbleGumBuilder implements GameInstance {
   }
   private select(id: ObjectId) {
     if (!this.editable || !this.choices.includes(id)) return;
-    this.selected = id; this.message = 'Tap the glowing outline.';
+    this.selected = id; this.message = 'Tap the glowing + to add it.';
     this.render('[data-gum-slot]');
   }
   private place(id: string, part = this.selected) {
     if (!this.editable || !part) return;
     if (!canPlace(this.state, id, part)) {
-      this.message = 'Try a piece that fits this shape.'; this.selected = null; this.render('[data-gum-part]:not([hidden])'); return;
+      this.message = 'Try another piece for this job.'; this.selected = null; this.render('[data-gum-part]:not([hidden])'); return;
     }
     if (!this.change(placePart(this.state, id, part))) return;
     this.context.emit?.({type: 'mechanic', name: 'bubblegum-part', value: Object.keys(this.state.placed).length});
     this.render(this.step && this.state.placed[this.step.id] ? '[data-gum-joint]' : '[data-gum-part]:not([hidden])');
   }
   private bond(id: string) {
-    if (!this.editable || !this.change(bondPart(this.state, id, this.gum), 'Squish! That join holds.')) return;
+    if (!this.editable || !this.change(bondPart(this.state, id, 'pink'), 'Squish! That join holds.')) return;
     this.context.emit?.({type: 'mechanic', name: 'bubblegum-joint', value: Object.keys(this.state.bonds).length});
     this.render(isReady(this.state) ? '.gum-build-launch' : '[data-gum-part]:not([hidden])');
   }
@@ -166,7 +189,7 @@ export default class BubbleGumBuilder implements GameInstance {
     // One host-owned round result, only after the child chooses to move on.
     // Replays and the wiggle test are never learning checkpoints or extra rewards.
     this.context.finish({won: true, level: this.state.completed + 1, title: this.blueprint.title,
-      description: `You built ${this.blueprint.title} from ${this.blueprint.slots.length} objects and joined them with gum. ${this.blueprint.outcome}`});
+      description: `You built ${this.blueprint.title} from ${this.blueprint.slots.length} objects and joined them with gum. ${this.journey.outcome}`});
   }
   private startClock() { this.stopClock(); this.lastFrame = performance.now(); this.frame = requestAnimationFrame(now => this.tick(now)); }
   private stopClock() { if (this.frame !== null) cancelAnimationFrame(this.frame); this.frame = null; }
@@ -180,8 +203,8 @@ export default class BubbleGumBuilder implements GameInstance {
       this.testElapsed += dt;
       if (this.testElapsed >= 1200) { this.phase = 'build'; this.render(isReady(this.state) ? '.gum-build-launch' : this.step && this.state.placed[this.step.id] ? '[data-gum-joint]' : '[data-gum-part]:not([hidden])'); return; }
     } else {
-      this.elapsed = Math.min(TOUR_DURATION_MS, this.elapsed + dt); this.paintAdventure();
-      if (this.elapsed >= TOUR_DURATION_MS) {
+      this.elapsed = Math.min(ADVENTURE_DURATION_MS, this.elapsed + dt); this.paintAdventure();
+      if (this.elapsed >= ADVENTURE_DURATION_MS) {
         this.state = completeTour(this.state); this.persist(); this.phase = 'showcase';
         this.message = 'You made it! Play again or build another.'; this.render('.gum-build-next'); return;
       }
@@ -191,27 +214,65 @@ export default class BubbleGumBuilder implements GameInstance {
   private paintAdventure() {
     const motion = this.root.querySelector<HTMLElement>('.gum-build-motion');
     if (!motion) return;
-    const t = this.elapsed / 1000, boost = this.boostUntil > this.elapsed, world = this.blueprint.world;
-    let x = 0, y = 0, angle = 0;
+    const journey = this.journey, world = this.blueprint.world, launch = this.launchPhase;
+    const t = this.journeyElapsed / 1000, boost = this.boostUntil > this.elapsed;
+    const ignition = Math.max(0, Math.min(1, (this.elapsed - 3000) / (LAUNCH_DURATION_MS - 3000)));
+    const lift = 1 - Math.pow(1 - ignition, 3);
+    let x = 0, y = world === 'sky' ? -4 : 0, angle = 0, scale = world === 'sky' ? .84 : .9;
     if (!this.reduced) {
-      x = Math.sin(t * .48) * (world === 'stage' ? 3 : 7);
-      y = Math.sin(t * (world === 'road' ? 2 : .8)) * (world === 'sea' ? 5 : 3);
-      angle = Math.sin(t * (world === 'stage' ? 2.2 : .8)) * (world === 'stage' ? 7 : 4);
-      if (boost) { y -= Math.sin((this.boostUntil - this.elapsed) / 1000 * Math.PI) * 5; angle += world === 'stage' ? 12 : -3; }
+      if (launch === 'countdown') {
+        const anticipation = this.elapsed / 3000;
+        x = Math.sin(this.elapsed / 90) * .22 * anticipation;
+        y = 3; angle = Math.sin(this.elapsed / 160) * .5 * anticipation; scale = .92;
+      } else if (launch === 'ignition') {
+        x = Math.sin(this.elapsed / 65) * .5 * (1 - ignition);
+        y = world === 'sky' ? 3 - lift * 12 : Math.sin(lift * Math.PI) * -5;
+        angle = world === 'road' ? -5 * Math.sin(lift * Math.PI) : Math.sin(this.elapsed / 90) * (1 - ignition);
+        scale = .92 - lift * (world === 'sky' ? .08 : .02);
+      } else {
+        const drift = t * journey.speed;
+        x = Math.sin(drift * .48) * (world === 'stage' ? 2 : 4);
+        y += Math.sin(drift * (world === 'road' ? 2 : .8)) * (world === 'sea' ? 3 : 2);
+        angle = Math.sin(drift * (world === 'stage' ? 2.2 : 1.4)) * journey.wobble * (world === 'stage' ? 7 : 8);
+        if (world === 'sky') y -= Math.max(0, 1 - t / 2) * 5;
+        if (boost) { y -= Math.sin((this.boostUntil - this.elapsed) / 1000 * Math.PI) * 4; angle += world === 'stage' ? 7 : -2; }
+      }
     }
-    motion.style.transform = `translate(${x}%,${y}%) rotate(${angle}deg) scale(${boost && !this.reduced ? 1.035 : 1})`;
+    motion.style.transform = `translate(${x}%,${y}%) rotate(${angle}deg) scale(${scale})`;
+    this.root.dataset.launch = launch;
+    this.root.style.setProperty('--gum-launch-power', String(launch === 'travel' ? .65 : ignition));
+    this.root.style.setProperty('--gum-flight-speed', String(journey.speed));
     this.root.classList.toggle('boosting', boost);
-    this.root.style.setProperty('--gum-journey', String(this.elapsed / TOUR_DURATION_MS));
+    this.root.style.setProperty('--gum-journey', String(this.elapsed / ADVENTURE_DURATION_MS));
     const progress = this.root.querySelector<HTMLElement>('.gum-build-progress');
-    progress?.setAttribute('aria-valuenow', String(Math.floor(this.elapsed / TOUR_DURATION_MS * 100)));
-    const stop = Math.min(3, Math.floor(this.elapsed / (TOUR_DURATION_MS / 4)));
+    progress?.setAttribute('aria-valuenow', String(Math.floor(this.elapsed / ADVENTURE_DURATION_MS * 100)));
+    const countdown = this.root.querySelector<HTMLElement>('.gum-build-countdown');
+    if (countdown) {
+      countdown.hidden = launch === 'travel';
+      const text = launch === 'countdown' ? String(3 - Math.floor(this.elapsed / 1000)) : this.blueprint.verb;
+      if (countdown.textContent !== text) countdown.textContent = text;
+    }
+    const stop = this.journeyStop;
     if (this.root.dataset.stop !== String(stop)) {
       this.root.dataset.stop = String(stop);
+      const sceneIndex = stop < 0 ? 0 : journey.stops[stop].sceneIndex;
+      this.root.dataset.milestone = String(sceneIndex);
       const moment = this.root.querySelector<HTMLElement>('.gum-build-moment');
-      if (moment) moment.innerHTML = sceneMoment(world, stop);
+      if (moment) moment.innerHTML = sceneMoment(world, sceneIndex);
+      for (const [index, item] of this.root.querySelectorAll<HTMLElement>('.gum-build-route li').entries()) {
+        item.dataset.reached = String(index <= stop);
+        if (index === stop) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current');
+      }
     }
     const caption = this.root.querySelector('.gum-build-destination');
-    if (caption) caption.textContent = WORLD_WORDS[world].stops[stop];
+    if (caption) caption.textContent = stop < 0 ? launch === 'countdown' ? 'Gum holding. Here we go…' : 'Hold on to your gum!' : journey.stops[stop].caption;
+    const rideNote = this.root.querySelector('.gum-build-ride-note');
+    if (rideNote) rideNote.textContent = stop < 0 ? 'Your invention is getting ready!' : journey.title;
+    const distance = Math.round(journey.goalDistance * this.journeyElapsed / TOUR_DURATION_MS);
+    const readout = this.root.querySelector('.gum-build-distance');
+    if (readout) readout.textContent = `${distance} ${DISTANCE_UNITS[world]}`;
+    this.root.style.setProperty('--gum-distance', String(distance / 100));
+    this.root.querySelector('.gum-build-reach')?.setAttribute('aria-valuenow', String(distance));
   }
 
   private beginDrag(button: HTMLButtonElement, id: ObjectId, event: PointerEvent) {
@@ -257,7 +318,10 @@ export default class BubbleGumBuilder implements GameInstance {
     this.cancelDrop();
     this.drag?.ghost.remove(); this.drag = null; this.observer.disconnect(); this.root.replaceChildren();
     this.root.dataset.phase = this.phase; this.root.dataset.world = this.blueprint.world;
-    this.root.dataset.stop = this.phase === 'adventure' ? '-1' : '0';
+    this.root.dataset.stop = this.phase === 'adventure' ? '-2' : String(this.journeyStop);
+    this.root.dataset.launch = this.launchPhase;
+    this.root.dataset.journeyTier = String(this.journey.tier);
+    this.root.dataset.milestone = String(this.journeyStop >= 0 ? this.journey.stops[this.journeyStop].sceneIndex : 0);
     this.root.dataset.blueprint = this.blueprint.id; this.root.classList.toggle('paused', this.paused);
     const heading = node('header', 'gum-build-heading');
     heading.append(node('h2', '', this.blueprint.title), node('span', 'gum-build-number', `Build ${this.state.completed + 1}`));
@@ -273,6 +337,7 @@ export default class BubbleGumBuilder implements GameInstance {
     }
     const scene = this.root.querySelector('.gum-build-scene'); if (scene) this.observer.observe(scene);
     this.fitCanvas();
+    if (this.phase === 'adventure') this.paintAdventure();
     if (this.paused) this.showPause();
     if (focus) this.root.querySelector<HTMLElement>(focus)?.focus({preventScroll: true});
   }
@@ -281,27 +346,33 @@ export default class BubbleGumBuilder implements GameInstance {
     const decor = node('div', 'gum-build-decor'); decor.setAttribute('aria-hidden', 'true'); decor.innerHTML = sceneDecor(this.blueprint.world); scene.append(decor);
     if (this.phase === 'adventure' || this.phase === 'showcase') {
       const moment = node('div', 'gum-build-moment'); moment.setAttribute('aria-hidden', 'true');
-      moment.innerHTML = sceneMoment(this.blueprint.world, this.phase === 'showcase' ? 3 : 0); scene.append(moment);
+      moment.innerHTML = sceneMoment(this.blueprint.world, this.journeyStop < 0 ? 0 : this.journey.stops[this.journeyStop].sceneIndex); scene.append(moment);
     }
     const canvas = node('div', 'gum-build-canvas');
     const motion = node('div', 'gum-build-motion');
+    if (this.phase === 'adventure') {
+      const launch = node('div', 'gum-build-launch-effects'); launch.setAttribute('aria-hidden', 'true');
+      launch.innerHTML = launchArt(this.blueprint.world, this.blueprint.id); motion.append(launch);
+    }
     const machine = svg('svg', {class: 'gum-build-machine', viewBox: '0 0 800 480', 'aria-hidden': 'true', focusable: 'false'});
     for (const slot of this.blueprint.slots) {
       const part = this.state.placed[slot.id];
-      if (!part && this.phase !== 'build') continue;
+      // A neutral placement target guides the position without implying that
+      // one of the valid household objects is the intended answer.
+      if (!part) continue;
       const group = svg('g', {transform: `translate(${slot.x * 8} ${slot.y * 4.8}) rotate(${slot.rotation || 0})`,
-        class: part ? `gum-built-object${isConnected(this.state, slot.id) ? ' connected' : ' loose'}` : 'gum-blueprint-outline'});
-      if (part) { group.setAttribute('data-built-part', slot.id); group.setAttribute('data-object', part); }
+        class: `gum-built-object${isConnected(this.state, slot.id) ? ' connected' : ' loose'}`});
+      group.setAttribute('data-built-part', slot.id); group.setAttribute('data-object', part);
       // All markup is a closed, locally authored object catalog. Saves only hold
       // validated object IDs; no child strings or URLs enter innerHTML.
-      const art = svg('g'); art.innerHTML = objectArtFrame(part || slot.accepts[0], slot.w * 8, slot.h * 4.8);
+      const art = svg('g'); art.innerHTML = objectArtFrame(part, slot.w * 8, slot.h * 4.8);
       const nested = art.firstElementChild!; nested.setAttribute('x', String(-slot.w * 4)); nested.setAttribute('y', String(-slot.h * 2.4));
       nested.setAttribute('width', String(slot.w * 8)); nested.setAttribute('height', String(slot.h * 4.8));
       group.append(art); machine.append(group);
     }
     for (const slot of this.blueprint.slots) {
       if (!this.state.bonds[slot.id] || !slot.joint) continue;
-      const {x1, y1, x2, y2} = slot.joint, color = GUMS.find(g => g.id === this.state.bonds[slot.id])!.color;
+      const {x1, y1, x2, y2} = slot.joint, color = PINK_GUM;
       const path = `M${x1 * 8} ${y1 * 4.8} Q${(x1 + x2) * 4 + 5} ${(y1 + y2) * 2.4 - 5} ${x2 * 8} ${y2 * 4.8}`;
       machine.append(svg('path', {d: path, stroke: '#98507f', 'stroke-width': 19, 'stroke-linecap': 'round', fill: 'none'}));
       machine.append(svg('path', {d: path, stroke: color, 'stroke-width': 14, 'stroke-linecap': 'round', fill: 'none', 'data-gum-bond': slot.id}));
@@ -316,7 +387,7 @@ export default class BubbleGumBuilder implements GameInstance {
         const target = this.button(joining ? '' : '+', joining ? 'gum-build-joint' : 'gum-build-slot', () => joining ? this.bond(step.id) : this.place(step.id));
         if (joining && step.joint) {
           target.dataset.gumJoint = step.id; target.setAttribute('aria-label', `Stick ${step.name} with gum`);
-          target.innerHTML = gumArt(this.gum); this.position(target, (step.joint.x1 + step.joint.x2) / 2, (step.joint.y1 + step.joint.y2) / 2);
+          target.innerHTML = gumArt('pink'); this.position(target, (step.joint.x1 + step.joint.x2) / 2, (step.joint.y1 + step.joint.y2) / 2);
         } else {
           target.dataset.gumSlot = step.id; target.setAttribute('aria-label', `Place ${step.name}`); this.position(target, step.x, step.y);
           if (this.selected) target.classList.add('selected');
@@ -330,10 +401,14 @@ export default class BubbleGumBuilder implements GameInstance {
     }
     scene.append(canvas);
     const caption = node('div', 'gum-build-scene-caption');
-    if (this.phase === 'adventure') caption.append(node('span', 'gum-build-destination', WORLD_WORDS[this.blueprint.world].stops[0]));
-    else if (this.phase === 'showcase' || this.phase === 'done') caption.append(node('span', '', 'Made by you!'));
+    if (this.phase === 'adventure') caption.append(node('span', 'gum-build-destination', 'Gum holding. Here we go…'));
+    else if (this.phase === 'showcase' || this.phase === 'done') caption.append(node('span', '', this.journey.stops[this.journey.stops.length - 1].caption));
     else caption.append(node('span', '', this.message || (this.editing ? 'Which piece will you change?' : 'Your invention takes shape')));
     scene.append(caption);
+    if (this.phase === 'adventure') {
+      const countdown = node('div', 'gum-build-countdown', '3'); countdown.setAttribute('role', 'status');
+      countdown.setAttribute('aria-live', 'polite'); scene.append(countdown);
+    }
     const effects = node('div', 'gum-build-effects'); effects.setAttribute('aria-hidden', 'true'); scene.append(effects);
     if (this.phase === 'adventure') {
       const progress = node('div', 'gum-build-progress'); progress.setAttribute('role', 'progressbar'); progress.setAttribute('aria-label', 'Adventure');
@@ -356,13 +431,27 @@ export default class BubbleGumBuilder implements GameInstance {
         : !step ? 'Ready for an adventure' : this.state.placed[step.id] ? 'Stick the join with gum' : `Choose ${step.name.toLowerCase()}`;
     tray.append(node('h3', 'gum-build-instruction', instruction));
     if (this.phase === 'adventure') {
-      const badge = node('div', 'gum-build-adventure-badge'); badge.innerHTML = gumArt(this.gum); badge.setAttribute('aria-hidden', 'true'); tray.append(badge);
+      const route = node('ol', 'gum-build-route'); route.setAttribute('aria-label', 'Your adventure stops');
+      for (const stop of this.journey.stops) {
+        const item = node('li'); item.dataset.reached = 'false';
+        const icon = node('span', 'gum-build-route-icon', WORLD_ICONS[this.blueprint.world][stop.sceneIndex]); icon.setAttribute('aria-hidden', 'true');
+        item.append(icon, node('span', 'gum-build-route-label', stop.caption)); route.append(item);
+      }
+      tray.append(route);
+      tray.append(node('p', 'gum-build-distance', `0 ${DISTANCE_UNITS[this.blueprint.world]}`));
+      const reach = node('div', 'gum-build-reach'); reach.setAttribute('role', 'progressbar'); reach.setAttribute('aria-label', 'Journey reach');
+      reach.setAttribute('aria-valuemin', '0'); reach.setAttribute('aria-valuemax', '100'); reach.setAttribute('aria-valuenow', '0');
+      reach.append(node('i')); tray.append(reach);
       tray.append(this.button(this.blueprint.action, 'gum-build-action', () => this.action()));
       tray.append(node('p', 'gum-build-hint', 'Tap to join the fun.'));
       if (!this.state.reported) tray.append(this.button('Back to build', 'gum-build-secondary', () => this.tinker()));
       else tray.append(this.button('Back to my invention', 'gum-build-secondary', () => { this.stopClock(); this.phase = 'showcase'; this.render('.gum-build-next'); }));
     } else if (this.phase === 'showcase' || this.phase === 'done') {
-      const badge = node('div', 'gum-build-adventure-badge'); badge.innerHTML = objectArt(this.state.placed[this.blueprint.slots[0].id]); tray.append(badge);
+      const result = node('div', 'gum-build-result');
+      result.append(node('h4', '', this.journey.title), node('p', 'gum-build-distance', `${this.journey.goalDistance} ${DISTANCE_UNITS[this.blueprint.world]}`),
+        node('p', 'gum-build-result-reason', this.journey.reason));
+      if (!this.state.reported) result.append(node('p', 'gum-build-suggestion', this.journey.suggestion));
+      tray.append(result);
       tray.append(this.button('Watch again', 'gum-build-replay', () => this.launch()));
       if (!this.state.reported) tray.append(this.button('Change pieces', 'gum-build-tinker gum-build-secondary', () => this.tinker()));
     } else if (step && !this.state.placed[step.id] && !this.editing) {
@@ -389,14 +478,11 @@ export default class BubbleGumBuilder implements GameInstance {
       }
       tray.append(choices);
     } else if (step && this.state.placed[step.id] && !this.editing) {
-      const colors = node('div', 'gum-build-gums'); colors.setAttribute('role', 'group'); colors.setAttribute('aria-label', 'Choose gum color');
-      for (const gum of GUMS) {
-        const color = this.button('', 'gum-build-gum', () => { if (!this.editable) return; this.gum = gum.id; this.render(`[data-gum-color="${gum.id}"]`); });
-        color.innerHTML = gumArt(gum.id); color.dataset.gumColor = gum.id; color.setAttribute('aria-label', `${gum.name} gum`); color.setAttribute('aria-pressed', String(gum.id === this.gum)); colors.append(color);
-      }
-      tray.append(colors, node('p', 'gum-build-hint', 'Tap the glowing join.'));
+      const cue = node('div', 'gum-build-pink-cue');
+      const gum = node('span', 'gum-build-pink-art'); gum.innerHTML = gumArt('pink'); gum.setAttribute('aria-hidden', 'true');
+      cue.append(gum, node('p', 'gum-build-hint', 'Tap the pink gum at the join.')); tray.append(cue);
     } else {
-      const preview = node('div', 'gum-build-ready-art'); preview.innerHTML = gumArt(this.gum); preview.setAttribute('aria-hidden', 'true'); tray.append(preview);
+      const preview = node('div', 'gum-build-ready-art'); preview.innerHTML = gumArt('pink'); preview.setAttribute('aria-hidden', 'true'); tray.append(preview);
       tray.append(node('p', 'gum-build-hint', this.editing ? 'The other pieces stay safe.' : 'The gum holds it all together.'));
       if (this.editing) tray.append(this.button('Keep my pieces', 'gum-build-secondary', () => { this.editing = false; this.render(); }));
       else if (!this.state.reported) tray.append(this.button('Change pieces', 'gum-build-tinker gum-build-secondary', () => this.tinker()));
@@ -463,12 +549,16 @@ export default class BubbleGumBuilder implements GameInstance {
     if (this.phase === 'test' || this.phase === 'adventure') this.startClock();
   }
   snapshot() {
-    const step = this.step;
+    const step = this.step, journey = this.journey, stop = this.journeyStop;
     return {mode: 'assembly', stage: this.phase, blueprint: this.state.blueprint, world: this.blueprint.world,
       completedCount: this.state.completed, placed: {...this.state.placed}, bonds: {...this.state.bonds},
       activeSlot: step && !this.state.placed[step.id] ? step.id : null, activeJoint: step && this.state.placed[step.id] ? step.id : null,
       availableChoices: [...this.choices], selectedPart: this.selected, gumLeft: gumRemaining(this.state), gumBudget: GUM_BUDGET,
-      totalParts: this.blueprint.slots.length, ready: isReady(this.state), tourElapsedMs: this.elapsed,
+      totalParts: this.blueprint.slots.length, ready: isReady(this.state), tourElapsedMs: this.journeyElapsed,
+      adventureElapsedMs: this.elapsed, launchElapsedMs: Math.min(LAUNCH_DURATION_MS, this.elapsed),
+      launchPhase: this.launchPhase, launchDurationMs: LAUNCH_DURATION_MS, journeyDurationMs: TOUR_DURATION_MS,
+      journey: {...journey, currentStop: stop, reachedMilestones: journey.stops.slice(0, stop + 1).map(item => item.caption),
+        distance: Math.round(journey.goalDistance * this.journeyElapsed / TOUR_DURATION_MS)},
       tourCompleted: this.state.tourCompleted, reported: this.state.reported, paused: this.paused, actionCount: this.actionCount,
       saveFailed: this.saveFailed, storageBlocked: this.storageBlocked, blueprintCount: BLUEPRINTS.length};
   }

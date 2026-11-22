@@ -93,7 +93,7 @@ jobs:
         id: build
       - name: Verify construction, saves and progression rules
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node --import tsx --test tests/bubble-gum-rules.test.ts
+        run: node --import tsx --test tests/bubble-gum-rules.test.ts tests/bubble-gum-journey.test.ts
       - name: Play every blueprint and inspect fitted views
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/bubble-gum-builder-browser.cjs

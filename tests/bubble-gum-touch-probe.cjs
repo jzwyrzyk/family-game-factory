@@ -14,11 +14,12 @@ const evidence = { schema: 'bubble-gum-touch-transport-probe-v1', startedAt: new
 const save = () => fs.writeFileSync(path.join(output, 'review.json'), JSON.stringify(evidence, null, 2) + '\n');
 
 async function probe(browser, options) {
-  const { name, detach = false, dragId = 'explicit-1', tap = 'locator', drag = true } = options;
+  const { name, detach = false, dragId = 'explicit-1', tap = 'locator', drag = true,
+    explicitCapture = true, interGestureDelayMs = 0, dragSettleMs = 0 } = options;
   const context = await browser.newContext({ viewport: { width: 820, height: 1024 }, hasTouch: true });
   const page = await context.newPage();
   let session;
-  const result = { name, parameters: { detach, dragId, tap, drag, tapId: 'implicit-0',
+  const result = { name, parameters: { detach, dragId, tap, drag, tapId: 'implicit-0', explicitCapture, interGestureDelayMs, dragSettleMs,
     contactDurationMs: tap === 'same-session-held' ? 100 : 0 }, protocol: [] };
   evidence.cases.push(result);
   try {
@@ -28,7 +29,7 @@ async function probe(browser, options) {
       #drop{position:absolute;left:120px;top:540px;width:60px;height:60px;border:2px dashed purple}</style>
       </head><body><button id="source" type="button">Piece</button><div id="drop">Drop</div>
       <button id="next" type="button">Join</button></body></html>`);
-    await page.evaluate(() => {
+    await page.evaluate(explicitCapture => {
       window.probe = { events: [], drops: 0, clicks: 0 };
       for (const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'gotpointercapture',
         'lostpointercapture', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'mousedown', 'mouseup', 'click']) {
@@ -43,13 +44,13 @@ async function probe(browser, options) {
         }, true);
       }
       const source = document.getElementById('source');
-      source.onpointerdown = event => source.setPointerCapture(event.pointerId);
+      source.onpointerdown = event => { if (explicitCapture) source.setPointerCapture(event.pointerId); };
       source.onpointerup = () => { window.probe.drops++; };
       document.getElementById('next').onclick = () => { window.probe.clicks++; };
       // These exact nodes remain alive for the entire probe.
       window.probe.source = source;
       window.probe.next = document.getElementById('next');
-    });
+    }, explicitCapture);
     const signals = () => page.evaluate(() => ({ maxTouchPoints: navigator.maxTouchPoints,
       touchEventSupport: 'ontouchstart' in window, coarsePointer: matchMedia('(pointer: coarse)').matches,
       finePointer: matchMedia('(pointer: fine)').matches, anyCoarse: matchMedia('(any-pointer: coarse)').matches,
@@ -74,10 +75,17 @@ async function probe(browser, options) {
           x: start.x + (end.x - start.x) * fraction, y: start.y + (end.y - start.y) * fraction,
         })]);
       }
+      // Keep this same finger stationary at the destination before lifting.
+      // It models placing a piece rather than releasing a moving flick; the
+      // follow-up Locator.tap remains unchanged and is still performed once.
+      if (dragSettleMs) await page.waitForTimeout(dragSettleMs);
       await dispatch('touchEnd', []);
     }
     result.afterDrag = await signals();
     if (detach) { await session.detach(); session = null; }
+    // The inter-gesture controls wait after the completed release and before
+    // the one ordinary Locator.tap; they never retry a missing activation.
+    if (interGestureDelayMs) await page.waitForTimeout(interGestureDelayMs);
     result.beforeTap = await signals();
     // Exactly one tap: no retry, forced click, synthetic DOM event,
     // compatibility-mouse injection, or game/controller method invocation.
@@ -120,12 +128,20 @@ async function probe(browser, options) {
     assert.deepEqual(contact.map(event => event.type), ['pointerdown', 'pointerup'],
       'the follow-up contact contains exactly one trusted press and release');
     result.observedContactMs = contact[1].time - contact[0].time;
+    const dragRelease = result.events.find(event => event.type === 'pointerup' && event.target === 'source');
+    const finalMove = result.events.filter(event => event.type === 'pointermove' && event.target === 'source').at(-1);
+    result.observedLastMoveToUpMs = finalMove && dragRelease ? dragRelease.time - finalMove.time : null;
+    if (dragSettleMs) assert.ok(result.observedLastMoveToUpMs >= dragSettleMs - 10,
+      'the dragged finger really rests at the destination before its one release');
+    result.observedReleaseToNextDownMs = dragRelease ? contact[0].time - dragRelease.time : null;
+    if (interGestureDelayMs) assert.ok(result.observedReleaseToNextDownMs >= interGestureDelayMs - 10,
+      'the separate follow-up tap starts only after the requested idle interval');
     if (tap === 'same-session-held') assert.ok(result.observedContactMs >= 80,
       'the physical-contact control actually holds the same finger before release');
     if (result.clicks === 1) assert.equal(result.events.filter(event => event.type === 'click' &&
       event.target === 'next' && event.trusted).length, 1, 'a reported click is one real trusted browser click');
     result.observed = result.clicks === 1 ? 'one-click' : result.clicks === 0 ? 'no-click' : 'multiple-clicks';
-    console.log(`TRANSPORT PROBE ${result.name}: ${result.observed}; maxTouchPoints ${result.beforeSession.maxTouchPoints} -> ${result.beforeTap.maxTouchPoints}`);
+    console.log(`TRANSPORT PROBE ${result.name}: ${result.observed}; maxTouchPoints ${result.beforeSession.maxTouchPoints} -> ${result.beforeTap.maxTouchPoints}; release-to-next-down ${result.observedReleaseToNextDownMs}; last-move-to-up ${result.observedLastMoveToUpMs}`);
   } catch (error) {
     result.error = String(error.stack || error);
     throw error;
@@ -154,6 +170,10 @@ async function probe(browser, options) {
       { name: 'explicit-1-same-session-sequential', tap: 'same-session-sequential' },
       { name: 'implicit-0-same-session-sequential', dragId: 'implicit-0', tap: 'same-session-sequential' },
       { name: 'implicit-0-same-session-held-100ms', dragId: 'implicit-0', tap: 'same-session-held' },
+      { name: 'implicit-0-no-explicit-capture', dragId: 'implicit-0', explicitCapture: false },
+      { name: 'implicit-0-gap-350ms', dragId: 'implicit-0', interGestureDelayMs: 350 },
+      { name: 'implicit-0-gap-600ms', dragId: 'implicit-0', interGestureDelayMs: 600 },
+      { name: 'implicit-0-drag-settle-120ms', dragId: 'implicit-0', dragSettleMs: 120 },
     ];
     for (const options of cases) await probe(browser, options);
     assert.equal(evidence.cases.length, cases.length, 'every independent diagnostic context ran');

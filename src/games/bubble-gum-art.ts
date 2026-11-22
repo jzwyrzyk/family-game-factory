@@ -291,7 +291,10 @@ export function objectArtFrame(id: ObjectId, width = 120, height = 120): string 
   const [x, y, w, h] = OBJECT_FRAMES[id];
   const aspect = width / height;
   const elongated = id === 'bottle' || Math.max(w / h, h / w) >= 1.5;
-  const turn = elongated && ((aspect > 1.15 && h > w) || (aspect < .87 && w > h));
+  // A modestly wide tube can still be an upright rocket nozzle. Its slot turns
+  // the opening downward; only a clearly horizontal tail pipe needs this turn.
+  const horizontalThreshold = id === 'tube' ? 1.5 : 1.15;
+  const turn = elongated && ((aspect > horizontalThreshold && h > w) || (aspect < .87 && w > h));
   const viewBox = turn ? `${-y - h} ${x} ${h} ${w}` : `${x} ${y} ${w} ${h}`;
   const shapes = OBJECTS[id].svg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" preserveAspectRatio="none" class="gum-object-svg" focusable="false" aria-hidden="true" data-art-turn="${turn ? 90 : 0}">${turn ? `<g transform="rotate(90)">${shapes}</g>` : shapes}</svg>`;
@@ -368,7 +371,7 @@ const bubble = (x: number, y: number, r: number) => `<circle cx="${x}" cy="${y}"
 const musicNote = (x: number, y: number, scale: number, color: string) =>
   `<g transform="translate(${x} ${y}) scale(${scale})"><g class="gum-moment-float" fill="${color}" stroke="${color}" stroke-width="4"><path d="M0 28V-17l31-8v46" fill="none"/><path d="m0-17 31-8v9L0-8Z"/><ellipse cx="-7" cy="29" rx="10" ry="7" transform="rotate(-18 -7 29)"/><ellipse cx="24" cy="22" rx="10" ry="7" transform="rotate(-18 24 22)"/></g></g>`;
 
-/** Four visible story beats per world. The invention stays unobscured in the
+/** The first four story beats retain their identities. The invention stays clear in the
  * middle; motion is optional CSS on child groups, so reduced motion retains art. */
 const MOMENTS: Record<SceneWorld, readonly string[]> = {
   sky: [
@@ -485,7 +488,231 @@ const MOMENTS: Record<SceneWorld, readonly string[]> = {
   ],
 };
 
+const distantStars = () => `<g fill="#fff4cd" opacity=".85">${[
+  [42, 49, 2], [119, 111, 3], [226, 31, 2], [318, 64, 3], [452, 24, 2], [626, 37, 2], [747, 88, 3],
+  [68, 234, 3], [160, 310, 2], [37, 421, 2], [217, 432, 3], [330, 459, 2], [492, 437, 3],
+  [620, 388, 2], [741, 432, 3], [707, 278, 2], [773, 188, 2], [551, 55, 2],
+].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>`;
+const night = (color: string) => `<path d="M0 0h800v480H0Z" fill="${color}"/>${distantStars()}`;
+const deepSea = (color: string) => `<path d="M0 0h800v480H0Z" fill="${color}"/>
+  <path d="M70 0h45l99 480H79Zm257 0h34l70 480h-99ZM621 0h27l55 480h-76Z" fill="#b3eff3" opacity=".06"/>
+  <path d="M0 431q107-33 214 1 109-28 224 4 178-38 362-3v47H0Z" fill="#1e4d70" opacity=".7"/>`;
+const confetti = () => `<g class="gum-moment-float" fill="none" stroke-width="7">
+  <path d="m80 91 8 15m84-61-6 18m82 2 9 12m337-16 7 15m81 31-12 9m72 120-8 14m-601 49 12 7" stroke="#f2a5c9"/>
+  <path d="m119 205 13-6m-78 164 13 7m116 43-5 16m438-20 6 15m102-59 13-7m-3-188 10 8" stroke="#9adbd8"/>
+  <path d="m220 105 7 12m372 5 8 12m-458 240 7-13m507 5-9 12" stroke="#f5d282"/></g>`;
+
+/** Further milestones change the whole setting, so a better-working invention
+ * visibly travels beyond its earlier outing. Landmarks stay around the craft. */
+const FAR_MOMENTS: Record<SceneWorld, readonly string[]> = {
+  sky: [
+    moment(`
+      ${night('#6b659d')}
+      <ellipse cx="360" cy="444" rx="470" ry="117" fill="#8c80b2" opacity=".25"/>
+      <g transform="translate(560 86) rotate(-18)"><g class="gum-moment-float">
+        <ellipse rx="116" ry="31" fill="none" stroke="#cdb7e9" stroke-width="17"/>
+        <circle r="56" fill="#e5b6c9" stroke="#b68bb3" stroke-width="3"/>
+        <path d="M-49-25q47 16 99 4m-104 19q53 17 108 3m-99 22q41 13 85 5" fill="none" stroke="#f5d3d8" stroke-width="9"/>
+        <path d="M-112 8q109 47 222-2" fill="none" stroke="#e2cbed" stroke-width="14"/>
+        <path d="M-109 11q109 37 215-1" fill="none" stroke="#b8a5d6" stroke-width="3"/>
+      </g></g>
+      <circle cx="134" cy="367" r="37" fill="#8ec5d1" stroke="#79a8c5" stroke-width="3"/>
+      <path d="M105 354q25-7 57 7m-58 15q27-8 56 6" fill="none" stroke="#b3dfe0" stroke-width="6"/>
+      ${sparkle(217, 116, 14)}${sparkle(698, 349, 18)}${sparkle(91, 168, 10)}
+    `),
+    moment(`
+      ${night('#514c87')}
+      <path d="M-60 7q241-13 448 74" fill="none" stroke="#989bd3" stroke-width="72" opacity=".16"/>
+      <g class="gum-moment-float">
+        <path d="M146-22q176 13 365 99-131 11-365-99Z" fill="#a5cce9" opacity=".6"/>
+        <path d="M231-6q143 25 281 83-99 3-281-83Z" fill="#d2e6ef"/>
+        <path d="M333 28q87 13 182 49-60 7-182-49Z" fill="#fff3c4"/>
+        <circle cx="515" cy="78" r="25" fill="#ffeab1" stroke="#f3c883" stroke-width="3"/>
+        <circle cx="522" cy="75" r="12" fill="#fff9df"/>
+      </g>
+      <path d="M75 336q72 13 100 51m465-133q56 6 93 31" fill="none" stroke="#9a95cf" stroke-width="3" opacity=".7"/>
+      <circle cx="691" cy="378" r="25" fill="#ae9ad0"/><circle cx="684" cy="372" r="6" fill="#8e7fbb"/><circle cx="704" cy="383" r="4" fill="#8e7fbb"/>
+      ${sparkle(134, 192, 16)}${sparkle(654, 140, 13)}${sparkle(200, 425, 11)}${sparkle(594, 424, 16)}
+    `),
+    moment(`
+      ${night('#343967')}
+      <g transform="translate(400 91) rotate(-12)">
+        <ellipse rx="262" ry="68" fill="#a69ed9" opacity=".10"/>
+        <ellipse rx="216" ry="47" fill="#bd9bd6" opacity=".16"/>
+        <ellipse rx="135" ry="29" fill="#f3bddb" opacity=".22"/>
+        <path d="M-225 4q65-68 210-27T201 12Q115 73-18 29T-214 8" fill="none" stroke="#b9a7e1" stroke-width="11" opacity=".65"/>
+        <path d="M-145-2q54-35 137-13T131 6Q63 39-10 15T-139-2" fill="none" stroke="#ecc6e6" stroke-width="8" opacity=".75"/>
+        <ellipse rx="41" ry="17" fill="#fff0cf" opacity=".85"/>
+      </g>
+      <g class="gum-moment-float">${sparkle(115, 204, 22)}${sparkle(682, 222, 18)}${sparkle(89, 371, 15)}${sparkle(704, 409, 23)}${sparkle(304, 425, 13)}${sparkle(534, 435, 15)}</g>
+      <path d="M72 360q64 23 107 76m449-35q81-15 127-68" fill="none" stroke="#8889bf" stroke-width="2"/>
+      <circle cx="163" cy="274" r="20" fill="#81b4ca"/><path d="M143 272q20 10 39 2" fill="none" stroke="#bee0df" stroke-width="5"/>
+    `),
+  ],
+  sea: [
+    moment(`
+      ${deepSea('#5babbf')}
+      <path d="M135 434V170q0-120 265-120t265 120v264h-46V181q0-88-219-88t-219 88v253Z" fill="#9ebdc2" stroke="#7c9fae" stroke-width="4"/>
+      <path d="M145 181h47m416 0h48M150 230h34m432 0h34M150 289h34m432 0h34M150 349h34m432 0h34" stroke="#c0d3d2" stroke-width="7"/>
+      <path d="m266 74 10 30m90-51 3 32m96-31-4 32m87-15-11 30" stroke="#7e9ea9" stroke-width="3"/>
+      <path d="M104 442q-11-57 9-85m575 84q19-45 5-79" fill="none" stroke="#92d4b9" stroke-width="10"/>
+      <g transform="translate(644 411)"><path d="M-41 0v-28q42-40 84 0V0Z" fill="#d3a172" stroke="#987f79" stroke-width="3"/><path d="M-41-23h84M-18-44v44m38-44v44" stroke="#e9c28a" stroke-width="7"/><circle cy="-14" r="6" fill="#f6df9b"/></g>
+      <g class="gum-moment-float">${bubble(82, 247, 17)}${bubble(711, 299, 12)}${bubble(215, 52, 8)}</g>
+      ${sparkle(621, 369, 14, '#fff0b4')}
+    `),
+    moment(`
+      ${deepSea('#407f9f')}
+      <g transform="translate(450 82)"><g class="gum-moment-float">
+        <path d="M-137 3q14-49 96-49 71 0 127 34 49 23 83-13-3 29-24 45 31 6 43 32-45-12-67-7-41 35-126 27-108-2-132-69Z" fill="#93b7d6" stroke="#6d92bb" stroke-width="3"/>
+        <path d="M-124 24q72 43 171 30-52 40-129 14-28-10-42-44Z" fill="#c5dbe4"/>
+        <path d="M-30 43q20 45 57 30L7 43" fill="#759dc4" stroke="#6d92bb" stroke-width="3"/>
+        <circle cx="-94" cy="9" r="5" fill="#3b567a"/><path d="M-113 26q16 8 28-1" fill="none" stroke="#5d7fa1" stroke-width="3"/>
+        <path d="M-43-47q-20-27-28-10m28 10q18-30 29-13" fill="none" stroke="#d4f1ef" stroke-width="5"/>
+      </g></g>
+      ${littleFish(89, 323, .9, '#d2badf')}${littleFish(689, 308, 1, '#e5c696', true)}
+      <g class="gum-moment-float">${bubble(96, 178, 13)}${bubble(716, 182, 20)}${bubble(678, 412, 13)}${bubble(190, 430, 9)}</g>
+      <path d="M0 457q120-40 232-9 159-34 287 1 135-31 281 3v28H0Z" fill="#477b92"/>
+    `),
+    moment(`
+      ${deepSea('#293f70')}
+      <g fill="#4f6e9b" opacity=".6"><ellipse cx="85" cy="339" rx="110" ry="140"/><ellipse cx="735" cy="353" rx="120" ry="150"/></g>
+      <g transform="translate(153 105)"><g class="gum-moment-float"><path d="M-43 0q4-48 43-48T43 0Z" fill="#9ed7df" fill-opacity=".7" stroke="#c2f2e8" stroke-width="3"/><path d="M-30 1q-15 33 0 58m20-58q-14 46 0 77m20-77q14 46 0 77m20-77q15 33 0 58" fill="none" stroke="#aee6df" stroke-width="4"/><path d="M-25-15q26-19 50 0" fill="none" stroke="#e1fff2" stroke-width="4"/></g></g>
+      <g transform="translate(633 103) scale(.78)"><g class="gum-moment-float"><path d="M-45 0q4-48 45-48T45 0Z" fill="#d7b0e2" fill-opacity=".8" stroke="#f0d3ee" stroke-width="3"/><path d="M-30 1q-14 38 0 65m20-65q12 47 0 80m20-80q-12 47 0 80m20-80q14 38 0 65" fill="none" stroke="#d8baed" stroke-width="4"/></g></g>
+      <g fill="none" stroke-width="7"><path d="M91 457v-62m0 25-24-17m24 35 21-20m579 39v-72m0 31-23-14m23 34 25-21" stroke="#7fd2c8"/><path d="M143 454q-18-37 1-62m502 64q19-44-3-71" stroke="#bba0df"/></g>
+      <g class="gum-moment-float">${sparkle(202, 54, 12, '#bdfff0')}${sparkle(575, 47, 15, '#e9d6ff')}${sparkle(61, 263, 10, '#b9f7ee')}${sparkle(742, 281, 13, '#e8d6ff')}${sparkle(255, 436, 12, '#aef4e8')}${sparkle(530, 435, 10, '#d8c7f6')}</g>
+      ${bubble(83, 188, 8)}${bubble(705, 199, 10)}
+    `),
+  ],
+  road: [
+    moment(`
+      <path d="M0 0h800v480H0Z" fill="#c7e6ef"/><circle cx="644" cy="73" r="38" fill="#ffedb5"/>
+      <path d="M0 315 143 130 312 333 491 116 658 319 800 193v287H0Z" fill="#abb4d6"/>
+      <path d="m94 194 49-64 64 77-61-23Z m345-16 52-62 58 71-59-21Z" fill="#eef3f5"/>
+      <path d="M0 419q220 38 400-4 212-37 400-2v67H0Z" fill="#94cada"/>
+      <path d="M-35 454Q400 314 835 454" fill="none" stroke="#c18da9" stroke-width="53"/>
+      <path d="M-35 447Q400 307 835 447" fill="none" stroke="#f0b7c7" stroke-width="16"/>
+      <path d="M-35 432Q400 292 835 432" fill="none" stroke="#f0d293" stroke-width="15"/>
+      <path d="M-35 419Q400 279 835 419" fill="none" stroke="#a5d5bb" stroke-width="12"/>
+      <path d="M40 407v-41m48 23v-42m625 43v-42m48 59v-41" stroke="#8c92b8" stroke-width="5"/>
+      <path d="M28 366q83-42 147-52m450 0q64 10 147 52" fill="none" stroke="#a4a6c9" stroke-width="4"/>
+      <g class="gum-moment-float">${sparkle(136, 85, 14)}${sparkle(700, 195, 12)}</g>
+    `),
+    moment(`
+      <path d="M0 0h800v480H0Z" fill="#d8e6f3"/><circle cx="577" cy="67" r="40" fill="#ffe8b4"/>
+      <path d="M0 280q101-158 224-77 134-120 279-3 160-140 297 69v211H0Z" fill="#a9c8bd"/>
+      <path d="M0 375q197-48 400-7 215-45 400 2v110H0Z" fill="#bdd8bb"/>
+      <g stroke="#a58d9d" stroke-width="3">
+        <path d="M72 241v-91h83v91" fill="#e9c9b1"/><path d="m60 151 54-43 53 43Z" fill="#c09dbd"/>
+        <path d="M168 212v-97h73v97" fill="#c6b9dd"/><path d="m156 116 48-41 49 41Z" fill="#a58bb8"/>
+        <path d="M578 219V115h88v104" fill="#edc9bd"/><path d="m565 117 57-45 56 45Z" fill="#b59fce"/>
+        <path d="M682 248v-91h69v91" fill="#c7c9df"/><path d="m671 159 45-36 47 36Z" fill="#9ca3c9"/>
+      </g>
+      <g fill="#fdf0c8" stroke="#b49aaa" stroke-width="2"><path d="M88 168h19v24H88Zm34 0h19v24h-19Zm62-30h18v23h-18Zm27 0h18v23h-18Zm383 2h21v26h-21Zm34 0h21v26h-21Zm69 38h19v25h-19Z"/></g>
+      <path d="M-20 441q204-59 417-9 215-60 423-9" fill="none" stroke="#d7c5b7" stroke-width="43"/>
+      <path d="M-20 441q204-59 417-9 215-60 423-9" fill="none" stroke="#fff2cf" stroke-width="4" stroke-dasharray="23 24"/>
+      <path d="M55 289q330-88 690 0" fill="none" stroke="#8a9c9b" stroke-width="2"/>
+      <path d="m80 283 16 22 14-27m44-9 16 23 14-28m444 2 16 27 14-22m43 11 17 28 14-23" fill="#f4c895"/>
+    `),
+    moment(`
+      <path d="M0 0h800v480H0Z" fill="#bcbfdf"/><circle cx="622" cy="77" r="38" fill="#fff0c6"/>
+      <path d="M-30 360 163 68 381 367 553 46 837 374v106H0Z" fill="#8d9fc6"/>
+      <path d="m110 148 53-80 70 96-67-24Zm390-2 53-100 83 96-80-22Z" fill="#ebedf5"/>
+      <path d="M0 393q219-63 405-15 209-63 395 4v98H0Z" fill="#94b8b1"/>
+      <path d="M0 437q220-32 405 0 202-37 395-4" fill="none" stroke="#d7c6bd" stroke-width="49"/>
+      <path d="M47 427V172m706 254V172" stroke="#7f719f" stroke-width="7"/>
+      <path d="M47 174q353-116 706 0" fill="none" stroke="#9e79b8" stroke-width="17"/>
+      <path d="M49 165q351-114 702 0" fill="none" stroke="#d7b5df" stroke-width="8"/>
+      <path d="m72 167 15 30 18-39m75-22 16 31 18-38m75-13 16 32 18-35m76-4 16 34 18-33m75 6 16 37 18-32m74 16 16 39 18-31m71 25 14 39 18-29" fill="#f2c794" stroke="#b99497" stroke-width="2"/>
+      <g fill="#ffedb2"><circle cx="74" cy="356" r="7"/><circle cx="727" cy="353" r="7"/><circle cx="121" cy="390" r="5"/><circle cx="677" cy="392" r="5"/></g>
+      ${confetti()}${sparkle(126, 261, 18)}${sparkle(681, 269, 18)}
+    `),
+  ],
+  stage: [
+    moment(`
+      <path d="M0 0h800v480H0Z" fill="#68608c"/>
+      <path d="M0 0h800v81q-200 44-400 0Q190 125 0 80Z" fill="#b083b1"/>
+      <path d="M0 0h104q-11 187-104 309Zm800 0H696q11 187 104 309Z" fill="#ae80ac"/>
+      <path d="M0 0h31q8 204-31 258Zm800 0h-31q-8 204 31 258Z" fill="#8c699f"/>
+      <path d="M70 70q328 69 660 0" fill="none" stroke="#e2bf8c" stroke-width="8"/>
+      <path d="m107 78 16 31 20-24m87 10 17 34 20-29m87 5 17 34 20-33m87-2 17 32 20-36m86-8 18 29 18-35" fill="#f3d1a0"/>
+      <path d="m165 81-76 343h220L221 81m358 0-75 343h223L635 81" fill="#fff0bd" opacity=".13"/>
+      <path d="M0 423h800v57H0Z" fill="#bb99a0"/><path d="M0 450h800" stroke="#8c798c" stroke-width="3"/>
+      <g fill="#8b78a6" stroke="#b59bc5" stroke-width="3"><path d="M18 329h114v42H18Zm650 0h114v42H668Z"/><path d="M25 312q50-32 100 0m550 0q50-32 100 0" fill="none"/></g>
+      ${sparkle(169, 181, 18)}${sparkle(640, 201, 18)}${sparkle(137, 383, 12)}
+    `),
+    moment(`
+      <path d="M0 0h800v480H0Z" fill="#aeafd2"/>
+      <path d="M0 301h64V142h78v159h47V99h64v202h61V174h64v127h49V130h85v171h55V90h70v211h46V154h83v147h44v179H0Z" fill="#8a8fb9" opacity=".65"/>
+      <path d="M0 411q194-31 398 0 205-32 402-1v70H0Z" fill="#c7abc2"/>
+      <path d="M0 444q191-30 398 0 205-33 402-1" fill="none" stroke="#ead3d9" stroke-width="9"/>
+      <path d="M52 51q347 85 696 0" fill="none" stroke="#7c749f" stroke-width="3"/>
+      <g fill="#ffebbb" stroke="#d8ba9f" stroke-width="2"><circle cx="111" cy="64" r="10"/><circle cx="225" cy="84" r="10"/><circle cx="342" cy="94" r="10"/><circle cx="460" cy="93" r="10"/><circle cx="578" cy="81" r="10"/><circle cx="691" cy="63" r="10"/></g>
+      ${musicNote(115, 207, 1.6, '#f0cadf')}${musicNote(658, 248, 1.6, '#f1d395')}${musicNote(136, 372, 1, '#a4e0d5')}${musicNote(688, 375, .9, '#d6c4ec')}
+      ${confetti()}
+    `),
+    moment(`
+      ${night('#45436f')}
+      <path d="M77 430V202q0-147 323-147t323 147v228" fill="none" stroke="#9581b9" stroke-width="25"/>
+      <path d="M77 430V202q0-147 323-147t323 147v228" fill="none" stroke="#e8c994" stroke-width="7"/>
+      <path d="M0 428h800v52H0Z" fill="#a58bae"/><path d="M0 452h800" stroke="#7b7097" stroke-width="3"/>
+      <path d="m139 425 63-334h32l79 334m174 0 80-334h32l62 334" fill="#fff1bb" opacity=".13"/>
+      <g class="gum-moment-float">${sparkle(156, 185, 28, '#ffe5aa')}${sparkle(648, 184, 28, '#ffe5aa')}${sparkle(270, 60, 20, '#ffe5aa')}${sparkle(526, 58, 20, '#ffe5aa')}${sparkle(105, 343, 20, '#f1c4df')}${sparkle(697, 344, 20, '#b6e6df')}</g>
+      ${confetti()}
+      <g fill="#efd4a3"><circle cx="126" cy="433" r="6"/><circle cx="198" cy="433" r="6"/><circle cx="602" cy="433" r="6"/><circle cx="674" cy="433" r="6"/></g>
+    `),
+  ],
+};
+
 export function sceneMoment(world: SceneWorld, stop: number): string {
-  const index = Number.isFinite(stop) ? Math.max(0, Math.min(3, Math.floor(stop))) : 0;
-  return MOMENTS[world][index];
+  const index = Number.isFinite(stop) ? Math.max(0, Math.min(6, Math.floor(stop))) : 0;
+  return index < 4 ? MOMENTS[world][index] : FAR_MOMENTS[world][index - 4];
+}
+
+const launchSvg = (shapes: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" preserveAspectRatio="none" class="gum-launch-svg" focusable="false" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${shapes}</g></svg>`;
+const smokePuff = (x: number, y: number, dx: number, dy: number, delay: number, color = '#e8e4ed') =>
+  `<g transform="translate(${x} ${y})"><g class="gum-launch-puff" style="--gum-drift-x:${dx}px;--gum-drift-y:${dy}px;animation-delay:${delay}s"><path d="M-38 12q-20-26 7-37 1-28 28-24 24-19 43 5 27-3 32 22 21 17 0 34Z" fill="${color}" stroke="#fff5ea" stroke-opacity=".65" stroke-width="3"/></g></g>`;
+
+/** Effects share the assembly coordinate system and sit behind the machine.
+ * Rocket exhaust starts at the actual booster edge. CSS controls the intro and
+ * persistent trail without moving the invention or needing SVG filter IDs. */
+export function launchArt(world: SceneWorld, blueprintId = ''): string {
+  if (world === 'sky' && (!blueprintId || blueprintId === 'rocket-pop')) return launchSvg(`
+    <g class="gum-launch-smoke">${smokePuff(367, 482, -86, 38, -.4)}${smokePuff(432, 486, 83, 31, -1.4)}${smokePuff(397, 510, -13, 43, -.9)}</g>
+    <g class="gum-build-trail" transform="translate(400 442)"><g class="gum-launch-jet">
+      <g class="gum-launch-flame"><path d="M-34-9q-8 39 4 56 1 20 12 43l12-19 12 53Q21 91 26 68l9 15q18-42-2-92Z" fill="#ef997a" stroke="#c77b87" stroke-width="3"/>
+        <path d="M-24-8q-2 29 8 47l-2 22L0 94q13-18 16-44l9 9q10-32-4-67Z" fill="#ffd27b"/>
+        <path d="M-13-7q-5 25 14 66Q17 23 11-7Z" fill="#fff5bc"/>
+        <path d="M-17 10q0 16 7 27" fill="none" stroke="#ffe7a0" stroke-width="4"/>
+      </g>
+      <g class="gum-launch-embers" fill="#ffd798"><path d="m-35 76-5 16 10-8Zm65 23-1 18 7-10Zm-16 33-4 15 9-8Z"/></g>
+    </g></g>
+  `);
+  if (world === 'sky') return launchSvg(`
+    <g class="gum-launch-smoke">${smokePuff(350, 448, -70, 29, -.3, '#e6edf8')}${smokePuff(450, 448, 70, 29, -1.3, '#e6edf8')}</g>
+    <g class="gum-build-trail" fill="none" stroke="#f5fbff" stroke-width="7">
+      <g class="gum-launch-flow"><path d="M311 409q-65 22-24 55 39 25 13 60m193-115q65 22 24 55-39 25-13 60"/><path d="M352 438q-31 27-11 57m110-57q31 27 11 57" stroke="#c4d8ed" stroke-width="5"/></g>
+      <g class="gum-launch-flow gum-launch-flow-late"><path d="M176 225q-46 44-27 95m501-95q46 44 27 95" stroke="#dceef7" stroke-width="5"/></g>
+    </g>
+  `);
+  if (world === 'sea') return launchSvg(blueprintId === 'sponge-sailor' ? `
+    <g class="gum-launch-smoke" fill="#bcecf0" stroke="#effff8" stroke-width="4"><path class="gum-launch-splash" d="M192 396q-47-14-52-46 43-5 58 22-8-45 18-59 24 25 13 61 37-25 64-3-21 36-68 36m346-11q47-14 52-46-43-5-58 22 8-45-18-59-24 25-13 61-37-25-64-3 21 36 68 36Z"/></g>
+    <g class="gum-build-trail gum-launch-water" fill="none" stroke="#ecfff8" stroke-width="7"><g class="gum-launch-flow"><path d="M179 418q87 34 205 0 116 34 214 0m-373 27q158 29 324 0"/><path d="M159 402q-27-22-48 0m518 0q27-22 48 0" stroke-width="4"/></g></g>
+  ` : `
+    <g class="gum-launch-smoke">${smokePuff(667, 259, 92, -34, -.4, '#c2f3ed')}${smokePuff(690, 284, 99, 37, -1.2, '#b9e9ee')}</g>
+    <g class="gum-build-trail gum-launch-water"><g class="gum-launch-flow" fill="none" stroke="#effff9" stroke-width="4">
+      <circle cx="669" cy="259" r="19"/><circle cx="709" cy="235" r="12"/><circle cx="727" cy="284" r="22"/><circle cx="767" cy="252" r="13"/>
+      <path d="M669 212q35-18 67-5m-56 106q39 14 75-2" stroke="#c5f5ef"/>
+    </g></g>
+  `);
+  if (world === 'road') return launchSvg(`
+    <g class="gum-launch-smoke">${smokePuff(222, 421, -90, -16, -.2, '#e8d5be')}${smokePuff(511, 430, -74, 9, -1.1, '#e8d5be')}${smokePuff(167, 437, -73, -7, -1.7, '#efddc7')}</g>
+    <g class="gum-build-trail"><g class="gum-launch-flow" fill="none" stroke="#fff3d9" stroke-width="6"><path d="M194 422q-30-22-52-1m29 21q-36-8-62 7m359-20q-31-14-48 3"/><path d="M115 380H67m64 19H42m402 44h-49" stroke="#dcc4ad" stroke-width="5"/></g></g>
+  `);
+  return launchSvg(`
+    <g class="gum-build-trail">
+      <g class="gum-launch-beams"><path d="m169 469 98-425 45 7 42 418Zm277 0 42-418 45-7 98 425Z" fill="#fff0b6" opacity=".23"/><ellipse cx="400" cy="450" rx="244" ry="25" fill="#fff3bf" opacity=".35"/></g>
+      <g class="gum-launch-flow" fill="none" stroke-width="7"><path d="M159 275q-43-59-21-105m501 105q43-59 21-105" stroke="#e9afce"/><path d="M126 351q-36-17-53-49m601 49q36-17 53-49" stroke="#b7d8e6"/></g>
+    </g>
+    <g class="gum-launch-smoke gum-launch-confetti">${confetti()}</g>
+  `);
 }
