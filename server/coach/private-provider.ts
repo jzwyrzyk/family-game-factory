@@ -3,6 +3,7 @@
  * Model credentials are injected only into the separately approved private executor.
  */
 import {COACH_POLICY,COACH_SCHEMA} from './policy';
+import {prepareCreationWire} from './private-creation-wire';
 import {approved,type CoachConfig,type CoachProvider} from './service';
 import type {CoachContext} from '../../src/studio/design';
 export type PrivateCoachConfig = CoachConfig & {apiKey:string};
@@ -12,7 +13,8 @@ const failureStages=['caller_verification','configuration','readiness','input_va
 const failureReasons=['denied','verification_failed','unavailable','invalid_request','input_limit','private_information',
  'turn_budget','rate_limit','http_error','transport_error','timeout','cancelled','invalid_json','invalid_shape',
  'response_limit','refused','incomplete','output_limit','provider_failed','invalid_usage','reply_invalid',
- 'readiness_missing','readiness_invalid','unknown'] as const;
+ 'readiness_missing','readiness_invalid','readiness_shape_invalid','readiness_evidence_invalid',
+ 'readiness_inconsistent','readiness_context_invalid','readiness_reference_invalid','unknown'] as const;
 export type CoachFailureStage=typeof failureStages[number];
 export type CoachFailureReason=typeof failureReasons[number];
 export interface CoachFailureDetail {
@@ -57,9 +59,11 @@ function failureReason(error:unknown,stage:CoachFailureStage,signal?:AbortSignal
    case 'RATE_LIMIT':return 'rate_limit';
    case 'COACH_REFUSED':return 'refused';
    case 'CREATION_REVIEW_MISSING':return 'readiness_missing';
-   case 'Invalid creation review.':case 'Creation review was not requested.':
-   case 'Creation review needs exact child-authored evidence.':
-   case 'A ready game needs grounded intent and no unresolved design gaps.':return 'readiness_invalid';
+   case 'Invalid creation review.':return 'readiness_shape_invalid';
+   case 'Creation review was not requested.':return 'readiness_context_invalid';
+   case 'Creation review needs exact child-authored evidence.':return 'readiness_evidence_invalid';
+   case 'A ready game needs grounded intent and no unresolved design gaps.':return 'readiness_inconsistent';
+   case 'Invalid creation evidence reference.':return 'readiness_reference_invalid';
   }
  }
  if(stage==='caller_verification')return 'verification_failed';
@@ -81,8 +85,8 @@ function fail(message:string,detail:CoachFailureDetail):never {throw tagCoachFai
 
 export class OpenAICoachProvider implements CoachProvider {
  constructor(private config:PrivateCoachConfig,private transport:typeof fetch=fetch){}
- private reservedCost(serialized:string){
-  const c=this.config,inputCeiling=Buffer.byteLength(serialized+COACH_POLICY+JSON.stringify(COACH_SCHEMA))+2048;
+ private reservedCost(serialized:string,schema:object=COACH_SCHEMA){
+  const c=this.config,inputCeiling=Buffer.byteLength(serialized+COACH_POLICY+JSON.stringify(schema))+2048;
   return Math.ceil((inputCeiling*c.inputMicroUsdPerMillion+c.maxOutputTokens*c.outputMicroUsdPerMillion)/1000000);
  }
  /** Local configuration arithmetic only. A key/reachable service is not usable
@@ -111,12 +115,13 @@ export class OpenAICoachProvider implements CoachProvider {
    stage='input_validation';reason='invalid_request';
    const c=this.config,serialized=JSON.stringify(context);
    if(serialized.length>c.maxInputChars)fail('INVALID_REQUEST',{stage,reason:'input_limit'});
+   const wire=prepareCreationWire(context,COACH_SCHEMA),modelInput=JSON.stringify(wire.input);
    // UTF-8 bytes are a conservative token ceiling; include policy, schema and envelope overhead.
    stage='budget';reason='turn_budget';
-   if(this.reservedCost(serialized)>c.maxTurnMicroUsd)throw Error('SPENDING_CUTOFF');
+   if(this.reservedCost(modelInput,wire.schema)>c.maxTurnMicroUsd)throw Error('SPENDING_CUTOFF');
    await this.moderate(serialized,signal,'input_moderation');
    stage='inference';reason='transport_error';
-   const response=await this.transport('https://api.openai.com/v1/responses',{method:'POST',signal,headers:{Authorization:`Bearer ${c.apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:c.model,store:false,max_output_tokens:c.maxOutputTokens,input:[{role:'developer',content:COACH_POLICY},{role:'user',content:serialized}],text:{format:{type:'json_schema',name:'child_owned_design_coach',strict:true,schema:COACH_SCHEMA}}})});
+   const response=await this.transport('https://api.openai.com/v1/responses',{method:'POST',signal,headers:{Authorization:`Bearer ${c.apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:c.model,store:false,max_output_tokens:c.maxOutputTokens,input:[{role:'developer',content:COACH_POLICY},{role:'user',content:modelInput}],text:{format:{type:'json_schema',name:'child_owned_design_coach',strict:true,schema:wire.schema}}})});
    if(!response.ok)fail('COACH_PROVIDER_FAILED',{stage,reason:'http_error',providerHttpStatus:response.status});
    const raw=await response.text();if(raw.length>100000)fail('COACH_PROVIDER_FAILED',{stage,reason:'response_limit'});
    reason='invalid_json';const body=JSON.parse(raw);reason='invalid_shape';
@@ -134,9 +139,10 @@ export class OpenAICoachProvider implements CoachProvider {
    const usedMicroUsd=Math.ceil((u.input_tokens*c.inputMicroUsdPerMillion+u.output_tokens*c.outputMicroUsdPerMillion)/1000000);
    await this.moderate(output,signal,'output_moderation');
    stage='reply_validation';reason='invalid_json';
-   return {reply:JSON.parse(output),usedMicroUsd};
+   const parsed=JSON.parse(output);reason='reply_invalid';
+   return {reply:wire.decode(parsed),usedMicroUsd};
   }catch(error){
-   throw tagCoachFailure(error,{stage,reason:reason==='transport_error'?failureReason(error,stage,signal):reason});
+   throw tagCoachFailure(error,{stage,reason:reason==='transport_error'||reason==='reply_invalid'?failureReason(error,stage,signal):reason});
   }
  }
 }
