@@ -22,7 +22,7 @@
 .studio-notifications{max-width:1060px;margin:0 auto;padding:10px 0 36px}
 .studio-notifications-heading{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:12px}
 .studio-review .studio-notifications h1{font-size:clamp(30px,4vw,42px);line-height:1.15;margin:0;color:#122444}
-.studio-review .studio-notifications-intro{font-size:22px;line-height:1.45;color:#455372;margin:0 0 24px}
+.studio-review .studio-notifications-intro{font-size:22px;line-height:1.45;color:#293954;margin:0 0 24px}
 .studio-notifications-list{display:grid;gap:18px}
 .studio-notification-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,auto);gap:20px;padding:24px;background:#fff;border:1px solid #dcd5f1;border-radius:22px;box-shadow:0 6px 20px #16234b06}
 .studio-notification-copy{min-width:0}

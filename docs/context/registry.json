@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:05:57.966Z",
-      "sourceDigest": "02fd208f13aec653b67715d3b9360d6aa37400ce89d117ad02533fcd61956329",
+      "reviewedAt": "2026-11-22T19:14:28.696Z",
+      "sourceDigest": "036cb4af76245abff9143ca9f9ae0826a2c82d7b3f723395a90d63741eaa05bc",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed authored reminder snippets and keyed notification readers: another project changing state preserves current audio and focus, while changed or removed rows retain cancellation and owner guards.",
+      "reviewReason": "Preserved the single Home card and Notifications contract; corrected the observed 4.11:1 intro contrast with darker ink on the actual gradient, retaining the measured 4.5:1 gate and unchanged card readers.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -547,10 +547,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:21.995Z",
-      "sourceDigest": "bdc4846f463b362a7fa75880e3f1c400a13325be0dadc2759a3e54963288545b",
+      "reviewedAt": "2026-11-22T19:14:29.343Z",
+      "sourceDigest": "094a58d4ec0d1e6be98391a3ab191520710c1a120b620e484979ecd6606ed411",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated natural narration authorization, accounting, private Google transport and rollout handoff; preserved newly merged content-free chat failure diagnostics and bounded metadata-token reads."
+      "reviewReason": "Reconciled merged PR131 private readiness source references and exact quote restoration with the default-off narration path; retained its complete policy/provider/wire implementation, public validators, spending boundaries and private inference documentation."
     },
     {
       "id": "adult-privacy",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:05:58.957Z",
-      "sourceDigest": "374d44deed0b79c78c1620432ffbb53108e618cced6422db4d68afc45414a5b5",
+      "reviewedAt": "2026-11-22T19:14:29.587Z",
+      "sourceDigest": "31d836fe0b53e9e00532d0a03dfcbd729e1a6629b160c4eed47421fe4e5198b1",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved first-head failure receipts and all40 viewport plus5 lifecycle passes; corrected obsolete catalogue and top-frame/welcome fixture setup, retained error assertions, added authored snippet and independent-reader continuity coverage.",
+      "reviewReason": "Merged both upstream readiness wire suites into test:coach while preserving play-view, Notifications, read-aloud and private speech gates; recorded the actual second-candidate contrast failure and incomplete phone acceptance without relaxing assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:05:59.204Z",
-      "sourceDigest": "04d6cb672df74d64f34d8bdfc4b797c71ec90017dd8374ec02e2b92a826418a0",
+      "reviewedAt": "2026-11-22T19:15:41.794Z",
+      "sourceDigest": "36dfd72b7d9230cb8023d12b4b36826f130b15b279c995e8e6595dc9f814817b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact first candidate and equivalent CI merge tree, verified artifact hashes, actual Mining visual defects and fixture failures; follow-up remains draft and requires new hosted captures before reference acceptance.",
+      "reviewReason": "Recorded current-main reconciliation with exact tree verification, 21 readiness and 52 narration passes plus eight coach/speech/recovery files; preserved original failure receipts, desktop-only capture scope, pending new hosted checks and no deployment claim.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
