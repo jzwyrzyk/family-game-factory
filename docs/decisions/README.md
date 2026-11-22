@@ -33,6 +33,8 @@ These records explain durable choices without turning chat history into another 
 | [Mining gameplay and navigation](2026-11-22-mining-gameplay-and-navigation.md) | Restore running, shake/hold risk, banking and level progression with the approved art; then unify ready-to-play placement and the native play journey | Accepted for ordered implementation; phase 1 retains the wait wrapper and phase 2 remains separate | Owner's November 22, 2026 mining-game correction and explicit gameplay-first sequence |
 | [Mining and shared navigation](2026-11-22-mining-game-navigation.md) | Put Mind Your Jems in the common native player and Ready to Play shelf, preserve the originating build, and retire default Moon/Robot cards without deleting saved games | Accepted owner direction; implementation and delivery separate | Owner's November 22 mining-overhaul-first and navigation-follow-on request |
 
+| [Bubble Gum assembly](2026-11-22-bubble-gum-assembly.md) | Recognizable objects, structural gum joins, varied puzzles and extended replayable adventures in the shared player | Accepted owner direction; initial tuning awaits play review | Owner's November 22 comprehensive overhaul request |
+
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
 ## When to record a decision

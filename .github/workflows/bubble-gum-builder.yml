@@ -1,0 +1,55 @@
+name: Bubble Gum Builders play and visual review
+on:
+  pull_request:
+    paths:
+      - 'src/games/bubble-gum-*'
+      - 'src/games/sticker-builder*'
+      - 'src/runtime/**'
+      - 'src/studio/ui.ts'
+      - 'src/studio/play-view*'
+      - 'tests/bubble-gum-*'
+      - 'tests/browser-server.cjs'
+      - 'tests/studio-entry.cjs'
+      - '.github/workflows/bubble-gum-builder.yml'
+      - 'index.html'
+      - 'vite.config.ts'
+      - 'package*.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bubble-gum-builders-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gameplay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+        id: build
+      - name: Verify construction, saves and progression rules
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx --test tests/bubble-gum-rules.test.ts
+      - name: Play every blueprint and inspect fitted views
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node tests/bubble-gum-builder-browser.cjs
+        env:
+          GUM_CAPTURE_VIDEO: '1'
+      - name: Upload actual gameplay captures and observed failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bubble-gum-builders-browser-evidence
+          path: test-results/bubble-gum-builders/
+          if-no-files-found: error
+          retention-days: 14

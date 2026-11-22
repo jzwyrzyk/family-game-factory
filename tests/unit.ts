@@ -63,3 +63,5 @@ import './adult-profile-client.test';
 import './mind-your-jems.test';
 
 import './drawing-engine.test';
+
+import './bubble-gum-rules.test';

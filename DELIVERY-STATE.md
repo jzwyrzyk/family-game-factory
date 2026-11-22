@@ -1,5 +1,14 @@
 # jems delivery state
 
+## November 22, 2026 — Bubble Gum Builders assembly overhaul prepared
+
+The owner requested an overhaul after mining: recognizable objects, gum acting as real joins, more varied builds and a longer flying/swimming/dancing payoff. The isolated candidate starts at PR129 source `cc05f419985b9242ce26c2d19ed103e2abe271d1`, retaining its PR125 shared-player foundation. [The new contract](docs/bubble-gum-builders/README.md) and [decision](docs/decisions/2026-11-22-bubble-gum-assembly.md) describe twelve blueprints, thirty objects, five-to-eight parts, ten gum connectors, undo/tinkering, a 24-second adventure, replay and explicit completion. New defaults are engine 3; saved sticker/physical/older engines and storage stay separate.
+
+Initial local typecheck/production build and all 420 unit checks passed, including 18 new assembly tests with 96 recipe/choice/difficulty combinations. Local Chromium cannot launch because its socket is denied; no local browser pass is claimed. A dedicated hosted browser workflow records real play, elapsed adventure, replay, recovery and responsive captures. Final source, hosted evidence and visual review will be added before handoff.
+
+**Prepared, unmerged; Jems production unchanged.** The separate private review Site does not activate AI or publish Jems production. The owner’s coordinated chat/shell/game merge sequence remains in effect. Compatibility consumers of the native manifest need a version-3-capable source before remote edits use that new base; no worker pin or backend release is changed here.
+
+
 ## November 22, 2026 — mining catalogue and shared-player follow-on
 
 The owner requested the mining mechanics first, then a consistent way to find, enter and leave the game. The separate navigation candidate builds on PR125's fitted player at `1340d041145ffba4322ccb8262188b7cf2c7b6c4` and the gameplay overhaul published as draft [PR128](https://github.com/jzwyrzyk/family-game-factory/pull/128). Its initial gameplay integration used head `cefa0b7a040825f8a3c7b68008b3cb8eab681dec` (tree `68d9eca0314abb4b92112916c2f28e22133c8240`, identical to local `36f21f52df48766c15d115d801c2fbe946850241`); later shared source and fixture corrections are recorded below. Neither dependency's publication is a merge or deployment. [The navigation decision](docs/decisions/2026-11-22-mining-game-navigation.md) and [shared-player contract](docs/homepage/PLAY_VIEW.md) describe this follow-on's scope.

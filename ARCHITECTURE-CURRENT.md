@@ -22,6 +22,10 @@ This is a map of the **implemented source architecture**, not an assertion that 
 
 ## System boundaries
 
+### Bubble Gum assembly candidate — November 22, 2026
+
+The [assembly contract](docs/bubble-gum-builders/README.md) adds the default native `qualityVersion:3` engine: an authored connection graph, recognizable object catalog, ten gum connectors and a 24-second replayable adventure. Pure rules validate the `gum-assembly-v1` record; the registry persists it as `assemblyConstruction` alongside the intact `stickerConstruction` and `qualityConstruction` fields. Saved engine choices are not migrated. The child explicitly reports a completed build once, through the existing host learning/result lifecycle; replay is local. See [the decision](docs/decisions/2026-11-22-bubble-gum-assembly.md). No generated runtime, service configuration or worker pin changes.
+
 ### Profile, play and reading candidate — November 21, 2026
 
 The [owner-requested repair](docs/decisions/2026-11-21-profile-play-and-reading.md) is an isolated source candidate based on `b4734b1323de87dfee96bb91769cbab3cff432e6`, not a deployment receipt. `src/learning/profile-setup.ts` edits the existing per-profile grade/intensity through the store's transactional save; absent grade no longer infers from age. Both subject engines retain the selected grade ceiling. `src/studio/play-view.ts` bounds native/preview play to the viewport, preserves trusted learning, and owns fullscreen/expanded-view cleanup. The native renderers resize their actual stages.

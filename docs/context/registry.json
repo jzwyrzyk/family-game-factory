@@ -68,7 +68,9 @@
     "docs/operations/POLICY_FOUNDATION.md",
     "docs/speech/READ_ALOUD.md",
     "docs/speech/NATURAL_NARRATION.md",
-    "docs/decisions/2026-11-21-profile-play-and-reading.md"
+    "docs/decisions/2026-11-21-profile-play-and-reading.md",
+    "docs/bubble-gum-builders/README.md",
+    "docs/decisions/2026-11-22-bubble-gum-assembly.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -101,7 +103,8 @@
     "docs/drawings/*.md",
     "docs/pals/previews/*.md",
     "docs/operations/*.md",
-    "docs/speech/*.md"
+    "docs/speech/*.md",
+    "docs/bubble-gum-builders/*.md"
   ],
   "areas": [
     {
@@ -122,10 +125,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:45:05.982Z",
+      "reviewedAt": "2026-11-22T18:17:51.532Z",
       "sourceDigest": "09a760f962afc24389cbcac0c2c3077a7706dadfc7cff6c0438f5ca06767c09a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-directed mining stakes and common catalogue/player journey while preserving local-score separation, saved authored work and explicit build readiness.",
+      "reviewReason": "Recorded owner-directed real-object assembly, visible gum joins, extended payoff and saved-engine preservation in doctrine and decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -214,7 +217,8 @@
         "docs/brand/CHILD_INTERFACE.md",
         "docs/decisions/2026-11-20-learning-readability-and-narration.md",
         "docs/speech/*.md",
-        "docs/decisions/2026-11-21-profile-play-and-reading.md"
+        "docs/decisions/2026-11-21-profile-play-and-reading.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -235,10 +239,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:45:06.445Z",
-      "sourceDigest": "9fd74dd29d6ae05468617b09555de3508f8e74853b56ae5706510e4ed647b7e7",
+      "reviewedAt": "2026-11-22T18:19:09.648Z",
+      "sourceDigest": "194bea274f595f09cde7ac3c7149181aeff9b528797994303c9a837a008eca59",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the four premades and Original jems group, shared native mining entry/exit and More build handoff, outside-tool pause, Help return and retained retired-game drafts/conversations.",
+      "reviewReason": "Reviewed object framing, visible phone rejection feedback, touch pagination, focus-safe paused controls and scene vignettes; feature contract and child interface remain aligned.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -373,10 +377,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "46276557b98b0399551a4e1a57c65b7f758f45950e5d128131edce84fabd47d7",
-      "reviewedAt": "2026-11-21T05:39:47.126Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed cosmetic suppression of reward and rank popups while the creation conversation is visible. Updated rewards and joy-layer contracts: committed receipts, gems, levels and normal Play/Keep/versions celebrations remain unchanged. Final Gem Journey and delight browser checks passed.",
+      "sourceDigest": "916b2c352cea3835af1f377d4f10e181914674a26c2f9699c87877ffc72e6150",
+      "reviewedAt": "2026-11-22T18:17:52.449Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed changed rewards and maker browser fixtures: only gameplay inputs and extra-piece wording change. All existing grant amounts, exact Keep/reflection/owner assertions remain. Assembly reports one host result after explicit continuation; no earning policy change.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -404,7 +408,8 @@
         "docs/brand/GEM_FACTORY.md",
         "docs/mind-your-jems/*.md",
         "docs/archetypes/*.md",
-        "docs/homepage/PLAY_VIEW.md"
+        "docs/homepage/PLAY_VIEW.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "src/games/**",
@@ -419,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:34:10.776Z",
-      "sourceDigest": "382b71dae036f7570f4072aa4ca7306d3ec091f380f4646db0943cf7eea138bf",
+      "reviewedAt": "2026-11-22T18:19:10.293Z",
+      "sourceDigest": "330d762691583a88c73c1fb41284be11ee10c79fc803624e7871987a48f84149",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the shared standalone terminal-button specificity correction and the native scene evidence. Documented the exact manually reviewed native baselines and the verified hosted-import path without changing gameplay rules or claiming a final visual comparison pass.",
+      "reviewReason": "Reviewed final84 seam anchors against actual artwork, deterministic state and reported replay recovery; added four visual scene moments per adventure.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -612,7 +617,8 @@
         "docs/rewards/*.md",
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
-        "docs/pals/previews/*.md"
+        "docs/pals/previews/*.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "tests/**",
@@ -621,10 +627,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:34:11.066Z",
-      "sourceDigest": "465a3fa1c2801c2b182af3bc164cdbf4748cd20ce1a0e2f7c1468899d656b161",
+      "reviewedAt": "2026-11-22T18:19:10.556Z",
+      "sourceDigest": "4961ec1917cd933c914e21f2be8719b32882737aebbd3039f9b3a9d68f1829eb",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the hosted archive and original manifest, all nine imported PNG hashes and dimensions, and the reviewed normal-motion clip. Preserved the nine historical comparison failures, functional gate, CI non-update guard and unchanged 20-channel/.008 thresholds; final candidate comparison remains required.",
+      "reviewReason": "Reviewed hosted suite and shared fixtures including pagination, More pause, receipt failures and legacy saves; build and420pure checks passed, hosted checks pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -685,7 +691,8 @@
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
         "docs/operations/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -701,10 +708,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T16:34:11.595Z",
-      "sourceDigest": "f2b6e4faddd33139b0fd1188c96fb7d16db4c8c0be75eb20af2f25bbdc2687ae",
+      "reviewedAt": "2026-11-22T18:17:53.148Z",
+      "sourceDigest": "0a239fdb1a988b7ab16c0ea8a50ad60305bc0aabe8d75ebae51b3b277c7dc62e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact e314/056f source and c91940f hosted build evidence: all 13 mining configurations passed, nine old-baseline comparisons failed, reviewed captures imported, and all five full-visual jobs passed. Retained initial failures and current pending Arcade status; no local browser, merge, deployment or final comparison success is claimed.",
+      "reviewReason": "Recorded isolated PR129 foundation, local build and420unit checks, pending hosted evidence, coordinated unmerged production posture and version3 manifest consumer implications.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -783,10 +790,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:34:11.359Z",
-      "sourceDigest": "ff4353c95423d19e35c2f9819abb3dab3d519633ff53a3eedfe9c5013d5e4402",
+      "reviewedAt": "2026-11-22T18:17:53.385Z",
+      "sourceDigest": "d01e92ec461bfc11eef0e9ab70313ab50e33526455abe35e33e880a9237a835e",
       "reviewOutcome": "updated",
-      "reviewReason": "Corrected the main README entry-point catalogue summary to four ready-made games with mining beside Factory and a separate Original jems group. Reviewed the feature and delivery links; registry policy, coverage, documentation rules and release boundaries remain unchanged.",
+      "reviewReason": "Added canonical Bubble Gum feature contract and decision, index entries and required-document review routing; retained historical evidence scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

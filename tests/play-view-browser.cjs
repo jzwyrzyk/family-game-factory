@@ -76,26 +76,26 @@ async function checkGameContent(page, game, label) {
     await insideHost(page, '.gf-world', label + ' factory scene', 140);
     await insideHost(page, '.gf-sort-basket', label + ' sorting buttons', 48);
   } else if (game === 'gum') {
-    await insideHost(page, '.gum-scene', label + ' sticker scene', 150);
-    await insideHost(page, '.gum-slot', label + ' sticker destinations', 48);
-    await insideHost(page, '.gum-tray', label + ' bounded sticker tray', 100);
-    const sceneTop = await page.locator('.gum-scene').evaluate(node => node.getBoundingClientRect().top);
-    // Optional tools use their own tray. Reading/scrolling that tray must not
-    // move the invention or the outer page. Disabled GO is still discoverable.
-    for (const button of await page.locator('.gum-tray button').all()) {
+    await insideHost(page, '.gum-build-scene', label + ' assembly scene', 140);
+    await insideHost(page, '.gum-build-slot', label + ' object target', 48);
+    await insideHost(page, '.gum-build-footer button', label + ' assembly controls', 48);
+    await insideHost(page, '.gum-build-tray', label + ' bounded object tray', 100);
+    const sceneTop = await page.locator('.gum-build-scene').evaluate(node => node.getBoundingClientRect().top);
+    for (const button of await page.locator('[data-gum-part]').all()) {
       await button.scrollIntoViewIfNeeded();
-      const box = await button.boundingBox(), tray = await page.locator('.gum-tray').boundingBox();
+      const box = await button.boundingBox(), tray = await page.locator('.gum-build-tray').boundingBox();
       assert.ok(box && tray && box.width >= 48 && box.height >= 48 && box.x >= tray.x - 1 && box.x + box.width <= tray.x + tray.width + 1 &&
         box.y >= tray.y - 1 && box.y + box.height <= tray.y + tray.height + 1,
-        label + ': each sticker and GO is reachable inside its tray');
-      if (await button.evaluate(node => node.classList.contains('gum-sticker'))) assert.equal(await button.evaluate(node => {
-        const text = node.querySelector('span');
+        label + ': each object choice is reachable inside its tray');
+      assert.equal(await button.evaluate(node => {
+        const text = node.querySelector('.gum-build-piece-name');
         return parseFloat(getComputedStyle(text).fontSize) >= 18 && node.scrollWidth <= node.clientWidth + 1;
-      }), true, label + ': sticker names remain readable without overlapping neighboring stickers');
-      assert.equal(await page.locator('.gum-scene').evaluate(node => node.getBoundingClientRect().top), sceneTop,
+      }), true, label + ': object names remain readable without overlapping choices');
+      assert.equal(await page.locator('.gum-build-scene').evaluate(node => node.getBoundingClientRect().top), sceneTop,
         label + ': tray scrolling keeps the invention still');
     }
-    await page.locator('.gum-tray').evaluate(node => { node.scrollTop = 0; });
+    await page.locator('.gum-build-choices').evaluate(node => { node.scrollTop = 0; });
+    await page.locator('.gum-build-tray').evaluate(node => { node.scrollTop = 0; });
   } else if (game === 'hill') {
     await insideHost(page, '.quality-hill canvas.q-canvas', label + ' rendered driving canvas', 140);
     await insideHost(page, '.quality-hill .q-pedal', label + ' driving pedals', 48);

@@ -1,4 +1,5 @@
 const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
+const {buildAndRide}=require('./bubble-gum-fixture.cjs');
 /* Production-browser checks for the earned, owner-scoped illustrated journey.
  * Notebook fixtures below use the production schema/API; they are isolated test
  * data, never demo progress in the application. The final milestone is exercised
@@ -21,9 +22,9 @@ function memoryNotebook(initial){
 function polishedFixture(notebook,owner,label){
  const session=notebook.create(owner,'gum',label,'fixture-project-'+crypto.randomUUID());
  const baseId='fixture-base-'+crypto.randomUUID(),testId='fixture-test-'+crypto.randomUUID();
- const candidate={id:testId,baseId,config:{...defaults('gum'),extraDecoys:2},prompt:'Give me 2 extra stickers',summary:'Two extra sticker choices'};
+ const candidate={id:testId,baseId,config:{...defaults('gum'),extraDecoys:2},prompt:'Give me 2 extra silly pieces',summary:'Two extra object choices'};
  notebook.saveExperiment(session.id,owner,candidate);
- notebook.observe(session.id,owner,'I tried the extra stickers and liked the new choices.','child',testId);
+ notebook.observe(session.id,owner,'I tried the extra pieces and liked the new choices.','child',testId);
  notebook.keepExperiment(session.id,owner,testId,{revisionId:testId,baseId,kind:'local'});
  return notebook.get(session.id,owner);
 }
@@ -324,7 +325,7 @@ function visualFixture(){
    await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];if(!FG.store.save())throw Error('Pacing fixture failed');});
    const learning=await page.evaluate(()=>JSON.stringify(FG.store.current().skills));
    await page.click('[data-starter="gum"]');
-   await page.click('#studioChange');await page.fill('#studioPrompt','Give me 2 extra stickers');await page.click('#studioSend');
+   await page.click('#studioChange');await page.fill('#studioPrompt','Give me 2 extra silly pieces');await page.click('#studioSend');
    await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.game==='gum'&&session.candidate));
    let session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'rough');
@@ -339,11 +340,10 @@ function visualFixture(){
    assert.equal((await notebook(page)).sessions.find(saved=>saved.id===session.id).candidate.id,testId);
    await more(page);await page.click('#studioCompare');
    await page.getByRole('button',{name:'Play preview',exact:true}).click();
-   for(let index=0;index<3;index++){await page.locator('.gum-sticker').nth(index).click();await page.locator('.gum-slot').nth(index).click();}
-   await page.click('.gum-launch');
+   await buildAndRide(page);
    await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.reflection));
    await page.click('#studioChange');await page.click('#studioReflectAnswer');
-   await page.fill('#studioPrompt','The extra sticker choices made my rocket more colorful.');await page.click('#studioSend');
+   await page.fill('#studioPrompt','The extra pieces made me look more carefully before joining my rocket.');await page.click('#studioSend');
    session=(await notebook(page)).sessions.find(session=>session.game==='gum');
    assert.equal(gemStage(session),'cut');
    assert.equal(session.design.observations.filter(observation=>observation.source==='child'&&observation.experimentId===testId).length,1);

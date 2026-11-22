@@ -1,0 +1,172 @@
+/* Every object and joint stays in the same fitted coordinate system. Text and
+   controls retain their CSS size; the stage never scales the child's controls. */
+.gum-builder {
+  --gum-ink: #293058; --gum-purple: #7253ba; --gum-berry: #e45e99;
+  box-sizing: border-box; position: relative; isolation: isolate;
+  height: min(760px, 78dvh); min-height: 480px; width: 100%; overflow: hidden;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--gum-ink); background: #fffaf5; border: 2px solid #d8c9ed;
+  border-radius: 24px; font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
+  box-shadow: 0 15px 36px #48316918; font-size: 18px;
+}
+.gum-builder *, .gum-build-ghost * { box-sizing: border-box; }
+.gum-builder button {
+  font: inherit; font-weight: 650; font-size: 18px; line-height: 1.15;
+  color: #35305c; background: #fff; border: 2px solid #ded2ee; border-radius: 16px;
+  min-width: 48px; min-height: 48px; cursor: pointer; touch-action: manipulation;
+  padding: 9px 13px; transition: background .15s, box-shadow .15s;
+}
+.gum-builder button:enabled:hover { background: #fff2cd; border-color: #be91c9; }
+.gum-builder button:focus-visible { outline: 4px solid #39368f; outline-offset: 2px; }
+.gum-builder button:disabled { color: #66647a; background: #eae5ee; border-color: #d8d2df; cursor: default; }
+.gum-builder h2, .gum-builder h3, .gum-builder p { color: var(--gum-ink); margin: 0; }
+.gum-build-heading { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: linear-gradient(110deg,#fff5dc,#f2e9ff); border-bottom: 2px solid #e4d6ed; }
+.gum-build-heading h2 { font-size: clamp(22px,2.3vw,30px); line-height: 1.15; font-weight: 650; }
+.gum-build-number { flex: none; font-size: 18px; padding: 6px 12px; background: #fffdf6; border: 1px solid #dfd4e6; border-radius: 50px; }
+.gum-build-main { min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) minmax(260px,31%); }
+.gum-build-scene { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: linear-gradient(145deg,#bee9fc,#e0daff 65%,#ffedcc); }
+.gum-builder[data-world=sea] .gum-build-scene { background: linear-gradient(#b9edfa,#9cd4ed 55%,#a9bedf); }
+.gum-builder[data-world=road] .gum-build-scene { background: linear-gradient(#c9edfe,#e9f2de 65%,#e0d3ed); }
+.gum-builder[data-world=stage] .gum-build-scene { background: linear-gradient(#e2cefa,#f9d2e0 70%,#e4c3e0); }
+.gum-build-decor { position: absolute; inset: 0; pointer-events: none; opacity: .9; }
+.gum-build-decor > svg { width: 100%; height: 100%; object-fit: cover; }
+.gum-build-moment { position: absolute; inset: 0; pointer-events: none; }
+.gum-build-moment > svg { width: 100%; height: 100%; }
+.gum-moment-float { animation: gumMoment 3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.gum-moment-float:nth-child(2n) { animation-delay: -.8s; }
+.gum-build-canvas { position: absolute; left: 50%; top: calc(50% - 14px); translate: -50% -50%; }
+.gum-build-motion { position: absolute; inset: 0; transform-origin: 50% 55%; }
+.gum-build-machine { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 9px 3px #5e54882b); }
+.gum-blueprint-outline { opacity: .18; filter: grayscale(1) brightness(1.4); }
+.gum-built-object { filter: drop-shadow(0 3px 1px #58487624); }
+.gum-built-object.loose { opacity: .85; }
+.gum-builder .gum-build-slot, .gum-builder .gum-build-joint, .gum-builder .gum-build-change-part {
+  position: absolute; translate: -50% -50%; z-index: 3; width: 60px; height: 60px;
+  padding: 0; display: grid; place-items: center; border-radius: 50%;
+  border: 3px dashed #8362b9; background: #fff8dce6; box-shadow: 0 0 0 7px #ffffff5c, 0 5px 12px #5c477e2e;
+  font-size: 35px; color: #614296;
+}
+.gum-builder .gum-build-slot.selected { background: #fff1ac; border-color: #a96916; box-shadow: 0 0 0 8px #ffeebc85; }
+.gum-builder .gum-build-joint { border: 3px dashed #a14476; background: #fff3f8ed; animation: gumJoinPulse 1.5s ease-in-out infinite; }
+.gum-build-joint svg { width: 50px; height: 50px; pointer-events: none; }
+.gum-builder .gum-build-change-part { width: 48px; height: 48px; border-style: solid; font-size: 26px; background: #fff9edee; }
+.gum-build-scene-caption { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; justify-content: center; pointer-events: none; }
+.gum-build-scene-caption span { background: #fffaf2f2; color: #443658; border: 1px solid #fff; border-radius: 20px; padding: 5px 15px; font-size: 18px; line-height: 1.2; text-align: center; max-width: 100%; box-shadow: 0 2px 8px #5e4c6910; }
+.gum-build-tray { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; padding: 18px; background: #fffdf8; border-left: 2px solid #e6d9ec; overflow-y: auto; overscroll-behavior: contain; }
+.gum-build-instruction { font-size: 22px; line-height: 1.15; font-weight: 600; }
+.gum-build-choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; align-content: start; }
+.gum-builder .gum-build-piece { min-width: 0; padding: 7px 4px 9px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; min-height: 116px; touch-action: none; background: linear-gradient(#fff,#faf1ff); }
+.gum-build-piece-art { display: block; width: 82px; max-width: 100%; height: 76px; pointer-events: none; }
+.gum-build-piece-art svg { width: 100%; height: 100%; }
+.gum-build-piece-name { font-size: 18px; line-height: 1.15; max-width: 100%; overflow-wrap: anywhere; pointer-events: none; }
+.gum-builder .gum-build-piece[hidden] { display: none; }
+.gum-builder .gum-build-more-pieces { align-self: flex-end; font-size: 18px; padding: 6px 10px; min-height: 48px; }
+.gum-builder .gum-build-piece[aria-pressed=true] { background: #fff0bd; border-color: #b17d2f; box-shadow: inset 0 0 0 1px #b17d2f; }
+.gum-builder .gum-build-piece.matching { border-color: #339a82; box-shadow: inset 0 0 0 1px #339a82; }
+.gum-build-gums { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; }
+.gum-builder .gum-build-gum { min-width: 48px; padding: 0; aspect-ratio: 1; }
+.gum-build-gum svg { width: 100%; height: 100%; pointer-events: none; }
+.gum-builder .gum-build-gum[aria-pressed=true] { border-color: #77549f; background: #f0e5ff; box-shadow: inset 0 0 0 1px #77549f; }
+.gum-build-hint { font-size: 20px; line-height: 1.25; }
+.gum-build-status { display: flex; justify-content: space-between; gap: 8px; padding-top: 12px; margin-top: auto; border-top: 1px solid #e7deeb; font-size: 18px; line-height: 1.2; }
+.gum-build-gum-count { color: #76406e; font-weight: 600; white-space: nowrap; }
+.gum-build-live { font-size: 18px; line-height: 1.2; }
+.gum-build-live:empty { display: none; }
+.gum-build-footer { padding: 10px 14px; display: flex; gap: 9px; align-items: center; justify-content: flex-end; background: #f8effb; border-top: 2px solid #e2d3ed; }
+.gum-builder .gum-build-launch, .gum-builder .gum-build-next, .gum-builder .gum-build-action, .gum-builder .gum-build-replay {
+  background: linear-gradient(120deg,#7658c8,#a04fa4); border-color: #7451ae; color: #fff;
+  font-size: 20px; font-weight: 650; box-shadow: 0 3px 0 #5b3d90; min-height: 52px;
+}
+.gum-builder .gum-build-launch:disabled { background: #e6dfee; border-color: #cfc2dc; color: #65586f; box-shadow: none; }
+.gum-builder .gum-build-launch:enabled:hover, .gum-builder .gum-build-next:hover, .gum-builder .gum-build-action:hover, .gum-builder .gum-build-replay:hover { background: #7751ac; color: #fff; }
+.gum-build-launch { flex: 1; max-width: 300px; }
+.gum-build-next { width: min(100%,320px); }
+.gum-build-footer:has(.gum-build-next) { justify-content: center; }
+.gum-build-adventure-badge, .gum-build-ready-art { width: 130px; height: 130px; align-self: center; }
+.gum-build-adventure-badge svg, .gum-build-ready-art svg { width: 100%; height: 100%; }
+.gum-build-ride-note { font-size: 18px; width: 100%; text-align: center; padding: 8px 0; }
+.gum-build-effects { position: absolute; inset: 15% 12% auto; color: #fff4a3; text-shadow: 0 2px #9e5da1; font-size: 40px; text-align: center; pointer-events: none; opacity: 0; }
+.gum-builder.boosting .gum-build-effects { opacity: 1; }
+.gum-build-effects[data-burst='0'] { transform: rotate(8deg); }
+.gum-build-effects[data-burst='1'] { transform: rotate(-8deg); }
+.gum-build-progress { position: absolute; height: 6px; bottom: 0; left: 0; right: 0; background: #ffffff70; }
+.gum-build-progress i { display: block; height: 100%; background: #7958ba; transform: scaleX(var(--gum-journey,0)); transform-origin: left; }
+.gum-builder[data-phase=adventure] .gum-build-decor { animation: gumScenery 12s ease-in-out infinite alternate; }
+.gum-builder[data-phase=test] .gum-build-motion { animation: gumWiggle 1.2s ease-in-out; }
+.gum-builder[data-phase=test] .gum-built-object.loose > g { animation: gumLoose .4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.gum-builder[data-phase=showcase] .gum-build-motion { animation: gumProud 4s ease-in-out infinite; }
+.gum-builder[data-phase=showcase] .gum-build-scene-caption span { background: #fff1af; color: #4f3e63; }
+.gum-builder.paused *, .gum-builder.paused *::before, .gum-builder.paused *::after { animation-play-state: paused !important; }
+.gum-build-pause { position: absolute; z-index: 12; inset: 0; background: #f4edfae8; backdrop-filter: blur(3px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 20px; text-align: center; }
+.gum-build-pause h3 { font-size: 24px; }
+.gum-build-pause button { padding: 14px 24px; }
+.gum-build-warning { position: absolute; z-index: 15; left: 12px; right: 12px; bottom: 80px; background: #fff2d2; color: #614122; border: 2px solid #b88c43; border-radius: 16px; padding: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.gum-build-warning p { color: #614122; font-size: 18px; flex: 1 1 220px; }
+.gum-build-ghost { width: 90px; height: 90px; position: fixed; translate: -50% -50%; pointer-events: none; z-index: 10000; filter: drop-shadow(0 8px 5px #584c6770); }
+.gum-build-ghost svg { width: 100%; height: 100%; }
+body.studio-review .studio-play-mode .gum-builder { min-height: 0; height: 100%; max-height: 100%; border-radius: 18px; }
+@keyframes gumJoinPulse { 50% { box-shadow: 0 0 0 10px #ffcde270, 0 5px 12px #5c477e2e; } }
+@keyframes gumWiggle { 0%,100% { transform: rotate(0); } 22%,65% { transform: rotate(-4deg); } 43%,82% { transform: rotate(4deg); } }
+@keyframes gumLoose { 50% { transform: translateY(8px) rotate(7deg); } }
+@keyframes gumProud { 50% { transform: translateY(-2%); } }
+@keyframes gumScenery { to { transform: scale(1.08) translateX(-2%); } }
+@keyframes gumMoment { to { transform: translate(8px,-12px) rotate(3deg); } }
+@media (max-width: 760px) and (min-height: 601px) {
+  .gum-build-heading { padding: 8px 12px; }
+  .gum-build-heading h2 { font-size: 22px; }
+  .gum-build-number { padding: 4px 9px; }
+  .gum-build-main { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(155px,1fr) minmax(145px,auto); }
+  .gum-build-tray { border-left: 0; border-top: 2px solid #e6d9ec; padding: 10px 12px; gap: 8px; max-height: 255px; }
+  .gum-build-instruction { font-size: 20px; }
+  .gum-build-tray:has(.gum-build-more-pieces) { display: grid; grid-template-columns: minmax(0,1fr) auto; }
+  .gum-build-tray:has(.gum-build-more-pieces) .gum-build-choices, .gum-build-tray:has(.gum-build-more-pieces) .gum-build-status { grid-column: 1/-1; }
+  .gum-build-choices { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; max-height: 130px; overflow-y: auto; overscroll-behavior: contain; }
+  .gum-builder .gum-build-piece { min-height: 100px; padding: 4px 3px 6px; }
+  .gum-build-piece-art { width: 64px; height: 57px; }
+  .gum-build-status { margin-top: 0; padding-top: 5px; }
+  .gum-build-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+  .gum-build-gums { max-width: 270px; align-self: center; width: 100%; }
+  .gum-builder .gum-build-gum { max-height: 55px; }
+  .gum-build-footer { padding: 8px; gap: 6px; }
+  .gum-builder .gum-build-footer button { padding: 8px 9px; min-height: 48px; }
+  .gum-builder .gum-build-launch { font-size: 18px; }
+  .gum-build-adventure-badge, .gum-build-ready-art { display: none; }
+  .gum-build-hint { font-size: 20px; }
+  .gum-builder[data-phase=adventure] .gum-build-tray { display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+  .gum-builder[data-phase=adventure] .gum-build-instruction { grid-column: 1/-1; }
+  .gum-builder[data-phase=adventure] .gum-build-hint { display: none; }
+  .gum-builder[data-phase=adventure] .gum-build-status { grid-column: 1/-1; }
+  .gum-builder[data-phase=showcase] .gum-build-tray { display: grid; grid-template-columns: 1fr 1fr; }
+  .gum-builder[data-phase=showcase] .gum-build-instruction, .gum-builder[data-phase=showcase] .gum-build-status { grid-column: 1/-1; }
+}
+@media (max-width: 360px) and (min-height: 601px) {
+  .gum-build-heading { padding: 7px 8px; }
+  .gum-build-heading h2 { font-size: 22px; }
+  .gum-build-number { padding: 3px 5px; }
+  .gum-build-tray { padding: 8px; max-height: 215px; }
+  .gum-build-choices { max-height: 104px; gap: 5px; }
+  .gum-build-piece-art { width: 52px; height: 48px; }
+  .gum-builder .gum-build-piece { min-height: 94px; }
+  .gum-build-footer { gap: 4px; padding: 6px; }
+  .gum-builder .gum-build-footer button { padding: 6px; }
+  .gum-build-scene-caption { bottom: 7px; left: 5px; right: 5px; }
+  .gum-build-scene-caption span { padding: 4px 9px; }
+}
+@media (max-height: 600px) {
+  .gum-builder { min-height: 300px; }
+  .gum-build-heading { padding: 6px 10px; }
+  .gum-build-heading h2 { font-size: 22px; }
+  .gum-build-main { grid-template-columns: minmax(0,1fr) minmax(230px,36%); }
+  .gum-build-tray { padding: 8px 10px; gap: 8px; }
+  .gum-build-instruction { font-size: 20px; }
+  .gum-build-choices { gap: 6px; }
+  .gum-builder .gum-build-piece { min-height: 98px; padding: 4px; }
+  .gum-build-piece-art { width: 58px; height: 52px; }
+  .gum-build-adventure-badge, .gum-build-ready-art { display: none; }
+  .gum-build-status { padding-top: 6px; }
+  .gum-build-footer { padding: 6px 10px; }
+  .gum-build-live { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gum-builder *, .gum-builder *::before, .gum-builder *::after { animation: none !important; transition: none !important; }
+}

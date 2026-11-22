@@ -1,4 +1,5 @@
 const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {buildAndRide}=require('./bubble-gum-fixture.cjs');
 /* Production app reward journey. Grants come only from ordinary host UI actions.
  * FG.rewards is inspected/refreshed, never given invented grants. Adult endpoints
  * are explicit local auth fixtures; this test invokes no paid provider. */
@@ -238,14 +239,13 @@ async function installAuthFixture(context) {
     // Real local game development: intent, an actual test, linked reflection and explicit Keep.
     await page.evaluate(() => { FG.store.changeProfile({ rate: 1 }); FG.store.current().mathWindow = [Date.now()]; if (!FG.store.save()) throw Error('Test pacing fixture did not save'); });
     await page.click('[data-starter="gum"]'); await page.click('#studioChange');
-    await page.fill('#studioPrompt', 'Give me 2 extra stickers'); await page.click('#studioSend');
+    await page.fill('#studioPrompt', 'Give me 2 extra silly pieces'); await page.click('#studioSend');
     await page.waitForFunction(() => FG.studio.exportNotebook().sessions.some(session => session.game === 'gum' && session.candidate));
     await expectTotal(page, 37);
-    for (let index = 0; index < 3; index++) { await page.locator('.gum-sticker').nth(index).click(); await page.locator('.gum-slot').nth(index).click(); }
-    await page.click('.gum-launch');
+    await buildAndRide(page);
     await page.waitForFunction(() => FG.studio.exportNotebook().sessions.some(session => session.reflection));
     await page.click('#studioChange'); await page.click('#studioReflectAnswer');
-    await page.fill('#studioPrompt', 'The extra sticker choices made my rocket more colorful.'); await page.click('#studioSend');
+    await page.fill('#studioPrompt', 'The extra pieces made me look more carefully before joining my rocket.'); await page.click('#studioSend');
     await expectTotal(page, 47);
     await page.click('#studioKeep'); await expectTotal(page, 92);
     assert.equal((await summary(page)).counts.making, 1, 'A developed project is counted once');
