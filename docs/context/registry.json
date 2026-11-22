@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:11.591Z",
-      "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
+      "reviewedAt": "2026-11-22T15:17:17.850Z",
+      "sourceDigest": "1ce60f75da46dd247fec38c348b43cf4a1df93b18ff13c1c89ed516cad3d6c13",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+      "reviewReason": "Reviewed the mining engine and controller diff: movement/contact replaces click collection, physical deposits preserve saved value, sustained hold/spill/fall/retry and bounded bucket levels are now specified; feature contract and accepted decision preserve unchanged artwork and phase-one wrapper scope.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T19:43:59.746Z",
-      "sourceDigest": "5fd2ff6f7a8fb7ca4e6df5ed7089cfac005ea70cf53dee915547c8aedbea0810",
+      "reviewedAt": "2026-11-22T15:17:18.147Z",
+      "sourceDigest": "ecee10d61c82ffb8cbf489db69731426a56eec89674a2ff3781d81716227263f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the observed exact-tree tablet Add Bottle failure and strengthened the one-real-tap test with a bounded trusted-activation receipt, unchanged blueprint/capability assertions and bounded failure evidence; local harness/review are distinct from pending Chromium CI and the unproved historical cause.",
+      "reviewReason": "Reviewed 14 deterministic mechanics contracts and rewritten 13-configuration browser fixtures: real sustained input, banking/accounting, hold release, falls, progression, focus, pause, recovery and owner lifecycle remain explicit. Visual mismatches now defer failure only until all captures; tolerance and approval boundary remain unchanged. No local browser pass is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T19:44:00.253Z",
-      "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+      "reviewedAt": "2026-11-22T15:17:18.459Z",
+      "sourceDigest": "d5c959af1feb19e84b4600d4163583713863457e96900ae9b259a17bd08f2d59",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified.",
+      "reviewReason": "Architecture and delivery now separate the mountable mining controller from the existing build-wait wrapper and pending PR125 navigation follow-on. Records actual local compilation and 395 unit passes, unchanged assets, socket-blocked local browser, and pending hosted visual acceptance without asserting merge/deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

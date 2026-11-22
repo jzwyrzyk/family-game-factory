@@ -18,7 +18,7 @@ exports.createJourney=async (browser,base,device,recordVideo=false)=>{
   else assetFailures.push(response.url());
  });
  await page.addInitScript(()=>{
-  // Stable random sequence for timings only; unique IDs still use crypto.
+  // Stable scene seed and timing inputs; unique project IDs still use crypto.
   let value=87431;
   Math.random=()=>{value=(value*48271)%2147483647;return value/2147483647;};
  });
@@ -130,8 +130,101 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  }
  if(device.artFailure)await arcade.locator('[data-myj="retry-art"]').waitFor({state:'visible'});
  else await inspectArtwork();
- return {context,page,arcade,launch,project,bodyOverflow,errors,assetFailures,expectedAssetFailures,counters,state,assets,inspectArtwork,
-  async advance(milliseconds){if(recordVideo)await page.waitForTimeout(milliseconds);else await page.clock.fastForward(milliseconds);},
+ const touches=new Map(),keyInputs=new Set();
+ const touchSession=device.touch?await context.newCDPSession(page):null;
+ const inputKeys={left:'ArrowLeft',right:'ArrowRight',grab:'Space'};
+ const touchIds={left:1,right:2,grab:3};
+ async function touchPoints(){return [...touches.values()];}
+ const journey={context,page,arcade,launch,project,bodyOverflow,errors,assetFailures,expectedAssetFailures,counters,state,assets,inspectArtwork,recordVideo,
+  async snapshot(){return arcade.evaluate(element=>({
+   phase:element.dataset.phase,x:Number(element.dataset.playerX),level:Number(element.dataset.level),
+   phaseMs:Number(element.dataset.phaseMs),holding:element.dataset.holding==='true',safe:element.dataset.safe==='true',
+   banked:Number(element.querySelector('[data-myj="banked"]').textContent),
+   loose:Number(element.querySelector('[data-myj="loose"]').textContent),
+   gems:[...element.querySelectorAll('[data-crystal]')].map(gem=>({id:gem.dataset.crystal,x:Number(gem.dataset.x)}))
+  }));},
+  async input(action,pressed,mode=device.touch?'touch':'keyboard'){
+   if(mode==='keyboard'){
+    const key=inputKeys[action];
+    if(pressed&&!keyInputs.has(key)){await page.keyboard.down(key);keyInputs.add(key);}
+    else if(!pressed&&keyInputs.has(key)){await page.keyboard.up(key);keyInputs.delete(key);}
+    return;
+   }
+   assert.ok(touchSession,'touch input needs a touch-enabled fixture');
+   if(pressed&&!touches.has(action)){
+    const target=arcade.locator('[data-myj="'+action+'"]');
+    await target.waitFor({state:'visible'});
+    assert.equal(await target.isEnabled(),true,'held control is enabled: '+action);
+    const point=await target.evaluate(element=>{
+     const box=element.getBoundingClientRect(),x=box.x+box.width/2,y=box.y+box.height/2,hit=document.elementFromPoint(x,y);
+     return {x,y,reachable:hit===element||element.contains(hit)};
+    });
+    assert.ok(point.reachable,'native touch reaches '+action);
+    touches.set(action,{id:touchIds[action],x:point.x,y:point.y,radiusX:4,radiusY:4,force:1});
+    await touchSession.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:await touchPoints()});
+   }else if(!pressed&&touches.has(action)){
+    touches.delete(action);
+    await touchSession.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:await touchPoints()});
+   }
+  },
+  async releaseInputs(){
+   if(touches.size){touches.clear();await touchSession.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});}
+   for(const key of keyInputs)await page.keyboard.up(key);
+   keyInputs.clear();
+  },
+  async walkTo(target,{mode=device.touch?'touch':'keyboard'}={}){
+   const start=await this.snapshot(),direction=target<start.x?'left':'right';
+   if(Math.abs(start.x-target)<1)return;
+   await this.input(direction,true,mode);
+   try{
+    await this.until(async()=>{
+     const current=await this.snapshot();
+     assert.ok(!['falling','retry'].includes(current.phase),'walking cannot silently recover a fall: '+JSON.stringify(current));
+     return (current.phase==='level-complete'&&direction==='right'&&target>=94)||
+      (direction==='left'?current.x<=target:current.x>=target);
+    },'miner reaches '+target,{step:32,limit:6500});
+   }finally{await this.input(direction,false,mode);}
+   await this.advance(32);
+  },
+  async freshCalm(){
+   const current=await this.snapshot();
+   assert.ok(current.safe,'wait for a fresh calm period only from the platform');
+   if(current.phase==='mining'&&current.phaseMs>=6500)return;
+   await this.until(async()=>{const next=await this.snapshot();return next.phase==='mining'&&next.phaseMs>=6500;},'a fresh calm period on the safe platform',{step:100,limit:20000});
+  },
+  async collect(minimum=1){
+   // Ordinary inputs only. Stay in the reachable right-hand half so even a
+   // warning permits a real run back to the platform; do not teleport or bank.
+   assert.ok(minimum>=1&&minimum<=8);
+   const initial=await this.snapshot();
+   if(initial.safe)await this.until(async()=>{
+    const current=await this.snapshot();
+    return current.phase==='mining'&&current.phaseMs>=6500&&current.gems.some(gem=>gem.x>=42&&gem.x<=76);
+   },'a reachable jem appears with time for a real round trip',{step:100,limit:60000});
+   await this.input('left',true);
+   try{
+    await this.until(async()=>{
+     const current=await this.snapshot();
+     assert.ok(!['falling','retry'].includes(current.phase),'collection never substitutes a state reset');
+     return current.loose>=minimum||current.x<=38||current.phase==='warning';
+    },'walk reaches a jem or the safe return point',{step:32,limit:6000});
+   }finally{await this.input('left',false);}
+   await this.advance(32);
+   return (await this.snapshot()).loose;
+  },
+  async collectAndBank(){
+   if((await this.snapshot()).phase==='level-complete')return 0;
+   await this.walkTo(96);await this.freshCalm();
+   const before=await this.score('banked');
+   await this.collect(8);
+   const carried=await this.score('loose');
+   assert.ok(carried>0,'a mining trip must physically collect a jem');
+   await this.walkTo(96);
+   assert.equal(await this.score('loose'),0,'reaching the bucket deposits the carried jems');
+   assert.equal(await this.score('banked'),before+carried,'every carried jem reaches the bucket once');
+   return carried;
+  },
+  async advance(milliseconds){if(recordVideo)await page.waitForTimeout(milliseconds);else await page.clock.runFor(milliseconds);},
   async until(predicate,message,{step=100,limit=20000}={}){
    for(let elapsed=0;elapsed<=limit;elapsed+=step){if(await predicate())return;await this.advance(step);}
    throw new Error(message);
@@ -155,6 +248,7 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
   },
   async score(kind){return Number(await arcade.locator('[data-myj="'+kind+'"]').innerText());},
   async finish(){
+   await this.releaseInputs();
    assert.deepEqual(assetFailures,[],'all illustrated assets returned successfully');
    if(device.artFailure){
     assert.ok(counters.blockedArt>0&&expectedAssetFailures.length>0,'artwork failure was actually delivered');
@@ -166,4 +260,5 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    await context.close();
   }
  };
+ return journey;
 };

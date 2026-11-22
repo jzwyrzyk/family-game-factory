@@ -44,6 +44,7 @@ exports.createReview=async browser=>{
  if(update)assert.ok(!process.env.CI,'CI cannot silently approve new visual baselines.');
  const baselineCandidates=new Map();
  let comparisonCount=0;
+ const visualFailures=[];
  return {
   manifest,directory,
   async capture(page,arcade,device,state){
@@ -61,18 +62,27 @@ exports.createReview=async browser=>{
    const baseline=path.join(baselineDirectory,file);
    if(update){baselineCandidates.set(file,bytes);return;}
    if(!compare)return;
-   assert.ok(fs.existsSync(baseline),'Missing reviewed visual baseline '+file+'. Review actual art and explicitly run MYJ_UPDATE_BASELINES=1.');
+   if(!fs.existsSync(baseline)){
+    visualFailures.push('Missing reviewed visual baseline '+file+'. Review actual art and explicitly run MYJ_UPDATE_BASELINES=1.');
+    return;
+   }
    const result=await compareImages(comparisonPage,bytes,fs.readFileSync(baseline));
    comparisonCount++;
    const {diff,...metrics}=result;manifest.checks.push({device,state,kind:'visual-regression',...metrics});
    if(!result.dimensions||result.ratio>0.008){
     if(diff)fs.writeFileSync(path.join(directory,file.replace('.png','-diff.png')),Buffer.from(diff.split(',')[1],'base64'));
     fs.copyFileSync(baseline,path.join(directory,file.replace('.png','-expected.png')));
-    throw new Error('Visual regression '+file+': '+JSON.stringify(metrics));
+    // Keep collecting actual gameplay and all nine states, then fail the same
+    // visual gate. A changed first frame must not hide later loss or input bugs.
+    visualFailures.push('Visual regression '+file+': '+JSON.stringify(metrics));
    }
   },
   check(device,kind,details){manifest.checks.push({device,kind,...details});},
   async finish(){
+   const gameplayFailed=manifest.errors.length>0;
+   if(compare&&process.env.MYJ_DEVICES===undefined&&!gameplayFailed&&comparisonCount!==9)
+    visualFailures.push('Expected all nine approved views; compared '+comparisonCount+'.');
+   manifest.errors.push(...visualFailures);
    fs.writeFileSync(path.join(directory,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
    await comparisonPage.close();
    if(update&&!manifest.errors.length){
@@ -84,7 +94,7 @@ exports.createReview=async browser=>{
      states:[...baselineStates],devices:[...baselineDevices],channelTolerance:20,maximumChangedRatio:0.008
     },null,2)+'\n');
    }
-   if(compare&&process.env.MYJ_DEVICES===undefined&&!manifest.errors.length)assert.equal(comparisonCount,9,'all nine approved views must be compared');
+   if(visualFailures.length&&!gameplayFailed)throw new AggregateError(visualFailures.map(message=>new Error(message)),'Mind Your Jems visual acceptance failed; all available captures are retained.');
   }
  };
 };
