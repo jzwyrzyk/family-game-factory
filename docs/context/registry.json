@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T15:14:06.857Z",
-      "sourceDigest": "dbf3ffe2ba970e4bb9ee643b52c65ff27536c382ed4d509147ef5dd6c13660cf",
+      "reviewedAt": "2026-11-22T15:50:53.805Z",
+      "sourceDigest": "68546fa89eb91c376a3ac872d8300924ee73b2b90e978d81fe4a70c5930dc14d",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded this isolated browser-only Factory candidate on b4734b1, local verification scope, blocked local Chromium launch, pending hosted captures and PR125 integration overlap without claiming merge or deployment.",
+      "reviewReason": "Verified all nine PR workflows on d82174e, including all four Arcade jobs, and confirmed the PR merge checkout has the same tree. Recorded the exact visual artifact, inspected states and initial failures. This final receipt changes documentation only and does not claim merge or deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
