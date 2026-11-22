@@ -28,7 +28,7 @@ const manifest = { schema: 'bubble-gum-browser-review-v1', startedAt: new Date()
   sources: Object.fromEntries(['src/games/bubble-gum-builder.ts', 'src/games/bubble-gum-builder.css',
     'src/games/bubble-gum-rules.ts', 'src/games/bubble-gum-art.ts', 'tests/bubble-gum-builder-browser.cjs']
     .map(file => [file, fs.existsSync(file) ? hash(fs.readFileSync(file)) : null])),
-  cases: [], captures: [], videos: [], contrast: [], failures: [] };
+  cases: [], captures: [], videos: [], contrast: [], touchReceipts: [], failures: [] };
 const saveManifest = () => fs.writeFileSync(path.join(output, 'review.json'), JSON.stringify(manifest, null, 2) + '\n');
 saveManifest();
 
@@ -90,11 +90,16 @@ async function dragPart(journey, object, slot) {
           y: start.y + (end.y - start.y) * fraction, id: 1 }] });
       await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     } finally { await session.detach(); }
+    // The touch controller commits on the next frame after touchend, keeping
+    // the captured source alive until the browser completes that gesture.
+    // Flush one frame when this journey owns the clock; never repeat input.
+    if (journey.clock) await journey.page.clock.runFor(32);
   } else {
     await journey.page.mouse.move(start.x, start.y); await journey.page.mouse.down();
     await journey.page.mouse.move(end.x, end.y, { steps: 10 }); await journey.page.mouse.up();
   }
   await waitPlaced(journey.page, slot, object);
+  if (journey.touch) journey.pendingTouchDrag = { part: object, slot };
 }
 
 async function nextConstructionAction(journey, input) {
@@ -114,6 +119,12 @@ async function nextConstructionAction(journey, input) {
     const after = await snapshot(journey.page);
     assert.equal(after.gumLeft, before.gumLeft - 1, 'a real seam consumes one gum connector');
     assert.deepEqual(after.placed, before.placed, 'joining leaves the chosen objects intact');
+    if (journey.pendingTouchDrag) {
+      manifest.touchReceipts.push({ case: journey.name, drag: journey.pendingTouchDrag,
+        joint: before.activeJoint, gumBefore: before.gumLeft, gumAfter: after.gumLeft,
+        events: await journey.page.evaluate(() => (window.__gumInputReceipts || []).slice(-12)) });
+      journey.pendingTouchDrag = null;
+    }
     return 'bond';
   }
   assert.ok(before.activeSlot, 'an unfinished blueprint provides the next object target');

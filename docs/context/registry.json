@@ -424,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:37:14.065Z",
-      "sourceDigest": "95a59e70d68fc2ec783de93ad03c2d6008af45608a57ee6a3109a4ddf8e6331b",
+      "reviewedAt": "2026-11-22T18:46:46.399Z",
+      "sourceDigest": "85632e1fad3924f29bc7eb06d047f15ad7bac5005ca9ff349884829d0ccafe36",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed observed assembly viewport and primary-action hover defects against the current game contract; minimum content width preserves narrow labels and matched hover states retain readable action colors.",
+      "reviewReason": "Reviewed the recorded touch gesture loss and narrow repair: preserve captured source until touchend, commit one drop on the next frame, cancel pending work on pause or teardown and retain all assembly rules.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:37:14.218Z",
-      "sourceDigest": "dcef78056110942fe336a9502feec87abb28c2488ad45cdf294bae6180efc726",
+      "reviewedAt": "2026-11-22T18:47:30.665Z",
+      "sourceDigest": "36f9c51af540ab93aecfd20d895c20e0d5ae5a7885f9246753061f6bcc0f209b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed ten mandatory focused browser cases with actual hovered text contrast, eligible host learning, preserved engine routes and bounded trusted touch-event diagnostics; no gesture retries or shortened tours.",
+      "reviewReason": "Retained mandatory ten-case play acceptance and added bounded success receipts for the same touch drag and following gum tap, preserving all existing exact-state, real-input and timing assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:36:34.692Z",
-      "sourceDigest": "b481e5dd4fd5d664e33792d515e362e274cd6569d265e321425c7e110d6474c4",
+      "reviewedAt": "2026-11-22T18:46:46.729Z",
+      "sourceDigest": "add1d40f947b7f0301b11d778e6ff2fc9d9c0f35871a7ebcb6ae8209b61f480e",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Bubble Gum delivery with integrated unit results, exact partial hosted acceptance, observed phone and hover corrections, remaining touch diagnosis and continued production merge hold.",
+      "reviewReason": "Recorded exact second hosted head and artifact, observed learning and compatibility passes, measured hover contrast and remaining touch repair requiring fresh source verification before preview handoff.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

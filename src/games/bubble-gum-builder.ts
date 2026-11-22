@@ -49,6 +49,7 @@ export default class BubbleGumBuilder implements GameInstance {
   private actionCount = 0;
   private boostUntil = 0;
   private drag: {id: ObjectId; pointer: number; x: number; y: number; moved: boolean; ghost: HTMLElement} | null = null;
+  private dropFrame: number | null = null;
   private suppressClick = false;
   private readonly reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   private readonly observer: ResizeObserver;
@@ -89,7 +90,7 @@ export default class BubbleGumBuilder implements GameInstance {
     return step && !this.state.placed[step.id] ? partChoices(this.state, step.id,
       Number(this.context.config.extraDecoys || 0) + (this.context.difficulty === 'gentle' ? 0 : 1)) : [];
   }
-  private get editable() { return !this.paused && !this.disposed && !this.storageBlocked && !this.state.reported && this.phase === 'build'; }
+  private get editable() { return !this.paused && !this.disposed && !this.storageBlocked && !this.state.reported && this.dropFrame === null && this.phase === 'build'; }
   private persist() {
     if (this.storageBlocked) return;
     try { this.saveFailed = !!this.context.persistence && !this.context.persistence.save(serializeBuild(this.state)); }
@@ -232,13 +233,28 @@ export default class BubbleGumBuilder implements GameInstance {
     if (drag.moved) {
       this.suppressClick = true;
       const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-gum-slot]');
-      if (target && this.root.contains(target)) this.place(target.dataset.gumSlot!, drag.id); else this.select(drag.id);
+      const slotId = target && this.root.contains(target) ? target.dataset.gumSlot : undefined;
+      const before = this.state;
+      const commit = () => {
+        if (this.state !== before) return;
+        if (slotId) this.place(slotId, drag.id); else this.select(drag.id);
+      };
+      if (event.pointerType === 'touch') {
+        // Keep the captured source alive through touchend. Replacing it inside
+        // pointerup can swallow the compatibility click of the next real tap.
+        this.dropFrame = requestAnimationFrame(() => { this.dropFrame = null; commit(); });
+      } else commit();
     }
   }
-  private cancelDrag() { this.drag?.ghost.remove(); this.drag = null; this.suppressClick = false; }
+  private cancelDrop() {
+    if (this.dropFrame !== null) cancelAnimationFrame(this.dropFrame);
+    this.dropFrame = null;
+  }
+  private cancelDrag() { this.cancelDrop(); this.drag?.ghost.remove(); this.drag = null; this.suppressClick = false; }
 
   private render(focus?: string) {
     if (this.disposed) return;
+    this.cancelDrop();
     this.drag?.ghost.remove(); this.drag = null; this.observer.disconnect(); this.root.replaceChildren();
     this.root.dataset.phase = this.phase; this.root.dataset.world = this.blueprint.world;
     this.root.dataset.stop = this.phase === 'adventure' ? '-1' : '0';
