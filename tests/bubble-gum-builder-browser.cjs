@@ -14,6 +14,7 @@ const { once } = require('node:events');
 const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
 const { exploreWelcome } = require('./studio-entry.cjs');
+const { assertTextContrast } = require('./helpers/text-contrast.cjs');
 const { BLUEPRINTS, TOUR_DURATION_MS, GUM_BUDGET, createBuild, getBlueprint } = require('../src/games/bubble-gum-rules.ts');
 const { defaults } = require('../src/runtime/manifests.ts');
 
@@ -27,7 +28,7 @@ const manifest = { schema: 'bubble-gum-browser-review-v1', startedAt: new Date()
   sources: Object.fromEntries(['src/games/bubble-gum-builder.ts', 'src/games/bubble-gum-builder.css',
     'src/games/bubble-gum-rules.ts', 'src/games/bubble-gum-art.ts', 'tests/bubble-gum-builder-browser.cjs']
     .map(file => [file, fs.existsSync(file) ? hash(fs.readFileSync(file)) : null])),
-  cases: [], captures: [], videos: [], failures: [] };
+  cases: [], captures: [], videos: [], contrast: [], failures: [] };
 const saveManifest = () => fs.writeFileSync(path.join(output, 'review.json'), JSON.stringify(manifest, null, 2) + '\n');
 saveManifest();
 
@@ -99,7 +100,16 @@ async function dragPart(journey, object, slot) {
 async function nextConstructionAction(journey, input) {
   const before = await snapshot(journey.page);
   if (before.activeJoint) {
-    await activate(journey, root(journey.page).locator(`[data-gum-joint="${before.activeJoint}"]`), input);
+    const target = root(journey.page).locator(`[data-gum-joint="${before.activeJoint}"]`);
+    journey.lastJointAttempt = { joint: before.activeJoint, input: input || (journey.touch ? 'touch' : 'pointer'),
+      before: exactBuild(before), target: await target.evaluate(node => {
+        const rect = node.getBoundingClientRect(), x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+        const hit = document.elementFromPoint(x, y), style = getComputedStyle(node);
+        return { time: performance.now(), x, y, width: rect.width, height: rect.height, connected: node.isConnected,
+          inert: !!node.closest('[inert]'), disabled: node.disabled, pointerEvents: style.pointerEvents,
+          hitTag: hit?.tagName, hitClass: hit?.getAttribute('class'), targetOwnsHit: node === hit || node.contains(hit) };
+      }) };
+    await activate(journey, target, input);
     await journey.page.waitForFunction(slot => !!FG.runtime.snapshot().state.bonds[slot], before.activeJoint, { timeout: 2500 });
     const after = await snapshot(journey.page);
     assert.equal(after.gumLeft, before.gumLeft - 1, 'a real seam consumes one gum connector');
@@ -216,6 +226,13 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
   await assertInventionVisible(journey.page, before, journey.name + ' early adventure');
   const action = root(journey.page).locator('.gum-build-action');
   assert.ok(await action.isEnabled(), 'the ride has a usable context-specific play action');
+  if (!journey.touch) {
+    await action.hover();
+    await action.evaluate(async button => { await Promise.all(button.getAnimations().map(animation => animation.finished.catch(() => {}))); });
+    assert.equal(await action.evaluate(button => button.matches(':hover')), true, 'the action is inspected in its actual hovered state');
+    manifest.contrast.push({ case: journey.name, blueprint: before.blueprint, state: 'adventure-action-hover',
+      samples: await assertTextContrast(journey.page, '.gum-build-action', journey.name + ' hovered adventure action') });
+  }
   const actionBefore = (await snapshot(journey.page)).actionCount;
   await activate(journey, action);
   await journey.page.waitForFunction(value => FG.runtime.snapshot().state.actionCount === value + 1, actionBefore);
@@ -275,7 +292,7 @@ async function nextBuild(journey) {
   return after;
 }
 
-async function createJourney(browser, base, name, viewport, { touch = false, motion = 'reduce', clock = true, video = false, difficulty = 'classic' } = {}) {
+async function createJourney(browser, base, name, viewport, { touch = false, motion = 'reduce', clock = true, video = false, difficulty = 'classic', legacyStarter = false } = {}) {
   const context = await browser.newContext({ viewport, hasTouch: touch, reducedMotion: motion, locale: 'en-US', colorScheme: 'light',
     ...(video ? { recordVideo: { dir: path.join(output, 'video'), size: viewport } } : {}) });
   const page = await context.newPage(), errors = [], posts = [];
@@ -286,6 +303,27 @@ async function createJourney(browser, base, name, viewport, { touch = false, mot
   const journey = { name, context, page, errors, posts, touch, clock, video, closed: false };
   try {
     if (clock) await page.clock.install();
+    await page.addInitScript(() => {
+      window.__gumInputReceipts = [];
+      for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'touchstart', 'touchend', 'click']) {
+        document.addEventListener(type, event => {
+          const target = event.target instanceof Element ? event.target.closest('button') : null;
+          if (!target || !target.closest('.gum-builder') && !target.matches('[data-gum-part]')) return;
+          let state;
+          try { state = window.FG?.runtime?.snapshot()?.state; } catch { /* pre-mount event */ }
+          const point = event.changedTouches?.[0] || event;
+          const receipt = { time: performance.now(), type, trusted: event.isTrusted, target: target.className,
+            part: target.dataset.gumPart || null, slot: target.dataset.gumSlot || null,
+            joint: target.dataset.gumJoint || null, gum: target.dataset.gumColor || null,
+            pointerId: event.pointerId ?? null, pointerType: event.pointerType || null,
+            x: point.clientX ?? null, y: point.clientY ?? null, defaultPrevented: event.defaultPrevented,
+            stage: state?.stage || null, activeJoint: state?.activeJoint || null };
+          window.__gumInputReceipts.push(receipt);
+          if (window.__gumInputReceipts.length > 100) window.__gumInputReceipts.shift();
+          queueMicrotask(() => { receipt.defaultPrevented = event.defaultPrevented; });
+        }, true);
+      }
+    });
     await page.route('**/factory-config.json', route => route.fulfill({ contentType: 'application/json', body: '{"version":1,"mode":"unavailable"}' }));
     await page.goto(base + '?studio=1');
     await page.waitForFunction(() => window.FG?.studio && window.FG?.runtime);
@@ -294,6 +332,24 @@ async function createJourney(browser, base, name, viewport, { touch = false, mot
       FG.store.changeProfile({ rate: 1 }); FG.store.current().mathWindow = [Date.now()];
       FG.store.current().remixes = { ...FG.store.current().remixes, gum: difficulty }; FG.store.save();
     }, difficulty);
+    if (legacyStarter) journey.legacyStarter = await page.evaluate(config => {
+      // A named pre-existing save exercises routing; it is never a migration
+      // or fabricated child result. Subsequent entry uses the real shelf cards.
+      const owner = FG.store.current().id, notebook = FG.studio.exportNotebook();
+      const workspace = JSON.parse(localStorage.getItem('family-game-factory-workspace-v2') || '{"version":2,"projects":[],"revisions":[],"plays":[]}');
+      const projectId = crypto.randomUUID(), revisionId = crypto.randomUUID(), id = crypto.randomUUID(), at = new Date().toISOString();
+      workspace.projects.push({ id: projectId, owner, game: 'gum', name: 'Earlier sticker creation', headId: revisionId });
+      workspace.revisions.push({ id: revisionId, projectId, parentId: null, config, label: 'Earlier saved workshop', hypothesis: '', createdAt: at, state: 'private' });
+      FG.factory.validateWorkspace(workspace);
+      notebook.sessions.push({ id, owner, game: 'gum', name: 'Earlier sticker creation', projectId, remoteId: null,
+        candidate: null, draft: '', messages: [], job: null, updated: at, hypothesis: '', reflection: false, playOnly: true });
+      localStorage.setItem('family-game-factory-workspace-v2', JSON.stringify(workspace));
+      localStorage.setItem('family-game-factory-studio-v1', JSON.stringify(notebook));
+      const stickerConstruction = { schema: 'gum-stickers-v1', mission: 'rocket', placed: { top: 'star' } };
+      FG.store.current().constructionStates = { ...FG.store.current().constructionStates, [revisionId]: { stickerConstruction } };
+      if (!FG.store.save()) throw Error('Could not seed the named legacy-starter fixture');
+      return { id, projectId, revisionId, config, stickerConstruction };
+    }, { ...defaults('gum'), qualityVersion: 2 });
     await page.locator('[data-starter="gum"]').click();
     await root(page).waitFor();
     assert.equal(await page.evaluate(() => FG.runtime.snapshot().config.qualityVersion), 3, 'new workshop uses the construction engine');
@@ -434,6 +490,14 @@ async function persistenceCompatibility(journey) {
     return { key: found[0], saved: structuredClone(found[1].assemblyConstruction) };
   });
   const config = defaults('gum');
+  // The compatibility API belongs to the retained Arcade route. Studio moves
+  // the native mount inside its own page, so opening that API in a live Studio
+  // page would hide its ancestor. Use the supported route with the same stored
+  // profile and state key; all engine controls and save checks remain real.
+  const legacyRoute = new URL(journey.page.url());
+  legacyRoute.searchParams.delete('studio'); legacyRoute.searchParams.set('arcade', '1');
+  await journey.page.goto(legacyRoute.href);
+  await journey.page.waitForFunction(() => window.FG?.runtime && window.FG?.app);
   await journey.page.evaluate(({ key, config }) => FG.app.openGame('gum', { stateKey: key, config: { ...config, qualityVersion: 2 } }),
     { key: binding.key, config });
   await journey.page.locator('.gum-play').waitFor();
@@ -507,6 +571,102 @@ async function persistenceCompatibility(journey) {
   await capture(journey.page, 'persistence-unknown-save');
 }
 
+async function legacyStarterRouting(journey) {
+  const legacy = journey.legacyStarter;
+  assert.ok(legacy, 'the route starts with an earlier play-only sticker project');
+  const readProjects = () => journey.page.evaluate(() => ({
+    sessions: FG.studio.exportNotebook().sessions.filter(session => session.owner === FG.store.current().id && session.game === 'gum'),
+    workspace: JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')),
+    saves: structuredClone(FG.store.current().constructionStates),
+  }));
+  const first = await readProjects();
+  const current = first.sessions.find(session => session.projectId !== legacy.projectId);
+  assert.equal(first.sessions.length, 2, 'Ready to Play creates one current workshop alongside the earlier save');
+  assert.ok(current?.playOnly, 'the current starter owns its separate play-only project');
+  const project = first.workspace.projects.find(project => project.id === current.projectId);
+  const currentConfig = first.workspace.revisions.find(revision => revision.id === project.headId).config;
+  assert.equal(currentConfig.qualityVersion, 3);
+  await nextConstructionAction(journey);
+  await nextConstructionAction(journey);
+  await nextConstructionAction(journey);
+  const built = exactBuild(await snapshot(journey.page));
+  await activate(journey, journey.page.locator('#studioHome'));
+  const oldCard = journey.page.locator(`[data-session="${legacy.id}"]`);
+  assert.equal(await oldCard.locator('.jems-project-badge').textContent(), 'Sticker workshop', 'earlier artwork remains clearly reachable in My jems');
+  await capture(journey.page, 'saved-starter-both-workshops');
+  await activate(journey, oldCard.locator('.studio-saved-open'));
+  await journey.page.locator('.gum-play').waitFor();
+  assert.equal(await journey.page.evaluate(() => FG.runtime.snapshot().config.qualityVersion), 2, 'the saved card keeps its chosen earlier engine');
+  const earlier = await snapshot(journey.page);
+  assert.equal(earlier.mode, 'stickers');
+  assert.deepEqual(earlier.stickers, legacy.stickerConstruction.placed, 'the old sticker drawing is restored exactly');
+  await capture(journey.page, 'saved-starter-earlier-stickers');
+  await activate(journey, journey.page.locator('#studioHelp'));
+  assert.match(await journey.page.locator('#studioHelpGoal').textContent(), /three stickers/i,
+    'the earlier saved engine keeps its own actual instructions');
+  await activate(journey, journey.page.locator('#studioHome'));
+  await activate(journey, journey.page.locator('[data-starter="gum"]'));
+  await root(journey.page).waitFor();
+  assert.deepEqual(exactBuild(await snapshot(journey.page)), built, 'Ready to Play returns to the same current construction');
+  const returned = await readProjects();
+  assert.equal(returned.sessions.length, 2, 'switching between workshops does not create repeated starter sessions');
+  assert.ok(returned.sessions.some(session => session.id === current.id && session.projectId === current.projectId));
+  assert.deepEqual(returned.workspace.revisions.find(revision => revision.id === legacy.revisionId).config, legacy.config,
+    'opening the new starter never rewrites the earlier revision config');
+  assert.deepEqual(returned.workspace.revisions.find(revision => revision.id === project.headId).config, currentConfig,
+    'reopening the earlier game never rewrites the current config');
+  assert.deepEqual(returned.saves[legacy.revisionId].stickerConstruction, legacy.stickerConstruction,
+    'both shelf routes preserve the earlier sticker payload');
+  await capture(journey.page, 'saved-starter-current-assembly');
+  await activate(journey, journey.page.locator('#studioHelp'));
+  assert.match(await journey.page.locator('#studioHelpGoal').textContent(), /real objects/i,
+    'the current workshop explains assembly rather than the saved sticker engine');
+  assert.match(await journey.page.locator('#studioHelpControls').textContent(), /Next build/);
+}
+
+async function learningCompletion(journey) {
+  const built = await assemble(journey);
+  await adventure(journey);
+  const records = await recordCount(journey.page);
+  const attemptsBefore = await journey.page.evaluate(() => {
+    // This test makes the next ordinary round boundary eligible. The actual
+    // trusted host still chooses, mounts, completes and records the activity.
+    FG.store.current().mathWindow = [];
+    if (!FG.store.save() || !FG.math.canAsk(FG.store.current())) throw Error('The learning-boundary pacing fixture must be eligible');
+    return FG.store.current().learning?.attempts.length || 0;
+  });
+  await activate(journey, root(journey.page).locator('.gum-build-next'));
+  await journey.page.locator('#native-learning-activity .math-activity').waitFor();
+  const attemptId = await journey.page.evaluate(() => FG.learning.activeAttemptId);
+  assert.ok(attemptId, 'explicit Next build reaches the trusted learning host');
+  assert.equal((await snapshot(journey.page)).reported, true, 'the creation receipt is durable while its learning activity is open');
+  assert.equal(await recordCount(journey.page), records, 'the result waits for the host activity');
+  assert.equal(await journey.page.locator('#native-result-title').count(), 0);
+  assert.equal(await journey.page.locator('#game-mount').evaluate(node => node.inert), true, 'the host owns input during learning');
+  await capture(journey.page, 'assembly-completion-host-learning');
+  const activity = journey.page.locator('#native-learning-activity .math-activity');
+  await activate(journey, activity.locator('[data-action="show-solution"]'));
+  await activate(journey, activity.locator('[data-action="continue-supported"]'));
+  await journey.page.clock.runFor(1000);
+  await journey.page.locator('#native-result-title').waitFor();
+  assert.equal(await recordCount(journey.page), records + 1, 'completing the host activity releases exactly one game result');
+  const learning = await journey.page.evaluate(id => ({
+    active: FG.learning.active,
+    count: FG.store.current().learning.attempts.length,
+    attempt: FG.store.current().learning.attempts.find(attempt => attempt.id === id),
+  }), attemptId);
+  assert.equal(learning.active, false);
+  assert.equal(learning.count, attemptsBefore + 1, 'one completed build produces one eligible learning attempt');
+  assert.equal(learning.attempt.context.gameId, 'gum');
+  assert.equal(learning.attempt.outcome, 'shown', 'supported participation keeps its actual evidence category');
+  assert.equal(learning.attempt.independent, false);
+  await capture(journey.page, 'assembly-completion-host-result');
+  await activate(journey, journey.page.locator('#resultNext'));
+  await journey.page.waitForFunction(id => FG.runtime.snapshot().state.blueprint !== id, built.blueprint);
+  assert.equal((await snapshot(journey.page)).completedCount, built.completedCount + 1);
+  assert.equal(await recordCount(journey.page), records + 1, 'host continuation cannot duplicate the result');
+}
+
 async function responsive(journey) {
   await assertFrame(journey.page, journey.name + ' initial');
   if (journey.name === 'phone') {
@@ -548,6 +708,8 @@ async function responsive(journey) {
         video: process.env.GUM_CAPTURE_VIDEO === '1', run: normalMotion },
       { name: 'desktop-all-blueprints', viewport: { width: 1360, height: 900 }, run: allBlueprints },
       { name: 'saved-engine-compatibility', viewport: { width: 1360, height: 900 }, run: persistenceCompatibility },
+      { name: 'saved-starter-routing', viewport: { width: 1360, height: 900 }, legacyStarter: true, run: legacyStarterRouting },
+      { name: 'host-learning-completion', viewport: { width: 820, height: 1024 }, touch: true, run: learningCompletion },
       { name: 'tablet', viewport: { width: 820, height: 1024 }, touch: true, run: responsive },
       { name: 'phone', viewport: { width: 390, height: 844 }, touch: true, difficulty: 'stretch', run: responsive },
       { name: 'small-phone', viewport: { width: 320, height: 667 }, touch: true, run: responsive },
@@ -567,6 +729,8 @@ async function responsive(journey) {
         const failure = { name: item.name, message: String(error.stack || error), startedAt };
         manifest.failures.push(failure); manifest.cases.push({ ...failure, status: 'failed' });
         if (journey) {
+          failure.jointAttempt = journey.lastJointAttempt || null;
+          failure.inputReceipts = await journey.page.evaluate(() => window.__gumInputReceipts || []).catch(() => []);
           await capture(journey.page, item.name + '-failure').catch(captureError => { failure.captureError = String(captureError); });
           await closeJourney(journey).catch(closeError => { failure.closeError = String(closeError); });
         }

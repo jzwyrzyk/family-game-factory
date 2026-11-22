@@ -239,10 +239,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:19:09.648Z",
-      "sourceDigest": "194bea274f595f09cde7ac3c7149181aeff9b528797994303c9a837a008eca59",
+      "reviewedAt": "2026-11-22T18:36:34.015Z",
+      "sourceDigest": "50996845390394f61fe2431f34aac1ffb58bc06919910b2d4f2fc02269c090bb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed object framing, visible phone rejection feedback, touch pagination, focus-safe paused controls and scene vignettes; feature contract and child interface remain aligned.",
+      "reviewReason": "Reviewed current catalogue routing and Help: separate assembly starter preserves earlier saved workshops in My jems, with actual engine-specific instructions and no revision rewrite.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -424,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:21:26.319Z",
-      "sourceDigest": "d80cb07586b3be07329b7a2acf617365ef03b4a48b60b4044ecf6cc5b893b029",
+      "reviewedAt": "2026-11-22T18:37:14.065Z",
+      "sourceDigest": "95a59e70d68fc2ec783de93ad03c2d6008af45608a57ee6a3109a4ddf8e6331b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled all Bubble Gum assembly behavior with PR129 one-jem/ten-pocket mining update; inspected both game diffs and preserved saved-engine, native-host and rendering contracts.",
+      "reviewReason": "Reviewed observed assembly viewport and primary-action hover defects against the current game contract; minimum content width preserves narrow labels and matched hover states retain readable action colors.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:21:26.567Z",
-      "sourceDigest": "39f2d59b262e580adbd90d4bb4aae691f516a7af7a8f93ab71b49b802db3c98e",
+      "reviewedAt": "2026-11-22T18:37:14.218Z",
+      "sourceDigest": "dcef78056110942fe336a9502feec87abb28c2488ad45cdf294bae6180efc726",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved mining refinement tests and all assembly browser/rules/reward journeys on the integrated tree; fresh combined build and hosted acceptance required.",
+      "reviewReason": "Reviewed ten mandatory focused browser cases with actual hovered text contrast, eligible host learning, preserved engine routes and bounded trusted touch-event diagnostics; no gesture retries or shortened tours.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:21:26.936Z",
-      "sourceDigest": "00d8ec713790c539dd99d0a817cd08f07ae15ef8938d6d7019b8d50c916650ee",
+      "reviewedAt": "2026-11-22T18:36:34.692Z",
+      "sourceDigest": "b481e5dd4fd5d664e33792d515e362e274cd6569d265e321425c7e110d6474c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR130 on latest PR129 base5b8abfb, retained both prior evidence histories, and kept production merge/deployment on owner hold.",
+      "reviewReason": "Updated Bubble Gum delivery with integrated unit results, exact partial hosted acceptance, observed phone and hover corrections, remaining touch diagnosis and continued production merge hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

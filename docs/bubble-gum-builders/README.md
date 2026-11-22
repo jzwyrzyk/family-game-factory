@@ -49,6 +49,8 @@ New defaults use `qualityVersion:3`, implemented in `src/games/bubble-gum-builde
 
 Existing version 2 uses the unchanged sticker game and `stickerConstruction`; version 1 retains physical play and `qualityConstruction`; missing version keeps the older engine. The three named persistence domains coexist, including when a legacy engine writes. This is a new default, not an automatic rewrite of saved revisions. Unknown assembly records are preserved and blocked; an explicit session-only play option does not overwrite them.
 
+The Ready to Play Bubble Gum card opens an existing version 3 starter session, or creates a separate version 3 project when a child has only an earlier starter. Earlier starter sessions remain reachable in **My jems**, labelled **Sticker workshop**, **Machine workshop**, or **Earlier workshop**. Their names, revisions, play state, conversations and experiments remain unchanged. Reopening those saved cards keeps their recorded engine; returning to the current catalogue card resumes the new assembly project rather than creating another copy.
+
 Supported local assembly edits are matching highlights and extra silly pieces. Gravity, thrust, joint strength and gum-budget edits are rejected for this guided engine; they remain meaningful in the physical workshop. No local edit silently changes engines. Native server/worker consumers of the manifest need a compatible source before accepting version 3 as an AI edit base. This change itself changes no worker pin or backend configuration.
 
 ## Acceptance evidence

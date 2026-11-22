@@ -78,8 +78,8 @@
   font-size: 20px; font-weight: 650; box-shadow: 0 3px 0 #5b3d90; min-height: 52px;
 }
 .gum-builder .gum-build-launch:disabled { background: #e6dfee; border-color: #cfc2dc; color: #65586f; box-shadow: none; }
-.gum-builder .gum-build-launch:enabled:hover, .gum-builder .gum-build-next:hover, .gum-builder .gum-build-action:hover, .gum-builder .gum-build-replay:hover { background: #7751ac; color: #fff; }
-.gum-build-launch { flex: 1; max-width: 300px; }
+.gum-builder .gum-build-launch:enabled:hover, .gum-builder .gum-build-next:enabled:hover, .gum-builder .gum-build-action:enabled:hover, .gum-builder .gum-build-replay:enabled:hover { background: #7751ac; color: #fff; }
+.gum-builder .gum-build-launch { flex: 1; min-width: min-content; max-width: 300px; }
 .gum-build-next { width: min(100%,320px); }
 .gum-build-footer:has(.gum-build-next) { justify-content: center; }
 .gum-build-adventure-badge, .gum-build-ready-art { width: 130px; height: 130px; align-self: center; }

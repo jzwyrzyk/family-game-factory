@@ -810,6 +810,17 @@ export async function installStudio(){
   else builderReadiness=builder.reason instanceof Error&&builder.reason.message==='UNAUTHENTICATED'?'sign-in':'unverified';
   if(route==='library')updateCreationNote();else if(activeId)render();
  }
+ function savedGumVersion(s:StudioSession):number|null{
+  if(s.game!=='gum'||!s.projectId||s.remoteId)return null;
+  try{
+   const version=games.revision(s.projectId,s.owner).config.qualityVersion;
+   return typeof version==='number'?version:0;
+  }catch{return null;}
+ }
+ function earlierGumWorkshop(s:StudioSession):string|null{
+  const version=savedGumVersion(s);
+  return version===2?'Sticker workshop':version===1?'Machine workshop':version===0?'Earlier workshop':null;
+ }
  function renderLibrary(){
   refreshLearningChoice();
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
@@ -833,21 +844,22 @@ export async function installStudio(){
    dismiss.onclick=()=>act(()=>{notebook.dismissResume(last.id,last.owner);renderLibrary();});
    banner.append(art,description,continueButton,dismiss);$('studioContinue').append(banner);
   }
-  const saved=entries.filter(s=>!s.archived&&(!s.playOnly||s.experiments?.length||s.candidate||isRetiredStarter(s.game)&&hasMeaningfulCreation([s],owner())));
+  const saved=entries.filter(s=>!s.archived&&(!s.playOnly||s.experiments?.length||s.candidate||earlierGumWorkshop(s)||isRetiredStarter(s.game)&&hasMeaningfulCreation([s],owner())));
   renderHomeProgress();
   const archived=entries.filter(s=>s.archived);
   $('studioSavedSection').hidden=!saved.length&&!archived.length;
   $('studioStarterTitle').textContent='Ready to Play jems';
   saved.forEach(s=>{
    const card=el('article','studio-library-card studio-saved-card');card.setAttribute('data-session',s.id);
+   const workshop=earlierGumWorkshop(s);
    const state:'building'|'ready'|'playable'|'idea'=busy(s)?'building':readyExperiment(s)||s.candidate?'ready':s.projectId||s.remoteId?'playable':'idea';
    const label={building:'Working on your idea',ready:'A test is ready to try',playable:'Ready to play',idea:'Idea · not built yet'}[state];
    const badge={building:'Tools at work',ready:'Test ready',playable:'Playable jem',idea:'Your idea'}[state];
    card.dataset.jemsState=state;
    const openButton=el('button','studio-saved-open') as HTMLButtonElement;
-   openButton.type='button';openButton.setAttribute('aria-label','Open '+s.name);
+   openButton.type='button';openButton.setAttribute('aria-label','Open '+s.name+(workshop?' · '+workshop:''));
    const cardAction=state==='ready'?s.projectId||s.remoteId?'Try my change':'Play my game':state==='idea'?'Open my idea':'Open my game';
-   openButton.append(el('span','jems-project-badge',badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),iconEl('span','studio-card-link','arrow',cardAction));
+   openButton.append(el('span','jems-project-badge',workshop||badge),el('span','studio-card-icon',icon[s.game]),el('span','studio-card-name',s.name),el('span','studio-card-state',label),iconEl('span','studio-card-link','arrow',cardAction));
    const stage=stageFor(s);
     if(stage!=='none'){
      const gemLabel=el('span','jems-gem-status');
@@ -925,7 +937,9 @@ export async function installStudio(){
   document.body.classList.remove('studio-designing');setActiveNav('studioNavHome');focusView(collectionTitle);
  }
  function start(game:GameId){
-  const existing=notebook.list(owner()).find(s=>s.game===game&&s.playOnly);if(existing)return open(existing.id);
+  // The current Gum card opens the assembly workshop. Earlier starter sessions
+  // remain unchanged and visible in My jems, with their own saved engine.
+  const existing=notebook.list(owner()).find(s=>s.game===game&&s.playOnly&&(game!=='gum'||savedGumVersion(s)===3));if(existing)return open(existing.id);
   const p=games.create(owner(),game,`My ${names[game]}`,defaults(game,FG.store.current().remixes?.[game]||'classic'));
   const s=notebook.create(owner(),game,p.name,p.id);notebook.update(s.id,s.owner,x=>{x.playOnly=true;});message(s,'helper','Play first. When you want to test an idea, your original game stays safe.');return open(s.id);
  }
@@ -1071,13 +1085,13 @@ export async function installStudio(){
   setTab('game');render();$('studioHelpPanel').hidden=false;
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
   const native=!remoteViewedId&&s.game!=='new';
-  $('studioHelpGoal').textContent=native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
   const touchHelp:Record<string,string>={mining:'Hold Left or Right to run into jems. Bring your bag to the bucket. Hold on during a shake, or run to the safe platform.',factory:'Find the next gem in the pattern. Tap a bucket, use the glowing machines, then choose paper and send your gift!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
   const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined).config:undefined;
-  const oldConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===0;
+  const oldConstruction=native&&s.game==='gum'&&(viewedConfig?.qualityVersion??0)===0;
   const physicalConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===1;
   const stickerConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===2;
   const assemblyConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===3;
+  $('studioHelpGoal').textContent=stickerConstruction?'Choose three stickers for your invention, then send it flying, swimming or dancing.':physicalConstruction?'Connect everyday pieces with gum. Test your machine, change it, and try again.':oldConstruction?'Build a silly invention with the pieces and gum. Try it and make a change.':native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
   $('studioHelpControls').textContent=assemblyConstruction?'Choose a real object, then tap its glowing outline. Tap a glowing join to stick it with gum. Wiggle test checks your joins. Launch, play along, and watch again as long as you like. Choose Next build when you are ready.':stickerConstruction?'Choose a sticker and tap a bubble on the machine, or drag a sticker onto a bubble. Add three, then tap Make it GO!':physicalConstruction?(touch?touchHelp.gum:'Choose a part from the tray, place it on the canvas, attach parts with gum and test your machine.'):oldConstruction?'Choose a part in your build, then use the move, turn and connect controls shown below it. Try your machine and change it again.':native&&touch?touchHelp[s.game]:native?FG.games[s.game]?.controls||'Use the controls in your game.':'Tap the game first, then use its buttons or keyboard controls.';
   $('studioHelpKeyboard').textContent=assemblyConstruction?'Use Tab and Enter to choose a piece. Enter places it on the focused outline. Tab to the gum join and press Enter to connect it. Every action also works with a tap.':stickerConstruction?'Press Tab to choose a sticker, Enter to select it, then Tab and Enter to place it on a bubble.':physicalConstruction?'Use Tab to reach parts and tools, Enter to select them, arrow keys to move a chosen part, and R to rotate it.':oldConstruction?'Use Tab and Enter to choose parts and construction controls.':'Use Tab to reach controls and Enter to choose. How a character moves depends on this game.';
   focusView($('studioHelpTitle'));
