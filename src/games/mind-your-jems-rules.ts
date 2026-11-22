@@ -1,6 +1,6 @@
 /** Pure, local arcade simulation. Banked Jems never become learning or lifetime rewards. */
 export type MinePhase = 'mining'|'warning'|'shaking'|'falling'|'retry'|'level-complete';
-export type MineGem = Readonly<{id:number;x:number;value:1|3;frame:number}>;
+export type MineGem = Readonly<{id:number;x:number;value:1;frame:number}>;
 export type MineInput = Readonly<{left:boolean;right:boolean;hold:boolean}>;
 export type MineState = Readonly<{
   phase:MinePhase;playerX:number;facing:-1|1;holding:boolean;
@@ -9,7 +9,7 @@ export type MineState = Readonly<{
   /** Remaining phase/spawn time; elapsedMs advances only while the game runs. */
   phaseMs:number;spawnInMs:number;elapsedMs:number;seed:number;nextGemId:number;
 }>;
-export const BAG_CAPACITY=8;
+export const BAG_CAPACITY=10;
 const PLATFORM_X=88,BUCKET_X=94,START_X=96,PICKUP_DISTANCE=2.4;
 const FALL_MS=850,MAX_STEP_MS=20,MAX_ELAPSED_MS=100,MAX_GEMS=9;
 const DEFAULT_SEED=0x4a454d53;
@@ -40,7 +40,7 @@ function between(state:WorkingState,min:number,max:number){
 }
 function gem(state:WorkingState,x:number):MineGem {
   const frame=Math.floor(random(state)*6);
-  return {id:state.nextGemId++,x,value:frame===3||frame===5?3:1,frame};
+  return {id:state.nextGemId++,x,value:1,frame};
 }
 function beginMining(state:WorkingState,first=false){
   const difficulty=mineDifficulty(state.level);
@@ -72,8 +72,8 @@ function fall(state:WorkingState){
   state.holding=false;
 }
 function collect(state:WorkingState,fromX:number){
-  // Swept contact avoids skipping a crystal on a slower frame. Full/near-full bags
-  // leave a crystal intact instead of silently throwing away part of its value.
+  // Swept contact avoids skipping a crystal on a slower frame. A full bag
+  // leaves the crystal on the head so it can be collected after banking.
   const low=Math.min(fromX,state.playerX)-PICKUP_DISTANCE;
   const high=Math.max(fromX,state.playerX)+PICKUP_DISTANCE;
   state.gems=state.gems.filter(crystal=>{

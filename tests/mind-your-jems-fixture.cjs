@@ -232,7 +232,7 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
   async collect(minimum=1){
    // Ordinary inputs only. Stay in the reachable right-hand half so even a
    // warning permits a real run back to the platform; do not teleport or bank.
-   assert.ok(minimum>=1&&minimum<=8);
+   assert.ok(minimum>=1&&minimum<=10);
    const initial=await this.snapshot();
    if(initial.safe)await this.until(async()=>{
     const current=await this.snapshot();
@@ -253,7 +253,7 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    if((await this.snapshot()).phase==='level-complete')return 0;
    await this.walkTo(96);await this.freshCalm();
    const before=await this.score('banked');
-   await this.collect(8);
+   await this.collect(10);
    assert.ok(await this.score('loose')>0,'the outward run physically collects a jem');
    // The return run may collect another jem. Sample after reaching the safe
    // platform, before the bucket, so the exact deposit accounts for that jem.

@@ -18,13 +18,19 @@ Use one deterministic local simulation and one reusable illustrated controller. 
 
 A visible warning precedes each shake. While exposed, holding Space or the touch Hold control saves the miner but spills the unbanked bag. Holding must continue throughout the shake. The platform protects the miner and cargo, while its bucket automatically banks the bag. The bridge remains exposed. Shaking clears uncollected head crystals; failing to hold while exposed produces a visible fall and explicit retry. Saved bucket progress survives that retry.
 
-A full bucket completes the level and waits for an explicit Next level. The initial tuning is a 12-jem first target, bag capacity 8, movement at 22 world units/second, 10–14 second first-level calm periods, 3 seconds of warning, a 1.5-second shake and an 850 ms fall. Later levels raise the bucket target and tighten bounded hazard/spawn intervals; warnings never fall below 2 seconds. These values are implementation choices to calibrate through play, not owner-approved numerical requirements or evidence of fun.
+A full bucket completes the level and waits for an explicit Next level. The initial difficulty tuning is a 12-jem first target, movement at 22 world units/second, 10–14 second first-level calm periods, 3 seconds of warning, a 1.5-second shake and an 850 ms fall. Later levels raise the bucket target and tighten bounded hazard/spawn intervals; warnings never fall below 2 seconds. Those difficulty values are implementation choices to calibrate through play, not owner-approved numerical requirements or evidence of fun. The owner-specified jem value and pocket capacity are recorded in the refinement below.
 
 Track carried, saved and lost value separately. Keep complete deposited value in the session score even when it exceeds a bucket's target. Do not add learning evidence, lifetime rewards, payments, persistence or another currency. Scores reset on leaving the mining session.
 
 Pause and Help preserve the simulation timers rather than canceling and rerolling an approaching hazard. Clear held input and stop optional sound. Resuming an exposed warning or shake gives a 900 ms preparation grace before its remaining timer continues. Backgrounding requires explicit resume. Disposal releases input state, callbacks, animation/audio and observation resources. Keyboard/touch and reduced-motion behavior remain first-class acceptance requirements.
 
 The current wait dialog remains a temporary wrapper around the reusable controller during phase 1. This phase does not claim the new library placement, common play shell or removal of obsolete default games.
+
+### Owner refinement: one jem per crystal, ten pocket spaces
+
+On November 22, 2026, the owner requested that every mining jem count as one and that the pocket hold ten. This supersedes the earlier implementation's weighted crystals and capacity of eight. Crystal colors and artwork remain varied; each collected crystal adds exactly one to carried jems and occupies one of the ten spaces. A full pocket leaves further crystals on the head. Banking, spilling and loss use the same one-jem count and retain the existing accounting and saved-progress rules.
+
+The request changes jem value and carrying capacity; the existing bucket targets, movement, hazards and level progression remain as specified above. Prepare this refinement, but do not merge it until the chat and shared shell corrections are complete. The earlier implementation, validation counts and visual receipts remain historical evidence for their exact sources, not acceptance of this update.
 
 ### Phase 2: use the ordinary play journey
 

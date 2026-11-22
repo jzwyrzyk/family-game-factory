@@ -12,7 +12,7 @@ function run(state:MineState,input:MineInput,ms:number):MineState {
   for(let remaining=ms;remaining>0;remaining-=20)next=stepMine(next,input,Math.min(remaining,20));
   return next;
 }
-const crystal=(id:number,x:number,value:1|3=1):MineGem=>({id,x,value,frame:value===3?3:0});
+const crystal=(id:number,x:number,frame=0):MineGem=>({id,x,value:1,frame});
 function scenario(patch:Partial<MineState>={}):MineState {
   return {...newMineState(42),gems:[],phaseMs:20000,spawnInMs:20000,...patch};
 }
@@ -54,12 +54,33 @@ test('holding stops movement and collection; opposed directions cancel',()=>{
   assert.equal(opposed.playerX,40);
 });
 
-test('a bag never exceeds eight and a rare crystal is not partially destroyed',()=>{
-  const state=scenario({playerX:40,loose:6,mined:6,gems:[crystal(1,40,3),crystal(2,40),crystal(3,40)]});
+test('all six crystal styles count as one in the initial head and later spawns',()=>{
+  const initialStyles=new Set<number>(),spawnedStyles=new Set<number>();
+  for(let seed=1;seed<=64;seed++){
+    const initial=newMineState(seed);
+    for(const gem of initial.gems){assert.equal(gem.value,1);initialStyles.add(gem.frame);}
+    const spawned=stepMine({...initial,gems:[],spawnInMs:1},IDLE,20);
+    assert.equal(spawned.gems.length,1);
+    assert.equal(spawned.gems[0].value,1);spawnedStyles.add(spawned.gems[0].frame);
+  }
+  assert.deepEqual([...initialStyles].sort(),[0,1,2,3,4,5]);
+  assert.deepEqual([...spawnedStyles].sort(),[0,1,2,3,4,5]);
+  const collected=stepMine(scenario({playerX:40,gems:Array.from({length:6},(_,frame)=>crystal(frame,40,frame))}),IDLE,20);
+  assert.equal(collected.loose,6);assert.equal(collected.mined,6);assert.equal(collected.gems.length,0);
+  assertAccounting(collected);
+});
+
+test('the tenth crystal fills the bag; a full bag leaves other crystals to collect later',()=>{
+  assert.equal(BAG_CAPACITY,10);
+  const state=scenario({playerX:40,loose:9,mined:9,gems:[crystal(1,40,3),crystal(2,40,5)]});
   const collected=stepMine(state,IDLE,20);
-  assert.equal(collected.loose,8);assert.equal(collected.gems.length,1);
-  assert.deepEqual(collected.gems[0],crystal(1,40,3));
-  assert.equal(run(collected,IDLE,500).loose,8);
+  assert.equal(collected.loose,10);assert.equal(collected.gems.length,1);
+  assert.deepEqual(collected.gems[0],crystal(2,40,5));
+  assert.equal(run(collected,IDLE,500).loose,10);
+  const banked=run(collected,RIGHT,2500);
+  assert.equal(banked.banked,10);assert.equal(banked.levelBanked,10);assert.equal(banked.loose,0);
+  assert.equal(banked.gems.length,1,'banking does not delete the uncollected crystal');
+  assertAccounting(banked);
   assertAccounting(collected);
 });
 

@@ -424,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:19:10.293Z",
-      "sourceDigest": "330d762691583a88c73c1fb41284be11ee10c79fc803624e7871987a48f84149",
+      "reviewedAt": "2026-11-22T18:21:26.319Z",
+      "sourceDigest": "d80cb07586b3be07329b7a2acf617365ef03b4a48b60b4044ecf6cc5b893b029",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final84 seam anchors against actual artwork, deterministic state and reported replay recovery; added four visual scene moments per adventure.",
+      "reviewReason": "Reconciled all Bubble Gum assembly behavior with PR129 one-jem/ten-pocket mining update; inspected both game diffs and preserved saved-engine, native-host and rendering contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -442,6 +442,13 @@
           "sourceDigest": "f7be746d325b6fe720eb05f67cb0182c7d56e4f04057cfd81aa3ce8fa8ed14e4",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed native Rally and shared physics changes including original-aspect scaling, full wheel masks, fixed decorations, exact revision selection and missing-art behavior; architecture and drawing contracts describe supported geometry and preserve stock runtime compatibility."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.011Z",
+          "sourceDigest": "84d4f2ce55b8910d68fdd3bc76e81277ce4e03df5ced5cf6a7422ee62b2e4983",
+          "reviewOutcome": "updated",
+          "reviewReason": "Integrated the owner-requested one-jem and ten-pocket shared engine into the native mining player; preserved all approved artwork and updated the active mining contract and decision.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
         }
       ]
     },
@@ -627,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:19:10.556Z",
-      "sourceDigest": "4961ec1917cd933c914e21f2be8719b32882737aebbd3039f9b3a9d68f1829eb",
+      "reviewedAt": "2026-11-22T18:21:26.567Z",
+      "sourceDigest": "39f2d59b262e580adbd90d4bb4aae691f516a7af7a8f93ab71b49b802db3c98e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed hosted suite and shared fixtures including pagination, More pause, receipt failures and legacy saves; build and420pure checks passed, hosted checks pending.",
+      "reviewReason": "Preserved mining refinement tests and all assembly browser/rules/reward journeys on the integrated tree; fresh combined build and hosted acceptance required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -680,6 +687,13 @@
           "sourceDigest": "9a1a08691b7a59def8f11da367d02f1882aec03aae21fb560efeda5f77584d3b",
           "reviewOutcome": "updated",
           "reviewReason": "Delivery and feature contracts record readiness/history/reconnect, exact saved-job/lost-ack retry and adult banner fixture coverage, local executable passes and Chromium startup restriction; live provider, device and child acceptance remain unverified."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.275Z",
+          "sourceDigest": "ed27456c2a2261fd8b039a6b0fdc423d60e265dd0937a113d8a75b06005d8a74",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed uniform crystal-value and ten-capacity rules tests and integrated HUD assertions while preserving native-host controls, real-input fixtures,13 configurations and unchanged visual tolerances;403combinedunits pass.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
         }
       ]
     },
@@ -708,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:17:53.148Z",
-      "sourceDigest": "0a239fdb1a988b7ab16c0ea8a50ad60305bc0aabe8d75ebae51b3b277c7dc62e",
+      "reviewedAt": "2026-11-22T18:21:26.936Z",
+      "sourceDigest": "00d8ec713790c539dd99d0a817cd08f07ae15ef8938d6d7019b8d50c916650ee",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded isolated PR129 foundation, local build and420unit checks, pending hosted evidence, coordinated unmerged production posture and version3 manifest consumer implications.",
+      "reviewReason": "Recorded PR130 on latest PR129 base5b8abfb, retained both prior evidence histories, and kept production merge/deployment on owner hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -768,6 +782,13 @@
           "sourceDigest": "64860b987176b12c2989d5aa7545db91d586735753fa3be4d24e33f100ad5841",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded source repair on merged PR112, observed PR108 Pages marker and separately reported gateway repair, hosted browser/package gate requirement and compatible gateway/private-coach/web rollout with unchanged worker and settings."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.584Z",
+          "sourceDigest": "dc424a9ccb5f9a51748ed348890caab1c91a31df5622a68129a90e7a946541d3",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded combined build and403unit pass separately from396phase-one units; kept fresh hosted acceptance pending and the user-directed merge hold explicit.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
         }
       ]
     },
