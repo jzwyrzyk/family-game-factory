@@ -68,7 +68,7 @@ const html=`<div class="myj-shell">
    </div>
    <p class="myj-tips" data-myj="tips" role="status" aria-live="polite">Run to jems. Bring them to the bucket.</p>
   </div>
-  <div class="myj-help" hidden><h3>Run. Collect. Save!</h3><p>Run into jems to pick them up.</p><p>Bring your bag to the bucket. Fill it to reach the next level.</p><p>Big shake coming? Run to safety, or hold on! Holding saves you, but spills your bag.</p><p><strong>← → or A / D</strong> to run.<br><strong>Hold Space</strong> to cling.</p><p>Saved jems survive a fall. This game’s score resets when you leave; it does not add to My rewards.</p><button type="button" data-myj="help-done">Let’s play</button></div>
+  <div class="myj-help" hidden><h3>Run. Collect. Save!</h3><div class="myj-help-copy"><p>Run into jems to pick them up.</p><p>Bring your bag to the bucket. Fill it to reach the next level.</p><p>Big shake coming? Run to safety, or hold on! Holding saves you, but spills your bag.</p><p><strong>← → or A / D</strong> to run.<br><strong>Hold Space</strong> to cling.</p><p>Saved jems survive a fall. This game’s score resets when you leave; it does not add to My rewards.</p></div><button type="button" data-myj="help-done">Let’s play</button></div>
   <div class="myj-ready" data-myj="ready" hidden><strong>Your game is ready!</strong><button type="button" data-myj="play-ready">Play my game ${icon('right')}</button></div>
   <div class="myj-build-problem" hidden><span></span><button class="myj-exit" type="button">Back to Studio ${icon('right')}</button></div>
  </div>
@@ -125,7 +125,7 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
     const landscape=window.matchMedia('(orientation: landscape)').matches;
     const portrait=!landscape&&(w<600||w<h*1.15),shallow=h<300,shortPortrait=portrait&&h<440;
     const bottomExtent=shallow||shortPortrait?.84:portrait?.90:.94;
-    const topClear=portrait?132:shallow?20:40;
+    const topClear=portrait?(window.matchMedia('(max-width:760px)').matches?174:132):shallow?20:40;
     const playerAt=(size:number)=>Math.max(64,Math.min(size*(portrait?.25:.225),shallow?83:portrait?104:174));
     const cartAt=(size:number)=>Math.max(72,size*(portrait?.36:.32));
     const widthAt=(size:number)=>.76*playerAt(size)+24+.75*size+Math.max(.87*cartAt(size),.69*cartAt(size)+.52*playerAt(size));
@@ -138,7 +138,9 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
     }
     const size=low,playerSize=playerAt(size),cartSize=cartAt(size);
     const start=(w-widthAt(size))/2+.76*playerSize+12,headLeft=start-size*.16;
-    const headTop=h-8-bottomExtent*size,cartX=start+.75*size-.13*cartSize,cartFoot=headTop+size*.29;
+    const bottomAligned=h-8-bottomExtent*size,minimumTop=topClear+.94*playerSize-.105*size;
+    const headTop=bottomAligned-(portrait?Math.max(0,bottomAligned-minimumTop)*.5:0);
+    const cartX=start+.75*size-.13*cartSize,cartFoot=headTop+size*.29;
     geometry={left:start,headTop,headSize:size,cartX,cartSize,cartFoot,playerSize};
     place(el('.myj-head-anchor'),headLeft,headTop,size);
     place(cart,cartX,cartFoot-cartSize*.66,cartSize);
@@ -226,8 +228,8 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   function resume(){if(disposed)return;paused=false;lastTime=0;resumeGrace=['warning','shaking'].includes(state.phase)&&!isMineSafe(state.playerX)?900:0;render();stage.focus({preventScroll:true});}
   function restart(){state=newMineState();clearInput();paused=false;resumeGrace=0;fallFromHold=false;noticeUntil=celebrateUntil=collectUntil=0;el('.myj-effects').replaceChildren();render();}
   function setHelp(open:boolean){
-    if(open){helpWasPaused=paused;clearInput();stopSound();help.hidden=false;stage.inert=true;button('help-done').focus({preventScroll:true});}
-    else {help.hidden=true;stage.inert=false;if(!helpWasPaused)resume();else button('resume').focus({preventScroll:true});}
+    if(open){helpWasPaused=paused;clearInput();stopSound();help.hidden=false;stage.inert=true;el('.myj-header').inert=true;button('help-done').focus({preventScroll:true});}
+    else {el('.myj-header').inert=false;help.hidden=true;stage.inert=false;if(!helpWasPaused)resume();else button('resume').focus({preventScroll:true});}
     el('.myj-help-toggle').setAttribute('aria-expanded',String(open));render();
   }
   async function prepareArtwork(){

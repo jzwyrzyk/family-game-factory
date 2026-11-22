@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:40:46.642Z",
-      "sourceDigest": "ddbbb5715b38ef236a94ece8203e7646cc5e772f3638649f4c1d9b3e33659d5e",
+      "reviewedAt": "2026-11-22T16:16:53.372Z",
+      "sourceDigest": "09a122eacc211ca0304b3da34ae57dbcb6773de716921e61856c84b9db2f91b7",
       "reviewOutcome": "updated",
-      "reviewReason": "Independent geometry review corrected narrow landscape clearance so small stages retain the giant and aligned drawn bridge endpoints exactly with the walking transition.",
+      "reviewReason": "Reviewed actual phone tablet and motion captures; fixed Help reachability and inert controls, preserved image contacts, centered portrait composition, and constrained narrow grids without shrinking readable labels.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:55:20.960Z",
+      "reviewedAt": "2026-11-22T16:16:54.062Z",
       "sourceDigest": "6aaf51c452a7f6a264491eebae5d099fd9df4a3b681547007f571163a5cbc374",
       "reviewOutcome": "updated",
-      "reviewReason": "Audited Chromium native partial touch release and corrected the fixture contact list; independent viewport failures now retain all evidence while exact assertions and final failure status remain mandatory.",
+      "reviewReason": "Retained all thirteen configuration outcomes and exact layout gates; actual Help and shallow stage failures now have source fixes requiring fresh hosted captures and the same comparison tolerance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T15:55:21.515Z",
-      "sourceDigest": "6b9d134baa6c6d4db12cdac22e673055f6abbf2f16d589cb2004c54204644e72",
+      "reviewedAt": "2026-11-22T16:16:54.650Z",
+      "sourceDigest": "339f6f6eaecfce4183909b963ea67d51d65962b7257455cbf36cf92a8b50ed94",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded full desktop pass on the changed candidate and tablet partial-touch fixture failure, retaining both evidence and pending corrected multi-device acceptance without waivers.",
+      "reviewReason": "Recorded ten passing configurations and three observed layout failures plus inspected motion evidence, distinguishing corrected source from still-pending baseline and hosted acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
