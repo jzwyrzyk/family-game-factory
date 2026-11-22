@@ -1,5 +1,21 @@
 # jems delivery state
 
+## November 22, 2026 — private-coach diagnostics serving; conversation still unverified
+
+The owner supplied the completed `COACH_DIAGNOSTICS_SERVING` receipt from the approved low-space recovery invocation. Cloud Build `158bd2f9-b2d1-470c-bdce-10eff2da603a` produced immutable coach image `us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/coach@sha256:fae4ad23a0c58dc92a6dfdd016ce310b7635afe3d49d475dc86178afddb5e1df`. The operator reports serving revision `factory-coach-private-chatdiag-b4734b1323de-a14b8b`, with the gateway unchanged and rollback target `factory-coach-private-pr115-19f5e46ae114-fb5fa6`.
+
+The receipt binds application `b4734b1323de87dfee96bb91769cbab3cff432e6`, hosted-tested source `5688bb3f6a01a766af8b78c783faccd8cce8f89c`, operator `9986ab4be38680cc8f2a9cc29f823b440ce03319`, primitives `804574895d8ab86fe270e590ecfa05fa5d4bc290`, and source archive SHA-256 `8692bd7abaa7dd775f5ffeff746dc6011fb1c0fef26ee18d4b584248a74493bf`. Its synthetic budget preflight passed. This is an owner-supplied successful deployment receipt, not an independent live cloud observation by the reviewer.
+
+The receipt explicitly retains `conversationVerified:false` and `providerCall:false`. A validated Adult conversation, or the bounded content-free failure event from this exact revision, remains the next diagnostic evidence. The original Adult HTTP 503 cause is not established. Normal-profile authorization, dictation, model settings, budgets and the separate PR107 work remain outside this deployment. Keep the original private journal, locks, source identities and recovery resources while conversation diagnosis continues.
+
+## November 22, 2026 — owner requested comprehensive Cloud Shell retention review
+
+The first owner-provided low-space recovery output passed the helper checksum, reported `REMOVED_REGENERABLE_NPM_DOWNLOAD_CACHE`, and reached `PREPARING_PINNED_OPERATOR`. That partial output established cache cleanup and operator preparation only; the later serving receipt above establishes the completed diagnostic rollout. No byte count was returned for the removed cache; the earlier 24 MB observation covered the whole `.npm` directory.
+
+The owner requested a comprehensive review of what should and should not be disposed. The [read-only storage inventory](docs/operations/CLOUD_SHELL_STORAGE_REVIEW.md) examines home and relevant temporary metadata, private-directory sizes, Git worktrees/common objects, ignored and unique work, recovery records and observed active use. It has no deletion, network or deployment operation. The existing coach state and locks, active temporary workspaces, prior Node setup, private credentials/history and unknown data remain protected. The actual owner inventory and resulting item-by-item disposition remain pending; local source validation does not substitute for access to that filesystem.
+
+All sixteen focused offline inventory checks passed, including unchanged source/index metadata, opaque-name redaction, cross-mount/symlink boundaries, real shared/linked/stashed repositories, strict journal projection, active process references beyond the display bound, and prevention of configured Git filter execution. Independent review identified and corrected the filter, metadata-boundary, activity-truncation and nested-journal cases. No filesystem cleanup or cloud operation was performed by this inventory validation.
+
 ## November 21, 2026 — diagnostic rollout blocked by Cloud Shell storage
 
 The owner-provided bootstrap output passed its source checksum but first stopped at a missing local Node prerequisite. A verified temporary Node 22.23.5/npm 10.9.9 setup passed; the next attempt stopped at `CLEAN_CHECKOUT_REQUIRED`. The scoped local inspection found the operator directory with no Git commit and untracked source files, no application or primitive checkouts, and no release journal. The subsequent preservation command failed while creating its backup directory with `No space left on device`, before any rename or operator invocation.
