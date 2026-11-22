@@ -170,6 +170,17 @@ const complexScene={
         const stage=await fittedStage(page,name+' beginner',minimumStage[name]);
         await readableSurface(page,name+' beginner');
         await capture(page,name+'-beginner');
+        if(name==='small-phone'){
+          assert.equal(await page.locator('#creationPickAction').isVisible(),true,'small phone shows an obvious first coding step');
+          await page.locator('#creationPickAction').click();
+          const actionReached=await page.evaluate(()=>{
+            const first=document.activeElement,dock=document.querySelector('.creation-code-card');
+            if(first?.getAttribute('data-add-block')!=='move')return false;
+            const button=first.getBoundingClientRect(),bounds=dock.getBoundingClientRect();
+            return button.top>=bounds.top-1&&button.bottom<=bounds.bottom+1;
+          });
+          assert.equal(actionReached,true,'Pick an action reveals and focuses the actual beginner palette');
+        }
         // Real pointer input must use that same displayed canvas rectangle.
         const actor=initial.actors[0],destination={x:300,y:285};
         await page.mouse.move(stage.canvas.x+actor.x/initial.width*stage.canvas.width,stage.canvas.y+actor.y/initial.height*stage.canvas.height);
