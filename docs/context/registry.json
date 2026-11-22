@@ -712,10 +712,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-21T20:58:23.001Z",
-      "sourceDigest": "e4e24f3cbb5dfa137e58055995910e35df2bcdb1d6f9774f9940367541aed9c4",
+      "reviewedAt": "2026-11-22T00:38:03.226Z",
+      "sourceDigest": "05cd855f146a31be67e89ec9432ecfe14c381e0b3a3e9f4b54a22764dc1913d4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the local-only integration of exact main b4734b1 with the tested access candidate while preserving its published head for the owner's source-bound account plan. Retained both complete delivery histories and review records; no remote merge, account mutation, deployment or new hosted acceptance is claimed.",
+      "reviewReason": "Reviewed the receipt-storage guard and its 85 offline fixture tests: reserve and sync private space before account actions, preserve incomplete evidence, refuse path reuse and report late receipt failure separately. Updated operations, architecture and delivery records for the seven owner-applied inactive resources, unchanged serving metadata and ENOSPC uncertainty. Recovery remains read-only from pinned PR107; PR126 carries the follow-up, with no merge, identity acceptance, activation or deployment claim.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

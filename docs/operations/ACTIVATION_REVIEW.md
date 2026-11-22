@@ -41,6 +41,16 @@ GitHub failure does not conceal a cloud-read failure. A failure exits before the
 following production review command. Read the reported blockers; do not chain an
 apply automatically after planning or treat partial output as a completed setup.
 
+An account apply can complete before a local report or receipt fails to save.
+If output shows applied resources and a successful readback followed by a local
+storage error, preserve that output and any existing receipt. Do not repeat the
+apply to recreate evidence. Restore writable local storage or select a new
+private destination, then run `verify --receipt NEW_PATH` from the reviewed
+checkout. That read-only result establishes current preparation state; it does
+not reconstruct the original apply receipt or its comparison with earlier
+serving metadata. See [receipt storage and recovery](PHASE_2.md#receipt-storage-and-recovery)
+for the pending-file guard, bounded reservation and post-action failure behavior.
+
 The optional isolated project and Logging volume remain explicit plan inputs.
 Without them, the default plan cannot establish the live drill or privacy proof.
 Do not invent an isolated project, silently approve cost, or substitute production

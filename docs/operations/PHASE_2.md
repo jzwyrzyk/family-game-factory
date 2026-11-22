@@ -194,7 +194,9 @@ requires a new read-only run. The tool refuses unavailable reads, unexpected
 grants, unknown protections, a moved PR head or either enable flag present.
 If a call fails during apply, rerun the plan to inspect the partial state.
 Only the preflighted resources are eligible for reuse. Keep receipts local
-to Cloud Shell. Completed apply phases save private JSON receipts by default.
+to Cloud Shell. Completed apply and dispatch phases save private JSON receipts
+by default. A local receipt failure does not undo account changes; follow the
+recovery procedure below instead of repeating an apply to recreate its evidence.
 
 | Phase | Scope |
 | --- | --- |
@@ -203,6 +205,46 @@ to Cloud Shell. Completed apply phases save private JSON receipts by default.
 | `verify` | Read back the GitHub protections and GCP preparation. With the same isolated options, verify the exact synthetic baseline image has 100% of its service traffic, verify Logging scope, and check live production serving state. This reads current state. The apply receipt records historical drill and redaction results. |
 | `plan-claims` / `dispatch-claims` / `verify-claims` | After the separately reviewed inert merge, check exact protected-main workflow and probe bytes. Run the claims-only dispatch while both release flags are unset. Verify successful exact-head claim jobs and skipped release jobs. |
 | `plan-production` | Read-only structured review of the exact proposed identities, resources and withheld privileges, including the separate operation-polling scope. It always reports activation as not ready and labels unverified prerequisites. Production identity activation requires separate explicit approval after both claim proofs and the isolated drill. This program has no production activation mode. |
+
+### Receipt storage and recovery
+
+Before an apply or dispatch reads account state, the program exclusively creates
+`RECEIPT_PATH.pending` beside the requested receipt with private permissions
+(`0600`). It writes and syncs a one-MiB reservation and syncs the directory entry.
+This exercises the actual destination rather than relying on a permission check
+or a reported free-space value. Before the first account action it also writes
+and syncs the exact plan and review code as an incomplete intent. A storage or
+sync failure at either of these steps stops before account mutations. Validation
+failures before an action remove the unused reservation when possible.
+
+After the requested actions and checks succeed, the program writes and syncs
+the completion receipt, publishes it without replacing an existing path, and
+syncs the directory before reporting success. Existing receipt or pending paths,
+including symlinks, are never reused or overwritten. A remaining pending path
+blocks another attempt using that path. Read-only `verify` and `verify-claims`
+also use this storage check when `--receipt` is supplied.
+
+The reservation is bounded to one MiB and is not a transaction with GitHub or
+Google Cloud. Later filesystem failures or competing disk use can still prevent
+completion. Once an account action starts, the pending evidence is retained on
+failure; it may contain an incomplete intent or a partial final write. If the
+account checks finish but saving the receipt fails, the status has a `receipt`
+blocker and exits nonzero. The final file may already exist if the directory sync
+failed. Neither file existence nor a nonzero exit establishes whether the account
+changes completed or were undone. The program does not roll back account changes
+because receipt storage failed, and a dispatch receipt does not prove that its
+workflow jobs have subsequently succeeded.
+
+Preserve earlier receipts and logs, restore writable local storage or select a
+new private directory, and use `verify --receipt NEW_PATH` for fresh preparation
+readback. Use `verify-claims --receipt NEW_PATH` for completed claims-only jobs.
+Do not rerun an apply or dispatch to recover a receipt. The new verification
+receipt records current state; it cannot reconstruct historical drill results,
+redaction checks or the prior apply's serving-state comparison. A separately
+captured shell log must also finish writing successfully; reserving receipt
+storage does not establish that `tee` or another report destination succeeded.
+
+### Published execution environment
 
 The program cannot publish Codex environment settings. Publish the saved egress
 draft adding `api.github.com` and `logging.googleapis.com` alongside
