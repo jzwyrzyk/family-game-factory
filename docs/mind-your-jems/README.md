@@ -109,13 +109,13 @@ Lifecycle evidence must cover simultaneous touch, key release after focus change
 
 The original illustrated click-to-mine implementation retains art provenance and earlier layout, wait-build, recovery and profile fixtures. Its ten main browser configurations, three supplementary fixtures and idle/warning/ready baselines describe that earlier implementation. Those earlier checks and pictures do not validate the new movement game.
 
-The existing `tests/visual/mind-your-jems/` files are historical comparison material until the new composition has been reviewed. Before accepting replacement baselines:
+The earlier click-to-mine baselines remain in Git history. The current `tests/visual/mind-your-jems/` set contains explicitly reviewed movement-game captures; `review.json` records their exact source, artifact and image hashes. Before accepting any replacement baselines:
 
 1. Inspect actual browser captures beside the storyboard for proportions, material, lighting, scene contacts, composition, legibility and branding.
 2. Inspect desktop, tablet and phone layouts, including narrow portrait and short landscape.
 3. Review running, collection, banking, warning, holding, shaking, falling, retry, level completion and build-ready states. Review a normal-motion clip as well as reduced-motion stills.
 4. Correct the implementation before accepting its screenshots.
-5. Only then run `MYJ_UPDATE_BASELINES=1 node tests/mind-your-jems-browser.cjs` locally and retain the reviewed baselines with the source. CI must not silently regenerate them.
+5. Only then run `MYJ_UPDATE_BASELINES=1 node tests/mind-your-jems-browser.cjs` locally and retain the reviewed baselines with the source. When the local environment cannot launch Chromium, an explicit local import of the reviewed hosted-browser captures is permitted: verify the artifact checksum, exact source/build identity, all 13 functional configurations, all nine expected state/device files and the normal-motion evidence. Any functional failure blocks import; retain intentional old-baseline mismatches as failed historical evidence. Record the workflow, artifact, manifest and per-image hashes, review scope and local limitation in `review.json`. Import the exact PNG bytes without editing them. CI must not silently regenerate or approve baselines, and comparison tolerances remain unchanged.
 
 The dedicated **Mind Your Jems art and gameplay review** workflow remains the separate visual/gameplay gate. Functional tests, visual comparisons and observed child play answer different questions; none substitutes for the others.
 

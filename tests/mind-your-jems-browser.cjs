@@ -35,8 +35,9 @@ async function geometry(journey,device,review){
    eyes:{x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65},
    gems:[...dialog.querySelectorAll('[data-crystal]')].filter(visible).map(gem=>({id:gem.dataset.crystal,...rect(gem)})),
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
-   targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {
+   targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2),style=getComputedStyle(element);return {
     label:element.getAttribute('aria-label')||element.textContent.trim(),...box,enabled:!element.disabled,
+    recovery:element.matches('.myj-exit'),foreground:style.color,background:style.backgroundColor,
     primary:['left','right','grab'].includes(element.dataset.myj),reachable:hit===element||element.contains(hit)};})};
  });
  review.check(device.name,'layout-and-hit-targets',details);
@@ -47,6 +48,11 @@ async function geometry(journey,device,review){
  for(const target of details.targets){
   const minimum=target.primary?47.5:43.5;
   assert.ok(target.width>=minimum&&target.height>=minimum,device.name+' usable target: '+target.label);
+  if(target.recovery){
+   const luminance=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(value=>value/255).map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4).reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
+   const foreground=luminance(target.foreground),background=luminance(target.background),contrast=(Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05);
+   assert.ok(contrast>=4.5,device.name+' recovery action text contrast is at least 4.5:1; observed '+contrast);
+  }
   if(target.enabled){
    assert.ok(target.reachable,device.name+' available control is not covered: '+target.label);
    const visibleWidth=Math.min(target.right,details.viewport.width)-Math.max(target.x,0),visibleHeight=Math.min(target.bottom,details.viewport.height)-Math.max(target.y,0);

@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:16:53.372Z",
-      "sourceDigest": "09a122eacc211ca0304b3da34ae57dbcb6773de716921e61856c84b9db2f91b7",
+      "reviewedAt": "2026-11-22T16:32:03.547Z",
+      "sourceDigest": "ce1368ed82123386337ecd3740faeb0b54341d9157c30dcc7c0c71b7431ca817",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed actual phone tablet and motion captures; fixed Help reachability and inert controls, preserved image contacts, centered portrait composition, and constrained narrow grids without shrinking readable labels.",
+      "reviewReason": "Reviewed the hosted 13-configuration mining evidence and nine original-byte baseline captures; documented explicit verified artifact import and the scoped recovery-button color correction.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T16:16:54.062Z",
-      "sourceDigest": "6aaf51c452a7f6a264491eebae5d099fd9df4a3b681547007f571163a5cbc374",
+      "reviewedAt": "2026-11-22T16:32:03.824Z",
+      "sourceDigest": "ef281b2b03707fa934eeed0c7c43f8e67a1c473429032e9404fb048e8dd63439",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained all thirteen configuration outcomes and exact layout gates; actual Help and shallow stage failures now have source fixes requiring fresh hosted captures and the same comparison tolerance.",
+      "reviewReason": "Recorded exact hosted browser artifact and per-image provenance, retained historical failures, and added visible recovery-action contrast coverage without changing visual tolerances.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T16:16:54.650Z",
-      "sourceDigest": "339f6f6eaecfce4183909b963ea67d51d65962b7257455cbf36cf92a8b50ed94",
+      "reviewedAt": "2026-11-22T16:32:04.107Z",
+      "sourceDigest": "45ab08eb54929b734794ad2bf6ac09511080177028ff6c5516bdbfcfdacf1402",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded ten passing configurations and three observed layout failures plus inspected motion evidence, distinguishing corrected source from still-pending baseline and hosted acceptance.",
+      "reviewReason": "Recorded e19dd gameplay evidence and manually reviewed baseline adoption while retaining unmerged, undeployed and pending final comparison status.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

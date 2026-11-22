@@ -1,10 +1,11 @@
 {
   "build": {
-    "sha": "75e888ee2910dcaf285f3c6b8c73d63e098c3919",
+    "sha": "d6a8619e5482fb7ac340ea7fcd0894dd3e56d2ab",
     "dirty": false
   },
   "browser": "141.0.7390.37",
-  "acceptedBy": "Explicit MYJ_UPDATE_BASELINES command after visual review",
+  "acceptedBy": "Explicit development visual review and local import of checksum-verified hosted browser captures; not product-owner approval",
+  "reviewedOn": "2026-11-22",
   "states": [
     "idle",
     "warning",
@@ -16,5 +17,86 @@
     "mobile"
   ],
   "channelTolerance": 20,
-  "maximumChangedRatio": 0.008
+  "maximumChangedRatio": 0.008,
+  "source": {
+    "head": "e19dd23ecd7ee764d200ac89db82a9a1b868b653",
+    "runId": 45043047983,
+    "jobId": 137271527844,
+    "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45043047983",
+    "artifactId": 14762348356,
+    "artifactSha256": "a0a6ed770ab0cab40cae68efbe47001cc0921fbfd6f8d390203949f3d9a2d16e",
+    "manifestSha256": "41a476afb53ea7a8ccc108131ff198c02967306f6dcddb3403303afd4d59f6e1"
+  },
+  "evidence": {
+    "functionalConfigurations": 13,
+    "captureCount": 121,
+    "sourceRunFailures": "Exactly nine intentional comparisons against the historical click-to-mine baselines; no functional errors",
+    "video": {
+      "file": "mind-your-jems-gameplay.webm",
+      "sha256": "0534943b310807f5a758175e10345c7e479835dcb79fc571e2b10a3dee94632b",
+      "motion": "normal"
+    }
+  },
+  "review": {
+    "scope": "All nine baseline views, desktop/tablet/phone proportions, scalp and platform contact, shallow landscapes, narrow portrait, Help actions, cancelled-build rotation and normal-motion hold/spill/fall/retry sequence",
+    "localBrowserLimitation": "Executor denies Chromium socket creation; captures were produced by the recorded hosted job, not locally",
+    "followup": "Recovery button contrast corrected separately; that button is absent from these nine baseline states. New comparison and visible recovery checks remain required.",
+    "limits": "No physical-device, child-enjoyment or owner acceptance claim"
+  },
+  "images": [
+    {
+      "file": "desktop-idle.png",
+      "width": 1256,
+      "height": 876,
+      "sha256": "6451531ed667f8e7462e1ab054516d17bce37fe434f5a81172d3e33c73b12525"
+    },
+    {
+      "file": "desktop-ready.png",
+      "width": 1256,
+      "height": 876,
+      "sha256": "fa84e550e96d2f6aa7113aed94f342d394e5c6f58304c3e4b7f2dac8eaf5ab3c"
+    },
+    {
+      "file": "desktop-warning.png",
+      "width": 1256,
+      "height": 876,
+      "sha256": "53515626cf5c020ada37992499296644d542c54b52182df72d5efd8d2347d527"
+    },
+    {
+      "file": "mobile-idle.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "95505872038527198e0f986eb4409865ce3a42a4cce38dacd650d635d07014d9"
+    },
+    {
+      "file": "mobile-ready.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "20ff9b2bf27d42c472179def28fd531b792e5184b3fe0d1f9642a03d1c6cd70d"
+    },
+    {
+      "file": "mobile-warning.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "729ed2dd9b163192ad5dd11f5439fb13f41d9f3116f87338b83b7bbef331a04c"
+    },
+    {
+      "file": "tablet-portrait-idle.png",
+      "width": 744,
+      "height": 940,
+      "sha256": "2bad03f10bb774ca5d34a937ed12bd3132df3bc4ca429a5117833b5fa51cdf51"
+    },
+    {
+      "file": "tablet-portrait-ready.png",
+      "width": 744,
+      "height": 940,
+      "sha256": "c7680d64d4433f182dd24f8f96136699da727718d32018d65a572773de8cec0c"
+    },
+    {
+      "file": "tablet-portrait-warning.png",
+      "width": 744,
+      "height": 940,
+      "sha256": "cdd161c184fd66ed4e3673cad90e3e135271c13c77bdb31272ed33b5d8e72afd"
+    }
+  ]
 }
