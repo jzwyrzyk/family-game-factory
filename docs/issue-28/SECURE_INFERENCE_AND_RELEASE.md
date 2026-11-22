@@ -39,6 +39,22 @@ The gateway's `FACTORY_COACH_API_KEY` / `FACTORY_OPENAI_API_KEY` environment
 variables now cause startup failure. The gateway image excludes the private
 provider and private executor modules.
 
+## Creation reply format and host validation
+
+The model's readiness decision and the host's evidence validation have distinct jobs. The model judges whether the child's idea describes a coherent playable first version. The host verifies exact source wording and the current saved context before Build can be enabled; selecting four evidence fields never replaces that semantic judgment or the child's explicit Build action.
+
+The [private creation wire adapter](../../server/coach/private-creation-wire.ts) preserves the existing public `CoachContext` and `CoachReply`. Only the provider-facing representation changes when `context.creation.version` is 1:
+
+- Exact eligible message text and accepted child-origin, nondelegated plan values become a bounded source catalog. Repeated fragments share an ID; context positions retain ordered references. Helper, reflection and unaccepted/delegated plan text remains visible as context but is ineligible for readiness evidence.
+- Fragments preserve every original character, including whitespace and Unicode surrogate pairs, and fit the existing 700-UTF-16-unit evidence limit. Child wording is in the request input, not copied into JSON Schema enums. The bounded schema contains only compact source IDs.
+- The schema separates positive and negative verdicts. Positive verdicts require four nonempty eligible IDs and an empty unresolved array. Negative verdicts carry empty evidence and at most eight nonblank unresolved items; general conversation may have no unresolved items. Each item is capped at 175 Unicode codepoints so it fits the host's 350-UTF-16-unit bound even when it contains astral characters.
+- Only readiness evidence uses IDs. `childDecisions` retains short, literal child quotations under its existing validator. A quote for one plan field must not expand to a multi-aspect paragraph and change later correction/compilation behavior.
+- The adapter rejects malformed metadata, unsupported references and contradictory positive verdicts. It restores exact evidence quotes, then the ordinary response validator runs. Unknown root keys remain visible to that validator. Missing readiness remains a failed check; there is no invented negative verdict, silent positive-to-negative downgrade or automatic inference retry.
+
+The budget check includes the actual projected provider input and dynamic schema, along with policy, output allowance and the existing envelope reserve, before moderation or inference begins. Input privacy/moderation still receives the original validated context. Output moderation still checks the returned model text before decoding; restored evidence is drawn only from the already checked input. The current model, token ceilings, per-turn ceiling, authorization and public error responses are unchanged.
+
+Older contexts without the creation capability keep their original provider input and public reply contract. This correction requires a private-coach image update; it does not require a new gateway/browser protocol or a notebook migration. Existing service identity, configuration, numeric secret pins and rollback safeguards remain release requirements. Fixture verification and schema constraints do not establish live conversational quality: an authenticated Adult conversation and coherent ready/not-ready behavior remain acceptance evidence.
+
 ## Private conversation diagnostics
 
 An HTTP 503 from the private coach previously hid several distinct failures.
@@ -69,6 +85,14 @@ request but does not by itself identify the invalid parameter. A private-service
 503 can also result from a thrown caller-verification error before inference.
 HTTP status 200 on a readiness request does not reveal the returned `available`
 value and never proves a successful model reply.
+
+Readiness failures now have separate fixed categories: `readiness_missing`,
+`readiness_shape_invalid`, `readiness_evidence_invalid`,
+`readiness_inconsistent`, `readiness_context_invalid` and
+`readiness_reference_invalid`. The earlier diagnostic runtime grouped invalid
+shape, unsupported literal evidence and inconsistent positive verdicts under
+`readiness_invalid`; an old event with that reason cannot identify its subtype.
+The additional categories expose no source IDs, quotes or response content.
 
 The standalone [read-only inspector](../../scripts/deployment/inspect_coach_runtime.py)
 uses the operator's existing `gcloud` identity, fixed project
