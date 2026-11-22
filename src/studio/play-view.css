@@ -2,6 +2,9 @@
    their own bounds; a stray swipe cannot scroll the game off the page. */
 body.studio-playing { overscroll-behavior: none; }
 body.studio-playing > footer { display: none; }
+/* Decorative acknowledgements cannot obscure play controls, even during entry.
+   Durable totals and their history remain available in My rewards. */
+body.studio-playing :is(.jems-rewards-toast-host, .jems-delight-host) { display: none !important; }
 body.studio-review.studio-playing .site-header { display: none !important; }
 body.studio-review #page-studio.studio-play-mode {
   position: fixed; top: var(--jems-play-top, 0px); left: 0; right: 0;

@@ -1,4 +1,4 @@
-/* Real production game hosts; synthetic profiles/remote transport only.
+/* Real production game hosts; synthetic profiles, remote transport and cosmetic events.
  * Never calls a model or starts a generation. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -32,6 +32,15 @@ async function checkFrame(page, label) {
     const host = document.getElementById('studioGameHost').getBoundingClientRect();
     const home = document.getElementById('studioHome').getBoundingClientRect();
     const full = document.getElementById('studioFullScreen').getBoundingClientRect();
+    const cosmeticToasts = [...document.querySelectorAll('.jems-rewards-toast,.jems-delight-toast')].filter(element => {
+      const r = element.getBoundingClientRect();
+      if (!r.width || !r.height || r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return false;
+      for (let node = element; node; node = node.parentElement) {
+        const style = getComputedStyle(node);
+        if (style.display === 'none' || style.visibility !== 'visible' || Number(style.opacity) === 0) return false;
+      }
+      return true;
+    }).map(element => ({ kind: element.className, text: element.textContent.trim() }));
     return { host: { top: host.top, bottom: host.bottom, left: host.left, right: host.right },
       home: { top: home.top, bottom: home.bottom, height: home.height },
       full: { left: full.left, right: full.right, top: full.top, bottom: full.bottom, height: full.height },
@@ -41,8 +50,9 @@ async function checkFrame(page, label) {
         return { id, left: r.left, right: r.right, top: r.top, bottom: r.bottom, height: r.height,
           clipped: element.scrollWidth > element.clientWidth + 1, fontSize: parseFloat(getComputedStyle(element).fontSize) };
       }),
-      height: innerHeight, width: innerWidth, y: scrollY, overflow: document.documentElement.scrollWidth > innerWidth + 1 };
+      cosmeticToasts, height: innerHeight, width: innerWidth, y: scrollY, overflow: document.documentElement.scrollWidth > innerWidth + 1 };
   });
+  assert.deepEqual(bounds.cosmeticToasts, [], label + ': cosmetic popups cannot cover play controls or labels');
   assert.ok(bounds.host.bottom - bounds.host.top > 100 && bounds.host.top >= 0 && bounds.host.bottom <= bounds.height + 1,
     `${label}: game keeps useful height inside the viewport: ${JSON.stringify(bounds)}`);
   assert.ok(bounds.host.left >= 0 && bounds.host.right <= bounds.width + 1, label + ': game stays in viewport');
@@ -363,8 +373,23 @@ async function checkPlayerMenu(page, label) {
           try {
             const entry = ['moon', 'robot'].includes(game) ?
               page.locator(`#studioLibrary [data-session="${legacy.sessions[game]}"] .studio-saved-open`) : page.locator(`[data-starter="${game}"]`);
-            await entry.scrollIntoViewIfNeeded(); await entry.click();
+            await entry.scrollIntoViewIfNeeded();
+            if (game === 'factory') {
+              // Exercise the real presentation event, without inventing a grant
+              // or altering saved achievements. Entry must remove an old toast.
+              await page.evaluate(() => window.dispatchEvent(new CustomEvent('jems:milestone', { detail: { kind: 'practice' } })));
+              await page.locator('#jems-delight-host .jems-delight-toast[data-kind="practice"]').waitFor({ state: 'visible' });
+            }
+            await entry.click();
             await checkFrame(page, `${device} ${game}`);
+            if (game === 'factory') {
+              assert.equal(await page.locator('#jems-delight-host').evaluate(host => host.childElementCount), 0,
+                device + ': entering play clears a previously visible celebration');
+              // A different valid kind avoids the existing per-kind debounce.
+              await page.evaluate(() => window.dispatchEvent(new CustomEvent('jems:milestone', { detail: { kind: 'copied' } })));
+              assert.equal(await page.locator('#jems-delight-host').evaluate(host => host.childElementCount), 0,
+                device + ': a later cosmetic event cannot insert a popup during play');
+            }
             if (game === 'dragon') await checkDragonIntro(page, `${device} ${game}`);
             await checkGameContent(page, game, `${device} ${game}`);
             await checkMore(page, `${device} ${game}`);

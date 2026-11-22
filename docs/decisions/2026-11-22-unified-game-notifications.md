@@ -14,6 +14,8 @@ Every action rechecks the active owner, saved project and current notification i
 
 The same speaker control reads each notification and saved helper reply. Starting private dictation cancels every reader both before microphone permission and immediately before recording, after checking that the original owner/scope is still current. Reading cannot restart while either local or private dictation is active. A stale permission result cannot cancel a new profile's narration.
 
+The actual motion review also found a global maker-reward toast covering Mining’s Bank label. Fitted play therefore uses the existing conversation rule for cosmetic celebrations: earned totals and receipts remain durable, while prior and delayed popups are suppressed during the game. My rewards still shows those grants; they do not replay on exit. Keeping the shared controls readable takes priority over a temporary cosmetic overlay on a game whose free space varies by screen and runtime.
+
 ## Unified navigation boundary
 
 The comparison source is PR129 head `d7ba7a828278a90f324bc12e1ba2592265f48095`, stacked on PR125 head `1340d041145ffba4322ccb8262188b7cf2c7b6c4`. That PR also contains the Mining gameplay work from PR128. This consolidation adopts the catalogue and shared-player navigation intent, with a standalone **Mind Your Jems!** tile and the same native host for **Play while I wait**. It refactors the existing PR125 tap/crystal/bank/grab game into a reusable mount. It does not adopt the later movement/contact/level rewrite, one-Jem crystals or ten-pocket economy from PR128, or its gameplay art/baselines.

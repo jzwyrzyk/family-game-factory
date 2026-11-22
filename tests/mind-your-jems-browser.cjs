@@ -6,6 +6,7 @@ const path=require('node:path');
 const {start}=require('./browser-server.cjs');
 const {createJourney}=require('./mind-your-jems-fixture.cjs');
 const {createReview}=require('./mind-your-jems-review.cjs');
+const {filteredContrast}=require('./mind-your-jems-contrast.cjs');
 
 const devices=[
  {name:'desktop',viewport:{width:1280,height:900},touch:false,mobile:false,motion:'reduce'},
@@ -41,27 +42,30 @@ async function geometry(journey,device,review){
   const feedback=compactScene&&notice&&notice.textContent.trim()?{text:notice.textContent.trim(),...rect(notice),
    fontSize:parseFloat(getComputedStyle(notice).fontSize),textFits:notice.scrollWidth<=notice.clientWidth+1,
    eyes}:null;
-  const contrast=element=>{
-   const style=getComputedStyle(element),rgb=value=>value.match(/[\d.]+/g)?.map(Number);
-   const front=rgb(style.color),back=rgb(style.backgroundColor),filter=style.filter;
-   const brightness=filter==='none'?1:Number(filter.match(/^brightness\(([\d.]+)\)$/)?.[1]);
-   if(style.backgroundImage!=='none'||!front||!back||(front[3]??1)!==1||(back[3]??1)!==1||!Number.isFinite(brightness))
-    return {ratio:null,color:style.color,background:style.backgroundColor,image:style.backgroundImage,filter};
-   const light=channels=>channels.slice(0,3).map(value=>Math.min(255,value*brightness)/255)
-    .map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4)
-    .reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
-   const a=light(front),b=light(back);
-   return {ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),color:style.color,background:style.backgroundColor,filter};
+  const colors=element=>{
+   const style=getComputedStyle(element);
+   return {color:style.color,backgroundColor:style.backgroundColor,backgroundImage:style.backgroundImage,filter:style.filter};
   };
+  const cosmeticToasts=[...document.querySelectorAll('.jems-rewards-toast,.jems-delight-toast')].filter(element=>{
+   const box=element.getBoundingClientRect();
+   if(!box.width||!box.height||box.right<=0||box.bottom<=0||box.left>=innerWidth||box.top>=innerHeight)return false;
+   for(let node=element;node;node=node.parentElement){
+    const style=getComputedStyle(node);
+    if(style.display==='none'||style.visibility!=='visible'||Number(style.opacity)===0)return false;
+   }
+   return true;
+  }).map(element=>({kind:element.className,text:element.textContent.trim(),...rect(element)}));
   return {phase:dialog.dataset.phase,viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
-   feedback,speech:speechStyle.display!=='none'&&Number(speechStyle.opacity)>0?{...rect(speech),eyes}:null,
+   feedback,cosmeticToasts,speech:speechStyle.display!=='none'&&Number(speechStyle.opacity)>0?{...rect(speech),eyes}:null,
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
    targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {
     label:element.getAttribute('aria-label')||element.textContent.trim(),...box,enabled:!element.disabled,
     reachable:hit===element||element.contains(hit),crystal:element.hasAttribute('data-crystal'),
-    contrast:!element.disabled&&element.matches('.myj-action,.myj-native-tools button,[data-myj="help-done"]')?contrast(element):null};})};
+    colors:!element.disabled&&element.matches('.myj-action,.myj-native-tools button,[data-myj="help-done"]')?colors(element):null};})};
  });
+ for(const target of details.targets)target.contrast=target.colors?filteredContrast(target.colors):null;
  review.check(device.name,'layout-and-hit-targets',details);
+ assert.deepEqual(details.cosmeticToasts,[],device.name+' fitted play keeps reward and delight popups off the game and its labels');
  assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' shared native game fits viewport');
  assert.ok(details.overflow.horizontal<=2,device.name+' has no horizontal clipping');
  assert.ok(details.overflow.vertical<=2,device.name+' main game fits without scrolling');

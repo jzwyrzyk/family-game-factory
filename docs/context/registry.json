@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:47:21.850Z",
-      "sourceDigest": "85a26e80e15ed336715d19048fcdd48c196c2c4d0ae09f76742e4964612b8fad",
+      "reviewedAt": "2026-11-22T19:34:35.936Z",
+      "sourceDigest": "d3ba2f30e451e68192e894dc6ae3a8603f424b87f6376cbcdab1fdc6992e3115",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed owner November22 consolidation: one continuation card, owner scoped Notifications and explicit pending-work actions; retained child authorship and separate gameplay rollout.",
+      "reviewReason": "Recorded the observed reward toast covering a game control and the decision to extend focused-conversation cosmetic suppression to fitted play, preserving durable rewards and their visible history.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -235,10 +235,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:14:28.696Z",
-      "sourceDigest": "036cb4af76245abff9143ca9f9ae0826a2c82d7b3f723395a90d63741eaa05bc",
+      "reviewedAt": "2026-11-22T19:34:36.213Z",
+      "sourceDigest": "24bc603a54ba46ef55f7d038fdd05ffe8587f54f487eff0fce29e15b337d5da6",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved the single Home card and Notifications contract; corrected the observed 4.11:1 intro contrast with darker ink on the actual gradient, retaining the measured 4.5:1 gate and unchanged card readers.",
+      "reviewReason": "Documented native and generated play entry clearing current and pending cosmetic presentations, suppression during active play, and no exit replay; actual-source browser checks are required after the observed Bank-label obstruction.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -373,10 +373,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "100d283ab6aff77a325e67323ca0d2e9f3f3ec6522f23e4f8f2a55366ae21edc",
-      "reviewedAt": "2026-11-22T18:47:22.897Z",
+      "sourceDigest": "c122715df45b431f0b2a3f4e51e084c65ebfd03fbc8eef479652e4de65025871",
+      "reviewedAt": "2026-11-22T19:34:37.013Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented bounded notification preferences in the existing notebook backup domain, family owner validation and exact byte rollback; seen and dismissed metadata grants no rewards.",
+      "reviewReason": "Updated the presentation contract only: earned totals, source outboxes and ledger receipts stay authoritative while chat and fitted play suppress obstructing cosmetic popups. Real-grant fixtures retain32-to37 and47-to92 progression plus identical history after exit.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:05:58.705Z",
+      "reviewedAt": "2026-11-22T19:26:18.310Z",
       "sourceDigest": "15185a6db02feb7bf9b6b3fd975a4015c60941f6fe5cb6b6291854107e247013",
-      "reviewOutcome": "updated",
-      "reviewReason": "Actual first hosted native captures exposed landscape eye overlap, portrait crystal obstruction and low contrast; documented native-only fixes and strengthened readable feedback and contrast assertions, with fresh capture acceptance pending.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the captured normal-motion saturation transition and isolated contrast sampler repair; native gameplay, CSS, art and controls are unchanged, while unknown rendering and 4.5:1 contrast remain failing gates and fresh 13-of-13 evidence is still required.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:14:29.587Z",
-      "sourceDigest": "31d836fe0b53e9e00532d0a03dfcbd729e1a6629b160c4eed47421fe4e5198b1",
+      "reviewedAt": "2026-11-22T19:34:37.244Z",
+      "sourceDigest": "ff5c30fb507d550ccad50fa38406d5534f1a8aad5dfc7683a3b1c086c0575403",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged both upstream readiness wire suites into test:coach while preserving play-view, Notifications, read-aloud and private speech gates; recorded the actual second-candidate contrast failure and incomplete phone acceptance without relaxing assertions.",
+      "reviewReason": "Preserved seven-route exact menu identities and saturation math checks; added visible-overlay assertions to all Mining and fitted-player cases plus real-grant retention and no-replay journeys. Existing Home/Lab celebration and reward ownership assertions remain.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:15:41.794Z",
-      "sourceDigest": "36dfd72b7d9230cb8023d12b4b36826f130b15b279c995e8e6595dc9f814817b",
+      "reviewedAt": "2026-11-22T19:34:37.492Z",
+      "sourceDigest": "f7ab0839af08253b0cbcb87bbab13c36e9a03a614e83f8c708def261b7cd141b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current-main reconciliation with exact tree verification, 21 readiness and 52 narration passes plus eight coach/speech/recovery files; preserved original failure receipts, desktop-only capture scope, pending new hosted checks and no deployment claim.",
+      "reviewReason": "Recorded verified third-candidate captures, complete40-plus5 viewport/lifecycle and later voice/continuity passes, remaining downstream legacy coverage, normal-motion reward obstruction, and the changed follow-up requiring new hosted evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

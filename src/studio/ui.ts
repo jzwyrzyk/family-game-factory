@@ -401,17 +401,18 @@ export async function installStudio(){
  const rewardToastHost=el('div','jems-rewards-toast-host');rewardToastHost.id='jemsRewardCelebrations';document.body.append(rewardToastHost);
  let rewardToastTimer:ReturnType<typeof setTimeout>|undefined,rewardBatchTimer:ReturnType<typeof setTimeout>|undefined,pendingGrants:RewardGrant[]=[];
  function clearRewardCelebration(){clearTimeout(rewardToastTimer);clearTimeout(rewardBatchTimer);pendingGrants=[];rewardToastHost.replaceChildren();}
- function chatIsVisible(){return route==='studio'&&panel==='talk'&&!page.classList.contains('hidden');}
+ function celebrationWouldCoverWork(){return playView.active||(route==='studio'&&panel==='talk'&&!page.classList.contains('hidden'));}
+ function enterPlayView(){clearRewardCelebration();document.getElementById('jems-delight-host')?.replaceChildren();playView.enter();}
  function renderRewards(){rewardsWidget.update(rewards.state.summary,rewards.state);rewardsPage.update({...rewards.state,journey:rewardJourney()});}
  rewards.subscribe((state,grants)=>{
   renderRewards();
-  // Earned totals still update; decorative popups must not cover a chat answer.
-  if(chatIsVisible()){clearRewardCelebration();return;}
+  // Earned totals still update; decorative popups must not cover answers or game controls.
+  if(celebrationWouldCoverWork()){clearRewardCelebration();return;}
   if(!grants.length||state.summary.owner!==owner()||document.hidden)return;
   pendingGrants.push(...grants);clearTimeout(rewardBatchTimer);
   const capturedOwner=owner();
   rewardBatchTimer=setTimeout(()=>{
-   if(owner()!==capturedOwner||document.hidden||chatIsVisible()){pendingGrants=[];return;}
+   if(owner()!==capturedOwner||document.hidden||celebrationWouldCoverWork()){pendingGrants=[];return;}
    const batch=pendingGrants;pendingGrants=[];
    const earned=batch.reduce((total,grant)=>total+grant.amount,0),summary=rewards.state.summary;
    const reached=summary.reachedGemMilestones.filter(goal=>goal>summary.lifetimeGems-earned).at(-1);
@@ -653,7 +654,7 @@ export async function installStudio(){
  }
  function celebrateProgress(kind:JemMilestone,anchorId='studioVersion'){
   // Persisted gem grants and a newly earned maker rank share one celebration.
-  if(chatIsVisible()||notebook.pendingRewards(owner()).length)return;
+  if(celebrationWouldCoverWork()||notebook.pendingRewards(owner()).length)return;
   celebrateJem(kind,anchorId,{character:notebook.avatar(owner()),level:levelForOwner().level});
  }
  function renderJourney(){
@@ -1073,7 +1074,7 @@ export async function installStudio(){
     if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
     announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`,false,playedTest);
   }});
-  mounted=true;showStudio();render();setTab('game');playView.enter();status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
+  mounted=true;showStudio();render();setTab('game');enterPlayView();status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
  }
  async function playWorking(){const s=current();if(!canChangePlay(s))return;if(s.remoteId){await showRemote(s,s.remoteId,'working');return;}if(!s.projectId){disposeGame();showing='working';$('studioEmpty').hidden=false;showStudio();render();return;}const r=games.revision(s.projectId,s.owner);playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'working',r.id);}
  async function playCandidate(){const s=current(),c=s.candidate;if(!canChangePlay(s))return;if(!c)return playWorking();if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate');}
@@ -1306,7 +1307,7 @@ export async function installStudio(){
   const url=new URL(preview.url);url.searchParams.set('channel',previewChannel);iframe.src=url.href;host.replaceChildren(iframe);
   previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onReadyChange:()=>queueMicrotask(()=>{if(sameView(s,generation))render();}),onRound:d=>announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest)});
   $('studioPlayNote').textContent=preview.adapter==='mock'?'Test builder (mock)—not a real AI generation.':'Private preview. Your working game stays unchanged until you keep it.';
-  render();setTab('game');playView.enter();
+  render();setTab('game');enterPlayView();
  }
  window.addEventListener('message',event=>{
   if(!iframe||event.source!==iframe.contentWindow||previewOwner!==owner()||route!=='studio')return;
