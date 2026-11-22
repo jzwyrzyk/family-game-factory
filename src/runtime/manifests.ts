@@ -1,6 +1,7 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
-  // The original mining game exposes no supported local tuning controls.
+  // Mining's difficulty grows through its actual levels. No decorative tuning
+  // controls are offered when the game does not implement a local edit.
   mining: {version:1,id:'mining',name:'Mind Your Jems!',mechanics:[]},
   factory: {version:1,id:'factory',name:'Jem Factory',mechanics:[
     {key:'orderSize',label:'Gifts per day',type:'number',default:2,min:2,max:5,step:1},

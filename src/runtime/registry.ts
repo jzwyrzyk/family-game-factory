@@ -27,7 +27,7 @@ export const plugins: Record<GameId, GamePlugin> = {
   hill: {manifest: manifests.hill, mount: (target, context) => new Hill(target, context)},
 };
 const details = {
-  mining: {type:'MINING ADVENTURE',instructions:'Tap crystals to collect Jems. Bank them in the cart. Grab on before the mountain shakes!',controls:'Tap a crystal · Bank Jems · Grab on during a warning · Tab and Enter on a keyboard'},
+  mining: {type:'MINING ADVENTURE',instructions:'Run to jems and save them in the bucket. Fill it to reach the next level. Hold on when the giant shakes!',controls:'← → or A / D to run · Hold Space to cling · Hold the touch controls below'},
   factory: {type:'SPARKLE WORKSHOP',instructions:'Find the next jem, tap the cutter in the green, and wrap your gift!',controls:'Keep or Return · Tap in the green · Rub the jem · Pick your paper · Tap your gift'},
   moon: {type:'MOON COLLECTOR',instructions:'Help your cat collect donuts and jump over falling meteors.',controls:'← → move · ↑ or Space jump · touch controls below'},
   robot: {type:'ROBOT PUZZLE',instructions:'Invent an arrow route to the star. The dark squares are walls.',controls:'Tap arrow buttons to plan · Run to test · Undo or Clear to revise'},

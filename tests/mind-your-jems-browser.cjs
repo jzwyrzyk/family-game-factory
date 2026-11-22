@@ -6,7 +6,6 @@ const path=require('node:path');
 const {start}=require('./browser-server.cjs');
 const {createJourney}=require('./mind-your-jems-fixture.cjs');
 const {createReview}=require('./mind-your-jems-review.cjs');
-const {filteredContrast}=require('./mind-your-jems-contrast.cjs');
 
 const devices=[
  {name:'desktop',viewport:{width:1280,height:900},touch:false,mobile:false,motion:'reduce'},
@@ -27,78 +26,51 @@ const devices=[
 async function geometry(journey,device,review){
  const details=await journey.arcade.evaluate(dialog=>{
   const rect=element=>{const r=element.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
-  // Inert scene buttons are intentionally unavailable while help is open.
-  // Disabled targets still need usable dimensions, but an error/ready overlay
-  // need not expose an unavailable cart through itself.
-  const stage=dialog.querySelector('.myj-stage'),targets=[...dialog.querySelectorAll('button')].filter(element=>
-   element.getClientRects().length&&getComputedStyle(element).visibility==='visible'&&!element.closest('[inert]'));
-  const notice=dialog.querySelector('.myj-notice-visible'),rock=rect(dialog.querySelector('.myj-rock'));
-  const speech=dialog.querySelector('.myj-speech'),speechStyle=getComputedStyle(speech);
-  const eyes={x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65};
-  const compactScene=(innerWidth<=600&&innerHeight<=720&&innerHeight>=innerWidth)||(innerHeight<=600&&innerWidth>innerHeight);
-  // The illustrated eye region has stable coordinates in every atlas frame.
-  // Check visible overlap explicitly: pointer-events:none feedback can still
-  // hide a crystal while the native hit-target test reports it reachable.
-  const feedback=compactScene&&notice&&notice.textContent.trim()?{text:notice.textContent.trim(),...rect(notice),
-   fontSize:parseFloat(getComputedStyle(notice).fontSize),textFits:notice.scrollWidth<=notice.clientWidth+1,
-   eyes}:null;
-  const colors=element=>{
-   const style=getComputedStyle(element);
-   return {color:style.color,backgroundColor:style.backgroundColor,backgroundImage:style.backgroundImage,filter:style.filter};
-  };
-  const cosmeticToasts=[...document.querySelectorAll('.jems-rewards-toast,.jems-delight-toast')].filter(element=>{
-   const box=element.getBoundingClientRect();
-   if(!box.width||!box.height||box.right<=0||box.bottom<=0||box.left>=innerWidth||box.top>=innerHeight)return false;
-   for(let node=element;node;node=node.parentElement){
-    const style=getComputedStyle(node);
-    if(style.display==='none'||style.visibility!=='visible'||Number(style.opacity)===0)return false;
-   }
-   return true;
-  }).map(element=>({kind:element.className,text:element.textContent.trim(),...rect(element)}));
-  return {phase:dialog.dataset.phase,viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
-   feedback,cosmeticToasts,speech:speechStyle.display!=='none'&&Number(speechStyle.opacity)>0?{...rect(speech),eyes}:null,
+  const visible=element=>element.getClientRects().length&&getComputedStyle(element).visibility==='visible'&&!element.closest('[inert]');
+  const stage=dialog.querySelector('.myj-stage'),targets=[...dialog.querySelectorAll('button'),
+   ...document.querySelectorAll('#studioHome,#studioFullScreen,#studioChange,#studioHelp,#studioMore > summary')].filter(visible),rock=rect(dialog.querySelector('.myj-rock'));
+  const bag=dialog.querySelector('.myj-score-loose');
+  const overlays=[...dialog.querySelectorAll('.myj-ready,.myj-build-problem,.myj-notice-visible')].filter(visible).map(element=>({name:element.className,...rect(element)}));
+  return {phase:dialog.dataset.phase,
+   viewport:{width:innerWidth,height:innerHeight},dialog:rect(dialog),stage:rect(stage),
+   player:rect(dialog.querySelector('.myj-miner-anchor')),overlays,
+   scoring:{capacity:bag.querySelector('small').textContent.trim(),loose:Number(bag.querySelector('[data-myj="loose"]').textContent),weightedMarkers:dialog.querySelectorAll('.myj-gem-value').length,...rect(bag)},
+   eyes:{x:rock.x+rock.width*.25,y:rock.y+rock.height*.42,right:rock.x+rock.width*.8,bottom:rock.y+rock.height*.65},
+   gems:[...dialog.querySelectorAll('[data-crystal]')].filter(visible).map(gem=>({id:gem.dataset.crystal,...rect(gem)})),
    overflow:{horizontal:dialog.scrollWidth-dialog.clientWidth,vertical:dialog.scrollHeight-dialog.clientHeight},
-   targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2),copy=element.querySelector('span');return {
+   targets:targets.map(element=>{const box=rect(element),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {
     label:element.getAttribute('aria-label')||element.textContent.trim(),...box,enabled:!element.disabled,
-    reachable:hit===element||element.contains(hit),crystal:element.hasAttribute('data-crystal'),
-    action:element.matches('.myj-action'),fontSize:parseFloat(getComputedStyle(element).fontSize),
-    textFits:element.scrollWidth<=element.clientWidth+1&&element.scrollHeight<=element.clientHeight+1&&
-     (!copy||(copy.scrollWidth<=copy.clientWidth+1&&copy.scrollHeight<=copy.clientHeight+1)),
-    colors:!element.disabled&&element.matches('.myj-action,.myj-native-tools button,[data-myj="help-done"]')?colors(element):null};})};
+    primary:['left','right','grab'].includes(element.dataset.myj),reachable:hit===element||element.contains(hit)};})};
  });
- for(const target of details.targets)target.contrast=target.colors?filteredContrast(target.colors):null;
+ details.ready=await journey.ready();
  review.check(device.name,'layout-and-hit-targets',details);
- assert.deepEqual(details.cosmeticToasts,[],device.name+' fitted play keeps reward and delight popups off the game and its labels');
- assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' shared native game fits viewport');
+ assert.match(details.scoring.capacity,/^\/\s*10$/,device.name+' pocket visibly holds ten jems');
+ assert.equal(details.scoring.weightedMarkers,0,device.name+' all jem colours use the same one-jem value without weighted badges');
+ assert.ok(Number.isInteger(details.scoring.loose)&&details.scoring.loose>=0&&details.scoring.loose<=10,device.name+' carried jem count stays within the ten-jem pocket');
+ assert.ok(details.scoring.x>=details.stage.x-1&&details.scoring.right<=details.stage.right+1,device.name+' two-digit pocket readout fits the visible stage');
+ assert.ok(details.dialog.x>=-1&&details.dialog.y>=-1&&details.dialog.right<=details.viewport.width+1&&details.dialog.bottom<=details.viewport.height+1,device.name+' game fits viewport');
  assert.ok(details.overflow.horizontal<=2,device.name+' has no horizontal clipping');
  assert.ok(details.overflow.vertical<=2,device.name+' main game fits without scrolling');
  assert.ok(details.stage.height>=Math.min(300,device.viewport.height*.46),device.name+' gives the illustrated play area useful space');
  for(const target of details.targets){
-  assert.ok(target.width>=43.5&&target.height>=43.5,device.name+' target is at least 44px: '+target.label);
-  if(target.action)assert.ok(target.height>=48&&target.fontSize>=18&&target.textFits&&
-   target.x>=details.dialog.x&&target.right<=details.dialog.right&&target.y>=details.dialog.y&&target.bottom<=details.dialog.bottom,
-   device.name+' '+details.phase+' action stays fully readable and inside the game even when disabled: '+JSON.stringify(target));
+  const minimum=target.primary?47.5:43.5;
+  assert.ok(target.width>=minimum&&target.height>=minimum,device.name+' usable target: '+target.label);
   if(target.enabled){
    assert.ok(target.reachable,device.name+' available control is not covered: '+target.label);
    const visibleWidth=Math.min(target.right,details.viewport.width)-Math.max(target.x,0),visibleHeight=Math.min(target.bottom,details.viewport.height)-Math.max(target.y,0);
-   assert.ok(visibleWidth>=43.5&&visibleHeight>=43.5,device.name+' available control has a visible 44px target: '+target.label);
+   assert.ok(visibleWidth>=minimum&&visibleHeight>=minimum,device.name+' control remains visibly reachable: '+target.label);
   }
-  if(target.contrast)assert.ok(target.contrast.ratio!==null&&target.contrast.ratio>=4.5,
-   device.name+' active '+target.label+' has readable contrast: '+JSON.stringify(target.contrast));
-  if(target.crystal)assert.ok(target.x>=details.stage.x-1&&target.y>=details.stage.y-1&&target.right<=details.stage.right+1&&target.bottom<=details.stage.bottom+1,device.name+' crystal remains inside the visible scene');
  }
- if(details.feedback){
-  const toast=details.feedback,intersects=box=>Math.min(toast.right,box.right)-Math.max(toast.x,box.x)>1&&Math.min(toast.bottom,box.bottom)-Math.max(toast.y,box.y)>1;
-  assert.ok(toast.fontSize>=18&&toast.textFits&&toast.x>=details.stage.x&&toast.right<=details.stage.right&&toast.y>=details.stage.y&&toast.bottom<=details.stage.bottom,
-   device.name+' keeps meaningful feedback readable inside the scene: '+JSON.stringify(toast));
-  for(const target of details.targets.filter(target=>target.crystal&&target.enabled))assert.ok(!intersects(target),device.name+' feedback leaves active crystal art visible: '+target.label);
-  assert.ok(!intersects(toast.eyes),device.name+' feedback leaves the rock eyes visible');
-  review.check(device.name,'feedback-clearance',{text:toast.text,crystals:details.targets.filter(target=>target.crystal&&target.enabled).length,eyesClear:true});
+ for(const gem of details.gems)assert.ok(gem.x>=details.stage.x-1&&gem.y>=details.stage.y-1&&gem.right<=details.stage.right+1&&gem.bottom<=details.stage.bottom+1,device.name+' spawned jem stays in visible scene: '+gem.id);
+ for(const overlay of details.overlays){
+  const intersects=box=>Math.min(overlay.right,box.right)-Math.max(overlay.x,box.x)>1&&Math.min(overlay.bottom,box.bottom)-Math.max(overlay.y,box.y)>1;
+  for(const gem of details.gems)assert.ok(!intersects(gem),device.name+' build/status notice leaves jem art visible: '+gem.id);
+  assert.ok(!intersects(details.eyes),device.name+' build/status notice leaves the giant’s eyes visible');
+  if(!['falling','retry'].includes(details.phase))assert.ok(!intersects(details.player),device.name+' build/status notice leaves the miner visible');
  }
- if(details.speech){
-  const bubble=details.speech,intersects=box=>Math.min(bubble.right,box.right)-Math.max(bubble.x,box.x)>1&&Math.min(bubble.bottom,box.bottom)-Math.max(bubble.y,box.y)>1;
-  for(const target of details.targets.filter(target=>target.crystal&&target.enabled))assert.ok(!intersects(target),device.name+' decorative warning leaves crystal art visible: '+target.label);
-  assert.ok(!intersects(bubble.eyes),device.name+' decorative warning leaves the rock eyes visible');
+ if(!['falling','retry'].includes(details.phase)){
+  const p=details.player,s=details.stage;
+  assert.ok(p.x>=s.x-1&&p.y>=s.y-1&&p.right<=s.right+1&&p.bottom<=s.bottom+1,device.name+' moving miner remains visible on the playable route');
  }
 }
 
@@ -106,157 +78,297 @@ async function assertScrollRestored(journey){
  assert.equal(await journey.page.evaluate(()=>document.body.style.overflow),journey.bodyOverflow,'closing restores the previous document scroll style');
 }
 
-async function assertPlayHandoffScroll(journey){
- const {page}=journey;
- assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'the explicitly chosen preview owns the same play view after Mining unmounts');
- assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden','active play keeps the outer page still');
- const frame=await page.locator('#studioRemoteHost iframe').boundingBox(),size=page.viewportSize();
- assert.ok(frame&&frame.y>=0&&frame.y+frame.height<=size.height+1,'the generated game fits its new scroll owner');
- await page.locator('#studioHome').click();
- assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),false,'leaving releases the play view');
- await assertScrollRestored(journey);
-}
-
 async function helpPause(journey,device,review){
  const {arcade}=journey;
- await journey.phase('mining');
- await journey.activate(arcade.locator('[data-crystal="3"]'));await journey.advance(450);await journey.phase('warning');
- const saved={banked:await journey.score('banked'),loose:await journey.score('loose')};
+ // Freeze a real warning. The new loop preserves the exact remaining time;
+ // opening Help cannot erase the danger and grant another calm interval.
+ await journey.walkTo(96);await journey.freshCalm();await journey.collect();await journey.phase('warning');
  await journey.activate(arcade.locator('.myj-help-toggle'));
  assert.equal(await arcade.locator('.myj-stage').evaluate(stage=>stage.inert),true,'help makes scene controls inert');
  assert.equal(await arcade.locator('.myj-help-toggle').getAttribute('aria-expanded'),'true');
- await journey.advance(15000);
- assert.equal(await journey.score('banked'),saved.banked);assert.equal(await journey.score('loose'),saved.loose);
- assert.equal(await arcade.getAttribute('data-phase'),'mining','help pauses the warning without penalizing the child');
+ const saved=await journey.snapshot();await journey.advance(15000);
+ assert.deepEqual(await journey.snapshot(),saved,'help freezes movement, spawn, hazard and both scores');
  await geometry(journey,device,review);await review.capture(journey.page,arcade,device.name,'help');
  await journey.activate(arcade.locator('[data-myj="help-done"]'));
  assert.equal(await arcade.locator('.myj-stage').evaluate(stage=>stage.inert),false);
  assert.equal(await arcade.locator('.myj-help-toggle').getAttribute('aria-expanded'),'false');
- await journey.advance(2000);assert.equal(await arcade.getAttribute('data-phase'),'mining','closing help gives a fresh warning interval');
+ await journey.input('grab',true);await journey.phase('shaking');await journey.phase('mining');await journey.input('grab',false);
+ assert.equal(await journey.score('banked'),saved.banked,'help does not manufacture another deposit');
  review.check(device.name,'help-pause',{preserved:saved});
 }
 
-async function exercise(journey,device,review){
+async function heldShake(journey,device,review,capture){
+ await journey.walkTo(96);await journey.freshCalm();
+ assert.ok(await journey.collect()>0,'held-shake test has real carried cargo');
+ await journey.phase('warning');
+ const before=await journey.snapshot();
+ assert.equal(await journey.arcade.locator('.myj-rock').getAttribute('data-expression'),'warning');
+ await geometry(journey,device,review);await capture('warning');
+ await journey.input('grab',true);await journey.advance(32);
+ assert.equal((await journey.snapshot()).holding,true,'hold requires a sustained physical input');
+ assert.equal(await journey.arcade.locator('.myj-miner').getAttribute('data-pose'),'holding');await capture('holding');
+ await journey.phase('shaking');
+ const shaken=await journey.snapshot();
+ assert.equal(shaken.banked,before.banked,'banked jems survive shaking');
+ assert.equal(shaken.loose,0,'holding saves the miner but spills unbanked cargo');
+ assert.equal(shaken.gems.length,0,'a shake removes every active jem from the head');
+ assert.equal(await journey.arcade.locator('.myj-miner').getAttribute('data-pose'),'holding');await capture('shaking');
+ await journey.phase('mining');await journey.input('grab',false);await journey.advance(32);
+ assert.equal((await journey.snapshot()).holding,false,'releasing hold releases the miner');
+ review.check(device.name,'held-shake',{before,after:await journey.snapshot(),input:device.touch?'native touch':'keyboard'});
+}
+
+async function fallAndRetry(journey,device,review,capture){
+ await journey.walkTo(96);await journey.freshCalm();await journey.collect();
+ const banked=await journey.score('banked');await journey.phase('warning');
+ // Begin safely, then release during the shake. Survival cannot be latched
+ // forever by a tap during the warning.
+ await journey.input('grab',true);await journey.phase('shaking');await journey.advance(250);
+ await journey.input('grab',false);await journey.phase('falling');
+ assert.equal(await journey.arcade.locator('.myj-miner').getAttribute('data-pose'),'slipping');await capture('slipping');
+ await journey.phase('retry');
+ assert.equal(await journey.arcade.locator('[data-myj="continue"]').evaluate(button=>button===document.activeElement),true,'fall focuses its now-visible retry action');
+ await capture('retry');
+ const retry=await journey.snapshot();assert.equal(retry.banked,banked);assert.equal(retry.loose,0);
+ await journey.advance(3000);assert.deepEqual(await journey.snapshot(),retry,'losing waits for an explicit retry');
+ await journey.activate(journey.arcade.locator('[data-myj="continue"]'));await journey.advance(32);
+ const restarted=await journey.snapshot();assert.equal(restarted.phase,'mining');assert.equal(restarted.banked,banked);
+ assert.ok(restarted.safe,'retry starts on the bucket platform');
+ assert.equal(restarted.level,retry.level,'retry preserves the current level');
+ review.check(device.name,'release-fall-and-retry',{banked,level:restarted.level,input:device.touch?'native touch':'keyboard'});
+}
+
+async function levelUp(journey,device,review,capture){
+ for(let trip=0;trip<12&&(await journey.snapshot()).phase!=='level-complete';trip++)await journey.collectAndBank();
+ assert.equal((await journey.snapshot()).phase,'level-complete','physical deposits fill the first bucket');
+ assert.equal(Number(await journey.arcade.locator('.myj-goal-track').getAttribute('aria-valuemax')),12,'first bucket goal is clear');
+ assert.equal(await journey.arcade.locator('[data-myj="continue"]').evaluate(button=>button===document.activeElement),true,'win focuses its now-visible next-level action');
+ await capture('milestone');
+ const complete=await journey.snapshot();await journey.advance(5000);
+ assert.deepEqual(await journey.snapshot(),complete,'winning waits for explicit next level');
+ await journey.activate(journey.arcade.locator('[data-myj="continue"]'));await journey.advance(32);
+ const advanced=await journey.snapshot();assert.equal(advanced.level,complete.level+1);assert.equal(advanced.banked,complete.banked);
+ assert.equal(advanced.phase,'mining');assert.ok(advanced.safe);assert.equal(advanced.loose,0);
+ assert.ok(Number(await journey.arcade.locator('.myj-goal-track').getAttribute('aria-valuemax'))>12,'next level increases the actual bucket objective');
+ await geometry(journey,device,review);await capture('level-two');
+ review.check(device.name,'bucket-win-and-progression',{complete,advanced});
+}
+
+async function pauseLifecycle(journey,device,review){
  const {page,arcade}=journey;
- const mine=index=>journey.activate(arcade.locator('[data-crystal="'+index+'"]'));
- const bank=()=>journey.activate(arcade.locator('[data-myj="bank"]'));
- const capture=state=>review.capture(page,arcade,device.name,state);
- assert.equal((await journey.original()).job.status,'building');
- assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-pending'),'1','the acknowledged original build remains in progress');
- assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-unread'),'0','building does not invent a ready update');
+ await journey.walkTo(96);await journey.freshCalm();await journey.collect();
+ await journey.activate(arcade.locator('.myj-pause'));const paused=await journey.snapshot();
+ await journey.advance(20000);assert.deepEqual(await journey.snapshot(),paused,'Pause freezes every gameplay clock');
+ await journey.activate(arcade.locator('[data-myj="resume"]'));await journey.advance(1000);
+ assert.equal((await journey.snapshot()).x,paused.x,'resume does not restore a stale movement key');
+ await journey.phase('warning');
+ await page.evaluate(()=>{
+  Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+  Object.defineProperty(document,'visibilityState',{configurable:true,get:()=> 'hidden'});
+  document.dispatchEvent(new Event('visibilitychange'));
+ });
+ const hidden=await journey.snapshot();await journey.advance(30000);
+ assert.deepEqual(await journey.snapshot(),hidden,'hidden tabs do not advance movement, spawn or danger');
+ await page.evaluate(()=>{delete document.hidden;delete document.visibilityState;document.dispatchEvent(new Event('visibilitychange'));});
+ assert.equal(await arcade.locator('[data-myj="resume"]').isVisible(),true,'returning asks for an explicit resume');
+ await journey.advance(2000);assert.deepEqual(await journey.snapshot(),hidden,'visibility alone cannot restart gameplay');
+ await journey.activate(arcade.locator('[data-myj="resume"]'));await journey.advance(200);
+ assert.deepEqual(await journey.snapshot(),hidden,'resume grace preserves the saved warning before holding');
+ await journey.input('grab',true);await journey.advance(800);
+ await journey.phase('shaking');await journey.phase('mining');await journey.input('grab',false);
+ assert.equal(await journey.score('banked'),hidden.banked);
+ review.check(device.name,'pause-and-background',{paused,hidden,banked:await journey.score('banked')});
+}
+
+async function inputLifecycle(journey,device,review){
+ const {page,arcade}=journey;
+ const scroll=await page.evaluate(()=>({x:scrollX,y:scrollY}));
+ await journey.walkTo(65);
+ const x=(await journey.snapshot()).x;
+ if(device.touch){
+  await journey.input('left',true);await journey.input('grab',true);await journey.advance(300);
+  assert.equal((await journey.snapshot()).holding,true,'second touch can hold while movement touch stays down');
+  assert.equal((await journey.snapshot()).x,x,'holding arrests movement');
+  await journey.input('grab',false);await journey.advance(250);
+  assert.ok((await journey.snapshot()).x<x-1,'remaining movement touch resumes after releasing hold');
+  await journey.releaseInputs();const cancelled=await journey.snapshot();await journey.advance(300);
+  assert.equal((await journey.snapshot()).x,cancelled.x,'native touchcancel cannot leave movement latched');
+ }else{
+  await page.keyboard.down('a');await journey.advance(250);await page.keyboard.up('a');
+  assert.ok((await journey.snapshot()).x<x-1,'A moves left');
+  const left=(await journey.snapshot()).x;
+  await page.keyboard.down('d');await journey.advance(250);await page.keyboard.up('d');
+  assert.ok((await journey.snapshot()).x>left+1,'D moves right');
+  await journey.input('grab',true);await journey.advance(250);await journey.input('grab',false);
+  await arcade.locator('[data-myj="left"]').focus();
+  await page.keyboard.down('Enter');await journey.advance(150);await page.keyboard.press('Tab');await page.keyboard.up('Enter');
+  const tabbed=await journey.snapshot();await journey.advance(250);
+  assert.equal((await journey.snapshot()).x,tabbed.x,'releasing Enter after focus changes cannot leave a movement control held');
+  await arcade.locator('[data-myj="left"]').focus();
+  assert.equal(await arcade.locator('[data-myj="left"]').evaluate(element=>element.matches(':focus-visible')),true,'keyboard controls keep visible focus');
+ }
+ assert.deepEqual(await page.evaluate(()=>({x:scrollX,y:scrollY})),scroll,'movement and Space do not scroll the page');
+ await journey.walkTo(96);
+ review.check(device.name,'sustained-input-lifecycle',{input:device.touch?'native multi-touch and touchcancel':'arrows, A/D and Space',scroll});
+}
+
+async function hostMenuPause(journey,device,review){
+ const {page,arcade}=journey;
+ await journey.walkTo(96);await journey.freshCalm();await journey.collect();await journey.phase('warning');
+ await journey.openBuilds();
+ assert.equal(await arcade.getAttribute('data-paused'),'true','opening shared tools pauses the native hazard');
+ const saved=await journey.snapshot();
+ await page.locator('#studioMore > summary').focus();
+ await page.keyboard.down('ArrowLeft');await page.keyboard.down('Space');await journey.advance(5000);
+ assert.deepEqual(await journey.snapshot(),saved,'keys aimed at shared tools cannot move or hold the miner');
+ await page.keyboard.up('Space');
+ await journey.advance(32);
+ assert.deepEqual(await journey.snapshot(),saved,'menu reading freezes the exact warning and cargo');
+ // Space may activate the focused disclosure on keyup; close only if still open.
+ await journey.closeBuilds();
+ assert.equal(await arcade.locator('[data-myj="resume"]').isVisible(),true,'closing shared tools keeps an explicit return to play');
+ await journey.advance(3000);assert.deepEqual(await journey.snapshot(),saved,'closing a menu cannot restart a hidden hazard');
+ await journey.activate(arcade.locator('[data-myj="resume"]'));
+ await journey.advance(1200);
+ assert.equal((await journey.snapshot()).x,saved.x,'an arrow pressed in shared tools cannot become movement after resume');
+ await page.keyboard.up('ArrowLeft');
+ await journey.input('grab',true);await journey.advance(32);
+ await journey.phase('shaking');await journey.phase('mining');await journey.input('grab',false);
+ assert.equal(await journey.score('banked'),saved.banked,'reading shared tools does not award a deposit');
+ review.check(device.name,'shared-menu-pause-and-key-scope',{saved,resumed:await journey.snapshot()});
+}
+
+async function nativeNavigation(journey,device,review){
+ const {page,arcade}=journey;
+ await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+ // The ready preview and ordinary catalogue use the same visible exit.
+ await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);
+ assert.equal(await page.locator('#page-studio-library').isVisible(),true);
+ const catalogue=await page.locator('[data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter));
+ assert.ok(catalogue.includes('mining'),'Mind Your Jems is discoverable in Ready to Play');
+ assert.ok(!catalogue.includes('moon')&&!catalogue.includes('robot'),'retired toy starters do not clutter the catalogue');
+ const before=await page.evaluate(()=>FG.studio.exportNotebook());
+ await journey.activate(page.locator('[data-starter="mining"]'));await arcade.waitFor({state:'visible'});
+ await journey.until(async()=>await arcade.getAttribute('data-assets')==='ready','catalogue mining art loads');
+ assert.equal(await page.locator('dialog.myj-arcade[open]').count(),0,'catalogue entry has no separate popup');
+ assert.equal(await page.locator('#studioGameHost #game-mount .native-mining').count(),1,'catalogue and build-wait share the trusted native host');
+ assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0);
+ const original=before.sessions.find(session=>session.id===journey.project.id);
+ const current=await page.evaluate(id=>FG.studio.exportNotebook().sessions.find(session=>session.id===id),journey.project.id);
+ assert.deepEqual(current,original,'opening the catalogue preserves the build-owning saved game and its selected revision');
+ await geometry(journey,device,review);await review.capture(page,arcade,device.name,'catalogue-entry');
+ await journey.collectAndBank();
+ const saved=await journey.snapshot(),native=await arcade.elementHandle();
+ // Model a browser denying fullscreen, without replacing the host controller.
+ await page.evaluate(()=>{
+  Object.defineProperty(document,'fullscreenEnabled',{configurable:true,value:true});
+  document.getElementById('page-studio').requestFullscreen=()=>Promise.reject(new Error('Fixture: fullscreen denied'));
+ });
+ await journey.activate(page.locator('#studioFullScreen'));
+ await page.locator('#studioPlayDisplayStatus').waitFor({state:'visible'});
+ assert.equal(await page.locator('#studioFullScreen').getAttribute('aria-pressed'),'true');
+ assert.match(await page.locator('#studioPlayDisplayStatus').textContent(),/Expanded view/);
+ assert.equal(await native.evaluate(node=>node===document.querySelector('.native-mining')),true,'fullscreen keeps the same mining controller');
+ assert.deepEqual(await journey.snapshot(),saved,'fullscreen preserves the exact mining position, timer and score');
+ await geometry(journey,device,review);await review.capture(page,arcade,device.name,'fullscreen-fallback');
+ await page.keyboard.press('Escape');
+ assert.equal(await page.locator('#studioFullScreen').getAttribute('aria-pressed'),'false','Escape leaves expanded view');
+ assert.equal(await arcade.isVisible(),true,'Escape keeps the ordinary native game open');
+ assert.equal(await native.evaluate(node=>node.isConnected),true);await native.dispose();
+ if(await arcade.locator('[data-myj="resume"]').isVisible())await journey.activate(arcade.locator('[data-myj="resume"]'));
+ // Unlike the satisfied pacing receipt used to isolate long gameplay above,
+ // this real host checkpoint must pause the native game and remain exitable.
+ await page.evaluate(()=>{
+  FG.store.current().mathWindow=[];
+  window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game:'mining'}}));
+ });
+ await journey.until(()=>page.evaluate(()=>FG.learning.active),'native mining uses host-owned learning');
+ const attempt=await page.evaluate(()=>FG.learning.activeAttemptId);
+ assert.ok(attempt,'a real host attempt exists');
+ assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),true);
+ const checkpoint=await journey.snapshot();await journey.advance(2000);
+ assert.deepEqual(await journey.snapshot(),checkpoint,'host learning freezes native gameplay');
+ await journey.activate(page.locator('#studioFullScreen'));
+ assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt,'fullscreen preserves the same learning attempt');
+ assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),true,'fullscreen cannot release the learning pause');
+ await review.capture(page,arcade,device.name,'host-learning');
+ await journey.leave();
+ assert.equal(await page.evaluate(()=>FG.learning.active),false,'visible My Games exit can leave learning without answering');
+ assert.equal(await page.locator('#page-studio-library').isVisible(),true);await assertScrollRestored(journey);
+ assert.equal(await page.evaluate(()=>document.documentElement.style.overflow),'');
+ assert.equal(await page.locator('.native-mining').count(),0,'leaving removes the native controller');
+ review.check(device.name,'catalogue-native-fullscreen-and-learning-exit',{sameHost:true,gamePreserved:true,attempt,buildRequests:journey.counters.submitted});
+}
+
+async function exercise(journey,device,review){
+ const {page,arcade}=journey,capture=state=>review.capture(page,arcade,device.name,state);
+ assert.match(await journey.buildText(),/building/i);
+ assert.equal(await journey.ready(),false,'build does not invent readiness');
+ assert.equal(await arcade.locator('.myj-build').isVisible(),false,'build information belongs to the shared host menu');
  await geometry(journey,device,review);
  if(device.motion==='reduce'){
   const moving=await arcade.evaluate(element=>element.getAnimations({subtree:true}).filter(animation=>animation.playState==='running'&&animation.effect?.getKeyframes().some(frame=>'transform' in frame||'translate' in frame||'rotate' in frame)).length);
-  assert.equal(moving,0,'reduced-motion preference suppresses character and scenery movement');
+  assert.equal(moving,0,'reduced motion suppresses decorative character and scenery animations');
  }
  await capture('idle');
  assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'false','sound starts muted');
  if(device.name==='desktop'){
-  await arcade.locator('.myj-sound').click();assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'true');
-  await arcade.locator('.myj-sound').click();assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'false');
+  await journey.activate(arcade.locator('.myj-sound'));assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'true');
+  await journey.activate(arcade.locator('.myj-sound'));assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'false');
  }
- await mine(0);await journey.advance(450);await mine(3);
- assert.equal(await journey.score('loose'),4,'one-Jem and rare three-Jem crystals');
- assert.equal(await arcade.locator('.myj-miner').getAttribute('data-pose'),'mining','mining has a visible character action');
- await capture('mining');await journey.advance(450);
- await arcade.locator('[data-crystal="1"]').focus();await page.keyboard.press('Enter');
- assert.equal(await journey.score('loose'),5,'keyboard reaches and activates the same crystals');
- await capture('keyboard');await journey.advance(450);
- await journey.activate(arcade.locator('[data-myj="bank-cart"]'));
- assert.equal(await journey.score('banked'),5);assert.equal(await journey.score('loose'),0);
- await capture('banked');await journey.advance(700);
- for(let i=0;i<3;i++){await mine(3);await journey.advance(450);}
- assert.equal(await journey.score('loose'),8,'rare gems stop at the bag capacity');
- assert.equal(await arcade.locator('[data-crystal]:enabled').count(),0,'full bag blocks further mining');
- await capture('full-bag');await bank();assert.equal(await journey.score('banked'),13);await journey.advance(700);
- await mine(0);await journey.advance(450);await mine(3);await journey.advance(450);
- await journey.phase('warning');
- assert.equal(await arcade.locator('[data-myj="grab"]').isEnabled(),true);
- assert.equal(await arcade.locator('.myj-rock').getAttribute('data-expression'),'warning');
- await geometry(journey,device,review);
- await capture('warning');await journey.activate(arcade.locator('[data-myj="grab"]'));
- assert.equal(await arcade.getAttribute('data-holding'),'true');
- assert.equal(await arcade.locator('.myj-miner').getAttribute('data-pose'),'holding');
- await geometry(journey,device,review);
- await capture('holding');await journey.phase('shaking');
- assert.equal(await journey.score('banked'),13,'banked Jems survive shaking');
- assert.equal(await journey.score('loose'),0,'holding protects the miner, not loose cargo');
- assert.equal(await arcade.locator('.myj-miner').getAttribute('data-pose'),'holding');
- await geometry(journey,device,review);
- await capture('shaking');await journey.phase('mining');
- if(device.name==='desktop'||device.name==='mobile-motion'){
-  await mine(3);await journey.advance(450);await journey.phase('warning');await journey.phase('shaking');
-  assert.equal(await arcade.locator('.myj-miner').getAttribute('data-pose'),'slipping','unheld miner visibly slips');
-  await capture('slipping');await journey.phase('mining');
-  for(let i=0;i<4;i++){await mine(3);await journey.advance(450);await bank();await journey.advance(700);}
-  assert.equal(await journey.score('banked'),25,'repeated deposits reach the actual milestone');await capture('milestone');
- }
- // The shared host preserves the exact phase and remaining timer while its
- // menu or another browser surface has the child's attention.
- if(device.name==='desktop'){
-  await mine(3);await journey.advance(450);await journey.phase('warning');
-  const saved=await page.evaluate(()=>FG.runtime.snapshot().state);
-  await page.locator('#studioMore > summary').click();
-  assert.equal(await arcade.getAttribute('data-paused'),'true');
-  await journey.advance(30000);
-  assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),saved,'More pauses the original hazard and scores exactly');
-  await page.keyboard.press('Escape');
-  assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false,'Escape closes the shared tools');
-  assert.equal(await arcade.getAttribute('data-paused'),'true','closing tools leaves an explicit resume choice');
-  await journey.activate(arcade.locator('.myj-pause-cover button'));
-  await page.evaluate(()=>{
-   Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
-   Object.defineProperty(document,'visibilityState',{configurable:true,get:()=> 'hidden'});
-   document.dispatchEvent(new Event('visibilitychange'));
-  });
-  await journey.advance(30000);
-  assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),saved,'background time cannot spend the warning interval');
-  await page.evaluate(()=>{delete document.hidden;delete document.visibilityState;document.dispatchEvent(new Event('visibilitychange'));});
-  await journey.advance(2000);assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),saved,'returning does not resume without the child');
-  await journey.activate(arcade.locator('.myj-pause-cover button'));
-  await journey.advance(2000);assert.equal(await arcade.getAttribute('data-phase'),'warning','resuming preserves the remaining warning time');
-  await journey.phase('mining');
-  review.check(device.name,'shared-menu-and-visibility-pause',{preserved:saved});
- }
+ const first=arcade.locator('[data-crystal]').first(),beforeClick=await journey.snapshot();
+ const crystalBox=await first.boundingBox();assert.ok(crystalBox,'spawned jem is visible');
+ const clickPoint={x:crystalBox.x+crystalBox.width/2,y:crystalBox.y+crystalBox.height/2};
+ if(device.touch)await page.touchscreen.tap(clickPoint.x,clickPoint.y);else await page.mouse.click(clickPoint.x,clickPoint.y);
+ await journey.advance(32);
+ assert.equal(await journey.score('loose'),0,'distant jems cannot be collected with a click or tap');
+ assert.equal((await journey.snapshot()).x,beforeClick.x,'a crystal click cannot teleport the miner');
+ assert.ok(await journey.collect()>0,'walking into a jem collects it');
+ assert.ok((await journey.snapshot()).x<beforeClick.x-10,'visible miner traverses the head');await capture('mining');
+ await journey.walkTo(96);assert.ok(await journey.score('banked')>0);assert.equal(await journey.score('loose'),0);await capture('banked');
+ await heldShake(journey,device,review,capture);
+ await fallAndRetry(journey,device,review,capture);
+ if(device.name==='desktop'||device.name==='mobile')await levelUp(journey,device,review,capture);
  await helpPause(journey,device,review);
- assert.equal(journey.counters.previewRequests,0,'playing the mini-game never opens the generated preview');
- await journey.activate(page.locator('#studioHome'));assert.equal(await arcade.isVisible(),false);
- await assertScrollRestored(journey);
+ if(device.name==='desktop'||device.name==='mobile')await pauseLifecycle(journey,device,review);
+ if(device.name==='desktop'||device.name==='mobile')await hostMenuPause(journey,device,review);
+ // Fresh session keeps the native input checks independent of increased
+ // difficulty. The close/reopen is the real user action being verified.
+ await journey.leave();assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
  await journey.launch.click();await journey.advance(50);
  assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0);
- // An old detached control cannot mutate a disposed game or a new mount.
- const oldCrystal=await arcade.locator('[data-crystal="0"]').elementHandle();
- await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);
- await journey.launch.click();await journey.advance(50);
- await oldCrystal.evaluate(button=>button.click());
- assert.equal(await journey.score('loose'),0,'detached previous-game callbacks cannot alter the new round');
- assert.equal(await arcade.isVisible(),true);
- await mine(0);assert.equal(await journey.score('loose'),1,'immediate reopen remains interactive');
- await journey.advance(450);await bank();assert.equal(await journey.score('banked'),1);await journey.advance(700);
+ await inputLifecycle(journey,device,review);await capture('keyboard');
+ const oldNative=await arcade.elementHandle();
+ await journey.leave();await assertScrollRestored(journey);await journey.launch.click();
+ await journey.advance(50);
+ assert.equal(await oldNative.evaluate(node=>node.isConnected),false,'leaving disposes the previous native game');
+ await oldNative.dispose();
+ assert.equal(await page.locator('#game-mount .native-mining').count(),1,'reopening mounts exactly one native game');
+ assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0);
+ review.check(device.name,'native-exit-and-reopen',{restoredOverflow:journey.bodyOverflow,singleController:true});
+ await journey.collectAndBank();const readyScore=await journey.score('banked');
  journey.state.status='ready';
- await journey.ready();
- assert.equal(journey.counters.previewRequests,0,'ready notification never auto-opens a preview');
- assert.match(await page.locator('#studioMore > summary').innerText(),/ready/i);await geometry(journey,device,review);await capture('ready');
- const readyScore=await journey.score('banked');await journey.advance(1500);
- assert.equal(await journey.score('banked'),readyScore,'ready status leaves earned progress intact');
- await journey.phase('mining');await mine(0);await journey.advance(450);
- await geometry(journey,device,review);
- await journey.activate(arcade.locator('[data-myj="bank-cart"]'));
- assert.equal(await journey.score('banked'),readyScore+1,'ready notification leaves the mining and cart controls playable');
- assert.equal(await journey.score('loose'),0);
- await geometry(journey,device,review);
- await capture('ready-playing');
- await journey.openOriginal();
- // The newly attached sandbox frame has its own animation frames and preview
- // handshake timers. Resume real time after the deterministic game assertions.
- await page.clock.resume();
+ await journey.until(()=>journey.ready(),'verified ready state is surfaced in the original project shelf',{step:250,limit:16000});
+ assert.equal(journey.counters.previewRequests,0,'readiness never auto-opens the preview');
+ assert.match(await journey.buildText(),/ready/i);
+ assert.match(await page.locator('#studioMore > summary').innerText(),/ready/i,'the ordinary game menu visibly signals readiness');
+ assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false,'readiness does not interrupt play with a menu');
+ // Freeze a deterministic safe state for the approved ready composition.
+ // A pending shake is still permitted, but capture always uses a fresh calm.
+ await journey.freshCalm();await geometry(journey,device,review);await capture('ready');
+ assert.equal(await journey.score('banked'),readyScore,'ready status preserves earned progress');
+ await journey.collectAndBank();assert.ok(await journey.score('banked')>readyScore,'host readiness leaves movement, collection and physical deposit playable');
+ await geometry(journey,device,review);await capture('ready-playing');
+ await journey.openBuilds();await journey.readyButton.scrollIntoViewIfNeeded();await capture('ready-menu');
+ await journey.playReady();await page.clock.resume();
  await page.locator('#studioRemoteHost iframe').waitFor({state:'attached'});
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
- assert.equal(await preview.locator('#result').innerText(),'Game started','handoff reaches an interactive preview fixture');
+ assert.equal(await preview.locator('#result').innerText(),'Game started','handoff reaches the interactive preview fixture');
  assert.equal(await arcade.isVisible(),false);assert.equal(journey.counters.previewRequests,1);
- await assertPlayHandoffScroll(journey);
- if(device.name==='desktop')await learningCheckpoint(journey,review);
- assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'preview capability does not enter saved projects');
+ assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'chosen preview stays in the same fitted game frame');
+ assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook()).includes('TEST_ONLY')),false,'preview capability stays out of saved projects');
+ if(device.name==='desktop'||device.name==='mobile')await nativeNavigation(journey,device,review);
+ else {await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);}
  review.check(device.name,'complete-journey',{motion:device.motion,loadedArt:journey.assets.length,buildRequests:journey.counters.submitted,previewRequests:journey.counters.previewRequests});
 }
 
@@ -264,155 +376,116 @@ async function existingRemoteHandoff(journey,review){
  const {page,arcade}=journey;
  assert.equal(journey.counters.previewRequests,1,'mini-game does not reload an existing generated game');
  journey.state.status='ready';
- await journey.ready();
+ await journey.until(()=>journey.ready(),'ready generated revision',{step:250,limit:16000});
  assert.equal(journey.counters.previewRequests,1,'readiness itself does not load either preview');
- await journey.openOriginal();await page.clock.resume();
+ await journey.playReady();await page.clock.resume();
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
  assert.equal(await preview.locator('#result').innerText(),'Game started');
  assert.equal(journey.counters.previewRequests,2,'handoff loads only the chosen new revision, not the old game followed by the new game');
  assert.ok(journey.counters.previewPaths[0].includes('myj-existing-revision'));
  assert.ok(journey.counters.previewPaths[1].includes('myj-ready-revision'));
- await assertPlayHandoffScroll(journey);
+ await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);
  review.check('remote-handoff','existing-generated-project',{previewPaths:journey.counters.previewPaths});
-}
-
-async function learningCheckpoint(journey,review){
- const {page,arcade}=journey;
- await journey.launch.click();
- await journey.activate(arcade.locator('[data-crystal="3"]'));
- const before=await page.evaluate(()=>FG.runtime.snapshot().state);
- await page.evaluate(()=>{
-  FG.store.current().mathWindow=[];
-  window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game:'mining'}}));
- });
- await page.waitForFunction(()=>FG.learning.active);
- const attempt=await page.evaluate(()=>FG.learning.activeAttemptId);
- assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),true,'the host owns the required learning pause');
- assert.equal(await arcade.getAttribute('data-paused'),'true');
- await page.waitForTimeout(1000);
- assert.deepEqual(await page.evaluate(()=>FG.runtime.snapshot().state),before,'required learning cannot spend Mining time or scores');
- await page.locator('#studioMore > summary').click();
- assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false,'Notifications and other tools cannot bypass required learning');
- assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt);
- await page.locator('#studioFullScreen').click();
- assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt,'expanded native play retains the same checkpoint');
- assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),true);
- await page.locator('#studioHome').click();
- assert.equal(await page.evaluate(()=>FG.learning.active),false,'the visible exit can interrupt without inventing an answer');
- assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
- review.check('desktop','native-host-learning',{attempt,pausedState:before,explicitExit:true});
 }
 
 async function recovery(journey,device,review){
  const {page,arcade,state,counters}=journey;
  if(device.artFailure){
   assert.equal(await arcade.getAttribute('data-assets'),'failed');
-  assert.equal(await arcade.locator('[data-crystal]:enabled').count(),0,'missing art cannot start invisible mining');
-  assert.equal(await arcade.locator('[data-myj="bank"]').isEnabled(),false);
+  for(const control of ['left','right','grab'])assert.equal(await arcade.locator('[data-myj="'+control+'"]').isEnabled(),false,'missing artwork disables '+control);
   assert.match(await arcade.locator('[data-myj="loading-copy"]').innerText(),/another try/i);
   await geometry(journey,device,review);await review.capture(page,arcade,device.name,'art-failure');
-  await journey.advance(25000);
-  assert.equal(await arcade.getAttribute('data-phase'),'mining','no hazard starts while artwork is missing');
-  assert.equal(await journey.score('loose'),0);
-  state.artBlocked=false;
-  await journey.activate(arcade.locator('[data-myj="retry-art"]'));
-  await journey.until(async()=>await arcade.getAttribute('data-assets')==='ready','artwork retry recovers');
-  await journey.inspectArtwork();
-  assert.equal(await arcade.locator('[data-myj="retry-art"]').isVisible(),false);
-  await review.capture(page,arcade,device.name,'art-recovered');
+  const failed=await journey.snapshot();await journey.advance(25000);assert.deepEqual(await journey.snapshot(),failed,'missing artwork cannot advance invisible gameplay');
+  state.artBlocked=false;await journey.activate(arcade.locator('[data-myj="retry-art"]'));
+  await journey.until(async()=>await arcade.getAttribute('data-assets')==='ready','artwork retry recovers');await journey.inspectArtwork();
+  assert.equal(await arcade.locator('[data-myj="retry-art"]').isVisible(),false);await review.capture(page,arcade,device.name,'art-recovered');
  }
- // Re-entry uses the ordinary catalog; the original build keeps its own
- // notification identity even while a different native project is selected.
- await journey.activate(page.locator('#studioHome'));await assertScrollRestored(journey);
- assert.equal(await page.locator('#page-studio-library').isVisible(),true,'recovery fixture starts from My Games');
+ await journey.leave();await assertScrollRestored(journey);
+ assert.equal(await page.locator('#page-studio-library').isVisible(),true);
  await journey.launch.click();await journey.advance(50);
- assert.equal(await arcade.isVisible(),true,'Mining opens through the shared Ready to Play card');
- assert.equal(await journey.score('banked'),0,'a reopened native round starts cleanly');
- await journey.activate(arcade.locator('[data-crystal="3"]'));await journey.advance(450);
- await journey.activate(arcade.locator('[data-myj="bank"]'));
- assert.equal(await journey.score('banked'),3);
+ assert.equal(await arcade.isVisible(),true,'global background shelf enters the same game');assert.equal(await journey.score('banked'),0);
+ await journey.collectAndBank();
  if(device.artFailure){
   state.networkOffline=true;
-  await journey.until(async()=>counters.interruptedPolls>0&&Number(await page.locator('#studioPlayNotifications').getAttribute('data-unread'))>0,'interrupted polling creates a visible notification count',{step:500,limit:20000});
-  assert.ok(counters.interruptedPolls>0,'reconnection is triggered by a real failed fixture request');
-  assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-pending'),'1','unknown build state remains in progress');
-  assert.equal(counters.previewRequests,0,'a connection error cannot claim readiness');
+  await journey.until(async()=>/Status unknown|checking connection/i.test(await journey.buildText()),'interrupted polling is shown in the original project shelf',{step:500,limit:20000});
+  assert.ok(counters.interruptedPolls>0);assert.match(await journey.buildText(),/Status unknown|checking connection/i);
+  assert.equal(await journey.ready(),false);
   await geometry(journey,device,review);await review.capture(page,arcade,device.name,'reconnecting');
-  await journey.phase('mining');
-  await journey.activate(arcade.locator('[data-crystal="0"]'));await journey.advance(450);
-  await journey.activate(arcade.locator('[data-myj="bank"]'));
-  assert.equal(await journey.score('banked'),4,'local mining stays playable while the build connection recovers');
+  const before=await journey.score('banked');await journey.collectAndBank();
+  assert.ok(await journey.score('banked')>before,'local mining remains playable without a build connection');
   state.networkOffline=false;
-  const polls=counters.jobPolls;
-  await journey.until(async()=>counters.jobPolls>polls&&await page.locator('#studioPlayNotifications').getAttribute('data-unread')==='0','the same acknowledged job reconnects and clears its unknown update',{step:500,limit:20000});
-  assert.equal(counters.submitted,1,'reconnecting never resubmits a build');
-  assert.equal(await journey.score('banked'),4,'reconnection preserves local earned progress');
+  await journey.until(async()=>/Building your idea/i.test(await journey.buildText()),'same acknowledged job reconnects',{step:500,limit:20000});
+  assert.equal(counters.submitted,1,'reconnection cannot resubmit a build');
  }
  state.status=device.recoveryTerminal;
- await journey.until(async()=>(await journey.original()).job?.status===device.recoveryTerminal,'terminal status is saved on the original build',{step:250,limit:16000});
- assert.equal(counters.previewRequests,0,'a failed or cancelled job never requests a preview');
- assert.equal(await page.locator('#studioPlayNotifications').getAttribute('data-pending'),'0');
+ const terminalCopy=device.recoveryTerminal==='failed'?/Build needs help/i:/Build stopped/i;
+ await journey.until(async()=>terminalCopy.test(await journey.buildText()),'terminal build status reaches the original project shelf',{step:250,limit:16000});
+ assert.equal(await journey.ready(),false);
+ assert.match(await journey.buildText(),terminalCopy);
+ if((await journey.snapshot()).phase==='level-complete')await journey.activate(arcade.locator('[data-myj="continue"]'));
  await geometry(journey,device,review);await review.capture(page,arcade,device.name,device.recoveryTerminal);
- await journey.phase('mining');
- const banked=await journey.score('banked');
- await journey.activate(arcade.locator('[data-crystal="3"]'));await journey.advance(450);
- await geometry(journey,device,review);
- await journey.activate(arcade.locator('[data-myj="bank-cart"]'));
- assert.equal(await journey.score('banked'),banked+3,'a terminal build leaves mining and the cart playable');
+ const banked=await journey.score('banked');await journey.collectAndBank();assert.ok(await journey.score('banked')>banked,'a failed or cancelled build leaves real mining playable');
  await review.capture(page,arcade,device.name,device.recoveryTerminal+'-playing');
  if(device.portraitViewport){
-  // Keep the same terminal session alive through a smaller portrait layout.
-  // Its cart becomes enabled again, so a banner cannot silently cover it.
-  await page.setViewportSize(device.portraitViewport);await journey.advance(50);await journey.phase('mining');
-  await journey.activate(arcade.locator('[data-crystal="0"]'));await journey.advance(450);
-  await geometry(journey,{...device,viewport:device.portraitViewport},review);
-  await review.capture(page,arcade,device.name,device.recoveryTerminal+'-small-portrait');
-  await journey.activate(arcade.locator('[data-myj="bank-cart"]'));
-  assert.equal(await journey.score('banked'),banked+4,'resizing preserves progress and keeps the terminal-state cart reachable');
+  const saved=await journey.score('banked'),resize=await journey.resizeViewport(device.portraitViewport);
+  assert.equal(await journey.score('banked'),saved,'orientation preserves deposited jems');
+  if((await journey.snapshot()).phase==='level-complete')await journey.activate(arcade.locator('[data-myj="continue"]'));
+  await geometry(journey,{...device,viewport:device.portraitViewport},review);await review.capture(page,arcade,device.name,device.recoveryTerminal+'-small-portrait');
+  await journey.collectAndBank();assert.ok(await journey.score('banked')>saved,'rotated terminal state keeps movement and the bucket usable');
   await review.capture(page,arcade,device.name,device.recoveryTerminal+'-small-portrait-playing');
-  review.check(device.name,'terminal-viewport-change',{viewport:device.portraitViewport,banked:banked+4});
+  review.check(device.name,'terminal-viewport-change',{viewport:device.portraitViewport,resize,banked:await journey.score('banked')});
  }
- const row=await journey.notification();
- assert.equal(await row.getAttribute('data-notification-kind'),device.recoveryTerminal==='failed'?'failed':'draft','cancelled authored work becomes a draft rather than a permanent job row');
- await journey.activate(row.locator('[data-notification-open]'));
- assert.equal(await arcade.isVisible(),false,'opening the original notification unmounts Mining');await assertScrollRestored(journey);
- assert.equal(await page.locator('#page-studio').isVisible(),true,'the notification opens the affected project');
- assert.equal(await page.locator('#page-studio-library').isVisible(),false,'recovery leaves My Games');
- assert.equal(await page.locator('#studioConversation').isVisible(),true,'recovery exposes the idea composer on small screens');
- assert.equal(await page.locator('#studioPrompt').isVisible(),true,'the child can revise an idea after a failed or cancelled build');
- assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]),journey.project.id,'terminal recovery opens the project that owns this background build');
- assert.equal(counters.previewRequests,0,'failed and cancelled builds never open a preview');
- review.check(device.name,'build-and-art-recovery',{terminal:device.recoveryTerminal,entry:'catalogue-and-original-project-notification',returnedToProject:journey.project.id,artRetries:device.artFailure?1:0,interruptedPolls:counters.interruptedPolls,buildRequests:counters.submitted,previewRequests:counters.previewRequests});
+ await journey.openBuilds();
+ await journey.buildItem.getByRole('button',{name:'Open game',exact:true}).scrollIntoViewIfNeeded();
+ await review.capture(page,arcade,device.name,device.recoveryTerminal+'-menu');
+ await journey.openBuildProject();assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
+ assert.equal(await page.locator('#page-studio').isVisible(),true,'terminal exit opens the build-owning project');
+ assert.equal(await page.locator('#page-studio-library').isVisible(),false);assert.equal(await page.locator('#studioConversation').isVisible(),true);
+ assert.equal(await page.locator('#studioPrompt').isVisible(),true,'the child can revise a failed idea');
+ assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]),journey.project.id);
+ assert.equal(counters.previewRequests,0,'terminal builds cannot open a preview');
+ review.check(device.name,'build-and-art-recovery',{terminal:device.recoveryTerminal,entry:'global-build-shelf',returnedToProject:journey.project.id,artRetries:device.artFailure?1:0,interruptedPolls:counters.interruptedPolls,buildRequests:counters.submitted,previewRequests:counters.previewRequests});
 }
 
 async function profileReset(journey,device,review){
  const {page,arcade,project}=journey;
- await journey.activate(arcade.locator('[data-crystal="3"]'));await journey.advance(450);
- await journey.activate(arcade.locator('[data-myj="bank"]'));
- await journey.activate(arcade.locator('[data-crystal="0"]'));
- assert.equal(await journey.score('banked'),3);assert.equal(await journey.score('loose'),1);
- await journey.choose(project.otherOwner);
+ // Model an application-driven profile event using the same guarded store and
+ // notification path as the profile chooser. This also exercises a change that
+ // arrives while movement is active, independently of shared menu pausing.
+ const choose=async owner=>{
+  const changed=await page.evaluate(owner=>{
+   if(!FG.store.choose(owner))return false;
+   FG.app.refreshProfiles();window.dispatchEvent(new Event('factory-profile'));return true;
+  },owner);
+  assert.equal(changed,true,'profile selection passes the application guards');
+ };
+ await journey.collectAndBank();await journey.collect();
+ assert.ok(await journey.score('banked')>0);assert.ok(await journey.score('loose')>0);
+ await choose(project.otherOwner);
  assert.equal(await arcade.isVisible(),false,'profile changes close active mini-game');await assertScrollRestored(journey);
- assert.equal(await page.locator('[data-notification-session="'+project.id+'"]').count(),0,'other profiles cannot see the previous child’s build');
+ assert.equal(await page.locator('#studioBuildShelf').isVisible(),false,'other profiles cannot see the previous child’s build');
  await journey.advance(20000);
  assert.equal(journey.counters.previewRequests,0);
- await journey.choose(project.owner);
+ // The background-build shelf is a real supported entry point after changing
+ // profiles and does not auto-open the project's separate generated preview.
+ await choose(project.owner);
  await journey.launch.click();await journey.advance(50);
  assert.equal(await journey.score('banked'),0);assert.equal(await journey.score('loose'),0,'profile re-entry starts a fresh mining session');
  assert.equal(await arcade.getAttribute('data-phase'),'mining');
- await journey.activate(arcade.locator('[data-crystal="0"]'));assert.equal(await journey.score('loose'),1,'profile re-entry is still interactive');
+ assert.ok(await journey.collect()>0,'profile re-entry still responds to real movement');
+ await journey.walkTo(96);
  journey.state.status='ready';
- await journey.ready();
- const notification=await journey.notification();
- const staleAction=await notification.locator('[data-notification-open]').elementHandle();
+ await journey.until(()=>journey.ready(),'ready callback exists before profile teardown',{step:250,limit:16000});
+ const oldReady=await journey.readyButton.elementHandle();
+ assert.ok(oldReady,'ready action exists before teardown');
  const before=await page.evaluate(id=>{
   const session=FG.studio.exportNotebook().sessions.find(item=>item.id===id);
   return {projectId:session.projectId,remoteId:session.remoteId,selectedTest:session.selectedTest};
  },project.id);
- await journey.choose(project.otherOwner);
+ await choose(project.otherOwner);
  assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
  // A delayed/programmatic activation of the old ready element must be inert.
- await staleAction.evaluate(button=>button.click());await journey.advance(1000);
+ await oldReady.evaluate(button=>button.click());await oldReady.dispose();await journey.advance(1000);
  assert.equal(journey.counters.previewRequests,0,'a stale ready callback cannot open another child’s preview');
  const after=await page.evaluate(id=>{
   const session=FG.studio.exportNotebook().sessions.find(item=>item.id===id);
@@ -427,15 +500,13 @@ async function recordGameplay(browser,base,review){
  const device={...devices.find(device=>device.name==='desktop-motion'),name:'gameplay-video'},journey=await createJourney(browser,base,device,true);
  try{
   const {arcade,page}=journey;await page.waitForTimeout(800);
-  for(const index of [0,3,1,2]){await journey.activate(arcade.locator('[data-crystal="'+index+'"]'));await page.waitForTimeout(650);}
-  await journey.activate(arcade.locator('[data-myj="bank"]'));await page.waitForTimeout(1000);
-  await journey.activate(arcade.locator('[data-crystal="3"]'));
-  await journey.phase('warning');await page.waitForTimeout(500);await journey.activate(arcade.locator('[data-myj="grab"]'));
-  await journey.phase('shaking');await journey.phase('mining');journey.state.status='ready';
-  await journey.ready();await page.waitForTimeout(1800);
-  const video=page.video();await journey.finish();const filename='mind-your-jems-gameplay.webm';
-  await video.saveAs(path.join(review.directory,filename));
-  review.manifest.video={file:filename,viewport:device.viewport,motion:'normal',source:'real browser with mocked build statuses'};
+  await journey.collectAndBank();await journey.collect();await journey.phase('warning');
+  await journey.input('grab',true);await journey.phase('shaking');await journey.phase('mining');await journey.input('grab',false);
+  await journey.walkTo(96);await journey.freshCalm();await journey.collect();await journey.phase('warning');await journey.phase('falling');await journey.phase('retry');
+  await page.waitForTimeout(700);await journey.activate(arcade.locator('[data-myj="continue"]'));
+  journey.state.status='ready';await journey.until(()=>journey.ready(),'recorded build is ready',{step:250,limit:16000});await page.waitForTimeout(1000);
+  const video=page.video();await journey.finish();const filename='mind-your-jems-gameplay.webm';await video.saveAs(path.join(review.directory,filename));
+  review.manifest.video={file:filename,viewport:device.viewport,motion:'normal',source:'real browser movement, collection, bank, held spill, unheld fall and retry; mocked build statuses'};
  }catch(error){await journey.context.close();throw error;}
 }
 
@@ -453,8 +524,9 @@ async function recordGameplay(browser,base,review){
    // Recovery fixtures intentionally start outside a fully loaded layout.
    (process.env.MYJ_LAYOUT_ONLY!=='1'||!device.recoveryTerminal&&!device.profileReset));
   assert.ok(selected.length,'MYJ_DEVICES must name a supported viewport');
+  const failures=[];
   for(const device of selected){
-   review.manifest.viewports.push(device);let journey;
+   review.manifest.viewports.push(device);const previousContexts=new Set(browser.contexts());let journey;
    try{
     journey=await createJourney(browser,base,device);
     if(process.env.MYJ_LAYOUT_ONLY==='1'){await geometry(journey,device,review);await review.capture(journey.page,journey.arcade,device.name,'idle');}
@@ -464,17 +536,16 @@ async function recordGameplay(browser,base,review){
     else await exercise(journey,device,review);
     await journey.finish();
    }catch(error){
-    review.manifest.errors.push(device.name+': '+(error.stack||String(error)));
-    console.error('FAIL '+device.name+': '+(error.stack||error));
-    if(journey){
-     await journey.page.screenshot({path:path.join(review.directory,device.name+'-failure.png'),animations:'disabled'}).catch(()=>{});
-     await journey.context.close();
-    }
+    const detail=device.name+': '+(error.stack||String(error));
+    failures.push(new Error(detail));review.manifest.errors.push(detail);console.error('FAIL '+detail);
+    if(journey&&await journey.arcade.isVisible())await journey.page.locator('#page-studio').screenshot({path:path.join(review.directory,device.name+'-failure.png'),animations:'disabled'}).catch(()=>{});
+    for(const context of browser.contexts())if(!previousContexts.has(context))await context.close();
     continue;
    }
-   console.log('PASS '+device.name+': '+(process.env.MYJ_LAYOUT_ONLY==='1'?'layout and loaded artwork':device.existingRemote?'existing generated-project handoff':device.recoveryTerminal?'failure, recovery, continued play and exit':device.profileReset?'profile teardown, reset and stale callback isolation':'art, layout, native input, bank, warning, hold, shake, reset, ready and playable handoff'));
+   console.log('PASS '+device.name+': '+(process.env.MYJ_LAYOUT_ONLY==='1'?'layout and loaded artwork':device.existingRemote?'existing generated-project handoff':device.recoveryTerminal?'failure, recovery, continued play and exit':device.profileReset?'profile teardown, reset and stale callback isolation':'art, layout, native input, bank, warning, hold, fall, levels, shared navigation and ready handoff'));
   }
   if(process.env.MYJ_CAPTURE_VIDEO==='1')await recordGameplay(browser,base,review);
+  if(failures.length)throw new AggregateError(failures,'Mind Your Jems failed in '+failures.length+' independent configuration(s); all available evidence is retained.');
  }catch(error){if(review)review.manifest.errors.push(error.stack||String(error));throw error;}
  finally{
   try{if(review)await review.finish();}

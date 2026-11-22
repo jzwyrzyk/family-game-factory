@@ -1,92 +1,134 @@
-# Mind Your Jems! — shared native play
+# Mind Your Jems! — run, collect, hold and bank
 
-Mind Your Jems is a prebuilt local game available from Ready to Play and, after an acknowledged build, through Play while I wait. Both modern entries use the same native runtime and fitted player. The November 22 navigation consolidation preserves the original tap/crystal/bank/grab rules described here; PR128's later movement/contact/level gameplay is separate. Its **This round** score and stars belong to the current mini-game session, separate from the lifetime gems shown in **My rewards**. They do not represent learning progress, influence build progress, or change the child's saved game.
+Mind Your Jems is a prebuilt, local arcade game. Its **Saved** score and bucket progress belong to the current mining session. They do not add to **My rewards**, represent learning progress, influence a background build, or alter the child's saved game.
 
-## Visual contract
+**Current source:** the owner's November 22, 2026 (America/New_York) request restores the intended movement, risk, banking and level progression while preserving the illustrated scene. The [ordered gameplay decision](../decisions/2026-11-22-mining-gameplay-and-navigation.md) records the sequence: overhaul the game first, then unify navigation and library organization. The follow-on [navigation contract](../decisions/2026-11-22-mining-game-navigation.md) now connects that same scene to the ordinary native player and catalogue. Combined source, hosted checks, visual acceptance and deployment remain separate states recorded in [Delivery state](../../DELIVERY-STATE.md).
 
-[The approved storyboard](reference-storyboard.png) is the production reference. The shipped game must preserve the reference's dimensional cartoon treatment: a cheerful miner, an expressive lavender rock giant, sculpted pink and mint hair, glossy colored crystals, a purple-and-gold minecart on a grassy ledge, and a lush floating-island world. Palette and subject matching alone do not satisfy this contract.
+## The playable contract
 
-The live UI uses the existing `public/jems-logo.svg` without alteration. Dynamic scores, instructions, build status and controls remain semantic HTML. The game's rounded display font is locally served Fredoka; its SIL Open Font License ships alongside it. No runtime font or art CDN is used.
+The child runs left and right across the giant's head to collect sporadically appearing jems. When a shake approaches, the child chooses between reaching safety with the bag or holding on and spilling it. Filling the bucket completes a level.
 
-Production assets live in `public/art/mind-your-jems/`. They are reusable illustrated layers, not a flattened game mockup. `scene-art.md` and `miner-props-art.md` record generation references, prompts, atlas coordinates and export details. The game uses the optimized WebP assets and preserves their alpha. Source PNG masters were used for verification and are not duplicated in the runtime payload.
+**Owner refinement, November 22, 2026:** every jem counts as one, and the pocket holds ten. This replaces the earlier weighted crystals and eight-jem capacity. The owner requested preparation of this refinement while holding its merge until the chat and shared shell corrections are complete.
 
-### Composition and behavior requirements
+| Action or event | Required consequence |
+| --- | --- |
+| Run into a jem | Collect it into the bag. Clicking a distant crystal cannot collect it. Every crystal counts as exactly 1 jem, including golden and sunset variants. |
+| Reach the bucket | Deposit automatically. The bag empties, **Saved** increases, and the current bucket fills. There is no remote Bank button. |
+| Notice the warning | A visible countdown and the giant's expression precede the shake. Sound is optional; the warning remains clear without it. |
+| Hold while exposed | The miner clings and stops moving. The shake spills the bag; holding protects the miner, not the carried jems. Hold must remain pressed throughout exposure to the shake. |
+| Reach the platform | The platform protects both the miner and any carried jems. The bucket sits farther onto that platform. The connecting bridge remains exposed. |
+| Shake without holding | The miner visibly falls, loses the unbanked bag, and reaches an explicit **Try again** state. Previously saved jems and the current bucket's progress survive. |
+| Any shake | Active crystals on the head fall away. The next calm period spawns new opportunities. |
+| Fill the bucket | Show **Bucket full!** and wait for **Next level**. Later levels change the actual bucket target and hazard timing. |
 
-- The miner, crystals and ladder move with the rock through a shared scene transform. Placement transforms are separate from local animation transforms.
-- Mining selects a strike pose; grabbing selects a holding pose; an unheld shake produces a harmless slip; banking and confirmed readiness select a celebration pose.
-- The face has distinct idle, warning, happy and recovery expressions.
-- The cart starts empty. Deposits add a visible gem pile and animate the transfer from the bag.
-- Desktop and landscape tablet have a wide composition. Portrait tablet and phone have their own framing, larger relative character and crystal sizes, and compact controls. Short phone landscape caps the head by the available height and puts the ready action in the header; a failed/cancelled build explanation sits beside the scene. Small-phone ready and terminal-build prompts use footer space to keep the eyes, crystals and cart clear. A single shrinking landscape image does not meet acceptance.
-- Text must not cover the miner, active crystals or the rock's eyes. Instructions belong in a dedicated help surface, which pauses the hazard while open.
-- Native crystal and action controls must remain keyboard operable, visible and reachable, with at least 44-by-44 CSS-pixel targets, including Help, Done, Retry, Back and the ready action. Keep deliberate visible focus treatment.
-- Reduced-motion mode uses pose and expression changes without continuous movement or flying particles. Optional local sounds are muted by default and start only after a user action.
+The bag holds ten jems. Each pickup uses one pocket space; when all ten spaces are full, further crystals remain on the head until there is room. The accounting invariant is `mined = banked + loose + lost`. Depositing beyond a level's target retains the entire deposit in the session's **Saved** score. The next level starts a new empty bucket; it does not remove that saved score.
 
-## Child experience
+Retry begins safely at the bucket on the same level. It does not reset saved bucket progress, spend anything, grant a reward, or start another game build. Leaving the mining session resets its score; the game adds no mining-score persistence or economy. Its ordinary native project/session uses the existing workspace and notebook records.
 
-1. **Mine:** tap a crystal or activate it with the keyboard. Most are worth 1 Jem; golden and sunset crystals are worth 3. The bag holds 8.
-2. **Bank:** tap the cart or **Bank my Jems**. Deposits add to **This round** and remain safe through every shake during that round. Actual deposits advance the next 25-Jem round star.
-3. **Notice:** after 11–18 seconds, the mountain has a big idea. A 3.6-second warning gives time to bank and grab.
-4. **Grab:** visibly hold the hair to avoid a funny slide. All unbanked Jems still fly away in the shake; banking is the only way to preserve them.
-5. **Continue:** shaking lasts 1.25 seconds, followed by a fresh mining period. There is no death, payment or recovery purchase.
-6. **Return:** verified build readiness updates the shared More cue and Notifications. The child explicitly opens the originating project's result. Readiness never interrupts a turn or opens a preview automatically.
+### Current tuning
 
-Closing resets this mini-game's scores; reopening starts a fresh round. The Help panel explicitly explains that these Jems and stars are round scores and do not add to My rewards. This wording clarifies the existing session boundary without adding rewards, persistence, conversion or a new economy.
+The one-jem value and ten-jem pocket are owner-specified requirements. The remaining numbers are implementation tuning, not proof of fun or a fixed owner-specified difficulty schedule.
 
-Help and a hidden browser tab cancel an approaching hazard without silently losing carried Jems. Returning gives a fresh warning interval. A profile change closes the arcade. Timers and optional sound are cleaned up on close, and an old native close event cannot erase an immediately reopened session.
+| Parameter | Current behavior |
+| --- | --- |
+| Jem value | 1 per crystal, for every color |
+| First bucket goal | 12 jems; later goals increase by 4, capped at 60 |
+| Pocket capacity | 10 jems |
+| Movement | 22 world units per second; the head spans 80 world units |
+| First-level calm interval | Seeded variation between 10 and 14 seconds |
+| Warning | 3 seconds at level 1, decreasing gradually to a 2-second minimum |
+| Shake | 1.5 seconds |
+| Fall | 850 ms, followed by explicit Retry |
+| Spawns | Variable positions and intervals, with reachable initial crystals and a bounded number of active crystals |
 
-## Studio integration
+The world uses positions from 0 to 100. Crystals appear at 5–76 on the head; the head ends at 80, safety starts at 88, and automatic banking starts at 94. The player starts at 96. Difficulty leaves movement speed unchanged, bounds the calm interval and warning, and increases the bucket objective. Real child play is needed to calibrate whether these choices produce the intended enjoyable challenge.
 
-- The direct catalogue tile opens ordinary native play. The separate Play while I wait action appears after a durable queued/building/testing job is acknowledged; it remembers the originating saved project separately. Typing an idea alone never claims a build was accepted.
-- The active build banner, focused handoff and Notifications may offer the same native game. There is no duplicate modern modal. The legacy dialog wrapper remains compatible.
-- Learning activity guards still apply. Launch stops speech and pauses the previous game using Studio's existing saved-scene mechanism.
-- Studio owns job polling, retry, cancellation and the authoritative `readyExperiment` check. Labels show observed phases, including interrupted connections; no invented percentages or completion times.
-- The ready handoff opens the chosen project without first loading its older working preview, then revalidates and opens the ready candidate once.
-- Build failure or cancellation is shown with a route back to the affected project's Studio idea composer, including when the arcade was opened from My Games; optional mining may continue. The composer remains visible on phones even when a first build has no playable game yet.
-- A native `mining` project uses the existing local game/notebook stores. Round scores remain transient and do not grant lifetime gems. Compatible strict readers are required for the new game ID; no analytics, third-party SDK, AI request or child-data collection is introduced. Artwork is built ahead of time and ships locally.
+## Controls, pause and lifecycle
 
-The native player's short-landscape feedback occupies clear lower-left scene space. Portrait decoration stays away from active crystals, and enabled Bank/Grab plus native tool/help labels must meet 4.5:1 measured contrast at their actual surfaces, including hover brightness. Native actions may wrap their longer holding label while keeping 18px text, a 48px minimum height and their complete bounds inside the player, including disabled holding/shaking states on a 360px phone. These layout refinements do not alter the legacy dialog or artwork/rules. They follow observed capture failures and require fresh native reference review.
+- **Keyboard:** Left/Right arrows or A/D move; held Space clings. Enter can hold the action of a focused movement control, and releasing it or moving focus clears that action.
+- **Touch or pointer:** large Left, Right and Hold on controls support sustained presses and simultaneous input. Pointer release, cancellation and lost capture release the corresponding action.
+- **Pause and Help:** freeze gameplay clocks, including warning, shaking, movement and spawns. They clear held inputs and stop optional sound. Help makes the stage and underlying mining toolbar inert. Its directions scroll within the panel while **Let’s play** stays in a fixed visible footer. Resuming an exposed warning or shake adds a 900 ms preparation grace while preserving the remaining simulation timer; it does not reroll the hazard or erase cargo.
+- **Backgrounding:** a hidden tab or lost window focus pauses the game. Returning does not silently restart play. Explicit resume returns keyboard focus to the game.
+- **Loss and win:** the result becomes visible before its Retry or Next level button receives focus. Neither screen advances on its own.
+- **Disposal:** cancel the animation loop, release input state, stop audio, disconnect resize observation and remove event listeners. A profile change or close cannot leave an old loop or ready callback controlling another session.
 
-The [consolidation decision](../decisions/2026-11-22-unified-game-notifications.md) and [Notifications contract](../homepage/NOTIFICATIONS.md) describe modern navigation, source boundaries and rollout. Prior modal captures below remain historical. Native-host screenshots use a separately reviewed reference directory with the existing comparison tolerances; the old modal references are retained.
+The pure engine advances in bounded slices. A delayed call advances at most 100 ms, so a suspended tab cannot jump through an entire warning into an immediate loss. Normal pausing is the controller's responsibility; the time cap is additional protection.
 
-## Verification commands
+## Visual contract and provenance
+
+[The approved storyboard](reference-storyboard.png) remains the production art reference. Preserve its dimensional cartoon treatment: a cheerful miner, an expressive lavender rock giant, sculpted pink and mint hair, glossy colored crystals, a purple-and-gold minecart on a grassy ledge, and a lush floating-island world. Palette and subject matching alone do not satisfy this contract. The gameplay overhaul reuses these assets.
+
+The UI uses the existing `public/jems-logo.svg` without alteration. Scores, instructions, build status and controls remain semantic HTML. The rounded display font is locally served Fredoka with its SIL Open Font License; there is no runtime font or art CDN.
+
+Production artwork lives in `public/art/mind-your-jems/`. [Scene provenance](../../public/art/mind-your-jems/scene-art.md) and [miner/props provenance](../../public/art/mind-your-jems/miner-props-art.md) retain generation references, prompts, atlas coordinates and export details. Optimized WebP layers preserve alpha. Source PNG masters used for original verification are not duplicated in the runtime payload.
+
+### Composition and animation acceptance
+
+- The visible running path follows the illustrated head and bridge into the bucket platform. Foot contacts, crystal positions and pickup distance must agree with the visible scene.
+- The renderer interpolates measured contact points on the common rock silhouette. Holding anchors the existing raised gloves to that surface; the platform's grass edge matches the rules' safe boundary. Viewport fitting reserves the miner and the giant's mouth, with only lower chin cropping on constrained screens. Tall portrait composition centers the connected world within its available space while leaving clearance for the countdown. These geometry choices still require screenshot and motion review.
+- The miner has visible running/collection, holding, falling and celebration states. The head must visibly shake during an unheld fall as well as a successful hold. Placement, facing and animation transforms remain separate.
+- The face retains idle, warning, happy and recovery expressions. Deposits add to the cart's visible pile and animate a transfer from the bag.
+- Desktop, tablet portrait/landscape and short/narrow phone layouts retain the giant, miner, reachable bucket and readable controls. Constrained grid columns prevent the mine from widening past its player. At 360 px or narrower, action labels remain 18 px and touch targets retain their size while decorative action icons are omitted. Short landscape keeps level, bucket goal and actions in one compact footer row; full directions remain in Help and live status stays available to assistive technology. The safety label sits beside the cart in that layout. Reflow the composition rather than shrinking all content into a single landscape image.
+- Text must not obscure the miner, active crystals or the giant's eyes. Longer instructions belong in Help. Readable child labels and targets follow [Child interface: clear at six](../brand/CHILD_INTERFACE.md).
+- All interactive actions, including Help, Pause, Retry, Next level, Back and the ready handoff, need visible focus and reachable targets. Crystals and the bucket are game objects, not remote action buttons.
+- Reduced motion suppresses decorative shaking, continuous bobbing and flying particles while retaining the essential player-controlled movement, states and consequences. Optional local sound starts muted and requires an explicit action.
+
+## Shared native player and Studio integration
+
+Mind Your Jems is the `mining` native game. The Ready to Play group places it beside Gem Factory, followed by Bubble Gum Builders and Junkyard Rally. Dragon Island Rescue and Splash or Pass appear under Original jems. Moon and Robot leave the default shelf while their saved runtime IDs, settings and child-authored work remain reachable. Drafts and conversations count as work even before an experiment exists.
+
+- `mountMindYourJems` owns the reusable scene and controller; `NativeMining` connects it to the ordinary lifecycle. The compatibility `createMindYourJems` wrapper remains in source but Studio does not use it for either catalogue or build-wait entry.
+- The [shared player](../homepage/PLAY_VIEW.md) owns My Games, fullscreen, Change, Help, More and profile access. There is no second mining dialog or unique close control. Its scene toolbar retains sound, pause and in-game directions without another layout header.
+- Entry focuses the actual stage. Embedded movement keys are accepted only from the game's stage or movement controls, with text fields and other buttons excluded. Moving focus or tapping into shared tools pauses the hazard and clears held input. Closing More leaves the visible **Keep playing** action in control of resume.
+- The native lifecycle retains the existing timed learning checkpoint, game inertness, pause/resume and guarded exits. Local bucket completion uses the mine's own Next level action and emits only a mechanic signal; it cannot manufacture a host round result, lifetime reward or learning evidence.
+- An acknowledged queued/building/testing job can offer explicit **Play while I wait**. This opens the same mining game through standard native starter creation/reuse; it never submits another generated job or changes the originating project's revision. Typing an idea alone does not launch mining.
+- Studio continues to own job polling, retries, cancellation, profile ownership and ready-experiment checks. The original project is first in **More → My builds & tests** during waiting. Status labels describe observed phases without invented progress or time estimates.
+- Confirmed readiness adds **ready** to More. The child explicitly opens **Play my game** or **Try ready test**; background completion never takes focus or changes the miner's state. The action re-reads the original project and opens only the chosen ready revision, avoiding an intermediate load of its old preview.
+- A failed or cancelled original build keeps a route back to its saved composer while mining can continue. Reconnecting never restarts generation or erases the mine's score.
+- Common Help/Change follows the existing action-game pause-preview flow. Explicit return starts a new mining run and retains the original build's priority. Leaving to My Games, another project or another profile clears the transient binding, disposes the game and restores the prior page scroll state; it does not cancel the build.
+
+The isolated phase 1 PR retained the old build-wait wrapper so gameplay could be reviewed first. Its historical scope and failed observations remain in Delivery state; they are not acceptance of the combined native journey. This follow-on adds no storage key, analytics, third-party SDK, automatic AI request or child-data collection. Artwork ships locally. The navigation contract records compatible gateway/worker requirements for later AI-built mining edits and the no-data-loss frontend rollback boundary.
+
+## Verification and evidence limits
 
 ```sh
 npm ci
 npx playwright install chromium
 npm run build
+node --import tsx --test tests/mind-your-jems.test.ts
 npm run test:unit
 node tests/mind-your-jems-browser.cjs
 MYJ_VISUAL_COMPARE=1 MYJ_CAPTURE_VIDEO=1 node tests/mind-your-jems-browser.cjs
 ```
 
-The browser suite uses the real bundled Studio, real game code and illustrated assets, with deterministic mocked backend statuses and an interactive preview fixture. It does not claim real paid AI generation or physical-device testing.
+At the phase 1 implementation checkpoint, the 14 focused rule tests passed locally. That checkpoint does not establish a full application build, revised browser acceptance, hosted CI, deployment, physical-device reliability or child enjoyment. Current exact validation and source status belong in [Delivery state](../../DELIVERY-STATE.md).
 
-The main journey runs ten browser configurations: desktop, portrait and landscape tablet, portrait phone and small phone, phone landscapes at 844×390 and 667×375, normal-motion desktop and phone, and the existing-remote-game handoff. These are browser viewports and input configurations, not ten physical devices. It exercises native pointer/touch and keyboard input, bag capacity, bank safety, held/unheld shakes, milestones, help and visibility pause, Escape and immediate reopen, confirmed ready gating, and the chosen preview handoff. Scene geometry, every visible native button's target size and input reachability are checked at runtime.
+The revised browser acceptance must exercise real controls against the bundled controller and approved artwork. Fixture backend statuses and a generated-preview fixture establish integration behavior, not paid AI generation. Required evidence includes contact-only pickup, sustained movement and Hold, partial/full bag handling, safe banking, complete warnings, held spill, unheld fall, Hold release during shaking, explicit Retry, bucket completion and Next level.
 
-Three supplementary recovery/profile fixtures cover failed art loading and a decoded Retry, a poll interruption followed by reconnection to the same job, failed and cancelled builds with continued mining and a route back, and profile switching with score reset and stale-ready suppression. Continued-ready and terminal-build checks mine again before testing the enabled cart, so an initially disabled cart cannot hide an obstructing prompt. The cancelled phone case also rotates from 667×375 to 360×640 and verifies reachable controls and preserved scores. The suite checks help pauses hazards and makes the stage inert, and closing restores the prior page scroll style. Expected transport failures are recorded separately from unexpected browser errors.
+Lifecycle evidence must cover simultaneous touch, key release after focus changes, late-warning/shake pause and resume, help, hidden tabs, art failure/retry, resize/orientation, close/reopen, build reconnection/failure/cancellation, owner changes and stale-ready suppression. Inspect focus, composed text contrast, control reachability, scene contacts and continued play when a build-ready or recovery message is visible. Browser viewports are not physical-device tests.
 
-## Art acceptance and visual regression
+### Reviewed visual evidence
 
-A functional pass alone is insufficient. Before accepting initial art or changing a baseline:
+The original illustrated click-to-mine implementation retains art provenance and earlier layout, wait-build, recovery and profile fixtures. Its ten main browser configurations, three supplementary fixtures and idle/warning/ready baselines describe that earlier implementation. Those earlier checks and pictures do not validate the new movement game.
 
-1. Inspect actual browser captures beside the storyboard for character proportions, material and lighting, scene contacts, composition, legibility and correct branding.
-2. Inspect portrait and landscape layouts, including title/character clearance and crystal target placement.
-3. Review idle, mining, banking, warning, holding, shaking, milestone and ready states. Review a normal-motion browser clip as well as reduced-motion stills.
-4. Fix the implementation before accepting its screenshots.
-5. Only after that review, explicitly accept the reference set. When local Chromium is available, run `MYJ_UPDATE_BASELINES=1 node tests/mind-your-jems-browser.cjs` locally. If the executor rejects Chromium before page load, a reviewer may instead import the exact PNG bytes from a hash-verified hosted artifact: verify its built commit/tree against the candidate, require all 13 functional configurations to pass, and inspect every required state and the normal-motion recording first. For the initial native set, the only remaining manifest errors may be the nine expected missing references. Record the source head/tree, run, artifact digest and individual image hashes in `review.json`. This is an explicit local acceptance after inspection; CI still only compares and must never approve or regenerate references itself.
+The current nine files in `tests/visual/mind-your-jems/` are the manually reviewed native-player captures from PR129 head `e314bab19607fffabe09a3815d0bc92c83bf78ed`. Their [review receipt](../../tests/visual/mind-your-jems/review.json) identifies the exact hosted build, run, artifact archive, manifest and individual image hashes, plus the reviewed normal-motion clip. The source run completed all 13 functional configurations and failed only its nine comparisons with the superseded click-to-mine pictures. Importing the reviewed captures does not change that historical result or establish a passing comparison for the final candidate.
 
-`tests/visual/mind-your-jems/` preserves the historical dialog references. The shared native player has a separate reviewed idle/warning/ready set for desktop, portrait tablet and phone in `tests/visual/mind-your-jems-native/`, with its [acceptance receipt](../../tests/visual/mind-your-jems-native/review.json). The November 22 initial set was explicitly imported from the verified hosted build of `cd6583ad043cfac5035f6783afb7476579cc6e43` only after all 13 functional configurations, required state captures and normal-motion evidence passed review. The receipt pins the identical source tree, artifact/video digests and each unchanged PNG's hash. The comparison uses a consistent Playwright Chromium version, local fonts, deterministic state, fixed viewports and the same 20-channel / 0.008 changed-pixel tolerance. The remaining state captures and a normal-motion recording are also required evidence; subsequent CI compares the committed reference bytes without regenerating them.
+Before accepting replacement baselines:
 
-The dedicated **Mind Your Jems art and gameplay review** workflow runs this game's actual journey, compares the reviewed views, and fails missing evidence. It supplements the site's existing page review, whose other routes do not open this optional arcade. Art-quality approval and image regression serve different purposes: the initial browser result must satisfy the visual contract before a baseline can protect it.
+1. Inspect actual browser captures beside the storyboard for proportions, material, lighting, scene contacts, composition, legibility and branding.
+2. Inspect desktop, tablet and phone layouts, including narrow portrait and short landscape.
+3. Review running, collection, banking, warning, holding, shaking, falling, retry, level completion and build-ready states. Review a normal-motion clip as well as reduced-motion stills.
+4. Correct the implementation before accepting its screenshots.
+5. Only after that review, explicitly accept the complete nine-image set locally. The usual path is `MYJ_UPDATE_BASELINES=1 node tests/mind-your-jems-browser.cjs`. If local Chromium cannot launch, an explicit local import of verified hosted captures is permitted: verify the source head and clean build, run and artifact identity, archive and manifest checksums, all nine image dimensions and checksums, and the complete functional result; record the still and normal-motion review in `review.json`. A run whose only failures are the known superseded-baseline comparisons can supply candidates, but any functional failure blocks acceptance. Preserve its original manifest and failed conclusion. CI must not regenerate or approve baselines, and the comparison tolerance remains 20 channel levels with a maximum changed ratio of 0.008.
 
-## Recovery checkpoints
+6. Run the existing hosted comparison against the accepted images on the final candidate. Baseline import, a passing functional journey and a passing visual comparison are separate observations.
 
-The illustrated rebuild was recovered from local work after the remote PR remained on its original SVG implementation. [The recovery checkpoint](RECOVERY-CHECKPOINT.md) records the bounded batches and remaining work. The live PR head, rather than an earlier local success report, establishes what has actually reached GitHub.
+The dedicated **Mind Your Jems art and gameplay review** workflow remains the separate visual/gameplay gate. Functional tests, visual comparisons and observed child play answer different questions; none substitutes for the others.
 
-## Release boundary
+## Recovery and release boundaries
 
-This is a feature PR. Passing tests and updating the artwork do not merge or deploy it. Production release follows the existing repository release process.
+[The recovery checkpoint](RECOVERY-CHECKPOINT.md) preserves how the earlier illustrated rebuild was recovered from local work while its remote PR still held an SVG implementation. It is historical evidence, not the current gameplay specification. A live PR head and its scoped results establish what reached GitHub.
 
-### Short-phone ready feedback
+The gameplay overhaul is a source change. Passing local checks or updating artwork baselines does not merge or deploy it. Production release follows the existing repository process; the ordered navigation work and actual child playtesting retain their own acceptance requirements.
 
-On 360×640 portrait and shallow landscape phones, short-lived ready-state banking notices use the existing footer hints rather than obscuring the rock's eyes and crystals. Play and scores remain visible, and ready handoff remains explicit. The browser suite asserts footer feedback and illustrated-scene clearance.
+The owner has held the merge of this refinement until the chat and shared shell corrections are complete. Earlier test counts and capture receipts retain their original source scope; they do not establish acceptance of this refinement.

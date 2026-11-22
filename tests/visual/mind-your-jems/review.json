@@ -1,10 +1,12 @@
 {
   "build": {
-    "sha": "75e888ee2910dcaf285f3c6b8c73d63e098c3919",
+    "sha": "baf6fc97e850f4b1db02fc1647d7ab179df4f9db",
     "dirty": false
   },
   "browser": "141.0.7390.37",
-  "acceptedBy": "Explicit MYJ_UPDATE_BASELINES command after visual review",
+  "acceptedBy": "Root approval for explicit local import of verified GitHub-hosted captures after independent still and normal-motion frame review",
+  "acceptedAt": "2026-11-22T18:20:01+00:00",
+  "surface": "shared native play view",
   "states": [
     "idle",
     "warning",
@@ -16,5 +18,232 @@
     "mobile"
   ],
   "channelTolerance": 20,
-  "maximumChangedRatio": 0.008
+  "maximumChangedRatio": 0.008,
+  "source": {
+    "head": "5b8abfb55e138ea9cd9a4a10dbca897341eab956",
+    "tree": "004cb545e4e8a21856a7edd5a2873912ad2e3826",
+    "pullRequest": "https://github.com/jzwyrzyk/family-game-factory/pull/129",
+    "runId": 45053129857,
+    "jobId": 137302426832,
+    "runUrl": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45053129857",
+    "artifactId": 14766576695,
+    "artifactName": "mind-your-jems-browser-screenshots",
+    "archiveSizeBytes": 81744425,
+    "archiveSha256": "3660a0195b0f5d3a96ef42232a1d306de279d7fef4c12b23cccd878080285fdd",
+    "manifestSha256": "cc91f9ab3d83371717a7fa274e1848a93e5531a83e4aecbdbd3c813f873b7cc6"
+  },
+  "review": {
+    "functionalConfigurationsPassed": 13,
+    "functionalConfigurations": [
+      "desktop",
+      "tablet-portrait",
+      "tablet-landscape",
+      "mobile",
+      "mobile-small",
+      "mobile-landscape",
+      "mobile-landscape-small",
+      "desktop-motion",
+      "mobile-motion",
+      "remote-handoff",
+      "recovery-desktop",
+      "recovery-mobile",
+      "profile-reset"
+    ],
+    "captures": 138,
+    "originalRunConclusion": "failure",
+    "originalFailureScope": "Exactly two old-reference visual mismatches: desktop-ready and mobile-ready. Seven of nine comparisons passed. All 13 functional configurations passed; no functional errors. The original hosted manifest and archive remain unchanged.",
+    "inspected": "All nine full-resolution source PNGs, including the two actual/expected/difference comparisons; desktop ready menu; representative frames across the 42.68-second normal-motion recording, with half-second hold/shake frames at 20–24 seconds and quarter-second fall/retry frames at 39–41.75 seconds.",
+    "visualFinding": "No blocking visual defect. The existing illustrated head, background, miner contact, bucket platform, shared player, controls and responsive framing remain intact. Desktop, tablet portrait and phone compositions retain legible counters and the /10 denominator without visible clipping in the reviewed states.",
+    "readyTimingExplanation": "The actual-input fixture collectAndBank now requests 10 rather than 8; with every jem worth 1, the outward trip may finish at its x <= 38 or warning guard before reaching capacity. After readiness polling, the capture calls freshCalm, which waits on the safe platform unless at least 6500 ms of calm remains. The new ready captures therefore show the safe post-shake idle frame with 4 saved jems and no active head jems, rather than the old 8-saved transient deposit celebration. No timer, hazard, art or layout change was made to force the new reference.",
+    "scoringObservations": {
+      "geometryChecks": 56,
+      "capacityLabels": [
+        "/ 10"
+      ],
+      "weightedMarkerCounts": [
+        0
+      ],
+      "observedLooseValuesInGeometryChecks": [
+        0,
+        1
+      ],
+      "fullPocketScreenshotClaimed": false,
+      "note": "All 56 real-game geometry observations show / 10 and zero weighted +3 marker elements. The baseline warning captures show one carried jem as 1/10; ready captures show 4 saved and 0/10. Exact 10/10 saturation is not claimed as a captured visual state."
+    },
+    "normalMotion": "The recorded input journey collects individual jems and banks 4. At about 22 seconds the active head jems scatter and the held pocket changes from 1/10 to 0/10 while Saved 4 remains. Around 39.75–40.5 seconds the unheld miner visibly falls and the pocket changes from 2/10 to 0/10; the retry action appears around 40.75 seconds, and the miner returns to the bucket around 41.25 seconds with Saved 4 retained. The shared shell remains stable.",
+    "reviewers": "Independent gameplay/art reviewer and root review of both mismatched comparisons; root explicitly approved importing these exact nine source PNGs.",
+    "localBrowser": "No local browser was run for this evidence review. Functional and source-capture evidence is from GitHub-hosted Playwright Chromium.",
+    "followup": "Root performs the repository import and receipt/docs commit. The next exact-head hosted run must compare the imported references with the unchanged channel tolerance 20 and maximum changed ratio 0.008. This receipt does not waive that rerun or convert the original failed run into a pass.",
+    "limits": "Synthetic browser/device viewports and mocked build statuses; not physical-device or frame-pacing validation, child-enjoyment evidence, paid-provider validation, merge authorization or deployment acceptance. The user merge hold remains in force."
+  },
+  "previousReferenceComparisons": [
+    {
+      "device": "desktop",
+      "state": "idle",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 1280,
+      "height": 900,
+      "changed": 168,
+      "ratio": 0.00014583333333333335,
+      "meanDelta": 0.019301215277777777
+    },
+    {
+      "device": "desktop",
+      "state": "warning",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 1280,
+      "height": 900,
+      "changed": 628,
+      "ratio": 0.0005451388888888888,
+      "meanDelta": 0.07976475694444445
+    },
+    {
+      "device": "desktop",
+      "state": "ready",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 1280,
+      "height": 900,
+      "changed": 66316,
+      "ratio": 0.05756597222222222,
+      "meanDelta": 6.314547743055556
+    },
+    {
+      "device": "tablet-portrait",
+      "state": "idle",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 768,
+      "height": 1024,
+      "changed": 168,
+      "ratio": 0.000213623046875,
+      "meanDelta": 0.024710337320963543
+    },
+    {
+      "device": "tablet-portrait",
+      "state": "warning",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 768,
+      "height": 1024,
+      "changed": 628,
+      "ratio": 0.0007985432942708334,
+      "meanDelta": 0.11326090494791667
+    },
+    {
+      "device": "tablet-portrait",
+      "state": "ready",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 768,
+      "height": 1024,
+      "changed": 2596,
+      "ratio": 0.0033009847005208335,
+      "meanDelta": 0.4251505533854167
+    },
+    {
+      "device": "mobile",
+      "state": "idle",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 390,
+      "height": 844,
+      "changed": 188,
+      "ratio": 0.0005711508081176328,
+      "meanDelta": 0.07014825616721351
+    },
+    {
+      "device": "mobile",
+      "state": "warning",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 390,
+      "height": 844,
+      "changed": 617,
+      "ratio": 0.0018744683436626565,
+      "meanDelta": 0.25742192246931583
+    },
+    {
+      "device": "mobile",
+      "state": "ready",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 390,
+      "height": 844,
+      "changed": 17362,
+      "ratio": 0.052746384736906064,
+      "meanDelta": 5.881106452788917
+    }
+  ],
+  "video": {
+    "file": "mind-your-jems-gameplay.webm",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "motion": "normal",
+    "source": "real browser movement, collection, bank, held spill, unheld fall and retry; mocked build statuses",
+    "sha256": "1c0c2f92d4fc6afb48a924fd74223cbc960b9622201ea36b902a9b5f175c8413",
+    "durationSeconds": 42.68,
+    "framesPerSecond": 25,
+    "sizeBytes": 4311981
+  },
+  "files": [
+    {
+      "file": "desktop-idle.png",
+      "sha256": "c80cb04fb94c519129983ee5a1441dd0c9fbd38edad8cac21ec49d288b6938b8",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "desktop-warning.png",
+      "sha256": "d6ea016b899ff1a7471d7f6bb41cd15ac5d71f6cf976a548ca676a89938ecf1c",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "desktop-ready.png",
+      "sha256": "cd11f71bd8dc5e8d05dd25575c0ba2df83f7e584aad04a70de6f5e9f3c6fd6d0",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "tablet-portrait-idle.png",
+      "sha256": "4a26c24cb8767a9d705e6581591327c319fa7a96b586978eb02c084735e3c471",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "tablet-portrait-warning.png",
+      "sha256": "5e13117088be604a18536ae317507e68aef3fe97a0f9214228f5fda51792ecdd",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "tablet-portrait-ready.png",
+      "sha256": "f0a150ef33e481cd9b42b9ffb4902baa15d8216d2dcb4860d0b74c9161d446f6",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "mobile-idle.png",
+      "sha256": "126b50b1cb6c5539e1fad0bb959ab8a7407b3824e288687f9fba45c69ff14b74",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "mobile-warning.png",
+      "sha256": "6d9fca24f9494c274c5c5d26cd5d9c58c14e270130db49380551248fcdc87c65",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "mobile-ready.png",
+      "sha256": "336d1fdfddb6a9d19c296697e1c9638569297f152bd381ad6590eec70c28838d",
+      "width": 390,
+      "height": 844
+    }
+  ]
 }
