@@ -124,6 +124,7 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 .creation-test-description summary { min-height:44px; padding-block:8px; font-weight:700; }
 /* The dock shows a small vocabulary and a readable ordered program. */
 .creation-code-card { display:flex; flex-direction:column; min-height:0; min-width:0; position:relative; border:1px solid #d9d1eb; border-radius:22px; background:white; box-shadow:0 4px 18px #172b4d0c; }
+.creation-find-actions { display:none; }
 .creation-code-heading { flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 14px 4px; }
 .creation-code-heading h2 { font-size:22px; margin:0; }
 .creation-tools-switch { padding:3px; }.creation-tools-switch button { min-height:44px; padding:7px 12px; white-space:nowrap; }
@@ -243,6 +244,7 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
      heading action row wrap inside the screen rather than widen the page. */
   #page-creation:not(.has-scene) .creation-heading-actions { flex:1 1 100%; width:100%; min-width:0; flex-wrap:wrap; justify-content:flex-start; }
   #page-creation.has-scene .creation-more-content { max-height:min(55dvh,calc(100dvh - 300px)); }
+  #page-creation.has-scene[data-tools=first] .creation-find-actions { display:flex; flex:none; align-self:stretch; justify-content:center; margin:8px 10px 3px; border-color:#6133ad; background:#7040c7; color:white; box-shadow:0 3px 0 #4d2590; }
   .creation-starters,.creation-saved-grid,.creation-challenge-grid { grid-template-columns:1fr; }.creation-starter { display:grid; grid-template-columns:110px minmax(0,1fr); }.creation-starter>img { height:100%; min-height:146px; }.creation-starter-copy { padding:14px; }
   #page-creation.has-scene .creation-heading { flex-wrap:nowrap; }.creation-project-bar>.creation-button { padding-inline:8px; }.creation-title-label { flex-basis:calc(100% - 135px); }
   .creation-playbar .creation-button { padding-inline:7px; }.creation-workspace-grid { grid-template-rows:minmax(190px,.85fr) minmax(210px,1fr); }
