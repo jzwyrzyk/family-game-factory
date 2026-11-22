@@ -169,7 +169,7 @@
 @container(max-width:900px){
  .gf-topbar{padding:10px 16px}.gf-brand h2{font-size:27px}.gf-brand>img{width:38px;height:42px}
  .gf-order{top:13%;left:65%;width:62%;padding:12px}.gf-order h3{font-size:24px}.gf-pattern{gap:4px;margin-top:9px}
- .gf-hud{inset:12px 14px auto}.gf-day strong{font-size:18px}.gf-wallet strong{font-size:20px}.gf-progress{top:12px;right:93px;padding:5px 8px}.gf-progress i{width:23px;height:25px}
+ .gf-hud{inset:12px 14px auto}.gf-day{padding:6px 8px;line-height:1.2;transform:none}.gf-day strong{font-size:18px}.gf-wallet strong{font-size:20px}.gf-progress{top:12px;right:93px;padding:5px 8px}.gf-progress i{width:23px;height:25px}
  .gf-sort-controls{left:3%;top:45%;width:27%;gap:5px;padding:6px}.gf-basket-symbol{width:17px;height:17px}
  .gf-helper{width:78px;height:110px;bottom:2%;left:2%}.gf-helper-hint{font-size:20px;max-width:310px;padding:10px 13px}
  .gem-factory[data-stage=cut] .gf-helper-hint,.gem-factory[data-stage=recycle] .gf-helper-hint{display:none}

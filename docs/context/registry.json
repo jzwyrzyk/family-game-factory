@@ -412,10 +412,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:16:01.503Z",
-      "sourceDigest": "3d23f6d67a303896cae2710d399a436f0c6068e933629c4fd0cc35bea84a8c50",
+      "reviewedAt": "2026-11-22T15:21:12.819Z",
+      "sourceDigest": "a7374f727674d827e56b9782e2b768210ef094b5079543ad0e86c2e36fd3d493",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final Factory geometry and copy including medium-width candidate/HUD separation, readable mounted controls, contained paper tray and a single cutter prompt, plus progression persistence and current-jem recovery; artwork and learning ownership remain intact.",
+      "reviewReason": "Inspected hosted desktop and tablet captures; desktop gameplay passed and tablet candidate overlapped the level badge. Tightened the readable badge geometry without shrinking pattern pieces or changing gameplay; hosted recheck remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:14:06.571Z",
-      "sourceDigest": "2e522a95e912cb6d0b605f83bb384dce273e896d98db0df2a1bdd2829535ea81",
+      "reviewedAt": "2026-11-22T15:21:13.113Z",
+      "sourceDigest": "c0563c6a734f126c8feae44e563702fe1d01c35f7c95757ace21ca5d68792965",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed focused cutoff, pattern and config tests plus the real host journeys and native custom-order fixture; documentation distinguishes passing local Node checks from pending hosted browser and screenshot acceptance.",
+      "reviewReason": "Reviewed failed hosted tablet overlap assertion and preserved it; added independent first-view captures at all narrow widths so later failures cannot hide unobserved layouts. Full gameplay assertions and input checks remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

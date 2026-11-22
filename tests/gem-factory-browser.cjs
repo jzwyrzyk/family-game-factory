@@ -298,6 +298,18 @@ async function checkCustomCadence(browser,url){
  let browser;
  try{
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
+  // Retain every first view even when a later gameplay/layout assertion fails.
+  // These are captures for inspection, not substitutes for the journeys below.
+  for(const width of [820,640,390,320]){
+   const context=await browser.newContext({viewport:{width,height:1000},hasTouch:true});
+   try{
+    const page=await context.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
+    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);await exploreWelcome(page);await openFactory(page);
+    await page.waitForFunction(()=>[...document.querySelectorAll('.gem-factory img')].every(img=>img.complete&&img.naturalWidth>0));
+    fs.mkdirSync('test-results/gem-factory',{recursive:true});
+    await page.locator('.gem-factory').screenshot({path:`test-results/gem-factory/entry-${width}.png`});
+   }finally{await context.close();}
+  }
   for(const [device,viewport] of [['desktop',{width:1440,height:1000}],['tablet',{width:820,height:1180}],['phone',{width:390,height:844}],['narrow-phone',{width:320,height:820}]]){
    const context=await browser.newContext({viewport,hasTouch:device!=='desktop',reducedMotion:'no-preference'});
    const page=await context.newPage(),errors=[];
