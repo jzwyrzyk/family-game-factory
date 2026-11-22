@@ -694,10 +694,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:41:50.155Z",
-      "sourceDigest": "15e6ebaa432444e78d4fd856d95c728a28f99c57d2353e9a8e3d3e8a8406b456",
+      "reviewedAt": "2026-11-22T19:01:01.200Z",
+      "sourceDigest": "36aee2523984b397275688fc222912a31d2f8a9df835f02c19adc6e5ddeca2df",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the PR131 coach-only operator with exact tested/tree and chatdiag baseline pins, three-file runtime scope, fresh journal purpose, dynamic budget proof and25offline checks. Clarified forward gateway/source guards versus cached rollback and separate low-space bootstrap/live acceptance; preserved the historical PR124 record.",
+      "reviewReason": "Recorded observed PR131 merge1996c1b and exact tested tree, all nine PR workflows and canceled-push gate rerun, pinned operator2b8f65 and final low-space bootstrap. Reviewed16offline bootstrap checks, old-journal preservation, no HOME cleanup and pending cloud/live/storage evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

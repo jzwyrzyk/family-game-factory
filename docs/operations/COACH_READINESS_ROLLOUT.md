@@ -4,7 +4,7 @@ This operation releases [PR131](https://github.com/jzwyrzyk/family-game-factory/
 
 ## Bound source and configuration
 
-The tested application head is `ae084f6b2b0364830adc9ae47c87046cbf7c2d72`, tree `2938d39799d66ac8d7a409dd0ad2208bd957aeb7`. The selected release source must be on protected main and have exactly that complete tested tree. Exact-head hosted checks, the application's clean checkout and absence of newer private runtime changes are checked before execution. Source preparation does not assert these gates have passed; the dated delivery record carries their observed results.
+The tested application head is `ae084f6b2b0364830adc9ae47c87046cbf7c2d72`, tree `2938d39799d66ac8d7a409dd0ad2208bd957aeb7`. PR131 merged as `1996c1b382a797a6052ee1304867fdb5b620c3d3` with that identical complete tree; this is the bootstrap's pinned application source. The selected release source must remain on protected main and match the tested tree. Exact-head hosted checks, the application's clean checkout and absence of newer private runtime changes are checked again before execution. The dated delivery record carries the observed CI/merge results separately from pending cloud deployment and live acceptance.
 
 The starting private revision is `factory-coach-private-chatdiag-b4734b1323de-a14b8b`, from application source `b4734b1323de87dfee96bb91769cbab3cff432e6`. The wrapper allows private runtime changes only in `server/coach/private-provider.ts`, `server/coach/policy.ts` and `server/coach/private-creation-wire.ts`. Runtime dependencies, Docker inputs, shared validators and publisher modules remain bound. The older diagnostics operator at `9986ab4be38680cc8f2a9cc29f823b440ce03319` is not suitable for this release.
 
@@ -18,7 +18,9 @@ The helper emits bounded arithmetic and approval/pinning booleans, never context
 
 ## Low-space preparation and persistent state
 
-Use the separately checksum-verified readiness bootstrap with the published operator, merged application and tested-head pins. It stages code, locked dependencies, Node 22.23.5, npm cache and temporary archives under `/tmp`. The previous HOME-staging `run_coach_diagnostics.sh` is historical; it is not the entry point for this repair.
+Use the separately checksum-verified [readiness bootstrap](../../scripts/deployment/run_coach_readiness_low_space.py) with its embedded immutable operator, merged application and tested-head pins. Operator `2b8f65de6e02637e34d1c89ac27512fcbd6c15b3` has exact tree `19d52b07d5067034fa86bbe1656fce7189333b7f`, matching the reviewed local operator. The bootstrap stages code, locked dependencies, Node 22.23.5, npm cache and temporary archives under `/tmp`. The previous HOME-staging `run_coach_diagnostics.sh` is historical; it is not the entry point for this repair.
+
+The published bootstrap supports `plan`, `execute` and `rollback`. Its [16 offline checks](../../scripts/deployment/check_coach_readiness_low_space.py) cover first setup, immutable checkout verification, old-journal preservation, competing locks, space admission, invalid Node archives, interruption, operator exit propagation and cached rollback. Invalid or unfinished pins stop before filesystem preparation. The bootstrap invokes the operator once; it does not retry a failed operator or remove its journal. Only freshly created temporary staging directories are removed after preparation completes or fails.
 
 Only the small private state and locks belong under:
 
