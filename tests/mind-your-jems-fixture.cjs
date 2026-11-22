@@ -144,6 +144,9 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    gems:[...element.querySelectorAll('[data-crystal]')].map(gem=>({id:gem.dataset.crystal,x:Number(gem.dataset.x)}))
   }));},
   async input(action,pressed,mode=device.touch?'touch':'keyboard'){
+   // Reopening mounts fresh image elements. Advancing a virtual clock is not
+   // evidence that their asynchronous decode has made controls playable.
+   if(pressed)await arcade.locator('.myj-loading').waitFor({state:'hidden'});
    if(mode==='keyboard'){
     const key=inputKeys[action];
     if(pressed&&!keyInputs.has(key)){await page.keyboard.down(key);keyInputs.add(key);}
@@ -230,7 +233,12 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
   async advance(milliseconds){if(recordVideo)await page.waitForTimeout(milliseconds);else await page.clock.runFor(milliseconds);},
   async until(predicate,message,{step=100,limit=20000}={}){
    for(let elapsed=0;elapsed<=limit;elapsed+=step){if(await predicate())return;await this.advance(step);}
-   throw new Error(message);
+   const diagnostic=await arcade.evaluate(element=>({
+    phase:element.dataset.phase,assets:element.dataset.assets,paused:element.dataset.paused,
+    playerX:element.dataset.playerX,holding:element.dataset.holding,
+    focused:document.activeElement?.tagName+':'+document.activeElement?.className,
+   }));
+   throw new Error(message+' '+JSON.stringify(diagnostic));
   },
   async phase(phase){await this.until(async()=>await arcade.getAttribute('data-phase')===phase,'Expected game phase '+phase);},
   async activate(locator){

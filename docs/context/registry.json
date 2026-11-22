@@ -613,10 +613,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:40:47.129Z",
-      "sourceDigest": "15a15e409ef6d53a85c73e682b1cf6c2e199c0746459c3732a6e06079f57f710",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed geometry follow-up against retained short landscape and rotation browser cases; exact accounting, real held input and visual mismatch gates remain unchanged.",
+      "reviewedAt": "2026-11-22T15:47:06.128Z",
+      "sourceDigest": "6c901207a36ebebef2d11c6b5da47c47ed5cbeeb64b556179af5962c42fd62f3",
+      "reviewOutcome": "updated",
+      "reviewReason": "Retained reopened-input timeout evidence, now wait for actual decoded artwork before held input, record bounded failure state and verify resume grace with both keyboard and touch.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -693,10 +693,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T15:38:49.289Z",
-      "sourceDigest": "35c34d0d273af7deb47f48398d6d85623fe3a29be111d59267a6190973e07d36",
+      "reviewedAt": "2026-11-22T15:47:06.683Z",
+      "sourceDigest": "2e048c2f2aac56ae519729d4af324ec13e03deacc3a292051e1a6d07cbe9233d",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented draft PR128 desktop art defects and separate unresolved generated resume failure with exact run links; complete browser acceptance and deployment remain unclaimed.",
+      "reviewReason": "Recorded second hosted desktop progression and pause success followed by reopen timeout, distinguishing readiness hypothesis from verified correction and keeping full acceptance pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

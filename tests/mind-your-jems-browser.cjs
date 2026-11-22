@@ -164,7 +164,9 @@ async function pauseLifecycle(journey,device,review){
  await page.evaluate(()=>{delete document.hidden;delete document.visibilityState;document.dispatchEvent(new Event('visibilitychange'));});
  assert.equal(await arcade.locator('[data-myj="resume"]').isVisible(),true,'returning asks for an explicit resume');
  await journey.advance(2000);assert.deepEqual(await journey.snapshot(),hidden,'visibility alone cannot restart gameplay');
- await journey.input('grab',true);await journey.activate(arcade.locator('[data-myj="resume"]'));await journey.advance(1000);
+ await journey.activate(arcade.locator('[data-myj="resume"]'));await journey.advance(200);
+ assert.deepEqual(await journey.snapshot(),hidden,'resume grace preserves the saved warning before holding');
+ await journey.input('grab',true);await journey.advance(800);
  await journey.phase('shaking');await journey.phase('mining');await journey.input('grab',false);
  assert.equal(await journey.score('banked'),hidden.banked);
  review.check(device.name,'pause-and-background',{paused,hidden,banked:await journey.score('banked')});
@@ -231,7 +233,7 @@ async function exercise(journey,device,review){
  await fallAndRetry(journey,device,review,capture);
  if(device.name==='desktop'||device.name==='mobile')await levelUp(journey,device,review,capture);
  await helpPause(journey,device,review);
- if(device.name==='desktop')await pauseLifecycle(journey,device,review);
+ if(device.name==='desktop'||device.name==='mobile')await pauseLifecycle(journey,device,review);
  // Fresh session keeps the native input checks independent of increased
  // difficulty. The close/reopen is the real user action being verified.
  await journey.activate(arcade.locator('.myj-close'));assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
