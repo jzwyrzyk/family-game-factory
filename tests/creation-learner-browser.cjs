@@ -140,6 +140,15 @@ const complexScene={
       const block=id=>page.locator(`[data-block-id="${id}"]`);
       const edit=async id=>{const button=page.locator(`[data-edit-block="${id}"]`);if(await button.getAttribute('aria-expanded')!=='true')await button.click();};
       const add=type=>page.locator(`[data-add-block="${type}"]`).click();
+      const backToScenes=async()=>{
+        if(await page.locator('#creationBack').isVisible())await page.locator('#creationBack').click();
+        else {
+          // On 320px and short-landscape screens the same scene-shelf action
+          // is inside More, keeping My Games and the stage visible.
+          await page.locator('#creationMore > summary').click();
+          await page.locator('#creationMoreScenes').click();
+        }
+      };
       const set=async(locator,value)=>{await locator.fill(String(value));await locator.press('Tab');};
       try{
         await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);
@@ -230,7 +239,7 @@ const complexScene={
         await readableSurface(page,name+' sequence');await capture(page,name+'-sequence');
         await page.locator('#creationKeep').click();
         const kept=(await state()).projects.find(project=>project.id===id).keptId;
-        await page.locator('#creationBack').click();await page.locator(`[data-scene="${id}"]`).click();
+        await backToScenes();await page.locator(`[data-scene="${id}"]`).click();
         assert.deepEqual(await scene(),savedBeforePlay,'reopening preserves the authored plan');
         assert.equal((await state()).projects.find(project=>project.id===id).keptId,kept);
 
@@ -253,7 +262,7 @@ const complexScene={
         assert.equal((await snapshot()).actors[0].x,initial.actors[0].x-40,'Try tap dispatches the authored tap behavior');
 
         // Correct a real challenge by changing order. Check feedback must be visible near the stage.
-        await page.locator('#creationBack').click();await page.locator('#creationChallengeMode').click();
+        await backToScenes();await page.locator('#creationChallengeMode').click();
         await page.locator('[data-challenge="early-cheer"]').click();
         const challengeBefore=await scene();
         await pacing(page);await page.locator('#creationCheck').click();
@@ -274,7 +283,7 @@ const complexScene={
         assert.ok(Math.abs(await page.evaluate(()=>scrollY)-scrollBeforeCheck)<2,'checking does not scroll the child away from the scene');
 
         // Opening and viewing a complex saved scene cannot silently simplify its data.
-        await page.locator('#creationBack').click();
+        await backToScenes();
         await openSceneFile(page,complexScene);
         const imported=await scene();
         assert.deepEqual(imported.actors,complexScene.actors);
@@ -293,7 +302,7 @@ const complexScene={
         const complexResult=await snapshot();assert.equal(complexResult.actors.find(actor=>actor.id==='dragon').x,417);
         assert.equal(complexResult.variables.counter,15,'named event, condition and nested repeat still run');
         assert.deepEqual(await scene(),imported,'viewing/running preserves custom durations, exact destinations and source pins');
-        await page.locator('#creationKeep').click();await page.locator('#creationBack').click();
+        await page.locator('#creationKeep').click();await backToScenes();
         await page.locator(`[data-scene="${imported.id}"]`).click();assert.deepEqual(await scene(),imported);
         await page.locator('#creationHome').click();
         assert.equal(await page.locator('#page-creation').isVisible(),false,'exit remains usable');
