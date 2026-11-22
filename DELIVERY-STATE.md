@@ -1,5 +1,24 @@
 # jems delivery state
 
+## November 22, 2026 — owner reports private readiness repair serving
+
+The owner ran the checksum-verified [low-space readiness bootstrap](https://github.com/jzwyrzyk/family-game-factory/blob/53c6332314a4bf2b9a1ffdf9273592cb3dca0237/scripts/deployment/run_coach_readiness_low_space.py) in authenticated Cloud Shell and supplied its terminal `COACH_READINESS_SERVING` receipt. It reports private revision `factory-coach-private-chatready-1996c1b382a7-9c98a0` serving the merged readiness repair, with `gatewayUnchanged:true`. This is owner-provided execution evidence; the assistant did not independently query Cloud Run. The receipt was supplied on November 22, 2026 and contains no exact deployment timestamp.
+
+| Release identity | Owner-supplied receipt |
+| --- | --- |
+| Application source | `1996c1b382a797a6052ee1304867fdb5b620c3d3` |
+| Reviewed/tested source | `ae084f6b2b0364830adc9ae47c87046cbf7c2d72` |
+| Operator | `2b8f65de6e02637e34d1c89ac27512fcbd6c15b3` |
+| Deployment primitives | `804574895d8ab86fe270e590ecfa05fa5d4bc290` |
+| Cloud Build | `89f6d537-e54e-414e-89cd-ada018bb726b` |
+| Source archive SHA-256 | `36942ff45a5b072655fb7f999735f4bbca6900bff6845cb2e81d731f00d4db21` |
+| Immutable image | `us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/coach@sha256:5719a739f5a470adf40bb544aab82afee3fab4dea8b2544b7f2b5dcc16e21488` |
+| Recorded rollback revision | `factory-coach-private-chatdiag-b4734b1323de-a14b8b` |
+
+The operator reports `providerCall:false` and `conversationVerified:false`: it performed no provider validation call, and a successful live conversation on this new revision remains unverified. The earlier connected Adult banner predates this rollout and cannot establish acceptance of the repaired revision. The remaining runtime check is one explicitly sent Adult chat message receiving a validated model reply, correlated with the current revision where available. The recorded rollback target does not assert that a rollback occurred. Normal-profile AI and dictation are not enabled or verified by this receipt.
+
+The new readiness state and preceding diagnostics/PR115 recovery evidence remain protected. The separate comprehensive Cloud Shell storage audit still awaits the owner's report; this deployment receipt establishes no further disposal decision or cleanup.
+
 ## November 22, 2026 — PR131 merged; pinned low-space readiness rollout prepared
 
 [PR131](https://github.com/jzwyrzyk/family-game-factory/pull/131) merged at **2:00:13 p.m. America/New_York** (`2026-11-22T19:00:13Z`) as `1996c1b382a797a6052ee1304867fdb5b620c3d3`, from reviewed head `ae084f6b2b0364830adc9ae47c87046cbf7c2d72` and base `b4734b1323de87dfee96bb91769cbab3cff432e6`. Fetched main and the merged commit have exact tree `2938d39799d66ac8d7a409dd0ad2208bd957aeb7`, identical to the tested source. All nine PR workflows passed, including [Arcade run45055528860](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45055528860). GitHub then reported three original push checks canceled by shared push/PR concurrency; their legitimate [run45055455332 attempt2](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45055455332/attempts/2) passed, and the protected merge gate became clean. No source, test, required rule or assertion was relaxed to obtain that result.
