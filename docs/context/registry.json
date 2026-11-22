@@ -694,7 +694,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-22T14:30:30.746Z",
-      "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+      "sourceDigest": "e8cfe09a72e0c88f8a514a7a002177e77cc106dfbdeb74c0273bc93b4a8f73b3",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed PR111/112 quality repair, PR114/115 Pal/coach integration, PR124 main diagnostic merge, PR125 draft profile/read-aloud contract, the exact Pages 44932334132 build/deploy job and worker source pin. Corrected present-vs-historical status for PR124 and PR81/68, linked PR117's unmerged Pal release receipt and documented unverified live services, actual chat/game acceptance, voice, child devices and consent. Architecture review found no new boundary decision.",
       "reviewHistory": [
