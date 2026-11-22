@@ -777,7 +777,7 @@ export function installCreationStudio(host: Host) {
   }
   $('creationHome').onclick = () => act(() => { saveVersion(); host.home(); });
   $('creationBack').onclick = () => act(() => shelf());
-  $('creationMoreScenes').onclick = () => act(() => { $('creationMore').open = false; shelf(); });
+  $('creationMoreScenes').onclick = () => act(() => { $<HTMLDetailsElement>('creationMore').open = false; shelf(); });
   $('creationFreeMode').onclick = () => act(() => shelf('free'));
   $('creationChallengeMode').onclick = () => act(() => shelf('challenge'));
   $<HTMLInputElement>('creationTitle').maxLength = 60;
