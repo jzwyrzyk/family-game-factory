@@ -847,6 +847,24 @@ async function responsive(journey) {
   await assertFrame(journey.page, journey.name + ' complete');
   await capture(journey.page, journey.name + '-assembled');
   await adventure(journey, { pause: true, captureWorld: true });
+  const resultText = await root(journey.page).evaluate(node => {
+    const measure = selector => {
+      const element = node.querySelector(selector), range = document.createRange();
+      range.selectNodeContents(element);
+      const rects = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0);
+      return { text: element.textContent, count: rects.length,
+        fragments: rects.slice(0, 16).map(rect => ({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom })) };
+    };
+    return { title: measure('.gum-build-result h4'), distance: measure('.gum-build-result .gum-build-distance') };
+  });
+  for (const [name, text] of Object.entries(resultText)) assert.ok(text.count > 0 && text.count <= 16,
+    journey.name + ': the result ' + name + ' has bounded, rendered text fragments');
+  // Text can overflow a narrow grid column while its element boxes remain
+  // separate. Measure the actual wrapped text, including that visible overflow.
+  const overlaps = resultText.title.fragments.some(title => resultText.distance.fragments.some(distance =>
+    Math.min(title.right, distance.right) - Math.max(title.left, distance.left) > 1 &&
+    Math.min(title.bottom, distance.bottom) - Math.max(title.top, distance.top) > 1));
+  assert.equal(overlaps, false, journey.name + ': result title and distance text must not overlap: ' + JSON.stringify(resultText));
   await capture(journey.page, journey.name + '-showcase');
   await nextBuild(journey);
   await activate(journey, journey.page.locator('#studioHome'));

@@ -362,7 +362,7 @@ const SCENES: Record<SceneWorld, string> = {
 
 export function sceneDecor(world: SceneWorld): string { return SCENES[world]; }
 
-const moment = (shapes: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid slice" class="gum-moment-svg" focusable="false" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${shapes}</g></svg>`;
+const moment = (shapes: string, preserve = 'xMidYMid slice') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" preserveAspectRatio="${preserve}" class="gum-moment-svg" focusable="false" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${shapes}</g></svg>`;
 const sparkle = (x: number, y: number, r: number, color = '#fff0b6') =>
   `<path d="M${x} ${y-r}q${r*.2} ${r*.8} ${r} ${r}q-${r*.8} ${r*.2}-${r} ${r}q-${r*.2}-${r*.8}-${r}-${r}q${r*.8}-${r*.2} ${r}-${r}Z" fill="${color}"/>`;
 const littleFish = (x: number, y: number, scale: number, color: string, reverse = false) =>
@@ -390,10 +390,10 @@ const MOMENTS: Record<SceneWorld, readonly string[]> = {
       ${sparkle(186, 350, 16)}${sparkle(650, 371, 20)}${sparkle(721, 301, 9)}
     `),
     moment(`
-      <g class="gum-moment-float"><circle cx="677" cy="100" r="63" fill="#fff0c1" stroke="#ddc58f" stroke-width="3"/><path d="M694 41a63 63 0 0 1-2 120 58 58 0 0 0 2-120Z" fill="#ecd89e"/><g fill="#ead89f" stroke="#ddc58f" stroke-width="2"><ellipse cx="656" cy="79" rx="13" ry="9"/><circle cx="695" cy="117" r="11"/><ellipse cx="651" cy="129" rx="7" ry="5"/><circle cx="704" cy="72" r="5"/></g></g>
+      <g transform="translate(-110 0)"><g class="gum-moment-float"><circle cx="677" cy="100" r="63" fill="#fff0c1" stroke="#ddc58f" stroke-width="3"/><path d="M694 41a63 63 0 0 1-2 120 58 58 0 0 0 2-120Z" fill="#ecd89e"/><g fill="#ead89f" stroke="#ddc58f" stroke-width="2"><ellipse cx="656" cy="79" rx="13" ry="9"/><circle cx="695" cy="117" r="11"/><ellipse cx="651" cy="129" rx="7" ry="5"/><circle cx="704" cy="72" r="5"/></g></g></g>
       <g class="gum-moment-float">${sparkle(94, 92, 19)}${sparkle(158, 164, 11)}${sparkle(734, 230, 14)}${sparkle(69, 345, 12)}${sparkle(658, 383, 20)}${sparkle(487, 39, 13)}</g>
       <path d="M99 410q20-18 45-13m-31 21q19-18 44-13" fill="none" stroke="#edf5ff" stroke-width="4"/>
-    `),
+    `, 'xMidYMid meet'),
     moment(`
       <g class="gum-moment-float">${sparkle(75, 72, 20)}${sparkle(180, 45, 12)}${sparkle(321, 44, 17)}${sparkle(495, 55, 12)}${sparkle(720, 91, 24)}${sparkle(113, 248, 13)}${sparkle(701, 291, 18)}${sparkle(63, 391, 23)}${sparkle(230, 422, 12)}${sparkle(418, 442, 18)}${sparkle(602, 420, 13)}${sparkle(752, 405, 20)}</g>
       <g fill="none" stroke="#d2c5eb" stroke-width="2" opacity=".8"><path d="m75 72 105-27 141-1m399 47-19 200 51 114M63 391l167 31 188 20 184-22"/></g>

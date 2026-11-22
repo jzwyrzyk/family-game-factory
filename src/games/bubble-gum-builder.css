@@ -51,7 +51,7 @@
 .gum-builder .gum-build-change-part { width: 48px; height: 48px; border-style: solid; font-size: 26px; background: #fff9edee; }
 .gum-build-scene-caption { position: absolute; z-index: 4; left: 12px; right: 12px; bottom: 10px; display: flex; justify-content: center; pointer-events: none; }
 .gum-build-scene-caption span { background: #fffaf2f2; color: #443658; border: 1px solid #fff; border-radius: 20px; padding: 5px 15px; font-size: 18px; line-height: 1.2; text-align: center; max-width: 100%; box-shadow: 0 2px 8px #5e4c6910; }
-.gum-build-tray { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; padding: 18px; background: #fffdf8; border-left: 2px solid #e6d9ec; overflow-y: auto; overscroll-behavior: contain; }
+.gum-build-tray { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; padding: 18px; background: #fffdf8; border-left: 2px solid #e6d9ec; overflow-y: auto; overscroll-behavior: contain; container: gum-tray / inline-size; }
 .gum-build-instruction { font-size: 22px; line-height: 1.15; font-weight: 600; }
 .gum-build-choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; align-content: start; }
 .gum-builder .gum-build-piece { min-width: 0; padding: 7px 4px 9px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; min-height: 116px; touch-action: none; background: linear-gradient(#fff,#faf1ff); }
@@ -87,6 +87,10 @@
 .gum-build-result-reason, .gum-build-suggestion { grid-column: 1/-1; font-size: 18px; line-height: 1.25; }
 .gum-builder .gum-build-suggestion { padding-top: 10px; border-top: 1px solid #e3cfa5; color: #674e6e; }
 .gum-builder[data-phase=showcase] .gum-build-instruction, .gum-builder[data-phase=done] .gum-build-instruction { display: none; }
+@container gum-tray (max-width: 250px) {
+  .gum-build-result { grid-template-columns: minmax(0,1fr); }
+  .gum-build-result .gum-build-distance { text-align: left; }
+}
 .gum-build-footer { padding: 10px 14px; display: flex; gap: 9px; align-items: center; justify-content: flex-end; background: #f8effb; border-top: 2px solid #e2d3ed; }
 .gum-builder .gum-build-launch, .gum-builder .gum-build-next, .gum-builder .gum-build-action, .gum-builder .gum-build-replay {
   background: linear-gradient(120deg,#7658c8,#a04fa4); border-color: #7451ae; color: #fff;
@@ -221,7 +225,7 @@ body.studio-review .studio-play-mode .gum-builder { min-height: 0; height: 100%;
   .gum-build-scene-caption { bottom: 7px; left: 5px; right: 5px; }
   .gum-build-scene-caption span { padding: 4px 9px; }
   .gum-build-countdown { top: 8px; left: 8px; min-width: 58px; min-height: 58px; font-size: 40px; padding: 5px 9px; }
-  .gum-builder[data-launch=ignition] .gum-build-countdown { min-height: 48px; font-size: 20px; }
+  .gum-builder[data-launch=ignition] .gum-build-countdown { min-height: 48px; max-width: 38%; font-size: 20px; }
   .gum-build-pink-cue { padding: 3px 6px; gap: 8px; }
   .gum-build-pink-art { width: 58px; height: 53px; flex-basis: 58px; }
   .gum-builder[data-phase=adventure] .gum-build-tray { gap: 5px 8px; }

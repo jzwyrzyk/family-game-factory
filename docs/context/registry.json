@@ -424,10 +424,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:25:30.112Z",
-      "sourceDigest": "15217dc6fd005c2a127da38f2ef02f9bd18a6795cadf3a8a20d28298ae042848",
+      "reviewedAt": "2026-11-22T19:44:22.314Z",
+      "sourceDigest": "22e0a22e44deeccde0b436b75da873ad7d3e817c5d3434b2d918b7dfab9732ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Aligned generic game instructions with neutral plus targets, single pink gum and the part-dependent adventure.",
+      "reviewReason": "Current README and physical-quality scope now point to version3 assembly. Reviewed the narrow-tray result reflow, bounded ignition label and portrait Moon framing; construction, saved engines, authored journey rules and timing remain as documented.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -634,10 +634,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:25:31.560Z",
-      "sourceDigest": "a32375f64c0a445e8fe308c755cd21fbb0c5ba9677892337a4108feb66ed4891",
+      "reviewedAt": "2026-11-22T19:44:22.710Z",
+      "sourceDigest": "267055d18b9d4dd5e6c283ac5628baf8a26a8e9ee6daa3813e531e38372e498c",
       "reviewOutcome": "updated",
-      "reviewReason": "Adopted the independently proven stationary-before-release touch gesture and exact remaining adventure clock advancement.",
+      "reviewReason": "Delivery records exact203 ten-case and host-integration success separately from the final visual defects. The same responsive journeys now measure actual title and distance text fragments so overlapping painted words fail; no cases, inputs or timing assertions were removed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -722,10 +722,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T19:25:31.969Z",
-      "sourceDigest": "48b9401b3c3296209c601d1cdf402c92048e058cbe74ff82d5d10228738f21c5",
+      "reviewedAt": "2026-11-22T19:44:23.229Z",
+      "sourceDigest": "4ad37d56f848b65daaa5d8e5a218d425eefda770928c4b3c01e4111d6d3d65cc",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded new 29-second host integration passes and decisive trusted touch evidence while requiring final exact-source browser review.",
+      "reviewReason": "Recorded exact203 source, ten passing browser cases,64 actual captures, full normal-motion recording and successful private Site deployment, while explicitly retaining pending acceptance for the bounded visual follow-up and the coordinated merge hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -811,10 +811,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T18:17:53.385Z",
-      "sourceDigest": "d01e92ec461bfc11eef0e9ab70313ab50e33526455abe35e33e880a9237a835e",
+      "reviewedAt": "2026-11-22T19:44:23.628Z",
+      "sourceDigest": "805409aea13e3a95bd96ce7c9658fd3eaa8d4129f9034c6413d6f8c7b45d43aa",
       "reviewOutcome": "updated",
-      "reviewReason": "Added canonical Bubble Gum feature contract and decision, index entries and required-document review routing; retained historical evidence scope.",
+      "reviewReason": "README no longer describes sticker-v2 as the current default; it links to the canonical assembly contract. The physical-v1 quality document preserves its historical evidence and explicitly identifies the current version3 scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
