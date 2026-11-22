@@ -246,7 +246,20 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 }
 @media (max-height:600px) and (min-width:600px) {
   #page-creation.has-scene { padding:6px 8px; }.has-scene .creation-heading-copy { display:none; }.has-scene .creation-heading { position:absolute; top:6px; left:8px; margin:0; }.has-scene .creation-heading-actions { width:auto; gap:6px; }
-  .has-scene .creation-project-bar { padding-left:280px; min-height:48px; margin-bottom:6px; flex-wrap:nowrap; gap:6px; }.creation-title-label { display:none; }.creation-version-actions { width:auto; margin-left:auto; }
+  /* A single compact landscape toolbar shares the top row with the accessible
+     reading and Home exits. The redundant My scenes link may be reached from
+     My Games after rotating back; it must never obscure the reading button. */
+  #page-creation.has-scene #creationWorkspace { padding-top:56px; }
+  #page-creation.has-scene .creation-project-bar { position:absolute; top:6px; right:8px; z-index:5; padding:0; min-height:48px; margin:0; flex-wrap:nowrap; gap:6px; }
+  #page-creation.has-scene .creation-project-bar>#creationBack { display:none!important; }
+  .creation-title-label { display:none; }.creation-version-actions { width:auto; margin:0; }
+  /* The visible Exit view button already explains the expanded fallback. Keep
+     its live status announcement for assistive technology, not as a 40px bar
+     that takes the enlarged scene's remaining short-screen height. */
+  #page-creation.has-scene.creation-expanded-view .creation-status:not(.is-error) {
+    position:absolute; width:1px; height:1px; padding:0; border:0;
+    margin:0!important; overflow:hidden; clip-path:inset(50%); white-space:nowrap;
+  }
   #page-creation.has-scene .creation-workspace-grid,#page-creation.has-scene[data-tools=full] .creation-workspace-grid { grid-template-rows:minmax(0,1fr); grid-template-columns:minmax(0,1.15fr) minmax(280px,1fr); gap:8px; }
   .creation-code-card { overflow:auto; }.creation-code-heading { flex-wrap:wrap; padding:6px 10px; }.creation-code-heading h2 { flex-basis:100%; }.creation-tools-switch { width:100%; }.creation-tools-switch button { flex:1; }
   .creation-cast-card { flex-wrap:wrap; }.creation-actors { flex:1; }.creation-scene-options { margin:0; }.creation-scene-options>div { position:fixed; top:62px; bottom:auto; right:10px; max-height:calc(100dvh - 74px); }
