@@ -65,7 +65,11 @@
     "docs/brand/CHILD_INTERFACE.md",
     "docs/decisions/2026-11-20-learning-readability-and-narration.md",
     "docs/brand/previews/learning-readability-20261120/README.md",
-    "docs/operations/POLICY_FOUNDATION.md"
+    "docs/operations/POLICY_FOUNDATION.md",
+    "docs/operations/ASSISTANT_ACCESS.md",
+    "docs/decisions/2026-11-20-direct-operations.md",
+    "docs/operations/PHASE_2.md",
+    "docs/operations/ACTIVATION_REVIEW.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -118,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.092Z",
-      "sourceDigest": "3e855730d9b5bf12aa36a0e8ef61188296fe42cbb45fb98fc61a5658359cd857",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled approved 24-character/two-form collection intent with merged PR115 playable-first-version readiness and explicit reconnect/retry doctrine; both accepted decisions and child authorship remain intact.",
+      "reviewedAt": "2026-11-21T19:01:23.610Z",
+      "sourceDigest": "2bbe73ab114feef4c596671b449b114cb9e8ea9df3333fd119a2e633ad766cc8",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the page-local portrait reuse and documented failure recovery against the existing companion doctrine. This removes repeated image work without changing approved identities/forms, ownership, growth, engagement rules, child choice or native-decoding readiness; explicit retry and honest unavailable feedback remain required.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -412,10 +416,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T04:38:11.591Z",
-      "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
+      "reviewedAt": "2026-11-22T00:40:58.790Z",
+      "sourceDigest": "5b18489a65280cba1c0085101d05d33ea21e6fa131ccccd3fd9f2dec8a507bd3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+      "reviewReason": "Reviewed the tablet evidence contract against the unchanged game and builder runtime. Updated game-quality and architecture guidance for the latest three tap receipts, bounded input/focus/scroll/viewport observations and geometry that distinguishes document scrolling from control movement. The single real tap, trusted activation counters, deadlines and construction-state assertions remain intact. The cause of the earlier redirected click and physical-device acceptance remain unverified; passive instrumentation is not a product repair. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c, including the reference assets unavailable locally.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -542,7 +546,16 @@
       "reviewedAt": "2026-11-22T21:59:42.641Z",
       "sourceDigest": "213cbc4ce51bb9f7ad5b2cad7abac7972525a8c556d0fe30ae2890f10f52927b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified."
+      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
+          "reviewedAt": "2026-11-22T18:28:47.707Z",
+          "sourceDigest": "55a4c78234ef73b8927e2d51db9f3da9e04f847d3a6f91c512d1ffb209a43545",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented the provider-only readiness source references, exact public quote restoration, literal child decisions, dynamic pre-call budget and specific content-free failure reasons; reviewed design, Adult/privacy and doctrine contracts without changing audience, semantic readiness, Build or model settings."
+        }
+      ]
     },
     {
       "id": "adult-privacy",
@@ -613,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T22:14:44.270Z",
-      "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
+      "reviewedAt": "2026-11-22T23:26:52.768Z",
+      "sourceDigest": "34cf87d62732972e53271a121d8dbca2121d5bbcb32992ffe0f6d805b7c61c39",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the corrected private loopback failure taxonomy assertion: a missing mandatory proposedChange reports reply_proposal_invalid, rejects with 503 and makes no extra model request; all existing readiness and Build gates remain strict.",
+      "reviewReason": "Reviewed retained Pal lifecycle/native decoding and tablet input regressions with current private-coach provider/tests and the unchanged independent Mind Your Jems visual baseline. Previously observed screenshot phase flake remains tracked in issue #76; no blanket acceptance or weakening of assertions. Exact validation digest from hosted documentation job 137395774437. Full newest combined CI remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -666,6 +679,55 @@
           "sourceDigest": "9a1a08691b7a59def8f11da367d02f1882aec03aae21fb560efeda5f77584d3b",
           "reviewOutcome": "updated",
           "reviewReason": "Delivery and feature contracts record readiness/history/reconnect, exact saved-job/lost-ack retry and adult banner fixture coverage, local executable passes and Chromium startup restriction; live provider, device and child acceptance remain unverified."
+        },
+        {
+          "sourceCommit": "4ed426345772fbe970add7409b889aa37479a893",
+          "reviewedAt": "2026-11-21T19:01:24.165Z",
+          "sourceDigest": "6bb01be7bf23848c3693e57e34fc535e3a0967ec568098ab83cdd714a1108345",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented the measured 1097-decode/210-pending trace and its unknown native cause separately from the prepared workload correction. Extended the actual browser fixture for retained image/source identity, ready-hero decode counts, retired load/native callbacks, owner/form/reset/dispose isolation and focused retry. Strengthened the integrated native assertion with current connected visible identity and added a pre-reload scalar checkpoint; local build and 65 existing tests passed, new hosted browser assertions remain pending."
+        },
+        {
+          "sourceCommit": "b4734b1323de87dfee96bb91769cbab3cff432e6",
+          "reviewedAt": "2026-11-21T19:43:59.746Z",
+          "sourceDigest": "5fd2ff6f7a8fb7ca4e6df5ed7089cfac005ea70cf53dee915547c8aedbea0810",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the observed exact-tree tablet Add Bottle failure and strengthened the one-real-tap test with a bounded trusted-activation receipt, unchanged blueprint/capability assertions and bounded failure evidence; local harness/review are distinct from pending Chromium CI and the unproved historical cause."
+        },
+        {
+          "sourceCommit": "1996c1b382a797a6052ee1304867fdb5b620c3d3",
+          "reviewedAt": "2026-11-22T18:28:47.828Z",
+          "sourceDigest": "d24e95db50fe53b7848bb7664f64b0ee079d603246bc8e58d4d830fd5ff2619b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded 51 focused Node22 tests including the new 21 wire/loopback groups, existing 77 coach unit and eight gateway HTTP checks, private security/diagnostics, typecheck and bundle import; synthetic provider, hosted image/browser and live reply evidence remain distinct."
+        },
+        {
+          "sourceCommit": "4ff91c7f0f440c0a3826b641921c47f28acd22a8",
+          "reviewedAt": "2026-11-22T00:40:58.790Z",
+          "sourceDigest": "59d746b674b130ab70db62f75ce7a82385ae31ddddf6a04f3091126a23d8b2cc",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the tablet instrumentation diff and independent review: one real tap, the original two-second activation wait, unchanged trusted/redirected/cancelled counters and construction-state assertions, complete listener cleanup, and bounds of three tap receipts and 32 retained events per tap. Updated architecture and delivery records to preserve the original redirected-click failure and distinguish syntax validation from unavailable local Chromium acceptance. New hosted results must be evaluated on their own source; a pass alone does not identify or repair the earlier failure. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c."
+        },
+        {
+          "sourceCommit": "4de78af41f788974e2c5f349be563810b1b809e4",
+          "reviewedAt": "2026-11-22T22:14:44.270Z",
+          "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the corrected private loopback failure taxonomy assertion: a missing mandatory proposedChange reports reply_proposal_invalid, rejects with 503 and makes no extra model request; all existing readiness and Build gates remain strict."
+        },
+        {
+          "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
+          "reviewedAt": "2026-11-22T22:30:12.846Z",
+          "sourceDigest": "650738219188f0e8fae9a5f97d19e89b9b622b28c088576a6731c3a07a614ef2",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed PR126's bounded tablet focus/scroll diagnostic assertions together with merged PR131's private creation-wire tests. No assertion was relaxed; historical missed-tap and portrait-decoding failures remain recorded. Full combined-source digest observed in hosted documentation job 137379759144; browser acceptance remains separate."
+        },
+        {
+          "sourceCommit": "611e05cca73d55addc2038a1118402a9dc6144d5",
+          "reviewedAt": "2026-11-22T23:25:28.510Z",
+          "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed PR126's existing real-tap, Pal image lifecycle and receipt regressions alongside merged PR133's private-provider optional-evidence fallback tests and unchanged visual baselines. Previous 0.8%-threshold Mind Your Jems screenshot flake is tracked in issue #76; the test-only capture experiment was reverted. Exact combined-source fingerprint and hosted acceptance remain pending."
         }
       ]
     },
@@ -684,6 +746,7 @@
         "scripts/deployment/**",
         "scripts/ops/**",
         "ops/**",
+        ".github/CODEOWNERS",
         "package.json",
         "package-lock.json",
         "tsconfig.json",
@@ -693,10 +756,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T18:29:52.608Z",
-      "sourceDigest": "4ad4208748e1d100a14d644e2c46e4b7bb3bdce764e1a52b360cd406d182c49b",
+      "reviewedAt": "2026-11-22T23:26:52.768Z",
+      "sourceDigest": "adf654212391bd7c66f0fd35e2f89dba0c829fa361988f1994af5a5b6158fc2a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner diagnostic serving receipt, three readiness-validation failures and a later connected banner, whose actual-turn event distinguishes it from status-only availability; preserved scoped fixture verification, separate merge/deployment and pending storage audit states.",
+      "reviewReason": "Reviewed the actual inert-merge authorization and bounded source scope after reconciling PR100/107/126 access and receipt tooling with current main. Confirmed release workflows remain gated by disabled GitHub flags, no new deployment/IAM binding, Cloud Shell receipt is temporary, and service-specific activation gates stay independent. Observed exact full-source delivery fingerprint in GitHub documentation job 137395774437; hosted final-head gates remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -753,6 +816,69 @@
           "sourceDigest": "64860b987176b12c2989d5aa7545db91d586735753fa3be4d24e33f100ad5841",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded source repair on merged PR112, observed PR108 Pages marker and separately reported gateway repair, hosted browser/package gate requirement and compatible gateway/private-coach/web rollout with unchanged worker and settings."
+        },
+        {
+          "sourceCommit": "b257527e3fcf06c9a7aad6f6b05c6bdb46dc24d9",
+          "reviewedAt": "2026-11-21T13:29:20.585Z",
+          "sourceDigest": "874386e76b832bf879f003581bc732337938eb81281805bc76e9d8d13ad1ad23",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled draft PR107 with PR112 policy and game-repair integration, retaining all newer runtime, packaging and delivery evidence. Verified both privileged workflows, advisory CODEOWNERS, administrator/controller modules and fixed assets remain unchanged from reviewed PR107. Updated architecture, task routing and Phase2 runbook to distinguish the extracted real CI dependency from still-pending cloud grants, claims proofs, Logging validation and isolated live drill; no deployment or activation is claimed."
+        },
+        {
+          "sourceCommit": "b981b9c12970d0c46c86e2e03079912d7699348b",
+          "reviewedAt": "2026-11-21T17:18:09.166Z",
+          "sourceDigest": "adfbbd0ca7cd17d7932b5b4ca42f51449df19b1a31ac51a46015ac8e9b306abf",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled PR100 metadata-only tooling with main 6cc9c3 while preserving current application, deployment workflows, policy foundation and complete delivery history. Added exact diagnostics-account rejection and reviewed its negative tests, the offline bootstrap and unchanged metadata/redaction boundaries. Recorded 79 deployment and 47 combined operations passes, initial missing-dependency failure, current no-gcloud/no-manifest limitation, prior conversation evidence separately and the explicit no-merge hold. PR107 cloud activation remains pending."
+        },
+        {
+          "sourceCommit": "6a69bff3c4b3ac4f8ff03ff95c0a4badf2cc0679",
+          "reviewedAt": "2026-11-21T17:22:45.160Z",
+          "sourceDigest": "e43f4cad14c447d88895ef452e9bb8c48b00721ad3b6b2f4f54ac03b48f0b452",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled PR100 and held PR107 with current main6cc9c3 while preserving all runtime and release history. Reviewed exact diagnostic-account rejection, revision-only scaling-status exclusion, isolated-registry reader scope and guarded readback, local-only preflight and non-executable activation review. Updated the operations runbooks, architecture and dated ledger with 79 deployment and 64 operations tests, source-only evidence limits, actual account setup interruption and the explicit no-merge boundary; no cloud activation is claimed."
+        },
+        {
+          "sourceCommit": "dc5771e5528a8f5872abe3a3b39ef0fe636eabb0",
+          "reviewedAt": "2026-11-21T17:41:31.936Z",
+          "sourceDigest": "f94fd642a9061b2862b9ef6e39792290cb39c8b3d0e5baf8554429ab56e0958d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Corrected the unsupported mandatory service_account_email manifest assumption using the installed provider runtime networking guide, which documents managed CLI selectors but no required account field. Selector-only fixtures now pass, wrong present declarations fail, and all reports keep account identity unverified. Reviewed preserved no-fallback/override/resource/command boundaries and made live selected-account plus denied-write acceptance explicit. Recorded 79 deployment and 48 operations passes, actual no-gcloud self-check, earlier hosted receipts scoped to b981b9c and the continuing no-merge hold."
+        },
+        {
+          "sourceCommit": "4ed426345772fbe970add7409b889aa37479a893",
+          "reviewedAt": "2026-11-21T19:01:24.665Z",
+          "sourceDigest": "40632ad55db4acd3e37047e8ed67f9cd48145aa07260281805292a8336f227cd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added a scoped preparation receipt for current-page portrait workload correction, local build and 65 existing non-browser Pal passes, asset/catalog checks and unexecuted hosted browser gates. The native decoder cause remains unknown; this source work claims no browser repair, merge, deployment, permission grant, provider action or CI rerun."
+        },
+        {
+          "sourceCommit": "b4734b1323de87dfee96bb91769cbab3cff432e6",
+          "reviewedAt": "2026-11-21T19:44:00.253Z",
+          "sourceDigest": "16f3b6dd6f5f592ab53ded14e89b8fda99884dec4746e6415829bc3f0bff27ae",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner-approved private diagnostic release, original and refreshed PR passes, canceled-push rerun failure, test-only activation correction and fresh required CI; merge, Cloud Run deployment and actual conversation remain unverified."
+        },
+        {
+          "sourceCommit": "1996c1b382a797a6052ee1304867fdb5b620c3d3",
+          "reviewedAt": "2026-11-22T18:29:52.608Z",
+          "sourceDigest": "4ad4208748e1d100a14d644e2c46e4b7bb3bdce764e1a52b360cd406d182c49b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner diagnostic serving receipt, three readiness-validation failures and a later connected banner, whose actual-turn event distinguishes it from status-only availability; preserved scoped fixture verification, separate merge/deployment and pending storage audit states."
+        },
+        {
+          "sourceCommit": "4ff91c7f0f440c0a3826b641921c47f28acd22a8",
+          "reviewedAt": "2026-11-22T00:38:03.226Z",
+          "sourceDigest": "05cd855f146a31be67e89ec9432ecfe14c381e0b3a3e9f4b54a22764dc1913d4",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the receipt-storage guard and its 85 offline fixture tests: reserve and sync private space before account actions, preserve incomplete evidence, refuse path reuse and report late receipt failure separately. Updated operations, architecture and delivery records for the seven owner-applied inactive resources, unchanged serving metadata and ENOSPC uncertainty. Recovery remains read-only from pinned PR107; PR126 carries the follow-up, with no merge, identity acceptance, activation or deployment claim."
+        },
+        {
+          "sourceCommit": "611e05cca73d55addc2038a1118402a9dc6144d5",
+          "reviewedAt": "2026-11-22T22:30:12.846Z",
+          "sourceDigest": "16c5eac1c30b4eec7e9ab92068d21e918ca831a58d9880ef56e5f02da2432c75",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed PR126's receipt hardening and guarded cloud operations alongside merged PR131's private coach readiness tests, package test wiring and the recovered read-only access receipt. This is a source-only integration, not a production rollout; the full combined-source digest was observed in hosted documentation job 137379759144. Other hosted acceptance remains separate."
         }
       ]
     },
@@ -775,10 +901,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:33:42.892Z",
-      "sourceDigest": "ebd564a2e3fe8d4256e42e76f568e11490bfcdaa08616de70e02f79d1d1a1d67",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed routing additions for the generator, supplemental approved art and integration decision; existing maintenance, evidence and PR review procedures already govern this additive feature and remain accurate.",
+      "reviewedAt": "2026-11-21T17:22:45.601Z",
+      "sourceDigest": "3080c42251cd4d49620f86401b6b9b8d141612a20fe87b8a3b8e3b5245158579",
+      "reviewOutcome": "updated",
+      "reviewReason": "Preserved both source histories and current main feature-area reviews. Registered Phase2 and activation-review documents using existing operations link/source coverage, retained advisory CODEOWNERS routing, and updated task entry points for exact-account metadata diagnostics and the read-only owner handoff. AGENTS and Project instructions retain authorization scope and the explicit no-merge hold; checker enforcement is unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -814,6 +940,34 @@
           "sourceDigest": "3baadae98a9cf0e7015e325454f85ac2f2363ebb89750ff818abaa82ed965e40",
           "reviewOutcome": "updated",
           "reviewReason": "Registered the child-interface contract and dated decision, routed shared browser speech source, and added permanent AGENTS/PR review links. Existing fingerprint, source coverage and approval policies are preserved."
+        },
+        {
+          "sourceCommit": "b257527e3fcf06c9a7aad6f6b05c6bdb46dc24d9",
+          "reviewedAt": "2026-11-21T13:29:21.019Z",
+          "sourceDigest": "fb2db8d59833d74bffaaeeb43e39b2b6918b595e24e8197895597cf5511883b1",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved PR112 required policy-foundation document, operations link checking and all newer area reviews; restored advisory CODEOWNERS source coverage for the remaining draft. Reconciled the documentation index and architecture so policy/game-fix integration and held privileged workflow activation have separate truthful entry points without weakening registry checks or source coverage."
+        },
+        {
+          "sourceCommit": "b981b9c12970d0c46c86e2e03079912d7699348b",
+          "reviewedAt": "2026-11-21T17:18:14.369Z",
+          "sourceDigest": "6af7ed23017d0ee2212376611ba04656150a3dfdd6c5efb9a0c3733099e72d14",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved current main source routing and all unrelated review records; registered the PR100 access runbook and operating decision under existing delivery/operations link coverage. Reviewed AGENTS, Project retrieval instructions, docs index and ADR for direct work only within approved scope, explicit preparation/no-merge holds, exact managed identity selection, and separation of previous connection evidence from current-task access. No checker or existing protection was weakened."
+        },
+        {
+          "sourceCommit": "6a69bff3c4b3ac4f8ff03ff95c0a4badf2cc0679",
+          "reviewedAt": "2026-11-21T17:22:45.601Z",
+          "sourceDigest": "3080c42251cd4d49620f86401b6b9b8d141612a20fe87b8a3b8e3b5245158579",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved both source histories and current main feature-area reviews. Registered Phase2 and activation-review documents using existing operations link/source coverage, retained advisory CODEOWNERS routing, and updated task entry points for exact-account metadata diagnostics and the read-only owner handoff. AGENTS and Project instructions retain authorization scope and the explicit no-merge hold; checker enforcement is unchanged."
+        },
+        {
+          "sourceCommit": "dc5771e5528a8f5872abe3a3b39ef0fe636eabb0",
+          "reviewedAt": "2026-11-21T17:18:14.369Z",
+          "sourceDigest": "6af7ed23017d0ee2212376611ba04656150a3dfdd6c5efb9a0c3733099e72d14",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved current main source routing and all unrelated review records; registered the PR100 access runbook and operating decision under existing delivery/operations link coverage. Reviewed AGENTS, Project retrieval instructions, docs index and ADR for direct work only within approved scope, explicit preparation/no-merge holds, exact managed identity selection, and separation of previous connection evidence from current-task access. No checker or existing protection was weakened."
         }
       ]
     },
@@ -894,10 +1048,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4943660550545f439dbbaefc38baafccff37efe4c8a8fa706f005eacda216700",
-      "reviewedAt": "2026-11-21T14:33:43.324Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Bound all 24 approved profiles in the canonical index, retained art approvals and historical references, excluded Brio review expressions and documented exact immutable manifest plus byte-identical supplemental neutrals."
+      "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
+      "reviewedAt": "2026-11-21T19:01:25.124Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the loading-contract update: approved character references, exact Base/Grown image bytes, expression bindings, art approvals and scene asset versions are unchanged. The page reuses current presentation nodes and retires callbacks; no visual redesign, substitute artwork or new form is introduced."
     },
     {
       "id": "art-studio",
@@ -954,10 +1108,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b734e7783f81ca8f947f67615961eb46db1ccac12414ca7d925d79b4f810363",
-      "reviewedAt": "2026-11-21T16:01:33.583Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected actual unavailable-picture screenshot and runtime loader guards; no speculative artwork/runtime workaround is justified. Added failure-only bounded public-asset diagnostics; approved identities, forms, ownership, recovery and acceptance assertions remain unchanged."
+      "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
+      "reviewedAt": "2026-11-21T19:01:26.034Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented bounded owner/surface/Pal/form reuse, unchanged-URL state retention, request retirement and the inability to cancel an active native decode. Reviewed fresh-container retry listeners, focused in-progress retry, unready-owner/dispose cleanup and actual-browser regressions. Explicit same-image detail recovery remains native; gallery failures do not silently retry on ordinary refresh or hide/show, and hosted acceptance is pending."
     }
   ]
 }

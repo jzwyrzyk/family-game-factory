@@ -42,6 +42,16 @@ const count = (value: number) => new Intl.NumberFormat('en-US').format(value);
 const portraitRequests = new WeakMap<HTMLElement, number>();
 const portraitTimeouts = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
+function retirePortrait(portrait: HTMLElement) {
+  portraitRequests.set(portrait, (portraitRequests.get(portrait) ?? 0) + 1);
+  clearTimeout(portraitTimeouts.get(portrait));
+  portraitTimeouts.delete(portrait);
+  const image = portrait.querySelector('img');
+  if (image) image.onload = image.onerror = null;
+  // A native decode already in progress cannot be cancelled here. Its existing
+  // request guard prevents a retired portrait from changing state or falling back.
+}
+
 /** Exact approved character/form artwork. Cards load on demand; a failed reaction
  * falls back only to this same character's same-form neutral. */
 export function createPalPortrait(id: PalId, stage: PalStage = 1, className = '', expression: PalArtworkExpression = 'neutral', eager = false): HTMLElement {
@@ -97,6 +107,7 @@ function setPortraitExpression(portrait: HTMLElement, expression: PalArtworkExpr
   };
   image.onload = () => {
     const decodedURL = image.src;
+    if (portraitRequests.get(portrait) !== request) return;
     void image.decode().then(() => {
       if (portraitRequests.get(portrait) !== request || image.src !== decodedURL) return;
       clearLoadTimeout();
@@ -141,6 +152,32 @@ export function createPalsPage(options: PalsPageOptions) {
   let growthOpen = false;
   let expressionsOpen = false;
   let expression: PalArtworkExpression = 'neutral';
+  const portraits = new Map<string, HTMLElement>();
+  const usedPortraits = new Set<string>();
+  const pictureRetries = new WeakSet<HTMLElement>();
+
+  function pagePortrait(id: PalId, stage: PalStage, surface: 'gallery' | 'detail', requested: PalArtworkExpression = 'neutral') {
+    const key = JSON.stringify([state.owner, surface, id, stage]);
+    usedPortraits.add(key);
+    let portrait = portraits.get(key);
+    if (!portrait) {
+      portrait = createPalPortrait(id, stage, surface === 'detail' ? 'pals-hero-portrait' : '', requested, surface === 'detail');
+      portraits.set(key, portrait);
+    } else {
+      const url = new URL(palArtworkPath(id, stage === 2 ? 'mature' : 'base', requested), document.baseURI).href;
+      // Ordinary progress/saving renders retain the same decoded or pending
+      // image, including an honest failure. Explicit expression/retry actions
+      // still use the original loader rather than silently retrying on render.
+      if (portrait.querySelector('img')!.src !== url) setPortraitExpression(portrait, requested);
+    }
+    return portrait;
+  }
+  function retireUnusedPortraits() {
+    for (const [key, portrait] of portraits) {
+      if (usedPortraits.has(key)) continue;
+      retirePortrait(portrait); pictureRetries.delete(portrait); portraits.delete(key);
+    }
+  }
 
   const element = el('section', 'page hidden jems-pals');
   element.id = 'page-jems-pals';
@@ -284,9 +321,11 @@ export function createPalsPage(options: PalsPageOptions) {
     heading.textContent = isReady && !state.profile!.starterId ? 'Choose your Pal' : 'My Pals';
     intro.textContent = isReady && !state.profile!.starterId ? 'Your first Pal is free.' : '';
     intro.hidden = !intro.textContent;
+    usedPortraits.clear();
     content.replaceChildren();
     if (!isReady) {
       content.append(el('div', 'pals-loading', state.loading ? 'Your crew will be right here.' : 'Your saved collection has not been replaced.'));
+      retireUnusedPortraits();
       restoreFocus(previousFocus);
       return;
     }
@@ -294,7 +333,7 @@ export function createPalsPage(options: PalsPageOptions) {
     if (selection === null || !PAL_CATALOG.some(pal => pal.id === selection)) selection = profile.activeId;
     const selectedOwned = owned(state, selection);
     if (profile.starterId && selectedOwned) {
-      content.append(detail(selectedOwned));
+      content.append(detail(selectedOwned, previousFocus));
     }
 
     const starterGrid = el('div', 'pals-grid pals-starter-grid');
@@ -320,7 +359,7 @@ export function createPalsPage(options: PalsPageOptions) {
       card.classList.toggle('is-selected', selection === definition.id && !!pal);
       const badge = el('span', 'pals-card-badge', starter ? 'Free starter' : pal ? profile.activeId === pal.id ? 'Your active Pal' : pal.stageName : available ? 'Ready to meet' : `${definition.unlockGems} gems`);
       const art = pal ? button('', `details-${definition.id}`, 'pals-card-art') : el('div', 'pals-card-art');
-      art.append(createPalPortrait(definition.id, pal?.stage ?? 1));
+      art.append(pagePortrait(definition.id, pal?.stage ?? 1, 'gallery'));
       if (art instanceof HTMLButtonElement) {
         art.setAttribute('aria-label', `Show ${definition.name} and progress`);
         art.setAttribute('aria-pressed', String(selection === definition.id));
@@ -359,10 +398,11 @@ export function createPalsPage(options: PalsPageOptions) {
     shelf.append(shelfHeading, grid);
     content.append(shelf);
     content.append(explainer(), preferences());
+    retireUnusedPortraits();
     restoreFocus(previousFocus);
   }
 
-  function detail(pal: OwnedPalView) {
+  function detail(pal: OwnedPalView, previousFocus: string) {
     const definition = palDefinition(pal.id), profile = state.profile!;
     const hero = el('section', 'pals-detail');
     hero.setAttribute('aria-labelledby', 'jemsPalDetailTitle');
@@ -374,27 +414,31 @@ export function createPalsPage(options: PalsPageOptions) {
     toy.textContent = '';
     toy.setAttribute('aria-label', `Tap ${definition.name} for a playful reaction`);
     toy.disabled = localSaving || !!state.saving;
-    const portrait = createPalPortrait(pal.id, pal.stage, 'pals-hero-portrait', expression, true);
+    const portrait = pagePortrait(pal.id, pal.stage, 'detail', expression);
     toy.append(portrait);
     toy.onclick = () => play(pal.id);
     const pictureRetry = button('Retry picture', `picture-retry-${pal.id}`);
     pictureRetry.hidden = true;
-    let retryingPicture = false;
     pictureRetry.onclick = () => {
-      if (retryingPicture) return;
-      retryingPicture = true; previewExpression('neutral');
+      if (pictureRetries.has(portrait)) return;
+      pictureRetries.add(portrait); previewExpression('neutral');
     };
-    portrait.addEventListener('pal-picture-state', () => {
+    const syncPictureRetry = (restoreRetryFocus = false) => {
       const status = portrait.dataset.state;
-      if (status === 'ready' || status === 'unavailable') retryingPicture = false;
+      if (status === 'ready' || status === 'unavailable') pictureRetries.delete(portrait);
+      const retryingPicture = pictureRetries.has(portrait);
       // Only the keyboard user still on this retry returns to the Pal. A late
       // image response cannot steal focus from navigation or another control.
       if (status === 'ready' && document.activeElement === pictureRetry && !element.hidden && portrait.isConnected) {
         toy.focus({ preventScroll: true });
       }
-      pictureRetry.hidden = status !== 'unavailable' && !(retryingPicture && document.activeElement === pictureRetry);
+      pictureRetry.hidden = status !== 'unavailable' && !(retryingPicture && (document.activeElement === pictureRetry || restoreRetryFocus));
       pictureRetry.setAttribute('aria-disabled', String(retryingPicture));
-    });
+    };
+    // The portrait survives ordinary renders; its controls and listeners do not.
+    // Listen on this detail container so old retry/toy controls cannot accumulate.
+    hero.addEventListener('pal-picture-state', () => syncPictureRetry());
+    syncPictureRetry(previousFocus === `picture-retry-${pal.id}` && pictureRetries.has(portrait));
     const hint = el('span', 'pals-tap-hint', `Tap ${definition.name}`);
     const speech = el('p', 'pals-play-line', playPal === pal.id && playLine ? playLine : '');
     speech.hidden = !speech.textContent;
@@ -520,7 +564,7 @@ export function createPalsPage(options: PalsPageOptions) {
     },
     show() { element.hidden = false; element.classList.remove('hidden'); render(); heading.focus({ preventScroll: true }); },
     hide() { cancelReaction(); element.hidden = true; element.classList.add('hidden'); expressionsOpen = false; expression = 'neutral'; },
-    dispose() { disposed = true; epoch++; cancelReaction(); element.remove(); },
+    dispose() { disposed = true; epoch++; cancelReaction(); usedPortraits.clear(); retireUnusedPortraits(); element.remove(); },
   };
 }
 

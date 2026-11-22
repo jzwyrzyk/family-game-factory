@@ -89,6 +89,27 @@ class ReleaseTests(unittest.TestCase):
         f.transition("rollback")
         self.assertTrue(all(tag in patch["traffic"] for _, patch in f.patches))
 
+    def test_effective_scaling_status_does_not_change_reviewed_configuration(self):
+        f = CloudRunFixture()
+        f.revisions[f.baseline]["scalingStatus"] = {"desiredMinInstanceCount": 0}
+        self.assertEqual(f.transition("stage"), "STAGED")
+        f.revisions[f.candidate]["scalingStatus"] = {"desiredMinInstanceCount": 1}
+        self.assertEqual(f.transition("canary"), "CANARY")
+        self.assertEqual(f.transition("promote"), "PROMOTED")
+        f.revisions[f.baseline]["scalingStatus"] = {"desiredMinInstanceCount": 2}
+        self.assertEqual(f.transition("rollback"), "ROLLED_BACK")
+        self.assertEqual(release.traffic(f.state), {f.baseline: 100})
+
+    def test_desired_scaling_change_still_blocks_before_write(self):
+        for target in ("template", "baseline"):
+            with self.subTest(target=target):
+                f = CloudRunFixture()
+                resource = f.state["template"] if target == "template" else f.revisions[f.baseline]
+                resource["scaling"] = {"minInstanceCount": 2}
+                with self.assertRaisesRegex(release.ReleaseError, "configuration"):
+                    f.transition("stage")
+                self.assertEqual(f.patches, [])
+
     def test_promote_requires_canary(self):
         f = CloudRunFixture()
         f.transition("stage")
@@ -141,8 +162,9 @@ class ReleaseTests(unittest.TestCase):
 class LogSummaryTests(unittest.TestCase):
     def test_only_fixed_metadata_is_emitted(self):
         entry = {
-            "resource": {"type": "cloud_run_revision", "labels": {"service_name": "factory-gateway"}},
-            "logName": "projects/example/logs/run.googleapis.com%2Frequests",
+            "resource": {"type": "cloud_run_revision", "labels": {
+                "service_name": "factory-gateway", "project_id": log_summary.PROJECT, "location": log_summary.REGION}},
+            "logName": f"projects/{log_summary.PROJECT}/logs/run.googleapis.com%2Frequests",
             "severity": "ERROR", "textPayload": "private", "httpRequest": {"requestUrl": "private"},
         }
         unrelated = {**entry, "logName": "projects/example/logs/run.googleapis.com%2Fstderr"}

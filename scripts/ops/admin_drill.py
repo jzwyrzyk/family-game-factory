@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime, timezone
 
 import admin_cloud as cloud
-from admin_api import Http, SetupError, command, gcloud, require
+from admin_api import Http, Plan, SetupError, command, gcloud, require
 import drill
 import release
 
@@ -40,6 +40,33 @@ def impersonated_token(email):
     return command(["gcloud", "auth", "print-access-token", f"--impersonate-service-account={email}", "--quiet"])
 
 
+def synthetic_registry(plan, project, operator):
+    """Plan only the isolated deployer's image-read grant, with guarded readback."""
+    require(drill.PROJECT.fullmatch(project) and project != cloud.PROJECT,
+            "Synthetic registry access requires the isolated drill project")
+    expected_operator = f"{OPERATOR}@{project}.iam.gserviceaccount.com"
+    require(operator == expected_operator, "Unexpected synthetic registry reader")
+    member = f"serviceAccount:{operator}"
+    expected = {("roles/artifactregistry.reader", member)}
+    grants = cloud.registry(plan, project, "jems-drill", expected_bindings=expected)
+    if grants == expected:
+        return
+
+    def apply_reader():
+        details = ("artifacts", "repositories", "get-iam-policy", "jems-drill", f"--location={REGION}")
+        current = cloud.permitted(gcloud(project, *details), expected, "jems-drill")
+        if current != expected:
+            gcloud(project, "artifacts", "repositories", "add-iam-policy-binding", "jems-drill",
+                   f"--location={REGION}", f"--member={member}",
+                   "--role=roles/artifactregistry.reader", "--condition=None")
+        require(cloud.permitted(gcloud(project, *details), expected, "jems-drill") == expected,
+                "Synthetic registry reader did not read back")
+
+    plan.add("Allow the isolated operator to read only the synthetic image repository",
+             {"project": project, "repository": "jems-drill", "location": REGION,
+              "member": member, "role": "roles/artifactregistry.reader"}, apply_reader)
+
+
 def isolated_plan(plan, root, head, project, number):
     location = drill.location_for(project, number)
     resource = f"{location}/services/{drill.SERVICE}"
@@ -66,7 +93,7 @@ def isolated_plan(plan, root, head, project, number):
         cloud.add_gcloud(plan, project, "Allow operation polling only in the isolated project", "projects",
                          "add-iam-policy-binding", project, f"--member={account_member}", f"--role={poll_role}",
                          "--condition=None")
-    cloud.registry(plan, project, "jems-drill")
+    synthetic_registry(plan, project, operator)
     api = Http("https://run.googleapis.com", cloud.admin_token())
     existing = api.call("GET", "v2/" + resource, missing=True)
     if existing:
@@ -85,7 +112,8 @@ def isolated_plan(plan, root, head, project, number):
              {"project": project, "region": REGION, "service": drill.SERVICE, "head": head,
               "runtime": runtime, "operator": operator, "existing_baseline": evidence,
               "scope": {"operator_on_service": list(SERVICE_PERMS), "maximum_instances": 1,
-                        "ingress": "internal", "service_account_user_on": runtime}},
+                        "ingress": "internal", "service_account_user_on": runtime,
+                        "artifact_registry_reader_on": f"projects/{project}/locations/{REGION}/repositories/jems-drill"}},
              lambda: provision_and_run(root, head, project, number, service_role))
 
 
@@ -200,6 +228,9 @@ def provision_and_run(root, head, project, number, role):
 def verify_baseline(project, head):
     number = cloud.project_check(project)
     location = drill.location_for(project, number)
+    check = Plan("isolated-registry-verify", {})
+    synthetic_registry(check, project, f"{OPERATOR}@{project}.iam.gserviceaccount.com")
+    require(not check.actions, "Synthetic registry reader is missing or unverified")
     token = cloud.admin_token()
     api = release.cloud_api(token, project=project, project_number=number)
     resource = f"{location}/services/{drill.SERVICE}"
