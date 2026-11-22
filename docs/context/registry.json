@@ -419,10 +419,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:45:07.364Z",
-      "sourceDigest": "cc22b55b65a54b27581ffdac29920990b3fbdc565054a860c7fe5253d94d70ab",
+      "reviewedAt": "2026-11-22T16:17:45.496Z",
+      "sourceDigest": "7f548bad2df8ae1ef968e89099544174de6ced2df49fefba6b06c8f1fd91db47",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the native mining adapter with the exact phase1 movement/contact/holding controller and geometry; documented timed host learning, local level results, saved runtime IDs and honest empty local tuning.",
+      "reviewReason": "Reviewed the shared Help lifecycle, constrained native grid, readable narrow controls, short-landscape footer and cart-label reflow, and portrait centering against the rules and illustrated composition contract; documented current behavior without claiming corrected browser or visual acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -621,10 +621,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T15:57:48.192Z",
-      "sourceDigest": "1ebbfa819bc2c46e709096e4aba73410278a0c20b2ad9c0a4ed1d84bd38f2ce1",
+      "reviewedAt": "2026-11-22T16:17:45.752Z",
+      "sourceDigest": "0ba2c68bafba01e332fb932bbe6d52201007e7b0d3f57150a9190e775dc74ffe",
       "reviewOutcome": "updated",
-      "reviewReason": "Ported Chromium released-contact touchEnd semantics with exact simultaneous Left/Hold assertions intact; native shared-player failure captures and independent viewport evidence accumulation retain nonzero failure and block baseline acceptance.",
+      "reviewReason": "Recorded combined TypeScript/build success and unchanged pure rules; preserved first-PR129 exact layout failures, catalogue artwork/decode coverage and all geometry/input/ownership gates. Independent review corrected resize readiness to use current viewport dimensions after both native event receipts, with bounded timeout and historical diagnostics; corrected hosted execution remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -701,10 +701,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T15:57:48.523Z",
-      "sourceDigest": "35dba22f2acd552578f03c17a5456d9029a134dc0e5c86568ae4b52a3aa0d0e1",
+      "reviewedAt": "2026-11-22T16:18:31.266Z",
+      "sourceDigest": "3559cc6fe097cef933724070099f9ca8621769c5150cb751accc7b1f3cc9aac1",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained run45040267569 complete desktop evidence and failed tablet multi-touch observation, recorded the scoped fixture correction and required corrected hosted configurations without claiming combined acceptance.",
+      "reviewReason": "Reconciled exact shared core PR128e19dd23/local a1d8d84 and native fixture repairs with first-PR129 focused/visual/Arcade results and artifact digests. Retained failed observations and downstream Studio commands that did not run. Combined build passed; the earlier 402-unit result is historical, rules are unchanged, and no unit rerun or merge/deployment is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -12,9 +12,26 @@ const {start}=require('./browser-server.cjs');
   const page=await ctx.newPage();page.on('dialog',d=>void d.accept());
   await page.goto(base);await page.waitForFunction(()=>window.FG?.studio&&document.getElementById('jems-delight-host'));await exploreWelcome(page);
   assert.equal(await page.locator('[data-starter]').count(),6);
-  assert.equal(await page.locator('.jems-world-scene').count(),5,'5 illustrated worlds + 2 existing quality-game canvases');
+  const cardArtwork={
+   factory:['./gem-factory-workshop.webp'],
+   mining:['./art/mind-your-jems/scene-sky.webp','./art/mind-your-jems/rock-expressions.webp','./art/mind-your-jems/miner-poses.webp','./art/mind-your-jems/cart-empty.webp'],
+   dragon:['./jems-world-dragon.svg'],buckets:['./jems-world-buckets.svg']
+  };
+  for(const [game,assets] of Object.entries(cardArtwork)){
+   const images=page.locator('[data-starter="'+game+'"] .studio-game-art img');
+   assert.deepEqual(await images.evaluateAll(nodes=>nodes.map(image=>image.getAttribute('src'))),assets,game+' keeps its actual illustrated artwork');
+   for(const image of await images.all())assert.ok(await image.evaluate(async image=>{await image.decode();return image.complete&&image.naturalWidth>0&&image.naturalHeight>0;}),game+' artwork decodes');
+  }
+  for(const game of ['gum','hill']){
+   const canvas=page.locator('[data-starter="'+game+'"] canvas.quality-card-art[data-quality-card="'+game+'"]');
+   assert.equal(await canvas.count(),1,game+' keeps its quality-game canvas');
+   assert.ok(await canvas.isVisible(),game+' canvas is visible');
+   assert.ok(await canvas.evaluate(canvas=>canvas.width>0&&canvas.height>0),game+' canvas has a drawable surface');
+  }
+  assert.equal(await page.locator('[data-starter="moon"],[data-starter="robot"]').count(),0,'retired worlds are not default catalogue cards');
   for(const asset of ['jems-workbench.svg','jems-world-buckets.svg','jems-world-dragon.svg','jems-world-moon.svg','jems-world-robot.svg']){
    assert.equal(await page.evaluate(p=>fetch('./'+p).then(r=>r.ok),asset),true,asset+' must be local');
+   assert.ok(await page.evaluate(async p=>{const image=new Image();image.src='./'+p;await image.decode();return image.naturalWidth>0&&image.naturalHeight>0;},asset),asset+' remains decodable, including retired saved worlds');
   }
   await page.locator('#studioNew').click();
   assert.equal(await page.locator('.jems-empty-workbench').count(),1);

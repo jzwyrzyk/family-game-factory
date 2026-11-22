@@ -111,11 +111,14 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  assert.equal(await page.locator('dialog.myj-arcade[open]').count(),0);
  const buildItem=page.locator('#studioBuildShelf .studio-build-item').filter({has:page.getByText(project.name,{exact:true})});
  const readyButton=buildItem.getByRole('button',{name:/^(Play my game|Try ready test)$/,includeHidden:true});
+ const activateBuildAction=button=>device.touch?button.tap():button.click();
  const launch={async click(){
   const more=page.locator('#studioMore');
   if(await more.isVisible()&&!await more.evaluate(node=>node.open))await more.locator(':scope > summary').click();
   const button=buildItem.locator('.studio-wait-arcade-button');
-  await button.scrollIntoViewIfNeeded();await button.click();
+  // The shelf can rerender after a profile/poll update. Locator activation
+  // scrolls and reacquires a detached target without repeating the input.
+  await activateBuildAction(button);
   await arcade.waitFor({state:'visible'});
  }};
  const assets=[];
@@ -157,10 +160,10 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    // Returning from host tools gives movement keys to the actual game surface.
    if(await arcade.isVisible())await arcade.locator('[data-myj="left"]').focus();
   },
-  async playReady(){await this.openBuilds();await readyButton.scrollIntoViewIfNeeded();await this.activate(readyButton);},
+  async playReady(){await this.openBuilds();await activateBuildAction(readyButton);},
   async openBuildProject(){
    await this.openBuilds();const button=buildItem.getByRole('button',{name:'Open game',exact:true});
-   await button.scrollIntoViewIfNeeded();await this.activate(button);
+   await activateBuildAction(button);
   },
   async buildText(){return await buildItem.textContent()||'';},
   async ready(){return await readyButton.count()===1;},
@@ -263,6 +266,49 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    return carried;
   },
   async advance(milliseconds){if(recordVideo)await page.waitForTimeout(milliseconds);else await page.clock.runFor(milliseconds);},
+  async resizeViewport(viewport){
+   // Native resize/visualViewport events are not advanced by a virtual clock.
+   // Observe their receipt first, then let the real frame handlers fit the game.
+   await page.evaluate(expected=>{
+    const events={},visual=window.visualViewport;
+    const measure=()=>({width:innerWidth,height:innerHeight,visualWidth:visual?.width||innerWidth,visualHeight:visual?.height||innerHeight});
+    let resolveReceipt;
+    const promise=new Promise(resolve=>{resolveReceipt=resolve;});
+    const cleanup=()=>{window.removeEventListener('resize',changed);visual?.removeEventListener('resize',changed);};
+    const changed=event=>{
+     events[event.currentTarget===window?'window':'visualViewport']=measure();
+     const current=measure();
+     if(events.window&&(!visual||events.visualViewport)&&current.width===expected.width&&current.height===expected.height&&Math.abs(current.visualWidth-expected.width)<1&&Math.abs(current.visualHeight-expected.height)<1){
+      cleanup();resolveReceipt({expected,events,current});
+     }
+    };
+    window.__myjResizeReceipt={promise,events,measure,dispose:()=>{cleanup();resolveReceipt({cancelled:true,events});}};
+    window.addEventListener('resize',changed);visual?.addEventListener('resize',changed);
+   },viewport);
+   let timeout;
+   try{
+    await page.setViewportSize(viewport);
+    let receipt;
+    try{
+     receipt=await Promise.race([
+      page.evaluate(()=>window.__myjResizeReceipt.promise),
+      new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Native viewport resize receipt timed out')),5000);})
+     ]);
+    }catch(error){
+     const diagnostic=await page.evaluate(()=>({events:window.__myjResizeReceipt.events,current:window.__myjResizeReceipt.measure()}));
+     throw new Error(error.message+' '+JSON.stringify({expected:viewport,...diagnostic}),{cause:error});
+    }
+    await this.advance(100);
+    const layout=await page.evaluate(()=>({height:innerHeight,visualHeight:visualViewport?.height||innerHeight,
+     playHeight:document.getElementById('page-studio').getBoundingClientRect().height,
+     configuredHeight:document.getElementById('page-studio').style.getPropertyValue('--jems-play-height')}));
+    assert.ok(Math.abs(layout.playHeight-layout.visualHeight)<=1,'shared player uses the observed resized height: '+JSON.stringify({receipt,layout}));
+    return {receipt,layout};
+   }finally{
+    clearTimeout(timeout);
+    await page.evaluate(()=>{window.__myjResizeReceipt?.dispose();delete window.__myjResizeReceipt;});
+   }
+  },
   async until(predicate,message,{step=100,limit=20000}={}){
    for(let elapsed=0;elapsed<=limit;elapsed+=step){if(await predicate())return;await this.advance(step);}
    const diagnostic=await arcade.evaluate(element=>({

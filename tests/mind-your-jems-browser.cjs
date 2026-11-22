@@ -421,13 +421,13 @@ async function recovery(journey,device,review){
  const banked=await journey.score('banked');await journey.collectAndBank();assert.ok(await journey.score('banked')>banked,'a failed or cancelled build leaves real mining playable');
  await review.capture(page,arcade,device.name,device.recoveryTerminal+'-playing');
  if(device.portraitViewport){
-  const saved=await journey.score('banked');await page.setViewportSize(device.portraitViewport);await journey.advance(50);
+  const saved=await journey.score('banked'),resize=await journey.resizeViewport(device.portraitViewport);
   assert.equal(await journey.score('banked'),saved,'orientation preserves deposited jems');
   if((await journey.snapshot()).phase==='level-complete')await journey.activate(arcade.locator('[data-myj="continue"]'));
   await geometry(journey,{...device,viewport:device.portraitViewport},review);await review.capture(page,arcade,device.name,device.recoveryTerminal+'-small-portrait');
   await journey.collectAndBank();assert.ok(await journey.score('banked')>saved,'rotated terminal state keeps movement and the bucket usable');
   await review.capture(page,arcade,device.name,device.recoveryTerminal+'-small-portrait-playing');
-  review.check(device.name,'terminal-viewport-change',{viewport:device.portraitViewport,banked:await journey.score('banked')});
+  review.check(device.name,'terminal-viewport-change',{viewport:device.portraitViewport,resize,banked:await journey.score('banked')});
  }
  await journey.openBuilds();
  await journey.buildItem.getByRole('button',{name:'Open game',exact:true}).scrollIntoViewIfNeeded();
