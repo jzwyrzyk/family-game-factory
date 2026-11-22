@@ -33,6 +33,7 @@ These records explain durable choices without turning chat history into another 
 | [Gem Pal expression runtime](2026-11-20-pal-expression-runtime.md) | Versioned 184-image original-roster exports, isolated expression previews and a finite Wink Base opacity pilot | Accepted for implementation; release acceptance separate | Owner approved the completed core artwork and integration work, November 20, 2026 |
 
 | [Approved Pal collection](2026-11-21-approved-pal-collection.md) | Connect all 24 approved character neutrals to actual collection, two free starter choices, earned forms and versioned scene use while retaining saved IDs | Accepted for implementation and release after verification | Owner confirmed the starter-art gap and authorized the complete fix and subsequent cutover, November 21 |
+| [First-learner coding](2026-11-22-first-learner-coding.md) | Put a larger scene before a compact beginner action dock; disclose fuller controls without rewriting saved programs; composite approved Pal paper backgrounds in the scene renderer | Accepted for implementation; candidate verification and release separate | Owner's November 22 coding-learning usability and Pal-background overhaul request |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 

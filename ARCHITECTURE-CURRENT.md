@@ -28,6 +28,8 @@ This is a map of the **implemented source architecture**, not an assertion that 
 
 `src/games/mind-your-jems-native.ts` mounts the original PR125 tap/bank/grab gameplay in the common player for both direct play and play while waiting. Its local round state is independent of the originating build. PR128's movement/contact/level rules and assets are not imported. The optional legacy dialog wrapper remains compatible; the modern route no longer uses a separate overlay. Main Menu and play More expose Notifications; current-project ready preview still uses the existing guarded path.
 
+**First-learner coding candidate, November 22, 2026:** the isolated change stacked on PR125 keeps `jems.creation.v1`, the deterministic engine, ownership, draft/Keep history, and challenge evidence unchanged. A fitted stage and progressive First steps / More tools views share those existing controls. Pal-only transient canvas compositing is bounded to the active scene and preserves approved source files and saved asset IDs; it adds no asset service, stored derivative or entitlement. The [Creation contract](docs/creation-studio/README.md) and [rendering contract](docs/creation-studio/PAL_SCENE_RENDERING.md) record scope and validation limits.
+
 ## System boundaries
 
 ### Profile, play and reading candidate — November 21, 2026

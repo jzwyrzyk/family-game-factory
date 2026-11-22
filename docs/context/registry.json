@@ -200,6 +200,13 @@
           "sourceDigest": "2bbe73ab114feef4c596671b449b114cb9e8ea9df3333fd119a2e633ad766cc8",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed the page-local portrait reuse and documented failure recovery against the existing companion doctrine. This removes repeated image work without changing approved identities/forms, ownership, growth, engagement rules, child choice or native-decoding readiness; explicit retry and honest unavailable feedback remain required."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:33:08.353Z",
+          "sourceDigest": "a40c8773795d110b03b554ac55fdd7130112a08ee17a56ea26186de4af0d7ab3",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the first-learner decision and architecture against existing child-owned creation doctrine; the new presentation preserves scene language, Keep, formative evidence and artwork identity."
         }
       ]
     },
@@ -318,10 +325,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "492a9a95124943cf48a1c1f450cea26f35051dda2e0690fc72a0033dc955fcad",
-      "reviewedAt": "2026-11-21T20:51:48.024Z",
+      "sourceDigest": "4870a315d92dd3a418efe409618671d944f52e5bdab96b65ef6258138185c54f",
+      "reviewedAt": "2026-11-22T18:41:04.295Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed hosted passing Creator reading journeys and adapted profile/navigation fixtures to visible play controls; creation schemas, saved versions and authored scene behavior remain unchanged.",
+      "reviewReason": "Reviewed final expanded-view cascade across portrait and short landscape; documented First steps and More tools while retaining exact saved programs and explicit Keep.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -402,6 +409,13 @@
           "sourceDigest": "5855c79c06be66d51a86c998f97a99d07c5ec725bfb9cf4f46493080f1ef8743",
           "reviewOutcome": "updated",
           "reviewReason": "Documented the dismissible gems/maker/practice explanation and owner-scoped notebook preferences. Reviewed backup rejection of foreign guidance owners and namespace isolation; grants, source eligibility and evidence remain unchanged."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:41:04.816Z",
+          "sourceDigest": "e03d1b2fff412d3505e0e5cdcabdd9ede262891ac7ef4793e358d1542439e43a",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed the rewards fixture adjustments to reveal full coding controls and exit the fitted scene before Parent. The durable passing-check receipt, one-time grant and backup assertions remain unchanged; reward policy and contract are unchanged."
         }
       ]
     },
@@ -764,6 +778,13 @@
           "sourceDigest": "4ba9ec51c463acef14cb9f2e21c1ab161789129da8ba2cfae20e437ef66920f2",
           "reviewOutcome": "updated",
           "reviewReason": "Verified the accepted native reference PNG hashes against the clean hosted source and artifact; retained all functional and geometry assertions, with final CI required to compare all nine committed images without regeneration."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:41:04.551Z",
+          "sourceDigest": "c3b75e616c9420f86a457329f51a62f1d2f3788b7f3c9b7e9fdc253a00f077fe",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed existing rewards, problem-solving, guidance and private-art journeys to use the visible My Games exit and optional More tools. All original data, authority and outcome assertions remain."
         }
       ]
     },
@@ -922,6 +943,13 @@
           "sourceDigest": "c58d97165e9719a6c732c4b7e639bb82b8747c277c2566534b13fb7307c9697b",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded the sixth candidate source-tree identity, complete Mining and visual evidence, cleared smallest-phone defect and explicit reference acceptance; final-head workflow outcome remains distinct from source/capture approval."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:39:37.762Z",
+          "sourceDigest": "2179d1f3bd579cc243da92252fd5eab0e84d8a12c7cb44b8e20db3f76d3b272b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the isolated PR125-based coding candidate and exact local test scope; new hosted workflow collects independent five-layout evidence and no merge or deployment is claimed."
         }
       ]
     },
@@ -1052,10 +1080,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2890e60e4c7977e59258c6aba7796aa5e0428c1c2249a219047eaeb805798edd",
-      "reviewedAt": "2026-11-21T20:51:48.987Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated authored-practice reading contract for shared natural or device narration, explicit gesture resume and actual-start support; browser fixtures select Grade3 deliberately and preserve reasoning bands and outcomes.",
+      "sourceDigest": "935acd09f28ffa7ac9ba0d8c7b1c30154fd0834b6ca6266cdfd9b137d9ced184",
+      "reviewedAt": "2026-11-22T18:41:05.064Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the browser Parent helper using the visible My Games exit from a fitted coding scene. Trusted source observations, assistance attribution and parent evidence assertions remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1098,10 +1126,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
-      "reviewedAt": "2026-11-21T21:16:32.993Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Portrait reuse and retirement change only runtime lifecycle; all approved character identities, two forms, artwork bytes, framing and expression approvals are preserved.",
+      "sourceDigest": "ace76e79cea7593c27303b594bc7515e4e1bb748304de5aac88982689974daaf",
+      "reviewedAt": "2026-11-22T18:39:36.906Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the 48-image scene contact sheets, exact artwork and color preservation, retained authored props and documented remaining fringes; this is rendering support rather than replacement character art.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1130,10 +1158,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "9efbe64048501e489ca125afb433b15562cefec636ff987c4dac0f9027fd4b37",
-      "reviewedAt": "2026-11-21T20:51:49.228Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated the Art Studio entry contract for More during dedicated play and retained the same guarded picture route; navigation fixture changes preserve original art, immutable scene bindings and ownership checks.",
+      "sourceDigest": "fa4dcad372ce28cd467e0b27491f824e22e81d3914ed62641dd7d56a2ea25844",
+      "reviewedAt": "2026-11-22T18:41:05.281Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed source-return and profile-switch fixture navigation through More and My Games. Existing private image hashes, immutable scene bindings, export/import, recording and owner-isolation checks remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1167,10 +1195,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
-      "reviewedAt": "2026-11-21T21:16:34.042Z",
+      "sourceDigest": "196be53f4cfde1416f0ad008d1ae06dde293f1455ce336fad7b1b4b2b952f22e",
+      "reviewedAt": "2026-11-22T18:39:36.408Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented bounded owner/surface/Pal/form image reuse, stale callback retirement, unchanged native decode and explicit retries; retained stronger same-current-image browser assertions and provenance.",
+      "reviewReason": "Reviewed shared bounded image readiness and cancellation, conservative scene-only paper compositing and all 48 approved source identities; originals and saved form keys remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
