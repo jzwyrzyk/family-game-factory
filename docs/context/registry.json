@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T15:32:06.767Z",
-      "sourceDigest": "01fbc8e4cd67366d95d8a1f71e4327f4dffe8cba1c84e61912feadee4c730405",
+      "reviewedAt": "2026-11-23T15:40:00.368Z",
+      "sourceDigest": "c0084ec2e8a51e362e70f7db24e5f2152f33395c368d5ad397cec8c6b8897579",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed owner-supplied collector outcome: exact direct proposal, 66 unknown effective checks and zero mutations. Documented the two-request read-only diagnostic, pinned private-evidence integrity, bounded error classification and unchanged activation/recovery hold; no application or production behavior change.",
+      "reviewReason": "Recorded owner-supplied diagnostic evidence establishing Policy Troubleshooter API disablement and validating original private-evidence comparisons. Documented proposed diagnostic-only API enablement subject to the existing read-only boundary, without treating it as IAM/deployment approval or a completed effective-access audit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

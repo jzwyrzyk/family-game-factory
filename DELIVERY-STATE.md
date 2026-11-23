@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — diagnostic API disablement identified; enablement approval pending
+
+The owner supplied the sanitized result from diagnostic helper `01c090b9d93d01eb81dc7ccb701d993e017c080c`, observed at `2026-11-23T15:38:28Z`. Service Usage returned HTTP 200 with Policy Troubleshooter `DISABLED`; the troubleshooting request returned HTTP 403 with `SERVICE_DISABLED` for that exact API and the expected project consumer. This establishes the cause of the rejected diagnostic request. It does not establish the target release accounts' effective permissions. The diagnostic reports zero mutations.
+
+Its private-evidence integrity check also confirms the original proposal contained two role actions, ten policy updates comprising eleven new bindings, two provider enablements and four identity-variable changes. The original release flags were absent, both dedicated providers disabled, all three saved service baselines matched the then-fresh collection, and the retained inspector matched its approved source bytes. These are historical observations, not refreshed activation authorization. The proposed next change is limited to enabling `policytroubleshooter.googleapis.com` in the existing production project, followed by a fresh read-only collection. The owner's read-only boundary requires approval before that API-state change; all additional IAM and deployment activation remain withheld.
+
 ## November 23, 2026 — direct IAM proposal collected; effective-access reads denied
 
 The owner supplied the sanitized Cloud Shell result from helper `62ef419613e7bcdc18d4028115f4620c062c0044`, observed at `2026-11-23T15:24:58Z`. It reports 11 proposed direct bindings (nine resource grants and two lane-specific federation bindings), four predefined role definitions read, all five earlier preflight/plan files present, and zero mutations. The exact direct proposal was recorded privately. All 66 Policy Troubleshooter requests returned HTTP 403, leaving effective access unknown and the review incomplete. Neither API disablement nor a particular missing permission is established by that status alone.
