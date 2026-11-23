@@ -718,10 +718,10 @@
         "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:49:01.042Z",
-      "sourceDigest": "a47ebfd7e522b1572fc2d9e1e7a6e689d7acdd1254a75770ddfd4a1682b1aa07",
+      "reviewedAt": "2026-11-23T15:03:43.087Z",
+      "sourceDigest": "53d4d63782ce39529617b05b43b43ddde93b7675112f786b79fba9e09e1c87bb",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the capture-capacity and legacy-v1 refusal categories survive both private worker and coordinator sanitization. Planning-only rejection settles completed planning usage exactly once with no code, artwork, repair or revision; the existing premium contract describes this recoverable boundary.",
+      "reviewReason": "Reviewed parent-resolved Playwright executable for the authored benchmark worker against the existing isolated-worker pattern. Production model policy, paid routing and source/capture acceptance are unchanged; delivery evidence records the hosted fixture lookup failure and narrow correction.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -870,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:49:28.139Z",
-      "sourceDigest": "2afe5d72cf46992aa95d19b040377c1cb27169eaab6844c8fc98d84c6347de31",
+      "reviewedAt": "2026-11-23T15:03:43.673Z",
+      "sourceDigest": "ae3af5b80177a4561aa4b5022589a3d91ad01bb3c8ee351ec8131f9ae985e6ca",
       "reviewOutcome": "updated",
-      "reviewReason": "Added end-to-end planning-only failure, duplicate report settlement, denied child read and no subsequent generation to the frozen premium suite. All 574 unit contracts pass, including 38 premium tests; TypeScript passes. Existing browser and production gaps remain explicitly scoped in Delivery state.",
+      "reviewReason": "Reviewed the exact hosted benchmark failure before gameplay and the browser-path resolution correction. Existing benchmark assertions and worker isolation remain intact; delivery evidence separates 574 passing units and successful pinned-browser gameplay gates from the failed fixture and unrelated dependency-install timeout.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1064,10 +1064,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T14:49:28.559Z",
-      "sourceDigest": "09cfc3bf524492aa745fefc884b35c6a6e564d95c5b10d66c519b4a75de93b3e",
+      "reviewedAt": "2026-11-23T15:03:44.250Z",
+      "sourceDigest": "35b01219cdfc81d02e8ff2dc0d69f66a37f73795917c24b14a15ebb3889ff7dc",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the candidate validation receipt to 574 unit contracts and 38 included premium tests after the bounded worker-diagnostic fix. Draft PR139 is published from the verified base; hosted checks are in progress. Deployment, activation, spending, IAM and worker pins remain unchanged.",
+      "reviewReason": "Recorded exact b332391 hosted successes, the benchmark browser-lookup failure and the Bubble Gum dependency-download timeout. Linked draft PR139 for subsequent exact-source checks; merge, deployment, live access, paid inference and production acceptance remain on hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
