@@ -1,6 +1,7 @@
 /** Independent, style-aware acceptance over captured play. A model opinion is
  * bounded evidence of these criteria, not proof of enjoyment or learning. */
 import type {GeneratedGame} from '../agent/generated';
+import type {ProductionDesign} from './production-design';
 import type {SuggestedAction} from './presentation-plan';
 import * as evidenceTools from './game-quality-evidence.cjs';
 
@@ -20,8 +21,9 @@ export interface GameQualityEvidence {
  version:'game-quality-evidence-v1';motion:'normal';artifactHash:string;sourceHash:string;codeHash:string;runtimeVersion:string;runtimeHash:string;
  captures:QualityCapture[];sessions:QualitySession[];
 }
+export interface InteractionObservation {interaction:number; device:QualitySession['device']; actionIndex:number; captureId:string}
 export interface GameQualityReview {
- version:'game-quality-review-v1';artifactHash:string;evidenceHash:string;sourceHash:string;
+ version:'game-quality-review-v1'|'game-quality-review-v2';observations?:InteractionObservation[];artifactHash:string;evidenceHash:string;sourceHash:string;
  axes:Record<QualityAxis,QualityStatus>;findings:QualityFinding[];evidenceByAxis:Record<QualityAxis,string[]>;
  verdict:'pass'|'repair'|'unverified';
 }
@@ -44,6 +46,14 @@ export const qualityReviewSchema={type:'object',additionalProperties:false,requi
  evidenceByAxis:{type:'object',additionalProperties:false,required:QUALITY_AXES,properties:Object.fromEntries(QUALITY_AXES.map(k=>[k,{type:'array',maxItems:8,items:{type:'string'}}]))}
 }};
 
+export const premiumQualityReviewSchema={...qualityReviewSchema,required:[...qualityReviewSchema.required,'observations'],properties:{
+ ...qualityReviewSchema.properties,observations:{type:'array',maxItems:16,items:{type:'object',additionalProperties:false,
+  required:['interaction','device','actionIndex','captureId'],properties:{
+   interaction:{type:'integer',minimum:0,maximum:7},device:{type:'string',enum:['desktop','tablet']},
+   actionIndex:{type:'integer',minimum:0,maximum:127},captureId:{type:'string'}
+  }}}
+}};
+
 const record=(x:unknown):Record<string,any>=>{
  if(!x||typeof x!=='object'||Array.isArray(x)||![Object.prototype,null].includes(Object.getPrototypeOf(x)))throw Error('QUALITY_REVIEW_INVALID');
  return x as Record<string,any>;
@@ -51,16 +61,55 @@ const record=(x:unknown):Record<string,any>=>{
 const exact=(x:Record<string,any>,fields:readonly string[])=>{
  if(fields.some(k=>!Object.hasOwn(x,k))||Object.keys(x).some(k=>!fields.includes(k)))throw Error('QUALITY_REVIEW_INVALID');
 };
+// PNG hashes and changed scene hashes prove provenance, not meaning. Enforce
+// mechanical consistency here; the independent reviewer must still see and
+// distinguish the child's actual consequences and every original requirement.
+function observationList(value:unknown,design:ProductionDesign,evidence:GameQualityEvidence):InteractionObservation[]{
+ if(!Array.isArray(value)||value.length>16)throw Error('QUALITY_REVIEW_INVALID');
+ return value.map(entry=>{
+  const r=record(entry);exact(r,['interaction','device','actionIndex','captureId']);
+  if(!Number.isSafeInteger(r.interaction)||r.interaction<0||r.interaction>=design.interactions.length||
+     !Number.isSafeInteger(r.actionIndex)||r.actionIndex<0||r.actionIndex>127||!['desktop','tablet'].includes(r.device)||
+     !evidence.captures.some(c=>c.id===r.captureId))throw Error('QUALITY_REVIEW_INVALID');
+  return {interaction:r.interaction,device:r.device,actionIndex:r.actionIndex,captureId:r.captureId};
+ });
+}
+function checkObservations(observations:InteractionObservation[],design:ProductionDesign,evidence:GameQualityEvidence,intentPass:boolean,intentIds:string[]):void{
+ const seen=new Set<string>(),usedReceipts=new Set<string>(),usedCaptures=new Set<string>();
+ for(const r of observations){
+  const session=evidence.sessions.find(s=>s.device===r.device)!;
+  const trace=session.actionTrace[r.actionIndex],capture=evidence.captures.find(c=>c.id===r.captureId&&c.device===r.device);
+  const input=trace?.action.type==='hold'?trace.action.control:trace?.action.type;
+  const key=r.device+'/'+r.interaction;
+  const receipt=r.device+'/'+r.actionIndex;
+  // The post-action image belongs to this gesture only until another player
+  // input begins. Waiting can reveal a delayed consequence. A final picture
+  // cannot retroactively demonstrate earlier, unpictured maneuvers.
+  const nextInput=session.actionTrace.slice(r.actionIndex+1).find(t=>t.action.type!=='wait');
+  if(seen.has(key)||usedReceipts.has(receipt)||usedCaptures.has(r.captureId)||!trace||trace.endTick<=trace.startTick||trace.beforeHash===trace.afterHash||input!==design.interactions[r.interaction].input||
+     !capture||capture.phase==='initial'||capture.tick<trace.endTick||nextInput&&capture.tick>nextInput.startTick||
+     evidence.captures.some(c=>c.device===r.device&&c.phase==='initial'&&c.sha256===capture.sha256)||intentPass&&!intentIds.includes(capture.id))
+   throw Error('QUALITY_REVIEW_UNGROUNDED');
+  seen.add(key);usedReceipts.add(receipt);usedCaptures.add(r.captureId);
+ }
+ if(intentPass){
+  if(seen.size!==design.interactions.length*2)throw Error('QUALITY_REVIEW_UNGROUNDED');
+  for(const session of evidence.sessions){
+   const finalPhase=design.payoffState==='won'?'outcome':'progress';
+   if(session.outcome!==design.payoffState||!evidence.captures.some(c=>c.device===session.device&&c.phase===finalPhase&&intentIds.includes(c.id))){
+    throw Error('QUALITY_REVIEW_UNGROUNDED');
+   }
+  }
+ }
+}
+
 export function bindQualityReview(game:GeneratedGame,evidenceValue:unknown,answer:unknown):GameQualityReview {
- const evidence=validateQualityEvidence(game,evidenceValue),raw=record(answer);exact(raw,['axes','findings','evidenceByAxis']);
+ const design=game.productionPlan?.version==='game-production-plan-v2'?game.productionPlan.design:undefined;
+ const evidence=validateQualityEvidence(game,evidenceValue),raw=record(answer);exact(raw,['axes','findings','evidenceByAxis',...(design?['observations']:[])]);
  const axes=record(raw.axes),references=record(raw.evidenceByAxis);exact(axes,QUALITY_AXES);exact(references,QUALITY_AXES);
  if(!Array.isArray(raw.findings)||raw.findings.length>12||raw.findings.some((f:unknown)=>!QUALITY_FINDINGS.includes(f as QualityFinding))||new Set(raw.findings).size!==raw.findings.length)throw Error('QUALITY_REVIEW_INVALID');
  for(const axis of QUALITY_AXES){
   if(!['pass','fail','not-tested'].includes(axes[axis])||!Array.isArray(references[axis])||references[axis].length>8||new Set(references[axis]).size!==references[axis].length||references[axis].some((id:unknown)=>typeof id!=='string'||!evidence.captures.some(p=>p.id===id)))throw Error('QUALITY_REVIEW_INVALID');
-  if(axes[axis]==='pass'){
-   if(references[axis].length<2)throw Error('QUALITY_REVIEW_UNGROUNDED');
-   if((axis==='visual'||axis==='input')&&new Set(evidence.captures.filter(p=>references[axis].includes(p.id)).map(p=>p.device)).size!==2)throw Error('QUALITY_REVIEW_UNGROUNDED');
-  }
  }
  // Finding/status contradictions never turn a fail into a pass.
  const findings=[...raw.findings] as QualityFinding[];
@@ -68,18 +117,45 @@ export function bindQualityReview(game:GeneratedGame,evidenceValue:unknown,answe
   const axis:QualityAxis|undefined=finding.startsWith('VISUAL_')?'visual':finding.startsWith('INTENT_')?'intent':finding.startsWith('GAMEPLAY_')?'gameplay':finding.startsWith('INPUT_')?'input':undefined;
   if(axis&&axes[axis]==='pass')throw Error('QUALITY_REVIEW_CONTRADICTORY');
  }
+ // Validate the *entire* answer before classifying an unsupported verdict.
+ const observations=design?observationList(raw.observations,design,evidence):undefined;
  const status=QUALITY_AXES.map(k=>axes[k]);
  if(status.some(s=>s==='not-tested')&&!findings.includes('QUALITY_EVIDENCE_INCOMPLETE'))findings.push('QUALITY_EVIDENCE_INCOMPLETE');
  if(status.every(s=>s==='pass')&&findings.length)throw Error('QUALITY_REVIEW_CONTRADICTORY');
  const verdict=status.includes('fail')?'repair':status.includes('not-tested')?'unverified':'pass';
  if(verdict==='repair'&&!findings.length)throw Error('QUALITY_REVIEW_INVALID');
- return {version:'game-quality-review-v1',artifactHash:qualityArtifactHash(game),evidenceHash:qualityEvidenceHash(evidence),sourceHash:evidence.sourceHash,
+ for(const axis of QUALITY_AXES){
+  if(axes[axis]!=='pass')continue;
+  const cited=evidence.captures.filter(c=>references[axis].includes(c.id));
+  const bothDevices=axis==='input'||axis==='visual';
+  if(cited.length<2||bothDevices&&new Set(cited.map(c=>c.device)).size!==2)throw Error('QUALITY_REVIEW_UNGROUNDED');
+  if(design&&(cited.every(c=>c.phase==='initial')||bothDevices&&evidence.sessions.some(s=>
+    !cited.some(c=>c.device===s.device&&c.phase!=='initial'))))throw Error('QUALITY_REVIEW_UNGROUNDED');
+ }
+ if(design&&observations)checkObservations(observations,design,evidence,axes.intent==='pass',references.intent);
+ return {version:design?'game-quality-review-v2':'game-quality-review-v1',...(observations?{observations}:{}),artifactHash:qualityArtifactHash(game),evidenceHash:qualityEvidenceHash(evidence),sourceHash:evidence.sourceHash,
   axes:{visual:axes.visual,intent:axes.intent,gameplay:axes.gameplay,input:axes.input},findings,
   evidenceByAxis:Object.fromEntries(QUALITY_AXES.map(k=>[k,[...references[k]]])) as GameQualityReview['evidenceByAxis'],verdict};
 }
+// A completed premium opinion can claim success on a path the tester did not
+// observe. Treat this one specific condition as a failed acceptance attempt so
+// the existing bounded repair can run without replaying a paid review.
+export function bindProviderQualityReview(game:GeneratedGame,evidence:GameQualityEvidence,answer:unknown):GameQualityReview{
+ try{return bindQualityReview(game,evidence,answer);}
+ catch(error){
+  if(!(error instanceof Error)||error.message!=='QUALITY_REVIEW_UNGROUNDED'||game.productionPlan?.version!=='game-production-plan-v2')throw error;
+  const axes=record(record(answer).axes);
+  if(!QUALITY_AXES.every(axis=>axes[axis]==='pass'))throw error;
+  return bindQualityReview(game,evidence,{
+   axes:{visual:'not-tested',intent:'not-tested',gameplay:'not-tested',input:'not-tested'},findings:['QUALITY_EVIDENCE_INCOMPLETE'],
+   evidenceByAxis:{visual:[],intent:[],gameplay:[],input:[]},observations:[]
+  });
+ }
+}
 export function validateQualityReview(game:GeneratedGame,evidence:GameQualityEvidence,value:unknown):GameQualityReview {
- const r=record(value);exact(r,['version','artifactHash','evidenceHash','sourceHash','axes','findings','evidenceByAxis','verdict']);
- const bound=bindQualityReview(game,evidence,{axes:r.axes,findings:r.findings,evidenceByAxis:r.evidenceByAxis});
+ const premium=game.productionPlan?.version==='game-production-plan-v2';
+ const r=record(value);exact(r,['version','artifactHash','evidenceHash','sourceHash','axes','findings','evidenceByAxis','verdict',...(premium?['observations']:[])]);
+ const bound=bindQualityReview(game,evidence,{axes:r.axes,findings:r.findings,evidenceByAxis:r.evidenceByAxis,...(premium?{observations:r.observations}:{})});
  if(r.version!==bound.version||r.artifactHash!==bound.artifactHash||r.evidenceHash!==bound.evidenceHash||r.sourceHash!==bound.sourceHash||r.verdict!==bound.verdict)throw Error('QUALITY_REVIEW_BINDING_MISMATCH');
  return bound;
 }
@@ -87,4 +163,20 @@ export function requireQualityPass(game:GeneratedGame,evidence:GameQualityEviden
  const r=validateQualityReview(game,evidence,value);
  if(r.verdict!=='pass')throw Error('QUALITY_REVIEW_FAILED:'+r.findings.join(','));
  return r;
+}
+
+
+// Only bounded indices feed repair. Captures, child quotes, code, and reviewer
+// prose do not become diagnostics or appear in a public job receipt.
+export function qualityRepairContext(game:GeneratedGame,review:GameQualityReview){
+ const common={axes:review.axes,findings:review.findings};
+ const plan=game.productionPlan;
+ if(plan?.version!=='game-production-plan-v2'||review.axes.intent==='pass')return common;
+ const missingInteractions:{interaction:number;device:'desktop'|'tablet'}[]=[];
+ for(const device of ['desktop','tablet'] as const){
+  for(let interaction=0;interaction<plan.design.interactions.length;interaction++){
+   if(!review.observations?.some(o=>o.device===device&&o.interaction===interaction))missingInteractions.push({interaction,device});
+  }
+ }
+ return {...common,missingInteractions};
 }

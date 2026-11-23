@@ -3,10 +3,11 @@ import { randomUUID } from 'node:crypto';
 import { isGeneratedGame,validateGenerated,validateCompiled,type GeneratedGame } from '../agent/generated';
 import type { PlayableGame } from '../pipeline/types';
 import type {FunctionalGameContract} from '../quality/functional-game-contract';
+import {captureHorizon} from '../quality/game-quality-evidence.cjs';
 import {validateQualityEvidence,type GameQualityEvidence} from '../quality/game-quality';
-export interface SandboxOptions {image:string;socket?:string;timeoutMs:number;memoryMb:number;cpus:number}
+export interface SandboxOptions {image:string;socket?:string;timeoutMs:number;premiumCaptureTimeoutMs?:number;memoryMb:number;cpus:number}
 export function sandboxArguments(config:SandboxOptions,name:string){
- if(!/^(?:sha256:[a-f0-9]{64}|[\w./:-]+@sha256:[a-f0-9]{64})$/.test(config.image)||config.timeoutMs<1000||config.timeoutMs>60000||config.memoryMb<512||config.memoryMb>4096||config.cpus<.5||config.cpus>2)throw Error('INVALID_SANDBOX_CONFIGURATION');
+ if(!/^(?:sha256:[a-f0-9]{64}|[\w./:-]+@sha256:[a-f0-9]{64})$/.test(config.image)||config.timeoutMs<1000||config.timeoutMs>60000||config.premiumCaptureTimeoutMs!==undefined&&(!Number.isInteger(config.premiumCaptureTimeoutMs)||config.premiumCaptureTimeoutMs<config.timeoutMs||config.premiumCaptureTimeoutMs>300000)||config.memoryMb<512||config.memoryMb>4096||config.cpus<.5||config.cpus>2)throw Error('INVALID_SANDBOX_CONFIGURATION');
  return ['--host='+ (config.socket||'unix:///var/run/docker.sock'),'run','--name',name,'--rm','--pull=never','--runtime=runsc','--network=none','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--pids-limit=128','--memory='+config.memoryMb+'m','--memory-swap='+config.memoryMb+'m','--cpus='+config.cpus,'--user=1000:1000','--tmpfs=/tmp:rw,nosuid,nodev,size=256m','--shm-size=128m','--env=HTTP_PROXY=','--env=HTTPS_PROXY=','--env=ALL_PROXY=','--env=NO_PROXY=','--env=http_proxy=','--env=https_proxy=','--env=all_proxy=','--env=no_proxy=','--env=HOME=/tmp','-i',config.image];
 }
 export class DockerArtifactGate {
@@ -26,7 +27,11 @@ export class DockerArtifactGate {
   // Keep its separate editable companion in trusted host state.
   try{
    const request={game:sandboxGame,...(context?.independentIntentPlan?{independentIntentPlan:context.independentIntentPlan}:{}),captureQuality:context?.captureQuality===true};
-   const raw=await this.execute(sandboxArguments(this.config,name),JSON.stringify(request),this.config.timeoutMs,context?.signal);
+   const horizon=request.captureQuality?captureHorizon(sandboxGame):600;
+   const timeout=horizon>600&&this.config.premiumCaptureTimeoutMs
+    ?Math.min(this.config.premiumCaptureTimeoutMs,this.config.timeoutMs+Math.ceil((horizon-600)*2*1000/60))
+    :this.config.timeoutMs;
+   const raw=await this.execute(sandboxArguments(this.config,name),JSON.stringify(request),timeout,context?.signal);
    const result=JSON.parse(raw);if(!result.ok)throw Error('PLAYTEST_FAILED:'+String(result.diagnostics).slice(0,1500));
    // This also rejects a companion injected by the sandbox. Only the original
    // host-validated scene can accompany the unchanged, attested source.

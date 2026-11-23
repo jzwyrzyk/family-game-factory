@@ -1,4 +1,5 @@
 import {setTimeout as delay} from 'node:timers/promises';
+import {PREMIUM_POLICY_VERSION} from '../agent/model-policy';
 import type {ActionCoordinator} from './coordinator';
 import type {WorkerStage} from './identity';
 
@@ -75,7 +76,7 @@ export class WorkerGateway implements WorkerClient {
    const token=await jsonResponse(this.fetcher,this.oidc.href,{headers:{Authorization:'Bearer '+this.options.oidcCredential}},operation.signal,32*1024);
    if(!object(token)||typeof token.value!=='string'||token.value.length>16384||!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(token.value))throw new WorkerTransportError('OIDC_RESPONSE_INVALID',false);
    return await jsonResponse(this.fetcher,`${this.gateway.origin}/v1/worker/jobs/${this.options.jobId}/${path}`,{
-    method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+token.value,...(body===undefined?{}:{'Content-Type':'application/json'})},body,
+    method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+token.value,...(path==='claim'?{'X-Factory-Model-Policy':PREMIUM_POLICY_VERSION}:{}),...(body===undefined?{}:{'Content-Type':'application/json'})},body,
    },operation.signal,path==='claim'?10*1024*1024:16*1024);
   }catch(error){
    if(operation.signal.aborted)throw operation.signal.reason;

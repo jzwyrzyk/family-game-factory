@@ -80,6 +80,12 @@ The gateway's existing coordinator owns dispatch, retries and acceptance. New re
 
 Actions repair feedback preserves all allowlisted quality findings and the validated review's four axis statuses within the existing worker's 1,500-character limit. The optional private execution `lastFailure` record retains the latest test/review rejection's stage, attempt, stable category/code, finding enums and review axes before retry advancement or final exhaustion. It contains no source, prompt, capture or free-form error, and is not exposed through the browser job response. Earlier repair feedback and this rejection record have separate provenance; a later Ready result or unrelated terminal error must be read from the current job status. The [quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md#four-independent-review-judgments) describes the unchanged acceptance and retention boundaries.
 
+### Adult Private premium game builder
+
+After explicit Build, the existing authenticated coordinator selects and records the approved generation policy for the job. Under `adult-astra-high-v1`, the private planning stage proposes a source-bound specification. Astra High builds the v2 game from the agreed intent, the specification, approved assets and the verified base revision. The credential-free sandbox exercises the actual game with ordinary inputs and returns captures and action receipts. A separate private review judges the observed result. Bounded Astra High repair returns through the same test and review gates. Only a passing candidate can enter isolated preview. Keep remains the creator's explicit decision.
+
+The conversation coach retains its own model, credential and spending boundary. Local edits continue through their deterministic handlers. Premium construction and repair use the exact model `gpt-6.2-astra` with `reasoning.effort` set to `high`. Planning and review have independent approved policies initially targeting `gpt-6.2-sol` at high effort. The selection belongs to the private worker and the authenticated Adult Private admission path. The gateway holds the allowance and the job's policy identity. A merge grants no model access. See the [pilot contract and post-cutover sequence](docs/game-intelligence/PREMIUM-BUILDER.md).
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |

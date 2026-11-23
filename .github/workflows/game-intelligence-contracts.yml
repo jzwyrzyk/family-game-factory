@@ -5,6 +5,11 @@ on:
       - '.github/workflows/game-intelligence-contracts.yml'
       - 'server/quality/**'
       - 'server/agent/openai.ts'
+      - 'server/agent/model-policy.ts'
+      - 'server/agent/generation-contract.ts'
+      - 'server/agent/premium-production.ts'
+      - 'tools/premium-*.ts'
+      - 'tests/premium-*'
       - 'server/sandbox/intent-playtest-v2.cjs'
       - 'server/sandbox/playtest-v2.cjs'
       - 'server/sandbox/worker.cjs'
@@ -29,6 +34,11 @@ on:
       - '.github/workflows/game-intelligence-contracts.yml'
       - 'server/quality/**'
       - 'server/agent/openai.ts'
+      - 'server/agent/model-policy.ts'
+      - 'server/agent/generation-contract.ts'
+      - 'server/agent/premium-production.ts'
+      - 'tools/premium-*.ts'
+      - 'tests/premium-*'
       - 'server/actions/coordinator.ts'
       - 'server/actions/worker-cli.ts'
       - 'server/pipeline/**'
@@ -59,6 +69,14 @@ jobs:
         run: npm run typecheck
       - name: Entire unit and contract suite
         run: npm run test:unit
+      - name: Premium policies and offline comparison harness
+        run: npm run test:premium
+      - name: Produce offline paired benchmark manifest
+        run: npm run --silent benchmark:premium > premium-benchmark.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: premium-offline-comparison
+          path: premium-benchmark.json
 # This workflow has no browser installer, privileged credentials, paid calls,
 # deployment permissions or worker trust configuration. Full Arcade/creative/
 # learning/visual and private-runner security gates remain separate and mandatory.

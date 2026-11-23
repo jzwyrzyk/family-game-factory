@@ -13,6 +13,21 @@ function qualityArtifactHash(game){
  return sha(canonical({kind:game.kind,title:game.title,instructions:game.instructions,source:game.source,controls:game.controls,
   assetsHash:assetPackHash(game.assets)||null,productionPlan:game.productionPlan||null,playthrough:game.playthrough||null}));
 }
+// A longer observation window changes only how long the isolated tester can
+// play. The game receives normal fixed ticks and the same ordinary controls.
+const captureLimits=premium=>premium?{actions:128,frames:7200}:{actions:16,frames:600};
+const usesPremiumCapture=game=>game.kind==='generated-module-v2'&&game.productionPlan?.version==='game-production-plan-v2';
+function captureHorizon(game){
+ if(!usesPremiumCapture(game)||!Array.isArray(game.playthrough))return 600;
+ // Real gestures, key release and frame captures consume simulation time.
+ const limits=captureLimits(true);
+ if(game.playthrough.length<1||game.playthrough.length>limits.actions)throw Error('PLAYTHROUGH_INVALID');
+ const total=game.playthrough.reduce((ticks,entry)=>ticks+action(entry).frames,0);
+ if(total>limits.frames)throw Error('PLAYTHROUGH_INVALID');
+ if(total<=600)return 600;
+ const planned=total+game.playthrough.length*12+240;
+ return Math.max(600,Math.min(captureLimits(true).frames,planned));
+}
 const qualityEvidenceHash=evidence=>sha(canonical(evidence));
 const record=value=>{
  if(!value||typeof value!=='object'||Array.isArray(value)||![Object.prototype,null].includes(Object.getPrototypeOf(value)))throw Error('QUALITY_EVIDENCE_INVALID');
@@ -32,7 +47,8 @@ function action(value){
  return {...a};
 }
 function validateQualityEvidence(game,value){
- const e=record(value),c=game.compiled;
+ const e=record(value),c=game.compiled,premium=usesPremiumCapture(game);
+ const limits=captureLimits(premium),maxTick=premium?captureHorizon(game):1800;
  keys(e,['version','motion','artifactHash','sourceHash','codeHash','runtimeVersion','runtimeHash','captures','sessions']);
  if(!c||e.version!=='game-quality-evidence-v1'||e.motion!=='normal'||e.artifactHash!==qualityArtifactHash(game)||e.sourceHash!==sha(game.source)||e.sourceHash!==c.sourceHash||e.codeHash!==sha(c.code)||e.codeHash!==c.codeHash||e.runtimeVersion!==(c.runtimeVersion||'legacy-v1')||e.runtimeHash!==(c.runtimeHash||sha('legacy-v1'))||!HASH.test(e.artifactHash)||!HASH.test(e.sourceHash)||!HASH.test(e.codeHash)||!HASH.test(e.runtimeHash))throw Error('QUALITY_EVIDENCE_BINDING_MISMATCH');
  if(c.tests?.desktop!==true||c.tests.mobile!==true||c.tests.replay!==true||c.tests.isolation!==true||game.kind==='generated-module-v2'&&(c.tests.input!==true||c.tests.resources!==true||c.tests.pause!==true))throw Error('QUALITY_TECHNICAL_ATTESTATION_REQUIRED');
@@ -40,7 +56,7 @@ function validateQualityEvidence(game,value){
  const ids=new Set();let totalBytes=0;
  const captures=e.captures.map(value=>{
   const p=record(value);keys(p,['id','device','phase','tick','width','height','sha256','data']);
-  if(typeof p.id!=='string'||!ID.test(p.id)||ids.has(p.id)||!['desktop','tablet'].includes(p.device)||!['initial','interaction','progress','outcome'].includes(p.phase)||!integer(p.tick,0,1800)||!integer(p.width,200,1024)||!integer(p.height,150,1200)||typeof p.sha256!=='string'||!HASH.test(p.sha256)||typeof p.data!=='string'||p.data.length>2*1024*1024||!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(p.data))throw Error('QUALITY_EVIDENCE_INVALID');
+  if(typeof p.id!=='string'||!ID.test(p.id)||ids.has(p.id)||!['desktop','tablet'].includes(p.device)||!['initial','interaction','progress','outcome'].includes(p.phase)||!integer(p.tick,0,maxTick)||!integer(p.width,200,1024)||!integer(p.height,150,1200)||typeof p.sha256!=='string'||!HASH.test(p.sha256)||typeof p.data!=='string'||p.data.length>2*1024*1024||!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(p.data))throw Error('QUALITY_EVIDENCE_INVALID');
   const bytes=Buffer.from(p.data,'base64');totalBytes+=bytes.length;
   // Six full-width illustrated captures need more space than flat fixtures.
   // Keep the actual 720/600px layouts legible within an explicit raw-byte cap.
@@ -52,19 +68,21 @@ function validateQualityEvidence(game,value){
  const devices=new Set();
  const sessions=e.sessions.map(value=>{
   const s=record(value);keys(s,['device','inputs','visibleChanges','simulatedTicks','outcome','replay','pause','touch','consoleErrors','actionTrace']);
-  if(!['desktop','tablet'].includes(s.device)||devices.has(s.device)||!integer(s.inputs,1,1000)||!integer(s.visibleChanges,1,1000)||!integer(s.simulatedTicks,60,1800)||!['playing','won','lost'].includes(s.outcome)||s.outcome==='playing'&&s.simulatedTicks<600||s.replay!==true||s.pause!==true||typeof s.touch!=='boolean'||s.device==='tablet'&&s.touch!==true||s.consoleErrors!==0||!Array.isArray(s.actionTrace)||s.actionTrace.length<1||s.actionTrace.length>16)throw Error('QUALITY_EVIDENCE_INCOMPLETE');
+  if(!['desktop','tablet'].includes(s.device)||devices.has(s.device)||!integer(s.inputs,1,1000)||!integer(s.visibleChanges,1,1000)||!integer(s.simulatedTicks,60,maxTick)||!['playing','won','lost'].includes(s.outcome)||s.outcome==='playing'&&s.simulatedTicks<(premium?maxTick:600)||s.replay!==true||s.pause!==true||typeof s.touch!=='boolean'||s.device==='tablet'&&s.touch!==true||s.consoleErrors!==0||!Array.isArray(s.actionTrace)||s.actionTrace.length<1||s.actionTrace.length>limits.actions)throw Error('QUALITY_EVIDENCE_INCOMPLETE');
   let previousTick=-1,totalFrames=0;
   const actionTrace=s.actionTrace.map((value,index)=>{
    const t=record(value);keys(t,['action','index','startTick','endTick','beforeHash','afterHash']);
    if(t.index!==index||!integer(t.startTick,0,s.simulatedTicks)||!integer(t.endTick,t.startTick,s.simulatedTicks)||t.startTick<previousTick||!HASH.test(t.beforeHash)||!HASH.test(t.afterHash))throw Error('QUALITY_EVIDENCE_INVALID');
-   const a=action(t.action);previousTick=t.endTick;totalFrames+=a.frames;
+   const a=action(t.action);
+   if(premium&&canonical(a)!==canonical(game.playthrough?.[index]))throw Error('QUALITY_EVIDENCE_BINDING_MISMATCH');
+   previousTick=t.endTick;totalFrames+=a.frames;
    return {...t,action:a};
   });
-  if(totalFrames>600||!actionTrace.some(t=>t.action.type!=='wait'&&t.beforeHash!==t.afterHash))throw Error('QUALITY_EVIDENCE_INCOMPLETE');
+  if(totalFrames>limits.frames||!actionTrace.some(t=>t.action.type!=='wait'&&t.beforeHash!==t.afterHash))throw Error('QUALITY_EVIDENCE_INCOMPLETE');
   const shots=captures.filter(p=>p.device===s.device);
   if(shots.length<2||!shots.some(p=>p.phase==='initial')||!shots.some(p=>p.phase!=='initial')||shots.some(p=>p.tick>s.simulatedTicks)||new Set(shots.map(p=>p.sha256)).size<2)throw Error('QUALITY_EVIDENCE_INCOMPLETE');
   devices.add(s.device);return {...s,actionTrace};
  });
  return {...e,captures,sessions};
 }
-module.exports={qualityArtifactHash,qualityEvidenceHash,validateQualityEvidence};
+module.exports={captureLimits,captureHorizon,usesPremiumCapture,qualityArtifactHash,qualityEvidenceHash,validateQualityEvidence};

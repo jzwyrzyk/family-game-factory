@@ -74,7 +74,10 @@
     "docs/speech/NATURAL_NARRATION.md",
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
-    "docs/decisions/2026-11-22-bubble-gum-assembly.md"
+    "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/game-intelligence/PREMIUM-BUILDER.md",
+    "docs/game-intelligence/premium-benchmark/README.md",
+    "docs/decisions/2026-11-23-premium-builder.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -109,7 +112,9 @@
     "docs/operations/*.md",
     "docs/speech/*.md",
     "docs/bubble-gum-builders/*.md",
-    "docs/evidence/README.md"
+    "docs/evidence/README.md",
+    "docs/game-intelligence/PREMIUM-BUILDER.md",
+    "docs/game-intelligence/premium-benchmark/*.md"
   ],
   "areas": [
     {
@@ -662,10 +667,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.636Z",
-      "sourceDigest": "d05a7f29c35d5896f75e73d04a67f1515cf32cca6237444b3a180a01353af9cc",
+      "reviewedAt": "2026-11-23T14:41:57.748Z",
+      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared UTF-8 reader, authenticated read-only request lookup, packaging, paid receipt reconciliation and worker HTTP guards together. Architecture and service contracts preserve auth/privacy and distinguish unavailable lookup from replay permission; no production service activation.",
+      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -699,7 +704,8 @@
         "docs/assignment-005/*.md",
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -708,13 +714,15 @@
         "server/quality/**",
         "server/sandbox/**",
         "server/testing/**",
-        "docs/game-intelligence/*.md"
+        "docs/game-intelligence/*.md",
+        "tools/premium-*.ts",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.962Z",
-      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
+      "reviewedAt": "2026-11-23T14:41:58.128Z",
+      "sourceDigest": "947ce73addc804c39838a799c97b13fde281d73dad9a20308d01042d7643bb67",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints.",
+      "reviewReason": "Reviewed fixed Astra High construction/repair, independent stage approvals and official rates, static and actual token admission, complete job reservation, measured and uncertain settlement, pinned claims, no fallback, bound production plan and compact canonical evidence. Contracts document long ordinary-input capture, near-action observations, three-interaction evidence capacity, bounded unverified repair and compatible-reader rollback; no paid activation.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -807,10 +815,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b5a2a570fc92fafa428dd532e1caf7ac1428605b1e7384de292406bed856ae8c",
-      "reviewedAt": "2026-11-23T05:43:14.662Z",
+      "sourceDigest": "321032521ff7272d9d7ca4f1c90b32b63264e024518448e133bb55c55324cd70",
+      "reviewedAt": "2026-11-23T14:41:58.509Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact owner/API/request binding, awaited acknowledgment persistence and profile cancellation with existing trusted/adult session boundaries. Delivery records synthetic reconnect/backup evidence, preserves default-off services and requires separately authorized real-provider Adult acceptance; no consent or audience expansion.",
+      "reviewReason": "Reviewed safe optional status/job metadata and the separate premium switch with existing family, trusted-device and adult-grant gates. Adult release guide links policy-only disable/drain; child behavior, consent and private provider eligibility remain separately enforced and unverified live.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -853,7 +861,8 @@
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
         "docs/pals/previews/*.md",
-        "docs/bubble-gum-builders/*.md"
+        "docs/bubble-gum-builders/*.md",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "sources": [
         "tests/**",

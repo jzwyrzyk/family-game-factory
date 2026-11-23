@@ -14,6 +14,8 @@ export interface ArtProductionInput {
  plan:{presentationStyle:VisualStyle;artRequests:GameArtRequest[]};
  baseAssets?:GameAssetPack;approval?:ImageApproval;budgetMicroUsd:number;
  signal:AbortSignal;key:()=>string;transport?:typeof fetch;
+ /** Record each validated flat allowance charge before starting another image. */
+ onImageCharge?:(microUsd:number)=>void;
 }
 const hash=(text:string)=>createHash('sha256').update(text).digest('hex');
 const styles:Record<VisualStyle,string>={
@@ -106,7 +108,7 @@ export async function produceGameArt(input:ArtProductionInput):Promise<{assets:G
    provenance:{kind:'generated',sourceId:item.sourceId}});
   const existing=assets.findIndex(old=>old.id===asset.id);if(existing>=0)assets[existing]=asset;else assets.push(asset);
   validateAssetPack({version:'game-assets-v1',style:plan.presentationStyle,assets});
-  usageUnits+=approval.maxMicroUsdPerImage;
+  usageUnits+=approval.maxMicroUsdPerImage;input.onImageCharge?.(approval.maxMicroUsdPerImage);
  }
  return {assets:validateAssetPack({version:'game-assets-v1',style:plan.presentationStyle,assets}),usageUnits};
 }
