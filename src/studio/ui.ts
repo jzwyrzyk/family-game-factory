@@ -923,7 +923,7 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
- function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.creationStandard=2;});message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
+ function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.creationStandard=2;});return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
   stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
