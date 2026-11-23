@@ -72,7 +72,9 @@
     "docs/operations/ACTIVATION_REVIEW.md",
     "docs/speech/READ_ALOUD.md",
     "docs/speech/NATURAL_NARRATION.md",
-    "docs/decisions/2026-11-21-profile-play-and-reading.md"
+    "docs/decisions/2026-11-21-profile-play-and-reading.md",
+    "docs/bubble-gum-builders/README.md",
+    "docs/decisions/2026-11-22-bubble-gum-assembly.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -105,7 +107,8 @@
     "docs/drawings/*.md",
     "docs/pals/previews/*.md",
     "docs/operations/*.md",
-    "docs/speech/*.md"
+    "docs/speech/*.md",
+    "docs/bubble-gum-builders/*.md"
   ],
   "areas": [
     {
@@ -214,6 +217,13 @@
           "sourceDigest": "bbc7163734e6cbead17471a255e625af47573a1eb9718622abb12d579236db79",
           "reviewOutcome": "unchanged",
           "reviewReason": "Read the added Factory phone-layout paragraph against product doctrine: reusing the current instruction area and keeping the active machine in view implement the existing clear, physical-game interface requirement. No new product policy, reward or learning behavior is introduced."
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T18:17:51.532Z",
+          "sourceDigest": "09a760f962afc24389cbcac0c2c3077a7706dadfc7cff6c0438f5ca06767c09a",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded owner-directed real-object assembly, visible gum joins, extended payoff and saved-engine preservation in doctrine and decision."
         }
       ]
     },
@@ -239,7 +249,8 @@
         "docs/brand/CHILD_INTERFACE.md",
         "docs/decisions/2026-11-20-learning-readability-and-narration.md",
         "docs/speech/*.md",
-        "docs/decisions/2026-11-21-profile-play-and-reading.md"
+        "docs/decisions/2026-11-21-profile-play-and-reading.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -313,6 +324,13 @@
           "sourceDigest": "b4529782d657c425aee734fd7e8edf7a2a5acb55a0e9ebf1c0843f5a1d416396",
           "reviewOutcome": "updated",
           "reviewReason": "Documented bounded authored context, stable disabled Build, explicit reassessment, actual chat state, saved-job retry and actionable handoff recovery while preserving drafts, learning, and owner guards."
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:25:30.499Z",
+          "sourceDigest": "bd67eebc50accd5320fdd8d7837faea8d328591e21226d280c55abed061c3f98",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the shared game controls and assembly Help for consistent neutral targets and pink joins."
         }
       ]
     },
@@ -423,6 +441,13 @@
           "sourceDigest": "e03d1b2fff412d3505e0e5cdcabdd9ede262891ac7ef4793e358d1542439e43a",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed the rewards fixture adjustments to reveal full coding controls and exit the fitted scene before Parent. The durable passing-check receipt, one-time grant and backup assertions remain unchanged; reward policy and contract are unchanged."
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T18:17:52.449Z",
+          "sourceDigest": "916b2c352cea3835af1f377d4f10e181914674a26c2f9699c87877ffc72e6150",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed changed rewards and maker browser fixtures: only gameplay inputs and extra-piece wording change. All existing grant amounts, exact Keep/reflection/owner assertions remain. Assembly reports one host result after explicit continuation; no earning policy change."
         }
       ]
     },
@@ -436,7 +461,8 @@
         "docs/brand/GEM_FACTORY.md",
         "docs/mind-your-jems/*.md",
         "docs/archetypes/*.md",
-        "docs/homepage/PLAY_VIEW.md"
+        "docs/homepage/PLAY_VIEW.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "src/games/**",
@@ -483,6 +509,20 @@
           "sourceDigest": "a91d1db892d110f8e28c5ab337348b419a625bbd0b3363edf3b2fb3da01258a0",
           "reviewOutcome": "updated",
           "reviewReason": "Inspected the Factory phone captures: the scene frame now clips without internal focus scrolling, and later-stage instructions occupy the former clue area so wrapping controls remain visible. These changes preserve the documented clear-phone and physical-control contract."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.011Z",
+          "sourceDigest": "84d4f2ce55b8910d68fdd3bc76e81277ce4e03df5ced5cf6a7422ee62b2e4983",
+          "reviewOutcome": "updated",
+          "reviewReason": "Integrated the owner-requested one-jem and ten-pocket shared engine into the native mining player; preserved all approved artwork and updated the active mining contract and decision.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:44:22.314Z",
+          "sourceDigest": "22e0a22e44deeccde0b436b75da873ad7d3e817c5d3434b2d918b7dfab9732ae",
+          "reviewOutcome": "updated",
+          "reviewReason": "Current README and physical-quality scope now point to version3 assembly. Reviewed the narrow-tray result reflow, bounded ignition label and portrait Moon framing; construction, saved engines, authored journey rules and timing remain as documented."
         }
       ]
     },
@@ -674,7 +714,8 @@
         "docs/rewards/*.md",
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
-        "docs/pals/previews/*.md"
+        "docs/pals/previews/*.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "tests/**",
@@ -806,6 +847,20 @@
           "sourceDigest": "7129b791b1fd6b62c03761edda1c4d37c12f0010c7dc5d262f2aeed46c24c93f",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the hosted phone failure and final browser diff: a real timed input now follows camera/actionability preparation and observes activation completion once; assertions reject hidden scene scrolling and phone hints over wrapping controls. This candidate still requires hosted execution."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.275Z",
+          "sourceDigest": "ed27456c2a2261fd8b039a6b0fdc423d60e265dd0937a113d8a75b06005d8a74",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed uniform crystal-value and ten-capacity rules tests and integrated HUD assertions while preserving native-host controls, real-input fixtures,13 configurations and unchanged visual tolerances;403combinedunits pass.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:48:18.740Z",
+          "sourceDigest": "d5fb43bb9f4a8b3733342b9c5c7787e44561b10a0f404ac6738c16c851315e87",
+          "reviewOutcome": "updated",
+          "reviewReason": "The legacy design-coach journey now reopens its exact saved physical session instead of the current catalogue starter. Existing project, experiment, voice and learning assertions remain; the same journey is included in focused host integration to verify the compatibility boundary."
         }
       ]
     },
@@ -817,7 +872,8 @@
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
         "docs/operations/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -978,6 +1034,20 @@
           "sourceDigest": "68546fa89eb91c376a3ac872d8300924ee73b2b90e978d81fe4a70c5930dc14d",
           "reviewOutcome": "updated",
           "reviewReason": "Verified all nine PR workflows on d82174e, including all four Arcade jobs, and confirmed the PR merge checkout has the same tree. Recorded the exact visual artifact, inspected states and initial failures. This final receipt changes documentation only and does not claim merge or deployment."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.584Z",
+          "sourceDigest": "dc424a9ccb5f9a51748ed348890caab1c91a31df5622a68129a90e7a946541d3",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded combined build and403unit pass separately from396phase-one units; kept fresh hosted acceptance pending and the user-directed merge hold explicit.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:59:28.314Z",
+          "sourceDigest": "6629d98039aaa17075985dabeec7fa1a6e22710662754f10dc20ee443a9d2dce",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded final exact6c source, all29 focused rules and10 browser cases, four host integration passes, artifact digests and actual tablet/phone visual acceptance. Recorded successful owner-private Site deployment and preserved the coordinated production merge hold; the follow-up commit changes delivery evidence only."
         }
       ]
     },
@@ -1000,10 +1070,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:22.967Z",
-      "sourceDigest": "8a0bea67cbda0c2a7c2f3e1d1112b9b3e45c92c81d295735b24b71b593cb630b",
+      "reviewedAt": "2026-11-22T19:44:23.628Z",
+      "sourceDigest": "805409aea13e3a95bd96ce7c9658fd3eaa8d4129f9034c6413d6f8c7b45d43aa",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the feature decision and speech contracts to the documentation index and registry; reviewed their required-file, area ownership and local-link routes without weakening freshness enforcement.",
+      "reviewReason": "README no longer describes sticker-v2 as the current default; it links to the canonical assembly contract. The physical-v1 quality document preserves its historical evidence and explicitly identifies the current version3 scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1074,6 +1144,13 @@
           "sourceDigest": "3080c42251cd4d49620f86401b6b9b8d141612a20fe87b8a3b8e3b5245158579",
           "reviewOutcome": "updated",
           "reviewReason": "Preserved both source histories and current main feature-area reviews. Registered Phase2 and activation-review documents using existing operations link/source coverage, retained advisory CODEOWNERS routing, and updated task entry points for exact-account metadata diagnostics and the read-only owner handoff. AGENTS and Project instructions retain authorization scope and the explicit no-merge hold; checker enforcement is unchanged."
+        },
+        {
+          "sourceCommit": "1291bc7ce4717be102db466ea044a7c7932b1a6c",
+          "reviewedAt": "2026-11-21T20:28:22.967Z",
+          "sourceDigest": "8a0bea67cbda0c2a7c2f3e1d1112b9b3e45c92c81d295735b24b71b593cb630b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added the feature decision and speech contracts to the documentation index and registry; reviewed their required-file, area ownership and local-link routes without weakening freshness enforcement."
         }
       ]
     },

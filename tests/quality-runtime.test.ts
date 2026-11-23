@@ -24,13 +24,16 @@ test('quality drawing: interpolation does not mutate authoritative positions',()
   assert.deepEqual(interpolateBody(body,.5),{...body,x:3,y:6,angle:1});assert.equal(body.x,4);
   assert.equal(interpolateBody(body,5).x,4);assert.equal(interpolateBody(body,-1).x,2);
 });
-test('quality compatibility: new workshop uses stickers; old revisions keep their engine',()=>{
-  assert.equal(defaults('gum').qualityVersion,2);
+test('quality compatibility: new workshop assembles objects; old revisions keep their engine',()=>{
+  assert.equal(defaults('gum').qualityVersion,3);
   const old=validateConfig('gum',{originalRules:true,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0});
   assert.equal(old.qualityVersion,0);assert.equal(old.originalRules,true);
   const oldest=validateConfig('gum',{highlightMatches:false,extraDecoys:0});assert.equal(oldest.qualityVersion,0);assert.equal(oldest.originalRules,false);
   assert.equal(interpret('gum',old,'Make gravity lower').kind,'invalid');
-  assert.deepEqual(playableMechanics('gum',defaults('gum')).map(x=>x.key),['extraDecoys']);
+  assert.deepEqual(playableMechanics('gum',defaults('gum')).map(x=>x.key),['highlightMatches','extraDecoys']);
+  assert.deepEqual(playableMechanics('gum',{...defaults('gum'),qualityVersion:2}).map(x=>x.key),['extraDecoys']);
+  assert.equal(interpret('gum',defaults('gum'),'Show matching pieces').kind,'supported');
+  assert.equal(interpret('gum',defaults('gum'),'Make gravity lower').kind,'invalid');
   assert.deepEqual(playableMechanics('gum',{...defaults('gum'),qualityVersion:1}).map(x=>x.key),['gravity','thrust','gumBudget','jointStrength']);
   for(const game of ['gum','hill','buckets','dragon'] as const)for(const difficulty of ['gentle','classic','stretch'] as const)assert.doesNotThrow(()=>validateConfig(game,defaults(game,difficulty)));
 });

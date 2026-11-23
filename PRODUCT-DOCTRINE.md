@@ -49,6 +49,8 @@ The owner's [November 22 Factory refinement](docs/decisions/2026-11-22-factory-p
 
 See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0006-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
 
+The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble-gum-assembly.md) requires recognizable component objects, gum that visibly connects their actual joins, varied assembly and an extended payoff that keeps the invention on screen. Guided puzzles are allowed. The child can replay or revise before choosing the next build; decoration of a finished illustration does not meet this assembly intent. See [the builder contract](docs/bubble-gum-builders/README.md).
+
 ## 3. Choose the simplest method that preserves the intent
 
 Choose a game's form from its actions and consequences. Rendering (2D or true 3D), input, simulation, visual style and goal/free-play mode are independent decisions. A robot does not imply 3D; a launch animation does not imply physical simulation.

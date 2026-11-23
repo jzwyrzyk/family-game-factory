@@ -1,6 +1,6 @@
 # Game Quality v1: the implementation standard
 
-> **Scope: physical-v1 and generated-runtime quality contract.** [PR40](https://github.com/jzwyrzyk/family-game-factory/pull/40) made the sticker workshop the default for newly created Bubble Gum games. Saved physical-v1 and older engines remain supported. The physical implementation/evidence below is retained for that scope; it is not a claim that legacy physics issues are fixed or that this is the new-game default. See [product doctrine](../PRODUCT-DOCTRINE.md) and [delivery state](../DELIVERY-STATE.md).
+> **Scope: physical-v1 and generated-runtime quality contract.** The current new-game default is the [version 3 assembly builder](bubble-gum-builders/README.md). [PR40](https://github.com/jzwyrzyk/family-game-factory/pull/40) previously introduced the version 2 sticker workshop; saved sticker-v2, physical-v1 and older engines remain supported. The physical implementation/evidence below is retained for that scope; it is not a claim that legacy physics issues are fixed or that this is the new-game default. See [product doctrine](../PRODUCT-DOCTRINE.md) and [delivery state](../DELIVERY-STATE.md).
 
 The current draft also implements the [presentation and playable quality contract](game-intelligence/PRESENTATION-QUALITY.md): style-diverse planning and assets, actual desktop/tablet capture, and mandatory separate review for new real generated games and v2 revisions. The physical reference below is one game family, not a required appearance or simulation for every game. [ADR0006](decisions/0006-style-diverse-playable-quality.md) records that choice. Source implementation is not a live-provider or release-activation claim.
 
@@ -58,7 +58,7 @@ These capability, rendering and audio budgets do **not** impose a hard JavaScrip
 
 ## Saves and versions
 
-New gum configs have `qualityVersion: 1`. A stored gum config without that field resolves to `qualityVersion: 0`, retaining its prior original or legacy rules. Compatibility fields are hidden from the child-facing controls: only mechanics used by the selected engine are displayed.
+Physical-workshop gum configs use `qualityVersion: 1`; the current assembly default uses version 3 and saved sticker workshops use version 2. A stored gum config without that field resolves to `qualityVersion: 0`, retaining its prior original or legacy rules. Compatibility fields are hidden from the child-facing controls: only mechanics used by the selected engine are displayed.
 
 Physical editor saves use `quality-construction-v1`; rides use `quality-hill-v1`. They are nested under `constructionStates[stateKey].qualityConstruction`. Existing legacy state fields remain intact. This also lets Studio's whole-record state copy preserve the new physical state. A run snapshot is never written over the construction blueprint.
 

@@ -68,7 +68,8 @@
     "test:learning-profile-browser": "node tests/learning-profile-browser.cjs",
     "test:play-view": "node tests/play-view-browser.cjs",
     "test:studio-notifications": "node --import tsx --test tests/studio-notifications.test.ts && node tests/studio-notifications-browser.cjs",
-    "test:creation-learner": "node tests/creation-learner-browser.cjs"
+    "test:creation-learner": "node tests/creation-learner-browser.cjs",
+    "test:bubble-gum": "node --import tsx --test tests/bubble-gum-rules.test.ts tests/bubble-gum-journey.test.ts && node tests/bubble-gum-builder-browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

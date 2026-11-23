@@ -36,6 +36,8 @@ These records explain durable choices without turning chat history into another 
 | [First-learner coding](2026-11-22-first-learner-coding.md) | Put a larger scene before a compact beginner action dock; disclose fuller controls without rewriting saved programs; composite approved Pal paper backgrounds in the scene renderer | Accepted for implementation; candidate verification and release separate | Owner's November 22 coding-learning usability and Pal-background overhaul request |
 | [Jem Factory play clarity](2026-11-22-factory-play-clarity.md) | Make patterns prominent, mount sorting controls on the machine, recycle missed cuts and increase pattern difficulty after two completed cycles | Accepted for implementation; verification and release separate | Owner's November 22 request to preserve the Factory's beauty and finishing play while making its actions clearer and consequential |
 
+| [Bubble Gum assembly](2026-11-22-bubble-gum-assembly.md) | Recognizable objects, structural gum joins, varied puzzles and extended replayable adventures in the shared player | Accepted owner direction; initial tuning awaits play review | Owner's November 22 comprehensive overhaul request |
+
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
 ## When to record a decision

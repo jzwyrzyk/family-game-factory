@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
 const { exploreWelcome, navigate } = require('./studio-entry.cjs');
 const { assertTextContrast } = require('./helpers/text-contrast.cjs');
+const { buildAndRide } = require('./bubble-gum-fixture.cjs');
 
 const devices = [['desktop', { width: 1280, height: 960 }], ['phone', { width: 390, height: 844 }]];
 const language = '#stage-overlay .language-activity';
@@ -49,7 +50,7 @@ async function chooseSubject(page, subject) {
 
 async function openWorkshop(page) {
   await page.locator('[data-starter="gum"]').click();
-  await page.locator('.studio-native-game .gum-play').waitFor({ state: 'visible' });
+  await page.locator('.studio-native-game .gum-builder').waitFor({ state: 'visible' });
 }
 
 async function checkpointFixture(page) {
@@ -113,7 +114,7 @@ async function journey(browser, base, device, viewport) {
     await exit.click();
     assert.equal(await page.evaluate(() => FG.learning.active), false);
     assert.equal(await page.locator('#stage-overlay').isVisible(), false, 'leaving closes the native checkpoint');
-    assert.equal(await page.locator('.gum-play').count(), 0, 'leaving unmounts the native game instead of resuming it');
+    assert.equal(await page.locator('.gum-builder').count(), 0, 'leaving unmounts the native game instead of resuming it');
     const interrupted = await page.evaluate(id => FG.store.current().language.attempts.find(entry => entry.id === id), attempt);
     assert.equal(interrupted.outcome, 'interrupted');
     assert.equal(interrupted.answers.length, 0);
@@ -138,13 +139,9 @@ async function journey(browser, base, device, viewport) {
     await finishWithHelp(page, math);
     assert.equal(await page.locator('#game-mount').evaluate(node => node.inert), false, 'supported completion resumes the same game');
 
-    // Complete the actual default sticker game to exercise the separate dark result.
-    for (const [sticker, slot] of [['Super star', 'Top'], ['Love power', 'Window'], ['Googly eyes', 'Boost']]) {
-      await page.getByRole('button', { name: `Select ${sticker}`, exact: true }).click();
-      await page.getByRole('button', { name: `Put a sticker on ${slot}`, exact: true }).click();
-    }
-    await page.getByRole('button', { name: /BLAST OFF!/ }).click();
-    await page.clock.runFor(6000);
+    // Complete the actual default assembly and its full adventure to exercise
+    // the separate dark result through the ordinary explicit finish control.
+    await buildAndRide(page, { touch: device === 'phone', clockInstalled: true });
     await page.locator('#native-result-title').waitFor({ state: 'visible' });
     assert.equal(await page.locator('#native-result-title').evaluate(node => node.parentElement.className), 'modal-card');
     await assertTextContrast(page, '#native-result-title', `${device} actual dark result title`);
