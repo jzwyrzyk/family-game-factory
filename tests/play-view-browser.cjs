@@ -121,17 +121,18 @@ async function checkGameContent(page, game, label) {
     assert.equal(await page.locator('dialog.myj-arcade[open]').count(), 0, label + ': Mining uses the same native game host');
     await insideHost(page, '.native-mining', label + ' original Mining root', 200);
     await insideHost(page, '.native-mining .myj-stage', label + ' illustrated Mining scene', Math.min(300, page.viewportSize().height * .46));
-    await insideHost(page, '.native-mining [data-crystal],.native-mining [data-myj="bank"],.native-mining .myj-native-tools button', label + ' native controls', 48);
+    await insideHost(page, '.native-mining [data-crystal]', label + ' contact-collectible art', 26);
+    await insideHost(page, '.native-mining .myj-actions button', label + ' movement and holding controls', 48);
     assert.equal(await mining.evaluate(node => node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1), true,
       label + ': Mining fits without an inner game scrollbar');
-    for (const button of await mining.locator('[data-crystal],.myj-native-tools button').all()) {
+    for (const button of await mining.locator('.myj-actions button').all()) {
       const bounds = await button.evaluate(node => {
         const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
         return { label: node.getAttribute('aria-label'), width: r.width, height: r.height, enabled: !node.disabled,
           reachable: hit === node || node.contains(hit), hit: hit?.className || hit?.tagName };
       });
       assert.ok(bounds.width >= 48 && bounds.height >= 48 && bounds.enabled && bounds.reachable,
-        label + ': the original crystal and tool controls are initially visible and usable: ' + JSON.stringify(bounds));
+        label + ': movement and holding controls are initially visible and reachable: ' + JSON.stringify(bounds));
     }
     assert.equal(await page.evaluate(() => FG.runtime.isPlaying()), true, label + ': native entry focus starts a playable round');
     await page.screenshot({ path: `test-results/play-view/${label.replace(/ /g, '-')}-initial.png` });

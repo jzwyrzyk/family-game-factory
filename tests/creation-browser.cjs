@@ -392,7 +392,7 @@ const {start}=require('./browser-server.cjs');
         assert.equal(await page.locator('#creationFeedback').evaluate(element=>element.classList.contains('is-success')),true);
         await pacing();await activate('#creationRun');await activate('#creationTapActor');
         await page.waitForFunction(()=>FG.creation.snapshot()?.actors.find(actor=>actor.id==='bucket')?.speech==='More');
-        if(!await page.locator('#creationSceneOptions').evaluate(element=>element.open))await activate('#creationSceneOptions summary');
+        if(!await page.locator('#creationSceneOptions').evaluate(element=>element.open))await activate('#creationSceneOptions > summary');
         await activate('#creationVariables summary');
         await set(page.locator('#creationVariables').getByRole('spinbutton',{name:'gems',exact:true}),3);
         await activate('#creationRun');await activate('#creationTapActor');

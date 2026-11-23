@@ -28,18 +28,24 @@ async function assertTargets(page,selectors){
 }
 async function expectBudget(page,value){await page.waitForFunction(expected=>FG.runtime.snapshot().config.gumBudget===expected,value);}
 async function openPhysicalGum(page){
-  // The physics journey exercises the preserved v1 game; the v2 sticker
-  // construction has its own separate browser acceptance suite.
+  // This historical journey exercises the preserved physical-v1 game. Bubble
+  // Gum v3 assembly is tested independently and remains the default starter.
   await page.click('[data-starter="gum"]');
-  await page.evaluate(()=>{
+  const originalSession=await page.evaluate(()=>{
     const key='family-game-factory-workspace-v2',workspace=JSON.parse(localStorage.getItem(key));
     const project=workspace?.projects.find(p=>p.game==='gum'),revision=workspace?.revisions.find(r=>r.id===project?.headId);
     if(!revision)throw Error('Missing physical workshop project');
     revision.config.qualityVersion=1;
     localStorage.setItem(key,JSON.stringify(workspace));
+    // Resume the legacy engine from its own saved card. The Ready to Play gum
+    // starter correctly opens the new assembly version instead.
+    const session=FG.studio.exportNotebook().sessions.find(s=>s.projectId===project.id);
+    if(!session)throw Error('Missing saved physical workshop session');
+    return session.id;
   });
   await page.reload();await page.waitForFunction(()=>window.FG?.studio);
-  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+  await page.locator(`#studioLibrary [data-session="${originalSession}"] .studio-saved-open`).click();
+  await page.waitForSelector('.quality-builder');
 }
 
 async function localTest(page){await page.click('#studioChange');await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');await expectBudget(page,15);}
