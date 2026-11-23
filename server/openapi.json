@@ -694,6 +694,9 @@
                         "UNAVAILABLE",
                         "ALLOWANCE_REQUIRED"
                       ]
+                    },
+                    "modelPolicy": {
+                      "$ref": "#/components/schemas/AdultBuilderPolicy"
                     }
                   }
                 }
@@ -1860,6 +1863,15 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "name": "X-Factory-Model-Policy",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "const": "adult-astra-high-v1"
+            },
+            "description": "Required on premium claims from the approved private worker. Legacy claims can omit the header."
           }
         ],
         "description": "Existing private worker OIDC and job/stage/run bindings remain mandatory. For adult jobs, the original device, profile and privilege grant must still be current at claim/report and Ready publication; a later unlock cannot authorize an old job. Family generation consent remains independently enforced in family mode. The worker does not receive browser adult credentials."
@@ -2425,6 +2437,9 @@
             "type": "string",
             "pattern": "^[\\w-]{1,100}$",
             "description": "Optional authorized retry successor returned by GET job status. This is an existing job ID for read-only recovery, not permission to submit another build."
+          },
+          "modelPolicy": {
+            "$ref": "#/components/schemas/AdultJobPolicy"
           }
         }
       },
@@ -3018,6 +3033,152 @@
             "pattern": "^[\\w-]{1,100}$"
           }
         }
+      },
+      "AdultBuilderPolicy": {
+        "description": "Visible only after current Adult Private authorization. Active means eligible for new admission under current service configuration and allowance. It does not attest provider access.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "configuredVersion": {
+            "enum": [
+              "legacy",
+              "adult-astra-high-v1"
+            ]
+          },
+          "activeVersion": {
+            "enum": [
+              "legacy",
+              "adult-astra-high-v1",
+              null
+            ]
+          },
+          "reason": {
+            "const": "MODEL_POLICY_UNAVAILABLE"
+          }
+        },
+        "required": [
+          "configuredVersion",
+          "activeVersion"
+        ]
+      },
+      "AdultJobPolicy": {
+        "description": "Premium job only. Measured text cost uses verified token receipts. Images use the separate approved allowance charge. An uncertain interruption can consume the reservation in ledger accounting.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "const": "adult-astra-high-v1"
+          },
+          "stages": {
+            "type": "array",
+            "maxItems": 9,
+            "items": {
+              "$ref": "#/components/schemas/PremiumStageUsage"
+            }
+          },
+          "repairAttempts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "review": {
+            "enum": [
+              "pending",
+              "not_completed",
+              "rejected",
+              "passed"
+            ]
+          },
+          "measuredTextCostMicroUsd": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "imageAllowanceMicroUsd": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reservationMicroUsd": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "accountedMicroUsd": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "usageUncertain": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "version",
+          "stages",
+          "repairAttempts",
+          "review",
+          "measuredTextCostMicroUsd",
+          "imageAllowanceMicroUsd",
+          "reservationMicroUsd",
+          "accountedMicroUsd",
+          "usageUncertain"
+        ]
+      },
+      "PremiumStageUsage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "attempt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "stage": {
+            "enum": [
+              "planning",
+              "construction",
+              "review",
+              "repair"
+            ]
+          },
+          "model": {
+            "enum": [
+              "gpt-6.2-sol",
+              "gpt-6.2-astra"
+            ]
+          },
+          "reasoningEffort": {
+            "const": "high"
+          },
+          "inputTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "cachedInputTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "outputTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reasoningTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "costMicroUsd": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "attempt",
+          "stage",
+          "model",
+          "reasoningEffort",
+          "inputTokens",
+          "cachedInputTokens",
+          "outputTokens",
+          "reasoningTokens",
+          "costMicroUsd"
+        ]
       }
     },
     "parameters": {

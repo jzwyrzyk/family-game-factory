@@ -8,6 +8,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Premium game builder](2026-11-23-premium-builder.md) | Use Astra High for all Adult Private premium game construction and repair, with separately approved planning and review | Accepted for implementation. Activation follows the production cutover and separate approval. | Owner's November 23 premium builder assignment |
 | [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |

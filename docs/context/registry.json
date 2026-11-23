@@ -74,7 +74,10 @@
     "docs/speech/NATURAL_NARRATION.md",
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
-    "docs/decisions/2026-11-22-bubble-gum-assembly.md"
+    "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/game-intelligence/PREMIUM-BUILDER.md",
+    "docs/game-intelligence/premium-benchmark/README.md",
+    "docs/decisions/2026-11-23-premium-builder.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -108,7 +111,9 @@
     "docs/pals/previews/*.md",
     "docs/operations/*.md",
     "docs/speech/*.md",
-    "docs/bubble-gum-builders/*.md"
+    "docs/bubble-gum-builders/*.md",
+    "docs/game-intelligence/PREMIUM-BUILDER.md",
+    "docs/game-intelligence/premium-benchmark/*.md"
   ],
   "areas": [
     {
@@ -661,10 +666,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.636Z",
-      "sourceDigest": "d05a7f29c35d5896f75e73d04a67f1515cf32cca6237444b3a180a01353af9cc",
+      "reviewedAt": "2026-11-23T14:41:57.748Z",
+      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared UTF-8 reader, authenticated read-only request lookup, packaging, paid receipt reconciliation and worker HTTP guards together. Architecture and service contracts preserve auth/privacy and distinguish unavailable lookup from replay permission; no production service activation.",
+      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -698,7 +703,8 @@
         "docs/assignment-005/*.md",
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -707,13 +713,15 @@
         "server/quality/**",
         "server/sandbox/**",
         "server/testing/**",
-        "docs/game-intelligence/*.md"
+        "docs/game-intelligence/*.md",
+        "tools/premium-*.ts",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.962Z",
-      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
+      "reviewedAt": "2026-11-23T14:41:58.128Z",
+      "sourceDigest": "947ce73addc804c39838a799c97b13fde281d73dad9a20308d01042d7643bb67",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints.",
+      "reviewReason": "Reviewed fixed Astra High construction/repair, independent stage approvals and official rates, static and actual token admission, complete job reservation, measured and uncertain settlement, pinned claims, no fallback, bound production plan and compact canonical evidence. Contracts document long ordinary-input capture, near-action observations, three-interaction evidence capacity, bounded unverified repair and compatible-reader rollback; no paid activation.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -806,10 +814,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b5a2a570fc92fafa428dd532e1caf7ac1428605b1e7384de292406bed856ae8c",
-      "reviewedAt": "2026-11-23T05:43:14.662Z",
+      "sourceDigest": "321032521ff7272d9d7ca4f1c90b32b63264e024518448e133bb55c55324cd70",
+      "reviewedAt": "2026-11-23T14:41:58.509Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact owner/API/request binding, awaited acknowledgment persistence and profile cancellation with existing trusted/adult session boundaries. Delivery records synthetic reconnect/backup evidence, preserves default-off services and requires separately authorized real-provider Adult acceptance; no consent or audience expansion.",
+      "reviewReason": "Reviewed safe optional status/job metadata and the separate premium switch with existing family, trusted-device and adult-grant gates. Adult release guide links policy-only disable/drain; child behavior, consent and private provider eligibility remain separately enforced and unverified live.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -852,7 +860,8 @@
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
         "docs/pals/previews/*.md",
-        "docs/bubble-gum-builders/*.md"
+        "docs/bubble-gum-builders/*.md",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "sources": [
         "tests/**",
@@ -861,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:15.018Z",
-      "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
+      "reviewedAt": "2026-11-23T14:41:58.854Z",
+      "sourceDigest": "f60b0951e1a34364f2104c12bc5bcea6e7b9a636c6cb8286815025c081da142d",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source and fixture evidence without replacing final exact-head hosted gates. Retained all five component tests; reproduced and corrected PROFILE_CHANGED expectation, current navigation locators and cross-chapter provenance. Added narration rollover/admission and real backup coverage; Pal decode gate/art/baselines remain unchanged and historical failure retained.",
+      "reviewReason": "Reviewed all new premium configuration, billing, recovery, plan, observation and seven-concept benchmark tests plus legacy compatibility evidence. Delivery records 573 unit contracts, 37 included premium cases, actual authored Chromium156 captures, two unresolved browser timing gates, dependency-install failures and pending pinned-browser/real-provider results without claiming enjoyment or efficacy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1055,10 +1064,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T08:08:28.213Z",
-      "sourceDigest": "13d90c6dc309c9f72282b63d93ee1e0e827a1163ba59cb049e9fa134213166ad",
+      "reviewedAt": "2026-11-23T14:41:59.312Z",
+      "sourceDigest": "8540afd151d32e62266a86686658900c59fdebd2ee1d023c0b157deabac6bed6",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded authorized frozen-source cutover evidence and blocked live baseline; preserved initial local packaging DNS failures and documented recovery using Docker-managed proxy defaults with CA trust, all three non-root network-disabled imports passing; no production action or runtime source change.",
+      "reviewReason": "Reviewed offline-only CI additions, unchanged deployment permissions and private worker pins. Recorded exact verified base, current public/private release evidence, passed local checks and unresolved browser/container limits. Draft-only post-cutover activation and rollback sequence retains spending, IAM, source/image and saved-reader boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1256,10 +1265,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:23.963Z",
-      "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
+      "reviewedAt": "2026-11-23T14:41:59.742Z",
+      "sourceDigest": "e7e43b16af261285d2ae96cc02c00506e41ff4a10b821a4881e3064502f406e2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
+      "reviewReason": "Added required premium contract, decision and benchmark references with link checking and generation/validation routing. Existing handbook and review history retained; source evidence and live acceptance remain distinct.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

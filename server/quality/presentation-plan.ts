@@ -4,6 +4,9 @@ import {createHash} from 'node:crypto';
 import type {AgentInput} from '../pipeline/types';
 import {validateAssetPack,type VisualStyle,type RasterAsset} from '../agent/game-assets';
 
+import {choiceSources,validateChoiceSources,validateProductionDesign,productionDesignSchema,type ProductionDesign,type ChoiceSource} from './production-design';
+import {captureLimits} from './game-quality-evidence.cjs';
+
 export const PRESENTATION_STYLES=['pixel','flat-2d','illustrated','dimensional','realistic'] as const;
 export type SuggestedAction=
  |{type:'tap';x:number;y:number;frames:number}
@@ -14,11 +17,15 @@ export type SuggestedAction=
  * callbacks or privileged state injection, and never independent intent proof. */
 export type SuggestedPlaythrough=SuggestedAction[];
 export interface ArtRequest {id:string;role:RasterAsset['role'];prompt:string;sampling:RasterAsset['sampling']}
-export interface GameProductionPlan {
- version:'game-production-plan-v1';requestHash:string;baseRevisionId:string;
+interface CommonProductionPlan {
+ requestHash:string;baseRevisionId:string;
  presentationStyle:VisualStyle;styleOrigin:'explicit'|'saved'|'chosen';
  playerAction:string;payoff:string;variation:string;openEnded:boolean;artRequests:ArtRequest[];
 }
+export type GameProductionPlan=CommonProductionPlan&(
+ | {version:'game-production-plan-v1'}
+ | {version:'game-production-plan-v2'; design:ProductionDesign; choiceSources:ChoiceSource[]}
+);
 export interface PresentationBrief {
  version:'presentation-brief-v1';requestHash:string;
  preferredStyle:VisualStyle|null;styleOrigin:'explicit'|'saved'|'unspecified';
@@ -40,8 +47,9 @@ const bounded=(x:unknown,max:number)=>{
 };
 export const presentationRequestHash=(text:string)=>createHash('sha256').update(text).digest('hex');
 
-export function validateSuggestedPlaythrough(value:unknown):SuggestedPlaythrough {
- if(!Array.isArray(value)||value.length<1||value.length>16)throw Error('PLAYTHROUGH_INVALID');
+export function validateSuggestedPlaythrough(value:unknown,premium=false):SuggestedPlaythrough {
+ const limits=captureLimits(premium);
+ if(!Array.isArray(value)||value.length<1||value.length>limits.actions)throw Error('PLAYTHROUGH_INVALID');
  let total=0;
  const coordinate=(x:unknown,max:number)=>typeof x==='number'&&Number.isFinite(x)&&x>=0&&x<=max;
  const path=value.map(entry=>{
@@ -55,7 +63,7 @@ export function validateSuggestedPlaythrough(value:unknown):SuggestedPlaythrough
   if(a.type==='hold'&&!['left','right','up','down','action'].includes(String(a.control)))throw Error('PLAYTHROUGH_INVALID');
   return {...a} as unknown as SuggestedAction;
  });
- if(total>600)throw Error('PLAYTHROUGH_INVALID');
+ if(total>limits.frames)throw Error('PLAYTHROUGH_INVALID');
  return path;
 }
 
@@ -121,8 +129,9 @@ export function permitsNewArt(input:AgentInput):boolean {
 }
 
 export function validateGameProductionPlan(value:unknown):GameProductionPlan {
- const p=own(value);exact(p,['version','requestHash','baseRevisionId','presentationStyle','styleOrigin','playerAction','payoff','variation','openEnded','artRequests']);
- if(p.version!=='game-production-plan-v1'||typeof p.requestHash!=='string'||!HASH.test(p.requestHash)||typeof p.baseRevisionId!=='string'||!/^[\w-]{1,100}$/.test(p.baseRevisionId)||
+ const p=own(value),premium=p.version==='game-production-plan-v2';
+ exact(p,['version','requestHash','baseRevisionId','presentationStyle','styleOrigin','playerAction','payoff','variation','openEnded','artRequests',...(premium?['design','choiceSources']:[])]);
+ if(!premium&&p.version!=='game-production-plan-v1'||typeof p.requestHash!=='string'||!HASH.test(p.requestHash)||typeof p.baseRevisionId!=='string'||!/^[\w-]{1,100}$/.test(p.baseRevisionId)||
   !PRESENTATION_STYLES.includes(p.presentationStyle as VisualStyle)||!['explicit','saved','chosen'].includes(String(p.styleOrigin))||typeof p.openEnded!=='boolean'||!Array.isArray(p.artRequests)||p.artRequests.length>2)throw Error('PRODUCTION_PLAN_INVALID');
  const ids=new Set<string>();
  const artRequests=p.artRequests.map(value=>{
@@ -130,20 +139,24 @@ export function validateGameProductionPlan(value:unknown):GameProductionPlan {
   if(typeof a.id!=='string'||!ID.test(a.id)||ids.has(a.id)||!['background','actor','object','effect'].includes(String(a.role))||!['pixelated','smooth'].includes(String(a.sampling)))throw Error('PRODUCTION_PLAN_INVALID');
   ids.add(a.id);return {id:a.id,role:a.role as ArtRequest['role'],prompt:bounded(a.prompt,1200),sampling:a.sampling as ArtRequest['sampling']};
  });
- return {version:p.version,requestHash:p.requestHash,baseRevisionId:p.baseRevisionId,presentationStyle:p.presentationStyle as VisualStyle,styleOrigin:p.styleOrigin as GameProductionPlan['styleOrigin'],playerAction:bounded(p.playerAction,500),payoff:bounded(p.payoff,500),variation:bounded(p.variation,500),openEnded:p.openEnded,artRequests};
+ const contract=premium?{version:'game-production-plan-v2' as const,design:validateProductionDesign(p.design),choiceSources:validateChoiceSources(p.choiceSources)}:{version:'game-production-plan-v1' as const};
+ if(contract.version==='game-production-plan-v2'&&p.openEnded&&contract.design.payoffState==='won')throw Error('PRODUCTION_PLAN_INVALID');
+ return {...contract,requestHash:p.requestHash,baseRevisionId:p.baseRevisionId,presentationStyle:p.presentationStyle as VisualStyle,styleOrigin:p.styleOrigin as GameProductionPlan['styleOrigin'],playerAction:bounded(p.playerAction,500),payoff:bounded(p.payoff,500),variation:bounded(p.variation,500),openEnded:p.openEnded,artRequests};
 }
 
 /** Bind a model proposal to independently sourced request/base metadata. */
-export function bindGameProductionPlan(value:unknown,input:AgentInput):GameProductionPlan {
- const raw=own(value);exact(raw,['presentationStyle','playerAction','payoff','variation','openEnded','artRequests']);
+export function bindGameProductionPlan(value:unknown,input:AgentInput,premium=false):GameProductionPlan {
+ const raw=own(value);exact(raw,['presentationStyle','playerAction','payoff','variation','openEnded','artRequests',...(premium?['design']:[])]);
  const brief=presentationBrief(input);
  if(brief.preferredStyle&&raw.presentationStyle!==brief.preferredStyle)throw Error('PRESENTATION_STYLE_CHANGED');
- return validateGameProductionPlan({...raw,version:'game-production-plan-v1',requestHash:brief.requestHash,baseRevisionId:input.baseRevision.id,styleOrigin:brief.styleOrigin==='unspecified'?'chosen':brief.styleOrigin});
+ const binding=premium?{version:'game-production-plan-v2',choiceSources:choiceSources(input.childIntent)}:{version:'game-production-plan-v1'};
+ return validateGameProductionPlan({...raw,...binding,requestHash:brief.requestHash,baseRevisionId:input.baseRevision.id,styleOrigin:brief.styleOrigin==='unspecified'?'chosen':brief.styleOrigin});
 }
 
-export function assertProductionPlanBinding(plan:GameProductionPlan,input:AgentInput):GameProductionPlan {
+export function assertProductionPlanBinding(plan:GameProductionPlan,input:AgentInput,premium?:boolean):GameProductionPlan {
  const p=validateGameProductionPlan(plan),brief=presentationBrief(input);
- if(p.requestHash!==brief.requestHash||p.baseRevisionId!==input.baseRevision.id)throw Error('PRODUCTION_PLAN_BINDING_MISMATCH');
+ if((premium!==undefined&&premium!==(p.version==='game-production-plan-v2'))||p.requestHash!==brief.requestHash||p.baseRevisionId!==input.baseRevision.id||
+    p.version==='game-production-plan-v2'&&JSON.stringify(p.choiceSources)!==JSON.stringify(choiceSources(input.childIntent)))throw Error('PRODUCTION_PLAN_BINDING_MISMATCH');
  if(brief.preferredStyle&&p.presentationStyle!==brief.preferredStyle)throw Error('PRESENTATION_STYLE_CHANGED');
  return p;
 }
@@ -158,3 +171,6 @@ export const productionPlanSchema={type:'object',additionalProperties:false,requ
  presentationStyle:{type:'string',enum:PRESENTATION_STYLES},playerAction:{type:'string'},payoff:{type:'string'},variation:{type:'string'},openEnded:{type:'boolean'},
  artRequests:{type:'array',maxItems:2,items:{type:'object',additionalProperties:false,required:['id','role','prompt','sampling'],properties:{id:{type:'string'},role:{type:'string',enum:['background','actor','object','effect']},prompt:{type:'string'},sampling:{type:'string',enum:['pixelated','smooth']}}}}
 }};
+
+export const premiumProductionPlanSchema={...productionPlanSchema,required:[...productionPlanSchema.required,'design'],properties:{...productionPlanSchema.properties,design:productionDesignSchema}};
+export const premiumPlaythroughSchema={...suggestedPlaythroughSchema,maxItems:captureLimits(true).actions};

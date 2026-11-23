@@ -1,6 +1,7 @@
 const {createHash}=require('node:crypto');
 const {runtimeBundle}=require('./bundle-v2.cjs');
 const {validateAssetPack,assetPackHash}=require('../agent/game-assets.cjs');
+const {captureHorizon}=require('../quality/game-quality-evidence.cjs');
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGeneratedV2(game,artifactId,channel,options={}){
  if(!game.compiled||!/^[\w-]{1,100}$/.test(artifactId)||!/^[\w-]{8,100}$/.test(channel))throw Error('INVALID_GENERATED_PREVIEW');
@@ -12,7 +13,7 @@ function renderGeneratedV2(game,artifactId,channel,options={}){
  // Sibling closures prevent generated code from naming the trusted engine or its mutable world.
  // The seeded RNG makes replay and independent input-effect probes reproducible.
  const worker=`"use strict";(function(){"use strict";${trusted.worker}\nreturn FactoryRuntime.run;})()(function(api){"use strict";${game.compiled.code}\nreturn GameModule.createGame(api);}${trusted.assets?','+JSON.stringify(assetIds):''});`;
- const auditTicks=options.auditTicks;if(auditTicks!==undefined&&(!Number.isInteger(auditTicks)||auditTicks<1||auditTicks>600))throw Error('AUDIT_TICK_LIMIT');
+ const auditTicks=options.auditTicks;if(auditTicks!==undefined&&(!Number.isInteger(auditTicks)||auditTicks<1||auditTicks>captureHorizon(game)))throw Error('AUDIT_TICK_LIMIT');
  const config=JSON.stringify({worker,artifactId,channel,controls:game.controls,auditTicks,...(trusted.assets?{assets:assets.map(({id,mime,data,width,height,sampling})=>({id,mime,data,width,height,sampling}))}:{})}).replace(/</g,'\\u003c');const script=trusted.client+'\nFactoryClient.startClient('+config+');';
  const digest=createHash('sha256').update(script).digest('base64');const csp=`default-src 'none'; script-src 'sha256-${digest}'; worker-src blob:; connect-src 'none'; style-src 'unsafe-inline'; img-src ${assets.length?'data:':"'none'"}; media-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors *`;
  const labels={left:'◀ Left',right:'Right ▶',up:'▲ Up',down:'▼ Down',action:'Action ✦'};const controls=game.controls.map(k=>`<button data-control="${k}">${labels[k]}</button>`).join('');

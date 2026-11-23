@@ -1,15 +1,15 @@
 // Trusted Actions controller. It never evaluates or logs model output.
+import {safeProviderFailure} from './provider-failure';
 import {appendFile} from 'node:fs/promises';
 import {OpenAIResponsesAgent} from '../agent/openai';
+import {PremiumGenerationError} from '../agent/model-policy';
 import {isGeneratedGame} from '../agent/generated';
 import {DockerArtifactGate} from '../sandbox/docker-gate';
 import type {AgentInput} from '../pipeline/types';
 import type {WorkerStage} from './identity';
 import {WorkerGateway,WorkerTransportError,coordinateWorkerStage} from './worker-transport';
 
-const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_REQUIRED','SPENDING_CUTOFF','INPUT_TOKEN_LIMIT',
- 'GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','IMAGE_APPROVAL_REQUIRED','IMAGE_ALLOWANCE_EXCEEDED',
- 'IMAGE_PROVIDER_RATE_LIMIT','IMAGE_PROVIDER_FAILED','QUALITY_REVIEW_REQUIRED'];
+
 
 async function main(){
  const stage=process.argv[2] as WorkerStage,attempt=Number(process.env.FACTORY_ATTEMPT);
@@ -31,14 +31,14 @@ async function main(){
       if(!task.game||!task.qualityEvidence)throw Error('WORKER_CLAIM_INVALID');
       return await agent.review(input,task.game,task.qualityEvidence);
      }
-     if(attempt&&task.previous){
+     if(attempt){
       if(!isGeneratedGame(task.previous))throw Error('WORKER_CLAIM_INVALID');
       return await agent.repair(input,task.previous,task.diagnostics||'Repair the failing game.',{qualityEvidence:task.qualityEvidence});
      }
      return await agent.generate(input);
     }
     if(!task.game)throw Error('WORKER_CLAIM_INVALID');
-    const gate=new DockerArtifactGate({image:process.env.FACTORY_SANDBOX_IMAGE||'',timeoutMs:60000,memoryMb:1536,cpus:1});
+    const gate=new DockerArtifactGate({image:process.env.FACTORY_SANDBOX_IMAGE||'',timeoutMs:60000,premiumCaptureTimeoutMs:300000,memoryMb:1536,cpus:1});
     await gate.preflight();signal.throwIfAborted();
     const tested=await gate.test(task.game,{signal,independentIntentPlan:task.independentIntentPlan,captureQuality:'captureQuality'in task&&task.captureQuality===true});
     if(!tested)throw Error('SANDBOX_ATTESTATION_REQUIRED');
@@ -49,7 +49,9 @@ async function main(){
     if(stage==='test')return {ok:false,diagnostics:(error as Error).message.slice(0,1500)};
     stageFailed=true;
     const code=(error as Error).message;
-    return {errorCode:providerErrors.includes(code)?code:'PROVIDER_FAILED'};
+    return {errorCode:safeProviderFailure(code),
+     ...(error instanceof PremiumGenerationError?{usageComplete:error.usageComplete,stageUsage:error.stageUsage,
+      imageUsageUnits:error.imageUsageUnits,usageUnits:error.usageUnits}:{})};
    }
   },controller.signal);
   if(stage==='test'&&process.env.GITHUB_OUTPUT)await appendFile(process.env.GITHUB_OUTPUT,`review_required=${receipt.reviewRequired?'true':'false'}\n`);

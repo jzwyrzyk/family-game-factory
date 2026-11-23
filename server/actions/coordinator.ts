@@ -1,3 +1,4 @@
+import {safeProviderFailure} from './provider-failure';
 import {createHash,randomUUID} from 'node:crypto';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotJobAllowed} from '../adult-pilot';
@@ -6,9 +7,11 @@ import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
 import {safeRepairDiagnostic,safeFinalRepairCode,type RepairCategory,type RepairCode,type QualityRepairAxes} from '../quality/repair-diagnostics';
 import {applyCurrentQualityPolicy,requireProductionCandidate} from '../quality/quality-policy';
-import {validateQualityEvidence,validateQualityReview,type GameQualityEvidence,type QualityFinding} from '../quality/game-quality';
+import {validateQualityEvidence,validateQualityReview,qualityRepairContext,type GameQualityEvidence,type QualityFinding} from '../quality/game-quality';
 import {validateArtifact} from '../pipeline/artifacts';
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
+import {PREMIUM_POLICY_VERSION,isPremiumApproval,validateStageUsage,type PremiumApproval} from '../agent/model-policy';
+import {requirePinnedPremium,settleStoppedJob,type PremiumPilot} from '../pipeline/premium-policy';
 import type {AgentApproval} from '../agent/openai';
 import type {Repository,Job,PipelineState,CandidateArtifact,AgentInput} from '../pipeline/types';
 import type {WorkerIdentity,WorkerStage} from './identity';
@@ -32,13 +35,13 @@ export interface ActionExecution {
  /** At most three stages per permitted attempt; survives repair identity changes. */
  reportReceipts?:ReportReceipt[];
 }
-const providerErrors=['PROVIDER_RATE_LIMIT','PROVIDER_REFUSED','OWNER_APPROVAL_REQUIRED','SPENDING_CUTOFF','INPUT_TOKEN_LIMIT',
- 'GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','IMAGE_APPROVAL_REQUIRED','IMAGE_ALLOWANCE_EXCEEDED',
- 'IMAGE_PROVIDER_RATE_LIMIT','IMAGE_PROVIDER_FAILED','QUALITY_REVIEW_REQUIRED'];
+
 const WORKFLOW_STAGE_MS=12*60*1000,WORKFLOW_PREPARE_MS=18*60*1000,MAX_ATTEMPTS=3;
 
 export class ActionCoordinator {
- constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false){}
+ constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot){
+  if(isPremiumApproval(approval))throw Error('LEGACY_APPROVAL_REQUIRED');
+ }
  private get stageMs(){return Math.min(this.leaseMs,WORKFLOW_STAGE_MS);}
  private get testHandoffMs(){return Math.min(2*this.leaseMs,WORKFLOW_PREPARE_MS+WORKFLOW_STAGE_MS);}
  private initializeLease(s:PipelineState,j:Job){
@@ -74,14 +77,17 @@ export class ActionCoordinator {
  }
  async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution){j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};this.initializeLease(s,j);}return true;});}
  private permissionError(s:PipelineState,j:Job):string|undefined {
+  if(j.premiumPolicy){
+   if(!this.adultPilotMode)return 'ADULT_PILOT_ACCESS_REQUIRED';
+   try{requirePinnedPremium(j,this.premiumPilot);}catch(error){return (error as Error).message;}
+  }
   if(this.requireVerifiedParentPrivacy&&!verifiedParentScope(s,j.familyId,'generation'))return 'GUARDIAN_CONSENT_REQUIRED';
   if((this.adultPilotMode||j.adultPilotDeviceId||j.adultPilotSessionId||j.adultPilotProfileId)&&
     (!this.adultPilotMode||!adultPilotJobAllowed(s,j)))return 'ADULT_PILOT_ACCESS_REQUIRED';
  }
  private failure(s:PipelineState,j:Job,code:string){
   if(['ready','failed','cancelled'].includes(j.status))return;
-  j.status='failed';j.errorCode=code;j.phase='failed';const ledger=s.ledgers[j.familyId];
-  ledger.reserved-=j.maxUnits;ledger.used+=j.maxUnits;j.usedUnits=j.maxUnits;
+  j.status='failed';j.errorCode=code;j.phase='failed';settleStoppedJob(s,j);
   s.audit.push({jobId:j.id,familyId:j.familyId,status:'failed',code,at:new Date().toISOString()});
   if(j.execution){delete j.execution.candidate;delete j.execution.qualityEvidence;}
  }
@@ -111,7 +117,8 @@ export class ActionCoordinator {
   if(e.attempt===0||e.attempt===1||e.attempt===2)e.lastFailure={stage,attempt:e.attempt,
    category:safe.category,code:safe.code,findings:[...(safe.findings||[])],
    ...(safe.qualityAxes?{qualityAxes:{...safe.qualityAxes}}:{})};
-  if(e.attempt>=2){this.failure(s,j,safeFinalRepairCode(diagnostics,j.independentIntentPlan));return;}
+  const maxRepairAttempts=j.premiumPolicy?requirePinnedPremium(j,this.premiumPilot).maxRepairAttempts:2;
+  if(e.attempt>=maxRepairAttempts){this.failure(s,j,safeFinalRepairCode(diagnostics,j.independentIntentPlan));return;}
   e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.reviewReport=undefined;
   e.claimAt=undefined;e.dispatchedAt=undefined;e.dispatchPending=true;e.diagnostics=safe.feedback;e.repairCategory=safe.category;
   this.advanceLease(j,'queued');
@@ -138,12 +145,16 @@ export class ActionCoordinator {
    await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===p.id);if(j?.execution&&!j.execution.runId)j.execution.dispatchPending=true;return true;});
   }
  }
- async claim(id:string,attempt:number,stage:WorkerStage,identity:WorkerIdentity){
-  return this.repo.transaction(s=>{
+ async claim(id:string,attempt:number,stage:WorkerStage,identity:WorkerIdentity,workerPolicy?:string){
+  const task=await this.repo.transaction(s=>{
    const j=s.jobs.find(x=>x.id===id),e=j?.execution;
    if(identity.stage!==stage||!j||!e||e.attempt!==attempt||['ready','failed','cancelled'].includes(j.status)||e.runId&&e.runId!==identity.runId)throw Error('WORKER_CLAIM_REJECTED');
    const denied=this.permissionError(s,j);if(denied)throw Error(denied);
    const expired=this.leaseError(s,j);if(expired)throw Error(expired);
+   if(j.premiumPolicy&&(workerPolicy!==PREMIUM_POLICY_VERSION||identity.sha!==j.premiumPolicy.workerSha)){
+    this.failure(s,j,'MODEL_POLICY_WORKER_MISMATCH');return {error:'MODEL_POLICY_WORKER_MISMATCH' as const};
+   }
+   const approval=j.premiumPolicy?requirePinnedPremium(j,this.premiumPilot):this.approval;
    applyCurrentQualityPolicy(j,s.revisions.find(r=>r.id===j.baseRevisionId)?.game);
    if(stage==='generate'){
     if(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled)throw Error('OWNER_APPROVAL_REQUIRED');
@@ -151,7 +162,7 @@ export class ActionCoordinator {
     e.runId=identity.runId;e.stage=stage;e.claimAt=Date.now();j.status='building';j.phase=attempt?'repairing':'generating';j.attempts=attempt+1;
     this.advanceLease(j,stage);
     s.audit.push({jobId:id,familyId:j.familyId,status:'building',at:new Date().toISOString()});
-    return {input:this.input(s,j),approval:this.approval,previous:e.candidate?.game,diagnostics:e.diagnostics,qualityEvidence:e.qualityEvidence,independentIntentPlan:undefined};
+    return {input:this.input(s,j),approval,previous:e.candidate?.game,diagnostics:e.diagnostics,qualityEvidence:e.qualityEvidence,independentIntentPlan:undefined};
    }
    if(stage==='review'){
     if(!this.approval.enabled||!s.ledgers[j.familyId]?.paidEnabled)throw Error('OWNER_APPROVAL_REQUIRED');
@@ -160,7 +171,7 @@ export class ActionCoordinator {
     requireProductionCandidate(j,game);e.stage=stage;e.claimAt=Date.now();
     this.advanceLease(j,stage);
     const denied=this.permissionError(s,j);if(denied)throw Error(denied);
-    return {input:this.input(s,j),approval:this.approval,game,qualityEvidence:evidence,independentIntentPlan:undefined};
+    return {input:this.input(s,j),approval,game,qualityEvidence:evidence,independentIntentPlan:undefined};
    }
    if(e.runId!==identity.runId||j.status!=='testing'||!e.candidate||e.stage!=='generate'||!e.generateReport)throw Error('WORKER_CLAIM_REJECTED');
    // Generated source and public callers never author independent expectations.
@@ -174,6 +185,18 @@ export class ActionCoordinator {
    this.advanceLease(j,stage);
    return {game:e.candidate.game,captureQuality:!!j.qualityRequired,...(independentIntentPlan?{independentIntentPlan}:{})};
   });
+  if(task.error)throw Error(task.error);
+  return task;
+ }
+ private recordUsage(job:Job,approval:PremiumApproval,stage:'generate'|'review',report:any,partial:boolean){
+  const e=job.execution!;
+  const expected=stage==='review'?'review':e.attempt?'repair':'construction';
+  const calls=validateStageUsage(approval,report.stageUsage,expected,report.usageUnits,report.imageUsageUnits,partial);
+  if(!partial&&expected==='construction'&&!calls.some(call=>call.stage==='planning'))throw Error('MODEL_USAGE_INVALID');
+  if(!Number.isSafeInteger(report.usageUnits)||report.usageUnits<0||job.usedUnits+report.usageUnits>job.maxUnits)throw Error('BUDGET_EXCEEDED');
+  const usage=job.premiumUsage??={calls:[],imageUsageUnits:0};
+  usage.calls.push(...calls.map(call=>({...call,attempt:e.attempt})));
+  usage.imageUsageUnits+=report.imageUsageUnits;
  }
  async report(id:string,attempt:number,stage:WorkerStage,identity:WorkerIdentity,report:any){
   const fingerprint=createHash('sha256').update(JSON.stringify(report)).digest('hex');
@@ -210,8 +233,16 @@ export class ActionCoordinator {
    if(stage==='generate'||stage==='review'){
     if(!report||report.errorCode){
      if(stage==='generate')e.generateReport=fingerprint;else e.reviewReport=fingerprint;
-     this.failure(s,j,providerErrors.includes(report?.errorCode)?report.errorCode:'PROVIDER_FAILED');return receipt();
+     if(j.premiumPolicy){
+      if(report&&typeof report.usageComplete==='boolean'){
+       this.recordUsage(j,requirePinnedPremium(j,this.premiumPilot),stage,report,true);
+       j.usedUnits+=report.usageUnits;
+      }
+      if(report?.usageComplete!==true)(j.premiumUsage??={calls:[],imageUsageUnits:0}).uncertain=true;
+     }
+     this.failure(s,j,safeProviderFailure(report?.errorCode));return receipt();
     }
+    if(j.premiumPolicy)this.recordUsage(j,requirePinnedPremium(j,this.premiumPilot),stage,report,false);
     if(!Number.isInteger(report.usageUnits)||report.usageUnits<0||j.usedUnits+report.usageUnits>j.maxUnits)throw Error('BUDGET_EXCEEDED');
    }
    if(stage==='generate'){
@@ -227,7 +258,7 @@ export class ActionCoordinator {
     const game=e.candidate.game,review=validateQualityReview(game,e.qualityEvidence,report.review);
     j.usedUnits+=report.usageUnits;e.reviewReport=fingerprint;
     if(review.verdict==='pass')this.ready(s,j,{...game,compiled:{...game.compiled!,quality:review}});
-    else this.repair(s,j,'review','QUALITY_REVIEW_FAILED:'+review.findings.join(','),{axes:review.axes,findings:review.findings});
+    else this.repair(s,j,'review','QUALITY_REVIEW_FAILED:'+review.findings.join(','),qualityRepairContext(game,review));
     return receipt();
    }
    if(report.ok){

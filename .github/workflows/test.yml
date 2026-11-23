@@ -102,6 +102,9 @@ jobs:
       - name: Actual normal-motion review captures and input receipts
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:quality-capture
+      - name: Premium benchmark authored gameplay evidence (no provider calls)
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run benchmark:premium -- --fixture test-results/premium-benchmark
       - name: Restored games
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node tests/restored-games.cjs
