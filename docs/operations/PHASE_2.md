@@ -15,6 +15,8 @@ The seven inactive GCP resources were created and verified; the read-only
 verification receipt was recovered under temporary /tmp storage. Live effective
 permissions and end-to-end assistant access remain unverified.
 
+**Current-source status (November 23, 2026):** The split description below preserves its original draft-stage rationale. [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) later merged the reconciled PR107/100 source, including `.github/workflows/jems-service-images.yml` and `.github/workflows/jems-cloud-run-release.yml`, at `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`; [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107) was marked merged through that same integration. These definitions are now on main. The source-only merge did **not** establish enabled identities, approved production flags, working Cloud Shell/managed connection, live permission readback, claimed traffic, or a successful production rollout. The November 23 authorized cutover remained blocked before promotion; check [delivery state](../../DELIVERY-STATE.md) for the observed limits. Any later administrative step requires a newly reviewed current-source plan, not the historical draft head or stale receipt.
+
 ## Integration split: policy checks and game fixes
 
 [PR112](https://github.com/jzwyrzyk/family-game-factory/pull/112) carries the
