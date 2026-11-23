@@ -6,6 +6,7 @@ import { builderJourney } from '../brand/gem-progress';
 import { createRewardFact, enqueueRewardFact, rewardFactId, validateRewardOutbox, type RewardFact } from '../rewards/model';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 import { freshGuidance, isGuideTipId, validateGuidePreferences, type GuidePreferences, type GuideTipId } from './guidance';
+import { acknowledgeStudioNotificationItems, freshStudioNotificationPreferences, validateStudioNotificationPreferences, type StudioNotificationPreferences, type StudioNotificationRef } from './notifications';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -29,7 +30,7 @@ export interface StudioSession {
   /** Canonical source project, retained through copies and local/remote transitions. */
   rewardProjectId?:string;
 }
-export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[];guidance?:Record<string,GuidePreferences> }
+export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[];guidance?:Record<string,GuidePreferences>;notifications?:Record<string,StudioNotificationPreferences> }
 const guidanceFor=(notebook:Notebook,owner:string):GuidePreferences=>notebook.guidance&&Object.hasOwn(notebook.guidance,owner)?notebook.guidance[owner]:freshGuidance();
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -38,7 +39,7 @@ const ident = (x: unknown): x is string => safeText(x, 160) && /^[\w:-]+$/.test(
 export function validateNotebook(input: unknown): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > 80 || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
-  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance'].includes(k)))throw Error('Unknown studio data; not restored.');
+  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance','notifications'].includes(k)))throw Error('Unknown studio data; not restored.');
   if(n.avatars!==undefined&&(!n.avatars||typeof n.avatars!=='object'||Array.isArray(n.avatars)||Object.keys(n.avatars).length>80||!Object.entries(n.avatars).every(([owner,choice])=>ident(owner)&&(choice==='spark'||choice==='nova'))))throw Error('Invalid builder character choice.');
   if(n.guidance!==undefined){
     if(!n.guidance||typeof n.guidance!=='object'||Array.isArray(n.guidance)||Object.keys(n.guidance).length>80)throw Error('Invalid journey guidance preferences.');
@@ -74,6 +75,14 @@ export function validateNotebook(input: unknown): Notebook {
     if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || s.job.phase!==undefined&&(typeof s.job.phase!=='string'||!/^[a-z-]{1,32}$/.test(s.job.phase)) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
   }
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
+  if(n.notifications!==undefined){
+    if(!n.notifications||typeof n.notifications!=='object'||Array.isArray(n.notifications)||Object.keys(n.notifications).length>80)throw Error('Invalid notification preferences.');
+    for(const [owner,preferences] of Object.entries(n.notifications)){
+      if(!ident(owner))throw Error('Invalid notification player.');
+      const validated=validateStudioNotificationPreferences(preferences);
+      if(validated.acknowledgements.some(item=>!n.sessions.some(session=>session.id===item.sessionId&&session.owner===owner)))throw Error('Invalid notification project.');
+    }
+  }
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
   const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
@@ -128,6 +137,28 @@ export class StudioNotebook {
     if(!ident(owner))throw Error('Invalid player.');
     return this.write(n=>{const next={...guidanceFor(n,owner),dismissedTips:[]};n.guidance={...n.guidance,[owner]:next};return next;});
   }
+  notificationPreferences(owner:string):StudioNotificationPreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    const preferences=this.read().notifications;
+    return preferences&&Object.hasOwn(preferences,owner)?validateStudioNotificationPreferences(preferences[owner]):freshStudioNotificationPreferences();
+  }
+  acknowledgeNotifications(owner:string,items:readonly StudioNotificationRef[]):StudioNotificationPreferences {
+    return this.writeNotificationAcknowledgements(owner,items,false);
+  }
+  dismissNotification(owner:string,item:StudioNotificationRef):StudioNotificationPreferences {
+    return this.writeNotificationAcknowledgements(owner,[item],true);
+  }
+  private writeNotificationAcknowledgements(owner:string,items:readonly StudioNotificationRef[],dismiss:boolean):StudioNotificationPreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    if(!Array.isArray(items)||items.length>80)throw Error('Invalid notification acknowledgement.');
+    if(!items.length)return this.notificationPreferences(owner);
+    return this.write(n=>{
+      if(items.some(item=>!item||item.ownerId!==owner||!n.sessions.some(session=>session.id===item.sessionId&&session.owner===owner)))throw Error('Choose a notification from your own profile.');
+      const before=n.notifications&&Object.hasOwn(n.notifications,owner)?n.notifications[owner]:freshStudioNotificationPreferences();
+      const next=acknowledgeStudioNotificationItems(before,owner,items,dismiss);
+      n.notifications={...n.notifications,[owner]:next};return next;
+    });
+  }
   avatar(owner:string):BuilderAvatar|null {
     if(!ident(owner))throw Error('Invalid player.');
     return this.read().avatars?.[owner]??null;
@@ -141,8 +172,8 @@ export class StudioNotebook {
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
   archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
-  create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
-    return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
+  create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null,options:{creationStandard?:2}={}):StudioSession {
+    return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:{...freshDesign(),...(options.creationStandard===2?{creationStandard:2 as const}:{})},experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
     let before:StudioSession|undefined;

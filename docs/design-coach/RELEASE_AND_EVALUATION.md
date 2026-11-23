@@ -1,11 +1,21 @@
 # Design-coach-first studio: implementation and evidence
 
-## Scope
+## Current v2.1 integration and source-release scope
+
+The November 23, 2026 integration of [PR135](https://github.com/jzwyrzyk/family-game-factory/pull/135) reconciles the creative-discovery coach with protected main `3a6fcca34b2e9d15bb2d6596153069db57056a04`, including the merged four-experience host, Coding, Notifications, profile settings and optional narration. The owner authorized source integration and merge after applicable checks; production deployment and provider activation remain outside this assignment. The original PR18 scope and implementation below are historical, not current authorization or first-build policy.
+
+New sessions durably save the v2 standard in the initial notebook write. Seven grounded dimensions and the child's explicit **Build my game** govern first creation; older saved sessions keep their recorded standard. Rechecking an exact selected helper option preserves the selecting child turn, the helper's authorship and the bound offer through reload and repeated checks. It neither adds a child message nor starts a build.
+
+Backend-first rollout preserves legacy reply compatibility: private schemas and validators expose the original eight plan fields to v1 and noncreation clients. `viewpoint` and `movement` metadata requires an explicit v2 creation context. Optional unsupported metadata is discarded for legacy clients while the reply's prose and required readiness evidence remain unchanged. V2 browser publication still requires compatible gateway and private-coach versions. Keep the v2 and selection-aware notebook reader/compiler during rollback; older strict readers and compilers do not provide a no-loss downgrade.
+
+Local source validation and synthetic browser results are recorded in [delivery state](../../DELIVERY-STATE.md). Fresh hosted checks on the integrated PR head remain a separate source-merge gate. The mandatory observed-model rubric below remains a live-release gate, not a claim supplied by deterministic fixtures; no provider inference, real-child review or physical-device acceptance occurred in this integration.
+
+## Original scope (historical)
 This extends PR #18's review-only `?studio=1` studio. No merge, Pages deployment, account changes, new secrets, funded API invocation or worker-security modification is authorized by this implementation. Existing games and math algorithms are unchanged.
 
 The governing product specification is `GOLD_STANDARD.md`. Its accepted conversation principles are requirements, not a claim of validated educational efficacy.
 
-## Implemented
+## Original implementation (historical)
 - Play-first native games; progressive design controls; no duplicate visible game cards merely for playing a starter.
 - Persistent design intention, stated friction, child/helper attribution, optional predictions, grounded observations and notes.
 - Typed discussion, inspiration, explanation, reflection and explicit-build paths. Known local commands create previews; unknown messages can be discussed without a build. The child can choose Try, ask for ideas, or skip.
@@ -16,7 +26,7 @@ The governing product specification is `GOLD_STANDARD.md`. Its accepted conversa
 - Existing AI build path remains separate. Coach outputs cannot execute code, change settings, publish, pick the winning version or promote a test.
 - The offline helper is explicitly labeled a limited local reflection aid, NOT an LLM or the gold-standard coaching experience.
 
-## Runtime boundaries still open
+## Original runtime boundaries (historical; current delivery evidence supersedes)
 - No live inference or real-family session evaluation was run in this update. Fixture tests prove transport/state behavior, not pedagogical conversation quality.
 - Model-backed interaction is disabled unless all owner approval flags, current prices, approved model, secure API key, existing family session and funded allowance are configured. No configuration or credentials have been supplied here.
 - Under-13 data use requires operational review of OpenAI's current under-18 guidance, including applicable ZDR requirements, plus child-safe policies, disclosure and safety escalation. `store:false` and a checkbox are NOT proof of ZDR. Never activate just because unit tests pass.

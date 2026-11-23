@@ -6,6 +6,25 @@ concurrency:
   group: arcade-journeys-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
+  notifications:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - run: npm run build
+      - name: Notifications, saved work and reading continuity
+        run: npm run test:studio-notifications
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notifications-evidence
+          path: test-results/
+          if-no-files-found: ignore
   private-coach-image:
     # No provider key, cloud identity or funded API endpoint is available here.
     runs-on: ubuntu-24.04

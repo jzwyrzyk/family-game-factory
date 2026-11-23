@@ -32,6 +32,21 @@ test('safe lifecycle pauses freeze controls, exclude learning time and cannot re
  lifecycle.next();assert.equal(lifecycle.isPlaying(),true);lifecycle.pause();lifecycle.dispose();assert.equal(target.inert,false);assert.equal(lifecycle.isPlaying(),false);assert.equal(lifecycle.pause(),false);
 });
 
+test('in-place game help cannot bypass a learning pause, completion or disposal',()=>{
+ let helps=0,mounts=0,context:GameContext;
+ const plugin:GamePlugin={manifest:manifests.mining,mount(_target,ctx){context=ctx;mounts++;return {
+  next(){},restart(){},unmount(){},isPlaying:()=>true,pause:()=>true,resume(){},showHelp(){helps++;}
+ };}};
+ const target={inert:false,replaceChildren(){}} as unknown as HTMLElement;
+ const lifecycle=createLifecycle(plugin,target,defaults('mining'),'classic',()=>{});
+ assert.equal(lifecycle.showHelp(),false);
+ lifecycle.start();assert.equal(lifecycle.showHelp(),true);assert.equal(helps,1);assert.equal(mounts,1);
+ lifecycle.pause();assert.equal(lifecycle.showHelp(),false);assert.equal(target.inert,true);assert.equal(helps,1);
+ lifecycle.resume();assert.equal(lifecycle.showHelp(),true);assert.equal(mounts,1);
+ context!.finish({won:true,level:1,title:'Done',description:'Done'});assert.equal(lifecycle.showHelp(),false);
+ lifecycle.dispose();assert.equal(lifecycle.showHelp(),false);assert.equal(helps,2);
+});
+
 test('Language Arts prompt policy preserves mandatory checkpoints without hijacking game creativity or Math legacy behavior',()=>{
   for(const phrase of ['No reading please','Remove all english','Turn off language arts','Skip learning','Make a game without learning questions','No checkpoints','Give me math instead of English','Switch the learning subject to math']){
     const result=interpretLearningRequest(phrase,'language');

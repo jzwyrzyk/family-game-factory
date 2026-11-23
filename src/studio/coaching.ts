@@ -234,7 +234,10 @@ export function installCoaching(h:Hooks){
    captured=h.current();const input=$<HTMLTextAreaElement>('studioPrompt'),submittedDraft=input.value,submittedVersion=promptVersion;
    const planAtSubmission=captured.design?.plan;
    const text=(supplied??submittedDraft).trim()||(mode==='ideas'?'Please help me find ideas.':mode==='explain'?'Explain the relevant game-design choice.':'What could I think about next?');
-   const submittedOrigin=sourceOf(captured,text);
+   // Rechecking an existing child turn must retain its recorded authority. Its
+   // literal words may now equal a selected helper-origin plan value.
+   const reviewedMessage=reviewOnly?visibleConversation(captured.messages).find(message=>message.role==='child'&&message.id===reviewMessageId):undefined;
+   const submittedOrigin=reviewedMessage?(isHelperAuthoredTurn(reviewedMessage,captured.design)?'helper':'child'):sourceOf(captured,text);
    // Stop/play are immediate child requests, never interpreted as build consent.
    const disposition=conversationDisposition(text);
    if(disposition!=='continue'&&!reviewOnly){
@@ -257,7 +260,7 @@ export function installCoaching(h:Hooks){
    if(!reviewOnly)h.message(captured,'child',text);
    const submittedMessage=reviewOnly?visibleConversation(h.current().messages).find(message=>message.role==='child'&&message.id===reviewMessageId):h.current().messages.at(-1);
    if(!submittedMessage)throw Error('Your saved idea could not be found. Reopen it and try again.');
-   if(submittedOrigin==='helper')h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.ideas.push({id:'helper-turn:'+submittedMessage.id,text:text.slice(0,1000),origin:'helper',adopted:true});});
+   if(submittedOrigin==='helper'&&!reviewOnly)h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.ideas.push({id:'helper-turn:'+submittedMessage.id,text:text.slice(0,1000),origin:'helper',adopted:true});});
    const submittedFingerprint=creationInputFingerprint(h.current());
    const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
    let reply:CoachReply,used:'model'|'local'='local',reason='',safetyRefusal=false;

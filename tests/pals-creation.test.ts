@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { test, type TestContext } from 'node:test';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { addPalToProject, createPalPlayground, CREATION_PAL_IDS } from '../src/pals/creation';
@@ -7,7 +7,7 @@ import { palArtworkPath, palDefinition, palSceneAssetId } from '../src/pals/cata
 import { CREATION_ASSETS, creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest, privateArtId } from '../src/creation/projects';
 import { SceneEngine } from '../src/creation/engine';
 import { CreationStore } from '../src/creation/storage';
-import { CreationStage } from '../src/creation/stage';
+import { CreationStage, CREATION_ART_LOAD_TIMEOUT_MS } from '../src/creation/stage';
 
 class MemoryStorage implements Storage {
   data = new Map<string, string>(); fail = false;
@@ -132,6 +132,60 @@ test('each playground visibly jumps, dances and tells a joke on tap; it does not
   }
 });
 
+test('scene Pal composites prepare once per active asset and stale loads cannot recreate a cleared scene', t => {
+  const originals = new Map(['Image', 'document'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => {
+    for (const [key, descriptor] of originals) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete (globalThis as any)[key];
+    }
+  });
+  const images: TestImage[] = [], draws: unknown[] = []; let preparations = 0;
+  class TestImage {
+    complete = false; naturalWidth = 0; naturalHeight = 0; src = '';
+    onload: (() => void) | null = null; onerror: (() => void) | null = null;
+    constructor() { images.push(this); }
+    ready() { this.complete = true; this.naturalWidth = 100; this.naturalHeight = 80; this.onload?.(); }
+  }
+  Object.defineProperty(globalThis, 'Image', { configurable: true, value: TestImage });
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: {
+    baseURI: 'https://example.test/jems/', createElement() {
+      preparations++;
+      const scratch = { width: 0, height: 0, getContext: () => ({
+        drawImage() {}, putImageData() {}, getImageData() {
+          const data = new Uint8ClampedArray(scratch.width * scratch.height * 4);
+          for (let index = 0; index < data.length; index += 4) data.set([253, 240, 227, 255], index);
+          data.set([20, 110, 230, 255], Math.floor(scratch.width * scratch.height / 2) * 4);
+          return { data };
+        },
+      }) };
+      return scratch;
+    },
+  } });
+  const context = new Proxy({
+    createLinearGradient: () => ({ addColorStop() {} }), measureText: () => ({ width: 80 }),
+    drawImage: (image: unknown) => draws.push(image),
+  } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
+  const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
+  const stage = new CreationStage(canvas), scene = createPalPlayground('kip'), snapshot = new SceneEngine(scene).snapshot();
+  stage.render(scene, snapshot); images[0].ready();
+  const prepared = draws.at(-1);
+  assert.notEqual(prepared, images[0], 'The scene uses the transient alpha composite.');
+  stage.render(scene, snapshot); stage.render(scene, snapshot);
+  assert.equal(preparations, 1, 'Ordinary animation frames reuse the prepared image.');
+  assert.equal(draws.at(-1), prepared);
+  stage.clear(); const drawCount = draws.length; images[0].ready();
+  assert.equal(draws.length, drawCount, 'A retired onload callback cannot repaint.');
+  assert.equal(preparations, 1);
+  stage.render(scene, snapshot); images[1].ready();
+  assert.equal(preparations, 2, 'Reopening owns a fresh bounded cache.');
+  const ordinary = createStarterProject('dragon');
+  stage.render(ordinary, new SceneEngine(ordinary).snapshot());
+  const previous = preparations;
+  for (const image of images.slice(2)) image.ready();
+  assert.equal(preparations, previous, 'Non-Pal scene images bypass paper compositing.');
+});
+
 test('adding a Pal preserves the existing scene, source pins and programs with independent identities', () => {
   const original = createStarterProject('dragon');
   original.provenance = { createdBy: 'child', sourceKind: 'curated', sourceProjectId: 'source-game', sourceRevisionId: 'source-v2' };
@@ -216,4 +270,124 @@ test('adding a Pal keeps private original/cutout hashes, exact source pins and p
     assert.throws(() => store.load(project.id, 'two'), /own profile/);
     assert.deepEqual(store.pendingRewards('one'), []);
   }
+});
+
+function stageImageFixture(t: TestContext) {
+  const originals = new Map(['Image', 'document'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  const images: TestImage[] = [], draws: unknown[] = [], errors: string[] = [];
+  class TestImage {
+    naturalWidth = 0; naturalHeight = 0; src = ''; removed = 0;
+    onload: (() => void) | null = null; onerror: (() => void) | null = null;
+    private resolveDecode!: () => void;
+    private rejectDecode!: (error: Error) => void;
+    private decoded = new Promise<void>((resolve, reject) => { this.resolveDecode = resolve; this.rejectDecode = reject; });
+    constructor() { images.push(this); }
+    load() { this.naturalWidth = 100; this.naturalHeight = 80; this.onload?.(); }
+    decode() { return this.decoded; }
+    finishDecode() { this.resolveDecode(); }
+    failDecode() { this.rejectDecode(Error('invalid bitmap')); }
+    removeAttribute(name: string) { assert.equal(name, 'src'); this.removed++; }
+  }
+  Object.defineProperty(globalThis, 'Image', { configurable: true, value: TestImage });
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://example.test/jems/' } });
+  const context = new Proxy({
+    createLinearGradient: () => ({ addColorStop() {} }), measureText: () => ({ width: 80 }),
+    drawImage: (image: unknown) => draws.push(image),
+  } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
+  const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
+  const stage = new CreationStage(canvas, undefined, message => errors.push(message));
+  t.after(() => {
+    stage.clear();
+    for (const [key, descriptor] of originals) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete (globalThis as any)[key];
+    }
+  });
+  return { stage, images, draws, errors };
+}
+
+test('playback preparation shares rendered loads and waits for hidden actors and decoded artwork', async t => {
+  const { stage, images, draws } = stageImageFixture(t);
+  const scene = addPalToProject(createPalPlayground('glim'), 'kip').scene;
+  scene.actors[1].visible = false;
+  scene.actors.push({ ...scene.actors[0], id: 'same-picture-again' });
+  stage.render(scene, new SceneEngine(scene).snapshot());
+  assert.equal(images.length, 1, 'Repeated visible actors share their exact source load.');
+  let ready = false;
+  const preparing = stage.prepare(scene).then(() => { ready = true; });
+  const alsoPreparing = stage.prepare(scene);
+  assert.equal(images.length, 2, 'A hidden actor is prepared before a later Show block needs it.');
+  for (const image of images) image.load();
+  await Promise.resolve();
+  assert.equal(ready, false, 'A load event alone does not make playback ready.');
+  images[0].finishDecode();
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(ready, false, 'All exact assets must finish decoding.');
+  images[1].finishDecode();
+  await Promise.all([preparing, alsoPreparing]);
+  assert.equal(ready, true);
+  assert.ok(draws.includes(images[0]));
+  await stage.prepare(scene);
+  assert.equal(images.length, 2, 'Repeated Play or export reuses the prepared images.');
+});
+
+test('playback preparation rejects an obsolete scene both before and after image readiness', async t => {
+  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('glim');
+  await assert.rejects(stage.prepare(scene, () => false), /scene or player changed/);
+  assert.equal(images.length, 0, 'An already obsolete scene cannot start new artwork requests.');
+  let current = true;
+  const rejected = assert.rejects(stage.prepare(scene, () => current), /scene or player changed/);
+  current = false;
+  images[0].load(); images[0].finishDecode();
+  await rejected;
+});
+
+test('clearing the stage cancels pending preparation and retires late load and decode callbacks', async t => {
+  const { stage, images, draws, errors } = stageImageFixture(t), scene = createPalPlayground('glim');
+  const snapshot = new SceneEngine(scene).snapshot();
+  stage.render(scene, snapshot);
+  const rejected = assert.rejects(stage.prepare(scene), /scene or player changed/);
+  const oldImage = images[0], staleLoad = oldImage.onload!;
+  oldImage.load(); stage.clear();
+  await rejected;
+  assert.equal(oldImage.removed, 1, 'Cancellation also releases the pending source.');
+  assert.equal(oldImage.onload, null); assert.equal(oldImage.onerror, null);
+  const count = draws.length;
+  oldImage.finishDecode(); staleLoad(); await Promise.resolve();
+  assert.equal(draws.length, count, 'Late completion cannot draw a retired scene.');
+  assert.deepEqual(errors, [], 'Cancellation is not reported as broken art.');
+  stage.render(scene, snapshot);
+  const reopened = stage.prepare(scene);
+  images[1].load(); images[1].finishDecode();
+  await reopened;
+  assert.equal(images.length, 2, 'Reopening owns a fresh source load.');
+});
+
+test('unresponsive scene art times out once, identifies its Pal and can retry after reopening', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { stage, images, errors } = stageImageFixture(t), scene = createPalPlayground('glim');
+  stage.render(scene, new SceneEngine(scene).snapshot());
+  const rejected = assert.rejects(stage.prepare(scene), /Luma's picture could not load in time/);
+  t.mock.timers.tick(CREATION_ART_LOAD_TIMEOUT_MS - 1);
+  assert.deepEqual(errors, []);
+  t.mock.timers.tick(1);
+  await rejected;
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /Reopen this scene/);
+  assert.equal(images[0].onload, null); assert.equal(images[0].onerror, null);
+  await assert.rejects(stage.prepare(scene), /Luma's picture could not load in time/);
+  assert.equal(images.length, 1, 'A failed current cache entry cannot cause a retry loop.');
+  stage.clear(); stage.render(scene, new SceneEngine(scene).snapshot());
+  const reopened = stage.prepare(scene);
+  images[1].load(); images[1].finishDecode(); await reopened;
+  t.mock.timers.tick(CREATION_ART_LOAD_TIMEOUT_MS);
+  assert.equal(errors.length, 1, 'A completed image clears its timeout.');
+});
+
+test('an invalid decoded bitmap fails playback instead of starting an empty export', async t => {
+  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('kip');
+  const rejected = assert.rejects(stage.prepare(scene), /Nook's picture could not load/);
+  images[0].load(); images[0].failDecode();
+  await rejected;
+  assert.equal(images[0].onload, null); assert.equal(images[0].onerror, null);
 });

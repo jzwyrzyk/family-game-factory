@@ -12,6 +12,9 @@ import {validateCoachReply} from '../../src/studio/design';
 import {privateCoachOrigin} from './private-bridge';
 import {speechApproved,speechConfig,validateAudio,type SpeechProvider,type SpeechConfig,AUDIO_MAX_BYTES} from './speech';
 import {GooglePrivateSpeech} from './private-speech-provider';
+import {GooglePrivateNarration} from './private-narration-provider';
+import {narrationApproved,narrationConfig,validateNarrationText,validateNarrationAudio,NARRATION_DEADLINE_MS,type NarrationProvider,type NarrationConfig} from './narration';
+import {readNarrationRequest} from './narration-transport';
 import {adultPilotFlags} from '../adult-pilot';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
@@ -33,6 +36,8 @@ export interface PrivateCoachRuntime {
  audio?:SpeechProvider;
  audioConfig?:SpeechConfig;
  reportFailure?:(event:CoachFailureEvent)=>void|Promise<void>;
+ narration?:NarrationProvider;
+ narrationConfig?:NarrationConfig;
 }
 export function privateCoachHandler(runtime:PrivateCoachRuntime){
  let active=0;
@@ -55,6 +60,23 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    const path=new URL(req.url||'','http://private').pathname;
    const token=req.headers.authorization?.match(/^Bearer ([A-Za-z0-9._-]{40,12000})$/)?.[1];
    if(!token||!await runtime.verifyCaller(token))throw Error('FORBIDDEN');
+   if(path==='/v1/private-coach/narration/status'||path==='/v1/private-coach/narration'){
+    const ready=!!runtime.narration&&!!runtime.narrationConfig&&narrationApproved(runtime.narrationConfig);
+    if(path.endsWith('/status')&&req.method==='GET')return send(res,200,{available:ready,mode:ready?'natural':'unavailable'});
+    if(path.endsWith('/status')||req.method!=='POST'||!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('FORBIDDEN');
+    if(!ready)throw Error('NARRATION_UNAVAILABLE');
+    if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
+    active++;
+    try {
+     const input:any=await readNarrationRequest(req,13000);
+     if(!input||input.version!==1||Object.keys(input).some(k=>!['version','text'].includes(k)))throw Error('INVALID_NARRATION');
+     const text=validateNarrationText(input.text),signal=AbortSignal.any([aborted.signal,AbortSignal.timeout(NARRATION_DEADLINE_MS)]);
+     signal.throwIfAborted();const audio=validateNarrationAudio(await runtime.narration!.read(text,signal));signal.throwIfAborted();
+     if(res.destroyed||res.writableEnded)return;
+     res.writeHead(200,{'Content-Type':'audio/mpeg','Content-Length':audio.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});
+     res.end(Buffer.from(audio));return;
+    }finally{active--;}
+   }
    stage='configuration';
    const configured=runtime.enabled&&approved(runtime.config)&&!!runtime.config.apiKey&&runtime.config.apiKey.length>=16;
    let readinessFailure:unknown,readinessSignal:AbortSignal|undefined;
@@ -134,9 +156,9 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
      void Promise.resolve(report(event)).catch(()=>{});
     }catch{}
    }
-   return send(res,code==='FORBIDDEN'?403:code==='INVALID_REQUEST'||code==='PRIVATE_INFORMATION'||code==='INVALID_AUDIO'?400:
+   return send(res,code==='FORBIDDEN'?403:code==='INVALID_REQUEST'||code==='PRIVATE_INFORMATION'||code==='INVALID_AUDIO'||code==='INVALID_NARRATION'?400:
     code==='RATE_LIMIT'?429:code==='COACH_REFUSED'||code==='AUDIO_NO_SPEECH'?422:503,{errorCode:
-    ['FORBIDDEN','INVALID_REQUEST','PRIVATE_INFORMATION','INVALID_AUDIO','RATE_LIMIT','COACH_REFUSED','AUDIO_NO_SPEECH'].includes(code)?code:'COACH_UNAVAILABLE'});
+    ['FORBIDDEN','INVALID_REQUEST','PRIVATE_INFORMATION','INVALID_AUDIO','INVALID_NARRATION','RATE_LIMIT','COACH_REFUSED','AUDIO_NO_SPEECH'].includes(code)?code:'COACH_UNAVAILABLE'});
   }
  };
 }
@@ -168,10 +190,11 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
   throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
  if(env.FACTORY_OPENAI_API_KEY||env.FACTORY_COACH_API_KEY)
   throw Error('GENERATION_OR_GATEWAY_KEY_FORBIDDEN_IN_PRIVATE_COACH');
- const config=privateConfig(env),audioConfig=speechConfig(env);
+ const config=privateConfig(env),audioConfig=speechConfig(env),readingConfig=narrationConfig(env);
  const requested=env.FACTORY_COACH_APPROVED==='true';
  const audioRequested=env.FACTORY_COACH_AUDIO_APPROVED==='true';
- if(!requested&&!audioRequested){
+ const narrationRequested=env.FACTORY_NARRATION_APPROVED==='true';
+ if(!requested&&!audioRequested&&!narrationRequested){
   if(config.apiKey)throw Error('COACH_SECRET_FORBIDDEN_WHILE_INACTIVE');
   return {config,enabled:false,verifyCaller:async(_token:string)=>false,
    provider:new OpenAICoachProvider(config)};
@@ -180,12 +203,15 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
   throw Error('COACH_APPROVAL_REQUIRED');
  if(!requested&&config.apiKey)throw Error('COACH_SECRET_FORBIDDEN_WHILE_INACTIVE');
  if(audioRequested&&!speechApproved(audioConfig))throw Error('AUDIO_APPROVAL_REQUIRED');
+ if(narrationRequested&&!narrationApproved(readingConfig))throw Error('NARRATION_APPROVAL_REQUIRED');
  const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
  const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
  if(privateCoachOrigin(audience)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
  return {config,enabled:requested,verifyCaller:googleCallerVerifier(audience,caller),
   provider:new OpenAICoachProvider(config),
   audioConfig,
+  narrationConfig:readingConfig,
+  narration:narrationRequested?new GooglePrivateNarration(readingConfig):undefined,
   audio:audioRequested?new GooglePrivateSpeech(audioConfig.projectId):undefined};
 }
 async function main(){

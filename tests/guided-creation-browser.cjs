@@ -59,6 +59,8 @@ const replies={
     assert.equal(newSession.design.creationStandard,2);
     assert.equal(newSession.messages.length,0,'the static intro is not a saved helper or child turn');
     assert.equal(await page.locator('#studioMoreChoices').evaluate(el=>el.open),false);
+    assert.equal(await page.locator('#studioHear').isVisible(),true,'read-aloud is visible without opening More choices');
+    assert.equal(await page.locator('#studioHear').isEnabled(),true,'the opening child direction can be read');
     assert.equal(await page.locator('#designPlan').isVisible(),false);
     assert.equal(await page.locator('#studioUseDrawing').isVisible(),false);
     assert.equal(await page.locator('#studioSend').isDisabled(),true,'Build stays disabled before the coach understands the game');
@@ -70,6 +72,10 @@ const replies={
     await sendChildMessage(page,action);
     assert.equal(await page.locator('#studioCreationHero').isVisible(),false);
     assert.match(await page.locator('#studioMessages').innerText(),/How do you want that bouncing to feel\?/);
+    const helperMessages=page.locator('#studioMessages .studio-message.helper');
+    assert.equal(await helperMessages.locator('[data-action=read-aloud]').count(),await helperMessages.count(),'every helper message keeps its own reader across later turns');
+    assert.equal(await page.locator('#studioHear').isVisible(),true);
+    assert.equal(await page.locator('#studioHear').isEnabled(),true);
     assert.equal(await page.locator('#coachProposals button').count(),0,'the child writes answers instead of choosing model answers');
     assert.equal(await page.locator('#studioMoreChoices').evaluate(el=>el.open),false);
     await page.waitForFunction(async()=>FG.rewards&&(await FG.rewards.summary()).lifetimeGems>0);

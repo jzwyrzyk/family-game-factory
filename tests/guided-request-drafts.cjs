@@ -54,32 +54,34 @@ async function askForProposal(page,message,title){
 }
 
 async function localProposal(browser,url){
- const f=await fixture(browser,url,message=>message.includes('slower')?proposal('Slower robot','Make robot slower'):proposal('Faster robot','Make robot faster'));
+ const f=await fixture(browser,url,message=>message.includes('fewer')?proposal('Fewer buckets','Give me two buckets'):proposal('More buckets','Give me four buckets'));
  const {page}=f;
  try{
-  await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot .favorite-canvas');
-  const initial=await page.evaluate(()=>FG.runtime.snapshot().config.robotSpeed);
-  await page.click('#studioChange');await askForProposal(page,'Help me think about robot speed.','Faster robot');
-  const draft='After this, make the robot blue.';
+  await page.click('[data-starter="buckets"]');await page.waitForSelector('#game-mount canvas#game');
+  const initial=await page.evaluate(()=>FG.runtime.snapshot().config.bucketCount);
+  await page.click('#studioChange');await askForProposal(page,'Help me think about bucket choices.','More buckets');
+  const draft='After this, make the buckets blue.';
   await page.fill('#studioPrompt',draft);
-  await page.getByRole('button',{name:'Try this idea: Faster robot',exact:true}).click();
-  await page.waitForSelector('.favorite-robot .favorite-canvas');
+  await page.getByRole('button',{name:'Try this idea: More buckets',exact:true}).click();
+  await page.waitForSelector('#game-mount canvas#game');
   let current=await session(page);
-  assert.equal(current.candidate.prompt,'Make robot faster');
-  assert.ok(current.candidate.config.robotSpeed>initial,'the chosen proposal actually changes the native game');
+  assert.equal(current.candidate.prompt,'Give me four buckets');
+  assert.ok(current.candidate.config.bucketCount>initial,'the chosen proposal actually changes the native game');
+  assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.bucketCount),4);
   assert.equal(current.draft,draft,'a native proposal cannot consume the separate unfinished thought');
   assert.equal(await page.inputValue('#studioPrompt'),draft);
   assert.equal(current.experiments.at(-1).origin,'helper');
   assert.equal(current.experiments.at(-1).depth,'tune');
   // A later request must use its own proposed words, not the preserved draft or
   // the first proposal. The child deliberately replaces the draft with a chat turn.
-  await page.click('#studioChange');await askForProposal(page,'Suggest a slower robot.','Slower robot');
+  await page.click('#studioChange');await askForProposal(page,'Suggest fewer buckets.','Fewer buckets');
   const later='Remember a purple trail for another version.';
   await page.fill('#studioPrompt',later);
-  await page.getByRole('button',{name:'Try this idea: Slower robot',exact:true}).click();
-  await page.waitForSelector('.favorite-robot .favorite-canvas');current=await session(page);
-  assert.equal(current.candidate.prompt,'Make robot slower');
-  assert.ok(current.candidate.config.robotSpeed<initial);
+  await page.getByRole('button',{name:'Try this idea: Fewer buckets',exact:true}).click();
+  await page.waitForSelector('#game-mount canvas#game');current=await session(page);
+  assert.equal(current.candidate.prompt,'Give me two buckets');
+  assert.ok(current.candidate.config.bucketCount<initial);
+  assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.bucketCount),2);
   assert.equal(current.experiments.length,2,'each explicit supported request makes its own test');
   assert.equal(current.draft,later);assert.equal(await page.inputValue('#studioPrompt'),later);
   assert.deepEqual(f.requests,[],'supported native proposals never start a remote build');
@@ -90,11 +92,11 @@ async function localProposal(browser,url){
 }
 
 async function remoteProposal(browser,url){
- const request='Replace the robot with a flying doughnut spaceship';
+ const request='Replace the buckets with a flying doughnut spaceship';
  const f=await fixture(browser,url,()=>proposal('Flying doughnut',request,'redesign'));
  const {page}=f;
  try{
-  await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot .favorite-canvas');
+  await page.click('[data-starter="buckets"]');await page.waitForSelector('#game-mount canvas#game');
   await page.click('#studioChange');await askForProposal(page,'Suggest a new way to play.','Flying doughnut');
   const draft='Save a rainbow trail for my next version.';
   await page.fill('#studioPrompt',draft);

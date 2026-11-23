@@ -6,7 +6,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,waitForWelcome,completeWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,waitForWelcome,completeWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 
 const NOTEBOOK='family-game-factory-studio-v1';
 const devices=[['desktop',{width:1280,height:900}],['phone',{width:390,height:844}]];
@@ -22,6 +22,11 @@ async function moreChoices(page){
  if(!await details.evaluate(node=>node.open))await details.locator(':scope > summary').click();
 }
 async function doneForNow(page){
+ // The fitted play view exposes My Games as its visible, host-owned exit.
+ // Done for now remains in the conversation tools outside an active game.
+ if(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode'))){
+  await page.locator('#studioHome').click();return;
+ }
  if(!await page.locator('#studioDoneForNow').isVisible())await moreChoices(page);
  await page.click('#studioDoneForNow');
 }
@@ -31,8 +36,7 @@ async function capture(page,name,device){
  await page.screenshot({path:`test-results/first-creation-${name}-${device}.png`,fullPage:false});
 }
 async function choosePlayer(page,index){
- const menu=page.locator('#studioProfileMenu');
- if(!await menu.evaluate(node=>node.open))await menu.locator('summary').click();
+ await openProfiles(page);
  await page.locator('#profile-choices .profile-choice').nth(index).click();
  await page.waitForFunction(value=>FG.store.current().id==='player'+(value+1),index);
  await waitForWelcome(page);
@@ -217,15 +221,16 @@ async function firstImprovement(browser,url,device,viewport){
  try{
   await page.route('**/factory-config.json',unavailable);
   await page.goto(url);await ready(page);await exploreWelcome(page);
-  await page.click('[data-starter="robot"]');await page.waitForSelector('.favorite-robot .favorite-canvas');
-  const original=(await snapshot(page)).config.robotSpeed;
+  await page.click('[data-starter="buckets"]');await page.waitForSelector('#game-mount canvas#game');
+  const original=(await snapshot(page)).config.bucketCount;
   const head=()=>page.evaluate(()=>{
    const n=FG.studio.exportNotebook(),s=n.sessions.find(x=>x.id===n.active[FG.store.current().id]);
    return JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects.find(x=>x.id===s.projectId).headId;
   });
   const before=await head();
-  await page.click('#studioChange');await page.fill('#studioPrompt','Make robot faster');await page.click('#studioSend');
-  await page.waitForFunction(speed=>FG.runtime.snapshot().config.robotSpeed>speed,original);
+  await page.click('#studioChange');await page.fill('#studioPrompt','Give me four buckets');await page.click('#studioSend');
+  await page.waitForFunction(count=>FG.runtime.snapshot().config.bucketCount>count,original);
+  assert.equal((await snapshot(page)).state.bucketCount,4,'the original game receives four real bucket choices');
   const experiment=(await current(page)).candidate;
   assert.ok(experiment,'the child’s change produces a distinct real local candidate');
   assert.equal(await head(),before,'trying a change does not replace the main game');
@@ -240,16 +245,17 @@ async function firstImprovement(browser,url,device,viewport){
   await doneForNow(page);await page.locator('#page-studio-library').waitFor({state:'visible'});
   await capture(page,'return',device);
   await page.reload();await ready(page);await page.click('#studioContinuePlaying');
-  await page.waitForSelector('.favorite-robot .favorite-canvas');
+  await page.waitForSelector('#game-mount canvas#game');
   assert.equal(await head(),kept,'returning retains the chosen version');
-  assert.ok((await snapshot(page)).config.robotSpeed>original,'the meaningful behavior change survives the next visit');
+  assert.ok((await snapshot(page)).config.bucketCount>original,'the meaningful behavior change survives the next visit');
+  assert.equal((await snapshot(page)).state.bucketCount,4,'returning plays the kept four-bucket game');
 
   // The host owns an ordinary required activity, including its interruption.
   const attempt=await page.evaluate(()=>{
    const host=document.getElementById('stage-overlay'),target=document.createElement('div');
    host.replaceChildren(target);host.classList.remove('hidden');FG.store.current().mathWindow=[];
    const n=FG.studio.exportNotebook(),s=n.sessions.find(x=>x.id===n.active[FG.store.current().id]);
-   FG.learning.checkpoint(target,{gameId:'robot',projectId:s.id,versionId:'first-journey-guard'},()=>{},{roundId:'first-journey-guard'});
+   FG.learning.checkpoint(target,{gameId:'buckets',projectId:s.id,versionId:'first-journey-guard'},()=>{},{roundId:'first-journey-guard'});
    return {id:FG.learning.activeAttemptId,owner:FG.store.current().id};
   });
   assert.ok(attempt.id);
@@ -261,7 +267,7 @@ async function firstImprovement(browser,url,device,viewport){
   }
   await doneForNow(page);
   await page.locator('#page-studio-library').waitFor({state:'visible'});
-  assert.equal(await page.evaluate(()=>FG.learning.active),false,'Done leaves through the host lifecycle');
+  assert.equal(await page.evaluate(()=>FG.learning.active),false,'the visible exit leaves through the host lifecycle');
   const outcome=await page.evaluate(({owner,id})=>{
    const record=FG.store.data.profiles.find(p=>p.id===owner).learning.attempts.find(a=>a.id===id);
    return {outcome:record.outcome,answers:record.answers.length,correct:record.correct};
@@ -336,8 +342,8 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   let waitingGameId=ownId;
   const focusedControl=focusedGuide?`#studioGuideCard${focusedGuide==='action'?'Action':'Dismiss'}`:'#studioChange';
   if(!focusedGuide){
-   await page.click('#studioNavHome');await page.click('[data-starter="robot"]');
-   await page.waitForSelector('.favorite-robot .favorite-canvas');
+   await page.click('#studioNavHome');await page.click('[data-starter="buckets"]');
+   await page.waitForSelector('#game-mount canvas#game');
    waitingGameId=(await current(page)).id;assert.notEqual(waitingGameId,ownId);
   }else await moreChoices(page);
   await page.locator(focusedControl).focus();
@@ -347,7 +353,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'background completion cannot reopen a dismissed Build handoff');
   if(focusedGuide)await page.locator('#studioGuideCard[data-guide-tip="ready"]').waitFor({state:'visible'});
   assert.equal(await page.locator(focusedControl).evaluate(node=>document.activeElement===node),true,'completion preserves keyboard focus on the visible control');
-  if(!focusedGuide)assert.equal(await page.locator('.favorite-robot .favorite-canvas').isVisible(),true);
+  if(!focusedGuide)assert.equal(await page.locator('#game-mount canvas#game').isVisible(),true);
   assert.equal(opened,0,'ready notification never opens the private preview automatically');
   const finished=(await notebook(page)).sessions.find(s=>s.id===ownId);
   assert.equal(finished.candidate,null,'the background result cannot select itself');
@@ -364,7 +370,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
     assert.equal(preferences.dismissedTips.includes('waiting'),false,'the stale waiting hint is never dismissed by the later keypress');
     assert.equal(opened,0);assert.equal(kept,0);
    }
-   await page.click('#studioNavHome');
+   await navigate(page,'studioNavHome');
    await capture(page,'ready',variant);
    await page.click('#studioContinuePlaying');
   }
@@ -429,9 +435,13 @@ async function hintsAcrossModes(browser,url){
   await page.click('#creationPracticeGuideDismiss');
   assert.deepEqual(await page.evaluate(()=>FG.creation.export()),empty,'dismissing navigation help records no challenge attempt, hint usage or scene');
   await page.click('[data-challenge="robot-route"]');
+  await page.click('#creationMore summary');
   assert.equal(await page.locator('#creationGuide').isVisible(),false,'the same practice tip remains dismissed in the editor');
   const sceneBefore=await page.evaluate(()=>FG.creation.export());
+  const sceneId=await page.evaluate(()=>FG.creation.scene().id);
   await navigate(page,'studioJourneyHelp');await page.click('#studioGuideReset');
+  await navigate(page,'studioNavScenes');await page.locator(`[data-scene="${sceneId}"]`).click();
+  await page.click('#creationMore summary');
   await page.locator('#creationGuide').waitFor({state:'visible'});
   assert.deepEqual(await page.evaluate(()=>FG.creation.export()),sceneBefore,'Show tips again does not edit the program or claim supported/independent evidence');
   await capture(page,'practice-guide','phone');

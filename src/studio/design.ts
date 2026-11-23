@@ -3,6 +3,7 @@
  */
 import type {Candidate} from './notebook';
 import {validateCreationReadiness,validateCreationReview,type CreationReadinessVerdict,type CreationReview} from './creation-readiness';
+export const LEGACY_PLAN_FIELDS = ['fun','action','goal','setback','score','style','progression','special'] as const;
 export const PLAN_FIELDS = ['fun','action','goal','setback','score','style','viewpoint','movement','progression','special'] as const;
 export type PlanField = typeof PLAN_FIELDS[number];
 export type Origin = 'child'|'helper';
@@ -29,6 +30,12 @@ export interface CoachContext {
  observations:Observation[]; tests:{label:string;title:string;prediction:string;notes:string}[];
  /** Opt-in keeps older browser clients compatible with the same coach route. */
  creation?:{version:1|2};
+}
+/** Only an explicit v2 request advertises a reader for the new plan fields.
+ * Backend-first rollout must keep v1 and existing-game replies readable by
+ * the previously published browser, even after the provider is upgraded. */
+export function coachReplyFields(context:Pick<CoachContext,'creation'>):readonly PlanField[] {
+ return context.creation?.version===2?PLAN_FIELDS:LEGACY_PLAN_FIELDS;
 }
 export interface CoachReply {
  move:'listen'|'clarify'|'inspire'|'explain'|'reflect'|'propose'|'repair'|'play';
@@ -75,9 +82,10 @@ export function missingPlan(d:DesignRecord):PlanField[] {
 export function planBrief(d:DesignRecord):string {return PLAN_FIELDS.map(k=>`${k}: ${d.plan[k]?.value|| (d.plan[k]?.delegated?'Choose a sensible option and report it.':'Not specified.')}`).join('\n');}
 export function validateCoachReply(value:unknown,context:CoachContext):CoachReply {
  const r=value as CoachReply;
- if(!r||!keys(r,['move','text','question','suggestions','proposedChange','planSuggestions','childDecisions','evidenceIds','creationReadiness'])||!['listen','clarify','inspire','explain','reflect','propose','repair','play'].includes(r.move)||!text(r.text,1800)||!(r.question===null||text(r.question,350))||!Array.isArray(r.suggestions)||r.suggestions.length>4||!r.suggestions.every(t=>text(t,500))||!Array.isArray(r.planSuggestions)||r.planSuggestions.length>8||!r.planSuggestions.every(p=>p&&keys(p,['field','value'])&&PLAN_FIELDS.includes(p.field)&&text(p.value,700))||!Array.isArray(r.evidenceIds)||r.evidenceIds.length>8||!r.evidenceIds.every(x=>context.observations.some(o=>o.id===x)))throw Error('Invalid coach response.');
+ const fields=coachReplyFields(context);
+ if(!r||!keys(r,['move','text','question','suggestions','proposedChange','planSuggestions','childDecisions','evidenceIds','creationReadiness'])||!['listen','clarify','inspire','explain','reflect','propose','repair','play'].includes(r.move)||!text(r.text,1800)||!(r.question===null||text(r.question,350))||!Array.isArray(r.suggestions)||r.suggestions.length>4||!r.suggestions.every(t=>text(t,500))||!Array.isArray(r.planSuggestions)||r.planSuggestions.length>8||!r.planSuggestions.every(p=>p&&keys(p,['field','value'])&&fields.includes(p.field)&&text(p.value,700))||!Array.isArray(r.evidenceIds)||r.evidenceIds.length>8||!r.evidenceIds.every(x=>context.observations.some(o=>o.id===x)))throw Error('Invalid coach response.');
  if(r.proposedChange!==null&&(!r.proposedChange||!keys(r.proposedChange,['title','request','depth'])||!text(r.proposedChange.title,120)||!text(r.proposedChange.request,2000)||!['tune','redesign','rethink'].includes(r.proposedChange.depth)))throw Error('Invalid proposed experiment.');
- if(r.childDecisions!==undefined&&(!Array.isArray(r.childDecisions)||r.childDecisions.length>8||!r.childDecisions.every(d=>d&&keys(d,['field','quote'])&&PLAN_FIELDS.includes(d.field)&&text(d.quote,700)&&d.quote.trim().length>0&&[context.message,...context.conversation.filter(m=>m.role==='child').map(m=>m.text)].some(t=>t.includes(d.quote)))))throw Error('Child decision needs an exact child-authored quote.');
+ if(r.childDecisions!==undefined&&(!Array.isArray(r.childDecisions)||r.childDecisions.length>8||!r.childDecisions.every(d=>d&&keys(d,['field','quote'])&&fields.includes(d.field)&&text(d.quote,700)&&d.quote.trim().length>0&&[context.message,...context.conversation.filter(m=>m.role==='child').map(m=>m.text)].some(t=>t.includes(d.quote)))))throw Error('Child decision needs an exact child-authored quote.');
  // No response can mutate a game, promote a version, or assert secret tool execution.
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)throw Error('Missing proposal.');
  if(((r.text+' '+(r.question||'')).match(/\?/g)||[]).length>1)throw Error('Ask one useful question at a time.');

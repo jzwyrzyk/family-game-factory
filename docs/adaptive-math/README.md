@@ -39,6 +39,16 @@ The math component was developed in [draft #19](https://github.com/jzwyrzyk/fami
 
 The child profile supplies a grade scope, optional skill or multiplication-fact focus, intensity, question budget, and help/challenge preferences. The grade is an upper content boundary, not a prediction of ability. Earlier-grade skills remain available; lowering the grade retains higher-grade history.
 
+### Profile grade and difficulty setup
+
+Each child profile now shows its saved **Grade · Difficulty** inside the player menu, with **Set learning level** until setup is confirmed and **Change learning level** afterward. The editor explicitly selects one of the reviewed grades 1–4 and **Gentle**, **Balanced**, or **Stretch**. The same settings appear under **Grown-ups → Settings**, labelled with the active learner's name. These controls edit the existing profile, not a second learner record.
+
+New child profiles start at **Grade 1 / Gentle**, including the second starter profile that previously shipped with a grade-3 multiplication preset. Missing grades no longer infer a school level from age. Existing explicitly saved grades and valid difficulty settings remain intact; the setup reminder asks for confirmation without silently lowering a legitimate setting. Missing/invalid difficulty starts Gentle. The reminder does not cover character-first onboarding or prevent ordinary navigation. Adults' isolated test workspace does not show the child setup control.
+
+Both subjects enforce the saved grade as an upper content boundary, including Stretch, review, older fact targets, and prerequisite selection. The grade never rises automatically with age, game level or success. Lowering the ceiling preserves higher-grade learning history. Difficulty changes the authored challenge and practice mix within that boundary; it does not set game difficulty. A parent can adjust either setting later.
+
+Saving the short editor confirms setup only after the existing profile store succeeds. A failed save restores the previous grade, difficulty and confirmation state. Escape/Not now discards unsaved edits; a profile change closes the editor and prevents a late save from changing the next child. Editing is unavailable during an active learning activity; existing Grown-ups navigation remains available for leaving that activity safely.
+
 An attempt records the item and its mathematical parameters, actual representation, tier, purpose, session, game/project/version, start and finish times, valid raw answers, hint depth and events, and outcome. Invalid input such as an empty field is input feedback, not evidence of a mathematical error. Skipping or leaving an unanswered activity is not a wrong answer.
 
 We do not infer emotion, intelligence, attention diagnoses, or disability from clicks or response time. A fast/slow game outcome does not alter answer correctness. Error patterns are narrow, tentative descriptions—currently repeated addition-for-multiplication or neighboring-product responses across different facts—and do not label the child.
@@ -143,3 +153,8 @@ Those sources motivate principles; they do not validate this product's exact fou
 ## Child presentation refinement
 
 The actual question appears first. Redundant purpose/skill labels and generic encouragement are removed; necessary representation guidance, diagrams, hints and worked examples remain. Ordinary child labels/controls use an 18px floor and main instructional text uses 20px. The dark Math palette remains independent of pale Language cards and dark game-result wrappers. The [shared child-interface contract](../brand/CHILD_INTERFACE.md) sets the target; source evidence and required-checkpoint behavior are unchanged.
+
+
+## Optional question and help narration
+
+The question and displayed choices have a persistent speaker control; hints and worked examples have their own **Read the help** control. Reading is explicit and stoppable, and unavailable audio leaves written content and the speaker visible with a short notice. Submission, replacement content, completion, disposal and profile/navigation changes cancel pending and active speech. Reading the question is access to its wording: it neither computes the answer nor records a mathematical hint, and does not change arithmetic scoring. Revealing a hint or worked example still records its ordinary assistance evidence before it can be narrated. The [shared read-aloud contract](../speech/READ_ALOUD.md) defines authorized natural narration, device fallback, cancellation and validation limits.

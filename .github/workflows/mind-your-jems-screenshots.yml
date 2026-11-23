@@ -10,6 +10,7 @@ on:
       - 'public/jems*.svg'
       - 'tests/mind-your-jems*'
       - 'tests/visual/mind-your-jems/**'
+      - 'tests/visual/mind-your-jems-native/**'
       - 'tests/browser-server.cjs'
       - '.github/workflows/**'
       - 'index.html'
@@ -49,5 +50,27 @@ jobs:
         with:
           name: mind-your-jems-browser-screenshots
           path: test-results/mind-your-jems/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload compact visual review packet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-your-jems-reference-review
+          path: |
+            test-results/mind-your-jems/manifest.json
+            test-results/mind-your-jems/mind-your-jems-gameplay.webm
+            test-results/mind-your-jems/desktop-idle.png
+            test-results/mind-your-jems/desktop-warning.png
+            test-results/mind-your-jems/desktop-ready.png
+            test-results/mind-your-jems/tablet-portrait-idle.png
+            test-results/mind-your-jems/tablet-portrait-warning.png
+            test-results/mind-your-jems/tablet-portrait-ready.png
+            test-results/mind-your-jems/mobile-idle.png
+            test-results/mind-your-jems/mobile-warning.png
+            test-results/mind-your-jems/mobile-ready.png
+            test-results/mind-your-jems/desktop-help.png
+            test-results/mind-your-jems/mobile-help.png
+            test-results/mind-your-jems/mobile-landscape-small-help.png
           if-no-files-found: error
           retention-days: 14

@@ -1,4 +1,4 @@
-import type {CoachContext} from '../../src/studio/design';
+import {coachReplyFields,type CoachContext} from '../../src/studio/design';
 
 const evidenceKeys=['action','consequence','experience','world'] as const;
 const creativeEvidenceKeys=[...evidenceKeys,'goal','visualStyle','mood'] as const;
@@ -74,6 +74,13 @@ export function prepareCreationWire(context:CoachContext,baseSchema:object):Prep
   unresolved:{type:'array',maxItems:0,items:gap}}));
  const schema=structuredClone(baseSchema) as Record<string,unknown>;
  if(!record(schema.properties))throw Error('INVALID_REQUEST');
+ if(context.creation.version===2){
+  for(const key of ['planSuggestions','childDecisions']){
+   const collection=schema.properties[key];
+   if(!record(collection)||!record(collection.items)||!record(collection.items.properties)||!record(collection.items.properties.field))throw Error('INVALID_REQUEST');
+   collection.items.properties.field.enum=[...coachReplyFields(context)];
+  }
+ }
  schema.properties.creationReadiness={anyOf:branches};
 
  const decode=(value:unknown):unknown=>{

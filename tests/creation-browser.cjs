@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
 /* Real production-dist journeys. All program edits use the public UI; FG.creation is read-only inspection. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -21,6 +21,17 @@ const {start}=require('./browser-server.cjs');
       const touch=device==='tablet';
       const context=await browser.newContext({viewport,hasTouch:touch,reducedMotion:'reduce',acceptDownloads:true});
       const page=await context.newPage();
+      await page.addInitScript(()=>{
+        window.__creationSpeech=[];window.__creationSpeaking=false;
+        window.SpeechSynthesisUtterance=class {constructor(text){this.text=text;} };
+        class Speech extends EventTarget {
+          getVoices(){return [{name:'Samantha (Enhanced)',voiceURI:'Samantha',lang:'en-US',localService:true,default:false}];}
+          speak(utterance){window.__creationSpeech.push(utterance.text);window.__creationSpeaking=true;utterance.onstart?.();}
+          cancel(){window.__creationSpeaking=false;}
+        }
+        Object.defineProperty(window,'speechSynthesis',{configurable:true,value:new Speech()});
+      });
+
       const errors=[],paidRequests=[];
       page.on('pageerror',error=>errors.push(error.message));
       page.on('dialog',dialog=>dialog.accept());
@@ -48,8 +59,11 @@ const {start}=require('./browser-server.cjs');
         if(!FG.store.save())throw Error('Could not save the test pacing fixture');
       });
       const more=async()=>{if(!await page.locator('#creationMore').evaluate(element=>element.open))await activate('#creationMore summary');};
+      // This existing journey covers every exact numeric field and script tool.
+      // The separate first-learner suite owns the simplified default experience.
+      const fullTools=async()=>{if(await page.locator('#creationFullMode').getAttribute('aria-pressed')!=='true')await activate('#creationFullMode');};
       const profiles=async()=>{
-        if(!await page.locator('#studioProfileMenu').evaluate(element=>element.open))await activate('#studioProfileMenu summary');
+        await openProfiles(page,activate);
         const bounds=await page.locator('.profile-choice').evaluateAll(elements=>elements.map(element=>{
           const box=element.getBoundingClientRect();return {name:element.textContent,left:box.left,right:box.right,viewport:innerWidth};
         }));
@@ -58,12 +72,26 @@ const {start}=require('./browser-server.cjs');
       const noOverflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`${device}: no document-wide horizontal overflow`);
       const chooseChallenge=async id=>{
         await activate('#creationBack');await activate('#creationChallengeMode');await activate(`[data-challenge="${id}"]`);
+        await fullTools();
+        const count=await page.evaluate(()=>window.__creationSpeech.length);
+        await activate('#creationRead');await page.waitForFunction(count=>window.__creationSpeech.length>count,count);
+        assert.ok((await page.evaluate(()=>window.__creationSpeech.at(-1))).includes(await page.locator('#creationChallengeBrief h2').textContent()),'the same speaker reads the newly selected challenge');
+        await activate('#creationRead');
+
       };
       try {
         await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);
         await page.waitForFunction(()=>window.FG?.creation&&window.FG?.studio);
         await pacing();
         assert.equal(await page.locator('#page-creation').isVisible(),true);
+        assert.equal(await page.locator('#creationRead').isVisible(),true,'Creator keeps its speaker visible on entry');
+        await activate('#creationRead');
+        await page.waitForFunction(()=>window.__creationSpeech.length>0);
+        assert.match(await page.evaluate(()=>window.__creationSpeech.at(-1)),/Choose a world/);
+        assert.equal(await page.locator('#creationRead').getAttribute('aria-pressed'),'true');
+        await activate('#creationRead');
+        assert.equal(await page.evaluate(()=>window.__creationSpeaking),false,'the same speaker stops reading');
+
         assert.equal(await page.locator('[data-creation-starter]').count(),4);
         await noOverflow();
         await page.screenshot({path:`test-results/creation-shelf-${device}.png`,fullPage:true});
@@ -83,6 +111,13 @@ const {start}=require('./browser-server.cjs');
         assert.notEqual(importedScene.id,fileScene.id,'Import assigns a new project identity');
         assert.equal(importedScene.title,fileScene.title);
         assert.equal(importedScene.provenance.createdBy,'assisted');
+        await activate('#creationAddActor');
+        assert.equal(await page.locator('[data-action="read-character-picker"]').isVisible(),true,'the character dialog keeps its own read control');
+        await activate('[data-action="read-character-picker"]');
+        await page.waitForFunction(()=>window.__creationSpeaking);
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(()=>!document.getElementById('creationActorDialog').open);
+        assert.equal(await page.evaluate(()=>window.__creationSpeaking),false,'Escape cancels dialog narration');
         await activate('#creationBack');
         const beforeInvalidImport=await workspace();
         await importFromShelf({...fileScene,actors:[{...fileScene.actors[0],assetId:'unavailable-character'}]});
@@ -151,7 +186,7 @@ const {start}=require('./browser-server.cjs');
         assert.equal(fromGame.provenance.sourceRevisionId,gameEntry.headId);
         assert.ok(fromGame.actors.some(actor=>actor.assetId==='dragon'));
         await page.screenshot({path:`test-results/creation-from-dragon-${device}.png`,fullPage:true});
-        await activate(page.getByRole('button',{name:'Back to my game',exact:true}));
+        await more();await activate(page.getByRole('button',{name:'Back to my game',exact:true}));
         assert.equal(await page.locator('#page-creation').isVisible(),false);
         const gameAfter=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
         assert.deepEqual(gameAfter,gameBefore,'Making and viewing a scene does not rewrite the saved game');
@@ -164,6 +199,7 @@ const {start}=require('./browser-server.cjs');
 
         // Build an original scene by touching/clicking actual blocks and fields.
         await activate('[data-creation-starter="blank"]');
+        await fullTools();
         const start=await scene(),title=`My moving gem ${device}`,projectId=start.id;
         assert.deepEqual(start.programs[0].actions,[]);
         await set(page.locator('#creationTitle'),title);
@@ -177,7 +213,7 @@ const {start}=require('./browser-server.cjs');
         assert.deepEqual((await scene()).programs[0].actions.map(item=>item.type),['say','move']);
         await activate('#creationUndo');
         assert.deepEqual((await scene()).programs[0].actions.map(item=>item.type),['move','say']);
-        await activate('#creationRedo');
+        await more();await activate('#creationRedo');await activate('#creationMore summary');
         assert.deepEqual((await scene()).programs[0].actions.map(item=>item.type),['say','move']);
         await activate(block(sayId).getByRole('button',{name:'Move block down',exact:true}));
         await add('repeat');current=await scene();const repeatId=current.programs[0].actions[2].id;
@@ -214,7 +250,7 @@ const {start}=require('./browser-server.cjs');
         await pacing();await activate('#creationRun');
         await page.waitForFunction(()=>FG.creation.snapshot()?.status==='running');
         const beforeNavigation=await workspace(),beforeNavigationScene=await scene();
-        await activate('#studioNavCreate');
+        await activate('#creationHome');await activate('#studioNavCreate');
         assert.equal(await page.locator('#page-studio').isVisible(),true);
         assert.equal(await page.locator('#page-creation').isVisible(),false);
         assert.equal(await page.evaluate(()=>document.body.classList.contains('creation-open')),false);
@@ -232,7 +268,7 @@ const {start}=require('./browser-server.cjs');
         // A pending scene edit must be saved before selecting a chat project.
         await set(page.locator('#creationTitle'),title+' draft');
         const beforeDraftExit=(await workspace()).projects.find(item=>item.id===projectId);
-        await activate('#studioNavCreate');
+        await activate('#creationHome');await activate('#studioNavCreate');
         const afterDraftExit=(await workspace()).projects.find(item=>item.id===projectId);
         assert.notEqual(afterDraftExit.headId,beforeDraftExit.headId,'Leaving saves the pending scene version');
         assert.equal(afterDraftExit.keptId,beforeDraftExit.keptId,'Saving on navigation does not silently Keep');
@@ -292,19 +328,25 @@ const {start}=require('./browser-server.cjs');
         assert.equal(await page.locator('#creationTargetBadge').isVisible(),false);
         await activate('#creationCheck');
         assert.equal(await page.locator('#creationFeedback').evaluate(element=>element.classList.contains('is-success')),false);
-        await activate('#creationHint');
+        await activate('#creationChallengeBrief .creation-goal-help > summary');await activate('#creationHint');
+        const hintText=await page.locator('.creation-hint').textContent();
+        const beforeHintRead=await page.evaluate(()=>window.__creationSpeech.length);
+        await activate('#creationRead');await page.waitForFunction(count=>window.__creationSpeech.length>count,beforeHintRead);
+        assert.ok((await page.evaluate(()=>window.__creationSpeech.at(-1))).includes(hintText),'later hint narration includes the newly revealed help even after feedback');
+        await activate('#creationRead');
         await add('repeat');await add('jump');await add('wait');
         current=await scene();const childRepeat=current.programs[0].actions[0],childWait=childRepeat.actions[1].id;
         await set(block(childWait).getByRole('spinbutton',{name:'seconds',exact:true}),.2);
         await activate('#creationCheck');
         assert.equal(await page.locator('#creationFeedback').evaluate(element=>element.classList.contains('is-success')),true);
-        assert.match(await page.textContent('#creationFeedback'),/with a hint/);
+        // Assistance is retained in the actual check record; parent-level
+        // interpretation no longer adds reading load to the child's feedback.
         saved=await workspace();let attempt=saved.attempts.at(-1);
         assert.equal(attempt.passed,true);assert.equal(attempt.hintUsed,true);
         assert.equal(attempt.projectId,challengeStart.id);
         assert.equal(saved.projects.find(item=>item.id===challengeStart.id).keptId,null,'A successful check does not silently Keep');
         await page.reload();await page.waitForFunction(()=>window.FG?.creation);await pacing();
-        await activate(`[data-scene="${challengeStart.id}"]`);await activate('#creationCheck');
+        await activate(`[data-scene="${challengeStart.id}"]`);await fullTools();await activate('#creationCheck');
         assert.equal((await workspace()).attempts.at(-1).hintUsed,true,'A revealed hint stays recorded after reload');
         await pacing();await activate('#creationRun');
         await page.waitForFunction(()=>FG.creation.snapshot()?.status==='completed',null,{timeout:8000});
@@ -350,6 +392,7 @@ const {start}=require('./browser-server.cjs');
         assert.equal(await page.locator('#creationFeedback').evaluate(element=>element.classList.contains('is-success')),true);
         await pacing();await activate('#creationRun');await activate('#creationTapActor');
         await page.waitForFunction(()=>FG.creation.snapshot()?.actors.find(actor=>actor.id==='bucket')?.speech==='More');
+        if(!await page.locator('#creationSceneOptions').evaluate(element=>element.open))await activate('#creationSceneOptions > summary');
         await activate('#creationVariables summary');
         await set(page.locator('#creationVariables').getByRole('spinbutton',{name:'gems',exact:true}),3);
         await activate('#creationRun');await activate('#creationTapActor');
@@ -371,13 +414,17 @@ const {start}=require('./browser-server.cjs');
         const tapX=canvasBox.x+tappedActor.x/800*canvasBox.width,tapY=canvasBox.y+tappedActor.y/450*canvasBox.height;
         if(touch)await page.touchscreen.tap(tapX,tapY);else await page.mouse.click(tapX,tapY);
         await page.waitForFunction(()=>FG.learning.active);
+        assert.equal(await page.locator('#creationReadingTools').isVisible(),false,'scene narration stays behind the active learning activity');
+        assert.equal(await page.locator('#creationLearning [data-action="read-aloud"]').isVisible(),true,'the learning activity has its own visible read control');
         const guarded=await page.evaluate(()=>({id:FG.learning.activeAttemptId,time:FG.creation.snapshot().timeMs}));
         assert.ok(guarded.id);
         await activate('#creationRun');await activate('#creationStep');await activate('#creationWatchTarget');
         const notebookBeforeGuard=await page.evaluate(()=>FG.studio.exportNotebook());
-        await activate('#studioNavCreate');await activate('#studioNavJourney');
-        assert.equal(await page.locator('#page-creation').isVisible(),true,'Creator and Journey navigation preserve an open scene checkpoint');
-        assert.deepEqual(await page.evaluate(()=>FG.studio.exportNotebook()),notebookBeforeGuard,'Blocked navigation creates no empty chat project');
+        assert.equal(await page.locator('#studioNavCreate').isVisible(),false,'unrelated global navigation is outside the fitted scene');
+        assert.equal(await page.locator('#studioNavJourney').isVisible(),false);
+        await activate('#creationBack');await activate('#creationFullMode');
+        assert.equal(await page.locator('#page-creation').isVisible(),true,'scene navigation and tool controls preserve an open checkpoint');
+        assert.deepEqual(await page.evaluate(()=>FG.studio.exportNotebook()),notebookBeforeGuard,'guarded scene actions create no empty chat project');
         assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),guarded.id);
         assert.equal((await snapshot()).timeMs,guarded.time,'Editor controls do not bypass the learning host');
         await page.screenshot({path:`test-results/creation-checkpoint-${device}.png`,fullPage:true});

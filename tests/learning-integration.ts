@@ -147,7 +147,12 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.fill('#livePrompt','Use both math formats');await page.click('#livePromptForm button[type=submit]');
     assert.equal(await page.evaluate(id=>window.FG.learning.modeFor(id),projectId),'both');
     assert.equal(await page.evaluate(()=>JSON.stringify(window.FG.factory.exportWorkspace())),workspaceBefore,'format preferences do not rewrite game versions');
-    await advanceBudget(page);await page.click('#livePlay');await page.locator('.gum-play').waitFor();await page.getByRole('button',{name:'Select Super star'}).click();await page.getByRole('button',{name:'Put a sticker on Top'}).click();
+    await advanceBudget(page);await page.click('#livePlay');await page.locator('.gum-builder').waitFor();
+    // A fresh remix uses the current assembly engine. Start the actual first
+    // object, then let the unchanged host checkpoint policy own the activity.
+    await page.locator('[data-gum-part="bottle"]').click();
+    await page.locator('[data-gum-slot="body"]').click();
+    await page.waitForFunction(()=>window.FG.runtime.snapshot().state.placed.body==='bottle');
     await page.clock.runFor(91_000);await page.waitForSelector('#stage-overlay .math-activity');
     assert.equal(await activity(page).getAttribute('data-mode'),'both');
     const remixId=await page.evaluate(()=>window.FG.learning.activeAttemptId);await submitWritten(page,await activeItem(page));

@@ -522,6 +522,36 @@ await test('a selected or adapted option stays helper-origin across context, rel
   assert.doesNotMatch(h.coach.buildPrompt()!,/storybook|silver lines/);
  }finally{h.dispose();}
 });
+await test('rechecking a literal selected helper option preserves child selection across reload and repeated checks',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const premise='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.',picked='paper waves';
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,question:null,creationReadiness:{ready:false,evidence:empty,unresolved:['How should it look?']}};
+  await sendTurn(h,premise,waiting);
+  await sendTurn(h,'Give me three ideas.',{...waiting,text:'My ideas are chalk lines, clay rings and paper waves.',
+   planSuggestions:['chalk lines','clay rings',picked].map(value=>({field:'style',value}))});
+  const ready:CoachReply={...reply,question:null,childDecisions:[{field:'style',quote:picked}],planSuggestions:[{field:'style',value:picked}],
+   creationReadiness:{ready:true,evidence:{action:'tap',consequence:'makes a ripple',world:'pond',experience:'play with the ripples',goal:'just want to play with the ripples',mood:'quiet',visualStyle:picked},unresolved:[]}};
+  await sendTurn(h,picked,ready);
+  const originalChildren=h.session().messages.filter(message=>message.role==='child');
+  const chosen=originalChildren.at(-1)!;
+  for(let checkNumber=0;checkNumber<2;checkNumber++){
+   const restored=new StudioNotebook(h.storage).get(id,owner);
+   assert.equal(creationBuildReadiness(restored,2).ready,true);
+   assert.equal(selectedSuggestions(restored).style?.[0].offer,picked);
+   h.coach.reset();h.coach.openSession();
+   const check=h.coach.reassess();await h.awaitModelRequest();h.resolve(ready);await check;
+   assert.equal(h.coach.buildReadiness().ready,true);
+   assert.deepEqual(h.session().messages.filter(message=>message.role==='child'),originalChildren);
+   assert.equal(h.session().design!.ideas.some(idea=>idea.id==='helper-turn:'+chosen.id),false);
+   assert.equal(h.session().design!.plan.style!.origin,'helper');
+   assert.match(h.coach.buildPrompt()!,/paper waves/);assert.doesNotMatch(h.coach.buildPrompt()!,/chalk lines|clay rings/);
+   assert.equal(h.buildRequests.length,0);
+  }
+ }finally{h.dispose();}
+});
 await test('repeated uncertainty sends prior kinds of support to the coach; a direct ideas request retains all three alternatives',async()=>{
  const h=coachingHarness();
  try{

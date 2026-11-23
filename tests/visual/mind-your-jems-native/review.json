@@ -1,0 +1,144 @@
+{
+  "build": {
+    "sha": "cc49291413696cd8dc9e1e72b6aaba8e01967136",
+    "dirty": false
+  },
+  "browser": "141.0.7390.37",
+  "acceptedBy": "Explicit local import of exact hosted PNG bytes after independent visual and source review",
+  "acceptedAt": "2026-11-22T20:11:45.327093+00:00",
+  "sourceHead": "cd6583ad043cfac5035f6783afb7476579cc6e43",
+  "sourceTree": "72555ed700ad9be020ca802dc2e5f226514425d2",
+  "workflowRun": 45064221649,
+  "artifactId": 14770931060,
+  "artifactSha256": "081909928db67ab7f6390328e7d77ccf9ed14fd049a3752101a448ac302178dd",
+  "functionalConfigurationsPassed": 13,
+  "captureCount": 112,
+  "checkCount": 119,
+  "initialMissingReferences": 9,
+  "states": [
+    "idle",
+    "warning",
+    "ready"
+  ],
+  "devices": [
+    "desktop",
+    "tablet-portrait",
+    "mobile"
+  ],
+  "reviewedStates": [
+    "idle",
+    "mining",
+    "banking",
+    "warning",
+    "holding",
+    "shaking",
+    "milestone",
+    "ready",
+    "help",
+    "art failure",
+    "reconnection",
+    "rotated recovery",
+    "profile teardown"
+  ],
+  "reviewFindings": "All nine reference views and required state/motion evidence passed review. The 360px holding/shaking scene is 298.125px high against the unchanged 294.4px minimum; full 18px labels and at least 48px targets stay contained. Readiness and rewards leave play controls clear.",
+  "normalMotionRecording": {
+    "file": "mind-your-jems-gameplay.webm",
+    "sha256": "542c2c0af41f5cced85500aec42a3322a83575e036d07b6823481bd4d56622a8",
+    "reviewedFrames": 16,
+    "frameTimesSeconds": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      28,
+      30
+    ]
+  },
+  "channelTolerance": 20,
+  "maximumChangedRatio": 0.008,
+  "scope": "Production browser build with deterministic backend fixtures; browser-emulated devices. Final committed references still require a fresh hosted comparison.",
+  "files": [
+    {
+      "file": "desktop-idle.png",
+      "bytes": 1177136,
+      "width": 1280,
+      "height": 900,
+      "sha256": "8d0276adeaf1ff5d668a8ccfc9be8d23d3c28c5b1c0c510a89f7fb5af505e6ae",
+      "gitBlobSha": "112b53eab03432d5c4398293906c23274b8b9015"
+    },
+    {
+      "file": "desktop-warning.png",
+      "bytes": 1163927,
+      "width": 1280,
+      "height": 900,
+      "sha256": "9ad05cf78145760f670dd90250f4304236a1a68ae236c0cfc98277aa65c0f5e2",
+      "gitBlobSha": "dd8d81b0e7c1b3247877175a76aa339609cedbc0"
+    },
+    {
+      "file": "desktop-ready.png",
+      "bytes": 1178742,
+      "width": 1280,
+      "height": 900,
+      "sha256": "faeca92d6f054ce4c8a83e3bee445675d2217aa4d605774af4eaa22261bf0c80",
+      "gitBlobSha": "e83ff8a89158c4c16829109b58c05beb47a99fc1"
+    },
+    {
+      "file": "tablet-portrait-idle.png",
+      "bytes": 804816,
+      "width": 768,
+      "height": 1024,
+      "sha256": "69adf7e1a0ff9e299da46a0e0519101b67aeef4a4d841b6ec8b5b8b4db0ff155",
+      "gitBlobSha": "da1e9c30e837695f7ead429c00f2968e0ff8790c"
+    },
+    {
+      "file": "tablet-portrait-warning.png",
+      "bytes": 810564,
+      "width": 768,
+      "height": 1024,
+      "sha256": "f331d52a52b241c02a65a79f869bd889e5c798628ff95c38d9033bd0003f050d",
+      "gitBlobSha": "f457ac78247553d2384c61092f6121374907fe7f"
+    },
+    {
+      "file": "tablet-portrait-ready.png",
+      "bytes": 806385,
+      "width": 768,
+      "height": 1024,
+      "sha256": "06b167979f0a672696d95f4b34305b862885fb0b9e2e76b2a099d397a6598c1c",
+      "gitBlobSha": "93caed30b6805fdd69ac051b29313f50ede89cd8"
+    },
+    {
+      "file": "mobile-idle.png",
+      "bytes": 340720,
+      "width": 390,
+      "height": 844,
+      "sha256": "d263674f61bb823e6ff65d76f45b5713a6817ab9facc641b19daed14249b5a4e",
+      "gitBlobSha": "23cb0ff48ce80f2f5711ad0e24cf8f60f11fd2c9"
+    },
+    {
+      "file": "mobile-warning.png",
+      "bytes": 339121,
+      "width": 390,
+      "height": 844,
+      "sha256": "a82278644ef9e843ef99d7903db3990f87d85f8dc3fbfe0bb42f25eac3a942f2",
+      "gitBlobSha": "13f3999842c04775c91f9f192726f2d4aeebd9f4"
+    },
+    {
+      "file": "mobile-ready.png",
+      "bytes": 341753,
+      "width": 390,
+      "height": 844,
+      "sha256": "ec17ba9b267e31052fff9041f0f85c86f19faecc1e6ae29ea52fd66966d28782",
+      "gitBlobSha": "920eabcd8e4bada1a56a521bd4026e814081920b"
+    }
+  ]
+}

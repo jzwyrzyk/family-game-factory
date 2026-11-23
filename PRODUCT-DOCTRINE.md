@@ -37,13 +37,19 @@ Use demonstrated behavior, predictions, experiments, and revisions as specific f
 
 ## 2. Deliver the actual playable experience
 
+Games opened through the child journey should occupy a consistent visible play area with an easy exit, readable controls and explicit fullscreen where supported. Accidental page scrolling must not lose the game. The trusted learning activity remains available inside the same view. [The profile, play and reading decision](docs/decisions/2026-11-21-profile-play-and-reading.md) records the owner's November 21 refinement.
+
 The requested player action must produce the intended visible consequence, and the essential payoff must happen. Collection without the requested growth, assembly without the launch, or a changed label without a changed mechanic does not fulfill an idea. Open-ended play can be complete without a manufactured win condition.
 
 A ready experiment must combine correct function with deliberate presentation, responsive controls, visible consequences and appropriate variation or expression. Polish is part of that acceptance floor, not work deferred until after a compile pass has made a game Ready. Keep idea fidelity, game-form fit, technical playability, presentation and observed player experience as separate judgments. Record missing evidence explicitly instead of averaging it into a reassuring score.
 
 Hold pixel art, flat digital 2D, illustration, dimensional art and realistic treatment to equivalent standards of craft in their own styles. Preserve the child's chosen appearance and the identity of saved artwork through unrelated mechanic changes. Gem Factory can set a reference for finish without becoming every game's palette, theme or loop. A simple complete game can meet the standard; an open-ended toy does not need a forced win, and a beautiful static scene does not establish meaningful play.
 
+The owner's [November 22 Factory refinement](docs/decisions/2026-11-22-factory-play-clarity.md) applies this principle within the existing illustrated workshop: make pattern matching the clear focus, attach sorting controls to the machine, give a missed cut a gentle current-jem consequence, and advance pattern difficulty after two completed gifts while preserving the expressive polishing and wrapping stages.
+
 See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0006-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
+
+The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble-gum-assembly.md) requires recognizable component objects, gum that visibly connects their actual joins, varied assembly and an extended payoff that keeps the invention on screen. Guided puzzles are allowed. The child can replay or revise before choosing the next build; decoration of a finished illustration does not meet this assembly intent. See [the builder contract](docs/bubble-gum-builders/README.md).
 
 ## 3. Choose the simplest method that preserves the intent
 
@@ -63,6 +69,8 @@ Keep the current playable game and earlier editions safe while a new experiment 
 
 While a build runs, the child can keep playing, make supported local edits and choose optional practice. A ready result must not seize focus, replace a newer decision or interrupt the learning host. Failure, cancellation, disconnection or a stale callback must not destroy the last working version. Report save failures honestly.
 
+The [November 22 continuation decision](docs/decisions/2026-11-22-unified-game-notifications.md) puts important results and unfinished work in one Home card and an owner-scoped Notifications page. Menu/card counts indicate unseen changes that need attention, not every poll or saved thought. Reading or dismissing an alert does not complete, cancel or delete its work. Keep results discoverable without automatic navigation or repeated banners.
+
 An explicit Build receives an immediate focused handoff: acknowledge submission truthfully, then offer **Play while I wait** and **Stay here** after a job is accepted. Dismissing that handoff does not cancel the job. Polling and background completion must not reopen it; the child explicitly opens a ready result. Keep the distinction between a submitted request, an acknowledged job and a saved playable result.
 
 A known failed build offers a working explicit retry, including after reopening its saved idea. An uncertain connection offers a status check when the job is known; neither uncertainty nor closing a dialog authorizes another paid build. Recover an already accepted retry before creating another one, and preserve the exact accepted request and owner.
@@ -75,6 +83,8 @@ The coach helps understand intentions, examine friction and explore choices. The
 
 The approved voice interaction is **Speak → finish/transcribe → editable draft → explicit Send to jems → a normal text reply**. Build/Try a change is separate. Hear reply is optional and user initiated. Preserve the draft through cancellation, errors and navigation; late results must not appear in another player's project. Availability and fallback must be truthful.
 
+Read-aloud stays discoverable across child interactions, including saved replies, questions, revealed help and Creator. A speaker requests reading; a microphone requests dictation. The target voice is natural, caring and clearly spoken by a young adult female voice. Hosted narration has separate approval and spending boundaries; choosing a device voice cannot authorize it. [The reading contract](docs/speech/READ_ALOUD.md) records implementation and its device-listening limits.
+
 A healthy service check establishes availability. Only a successful validated conversation reply establishes that chat connected. Do not erase a failed conversation result with a healthy status response, or describe an incomplete technical response as a refusal of the child's idea.
 
 Continuous listening, automatic send, voice-triggered builds and automatic favorite selection are outside this decision. See [the voice decision](docs/decisions/0003-explicit-voice-and-build.md) and [detailed acceptance contract](docs/issue-28/PUSH_TO_TALK_MVP.md). The active pilot and provider permissions belong in delivery state, not in this durable product contract.
@@ -82,6 +92,8 @@ Continuous listening, automatic send, voice-triggered builds and automatic favor
 ## 6. Learning belongs to the trusted host and needs honest evidence
 
 The parent-selected subject, grade boundary and learning settings travel with the child across games and versions. Game difficulty is separate from learning difficulty. The selected Math or Language Arts host controls activities, answers, assistance and progress; generated code cannot grade the child, bypass checkpoints or award proficiency. Additional practice while waiting is optional and does not replace ordinary required checkpoints.
+
+Make the current profile's grade and learning difficulty explicit. An unconfigured child starts conservatively; age or game progress must not infer a higher grade. Stretch varies challenge within the chosen ceiling. Preserve intentionally saved settings and prior learning evidence when introducing a clearer setup flow.
 
 Keep Math and Language Arts evidence distinct. Preserve independent responses, hints, corrections, read-aloud support, interrupted tasks and delayed retrieval as different observations. A grade is a content ceiling, not a diagnosis. A supported answer is not unaided recall; listening is not independent reading; creative writing is not a single right/wrong response.
 

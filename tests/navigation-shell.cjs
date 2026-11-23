@@ -4,11 +4,11 @@ const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const { start } = require('./browser-server.cjs');
-const { waitForWelcome, exploreWelcome, navigate } = require('./studio-entry.cjs');
+const { waitForWelcome, exploreWelcome, navigate, openProfiles } = require('./studio-entry.cjs');
 
 const NOTEBOOK = 'family-game-factory-studio-v1';
 const SECONDARY = [
-  'studioNavScenes', 'studioNavJourney', 'studioNavRewards',
+  'studioNavNotifications', 'studioNavScenes', 'studioNavJourney', 'studioNavRewards',
   'studioNavPals', 'studioNavPowers', 'studioNavProblemSolving',
 ];
 
@@ -113,6 +113,7 @@ async function shellJourney(browser, base, viewport) {
     await page.screenshot({ path: `test-results/navigation-menu-${viewport.width}.png`, fullPage: false });
 
     for (const [id, target] of [
+      ['studioNavNotifications', '#studioNotifications'],
       ['studioNavJourney', '#page-jems-journey'],
       ['studioNavRewards', '#page-jems-rewards'],
       ['studioNavPals', '#page-jems-pals'],
@@ -132,12 +133,18 @@ async function shellJourney(browser, base, viewport) {
     await page.locator('#page-parent').waitFor({ state: 'visible' });
     await navigate(page, '#studioNavHome');
     await page.locator('[data-starter="factory"]').click();
-    await page.waitForFunction(() => window.FG.runtime.snapshot()?.config.orderSize === 3);
-    if (viewport.width <= 760) {
-      assert.equal(await page.locator('.studio-shell-navigation').evaluate(element => getComputedStyle(element).position), 'static',
-        'navigation returns to header flow for game and work controls');
-    }
+    await page.waitForFunction(() => window.FG.runtime.snapshot()?.config.orderSize === 2);
+    assert.equal(await page.locator('.site-header').isVisible(), false, 'active play replaces duplicate global navigation');
+    assert.equal(await page.locator('#studioHome').isVisible(), true, 'the game retains a visible My Games exit');
+    await openProfiles(page);
+    assert.equal(await page.locator('#studioProfileMenu').evaluate(element => !!element.closest('#studioMore')), true,
+      'the original profile picker remains available inside More');
+    await page.locator('#studioProfileMenu > summary').click();
+    await page.locator('#studioMore > summary').click();
     await navigate(page, '#studioNavHome');
+    assert.equal(await page.locator('.site-header').isVisible(), true, 'leaving play restores the ordinary header');
+    assert.equal(await page.locator('#studioProfileMenu').evaluate(element => !!element.closest('.site-header')), true,
+      'leaving play restores the same profile picker to the header');
     assert.deepEqual(errors, [], 'no runtime errors while navigating real pages');
     assert.deepEqual(posts, [], 'navigation and choosing a character never submit a build');
     console.log(`PASS compact navigation ${viewport.width}px: parent entry before onboarding, three primary controls, drawer keyboard/touch layout, existing destinations and game-safe placement`);

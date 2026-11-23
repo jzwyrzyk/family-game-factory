@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {prepareCreationWire} from '../server/coach/private-creation-wire';
 import {COACH_SCHEMA} from '../server/coach/policy';
+import {normalizePrivateCoachReply} from '../server/coach/private-provider';
 import {validateCoachReply,type CoachContext} from '../src/studio/design';
 import {recordCreationReview,creationBuildReadiness} from '../src/studio/creation-readiness';
 import {StudioNotebook} from '../src/studio/notebook';
@@ -244,4 +245,40 @@ test('creative readiness v2 has seven sourced dimensions and preserves the v1 sc
   unresolved:['The child has not chosen a visual style.']}};
  assert.equal(matches(unresolved,prepared.schema),true);
  assert.equal(validateCoachReply(prepared.decode(unresolved),c).creationReadiness?.ready,false);
+});
+
+test('backend-first rollout keeps v1 and existing-game replies within the published eight-field contract',()=>{
+ const words='A cartoon fox runs while I watch from the side.';
+ for(const creating of [false,true]){
+  const c=context(words);if(!creating){delete c.creation;c.game='dragon';}
+  const wire=prepareCreationWire(c,COACH_SCHEMA);
+  const valid={...(creating?notReady():{...reply(),creationReadiness:null}),text:words,
+   planSuggestions:[{field:'style',value:'cartoon'}],childDecisions:[{field:'style',quote:'cartoon'}]};
+  assert.equal(matches(valid,wire.schema),true);
+  for(const field of ['viewpoint','movement']){
+   const newerSuggestion={...valid,planSuggestions:[...valid.planSuggestions,{field,value:'from the side'}]};
+   const newerDecision={...valid,childDecisions:[...valid.childDecisions,{field,quote:'from the side'}]};
+   assert.equal(matches(newerSuggestion,wire.schema),false,'old readers cannot accept new suggestion fields');
+   assert.equal(matches(newerDecision,wire.schema),false,'old readers cannot accept new decision fields');
+   assert.throws(()=>validateCoachReply(newerSuggestion,c),/Invalid coach response/);
+   assert.throws(()=>validateCoachReply(newerDecision,c),/exact child-authored quote/);
+   for(const response of [newerSuggestion,newerDecision]){
+    const before=structuredClone(response),normalized=normalizePrivateCoachReply(response,c);
+    assert.deepEqual(normalized,valid,'optional metadata cannot break the older reader or rewrite its conversation');
+    assert.deepEqual(response,before);
+    assert.doesNotThrow(()=>validateCoachReply(normalized,c));
+   }
+  }
+ }
+});
+
+test('explicit v2 clients retain viewpoint and movement choices through schema, normalization and validation',()=>{
+ const c=context('I watch from the side and tap to jump.');c.creation={version:2};
+ const fields=[{field:'viewpoint',quote:'from the side'},{field:'movement',quote:'tap to jump'}];
+ const response={...reply(),childDecisions:fields,planSuggestions:fields.map(({field,quote})=>({field,value:quote})),
+  creationReadiness:{ready:false,evidence:{...empty,goal:'',visualStyle:'',mood:''},unresolved:['The game needs a purpose.']}};
+ const wire=prepareCreationWire(c,COACH_SCHEMA);
+ assert.equal(matches(response,wire.schema),true);
+ assert.deepEqual(normalizePrivateCoachReply(response,c),response);
+ assert.deepEqual(validateCoachReply(wire.decode(response),c).childDecisions,fields);
 });
