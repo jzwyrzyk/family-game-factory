@@ -233,10 +233,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T01:04:40.735Z",
-      "sourceDigest": "6cb121097cabb80abbff0ca39454b407dc1445f20592e56d9284c2e286adb445",
+      "reviewedAt": "2026-11-23T01:07:36.638Z",
+      "sourceDigest": "a0f61a6b68b23f3d1d2c36a53045653469d675d421d576275289faf2bb5be781",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed new-game two-sentence jems greeting, only-before-first-turn placement, child-facing copy and optional viewpoint/movement fields. Source changes retain separate chat, Build and authenticated execution controls.",
+      "reviewReason": "Re-reviewed first-creation greeting implementation so the two-sentence introduction is display-only, disappears after the first child turn, and never enters saved messages or Build evidence; no other experience ownership boundaries changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -626,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T01:04:40.735Z",
-      "sourceDigest": "ca4aa353960a01d05866a52ceec90d6fd4642de2be53d38561877f212b611ed9",
+      "reviewedAt": "2026-11-23T01:07:36.638Z",
+      "sourceDigest": "99a8f788d31cbcfb3f2684c8d2fca24c63cc2937f4b708dc9ef6c635497acf80",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated ARCHITECTURE-CURRENT to describe v2 synthetic regression evidence for first-creation goals, visual mood, source IDs, old v1 compatibility, revised child choices and first-screen greeting. Real-model evaluation remains pending.",
+      "reviewReason": "Re-reviewed synthetic guided-creation fixture to assert the welcoming introduction never enters saved child or helper messages; versioned creative evidence, explicit Build, and child intent protections remain covered.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
