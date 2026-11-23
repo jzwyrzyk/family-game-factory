@@ -4,6 +4,8 @@
 
 **Decision:** [ADR0006](../decisions/0006-style-diverse-playable-quality.md), following the owner's request to carry the craft of Gem Factory into generated games without making every game look or play alike. Child art uploads and a new art-library workflow remain later work.
 
+**Future model target, not an active setting:** On November 23 the owner selected “Astra High” as the desired higher-capability game-construction model for the adult-private builder. [The model direction](../decisions/2026-11-23-game-construction-model-direction.md) defers implementation and requires an actual supported API identity, effort/rate verification, approval and compatible worker release. The current quality gate and human-evidence limits below remain unchanged. No deployed model or measured improvement is implied.
+
 ## The quality target
 
 A complete result needs deliberate presentation, the requested action and payoff, meaningful play, and usable controls. An attractive picture with advance buttons does not satisfy this standard. Neither do colorful placeholders whose controls technically change a score. A small matching game or an open-ended toy can satisfy it without an economy, compulsory win or complicated simulation.
