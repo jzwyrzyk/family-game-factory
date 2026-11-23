@@ -83,15 +83,19 @@ async function helpPause(journey,device,review){
  // Freeze a real warning. The new loop preserves the exact remaining time;
  // opening Help cannot erase the danger and grant another calm interval.
  await journey.walkTo(96);await journey.freshCalm();await journey.collect();await journey.phase('warning');
- await journey.activate(arcade.locator('.myj-help-toggle'));
+ const native=await arcade.elementHandle();
+ await journey.activate(journey.page.locator('#studioHelp'));
  assert.equal(await arcade.locator('.myj-stage').evaluate(stage=>stage.inert),true,'help makes scene controls inert');
- assert.equal(await arcade.locator('.myj-help-toggle').getAttribute('aria-expanded'),'true');
+ assert.equal(await journey.page.locator('#studioHelp').getAttribute('aria-expanded'),'true');
+ assert.equal(await arcade.locator('.myj-help [data-action="read-aloud"]').isVisible(),true,'visible Help retains optional narration');
  const saved=await journey.snapshot();await journey.advance(15000);
  assert.deepEqual(await journey.snapshot(),saved,'help freezes movement, spawn, hazard and both scores');
  await geometry(journey,device,review);await review.capture(journey.page,arcade,device.name,'help');
  await journey.activate(arcade.locator('[data-myj="help-done"]'));
  assert.equal(await arcade.locator('.myj-stage').evaluate(stage=>stage.inert),false);
- assert.equal(await arcade.locator('.myj-help-toggle').getAttribute('aria-expanded'),'false');
+ assert.equal(await journey.page.locator('#studioHelp').getAttribute('aria-expanded'),'false');
+ assert.equal(await native.evaluate(node=>node.isConnected),true,'host Help preserves the same live round');await native.dispose();
+ await journey.activate(arcade.locator('[data-myj="resume"]'));
  await journey.input('grab',true);await journey.phase('shaking');await journey.phase('mining');await journey.input('grab',false);
  assert.equal(await journey.score('banked'),saved.banked,'help does not manufacture another deposit');
  review.check(device.name,'help-pause',{preserved:saved});
@@ -157,9 +161,9 @@ async function levelUp(journey,device,review,capture){
 async function pauseLifecycle(journey,device,review){
  const {page,arcade}=journey;
  await journey.walkTo(96);await journey.freshCalm();await journey.collect();
- await journey.activate(arcade.locator('.myj-pause'));const paused=await journey.snapshot();
+ await journey.openBuilds();const paused=await journey.snapshot();
  await journey.advance(20000);assert.deepEqual(await journey.snapshot(),paused,'Pause freezes every gameplay clock');
- await journey.activate(arcade.locator('[data-myj="resume"]'));await journey.advance(1000);
+ await journey.closeBuilds();await journey.activate(arcade.locator('[data-myj="resume"]'));await journey.advance(1000);
  assert.equal((await journey.snapshot()).x,paused.x,'resume does not restore a stale movement key');
  await journey.phase('warning');
  await page.evaluate(()=>{
@@ -311,10 +315,12 @@ async function exercise(journey,device,review){
   assert.equal(moving,0,'reduced motion suppresses decorative character and scenery animations');
  }
  await capture('idle');
- assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'false','sound starts muted');
+ assert.equal(await page.locator('#studioMiningSound').getAttribute('aria-pressed'),'false','sound starts muted');
  if(device.name==='desktop'){
-  await journey.activate(arcade.locator('.myj-sound'));assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'true');
-  await journey.activate(arcade.locator('.myj-sound'));assert.equal(await arcade.locator('.myj-sound').getAttribute('aria-pressed'),'false');
+  await journey.openBuilds();
+  await journey.activate(page.locator('#studioMiningSound'));assert.equal(await page.locator('#studioMiningSound').getAttribute('aria-pressed'),'true');
+  await journey.activate(page.locator('#studioMiningSound'));assert.equal(await page.locator('#studioMiningSound').getAttribute('aria-pressed'),'false');
+  await journey.closeBuilds();await journey.activate(arcade.locator('[data-myj="resume"]'));
  }
  const first=arcade.locator('[data-crystal]').first(),beforeClick=await journey.snapshot();
  const crystalBox=await first.boundingBox();assert.ok(crystalBox,'spawned jem is visible');

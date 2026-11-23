@@ -1,5 +1,9 @@
 # Creation Studio acceptance evidence
 
+## Four-experience integration review — November 22, 2026
+
+[PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134) is the consolidated release vehicle for the first-learner UI, approved Pal scene compositing and the three game overhauls. The original candidate records below retain their source scope. The integration's creation recovery test now targets the challenge Help disclosure directly (`#creationChallengeBrief .creation-goal-help > summary`), preserving both Help and its nested **What is checked?** disclosure. Its eight production-browser recovery journeys pass locally, including corrupt export, exact-byte rollback, hint retention, legacy replacement and explicit draft recovery. Current final-head CI, visual acceptance and merge/deployment status belong in [delivery state](../../DELIVERY-STATE.md).
+
 **Current disposition:** the private-art capability below subsequently merged in [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). [Delivery state](../../DELIVERY-STATE.md#pr23-art-studio--merged) records that exact-source merge and hosted acceptance. The dated development records below retain their original source and test scope; acceptance of the later first-creation reconciliation with main is recorded separately in the current delivery section.
 
 ## First-learner coding UI candidate — November 22, 2026

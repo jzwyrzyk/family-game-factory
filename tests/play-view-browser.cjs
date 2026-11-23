@@ -397,7 +397,7 @@ async function checkPlayerMenu(page, label) {
             if (game === 'factory') await checkPlayerMenu(page, `${device} ${game}`);
             if (game === 'mining') {
               assert.equal(await page.locator('.native-mining').getAttribute('data-paused'), 'true', 'shared tools pause Mining');
-              await page.locator('.native-mining .myj-pause-cover button').click();
+              await page.locator('.native-mining [data-myj="resume"]').click();
               assert.equal(await page.evaluate(() => FG.runtime.isPlaying()), true, 'Keep playing explicitly resumes Mining after tools');
             }
             await page.screenshot({ path: `test-results/play-view/${device}-${game}.png` });

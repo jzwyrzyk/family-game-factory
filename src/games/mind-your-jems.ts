@@ -1,15 +1,16 @@
 import './mind-your-jems.css';
 import {BAG_CAPACITY,newMineState,stepMine,retryMine,nextMineLevel,mineDifficulty,isMineSafe,type MineState} from './mind-your-jems-rules';
+import {createReadAloudControl} from '../speech/read-aloud-control';
 
 /** Local illustrated play. The host owns builds, learning, and navigation. */
 export type WorkshopStatus = 'queued'|'building'|'testing'|'ready'|'failed'|'cancelled'|'reconnecting';
 export type ArcadeLaunch = {projectName:string;status:WorkshopStatus;isReady:boolean;onPlayReady:()=>void;onBackToStudio?:()=>void;onClose?:()=>void};
 export type WaitArcade = {open:(launch:ArcadeLaunch)=>void;update:(status:WorkshopStatus,isReady:boolean)=>void;close:()=>void;isOpen:()=>boolean};
 export type MiningGame = {
-  pause:()=>void;resume:()=>void;restart:()=>void;dispose:()=>void;
+  pause:()=>void;resume:()=>void;restart:()=>void;dispose:()=>void;showHelp:()=>void;
   isPlaying:()=>boolean;snapshot:()=>MineState;update:(status:WorkshopStatus,isReady:boolean)=>void;
 };
-type MountOptions = {onExit?:()=>void;onPlayReady?:()=>void;onBackToStudio?:()=>void;onLevelComplete?:(level:number)=>void};
+type MountOptions = {onExit?:()=>void;onPlayReady?:()=>void;onBackToStudio?:()=>void;onLevelComplete?:(level:number)=>void;soundButton?:HTMLButtonElement;onHelpChange?:(open:boolean)=>void};
 const ART='./art/mind-your-jems/';
 // Contact points traced on the shared silhouette of the four approved rock frames.
 // Coordinates are fractions of the sprite square, not a generic circular arc.
@@ -82,6 +83,9 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   const el=<T extends HTMLElement=HTMLElement>(selector:string)=>root.querySelector<T>(selector)!;
   const button=(key:string)=>el<HTMLButtonElement>('[data-myj="'+key+'"]');
   const stage=el('.myj-stage'),miner=el('.myj-miner'),player=el('.myj-miner-anchor'),cart=el('.myj-cart-hit'),help=el('.myj-help');
+  const soundButton=options.soundButton||el<HTMLButtonElement>('.myj-sound');
+  const helpReading=createReadAloudControl({text:()=>el('.myj-help-copy').textContent||'',label:'Read the instructions',buttonClass:'studio-button',canRead:()=>!help.hidden});
+  button('help-done').before(helpReading.element);
   const abort=new AbortController(),signal=abort.signal,reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   let state=newMineState(Math.floor(Math.random()*0x7fffffff)+1),disposed=false,paused=false,helpWasPaused=false;
   let assets:'loading'|'ready'|'failed'='loading',artworkPromise:Promise<void>|null=null;
@@ -229,8 +233,8 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   function restart(){state=newMineState();clearInput();paused=false;resumeGrace=0;fallFromHold=false;noticeUntil=celebrateUntil=collectUntil=0;el('.myj-effects').replaceChildren();render();}
   function setHelp(open:boolean){
     if(open){helpWasPaused=paused;clearInput();stopSound();help.hidden=false;stage.inert=true;el('.myj-header').inert=true;button('help-done').focus({preventScroll:true});}
-    else {el('.myj-header').inert=false;help.hidden=true;stage.inert=false;if(!helpWasPaused)resume();else button('resume').focus({preventScroll:true});}
-    el('.myj-help-toggle').setAttribute('aria-expanded',String(open));render();
+    else {helpReading.stop();el('.myj-header').inert=false;help.hidden=true;stage.inert=false;if(!helpWasPaused)resume();else button('resume').focus({preventScroll:true});}
+    el('.myj-help-toggle').setAttribute('aria-expanded',String(open));options.onHelpChange?.(open);render();
   }
   async function prepareArtwork(){
     if(artworkPromise||disposed)return;
@@ -265,17 +269,18 @@ export function mountMindYourJems(root:HTMLElement,options:MountOptions={}):Mini
   listen(button('continue'),'click',()=>{state=state.phase==='level-complete'?nextMineLevel(state):retryMine(state);clearInput();noticeUntil=0;el('.myj-effects').replaceChildren();render();button('left').focus({preventScroll:true});});
   listen(button('play-ready'),'click',()=>{if(ready)options.onPlayReady?.();});listen(el('.myj-exit'),'click',()=>options.onBackToStudio?.());
   listen(button('retry-art'),'click',()=>{for(const image of root.querySelectorAll<HTMLImageElement>('img'))if(!image.naturalWidth)image.src=image.src;void prepareArtwork();});
-  listen(el('.myj-sound'),'click',()=>{soundOn=!soundOn;const b=el('.myj-sound');b.setAttribute('aria-pressed',String(soundOn));b.setAttribute('aria-label',soundOn?'Mute game sounds':'Turn on game sounds');b.innerHTML=icon(soundOn?'sound':'muted');if(soundOn)sound('collect');else stopSound();});
+  function renderSound(){soundButton.setAttribute('aria-pressed',String(soundOn));soundButton.setAttribute('aria-label',soundOn?'Mute game sounds':'Turn on game sounds');if(options.soundButton)soundButton.textContent=soundOn?'Sound on':'Sound off';else soundButton.innerHTML=icon(soundOn?'sound':'muted');}
+  renderSound();listen(soundButton,'click',()=>{soundOn=!soundOn;renderSound();if(soundOn)sound('collect');else stopSound();});
   const resize=new ResizeObserver(layout);resize.observe(stage);
   layout();render();void prepareArtwork();frame=requestAnimationFrame(frameTick);
-  return {pause,resume,restart,snapshot:()=>state,isPlaying:()=>!disposed&&!paused&&help.hidden&&assets==='ready'&&!['retry','falling','level-complete'].includes(state.phase),
+  return {pause,resume,restart,showHelp:()=>setHelp(true),snapshot:()=>state,isPlaying:()=>!disposed&&!paused&&help.hidden&&assets==='ready'&&!['retry','falling','level-complete'].includes(state.phase),
     update(status,isReady){
       ready=isReady;root.dataset.build=status;root.dataset.ready=String(isReady);el('.myj-build').hidden=false;
       const copy:Record<WorkshopStatus,string>={queued:'Your game is queued',building:'Your game is building',testing:'Testing your game',ready:isReady?'Your game is ready!':'Checking your game',failed:'Your build needs a hand',cancelled:'Your build was cancelled',reconnecting:'Reconnecting to your build'};
       el('.myj-build-status').textContent=copy[status];el('[data-myj="ready"]').hidden=!isReady;
       el('.myj-build-problem').hidden=status!=='failed'&&status!=='cancelled';el('.myj-build-problem span').textContent=status==='failed'?'Your other game needs a hand.':'Your other build was cancelled.';
     },
-    dispose(){if(disposed)return;disposed=true;abort.abort();resize.disconnect();cancelAnimationFrame(frame);clearInput();stopSound();root.replaceChildren();}
+    dispose(){if(disposed)return;disposed=true;helpReading.dispose();abort.abort();resize.disconnect();cancelAnimationFrame(frame);clearInput();stopSound();root.replaceChildren();}
   };
 }
 

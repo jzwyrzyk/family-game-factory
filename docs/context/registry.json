@@ -129,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:34:35.936Z",
-      "sourceDigest": "d3ba2f30e451e68192e894dc6ae3a8603f424b87f6376cbcdab1fdc6992e3115",
+      "reviewedAt": "2026-11-23T03:35:19.185Z",
+      "sourceDigest": "fd71a375d21b896e9ed02b7706bc93ea30be96794f30ebeb93e0b32ec4b3ce52",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the observed reward toast covering a game control and the decision to extend focused-conversation cosmetic suppression to fitted play, preserving durable rewards and their visible history.",
+      "reviewReason": "Reviewed the combined owner-approved Factory, assembly-v3, First steps, unified Mining and Notifications contracts against doctrine. Existing Keep, ownership, learning and provider boundaries remain explicit; release authorization is recorded separately from acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -271,10 +271,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:34:36.213Z",
-      "sourceDigest": "24bc603a54ba46ef55f7d038fdd05ffe8587f54f487eff0fce29e15b337d5da6",
+      "reviewedAt": "2026-11-23T03:35:19.713Z",
+      "sourceDigest": "620650089f438558519517cb3ee2b461b9e46308d01018294556a579afe66dd0",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented native and generated play entry clearing current and pending cosmetic presentations, suppression during active play, and no exit replay; actual-source browser checks are required after the observed Bank-label obstruction.",
+      "reviewReason": "Reconciled shared running Mining with current navigation and Notifications; documented live in-place Help, explicit resume, optional sound and narration cleanup. Preserved current private chat, owner guards, saved versions and all existing shell routes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -350,10 +350,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4870a315d92dd3a418efe409618671d944f52e5bdab96b65ef6258138185c54f",
-      "reviewedAt": "2026-11-22T18:41:04.295Z",
+      "sourceDigest": "18e6acdaf501cbc0be82948715dc225914c95180bac085b2c225f3a0c1c46b49",
+      "reviewedAt": "2026-11-23T03:35:20.859Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final expanded-view cascade across portrait and short landscape; documented First steps and More tools while retaining exact saved programs and explicit Keep.",
+      "reviewReason": "Reviewed First steps exact-value editing and independent event programs, bounded Pal compositing and immutable saved scene references. Documented scoped challenge Help locators and eight passing backup/recovery journeys without removing nested Help or weakening assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -416,10 +416,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c122715df45b431f0b2a3f4e51e084c65ebfd03fbc8eef479652e4de65025871",
-      "reviewedAt": "2026-11-22T19:34:37.013Z",
+      "sourceDigest": "26a06a9990228e2db61ad4069b1e4945a10427117a1a616162e858a0b235d181",
+      "reviewedAt": "2026-11-23T03:35:21.443Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the presentation contract only: earned totals, source outboxes and ledger receipts stay authoritative while chat and fitted play suppress obstructing cosmetic popups. Real-grant fixtures retain32-to37 and47-to92 progression plus identical history after exit.",
+      "reviewReason": "Reviewed owner-scoped notification metadata validation and exact-byte backup rollback plus ordinary assembly completion fixtures. The existing updated rewards contract records play-popup suppression without changing earning policy, durable grants or replay rules.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -477,10 +477,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T20:14:53.324Z",
-      "sourceDigest": "9348c0652f14446ba146decb9be84409f363eba4ee6a857a472aebda679e7424",
+      "reviewedAt": "2026-11-23T03:35:21.865Z",
+      "sourceDigest": "e8246cb4dd638ca4d188c5662b2c395acc5dd039420daec6a74893a9bafc15be",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed all nine actual native reference views and required holding, shaking, recovery and normal-motion evidence after 13 passing configurations; documented explicit exact-byte acceptance and preserved original rules, artwork and tolerances.",
+      "reviewReason": "Reconciled run/contact/bucket Mining with the shared host, added learning-safe live Help and removable sound controls, and documented stable physical-v1 picker geometry through reset/first additions. Factory progression, assembly-v3, old engines and score/reward separation remain preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -633,10 +633,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T21:59:42.641Z",
-      "sourceDigest": "213cbc4ce51bb9f7ad5b2cad7abac7972525a8c556d0fe30ae2890f10f52927b",
+      "reviewedAt": "2026-11-23T03:35:22.537Z",
+      "sourceDigest": "57f21bf5c6a4ae0afb0194d6c4c47f00b5cf96bf5bed4fe748ee94733e878b3a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified.",
+      "reviewReason": "Reviewed inherited default-off narration endpoints, independent consent/budget/private-service checks and bounded metadata reads alongside merged PR133 optional-reply recovery. Current architecture records preserved source; natural narration remains separately unactivated and no provider calls were made.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -724,10 +724,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T23:26:52.768Z",
-      "sourceDigest": "34cf87d62732972e53271a121d8dbca2121d5bbcb32992ffe0f6d805b7c61c39",
+      "reviewedAt": "2026-11-23T03:35:23.114Z",
+      "sourceDigest": "13a51022a07caa2a7f7a2fdfa74211e3be8a84b14d3bb702d7d324913e05a2d3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed retained Pal lifecycle/native decoding and tablet input regressions with current private-coach provider/tests and the unchanged independent Mind Your Jems visual baseline. Previously observed screenshot phase flake remains tracked in issue #76; no blanket acceptance or weakening of assertions. Exact validation digest from hosted documentation job 137395774437. Full newest combined CI remains pending.",
+      "reviewReason": "Reviewed combined real-input, browser, engine, privacy, recovery and visual gates. Recorded exact initial failures and scoped local evidence; replaced hidden Mining controls and obsolete resume/Help selectors, strengthened stable-tablet geometry and learning-pause coverage, and retained all visual tolerances and gameplay assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -890,10 +890,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T23:26:52.768Z",
-      "sourceDigest": "adf654212391bd7c66f0fd35e2f89dba0c829fa361988f1994af5a5b6158fc2a",
+      "reviewedAt": "2026-11-23T03:35:23.560Z",
+      "sourceDigest": "b9bc840e61ef8d6ea40b8aa03493f3740d08530075d4cfa57ac33de6a8a0b363",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual inert-merge authorization and bounded source scope after reconciling PR100/107/126 access and receipt tooling with current main. Confirmed release workflows remain gated by disabled GitHub flags, no new deployment/IAM binding, Cloud Shell receipt is temporary, and service-specific activation gates stay independent. Observed exact full-source delivery fingerprint in GitHub documentation job 137395774437; hosted final-head gates remain pending.",
+      "reviewReason": "Recorded PR134 takeover head and failed workflows, actual corrections/local results, preserved PR126/133 merges, pending final-head gates and manual-only Pages publication. No merge, live deployment or infrastructure activation is claimed at this checkpoint.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1070,10 +1070,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T19:44:23.628Z",
-      "sourceDigest": "805409aea13e3a95bd96ce7c9658fd3eaa8d4129f9034c6413d6f8c7b45d43aa",
+      "reviewedAt": "2026-11-23T03:35:23.963Z",
+      "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
       "reviewOutcome": "updated",
-      "reviewReason": "README no longer describes sticker-v2 as the current default; it links to the canonical assembly contract. The physical-v1 quality document preserves its historical evidence and explicitly identifies the current version3 scope.",
+      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1167,10 +1167,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
-      "reviewedAt": "2026-11-19T17:17:56.552Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states."
+      "sourceDigest": "21cbc0fa874ca9cd7f833db2b5f756cbe41d49c349937372c3d04f5f7015c2e8",
+      "reviewedAt": "2026-11-23T03:35:24.321Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the synthetic parent-dashboard fixture date moved from 29 to 28 days before now so the oldest sample remains within the documented inclusive 30-local-calendar-day window at UTC midnight. Parent report source, filter semantics, evidence labels and limitations are unchanged."
     },
     {
       "id": "problem-solving",

@@ -41,6 +41,10 @@ export function createLifecycle(plugin: GamePlugin, target: HTMLElement, config:
       if (disposed || !hostPaused) return;
       hostPaused = false; instance?.resume?.(); clockState(); target.inert = false;
     },
+    showHelp() {
+      if (disposed || finished || hostPaused || !instance?.showHelp) return false;
+      instance.showHelp(); return true;
+    },
     dispose() { if (disposed) return; disposed = true; instance?.unmount(); target.inert = false; target.replaceChildren(); },
     snapshot() { return { config: { ...checked }, state: instance?.snapshot?.() || {}, disposed }; },
   };

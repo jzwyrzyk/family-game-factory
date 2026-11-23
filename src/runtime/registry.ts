@@ -41,7 +41,7 @@ let current: GameLifecycle | undefined;
 export function snapshot() { return current?.snapshot(); }
 // Compatibility edge for the existing orchestration; plugins themselves do not know profiles or math.
 const FG = (window as any).FG;
-FG.runtime = { snapshot, isPlaying: () => current?.isPlaying() ?? false, pause: () => current?.pause(), resume: () => current?.resume() };
+FG.runtime = { snapshot, isPlaying: () => current?.isPlaying() ?? false, pause: () => current?.pause(), resume: () => current?.resume(), showHelp: () => current?.showHelp() ?? false };
 FG.games = Object.fromEntries((Object.keys(plugins) as GameId[]).map(id => [id, {
   name: manifests[id].name, ...details[id], build: function(target: HTMLElement, ctx: {difficulty: Difficulty; config?: Mechanics; stateKey?:string; drawingRigId?:string|null; finish(outcome: PlayOutcome): void}) {
     const config = ctx.config || defaults(id, ctx.difficulty), key = ctx.stateKey || id;

@@ -45,6 +45,8 @@ The world uses positions from 0 to 100. Crystals appear at 5–76 on the head; t
 
 ## Controls, pause and lifecycle
 
+In the unified player, use the visible host **Help** button and **More → Sound off/on**. Opening More pauses the hazard; closing it leaves **Keep playing** visible. Help opens the live game's instructions, including optional **Read the instructions**, without unmounting the controller or resetting the current round. Closing Help stops its reading and retains the explicit resume action when the host had paused play. Required learning still owns its separate pause/inert lease and cannot be bypassed by opening Help.
+
 - **Keyboard:** Left/Right arrows or A/D move; held Space clings. Enter can hold the action of a focused movement control, and releasing it or moving focus clears that action.
 - **Touch or pointer:** large Left, Right and Hold on controls support sustained presses and simultaneous input. Pointer release, cancellation and lost capture release the corresponding action.
 - **Pause and Help:** freeze gameplay clocks, including warning, shaking, movement and spawns. They clear held inputs and stop optional sound. Help makes the stage and underlying mining toolbar inert. Its directions scroll within the panel while **Let’s play** stays in a fixed visible footer. Resuming an exposed warning or shake adds a 900 ms preparation grace while preserving the remaining simulation timer; it does not reroll the hazard or erase cargo.
@@ -131,4 +133,4 @@ The dedicated **Mind Your Jems art and gameplay review** workflow remains the se
 
 The gameplay overhaul is a source change. Passing local checks or updating artwork baselines does not merge or deploy it. Production release follows the existing repository process; the ordered navigation work and actual child playtesting retain their own acceptance requirements.
 
-The owner has held the merge of this refinement until the chat and shared shell corrections are complete. Earlier test counts and capture receipts retain their original source scope; they do not establish acceptance of this refinement.
+The earlier owner hold required the chat and shared shell corrections first. The subsequent four-experience release mission authorizes merging the consolidated [PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134) after its exact final source passes all release gates. Earlier source-PR results remain historical evidence; current disposition is recorded in delivery state.

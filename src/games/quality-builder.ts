@@ -306,11 +306,14 @@ export default class QualityBuilder implements GameInstance {
         const selectable = this.blueprint.parts.filter(p => !this.joining || p.id !== this.selected);
         const index = selectable.findIndex(p => p.id === (this.joining ? this.joinTarget : this.selected));
         const piece = index >= 0 ? selectable[index] : undefined;
-        this.piecePicker.hidden = !building || this.storageBlocked || this.blueprint.parts.length < 2;
-        this.previousPieceButton.disabled = this.nextPieceButton.disabled = !selectable.length;
+        // Keep the tray at a stable document position while resetting or adding
+        // the first parts. Removing this row used to move it by 65px between a
+        // tablet's touchend and compatibility click, redirecting that click.
+        this.piecePicker.hidden = !building || this.storageBlocked;
+        this.previousPieceButton.disabled = this.nextPieceButton.disabled = selectable.length < 2;
         this.piecePickerLabel.textContent = piece
             ? `${this.joining ? 'Gum target' : 'Selected'} ${index + 1} of ${selectable.length} · ${PARTS[piece.kind].name}`
-            : `${this.joining ? 'Choose a gum target' : 'Choose a piece'} · ${selectable.length} available`;
+            : selectable.length ? `${this.joining ? 'Choose a gum target' : 'Choose a piece'} · ${selectable.length} available` : 'Choose a part below';
         this.root.dataset.mode = this.mode;
         this.root.dataset.selected = this.selected || '';
         this.root.dataset.mission = this.mission;

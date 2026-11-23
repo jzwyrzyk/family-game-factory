@@ -8,13 +8,22 @@ export default class NativeMining implements GameInstance {
   private root:HTMLElement;
   private game:ReturnType<typeof mountMindYourJems>;
   private abort=new AbortController();
+  private soundControl?:HTMLButtonElement;
+  private helpControl?:HTMLElement;
   constructor(target:HTMLElement,context:GameContext){
     this.root=document.createElement('section');
     this.root.className='myj-arcade native-mining';
     this.root.setAttribute('aria-label','Mind Your Jems');
     target.replaceChildren(this.root);
+    const host=target.closest('#page-studio'),tools=host?.querySelector('#studioMore .studio-more-actions');
+    this.helpControl=host?.querySelector<HTMLElement>('#studioHelp')||undefined;
+    if(tools){
+      this.soundControl=document.createElement('button');this.soundControl.type='button';
+      this.soundControl.id='studioMiningSound';this.soundControl.className='studio-button';tools.prepend(this.soundControl);
+    }
     this.game=mountMindYourJems(this.root,{
-      onLevelComplete:level=>context.emit?.({type:'mechanic',name:'mining-level',value:level})
+      onLevelComplete:level=>context.emit?.({type:'mechanic',name:'mining-level',value:level}),
+      soundButton:this.soundControl,onHelpChange:open=>this.helpControl?.setAttribute('aria-expanded',String(open))
     });
     this.root.querySelector<HTMLElement>('.myj-stage')!.dataset.gameEntryFocus='';
     // More, profile choices and other host controls are outside the game. Keep
@@ -33,6 +42,7 @@ export default class NativeMining implements GameInstance {
   isPlaying(){return this.game.isPlaying();}
   pause(){if(!this.game.isPlaying())return false;this.game.pause();return true;}
   resume(){this.game.resume();}
+  showHelp(){this.game.showHelp();}
   snapshot(){return {...this.game.snapshot()};}
-  unmount(){this.abort.abort();this.game.dispose();this.root.remove();}
+  unmount(){this.abort.abort();this.game.dispose();this.soundControl?.remove();this.helpControl?.removeAttribute('aria-expanded');this.root.remove();}
 }
