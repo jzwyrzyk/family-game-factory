@@ -1,0 +1,144 @@
+# Coach, reliability and storage release control
+
+This record covers the owner-authorized integration of PR135 and PR123, preservation of components PR118–122, storage integrity review, Cloud Shell cleanup assessment and superseded documentation reconciliation. It does not authorize production deployment, paid activation, IAM changes, storage migration, PR106 or the isolated DEV environment.
+
+## Source gate and merge receipts
+
+Starting protected main was `3a6fcca34b2e9d15bb2d6596153069db57056a04`. PR134 and PR136 were already merged and have not been reopened or repeated.
+
+[PR135](https://github.com/jzwyrzyk/family-game-factory/pull/135) merged at `2026-11-23T06:20:16Z` as **`14f16aa2b8d2dfbd150a60dfb0fad4276ebabcbc`**. Final head `2ce1ba08e672dcb9d15546806646f15700e51fd9`, prospective merge `17946d5b53fbc2bc9ccaba0af88c28d91ab3c3c7` and actual merge all have tree **`25b3a8706919496477490521b31ef12c4b555066`**. All nine PR workflows passed: [Arcade](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731105), [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731168), [operations](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731113), [security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731170), [service images](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731191), [parent reporting](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731109), [visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731125), [Mining](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731121) and [Bubble Gum](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118731097). The required original-push Arcade run had been cancelled by shared push/PR concurrency; its legitimate [attempt 2](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118722894/attempts/2) passed all five jobs at `2026-11-23T06:19:50Z` before the guarded merge. No failing check or branch rule was bypassed. The earlier cancelled service-image push remains history; the exact-head PR service-image contract passed.
+
+[PR123](https://github.com/jzwyrzyk/family-game-factory/pull/123) merged at `2026-11-23T06:46:42Z` as **`4784d76833b3ddbec43adfb70388ee0e75931856`**, preserving actual Coach merge ancestry. Final head `2f76fcf884e04478b53e69a8b03df9b8917253d6`, hosted prospective merge `35e3e581b3fb8de7e826e835080fa3add7184e54` and actual protected merge all have tree **`1a118a0fa25878756b5c21adc602b5200feb8aaf`**. All **12 applicable PR workflows plus two source-head workflows / 28 jobs passed**: [Documentation context (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123500194), [Release regression contracts (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458011), [Trusted family device security (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458208), [Jems operations contracts (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458017), [Jems Game Intelligence contracts (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458133), [Service image packaging (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458048), [Coding learner review (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458100), [Parent reporting and dashboard (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458137), [jems full visual review (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458141), [Mind Your Jems art and gameplay review (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458303), [Bubble Gum Builders play and visual review (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458145), [Arcade journeys (pull_request)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123458202), [Trusted family device security (push)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123449331), [Arcade journeys (push)](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45123449281). Initial documentation run45123458063 was cancelled by the same-head ready-for-review event; its replacement45123500194 passed. All five component heads were rechecked unchanged and PR118–122 were closed as superseded between `2026-11-23T06:47:28Z` and `2026-11-23T06:47:46Z`, after the actual merged tree was verified. Each closure retains its original record and links this integration.
+
+Local acceptance includes Node 22 production build/typecheck, 436 Coach integration unit checks and 536 combined reliability unit checks, focused coach/Studio/wire and component fault-injection suites, 83 deployment plus 85 operations tests, the combined 87-case Coach harness and 21 whole-family backup cases. These counts describe overlapping suite scopes, not a sum of unique tests. Desktop/tablet/phone journeys exercise the fox-dodging-leaves readiness benchmark, corrections and selected helper attribution, explicit Build, reconnect, existing games/Coding and exact saved-work recovery. The combined guided-creation suite includes all six lost-initial-ack desktop/phone cases. Hosted pinned-browser checks are the source gate; local system-Chromium evidence does not replace them. No assertion, approved artwork or visual threshold was weakened.
+
+## Workstream dispositions
+
+| Workstream | Final disposition | Merge SHA/evidence | Testing | Outstanding work |
+|---|---|---|---|---|
+| #135 Conversation Coach | Merged November 23 at 06:20:16 UTC | [14f16aa2b8d2dfbd150a60dfb0fad4276ebabcbc](https://github.com/jzwyrzyk/family-game-factory/commit/14f16aa2b8d2dfbd150a60dfb0fad4276ebabcbc); merged tree `25b3a8706919496477490521b31ef12c4b555066` matches tested head `2ce1ba08e672dcb9d15546806646f15700e51fd9` | Build/typecheck, 436 unit contracts, targeted Coach/Studio/wire tests, desktop/tablet/phone journeys; exact-head hosted gates passed, including required push rerun [45118722894](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118722894) | Separately approved compatible gateway/private-coach rollout before frontend; real-model, physical-device and observed-child acceptance remain unverified |
+| #123 Reliability | Merged November 23 at 06:46:42 UTC | [4784d76833b3ddbec43adfb70388ee0e75931856](https://github.com/jzwyrzyk/family-game-factory/commit/4784d76833b3ddbec43adfb70388ee0e75931856); final source and merged tree verified above | Build/typecheck, 536 unit contracts, focused fault injection, 87 Coach/chapter checks, 21 family-backup cases, six desktop/phone initial-ack cases and all final hosted gates passed | Compatible gateway release before frontend; revised worker CLI requires separate private release/pin |
+| #118–#122 Components | All five verified and closed as superseded after PR123 merged | Actual integration `4784d76833b3ddbec43adfb70388ee0e75931856`; [five-component matrix](../child-continuity/RELIABILITY-2026-11-23.md) and closure receipts in each PR | Independent source/component review and 107 focused checks; reservation, worker/report, stale-writer, partial-write, transport and lost-ack fault cases passed | Branches and historical evidence retained; component closure does not close broader F06 work |
+| Cloud Shell cleanup | Blocked by unavailable authenticated access; no cleanup performed | Exact hash-pinned read-only inventory command and preservation list in this report; actual Cloud Shell before/after usage remains unmeasured | Inventory helper: 16/16 offline fixtures passed; wrapper syntax checked | Obtain access to the intended Cloud Shell, inventory exact paths/references/ownership, then remove only verified disposable material and record disk/inode and integrity results |
+| Application storage/F06 | Non-destructive safeguards integrated; F06 remains partial | #123 source above and [storage/F06 plan](../child-continuity/RELIABILITY-2026-11-23.md#f06-remains-partially-implemented); PR13 artifact/Firestore compatibility retained | Exact history/backup/restore, owner/head fences, immutable revisions, pending identities, compensated partial writes and capacity rejection tested | Retention policy, crash recovery across stores, profile-copy capacity, uncertain remote-copy reconciliation and atomic reply persistence remain gated; archiving does not free storage; no cloud activation or migration |
+| Superseded PR reconciliation | Unique PR87/117 evidence reconciled in this documentation change | [PR87](https://github.com/jzwyrzyk/family-game-factory/pull/87) retains both original heads and the [receipt archive](../evidence/pr87-pr117-historical-receipts.md); PR117 original head is included by ancestry | Independent historical-diff review preserves every unique operational receipt; current-tree and PR-range documentation checks | No repeated release; original branches retained; PR106 and unrelated initiatives untouched |
+
+## Storage acceptance and remaining F06 work
+
+PR123 preserves authoritative owner/head checks, immutable revisions, linked full conversation history, exact backups and recovery, conservative pending Build identities and compensation that only removes unchanged writes owned by the failed operation. The [five-component matrix and F06 implementation plan](../child-continuity/RELIABILITY-2026-11-23.md) records each implementation, overlap, test, storage contract and rollback limitation; final hosted evidence accompanies the merge receipts.
+
+F06 remains **partial**. Archiving hides work and does not free capacity. Synchronous compensation is not crash-atomic cross-key storage. Retention/deletion policy, durable cross-store creation/copy journals, profile-copy capacity, remote-copy reconciliation and atomic response persistence remain separately gated. A response can exceed remaining design capacity or quota after an earlier preflight; never replay paid inference merely because the reply or save was lost. Existing data and drafts must remain recoverable.
+
+The optional PR13 private artifact adapter and Firestore encoding remain compatible; no bucket, IAM, adapter activation or child-data migration was performed. Artifact hashes, bounded payloads, legacy inline reads and exact metadata/references are covered by the integrity tests. Dropping a reference is not blob garbage collection. Adapter activation and retention policy remain separate decisions.
+
+## Superseded documentation evidence
+
+PR87 and PR117's unique historical receipts are preserved in the [receipt archive](../evidence/pr87-pr117-historical-receipts.md), including original immutable source links, Pal publication evidence, exact image-byte verification and incomplete live UAT. Newer main's architecture, source history and release instructions remain authoritative. Original branches are retained.
+
+## Cloud Shell cleanup — blocked, not completed
+
+Operational/API observations in this section were collected November 23, 2026, around 12:30 a.m. America/New_York (`2026-11-23T05:30Z`). They are dated metadata checks, not continuous live monitoring.
+
+The deployment/API and access observations were refreshed at `2026-11-23T06:16:30Z` (1:16:30 a.m. America/New_York): Pages deployment/source/run, private worker source/pin, inaccessible worker variable, blocked website/Cloud Shell routes and unavailable cloud identity/configuration were unchanged. A further Pages/worker-source refresh at `2026-11-23T06:47:19Z` confirmed the same deployment, successful Pages run and exact worker/public-source pins after both source merges. The workspace disk/inode figures below remain the earlier measurement; later source/API checks do not renew inaccessible live-service or disk evidence.
+
+The selected Codex workspace is a different environment from the owner's historical 4.8 GB Cloud Shell home volume. Its `/workspace` filesystem measured 63 GB total, 2.1 GB used, 58 GB available (4%); inode total 4,194,304, used 8,114, free 4,186,190 at this check. These are **not** Cloud Shell before/after measurements. The root's earlier workspace observation was about 60 GB available before worktrees/dependencies, not a Cloud Shell cleanup result.
+
+Exact access evidence:
+
+- Cloud environment status reports no configured secrets, runtime variables or outbound identities.
+- `gcloud` is absent from PATH, although an SDK is already installed at `/workspace/.family-game-factory-tools/google-cloud-cli-594.0.0/bin/gcloud`. The repository's read-only `python3 scripts/ops/diagnose.py --self-check --json` exited 2 with `GCLOUD_NOT_INSTALLED`; it reported zero mutations and `identity_account_verification: not_verified`. Follow-up normal read-only calls to that exact installed binary (`auth list --filter=status:ACTIVE --format=value(account)` and `config get-value project`) both failed because `/home/agent/.config/gcloud` is on a read-only filesystem and gcloud could not initialize its normal credentials database/log directory. No active account or project was returned. No tokens/configuration contents were printed or default configuration changed.
+- Cloud desktop inventory contained no existing Chrome tabs or authenticated Cloud Shell session. Opening `https://shell.cloud.google.com/` failed before navigation with `Browser Use could not read requirements`; the resulting tab remained blank. A fresh browser initialization after workspace recovery at `2026-11-23T06:31:52Z` again found no tabs/session and failed before navigation with the same error. No login, Cloud Shell command or mutation occurred.
+- An ordinary HTTPS request to that exact Cloud Shell origin failed at the configured proxy: `CONNECT tunnel failed, response 403` / HTTP status `000`. This is a workspace connectivity restriction, not evidence of a Google account denial, site outage or bot block.
+
+Actual Cloud Shell disk, inode, process, repository/worktree, file ownership, recoverability and active-reference state therefore remain unmeasured. Files removed: **none**. Bytes recovered: **not measured; no cleanup performed**. All operational journals and rollback records were left untouched; continued existence/integrity on the inaccessible Cloud Shell cannot be freshly attested.
+
+### Concrete inventory handoff
+
+Reuse the existing reviewed helper from immutable repository commit `a035e4dfc5a28fb1018c624ba7693dea3c4608ab`, without merging that operations branch:
+
+- Helper: `scripts/deployment/inspect_jems_storage.py`.
+- SHA-256: `fa4b93a33c1cccfe9be74f14bc9fffe85d1b092647943f380d93ac3decabbc31`.
+- Instructions: `docs/operations/CLOUD_SHELL_STORAGE_REVIEW.md` at that commit.
+- Validation rerun here: **16/16 offline fixtures passed** with `python3 -B check_jems_storage_audit.py`. Cases cover redaction, read-only Git/index metadata, symlinks/mounts/hardlinks, external-filter suppression, shared worktrees, dirty/stashed/unknown work, release journals, active references, and explicit truncation. This tests the helper, not Cloud Shell contents.
+- The exact read-only wrapper is included below. It creates an owner-only `/tmp/jems-storage-audit.*` directory, downloads and checks the immutable helper, prints actual disk/inode usage, then writes a sanitized private metadata report there. It does not delete anything. Preserve its full report and return only the sanitized terminal block; inspect retained sections where terminal truncation is nonzero.
+
+The helper scans all accessible HOME entries and owner-controlled `jems*`/`factory*` temporary entries, records sizes, Git dependency information and process references, preserves opaque private/configuration/history areas, and classifies `KEEP`, `REGENERABLE_CANDIDATE_REVIEW`, `CHECKOUT_REVIEW`, `UNKNOWN_KEEP`. Keep the complete inventory, ordinary path metadata and private recovery evidence out of this public repository. The sanitized terminal summary excludes content and sensitive names but does not anonymize every ordinary path; review it before sharing. Classification is advisory. Before an exact candidate can be removed, verify its absolute resolved path, owner, symlink/mount status, tracked/untracked/ignored content, current open/cwd/process references, remote publication and reproducibility, and that no journal/receipt/rollback or shared-object dependency uses it. Missing visibility, unknown files, stale cached refs or race observations require KEEP. Re-run disk/inode measurements and integrity checks after any later authorized narrow cleanup.
+
+Preservation checklist carried from existing evidence, with no current existence claim:
+
+- Entire unresolved `~/jems-releases/coach-diagnostics-b4734b1323de87dfee96bb91769cbab3cff432e6/`, including `bootstrap.lock`, `state/release.lock`, `state/release.json` if present. Empty lock files still preserve serialization identity.
+- `/tmp/jems-coach-lowspace-*`, `/tmp/jems-coach-recovery.*`, `/tmp/jems-chat-rollout.*` (including the referenced `jems-chat-rollout.qfgeyx` Node provider).
+- `/tmp/jems-access-recovery.CbqLURFt/verification.json`: historical read-only verify receipt, temporary not durable off-machine archival. Do not replay `apply-gcp` to reconstruct it.
+- Original PR115 private state, journal identity, rollback provenance, linked application worktree and original tool checkout/shared Git objects.
+- `jems-access-review.*`, `jems-gateway-repair-tool-*`, `jems-service-release-*`: candidates only for detailed review, never disposable by name or size.
+- Credentials, auth/config directories, personal history, unknown data and private child/application data stay private and preserved. No broad cache prune, `git clean`, Git GC or recursive home/tmp cleanup.
+
+## Published website evidence
+
+GitHub Pages API reports `status: built`, workflow-based publication and HTTPS enforcement. Latest deployment is `7967192841`, source `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`, created `2026-11-21T17:59:53Z`, successful at `2026-11-21T18:00:16Z` (November 21, 1:00:16 p.m. America/New_York). Environment URL: `https://jzwyrzyk.github.io/family-game-factory/`.
+
+The corresponding successful [Pages run44932334132](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44932334132) includes build, all eight regression shards and deploy. The actual [build job136931468865](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44932334132/job/136931468865) emitted `PAGES_BUILD_SOURCE_VERIFIED=6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`; the workflow asserts clean `build-info.json` and stamps `jems-release.json`. This distinguishes the selected application source from merely the workflow head. [Deploy job136933666456](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44932334132/job/136933666456) and deployment-status API agree on success.
+
+The current Pages run inventory contains no later publication. Deployment API returned zero records for four-experience merge `afa5251cde97fda1865e42dbaed5fae08a2a4061` and starting main `3a6fcca34b2e9d15bb2d6596153069db57056a04`. The release source predates PR134 and is not its descendant. Therefore **PR134's four-experience release is not in the latest GitHub-recorded production Pages deployment**.
+
+Direct retrieval of production `build-info.json` was blocked by the workspace proxy (`CONNECT ... 403`, status `000`). The live CDN bytes and current rendered product cannot be independently attested from this environment. Do not label deployment metadata as a fresh live-browser smoke. Separate private Sites previews are not the production Jems Pages deployment.
+
+The current Pages workflow is manual `workflow_dispatch` with an exact merged source SHA and two exact production origins. Source merges do not automatically deploy. No workflow was dispatched by this review.
+
+## Gateway, private coach, worker and acceptance boundaries
+
+Live Cloud Run revision/image/traffic identities and configuration are unverified because no approved managed GCP identity is configured and the installed SDK's normal configuration path is inaccessible. No backend compatibility claim is inferred from merged code or historical serving receipts.
+
+Source rollout dependencies:
+
+1. Coach v2 requires compatible gateway validators, private coach and web app. Deploy and verify the compatible backends before the dependent frontend. Old gateway/executor versions reject new creation context; old replies without valid readiness must not authorize Build. Preserve selected-helper attribution/compiler support in rollback.
+2. Reliability needs the additive authenticated read-only admitted-request lookup on the gateway before frontend recovery uses it. Unknown paid outcomes must remain conservative, with no automatic paid POST replay.
+3. The gateway implements fixed worker phase/whole-job leases and idempotent report receipts while preserving the old worker callback shape. The worker CLI’s bounded heartbeat, transport and identical-report retries additionally require a separately reviewed private worker release and pin rotation, with retained source/image/rollback receipts. An unchanged old worker does not gain those CLI protections from a gateway or public-source merge.
+4. New notebook readiness/chapter/pending-request metadata needs compatible rollback readers; pre-change strict readers can reject new records. Preserve full conversations, selected-helper provenance and pending identities rather than stripping fields for rollback. Broader migrations/cloud storage activation remain separately gated.
+
+Retain compatible gateway/worker versions on rollback, or drain all in-flight generation/test/review and coach/audio work before returning to older versions. The old coordinator ignores fixed deadlines and cannot reproduce repair-report receipts; old coach/audio completions lack `reservationId` fencing. Do not overlap those completions with new recovery, erasure or reused receipt identities. Preserve tombstones, accounting and rollback evidence; no uncertain paid request may be replayed.
+
+Refreshed private worker Git main is `dddf53dbc76796be19782c1bb5bbb99b86e99909`; its workflow source still explicitly checks out public `b472c224f7e8ef8ab0986ce6f755728d7cc63d46`. The owner-controlled `FACTORY_PRIVATE_WORKER_SHA` variable read returned GitHub 403 `Resource not accessible by integration`, so its current configured value and all effective WIF/activation conditions remain unverified. Recent successful worker workflow records do not establish a current pin/configuration or product acceptance. No workflow was dispatched or worker checkout changed beyond read-only fetch of remote history.
+
+The requested actual adult **Build → Review → Play → Keep → Reload** acceptance was not run: no paid Build was authorized for this assessment, live site access is blocked, and service identities cannot be confirmed. Fixture browser suites and historical workflow passes must remain labeled as synthetic-service evidence. A later operational release requires approved service deployment/pin and source selection, authenticated protocol and rollback verification, and separately authorized bounded adult/live-provider acceptance. Physical-device audio/fullscreen, real-model coach quality, observed-child usability and learning efficacy are not established by this source work.
+
+## Read-only Cloud Shell inventory command
+
+Run only in the intended authenticated Cloud Shell. It downloads the immutable helper, checks its hash and records private metadata; it contains no deletion or production action.
+
+```bash
+#!/usr/bin/env bash
+# Run in the intended Google Cloud Shell, not the Codex workspace.
+# Downloads a hash-pinned, reviewed metadata inventory and writes its report only
+# to a new owner-only /tmp directory. Does not delete or change source/config/data.
+set -euo pipefail
+umask 077
+JEMS_STORAGE_AUDIT_DIR="$(mktemp -d /tmp/jems-storage-audit.XXXXXXXX)"
+JEMS_STORAGE_AUDIT_SHA='a035e4dfc5a28fb1018c624ba7693dea3c4608ab'
+JEMS_STORAGE_AUDIT_HASH='fa4b93a33c1cccfe9be74f14bc9fffe85d1b092647943f380d93ac3decabbc31'
+curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+  "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/${JEMS_STORAGE_AUDIT_SHA}/scripts/deployment/inspect_jems_storage.py" \
+  --output "$JEMS_STORAGE_AUDIT_DIR/inspect_jems_storage.py"
+printf '%s  %s\n' "$JEMS_STORAGE_AUDIT_HASH" "$JEMS_STORAGE_AUDIT_DIR/inspect_jems_storage.py" | sha256sum --check --strict
+date -u +%Y-%m-%dT%H:%M:%SZ
+df -h -- "$HOME" /tmp
+df -i -- "$HOME" /tmp
+python3 -B "$JEMS_STORAGE_AUDIT_DIR/inspect_jems_storage.py" \
+  --output-dir "$JEMS_STORAGE_AUDIT_DIR"
+printf 'PRIVATE_INVENTORY_DIRECTORY=%s\n' "$JEMS_STORAGE_AUDIT_DIR"
+# Retain the report. Review every candidate and all truncated/unknown metadata
+# before proposing any cleanup. No deletion command is included intentionally.
+```
+
+## Exact remaining operational gates
+
+| Next action | Authorization / blocker | Completion evidence |
+| --- | --- | --- |
+| Intended Cloud Shell inventory and narrow cleanup | Already authorized by this assignment; blocked by unavailable authenticated access. No renewed cleanup approval is needed for verified disposable material within that scope. | Private full inventory; exact candidate paths/owners/references/recoverability; removal receipt; actual disk/inode before and after; journal/worktree integrity. |
+| Read current production identities | Read-only review already authorized; approved existing GCP identity/usable CLI configuration, worker-variable access and live-site route unavailable here. Do not expand IAM merely to obtain visibility. | Actual Cloud Run revision/image/traffic and configuration metadata, effective worker pin, live release marker and retained receipts. |
+| Release compatible services and frontend | Separate production release authorization required. Choose immutable reviewed sources/images, preserve identities/configuration/budgets and approve staged rollout plus rollback. | Compatible gateway/private coach before dependent frontend; all exact-source release shards; actual serving and published source receipts. |
+| Change private worker source/workflow pin | Separate reviewed worker release authorization required; current pin stays unchanged. | Workflow/source/trust/image compatibility, drain or safe in-flight transition, bounded transport/report acceptance and rollback evidence. |
+| Adult Build → Review → Play → Keep → Reload | Separate bounded paid UAT authorization with provider/spend limits required. | Actual admitted request, accepted review, playable result, explicit Keep and exact reload/ownership evidence. |
+| Broader F06 architecture or optional cloud storage | Separate retention/design/implementation/activation or migration gate. | Versioned no-loss storage and rollback design, fault injection at every write boundary, capacity/uncertain-copy tests and exact backup/restore before rollout. |
+
+No production release, paid request, IAM/bucket change, data migration or deletion of uncertain material was performed by this assignment. Synthetic browser viewports do not establish physical-device behavior; fixture providers do not establish model quality, child comprehension or educational efficacy.
