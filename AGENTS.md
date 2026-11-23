@@ -25,6 +25,10 @@ For a substantive project answer, consult the applicable references before reaso
 - Existing assignment reports, test artifacts and release handoffs are historical evidence. Preserve their original scope; link a superseding source instead of rewriting history.
 - Do not describe a draft as merged, a merge as deployed, deployment as paid activation, or fixture CI as live-provider/device/child acceptance. Unknown is a valid state. Verify volatile state again before release claims.
 
+## Direct operations within the approved task
+
+For diagnostics, merges or releases, use the authenticated execution tools already available before asking the owner to relay terminal commands. Follow [Direct diagnostic access](docs/operations/ASSISTANT_ACCESS.md) for connection setup and limits. Within the owner's authorized scope, investigate routine failures, prepare permitted fixes and verify the outcome. For a larger in-scope change, give a brief heads-up and continue; do not turn each command into a new approval request. A request to prepare or review work does not authorize a merge, deployment or expanded access; preserve explicit holds. Engage the owner for initial authentication or an actual decision about expanded authority/trust, spending, destructive production data, sensitive-data exposure or product direction. Bring a diagnosis and recommended action when escalating. A configured/merged script is not evidence of a working cloud connection.
+
 ## Invariants to preserve
 
 The [doctrine](PRODUCT-DOCTRINE.md) and feature contracts provide the detail. In particular:

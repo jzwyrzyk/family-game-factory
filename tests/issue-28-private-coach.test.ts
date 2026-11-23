@@ -5,7 +5,7 @@ import {CoachService,COACH_RECEIPT_TTL_MS} from '../server/coach/service';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {privateCoachHandler,dedicatedCoachRuntime,googleCallerVerifier,type PrivateCoachRuntime} from '../server/coach/private-executor';
 import type {CoachContext} from '../src/studio/design';
-import type {PrivateCoachConfig} from '../server/coach/private-provider';
+import {OpenAICoachProvider,coachFailureEvent,tagCoachFailure,type CoachFailureEvent,type PrivateCoachConfig} from '../server/coach/private-provider';
 import {readFileSync} from 'node:fs';
 const config:PrivateCoachConfig={
  enabled:true,privacyApproved:true,moderationApproved:true,zdrVerified:true,privateExecutionApproved:true,
@@ -26,7 +26,132 @@ const context:CoachContext={message:'Only if I jump',mode:'discuss',game:'dragon
  {role:'child',text:'Only if I jump'}],observations:[],tests:[]};
 const reply={move:'clarify',text:'So jumping is the trigger!',question:'Should it sneeze once per jump?',
  suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
+
+/** Exercise the real private HTTP boundary, including the production logger.
+ * Every provider response is synthetic; no network call leaves loopback. */
+async function failureDiagnostics(){
+ const secret='PRIVATE_DIAGNOSTIC_SENTINEL',events:CoachFailureEvent[]=[];
+ const proof='d'.repeat(80),headers={'Content-Type':'application/json','X-Factory-Request':'1',Authorization:'Bearer '+proof};
+ const defaults:PrivateCoachRuntime={config,enabled:true,verifyCaller:async()=>true,
+  provider:{complete:async()=>({reply,usedMicroUsd:1})},reportFailure:event=>{events.push(event);}};
+ const runtime={...defaults},handler=privateCoachHandler(runtime);
+ const server=createServer((req,res)=>{void handler(req,res);});
+ await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+(server.address() as any).port;
+ const invoke=async(patch:Partial<PrivateCoachRuntime>={},body:unknown={version:1,context},path='/v1/private-coach/complete',method='POST')=>{
+  events.length=0;Object.assign(runtime,defaults,patch);
+  const response=await fetch(base+path,{method,headers,...(method==='POST'?{body:JSON.stringify(body)}:{})});
+  return {status:response.status,body:await response.json()};
+ };
+ const assertEvent=(stage:string,reason:string)=>{
+  assert.equal(events.length,1,'exactly one terminal record per failed coach POST');
+  const event=events[0];assert.equal(event.event,'jems_private_coach_failure');assert.equal(event.version,1);
+  assert.equal(event.stage,stage);assert.equal(event.reason,reason);
+  assert.ok(Number.isInteger(event.elapsedMs)&&event.elapsedMs>=0&&event.elapsedMs<=3600000);
+  assert.ok(Object.keys(event).every(key=>['event','version','stage','reason','elapsedMs','providerHttpStatus','incompleteReason'].includes(key)));
+  const serialized=JSON.stringify(event);
+  for(const privateValue of [secret,config.apiKey,context.message,proof])assert.ok(!serialized.includes(privateValue),'diagnostics must exclude private values');
+  return event;
+ };
+ const unavailable={status:503,body:{errorCode:'COACH_UNAVAILABLE'}};
+ const successfulBody=()=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(reply)}]}],usage:{input_tokens:10,output_tokens:20}});
+ function providerFor(failureStage?:string,httpStatus=503,inferenceBody:unknown=successfulBody()){
+  const calls:string[]=[];let moderation=0;
+  const provider=new OpenAICoachProvider(config,async url=>{
+   const stage=String(url).endsWith('/moderations')?(++moderation===1?'input_moderation':'output_moderation'):'inference';
+   calls.push(stage);
+   if(stage===failureStage){
+    const response=new Response(secret,{status:httpStatus});
+    response.text=async()=>{throw Error('Provider error bodies must not be read: '+secret);};
+    return response;
+   }
+   return new Response(JSON.stringify(stage==='inference'?inferenceBody:{results:[{flagged:false}]}));
+  });
+  return {provider,calls};
+ }
+ try{
+  assert.deepEqual(await invoke({verifyCaller:async()=>{throw Error(secret);}}),unavailable);
+  assertEvent('caller_verification','verification_failed');
+  assert.deepEqual(await invoke({verifyCaller:async()=>false}),{status:403,body:{errorCode:'FORBIDDEN'}});
+  assertEvent('caller_verification','denied');
+
+  for(const status of [400,401,403,429,500]){
+   const {provider,calls}=providerFor('input_moderation',status);
+   assert.deepEqual(await invoke({provider}),unavailable);
+   assert.equal(assertEvent('input_moderation','http_error').providerHttpStatus,status);
+   assert.deepEqual(calls,['input_moderation'],'a failed call must not retry or continue to inference');
+  }
+  for(const stage of ['inference','output_moderation']){
+   const {provider,calls}=providerFor(stage,400);
+   assert.deepEqual(await invoke({provider}),unavailable);
+   assert.equal(assertEvent(stage,'http_error').providerHttpStatus,400);
+   assert.equal(calls.filter(value=>value==='inference').length,1,'no automatic paid retry');
+  }
+  for(const reason of ['max_output_tokens',secret]){
+   const {provider,calls}=providerFor(undefined,503,{status:'incomplete',incomplete_details:{reason},output:[]});
+   assert.deepEqual(await invoke({provider}),unavailable);
+   const event=assertEvent('inference',reason==='max_output_tokens'?'output_limit':'incomplete');
+   assert.equal(event.incompleteReason,reason==='max_output_tokens'?'max_output_tokens':'other');
+   assert.deepEqual(calls,['input_moderation','inference']);
+  }
+  const invalidJson=new OpenAICoachProvider(config,async()=>new Response(secret));
+  assert.deepEqual(await invoke({provider:invalidJson}),unavailable);
+  assertEvent('input_moderation','invalid_json');
+  const transportFailure=new OpenAICoachProvider(config,async()=>{throw Error(secret);});
+  assert.deepEqual(await invoke({provider:transportFailure}),unavailable);
+  assertEvent('input_moderation','transport_error');
+
+  const refused=new OpenAICoachProvider(config,async()=>new Response(JSON.stringify({results:[{flagged:true}]})));
+  assert.deepEqual(await invoke({provider:refused}),{status:422,body:{errorCode:'COACH_REFUSED'}});
+  assertEvent('input_moderation','refused');
+  const filtered=providerFor(undefined,503,{status:'incomplete',incomplete_details:{reason:'content_filter'},output:[]});
+  assert.deepEqual(await invoke({provider:filtered.provider}),{status:422,body:{errorCode:'COACH_REFUSED'}});
+  assertEvent('inference','refused');
+
+  let budgetCalls=0;
+  const budgetConfig={...config,inputMicroUsdPerMillion:1000000,maxTurnMicroUsd:20000};
+  const budgetProvider=new OpenAICoachProvider(budgetConfig,async()=>{budgetCalls++;throw Error('Unexpected paid request');});
+  assert.equal(await budgetProvider.readiness(new AbortController().signal),true,'fixed prompt fits this approved allowance');
+  const longContext={...context,message:'a'.repeat(1800),conversation:Array.from({length:6},()=>({role:'child',text:'b'.repeat(2000)}))};
+  assert.deepEqual(await invoke({config:budgetConfig,provider:budgetProvider},{version:1,context:longContext}),unavailable);
+  assertEvent('budget','turn_budget');assert.equal(budgetCalls,0,'full-context cutoff must precede any provider request');
+
+  assert.deepEqual(await invoke({}, {version:1,context:{...context,creation:{version:1}}}),unavailable);
+  assertEvent('reply_validation','readiness_missing');
+  assert.deepEqual(await invoke({provider:{complete:async()=>({reply:{...reply,text:secret,unexpected:secret},usedMicroUsd:1})}}),unavailable);
+  assertEvent('reply_validation','reply_shape_invalid');
+  assert.deepEqual(await invoke({provider:{complete:async()=>({reply,usedMicroUsd:-1})}}),unavailable);
+  assertEvent('usage_validation','invalid_usage');
+
+  for(const reportFailure of [()=>{throw Error(secret);},async()=>{throw Error(secret);}]){
+   assert.deepEqual(await invoke({verifyCaller:async()=>{throw Error(secret);},reportFailure}),unavailable,'diagnostic failure must preserve the original HTTP result');
+  }
+  const printed:unknown[][]=[],oldError=console.error;
+  try{
+   console.error=(...args:unknown[])=>{printed.push(args);};
+   assert.deepEqual(await invoke({verifyCaller:async()=>{throw Error(secret);},reportFailure:undefined}),unavailable);
+  }finally{console.error=oldError;}
+  assert.equal(printed.length,1);assert.equal(printed[0].length,1);
+  events.push(JSON.parse(String(printed[0][0])));assertEvent('caller_verification','verification_failed');
+
+  assert.equal((await invoke()).status,200);assert.equal(events.length,0,'successful chat has no failure diagnostic');
+  assert.equal((await invoke({verifyCaller:async()=>false},undefined,'/v1/private-coach/status','GET')).status,403);
+  assert.equal(events.length,0,'status probes do not create turn-failure records');
+  assert.equal((await invoke({}, {version:1},'/v1/private-coach/audio')).status,503);
+  assert.equal(events.length,0,'speech diagnostics are outside this change');
+
+  const tampered=tagCoachFailure(Error(secret),{stage:secret,reason:secret,providerHttpStatus:secret,incompleteReason:secret} as any);
+  const safe=coachFailureEvent(tampered,'unknown',Infinity);
+  assert.ok(!JSON.stringify(safe).includes(secret));
+  assert.ok(Number.isFinite(safe.elapsedMs)&&safe.elapsedMs>=0);
+  assert.equal(safe.providerHttpStatus,undefined);
+  const timed=coachFailureEvent(new DOMException(secret,'TimeoutError'),'inference',25);
+  assert.equal(timed.reason,'timeout');assert.ok(!JSON.stringify(timed).includes(secret));
+  console.log('PASS private coach diagnostics: failure stages, unchanged public errors, bounded metadata, redaction and reporter isolation');
+ }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));}
+}
 async function main(){
+await failureDiagnostics();
 assert.equal(privateCoachOrigin('https://factory-coach-private-demo-uc.a.run.app'),'https://factory-coach-private-demo-uc.a.run.app');
 for(const unsafe of ['https://evil.example.com','https://api.openai.com','http://coaching.example.com','https://factory-coach-private-demo-uc.a.run.app/v1/coach',
  'https://factory-coach-private-demo-uc.a.run.app?token=secret','https://localhost','https://evil.invalid'])
@@ -73,7 +198,7 @@ assert.doesNotMatch(gateway,/new OpenAICoachProvider|apiKey\s*:\s*process\.env\.
 assert.match(dockerfile,/rm -f .*private-provider\.ts .*private-executor\.ts/);
 
 const proof='x'.repeat(80);let providerCalls=0;
-const runtime:PrivateCoachRuntime={config,enabled:true,verifyCaller:async token=>token===proof,
+const runtime:PrivateCoachRuntime={config,enabled:true,verifyCaller:async token=>token===proof,reportFailure:()=>{},
  provider:{complete:async c=>{providerCalls++;assert.equal(c.conversation[0].text,'The dragon should sneeze spaghetti');
  return {reply,usedMicroUsd:21};}}
 };

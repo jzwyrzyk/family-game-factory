@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 const {renderGenerated}=require('../server/sandbox/preview.cjs');
 const {renderGeneratedV2}=require('../server/sandbox/preview-v2.cjs');
 const {runtimeBundle}=require('../server/sandbox/bundle-v2.cjs');
@@ -21,26 +21,31 @@ const currentSession=page=>page.evaluate(()=>{
 const runtime=page=>page.evaluate(()=>FG.runtime.snapshot());
 const mainId=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).projects[0].headId);
 async function more(page){if(!await page.locator('#studioMore').evaluate(node=>node.open))await page.locator('#studioMore > summary').click();}
-async function moreChoices(page){const choices=page.locator('#studioMoreChoices');if(await choices.isVisible()&&!await choices.evaluate(node=>node.open))await choices.locator(':scope > summary').click();}
 async function talk(page){if(!await page.locator('#studioPrompt').isVisible())await page.click('#studioChange');}
-async function player(page,index){if(!await page.locator('#studioProfileMenu').evaluate(node=>node.open))await page.locator('#studioProfileMenu > summary').click();await page.locator('.profile-choice').nth(index).click();}
+async function player(page,index){await openProfiles(page);await page.locator('.profile-choice').nth(index).click();}
 async function assertTargets(page,selectors){
  for(const selector of selectors){const box=await page.locator(selector).boundingBox();assert.ok(box&&box.width>=44&&box.height>=44,`${selector} is a visible target of at least 44 × 44 CSS pixels`);}
 }
 async function expectBudget(page,value){await page.waitForFunction(expected=>FG.runtime.snapshot().config.gumBudget===expected,value);}
 async function openPhysicalGum(page){
-  // The physics journey exercises the preserved v1 game; the v2 sticker
-  // construction has its own separate browser acceptance suite.
+  // This historical journey exercises the preserved physical-v1 game. Bubble
+  // Gum v3 assembly is tested independently and remains the default starter.
   await page.click('[data-starter="gum"]');
-  await page.evaluate(()=>{
+  const originalSession=await page.evaluate(()=>{
     const key='family-game-factory-workspace-v2',workspace=JSON.parse(localStorage.getItem(key));
     const project=workspace?.projects.find(p=>p.game==='gum'),revision=workspace?.revisions.find(r=>r.id===project?.headId);
     if(!revision)throw Error('Missing physical workshop project');
     revision.config.qualityVersion=1;
     localStorage.setItem(key,JSON.stringify(workspace));
+    // Resume the legacy engine from its own saved card. The Ready to Play gum
+    // starter correctly opens the new assembly version instead.
+    const session=FG.studio.exportNotebook().sessions.find(s=>s.projectId===project.id);
+    if(!session)throw Error('Missing saved physical workshop session');
+    return session.id;
   });
   await page.reload();await page.waitForFunction(()=>window.FG?.studio);
-  await page.click('[data-starter="gum"]');await page.waitForSelector('.quality-builder');
+  await page.locator(`#studioLibrary [data-session="${originalSession}"] .studio-saved-open`).click();
+  await page.waitForSelector('.quality-builder');
 }
 
 async function localTest(page){await page.click('#studioChange');await page.fill('#studioPrompt','Give me 15 gum sticks');await page.click('#studioSend');await expectBudget(page,15);}
@@ -85,7 +90,7 @@ async function localJourney(browser,url,device,viewport){
   await journeyScreenshot(page,device,'first-screen');
 
   await openPhysicalGum(page);
-  await assertTargets(page,['#studioPlay','#studioChange','#studioHelp','#studioMore > summary']);
+  await assertTargets(page,['#studioHome','#studioChange','#studioHelp','#studioMore > summary','#studioFullScreen']);
   const originalMain=await mainId(page);
   await page.getByRole('button',{name:'Add Bottle',exact:true}).click();await localTest(page);
   const candidate=(await currentSession(page)).candidate.id;
@@ -115,13 +120,13 @@ async function localJourney(browser,url,device,viewport){
   assert.equal(await mainId(page),promotedMain,'only the earlier play view changes; the main pointer remains promoted');
 
   // The real checkpoint closes secondary tools. The child cannot reopen them
-  // over math; visible Help/mobile panel actions must also preserve this task.
+  // over math; the visible Help and Change actions must preserve this task.
   await more(page);await page.clock.runFor(91_000);await page.waitForSelector('#stage-overlay .math-activity');
   const attempt=await page.evaluate(()=>({id:FG.learning.activeAttemptId,owner:FG.store.current().id}));assert.ok(attempt.id);
   assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false);
   await page.locator('#studioMore > summary').click();assert.equal(await page.locator('#studioMore').evaluate(node=>node.open),false,'More game tools cannot reopen over required math');
   assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt.id);
-  const guarded=['#studioHelp',...(device==='mobile'?['[data-studio-tab="versions"]','[data-studio-tab="talk"]']:[])];
+  const guarded=['#studioHelp','#studioChange'];
   for(const selector of guarded){
    await page.click(selector);
    assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),attempt.id,`${selector} preserves the same attempt`);
@@ -140,14 +145,17 @@ async function localJourney(browser,url,device,viewport){
   const question=await page.locator('#stage-overlay .math-activity h2').evaluate(node=>{const box=node.getBoundingClientRect();return {focused:document.activeElement===node,visible:box.top>=0&&box.bottom<=innerHeight};});
   assert.deepEqual(question,{focused:true,visible:true});
   await journeyScreenshot(page,device,'required-math');
-  await player(page,1);assert.equal(await page.evaluate(()=>FG.learning.active),false);
+  // The play menu stays blocked during a required question. Leave through the
+  // visible host exit before choosing a sibling in the ordinary profile menu.
+  await page.click('#studioHome');assert.equal(await page.evaluate(()=>FG.learning.active),false);
+  await player(page,1);
   const abandoned=await page.evaluate(({owner,id})=>{
    const record=FG.store.data.profiles.find(profile=>profile.id===owner).learning.attempts.find(item=>item.id===id);
    return {outcome:record.outcome,answers:record.answers.length,correct:record.correct,independent:record.independent,ownerChanged:FG.store.current().id!==owner};
   },attempt);
   assert.deepEqual(abandoned,{outcome:'interrupted',answers:0,correct:false,independent:false,ownerChanged:true});
   assert.equal(await page.locator('#page-studio-library').isVisible(),true);assert.deepEqual(errors,[]);
-  console.log(`PASS child ${device}: first-screen play, touch targets, help/history return, real required-math guards, profile interruption`);
+  console.log(`PASS child ${device}: first-screen play, touch targets, help/history return, real required-math guards, explicit exit and profile isolation`);
  }catch(error){await failureScreenshot(page,`local-${device}`);throw error;}finally{await context.close();}
 }
 
@@ -211,8 +219,15 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await page.locator('#studioBuildHandoffStay').click();
   assert.equal(requests.length,1);assert.equal(await page.inputValue('#studioPrompt'),'','the submitted idea clears only after the durable acknowledgement');
    assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'extra tools remain optional in chat');
-   await moreChoices(page);
-   assert.equal(await page.locator('#studioBuildShelf').isVisible(),true,'the child can inspect background build controls by choice');
+   const buildingSession=(await currentSession(page)).id;
+   await navigate(page,'#studioNavNotifications');
+   await page.locator('#studioNotifications').waitFor({state:'visible'});
+   const buildingNotice=page.locator(`#studioNotificationsList [data-notification-session="${buildingSession}"]`);
+   assert.equal(await buildingNotice.getAttribute('data-notification-kind'),'building','the child can inspect the saved background build by choice');
+   assert.equal(await page.locator('#studioBuildShelf').count(),0,'there is no duplicate blue build shelf');
+   await buildingNotice.locator('[data-notification-open]').click();
+   await page.locator('#studioPrompt').waitFor({state:'visible'});
+   assert.equal((await currentSession(page)).id,buildingSession);assert.equal(requests.length,1,'opening Notifications cannot submit another build');
    // Conversation during a slow remote build must remain child-led and must
    // not dispatch a second job, change the selected game or interrupt learning.
    await talk(page);await page.fill('#studioPrompt','Could the rocket have a funny secret name?');
@@ -234,7 +249,11 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await page.fill('#studioPrompt',laterDraft);await page.click('#studioPlay');await expectBudget(page,12);
   ready=true;await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(session=>session.job?.status==='ready'));
   assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'background completion never reopens the build handoff over play');
-  const readyFromPlay=page.locator('#studioBuildShelf').getByRole('button',{name:'Try ready test',exact:true});
+  await more(page);
+  assert.equal(await page.locator('#studioPlayNotifications').isVisible(),true,'all-project Notifications stays available in More');
+  // The current project's direct ready action keeps the mounted game available
+  // during its preview GET. Opening the all-project center is a separate route.
+  const readyFromPlay=page.locator('#studioReady');
   await readyFromPlay.waitFor({state:'visible'});
   const completed=await currentSession(page);
   assert.equal(completed.draft,laterDraft,'the later draft survives job completion');assert.equal(await page.inputValue('#studioPrompt'),laterDraft);
@@ -250,7 +269,7 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
   await readyFromPlay.click();await heldRequest;
   assert.equal((await runtime(page)).disposed,false,'fetching a preview keeps the currently playable game available');
   assert.equal((await currentSession(page)).candidate.id,concurrentCandidate,'selection waits for an accepted preview response');
-  if(device==='mobile')await page.click('[data-studio-tab="talk"]');else await page.click('#studioChange');
+  await page.click('#studioChange');
   const raceDraft=laterDraft+' I am still thinking about the controls.';await page.fill('#studioPrompt',raceDraft);
   const heldResponse=page.waitForResponse(response=>response.url()===api+'/v1/revisions/journey-ready/preview');
   releasePreview();await(await heldResponse).finished();

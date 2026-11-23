@@ -1,4 +1,5 @@
 const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {buildAndRide}=require('./bubble-gum-fixture.cjs');
 /* Production app reward journey. Grants come only from ordinary host UI actions.
  * FG.rewards is inspected/refreshed, never given invented grants. Adult endpoints
  * are explicit local auth fixtures; this test invokes no paid provider. */
@@ -237,20 +238,43 @@ async function installAuthFixture(context) {
 
     // Real local game development: intent, an actual test, linked reflection and explicit Keep.
     await page.evaluate(() => { FG.store.changeProfile({ rate: 1 }); FG.store.current().mathWindow = [Date.now()]; if (!FG.store.save()) throw Error('Test pacing fixture did not save'); });
-    await page.click('[data-starter="gum"]'); await page.click('#studioChange');
-    await page.fill('#studioPrompt', 'Give me 2 extra stickers'); await page.click('#studioSend');
+    await page.click('[data-starter="gum"]');
+    await page.waitForFunction(() => document.body.classList.contains('studio-playing'));
+    const beforeMaking = await summary(page);
+    const toastCountBeforeMaking = await page.evaluate(() => window.rewardToastMessages.length);
+    assert.equal(await page.locator('#jemsRewardCelebrations, #jems-delight-host').evaluateAll(hosts => hosts.reduce((count, host) => count + host.childElementCount, 0)), 0, 'Entering fitted play clears any previous celebration');
+    await page.click('#studioChange');
+    await page.fill('#studioPrompt', 'Give me 2 extra silly pieces'); await page.click('#studioSend');
     await page.waitForFunction(() => FG.studio.exportNotebook().sessions.some(session => session.game === 'gum' && session.candidate));
     await expectTotal(page, 37);
-    for (let index = 0; index < 3; index++) { await page.locator('.gum-sticker').nth(index).click(); await page.locator('.gum-slot').nth(index).click(); }
-    await page.click('.gum-launch');
+    await page.waitForFunction(() => document.body.classList.contains('studio-playing'));
+    const makerReward = await summary(page);
+    assert.equal(makerReward.totalGrants, beforeMaking.totalGrants + 1, 'The real saved test commits its ordinary maker receipt');
+    assert.equal(makerReward.recentGrants.filter(grant => grant.kind === 'maker.milestone' && grant.amount === 5 && grant.label === 'Gem Maker milestone').length, 1);
+    await page.evaluate(() => FG.rewards.refresh({ celebrate: true }));
+    await page.waitForTimeout(300); // Cross the actual 180ms cosmetic batching window.
+    assert.equal(await page.locator('#jemsRewardCelebrations, #jems-delight-host').evaluateAll(hosts => hosts.reduce((count, host) => count + host.childElementCount, 0)), 0, 'Earned rewards cannot put an overlay over fitted game controls');
+    assert.equal(await page.evaluate(() => window.rewardToastMessages.length), toastCountBeforeMaking, 'The real maker grant never renders even a transient reward popup');
+    assert.deepEqual(await summary(page), makerReward, 'Quiet projection preserves the committed total and reward history');
+    await buildAndRide(page);
     await page.waitForFunction(() => FG.studio.exportNotebook().sessions.some(session => session.reflection));
     await page.click('#studioChange'); await page.click('#studioReflectAnswer');
-    await page.fill('#studioPrompt', 'The extra sticker choices made my rocket more colorful.'); await page.click('#studioSend');
+    await page.fill('#studioPrompt', 'The extra pieces made me look more carefully before joining my rocket.'); await page.click('#studioSend');
     await expectTotal(page, 47);
     await page.click('#studioKeep'); await expectTotal(page, 92);
     assert.equal((await summary(page)).counts.making, 1, 'A developed project is counted once');
     await page.evaluate(() => FG.rewards.refresh({ celebrate: true })); await expectTotal(page, 92);
+    await page.waitForFunction(() => document.body.classList.contains('studio-playing'));
+    const keptRewards = await summary(page);
+    await page.waitForTimeout(300);
+    assert.equal(await page.locator('#jemsRewardCelebrations, #jems-delight-host').evaluateAll(hosts => hosts.reduce((count, host) => count + host.childElementCount, 0)), 0, 'Keep and rank rewards stay out of the resumed game');
     await openRewards(page);
+    await page.evaluate(() => FG.rewards.refresh({ celebrate: true }));
+    await page.waitForTimeout(300);
+    assert.deepEqual(await summary(page), keptRewards, 'Leaving play keeps every committed total and receipt');
+    assert.equal(await page.evaluate(() => window.rewardToastMessages.length), toastCountBeforeMaking, 'Leaving play and reading My rewards cannot replay suppressed celebrations');
+    assert.equal(await page.locator('#jemsRewardCelebrations, #jems-delight-host').evaluateAll(hosts => hosts.reduce((count, host) => count + host.childElementCount, 0)), 0);
+    assert.equal(await page.locator('#jemsRewardsTotal').textContent(), '92', 'The ordinary rewards page still shows the full earned total');
     assert.equal(await page.locator('#jemsRewardsMakerName').textContent(), 'Gem Polisher');
     await page.locator('.jems-rewards-toast').waitFor({ state: 'hidden' });
     await page.screenshot({ path: 'test-results/rewards-app-desktop-settled.png', fullPage: true });
@@ -264,6 +288,7 @@ async function installAuthFixture(context) {
     assert.equal(await page.locator('#creationChallengeMode').getAttribute('aria-pressed'), 'true');
     assert.equal(await page.locator('#creationFreeShelf').isVisible(), false, 'Coding rewards opens challenges directly');
     await page.click('[data-challenge="robot-taps"]');
+    await page.click('#creationFullMode');
     await page.getByRole('combobox', { name: 'When', exact: true }).selectOption('tap');
     await page.click('[data-add-block="move"]');
     const scene = await page.evaluate(() => FG.creation.scene());
@@ -277,6 +302,7 @@ async function installAuthFixture(context) {
     assert.equal((await summary(page)).counts.coding, 1);
 
     // Parent UI exports the actual ledger; restoring it twice remains idempotent.
+    await page.click('#creationHome');
     await page.locator('footer [data-page="parent"]').click(); await page.locator('[data-parent-tab="settings"]').click();
     const downloadPromise = page.waitForEvent('download'); await page.click('#exportData');
     const download = await downloadPromise, backupPath = path.resolve('test-results/rewards-family-backup.json');
@@ -365,7 +391,7 @@ async function installAuthFixture(context) {
     assert.equal(await second.evaluate(id => FG.store.current().learning.attempts.some(attempt => attempt.id === id && attempt.outcome === 'completed'), newerAttempt), true, 'The takeover preserves the first tab’s last completed evidence');
     await startMath(second); await answerMath(second); await expectTotal(second, 106);
     assert.deepEqual(errors, []); assert.deepEqual(paid, [], 'The reward journey does not request paid generation or coaching');
-    console.log('PASS: full app rewards from Math/English/making/coding, assisted evidence, no shown/duplicate credit, reload, profile/adult isolation, parent backup/restore, source-save failure, legacy host, two-tab save ownership and responsive navigation.');
+    console.log('PASS: full app rewards from Math/English/making/coding, quiet fitted-play earnings without replay, assisted evidence, no shown/duplicate credit, reload, profile/adult isolation, parent backup/restore, source-save failure, legacy host, two-tab save ownership and responsive navigation.');
   } catch (error) {
     console.error('Rewards browser failure before capture:', error);
     if (dialogs.length) console.error('Recent application dialogs:', JSON.stringify(dialogs.slice(-3)));

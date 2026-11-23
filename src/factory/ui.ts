@@ -71,7 +71,7 @@ export function initLiveRemix() {
     $('liveMechanics').replaceChildren(...playableMechanics(p.game,r.config).map(m=>{const card=document.createElement('div');card.className='stat';card.textContent=`${m.label}: ${display(m.key,r.config[m.key])}`;return card;}));
     $<HTMLButtonElement>('liveUndo').disabled=!r.parentId;const redo=$<HTMLButtonElement>('liveRedo');if(redo)redo.disabled=!history.some(x=>x.parentId===r.id);$('compareVersion').replaceChildren(...history.map((rev,i)=>option(rev.id,`Version ${i+1}: ${rev.label}`)));$<HTMLSelectElement>('compareVersion').value=r.parentId||r.id;
     $('liveExamples').replaceChildren(...examples[p.game].map(example=>{const button=document.createElement('button');button.type='button';button.className='text-btn';button.textContent=example;button.onclick=()=>{clearPending();$<HTMLInputElement>('livePrompt').value=example;$('livePrompt').focus()};return button;}));
-    $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0];renderComparison();renderCoach();
+    $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0]||'Describe your game idea';renderComparison();renderCoach();
   }
   function play(r:Revision){
     const p=project(),capturedOwner=owner();$('playedVersion').hidden=false;$('playedVersion').textContent=`Playing ${p.name}: ${playableMechanics(p.game,r.config).map(m=>`${m.label} ${display(m.key,r.config[m.key])}`).join(' · ')}`;$('returnLive').hidden=false;

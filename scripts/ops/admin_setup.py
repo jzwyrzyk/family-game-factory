@@ -4,12 +4,12 @@
 import argparse
 import json
 import math
-import os
 from pathlib import Path
 import re
 import sys
 
 from admin_api import Http, Plan, SetupError, command, require
+from admin_receipts import Receipt
 import admin_cloud
 from release import ReleaseError
 
@@ -198,16 +198,6 @@ def show(plan):
     print(json.dumps({**plan.describe(), "review_code": plan.review_code()}, indent=2, sort_keys=True), flush=True)
 
 
-def write_receipt(path, head, phase, details):
-    if not path:
-        return
-    full = Path(path).expanduser()
-    fd = os.open(full, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-    with os.fdopen(fd, "w") as out:
-        json.dump({"head": head, "phase": phase, "details": details}, out, indent=2)
-        out.write("\n")
-
-
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("phase", nargs="?", default="plan", choices=(
@@ -230,8 +220,11 @@ def main():
         require(re.fullmatch(r"[a-f0-9]{64}", args.review_code), "A review code is 64 lowercase hexadecimal characters")
         if not args.receipt:
             args.receipt = str(Path.home() / f"jems-107-{args.phase}-{head[:12]}-{args.review_code[:12]}.json")
-    if args.receipt:
-        require(not Path(args.receipt).expanduser().exists(), "The requested receipt path already exists")
+    with Receipt(args.receipt, head, args.phase) as receipt:
+        run_phase(args, head, receipt)
+
+
+def run_phase(args, head, receipt):
     outcomes = {}
     blockers = {}
     if args.phase in {"plan", "verify", "plan-github", "apply-github", "plan-claims", "dispatch-claims", "verify-claims"}:
@@ -255,7 +248,7 @@ def main():
                 next_phase = "dispatch-claims" if after else "apply-github"
                 print(f"After review: python3 scripts/ops/admin_setup.py {next_phase} --review-code {plan.review_code()}", flush=True)
             if args.phase in {"apply-github", "dispatch-claims"}:
-                plan.execute(args.review_code)
+                receipt.execute(plan, args.review_code)
                 if not after:
                     require(not github_plan(api, head).actions, "GitHub protections did not verify after apply")
             if args.phase == "verify":
@@ -284,7 +277,7 @@ def main():
                 if args.phase == "apply-gcp":
                     require(not github_plan(github_api(), head).actions,
                             "Apply and verify GitHub protections first; the PR must remain a draft")
-                    observed = plan.execute(args.review_code)
+                    observed = receipt.execute(plan, args.review_code)
                     outcomes["gcp"]["performed_checks"] = observed
                     outcomes["gcp"]["verified_state"] = cloud.verify(
                         args.drill_project if args.acknowledge_isolated_cost else None,
@@ -297,11 +290,17 @@ def main():
         except (SetupError, ReleaseError) as error:
             blockers["gcp"] = str(error)
 
-    print(json.dumps({"head": head, "codex_egress": admin_cloud.egress_status(),
-                      "blockers": blockers}, sort_keys=True), flush=True)
+    if not blockers:
+        try:
+            receipt.finish(outcomes)
+        except SetupError as error:
+            blockers["receipt"] = str(error)
+    result = {"head": head, "codex_egress": admin_cloud.egress_status(), "blockers": blockers}
+    if blockers and (receipt.started or receipt.verified):
+        result["incomplete_receipt"] = str(receipt.pending)
+    print(json.dumps(result, sort_keys=True), flush=True)
     if blockers:
         raise SystemExit(1)
-    write_receipt(args.receipt, head, args.phase, outcomes)
     if args.receipt:
         print(json.dumps({"receipt": args.receipt}), flush=True)
 

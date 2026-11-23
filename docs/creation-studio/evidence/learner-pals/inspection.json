@@ -1,0 +1,770 @@
+[
+  {
+    "name": "Luma",
+    "form": "base",
+    "url": "jems-pals/luma/base/neutral-93fde3101e62.webp",
+    "source": [
+      1425,
+      795
+    ],
+    "prepared": [
+      768,
+      428
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6305916569314641,
+    "elapsedMs": 26
+  },
+  {
+    "name": "Luma",
+    "form": "mature",
+    "url": "jems-pals/luma/mature/neutral-6b3ffa07f571.webp",
+    "source": [
+      1679,
+      937
+    ],
+    "prepared": [
+      768,
+      429
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6005942841880342,
+    "elapsedMs": 26
+  },
+  {
+    "name": "Nook",
+    "form": "base",
+    "url": "jems-pals/nook/base/neutral-458c3fb0fc44.webp",
+    "source": [
+      830,
+      760
+    ],
+    "prepared": [
+      768,
+      703
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.39900611960644855,
+    "elapsedMs": 23
+  },
+  {
+    "name": "Nook",
+    "form": "mature",
+    "url": "jems-pals/nook/mature/neutral-be860de47216.webp",
+    "source": [
+      1254,
+      1080
+    ],
+    "prepared": [
+      768,
+      661
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.4702884675995966,
+    "elapsedMs": 21
+  },
+  {
+    "name": "Mizzle",
+    "form": "base",
+    "url": "jems-pals/mizzle/base/neutral-37e57f8937e6.webp",
+    "source": [
+      485,
+      655
+    ],
+    "prepared": [
+      485,
+      655
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.4491004957897222,
+    "elapsedMs": 13
+  },
+  {
+    "name": "Mizzle",
+    "form": "mature",
+    "url": "jems-pals/mizzle/mature/neutral-e978474ddffa.webp",
+    "source": [
+      1536,
+      1024
+    ],
+    "prepared": [
+      768,
+      512
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5836970011393229,
+    "elapsedMs": 15
+  },
+  {
+    "name": "Tumble",
+    "form": "base",
+    "url": "jems-pals/tumble/base/neutral-a75baf959eda.webp",
+    "source": [
+      700,
+      700
+    ],
+    "prepared": [
+      700,
+      700
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5959632653061224,
+    "elapsedMs": 22
+  },
+  {
+    "name": "Tumble",
+    "form": "mature",
+    "url": "jems-pals/tumble/mature/neutral-8279cc081987.webp",
+    "source": [
+      1254,
+      1254
+    ],
+    "prepared": [
+      768,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5810326470269097,
+    "elapsedMs": 33
+  },
+  {
+    "name": "Navi",
+    "form": "base",
+    "url": "jems-pals/navi/base/neutral-f0d1f53e54dd.webp",
+    "source": [
+      1191,
+      1321
+    ],
+    "prepared": [
+      1191,
+      1321
+    ],
+    "preparedCanvas": false,
+    "transparentFraction": 0.4741961379536532,
+    "elapsedMs": 4
+  },
+  {
+    "name": "Navi",
+    "form": "mature",
+    "url": "jems-pals/navi/mature/neutral-ed4534b76918.webp",
+    "source": [
+      1191,
+      1321
+    ],
+    "prepared": [
+      692,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5331918352601156,
+    "elapsedMs": 22
+  },
+  {
+    "name": "Mote",
+    "form": "base",
+    "url": "jems-pals/mote/base/neutral-4dc984ce0f70.webp",
+    "source": [
+      125,
+      145
+    ],
+    "prepared": [
+      125,
+      145
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.7595586206896552,
+    "elapsedMs": 1
+  },
+  {
+    "name": "Mote",
+    "form": "mature",
+    "url": "jems-pals/mote/mature/neutral-2db6976032b2.webp",
+    "source": [
+      1209,
+      1301
+    ],
+    "prepared": [
+      714,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6457549165499533,
+    "elapsedMs": 25
+  },
+  {
+    "name": "Sivo",
+    "form": "base",
+    "url": "jems-pals/sivo/base/neutral-b3600e7cc722.webp",
+    "source": [
+      665,
+      530
+    ],
+    "prepared": [
+      665,
+      530
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.29702652858561496,
+    "elapsedMs": 6
+  },
+  {
+    "name": "Sivo",
+    "form": "mature",
+    "url": "jems-pals/sivo/mature/neutral-7837cf6380f8.webp",
+    "source": [
+      1754,
+      896
+    ],
+    "prepared": [
+      768,
+      392
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5165417729591837,
+    "elapsedMs": 16
+  },
+  {
+    "name": "Furl",
+    "form": "base",
+    "url": "jems-pals/furl/base/neutral-b6ba89248449.webp",
+    "source": [
+      930,
+      760
+    ],
+    "prepared": [
+      768,
+      628
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6314150411358811,
+    "elapsedMs": 14
+  },
+  {
+    "name": "Furl",
+    "form": "mature",
+    "url": "jems-pals/furl/mature/neutral-c689f2256e41.webp",
+    "source": [
+      1672,
+      941
+    ],
+    "prepared": [
+      768,
+      432
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.7584303867669753,
+    "elapsedMs": 10
+  },
+  {
+    "name": "Tessit",
+    "form": "base",
+    "url": "jems-pals/tessit/base/neutral-114b74de9e72.webp",
+    "source": [
+      582,
+      695
+    ],
+    "prepared": [
+      582,
+      695
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.4209918663007738,
+    "elapsedMs": 8
+  },
+  {
+    "name": "Tessit",
+    "form": "mature",
+    "url": "jems-pals/tessit/mature/neutral-a50b4cddf9b2.webp",
+    "source": [
+      1536,
+      1024
+    ],
+    "prepared": [
+      768,
+      512
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.48283640543619794,
+    "elapsedMs": 10
+  },
+  {
+    "name": "Flick",
+    "form": "base",
+    "url": "jems-pals/flick/base/neutral-09e10c435dcd.webp",
+    "source": [
+      525,
+      785
+    ],
+    "prepared": [
+      514,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6434571579118028,
+    "elapsedMs": 11
+  },
+  {
+    "name": "Flick",
+    "form": "mature",
+    "url": "jems-pals/flick/mature/neutral-bd0f358d1012.webp",
+    "source": [
+      1199,
+      1312
+    ],
+    "prepared": [
+      702,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6957075765669516,
+    "elapsedMs": 18
+  },
+  {
+    "name": "Clasp",
+    "form": "base",
+    "url": "jems-pals/clasp/base/neutral-b0b8aba2bb28.webp",
+    "source": [
+      607,
+      770
+    ],
+    "prepared": [
+      605,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.512224517906336,
+    "elapsedMs": 16
+  },
+  {
+    "name": "Clasp",
+    "form": "mature",
+    "url": "jems-pals/clasp/mature/neutral-a6c9939e3eed.webp",
+    "source": [
+      1254,
+      950
+    ],
+    "prepared": [
+      768,
+      582
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.48814030283505155,
+    "elapsedMs": 17
+  },
+  {
+    "name": "Skiff",
+    "form": "base",
+    "url": "jems-pals/skiff/base/neutral-ff5d636dbdce.webp",
+    "source": [
+      550,
+      700
+    ],
+    "prepared": [
+      550,
+      700
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5108805194805195,
+    "elapsedMs": 12
+  },
+  {
+    "name": "Skiff",
+    "form": "mature",
+    "url": "jems-pals/skiff/mature/neutral-006e15bba0a9.webp",
+    "source": [
+      1254,
+      1020
+    ],
+    "prepared": [
+      768,
+      625
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5823708333333333,
+    "elapsedMs": 14
+  },
+  {
+    "name": "Peep",
+    "form": "base",
+    "url": "jems-pals/peep/base/neutral-e5fb86581cc8.webp",
+    "source": [
+      520,
+      535
+    ],
+    "prepared": [
+      520,
+      535
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.3984867002156722,
+    "elapsedMs": 6
+  },
+  {
+    "name": "Peep",
+    "form": "mature",
+    "url": "jems-pals/peep/mature/neutral-6afc004481ee.webp",
+    "source": [
+      1236,
+      1272
+    ],
+    "prepared": [
+      746,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5504688198168007,
+    "elapsedMs": 31
+  },
+  {
+    "name": "Weft",
+    "form": "base",
+    "url": "jems-pals/weft/base/neutral-ce8ebc0adae5.webp",
+    "source": [
+      600,
+      805
+    ],
+    "prepared": [
+      572,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.473266317016317,
+    "elapsedMs": 19
+  },
+  {
+    "name": "Weft",
+    "form": "mature",
+    "url": "jems-pals/weft/mature/neutral-d8a6165d9fa1.webp",
+    "source": [
+      1536,
+      1024
+    ],
+    "prepared": [
+      768,
+      512
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5706278483072916,
+    "elapsedMs": 17
+  },
+  {
+    "name": "Cache",
+    "form": "base",
+    "url": "jems-pals/cache/base/neutral-9dac020556a5.webp",
+    "source": [
+      600,
+      605
+    ],
+    "prepared": [
+      600,
+      605
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.41929201101928376,
+    "elapsedMs": 7
+  },
+  {
+    "name": "Cache",
+    "form": "mature",
+    "url": "jems-pals/cache/mature/neutral-9fffd1f08a0f.webp",
+    "source": [
+      1254,
+      945
+    ],
+    "prepared": [
+      768,
+      579
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.44022785333909037,
+    "elapsedMs": 9
+  },
+  {
+    "name": "Brim",
+    "form": "base",
+    "url": "jems-pals/brim/base/neutral-ecfe4d863199.webp",
+    "source": [
+      695,
+      655
+    ],
+    "prepared": [
+      695,
+      655
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.44851666758196496,
+    "elapsedMs": 8
+  },
+  {
+    "name": "Brim",
+    "form": "mature",
+    "url": "jems-pals/brim/mature/neutral-e1deceb1c58f.webp",
+    "source": [
+      1254,
+      930
+    ],
+    "prepared": [
+      768,
+      570
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.3915136147660819,
+    "elapsedMs": 9
+  },
+  {
+    "name": "Wink",
+    "form": "base",
+    "url": "jems-pals/wink/base/neutral-42c9a2c10602.webp",
+    "source": [
+      594,
+      590
+    ],
+    "prepared": [
+      594,
+      590
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.47229355703931974,
+    "elapsedMs": 7
+  },
+  {
+    "name": "Wink",
+    "form": "mature",
+    "url": "jems-pals/wink/mature/neutral-7c83c99e39f5.webp",
+    "source": [
+      1254,
+      1254
+    ],
+    "prepared": [
+      768,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6131167941623263,
+    "elapsedMs": 16
+  },
+  {
+    "name": "Poff",
+    "form": "base",
+    "url": "jems-pals/poff/base/neutral-147c13ba7e6c.webp",
+    "source": [
+      715,
+      595
+    ],
+    "prepared": [
+      715,
+      595
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5704648292883587,
+    "elapsedMs": 9
+  },
+  {
+    "name": "Poff",
+    "form": "mature",
+    "url": "jems-pals/poff/mature/neutral-8504050f12e9.webp",
+    "source": [
+      1254,
+      1254
+    ],
+    "prepared": [
+      768,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5842793782552084,
+    "elapsedMs": 15
+  },
+  {
+    "name": "Chimi",
+    "form": "base",
+    "url": "jems-pals/chimi/base/neutral-2dc6024a8f92.webp",
+    "source": [
+      660,
+      625
+    ],
+    "prepared": [
+      660,
+      625
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5734860606060606,
+    "elapsedMs": 16
+  },
+  {
+    "name": "Chimi",
+    "form": "mature",
+    "url": "jems-pals/chimi/mature/neutral-839afb70a7e3.webp",
+    "source": [
+      1422,
+      1106
+    ],
+    "prepared": [
+      768,
+      597
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.523047093104411,
+    "elapsedMs": 11
+  },
+  {
+    "name": "Pleeko",
+    "form": "base",
+    "url": "jems-pals/pleeko/base/neutral-acf9007b0389.webp",
+    "source": [
+      792,
+      470
+    ],
+    "prepared": [
+      768,
+      456
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5027954815423976,
+    "elapsedMs": 9
+  },
+  {
+    "name": "Pleeko",
+    "form": "mature",
+    "url": "jems-pals/pleeko/mature/neutral-3c0b43f73d21.webp",
+    "source": [
+      1254,
+      1085
+    ],
+    "prepared": [
+      768,
+      664
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5145366622740963,
+    "elapsedMs": 14
+  },
+  {
+    "name": "Talli",
+    "form": "base",
+    "url": "jems-pals/talli/base/neutral-e86fa909bb99.webp",
+    "source": [
+      610,
+      665
+    ],
+    "prepared": [
+      610,
+      665
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5176383581905584,
+    "elapsedMs": 9
+  },
+  {
+    "name": "Talli",
+    "form": "mature",
+    "url": "jems-pals/talli/mature/neutral-0785af1c21ae.webp",
+    "source": [
+      1254,
+      1085
+    ],
+    "prepared": [
+      768,
+      664
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5872827246485943,
+    "elapsedMs": 15
+  },
+  {
+    "name": "Zippa",
+    "form": "base",
+    "url": "jems-pals/zippa/base/neutral-b0f8aca344a3.webp",
+    "source": [
+      515,
+      730
+    ],
+    "prepared": [
+      515,
+      730
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.4918074211996276,
+    "elapsedMs": 8
+  },
+  {
+    "name": "Zippa",
+    "form": "mature",
+    "url": "jems-pals/zippa/mature/neutral-df295181dbce.webp",
+    "source": [
+      1254,
+      1254
+    ],
+    "prepared": [
+      768,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.6614668104383681,
+    "elapsedMs": 17
+  },
+  {
+    "name": "Whorl",
+    "form": "base",
+    "url": "jems-pals/whorl/base/neutral-6c3dfbd80b7c.webp",
+    "source": [
+      625,
+      785
+    ],
+    "prepared": [
+      611,
+      768
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5581057351336607,
+    "elapsedMs": 22
+  },
+  {
+    "name": "Whorl",
+    "form": "mature",
+    "url": "jems-pals/whorl/mature/neutral-bcca0e4f1289.webp",
+    "source": [
+      1254,
+      1100
+    ],
+    "prepared": [
+      768,
+      674
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.7392974159248269,
+    "elapsedMs": 18
+  },
+  {
+    "name": "Brio",
+    "form": "base",
+    "url": "jems-pals-extra/brio/base/neutral-a7324e9903e5.png",
+    "source": [
+      1536,
+      1024
+    ],
+    "prepared": [
+      768,
+      512
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.5774002075195312,
+    "elapsedMs": 10
+  },
+  {
+    "name": "Brio",
+    "form": "mature",
+    "url": "jems-pals-extra/brio/mature/neutral-647287b06502.png",
+    "source": [
+      1536,
+      1024
+    ],
+    "prepared": [
+      768,
+      512
+    ],
+    "preparedCanvas": true,
+    "transparentFraction": 0.4836273193359375,
+    "elapsedMs": 9
+  }
+]

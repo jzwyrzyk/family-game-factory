@@ -1,6 +1,45 @@
 # Creation Studio acceptance evidence
 
+## Four-experience integration review — November 22, 2026
+
+[PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134) is the consolidated release vehicle for the first-learner UI, approved Pal scene compositing and the three game overhauls. The original candidate records below retain their source scope. The integration's creation recovery test now targets the challenge Help disclosure directly (`#creationChallengeBrief .creation-goal-help > summary`), preserving both Help and its nested **What is checked?** disclosure. Its eight production-browser recovery journeys pass locally, including corrupt export, exact-byte rollback, hint retention, legacy replacement and explicit draft recovery. Current final-head CI, visual acceptance and merge/deployment status belong in [delivery state](../../DELIVERY-STATE.md).
+
 **Current disposition:** the private-art capability below subsequently merged in [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23). [Delivery state](../../DELIVERY-STATE.md#pr23-art-studio--merged) records that exact-source merge and hosted acceptance. The dated development records below retain their original source and test scope; acceptance of the later first-creation reconciliation with main is recorded separately in the current delivery section.
+
+## First-learner coding UI candidate — November 22, 2026
+
+**Disposition:** implementation candidate; local non-browser checks passed, hosted browser journeys and composed viewport review pending. No merge or deployment is recorded here.
+**Stack base:** [PR125](https://github.com/jzwyrzyk/family-game-factory/pull/125), source `1340d041145ffba4322ccb8262188b7cf2c7b6c4`.
+**Decision:** [First-learner coding](../decisions/2026-11-22-first-learner-coding.md).
+
+The candidate gives the scene a larger fitted stage, a compact First steps action dock and selected-block controls, while retaining More tools for the full saved language. It keeps exact custom values and start/tap programs, shortens the challenge presentation, places feedback beside the stage, and supplements canvas speech/counters with readable DOM output. Shared PR125 narration, learning/profile guards, scene recovery and explicit Keep remain required integration checks.
+
+Pal paper removal is bounded scene-renderer compositing of approved loaded images. Original RGB, source assets and immutable actor references remain unchanged. There are no generated replacement portraits or new asset files in this scope. Roster-wide visual acceptance requires checking all 48 approved Base/Grown pictures against contrasting backgrounds; that claim remains pending until evidence is recorded.
+
+### Local candidate checks
+
+The following checks passed on the working implementation derived from the stack base above, before its initial hosted candidate. The eventual published source SHA and hosted run identities must be recorded separately; these results do not establish browser rendering or acceptance of a later changed source.
+
+| Check | Observed result and scope |
+| --- | --- |
+| Production build and TypeScript check | Passed. The application compiles; this does not verify the fitted viewport or actual interaction. |
+| `npm run test:creation` | **85/85 passed** across engine, behavioral challenges, storage, generated manifests, generation budgets and the new learner-control contracts. New cases exercise real directional trajectories, no-op movement, exact fractional/custom-value preservation, and intact nested actions/text. |
+| `npm run test:unit` | **393/393 passed** in the existing unit suite. These are local software contracts, not live-provider or device observations. |
+| Focused `pals-creation.test.ts` and `pal-scene-image.test.ts` checks | **22/22 passed**, including five playback-preparation cases for shared/hidden-actor loads, stale scenes, cancelled/late decodes, timeout/reopen recovery and invalid decoded bitmaps. Other cases cover exact Pal bindings, source/owner/recovery preservation, bounded transient compositing and synthetic alpha/RGB invariants. Simulated image/canvas behavior does not replace the full-roster visual review. |
+
+### Browser and visual acceptance still required
+
+| Acceptance criterion | Required observation | Current evidence |
+| --- | --- | --- |
+| Stage, readability and navigation | Desktop, tablet, narrow phone and short landscape; useful stage area, readable labels, visible playback/exit/Keep/Undo, no horizontal overflow | Pending |
+| Real beginner authoring | Add actions, edit direction/steps, reorder, repeat, choose start/tap, play and inspect execution highlight | Pending |
+| Existing programs and storage | Custom values and absolute/nested programs survive mode changes, Keep/reopen, undo/redo, draft recovery and profile changes | Pending |
+| Practice and feedback | Watch preserves editable scene; valid and invalid checks stay visible; hint provenance and equivalent-program behavior remain intact | Pending |
+| Learning, reading and private artwork | Required checkpoint guards, persistent explicit reading, source-game return, exact private-art references, export/import and recording | Pending |
+| Approved Pal rendering | Original RGB/source identity preserved, paper transparency bounded to supported images, all 48 neutral portraits inspected, loading/failure/cache disposal exercised | Pending |
+| Remaining release-candidate regression | Existing authoring/recovery journeys and documentation checks on the published candidate; recheck any source changed after the local run | Pending |
+
+The browser/visual table lists pending criteria, not passed checks. Record actual commands, source identity, capture provenance and remaining failures before updating those rows or claiming overall acceptance. Earlier green Creation, Pal or PR125 checks do not establish acceptance of this candidate. Browser emulation remains distinct from physical-device, observed-child, audible-voice and educational-efficacy evidence.
 
 ## Art Studio integration candidate — November 19, 2026
 

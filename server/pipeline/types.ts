@@ -3,6 +3,7 @@ import type {FamilyCoachConsent} from '../coach/consent';
 import type {ParentPrivacyChoice} from '../privacy/parent-consent';
 import type {AdultPilotPermit,AdultPilotSession} from '../adult-pilot';
 import type {AudioReceipt} from '../coach/speech';
+import type {NarrationReceipt} from '../coach/narration';
 import type {TrustedDevice,FamilyParentAuth} from '../trusted-devices';
 import type {Invitation} from '../sessions';
 import type {ActionExecution} from '../actions/coordinator';
@@ -50,5 +51,5 @@ export interface AuditEvent {
  usage?:{kind:'coach'|'audio';month:string;reservedMicroUsd:number;usedMicroUsd:number;outcome:'settled'|'interrupted'};
 }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
-export interface PipelineState { parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
+export interface PipelineState { narrationReceipts?:NarrationReceipt[]; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
 export interface Repository { transaction<T>(update:(state:PipelineState)=>T):Promise<T>; snapshot():Promise<PipelineState> }

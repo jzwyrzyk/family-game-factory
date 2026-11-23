@@ -1,13 +1,20 @@
 import type { CreationProject } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
-import { creationAsset, drawCreationVector, parsePrivateArtId } from './projects';
+import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsset } from './projects';
 import type { PrivateArtResolver } from './private-art';
+import { preparePalSceneImage } from './pal-scene-image';
+
+export const CREATION_ART_LOAD_TIMEOUT_MS = 8_000;
+type SceneImage = {
+  image: HTMLImageElement; ready: Promise<void>; sprite: CanvasImageSource | null;
+  loaded: boolean; failed: boolean; cancel(): void;
+};
 
 /** The trusted renderer resolves bundled art and owner-checked local references.
  * Private art never accepts an externally supplied URL. */
 export class CreationStage {
   private readonly context: CanvasRenderingContext2D;
-  private readonly images = new Map<string, HTMLImageElement>();
+  private readonly images = new Map<string, SceneImage>();
   private scene: CreationProject | null = null;
   private snapshot: SceneSnapshot | null = null;
   private selected = '';
@@ -17,13 +24,77 @@ export class CreationStage {
   constructor(readonly canvas: HTMLCanvasElement,private privateArt?:PrivateArtResolver,private artError?:(message:string)=>void) {
     this.context = canvas.getContext('2d')!;
   }
-  clear() { this.artEpoch++;this.requestedArt.clear();this.images.clear();this.failedArt.clear();this.scene = null; this.snapshot = null; this.selected = ''; this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); }
+  clear() {
+    this.artEpoch++; this.requestedArt.clear();
+    for (const entry of this.images.values()) entry.cancel();
+    this.images.clear(); this.failedArt.clear(); this.scene = null; this.snapshot = null; this.selected = '';
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+  /** Playback/export waits for these same cached images, including hidden
+   * actors that a later Show block may reveal. No alternate loads or retries. */
+  async prepare(project: CreationProject, current: () => boolean = () => true): Promise<void> {
+    const epoch = this.artEpoch;
+    const assertCurrent = () => {
+      if (epoch !== this.artEpoch || !current()) throw Error('The scene or player changed. Choose Play again when you are ready.');
+    };
+    assertCurrent();
+    const assets = [...new Set(project.actors.map(actor => actor.assetId))]
+      .map(id => creationAsset(id)).filter((asset): asset is CreationAsset => !!asset?.url);
+    await Promise.all(assets.map(asset => this.loadImage(asset).ready));
+    assertCurrent();
+  }
+  private loadImage(asset: CreationAsset): SceneImage {
+    const existing = this.images.get(asset.id); if (existing) return existing;
+    const image = new Image(), epoch = this.artEpoch;
+    let settled = false, timer: ReturnType<typeof setTimeout> | undefined;
+    let settle!: (error?: Error) => void;
+    const ready = new Promise<void>((resolve, reject) => {
+      settle = (error?: Error) => {
+        if (settled) return; settled = true; clearTimeout(timer);
+        image.onload = null; image.onerror = null;
+        if (error) reject(error); else resolve();
+      };
+    });
+    // render() starts a load without awaiting it; prepare() observes this exact
+    // promise later. Retain rejection without an unhandled background promise.
+    void ready.catch(() => {});
+    const entry: SceneImage = { image, ready, sprite: null, loaded: false, failed: false, cancel: () => {
+      settle(Error('The scene or player changed. Choose Play again when you are ready.'));
+      image.onload = null; image.onerror = null; image.removeAttribute?.('src'); entry.sprite = null;
+    } };
+    this.images.set(asset.id, entry);
+    const active = () => epoch === this.artEpoch && this.images.get(asset.id) === entry;
+    const repaint = () => { if (active() && this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected); };
+    const fail = (timedOut = false) => {
+      if (!active() || settled) return;
+      const message = `${asset.label}'s picture could not load${timedOut ? ' in time' : ''}. Reopen this scene to try again.`;
+      entry.failed = true; this.failedArt.add(asset.id); settle(Error(message));
+      if (this.scene?.actors.some(actor => actor.assetId === asset.id)) this.artError?.(message);
+      repaint();
+    };
+    const finish = () => {
+      if (!active() || settled) return;
+      if (!image.naturalWidth || !image.naturalHeight) { fail(); return; }
+      entry.sprite = asset.palForm ? preparePalSceneImage(image, asset.url) : image;
+      entry.loaded = true; settle(); repaint();
+    };
+    image.decoding = 'async';
+    image.onload = () => {
+      if (!active() || settled) return;
+      if (typeof image.decode === 'function') void image.decode().then(finish, () => fail());
+      else finish();
+    };
+    image.onerror = () => fail();
+    timer = setTimeout(() => fail(true), CREATION_ART_LOAD_TIMEOUT_MS);
+    image.src = new URL(asset.url!, document.baseURI).href;
+    return entry;
+  }
   render(scene: CreationProject, snapshot: SceneSnapshot, selected = '') {
     this.scene = scene; this.snapshot = snapshot; this.selected = selected;
     // Approved portraits are large. Retain only this scene's pinned pictures,
     // not every Pal/form visited across the whole collection.
     const assets = new Set(scene.actors.map(actor => actor.assetId));
-    for (const id of this.images.keys()) if (!assets.has(id)) { this.images.delete(id); this.failedArt.delete(id); }
+    for (const [id, entry] of this.images) if (!assets.has(id)) { entry.cancel(); this.images.delete(id); this.failedArt.delete(id); }
     if (this.canvas.width !== scene.width) this.canvas.width = scene.width;
     if (this.canvas.height !== scene.height) this.canvas.height = scene.height;
     const c = this.context, w = scene.width, h = scene.height;
@@ -127,23 +198,11 @@ export class CreationStage {
         c.fillText(this.failedArt.has(actor.assetId)?'Art unavailable':'Loading art…',0,0,s*.85);
       }
     } else if (asset?.url) {
-      let img = this.images.get(asset.id);
-      if (!img) {
-        img = new Image(); img.onload = () => { if (this.images.get(asset.id) === img && this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected); };
-        if (asset.palForm) img.onerror = () => {
-          if (this.images.get(asset.id) !== img) return;
-          this.failedArt.add(asset.id);
-          if (this.scene?.actors.some(item => item.assetId === asset.id) && this.snapshot) {
-            this.artError?.(`${asset.label}'s picture could not load. Reopen this scene to try again.`);
-            this.render(this.scene, this.snapshot, this.selected);
-          }
-        };
-        img.src = new URL(asset.url, document.baseURI).href; this.images.set(asset.id, img);
-      }
-      if (img.complete && img.naturalWidth) {
+      const entry = this.loadImage(asset), img = entry.image;
+      if (entry.loaded && entry.sprite) {
         const scale = s / Math.max(img.naturalWidth, img.naturalHeight);
         const iw = img.naturalWidth * scale, ih = img.naturalHeight * scale;
-        c.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+        c.drawImage(entry.sprite, -iw / 2, -ih / 2, iw, ih);
       } else if (asset.palForm) {
         // A delayed approved creature must not appear to turn into a gem token.
         c.fillStyle = '#F5F1FA'; c.strokeStyle = '#786489'; c.lineWidth = 2;

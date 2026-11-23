@@ -1,0 +1,109 @@
+name: Jems Cloud Run release
+on:
+  push:
+    branches: [main]
+    paths: ['ops/release.json']
+  workflow_dispatch:
+    inputs:
+      verify_identity:
+        description: Verify GitHub OIDC claims only while production flags are off
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: jems-cloud-run-production
+  cancel-in-progress: false
+
+jobs:
+  verify-identity:
+    if: >-
+      github.repository == 'jzwyrzyk/family-game-factory' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      inputs.verify_identity &&
+      vars.JEMS_IMAGE_PUBLISH_ENABLED != 'true' &&
+      vars.JEMS_CLOUD_RUN_RELEASE_ENABLED != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: jems-cloud-run-production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 scripts/ops/oidc_claims.py release
+  plan:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity
+    runs-on: ubuntu-24.04
+    outputs:
+      operation: ${{ steps.plan.outputs.operation }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate reviewed intent and source
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if jq -e '. == {}' ops/release.json >/dev/null; then exit 0; fi
+          plan="$(python3 scripts/ops/release.py ops/release.json)"
+          source="$(jq -er .source <<<"$plan")"
+          operation="$(jq -er .operation <<<"$plan")"
+          git merge-base --is-ancestor "$source" HEAD
+          # A rollback must remain available even when current application CI is red.
+          if [[ "$operation" != rollback ]]; then
+            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yml/runs?branch=main&event=push&head_sha=$source&status=success"               --jq '.total_count' | awk '($1 > 0) {passed=1} END {exit !passed}'
+            evidence="$(jq -er '.evidence | split("/") | last' ops/compatibility.json)"
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$evidence" |
+              jq -e --arg source "$source" --arg repo "$GITHUB_REPOSITORY" '
+                .head_sha == $source and .head_branch == "main" and .conclusion == "success"
+                and .head_repository.full_name == $repo and .path == ".github/workflows/test.yml"
+              ' >/dev/null
+          fi
+          echo "operation=$operation" >> "$GITHUB_OUTPUT"
+          echo "$plan" >> "$GITHUB_STEP_SUMMARY"
+  transition:
+    needs: plan
+    if: needs.plan.outputs.operation != '' && vars.JEMS_CLOUD_RUN_RELEASE_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: jems-cloud-run-production
+    permissions:
+      contents: read
+      attestations: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ vars.JEMS_RELEASE_WIF_PROVIDER }}
+          service_account: ${{ vars.JEMS_RELEASE_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Verify signed image provenance
+        if: needs.plan.outputs.operation != 'rollback'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          image="$(jq -er .image ops/release.json)"
+          source="$(jq -er .source ops/release.json)"
+          gcloud auth configure-docker us-east5-docker.pkg.dev --quiet
+          gh attestation verify "oci://$image" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/jems-service-images.yml" \
+            --source-ref refs/heads/main --source-digest "$source" --deny-self-hosted-runners
+      - name: Check current main and execute reviewed transition
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$GITHUB_SHA"
+          python3 scripts/ops/release.py ops/release.json --apply | tee -a "$GITHUB_STEP_SUMMARY"

@@ -59,6 +59,7 @@ import './presentation-quality.test';
 import './quality-pipeline.test';
 import './gem-factory-physics.test';
 import './gem-factory-pattern.test';
+import './gem-factory-cut.test';
 import './parent-privacy.test';
 
 import './parent-privacy-paid.test';
@@ -73,3 +74,6 @@ import './adult-profile-client.test';
 import './mind-your-jems.test';
 
 import './drawing-engine.test';
+
+import './bubble-gum-rules.test';
+import './bubble-gum-journey.test';

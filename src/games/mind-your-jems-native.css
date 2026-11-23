@@ -1,0 +1,79 @@
+/* Shared native host for the real run/collect/bank Mining engine.
+ * The scene needs its own flex height; score is an overlay, not a grid item.
+ * No old click-to-collect tools are present in the new game. */
+.native-mining.myj-arcade {
+  position:relative; width:100%; height:100%; min-height:0; max-height:none;
+  margin:0; border:0; border-radius:0; box-shadow:none; overflow:hidden;
+  container:myj-player / size;
+}
+.native-mining .myj-shell { height:100%; min-height:0; display:flex; flex-direction:column; }
+.native-mining .myj-header { display:none; }
+.native-mining .myj-main { display:flex; flex-direction:column; flex:1 1 auto; min-height:0; min-width:0; }
+.native-mining .myj-stage {
+  flex:1 1 auto; min-height:0; min-width:0; position:relative; overflow:hidden;
+  container:myj-scene / size;
+}
+.native-mining .myj-title { display:none; }
+.native-mining .myj-score {
+  position:absolute; z-index:12; top:8px; right:8px; left:auto;
+  display:flex; flex-direction:row; align-items:flex-start; gap:8px;
+}
+.native-mining .myj-score > div {
+  flex:none; min-width:112px; max-width:168px;
+  padding:4px 9px; border-width:2px; border-radius:16px;
+}
+.native-mining .myj-score .myj-sprite { width:30px; height:30px; }
+.native-mining .myj-score > div > span:last-child { font-size:18px; line-height:1.1; }
+.native-mining .myj-score strong { font-size:25px; }
+.native-mining .myj-score small { font-size:18px; }
+.native-mining .myj-controls {
+  position:relative; z-index:14; flex:none; display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);
+  grid-template-areas:'mission actions';
+  align-items:center; gap:8px; min-width:0;
+  padding:8px 12px; border-top:3px solid #fff;
+}
+.native-mining .myj-mission { grid-area:mission; min-width:0; max-width:none; }
+.native-mining .myj-mission strong { font-size:18px; line-height:1.2; white-space:normal; }
+.native-mining .myj-actions {
+  grid-area:actions; display:flex; justify-content:stretch; min-width:0; gap:8px;
+}
+.native-mining .myj-action {
+  flex:1 1 0; min-width:0; min-height:48px!important; padding:6px 10px;
+  font-size:18px!important; white-space:normal; gap:6px; border-width:2px;
+}
+.native-mining .myj-action-grab { flex:1.2 1 0; }
+.native-mining .myj-tips { display:none; }
+.native-mining .myj-cart-label { display:none; }
+.native-mining .myj-help {
+  inset:8px; width:auto; max-width:none; max-height:calc(100% - 16px);
+  overflow:auto; overscroll-behavior:contain; padding:18px;
+  font-size:20px; line-height:1.35; color:#25134e; background:#fffdf8;
+}
+.native-mining .myj-help strong { font-size:22px; }
+.native-mining .myj-help button { min-height:48px; font-size:18px; }
+.native-mining .myj-ready, .native-mining .myj-build-problem { flex:none; }
+@container myj-player (max-width:650px) {
+  .native-mining .myj-controls {
+    grid-template-columns:minmax(0,1fr); grid-template-areas:'mission' 'actions';
+    padding:6px 8px; gap:5px;
+  }
+  .native-mining .myj-mission { grid-template-columns:auto 1fr auto; max-width:none; }
+  .native-mining .myj-mission [data-myj=mission] { grid-row:1; grid-column:2; }
+  .native-mining .myj-mission [data-myj=level-goal] { grid-row:1; grid-column:3; }
+  .native-mining .myj-score { top:7px; right:7px; gap:5px; }
+  .native-mining .myj-score > div { min-width:0; padding:4px 6px; }
+  .native-mining .myj-score .myj-sprite { display:none; }
+  .native-mining .myj-score strong { font-size:23px; }
+  .native-mining .myj-action { padding:6px; }
+}
+@container myj-player (max-height:450px) and (min-aspect-ratio:1/1) {
+  .native-mining .myj-controls {
+    grid-template-areas:'actions'; grid-template-columns:minmax(0,1fr);
+    gap:0; padding:5px 8px;
+  }
+  .native-mining .myj-mission { display:none; }
+  .native-mining .myj-action { min-height:48px!important; padding:4px 8px; }
+  .native-mining .myj-score { top:6px; right:6px; }
+  .native-mining .myj-score strong { font-size:21px; }
+}

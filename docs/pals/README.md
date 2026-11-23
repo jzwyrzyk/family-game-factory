@@ -155,3 +155,7 @@ The [component browser checks](../../tests/pals-ui-browser.cjs) use explicit syn
 The real collection now uses the approved roster. Articulated rigs, richer animation and companion behavior inside arbitrary generated-game mechanics remain separate. New art must preserve exact existing scene references and receipt ownership. Paid features, trading, cross-device synchronization or a generated-game companion API are outside this feature.
 
 The v1 saved collection accepts all 24 IDs. Older application builds do not understand newly earned IDs or new versioned scene assets; preserve storage during rollback and use a compatible forward repair. The existing three saved aliases and their historical scenes remain readable.
+
+### Coding scene presentation
+
+The first-learner coding candidate adds [scene-only Pal compositing](../creation-studio/PAL_SCENE_RENDERING.md) for the 48 approved neutral pictures. It removes cream paper at draw time with a bounded active-scene cache. Catalogue portraits, source bytes, ownership and growth, expression approvals, saved asset IDs and original token compatibility remain unchanged. This is not a replacement art pack or a new approval of character designs.

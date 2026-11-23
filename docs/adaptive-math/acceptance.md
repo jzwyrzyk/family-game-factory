@@ -45,3 +45,10 @@ Observe representative grade 1–4 children using both checkpoint and constructi
 Return after one day and after at least a week. Evaluate independent answers on different examples and forms, the amount of help required, and whether the same confusion reappears. Track game checkpoint burden separately from learning. Synthetic multi-day clocks verify scheduling logic only; they cannot demonstrate retention in children.
 
 The initial ratios, challenge thresholds, cadence, and review intervals are product defaults for that pilot, not validated optimums. A release decision should use the observed results and documented coverage, not just green CI.
+
+
+## November 21, 2026 — profile setup candidate
+
+This candidate adds per-profile grade/difficulty setup and a conservative Grade 1 / Gentle start for unconfigured child profiles. On the local working tree, `tests/learning-repair.test.ts`, `tests/learning-engine.test.ts`, and `tests/language-engine.test.ts` passed **60 checks**, including all three difficulty modes under a grade-1 ceiling, older higher-grade targets/history, explicit saved settings, backup/restore, profile switching, malformed grade/age inputs and a failed setup save. The profile/store regression plus whole-family rewards-backup suite passed **28 checks** (these overlap the 60 and are not additive). TypeScript and a Vite production build passed.
+
+`tests/learning-profile-browser.cjs` covers desktop/phone controls, save/reload, cancellation, profile isolation, grade sampling, viewport/touch geometry and zero remote POSTs. It could not run locally: the pinned Playwright headless shell is absent, and the existing system Chromium exited before opening a page with `socket() failed: Operation not permitted`. No browser screenshot, real-device or child acceptance is claimed; hosted execution on the final integrated source remains required. This records source verification, not a merge or deployment.

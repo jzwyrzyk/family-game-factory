@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 
 const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1',WORKSPACE='family-game-factory-workspace-v2';
 const IDEAS=[
@@ -65,8 +65,7 @@ async function seedHistoricalRecords(page){
 }
 
 async function choosePlayer(page,index){
- const menu=page.locator('#studioProfileMenu');
- if(!await menu.evaluate(element=>element.open))await menu.locator('summary').click();
+ await openProfiles(page);
  await page.locator('#profile-choices .profile-choice').nth(index).click();
  await page.waitForFunction(id=>window.FG.store.current().id===id,'player'+(index+1));
  await page.locator('#page-studio-library').waitFor({state:'visible'});
@@ -146,7 +145,7 @@ async function collectionJourney(browser,base,device,viewport){
   await navigate(page,'#studioNavPals');await page.locator('#page-jems-pals').waitFor({state:'visible'});
   assert.equal(await page.locator('#studioNavPals').getAttribute('aria-current'),'page');
   assert.deepEqual(await page.locator('.studio-nav button.active').evaluateAll(buttons=>buttons.map(button=>button.id)),['studioNavPals']);
-  await page.click('#studioNavHome');await page.click('#studioSavedIdeas');await assertCollection(page,0);
+  await navigate(page,'#studioNavHome');await page.click('#studioSavedIdeas');await assertCollection(page,0);
   await choosePlayer(page,1);await page.click('#studioSavedIdeas');await assertCollection(page,1);
   await page.reload();await ready(page);
   assert.equal(await page.evaluate(()=>window.FG.store.current().id),'player2','active player survives reload');
@@ -172,7 +171,7 @@ async function failNotebookWrites(page,enabled){
 async function recoveryJourney(browser,base){
  const {context,page,errors,posts}=await prepare(browser,base,{width:1280,height:900});
  try{
-  await page.click('#studioNavCreate');
+  await navigate(page,'#studioNavCreate');
   const prior='Fixture: a saved balloon library.';
   await page.fill('#studioPrompt',prior);
   await page.waitForFunction(text=>window.FG.studio.exportNotebook().sessions.some(s=>s.draft===text),prior);
@@ -181,7 +180,7 @@ async function recoveryJourney(browser,base){
   const unsaved='Fixture: keep my new words when the device cannot save.';
   await page.fill('#studioPrompt',unsaved);
   await page.waitForFunction(()=>document.getElementById('studioDraftStatus').textContent.includes('Could not save'));
-  await page.click('#studioNavHome');
+  await navigate(page,'#studioNavHome');
   assert.equal(await page.locator('#page-studio').isVisible(),true,'normal home navigation does not discard an unsaved draft');
   // Exercise the retained legacy route listener as well as the visible home path.
   // This event is intentionally synthetic; it does not claim a hidden item is clickable.
@@ -190,7 +189,7 @@ async function recoveryJourney(browser,base){
   assert.equal(await page.locator('#page-creations').isVisible(),false);
   assert.equal(await page.inputValue('#studioPrompt'),unsaved);
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),NOTEBOOK),durable,'a failed save does not overwrite the durable draft');
-  await failNotebookWrites(page,false);await page.click('#studioNavHome');
+  await failNotebookWrites(page,false);await navigate(page,'#studioNavHome');
   await page.click('#studioSavedIdeas');await page.locator('#page-creations').waitFor({state:'visible'});
   assert.equal(await page.locator('#feedbackList .idea').count(),0,'an empty notebook remains a usable collection');
   assert.equal(await page.locator('#drawingUpload').isVisible(),true);
@@ -209,14 +208,14 @@ async function workspaceIntegrityJourney(browser,base){
  try{
   await page.click('[data-starter="buckets"]');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===1,WORKSPACE);
-  await page.click('#studioNavHome');await page.reload();await ready(page);
+  await navigate(page,'studioNavHome');await page.reload();await ready(page);
   const original=(await workspace()).projects[0];
   // The legacy store now knows the first game. Keep this same document alive
   // while Studio adds a second game through its actual adapter and controls.
   await page.click('[data-starter="robot"]');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===2,WORKSPACE);
   const before=await workspace();
-  await page.click('#studioNavHome');await page.click('#studioSavedIdeas');
+  await navigate(page,'studioNavHome');await page.click('#studioSavedIdeas');
   await page.locator('#savedRemixes').getByRole('button',{name:original.name,exact:true}).click();
   await page.locator('#liveKeep').waitFor({state:'visible'});await page.click('#liveKeep');
   assert.match(await page.textContent('#liveStatus'),/pinned/);
@@ -241,7 +240,7 @@ async function notebookCapacityJourney(browser,base){
  try{
   const draft='My next unsent idea';
   await page.click('[data-starter="buckets"]');await page.click('#studioChange');
-  await page.fill('#studioPrompt',draft);await page.click('#studioNavHome');
+  await page.fill('#studioPrompt',draft);await navigate(page,'studioNavHome');
   assert.equal((await notebook()).sessions[0].draft,draft,'the real composer saves the unsent draft before historical messages are seeded');
   const sourceId=await page.evaluate(key=>{
    // Reload flushes the live composer. Seed only retained history; replacing

@@ -16,10 +16,13 @@ export function factoryPalette(level: number): FactoryGemColor[] {
 export function factoryPattern(level: number, gift: number): FactoryPattern {
   const palette = factoryPalette(level), start = (gift + level - 1) % palette.length;
   const a = palette[start], b = palette[(start + 1) % palette.length], c = palette[(start + 2) % palette.length];
-  const cycle: FactoryGemColor[] = level === 1 ? [a, b] : level === 2 ? [a, a, b]
+  const base: FactoryGemColor[] = level === 1 ? [a, b] : level === 2 ? [a, a, b]
     : level % 3 === 0 ? [a, b, c] : level % 3 === 1 ? [a, b, b] : [a, b, a];
-  // Vary where the question falls, so copying the first gem is not a solution.
-  const length = cycle.length === 2 ? 4 + gift % 2 : 6 - gift % 2;
+  // Show at least two complete repeats. Rotate longer units on alternating
+  // gifts so a six/seven-piece clue does not always ask for its first color.
+  const offset = base.length === 3 && gift % 2 ? (base[1] === base[2] ? 2 : 1) : 0;
+  const cycle = [...base.slice(offset), ...base.slice(0, offset)];
+  const length = 6 + gift % 2;
   const sequence = Array.from({ length }, (_, i) => cycle[i % cycle.length]);
   return { cycle, sequence, next: cycle[length % cycle.length] };
 }

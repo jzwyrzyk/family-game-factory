@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,waitForWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,waitForWelcome,navigate}=require('./studio-entry.cjs');
 const output=path.resolve('test-results/art-studio');
 fs.mkdirSync(output,{recursive:true});
 const ready=page=>page.waitForFunction(()=>window.FG?.artStudio&&window.FG?.creation);
@@ -94,7 +94,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   const ride=await page.evaluate(()=>window.FG.runtime.snapshot().state);assert.ok(ride.drawingRigId,'Rally uses immutable selected art');
   const originalBinding=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).revisions.find(r=>r.drawingRigId)?.drawingRigId);assert.equal(originalBinding,ride.drawingRigId);
   await page.screenshot({path:path.join(output,'rally-with-my-art.png'),fullPage:true});
-  await page.locator('#studioNavHome').click();await page.locator('#studioArtShortcut').click();
+  await navigate(page,'#studioNavHome');await page.locator('#studioArtShortcut').click();
   await page.locator('[data-art-id]').first().click();await page.locator('.art-detail-tools summary').click();await page.getByRole('button',{name:'Trim, turn & clean up',exact:true}).click();
   await page.locator('.art-picture').waitFor({state:'visible'});await page.locator('[data-edge="left"]').fill('10');await page.locator('[data-edge="left"]').dispatchEvent('change');
   await page.locator('[data-turn]').click();await page.locator('.art-picture [data-name]').fill('Jellybean close-up');
@@ -113,7 +113,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await page.locator('#artUseScene').click();await page.locator('#creationWorkspace').waitFor({state:'visible'});assert.ok((await page.locator('#creationTitle').inputValue()).includes('Mochi'),'drawing starts its own editable scene');
   assert.ok(await page.evaluate(()=>window.FG.creation.scene().actors[0].assetId.startsWith('art:rig:')),'the scene uses the selected saved character cutout');
   await page.waitForFunction(()=>document.querySelector('#creationActors canvas'));await page.screenshot({path:path.join(output,'my-art-in-create-and-code.png'),fullPage:true});
-  await page.locator('#studioNavHome').click();await page.locator('#studioArtShortcut').click();await page.locator('[data-category="all"]').click();
+  await navigate(page,'#studioNavHome');await page.locator('#studioArtShortcut').click();await page.locator('[data-category="all"]').click();
   await page.locator('.art-library-more summary').click();const download=page.waitForEvent('download');await page.locator('#artExport').click();const artifact=await download;assert.equal(artifact.suggestedFilename(),'my-jems-art.json');const artBundle=JSON.parse(fs.readFileSync(await artifact.path(),'utf8'));assert.equal(artBundle.drawings.length,4);assert.ok(artBundle.rigs.length>=1);
   await page.locator('.art-library-more summary').click();
   await page.setViewportSize({width:390,height:844});await noOverflow(page,'390px library');const closeIcon=await page.getByRole('button',{name:'Close artwork details'}).locator('svg').boundingBox();assert.ok(closeIcon.width>=16&&closeIcon.height>=16,'icon-only close remains visible');await page.screenshot({path:path.join(output,'art-library-phone.png'),fullPage:true});

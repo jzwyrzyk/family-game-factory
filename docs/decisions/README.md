@@ -1,11 +1,14 @@
 # jems decision records
 
+- [November 22: unified game navigation and one Notifications surface](2026-11-22-unified-game-notifications.md) — consolidate PR125 after shell/chat and Conversation Coach, preserving separate gameplay overhauls.
+
 These records explain durable choices without turning chat history into another backlog. They are a compact index of decisions; [product doctrine](../../PRODUCT-DOCTRINE.md) describes intent, [architecture](../../ARCHITECTURE-CURRENT.md) describes the system and [delivery state](../../DELIVERY-STATE.md) records implementation and operational evidence.
 
 ## Index
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
 | [0003](0003-explicit-voice-and-build.md) | Editable dictation, explicit Send and separate Build | Accepted, retrospectively documented | November 18, 2026 push-to-talk decision |
@@ -30,6 +33,10 @@ These records explain durable choices without turning chat history into another 
 | [Gem Pal expression runtime](2026-11-20-pal-expression-runtime.md) | Versioned 184-image original-roster exports, isolated expression previews and a finite Wink Base opacity pilot | Accepted for implementation; release acceptance separate | Owner approved the completed core artwork and integration work, November 20, 2026 |
 
 | [Approved Pal collection](2026-11-21-approved-pal-collection.md) | Connect all 24 approved character neutrals to actual collection, two free starter choices, earned forms and versioned scene use while retaining saved IDs | Accepted for implementation and release after verification | Owner confirmed the starter-art gap and authorized the complete fix and subsequent cutover, November 21 |
+| [First-learner coding](2026-11-22-first-learner-coding.md) | Put a larger scene before a compact beginner action dock; disclose fuller controls without rewriting saved programs; composite approved Pal paper backgrounds in the scene renderer | Accepted for implementation; candidate verification and release separate | Owner's November 22 coding-learning usability and Pal-background overhaul request |
+| [Jem Factory play clarity](2026-11-22-factory-play-clarity.md) | Make patterns prominent, mount sorting controls on the machine, recycle missed cuts and increase pattern difficulty after two completed cycles | Accepted for implementation; verification and release separate | Owner's November 22 request to preserve the Factory's beauty and finishing play while making its actions clearer and consequential |
+
+| [Bubble Gum assembly](2026-11-22-bubble-gum-assembly.md) | Recognizable objects, structural gum joins, varied puzzles and extended replayable adventures in the shared player | Accepted owner direction; initial tuning awaits play review | Owner's November 22 comprehensive overhaul request |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
@@ -68,3 +75,5 @@ Never copy private child content, credentials or restricted evidence into this p
 - [Private Art Studio and explicit reusable art versions](2026-11-19-private-art-studio.md) — dedicated creation space, original preservation, pinned game/scene use and private portability.
 
 - [November 20: readable learning surfaces and friendly narration](2026-11-20-learning-readability-and-narration.md) — question-first copy, semantic light/dark separation, readable type and deliberate local female voice selection.
+
+- [November 21: explicit profile levels, fitted play and persistent reading](2026-11-21-profile-play-and-reading.md) — conservative per-profile learning setup, common viewport/fullscreen, shared read-aloud and separately approved natural narration.

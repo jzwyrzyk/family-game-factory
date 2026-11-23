@@ -3,6 +3,12 @@ const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const fs=require('node:fs');
+const SECONDARY_DESTINATIONS=[
+ ['studioNavScenes','Create & code'],
+ ['studioNavNotifications',/^Notifications, \d+ new, \d+ in progress$/],
+ ['studioNavJourney','My journey'],['studioNavRewards','My rewards'],
+ ['studioNavPals','My Pals'],['studioNavPowers','My Powers'],['studioNavProblemSolving','Try an idea'],
+];
 async function approvedIcons(page,basePath){
  const icons=await page.locator('svg.jems-icon').evaluateAll(elements=>elements.map(icon=>({
   name:icon.dataset.jemsIcon,hidden:icon.getAttribute('aria-hidden'),focusable:icon.getAttribute('focusable'),
@@ -59,7 +65,7 @@ async function currentNavigation(page,id){
     assert.equal(await page.locator('.studio-nav').getByRole('button',{name,exact:true}).getAttribute('id'),id,'navigation keeps its visible accessible label');
    }
    await page.locator('#studioNavMenu').click();
-   for(const [id,name] of [['studioNavScenes','Create & code'],['studioNavProblemSolving','Try an idea'],['studioNavJourney','My journey'],['studioNavRewards','My rewards'],['studioNavPals','My Pals'],['studioNavPowers','My Powers']]){
+   for(const [id,name] of SECONDARY_DESTINATIONS){
     assert.equal(await page.locator('#studioMenuDialog').getByRole('button',{name,exact:true}).getAttribute('id'),id,'Menu preserves each secondary destination and label');
    }
    await page.locator('#studioMenuClose').click();
@@ -74,7 +80,8 @@ async function currentNavigation(page,id){
    const title=await page.title();assert.match(title,/^jems/);
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
-   assert.equal(await page.locator('#studioStarters [data-starter]').count(),7);
+   assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
+   assert.deepEqual(await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'original games retain their own visible group');
    // Keep three primary actions in one row, every secondary route in the drawer,
    // and the selected maker clear of home actions even at a narrow 320px width.
    if(label==='mobile'){
@@ -105,7 +112,7 @@ async function currentNavigation(page,id){
      const secondary=await page.locator('#studioMenuDialog [id^="studioNav"]').evaluateAll(buttons=>buttons.map(button=>{
       const box=button.getBoundingClientRect();return {id:button.id,width:box.width,height:box.height,left:box.left,right:box.right,font:parseFloat(getComputedStyle(button).fontSize)};
      }));
-     assert.equal(secondary.length,6,'all six secondary destinations remain in the menu');
+     assert.deepEqual(secondary.map(button=>button.id),SECONDARY_DESTINATIONS.map(([id])=>id),'all seven intended secondary destinations remain in their menu groups');
      assert.ok(secondary.every(button=>button.height>=44&&button.width>=44&&button.font>=16&&button.left>=0&&button.right<=phoneWidth+1),'drawer routes retain readable labels and complete touch targets');
      await page.locator('#studioMenuClose').click();
     }

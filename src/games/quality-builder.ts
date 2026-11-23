@@ -306,11 +306,14 @@ export default class QualityBuilder implements GameInstance {
         const selectable = this.blueprint.parts.filter(p => !this.joining || p.id !== this.selected);
         const index = selectable.findIndex(p => p.id === (this.joining ? this.joinTarget : this.selected));
         const piece = index >= 0 ? selectable[index] : undefined;
-        this.piecePicker.hidden = !building || this.storageBlocked || this.blueprint.parts.length < 2;
-        this.previousPieceButton.disabled = this.nextPieceButton.disabled = !selectable.length;
+        // Keep the tray at a stable document position while resetting or adding
+        // the first parts. Removing this row used to move it by 65px between a
+        // tablet's touchend and compatibility click, redirecting that click.
+        this.piecePicker.hidden = !building || this.storageBlocked;
+        this.previousPieceButton.disabled = this.nextPieceButton.disabled = selectable.length < 2;
         this.piecePickerLabel.textContent = piece
             ? `${this.joining ? 'Gum target' : 'Selected'} ${index + 1} of ${selectable.length} · ${PARTS[piece.kind].name}`
-            : `${this.joining ? 'Choose a gum target' : 'Choose a piece'} · ${selectable.length} available`;
+            : selectable.length ? `${this.joining ? 'Choose a gum target' : 'Choose a piece'} · ${selectable.length} available` : 'Choose a part below';
         this.root.dataset.mode = this.mode;
         this.root.dataset.selected = this.selected || '';
         this.root.dataset.mission = this.mission;
@@ -325,7 +328,9 @@ export default class QualityBuilder implements GameInstance {
         // A touch tablet with an attached mouse may report a fine pointer mid-session.
         const compactLandscape = window.innerWidth > window.innerHeight
             && window.innerHeight >= 600 && window.innerHeight <= 900 && w >= 600;
-        const h = compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
+        const fitted = this.root.closest('.studio-play-mode') && rect.height > 0;
+        const h = fitted ? Math.max(140, rect.height)
+            : compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
         this.canvas.style.height = h + 'px';
         const dpr = Math.min(2, devicePixelRatio || 1);
         this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);

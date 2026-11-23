@@ -89,9 +89,6 @@ h1,h2,h3,.brand,.studio-card-name,.studio-make-copy strong,.studio-library-headi
 .studio-review #studioTalk {font-size:15px;font-weight:800}
 .studio-review #studioMic {background:#F1E8FF;color:#5327A7;border-color:#BCA2EF}
 .studio-review #studioMic[aria-pressed=true] {background:#FFE4DF;color:#772D37;border-color:#FF7E89}
-.studio-review .studio-build-shelf{background:#12265F;color:#fff;border-color:#2D4383}
-.studio-review .studio-build-item{background:#223B72;border-color:#4766A3}
-.studio-review .studio-build-copy span{color:#D1DDF5}
 .studio-review .studio-versions,.studio-review .design-plan{border-color:#CFC9EC}
 .studio-review .studio-preview-notice{background:#FFF3D0;border-color:#FFD878;color:#5B4306}
 .studio-review .studio-profile-menu .profile-choices{border-color:#DED5EF}
@@ -253,8 +250,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible {
 .studio-review .studio-version-card.is-candidate{background:#FFFAEA;border-color:#E8C96D}
 .studio-review .studio-status.is-error{background:#FFF2EF;color:#8D2733;border-color:#F7B8C0}
 .studio-review .studio-preview-notice{background:#FFF5D9;color:var(--jems-warning-ink);border-color:#EECB6D}
-.studio-review .studio-build-shelf{background:linear-gradient(135deg,#0B1E3B,#192F65);border-color:#334A83}
-.studio-review .studio-build-item{background:#213A72;border-color:#4C6298}
 .studio-review .studio-button,
 .studio-review .studio-chip,
 .studio-review #studioTalk,

@@ -7,6 +7,7 @@ import { createRewardFact, enqueueRewardFact, rewardFactId, validateRewardOutbox
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 import { freshGuidance, isGuideTipId, validateGuidePreferences, type GuidePreferences, type GuideTipId } from './guidance';
 import {validateBuildSubmission,type PendingBuildSubmission} from '../builder/submission';
+import { acknowledgeStudioNotificationItems, freshStudioNotificationPreferences, validateStudioNotificationPreferences, type StudioNotificationPreferences, type StudioNotificationRef } from './notifications';
 /** Persistent UI state only. Never stores credentials, signed URLs or executable code. */
 export const STUDIO_KEY = 'family-game-factory-studio-v1';
 export const NOTEBOOK_CAPACITY = 80;
@@ -36,7 +37,7 @@ export interface StudioSession {
   /** Immutable earlier pages; the current messages remain a bounded writable page. */
   previousConversationId?:string;
 }
-export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[];guidance?:Record<string,GuidePreferences>;conversationChapters?:ConversationChapter[] }
+export interface Notebook { version: 1; sessions: StudioSession[]; active: Record<string, string>; avatars?:Record<string,BuilderAvatar>;rewardOutbox?:RewardFact[];guidance?:Record<string,GuidePreferences>;conversationChapters?:ConversationChapter[];notifications?:Record<string,StudioNotificationPreferences> }
 const guidanceFor=(notebook:Notebook,owner:string):GuidePreferences=>notebook.guidance&&Object.hasOwn(notebook.guidance,owner)?notebook.guidance[owner]:freshGuidance();
 const fresh = (): Notebook => ({version: 1, sessions: [], active: {}});
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -66,7 +67,7 @@ function conversationContext(notebook:Notebook,session:StudioSession):StudioSess
 export function validateNotebook(input: unknown): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > NOTEBOOK_CAPACITY || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
-  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance','conversationChapters'].includes(k)))throw Error('Unknown studio data; not restored.');
+  if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance','conversationChapters','notifications'].includes(k)))throw Error('Unknown studio data; not restored.');
   if(n.conversationChapters!==undefined){
     if(!Array.isArray(n.conversationChapters)||n.sessions.length+n.conversationChapters.length>NOTEBOOK_CAPACITY)throw Error('Invalid retained notebook capacity.');
     const ids=new Set<string>();
@@ -118,6 +119,14 @@ export function validateNotebook(input: unknown): Notebook {
   const retainedPages=new Set(n.sessions.flatMap(session=>chaptersFor(n,session).map(page=>page.id)));
   if(n.conversationChapters?.some(page=>!retainedPages.has(page.id)))throw Error('An earlier conversation page is missing its owning project.');
   for (const [owner,id] of Object.entries(n.active)) if (!ident(owner) || !ident(id) || !n.sessions.some(s=>s.id===id&&s.owner===owner)) throw Error('Invalid current project.');
+  if(n.notifications!==undefined){
+    if(!n.notifications||typeof n.notifications!=='object'||Array.isArray(n.notifications)||Object.keys(n.notifications).length>80)throw Error('Invalid notification preferences.');
+    for(const [owner,preferences] of Object.entries(n.notifications)){
+      if(!ident(owner))throw Error('Invalid notification player.');
+      const validated=validateStudioNotificationPreferences(preferences);
+      if(validated.acknowledgements.some(item=>!n.sessions.some(session=>session.id===item.sessionId&&session.owner===owner)))throw Error('Invalid notification project.');
+    }
+  }
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
   const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
@@ -185,6 +194,28 @@ export class StudioNotebook {
   resetGuidance(owner:string):GuidePreferences {
     if(!ident(owner))throw Error('Invalid player.');
     return this.write(n=>{const next={...guidanceFor(n,owner),dismissedTips:[]};n.guidance={...n.guidance,[owner]:next};return next;});
+  }
+  notificationPreferences(owner:string):StudioNotificationPreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    const preferences=this.read().notifications;
+    return preferences&&Object.hasOwn(preferences,owner)?validateStudioNotificationPreferences(preferences[owner]):freshStudioNotificationPreferences();
+  }
+  acknowledgeNotifications(owner:string,items:readonly StudioNotificationRef[]):StudioNotificationPreferences {
+    return this.writeNotificationAcknowledgements(owner,items,false);
+  }
+  dismissNotification(owner:string,item:StudioNotificationRef):StudioNotificationPreferences {
+    return this.writeNotificationAcknowledgements(owner,[item],true);
+  }
+  private writeNotificationAcknowledgements(owner:string,items:readonly StudioNotificationRef[],dismiss:boolean):StudioNotificationPreferences {
+    if(!ident(owner))throw Error('Invalid player.');
+    if(!Array.isArray(items)||items.length>80)throw Error('Invalid notification acknowledgement.');
+    if(!items.length)return this.notificationPreferences(owner);
+    return this.write(n=>{
+      if(items.some(item=>!item||item.ownerId!==owner||!n.sessions.some(session=>session.id===item.sessionId&&session.owner===owner)))throw Error('Choose a notification from your own profile.');
+      const before=n.notifications&&Object.hasOwn(n.notifications,owner)?n.notifications[owner]:freshStudioNotificationPreferences();
+      const next=acknowledgeStudioNotificationItems(before,owner,items,dismiss);
+      n.notifications={...n.notifications,[owner]:next};return next;
+    });
   }
   avatar(owner:string):BuilderAvatar|null {
     if(!ident(owner))throw Error('Invalid player.');

@@ -84,7 +84,7 @@ def fingerprint(resource):
     ignored = {"name", "uid", "generation", "createTime", "updateTime", "deleteTime",
                "expireTime", "creator", "service", "reconciling", "conditions",
                "observedGeneration", "logUri", "etag", "revision", "containerStatuses",
-               "launchStage", "satisfiesPzs", "client", "clientVersion"}
+               "launchStage", "satisfiesPzs", "client", "clientVersion", "scalingStatus"}
     template = {key: value for key, value in resource.items() if key not in ignored}
     containers = template.get("containers", [])
     require(isinstance(containers, list) and len(containers) == 1, "Expected one container")

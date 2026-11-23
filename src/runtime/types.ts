@@ -1,4 +1,4 @@
-export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill' | 'moon' | 'robot' | 'factory';
+export type GameId = 'gum' | 'buckets' | 'dragon' | 'hill' | 'moon' | 'robot' | 'factory' | 'mining';
 export type Difficulty = 'gentle' | 'classic' | 'stretch';
 export type Mechanics = Record<string, number | boolean>;
 export interface Mechanic {
@@ -16,6 +16,8 @@ export interface GameInstance {
   next(): void; restart(): void; retry?(): void; unmount(): void;
   /** Optional safe checkpoint contract. Only an actively playing game may pause. */
   isPlaying?(): boolean; pause?(): boolean; resume?(): void;
+  /** Optional in-place instructions that preserve the current round. */
+  showHelp?(): void;
   snapshot?(): Record<string, unknown>;
 }
 export interface GameContext {
@@ -33,5 +35,6 @@ export interface GamePlugin {
 export interface GameLifecycle {
   start(): void; next(): void; retry(): void; dispose(): void;
   isPlaying(): boolean; pause(): boolean; resume(): void;
+  showHelp(): boolean;
   snapshot(): { config: Mechanics; state: Record<string, unknown>; disposed: boolean };
 }

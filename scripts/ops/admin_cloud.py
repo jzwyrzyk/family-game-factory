@@ -11,6 +11,7 @@ from admin_api import Http, Plan, SetupError, command, gcloud, require
 import drill
 import oidc_claims
 import release
+from activation_review import review_plan
 
 PROJECT = release.PROJECT
 NUMBER = release.PROJECT_NUMBER
@@ -110,20 +111,21 @@ def account(plan, project, name, *, expected_bindings=()):
     return email, permitted(policy, expected_bindings, email)
 
 
-def registry(plan, project, name):
+def registry(plan, project, name, *, expected_bindings=()):
     available = {row["name"].rsplit("/", 1)[-1]: row for row in
                  rows(project, "artifacts", "repositories", "list", f"--location={REGION}")}
     current = available.get(name)
     if current is None:
         add_gcloud(plan, project, f"Create immutable Docker repository {name}", "artifacts", "repositories", "create",
                    name, f"--location={REGION}", "--repository-format=docker", "--immutable-tags", f"--description={MARKER}")
+        return set()
     else:
         exact(current, {"format": "DOCKER", "description": MARKER}, name)
         require(current.get("dockerConfig", {}).get("immutableTags") is True
                 and not current.get("cleanupPolicies") and current.get("mode", "STANDARD_REPOSITORY") == "STANDARD_REPOSITORY",
                 f"Repository {name} has unexpected tag, retention or mode settings")
-        permitted(gcloud(project, "artifacts", "repositories", "get-iam-policy", name, f"--location={REGION}"),
-                  [], name)
+        return permitted(gcloud(project, "artifacts", "repositories", "get-iam-policy", name, f"--location={REGION}"),
+                         expected_bindings, name)
 
 
 def lane_condition(lane):
@@ -347,16 +349,7 @@ class Cloud:
     def production_plan(self):
         project_check(PROJECT, NUMBER)
         services = self.serving()
-        plan = Plan("production-activation-withheld", {"head": self.head, "services": services})
-        plan.notes.extend([
-            "Requires independently verified claims-only runs on protected main and explicit owner approval.",
-            "Publisher role roles/artifactregistry.writer only on the new immutable repository.",
-            "Rollout registry access roles/artifactregistry.reader only on that repository.",
-            "Rollout custom permissions run.services.get, run.services.update, run.revisions.get on individually approved services.",
-            "No runtime iam.serviceAccounts.actAs unless separately approved on the corresponding runtime service account.",
-            "Any service with configuration drift remains blocked. This program cannot apply production activation.",
-        ])
-        return plan
+        return review_plan(self.head, services)
 
 
 def isolated_owner():
