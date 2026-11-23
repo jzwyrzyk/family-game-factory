@@ -36,6 +36,25 @@ LIMIT = 500
 FORMAT = ('json[private](timestamp,resource.type,resource.labels.project_id,'
           'resource.labels.location,resource.labels.service_name,'
           'resource.labels.revision_name,logName,severity,httpRequest.status)')
+# Cloud Run v2 Condition enums. Never expose free-form messages or unknown values.
+CONDITION_VALUES = {
+    'type': {'Ready', 'Active', 'ResourcesAvailable', 'ContainerReady', 'ContainerHealthy'},
+    'state': {'STATE_UNSPECIFIED', 'CONDITION_PENDING', 'CONDITION_RECONCILING',
+              'CONDITION_FAILED', 'CONDITION_SUCCEEDED'},
+    'severity': {'SEVERITY_UNSPECIFIED', 'ERROR', 'WARNING', 'INFO'},
+    'reason': {'COMMON_REASON_UNDEFINED', 'UNKNOWN', 'REVISION_FAILED',
+               'PROGRESS_DEADLINE_EXCEEDED', 'CONTAINER_MISSING',
+               'CONTAINER_PERMISSION_DENIED', 'CONTAINER_IMAGE_UNAUTHORIZED',
+               'CONTAINER_IMAGE_AUTHORIZATION_CHECK_FAILED',
+               'ENCRYPTION_KEY_PERMISSION_DENIED', 'ENCRYPTION_KEY_CHECK_FAILED',
+               'SECRETS_ACCESS_CHECK_FAILED', 'WAITING_FOR_OPERATION', 'IMMEDIATE_RETRY',
+               'POSTPONED_RETRY', 'INTERNAL', 'VPC_NETWORK_NOT_FOUND'},
+    'revisionReason': {'REVISION_REASON_UNDEFINED', 'PENDING', 'RESERVE', 'RETIRED',
+                       'RETIRING', 'RECREATING', 'HEALTH_CHECK_CONTAINER_ERROR',
+                       'CUSTOMIZED_PATH_RESPONSE_PENDING', 'MIN_INSTANCES_NOT_PROVISIONED',
+                       'ACTIVE_REVISION_LIMIT_REACHED', 'NO_DEPLOYMENT',
+                       'HEALTH_CHECK_SKIPPED', 'MIN_INSTANCES_WARMING'},
+}
 
 
 class ObservationError(Exception):
@@ -123,12 +142,32 @@ def latest_references(release, intent, service):
             for key in ('latestCreatedRevision', 'latestReadyRevision')}
 
 
+def condition_summary(revision):
+    rows = revision.get('conditions', [])
+    need(isinstance(rows, list) and len(rows) <= 32
+         and all(isinstance(row, dict) for row in rows), 'REVISION_CONDITIONS_INVALID')
+    return [{key: ('NOT_REPORTED' if key not in row else
+                   row[key] if isinstance(row[key], str) and row[key] in allowed else 'UNRECOGNIZED')
+             for key, allowed in CONDITION_VALUES.items()} for row in rows]
+
+
 def staged_state(release, intent, service, baseline, candidate):
     name = release.revision_name(intent)
     need(service.get('name') == RESOURCE and service.get('etag')
          and not service.get('reconciling', False), 'SERVICE_UNSTABLE')
-    need(all(row['target'] == 'candidate' and row['project_reference'] in {'project_id', 'project_number'}
-             for row in latest_references(release, intent, service).values()),
+    generation = service.get('generation')
+    terminal = service.get('terminalCondition', {})
+    need(isinstance(generation, str) and re.fullmatch(r'[1-9][0-9]*', generation)
+         and service.get('observedGeneration') == generation
+         and terminal.get('type') == 'Ready'
+         and terminal.get('state') == 'CONDITION_SUCCEEDED', 'SERVICE_NOT_RECONCILED')
+    references = latest_references(release, intent, service)
+    # A Ready candidate with no traffic can leave latestReadyRevision pointing
+    # at the serving baseline. It must still be the exact latest-created revision.
+    need(references['latestCreatedRevision']['target'] == 'candidate'
+         and references['latestReadyRevision']['target'] in {'baseline', 'candidate'}
+         and all(row['project_reference'] in {'project_id', 'project_number'}
+                 for row in references.values()),
          'LATEST_REVISION_CHANGED')
     need(release.traffic(service) == {intent['baseline']: 100}, 'STAGE_TRAFFIC_CHANGED')
     # Validate desired traffic too; a pending or implicit/latest target is not
@@ -149,6 +188,8 @@ def staged_state(release, intent, service, baseline, candidate):
              and release.fingerprint(revision) == intent['configuration'], 'REVISION_CHANGED')
     return {'baseline_percent': 100, 'candidate_percent': 0,
             'candidate': name, 'both_revisions_ready': True,
+            'service_reconciled': True, 'candidate_serving_health': 'NOT_TESTED',
+            'candidate_lifecycle_review': 'REQUIRED_BEFORE_CANARY',
             'images_and_configuration_matched': True}
 
 
@@ -257,6 +298,8 @@ def observe(report):
     baseline = get('GET', RESOURCE + '/revisions/' + intent['baseline'])
     candidate = get('GET', RESOURCE + '/revisions/' + name)
     report['latest_revision_references'] = latest_references(release, intent, current)
+    report['revision_conditions'] = {'baseline': condition_summary(baseline),
+                                     'candidate': condition_summary(candidate)}
     report['stage'] = staged_state(release, intent, current, baseline, candidate)
     for expected in activated['service_baselines']:
         if expected['service'] == SERVICE:

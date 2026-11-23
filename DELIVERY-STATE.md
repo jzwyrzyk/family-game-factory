@@ -1,5 +1,13 @@
 # jems delivery state
 
+## November 23, 2026 — zero-traffic Coach state explains observer failure
+
+The owner's subsequent read-only Cloud Run v2 projection identifies the actual mismatch: latest-created is the exact staged candidate `factory-coach-private-r-890188092e3f4396dab0`, while latest-ready remains the retained baseline `factory-coach-private-chatready-1996c1b382a7-9c98a0`. Desired and effective traffic both remain baseline 100%; generation and observed generation are both `13`, and the service terminal Ready condition succeeded. Both revision Ready conditions succeeded and both image digests match the reviewed intent. This owner-supplied observation has no timestamp or saved receipt hash and is not an independent cloud read from Codex. It resolves the field mismatch; the earlier project-number-format hypothesis below was not the cause in this observation.
+
+The observer now permits only the exact baseline or candidate in latest-ready, still requiring the exact candidate in latest-created and the verified namespace forms. It additionally requires a positive matching service generation and successful terminal Ready condition. Both revision identities/readiness/images/configuration, tags, desired/effective traffic, peer baselines, recovery, continuity and monitoring checks remain in place. Regression fixtures reproduce the supplied zero-traffic state and reject stale/failed reconciliation and unexpected revisions or traffic.
+
+The candidate also reported Active `CONDITION_FAILED` and ResourcesAvailable `CONDITION_RECONCILING`; the supplied projection omitted their reasons and severity. These do not override its successful Ready metadata, but their causes and serving health are **unverified**. The next observer run emits allowlisted condition enums, reasons and severity without messages or unknown values, and explicitly requires lifecycle review before canary. It does not classify those states as harmless idle, prove startup under traffic or establish a working provider reply. Fresh full observation, lifecycle review and the existing release gates remain outstanding; no canary, promotion, traffic change, paid call or merge is performed by this correction.
+
 ## November 23, 2026 — stage observer stopped on latest-revision comparison
 
 The owner ran observer source `bd1b24144c61dbd1691a53cb5b7e8f5918135374` with its exact SHA-256. It stopped at `LIVE_CLOUD` with `LATEST_REVISION_CHANGED`, zero mutations and private receipt SHA-256 `f8aefc4c3bacfcfaf308ae7ba0001d8bd1fab66562230abaed253ec019ae8b58`. That result does not identify which latest-revision field differed or establish current traffic, configuration, monitoring or continuity. The successful stage workflow remains historical evidence, and canary remains unexecuted.

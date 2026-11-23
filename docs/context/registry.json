@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T23:11:47.753Z",
-      "sourceDigest": "36f6924d7f9c2df23f881894b270e96dc13051ff5c5fd0dcbe36f6a7462e5565",
+      "reviewedAt": "2026-11-23T23:18:32.994Z",
+      "sourceDigest": "9b2af42f9edddf41dc4aef95aa8584bc03a827a90f5a98a332ec73f086aee9ee",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner observation blocked at latest revision comparison with zero mutations. Recognize only exact candidate references in the verified project ID or number namespace, retain all traffic/revision/configuration gates, and emit sanitized reference classifications on failure. Project-number formatting remains an unconfirmed cause pending fresh owner read. Operations suite passed 175 tests; focused observer suite passed 16 after short-name diagnostic classification, which remains rejected. No release intent/controller/traffic/IAM changes.",
+      "reviewReason": "Recorded owner-observed baseline latest-ready at zero traffic, required successful generation reconciliation, and documented enum-only lifecycle evidence and unresolved candidate serving health before canary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

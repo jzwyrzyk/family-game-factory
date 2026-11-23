@@ -31,6 +31,8 @@ class CoachFixture(CloudRunFixture):
         self.transition('stage')
         self.state['name'] = self.resource
         self.state['latestReadyRevision'] = self.state['latestCreatedRevision']
+        self.state.update(generation='13', observedGeneration='13',
+                          terminalCondition={'type': 'Ready', 'state': 'CONDITION_SUCCEEDED'})
 
     def observe(self):
         return o.staged_state(release, self.intent, self.state,
@@ -65,20 +67,78 @@ class StageTests(unittest.TestCase):
                     with self.assertRaises(o.ObservationError):
                         changed.observe()
 
-    def test_baseline_latest_ready_still_blocks_and_is_reported_without_raw_values(self):
+    def test_observed_zero_traffic_candidate_keeps_baseline_latest_ready(self):
         f = CoachFixture()
         f.state['latestReadyRevision'] = f.resource + '/revisions/' + f.baseline
+        f.revisions[f.candidate]['conditions'] = [
+            {'type': 'Ready', 'state': 'CONDITION_SUCCEEDED'},
+            {'type': 'Active', 'state': 'CONDITION_FAILED'},
+            {'type': 'ResourcesAvailable', 'state': 'CONDITION_RECONCILING'},
+            {'type': 'ContainerReady', 'state': 'CONDITION_SUCCEEDED'},
+        ]
         diagnostic = o.latest_references(release, f.intent, f.state)
         self.assertEqual(diagnostic['latestReadyRevision']['target'], 'baseline')
+        result = f.observe()
+        self.assertTrue(result['service_reconciled'])
+        self.assertEqual(result['candidate_serving_health'], 'NOT_TESTED')
+        self.assertEqual(result['candidate_lifecycle_review'], 'REQUIRED_BEFORE_CANARY')
+        self.assertEqual((result['baseline_percent'], result['candidate_percent']), (100, 0))
+
+    def test_baseline_latest_ready_accepts_only_verified_project_namespaces(self):
+        for project in (o.PROJECT, o.PROJECT_NUMBER):
+            f = CoachFixture()
+            f.state['latestReadyRevision'] = (
+                f'projects/{project}/locations/{o.REGION}/services/{o.SERVICE}/revisions/{f.baseline}')
+            self.assertTrue(f.observe()['both_revisions_ready'])
+        f.state['latestReadyRevision'] = f.baseline
         with self.assertRaises(o.ObservationError):
             f.observe()
+
+    def test_unrecognized_and_short_latest_ready_remain_private_and_blocked(self):
+        f = CoachFixture()
         f.state['latestReadyRevision'] = 'unknown/private/value'
         self.assertNotIn('private', json.dumps(o.latest_references(release, f.intent, f.state)))
+        with self.assertRaises(o.ObservationError):
+            f.observe()
         f.state['latestReadyRevision'] = f.candidate
         self.assertEqual(o.latest_references(release, f.intent, f.state)['latestReadyRevision'],
                          {'target': 'candidate', 'project_reference': 'short_name'})
         with self.assertRaises(o.ObservationError):
             f.observe()
+
+    def test_baseline_latest_ready_does_not_allow_stale_or_failed_reconciliation(self):
+        mutations = [
+            lambda s: s.pop('generation'),
+            lambda s: s.pop('observedGeneration'),
+            lambda s: s.update(generation='', observedGeneration=''),
+            lambda s: s.update(generation='0', observedGeneration='0'),
+            lambda s: s.update(generation=True, observedGeneration=True),
+            lambda s: s.update(observedGeneration='12'),
+            lambda s: s.update(reconciling=True),
+            lambda s: s.pop('terminalCondition'),
+            lambda s: s['terminalCondition'].update(type='Active'),
+            lambda s: s['terminalCondition'].update(state='CONDITION_FAILED'),
+            lambda s: s['terminalCondition'].update(state='CONDITION_RECONCILING'),
+            lambda s: s.update(latestCreatedRevision=f.resource + '/revisions/' + f.baseline),
+        ]
+        for index, mutate in enumerate(mutations):
+            with self.subTest(mutation=index):
+                f = CoachFixture()
+                f.state['latestReadyRevision'] = f.resource + '/revisions/' + f.baseline
+                mutate(f.state)
+                with self.assertRaises(o.ObservationError):
+                    f.observe()
+
+    def test_baseline_latest_ready_cannot_hide_an_unready_candidate(self):
+        for changes in ({'conditions': []},
+                        {'conditions': [{'type': 'Ready', 'state': 'CONDITION_FAILED'}]},
+                        {'reconciling': True}):
+            with self.subTest(changes=changes):
+                f = CoachFixture()
+                f.state['latestReadyRevision'] = f.resource + '/revisions/' + f.baseline
+                f.revisions[f.candidate].update(changes)
+                with self.assertRaisesRegex(o.ObservationError, 'REVISION_CHANGED'):
+                    f.observe()
 
     def test_stage_accepts_zero_candidate_traffic_and_checks_both_revisions(self):
         f = CoachFixture()
@@ -201,6 +261,30 @@ class LogTests(unittest.TestCase):
 
 
 class PrivacyTests(unittest.TestCase):
+    def test_lifecycle_summary_preserves_known_reasons_without_exposing_messages(self):
+        result = o.condition_summary({'conditions': [
+            {'type': 'Active', 'state': 'CONDITION_FAILED', 'revisionReason': 'RETIRED',
+             'severity': 'INFO', 'message': 'private service metadata'},
+            {'type': 'ResourcesAvailable', 'state': 'CONDITION_RECONCILING',
+             'revisionReason': 'HEALTH_CHECK_CONTAINER_ERROR', 'severity': 'ERROR'},
+        ]})
+        self.assertEqual(result[0]['revisionReason'], 'RETIRED')
+        self.assertEqual(result[1]['revisionReason'], 'HEALTH_CHECK_CONTAINER_ERROR')
+        self.assertEqual(result[1]['severity'], 'ERROR')
+        self.assertEqual(result[0]['reason'], 'NOT_REPORTED')
+        self.assertNotIn('private', json.dumps(result))
+        self.assertNotIn('message', json.dumps(result))
+
+    def test_unknown_lifecycle_fields_are_sanitized_and_malformed_rows_block(self):
+        result = o.condition_summary({'conditions': [{
+            key: 'private-unknown-value' for key in o.CONDITION_VALUES}]})
+        self.assertEqual(set(result[0].values()), {'UNRECOGNIZED'})
+        self.assertNotIn('private', json.dumps(result))
+        for value in (None, {}, [None], [{}] * 33):
+            with self.subTest(value=value):
+                with self.assertRaises(o.ObservationError):
+                    o.condition_summary({'conditions': value})
+
     def test_command_captures_private_output_disables_debug_and_never_prompts(self):
         result = subprocess.CompletedProcess([], 0, b'{}', b'')
         with patch.dict(o.os.environ, GH_DEBUG='api', CLOUDSDK_CORE_LOG_HTTP='true'), \
