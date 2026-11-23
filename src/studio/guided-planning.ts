@@ -2,11 +2,13 @@ import {PLAN_FIELDS, type DesignField, type DesignRecord, type PlanField} from '
 import type {Message} from './notebook';
 
 /** Limited local reflection prompts. They never establish that a game is ready to build. */
-export const GUIDED_PLAN_ORDER:readonly PlanField[]=['action','fun','style','goal','setback','score','progression','special'];
+export const GUIDED_PLAN_ORDER:readonly PlanField[]=['action','goal','fun','style','viewpoint','movement','setback','score','progression','special'];
 export const GUIDED_PLAN_QUESTIONS:Record<PlanField,string>={
  action:'What does the player do?',
  fun:'How should it feel?',
  style:'How should it look?',
+ viewpoint:'Do you see the game from the side, above, or somewhere else?',
+ movement:'How does your character move?',
  goal:'What are you trying to do?',
  setback:'What happens if something goes wrong?',
  score:'Do you want points?',
@@ -41,8 +43,10 @@ export function explicitPlanChoices(text:string):Partial<Record<PlanField,Design
  if(isGuidanceHelp(text)&&!isExplicitPlanRevision(text)||guidedDelegation(text))return result;
  const patterns:Partial<Record<PlanField,RegExp>>={
   action:/\b(?:jump(?:s|ing)?|hop(?:s|ping)?|run(?:s|ning)?|race(?:s)?|racing|fly|flies|flying|collect(?:s|ing)?|deliver(?:s|ing)?|bounce(?:s)?|bouncing|dodge(?:s)?|dodging|catch(?:es|ing)?|eat(?:s|ing)?|draw(?:s|ing)?|explore(?:s)?|exploring)\b/i,
-  fun:/\b(?:funny|silly|exciting|calm|relaxing|spooky|surprising|surprises|cozy)\b/i,
-  style:/\b(?:cartoon|pixel art|watercolo(?:u)?r|3d|2d|realistic|painted|colo(?:u)?rful)\b/i,
+  fun:/\b(?:funny|silly|exciting|calm|relaxing|spooky|surprising|surprises|cozy|cute|cool|happy|cheerful|scary|edgy|lighthearted)\b/i,
+  style:/\b(?:cartoon|pixel art|pixelated|storybook|hand[- ]drawn|watercolo(?:u)?r|3d|2d|realistic|painted|colo(?:u)?rful)\b/i,
+  viewpoint:/\b(?:side[- ]scroll(?:ing|er)?|left to right|top[- ]down|overhead|first[- ]person|third[- ]person|from behind|from above|from the side)\b/i,
+  movement:/\b(?:auto[- ]run|always runs?|gallop|dash|swim|walk|tap to jump|drag to move|tilt to steer|swipe to dodge|arrow keys|joystick)\b/i,
   goal:/\b(?:win by|goal (?:is|should)|finish when|rescue|deliver all|collect all|no (?:winning|goal)|just explore)\b/i,
   setback:/\b(?:no losing|never lose|lose when|try again|respawn|start over)\b/i,
   score:/\b(?:points|scoring|score)\b/i,
