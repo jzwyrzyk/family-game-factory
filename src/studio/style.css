@@ -210,13 +210,13 @@ body.studio-review>.notice{color:#f7f5ff}
 .studio-continue-copy strong{font-size:19px;color:#303b5c;overflow-wrap:anywhere}
 .studio-continue .studio-primary{background:#fff;border:1px solid #aaa9ec;color:#4b48ab;box-shadow:none;min-height:48px;white-space:normal;text-align:center}
 .studio-continue .studio-primary:hover{background:#f4f0ff;color:#332b88}
-.studio-review #page-studio-library .studio-section-heading{margin:32px 0 15px;align-items:end}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-section-heading{margin:32px 0 15px;align-items:end}
 .studio-section-kicker{display:block;color:#777a9b;font-size:11px;font-weight:850;letter-spacing:1.6px;margin-bottom:7px}
-.studio-review #page-studio-library .studio-section-heading h2{font-size:clamp(23px,2.8vw,29px);line-height:1.18;color:#273255;font-weight:840;letter-spacing:-.8px;margin:0 0 7px}
-.studio-review #page-studio-library .studio-section-heading p{font-size:14px;line-height:1.55;margin:0;color:#647089}
-.studio-review #page-studio-library .studio-library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
-.studio-review #page-studio-library .studio-starter{padding:0;display:flex;flex-direction:column;min-height:259px;gap:0;overflow:hidden;border-radius:21px;border:1px solid #e3e8f2;background:#fff;box-shadow:0 5px 19px #364a8309;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.studio-review #page-studio-library .studio-starter:hover{border-color:#aaa3e6;box-shadow:0 13px 27px #4255a41c;transform:translateY(-3px)}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-section-heading h2{font-size:clamp(23px,2.8vw,29px);line-height:1.18;color:#273255;font-weight:840;letter-spacing:-.8px;margin:0 0 7px}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-section-heading p{font-size:14px;line-height:1.55;margin:0;color:#647089}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter{padding:0;display:flex;flex-direction:column;min-height:259px;gap:0;overflow:hidden;border-radius:21px;border:1px solid #e3e8f2;background:#fff;box-shadow:0 5px 19px #364a8309;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:hover{border-color:#aaa3e6;box-shadow:0 13px 27px #4255a41c;transform:translateY(-3px)}
 .studio-game-art{display:grid;place-items:center;position:relative;width:100%;height:126px;overflow:hidden;isolation:isolate}
 .studio-art-gum{background:linear-gradient(135deg,#c9f1ea,#effcef)}
 .studio-art-hill{background:linear-gradient(135deg,#e7edc9,#d5edf9)}
@@ -237,12 +237,12 @@ body.studio-review>.notice{color:#f7f5ff}
 .studio-art-symbol{position:relative;z-index:1;font-size:70px;line-height:1;filter:drop-shadow(0 10px 9px #2c338d25);transform:rotate(-9deg)}
 .studio-art-companion{position:absolute;z-index:2;right:21%;bottom:8px;font-size:31px;line-height:1;filter:drop-shadow(0 5px 7px #2c338b27);transform:rotate(15deg)}
 .studio-card-info{display:flex;flex:1;flex-direction:column;align-items:flex-start;gap:6px;padding:19px 20px 17px;min-width:0}
-.studio-review #page-studio-library .studio-card-name{font-size:18px;line-height:1.25;letter-spacing:-.2px;font-weight:840;color:#2f3857}
-.studio-review #page-studio-library .studio-card-state{font-size:13px;line-height:1.45;color:#65728a}
-.studio-review #page-studio-library .studio-card-link{font-size:13px;font-weight:800;color:#554dc4;margin-top:auto;padding-top:10px}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-name{font-size:18px;line-height:1.25;letter-spacing:-.2px;font-weight:840;color:#2f3857}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-state{font-size:13px;line-height:1.45;color:#65728a}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-link{font-size:13px;font-weight:800;color:#554dc4;margin-top:auto;padding-top:10px}
 .studio-review #page-studio-library .studio-saved-card{min-height:140px;padding:20px;border-radius:18px;gap:8px}
 .studio-review #page-studio-library .studio-saved-card:hover{border-color:#aaa3e6}
-.studio-review #page-studio-library .studio-saved-card .studio-card-state{line-height:1.5}
+.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-saved-card .studio-card-state{line-height:1.5}
 .studio-review #page-studio-library .studio-library-note{margin-top:26px;font-size:12px;max-width:100%;color:#6a7690;text-align:center}
 .studio-review #page-studio-library button:focus-visible,.studio-review .studio-profile-menu>summary:focus-visible{outline:3px solid #4035a2;outline-offset:4px}
 @media(max-width:900px){
@@ -250,7 +250,7 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-home-intro h1{font-size:clamp(32px,4.6vw,45px)}
  .studio-make-tile{grid-template-columns:48px minmax(0,1fr) 20px;gap:12px;min-height:132px;padding:21px 16px}
  .studio-make-icon{width:48px;height:48px;font-size:28px}
- .studio-review #page-studio-library .studio-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:650px){
  .studio-review .site-header{padding:13px 14px;gap:10px}
@@ -271,28 +271,28 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-continue-copy small{font-size:9px}
  .studio-continue-copy strong{font-size:15px}
  .studio-continue .studio-primary{width:100%;min-height:44px}
- .studio-review #page-studio-library .studio-section-heading{margin:28px 0 13px}
- .studio-review #page-studio-library .studio-section-heading p{font-size:13px}
- .studio-review #page-studio-library .studio-library-grid{gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
- .studio-review #page-studio-library .studio-starter{min-height:234px;border-radius:17px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-section-heading{margin:28px 0 13px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-section-heading p{font-size:13px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-library-grid{gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter{min-height:234px;border-radius:17px}
  .studio-game-art{height:106px}
  .studio-art-symbol{font-size:58px}
  .studio-art-companion{font-size:26px;right:14%}
  .studio-card-info{padding:13px 12px 14px;gap:6px}
- .studio-review #page-studio-library .studio-card-name{font-size:15px}
- .studio-review #page-studio-library .studio-card-state{font-size:12px}
- .studio-review #page-studio-library .studio-card-link{font-size:12px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-name{font-size:15px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-state{font-size:12px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-link{font-size:12px}
  .studio-review #page-studio-library .studio-saved-card{min-height:150px;padding:13px}
 }
 @media(max-width:350px){
- .studio-review #page-studio-library .studio-library-grid{grid-template-columns:1fr}
- .studio-review #page-studio-library .studio-starter{min-height:0}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-library-grid{grid-template-columns:1fr}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter{min-height:0}
  .studio-make-tile{grid-template-columns:40px minmax(0,1fr) 18px}
  .studio-make-icon{height:40px;width:40px;font-size:23px}
 }
 @media(prefers-reduced-motion:reduce){
- .studio-review #page-studio-library .studio-starter,.studio-make-tile{transition:none}
- .studio-review #page-studio-library .studio-starter:hover,.studio-make-tile:hover{transform:none}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter,.studio-make-tile{transition:none}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:hover,.studio-make-tile:hover{transform:none}
 }
 
 
@@ -318,18 +318,24 @@ body.studio-review>.notice{color:#f7f5ff}
  .studio-make-copy strong{font-size:20px}
  .studio-home-action{gap:6px}
  .studio-creation-note{font-size:10px;line-height:1.35}
- .studio-review #page-studio-library .studio-section-heading{margin:18px 0 10px}
- .studio-review #page-studio-library .studio-home-favorites .studio-section-heading p{display:none}
- .studio-review #page-studio-library .studio-starter{min-height:201px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-section-heading{margin:18px 0 10px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-home-favorites .studio-section-heading p{display:none}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter{min-height:201px}
  .studio-game-art{height:88px}
  .studio-card-info{padding:10px 12px 12px}
- .studio-review #page-studio-library .studio-card-name{font-size:14px}
- .studio-review #page-studio-library .studio-card-state{font-size:11px}
- .studio-review #page-studio-library .studio-card-link{font-size:11px;padding-top:7px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-name{font-size:14px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-state{font-size:11px}
+ .studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-card-link{font-size:11px;padding-top:7px}
 }
 
 /* Keep the optional update banner legible against the light Studio shell. */
 body.studio-review > .factory-update-notice{color:#394862}
+
+/* Retained play shortcuts share the native cards, inside My Creations. */
+body.studio-review #studioOriginalsSection{margin-bottom:24px}
+body.studio-review #studioOriginalsSection :is(.studio-card-name,.studio-card-state,.studio-card-link){font-size:var(--jems-child-label,18px);line-height:1.4}
+body.studio-review #studioOriginalsSection .studio-section-heading h2{font-size:24px}
+body.studio-review #page-creations>.page-head>p{font-size:var(--jems-child-label,18px)}
 
 /* Math / English choice: calm segmented buttons, consistent touch sizing. */
 .studio-learning-choice{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;margin:16px 0 4px;border:1px solid #dfe5f0;border-radius:16px;background:#fff;box-shadow:0 4px 12px #46578608}

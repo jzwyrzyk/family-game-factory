@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles,openRetainedGame}=require('./studio-entry.cjs');
 
 async function records(page,store,owner){
   return page.evaluate(async({store,owner})=>{
@@ -85,7 +85,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
 
     // Private artwork added to a game-derived scene must preserve the route
     // back to that game as well as the separate route into Art Studio.
-    await page.locator('#creationHome').click();await page.locator('[data-starter="dragon"]').click();
+    await page.locator('#creationHome').click();await openRetainedGame(page,'dragon');
     const gameSession=await page.evaluate(()=>{const n=FG.studio.exportNotebook();return n.sessions.find(s=>s.id===n.active[FG.store.current().id]);});
     const gameBefore=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
     if(!await page.locator('#studioMakeScene').isVisible())await page.locator('#studioChange').click();

@@ -299,7 +299,27 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
   await journey.page.waitForFunction(() => FG.runtime.snapshot().state.stage === 'adventure');
   if (!realTime) await journey.page.clock.pauseAt(await journey.page.evaluate(() => Date.now() + 500));
   const advance = async milliseconds => realTime ? journey.page.waitForTimeout(milliseconds) : journey.page.clock.runFor(milliseconds);
-  const advanceTo = async elapsed => advance(Math.max(0, elapsed - (await snapshot(journey.page)).adventureElapsedMs) + 32);
+  const advanceTo = async elapsed => {
+    let state = await snapshot(journey.page);
+    assert.ok(Number.isFinite(state.adventureElapsedMs), 'adventure elapsed time must be finite');
+    if (realTime) return advance(Math.max(0, elapsed - state.adventureElapsedMs) + 32);
+    // Virtual wall time is not necessarily simulated time: the game deliberately
+    // caps a stalled frame. Observe real progress before sampling the countdown,
+    // while a bounded budget still fails a paused or nonadvancing adventure.
+    const budget = Math.max(0, elapsed - state.adventureElapsedMs) + 1000;
+    let advanced = 0;
+    while (state.adventureElapsedMs < elapsed) {
+      assert.equal(state.stage, 'adventure', 'the countdown must remain in the running adventure');
+      assert.equal(state.paused, false, 'a paused adventure cannot satisfy the launch timing check');
+      const step = Math.min(100, budget - advanced);
+      assert.ok(step > 0, `launch did not reach ${elapsed}ms: observed ${state.adventureElapsedMs}ms after ${advanced}ms virtual time`);
+      const previous = state.adventureElapsedMs;
+      await journey.page.clock.runFor(step); advanced += step;
+      state = await snapshot(journey.page);
+      assert.ok(Number.isFinite(state.adventureElapsedMs) && state.adventureElapsedMs >= previous,
+        'adventure elapsed time must remain finite and monotonic');
+    }
+  };
   const launch = [];
   const observeLaunch = async (phase, text) => {
     const state = await snapshot(journey.page);
@@ -309,7 +329,8 @@ async function adventure(journey, { realTime = false, captureWorld = false, paus
     if (phase !== 'travel') {
       assert.equal(state.tourElapsedMs, 0, 'the dramatic launch does not consume the twenty-four-second journey');
       assert.equal(state.journey.distance, 0, 'distance begins when the invention actually starts its journey');
-      assert.equal(await root(journey.page).locator('.gum-build-countdown').textContent(), text);
+      assert.equal(await root(journey.page).locator('.gum-build-countdown').textContent(), text,
+        `visible ${phase} text at observed ${state.adventureElapsedMs}ms`);
     }
     launch.push({ phase, elapsedMs: state.adventureElapsedMs, journeyMs: state.tourElapsedMs, text });
   };

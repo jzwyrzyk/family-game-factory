@@ -1,5 +1,7 @@
 # One game journey and one place for pending work
 
+**Placement follow-up:** The [November 23 retained-games decision](2026-11-23-retained-games-in-my-creations.md) supersedes only this record's two Original cards on Home: those existing cards move to My Creations. The original decision and evidence below remain historical; game IDs, saved variants and the four Ready to Play games are retained.
+
 **Decision:** owner request, November 22, 2026 (America/New_York). Implement in the existing [PR125](https://github.com/jzwyrzyk/family-game-factory/pull/125), following the shell/chat repairs and Conversation Coach rollout. This is source preparation, not merge, deployment or paid narration authorization.
 
 ## Why

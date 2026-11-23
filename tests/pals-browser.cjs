@@ -11,7 +11,7 @@ const { build } = require('esbuild');
 const { chromium } = require('playwright');
 const playwrightVersion = require('playwright/package.json').version;
 const { start } = require('./browser-server.cjs');
-const { exploreWelcome, navigate } = require('./studio-entry.cjs');
+const { exploreWelcome, navigate, openRetainedGame } = require('./studio-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const outputs = path.join(root, 'test-results');
@@ -492,7 +492,7 @@ async function installReceiptFixture(page) {
     }
     await page.reload(); await ready(page);
     assert.deepEqual((await view(page)).preferences, { showCompanion: false, encouragement: false });
-    await page.click('[data-starter="dragon"]');
+    await openRetainedGame(page,'dragon');
     assert.equal(await page.locator('#studioPalCameo').isVisible(), false);
     await openPals(page);
     assert.equal((await view(page)).owned.length, 1, 'Turning off the cameo keeps the collection');
@@ -516,7 +516,7 @@ async function installReceiptFixture(page) {
       await page.waitForFunction(key => FG.pals.view()?.preferences[key] === true, preference); await idle(page);
       assert.equal(await page.locator(`#jemsPalPreference-${preference}`).isChecked(), true);
     }
-    await page.click('#jemsPalsBack'); await page.click('[data-starter="dragon"]');
+    await page.click('#jemsPalsBack'); await openRetainedGame(page,'dragon');
     await page.locator('#studioPalCameo').waitFor({ state: 'visible' });
     await openPals(page);
     mark('parent and child preferences persist; collection, growth, starters and scenes stay profile-scoped');

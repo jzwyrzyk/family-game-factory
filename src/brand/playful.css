@@ -60,19 +60,19 @@ body.studio-review .studio-starter.dragon{--jems-world-color:#723DCE;--jems-worl
 body.studio-review .studio-starter.moon{--jems-world-color:#255BC2;--jems-world-light:#E0E9FF}
 body.studio-review .studio-starter.robot{--jems-world-color:#07877E;--jems-world-light:#D4F8F0}
 body.studio-review .studio-starter.factory{--jems-world-color:#7350C3;--jems-world-light:#F1E4FF}
-body.studio-review #page-studio-library .studio-starter{
+body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter{
  border-color:#D9D9EB;box-shadow:0 6px 19px #0B1E3B0F;
  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
 }
-body.studio-review #page-studio-library .studio-starter:hover,
-body.studio-review #page-studio-library .studio-starter:focus-visible{
+body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:hover,
+body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:focus-visible{
  border-color:var(--jems-world-color);
  box-shadow:0 13px 28px #0B1E3B22;transform:translateY(-4px);
 }
-body.studio-review #page-studio-library .studio-starter:focus-visible{
+body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:focus-visible{
  outline:3px solid #7136C9;outline-offset:3px;
 }
-body.studio-review #page-studio-library .studio-starter:active{transform:translateY(-1px) scale(.995)}
+body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:active{transform:translateY(-1px) scale(.995)}
 body.studio-review .studio-starter .studio-game-art{background:var(--jems-world-light)}
 body.studio-review .studio-starter .studio-game-art .jems-world-scene{
  position:absolute;inset:0;width:100%;height:100%;
@@ -205,6 +205,6 @@ body.studio-review .studio-game-subject:has(#studioGameLanguage[aria-pressed='tr
  body.studio-review .studio-starter:focus-visible :is(.quality-card-art,.jems-world-scene){
   transform:none!important;transition:none!important;
  }
- body.studio-review #page-studio-library .studio-starter:hover,
- body.studio-review #page-studio-library .studio-starter:active{transform:none!important}
+ body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:hover,
+ body.studio-review :is(#page-studio-library,#studioOriginalsSection) .studio-starter:active{transform:none!important}
 }

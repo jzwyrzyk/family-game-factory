@@ -81,7 +81,9 @@ async function currentNavigation(page,id){
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
    assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
-   assert.deepEqual(await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'original games retain their own visible group');
+   assert.equal(await page.locator('#page-studio-library #studioOriginals').count(),0,'Home keeps only the four Ready to Play games');
+   assert.deepEqual(await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My Creations');
+   assert.equal(await page.locator('#page-creations #studioOriginalsTitle').textContent(),'Play your games');
    // Keep three primary actions in one row, every secondary route in the drawer,
    // and the selected maker clear of home actions even at a narrow 320px width.
    if(label==='mobile'){

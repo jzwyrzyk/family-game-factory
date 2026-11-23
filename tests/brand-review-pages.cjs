@@ -1,4 +1,4 @@
-const {exploreWelcome,navigate,sendChildMessage}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,sendChildMessage,openRetainedGame}=require('./studio-entry.cjs');
 /* jems final premerge screenshot review: real built app, synthetic local browser data. */
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -28,7 +28,9 @@ async function pages(device,viewport){
  try{
   await p.goto(base);await p.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);await exploreWelcome(p);
   assert.deepEqual(await p.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
-  assert.deepEqual(await p.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'both original games are available in their own group');
+  assert.equal(await p.locator('#page-studio-library #studioOriginals').count(),0,'Home keeps only the four Ready to Play games');
+  assert.deepEqual(await p.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My Creations');
+  assert.equal(await p.locator('#page-creations #studioOriginalsTitle').textContent(),'Play your games');
   await shot(p,device,'01-studio-home');
   await p.locator('#studioNew').click();await p.locator('#page-studio').waitFor({state:'visible'});
   await p.locator('#studioCreationHero').waitFor({state:'visible'});
@@ -48,7 +50,9 @@ async function pages(device,viewport){
   await p.locator('#studioVersions').waitFor({state:'visible'});await shot(p,device,'03-versions-and-tests');
   await home(p);await shot(p,device,'04-saved-idea-home');
   for(const [num,game] of [['05','dragon'],['06','gum'],['07','buckets']]){
-   await p.locator('[data-starter="'+game+'"]').click();await p.locator('#page-studio').waitFor({state:'visible'});
+   if(['dragon','buckets'].includes(game))await openRetainedGame(p,game);
+   else await p.locator('[data-starter="'+game+'"]').click();
+   await p.locator('#page-studio').waitFor({state:'visible'});
    await p.waitForTimeout(300);await shot(p,device,num+'-play-'+game);await home(p);
   }
   await navigate(p,'#studioNavPowers');await p.locator('#page-lab').waitFor({state:'visible'});

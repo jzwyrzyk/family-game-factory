@@ -264,13 +264,13 @@ export async function installStudio(){
  homeCharacterLink.type='button';homeCharacterLink.id='studioHomeCharacter';
  library.querySelector('.studio-home-action')!.append(homeCharacterLink);
  const libraryTools=el('div','studio-library-tools');
- const savedIdeas=iconEl('button','studio-button','grid','Saved ideas & drawings') as HTMLButtonElement;
+ const savedIdeas=iconEl('button','studio-button','grid','My Creations') as HTMLButtonElement;
  savedIdeas.id='studioSavedIdeas';savedIdeas.type='button';savedIdeas.onclick=()=>act(openSavedIdeas);
  libraryTools.append(savedIdeas);library.querySelector('#studioFavoritesSection')!.after(libraryTools);
  const originals=el('section','studio-home-favorites');originals.id='studioOriginalsSection';
  originals.setAttribute('aria-labelledby','studioOriginalsTitle');
- originals.innerHTML='<div class="studio-section-heading"><h2 id="studioOriginalsTitle">Original jems</h2></div><div id="studioOriginals" class="studio-library-grid"></div>';
- library.querySelector('#studioFavoritesSection')!.after(originals);
+ originals.innerHTML='<div class="studio-section-heading"><h2 id="studioOriginalsTitle">Play your games</h2></div><div id="studioOriginals" class="studio-library-grid"></div>';
+ $('page-creations').querySelector('.page-head')!.after(originals);
  const collectionBack=iconEl('button','studio-button','arrow','My Games','jems-icon--back') as HTMLButtonElement;
  collectionBack.id='studioCollectionBack';collectionBack.type='button';collectionBack.onclick=()=>act(home);
  $('page-creations').querySelector('.page-head')!.prepend(collectionBack);
@@ -281,6 +281,8 @@ export async function installStudio(){
  // The subject switch belongs to the player's header, not below the game shelf.
  for(const [id,name,label] of [['studioSubjectMath','grid','Math'],['studioSubjectLanguage','book','English']] as const)setIconLabel(learningChoice.querySelector<HTMLElement>('#'+id)!,name,label);
  const nativeStage=$('page-game');
+ const nativeStageHome=document.createComment('Native game host returns here');
+ nativeStage.before(nativeStageHome);
  const playView=installPlayView(page,$('studioGameHost'));
  const originalNav=document.querySelector('.site-header nav') as HTMLElement;
  originalNav.hidden=true;
@@ -789,7 +791,13 @@ export async function installStudio(){
   ++epoch;previewLearning?.dispose();previewLearning=null;FG.learning.dispose();iframe?.remove();iframe=null;previewChannel='';previewArtifact='';previewOwner='';
   // The original host cleans listeners, timers, audio and pending math callbacks.
   if(mounted){FG.app.page('home');mounted=false;}
-  nativeStage.classList.add('hidden');$('studioRemoteHost').replaceChildren();$('studioRemoteHost').hidden=true;
+  nativeStage.classList.add('hidden');
+  // Saved remixes also use this host outside Studio. Return it after unmount so
+  // their explicit Play cannot inherit a hidden Studio ancestor or its chrome.
+  if(nativeStage.parentElement===$('studioGameHost')){
+   nativeStageHome.after(nativeStage);nativeStage.classList.add('page');nativeStage.classList.remove('studio-native-game');
+  }
+  $('studioRemoteHost').replaceChildren();$('studioRemoteHost').hidden=true;
  }
  function updateCreationNote(){
   const note=$('studioCreationNote');if(!note)return;

@@ -8,6 +8,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Retained games in My Creations](2026-11-23-retained-games-in-my-creations.md) | Move Dragon/Buckets cards into My Creations, preserve every variant and retain four Home games; scope the owner's retention exception to this cutover | Accepted for implementation; source and live acceptance separate | Owner's November 23 retained-games and production-cutover direction |
 | [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |

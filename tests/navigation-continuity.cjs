@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles,openRetainedGame}=require('./studio-entry.cjs');
 
 const STATE='family-game-factory-state-v1',NOTEBOOK='family-game-factory-studio-v1',WORKSPACE='family-game-factory-workspace-v2';
 const IDEAS=[
@@ -130,7 +130,7 @@ async function collectionJourney(browser,base,device,viewport){
   await page.click('#studioNavMenu');
   for(const id of NAV.slice(2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' is discoverable in Menu');
   await page.click('#studioMenuClose');
-  const entry=page.getByRole('button',{name:'Saved ideas & drawings',exact:true});
+  const entry=page.getByRole('button',{name:'My Creations',exact:true});
   assert.equal(await entry.getAttribute('id'),'studioSavedIdeas');
   const target=await entry.boundingBox();assert.ok(target&&target.height>=44,'collection entry is a touch-sized target');
   await entry.focus();await page.keyboard.press('Enter');
@@ -206,13 +206,13 @@ async function workspaceIntegrityJourney(browser,base){
  const {context,page,errors,posts}=await prepare(browser,base,{width:1280,height:900});
  const workspace=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)),WORKSPACE);
  try{
-  await page.click('[data-starter="buckets"]');
+  await openRetainedGame(page,'buckets');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===1,WORKSPACE);
   await navigate(page,'studioNavHome');await page.reload();await ready(page);
   const original=(await workspace()).projects[0];
   // The legacy store now knows the first game. Keep this same document alive
   // while Studio adds a second game through its actual adapter and controls.
-  await page.click('[data-starter="dragon"]');
+  await openRetainedGame(page,'dragon');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===2,WORKSPACE);
   const before=await workspace();
   await navigate(page,'studioNavHome');await page.click('#studioSavedIdeas');
@@ -239,7 +239,7 @@ async function notebookCapacityJourney(browser,base){
  const notebook=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)),NOTEBOOK);
  try{
   const draft='My next unsent idea';
-  await page.click('[data-starter="buckets"]');await page.click('#studioChange');
+  await openRetainedGame(page,'buckets');await page.click('#studioChange');
   await page.fill('#studioPrompt',draft);await navigate(page,'studioNavHome');
   assert.equal((await notebook()).sessions[0].draft,draft,'the real composer saves the unsent draft before historical messages are seeded');
   const sourceId=await page.evaluate(key=>{
@@ -280,8 +280,9 @@ async function notebookCapacityJourney(browser,base){
   await page.reload();await ready(page);await exploreWelcome(page);
   await page.locator('#studioNotebookCapacity').waitFor({state:'visible'});
   const before=await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE});
-  await page.click('[data-starter="dragon"]');
+  await openRetainedGame(page,'dragon');
   assert.deepEqual(await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE}),before,'full notebook fails before writing an orphan native game');
+  await page.locator('#studioCollectionBack').click();
   await page.locator('#studioArchived summary').click();await page.getByRole('button',{name:'Bring back Saved idea 0',exact:true}).click();
   const full=await notebook();assert.equal(full.sessions.length,80);assert.equal(full.sessions.filter(s=>!s.archived).length,1);
   await page.locator('#studioNotebookCapacity summary').click();assert.match(await page.textContent('#studioNotebookCapacity'),/80 of 80.*1 open jems, 79 put-away jems/s);
