@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — preserve required push checks alongside PR checks
+
+A guarded Coach merge was rejected after its prospective-merge PR workflows passed because the shared push/PR concurrency group had cancelled the original source-head Arcade run. Four of the six protected-main required contexts (`browser`, `learning`, `creative`, `private-coach-image`) therefore remained cancelled on that source head; a green PR run did not satisfy that protection state. The original Coach push run [45118722894](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45118722894) was legitimately rerun without bypassing protection. PR123's original push [45119603071](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45119603071) showed the same cancellation while its PR run proceeded.
+
+The reliability correction adds `github.event_name` to the concurrency groups in Arcade, service-image contracts and release-regression contracts. Push and PR checks now keep independent evidence; new commits still cancel superseded work within the same event/repository/branch. Every job, assertion, visual baseline, trigger, permission and protected-main rule is retained. Production Pages, service deployment and worker workflows are unchanged. Existing deployment/operations, packaging/regression assignment and documentation checks validate the source correction; final hosted push and PR checks must both complete on the resulting head. The earlier cancelled runs remain historical evidence, not successful checks.
+
 ## November 23, 2026 — reliability reconciled with four-experience main and Coach v2
 
 The owner explicitly authorized integrating and merging PR135 and PR123 after applicable source gates pass. This supersedes the historical preparation-only hold below. PR123 now contains main `3a6fcca34b2e9d15bb2d6596153069db57056a04`, the complete Coach head `2ce1ba08e672dcb9d15546806646f15700e51fd9`, all five audit components, and their recovery contracts. Integration commit `40a6262` combines these source histories; test commit `71fc78f` adds cross-chapter provenance and real family-backup regressions. No component closure, final merge or deployment is claimed by this preparation receipt.
