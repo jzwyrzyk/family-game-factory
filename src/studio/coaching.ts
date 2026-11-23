@@ -91,7 +91,7 @@ export function installCoaching(h:Hooks){
   if(!isNewIdea(s))return {ready:true,reason:''};
   if(thinking)return {ready:false,reason:'jems is still thinking about your idea.',issue:'thinking'};
   if(pendingFields.size)return {ready:false,reason:'Save your new ideas before building.',issue:'unsaved'};
-  const readiness=creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value});
+  const readiness=creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value},s.design?.creationStandard===2?2:1);
   if(!readiness.ready&&readiness.issue!=='draft'&&reviewUnavailable)return {ready:false,reason:'Chat could not check your idea. Try reconnecting.',issue:'review-unavailable'};
   return readiness;
  }
@@ -140,7 +140,7 @@ export function installCoaching(h:Hooks){
  function context(message:string,mode:CoachContext['mode']):CoachContext {
   const s=h.current(),d=s.design||freshDesign(),creating=isNewIdea(s);
   const conversation=visibleConversation(s.messages).filter(message=>!creating||message.role!=='child'||!isHelperAuthoredTurn(message,d));
-  const result:CoachContext={message,mode,game:s.game,...(creating?{creation:{version:1 as const}}:{}),plan:creating?creationPlan(s):d.plan,rules:h.rules(),friction:d.friction,helpLevel:d.helpLevel,support:d.support,conversation:creating?[]:conversation.slice(-10).map(m=>({role:m.role,text:m.text})),observations:d.observations.slice(-8),tests:(s.experiments||[]).slice(-8).map(e=>({label:e.label,title:e.title,prediction:e.prediction,notes:e.notes}))};
+  const result:CoachContext={message,mode,game:s.game,...(creating?{creation:{version:d.creationStandard===2?2 as const:1 as const}}:{}),plan:creating?creationPlan(s):d.plan,rules:h.rules(),friction:d.friction,helpLevel:d.helpLevel,support:d.support,conversation:creating?[]:conversation.slice(-10).map(m=>({role:m.role,text:m.text})),observations:d.observations.slice(-8),tests:(s.experiments||[]).slice(-8).map(e=>({label:e.label,title:e.title,prediction:e.prediction,notes:e.notes}))};
   if(creating){
    // Keep authored intent within the existing 16-entry protocol and the default
    // 16k input allowance. Old test notes cannot crowd out a first game's idea.
@@ -183,7 +183,7 @@ export function installCoaching(h:Hooks){
    }
    if(changed)s.design.approvedPlan=false;
    if(mode==='model'&&turn?.reviewCurrent&&isNewIdea(s)&&reply.creationReadiness){
-    try{s.design.creationReview=recordCreationReview(s,reply.creationReadiness);}catch{delete s.design.creationReview;reviewUnavailable=true;}
+    try{s.design.creationReview=recordCreationReview(s,reply.creationReadiness,s.design.creationStandard===2?2:1);}catch{delete s.design.creationReview;reviewUnavailable=true;}
    }
   });
   h.onSavedDesignChange?.(before,h.notebook.get(captured.id,captured.owner));
