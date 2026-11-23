@@ -477,10 +477,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:21.865Z",
-      "sourceDigest": "e8246cb4dd638ca4d188c5662b2c395acc5dd039420daec6a74893a9bafc15be",
+      "reviewedAt": "2026-11-23T04:08:52.154Z",
+      "sourceDigest": "5724f5d35ec88cc328b8c315085c1bc1e96473f58ddafa7f1f766ab8c8c8b298",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled run/contact/bucket Mining with the shared host, added learning-safe live Help and removable sound controls, and documented stable physical-v1 picker geometry through reset/first additions. Factory progression, assembly-v3, old engines and score/reward separation remain preserved.",
+      "reviewReason": "Updated the Mining visual-evidence contract to the inspected PR134 unified-player captures, with prior receipt preserved. Gameplay rules, artwork, shared Help lifecycle and compatibility contracts are unchanged by the exact hosted PNG import.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -523,6 +523,13 @@
           "sourceDigest": "22e0a22e44deeccde0b436b75da873ad7d3e817c5d3434b2d918b7dfab9732ae",
           "reviewOutcome": "updated",
           "reviewReason": "Current README and physical-quality scope now point to version3 assembly. Reviewed the narrow-tray result reflow, bounded ignition label and portrait Moon framing; construction, saved engines, authored journey rules and timing remain as documented."
+        },
+        {
+          "reviewedAt": "2026-11-23T03:35:21.865Z",
+          "sourceDigest": "e8246cb4dd638ca4d188c5662b2c395acc5dd039420daec6a74893a9bafc15be",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled run/contact/bucket Mining with the shared host, added learning-safe live Help and removable sound controls, and documented stable physical-v1 picker geometry through reset/first additions. Factory progression, assembly-v3, old engines and score/reward separation remain preserved.",
+          "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         }
       ]
     },
@@ -724,10 +731,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:44:21.397Z",
-      "sourceDigest": "23620a29fb4cf258653b58fa632ef8d9fc8426555fd442f56ff2029d1117f092",
+      "reviewedAt": "2026-11-23T04:08:52.534Z",
+      "sourceDigest": "68391dfba47b3a938eb82ae8401515b9cffebb789df571a285e853e323b519a7",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed new Mining sibling onboarding through real character/Home controls and preview handshake/paint before one click. The mock now matches production repeat-connect behavior; result, request count, stale-owner, loss and visual assertions remain. Recorded full local quality, Coding, Bubble Gum and Notifications evidence plus remaining hosted gates.",
+      "reviewReason": "Explicitly inspected all nine hosted Chromium 141 reference PNGs, three Help views and sampled normal-motion held-spill/fall/retry frames. Verified archive, clean build/tree, manifest, dimensions and image hashes; retained the original nine failed comparisons and all 13 functional passes. No tolerance or assertion changes; final-head CI remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -861,6 +868,13 @@
           "sourceDigest": "d5fb43bb9f4a8b3733342b9c5c7787e44561b10a0f404ac6738c16c851315e87",
           "reviewOutcome": "updated",
           "reviewReason": "The legacy design-coach journey now reopens its exact saved physical session instead of the current catalogue starter. Existing project, experiment, voice and learning assertions remain; the same journey is included in focused host integration to verify the compatibility boundary."
+        },
+        {
+          "reviewedAt": "2026-11-23T03:44:21.397Z",
+          "sourceDigest": "23620a29fb4cf258653b58fa632ef8d9fc8426555fd442f56ff2029d1117f092",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed new Mining sibling onboarding through real character/Home controls and preview handshake/paint before one click. The mock now matches production repeat-connect behavior; result, request count, stale-owner, loss and visual assertions remain. Recorded full local quality, Coding, Bubble Gum and Notifications evidence plus remaining hosted gates.",
+          "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         }
       ]
     },
@@ -890,10 +904,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T03:56:29.310Z",
-      "sourceDigest": "78ca8a1cd716efc8cf2ec0fa083ebffd524b39756593748ae445ddb307ebde07",
+      "reviewedAt": "2026-11-23T04:08:52.958Z",
+      "sourceDigest": "ea52d2f7c562fca2803d4740135be658ad8fb492be698b4c6ee5540be566d814",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded all 13 hosted Mining functional passes at 8496696 and the nine remaining old-reference mismatches. Added a bounded review packet beside the unchanged full artifact for exact Chromium-141 image/video inspection; tests, retention, read-only workflow permissions and tolerances remain unchanged.",
+      "reviewReason": "Recorded the downloaded compact artifact, exact source/build/tree identity, explicit visual acceptance and preserved failed source run. PR134 remains unmerged and undeployed pending a fresh complete CI run; owner requested a pause while it completes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1048,6 +1062,13 @@
           "sourceDigest": "6629d98039aaa17075985dabeec7fa1a6e22710662754f10dc20ee443a9d2dce",
           "reviewOutcome": "updated",
           "reviewReason": "Recorded final exact6c source, all29 focused rules and10 browser cases, four host integration passes, artifact digests and actual tablet/phone visual acceptance. Recorded successful owner-private Site deployment and preserved the coordinated production merge hold; the follow-up commit changes delivery evidence only."
+        },
+        {
+          "reviewedAt": "2026-11-23T03:56:29.310Z",
+          "sourceDigest": "78ca8a1cd716efc8cf2ec0fa083ebffd524b39756593748ae445ddb307ebde07",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded all 13 hosted Mining functional passes at 8496696 and the nine remaining old-reference mismatches. Added a bounded review packet beside the unchanged full artifact for exact Chromium-141 image/video inspection; tests, retention, read-only workflow permissions and tolerances remain unchanged.",
+          "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         }
       ]
     },

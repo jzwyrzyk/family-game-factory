@@ -1,11 +1,11 @@
 {
   "build": {
-    "sha": "baf6fc97e850f4b1db02fc1647d7ab179df4f9db",
+    "sha": "fe5be7e0283c875dd11a9891eb535c9a0960ef81",
     "dirty": false
   },
   "browser": "141.0.7390.37",
-  "acceptedBy": "Root approval for explicit local import of verified GitHub-hosted captures after independent still and normal-motion frame review",
-  "acceptedAt": "2026-11-22T18:20:01+00:00",
+  "acceptedBy": "Codex explicit review of verified hosted stills and sampled normal-motion frames",
+  "acceptedAt": "2026-11-22T23:08:50-05:00",
   "surface": "shared native play view",
   "states": [
     "idle",
@@ -20,17 +20,20 @@
   "channelTolerance": 20,
   "maximumChangedRatio": 0.008,
   "source": {
-    "head": "5b8abfb55e138ea9cd9a4a10dbca897341eab956",
-    "tree": "004cb545e4e8a21856a7edd5a2873912ad2e3826",
-    "pullRequest": "https://github.com/jzwyrzyk/family-game-factory/pull/129",
-    "runId": 45053129857,
-    "jobId": 137302426832,
-    "runUrl": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45053129857",
-    "artifactId": 14766576695,
-    "artifactName": "mind-your-jems-browser-screenshots",
-    "archiveSizeBytes": 81744425,
-    "archiveSha256": "3660a0195b0f5d3a96ef42232a1d306de279d7fef4c12b23cccd878080285fdd",
-    "manifestSha256": "cc91f9ab3d83371717a7fa274e1848a93e5531a83e4aecbdbd3c813f873b7cc6"
+    "head": "4b00c474c733873e31849acb0778be8f4f3ceec2",
+    "tree": "07d0848fb97156c00cc3cace974a62f0361c01c3",
+    "pullRequest": "https://github.com/jzwyrzyk/family-game-factory/pull/134",
+    "runId": 45108887504,
+    "jobId": 137476434311,
+    "runUrl": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45108887504",
+    "artifactId": 14789136447,
+    "artifactName": "mind-your-jems-reference-review",
+    "archiveSizeBytes": 11554514,
+    "archiveSha256": "4c067f9490c4b1c6d9a8f5528008e303219811519da5e225a25b49b85e1245fe",
+    "manifestSha256": "ad6330b52ceb5a0a03b0da1bb7991fc76772f2fd5a25b9fc8636e5e84baeda69",
+    "fullArtifactId": 14788798205,
+    "fullArtifactSizeBytes": 90350429,
+    "fullArtifactSha256": "8daf94bcd14bb30bf4f46b17e692f01bd4615de78fdc6cc6d707ebf871284207"
   },
   "review": {
     "functionalConfigurationsPassed": 13,
@@ -49,32 +52,21 @@
       "recovery-mobile",
       "profile-reset"
     ],
-    "captures": 138,
+    "captures": 148,
     "originalRunConclusion": "failure",
-    "originalFailureScope": "Exactly two old-reference visual mismatches: desktop-ready and mobile-ready. Seven of nine comparisons passed. All 13 functional configurations passed; no functional errors. The original hosted manifest and archive remain unchanged.",
-    "inspected": "All nine full-resolution source PNGs, including the two actual/expected/difference comparisons; desktop ready menu; representative frames across the 42.68-second normal-motion recording, with half-second hold/shake frames at 20–24 seconds and quarter-second fall/retry frames at 39–41.75 seconds.",
-    "visualFinding": "No blocking visual defect. The existing illustrated head, background, miner contact, bucket platform, shared player, controls and responsive framing remain intact. Desktop, tablet portrait and phone compositions retain legible counters and the /10 denominator without visible clipping in the reviewed states.",
-    "readyTimingExplanation": "The actual-input fixture collectAndBank now requests 10 rather than 8; with every jem worth 1, the outward trip may finish at its x <= 38 or warning guard before reaching capacity. After readiness polling, the capture calls freshCalm, which waits on the safe platform unless at least 6500 ms of calm remains. The new ready captures therefore show the safe post-shake idle frame with 4 saved jems and no active head jems, rather than the old 8-saved transient deposit celebration. No timer, hazard, art or layout change was made to force the new reference.",
-    "scoringObservations": {
-      "geometryChecks": 56,
-      "capacityLabels": [
-        "/ 10"
-      ],
-      "weightedMarkerCounts": [
-        0
-      ],
-      "observedLooseValuesInGeometryChecks": [
-        0,
-        1
-      ],
-      "fullPocketScreenshotClaimed": false,
-      "note": "All 56 real-game geometry observations show / 10 and zero weighted +3 marker elements. The baseline warning captures show one carried jem as 1/10; ready captures show 4 saved and 0/10. Exact 10/10 saturation is not claimed as a captured visual state."
-    },
-    "normalMotion": "The recorded input journey collects individual jems and banks 4. At about 22 seconds the active head jems scatter and the held pocket changes from 1/10 to 0/10 while Saved 4 remains. Around 39.75–40.5 seconds the unheld miner visibly falls and the pocket changes from 2/10 to 0/10; the retry action appears around 40.75 seconds, and the miner returns to the bucket around 41.25 seconds with Saved 4 retained. The shared shell remains stable.",
-    "reviewers": "Independent gameplay/art reviewer and root review of both mismatched comparisons; root explicitly approved importing these exact nine source PNGs.",
-    "localBrowser": "No local browser was run for this evidence review. Functional and source-capture evidence is from GitHub-hosted Playwright Chromium.",
-    "followup": "Root performs the repository import and receipt/docs commit. The next exact-head hosted run must compare the imported references with the unchanged channel tolerance 20 and maximum changed ratio 0.008. This receipt does not waive that rerun or convert the original failed run into a pass.",
-    "limits": "Synthetic browser/device viewports and mocked build statuses; not physical-device or frame-pacing validation, child-enjoyment evidence, paid-provider validation, merge authorization or deployment acceptance. The user merge hold remains in force."
+    "originalFailureScope": "Exactly nine comparisons against the previous native-player references failed. All 13 functional configurations passed. Original hosted manifest and failed conclusion remain unchanged.",
+    "inspected": "All nine full-resolution source PNGs; desktop, phone and short-landscape Help; original storyboard and previous desktop composition; representative frames throughout the 42.16-second normal-motion recording, half-second held-shake frames at 18\u201323 seconds and quarter-second fall/retry frames at 37\u201342 seconds.",
+    "visualFinding": "No blocking defect in the reviewed compositions. Original illustrated head, hair, crystals, miner, bucket and floating-island artwork remain. The unified header owns Help and More; duplicate internal header controls and helper lines are removed, counters are compact, and bottom controls fill available width. Desktop, tablet portrait and phone retain legible counters, /10 capacity, warning and ready state, with no visible control clipping. Short-landscape Help keeps reading and return actions visible while its instruction copy scrolls.",
+    "normalMotion": "The real-input recording collects individual jems and banks 4. Around 21.5 seconds the held miner stays on the head while jems scatter and Bag changes from 1/10 to 0/10, with Saved 4 retained. Around 39\u201339.75 seconds the unheld miner falls and Bag changes from 2/10 to 0/10. The retry overlay appears around 40 seconds and the miner returns to the bucket around 40.75 seconds, retaining Saved 4. Ready then appears in More without replacing the game.",
+    "functionalEvidence": "Hosted job logs report all 13 PASS results. Manifest checks retain real movement/contact, banking, held spill, release/fall/retry, level completion/advance, Help pause preserving the round, shared navigation, fullscreen, learning exit, recovery, preview handoff and owner teardown.",
+    "reviewers": "Codex; no independent human or child review claimed.",
+    "localBrowser": "Local Chromium 156 gameplay passes are supplementary. The pinned Chromium 141 download was unavailable in this environment, so these exact hosted Chromium 141 PNG bytes were imported after verification; local Chromium 156 captures were not used as references.",
+    "followup": "The next exact-head hosted run must compare these references with unchanged channel tolerance 20 and maximum changed ratio 0.008. Acceptance does not waive any release gate or convert the source failed run into a pass.",
+    "limits": "Synthetic browser/device viewports and mocked build services. Sampled video frames are not physical-device, audio, frame-pacing, child-enjoyment, educational-efficacy, paid-provider or deployment acceptance. Merge remains conditional on all final-head release gates."
+  },
+  "priorReview": {
+    "file": "history/5b8abfb.json",
+    "sha256": "11a77a8b44f6950ebe74ba7981de45c4e4ca38e7aa4750cb232f047230cbad65"
   },
   "previousReferenceComparisons": [
     {
@@ -84,9 +76,9 @@
       "dimensions": true,
       "width": 1280,
       "height": 900,
-      "changed": 168,
-      "ratio": 0.00014583333333333335,
-      "meanDelta": 0.019301215277777777
+      "changed": 680354,
+      "ratio": 0.5905850694444444,
+      "meanDelta": 53.207388888888886
     },
     {
       "device": "desktop",
@@ -95,9 +87,9 @@
       "dimensions": true,
       "width": 1280,
       "height": 900,
-      "changed": 628,
-      "ratio": 0.0005451388888888888,
-      "meanDelta": 0.07976475694444445
+      "changed": 682206,
+      "ratio": 0.5921927083333334,
+      "meanDelta": 53.61471180555556
     },
     {
       "device": "desktop",
@@ -106,9 +98,9 @@
       "dimensions": true,
       "width": 1280,
       "height": 900,
-      "changed": 66316,
-      "ratio": 0.05756597222222222,
-      "meanDelta": 6.314547743055556
+      "changed": 676190,
+      "ratio": 0.5869704861111111,
+      "meanDelta": 53.387046875
     },
     {
       "device": "tablet-portrait",
@@ -117,9 +109,9 @@
       "dimensions": true,
       "width": 768,
       "height": 1024,
-      "changed": 168,
-      "ratio": 0.000213623046875,
-      "meanDelta": 0.024710337320963543
+      "changed": 376624,
+      "ratio": 0.4789021809895833,
+      "meanDelta": 43.19746017456055
     },
     {
       "device": "tablet-portrait",
@@ -128,9 +120,9 @@
       "dimensions": true,
       "width": 768,
       "height": 1024,
-      "changed": 628,
-      "ratio": 0.0007985432942708334,
-      "meanDelta": 0.11326090494791667
+      "changed": 378004,
+      "ratio": 0.4806569417317708,
+      "meanDelta": 43.699462890625
     },
     {
       "device": "tablet-portrait",
@@ -139,9 +131,9 @@
       "dimensions": true,
       "width": 768,
       "height": 1024,
-      "changed": 2596,
-      "ratio": 0.0033009847005208335,
-      "meanDelta": 0.4251505533854167
+      "changed": 370143,
+      "ratio": 0.4706611633300781,
+      "meanDelta": 42.67292022705078
     },
     {
       "device": "mobile",
@@ -150,9 +142,9 @@
       "dimensions": true,
       "width": 390,
       "height": 844,
-      "changed": 188,
-      "ratio": 0.0005711508081176328,
-      "meanDelta": 0.07014825616721351
+      "changed": 145013,
+      "ratio": 0.44055474541256534,
+      "meanDelta": 44.791985660469074
     },
     {
       "device": "mobile",
@@ -161,9 +153,9 @@
       "dimensions": true,
       "width": 390,
       "height": 844,
-      "changed": 617,
-      "ratio": 0.0018744683436626565,
-      "meanDelta": 0.25742192246931583
+      "changed": 146088,
+      "ratio": 0.44382063434196134,
+      "meanDelta": 45.718544173046546
     },
     {
       "device": "mobile",
@@ -172,9 +164,9 @@
       "dimensions": true,
       "width": 390,
       "height": 844,
-      "changed": 17362,
-      "ratio": 0.052746384736906064,
-      "meanDelta": 5.881106452788917
+      "changed": 144404,
+      "ratio": 0.4387045813586098,
+      "meanDelta": 45.19630878600073
     }
   ],
   "video": {
@@ -185,63 +177,63 @@
     },
     "motion": "normal",
     "source": "real browser movement, collection, bank, held spill, unheld fall and retry; mocked build statuses",
-    "sha256": "1c0c2f92d4fc6afb48a924fd74223cbc960b9622201ea36b902a9b5f175c8413",
-    "durationSeconds": 42.68,
+    "sha256": "eadbc5b4c7a6b1fd03194f7447263bdc1430f225b70f90f97b8b22e6fd89890b",
+    "durationSeconds": 42.16,
     "framesPerSecond": 25,
-    "sizeBytes": 4311981
+    "sizeBytes": 4346502
   },
   "files": [
     {
       "file": "desktop-idle.png",
-      "sha256": "c80cb04fb94c519129983ee5a1441dd0c9fbd38edad8cac21ec49d288b6938b8",
+      "sha256": "53148e5299dc84777663af9130ca69042850b294c5a44b24711191322c73b0fe",
       "width": 1280,
       "height": 900
     },
     {
       "file": "desktop-warning.png",
-      "sha256": "d6ea016b899ff1a7471d7f6bb41cd15ac5d71f6cf976a548ca676a89938ecf1c",
+      "sha256": "efb0500dd36eaeb69c606e743382f5944fcc88733aa2a67c1148fb662af09388",
       "width": 1280,
       "height": 900
     },
     {
       "file": "desktop-ready.png",
-      "sha256": "cd11f71bd8dc5e8d05dd25575c0ba2df83f7e584aad04a70de6f5e9f3c6fd6d0",
+      "sha256": "2ee09516b8a38b9e3e996f80cdfb0a5d6e2b420d5947c645430764a10d98765c",
       "width": 1280,
       "height": 900
     },
     {
       "file": "tablet-portrait-idle.png",
-      "sha256": "4a26c24cb8767a9d705e6581591327c319fa7a96b586978eb02c084735e3c471",
+      "sha256": "d2d4fa9b2a77a64c873d52aa86bee975a0c6e01e09f3f78b7d4ed3d8ad514c6e",
       "width": 768,
       "height": 1024
     },
     {
       "file": "tablet-portrait-warning.png",
-      "sha256": "5e13117088be604a18536ae317507e68aef3fe97a0f9214228f5fda51792ecdd",
+      "sha256": "21ea800507950b91452c1669815b6e456be62d7876d965088e57ffb23f0309fb",
       "width": 768,
       "height": 1024
     },
     {
       "file": "tablet-portrait-ready.png",
-      "sha256": "f0a150ef33e481cd9b42b9ffb4902baa15d8216d2dcb4860d0b74c9161d446f6",
+      "sha256": "917d2e8930514b62e809e7e7526652d7fa00c7f34cd7e7b9ce3a627b89e8481d",
       "width": 768,
       "height": 1024
     },
     {
       "file": "mobile-idle.png",
-      "sha256": "126b50b1cb6c5539e1fad0bb959ab8a7407b3824e288687f9fba45c69ff14b74",
+      "sha256": "b9ffd4e897878105f8e1abbb6d060458c851f5715167961d6583cca4163360cd",
       "width": 390,
       "height": 844
     },
     {
       "file": "mobile-warning.png",
-      "sha256": "6d9fca24f9494c274c5c5d26cd5d9c58c14e270130db49380551248fcdc87c65",
+      "sha256": "66a8ad204623dd3bc0cbd1297eb79c7ab5657abe43687d7faa60ba77db96256e",
       "width": 390,
       "height": 844
     },
     {
       "file": "mobile-ready.png",
-      "sha256": "336d1fdfddb6a9d19c296697e1c9638569297f152bd381ad6590eec70c28838d",
+      "sha256": "57a05940cc50b86754e720962831833958f08fc462879ccf8908c42b57dcaf64",
       "width": 390,
       "height": 844
     }
