@@ -22,6 +22,8 @@ PR87 and PR117's unique historical receipts are preserved in the [receipt archiv
 
 Operational/API observations in this section were collected November 23, 2026, around 12:30 a.m. America/New_York (`2026-11-23T05:30Z`). They are dated metadata checks, not continuous live monitoring.
 
+The deployment/API and access observations were refreshed at `2026-11-23T06:16:30Z` (1:16:30 a.m. America/New_York): Pages deployment/source/run, private worker source/pin, inaccessible worker variable, blocked website/Cloud Shell routes and unavailable cloud identity/configuration were unchanged. The workspace disk/inode figures below remain the earlier measurement.
+
 The selected Codex workspace is a different environment from the owner's historical 4.8 GB Cloud Shell home volume. Its `/workspace` filesystem measured 63 GB total, 2.1 GB used, 58 GB available (4%); inode total 4,194,304, used 8,114, free 4,186,190 at this check. These are **not** Cloud Shell before/after measurements. The root's earlier workspace observation was about 60 GB available before worktrees/dependencies, not a Cloud Shell cleanup result.
 
 Exact access evidence:

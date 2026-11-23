@@ -7,7 +7,7 @@ These receipts preserve their original observation scope. They are historical ev
 
 Original immutable source: [`f606818acca661bb1dda038f2601fed5b842e19a`](https://github.com/jzwyrzyk/family-game-factory/blob/f606818acca661bb1dda038f2601fed5b842e19a/DELIVERY-STATE.md). Text retained from that source:
 
-## November 22, 2026 — reconciled main, web publication and diagnostic merge
+### November 22, 2026 — reconciled main, web publication and diagnostic merge
 
 **Current source check:** public `main` is [`b4734b1323de87dfee96bb91769cbab3cff432e6`](https://github.com/jzwyrzyk/family-game-factory/commit/b4734b1323de87dfee96bb91769cbab3cff432e6). [PR124](https://github.com/jzwyrzyk/family-game-factory/pull/124) **merged** on November 21 at **20:15:43 UTC**, after the corrected portrait-tablet check passed the required workflows. Its content-free private-coach failure diagnostics and read-only inspector are now in the application **source**. The older November 21 headings below saying this diagnostic candidate was "prepared and unmerged" or still needed hosted checks are explicitly **pre-merge observations**, not today's PR state. The owner authorized only the private-coach diagnostic rollout after checks; no post-merge Cloud Run rollout, serving diagnostic image, new failure-stage event or successful Adult chat response was independently established by this audit. Owner-supplied earlier serving inspection identified PR115 gateway and coach revisions; those observations do not inventory the present services. [Diagnostic contract](../issue-28/SECURE_INFERENCE_AND_RELEASE.md#private-conversation-diagnostics).
 
@@ -21,7 +21,7 @@ Original immutable source: [`f606818acca661bb1dda038f2601fed5b842e19a`](https://
 
 Original immutable source: [`d4ec7498a8f9931def2c6b3b4b702833f3790135`](https://github.com/jzwyrzyk/family-game-factory/blob/d4ec7498a8f9931def2c6b3b4b702833f3790135/DELIVERY-STATE.md). Text retained from that source:
 
-## November 21, 2026 — approved Pal collection deployed; production artwork verified
+### November 21, 2026 — approved Pal collection deployed; production artwork verified
 
 The owner dispatched [Pages run44932334132](https://github.com/jzwyrzyk/family-game-factory/actions/runs/44932334132) at **12:51:40 p.m. America/New_York** (`2026-11-21T17:51:40Z`) for exact merged source **`6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`**. The build, all eight regression shards (core, learning, gameplay, browser-security, generated, creative, studio and coach), and deployment passed on attempt 1. Deploy job `136933666456` reported success at **1:00:13 p.m. America/New_York** (`2026-11-21T18:00:13.3644163Z`), using Pages artifact `14717369116` and that exact `pages_build_version`. No second dispatch, rerun, gate bypass or backend mutation was performed for this Pal cutover.
 
@@ -33,7 +33,7 @@ By `2026-11-21T18:01:25.470283Z`, all **48 approved Base/Grown neutral images ac
 
 The requested Pal deployment and cutover are complete; **no additional Cloud Shell release command is needed**. Existing clients can use the normal **Update jems** action when offered, then open **Menu → My Pals**. PR115's serving gateway/private coach, preview traffic, worker/sandbox pins and original recovery journal remain retained under the prior receipt below. This website release does not resolve the separate connected-chat or real generated-game acceptance work; [issue93](https://github.com/jzwyrzyk/family-game-factory/issues/93) remains open. [PR117](https://github.com/jzwyrzyk/family-game-factory/pull/117) records this operational follow-up to merged PR114.
 
-## November 21, 2026 — approved Pal collection merged; Pages-only cutover ready
+### November 21, 2026 — approved Pal collection merged; Pages-only cutover ready
 
 [PR114](https://github.com/jzwyrzyk/family-game-factory/pull/114) merged at **11:36:19 a.m. America/New_York** (`2026-11-21T16:36:19Z`) as **`6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`**, preserving PR115 main `19f5e46ae1141da3df7bf14d682757de7e9aec69`. The merged tree `b8dc483828d01cce041f93848c10768830dfb8a6` exactly matches tested Pal head `2adfa80dd91751bd8b38c09f2deca06d452d8962` and hosted merge checkout `3f30f6d9cd2052f5717a5afcfea75efe433e393e`. This is a source merge receipt; no Pal website deployment is claimed here.
 
