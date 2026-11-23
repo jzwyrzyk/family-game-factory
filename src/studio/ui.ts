@@ -923,7 +923,7 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
- function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
+ function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea');notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.creationStandard=2;});message(s,'helper','Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.');return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
   stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
@@ -939,6 +939,14 @@ export async function installStudio(){
   if(box.dataset.session===s.id&&box.dataset.signature===signature)return;
   const sameSession=box.dataset.session===s.id,earlierWasOpen=sameSession&&box.querySelector<HTMLDetailsElement>('.studio-earlier-messages')?.open;
   box.replaceChildren();box.dataset.session=s.id;box.dataset.signature=signature;
+  // An onboarding greeting is presentation only: never a child choice, model instruction, or Build request.
+  if(s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate&&!messages.some(m=>m.role==='child')){
+   const greeting=el('div','studio-message helper studio-coach-welcome');
+   greeting.setAttribute('aria-label','jems');
+   greeting.append(el('p','',"Hey, I'm jems! Tell me the game you're imagining."),
+    el('p','',"I'll ask a few fun questions so we can make it look and play the way you want."));
+   box.append(greeting);
+  }
   const earlier=el('details','studio-earlier-messages') as HTMLDetailsElement;
   earlier.append(el('summary','','Earlier ideas'));earlier.open=!!earlierWasOpen;
   if(messages.length>4)box.append(earlier);
