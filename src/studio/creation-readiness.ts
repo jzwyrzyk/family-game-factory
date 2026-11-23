@@ -19,7 +19,7 @@ export interface CreationReview extends CreationReadinessVerdict {
 const evidenceKeys=['action','consequence','experience','world'] as const;
 const creativeEvidenceKeys=[...evidenceKeys,'goal','visualStyle','mood'] as const;
 const requiredEvidenceKeys=(standard:CreationStandard)=>standard===2?creativeEvidenceKeys:evidenceKeys;
-const planKeys=['fun','action','goal','setback','score','style','progression','special'] as const;
+const planKeys=['fun','action','goal','setback','score','style','viewpoint','movement','progression','special'] as const;
 const isRecord=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const only=(value:Record<string,unknown>,keys:readonly string[])=>Object.keys(value).every(key=>keys.includes(key));
 
@@ -48,8 +48,9 @@ function supported(verdict:CreationReadinessVerdict,sources:readonly string[]){
 /** Transport validation; a complete-looking set of fields alone is never a
  * readiness verdict. Missing metadata remains compatible but cannot unlock Build. */
 export function validateCreationReadiness(value:unknown,context:CoachContext):CreationReadinessVerdict {
- if(context.creation?.version!==1&&context.creation?.version!==2)throw Error('Creation review was not requested.');
- const verdict=verdictShape(value,context.creation.version);
+ const standard=context.creation?.version;
+ if(standard!==1&&standard!==2)throw Error('Creation review was not requested.');
+ const verdict=verdictShape(value,standard);
  const sources=[context.message,...context.conversation.filter(message=>message.role==='child').map(message=>message.text),
   ...Object.values(context.plan).filter(field=>field?.origin==='child'&&field.accepted&&!field.delegated).map(field=>field!.value)];
  supported(verdict,sources);
