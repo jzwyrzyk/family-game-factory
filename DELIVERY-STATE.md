@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — direct IAM proposal collected; effective-access reads denied
+
+The owner supplied the sanitized Cloud Shell result from helper `62ef419613e7bcdc18d4028115f4620c062c0044`, observed at `2026-11-23T15:24:58Z`. It reports 11 proposed direct bindings (nine resource grants and two lane-specific federation bindings), four predefined role definitions read, all five earlier preflight/plan files present, and zero mutations. The exact direct proposal was recorded privately. All 66 Policy Troubleshooter requests returned HTTP 403, leaving effective access unknown and the review incomplete. Neither API disablement nor a particular missing permission is established by that status alone.
+
+The [activation runbook](docs/operations/PRODUCTION_ACTIVATION.md) now documents a pinned, read-only follow-up that verifies the original private evidence and makes two diagnostic reads, preserving full error responses privately. The draft remains unmerged. No activation approval, API enablement, IAM change, release-flag change, image publication, traffic shift or live product acceptance follows from this receipt. Recovery prerequisites and a fresh complete effective-access review remain outstanding.
+
 ## November 23, 2026 — fresh production activation review prepared; IAM approval pending
 
 The owner reports successful Cloud Shell inspection of all three service baselines/configuration fingerprints and an Adult continuity result of `CURRENT_STATE_VERIFIED`, with worker pin `dddf53dbc76796be19782c1bb5bbb99b86e99909` retained. The reported service files and earlier production proposal remain private Cloud Shell artifacts; the Adult result was printed without a saved receipt. The owner also reports both dedicated deployment providers disabled, lane flags/identity variables unset, the immutable release registry empty and Pages still serving `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d`. These are owner-reported observations, not a newly collected effective-IAM audit.

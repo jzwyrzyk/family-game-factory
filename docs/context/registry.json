@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T15:20:04.694Z",
-      "sourceDigest": "43d3afdc5aa5bc403bfa850e05c7a3cb3b1b67ac33e83442a3823c048a366f75",
+      "reviewedAt": "2026-11-23T15:32:06.767Z",
+      "sourceDigest": "01fbc8e4cd67366d95d8a1f71e4327f4dffe8cba1c84e61912feadee4c730405",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the fixed-resource read-only production IAM collector, private evidence and incomplete-access limits; documented explicit additional-IAM approval hold, opt-in federated proof jobs, immutable tool/publication/intent source sequence, and canary/recovery requirements. Application, runtime, worker, data and paid-provider behavior remain unchanged.",
+      "reviewReason": "Reviewed owner-supplied collector outcome: exact direct proposal, 66 unknown effective checks and zero mutations. Documented the two-request read-only diagnostic, pinned private-evidence integrity, bounded error classification and unchanged activation/recovery hold; no application or production behavior change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
