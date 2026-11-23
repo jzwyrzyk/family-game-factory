@@ -1,5 +1,9 @@
 # Review the remaining Jems access setup
 
+**Current production handoff:** use [Production activation and exact-source release](PRODUCTION_ACTIVATION.md). The owner has authorized the cutover but has explicitly withheld approval of the additional IAM/provider activation scope until fresh live IAM evidence and an exact diff are reviewed. The new collector is read-only; the release operator supplies one immutable, tested Cloud Shell command. Do not run the historical placeholder command or old PR107 apply pathway below as the current production procedure.
+
+## Historical PR107 preparation
+
 This is preparation for the operational access in draft [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107).
 It does not authorize a merge, install permissions, enable a workflow or change
 production. The [policy foundation](POLICY_FOUNDATION.md) is source validation;

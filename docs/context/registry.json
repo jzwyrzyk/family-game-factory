@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T08:08:28.213Z",
-      "sourceDigest": "13d90c6dc309c9f72282b63d93ee1e0e827a1163ba59cb049e9fa134213166ad",
+      "reviewedAt": "2026-11-23T15:20:04.694Z",
+      "sourceDigest": "43d3afdc5aa5bc403bfa850e05c7a3cb3b1b67ac33e83442a3823c048a366f75",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded authorized frozen-source cutover evidence and blocked live baseline; preserved initial local packaging DNS failures and documented recovery using Docker-managed proxy defaults with CA trust, all three non-root network-disabled imports passing; no production action or runtime source change.",
+      "reviewReason": "Reviewed the fixed-resource read-only production IAM collector, private evidence and incomplete-access limits; documented explicit additional-IAM approval hold, opt-in federated proof jobs, immutable tool/publication/intent source sequence, and canary/recovery requirements. Application, runtime, worker, data and paid-provider behavior remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
