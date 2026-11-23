@@ -1,5 +1,6 @@
 from pathlib import Path
 import unittest
+import urllib.error
 from unittest.mock import Mock
 
 import oidc_claims
@@ -183,6 +184,51 @@ class AccessProofTests(unittest.TestCase):
         for call in api.calls:
             if call[0] == "permissions" and "run.googleapis.com" in call[1]:
                 self.assertEqual("run.routes.invoke" in call[2], "factory-coach-private" in call[1])
+
+    def test_service_probes_do_not_stand_in_for_revision_access(self):
+        for lane in access.ACCOUNTS:
+            api = FakeGoogle(lane)
+            result = self.run_proof(lane, api)
+            service_calls = [call for call in api.calls if call[0] == "permissions" and
+                             "run.googleapis.com" in call[1]]
+            self.assertEqual(len(service_calls), 3)
+            for call in service_calls:
+                self.assertNotIn("run.revisions.get", call[2])
+                self.assertEqual(call[2] - {"run.routes.invoke"},
+                                 {"run.services.get", "run.services.update",
+                                  "run.services.delete", "run.services.setIamPolicy"})
+            reads = [call[1] for call in api.calls if call[0] == "get" and "/revisions/" in call[1]]
+            proof = result["revision_access"]
+            if lane == "release":
+                self.assertEqual(proof["status"], "VERIFIED")
+                self.assertEqual(proof["method"], "GET")
+                self.assertEqual(sorted(reads), sorted("https://run.googleapis.com/v2/" +
+                                                      name for name in proof["resources"]))
+                self.assertEqual(len(reads), 3)
+            else:
+                self.assertEqual(reads, [])
+                self.assertEqual(proof["status"], "NOT_VERIFIED")
+                self.assertIn("absence of revision-read access remains unverified", proof["scope"])
+
+    def test_actual_revision_read_failures_do_not_yield_a_success_receipt(self):
+        for failure in (401, 403, 404, 429, 503, "wrong_name"):
+            api = FakeGoogle("release")
+            original = api.get
+            def read(url):
+                result = original(url)
+                if "/revisions/" in url:
+                    if failure == "wrong_name":
+                        result["name"] = result["name"] + "-other"
+                    else:
+                        # Every HTTP failure remains a failed read. In particular,
+                        # 401/404/429 cannot be converted to permission evidence.
+                        opener = Mock()
+                        opener.open.side_effect = urllib.error.HTTPError(url, failure, "private detail", {}, None)
+                        return access.Google("test-token-not-for-output" * 2, opener).get(url)
+                return result
+            api.get = read
+            with self.subTest(failure=failure), self.assertRaises(access.AccessError):
+                self.run_proof("release", api)
 
     def test_malformed_unsupported_permission_checks_do_not_become_denial_evidence(self):
         for response in ({"error": "unsupported"}, {"permissions": "run.services.get"},

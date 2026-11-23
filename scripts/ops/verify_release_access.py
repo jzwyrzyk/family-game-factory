@@ -38,7 +38,10 @@ ACCOUNTS = {lane: f"{name}@{PROJECT}.iam.gserviceaccount.com" for lane, name in
 RUNTIMES = {service: f"{account}@{PROJECT}.iam.gserviceaccount.com" for service, account in
             (("factory-gateway", "factory-gateway"), ("factory-preview", "factory-preview"),
              ("factory-coach-private", "factory-coach"))}
-SERVICE_REQUIRED = {"run.services.get", "run.services.update", "run.revisions.get"}
+# Service testIamPermissions is a typed service-resource probe. Revision access
+# is proved separately by GET of actual serving revisions, never inferred from
+# a revision permission queried against the service resource.
+SERVICE_REQUIRED = {"run.services.get", "run.services.update"}
 SERVICE_DENIED = {"run.services.delete", "run.services.setIamPolicy"}
 REGISTRY_READ = {"artifactregistry.repositories.get", "artifactregistry.repositories.downloadArtifacts"}
 REGISTRY_WRITE = "artifactregistry.repositories.uploadArtifacts"
@@ -237,9 +240,18 @@ def verify(lane, env, claims, head, api):
     forbidden = PROJECT_DENIED | ({"run.operations.get"} if lane == "publish" else set())
     checks.append(permission_check(api, "project", "https://cloudresourcemanager.googleapis.com/v3/projects/" +
                                    PROJECT + ":testIamPermissions", needed, forbidden))
+    revision_access = ({
+        "status": "VERIFIED", "permission": "run.revisions.get", "method": "GET",
+        "resources": [f"{LOCATION}/services/{row['service']}/revisions/{revision}"
+                      for row in runtimes for revision in row["serving_revisions"]],
+    } if lane == "release" else {
+        "status": "NOT_VERIFIED", "permission": "run.revisions.get",
+        "scope": "No actual revision GET was attempted for the publisher; absence of revision-read access remains unverified.",
+    })
     return {"schema": "jems-federated-access-v1", "status": "VERIFIED", "lane": lane,
             "observed_at_utc": datetime.now(timezone.utc).isoformat(),
             **receipt, "effective_service_account": ACCOUNTS[lane], "checks": checks, "runtimes": runtimes,
+            "revision_access": revision_access,
             "flag_gate": "Both flag values resolved empty; actual variable absence requires the operator collector.",
             "operation_poll": "Project run.operations.get permission checked; no named operation was read.",
             "scope": "Named permissions on exact resources at observation time only; unprobed inherited/group/deny boundaries remain subject to operator IAM review.",
