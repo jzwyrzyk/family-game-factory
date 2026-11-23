@@ -38,6 +38,48 @@ class CoachFixture(CloudRunFixture):
 
 
 class StageTests(unittest.TestCase):
+    def test_known_project_number_and_id_references_are_equivalent(self):
+        for keys in (('latestCreatedRevision',), ('latestReadyRevision',),
+                     ('latestCreatedRevision', 'latestReadyRevision')):
+            with self.subTest(keys=keys):
+                f = CoachFixture()
+                for key in keys:
+                    f.state[key] = f.state[key].replace('/' + o.PROJECT + '/', '/' + o.PROJECT_NUMBER + '/')
+                self.assertTrue(f.observe()['both_revisions_ready'])
+                diagnostic = o.latest_references(release, f.intent, f.state)
+                self.assertTrue(all(row['target'] == 'candidate' for row in diagnostic.values()))
+                self.assertTrue(all(diagnostic[key]['project_reference'] == 'project_number' for key in keys))
+
+    def test_same_revision_suffix_in_other_namespace_or_short_form_is_rejected(self):
+        f = CoachFixture()
+        correct = f.state['latestCreatedRevision']
+        for wrong in (correct.replace(o.PROJECT, 'different-project'),
+                      correct.replace(o.REGION, 'different-location'),
+                      correct.replace('/services/' + o.SERVICE + '/', '/services/different/'),
+                      correct.replace('/' + o.PROJECT + '/', '/1054529152894/'),
+                      f.candidate, correct + '/extra', correct + '?private=value', None, '', 123):
+            for key in ('latestCreatedRevision', 'latestReadyRevision'):
+                with self.subTest(value=wrong, key=key):
+                    changed = CoachFixture()
+                    changed.state[key] = wrong
+                    with self.assertRaises(o.ObservationError):
+                        changed.observe()
+
+    def test_baseline_latest_ready_still_blocks_and_is_reported_without_raw_values(self):
+        f = CoachFixture()
+        f.state['latestReadyRevision'] = f.resource + '/revisions/' + f.baseline
+        diagnostic = o.latest_references(release, f.intent, f.state)
+        self.assertEqual(diagnostic['latestReadyRevision']['target'], 'baseline')
+        with self.assertRaises(o.ObservationError):
+            f.observe()
+        f.state['latestReadyRevision'] = 'unknown/private/value'
+        self.assertNotIn('private', json.dumps(o.latest_references(release, f.intent, f.state)))
+        f.state['latestReadyRevision'] = f.candidate
+        self.assertEqual(o.latest_references(release, f.intent, f.state)['latestReadyRevision'],
+                         {'target': 'candidate', 'project_reference': 'short_name'})
+        with self.assertRaises(o.ObservationError):
+            f.observe()
+
     def test_stage_accepts_zero_candidate_traffic_and_checks_both_revisions(self):
         f = CoachFixture()
         result = f.observe()

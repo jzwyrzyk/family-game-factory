@@ -23,6 +23,7 @@ WORK = Path('/home/jzwyrzyk/jems-production-activation.lekdl0n2')
 STAGE_HELPER = '2ea4387f7a857a0ded7928ee35651f6c1ee88604c9a75c67ceca5976df7e220c'
 STAGE_RUN = 45282960847
 PROJECT = 'family-game-factory-jzw'
+PROJECT_NUMBER = '1054529152893'
 REGION = 'us-east5'
 SERVICE = 'factory-coach-private'
 LOCATION = f'projects/{PROJECT}/locations/{REGION}'
@@ -92,12 +93,42 @@ def command(args):
     return result.stdout.decode().strip()
 
 
+def revision_reference(value, intent):
+    """Classify only references within this verified project/service/location.
+
+    The activation receipts bind this project ID and number. Do not accept an
+    arbitrary suffix match, another namespace, a short name or an absent field.
+    Unknown reference values are never included in the shareable report.
+    """
+    if value is None or value == '':
+        return {'target': 'missing', 'project_reference': 'none'}
+    if not isinstance(value, str):
+        return {'target': 'unrecognized', 'project_reference': 'unrecognized'}
+    for target in ('candidate', 'baseline'):
+        if value == intent[target]:
+            return {'target': target, 'project_reference': 'short_name'}
+    for project, form in ((PROJECT, 'project_id'), (PROJECT_NUMBER, 'project_number')):
+        prefix = f'projects/{project}/locations/{REGION}/services/{SERVICE}/revisions/'
+        if value.startswith(prefix):
+            suffix = value[len(prefix):]
+            target = ('candidate' if suffix == intent['candidate'] else
+                      'baseline' if suffix == intent['baseline'] else 'other_revision')
+            return {'target': target, 'project_reference': form}
+    return {'target': 'unrecognized', 'project_reference': 'unrecognized'}
+
+
+def latest_references(release, intent, service):
+    identities = {'baseline': intent['baseline'], 'candidate': release.revision_name(intent)}
+    return {key: revision_reference(service.get(key), identities)
+            for key in ('latestCreatedRevision', 'latestReadyRevision')}
+
+
 def staged_state(release, intent, service, baseline, candidate):
     name = release.revision_name(intent)
     need(service.get('name') == RESOURCE and service.get('etag')
          and not service.get('reconciling', False), 'SERVICE_UNSTABLE')
-    need(service.get('latestCreatedRevision') == f'{RESOURCE}/revisions/{name}'
-         and service.get('latestReadyRevision') == f'{RESOURCE}/revisions/{name}',
+    need(all(row['target'] == 'candidate' and row['project_reference'] in {'project_id', 'project_number'}
+             for row in latest_references(release, intent, service).values()),
          'LATEST_REVISION_CHANGED')
     need(release.traffic(service) == {intent['baseline']: 100}, 'STAGE_TRAFFIC_CHANGED')
     # Validate desired traffic too; a pending or implicit/latest target is not
@@ -225,6 +256,7 @@ def observe(report):
     name = release.revision_name(intent)
     baseline = get('GET', RESOURCE + '/revisions/' + intent['baseline'])
     candidate = get('GET', RESOURCE + '/revisions/' + name)
+    report['latest_revision_references'] = latest_references(release, intent, current)
     report['stage'] = staged_state(release, intent, current, baseline, candidate)
     for expected in activated['service_baselines']:
         if expected['service'] == SERVICE:

@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — stage observer stopped on latest-revision comparison
+
+The owner ran observer source `bd1b24144c61dbd1691a53cb5b7e8f5918135374` with its exact SHA-256. It stopped at `LIVE_CLOUD` with `LATEST_REVISION_CHANGED`, zero mutations and private receipt SHA-256 `f8aefc4c3bacfcfaf308ae7ba0001d8bd1fab66562230abaed253ec019ae8b58`. That result does not identify which latest-revision field differed or establish current traffic, configuration, monitoring or continuity. The successful stage workflow remains historical evidence, and canary remains unexecuted.
+
+The observer now accepts an exact latest-revision reference using either the verified project ID or its bound numeric project identifier. It still requires the exact region, service and candidate; foreign namespaces, short names, missing values and a baseline/latest mismatch fail closed. Both actual revision GETs, image/configuration checks and baseline-100 traffic checks remain unchanged. A sanitized classification of each latest-revision reference is emitted even if the gate fails. This repairs a brittle string comparison, but project-number formatting is only a possible explanation for the owner's failure until a fresh observation confirms it. Offline regressions cover both equivalent forms and negative namespace/reference cases. No traffic, release intent or controller change is included.
+
 ## November 23, 2026 — private Coach staged; baseline retains all traffic
 
 [PR142](https://github.com/jzwyrzyk/family-game-factory/pull/142) merged as release intent `7932580f1af890a5e0d879fe6a8390e86134068e`, referencing the already published application source `aa56b60abe152e750f9f0b5e8949bdb44be53196`. The owner-run, checksum-verified Cloud Shell handoff rechecked live baselines, continuity, recovery access and release controls, then recorded release-flag enablement at **5:47 p.m. America/New_York (`2026-11-23T22:47:10Z`)**. Its private completion receipt SHA-256 is `26cc9111206274ac678bd7746b58ea379c0a5b995214a5d84aa709f941478b0b`. The direct GitHub download succeeded; the earlier missing-file launchers and incomplete pastes did not establish deployment.
