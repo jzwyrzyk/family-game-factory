@@ -37,6 +37,17 @@ exports.navigate=async function navigate(page,id){
  if(!await target.isVisible())await page.locator('#studioNavMenu').click();
  await target.click();
 };
+/** Retained native games live in My Creations, reached through visible controls. */
+exports.openRetainedGame=async function openRetainedGame(page,game,activate=target=>target.click()){
+ if(!['buckets','dragon'].includes(game))throw Error('Choose a retained native game');
+ if(!await page.locator('#page-creations').isVisible()){
+  if(await page.locator('#page-studio.studio-play-mode').isVisible())await activate(page.locator('#studioHome'));
+  if(await page.locator('#page-creation').isVisible())await activate(page.locator('#creationHome'));
+  if(!await page.locator('#studioSavedIdeas').isVisible())await activate(page.locator('#studioNavHome'));
+  await activate(page.locator('#studioSavedIdeas'));
+ }
+ await activate(page.locator(`#page-creations [data-starter="${game}"]`));
+};
 exports.openProfiles=async function openProfiles(page,activate=target=>target.click()){
  if(await page.locator('#page-studio.studio-play-mode').isVisible()){
   const more=page.locator('#studioMore');

@@ -10,6 +10,8 @@ The local play header always includes **My Games** and **Full screen / Exit full
 
 Changing a game, opening help, choosing versions, leaving for another page or changing profiles uses existing disposal and learning guards. Disposal exits fullscreen, restores prior document scrolling and restores the ordinary tools. The `factory-page` listener also releases the view when a legacy or learning-host route leaves directly. These changes do not save a favorite, select a version, clear learning evidence or reset a required checkpoint.
 
+After a modern native game unmounts, Studio restores the shared `#page-game` host to its original document position and page classes. The same host also serves My Creations → saved remix → Live Remix → Play; leaving it inside a hidden Studio page made that later canvas invisible. The routing repair preserves the existing unmount, learning guards, runtime and saved version. The [retained-games regression](../../tests/retained-games-browser.cjs) exercises this mixed-route sequence with saved Dragon and Buckets variants on desktop and phone.
+
 Cosmetic reward and maker celebrations do not overlay fitted play. Entry clears an earlier toast and pending presentation batch; delayed grants still commit their total and receipt, but do not create a popup over game controls. The same rule covers native and generated games, including while More or required learning is open. My rewards retains the committed total and recent grants. Leaving the game does not replay a suppressed celebration. This follows an actual normal-motion capture where a four-second maker reward covered Mining’s Bank label despite allowing pointer input.
 
 ## Fullscreen and learning

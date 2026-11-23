@@ -129,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:12.254Z",
-      "sourceDigest": "109eb451d901427e8febf3fbe514e1d758b0a48bbcefeb9a4b385cd2e3453bec",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed retained-history, evidence-capacity, owner/head and paid-recovery safeguards against current doctrine including Coach v2 and the four experiences. No new product policy, retention deletion, earning rule or Build authority; F06 limits and source-only authorization remain explicit.",
+      "reviewedAt": "2026-11-23T18:16:02.638Z",
+      "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded the owner-specific retained-game placement and cutover retention exception in a decision; general preserve-work doctrine is unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -292,10 +292,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:12.647Z",
-      "sourceDigest": "d52d9e1b0c95b09478b7e24cd84d47c8873aca22f93f576dc9b84b5e8c74a28f",
+      "reviewedAt": "2026-11-23T18:16:02.770Z",
+      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the combined five-component matrix, durable Notifications recovery, full transcript provenance through chapters, atomic v2 creation, compensated native creation and truthful capacity notices. Preserved all four experiences, current visible navigation, reading and ownership guards.",
+      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -392,10 +392,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fe6facdb555a348abc3ab99ef75ab2b7e6cfeab75e39f654adc92d03055727ba",
-      "reviewedAt": "2026-11-23T05:34:31.892Z",
+      "sourceDigest": "046b2da4d3be2a0b8803de7689f7ac8daff903cc1c25a9e8ce18f26418dee6c3",
+      "reviewedAt": "2026-11-23T18:16:03.267Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed v2 readiness coverage against the merged First steps source; the architecture preserves seven-source first-build gates separately from Coding scene practice, saved references and recovery.",
+      "reviewReason": "Updated shared architecture for retained saved-variant routing; scene/art ownership, revision data and creation authority remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -861,10 +861,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:15.018Z",
-      "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
+      "reviewedAt": "2026-11-23T18:16:03.343Z",
+      "sourceDigest": "adce7f016d78e5dd4174b1efcef89f8c669d4c8e9b296ce2e4d4c2f5efccec57",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source and fixture evidence without replacing final exact-head hosted gates. Retained all five component tests; reproduced and corrected PROFILE_CHANGED expectation, current navigation locators and cross-chapter provenance. Added narration rollover/admission and real backup coverage; Pal decode gate/art/baselines remain unchanged and historical failure retained.",
+      "reviewReason": "Recorded focused preservation/lifecycle evidence and added retention regression to test:studio; eight-shard assignment still covers all40 commands.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T17:06:32.886Z",
-      "sourceDigest": "85b19cf1184bd3459f0941ad7c44ecaec0ed1f26eaad8b26b6fc7bd738278c08",
+      "reviewedAt": "2026-11-23T18:16:03.485Z",
+      "sourceDigest": "4e168f4384343575533ebb2861d75715c34bdb163ee405b2e08ea0e06266099f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the paced owner audit and exact guarded activation scope: historical evidence integrity, stable approval and fresh-source preparation hashes, strict source-and-claims rebinding, current state and etag guards, private per-action recovery receipts and bounded transport. Documented the 158 passing operations tests, actual revision GET proof and publisher uncertainty, recovery prerequisites, and the unapproved unexecuted deployment boundary.",
+      "reviewReason": "Recorded approved merged IAM source and successful exact-source checks, narrowed recovery requirement, and separate later UI publication source; no live activation claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1479,10 +1479,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "925ba2415c4e93d79d88f42bd14a0c7c8de30cbcabf335381630131d3e7c812c",
-      "reviewedAt": "2026-11-23T05:43:15.787Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed original-drawing, rig identity and native/notebook staging with current four-experience main. Art source contract and recovery test require exact two-store restoration after quota failure and one linked Rally on retry; optional usage indexing remains nonblocking and original assets/pins are unchanged.",
+      "sourceDigest": "38e5940ba3f7e89ed9353f01f65b9702bb3b04792db98f4db9c377158730dd8c",
+      "reviewedAt": "2026-11-23T18:16:03.593Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed art ownership and immutable reference contract; only native-game navigation in fixture setup changes, with no artwork store, adapter, export or dependency mutation.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1523,10 +1523,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "196be53f4cfde1416f0ad008d1ae06dde293f1455ce336fad7b1b4b2b952f22e",
-      "reviewedAt": "2026-11-22T18:39:36.408Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared bounded image readiness and cancellation, conservative scene-only paper compositing and all 48 approved source identities; originals and saved form keys remain unchanged.",
+      "sourceDigest": "56651655d4d633e4b13f6f648dde41b07155523146b067d4e85bb0ac8e3a45a4",
+      "reviewedAt": "2026-11-23T18:16:03.677Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed Pal ownership and recovery contract; browser fixture enters moved native cards through My Creations, without changing Pal assets, collection, growth or rewards.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

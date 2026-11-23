@@ -1,4 +1,4 @@
-const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles,openRetainedGame}=require('./studio-entry.cjs');
 /* Real production-dist journeys. All program edits use the public UI; FG.creation is read-only inspection. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -173,7 +173,7 @@ const {start}=require('./browser-server.cjs');
         }
 
         // Carry real saved-game characters and provenance into a scene, then return.
-        await activate('#creationHome');await activate('[data-starter="dragon"]');
+        await activate('#creationHome');await openRetainedGame(page,'dragon',activate);
         const gameSession=await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(session=>session.game==='dragon'));
         assert.ok(gameSession?.projectId);
         const gameBefore=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));

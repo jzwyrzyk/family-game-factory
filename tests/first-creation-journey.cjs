@@ -6,7 +6,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,waitForWelcome,completeWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,waitForWelcome,completeWelcome,navigate,openProfiles,openRetainedGame}=require('./studio-entry.cjs');
 
 const NOTEBOOK='family-game-factory-studio-v1';
 const devices=[['desktop',{width:1280,height:900}],['phone',{width:390,height:844}]];
@@ -221,7 +221,7 @@ async function firstImprovement(browser,url,device,viewport){
  try{
   await page.route('**/factory-config.json',unavailable);
   await page.goto(url);await ready(page);await exploreWelcome(page);
-  await page.click('[data-starter="buckets"]');await page.waitForSelector('#game-mount canvas#game');
+  await openRetainedGame(page,'buckets');await page.waitForSelector('#game-mount canvas#game');
   const original=(await snapshot(page)).config.bucketCount;
   const head=()=>page.evaluate(()=>{
    const n=FG.studio.exportNotebook(),s=n.sessions.find(x=>x.id===n.active[FG.store.current().id]);
@@ -342,7 +342,7 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
   let waitingGameId=ownId;
   const focusedControl=focusedGuide?`#studioGuideCard${focusedGuide==='action'?'Action':'Dismiss'}`:'#studioChange';
   if(!focusedGuide){
-   await page.click('#studioNavHome');await page.click('[data-starter="buckets"]');
+   await page.click('#studioNavHome');await openRetainedGame(page,'buckets');
    await page.waitForSelector('#game-mount canvas#game');
    waitingGameId=(await current(page)).id;assert.notEqual(waitingGameId,ownId);
   }else await moreChoices(page);

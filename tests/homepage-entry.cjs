@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openRetainedGame}=require('./studio-entry.cjs');
 
 /** Homepage contract: Studio by default, old Arcade only when explicitly requested.
  * The same saved ideas must survive home and reload without ever claiming an AI build.
@@ -30,11 +30,11 @@ const {exploreWelcome}=require('./studio-entry.cjs');
    assert.ok(firstAction&&firstAction.height>=44&&firstAction.width>=130,'first creation is a large touch target');
    await exploreWelcome(page);
    assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'the four current Ready to Play games stay in their curated order');
-   assert.deepEqual(await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'the two original games have their own group');
+   assert.deepEqual(await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'the two retained games belong to My Creations');
    assert.equal(await page.locator('[data-starter="moon"], [data-starter="robot"]').count(),0,'retired starters do not return to the current catalogue');
    assert.equal((await page.locator('#studioLibraryTitle').textContent()).replace(/\s+/g,' ').trim(),'What jems will you make today?');
    assert.equal(await page.locator('#studioStarterTitle').textContent(),'Ready to Play jems');
-   assert.equal(await page.locator('#studioOriginalsTitle').textContent(),'Original jems');
+   assert.equal(await page.locator('#studioOriginalsTitle').textContent(),'Play your games');
    assert.equal(await page.locator('#studioSavedTitle').textContent(),'My jems');
    assert.equal(await page.locator('#studioFavoritesSection').textContent().then(t=>t.includes('Six games')),false);
    assert.equal(await page.locator('.studio-home-intro').textContent().then(t=>t.includes('Imagine it. Play it. Make it yours.')),true);
@@ -93,7 +93,7 @@ const {exploreWelcome}=require('./studio-entry.cjs');
    await page.locator('#studioArchived summary').click();
    await page.locator('#studioArchived button').click();
    assert.equal(await page.locator('#studioLibrary [data-session]').count(),1,'Bring back restores the game');
-   await page.click('[data-starter="buckets"]');
+   await openRetainedGame(page,'buckets');
    await page.waitForSelector('#game-mount canvas#game');
    await page.locator('#studioMore > summary').click();
    await page.locator('#studioMathOptions summary').click();
@@ -104,7 +104,7 @@ const {exploreWelcome}=require('./studio-entry.cjs');
    assert.equal(await page.evaluate(()=>window.FG.learning.subject),'math');
    await page.click('#studioHome');
    assert.equal(await page.locator('#studioStarters [data-starter]').count(),4,'Ready to Play games stay available after play');
-   assert.equal(await page.locator('#studioOriginals [data-starter]').count(),2,'Original games stay available after play');
+   assert.equal(await page.locator('#page-creations #studioOriginals [data-starter]').count(),2,'Retained games stay in My Creations after play');
    assert.deepEqual(errors,[],'no browser runtime errors');
    await context.close();
   }
@@ -123,6 +123,6 @@ const {exploreWelcome}=require('./studio-entry.cjs');
   await alias.waitForFunction(()=>window.FG?.studio);
   assert.equal(await alias.locator('#page-studio-library').isVisible(),true,'review alias remains compatible');
   await context.close();
-  console.log('PASS Studio homepage: default entry, four Ready to Play and two Original games, large CTA, honest builder state, saved drafts, legacy escape and responsive layout');
+  console.log('PASS Studio homepage: default entry, four Ready to Play and two retained games in My Creations, large CTA, honest builder state, saved drafts, legacy escape and responsive layout');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});
