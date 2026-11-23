@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { chromium } from 'playwright';
 import { draftChildIntentContract } from '../server/quality/child-intent';
 import { chooseGameForm } from '../server/quality/game-form';
 import { createFunctionalGameContract, type FunctionalProbe } from '../server/quality/functional-game-contract';
@@ -37,7 +38,7 @@ export function runAuthoredFixture(directory: string) {
   const started = performance.now();
   const stdout = execFileSync(process.execPath, ['server/sandbox/worker.cjs'], {
     input: JSON.stringify({ game, independentIntentPlan: contract, captureQuality: true }),
-    env: { PATH: process.env.PATH, HOME: '/tmp', WORKER_BROWSER_PATH: process.env.CHROMIUM_PATH,
+    env: { PATH: process.env.PATH, HOME: '/tmp', WORKER_BROWSER_PATH: process.env.CHROMIUM_PATH || chromium.executablePath(),
       PLAYWRIGHT_BROWSERS_PATH: process.env.PLAYWRIGHT_BROWSERS_PATH },
     stdio: ['pipe', 'pipe', 'ignore'], timeout: 120000, maxBuffer: 10 * 1024 * 1024,
   });
