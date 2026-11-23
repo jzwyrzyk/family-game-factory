@@ -163,7 +163,7 @@ async function firstCreationConversation(browser,url){
   for(const text of [idea,...Object.values(evidence)])assert.ok(f.requests[0].prompt.includes(text),text+' survives the reviewed build request');
   assert.ok(!f.requests[0].prompt.includes('Make a silly moon cat collect stars'),'the unchosen model proposal is not built');
   assert.ok(!f.requests[0].prompt.includes('Funny surprises'),'an unchosen helper plan field is not child intent');
-  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Current choices \(these replace|Choose sensible details for:|Later ideas, in order/,'the full build envelope stays outside child chat');
+  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Game choices in order|Current choices \(these replace|Choose sensible details for:|Later ideas, in order/,'the full build envelope stays outside child chat');
   await page.click('#studioBuildHandoffStay');
   await page.fill('#studioPrompt',draft);f.acknowledge();
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.id==='draft-job'));
@@ -229,7 +229,7 @@ async function sentCorrections(browser,url){
   for(const required of [evidence.world,evidence.action,evidence.consequence,'Actually make it calm instead.','The clouds are trampolines.'])assert.ok(f.requests[0].prompt.includes(required),required+' reaches the actual build request');
   assert.ok(f.requests[0].prompt.lastIndexOf('Actually make it calm instead.')>f.requests[0].prompt.indexOf('silly and springy'),'the explicit newer choice follows and supersedes the original feeling');
   assert.equal((await session(page)).pendingExperiment.prompt,f.requests[0].prompt,'recovery retains the same reviewed request');
-  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Current choices \(these replace|Choose sensible details for:|Later ideas, in order/);
+  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Game choices in order|Current choices \(these replace|Choose sensible details for:|Later ideas, in order/);
   assert.deepEqual(f.unexpected,[]);assert.deepEqual(f.errors,[]);
   console.log('PASS sent correction: old readiness blocked, new contextual assessment required, child revision and later mechanic reach explicit Build');
  }catch(error){await page.screenshot({path:'test-results/guided-request-correction-failure.png',fullPage:true}).catch(()=>{});throw error;}

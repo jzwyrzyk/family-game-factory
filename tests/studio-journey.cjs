@@ -190,7 +190,7 @@ const {start}=require('./browser-server.cjs');
  assert.equal(coachRequests.length,2);assert.equal(remoteRequests.length,0,'even a reviewed game still waits for the child to choose Build');
  await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('studioBuildHandoff')?.dataset.phase==='ready');
  assert.equal(remoteRequests.length,1);assert.ok(remoteRequests[0].prompt.includes(childIdea)&&remoteRequests[0].prompt.includes(childRules),'the submitted game carries the child’s own plan');
- assert.doesNotMatch(await page.textContent('#studioMessages'),/Current choices \(these replace|Later ideas, in order|Approved game plan|Choose sensible details for:/,'the build envelope stays out of the child’s conversation');
+ assert.doesNotMatch(await page.textContent('#studioMessages'),/Game choices in order|Current choices \(these replace|Later ideas, in order|Approved game plan|Choose sensible details for:/,'the build envelope stays out of the child’s conversation');
  await page.click('#studioBuildHandoffPlay');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');

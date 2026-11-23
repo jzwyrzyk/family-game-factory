@@ -8,15 +8,21 @@ const {assertTextContrast}=require('./helpers/text-contrast.cjs');
 const idea='A dragon lives above jelly clouds.';
 const action='I tap a cloud and the dragon bounces off it to catch a star.';
 const purpose='I want it to feel calm and floaty. Each star lights a window in the moon house; when all five shine the dragon goes home.';
+const askForLooks='Can you give me three ideas for how my clouds could look?';
+const offeredLook='cartoon clouds';
+const alternatives=['clouds cut from paper','clouds made of clay',offeredLook];
 const finish='If I miss, the dragon floats back to the last cloud and I try again. I want soft blue and pink cartoon clouds. No timer, points or enemies.';
 const evidence={action,consequence:'Each star lights a window in the moon house; when all five shine the dragon goes home.',experience:'I want it to feel calm and floaty.',world:'I want soft blue and pink cartoon clouds.',goal:'when all five shine the dragon goes home',visualStyle:'soft blue and pink cartoon clouds',mood:'calm and floaty'};
 const emptyEvidence=Object.fromEntries(Object.keys(evidence).map(key=>[key,'']));
 const baseReply={move:'clarify',suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
 const replies={
- [idea]:{...baseReply,text:'Your dragon has a world of jelly clouds.',question:'What could your dragon do with those clouds?',childDecisions:[{field:'style',quote:idea}],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['The player action and its effect are still unclear.']}},
+ [idea]:{...baseReply,text:'Your dragon has a world of jelly clouds.',question:'What could your dragon do with those clouds?',childDecisions:[],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['The player action and its effect are still unclear.']}},
  [action]:{...baseReply,text:'Your tap sends the dragon bouncing toward a star.',question:'How do you want that bouncing to feel?',childDecisions:[{field:'action',quote:action}],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['What happens when a star is caught, and the intended experience, are still unclear.']}},
  [purpose]:{...baseReply,text:'Each caught star lights up the dragon’s home. You want the bouncing to feel calm and floaty.',question:'What happens if the dragon misses a star?',childDecisions:[{field:'fun',quote:evidence.experience},{field:'goal',quote:evidence.consequence}],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['The consequence of missing a jump still needs the child’s decision.']}},
- [finish]:{...baseReply,text:'Tap a jelly cloud to bounce your dragon toward a star. Light all five windows to bring it home. Miss a star and float back to try again. Your calm blue-and-pink game is ready to build.',question:null,childDecisions:[{field:'setback',quote:'If I miss, the dragon floats back to the last cloud and I try again.'},{field:'style',quote:evidence.world},{field:'score',quote:'No timer, points or enemies.'},{field:'special',quote:'No timer, points or enemies.'}],creationReadiness:{ready:true,evidence,unresolved:[]}}
+ [askForLooks]:{...baseReply,move:'inspire',text:'Here are three ideas from me. Try clouds cut from paper, clouds made of clay, or cartoon clouds. You can mix them or make up your own.',question:null,
+  planSuggestions:alternatives.map(value=>({field:'style',value})),creationReadiness:{ready:false,evidence:emptyEvidence,unresolved:['The look of the clouds is still open.']}},
+ 'Sure.':{...baseReply,text:'You get to choose.',question:'How do you picture your clouds?',creationReadiness:{ready:false,evidence:emptyEvidence,unresolved:['The look of the clouds is still open.']}},
+ [finish]:{...baseReply,text:'Tap a jelly cloud to bounce your dragon toward a star. Light all five windows to bring it home. Miss a star and float back to try again. Choose Build my game when you’re ready.',question:null,planSuggestions:[{field:'style',value:offeredLook}],childDecisions:[{field:'setback',quote:'If I miss, the dragon floats back to the last cloud and I try again.'},{field:'style',quote:evidence.world},{field:'score',quote:'No timer, points or enemies.'},{field:'special',quote:'No timer, points or enemies.'}],creationReadiness:{ready:true,evidence,unresolved:[]}}
 };
 (async()=>{
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
@@ -75,7 +81,14 @@ const replies={
     await page.screenshot({path:'test-results/guided-question-'+device+'.png'});
     await sendChildMessage(page,purpose);
     assert.equal(await page.locator('#studioSend').isDisabled(),true,'four quoted aspects still cannot override a material unresolved rule');
+    const offered=await sendChildMessage(page,askForLooks);
+    assert.deepEqual(offered.design.plan.style,{origin:'helper',accepted:false,delegated:false,value:offeredLook});
+    const unsure=await sendChildMessage(page,'Sure.');
+    assert.equal(unsure.design.plan.style.accepted,false);
+    assert.equal(await page.locator('#studioSend').isDisabled(),true);
     const reviewed=await sendChildMessage(page,finish);
+    assert.deepEqual(reviewed.design.plan.style,{origin:'helper',accepted:true,delegated:false,value:evidence.world});
+    assert.ok(reviewed.design.ideas.some(idea=>idea.origin==='helper'&&idea.adopted&&idea.text===offeredLook));
     assert.equal(reviewed.design.creationReview.ready,true);
      assert.equal(reviewed.design.creationReview.version,2);
     assert.equal(await page.locator('#studioSend').isEnabled(),true,'the child can build after a grounded contextual review');
@@ -91,7 +104,9 @@ const replies={
     await page.waitForTimeout(40);assert.equal(requests.length,1);
     const payload=requests[0].prompt;
     for(const required of [idea,action,evidence.experience,evidence.consequence,evidence.world,'No timer, points or enemies.'])assert.ok(payload.includes(required),required+' survives into the actual job');
-    assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Current choices \(these replace|Later ideas, in order|Approved game plan/);
+    assert.match(payload,/style \(jems suggested "cartoon clouds", child chose\): I want soft blue and pink cartoon clouds/);
+    for(const excluded of [...alternatives.slice(0,2),askForLooks,'Sure.', "Hey, I'm jems!"])assert.ok(!payload.includes(excluded),excluded);
+    assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Game choices in order|Current choices \(these replace|Later ideas, in order|Approved game plan/);
     assert.equal(await page.locator('#studioPrompt').inputValue(),'');
     acknowledge();await page.waitForFunction(()=>!document.getElementById('studioBuildHandoffPlay').disabled);
     await page.locator('.studio-handoff-art img').evaluate(image=>image.decode());

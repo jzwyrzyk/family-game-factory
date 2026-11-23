@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T01:04:40.735Z",
-      "sourceDigest": "0a7822c4d2802f725e5d423b04b129a3aa7dfe3618638d7719e9e57e0449e5cc",
+      "reviewedAt": "2026-11-23T02:35:27.598Z",
+      "sourceDigest": "73ca76f7e495126b1a9145690ce96ae593d2c1512a82000a136d6c5f02024864",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the owner-approved change from merely playable first creation to child-authored goal, visual style and mood evidence, with adaptive questioning and optional surprises in the guided-coach decision.",
+      "reviewReason": "The doctrine and guided-creation decision record now distinguish open discovery, named helper adoption and the seven v2 first-build dimensions.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -233,10 +233,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T01:07:36.638Z",
-      "sourceDigest": "a0f61a6b68b23f3d1d2c36a53045653469d675d421d576275289faf2bb5be781",
+      "reviewedAt": "2026-11-23T02:35:28.321Z",
+      "sourceDigest": "8cf4a1db7724c2b26e4bfc176b837dd5bd78f98344fc5c9a552af2f4b4891b62",
       "reviewOutcome": "updated",
-      "reviewReason": "Re-reviewed first-creation greeting implementation so the two-sentence introduction is display-only, disappears after the first child turn, and never enters saved messages or Build evidence; no other experience ownership boundaries changed.",
+      "reviewReason": "Reviewed the conversation, immediate stop, bounded context, Build compilation and unchanged welcome. First-creation documentation describes explicit selection and child-led help.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -543,10 +543,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T01:04:40.735Z",
-      "sourceDigest": "930ad10ceef4f12d9b7d6c7b16471a0ae63840d6db331fec37423a82af495e69",
+      "reviewedAt": "2026-11-23T02:35:29.428Z",
+      "sourceDigest": "2e7abe71b2608b92284cab436a8447ebcbb848506710b41156658e5ed4db2baf",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed actual private-coach schema projection and creative-coaching instruction changes, including original child evidence, seven-key v2 contract, bounded enumeration, and no changes to identity, consent or spending.",
+      "reviewReason": "The gold standard, architecture, decision record and review rubric describe contextual support, quoted selection evidence, corrections and older notebook readers.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -579,10 +579,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
-      "reviewedAt": "2026-11-21T14:34:24.173Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
+      "sourceDigest": "e463bbb341ce42ac878964926183ed1fb97658435c94599f17dc5af62bc10ebc",
+      "reviewedAt": "2026-11-23T02:35:29.925Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the synthetic adult reconnect fixture now returns seven empty evidence fields for its v2 request. Adult authentication, consent, isolation, budget and reporting contracts are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -626,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T01:07:36.638Z",
-      "sourceDigest": "99a8f788d31cbcfb3f2684c8d2fca24c63cc2937f4b708dc9ef6c635497acf80",
+      "reviewedAt": "2026-11-23T02:35:30.480Z",
+      "sourceDigest": "3825c1f67203b885304ede3eb9bc0a78057fe28645a789e7b9024c5e5ea1b705",
       "reviewOutcome": "updated",
-      "reviewReason": "Re-reviewed synthetic guided-creation fixture to assert the welcoming introduction never enters saved child or helper messages; versioned creative evidence, explicit Build, and child intent protections remain covered.",
+      "reviewReason": "Reviewed the provenance, wire, older-reader and browser assertions against the architecture. The linked coach review separates state and response fixtures from scored observed language.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
