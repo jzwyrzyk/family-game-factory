@@ -631,6 +631,41 @@ await test('reconnect restores provenance for an earlier prose-only offer and ne
   assert.equal(h.buildRequests.length,0);
  }finally{h.dispose();}
 });
+await test('a selected prose-only helper offer keeps its origin across a sealed chapter, restore and Build',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const premise='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.';
+  const picked='I want a storybook look.',offer='storybook';
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,question:null,creationReadiness:{ready:false,evidence:empty,unresolved:['How should it look?']}};
+  await sendTurn(h,premise,{...waiting,text:'One idea from me is a storybook look. You can invent your own.'});
+  while(h.book.conversationPage(id,owner).available)h.book.message(id,owner,'helper','Earlier saved conversation note '+h.book.conversationPage(id,owner).count+'.');
+  const original=h.session().messages;
+  h.book.continueConversation(id,owner);
+  const backup=JSON.parse(JSON.stringify(h.book.read()));h.book.restore(backup);
+  assert.deepEqual(h.session().messages,original);
+  const ready:CoachReply={...reply,question:null,childDecisions:[{field:'style',quote:offer}],
+   creationReadiness:{ready:true,evidence:{action:'tap',consequence:'makes a ripple',world:'pond',experience:'play with the ripples',goal:'just want to play with the ripples',mood:'quiet',visualStyle:picked},unresolved:[]}};
+  await sendTurn(h,picked,ready);
+  const selected=h.session();
+  assert.deepEqual(selected.design!.plan.style,{value:offer,origin:'helper',accepted:true,delegated:false});
+  assert.equal(selectedSuggestions(selected).style?.[0].offer,offer);
+  assert.equal(h.coach.buildReadiness().ready,true);
+  const beforePrompt=h.coach.buildPrompt()!;
+  assert.match(beforePrompt,/jems suggested "storybook", child chose/);assert.ok(beforePrompt.includes(premise));
+  assert.equal(h.buildRequests.length,0,'saved readiness is never Build consent');
+  h.book.continueConversation(id,owner);h.book.restore(JSON.parse(JSON.stringify(h.book.read())));
+  h.coach.reset();h.coach.openSession();
+  const children=h.session().messages.filter(message=>message.role==='child');
+  const check=h.coach.reassess();await h.awaitModelRequest();h.resolve(ready);await check;
+  assert.deepEqual(h.session().messages.filter(message=>message.role==='child'),children);
+  assert.equal(h.coach.buildReadiness().ready,true);
+  assert.equal(h.coach.buildPrompt(),beforePrompt);
+  assert.deepEqual(new StudioNotebook(h.storage).get(id,owner).messages.slice(0,200),original);
+ }finally{h.dispose();}
+});
+
 await test('a mixed selection preserves both earlier options and no other option',async()=>{
  const h=coachingHarness();
  try{
