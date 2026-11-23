@@ -15,6 +15,12 @@ import activation_execute as e
 from test_production_activation import fixture
 
 
+FROZEN_ACTIVATION_INPUTS = {
+    'ops/compatibility.json': b'{}\n',
+    'ops/release.json': b'{}\n',
+}
+
+
 class FakeClient:
     def __init__(self, state):
         self.state, self.writes, self.finished = copy.deepcopy(state), [], []
@@ -202,8 +208,29 @@ class Preparation(unittest.TestCase):
         result = json.loads(output.getvalue())
         self.assertEqual(result['owner_approval'], 'NOT_GRANTED_BY_THIS_OUTPUT')
         self.assertEqual(len(result['scope']['roles']), 2); self.assertEqual(len(result['scope']['variables']), 4)
+        self.assertTrue(FROZEN_ACTIVATION_INPUTS.keys() <= e.SOURCE_HASHES.keys())
         for path, expected in e.SOURCE_HASHES.items():
-            self.assertEqual(hashlib.sha256((e.review.ROOT / path).read_bytes()).hexdigest(), expected, path)
+            # These two files were empty at activation; later release intents
+            # evolve independently. Executable and workflow pins stay exact.
+            data = FROZEN_ACTIVATION_INPUTS[path] if path in FROZEN_ACTIVATION_INPUTS else (e.review.ROOT / path).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), expected, path)
+
+
+class SourceGate(unittest.TestCase):
+    def test_original_activation_gate_rejects_later_release_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for path in e.SOURCE_HASHES:
+                destination = root / path; destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(FROZEN_ACTIVATION_INPUTS[path] if path in FROZEN_ACTIVATION_INPUTS else (e.review.ROOT / path).read_bytes())
+            with patch.object(e.review, 'ROOT', root), patch.object(e.review, 'clean_source'), patch.object(e, 'command'):
+                e.source_gate('c' * 40, 'c' * 40)
+                for path, original in FROZEN_ACTIVATION_INPUTS.items():
+                    with self.subTest(path=path):
+                        (root / path).write_bytes(b'{"operation":"stage"}\n')
+                        with self.assertRaisesRegex(SetupError, 'Reviewed workflow or access proof source changed'):
+                            e.source_gate('c' * 40, 'c' * 40)
+                        (root / path).write_bytes(original)
 
 
 if __name__ == '__main__': unittest.main()
