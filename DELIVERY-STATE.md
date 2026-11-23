@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — diagnostic API enabled; effective-access audit still incomplete
+
+The owner's fresh Cloud Shell receipt reports Policy Troubleshooter `ENABLED` and a full collection at `2026-11-23T15:56:52Z`, using helper `01c090b9d93d01eb81dc7ccb701d993e017c080c`. Of 66 permission checks, 15 returned `CANNOT_ACCESS` and 51 remain `UNKNOWN`: six project checks returned HTTP 403, four revision checks HTTP 400 and 41 checks HTTP 429. These failures do not establish denied target permissions. The direct proposal's review hash remains `4b70ce88b0310fcb18a5c9f7bb8d353c767aaa095f6f90fe7f6ea67a3a2c1bfa`; all eleven bindings remain proposed additions. The collection reports zero mutations and `activation_ready: false`.
+
+The next read-only rerun corrects the existing collector's project resource name, paces requests and bounds transient retries while retaining every permission outcome and private error evidence. The [activation runbook](docs/operations/PRODUCTION_ACTIVATION.md) records those limits. That rerun has not occurred; API enablement resolves the earlier disabled-API finding, not the incomplete IAM review. No IAM grant, deployment-provider activation, release-variable change, publication or traffic change is approved by this receipt.
+
 ## November 23, 2026 — diagnostic API enablement reported successful; fresh audit pending
 
 After reviewing the confirmed `SERVICE_DISABLED` result, the owner explicitly approved enabling only `policytroubleshooter.googleapis.com` in `family-game-factory-jzw`, then rerunning the read-only IAM audit. This supersedes the diagnostic API approval hold below; it does not approve the eleven proposed IAM bindings, two deployment federation providers, release identity variables or flags, publication, model calls or production traffic changes.

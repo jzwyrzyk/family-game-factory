@@ -1,12 +1,14 @@
 """Read-only production collector boundaries and exact-scope failure cases."""
 import copy
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import tempfile
 import time
 import unittest
+import urllib.error
 from unittest.mock import patch
 
 import production_activation as a
@@ -129,7 +131,7 @@ class ReadOnlyClient(unittest.TestCase):
                              ('crm', 'v3/folders/123:getIamPolicy'), ('troubleshooter', 'v3/iam:troubleshoot')]:
             live.readonly(lambda *args, **kwargs: calls.append(args) or {}, origin)('POST', path)
         self.assertEqual(len(calls), 4)
-        self.assertEqual(len(live.evidence), 4)
+        self.assertEqual(len(live.evidence), 3)  # Dedicated Troubleshooter transport records its own attempts.
         self.assertIn('observed_at_utc', live.evidence[0])
 
     def test_service_account_and_project_policy_protocols_differ(self):
@@ -276,6 +278,128 @@ class EvidenceFiles(unittest.TestCase):
         with patch.object(a, 'git', side_effect=fake_git), patch.object(a, 'command', return_value=''):
             self.assertEqual(a.clean_source(source, helper), source)
             with self.assertRaises(SetupError): a.clean_source(source, 'e'*40)
+
+
+class PacedTroubleshooter(unittest.TestCase):
+    def test_direct_state_and_roles_are_rechecked_after_paced_probes(self):
+        for scope in ('direct', 'roles'):
+            with self.subTest(scope=scope):
+                live = bare_live(); state = fixture(); live.source = state['source']; events = []
+                final = copy.deepcopy(state); final_roles = copy.deepcopy(state['predefined_roles'])
+                if scope == 'direct': final['flags'][a.FLAGS[0]] = {'value': 'true'}
+                else: final_roles[a.PREDEFINED_ROLES[0]]['includedPermissions'].append('changed.permission')
+                states, roles = iter([state, final]), iter([state['predefined_roles'], final_roles])
+                live.read_state = lambda: events.append('state') or next(states)
+                live.predefined_roles = lambda: events.append('roles') or next(roles)
+                live.ancestry_audit = lambda: {}
+                live.effective_audit = lambda value: events.append('probes') or {'probes': [], 'unknown_count': 0}
+                live.read_target = lambda kind, target: events.append('policy') or state['policies'][target]
+                live.gh = lambda *args: {'protected': True, 'commit': {'sha': live.source}}
+                result = live.collect()
+                self.assertGreater(events.index('policy'), events.index('probes'))
+                self.assertEqual(events.count('state'), 2); self.assertEqual(events.count('roles'), 2)
+                self.assertTrue(any(e['status'] == 'DRIFT' for e in result['errors']))
+                self.assertIsNone(result['plan'])  # A historical initial snapshot is not a current exact proposal.
+
+    def client(self, replies, deadline=600):
+        now, starts, records = [0.0], [], []
+        class Opener:
+            def open(self, request, timeout):
+                starts.append(now[0])
+                self_outer.assertEqual(request.method, 'POST')
+                self_outer.assertEqual(request.full_url, 'https://policytroubleshooter.googleapis.com/v3/iam:troubleshoot')
+                code, body = replies.pop(0)
+                data = io.BytesIO(json.dumps(body).encode())
+                if code != 200: raise urllib.error.HTTPError(request.full_url, code, 'PRIVATE MESSAGE', {}, data)
+                data.code, data.headers = code, {}
+                return data
+        self_outer = self
+        client = a.Troubleshooter('SECRET TOKEN', records.append, deadline, clock=lambda: now[0],
+                                 sleep=lambda seconds: now.__setitem__(0, now[0] + seconds), opener=Opener())
+        return client, now, starts, records
+
+    @staticmethod
+    def call(client):
+        return client.call('POST', 'v3/iam:troubleshoot', {'accessTuple': {'principal': a.ACCOUNTS['publish']}})
+
+    def test_serial_requests_are_paced_without_real_sleep(self):
+        client, now, starts, records = self.client([(200, {'overallAccessState': 'CANNOT_ACCESS'})] * 3)
+        for _ in range(3): self.call(client)
+        self.assertEqual(starts, [0, 6.1, 12.2])
+        self.assertEqual(len(records), 3)
+        self.assertNotIn('SECRET', json.dumps(records))
+        with self.assertRaises(SetupError): client.call('POST', 'v3/iam:enable', {})
+        self.assertEqual(len(starts), 3)
+
+    def test_transient_retry_honors_safe_retry_info_and_records_private_error(self):
+        body = {'error': {'status': 'RESOURCE_EXHAUSTED', 'message': 'PRIVATE MESSAGE', 'details': [
+            {'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED',
+             'domain': 'googleapis.com', 'metadata': {'quota_limit_value': '10', 'secret': 'PRIVATE METADATA'}},
+            {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '10s'}]}}
+        client, now, starts, records = self.client([(429, body), (200, {'overallAccessState': 'CANNOT_ACCESS'})])
+        self.assertEqual(self.call(client)['overallAccessState'], 'CANNOT_ACCESS')
+        self.assertEqual(starts, [0, 10])
+        self.assertIn('PRIVATE MESSAGE', json.dumps(records))
+        safe = a.troubleshoot_error(429, body)
+        self.assertEqual(safe['retry_after_seconds'], 10)
+        self.assertEqual(safe['quota_limit_value'], 10)
+        self.assertNotIn('PRIVATE', json.dumps(safe))
+
+    def test_permanent_bad_request_stays_unknown_and_never_retries(self):
+        body = {'error': {'status': 'INVALID_ARGUMENT', 'message': 'PRIVATE', 'details': [
+            {'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [
+                {'field': 'accessTuple.fullResourceName', 'description': 'PRIVATE'}, {'field': 'PRIVATE', 'description': 'PRIVATE'}]}]}}
+        client, now, starts, records = self.client([(400, body)])
+        with self.assertRaises(a.TroubleshootError) as failed: self.call(client)
+        self.assertEqual(starts, [0])
+        self.assertEqual(failed.exception.safe['invalid_fields'], ['accessTuple.fullResourceName'])
+        self.assertNotIn('PRIVATE', json.dumps(failed.exception.safe))
+        typed = a.troubleshoot_error(400, {'error': {'details': [{
+            '@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'domain': 'googleapis.com',
+            'reason': 'RESOURCE_TYPE_UNSUPPORTED', 'message': 'PRIVATE'}]}})
+        self.assertEqual(typed['reasons'], ['RESOURCE_TYPE_UNSUPPORTED'])
+        live = bare_live()
+        def reject(*args): raise failed.exception
+        live.http = {'troubleshooter': reject}
+        audit = live.effective_audit(fixture())
+        self.assertEqual(len(audit['probes']), 66)
+        self.assertEqual(audit['unknown_count'], 66)
+        self.assertEqual(len(a.error_groups(live.errors)), 1)
+        self.assertEqual(a.error_groups(live.errors)[0]['count'], 66)
+        self.assertEqual({p['resource'] for p in audit['probes'] if 'cloudresourcemanager.googleapis.com' in p['resource']},
+                         {'//cloudresourcemanager.googleapis.com/projects/' + a.PROJECT})
+        self.assertEqual(len([p for p in audit['probes'] if p['permission'] == 'run.revisions.get']), 6)
+        live.http['troubleshooter'] = lambda *args: {'overallAccessState': []}
+        self.assertEqual(live.effective_audit(fixture())['unknown_count'], 66)
+
+    def test_retry_count_delay_and_total_deadline_are_bounded(self):
+        body = {'error': {'status': 'UNAVAILABLE'}}
+        client, now, starts, records = self.client([(503, body)] * 3)
+        with self.assertRaises(a.TroubleshootError): self.call(client)
+        self.assertEqual(starts, [0, 8])
+        client, now, starts, records = self.client([(503, body)], deadline=24)
+        with self.assertRaises(a.TroubleshootError) as failed: self.call(client)
+        self.assertEqual(failed.exception.safe['error_status'], 'BUDGET_EXHAUSTED')
+        self.assertEqual(starts, [])
+        body['error']['details'] = [{'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '61s'}]
+        client, now, starts, records = self.client([(503, body)])
+        with self.assertRaises(a.TroubleshootError): self.call(client)
+        self.assertEqual(starts, [0])
+
+    def test_summary_retains_every_outcome_with_grouped_failures(self):
+        live = bare_live(); state = fixture()
+        def reject(*args): raise a.TroubleshootError({'http_status': 403, 'error_status': 'PERMISSION_DENIED', 'reasons': []})
+        live.http = {'troubleshooter': reject}
+        effective = live.effective_audit(state)
+        class Client:
+            evidence = []
+            def collect(self): return {'state': state, 'plan': a.make_plan(state), 'errors': live.errors, 'effective_audit': effective}
+        with tempfile.TemporaryDirectory() as directory, patch.object(a, 'prior_files', return_value={'files': []}):
+            result = a.collect_to_directory(Client(), 'a' * 40, 'd' * 40, Path(directory) / 'new')
+        self.assertEqual(len(result['current_effective_checks']), 66)
+        self.assertEqual(len(result['errors']), 1)
+        self.assertEqual(result['status'], 'READ_ONLY_REVIEW_INCOMPLETE')
+        self.assertEqual(result['effective_unknown_count'], 66)
 
 
 if __name__ == '__main__': unittest.main()

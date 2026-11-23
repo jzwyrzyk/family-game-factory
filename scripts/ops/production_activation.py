@@ -16,9 +16,11 @@ import os
 from pathlib import Path
 import re
 import time
+import urllib.error
 import urllib.parse
+import urllib.request
 
-from admin_api import Http, SetupError, command, require
+from admin_api import Http, NoRedirect, SetupError, command, require
 import admin_cloud
 import admin_setup
 import oidc_claims
@@ -48,6 +50,104 @@ VARIABLES = {f'JEMS_{prefix}_{suffix}': value for lane, prefix in (('publish', '
                                    ('SERVICE_ACCOUNT', ACCOUNTS[lane]))}
 MAX_BYTES = 32_000_000
 EVIDENCE_BYTES = 16_000_000
+TROUBLESHOOT_INTERVAL = 6.1  # Conservative client pacing, not a claimed service quota.
+
+
+def troubleshoot_error(status, body):
+    """Only canonical status/reasons and bounded RetryInfo are public."""
+    error = body.get('error', {}) if isinstance(body, dict) else {}
+    error = error if isinstance(error, dict) else {}
+    statuses = {'PERMISSION_DENIED', 'INVALID_ARGUMENT', 'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'UNAUTHENTICATED', 'INTERNAL', 'NOT_FOUND'}
+    safe = {'http_status': status, 'error_status': error.get('status') if isinstance(error.get('status'), str) and error['status'] in statuses else 'UNVERIFIED', 'reasons': []}
+    details = error.get('details', [])
+    for detail in details if isinstance(details, list) else []:
+        if not isinstance(detail, dict): continue
+        if detail.get('@type') == 'type.googleapis.com/google.rpc.ErrorInfo' and detail.get('domain') in ('googleapis.com', 'iam.googleapis.com', 'serviceusage.googleapis.com'):
+            reason = detail.get('reason')
+            if isinstance(reason, str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,62}', reason) and reason not in safe['reasons']:
+                if len(safe['reasons']) < 16: safe['reasons'].append(reason)
+                else: safe['reason_codes_truncated'] = True
+            metadata = detail.get('metadata', {})
+            quota = metadata.get('quota_limit_value') if isinstance(metadata, dict) else None
+            if isinstance(quota, str) and re.fullmatch(r'[0-9]{1,9}', quota): safe['quota_limit_value'] = int(quota)
+        if detail.get('@type') == 'type.googleapis.com/google.rpc.BadRequest':
+            fields = {'accessTuple.principal', 'accessTuple.fullResourceName', 'accessTuple.permission',
+                      'access_tuple.principal', 'access_tuple.full_resource_name', 'access_tuple.permission'}
+            violations = detail.get('fieldViolations', [])
+            safe['invalid_fields'] = sorted({v['field'] for v in violations if isinstance(v, dict)
+                and isinstance(v.get('field'), str) and v['field'] in fields}) if isinstance(violations, list) else []
+        if detail.get('@type') == 'type.googleapis.com/google.rpc.RetryInfo':
+            match = re.fullmatch(r'([0-9]{1,4}(?:\.[0-9]{1,9})?)s', str(detail.get('retryDelay', '')))
+            if match and float(match[1]) <= 60: safe['retry_after_seconds'] = max(safe.get('retry_after_seconds', 0), float(match[1]))
+            else: safe['retry_delay_unusable'] = True
+    safe['reasons'].sort()
+    return safe
+
+
+class TroubleshootError(SetupError):
+    def __init__(self, safe):
+        super().__init__('Policy Troubleshooter request failed; target permission remains unknown')
+        self.safe = safe
+
+
+class Troubleshooter:
+    """One fixed read endpoint, paced starts, one bounded transient retry."""
+    def __init__(self, token, record, deadline, *, clock=time.monotonic, sleep=time.sleep, opener=None):
+        self.token, self.record, self.deadline = token, record, deadline
+        self.clock, self.sleep, self.next_start = clock, sleep, 0
+        self.opener = opener or urllib.request.build_opener(NoRedirect())
+
+    def call(self, method, path, data=None):
+        require(method == 'POST' and path == 'v3/iam:troubleshoot', 'Unexpected troubleshooting operation')
+        backoff = 0
+        for attempt in range(2):
+            delay = max(0, self.next_start - self.clock(), backoff)
+            if self.clock() + delay + 25 > self.deadline:
+                raise TroubleshootError({'http_status': None, 'error_status': 'BUDGET_EXHAUSTED', 'reasons': []})
+            if delay: self.sleep(delay)
+            self.next_start = self.clock() + TROUBLESHOOT_INTERVAL
+            request = urllib.request.Request('https://policytroubleshooter.googleapis.com/v3/iam:troubleshoot', method='POST',
+                data=json.dumps(data).encode(), headers={'Authorization': 'Bearer ' + self.token,
+                'Content-Type': 'application/json', 'Accept': 'application/json', 'x-goog-user-project': PROJECT})
+            raw = {'origin': 'troubleshooter', 'method': 'POST', 'path': path, 'attempt': attempt + 1,
+                   'access_tuple': data.get('accessTuple') if isinstance(data, dict) else None,
+                   'observed_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat()}
+            status, body, retry_after = None, None, None
+            try:
+                try: response = self.opener.open(request, timeout=25)
+                except urllib.error.HTTPError as error: response = error
+                with response:
+                    status = response.code; content = response.read(1_000_001)
+                    retry_after = response.headers.get('Retry-After') if response.headers else None
+                raw['http_status'] = status
+                if retry_after is not None: raw['retry_after_header'] = retry_after[:128]
+                if len(content) > 1_000_000: raw['failure'] = 'RESPONSE_TOO_LARGE'
+                else:
+                    try: body = json.loads(content); raw['response'] = body
+                    except (ValueError, UnicodeError): raw['non_json_body'] = content.decode('utf-8', errors='replace')
+            except (urllib.error.URLError, TimeoutError, OSError): raw['failure'] = 'TRANSPORT_UNVERIFIED'
+            self.record(raw)
+            if status == 200 and isinstance(body, dict) and 'error' not in body: return body
+            safe = troubleshoot_error(status, body)
+            if retry_after is not None:
+                if re.fullmatch(r'[0-9]{1,4}(?:\.[0-9]{1,3})?', retry_after) and float(retry_after) <= 60:
+                    safe['retry_after_seconds'] = max(safe.get('retry_after_seconds', 0), float(retry_after))
+                else: safe['retry_delay_unusable'] = True
+            if attempt or status not in {429, 503} or safe.get('retry_delay_unusable'): raise TroubleshootError(safe)
+            backoff = max(8, safe.get('retry_after_seconds', 0))
+
+
+def grouped_error(error):
+    value = {**error, 'scope': 'effective-access' if error['scope'].startswith('effective:') else error['scope']}
+    return {'id': digest(value)[:12], **value}
+
+
+def error_groups(errors):
+    groups = {}
+    for error in errors:
+        row = grouped_error(error); key = row['id']
+        groups.setdefault(key, {**row, 'count': 0})['count'] += 1
+    return list(groups.values())
 
 
 def digest(value):
@@ -243,9 +343,15 @@ class Live:
         self.http = {name: self.readonly(Http(origin, token, {'x-goog-user-project': PROJECT}).call, name) for name, origin in {
             'run': 'https://run.googleapis.com', 'iam': 'https://iam.googleapis.com',
             'registry': 'https://artifactregistry.googleapis.com',
-            'crm': 'https://cloudresourcemanager.googleapis.com',
-            'troubleshooter': 'https://policytroubleshooter.googleapis.com'}.items()}
+            'crm': 'https://cloudresourcemanager.googleapis.com'}.items()}
+        self.http['troubleshooter'] = self.readonly(Troubleshooter(token, self.record, self.started + 600).call, 'troubleshooter')
         self.gh = self.readonly(admin_setup.github_api(), "github")
+
+    def record(self, value):
+        size = len(json.dumps(value, sort_keys=True).encode())
+        require(self.evidence_bytes + size <= EVIDENCE_BYTES, 'Response exceeded the remaining private evidence budget')
+        self.evidence_bytes += size
+        self.evidence.append(value)
 
     def readonly(self, call, origin):
         def read(method, path, data=None, **kwargs):
@@ -260,11 +366,9 @@ class Live:
             self.calls += 1
             try:
                 response = call(method, path, data, **kwargs)
-                size = len(json.dumps(response, sort_keys=True).encode())
-                self.evidence_bytes += size
-                require(self.evidence_bytes <= EVIDENCE_BYTES, 'Response exceeded the remaining private evidence budget')
-                self.evidence.append({'origin': origin, 'method': method, 'path': path,
-                                      'observed_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'response': response})
+                if origin != 'troubleshooter':
+                    self.record({'origin': origin, 'method': method, 'path': path,
+                                 'observed_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'response': response})
                 return response
             except SetupError as error:
                 self.evidence.append({'origin': origin, 'method': method, 'path': path,
@@ -278,7 +382,8 @@ class Live:
         except (SetupError, release.ReleaseError, OSError, ValueError, KeyError, TypeError) as error:
             self.errors.append({'scope': label, 'status': 'UNKNOWN',
                                 'reason': str(error) if isinstance(error, (SetupError, release.ReleaseError))
-                                else 'Response shape, transport, or local evidence could not be verified'})
+                                else 'Response shape, transport, or local evidence could not be verified',
+                                **({'diagnostic': error.safe} if isinstance(error, TroubleshootError) else {})})
             return None
 
     def pages(self, path, key=None): return list(admin_setup.github_pages(self.gh, path, key))
@@ -447,7 +552,7 @@ class Live:
     def effective_audit(self, state=None):
         probes, untested = [], []
         registry_name = '//artifactregistry.googleapis.com/' + REGISTRY
-        project_name = f'//cloudresourcemanager.googleapis.com/projects/{NUMBER}'
+        project_name = f'//cloudresourcemanager.googleapis.com/projects/{PROJECT}'
         for lane, email in ACCOUNTS.items():
             cases = [(registry_name, p) for p in ('artifactregistry.repositories.downloadArtifacts',
                       'artifactregistry.repositories.uploadArtifacts', 'artifactregistry.repositories.setIamPolicy')]
@@ -469,14 +574,18 @@ class Live:
                 resource = f'//iam.googleapis.com/projects/{PROJECT}/serviceAccounts/{email_runtime}'
                 cases += [(resource, p) for p in ('iam.serviceAccounts.actAs', 'iam.serviceAccounts.getAccessToken')]
             for resource, permission in cases:
+                prior_errors = len(self.errors)
                 result = self.capture('effective:' + lane + ':' + permission,
                     lambda resource=resource, permission=permission, email=email:
                     self.http['troubleshooter']('POST', 'v3/iam:troubleshoot',
                         {'accessTuple': {'principal': email, 'fullResourceName': resource, 'permission': permission}}))
                 access = result.get('overallAccessState') if isinstance(result, dict) else None
-                status = access if access in {'CAN_ACCESS', 'CANNOT_ACCESS'} else 'UNKNOWN'
-                probes.append({'lane': lane, 'principal': email, 'resource': resource, 'permission': permission,
-                               'observed_access': status})
+                status = access if isinstance(access, str) and access in {'CAN_ACCESS', 'CANNOT_ACCESS'} else 'UNKNOWN'
+                probe = {'lane': lane, 'principal': email, 'resource': resource, 'permission': permission,
+                         'observed_access': status}
+                if len(self.errors) > prior_errors: probe['error_group'] = grouped_error(self.errors[-1])['id']
+                if isinstance(access, str) and access in {'UNKNOWN_INFO', 'UNKNOWN_CONDITIONAL', 'OVERALL_ACCESS_STATE_UNSPECIFIED'}: probe['api_access_state'] = access
+                probes.append(probe)
         return {'probes': probes, 'untested': untested,
                 'unknown_count': sum(p['observed_access'] == 'UNKNOWN' for p in probes) + len(untested),
                 'scope': 'Finite current allow/deny-policy probes using the existing operator identity. No provider enabled and no federated token exchange performed.',
@@ -488,22 +597,33 @@ class Live:
         # Even a failed high-level check must not conceal independent IAM reads.
         fixed_targets = ['registry', 'project'] + ['service:' + s for s in sorted(release.SERVICES)] + [
             'account:' + email for email in sorted(set(ACCOUNTS.values()) | set(RUNTIMES.values()))]
-        policies = {target: self.capture('policy:' + target, lambda target=target: self.read_target('policy', target))
-                    for target in fixed_targets}
         roles = self.predefined_roles()
         ancestry = self.capture('project-ancestry', self.ancestry_audit)
         effective = self.effective_audit(state)
+        # Pacing lengthens the window: recheck the complete direct hold after all probes.
+        policies = {target: self.capture('policy:' + target, lambda target=target: self.read_target('policy', target))
+                    for target in fixed_targets}
+        final_state = self.capture('final-direct-state', self.read_state)
+        final_roles = self.predefined_roles()
+        if state is not None and final_state != state:
+            self.errors.append({'scope': 'final-direct-state', 'status': 'DRIFT', 'reason': 'Direct resource, provider, identity or release-control state changed or became unreadable during collection'})
+        if final_roles != roles:
+            self.errors.append({'scope': 'final-predefined-roles', 'status': 'DRIFT', 'reason': 'Predefined role definitions changed or became unreadable during collection'})
+        stable = state is not None and final_state == state and final_roles == roles
         final_branch = self.capture('final-main', lambda: self.gh('GET', PREFIX + 'branches/main'))
         if final_branch is not None and (not final_branch.get('protected') or final_branch['commit']['sha'] != self.source):
             self.errors.append({'scope': 'final-main', 'status': 'DRIFT', 'reason': 'Protected main changed during collection'})
+        stable = stable and final_branch is not None and final_branch.get('protected') and final_branch.get('commit', {}).get('sha') == self.source
         # Repeated IAM observations must agree; concurrent changes require a new collection.
         if state is not None:
             state['predefined_roles'] = roles
             for target, prior in state['policies'].items():
                 if policies.get(target) != prior:
+                    stable = False
                     self.errors.append({'scope': 'policy:' + target, 'status': 'DRIFT', 'reason': 'IAM policy changed during collection'})
-        plan = self.capture('exact-proposed-diff', lambda: make_plan(state)) if state is not None else None
+        plan = self.capture('exact-proposed-diff', lambda: make_plan(state)) if stable else None
         return {'state': state, 'plan': plan, 'independent_policy_reads': policies,
+                'final_state': final_state, 'final_predefined_roles': final_roles,
                 'predefined_roles': roles, 'ancestry_audit': ancestry, 'effective_audit': effective, 'errors': self.errors}
 
 
@@ -592,7 +712,10 @@ def collect_to_directory(client, source, helper, output):
                'proposed_role_definitions': [expected_role(k) for k in ROLE_IDS] if result['plan'] else [],
                'proposed_provider_enablement': [VARIABLES[n] for n in VARIABLES if n.endswith('_WIF_PROVIDER')] if result['plan'] else [],
                'proposed_identity_variables': VARIABLES if result['plan'] else {}, 'enable_flags': {n: 'KEEP_UNSET' for n in FLAGS},
-               'errors': result['errors'], 'effective_unknown_count': result['effective_audit']['unknown_count'],
+               'errors': error_groups(result['errors']), 'effective_unknown_count': result['effective_audit']['unknown_count'],
+               'current_effective_checks': result['effective_audit']['probes'],
+               'troubleshooter_policy': {'minimum_start_interval_seconds': TROUBLESHOOT_INTERVAL, 'transient_retries_per_tuple': 1,
+                                         'collection_budget_seconds': 600, 'rate_is_conservative_not_a_verified_quota': True},
                'current_effective_grants': grants,
                'current_effective_denied_count': sum(p['observed_access'] == 'CANNOT_ACCESS' for p in result['effective_audit']['probes']),
                'effective_untested': result['effective_audit'].get('untested', []),
