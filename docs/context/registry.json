@@ -904,10 +904,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T04:08:52.958Z",
-      "sourceDigest": "ea52d2f7c562fca2803d4740135be658ad8fb492be698b4c6ee5540be566d814",
+      "reviewedAt": "2026-11-23T04:34:33.110Z",
+      "sourceDigest": "ae5821af3105addbd8d551dbf71f4c39a06e016ca9d82a1ebfc931944d5f5657",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the downloaded compact artifact, exact source/build/tree identity, explicit visual acceptance and preserved failed source run. PR134 remains unmerged and undeployed pending a fresh complete CI run; owner requested a pause while it completes.",
+      "reviewReason": "Recorded verified PR134 merge afa5251, exact tested-tree identity, all final release workflows and ready-event documentation success, and observed source-PR closure. Corrected the stale architecture paragraph to the already-integrated running Mining engine. Manual Pages and absent deployment remain explicit; no runtime or service configuration changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1069,6 +1069,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Recorded all 13 hosted Mining functional passes at 8496696 and the nine remaining old-reference mismatches. Added a bounded review packet beside the unchanged full artifact for exact Chromium-141 image/video inspection; tests, retention, read-only workflow permissions and tolerances remain unchanged.",
           "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
+        },
+        {
+          "reviewedAt": "2026-11-23T04:08:52.958Z",
+          "sourceDigest": "ea52d2f7c562fca2803d4740135be658ad8fb492be698b4c6ee5540be566d814",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the downloaded compact artifact, exact source/build/tree identity, explicit visual acceptance and preserved failed source run. PR134 remains unmerged and undeployed pending a fresh complete CI run; owner requested a pause while it completes.",
+          "sourceCommit": "afa5251cde97fda1865e42dbaed5fae08a2a4061"
         }
       ]
     },
