@@ -129,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:12.254Z",
+      "reviewedAt": "2026-11-23T14:33:14.658Z",
       "sourceDigest": "109eb451d901427e8febf3fbe514e1d758b0a48bbcefeb9a4b385cd2e3453bec",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed retained-history, evidence-capacity, owner/head and paid-recovery safeguards against current doctrine including Coach v2 and the four experiences. No new product policy, retention deletion, earning rule or Build authority; F06 limits and source-only authorization remain explicit.",
+      "reviewOutcome": "updated",
+      "reviewReason": "Compared the owner's November 23 adult-private high-capability game-builder direction with the existing child-authorship/playable-quality doctrine and ADR0006; added a distinct sourced future-model decision without changing product policy, child consent or acceptance criteria.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -245,6 +245,12 @@
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed the integrated PR120 fixture corrections against draft ownership, retained artwork and recovery doctrine. The change adds real-editor setup, exact preservation assertions and one adapter regression; no product source, approval boundary or retention policy changes. Existing worker, recovery and transport policies remain as reviewed.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-23T05:43:12.254Z",
+          "sourceDigest": "109eb451d901427e8febf3fbe514e1d758b0a48bbcefeb9a4b385cd2e3453bec",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed retained-history, evidence-capacity, owner/head and paid-recovery safeguards against current doctrine including Coach v2 and the four experiences. No new product policy, retention deletion, earning rule or Build authority; F06 limits and source-only authorization remain explicit."
         }
       ]
     },
@@ -710,10 +716,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.962Z",
+      "reviewedAt": "2026-11-23T14:33:14.658Z",
       "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints.",
+      "reviewReason": "Inspected merged server/agent/openai.ts approval type, planning/source/repair and review flow, worker main dddf53db hard-coded public b472c224 checkout, and game-quality contract; documented the owner-selected future model target without asserting an API identity, entitlement, cost or current model activation.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -721,6 +727,12 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed combined coordinator, worker transport, dispatcher and job-service changes. Architecture and worker contracts cover fixed phase and global deadlines, immutable report receipts, bounded identity and dispatch requests, status responses independent of dispatch and exact initial-request lookup. Authorization, transactional spending and uncertain-outcome no-replay boundaries are preserved.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-23T05:43:13.962Z",
+          "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints."
         }
       ]
     },
@@ -861,10 +873,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:15.018Z",
+      "reviewedAt": "2026-11-23T14:33:14.658Z",
       "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded source and fixture evidence without replacing final exact-head hosted gates. Retained all five component tests; reproduced and corrected PROFILE_CHANGED expectation, current navigation locators and cross-chapter provenance. Added narration rollover/admission and real backup coverage; Pal decode gate/art/baselines remain unchanged and historical failure retained.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed existing quality-capture contract, four-axis reviewer and bounded repair/worker sources against the proposed game-construction model choice; no executable test, captured benchmark, provider approval, physical-device evidence or success rate was changed or asserted by this documentation-only update.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1026,6 +1038,12 @@
           "reviewOutcome": "updated",
           "reviewReason": "Integrated PR120 fixture correction 79ccb6f while preserving the Actions first-paint fix and all product source. Full combined unit passes 486/486; component notebook/workspace/backup 60/60 and art 24/24, build/typecheck/syntax checks pass. Stronger draft, compensation and legacy-art recovery assertions remain; Chromium is launch-blocked and corrected hosted browser gates are pending.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-23T05:43:15.018Z",
+          "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded source and fixture evidence without replacing final exact-head hosted gates. Retained all five component tests; reproduced and corrected PROFILE_CHANGED expectation, current navigation locators and cross-chapter provenance. Added narration rollover/admission and real backup coverage; Pal decode gate/art/baselines remain unchanged and historical failure retained."
         }
       ]
     },
@@ -1055,10 +1073,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T08:08:28.213Z",
+      "reviewedAt": "2026-11-23T14:33:14.658Z",
       "sourceDigest": "13d90c6dc309c9f72282b63d93ee1e0e827a1163ba59cb049e9fa134213166ad",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded authorized frozen-source cutover evidence and blocked live baseline; preserved initial local packaging DNS failures and documented recovery using Docker-managed proxy defaults with CA trust, all three non-root network-disabled imports passing; no production action or runtime source change.",
+      "reviewReason": "Rechecked protected main f60f3b8, PR59/87/107/126/137 merged states and their exact heads, Nov23 main and documentation CI, worker generation-source pin and Nov21 Pages publication receipt; corrected current delivery intent and archived draft-only operations language while retaining the blocked-production-cutover receipt and live configuration unknowns.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1234,6 +1252,12 @@
           "reviewOutcome": "updated",
           "reviewReason": "Added exact PR120 hosted failure evidence and narrow fixture corrections on integration base 2ccd585, preserving previous combined and Actions synchronization entries. Recorded full combined unit 486/486, scoped local verification and browser launch limitation. Hosted reruns and the separate baseline Pal decode issue remain unresolved; no merge or deployment is claimed.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-23T08:08:28.213Z",
+          "sourceDigest": "13d90c6dc309c9f72282b63d93ee1e0e827a1163ba59cb049e9fa134213166ad",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded authorized frozen-source cutover evidence and blocked live baseline; preserved initial local packaging DNS failures and documented recovery using Docker-managed proxy defaults with CA trust, all three non-root network-disabled imports passing; no production action or runtime source change."
         }
       ]
     },
@@ -1256,10 +1280,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:23.963Z",
+      "reviewedAt": "2026-11-23T14:33:14.658Z",
       "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
+      "reviewReason": "Inspected AGENTS, canonical documentation index, decisions index, docs/context/MAINTENANCE and registry routing; linked the new owner-approved builder-model ADR and corrected the historical PR107-unmerged navigation statement without modifying review policy or existing source routes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1344,6 +1368,12 @@
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed routing additions for the generator, supplemental approved art and integration decision; existing maintenance, evidence and PR review procedures already govern this additive feature and remain accurate.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-23T03:35:23.963Z",
+          "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact."
         }
       ]
     },
