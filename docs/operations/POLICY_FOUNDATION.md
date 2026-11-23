@@ -1,5 +1,7 @@
 # Operations policy foundation
 
+**Current-source status (November 23, 2026):** The historical November 21 extraction and draft-PR references below describe why this policy foundation was created. [PR112](https://github.com/jzwyrzyk/family-game-factory/pull/112) subsequently merged the read-only policy/workflow foundation, and [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) merged the previously proposed PR107/100 privileged workflow *definitions* and access-source changes as `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`. Consequently, “not installed” below is a **foundation-only, historical snapshot**, not a current main-branch inventory. Mere workflow presence does not confirm enabled flags, live IAM, production releases or operator access. See [current architecture](../../ARCHITECTURE-CURRENT.md#cross-repository-and-release-coupling) and [delivery state](../../DELIVERY-STATE.md).
+
 ## Why this is separate from release activation
 
 On November 21, 2026, the active main ruleset required **Jems operations policy**,
