@@ -55,8 +55,10 @@ exports.createJourney=async (browser,base,device,recordVideo=false)=>{
   await route.fulfill({status:body.errorCode==='UNEXPECTED_ENDPOINT'?404:200,headers:cors,contentType:'application/json',body:JSON.stringify(body)});
  });
  await page.route(preview+'/**',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><html><body><h1>Playable preview fixture</h1><button id="play">Play</button><p id="result"></p><script>
-const channel=new URLSearchParams(location.search).get('channel'),artifactId='myj-fixture-artifact';let readySent=false;
-window.addEventListener('message',event=>{if(!readySent&&event.source===parent&&event.data.type==='factory-learning'&&event.data.channel===channel&&event.data.artifactId===artifactId&&event.data.action==='connect'){readySent=true;parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')}});
+const channel=new URLSearchParams(location.search).get('channel'),artifactId='myj-fixture-artifact';
+// Match the real renderer: answer every authenticated connect, including the
+// host's post-load handshake after an earlier ready packet.
+window.addEventListener('message',event=>{if(event.source===parent&&event.data.type==='factory-learning'&&event.data.channel===channel&&event.data.artifactId===artifactId&&event.data.action==='connect'){parent.postMessage({type:'factory-preview',channel,artifactId,event:'ready',height:400,learningProtocol:1},'*')}});
 document.querySelector('#play').onclick=()=>document.querySelector('#result').textContent='Game started';
 </script></body></html>`}));
  await page.goto(base+'?studio=1',{waitUntil:'domcontentloaded',timeout:30000});

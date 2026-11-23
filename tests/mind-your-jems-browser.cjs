@@ -6,6 +6,7 @@ const path=require('node:path');
 const {start}=require('./browser-server.cjs');
 const {createJourney}=require('./mind-your-jems-fixture.cjs');
 const {createReview}=require('./mind-your-jems-review.cjs');
+const {exploreWelcome}=require('./studio-entry.cjs');
 
 const devices=[
  {name:'desktop',viewport:{width:1280,height:900},touch:false,mobile:false,motion:'reduce'},
@@ -368,6 +369,10 @@ async function exercise(journey,device,review){
  await journey.openBuilds();await page.locator('#studioPlayNotifications').scrollIntoViewIfNeeded();await capture('ready-menu');
  await journey.playReady();await page.clock.resume();
  await page.locator('#studioRemoteHost iframe').waitFor({state:'attached'});
+ // Observe the accepted, painted preview before its first real click. DOM
+ // readiness alone can precede the cross-origin frame's input surface.
+ await page.waitForFunction(()=>{const frame=document.querySelector('#studioRemoteHost iframe');return frame&&!frame.inert&&!document.querySelector('#studioKeep').disabled;});
+ await capture('ready-preview');
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
  assert.equal(await preview.locator('#result').innerText(),'Game started','handoff reaches the interactive preview fixture');
  assert.equal(await arcade.isVisible(),false);assert.equal(journey.counters.previewRequests,1);
@@ -385,6 +390,8 @@ async function existingRemoteHandoff(journey,review){
  await journey.until(()=>journey.ready(),'ready generated revision',{step:250,limit:16000});
  assert.equal(journey.counters.previewRequests,1,'readiness itself does not load either preview');
  await journey.playReady();await page.clock.resume();
+ await page.waitForFunction(()=>{const frame=document.querySelector('#studioRemoteHost iframe');return frame&&!frame.inert&&!document.querySelector('#studioKeep').disabled;});
+ await review.capture(page,arcade,'remote-handoff','ready-preview');
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
  assert.equal(await preview.locator('#result').innerText(),'Game started');
  assert.equal(journey.counters.previewRequests,2,'handoff loads only the chosen new revision, not the old game followed by the new game');
@@ -474,6 +481,9 @@ async function profileReset(journey,device,review){
  assert.ok(await journey.score('banked')>0);assert.ok(await journey.score('loose')>0);
  await choose(project.otherOwner);
  assert.equal(await arcade.isVisible(),false,'profile changes close active mini-game');await assertScrollRestored(journey);
+ // This sibling is new. Finish the actual character/Home entrance before
+ // opening navigation; the welcome screen deliberately hides destinations.
+ await exploreWelcome(page);
  await journey.openBuildNotifications();
  assert.equal(await journey.buildItem.count(),0,'a sibling’s Notifications page cannot reveal another child’s build');
  await page.locator('#studioNotificationsBack').click();
