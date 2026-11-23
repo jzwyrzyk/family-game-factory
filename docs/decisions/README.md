@@ -38,6 +38,8 @@ These records explain durable choices without turning chat history into another 
 
 | [Bubble Gum assembly](2026-11-22-bubble-gum-assembly.md) | Recognizable objects, structural gum joins, varied puzzles and extended replayable adventures in the shared player | Accepted owner direction; initial tuning awaits play review | Owner's November 22 comprehensive overhaul request |
 
+| [Private game-construction model direction](2026-11-23-game-construction-model-direction.md) | Owner-selected “Astra High” capability target for adult-private game construction; provider model ID, supported effort, budget, and separate review-model scope require verification | Accepted intent for later implementation; not a source or production activation | Owner's November 23 game-generation comparison and Codex handoff; executable source and worker links in the record |
+
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
 ## When to record a decision
