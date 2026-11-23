@@ -4,42 +4,52 @@ import {visibleConversation} from './conversation-view';
 
 /** The coach judges coherence. The host verifies whose words support that
  * judgment and that it still describes this exact saved conversation. */
+export type CreationStandard=1|2;
 export interface CreationReadinessVerdict {
  ready:boolean;
- evidence:{action:string;consequence:string;experience:string;world:string};
+ evidence:{action:string;consequence:string;experience:string;world:string;
+  goal?:string;visualStyle?:string;mood?:string};
  unresolved:string[];
 }
 export interface CreationReview extends CreationReadinessVerdict {
- version:1;
+ version:CreationStandard;
  source:'model';
  fingerprint:string;
 }
 const evidenceKeys=['action','consequence','experience','world'] as const;
+const creativeEvidenceKeys=[...evidenceKeys,'goal','visualStyle','mood'] as const;
+const requiredEvidenceKeys=(standard:CreationStandard)=>standard===2?creativeEvidenceKeys:evidenceKeys;
 const planKeys=['fun','action','goal','setback','score','style','progression','special'] as const;
 const isRecord=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const only=(value:Record<string,unknown>,keys:readonly string[])=>Object.keys(value).every(key=>keys.includes(key));
 
-function verdictShape(value:unknown):CreationReadinessVerdict {
+function verdictShape(value:unknown,standard:CreationStandard=1):CreationReadinessVerdict {
+ const keys=requiredEvidenceKeys(standard);
  if(!isRecord(value)||!only(value,['ready','evidence','unresolved'])||typeof value.ready!=='boolean'||
-  !isRecord(value.evidence)||!only(value.evidence,evidenceKeys))throw Error('Invalid creation review.');
+  !isRecord(value.evidence)||!only(value.evidence,keys)||Object.keys(value.evidence).length!==keys.length)
+  throw Error('Invalid creation review.');
  const evidence=value.evidence;
- if(!evidenceKeys.every(key=>typeof evidence[key]==='string'&&(evidence[key] as string).length<=700)||
+ if(!keys.every(key=>typeof evidence[key]==='string'&&(evidence[key] as string).length<=700)||
   !Array.isArray(value.unresolved)||value.unresolved.length>8||!value.unresolved.every(item=>typeof item==='string'&&!!item.trim()&&item.length<=350))
   throw Error('Invalid creation review.');
  const verdict=value as unknown as CreationReadinessVerdict;
- if(verdict.ready&&(verdict.unresolved.length||evidenceKeys.some(key=>!verdict.evidence[key].trim())))throw Error('A ready game needs grounded intent and no unresolved design gaps.');
+ if(verdict.ready&&(verdict.unresolved.length||keys.some(key=>!(evidence[key] as string).trim())))
+  throw Error('A ready game needs grounded intent and no unresolved design gaps.');
+ if(standard===2&&!verdict.ready&&keys.some(key=>evidence[key]!==''))throw Error('Unready creation must have empty evidence.');
  return structuredClone(verdict);
 }
 
 function supported(verdict:CreationReadinessVerdict,sources:readonly string[]){
- for(const key of evidenceKeys){const quote=verdict.evidence[key];if(quote&&!sources.some(source=>source.includes(quote)))throw Error('Creation review needs exact child-authored evidence.');}
+ for(const quote of Object.values(verdict.evidence)){
+  if(quote&&!sources.some(source=>source.includes(quote)))throw Error('Creation review needs exact child-authored evidence.');
+ }
 }
 
 /** Transport validation; a complete-looking set of fields alone is never a
  * readiness verdict. Missing metadata remains compatible but cannot unlock Build. */
 export function validateCreationReadiness(value:unknown,context:CoachContext):CreationReadinessVerdict {
- const verdict=verdictShape(value);
- if(context.creation?.version!==1)throw Error('Creation review was not requested.');
+ if(context.creation?.version!==1&&context.creation?.version!==2)throw Error('Creation review was not requested.');
+ const verdict=verdictShape(value,context.creation.version);
  const sources=[context.message,...context.conversation.filter(message=>message.role==='child').map(message=>message.text),
   ...Object.values(context.plan).filter(field=>field?.origin==='child'&&field.accepted&&!field.delegated).map(field=>field!.value)];
  supported(verdict,sources);
@@ -47,9 +57,9 @@ export function validateCreationReadiness(value:unknown,context:CoachContext):Cr
 }
 
 export function validateCreationReview(value:unknown):CreationReview {
- if(!isRecord(value)||!only(value,['version','source','fingerprint','ready','evidence','unresolved'])||value.version!==1||value.source!=='model'||
+ if(!isRecord(value)||!only(value,['version','source','fingerprint','ready','evidence','unresolved'])||![1,2].includes(value.version as number)||value.source!=='model'||
   typeof value.fingerprint!=='string'||!/^creation-v1:[a-f0-9]{16}$/.test(value.fingerprint))throw Error('Invalid saved creation review.');
- return {...verdictShape({ready:value.ready,evidence:value.evidence,unresolved:value.unresolved}),version:1,source:'model',fingerprint:value.fingerprint};
+ return {...verdictShape({ready:value.ready,evidence:value.evidence,unresolved:value.unresolved},value.version as CreationStandard),version:value.version as CreationStandard,source:'model',fingerprint:value.fingerprint};
 }
 
 function authoredTurns(session:StudioSession){
@@ -122,22 +132,23 @@ export function creationInputFingerprint(session:StudioSession):string {
  return 'creation-v1:'+(left>>>0).toString(16).padStart(8,'0')+(right>>>0).toString(16).padStart(8,'0');
 }
 
-export function recordCreationReview(session:StudioSession,value:unknown):CreationReview {
- const verdict=verdictShape(value);
+export function recordCreationReview(session:StudioSession,value:unknown,standard:CreationStandard=1):CreationReview {
+ const verdict=verdictShape(value,standard);
  const sources=authoredTurns(session).filter(turn=>turn.source==='child'&&!turn.superseded&&!turn.refused).map(turn=>turn.text);
  for(const field of Object.values(creationPlan(session)))if(field?.origin==='child'&&field.accepted&&!field.delegated)sources.push(field.value);
  supported(verdict,sources);
- return {...verdict,version:1,source:'model',fingerprint:creationInputFingerprint(session)};
+ return {...verdict,version:standard,source:'model',fingerprint:creationInputFingerprint(session)};
 }
 
-export function creationBuildReadiness(session:StudioSession):CreationBuildReadiness {
+export function creationBuildReadiness(session:StudioSession,standard:CreationStandard=1):CreationBuildReadiness {
  if(session.draft.trim())return {ready:false,reason:'Send your new thought so we can include it in your game.',issue:'draft'};
  const review=session.design?.creationReview;
  if(!review)return {ready:false,reason:'Let’s check how your game will play.',issue:'missing-review'};
  try{
   validateCreationReview(review);
+  if(review.version!==standard)return {ready:false,reason:'Let’s check how your game should look and play.',issue:'stale-review'};
   if(review.fingerprint!==creationInputFingerprint(session))return {ready:false,reason:'Let’s check your latest changes together.',issue:'stale-review'};
-  recordCreationReview(session,{ready:review.ready,evidence:review.evidence,unresolved:review.unresolved});
+  recordCreationReview(session,{ready:review.ready,evidence:review.evidence,unresolved:review.unresolved},standard);
  }catch{return {ready:false,reason:'Let’s check your game idea together.',issue:'invalid-review'};}
  if(!review.ready)return {ready:false,reason:review.unresolved[0]||'Let’s work out the next part of your game.',issue:'unresolved'};
  return {ready:true,reason:''};
