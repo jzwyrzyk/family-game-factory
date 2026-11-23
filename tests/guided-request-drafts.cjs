@@ -123,13 +123,13 @@ async function remoteProposal(browser,url){
 
 async function firstCreationConversation(browser,url){
  const idea='I want a purple cat game on the moon.';
- const answer='I tap to jump between stones, and touching a donut makes the cat grow. It should feel silly and springy.';
- const evidence={action:'I tap to jump between stones',consequence:'touching a donut makes the cat grow',experience:'silly and springy',world:'a purple cat game on the moon'};
+ const answer='I tap to jump between stones, and touching a donut makes the cat grow. It should feel silly and springy. I want a cute pixel-art look. I win when I reach the big moon donut.';
+ const evidence={action:'I tap to jump between stones',consequence:'touching a donut makes the cat grow',experience:'silly and springy',world:'a purple cat game on the moon',goal:'I win when I reach the big moon donut.',visualStyle:'cute pixel-art look',mood:'silly and springy'};
  const f=await fixture(browser,url,message=>message===idea?{
   ...proposal('Helper-made cat','Make a silly moon cat collect stars','redesign'),
   text:'Let’s work out what your cat does.',question:'What happens when you help your cat move?',
   suggestions:['Make it silly'],planSuggestions:[{field:'fun',value:'Funny surprises'}],
-  creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:evidence.world},unresolved:['The player action and its consequence need your own detail.']}
+  creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''},unresolved:['The player action and its consequence need your own detail.']}
  }:{
   ...reflection,text:'Your cat grows when it reaches a donut, and the jumping feels springy.',
   childDecisions:[{field:'action',quote:evidence.action},{field:'goal',quote:evidence.consequence},{field:'fun',quote:evidence.experience}],
@@ -151,7 +151,7 @@ async function firstCreationConversation(browser,url){
   await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   assert.equal((await session(page)).design.creationReview.ready,true);
   assert.equal(f.coachRequests.length,2,'two explicit child messages drive the existing conversation service');
-  assert.ok(f.coachRequests.every(context=>context.creation?.version===1));
+  assert.ok(f.coachRequests.every(context=>context.creation?.version===2));
   assert.equal(f.requests.length,0,'readiness never automatically submits a game');
   // New unsent thoughts are not silently folded into a previously reviewed game.
   const draft='Keep this thought for a different version.';
@@ -165,7 +165,7 @@ async function firstCreationConversation(browser,url){
   for(const text of [idea,...Object.values(evidence)])assert.ok(f.requests[0].prompt.includes(text),text+' survives the reviewed build request');
   assert.ok(!f.requests[0].prompt.includes('Make a silly moon cat collect stars'),'the unchosen model proposal is not built');
   assert.ok(!f.requests[0].prompt.includes('Funny surprises'),'an unchosen helper plan field is not child intent');
-  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Current choices \(these replace|Choose sensible details for:|Later ideas, in order/,'the full build envelope stays outside child chat');
+  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Game choices in order|Current choices \(these replace|Choose sensible details for:|Later ideas, in order/,'the full build envelope stays outside child chat');
   await page.click('#studioBuildHandoffStay');
   await page.fill('#studioPrompt',draft);f.acknowledge();
   await page.waitForFunction(()=>FG.studio.exportNotebook().sessions.some(s=>s.job?.id==='draft-job'));
@@ -194,15 +194,15 @@ async function firstCreationConversation(browser,url){
 }
 
 async function sentCorrections(browser,url){
- const idea='A purple cat lives on the moon. I tap to jump over stones. Each donut makes the cat bigger. It should feel silly and springy.';
+ const idea='A purple cat lives on the moon. I tap to jump over stones. Each donut makes the cat bigger. It should feel silly and springy. I want a bright cartoon look. I win by reaching the moon castle.';
  const correction='Actually make it calm instead. The clouds are trampolines.';
- const evidence={action:'I tap to jump over stones',consequence:'Each donut makes the cat bigger',experience:'silly and springy',world:'A purple cat lives on the moon'};
+ const evidence={action:'I tap to jump over stones',consequence:'Each donut makes the cat bigger',experience:'silly and springy',world:'A purple cat lives on the moon',goal:'I win by reaching the moon castle.',visualStyle:'bright cartoon look',mood:'silly and springy'};
  let finishAssessment;const assessment=new Promise(resolve=>{finishAssessment=resolve;});
  const f=await fixture(browser,url,async message=>{
   if(message===correction){await assessment;return {
    ...reflection,text:'The same moon cat now moves calmly, and the clouds bounce it back up.',
    childDecisions:[{field:'fun',quote:'Actually make it calm instead.'},{field:'special',quote:'The clouds are trampolines.'}],
-   creationReadiness:{ready:true,evidence:{...evidence,experience:'Actually make it calm instead.'},unresolved:[]}
+   creationReadiness:{ready:true,evidence:{...evidence,experience:'Actually make it calm instead.',mood:'Actually make it calm instead.'},unresolved:[]}
   };}
   return {...reflection,childDecisions:[{field:'action',quote:evidence.action},{field:'fun',quote:evidence.experience}],creationReadiness:{ready:true,evidence,unresolved:[]}};
  });
@@ -231,7 +231,7 @@ async function sentCorrections(browser,url){
   for(const required of [evidence.world,evidence.action,evidence.consequence,'Actually make it calm instead.','The clouds are trampolines.'])assert.ok(f.requests[0].prompt.includes(required),required+' reaches the actual build request');
   assert.ok(f.requests[0].prompt.lastIndexOf('Actually make it calm instead.')>f.requests[0].prompt.indexOf('silly and springy'),'the explicit newer choice follows and supersedes the original feeling');
   assert.equal((await session(page)).pendingExperiment.prompt,f.requests[0].prompt,'recovery retains the same reviewed request');
-  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Current choices \(these replace|Choose sensible details for:|Later ideas, in order/);
+  assert.doesNotMatch(await page.locator('#studioMessages').textContent(),/Game choices in order|Current choices \(these replace|Choose sensible details for:|Later ideas, in order/);
   assert.deepEqual(f.unexpected,[]);assert.deepEqual(f.errors,[]);
   console.log('PASS sent correction: old readiness blocked, new contextual assessment required, child revision and later mechanic reach explicit Build');
  }catch(error){await page.screenshot({path:'test-results/guided-request-correction-failure.png',fullPage:true}).catch(()=>{});throw error;}

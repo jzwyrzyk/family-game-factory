@@ -172,8 +172,8 @@ export class StudioNotebook {
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
   archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
-  create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null):StudioSession {
-    return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:freshDesign(),experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
+  create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null,options:{creationStandard?:2}={}):StudioSession {
+    return this.write(n=>{const id=crypto.randomUUID(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:[],job:null,updated:new Date().toISOString(),hypothesis:'',reflection:false,design:{...freshDesign(),...(options.creationStandard===2?{creationStandard:2 as const}:{})},experiments:[],selectedTest:null,playOnly:false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
     let before:StudioSession|undefined;

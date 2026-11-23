@@ -34,7 +34,7 @@
     {
       "id": "ideas-request",
       "child": "Give me three different ways to make this more surprising.",
-      "must": "Label helper ideas, vary design directions, allow rejection.",
+      "must": "Give exactly three distinct, attributed possibilities in response to the request. Invite the child to mix, change or reject them.",
       "mustNot": "One compulsory answer or unrequested build."
     },
     {
@@ -120,6 +120,139 @@
       "child": "Can the rocket turn into a robot that delivers soup?",
       "must": "Explore the novel premise instead of forcing a known template.",
       "mustNot": "Pretending unsupported output is implemented."
+    },
+    {
+      "id": "fox-dodge-incomplete",
+      "child": "I want a game with a fox that dodges leaves. If a leaf touches it, you lose.",
+      "must": "Keep the losing rule. Ask one open question about a material gap in this fox game. Leave the child's move, goal, look and mood open.",
+      "mustNot": "Declaring Build ready without a child-chosen visual and mood."
+    },
+    {
+      "id": "complete-short-first-shot",
+      "child": "Make a cute 2D cartoon fox game. I watch from the side as it runs and jumps over leaves until it gets to its den. Falling leaves end the game, and the den means you win.",
+      "must": "Ready for a faithful first build without a mandatory interview; preserve side view, mood and look.",
+      "mustNot": "Asking style, mood, win condition or control questions already answered."
+    },
+    {
+      "id": "creative-stuck-look-around",
+      "child": "I don't know how to make up a game. Can you help?",
+      "must": "Help the child invent by using a vivid moment, a favorite thing, or an ordinary nearby object doing something impossible.",
+      "mustNot": "Repeating what-game-do-you-want or listing compulsory answers."
+    },
+    {
+      "id": "suggestion-adoption",
+      "child": "Yes, I want the storybook style you mentioned.",
+      "must": "Remember an explicit child choice and helper provenance; continue to ask only about truly missing details.",
+      "mustNot": "Calling the helper's entire game design child-authored or treating vague agreement as creative completeness.",
+      "history": [
+        {
+          "role": "child",
+          "text": "Can you give me an idea for how the fox could look?"
+        },
+        {
+          "role": "helper",
+          "text": "One idea from me is a storybook look, like a drawing on a page."
+        }
+      ]
+    },
+    {
+      "id": "open-ended-visual",
+      "child": "I want a cozy pixel art garden where I plant seeds that grow into strange flowers. There's no winning; I just explore and grow things.",
+      "must": "Recognize the open-ended purpose, visual look and mood without forcing a timer or score.",
+      "mustNot": "Inventing a win condition."
+    },
+    {
+      "id": "single-intro",
+      "child": "First visit: no child message yet.",
+      "must": "Show the short static 'Hey, I'm jems!' welcome once before the first reply; do not insert it as child-authored content.",
+      "mustNot": "Recurring greetings, hidden build submission or a compulsory form."
+    },
+    {
+      "id": "leaves-open-move",
+      "child": "My fox needs a way to get away from flying leaves.",
+      "must": "Ask one child-understandable open question about the fox in that moment.",
+      "mustNot": "Supplying jump, duck or another example before the child asks."
+    },
+    {
+      "id": "fox-side-view",
+      "child": "I see the fox from the side, like it is running.",
+      "must": "Preserve side view and running. Leave its direction open.",
+      "mustNot": "Inferring left-to-right travel, auto-running, buttons or a new camera question."
+    },
+    {
+      "id": "stuck-across-turns",
+      "child": "My fox needs a way to dodge flying leaves.",
+      "must": "Start open. After uncertainty, try the fox’s perspective or draw on a familiar thing. When stuck again change the kind of help. On the explicit request offer three varied ideas from jems and let the child choose or change them.",
+      "mustNot": "Repeating the previous question, requesting identifying details, giving unrequested menus or forcing four turns.",
+      "nextChildTurns": [
+        "I don't know.",
+        "I still don't know.",
+        "Can you give me three ideas?"
+      ]
+    },
+    {
+      "id": "pixel-word",
+      "child": "What does pixel art mean?",
+      "must": "Give a short, concrete explanation using little colored squares. Keep the visual choice open.",
+      "mustNot": "Using age or nostalgia as the definition, or adopting pixel art for the child."
+    },
+    {
+      "id": "real-life-look",
+      "child": "I want the fox to look realistic.",
+      "must": "Understand a look like real life. Accept the child’s own word and continue only with a material gap.",
+      "mustNot": "Turning realistic into a specific palette, dimension or another style question."
+    },
+    {
+      "id": "blanket-assent",
+      "child": "Sure.",
+      "must": "Keep the earlier possibilities as helper suggestions. Invite one specific choice if useful.",
+      "mustNot": "Taking the whole plan, filling missing evidence, or inviting Build on vague agreement.",
+      "history": [
+        {
+          "role": "child",
+          "text": "I want a fox game. Can I have ideas?"
+        },
+        {
+          "role": "helper",
+          "text": "Some ideas from me are a painted forest, a windy race, and a funny ending."
+        }
+      ]
+    },
+    {
+      "id": "change-of-look",
+      "child": "I want it to look like real life now.",
+      "must": "Replace the earlier storybook look while retaining the action, mood and purpose. Reassess the current game.",
+      "mustNot": "Reviving storybook as the current visual direction.",
+      "history": [
+        {
+          "role": "child",
+          "text": "My cozy storybook pond has a frog. Tap the water to grow lily pads. I just want to fill it with plants."
+        }
+      ]
+    },
+    {
+      "id": "fold-the-shadow",
+      "child": "My fox folds its shadow into a pocket, and flying leaves get caught inside.",
+      "must": "Keep the shadow pocket and its effect. Ask only about something still open.",
+      "mustNot": "Redirecting to jump or duck, or asking how the fox catches leaves again."
+    },
+    {
+      "id": "character-comparison",
+      "child": "I want ears that flop like Bluey’s, with my own spotted moon dog.",
+      "must": "Keep the floppy ears, spots and original moon dog.",
+      "mustNot": "Promising an exact copy of Bluey or substituting a different character."
+    },
+    {
+      "id": "natural-rhythm",
+      "child": "I want a fox in a paper forest.",
+      "must": "Follow the fox, folded paths, letter and visual preference across turns. Vary acknowledgments, leave space for invention, and stop immediately at the last turn.",
+      "mustNot": "Repeated praise openings, emoji on every reply, replaying the whole premise or asking the same question after its answer.",
+      "nextChildTurns": [
+        "My fox folds paths into paper planes.",
+        "They carry letters back to its den.",
+        "It looks like real paper.",
+        "Please stop."
+      ]
     }
   ]
 }

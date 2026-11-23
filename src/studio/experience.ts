@@ -66,6 +66,6 @@ export type ConversationDisposition='continue'|'play'|'cancel';
 export function conversationDisposition(message:string):ConversationDisposition {
  const normalized=message.trim().toLowerCase().replace(/[.!?]+$/,'').trim();
  if(/^(?:(?:actually|okay|oh)\s+)?(?:never\s?mind|forget (?:it|that)|cancel (?:that|my idea))$/.test(normalized))return 'cancel';
- if(/^(?:please\s+)?(?:i (?:just )?want to play(?: now)?|just (?:let me )?play(?: now)?|let me play(?: now)?|can i (?:go )?play(?: now)?|back to (?:my|the) game|take me back to (?:my|the) game|stop asking(?: me)? questions|no more questions)$/.test(normalized))return 'play';
+ if(/^(?:please\s+)?(?:i (?:just )?want to play(?: now)?|just (?:let me )?play(?: now)?|let me play(?: now)?|can i (?:go )?play(?: now)?|back to (?:my|the) game|take me back to (?:my|the) game|stop(?: coaching| asking(?: me)? questions)?|no more questions)$/.test(normalized))return 'play';
  return 'continue';
 }

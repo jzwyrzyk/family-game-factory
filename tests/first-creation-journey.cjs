@@ -286,8 +286,8 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
  const cors={'Access-Control-Allow-Origin':new URL(url).origin,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
  let phase='testing',submitted=0,opened=0,kept=0,coachTurns=0;
  const firstIdea='I want a purple cat game on the moon.';
- const ownDetails='I tap to jump to a donut. Each donut makes the cat bigger. It should feel silly and springy.';
- const evidence={action:'I tap to jump to a donut',consequence:'Each donut makes the cat bigger',experience:'silly and springy',world:'a purple cat game on the moon'};
+ const ownDetails='I tap to jump to a donut. Each donut makes the cat bigger. It should feel silly and springy. I want cute pixel art. I win after collecting five donuts.';
+ const evidence={action:'I tap to jump to a donut',consequence:'Each donut makes the cat bigger',experience:'silly and springy',world:'a purple cat game on the moon',goal:'I win after collecting five donuts.',visualStyle:'cute pixel art',mood:'silly and springy'};
  try{
   await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:api,previewOrigin:preview})}));
   await page.route(api+'/**',async route=>{
@@ -300,12 +300,12 @@ async function firstRemoteResult(browser,url,device,viewport,focusedGuide){
    else if(path==='/v1/coach/audio/status')body={available:false};
    else if(path==='/v1/coach'&&request.method()==='POST'){
     coachTurns++;const context=request.postDataJSON().context;
-    assert.equal(context.creation?.version,1,'first creation explicitly requests the readiness-capable conversation contract');
+    assert.equal(context.creation?.version,2,'first creation explicitly requests the readiness-capable conversation contract');
     const enough=context.message===ownDetails;
     body={mode:'model',reply:{move:enough?'listen':'clarify',text:enough?'Your cat grows when it reaches a donut.':'Let’s work out how your moon cat plays.',
      question:enough?null:'What should happen when you help your cat move?',suggestions:[],proposedChange:null,planSuggestions:[],
      childDecisions:enough?[{field:'action',quote:evidence.action},{field:'goal',quote:evidence.consequence},{field:'fun',quote:evidence.experience}]:[],evidenceIds:[],
-     creationReadiness:{ready:enough,evidence:enough?evidence:{action:'',consequence:'',experience:'',world:evidence.world},unresolved:enough?[]:['The player action and its result are still unclear.']}}};
+     creationReadiness:{ready:enough,evidence:enough?evidence:{action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''},unresolved:enough?[]:['The player action and its result are still unclear.']}}};
    }
    else if(path==='/v1/jobs'&&request.method()==='POST'){submitted++;body={jobId:'first-job',status:'queued',adapter:'mock'};}
    else if(path==='/v1/jobs/first-job')body={jobId:'first-job',status:phase,adapter:'mock',...(phase==='ready'?{revisionId:'first-revision'}:{})};

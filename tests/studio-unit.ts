@@ -14,6 +14,18 @@ function test(name:string,fn:()=>void){fn();console.log('PASS '+name);passed++;}
 const storage=new Memory(),notebook=new StudioNotebook(storage),owner='player1';
 const s=notebook.create(owner,'buckets','My buckets','project1');
 test('separate per-player projects',()=>{assert.equal(notebook.list(owner).length,1);assert.equal(notebook.list('player2').length,0);assert.throws(()=>notebook.get(s.id,'player2'));});
+test('new v2 creation is durable in one write and a failed save leaves no v1 fallback',()=>{
+ const memory=new Memory(),book=new StudioNotebook(memory);
+ const existing=book.create(owner,'gum','Existing game','existing-project');
+ const before=memory.getItem(STUDIO_KEY);memory.fail=true;
+ assert.throws(()=>book.create(owner,'new','New idea',null,{creationStandard:2}));
+ assert.equal(memory.getItem(STUDIO_KEY),before);
+ memory.fail=false;let writes=0;const save=memory.setItem.bind(memory);
+ memory.setItem=(key,value)=>{writes++;save(key,value);};
+ const idea=book.create(owner,'new','New idea',null,{creationStandard:2});
+ assert.equal(writes,1);assert.equal(new StudioNotebook(memory).get(idea.id,owner).design?.creationStandard,2);
+ assert.equal(book.list(owner).length,2);assert.equal(book.get(existing.id,owner).projectId,'existing-project');
+});
 test('draft and conversation survive reload',()=>{notebook.update(s.id,owner,x=>{x.draft='Try more buckets';});notebook.message(s.id,owner,'child','Give me four buckets');const reopened=new StudioNotebook(storage);assert.equal(reopened.get(s.id,owner).draft,'Try more buckets');assert.equal(reopened.get(s.id,owner).messages[0].text,'Give me four buckets');});
 test('candidate survives reload without becoming working revision',()=>{notebook.update(s.id,owner,x=>{x.candidate={id:'candidate1',baseId:'base1',config:{bucketCount:4},prompt:'Four buckets',summary:'Three to four'};});const r=new StudioNotebook(storage).get(s.id,owner);assert.equal(r.candidate?.config?.bucketCount,4);assert.equal(r.remoteId,null);});
 test('forked conversation is independent',()=>{const f=notebook.fork(s.id,owner,'New copy','project2',null);notebook.message(f.id,owner,'helper','Only in copy');assert.equal(notebook.get(s.id,owner).messages.length,1);assert.equal(notebook.get(f.id,owner).candidate,null);});

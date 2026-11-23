@@ -240,3 +240,42 @@ test('bounded creation context preserves exact original and newest words without
  const safe=creationConversation(snapshot,9000);
  assert.ok(!safe.some(message=>message.text===first.text||message.text==='Rejected request.'));
 });
+
+
+test('v2 does not mistake a fox dodge-and-lose rule for a complete game vision',()=>{
+ const short='I want a fox game. The fox dodges leaves. If a leaf touches it, you lose.';
+ const f=fixture(short),s=f.get(),c={...context(s),creation:{version:2 as const}};
+ assert.throws(()=>validateCreationReadiness(ready(),c),/Invalid creation review/,'v1 evidence is not a v2 first-build pass');
+ const incomplete:CreationReadinessVerdict={ready:false,
+  evidence:{action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''},
+  unresolved:['How does the fox win?','How should this game look and feel?']};
+ assert.deepEqual(validateCreationReadiness(incomplete,c),incomplete);
+ assert.equal(recordCreationReview(s,incomplete,2).ready,false);
+ assert.equal(creationBuildReadiness({...s,design:{...s.design!,creationReview:recordCreationReview(s,incomplete,2)}},2).ready,false);
+});
+
+test('v2 needs exact child-owned goal, appearance and mood while retaining older review compatibility',()=>{
+ const game='A happy pixel-art fox dodges falling leaves in an autumn forest. A leaf hitting the fox ends the round. I win when the wind stops. I want it to feel cute and cozy.';
+ const f=fixture(game),s=f.get(),c={...context(s),creation:{version:2 as const}};
+ const v2:CreationReadinessVerdict={ready:true,evidence:{
+  action:'fox dodges falling leaves',
+  consequence:'A leaf hitting the fox ends the round.',
+  experience:'cute and cozy',
+  world:'autumn forest',
+  goal:'I win when the wind stops.',
+  visualStyle:'pixel-art',
+  mood:'cute and cozy'
+ },unresolved:[]};
+ assert.deepEqual(validateCreationReadiness(v2,c),v2);
+ const accepted=recordCreationReview(s,v2,2);
+ assert.equal(accepted.version,2);
+ assert.equal(creationBuildReadiness({...s,design:{...s.design!,creationReview:accepted}},2).ready,true);
+ assert.equal(creationBuildReadiness({...s,design:{...s.design!,creationReview:recordCreationReview(s,{
+  ready:true,evidence:{action:game,consequence:game,experience:game,world:game},unresolved:[]})}},2).ready,false,
+  'a legacy review cannot bypass the new gate');
+ assert.throws(()=>validateCreationReadiness({...v2,evidence:{...v2.evidence,visualStyle:'dark 3D realism'}},c),/exact child/i);
+ assert.throws(()=>validateCreationReadiness({...v2,evidence:{...v2.evidence,mood:''}},c),/grounded|ready/i);
+ const younger={...s,design:{...s.design!,creationReview:accepted},messages:[...s.messages,
+  {id:'new-correction',role:'child' as const,text:'Actually I want it to look like a painted storybook.',at:new Date().toISOString()}]};
+ assert.equal(creationBuildReadiness(younger,2).ready,false,'a new visual preference invalidates the prior review');
+});
