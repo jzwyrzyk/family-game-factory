@@ -122,10 +122,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T19:01:23.610Z",
-      "sourceDigest": "2bbe73ab114feef4c596671b449b114cb9e8ea9df3333fd119a2e633ad766cc8",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the page-local portrait reuse and documented failure recovery against the existing companion doctrine. This removes repeated image work without changing approved identities/forms, ownership, growth, engagement rules, child choice or native-decoding readiness; explicit retry and honest unavailable feedback remain required.",
+      "reviewedAt": "2026-11-23T01:04:40.735Z",
+      "sourceDigest": "0a7822c4d2802f725e5d423b04b129a3aa7dfe3618638d7719e9e57e0449e5cc",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the owner-approved change from merely playable first creation to child-authored goal, visual style and mood evidence, with adaptive questioning and optional surprises in the guided-coach decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -233,10 +233,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.352Z",
-      "sourceDigest": "fe2798829c213e3c2515a4dff46c256408d3aa8f6aa5a7de9b1ad7427ed14bc0",
+      "reviewedAt": "2026-11-23T01:04:40.735Z",
+      "sourceDigest": "6cb121097cabb80abbff0ca39454b407dc1445f20592e56d9284c2e286adb445",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected combined Studio diff: PR115 reconnect, visible Build, saved-job retry and owner guards are preserved, with only the Pal earned-form callback added; both UI contracts and scoped hosted visual evidence remain documented.",
+      "reviewReason": "Reviewed new-game two-sentence jems greeting, only-before-first-turn placement, child-facing copy and optional viewpoint/movement fields. Source changes retain separate chat, Build and authenticated execution controls.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -305,10 +305,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d6cb0d3686e70962d79396acab7912fe36f7622858fcd432dfe91c7faf487843",
-      "reviewedAt": "2026-11-21T15:39:46.199Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Combined source preserves the validated Pal scene catalog, fixed form/version references, ownership and legacy readers; PR115 matching creation-readiness tests concern conversation only. Focused combined generation-budget and saved-scene checks pass without runtime cap changes.",
+      "sourceDigest": "14986de0c075a11ce1f2aeaee823c810b07d51c9a9720f81d2e7b55d18b31b0b",
+      "reviewedAt": "2026-11-23T01:04:40.735Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded broader creation-readiness test coverage and the v2 seven-source field gate in ARCHITECTURE-CURRENT. Existing Creation Studio scene practice remains separate from new game invention.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -543,10 +543,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T21:59:42.641Z",
-      "sourceDigest": "213cbc4ce51bb9f7ad5b2cad7abac7972525a8c556d0fe30ae2890f10f52927b",
+      "reviewedAt": "2026-11-23T01:04:40.735Z",
+      "sourceDigest": "930ad10ceef4f12d9b7d6c7b16471a0ae63840d6db331fec37423a82af495e69",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified.",
+      "reviewReason": "Reviewed actual private-coach schema projection and creative-coaching instruction changes, including original child evidence, seven-key v2 contract, bounded enumeration, and no changes to identity, consent or spending.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -626,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T23:26:52.768Z",
-      "sourceDigest": "34cf87d62732972e53271a121d8dbca2121d5bbcb32992ffe0f6d805b7c61c39",
+      "reviewedAt": "2026-11-23T01:04:40.735Z",
+      "sourceDigest": "ca4aa353960a01d05866a52ceec90d6fd4642de2be53d38561877f212b611ed9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed retained Pal lifecycle/native decoding and tablet input regressions with current private-coach provider/tests and the unchanged independent Mind Your Jems visual baseline. Previously observed screenshot phase flake remains tracked in issue #76; no blanket acceptance or weakening of assertions. Exact validation digest from hosted documentation job 137395774437. Full newest combined CI remains pending.",
+      "reviewReason": "Updated ARCHITECTURE-CURRENT to describe v2 synthetic regression evidence for first-creation goals, visual mood, source IDs, old v1 compatibility, revised child choices and first-screen greeting. Real-model evaluation remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
