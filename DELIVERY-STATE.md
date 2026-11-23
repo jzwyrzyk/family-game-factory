@@ -1,5 +1,42 @@
 # jems delivery state
 
+## November 22, 2026 — four-experience release merged
+
+[PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134) merged into protected `main` at **11:33:15 p.m. America/New_York (2026-11-23T04:33:15Z)** as [`afa5251cde97fda1865e42dbaed5fae08a2a4061`](https://github.com/jzwyrzyk/family-game-factory/commit/afa5251cde97fda1865e42dbaed5fae08a2a4061), after every release gate passed for final head `e8ba47d60a0f455e17a971383b159d805ce4ea4d`. The merged tree is `b0843d78aed08109caba4c1ca0a20b929658edfc`, identical to the tested candidate tree. Main's preceding `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`, including private-coach PR133 and operations-source PR126, remains in history. The owner authorized this consolidated release; no source branch was separately merged as a second release.
+
+All four experiences are integrated and passed their scoped browser/contract acceptance:
+
+- **Bubble Gum Builders:** recognizable object assembly and pink gum joins, undo/shake testing, viability-dependent routes, five-second ignition plus a 24-second journey, and retained older saved engines.
+- **Mind Your Jems:** running/contact collection, one jem per crystal, ten-jem pockets, banking, held cargo spill, unheld falling/retry and level progression in the shared native player.
+- **Jem Factory:** six/seven-item patterns, physical Keep/Return sorting, forgiving cuts with recycling after misses, and two-gift progression with the approved art, wrapping and rewards.
+- **Coding Learning:** a large stage, First Steps and More Tools, actual program execution, transparent approved Pals, and preserved saved programs, ownership/history and explicit Keep.
+
+The release also retains shared navigation, fitted play, profile grade/difficulty, narration and owner-scoped Notifications. Corrections restored child-visible Mining sound and narrated Help without resetting its round, kept the physical-builder picker row stable to prevent a redirected tablet tap, updated obsolete resume and ambiguous Help locators, and completed the real sibling welcome/preview handshake in fixtures. Area-specific documentation reviews preserve existing history and enforcement. The nine Mining references were imported only after explicit review of the exact hosted Chromium 141 stills and normal-motion frames; the [receipt](tests/visual/mind-your-jems/review.json) preserves provenance, previous references and the unchanged 20-channel/0.008 comparison tolerance.
+
+**Exact-head CI:** All 13 release workflows and all 24 reported checks passed before marking the PR ready. Each run below tested `e8ba47d60a0f455e17a971383b159d805ce4ea4d` through GitHub's prospective merge tree. Local build/typecheck, 436 unit contracts, focused gameplay and recovery results remain scoped in the preceding correction record.
+
+| Workflow | Final-head result |
+| --- | --- |
+| [Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114320) — browser, learning, creative, Notifications and private-coach image | Passed |
+| [Mind Your Jems art and gameplay](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114475) | Passed |
+| [Bubble Gum play and visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114380) | Passed |
+| [Coding learner review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114269) | Passed |
+| [Full visual review, including Jem Factory](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114365) | Passed |
+| [Release regression contracts](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114288) | Passed |
+| [Operations contracts](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114479) | Passed |
+| [Game Intelligence contracts](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114304) | Passed |
+| [Archetype library and creative differentiation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114411) | Passed |
+| [Trusted family device security](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114402) | Passed |
+| [Service image packaging](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114383) | Passed |
+| [Parent reporting and dashboard](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114337) | Passed |
+| [Documentation context](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45110114325) | Passed |
+
+The additional [ready-event documentation run45112465662](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45112465662) also passed before merge. GitHub reported a clean merge state with no unresolved review threads.
+
+**Source PR reconciliation:** Verified after the release merge: PR125, PR127 and PR128 are closed/merged; PR129, PR130 and PR132 are closed as superseded. Their source heads are ancestors of the tested consolidated release. GitHub automatically marked PR125/127/128 merged through the consolidated commit ancestry. PR129/130/132 targeted stacked branches and were explicitly closed as superseded. Each source PR description now links the consolidated release receipt. Earlier [Mining](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45087996467), [Arcade](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45087996411) and [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45087996459) failures, plus the later superseded-reference comparisons, remain historical failures; this receipt records subsequent acceptance rather than rewriting those results.
+
+**Deployment and limits:** source integration is complete. The Pages workflow requires a manual exact-source dispatch and does not publish on merge. The post-merge Actions inventory contained CI and a Codespaces prebuild, with no Pages publication; GitHub returned no deployment for the release SHA; no production browser smoke is claimed for this release. No worker pin, paid-provider activation, IAM expansion, Cloud Run traffic or service configuration was changed. CI uses real browser input with deterministic service fixtures and synthetic device viewports. Physical-device fullscreen/audio, observed-child usability/enjoyment, educational efficacy and live-provider acceptance remain unverified. This documentation follow-up records the observed merge and source-PR disposition; it changes no runtime or release configuration.
+
 ## November 22, 2026 — four-experience integration corrections
 
 The owner explicitly authorized completing and merging [PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134) after every release gate passes. This supersedes the earlier staged merge holds recorded below. PR134 preserves the source histories of PR125/127/128/129/130/132 and main `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`; the source PRs must not be separately merged again. At takeover, exact head `b81c4b23d07e80445d9e210088d7d610813217fd` had 21 successful and three failed reported checks, and remained draft/unmerged.
