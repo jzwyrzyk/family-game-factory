@@ -48,7 +48,7 @@ export interface BuiltRevision { id:string;familyId:string;parentId:string|null;
 export interface AuditEvent {
  jobId:string;familyId:string;status:JobStatus;at:string;code?:string;
  /** Allowance accounting only; never request, response or recording content. */
- usage?:{kind:'coach'|'audio';month:string;reservedMicroUsd:number;usedMicroUsd:number;outcome:'settled'|'interrupted'};
+ usage?:{kind:'coach'|'audio'|'narration';month:string;reservedMicroUsd:number;usedMicroUsd:number;outcome:'settled'|'interrupted'};
 }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
 export interface PipelineState { narrationReceipts?:NarrationReceipt[]; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }

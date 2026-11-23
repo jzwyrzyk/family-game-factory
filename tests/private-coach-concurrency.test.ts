@@ -158,3 +158,29 @@ test('private coach: preserve split UTF-8, both raw-byte caps and identity check
  const denied=begin(handler,unread(),false,{...headers,authorization:'Bearer '+'z'.repeat(80)});await denied.done;
  assert.equal(denied.response.statusCode,403);assert.equal(read,false);assert.equal(calls,3);
 });
+
+
+test('private coach: unread narration cannot monopolize or release an active text slot',{timeout:5000},async()=>{
+ const entered=deferred(),release=deferred();let textCalls=0,narrationCalls=0;
+ const mp3=Buffer.alloc(200);mp3.write('ID3');
+ const handler=privateCoachHandler(runtime({maxConcurrent:1,
+  provider:{complete:async()=>{textCalls++;entered.resolve();await release.promise;return result;}},
+  narrationConfig:{approved:true,privacyApproved:true,providerApproved:true,parentConsentApproved:true,projectId:'synthetic-fixture-project',voice:'en-US-Chirp3-HD-Aoede',maxMicroUsd:60000,priceMicroUsdPerMillionChars:30_000_000,pricesReviewedAt:new Date().toISOString()},
+  narration:{read:async()=>{narrationCalls++;return mp3;}}}));
+ const startNarration=(body:AsyncIterable<Uint8Array>)=>{
+  const response=new ResponseRecorder();
+  return {response,done:handler(streamedRequest('/v1/private-coach/narration',body,headers),response.response())};
+ };
+ const malformed=delayedBody(),valid=delayedBody(),body=Buffer.from(JSON.stringify({version:1,text:'Hello.'}));
+ const waiting=[startNarration(malformed.stream),startNarration(valid.stream)];
+ await Promise.all([malformed.started,valid.started]);
+ const textRequest=begin(handler,chunks(textBody));
+ try{
+  await entered.promise;assert.equal(textCalls,1,'unread narration does not acquire a provider slot');
+  malformed.resolve(Buffer.from('{'));valid.resolve(body);await Promise.all(waiting.map(item=>item.done));
+  assert.equal(waiting[0].response.statusCode,400);assert.equal(waiting[1].response.statusCode,429);
+  assert.equal(narrationCalls,0);assert.equal((await request(handler)).statusCode,429,'rejected narration never releases the text slot');
+ }finally{release.resolve();await textRequest.done;}
+ const narration=startNarration(chunks(body));await narration.done;
+ assert.equal(narration.response.statusCode,200);assert.equal(narrationCalls,1);
+});

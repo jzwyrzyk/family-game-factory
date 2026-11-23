@@ -72,11 +72,11 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
     if(path.endsWith('/status')||req.method!=='POST'||!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('FORBIDDEN');
     if(!ready)throw Error('NARRATION_UNAVAILABLE');
     if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
-    active++;
+    const input:any=await readNarrationRequest(req,13000);
+    if(!input||input.version!==1||Object.keys(input).some(k=>!['version','text'].includes(k)))throw Error('INVALID_NARRATION');
+    const text=validateNarrationText(input.text),signal=AbortSignal.any([aborted.signal,AbortSignal.timeout(NARRATION_DEADLINE_MS)]);
+    acquire();
     try {
-     const input:any=await readNarrationRequest(req,13000);
-     if(!input||input.version!==1||Object.keys(input).some(k=>!['version','text'].includes(k)))throw Error('INVALID_NARRATION');
-     const text=validateNarrationText(input.text),signal=AbortSignal.any([aborted.signal,AbortSignal.timeout(NARRATION_DEADLINE_MS)]);
      signal.throwIfAborted();const audio=validateNarrationAudio(await runtime.narration!.read(text,signal));signal.throwIfAborted();
      if(res.destroyed||res.writableEnded)return;
      res.writeHead(200,{'Content-Type':'audio/mpeg','Content-Length':audio.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});

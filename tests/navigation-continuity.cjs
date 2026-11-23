@@ -212,7 +212,7 @@ async function workspaceIntegrityJourney(browser,base){
   const original=(await workspace()).projects[0];
   // The legacy store now knows the first game. Keep this same document alive
   // while Studio adds a second game through its actual adapter and controls.
-  await page.click('[data-starter="robot"]');
+  await page.click('[data-starter="dragon"]');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.projects.length===2,WORKSPACE);
   const before=await workspace();
   await navigate(page,'studioNavHome');await page.click('#studioSavedIdeas');
@@ -252,7 +252,7 @@ async function notebookCapacityJourney(browser,base){
   await page.reload();await ready(page);await exploreWelcome(page);
   await page.locator(`[data-session="${sourceId}"] .studio-saved-open`).click();
   assert.equal(await page.inputValue('#studioPrompt'),draft,'the saved draft survives reload before copying');
-  await page.locator('#studioMore summary').click();await page.click('#studioCopy');
+  await page.locator('#studioMore > summary').click();await page.click('#studioCopy');
   await page.fill('#studioCopyName','Full chat copy');await page.locator('#studioCopyForm button[type="submit"]').click();
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)).sessions.some(s=>s.name==='Full chat copy'),NOTEBOOK);
   const copied=(await notebook()).sessions.find(s=>s.name==='Full chat copy');
@@ -280,7 +280,7 @@ async function notebookCapacityJourney(browser,base){
   await page.reload();await ready(page);await exploreWelcome(page);
   await page.locator('#studioNotebookCapacity').waitFor({state:'visible'});
   const before=await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE});
-  await page.click('[data-starter="robot"]');
+  await page.click('[data-starter="dragon"]');
   assert.deepEqual(await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE}),before,'full notebook fails before writing an orphan native game');
   await page.locator('#studioArchived summary').click();await page.getByRole('button',{name:'Bring back Saved idea 0',exact:true}).click();
   const full=await notebook();assert.equal(full.sessions.length,80);assert.equal(full.sessions.filter(s=>!s.archived).length,1);
