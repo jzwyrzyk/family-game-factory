@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T23:18:32.994Z",
-      "sourceDigest": "9b2af42f9edddf41dc4aef95aa8584bc03a827a90f5a98a332ec73f086aee9ee",
+      "reviewedAt": "2026-11-23T23:22:55.298Z",
+      "sourceDigest": "c75735793688b7ad4d4e57b0b3f8bdc8076992251610ba4140d99cf41111b4ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-observed baseline latest-ready at zero traffic, required successful generation reconciliation, and documented enum-only lifecycle evidence and unresolved candidate serving health before canary.",
+      "reviewReason": "Recorded successful owner stage observation and RETIRED zero-traffic lifecycle; prepared the same pinned Coach candidate for baseline95/candidate5 using the existing release controller and recovery route.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
