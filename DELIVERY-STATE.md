@@ -2,7 +2,7 @@
 
 ## November 23, 2026 — historical release receipts reconciled
 
-The unique PR87 diagnostic/publication audit and PR117 Pal merge, Pages cutover and 48-image verification receipts are preserved in the [historical receipt archive](docs/evidence/pr87-pr117-historical-receipts.md), with immutable source references and their original observation limits. Their former current-PR statuses and release instructions are historical. This documentation reconciliation does not deploy anything or repeat a completed release. Current Coach/reliability execution and final disposition will be recorded separately after the final source checks.
+The unique PR87 diagnostic/publication audit and PR117 Pal merge, Pages cutover and 48-image verification receipts are preserved in the [historical receipt archive](docs/evidence/pr87-pr117-historical-receipts.md), with immutable source references and their original observation limits. Their former current-PR statuses and release instructions are historical. The original branches and both historical source histories remain preserved; the archive carries the unique operational evidence without replacing newer main. This documentation reconciliation does not deploy anything or repeat a completed release. Current Coach/reliability execution and final disposition will be recorded separately after the final source checks.
 
 ## November 22, 2026 — four-experience release merged
 
