@@ -225,6 +225,7 @@ export function installCoaching(h:Hooks){
     return;
    }
    if(thinking){h.status('Your design coach is still replying. You can keep playing.');return;}
+   h.notebook.assertIdeaCapacity(captured.id,captured.owner);
    if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');
    seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;reviewUnavailable=false;
    h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(/don.t know|stuck/i.test(text))s.design.helpLevel=Math.min(3,s.design.helpLevel+1);});

@@ -15,6 +15,14 @@ export interface DesignRecord {
  support:'brief'|'balanced'|'detailed'; paused:boolean; approvedPlan:boolean;
  creationReview?:CreationReview;
 }
+export const DESIGN_IDEA_CAPACITY=100;
+export const DESIGN_OBSERVATION_CAPACITY=300;
+export class DesignCapacityError extends Error {
+ constructor(kind:'idea'|'observation'){
+  super(`This game's ${kind} notes are full. Your saved work is safe. Ask a grown-up to export a backup.`);
+  this.name='DesignCapacityError';
+ }
+}
 export interface Experiment {
  id:string; label:string; title:string; baseId:string|null; parents:string[];
  candidate:Candidate; depth:'tune'|'redesign'|'rethink'; origin:Origin;
@@ -45,8 +53,10 @@ export function validateDesign(input:unknown):DesignRecord {
  if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan','creationReview'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
  if(d.creationReview!==undefined)validateCreationReview(d.creationReview);
  for(const field of Object.values(d.plan)){if(!field||!keys(field,['value','origin','accepted','delegated'])||!text(field.value,700)||!['child','helper'].includes(field.origin)||typeof field.accepted!=='boolean'||typeof field.delegated!=='boolean')throw Error('Invalid plan field.');}
- if(!Array.isArray(d.ideas)||d.ideas.length>100||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
- if(!Array.isArray(d.observations)||d.observations.length>300||!d.observations.every(o=>o&&keys(o,['id','experimentId','text','source','at'])&&id(o.id)&&(o.experimentId===null||id(o.experimentId))&&text(o.text,1200)&&['runtime','child'].includes(o.source)&&text(o.at,40)&&Number.isFinite(Date.parse(o.at)))||new Set(d.observations.map(o=>o.id)).size!==d.observations.length)throw Error('Invalid observation.');
+ if(Array.isArray(d.ideas)&&d.ideas.length>DESIGN_IDEA_CAPACITY)throw new DesignCapacityError('idea');
+ if(!Array.isArray(d.ideas)||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
+ if(Array.isArray(d.observations)&&d.observations.length>DESIGN_OBSERVATION_CAPACITY)throw new DesignCapacityError('observation');
+ if(!Array.isArray(d.observations)||!d.observations.every(o=>o&&keys(o,['id','experimentId','text','source','at'])&&id(o.id)&&(o.experimentId===null||id(o.experimentId))&&text(o.text,1200)&&['runtime','child'].includes(o.source)&&text(o.at,40)&&Number.isFinite(Date.parse(o.at)))||new Set(d.observations.map(o=>o.id)).size!==d.observations.length)throw Error('Invalid observation.');
  return copy(d);
 }
 export function validateExperiments(input:unknown):Experiment[] {

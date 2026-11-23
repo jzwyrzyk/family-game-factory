@@ -216,6 +216,37 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
   const restored=new StudioNotebook(h.storage).get(h.session().id,h.session().owner);assert.equal(restored.design!.plan.fun!.value,'A funny wobbly bridge');assert.equal(restored.hypothesis,'The lighter bridge might sway');assert.equal(restored.design!.friction,'I want to try balancing');assert.equal(restored.design!.approvedPlan,false);
  }finally{h.dispose();}
 });
+for(const game of ['new','gum'] as const)await test(`a full ${game} idea ledger refuses another model request without losing work or the draft`,async()=>{
+ const h=coachingHarness(game);try{
+  const session=h.session();
+  h.book.update(session.id,session.owner,s=>{
+   s.design!.ideas=Array.from({length:100},(_,index)=>({id:'retained-idea-'+index,text:'Original idea '+index,origin:index%2?'helper':'child',adopted:index%2===0}));
+  });
+  h.book.message(session.id,session.owner,'child','Keep my earlier exact words.');
+  h.book.continueConversation(session.id,session.owner);
+  h.input('studioPrompt','My next unsent idea');
+  h.book.update(session.id,session.owner,s=>{s.draft='My next unsent idea';});
+  const before=h.storage.getItem(STUDIO_KEY);
+  await h.coach.discuss('ideas');
+  assert.equal(h.requests.length,0,'a full provenance ledger cannot start a paid reply');
+  assert.equal(h.storage.getItem(STUDIO_KEY),before,'no existing words or provenance are trimmed');
+  assert.equal(h.get('studioPrompt').value,'My next unsent idea');
+  assert.match(h.statuses.at(-1)!.text,/idea notes are full/);
+  assert.equal(new StudioNotebook(h.storage).get(session.id,session.owner).messages[0].text,'Keep my earlier exact words.');
+  // Stopping is still an immediate local action with the full saved ledger.
+  h.input('studioPrompt','no more questions');await h.coach.discuss('discuss');
+  assert.equal(h.requests.length,0);assert.equal(h.session().design!.ideas.length,100);
+  assert.match(h.session().messages.at(-1)!.text,/Okay/);
+ }finally{h.dispose();}
+});
+await test('full observation notes reject a further entry without altering earlier evidence',()=>{
+ const storage=new Memory(),book=new StudioNotebook(storage),session=book.create(owner,'new','Retained observations');
+ book.update(session.id,owner,s=>{s.design!.observations=Array.from({length:300},(_,index)=>({id:'observation-'+index,experimentId:null,text:'Exact observation '+index,source:'child',at:'2026-11-23T00:00:00Z'}));});
+ const before=storage.getItem(STUDIO_KEY);
+ assert.throws(()=>book.observe(session.id,owner,'My next observation','child'),/observation notes are full/);
+ assert.equal(storage.getItem(STUDIO_KEY),before);
+ assert.equal(new StudioNotebook(storage).get(session.id,owner).design!.observations.at(-1)!.text,'Exact observation 299');
+});
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
  const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
   assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);

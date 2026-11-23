@@ -1,4 +1,4 @@
-import {freshDesign, validateDesign, validateExperiments, experiment, type DesignRecord, type Experiment, type Origin} from './design';
+import {freshDesign, validateDesign, validateExperiments, experiment, DESIGN_IDEA_CAPACITY, DesignCapacityError, type DesignRecord, type Experiment, type Origin} from './design';
 import { isGameId } from '../runtime/manifests';
 import type { GameId } from '../runtime/types';
 import { publishSourceEvidence } from '../problem-solving/signals';
@@ -177,6 +177,13 @@ export class StudioNotebook {
     if(!Number.isInteger(count)||count<1||count>CONVERSATION_PAGE_CAPACITY)throw Error('Invalid conversation capacity request.');
     const n=this.read(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');
     if(s.messages.length+count>CONVERSATION_PAGE_CAPACITY){assertNotebookCapacity(n);throw new ConversationCapacityError();}
+  }
+  /** Refuse a paid conversation when its existing idea ledger is already full.
+   * Continuing messages does not reset provenance or reserve future reply space.
+   */
+  assertIdeaCapacity(id:string,owner:string):void {
+    const s=this.get(id,owner);
+    if((s.design?.ideas.length??0)>=DESIGN_IDEA_CAPACITY)throw new DesignCapacityError('idea');
   }
   /** Optional hints are profile preferences, not evidence or a completed journey. */
   guidance(owner:string):GuidePreferences {
