@@ -51,6 +51,7 @@ const replies={
     assert.match(await page.locator('#studioMessages').innerText(),/I'll ask a few fun questions/);
     const newSession=(await page.evaluate(()=>FG.studio.exportNotebook())).sessions.at(-1);
     assert.equal(newSession.design.creationStandard,2);
+    assert.equal(newSession.messages.length,0,'the static intro is not a saved helper or child turn');
     assert.equal(await page.locator('#studioMoreChoices').evaluate(el=>el.open),false);
     assert.equal(await page.locator('#designPlan').isVisible(),false);
     assert.equal(await page.locator('#studioUseDrawing').isVisible(),false);
