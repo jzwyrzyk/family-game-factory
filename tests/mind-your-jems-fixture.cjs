@@ -1,4 +1,4 @@
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 const assert=require('node:assert/strict');
 const path=require('node:path');
 
@@ -109,15 +109,24 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
  await arcade.waitFor({state:'visible'});
  assert.equal(await page.locator('#page-studio').evaluate(node=>node.classList.contains('studio-play-mode')),true,'wait play uses the ordinary native game frame');
  assert.equal(await page.locator('dialog.myj-arcade[open]').count(),0);
- const buildItem=page.locator('#studioBuildShelf .studio-build-item').filter({has:page.getByText(project.name,{exact:true})});
- const readyButton=buildItem.getByRole('button',{name:/^(Play my game|Try ready test)$/,includeHidden:true});
+ const buildItem=page.locator('#studioNotificationsList [data-notification-session="'+project.id+'"]');
+ const readyButton=buildItem.locator('[data-notification-open]');
  const activateBuildAction=button=>device.touch?button.tap():button.click();
+ // A current, owner-scoped Notifications row replaces the retired blue Build
+ // shelf. A game’s More menu links there without silently starting a build.
+ const openBuildNotifications=async()=>{
+  if(await page.locator('#studioNotifications').isVisible())return;
+  if(await page.locator('#page-studio.studio-play-mode').isVisible()){
+   const more=page.locator('#studioMore');
+   if(!await more.evaluate(node=>node.open))await activateBuildAction(more.locator(':scope > summary'));
+   await activateBuildAction(page.locator('#studioPlayNotifications'));
+  }else await navigate(page,'#studioNavNotifications');
+  await page.locator('#studioNotifications').waitFor({state:'visible'});
+ };
  const launch={async click(){
-  const more=page.locator('#studioMore');
-  if(await more.isVisible()&&!await more.evaluate(node=>node.open))await more.locator(':scope > summary').click();
+  await openBuildNotifications();
+  // Reopening remains an explicit decision in the owner’s actual work list.
   const button=buildItem.locator('.studio-wait-arcade-button');
-  // The shelf can rerender after a profile/poll update. Locator activation
-  // scrolls and reacquires a detached target without repeating the input.
   await activateBuildAction(button);
   await arcade.waitFor({state:'visible'});
  }};
@@ -160,13 +169,16 @@ document.querySelector('#play').onclick=()=>document.querySelector('#result').te
    // Returning from host tools gives movement keys to the actual game surface.
    if(await arcade.isVisible())await arcade.locator('[data-myj="left"]').focus();
   },
-  async playReady(){await this.openBuilds();await activateBuildAction(readyButton);},
-  async openBuildProject(){
-   await this.openBuilds();const button=buildItem.getByRole('button',{name:'Open game',exact:true});
-   await activateBuildAction(button);
-  },
-  async buildText(){return await buildItem.textContent()||'';},
-  async ready(){return await readyButton.count()===1;},
+  async openBuildNotifications(){await openBuildNotifications();},
+  async playReady(){await openBuildNotifications();await readyButton.waitFor({state:'visible'});await activateBuildAction(readyButton);},
+  async openBuildProject(){await openBuildNotifications();await activateBuildAction(buildItem.locator('[data-notification-open]'));},
+  // Polling does not open Notifications or interrupt game movement. The shared
+  // More menu announces readiness; the saved job carries the exact status.
+  async buildText(){return page.evaluate(id=>{
+   const session=FG.studio.exportNotebook().sessions.find(s=>s.id===id&&s.owner===FG.store.current().id);
+   return [session?.job?.status,session?.job?.phase].filter(Boolean).join(' ');
+  },project.id);},
+  async ready(){return /ready/i.test((await page.locator('#studioMore > summary').textContent())||'');},
   async snapshot(){return arcade.evaluate(element=>({
    phase:element.dataset.phase,x:Number(element.dataset.playerX),level:Number(element.dataset.level),
    phaseMs:Number(element.dataset.phaseMs),holding:element.dataset.holding==='true',safe:element.dataset.safe==='true',

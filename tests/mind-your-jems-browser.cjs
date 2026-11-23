@@ -348,7 +348,7 @@ async function exercise(journey,device,review){
  review.check(device.name,'native-exit-and-reopen',{restoredOverflow:journey.bodyOverflow,singleController:true});
  await journey.collectAndBank();const readyScore=await journey.score('banked');
  journey.state.status='ready';
- await journey.until(()=>journey.ready(),'verified ready state is surfaced in the original project shelf',{step:250,limit:16000});
+ await journey.until(()=>journey.ready(),'the shared game More menu surfaces a ready project',{step:250,limit:16000});
  assert.equal(journey.counters.previewRequests,0,'readiness never auto-opens the preview');
  assert.match(await journey.buildText(),/ready/i);
  assert.match(await page.locator('#studioMore > summary').innerText(),/ready/i,'the ordinary game menu visibly signals readiness');
@@ -359,7 +359,7 @@ async function exercise(journey,device,review){
  assert.equal(await journey.score('banked'),readyScore,'ready status preserves earned progress');
  await journey.collectAndBank();assert.ok(await journey.score('banked')>readyScore,'host readiness leaves movement, collection and physical deposit playable');
  await geometry(journey,device,review);await capture('ready-playing');
- await journey.openBuilds();await journey.readyButton.scrollIntoViewIfNeeded();await capture('ready-menu');
+ await journey.openBuilds();await page.locator('#studioPlayNotifications').scrollIntoViewIfNeeded();await capture('ready-menu');
  await journey.playReady();await page.clock.resume();
  await page.locator('#studioRemoteHost iframe').waitFor({state:'attached'});
  const preview=page.frameLocator('#studioRemoteHost iframe');await preview.locator('#play').click();
@@ -407,19 +407,21 @@ async function recovery(journey,device,review){
  await journey.collectAndBank();
  if(device.artFailure){
   state.networkOffline=true;
-  await journey.until(async()=>/Status unknown|checking connection/i.test(await journey.buildText()),'interrupted polling is shown in the original project shelf',{step:500,limit:20000});
-  assert.ok(counters.interruptedPolls>0);assert.match(await journey.buildText(),/Status unknown|checking connection/i);
+  await journey.until(async()=>Number(await page.locator('#studioPlayNotifications').getAttribute('data-unread'))>0,
+   'an uncertain connection surfaces a new Notifications alert without leaving the game',{step:500,limit:20000});
+  assert.ok(counters.interruptedPolls>0);
+  assert.ok(Number(await page.locator('#studioPlayNotifications').getAttribute('data-unread'))>0,'the visible More action carries the uncertain-build alert');
   assert.equal(await journey.ready(),false);
   await geometry(journey,device,review);await review.capture(page,arcade,device.name,'reconnecting');
   const before=await journey.score('banked');await journey.collectAndBank();
   assert.ok(await journey.score('banked')>before,'local mining remains playable without a build connection');
   state.networkOffline=false;
-  await journey.until(async()=>/Building your idea/i.test(await journey.buildText()),'same acknowledged job reconnects',{step:500,limit:20000});
+  await journey.until(async()=>/building/i.test(await journey.buildText()),'same acknowledged build resumes without a second submit',{step:500,limit:20000});
   assert.equal(counters.submitted,1,'reconnection cannot resubmit a build');
  }
  state.status=device.recoveryTerminal;
- const terminalCopy=device.recoveryTerminal==='failed'?/Build needs help/i:/Build stopped/i;
- await journey.until(async()=>terminalCopy.test(await journey.buildText()),'terminal build status reaches the original project shelf',{step:250,limit:16000});
+ const terminalCopy=device.recoveryTerminal==='failed'?/failed/i:/cancelled/i;
+ await journey.until(async()=>terminalCopy.test(await journey.buildText()),'terminal status is retained in the owner job',{step:250,limit:16000});
  assert.equal(await journey.ready(),false);
  assert.match(await journey.buildText(),terminalCopy);
  if((await journey.snapshot()).phase==='level-complete')await journey.activate(arcade.locator('[data-myj="continue"]'));
@@ -436,15 +438,18 @@ async function recovery(journey,device,review){
   review.check(device.name,'terminal-viewport-change',{viewport:device.portraitViewport,resize,banked:await journey.score('banked')});
  }
  await journey.openBuilds();
- await journey.buildItem.getByRole('button',{name:'Open game',exact:true}).scrollIntoViewIfNeeded();
+ await page.locator('#studioPlayNotifications').scrollIntoViewIfNeeded();
  await review.capture(page,arcade,device.name,device.recoveryTerminal+'-menu');
+ await journey.openBuildNotifications();
+ assert.equal(await journey.buildItem.count(),1,'Notifications retains the original project after a terminal build');
+ await journey.buildItem.locator('[data-notification-open]').scrollIntoViewIfNeeded();
  await journey.openBuildProject();assert.equal(await arcade.isVisible(),false);await assertScrollRestored(journey);
  assert.equal(await page.locator('#page-studio').isVisible(),true,'terminal exit opens the build-owning project');
  assert.equal(await page.locator('#page-studio-library').isVisible(),false);assert.equal(await page.locator('#studioConversation').isVisible(),true);
  assert.equal(await page.locator('#studioPrompt').isVisible(),true,'the child can revise a failed idea');
  assert.equal(await page.evaluate(()=>FG.studio.exportNotebook().active[FG.store.current().id]),journey.project.id);
  assert.equal(counters.previewRequests,0,'terminal builds cannot open a preview');
- review.check(device.name,'build-and-art-recovery',{terminal:device.recoveryTerminal,entry:'global-build-shelf',returnedToProject:journey.project.id,artRetries:device.artFailure?1:0,interruptedPolls:counters.interruptedPolls,buildRequests:counters.submitted,previewRequests:counters.previewRequests});
+ review.check(device.name,'build-and-art-recovery',{terminal:device.recoveryTerminal,entry:'owner-notifications',returnedToProject:journey.project.id,artRetries:device.artFailure?1:0,interruptedPolls:counters.interruptedPolls,buildRequests:counters.submitted,previewRequests:counters.previewRequests});
 }
 
 async function profileReset(journey,device,review){
@@ -463,10 +468,12 @@ async function profileReset(journey,device,review){
  assert.ok(await journey.score('banked')>0);assert.ok(await journey.score('loose')>0);
  await choose(project.otherOwner);
  assert.equal(await arcade.isVisible(),false,'profile changes close active mini-game');await assertScrollRestored(journey);
- assert.equal(await page.locator('#studioBuildShelf').isVisible(),false,'other profiles cannot see the previous child’s build');
+ await journey.openBuildNotifications();
+ assert.equal(await journey.buildItem.count(),0,'a sibling’s Notifications page cannot reveal another child’s build');
+ await page.locator('#studioNotificationsBack').click();
  await journey.advance(20000);
  assert.equal(journey.counters.previewRequests,0);
- // The background-build shelf is a real supported entry point after changing
+ // The Notifications Play while I wait action is a supported entry after changing
  // profiles and does not auto-open the project's separate generated preview.
  await choose(project.owner);
  await journey.launch.click();await journey.advance(50);
@@ -476,6 +483,7 @@ async function profileReset(journey,device,review){
  await journey.walkTo(96);
  journey.state.status='ready';
  await journey.until(()=>journey.ready(),'ready callback exists before profile teardown',{step:250,limit:16000});
+ await journey.openBuildNotifications();
  const oldReady=await journey.readyButton.elementHandle();
  assert.ok(oldReady,'ready action exists before teardown');
  const before=await page.evaluate(id=>{
