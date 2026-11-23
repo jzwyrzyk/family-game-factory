@@ -1,0 +1,126 @@
+# Jems production activation and exact-source release
+
+## Current gate: review the exact additional IAM scope
+
+The owner authorizes the production cutover using existing working Adult AI, worker, data and spending settings. The owner **has not approved the additional IAM bindings or enabling the two dedicated Google deployment providers**. The approved diagnostic API enablement and paced read-only collection are now recorded. The exact direct proposal is available; six revision checks remain unknown. The next action is owner review of the bounded proposal and prepared guarded procedure. Do not apply the deployment proposal, set release variables or flags, enable federation providers or publish images before the owner approves that concrete scope.
+
+[`production_activation.py`](../../scripts/ops/production_activation.py) is a read-only collector. It has no activation/apply mode. Its output is evidence for review, not an executable authorization or a production-readiness receipt. The operator command must identify an immutable helper commit, verified downloaded bytes and a fresh private output directory. The release operator supplies that complete command after source review and tests; this document deliberately supplies no placeholder command to paste into Cloud Shell.
+
+Use the owner's existing authenticated Cloud Shell when Codex has no approved Google connection. Preserve the prior release journal and the separate Cloud Shell preflight/plan files. Do not overwrite a receipt to make a repeat look like an initial run. Keep full policies, service metadata and any account identifiers in the private output; share only the bounded review summary. Never print tokens, secret payloads, private application data or child content.
+
+## What is known, and what still needs a fresh read
+
+| Evidence | Scope and limit |
+| --- | --- |
+| Reviewed application `023377f146c5cafdf828a6ad84c4466f3d564ac3`; protected main `f60f3b8f8cab67c0b97b7b136e6ce94de3b51844` | Source comparison verifies unchanged application/service inputs. Both produce service archive SHA-256 `ac5e9c531c399f893714fab17acf3b199f6e483fc4aa2bc87c3804d2e0a011de` (547,960 bytes). This is source equality, not a new deployed source. |
+| Claims-only [image run45197519609](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45197519609) and [release run45197525238](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45197525238) | Independently verified successful exact-main `f60f3b8…` claim checks; mutating jobs skipped. They prove the expected GitHub claim projection for that revision, not token exchange with Google or effective IAM. |
+| Three service baselines/configuration fingerprints and Adult `CURRENT_STATE_VERIFIED` | Owner-reported Cloud Shell observations. The reported files are private Cloud Shell artifacts; the Adult continuity output was not retained as a saved receipt. They do not constitute the new collector's fresh IAM/effective-access evidence. |
+| Worker `dddf53dbc76796be19782c1bb5bbb99b86e99909`, disabled deployment providers, unset release flags/identity variables, empty immutable `jems-release-images`, Pages source `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d` | Owner-reported current operational baseline. Re-read the relevant state immediately before any later activation or release. Preserve the worker pin and its separate trust. |
+| Earlier `plan-production` proposed grants | A historical proposal, not a complete live IAM audit. The newer collector supersedes its direct diff; effective access remains unresolved. |
+| Historical owner-supplied collector summary, November 23, 2026, 15:24:58 UTC; helper `62ef419613e7bcdc18d4028115f4620c062c0044` | Recorded `EXACT_DIRECT_SCOPE_RECORDED`, 11 proposed bindings, all five earlier files present, four predefined roles read and zero mutations. All 66 effective-access checks returned HTTP 403, leaving status `READ_ONLY_REVIEW_INCOMPLETE`. This receipt did not establish the cause of the 403s or effective access. |
+| Historical owner-supplied API-state and collector receipt, November 23, 2026, 15:56:52 UTC; helper `01c090b9d93d01eb81dc7ccb701d993e017c080c` | API `ENABLED`; 15 of 66 checks reported `CANNOT_ACCESS`, 51 remained `UNKNOWN` (six project HTTP 403, four revision HTTP 400, 41 HTTP 429). Status was `READ_ONLY_REVIEW_INCOMPLETE`, zero mutations; eleven proposed additions and unchanged direct review hash. |
+| Latest owner-supplied paced receipt, November 23, 2026, 16:39:24 UTC; helper `f7fd3d4e6b21820f754cae47954cfdd22992e0ce` | 56 `CANNOT_ACCESS`, four expected public Gateway/Preview `CAN_ACCESS` results across both lanes, six actual-revision `UNKNOWN` results (HTTP 400 `INVALID_ARGUMENT`, field `accessTuple.fullResourceName`). No HTTP 403/429 errors. `EXACT_DIRECT_SCOPE_RECORDED`, eleven unapplied additions and unchanged direct review hash; overall `READ_ONLY_REVIEW_INCOMPLETE`, zero mutations, `activation_ready: false`. Full evidence remains private. |
+
+The collector must distinguish direct policy snapshots from effective access. Read the exact repository/service/account/project policies, role definitions, dedicated providers/pools, service runtime identities and GitHub release controls. Retain available ancestor-policy and IAM evaluation evidence; permission-denied, unsupported or indeterminate results remain explicit gaps. Do not broaden IAM to make the audit complete, enable an API as a side effect, or infer absence of inherited privileges from an empty direct policy.
+
+## Read the collection result without treating it as approval
+
+The reviewed command binds `--helper-sha`, `--release-source`, the two exact-source claims run IDs and a new `--output-dir`. For the immediate review, T may inspect main `f60f3b8…` using the two claim receipts above; the helper checkout must be clean, full-SHA pinned, and contain that inspected source as an ancestor. The collector rechecks protected main and repeated policy reads for drift.
+
+| Private output | Purpose |
+| --- | --- |
+| `raw-responses.json`, `audit.json` | Retain source responses, fixed-resource state, independent policy reads, ancestry and finite Policy Troubleshooter observations/errors. |
+| `proposed-activation-plan.json` | Exact before/after proposal when the required state permits one; absence means no complete proposal was produced. |
+| `prior-file-comparison.json` | Existence/hash and available-field comparison of the exact owner-supplied preflight files; does not execute or modify old helpers. |
+| `summary.json`, `SHA256SUMS.json` | Bounded review metadata and file integrity manifest. Keep full output private and preserve any partial directory after an error. |
+
+`READ_ONLY_REVIEW_COMPLETE` describes collection, not authorization or an exhaustive IAM result. Inspect every error and `effective_unknown_count`; an unsupported or ambiguous permission tuple remains unknown even if its API request completed. `READ_ONLY_REVIEW_INCOMPLETE` or `READ_ONLY_REVIEW_STOPPED` leaves the missing evidence unresolved. Every result retains `activation_ready: false` and `mutations: 0`. The review hash binds evidence; it neither grants permission nor proves the proposed privileges are effective. Review the exact direct proposal with its explicit effective-access gaps; never present it as a complete IAM proof.
+
+### Historical diagnosis and the paced collection
+
+[`diagnose_iam_review.py`](../../scripts/ops/diagnose_iam_review.py) is a separate read-only follow-up. The pinned command verifies the original private evidence against its recorded manifest hash, preserves it, and writes into a new private directory. It performs one Service Usage GET for the Policy Troubleshooter API and one repeat of the exact recorded registry permission tuple. It retains bounded response/error bodies privately and prints only reviewed status/reason fields and evidence checks.
+
+HTTP 403 alone cannot distinguish a disabled API, quota-project authorization or another permission restriction. An empty effective-grants list with unknown probes is not proof of denied access. Do not enable an API, grant an inferred troubleshooting permission, remove the quota-project header or switch identities to make this check pass. The diagnostic does not retry the entire IAM audit, prove recovery readiness, authorize the proposal or change the production activation gate. A successful single probe still leaves the other permission tuples unresolved until a fresh full collection.
+
+The owner's November 23 diagnostic receipt subsequently established API disablement: the successful Service Usage read returned `DISABLED`, and the rejected troubleshooting request identified `SERVICE_DISABLED` for `policytroubleshooter.googleapis.com` and the expected consumer. The owner then explicitly approved enabling only that API using existing operator authority and rerunning the full read-only collection. This approval does not approve the proposed IAM bindings, dedicated federation providers, release variables, publishing or traffic changes.
+
+The owner subsequently supplied successful completion of the approved single-service enablement command and then a fresh `ENABLED` read. That first full rerun had the 51 unknown outcomes recorded above; the later paced collection supersedes it. Preserve the earlier receipts; another API enablement is not indicated. A denied request does not authorize a role grant or another API enablement. Do not automatically disable the API afterward without checking current usage and obtaining the applicable operational authorization.
+
+The paced collection uses the existing collector and the documented Cloud Resource Manager **project ID** resource name. It serializes troubleshooting requests with a minimum 6.1-second start interval; this is a conservative client choice, not a verified service quota. Only HTTP 429/503 permit one bounded retry per tuple, within the 600-second collection budget. It retains bounded response/error bodies privately and exposes only sanitized `ErrorInfo`, `BadRequest` and retry metadata with grouped errors. The owner supplied its live receipt at 16:39:24 UTC.
+
+After the paced checks, it re-reads direct state, policies, role definitions and protected main. Drift or an unread final state suppresses the exact proposal; the earlier snapshot is retained privately as historical evidence. `current_effective_checks` retains each tuple's outcome and links failed requests to the grouped diagnostics.
+
+All 66 permission outcomes remain visible, including errors and budget-exhausted checks. A revision tuple that is unsupported or otherwise rejected remains `UNKNOWN`; a service-level permission result cannot silently replace revision evidence. HTTP 400/403/429 alone does not establish the underlying cause or target permission. Preserve incomplete output in a fresh private directory and share only its bounded summary; do not upload the raw report. No IAM or deployment approval follows from a cleaner diagnostic result.
+
+The six remaining revision checks are unknown, not denied. The next step is review of the bounded direct proposal and prepared guarded procedure, rather than another blind full rerun. After approved activation, actual revision GETs under a verified release identity must establish required release-side access. The publisher's absence of revision-read access remains explicitly unverified; a release-side success cannot close that separate gap. Do not broaden grants to compensate for this diagnostic limitation. Recovery-path confirmation remains unanswered; the reviewed executor source remains unmerged and unexecuted.
+
+## Scope of the proposal to review
+
+Only project `family-game-factory-jzw` (`1054529152893`), region `us-east5`, the existing `jems-release-images` repository and the three named services are enrolled. The proposed accounts are `jems-image-publisher@family-game-factory-jzw.iam.gserviceaccount.com` and `jems-cloud-run-release@family-game-factory-jzw.iam.gserviceaccount.com`.
+
+| Target | Proposed identity and exact permission boundary |
+| --- | --- |
+| Artifact Registry `jems-release-images` | Publisher gets `roles/artifactregistry.writer`; release account gets `roles/artifactregistry.reader`. Neither grant belongs on the whole project. Preserve immutable tags and retained images. |
+| Each of `factory-gateway`, `factory-preview`, `factory-coach-private` | Release account gets custom role `jemsProductionServiceRelease` with only `run.services.get`, `run.services.update`, `run.revisions.get`, bound separately on each service. |
+| Production project | Release account gets separate custom role `jemsProductionOperationReader` containing only `run.operations.get`. This broader operation-metadata visibility needs explicit review; it is not service-update authority. |
+| Each verified runtime account | Release account gets `roles/iam.serviceAccountUser` only on that exact account. Expected accounts are `factory-gateway`, `factory-preview` and `factory-coach` in the production project; confirm live service identity before proposing a binding. No project-wide `actAs` or Token Creator. |
+| Each dedicated publisher/release account | One separately restricted `roles/iam.workloadIdentityUser` binding for that lane's exact reviewed GitHub subject. Preserve issuer, audience, repository/owner immutable IDs, protected-main workflow, environment and GitHub-hosted runner restrictions. No cross-lane or private-worker trust changes. |
+| Dedicated providers | Enable only `github-main` under pools `jems-github-image-publish` and `jems-github-cloud-run`, after the existing disabled definitions exactly match reviewed trust. Do not create replacement providers or rewrite conditions to accommodate a mismatch. |
+| GitHub repository variables | Set only the four lane identity variables below after approval. Both release enable flags remain absent until actual federated access and permission checks pass. |
+
+The exact lane variables are:
+
+| Variable | Proposed value |
+| --- | --- |
+| `JEMS_PUBLISH_WIF_PROVIDER` | `projects/1054529152893/locations/global/workloadIdentityPools/jems-github-image-publish/providers/github-main` |
+| `JEMS_PUBLISH_SERVICE_ACCOUNT` | `jems-image-publisher@family-game-factory-jzw.iam.gserviceaccount.com` |
+| `JEMS_RELEASE_WIF_PROVIDER` | `projects/1054529152893/locations/global/workloadIdentityPools/jems-github-cloud-run/providers/github-main` |
+| `JEMS_RELEASE_SERVICE_ACCOUNT` | `jems-cloud-run-release@family-game-factory-jzw.iam.gserviceaccount.com` |
+
+### Separate guarded executor
+
+[`activation_execute.py`](../../scripts/ops/activation_execute.py) is separate from the read-only collector. Its reviewed source is prepared but unmerged and unexecuted; no owner approval is recorded. These mode names describe its interface, not commands to run:
+
+| Mode | Boundary |
+| --- | --- |
+| `describe` (default) | Offline scope description and stable scope hash; no cloud calls or mutations. |
+| `check` | Read-only source/evidence/live-state validation; writes a new private `prepared.json`. Requires the reviewed operational helper merged as exact protected main, current required checks and successful main-push Arcade, fresh exact-source claims in both lanes, and the pinned historical audit with the strict rebinding described below. |
+| `apply` | Explicitly selected mutation mode requiring the exact prepared-plan hash and separately approved stable scope hash. Rechecks source and live state before writes; preserves unrelated bindings and keeps both release flags absent. |
+
+The **scope hash** binds the reviewed roles, resource/identity bindings, provider trust, four identity variables, flag holds, executor/dependency/workflow bytes and historical audit manifest. The **prepared-plan hash** binds that scope to the exact newly merged source, fresh claims and current baseline. The earlier `review_code` identifies the collector proposal; it is not either executor hash. Printed or supplied hashes do not establish owner authorization. One explicit approval can cover the concrete scope, reviewed pinned procedure and historical manifest; the later prepared hash is an execution guard, not an automatic second approval round. Changed scope, policy, trust or source beyond the reviewed operational merge requires review; a new receipt timestamp alone does not.
+
+Reusing the paced audit does not claim a fresh 66-check evaluation. Only its source identity, `github.source` and claims-run references may be rebound to the newly merged source. Every other audited direct-state, ancestor-policy and predefined-role field, including etags, must match fresh reads. Any other change stops preparation. The six historical revision unknowns remain explicit until the applicable later access evidence exists.
+
+The executor reserves private receipt storage and journals each action's intent before sending it, then its response and verified readback. IAM policy writes require reviewed etags; custom roles and identity variables are create-only. Provider/variable APIs lack conditional-write protection, so use one operator and exact pre/post checks. An uncertain write or mismatched readback stops the sequence. Preserve the original journal; resume only through its reconciliation path, never by replaying a fresh batch. Even a future successful completion reports `activation_ready: false`; actual federation/access proofs and later release gates remain separate. It does not publish images, shift traffic, change runtime/worker settings or data, or enable another API.
+
+## Keep tool, publication and intent revisions distinct
+
+Use the following identities; these are explanatory names, not runnable placeholders.
+
+| Identity | Meaning |
+| --- | --- |
+| **T** | Immutable reviewed collector/tool commit. It may be an unmerged read-only helper whose ancestor is the live protected main being inspected. Running T to inspect `f60f3b8…` does not make T a release candidate. |
+| **S** | Final **merged** release source. If the helper or verification workflow is merged first, freeze that resulting main SHA as S and prove that its approved application/service inputs remain identical to `023377f…`. |
+| **D** | Immutable per-service image digest published from S, with matching OCI source label and signed GitHub provenance. |
+| **R** | Later protected-main release-intent commit referring to source S and image D. It changes the reviewed intent/compatibility record; it does not relabel or rebuild the image. |
+
+The current image publisher has no `source_sha` override: archive staging, image labels, tags and signed provenance use its **`GITHUB_SHA`**. Publish while S is current protected main. Never publish a newer commit and put the older approved `023377f…` in `intent.source`, even when the application bytes match. Do not weaken the attestation source check or dispatch from a detached/tag ref to avoid this sequence.
+
+Before activation, S needs its successful exact-main Arcade run and all applicable checks, plus fresh claims-only runs in both lanes. The f60 claim receipts remain historical after main advances. Obtain owner approval for the exact live activation diff, then revalidate it before any later mutation.
+
+After publication, commit R with `ops/compatibility.json` identifying S, service, D, baseline revision/image and the successful main-push Arcade run for S. `ops/release.json` must agree and bind the SHA-256 of the exact compatibility file bytes. The controller requires S to be an ancestor of R and current main to equal R. Signed-image verification still requires source digest S and `refs/heads/main`. Later stage/canary/promote intents can retain S and D without republishing images.
+
+Pages subsequently dispatches from current main with input `source_sha` equal to S. Its ancestry check permits this; `build-info.json`, `jems-release.json`, service OCI labels, signed provenance, compatibility source and intent source must all agree on S. The final image digest cannot appear in the same immutable source commit that produces it, so publication and release intent are separate commits.
+
+## Release-specific checklist after explicit IAM approval
+
+1. **Reconcile and preserve.** Freeze merged S and its checks/claims; retain fresh exact IAM diff and owner approval, previous service revisions/images/configuration fingerprints, Pages artifacts, private journals, parent backups and worker/runtime identity. In the current source, **Grown-ups → Parent Controls → Save & restore progress → Export progress + ideas (JSON)** exports family progress; the Adult workspace has a separate export. For each player with artwork, use **Art Studio → Library tools → Download my art library**; artwork bytes are separate from progress. Keep distinct private copies without restoring/resetting the live browser to test them. Verify in-flight paid work and receipt state before cutover. Source tests do not prove actual backup or drain readiness.
+2. **Activate only the approved diff.** Use the reviewed, idempotent, receipt-backed operator procedure, rechecking state before writes. Keep `JEMS_IMAGE_PUBLISH_ENABLED` and `JEMS_CLOUD_RUN_RELEASE_ENABLED` absent. Do not use `deploy.py`'s inactive bootstrap or the historical PR107 apply pathway against working production.
+3. **Prove GitHub-to-Google access without publication.** The prepared optional `verify_access` modes in the same two workflows are default-off and mutually exclusive with `verify_identity`. They require protected main, the correct lane environment and both enable-flag values to resolve empty. GitHub expressions cannot distinguish absent variables from stored empty strings; a fresh collector/API read must separately establish actual absence. After approval and activation, use fresh exact-S runs to verify actual federation, the effective Google account using the same short-lived token, registry/service/runtime-account/operation permissions and selected excessive-permission denials. Release revision access requires actual serving-revision GETs with matching names/runtime accounts, not a service-resource permission probe. Publisher revision denial remains `NOT_VERIFIED`. The bounded receipts are point-in-time permission evidence, not an exhaustive IAM proof or application health test. The source addition is not yet a successful live proof.
+4. **Publish S.** Only after the access proofs and release gates pass may the corresponding enable flags be set through a separately reviewed concrete step. Publish immutable candidate images from current S; independently verify digest availability, labels and signed provenance before making an intent. Preserve old images and spending/provider settings.
+5. **Stage compatible backends.** Reassess whether Preview needs any change; unchanged compatible Preview may be retained. Stage Gateway and private Coach with exact digest/configuration and baseline traffic preserved. The existing controller's `stage` verifies revision readiness, image and configuration metadata; it creates **no candidate tag or routable candidate URL**. It does not provide a pre-traffic HTTP smoke test.
+6. **Canary, observe, promote.** The established path shifts 5% to the candidate, then performs authorized functional smoke and sanitized monitoring before promotion. Prove legacy and v2 Coach behavior, gateway request lookup, old worker callbacks, trusted-device/Adult separation and receipt settlement. If pre-traffic HTTP acceptance is mandatory, stop and review a narrowly scoped routing capability; never call metadata staging a functional test. Gateway and private Coach must be compatible and fully serving before dependent Pages publication.
+7. **Publish Pages S and accept the live product.** Require the build and all eight release shards. Verify actual production manifests/assets/configuration, clean and compatible returning sessions, Games/Mining/Factory/Bubble Gum/Coding, profiles/Notifications, Coach v2.1 and saved-work continuation. Perform bounded Adult Build → Review → Play → Keep → Reload only with existing valid grants, consent/provider settings and allowance; never replay uncertain paid requests or activate child paid AI for a test.
+8. **Recover safely and close.** Use retained compatible backend traffic recovery only after draining incompatible writers. Keep readers for v2 evidence, chapters, Notifications and pending identities; an old website is not a no-loss fallback. Prefer a compatible repair/roll-forward where older readers or expired Pages artifacts cannot provide safe recovery. Retain an approved authenticated operator route if a new rollback-intent PR cannot pass protected-main checks. Record actual serving revisions/digests, traffic, Pages deployment/source, acceptance and limitations in delivery state. No live completion claim precedes observed acceptance.
+
+The [Coach/reliability release control](COACH_RELIABILITY_RELEASE_CONTROL.md), [continuity contract](../assignment-006/RELEASE-CONTINUITY.md), [Coach evaluation gate](../design-coach/RELEASE_AND_EVALUATION.md) and [storage/rollback contract](../child-continuity/RELIABILITY-2026-11-23.md) remain applicable. This runbook neither expands the private-worker release scope nor authorizes PR106, provider activation, additional spending or destructive storage changes.

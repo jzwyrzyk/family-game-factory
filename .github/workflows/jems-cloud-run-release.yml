@@ -9,6 +9,10 @@ on:
         description: Verify GitHub OIDC claims only while production flags are off
         type: boolean
         default: false
+      verify_access:
+        description: Read-only federated access proof after reviewed flag-absence check
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -24,7 +28,7 @@ jobs:
       github.repository == 'jzwyrzyk/family-game-factory' &&
       github.event_name == 'workflow_dispatch' &&
       github.ref == 'refs/heads/main' && github.ref_protected &&
-      inputs.verify_identity &&
+      inputs.verify_identity && !inputs.verify_access &&
       vars.JEMS_IMAGE_PUBLISH_ENABLED != 'true' &&
       vars.JEMS_CLOUD_RUN_RELEASE_ENABLED != 'true'
     runs-on: ubuntu-24.04
@@ -38,8 +42,46 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 scripts/ops/oidc_claims.py release
+  verify-access:
+    if: >-
+      github.repository == 'jzwyrzyk/family-game-factory' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      inputs.verify_access && !inputs.verify_identity &&
+      vars.JEMS_IMAGE_PUBLISH_ENABLED == '' &&
+      vars.JEMS_CLOUD_RUN_RELEASE_ENABLED == ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: jems-cloud-run-production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - id: access-auth
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ vars.JEMS_RELEASE_WIF_PROVIDER }}
+          service_account: ${{ vars.JEMS_RELEASE_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_lifetime: 600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/userinfo.email
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Verify federated production access
+        env:
+          JEMS_GOOGLE_ACCESS_TOKEN: ${{ steps.access-auth.outputs.access_token }}
+          JEMS_ACCESS_PROVIDER: ${{ vars.JEMS_RELEASE_WIF_PROVIDER }}
+          JEMS_ACCESS_SERVICE_ACCOUNT: ${{ vars.JEMS_RELEASE_SERVICE_ACCOUNT }}
+          JEMS_VERIFY_ACCESS: ${{ inputs.verify_access }}
+          JEMS_VERIFY_IDENTITY: ${{ inputs.verify_identity }}
+          JEMS_IMAGE_PUBLISH_ENABLED: ${{ vars.JEMS_IMAGE_PUBLISH_ENABLED }}
+          JEMS_CLOUD_RUN_RELEASE_ENABLED: ${{ vars.JEMS_CLOUD_RUN_RELEASE_ENABLED }}
+        run: python3 scripts/ops/verify_release_access.py release
   plan:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && !inputs.verify_access
     runs-on: ubuntu-24.04
     outputs:
       operation: ${{ steps.plan.outputs.operation }}
