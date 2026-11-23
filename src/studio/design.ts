@@ -3,7 +3,7 @@
  */
 import type {Candidate} from './notebook';
 import {validateCreationReadiness,validateCreationReview,type CreationReadinessVerdict,type CreationReview} from './creation-readiness';
-export const PLAN_FIELDS = ['fun','action','goal','setback','score','style','progression','special'] as const;
+export const PLAN_FIELDS = ['fun','action','goal','setback','score','style','viewpoint','movement','progression','special'] as const;
 export type PlanField = typeof PLAN_FIELDS[number];
 export type Origin = 'child'|'helper';
 export interface DesignField {value:string; origin:Origin; accepted:boolean; delegated:boolean}
@@ -14,6 +14,8 @@ export interface DesignRecord {
  ideas:Idea[]; observations:Observation[]; helpLevel:number;
  support:'brief'|'balanced'|'detailed'; paused:boolean; approvedPlan:boolean;
  creationReview?:CreationReview;
+ /** New ideas opt into richer creative readiness; older saved ideas keep their earlier contract. */
+ creationStandard?:2;
 }
 export interface Experiment {
  id:string; label:string; title:string; baseId:string|null; parents:string[];
@@ -26,7 +28,7 @@ export interface CoachContext {
  conversation:{role:'child'|'helper'|'reflection';text:string}[];
  observations:Observation[]; tests:{label:string;title:string;prediction:string;notes:string}[];
  /** Opt-in keeps older browser clients compatible with the same coach route. */
- creation?:{version:1};
+ creation?:{version:1|2};
 }
 export interface CoachReply {
  move:'listen'|'clarify'|'inspire'|'explain'|'reflect'|'propose'|'repair'|'play';
@@ -42,8 +44,9 @@ const keys=(v:object,allowed:string[])=>Object.keys(v).every(k=>allowed.includes
 export function freshDesign():DesignRecord {return {version:1,plan:{},friction:'',ideas:[],observations:[],helpLevel:0,support:'balanced',paused:false,approvedPlan:false};}
 export function validateDesign(input:unknown):DesignRecord {
  const d=input as DesignRecord;
- if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan','creationReview'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
+ if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan','creationReview','creationStandard'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
  if(d.creationReview!==undefined)validateCreationReview(d.creationReview);
+ if(d.creationStandard!==undefined&&d.creationStandard!==2)throw Error('Invalid creation standard.');
  for(const field of Object.values(d.plan)){if(!field||!keys(field,['value','origin','accepted','delegated'])||!text(field.value,700)||!['child','helper'].includes(field.origin)||typeof field.accepted!=='boolean'||typeof field.delegated!=='boolean')throw Error('Invalid plan field.');}
  if(!Array.isArray(d.ideas)||d.ideas.length>100||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
  if(!Array.isArray(d.observations)||d.observations.length>300||!d.observations.every(o=>o&&keys(o,['id','experimentId','text','source','at'])&&id(o.id)&&(o.experimentId===null||id(o.experimentId))&&text(o.text,1200)&&['runtime','child'].includes(o.source)&&text(o.at,40)&&Number.isFinite(Date.parse(o.at)))||new Set(d.observations.map(o=>o.id)).size!==d.observations.length)throw Error('Invalid observation.');
@@ -79,7 +82,7 @@ export function validateCoachReply(value:unknown,context:CoachContext):CoachRepl
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)throw Error('Missing proposal.');
  if(((r.text+' '+(r.question||'')).match(/\?/g)||[]).length>1)throw Error('Ask one useful question at a time.');
  const reply=copy(r);
- if(context.creation?.version===1){
+ if(context.creation?.version===1||context.creation?.version===2){
   if(reply.creationReadiness===undefined||reply.creationReadiness===null)throw Error('CREATION_REVIEW_MISSING');
   reply.creationReadiness=validateCreationReadiness(reply.creationReadiness,context);
   // A successful review means no material question remains. Do not send a
@@ -89,7 +92,7 @@ export function validateCoachReply(value:unknown,context:CoachContext):CoachRepl
  else delete reply.creationReadiness;
  return reply;
 }
-export const PLAN_LABELS:Record<PlanField,string>={fun:'What would make it fun?',action:'What does the player do?',goal:'What is the goal?',setback:'What happens when things go wrong?',score:'Points or rewards — or none?',style:'How should it look and feel?',progression:'What changes as you get better?',special:'Any special rules — or none?'};
+export const PLAN_LABELS:Record<PlanField,string>={fun:'How should it feel?',action:'What does the player do?',goal:'How do you win or enjoy free play?',setback:'What happens when things go wrong?',score:'Points or rewards — or none?',style:'How should it look?',viewpoint:'Where do you see the game from?',movement:'How does your character move?',progression:'What changes as you get better?',special:'Any funny surprises or special rules?'};
 /** A deliberately limited offline aid, not an LLM and never a build command. */
 export function localCoach(c:CoachContext):CoachReply {
  let message='Your idea is saved. You choose what we try.',question:string|null=null,suggestions:string[]=[],move:CoachReply['move']='listen';
