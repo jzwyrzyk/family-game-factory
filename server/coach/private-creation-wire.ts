@@ -6,7 +6,6 @@ const record=(value:unknown):value is Record<string,unknown>=>!!value&&typeof va
 const exactKeys=(value:Record<string,unknown>,keys:readonly string[])=>Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
 const invalid=(message='Invalid creation review.'):never=>{throw Error(message);};
 const object=(properties:Record<string,unknown>)=>({type:'object',additionalProperties:false,properties,required:Object.keys(properties)});
-const evidence=(item:object)=>object(Object.fromEntries(evidenceKeys.map(key=>[key,item])));
 
 /** Preserve each UTF-16 character, including whitespace and surrogate pairs.
  * Prefer an existing sentence/phrase boundary once a chunk is substantial.
