@@ -662,7 +662,7 @@ export async function installStudio(){
  function refreshBuildAction(){
   if(!activeId)return;
   const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
-  const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value})):null;
+  const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value},s.design?.creationStandard===2?2:1)):null;
   const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||unconfirmedSubmissions.has(s.id);
   $<HTMLButtonElement>('studioSend').hidden=false;
   $<HTMLButtonElement>('studioSend').disabled=pending||!reflecting&&uncertain||creating&&(busy(s)||!readiness?.ready);
@@ -1094,7 +1094,7 @@ export async function installStudio(){
   const decision=coaching?.details()||{continueTest:false,parents:[],depth:'tune' as const,origin:'child' as const};
   const firstBuild=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   if(firstBuild){
-   const readiness=coaching?.buildReadiness()||creationBuildReadiness(current());
+   const readiness=coaching?.buildReadiness()||creationBuildReadiness(current(),current().design?.creationStandard===2?2:1);
    if(!readiness.ready){status(readiness.reason);return;}
    prompt=coaching?.buildPrompt(request?.compiledPlan?typed:request?.prompt||typed)||prompt;
    // The request contains the full agreed plan; the conversation contains only
