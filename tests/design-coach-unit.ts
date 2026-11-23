@@ -546,6 +546,30 @@ await test('repeated uncertainty sends prior kinds of support to the coach; a di
   assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.buildRequests.length,0);
  }finally{h.dispose();}
 });
+await test('reconnect restores provenance for an earlier prose-only offer and never creates another child turn',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,creationReadiness:{ready:false,evidence:empty,unresolved:['What will the fox do?']}};
+  await sendTurn(h,'My fox needs a look. Can I have an idea?',{...waiting,text:'One idea from me is a storybook look.',question:null});
+  const words='Yes, I want it to look like a storybook.';
+  h.input('studioPrompt',words);const failed=h.coach.discuss('discuss');await h.awaitModelRequest();
+  h.pending.shift()!.reject(Error('fixture connection failure'));await failed;
+  assert.equal(h.coach.buildReadiness().ready,false);
+  assert.equal(h.session().design!.plan.style,undefined,'the disconnected extractor leaves the offered look unassigned');
+  // A notebook from the original v2 client could already contain this literal
+  // classification after an outage. A fresh review can repair its attribution.
+  h.book.update(id,owner,s=>{s.design!.plan.style={value:words,origin:'child',accepted:true,delegated:false};});
+  const before=h.session().messages.filter(m=>m.role==='child');
+  const check=h.coach.reassess();await h.awaitModelRequest();
+  h.resolve({...waiting,childDecisions:[{field:'style',quote:'storybook'}]});await check;
+  assert.deepEqual(h.session().messages.filter(m=>m.role==='child'),before);
+  assert.deepEqual(h.session().design!.plan.style,{value:'storybook',origin:'helper',accepted:true,delegated:false});
+  assert.equal(selectedSuggestions(h.session()).style?.[0].offer,'storybook');
+  assert.equal(h.buildRequests.length,0);
+ }finally{h.dispose();}
+});
 await test('a mixed selection preserves both earlier options and no other option',async()=>{
  const h=coachingHarness();
  try{

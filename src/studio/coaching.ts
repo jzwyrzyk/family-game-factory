@@ -176,7 +176,10 @@ export function installCoaching(h:Hooks){
     const correction=currentQuote&&turn.direct&&(s.design.creationStandard===2||isExplicitPlanRevision(turn.text));
     if(!unchanged)continue;
     const offers=currentQuote?suggestionsBehindChoice(d.field,d.quote,previous,earlier,reply.planSuggestions,s.design.ideas):[];
-    if(creationPlan(s)[d.field]?.accepted&&!previous?.delegated&&!correction)continue;
+    // An offline save may have filed this same literal sentence as a child
+    // field. Reassessment can restore its credit without replacing newer work.
+    const restoresOrigin=offers.length>0&&previous?.origin==='child'&&turn.text.includes(previous.value)&&previous.value.includes(d.quote);
+    if(creationPlan(s)[d.field]?.accepted&&!previous?.delegated&&!correction&&!restoresOrigin)continue;
     const origin=offers.length?'helper':currentQuote?turn.origin:sourceOf(s,d.quote);
     if(origin==='helper'&&!offers.length&&previous?.accepted)continue;
     if(previous?.accepted&&previous.value===d.quote&&!offers.length)continue;
@@ -283,7 +286,10 @@ export function installCoaching(h:Hooks){
     h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();const id='superseded-turn:'+submittedMessage.id;if(!s.design.ideas.some(idea=>idea.id===id))s.design.ideas.push({id,text:text.slice(0,1000),origin:submittedOrigin,adopted:false});});
     reply={move:'listen',text:'Your newer choice is saved.',question:null,suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
    }
-   if(used==='local'&&!safetyRefusal&&!supersededCorrection&&isNewIdea(captured)&&mode==='discuss'){
+   // After an assisted exchange the offline extractor cannot distinguish
+   // adaptation from invention. The exact turn is already saved for reconnect.
+   const assistedCreation=captured.design?.creationStandard===2&&!!captured.design.creationReview;
+   if(used==='local'&&!assistedCreation&&!safetyRefusal&&!supersededCorrection&&isNewIdea(captured)&&mode==='discuss'){
     saveLiteralChoices(h.current(),text,planAtSubmission,submittedOrigin);
    }
    if(used==='local'&&!safetyRefusal&&guidedDelegation(text))reply={...reply,text:'I can help you think of your own idea.',question:'Imagine one moment you would want to play. What happens in it?',suggestions:[],planSuggestions:[]};

@@ -84,7 +84,12 @@ export function suggestionsBehindChoice(
  if(paired.length)return [...new Set(paired)];
  const offers=ideas.filter(idea=>idea.origin==='helper'&&(!idea.adopted||idea.id.startsWith('selection:'))).map(idea=>idea.text);
  if(prior?.origin==='helper'&&!prior.accepted&&!prior.delegated)offers.push(prior.value);
- return [...new Set(offers)].filter(phrase=>phrase.trim()&&quote.toLowerCase().includes(phrase.toLowerCase())&&appearedInReply(phrase));
+ const named=[...new Set(offers)].filter(phrase=>phrase.trim()&&quote.toLowerCase().includes(phrase.toLowerCase())&&appearedInReply(phrase));
+ if(named.length)return named;
+ // Older replies sometimes gave examples only in prose. Preserve the origin
+ // of an exact phrase first introduced by jems without importing the rest.
+ const firstMention=earlier.find(message=>message.role!=='reflection'&&message.text.includes(quote));
+ return firstMention?.role==='helper'?[quote]:[];
 }
 
 /** Follow-up statements are kept even without command words (e.g. clouds are trampolines).

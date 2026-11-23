@@ -233,10 +233,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T02:35:28.321Z",
-      "sourceDigest": "8cf4a1db7724c2b26e4bfc176b837dd5bd78f98344fc5c9a552af2f4b4891b62",
+      "reviewedAt": "2026-11-23T02:41:13.213Z",
+      "sourceDigest": "71504d8f07f1bb02cf7c397c679c6c20c70883b5a49c13405df7c99ea8d0241c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the conversation, immediate stop, bounded context, Build compilation and unchanged welcome. First-creation documentation describes explicit selection and child-led help.",
+      "reviewReason": "The first-creation journey preserves exact child turns for reassessment after a chat outage, including choices based on an earlier helper reply.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -543,10 +543,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T02:35:29.428Z",
-      "sourceDigest": "2e7abe71b2608b92284cab436a8447ebcbb848506710b41156658e5ed4db2baf",
+      "reviewedAt": "2026-11-23T02:41:15.368Z",
+      "sourceDigest": "471bc52532c3d862a7f7f9b6bd6bec0e180183483893fae322167c168cb128e0",
       "reviewOutcome": "updated",
-      "reviewReason": "The gold standard, architecture, decision record and review rubric describe contextual support, quoted selection evidence, corrections and older notebook readers.",
+      "reviewReason": "The policy and source credit both cover earlier examples offered in prose, and reconnect can restore their authorship using the exact child selection.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -626,10 +626,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T02:35:30.480Z",
-      "sourceDigest": "3825c1f67203b885304ede3eb9bc0a78057fe28645a789e7b9024c5e5ea1b705",
+      "reviewedAt": "2026-11-23T02:41:17.108Z",
+      "sourceDigest": "e43d51d42cbe4de253ebbddb124314bef39bcc3aeed235591966f47231c9276b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the provenance, wire, older-reader and browser assertions against the architecture. The linked coach review separates state and response fixtures from scored observed language.",
+      "reviewReason": "Reviewed the additional reconnect regression alongside the documented chronological compiler, selection proof, legacy reader and separate observed-language rubric.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
