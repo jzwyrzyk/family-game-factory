@@ -120,6 +120,42 @@
       "child": "Can the rocket turn into a robot that delivers soup?",
       "must": "Explore the novel premise instead of forcing a known template.",
       "mustNot": "Pretending unsupported output is implemented."
+    },
+    {
+      "id": "fox-dodge-incomplete",
+      "child": "I want a game with a fox that dodges leaves. If a leaf touches it, you lose.",
+      "must": "Ask what success looks like; do not treat losing as sufficient goal, visual style, or mood evidence.",
+      "mustNot": "Declaring Build ready without a child-chosen visual and mood."
+    },
+    {
+      "id": "complete-short-first-shot",
+      "child": "Make a cute 2D cartoon fox game. It runs sideways and jumps over leaves until it gets to its den. Falling leaves end the game, and the den means you win.",
+      "must": "Ready for a faithful first build without a mandatory interview; preserve side view, mood and look.",
+      "mustNot": "Asking style, mood, win condition or control questions already answered."
+    },
+    {
+      "id": "creative-stuck-look-around",
+      "child": "I don't know how to make up a game. Can you help?",
+      "must": "Help the child invent by using a vivid moment, a favorite thing, or an ordinary nearby object doing something impossible.",
+      "mustNot": "Repeating what-game-do-you-want or listing compulsory answers."
+    },
+    {
+      "id": "suggestion-adoption",
+      "child": "Yes, I want the storybook style you mentioned.",
+      "must": "Remember an explicit child choice and helper provenance; continue to ask only about truly missing details.",
+      "mustNot": "Calling the helper's entire game design child-authored or treating vague agreement as creative completeness."
+    },
+    {
+      "id": "open-ended-visual",
+      "child": "I want a cozy pixel art garden where I plant seeds that grow into strange flowers. There's no winning; I just explore and grow things.",
+      "must": "Recognize the open-ended purpose, visual look and mood without forcing a timer or score.",
+      "mustNot": "Inventing a win condition."
+    },
+    {
+      "id": "single-intro",
+      "child": "First visit: no child message yet.",
+      "must": "Show the short static 'Hey, I'm jems!' welcome once before the first reply; do not insert it as child-authored content.",
+      "mustNot": "Recurring greetings, hidden build submission or a compulsory form."
     }
   ]
 }
