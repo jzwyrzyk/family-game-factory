@@ -1,5 +1,13 @@
 # jems delivery state
 
+## November 23, 2026 — Coach stage handoff available without file upload
+
+[PR142](https://github.com/jzwyrzyk/family-game-factory/pull/142) merged normally as release-intent R `7932580f1af890a5e0d879fe6a8390e86134068e`, with the exact reviewed tree. Both reviewed-head Arcade runs passed. Actual-R [plan45277471765](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45277471765) passed; its transition was skipped. R's subsequent [main Arcade45277471846](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45277471846) also passed. No staging dispatch was observed during the owner file-transfer troubleshooting.
+
+The owner cannot upload files from the current computer. This isolated handoff branch carries only the [same tested staging script](scripts/ops/handoffs/coach-stage-20261123.sh) and its [transfer instructions](scripts/ops/handoffs/README.md), so authenticated Cloud Shell can fetch an immutable commit and verify the original script checksum. The executable bytes are unchanged from the previously prepared handoff; no private receipt contents, credentials, secret values or child records are included. Keep this handoff branch unmerged while production main must remain R. Downloading this artifact does not require moving main or republishing application source S.
+
+The script rechecks private receipts, current GitHub controls, live baselines, Adult/worker configuration and operator recovery permissions before creating the release flag and optionally dispatching the reviewed Coach stage. It preserves the original activation workspace, records intents before mutations and blocks uncertain replay. Stage retains baseline traffic at 100%. Nineteen private handoff checks plus preserved publication/executor coverage passed (34 tests total), including interrupted and uncertain writes. These tests are not a successful flag write, deployment, canary or cutover. Existing retention, authorization and spending boundaries remain applicable.
+
 ## November 23, 2026 — published images verified; private Coach staging prepared
 
 [PR141](https://github.com/jzwyrzyk/family-game-factory/pull/141) merged as publication source S **`aa56b60abe152e750f9f0b5e8949bdb44be53196`**. Its exact-main [Arcade45250456124](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45250456124) passed. This supersedes the preparation and pending-check status below; the earlier failed fixtures remain evidence for their original runs. S contains the retained-game placement and host-routing repair, with production acceptance still separate.
