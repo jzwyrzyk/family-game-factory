@@ -890,10 +890,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T03:44:52.143Z",
-      "sourceDigest": "2f4e4a88758eb61a77f46baf707671c90501f4d772f263353c79ef72fd40a351",
+      "reviewedAt": "2026-11-23T03:56:29.310Z",
+      "sourceDigest": "78ca8a1cd716efc8cf2ec0fa083ebffd524b39756593748ae445ddb307ebde07",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded expanded local test results and observed Mining profile/preview fixture failures with their scoped corrections, preserving pending exact-head hosted and visual acceptance and manual-only publication.",
+      "reviewReason": "Recorded all 13 hosted Mining functional passes at 8496696 and the nine remaining old-reference mismatches. Added a bounded review packet beside the unchanged full artifact for exact Chromium-141 image/video inspection; tests, retention, read-only workflow permissions and tolerances remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
