@@ -66,14 +66,18 @@ export function validateNarrationAudio(bytes:Uint8Array):Uint8Array {
  return bytes;
 }
 /** Charge an unknown outcome once. Never replay speech after process loss. */
-function settle(state:PipelineState,r:NarrationReceipt,outcome:'ready'|'failed') {
+function settle(state:PipelineState,r:NarrationReceipt,outcome:'ready'|'failed',now=Date.now(),interrupted=false) {
  if(r.state!=='running')return;
  const ledger=state.ledgers[r.familyId];
- if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=r.reserved;}
+ // Reservations carry across allowance-month changes; usage belongs to the
+ // original month and must not consume the new month's used allowance.
+ if(ledger){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);if(ledger.month===r.month)ledger.used+=r.reserved;}
  r.state=outcome;
+ state.audit.push({jobId:'narration-'+r.reservationId,familyId:r.familyId,status:outcome,at:new Date(now).toISOString(),
+  code:interrupted?'NARRATION_INTERRUPTED':'NARRATION_READ',usage:{kind:'narration',month:r.month,reservedMicroUsd:r.reserved,usedMicroUsd:r.reserved,outcome:interrupted?'interrupted':'settled'}});
 }
 export function reconcileNarrationReceipts(state:PipelineState,now=Date.now()) {
- for(const r of state.narrationReceipts||[])if(r.state==='running'&&r.leaseUntil<=now)settle(state,r,'failed');
+ for(const r of state.narrationReceipts||[])if(r.state==='running'&&r.leaseUntil<=now)settle(state,r,'failed',now,true);
 }
 export class NarrationService {
  constructor(private repo:Repository,private config:NarrationConfig,private provider:NarrationProvider){}

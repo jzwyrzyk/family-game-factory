@@ -7,7 +7,7 @@ const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const PROFILE='adult:12345678-1234-4123-8123-123456789abc',TOKEN='a'.repeat(43),PASSPHRASE='a long adult passphrase';
 const until=async(predicate)=>{const end=Date.now()+10000;while(!predicate()){if(Date.now()>end)throw Error('Timed out waiting for fixture request');await new Promise(resolve=>setTimeout(resolve,10));}};
-const reply={move:'listen',text:'Your adult test idea is ready to explore.',question:'What should happen next?',suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[],creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:''},unresolved:['The player action and its consequence need clarification.']}};
+const reply={move:'listen',text:'Your adult test idea is ready to explore.',question:'What should happen next?',suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[],creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''},unresolved:['The player action and its consequence need clarification.']}};
 (async()=>{
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox']});
  try{

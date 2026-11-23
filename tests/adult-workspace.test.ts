@@ -11,6 +11,7 @@ import {stickerLaunchFixture} from '../server/testing/working-game-fixtures';
 import {syntheticQualityEvidence,syntheticQualityReview} from '../server/testing/presentation-quality-fixtures';
 import {productionFixture,compiledPipelineFixture,testedPipelineFixture} from './quality-pipeline-fixtures';
 import {defaults} from '../src/runtime/manifests';
+import {identifyBuildRequest} from '../src/builder/submission';
 import type {VerifiedSession} from '../server/contracts/api';
 import type {AgentAdapter} from '../server/pipeline/types';
 import type {AgentApproval} from '../server/agent/openai';
@@ -78,6 +79,9 @@ test('adult workspace: seeds and idempotency are isolated within one family and 
  const second=await service.submit(adult,request('same-client-request'));
  const third=await service.submit(otherAdult,request('same-client-request'));
  assert.equal(new Set([first.jobId,second.jobId,third.jobId]).size,3,'profile namespaces cannot collide');
+ const saved=await identifyBuildRequest(request('same-client-request'));
+ for(const [session,svc,expected] of [[child,childService,first],[adult,service,second],[otherAdult,service,third]] as const)
+  assert.equal((await svc.lookupSubmission(session,saved.clientRequestId,saved.payloadHash)).job?.jobId,expected.jobId,'lost-ACK lookup preserves the exact family/adult namespace');
  assert.equal((await service.submit(adult,request('same-client-request'))).jobId,second.jobId);
  await assert.rejects(service.submit(adult,{...request('same-client-request'),prompt:'Build a different rocket'}),/IDEMPOTENCY_CONFLICT/);
  for(const [session,svc,revisionId] of [

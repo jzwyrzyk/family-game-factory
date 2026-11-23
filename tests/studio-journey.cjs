@@ -151,7 +151,10 @@ const {start}=require('./browser-server.cjs');
   action:'Tap to jump.',
   consequence:'You win when all five stars reach the house. Falling puts the fox back on the last cloud.',
   experience:'I want it to feel playful and brave, with time to think.',
-  world:'A pink sky, soft cartoon clouds, and gold stars.'
+  world:'A pink sky, soft cartoon clouds, and gold stars.',
+   goal:'You win when all five stars reach the house.',
+   visualStyle:'soft cartoon clouds',
+   mood:'playful and brave'
  };
  await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:'https://studio-api.test',previewOrigin:'https://studio-preview.test'})}));
  await page.route('https://studio-api.test/**',async route=>{
@@ -164,7 +167,7 @@ const {start}=require('./browser-server.cjs');
    data={connected:true,trusted:true,expiresAt:Date.now()+60000};
   else if(path==='/v1/coach'&&req.method()==='POST'){
    const context=req.postDataJSON().context;coachRequests.push(context);
-   assert.deepEqual(context.creation,{version:1},'new-game Send requests a contextual creation review');
+   assert.deepEqual(context.creation,{version:2},'new-game Send requests a contextual creation review');
    const complete=context.message===childRules;
    assert.ok(complete||context.message===childIdea,'the fixture reviews only the words the child sent');
    if(complete)for(const quote of Object.values(childEvidence))assert.ok([context.message,...context.conversation.filter(message=>message.role==='child').map(message=>message.text)].some(text=>text.includes(quote)),'every ready reason quotes the child');
@@ -173,7 +176,7 @@ const {start}=require('./browser-server.cjs');
     question:complete?null:'How should it feel to jump between the clouds?',
     suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[],
     creationReadiness:complete?{ready:true,evidence:childEvidence,unresolved:[]}:
-     {ready:false,evidence:{action:childEvidence.action,consequence:'',experience:'',world:''},unresolved:['We still need to discuss what falling means, how it should feel, and the world around the fox.']}}};
+     {ready:false,evidence:{action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''},unresolved:['We still need to discuss what falling means, how it should feel, and the world around the fox.']}}};
   }
   else if(path==='/v1/jobs'&&req.method()==='POST'){remoteRequests.push(req.postDataJSON());polls=0;data={jobId:'fixture-job',status:'queued',adapter:'mock'};}
   else if(path==='/v1/jobs/fixture-job'){polls++;data=polls<2?{jobId:'fixture-job',status:'testing',adapter:'mock'}:phase==='failed'?{jobId:'fixture-job',status:'failed',adapter:'mock'}:{jobId:'fixture-job',status:'ready',revisionId:'fixture-rev',adapter:'mock'};}
@@ -194,7 +197,7 @@ const {start}=require('./browser-server.cjs');
  assert.equal(coachRequests.length,2);assert.equal(remoteRequests.length,0,'even a reviewed game still waits for the child to choose Build');
  await page.click('#studioSend');await page.waitForFunction(()=>document.getElementById('studioBuildHandoff')?.dataset.phase==='ready');
  assert.equal(remoteRequests.length,1);assert.ok(remoteRequests[0].prompt.includes(childIdea)&&remoteRequests[0].prompt.includes(childRules),'the submitted game carries the child’s own plan');
- assert.doesNotMatch(await page.textContent('#studioMessages'),/Current choices \(these replace|Later ideas, in order|Approved game plan|Choose sensible details for:/,'the build envelope stays out of the child’s conversation');
+ assert.doesNotMatch(await page.textContent('#studioMessages'),/Game choices in order|Current choices \(these replace|Later ideas, in order|Approved game plan|Choose sensible details for:/,'the build envelope stays out of the child’s conversation');
  await page.click('#studioBuildHandoffPlay');await page.waitForSelector('#studioRemoteHost iframe');
   assert.equal(await page.locator('#studioPausedPreview canvas').count(),0,'remote mounting does not retain a native frame');
  assert.equal(await page.locator('#studioRemoteHost iframe').getAttribute('sandbox'),'allow-scripts');

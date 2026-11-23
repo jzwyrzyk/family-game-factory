@@ -88,7 +88,7 @@ export function initLiveRemix() {
     else{$('liveIntent').textContent=intent.message;$('saveNovelIdea').hidden=intent.kind!=='generation-needed';if(intent.kind==='generation-needed')FG.builder?.request({gameId:p.game,baseRevisionId:r.id,config:r.config,prompt});}
   });};
   $('livePrompt').oninput=clearPending;
-  function applyPending(){if(!pending)throw Error('Describe your change first.');const p=project(),intent=pending;const r=withBuildCopy(p.headId,id=>store.commit(p.id,owner(),intent.config,pendingPrompt,coach.hypothesis,id));clearPending();render();play(r);}
+  function applyPending(){if(!pending)throw Error('Describe your change first.');const p=project(),intent=pending;const r=withBuildCopy(p.headId,id=>store.commit(p.id,owner(),intent.config,pendingPrompt,coach.hypothesis,id,p.headId));clearPending();render();play(r);}
   $('liveTry').onclick=()=>guarded(applyPending);
   $('saveNovelIdea').onclick=()=>guarded(()=>{if(!FG.store.addFeedback({game:project().game,type:'generation needed',idea:pendingPrompt}))throw Error('Could not save your idea. Keep it here and try again.');$('liveIntent').textContent='Idea saved in My Creations. It has not been built into a game.';$('saveNovelIdea').hidden=true;});
   const redo=document.createElement('button');redo.id='liveRedo';redo.className='btn secondary';setIconLabel(redo,'undo','Redo latest change','jems-icon--mirror');$('liveUndo').after(redo);redo.onclick=()=>guarded(()=>{store.redo(project().id,owner());clearPending();coach.reset();render();$('liveStatus').textContent='Restored the latest child of this version. Other branches remain in Compare.';});
@@ -96,7 +96,7 @@ export function initLiveRemix() {
   $('compareVersion').onchange=()=>guarded(renderComparison);
   $('playCompare').onclick=()=>guarded(()=>play(store.revision(project().id,owner(),value('compareVersion'))));
   $('restoreVersion').onclick=()=>guarded(()=>{store.checkout(project().id,owner(),value('compareVersion'));clearPending();coach.reset();render();$('liveStatus').textContent='That version is now your current game. All other versions are kept.';});
-  $('liveForkForm').onsubmit=e=>{e.preventDefault();guarded(()=>{const p=project(),fork=withBuildCopy(p.headId,id=>store.fork(p.id,owner(),value('forkName'),id));active=fork.id;clearPending();coach.reset();render();$('liveStatus').textContent='Saved as a new game! Find it in My Creations or come back after reloading.';});};
+  $('liveForkForm').onsubmit=e=>{e.preventDefault();guarded(()=>{const p=project(),fork=withBuildCopy(p.headId,id=>store.fork(p.id,owner(),value('forkName'),id,p.headId));active=fork.id;clearPending();coach.reset();render();$('liveStatus').textContent='Saved as a new game! Find it in My Creations or come back after reloading.';});};
   $('coachForm').onsubmit=e=>{e.preventDefault();guarded(()=>{const answer=value('coachAnswer');if(coach.phase==='reflection'&&coach.playId)store.reflect(coach.playId,owner(),answer);coach.answer(answer);$<HTMLInputElement>('coachAnswer').value='';renderCoach();});};
   $('coachSkip').onclick=()=>{coach.skip();renderCoach();};
   window.addEventListener('factory-game',event=>{const detail=(event as CustomEvent<{live:boolean;game:GameId;stateKey:string;config?:Mechanics}>).detail;

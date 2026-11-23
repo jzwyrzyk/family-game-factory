@@ -209,12 +209,16 @@ Important current distinction:
 
 ## Technical acceptance evidence required
 
+The private handler's provider concurrency is shared by text and audio, with four slots per process by default. It may reject a request immediately when full, then independently rechecks and increments the count synchronously after the bounded body and context/audio validation, immediately before provider work. There is no queued retry. Bodies still being read, malformed input and disconnected clients do not consume a provider slot. A response disconnect is checked before admission and aborts an admitted provider's signal; the slot remains counted until that provider promise settles and the `finally` block releases it. This process-local bound supplements Cloud Run admission and the gateway's atomic spending reservation; it is not a global spending or concurrency limit across instances.
+
+Both private JSON envelopes use the shared bounded UTF-8 reader (40,000 bytes for text and 440,000 for audio). Authenticated caller verification, schema/PII checks, provider approvals, usage validation and existing public error codes still apply. The dedicated image explicitly copies the shared reader before bundling. [HTTP transport tests](../../tests/http-json.test.ts) and [private concurrency tests](../../tests/private-coach-concurrency.test.ts) are registered in the unit suite and use synthetic streams/providers, including delayed-body races, text/audio contention, byte limits and malformed/aborted/failing-request recovery. These tests make no paid request and do not establish container, IAM, network or live-provider acceptance.
+
 - Security unit/HTTP tests of fake/expired identity, wrong audience,
   browser Origin, CSRF, oversized/malformed input, PII, schema spoofing,
   unsafe responses, over-budget usage and no generated code or job dispatch.
 - Model-backed multi-turn benchmark: "dragon sneezes spaghetti" ->
   "only if I jump" -> "actually never mind"; no build at any point.
-- All 20 scenarios in `docs/design-coach/evaluation-cases.json` judged by
+- All current scenarios in `docs/design-coach/evaluation-cases.json` judged by
   a human on child ownership, relevance, help, honesty, brevity, preservation
   of alternatives, and next action. Refusals/injections and unsafe claims
   are blocking regardless of aggregate score.
@@ -243,7 +247,7 @@ Important current distinction:
    and generation-worker pins. Leave all activation flags disabled.
 5. Review rollback, red-team and tablet acceptance. Separately authorize
    the paid model and per-family opt-in; enable flags in a controlled pilot.
-6. Run a real multi-turn, fully authorized smoke and compare the 20-case rubric.
+6. Run a real multi-turn, fully authorized smoke and score the current review rubric.
    Revert to limited/local chat on any critical failure; do not suppress errors.
 7. Only then consider production activation. The static site itself may
    be updated independently without conveying permission for paid requests.

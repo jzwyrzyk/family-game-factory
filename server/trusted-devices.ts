@@ -7,6 +7,7 @@ import type {IncomingMessage,ServerResponse} from 'node:http';
 import type {VerifiedSession} from './contracts/api';
 import type {Repository,PipelineState} from './pipeline/types';
 import {signSession,verifySession} from './pipeline/auth';
+import {readJsonBody} from './http-json';
 import {privacyStatus,submitParentPrivacyChoice,revokeParentPrivacyChoice} from './privacy/parent-consent';
 import {adultPilotConfigured,adultPilotEligible,adultPilotProfileId,adultPilotCookieSession,authenticateAdultPilotSession,
  beginAdultPilotSession,type AdultPilotFlags} from './adult-pilot';
@@ -87,8 +88,7 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
   };
   const readBody=async()=>{
    if(request.headers['x-factory-request']!=='1'||!request.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
-   let raw='';for await(const piece of request){raw+=piece;if(Buffer.byteLength(raw)>2048)throw Error('INVALID_REQUEST');}
-   let data:unknown;try{data=JSON.parse(raw||'{}');}catch{throw Error('INVALID_REQUEST');}
+   const data:unknown=await readJsonBody(request,2048,{invalidJsonError:'INVALID_REQUEST',emptyObject:true});
    if(!data||typeof data!=='object'||Array.isArray(data))throw Error('INVALID_REQUEST');
    return data as Record<string,unknown>;
   };

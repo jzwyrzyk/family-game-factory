@@ -88,7 +88,7 @@ game success with enjoyment.
    An approved private speech-to-text service or tested local embedded
    speech model is a separate alternative, subject to privacy/performance
    review and actual touch-tablet evidence.
-4. **Conversational intelligence:** run all 20 synthetic evaluations against
+4. **Conversational intelligence:** run the full synthetic evaluation catalog against
    the actual approved model, plus targeted multi-turn audio/transcription
    scenarios; check adherence to child ownership, short natural responses,
    no auto-build, truthfulness about observations and skip behavior.

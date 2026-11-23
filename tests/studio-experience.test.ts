@@ -131,7 +131,8 @@ async function retryGuards(){
    throw Error('Unexpected request');
   }) as typeof fetch;
   const events:string[]=[],client=new BuilderClient(config,job=>events.push(job.jobId));
-  const pending=client.retry('parent');client.disconnect();resolveRead(new Response(JSON.stringify({jobId:'parent',status:'failed'})));await pending;
+  const pending=client.retry('parent'),cancelled=assert.rejects(pending,/PROFILE_CHANGED/);
+  client.disconnect();resolveRead(new Response(JSON.stringify({jobId:'parent',status:'failed'})));await cancelled;
   assert.deepEqual(events,[],'profile change suppresses stale callbacks and mutation');
   mode='wrong-id';await assert.rejects(new BuilderClient(config,()=>{}).retry('parent'),/INVALID_JOB_RESPONSE/);
   mode='loop';await assert.rejects(new BuilderClient(config,()=>{}).check('parent'),/INVALID_JOB_RESPONSE/);

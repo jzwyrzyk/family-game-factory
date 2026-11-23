@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {freshDesign,validateDesign,validateExperiments,experiment,missingPlan,localCoach,validateCoachReply,type CoachContext,type CoachReply,PLAN_FIELDS} from '../src/studio/design';
+import {creationBuildReadiness,creationConversation,recordCreationReview,selectedSuggestions} from '../src/studio/creation-readiness';
 import {StudioNotebook,STUDIO_KEY,type Candidate} from '../src/studio/notebook';
 import {CoachService,type CoachConfig} from '../server/coach/service';
 import {OpenAICoachProvider} from '../server/coach/private-provider';
@@ -215,6 +216,37 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
   assert.equal(h.get('plan-fun').value,'A funny wobbly bridge');assert.equal(h.get('designPrediction').value,'The lighter bridge might sway');assert.equal(h.get('coachFriction').value,'I want to try balancing');
   const restored=new StudioNotebook(h.storage).get(h.session().id,h.session().owner);assert.equal(restored.design!.plan.fun!.value,'A funny wobbly bridge');assert.equal(restored.hypothesis,'The lighter bridge might sway');assert.equal(restored.design!.friction,'I want to try balancing');assert.equal(restored.design!.approvedPlan,false);
  }finally{h.dispose();}
+});
+for(const game of ['new','gum'] as const)await test(`a full ${game} idea ledger refuses another model request without losing work or the draft`,async()=>{
+ const h=coachingHarness(game);try{
+  const session=h.session();
+  h.book.update(session.id,session.owner,s=>{
+   s.design!.ideas=Array.from({length:100},(_,index)=>({id:'retained-idea-'+index,text:'Original idea '+index,origin:index%2?'helper':'child',adopted:index%2===0}));
+  });
+  h.book.message(session.id,session.owner,'child','Keep my earlier exact words.');
+  h.book.continueConversation(session.id,session.owner);
+  h.input('studioPrompt','My next unsent idea');
+  h.book.update(session.id,session.owner,s=>{s.draft='My next unsent idea';});
+  const before=h.storage.getItem(STUDIO_KEY);
+  await h.coach.discuss('ideas');
+  assert.equal(h.requests.length,0,'a full provenance ledger cannot start a paid reply');
+  assert.equal(h.storage.getItem(STUDIO_KEY),before,'no existing words or provenance are trimmed');
+  assert.equal(h.get('studioPrompt').value,'My next unsent idea');
+  assert.match(h.statuses.at(-1)!.text,/idea notes are full/);
+  assert.equal(new StudioNotebook(h.storage).get(session.id,session.owner).messages[0].text,'Keep my earlier exact words.');
+  // Stopping is still an immediate local action with the full saved ledger.
+  h.input('studioPrompt','no more questions');await h.coach.discuss('discuss');
+  assert.equal(h.requests.length,0);assert.equal(h.session().design!.ideas.length,100);
+  assert.match(h.session().messages.at(-1)!.text,/Okay/);
+ }finally{h.dispose();}
+});
+await test('full observation notes reject a further entry without altering earlier evidence',()=>{
+ const storage=new Memory(),book=new StudioNotebook(storage),session=book.create(owner,'new','Retained observations');
+ book.update(session.id,owner,s=>{s.design!.observations=Array.from({length:300},(_,index)=>({id:'observation-'+index,experimentId:null,text:'Exact observation '+index,source:'child',at:'2026-11-23T00:00:00Z'}));});
+ const before=storage.getItem(STUDIO_KEY);
+ assert.throws(()=>book.observe(session.id,owner,'My next observation','child'),/observation notes are full/);
+ assert.equal(storage.getItem(STUDIO_KEY),before);
+ assert.equal(new StudioNotebook(storage).get(session.id,owner).design!.observations.at(-1)!.text,'Exact observation 299');
 });
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
  const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
@@ -469,6 +501,204 @@ await test('copying a helper suggestion never relabels its source or supplies re
   await sendTurn(h,'A cat jumps over stones.',{...reply,text:'Here is one possibility to think about.',question:'What would you invent?',suggestions:['Make it silly']});
   await sendTurn(h,'Make it silly',{...reply,text:'Tell me what makes that interesting to you.',question:null,childDecisions:[{field:'fun',quote:'silly'}]});
   assert.equal(h.session().design!.plan.fun!.origin,'helper');assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.buildRequests.length,0);
+ }finally{h.dispose();}
+});
+await test('a selected or adapted option stays helper-origin across context, reload, Build and a later independent correction',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();
+  h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const premise='In a cozy paper forest my fox folds its shadow into a pocket. The pocket catches leaves until the den is full.';
+  const offer='a storybook drawing',picked='I pick the second one, with silver lines.',replacement='Realistic fur now.';
+  const evidence={world:'paper forest',action:'folds its shadow into a pocket',consequence:'The pocket catches leaves',
+   experience:'cozy',goal:'until the den is full',mood:'cozy',visualStyle:picked};
+  const gaps=Object.fromEntries(Object.keys(evidence).map(key=>[key,''])) as typeof evidence;
+  const thinking={...reply,creationReadiness:{ready:false,evidence:gaps,unresolved:['How should the forest look?']}};
+  await sendTurn(h,premise,{...thinking,childDecisions:[{field:'action',quote:evidence.action}]});
+  const options=['paper cutouts',offer,'chalk marks'];
+  await sendTurn(h,'Can I have three ideas?',{...thinking,text:'Three ideas from me are paper cutouts, a storybook drawing, or chalk marks.',
+   question:null,planSuggestions:options.map(value=>({field:'style',value}))});
+  assert.equal(h.session().design!.plan.action!.origin,'child');
+  await sendTurn(h,'Sure.',{...thinking,childDecisions:[{field:'style',quote:'Sure.'}],planSuggestions:[{field:'style',value:offer}]});
+  assert.equal(h.session().design!.plan.style!.accepted,false);
+  assert.equal(h.coach.buildReadiness().ready,false);
+  await sendTurn(h,picked,{...reply,question:null,childDecisions:[{field:'style',quote:picked}],
+   planSuggestions:[{field:'style',value:offer}],creationReadiness:{ready:true,evidence,unresolved:[]}});
+  const restored=new StudioNotebook(h.storage).get(id,owner);
+  assert.deepEqual(restored.design!.plan.style,{value:picked,origin:'helper',accepted:true,delegated:false});
+  assert.equal(selectedSuggestions(restored).style?.[0].offer,offer);
+  assert.equal(creationBuildReadiness(restored,2).ready,true);
+  assert.equal(h.buildRequests.length,0);
+  const build=h.coach.buildPrompt()!;
+  for(const words of [premise,picked,offer])assert.ok(build.includes(words),words);
+  assert.doesNotMatch(build,/chalk marks|paper cutouts|Can I have three ideas|Sure\./);
+  assert.throws(()=>recordCreationReview(restored,{ready:true,evidence:{...evidence,visualStyle:offer},unresolved:[]},2),/exact child/);
+  const lostOffer=structuredClone(restored);
+  lostOffer.messages=lostOffer.messages.filter(message=>message.role!=='helper'||!message.text.includes(offer));
+  assert.equal(creationBuildReadiness(lostOffer,2).ready,false,'the child’s reference needs its earlier offer');
+  const lostProof=structuredClone(restored);lostProof.design!.ideas=lostProof.design!.ideas.filter(i=>!i.id.startsWith('selection:'));
+  assert.equal(creationBuildReadiness(lostProof,2).ready,false);
+  assert.deepEqual(selectedSuggestions(lostProof),{});
+  for(let i=0;i<20;i++)h.book.message(id,owner,'helper','A later conversation note '+i+'.');
+  const bounded=creationConversation(h.session());
+  assert.ok(bounded.some(m=>m.role==='helper'&&m.text.includes(offer)));
+  assert.ok(bounded.some(m=>m.role==='child'&&m.text===picked));
+  await sendTurn(h,replacement,{...reply,question:null,childDecisions:[{field:'style',quote:replacement}],
+   creationReadiness:{ready:true,evidence:{...evidence,visualStyle:replacement},unresolved:[]}});
+  assert.deepEqual(h.requests.at(-1).context.plan.style,restored.design!.plan.style);
+  assert.deepEqual(h.session().design!.plan.style,{value:replacement,origin:'child',accepted:true,delegated:false});
+  assert.notEqual(h.session().design!.creationReview!.fingerprint,restored.design!.creationReview!.fingerprint);
+  assert.deepEqual(selectedSuggestions(h.session()),{});
+  assert.match(h.coach.buildPrompt()!,/style: Realistic fur now/);
+  assert.doesNotMatch(h.coach.buildPrompt()!,/storybook|silver lines/);
+ }finally{h.dispose();}
+});
+await test('rechecking a literal selected helper option preserves child selection across reload and repeated checks',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const premise='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.',picked='paper waves';
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,question:null,creationReadiness:{ready:false,evidence:empty,unresolved:['How should it look?']}};
+  await sendTurn(h,premise,waiting);
+  await sendTurn(h,'Give me three ideas.',{...waiting,text:'My ideas are chalk lines, clay rings and paper waves.',
+   planSuggestions:['chalk lines','clay rings',picked].map(value=>({field:'style',value}))});
+  const ready:CoachReply={...reply,question:null,childDecisions:[{field:'style',quote:picked}],planSuggestions:[{field:'style',value:picked}],
+   creationReadiness:{ready:true,evidence:{action:'tap',consequence:'makes a ripple',world:'pond',experience:'play with the ripples',goal:'just want to play with the ripples',mood:'quiet',visualStyle:picked},unresolved:[]}};
+  await sendTurn(h,picked,ready);
+  const originalChildren=h.session().messages.filter(message=>message.role==='child');
+  const chosen=originalChildren.at(-1)!;
+  for(let checkNumber=0;checkNumber<2;checkNumber++){
+   const restored=new StudioNotebook(h.storage).get(id,owner);
+   assert.equal(creationBuildReadiness(restored,2).ready,true);
+   assert.equal(selectedSuggestions(restored).style?.[0].offer,picked);
+   h.coach.reset();h.coach.openSession();
+   const check=h.coach.reassess();await h.awaitModelRequest();h.resolve(ready);await check;
+   assert.equal(h.coach.buildReadiness().ready,true);
+   assert.deepEqual(h.session().messages.filter(message=>message.role==='child'),originalChildren);
+   assert.equal(h.session().design!.ideas.some(idea=>idea.id==='helper-turn:'+chosen.id),false);
+   assert.equal(h.session().design!.plan.style!.origin,'helper');
+   assert.match(h.coach.buildPrompt()!,/paper waves/);assert.doesNotMatch(h.coach.buildPrompt()!,/chalk lines|clay rings/);
+   assert.equal(h.buildRequests.length,0);
+  }
+ }finally{h.dispose();}
+});
+await test('repeated uncertainty sends prior kinds of support to the coach; a direct ideas request retains all three alternatives',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const game='My fox needs to dodge flying leaves.';
+  const gap={ready:false,evidence:{action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''},unresolved:['The fox needs a move.']};
+  const turn=(text:string,question:string|null)=>({...reply,text,question,creationReadiness:gap});
+  const open='What could your fox do to get away from the leaves?';
+  const imagine='Imagine being that fox. A leaf is flying at your nose!';
+  const inspiration='Picture a toy doing something impossible.';
+  await sendTurn(h,game,turn('',open));
+  await sendTurn(h,"I don't know.",turn(imagine,'What do you do?'));
+  await sendTurn(h,"I still don't know.",turn(inspiration,'What could your fox borrow from it?'));
+  const examples=['fold the wind','zip into a shadow','sing the leaf to sleep'];
+  const ideas='Three ideas from me: '+examples.join(', ')+'. You can change any of them.';
+  await sendTurn(h,'Can I have three ideas?',{...turn(ideas,null),planSuggestions:examples.map(value=>({field:'action',value}))});
+  const sent=h.requests.at(-1).context as CoachContext;
+  for(const text of [game,open,imagine,inspiration])assert.ok(sent.conversation.some(message=>message.text===text),text);
+  assert.deepEqual(h.requests.map(r=>r.context.helpLevel),[0,1,2,0]);
+  assert.equal(h.session().messages.at(-1)!.text,ideas);
+  assert.ok(examples.every(text=>h.session().design!.ideas.some(i=>i.text===text&&i.origin==='helper'&&!i.adopted)));
+  assert.equal(h.coach.buildReadiness().ready,false);assert.equal(h.buildRequests.length,0);
+ }finally{h.dispose();}
+});
+await test('reconnect restores provenance for an earlier prose-only offer and never creates another child turn',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,creationReadiness:{ready:false,evidence:empty,unresolved:['What will the fox do?']}};
+  await sendTurn(h,'My fox needs a look. Can I have an idea?',{...waiting,text:'One idea from me is a storybook look.',question:null});
+  const words='Yes, I want it to look like a storybook.';
+  h.input('studioPrompt',words);const failed=h.coach.discuss('discuss');await h.awaitModelRequest();
+  h.pending.shift()!.reject(Error('fixture connection failure'));await failed;
+  assert.equal(h.coach.buildReadiness().ready,false);
+  assert.equal(h.session().design!.plan.style,undefined,'the disconnected extractor leaves the offered look unassigned');
+  // A notebook from the original v2 client could already contain this literal
+  // classification after an outage. A fresh review can repair its attribution.
+  h.book.update(id,owner,s=>{s.design!.plan.style={value:words,origin:'child',accepted:true,delegated:false};});
+  const before=h.session().messages.filter(m=>m.role==='child');
+  const check=h.coach.reassess();await h.awaitModelRequest();
+  h.resolve({...waiting,childDecisions:[{field:'style',quote:'storybook'}]});await check;
+  assert.deepEqual(h.session().messages.filter(m=>m.role==='child'),before);
+  assert.deepEqual(h.session().design!.plan.style,{value:'storybook',origin:'helper',accepted:true,delegated:false});
+  assert.equal(selectedSuggestions(h.session()).style?.[0].offer,'storybook');
+  assert.equal(h.buildRequests.length,0);
+ }finally{h.dispose();}
+});
+await test('a selected prose-only helper offer keeps its origin across a sealed chapter, restore and Build',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const premise='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.';
+  const picked='I want a storybook look.',offer='storybook';
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,question:null,creationReadiness:{ready:false,evidence:empty,unresolved:['How should it look?']}};
+  await sendTurn(h,premise,{...waiting,text:'One idea from me is a storybook look. You can invent your own.'});
+  while(h.book.conversationPage(id,owner).available)h.book.message(id,owner,'helper','Earlier saved conversation note '+h.book.conversationPage(id,owner).count+'.');
+  const original=h.session().messages;
+  h.book.continueConversation(id,owner);
+  const backup=JSON.parse(JSON.stringify(h.book.read()));h.book.restore(backup);
+  assert.deepEqual(h.session().messages,original);
+  const ready:CoachReply={...reply,question:null,childDecisions:[{field:'style',quote:offer}],
+   creationReadiness:{ready:true,evidence:{action:'tap',consequence:'makes a ripple',world:'pond',experience:'play with the ripples',goal:'just want to play with the ripples',mood:'quiet',visualStyle:picked},unresolved:[]}};
+  await sendTurn(h,picked,ready);
+  const selected=h.session();
+  assert.deepEqual(selected.design!.plan.style,{value:offer,origin:'helper',accepted:true,delegated:false});
+  assert.equal(selectedSuggestions(selected).style?.[0].offer,offer);
+  assert.equal(h.coach.buildReadiness().ready,true);
+  const beforePrompt=h.coach.buildPrompt()!;
+  assert.match(beforePrompt,/jems suggested "storybook", child chose/);assert.ok(beforePrompt.includes(premise));
+  assert.equal(h.buildRequests.length,0,'saved readiness is never Build consent');
+  h.book.continueConversation(id,owner);h.book.restore(JSON.parse(JSON.stringify(h.book.read())));
+  h.coach.reset();h.coach.openSession();
+  const children=h.session().messages.filter(message=>message.role==='child');
+  const check=h.coach.reassess();await h.awaitModelRequest();h.resolve(ready);await check;
+  assert.deepEqual(h.session().messages.filter(message=>message.role==='child'),children);
+  assert.equal(h.coach.buildReadiness().ready,true);
+  assert.equal(h.coach.buildPrompt(),beforePrompt);
+  assert.deepEqual(new StudioNotebook(h.storage).get(id,owner).messages.slice(0,200),original);
+ }finally{h.dispose();}
+});
+
+await test('a mixed selection preserves both earlier options and no other option',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const world='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.';
+  const looks=['chalk lines','clay rings','paper waves'];
+  const evidence={action:'tap',consequence:'makes a ripple',world:'pond',mood:'quiet',experience:'play with the ripples',
+   goal:'just want to play with the ripples',visualStyle:'Mix the first and third.'};
+  const gaps=Object.fromEntries(Object.keys(evidence).map(key=>[key,''])) as typeof evidence;
+  const incomplete={...reply,creationReadiness:{ready:false,evidence:gaps,unresolved:['How should the pond look?']}};
+  await sendTurn(h,world,incomplete);
+  await sendTurn(h,'Give me three ideas.',{...incomplete,text:'My ideas are chalk lines, clay rings and paper waves.',
+   planSuggestions:looks.map(value=>({field:'style',value}))});
+  await sendTurn(h,evidence.visualStyle,{...reply,question:null,childDecisions:[{field:'style',quote:evidence.visualStyle}],
+   planSuggestions:[looks[0],looks[2]].map(value=>({field:'style',value})),creationReadiness:{ready:true,evidence,unresolved:[]}});
+  const build=h.coach.buildPrompt()!;
+  assert.match(build,/chalk lines/);assert.match(build,/paper waves/);assert.doesNotMatch(build,/clay rings/);
+  assert.equal(h.buildRequests.length,0);
+ }finally{h.dispose();}
+});
+await test('a clarification about pixel art and a side view create no extra plan fields in a connected v2 game',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const evidence={action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''};
+  const ongoing={...reply,creationReadiness:{ready:false,evidence,unresolved:['The purpose of play is still open.']}};
+  await sendTurn(h,'I see the fox from the side, like it is running.',{...ongoing,childDecisions:[{field:'viewpoint',quote:'from the side'},{field:'movement',quote:'running'}]});
+  await sendTurn(h,'What does pixel art mean?',{...ongoing,move:'explain',text:'A picture made of little colorful squares.',question:null,childDecisions:[{field:'style',quote:'pixel art'}]});
+  assert.deepEqual(Object.keys(h.session().design!.plan).sort(),['movement','viewpoint']);
+  assert.doesNotMatch(JSON.stringify(h.session().design!.plan),/right|left|pixel|button/);
+  h.input('studioPrompt','Please stop.');await h.coach.discuss('discuss');
+  assert.equal(h.requests.length,2);assert.equal(h.buildRequests.length,0);
+  assert.doesNotMatch(h.session().messages.at(-1)!.text,/\?/);
  }finally{h.dispose();}
 });
 await test('a legacy sole compiled message needs a new contextual review and its payload stays out of visible intent',async()=>{
