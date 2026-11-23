@@ -116,6 +116,22 @@ for(const usageComplete of [true,false])test('an interrupted paid report preserv
  assert.equal(state.jobs[0].premiumUsage!.calls.length,1);
  for(const privateValue of [approval.approvalId,request.prompt,'receiptHash','fingerprint'])assert.ok(!JSON.stringify(view).includes(privateValue));
 });
+test('a settled planning-only rejection reaches the adult without construction, repair or duplicate charges',async()=>{
+ const h=await admitted(),gen=identity('generate');
+ await h.coordinator.claim(h.id,0,'generate',gen,PREMIUM_POLICY_VERSION);
+ const report={errorCode:'QUALITY_EVIDENCE_CAPACITY_EXCEEDED',...usage('planning'),usageComplete:true};
+ await h.coordinator.report(h.id,0,'generate',gen,report);
+ await h.coordinator.report(h.id,0,'generate',gen,report);
+ await h.coordinator.tick();
+ const job=await h.service.get(h.adult,h.id),state=await h.repo.snapshot();
+ assert.equal(job.status,'failed');assert.equal(job.errorCode,report.errorCode);
+ assert.deepEqual(job.modelPolicy?.stages.map(call=>call.stage),['planning']);
+ assert.equal(job.modelPolicy?.repairAttempts,0);assert.equal(job.modelPolicy?.usageUncertain,false);
+ assert.equal(job.modelPolicy?.measuredTextCostMicroUsd,report.usageUnits);
+ assert.equal(state.ledgers[familyId].used,report.usageUnits);assert.equal(state.ledgers[familyId].reserved,0);
+ assert.equal(state.revisions.length,0);await assert.rejects(h.service.get(child,h.id),/FORBIDDEN/);
+ await assert.rejects(h.coordinator.claim(h.id,1,'generate',identity('generate',1),PREMIUM_POLICY_VERSION),/WORKER_CLAIM_REJECTED/);
+});
 test('ambiguous paid cancellation conservatively settles once and ignores late results',async()=>{
  const h=await admitted(),gen=identity('generate');await h.coordinator.claim(h.id,0,'generate',gen,PREMIUM_POLICY_VERSION);
  await h.service.cancel(h.adult,h.id);await h.service.cancel(h.adult,h.id);

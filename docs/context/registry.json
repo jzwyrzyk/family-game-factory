@@ -718,10 +718,10 @@
         "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:58.128Z",
-      "sourceDigest": "947ce73addc804c39838a799c97b13fde281d73dad9a20308d01042d7643bb67",
+      "reviewedAt": "2026-11-23T14:49:01.042Z",
+      "sourceDigest": "a47ebfd7e522b1572fc2d9e1e7a6e689d7acdd1254a75770ddfd4a1682b1aa07",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fixed Astra High construction/repair, independent stage approvals and official rates, static and actual token admission, complete job reservation, measured and uncertain settlement, pinned claims, no fallback, bound production plan and compact canonical evidence. Contracts document long ordinary-input capture, near-action observations, three-interaction evidence capacity, bounded unverified repair and compatible-reader rollback; no paid activation.",
+      "reviewReason": "Verified the capture-capacity and legacy-v1 refusal categories survive both private worker and coordinator sanitization. Planning-only rejection settles completed planning usage exactly once with no code, artwork, repair or revision; the existing premium contract describes this recoverable boundary.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -870,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:58.854Z",
-      "sourceDigest": "f60b0951e1a34364f2104c12bc5bcea6e7b9a636c6cb8286815025c081da142d",
+      "reviewedAt": "2026-11-23T14:49:28.139Z",
+      "sourceDigest": "2afe5d72cf46992aa95d19b040377c1cb27169eaab6844c8fc98d84c6347de31",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed all new premium configuration, billing, recovery, plan, observation and seven-concept benchmark tests plus legacy compatibility evidence. Delivery records 573 unit contracts, 37 included premium cases, actual authored Chromium156 captures, two unresolved browser timing gates, dependency-install failures and pending pinned-browser/real-provider results without claiming enjoyment or efficacy.",
+      "reviewReason": "Added end-to-end planning-only failure, duplicate report settlement, denied child read and no subsequent generation to the frozen premium suite. All 574 unit contracts pass, including 38 premium tests; TypeScript passes. Existing browser and production gaps remain explicitly scoped in Delivery state.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1064,10 +1064,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T14:41:59.312Z",
-      "sourceDigest": "8540afd151d32e62266a86686658900c59fdebd2ee1d023c0b157deabac6bed6",
+      "reviewedAt": "2026-11-23T14:49:28.559Z",
+      "sourceDigest": "09cfc3bf524492aa745fefc884b35c6a6e564d95c5b10d66c519b4a75de93b3e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed offline-only CI additions, unchanged deployment permissions and private worker pins. Recorded exact verified base, current public/private release evidence, passed local checks and unresolved browser/container limits. Draft-only post-cutover activation and rollback sequence retains spending, IAM, source/image and saved-reader boundaries.",
+      "reviewReason": "Updated the candidate validation receipt to 574 unit contracts and 38 included premium tests after the bounded worker-diagnostic fix. Draft PR139 is published from the verified base; hosted checks are in progress. Deployment, activation, spending, IAM and worker pins remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
