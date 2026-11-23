@@ -31,6 +31,8 @@ async function fixture(browser,url,replyFor){
   if(path==='/v1/sessions/status')body={connected:true,trusted:true,expiresAt:Date.now()+60000};
   else if(path==='/v1/builder/status'||path==='/v1/coach/status')body={available:true};
   else if(path==='/v1/coach/audio/status')body={available:false};
+  // Opening the retained games through My Creations also reads its private list.
+  else if(path==='/v1/creations'&&request.method()==='GET')body=[];
   else if(path==='/v1/coach'&&request.method()==='POST'){
    const coachContext=request.postDataJSON().context;coachRequests.push(coachContext);
    body={mode:'model',reply:await replyFor(coachContext.message,coachContext)};

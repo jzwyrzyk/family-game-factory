@@ -861,10 +861,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:03.343Z",
-      "sourceDigest": "adce7f016d78e5dd4174b1efcef89f8c669d4c8e9b296ce2e4d4c2f5efccec57",
+      "reviewedAt": "2026-11-23T18:54:44.529Z",
+      "sourceDigest": "9fb64a023aabdbdd877544ea349c9701605d964aa9fec17f18dd618c4c4f38fb",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded focused preservation/lifecycle evidence and added retention regression to test:studio; eight-shard assignment still covers all40 commands.",
+      "reviewReason": "Reviewed the exact collection GET fixture and bounded observed-time countdown helper; retained strict unknown-request, paid-build, phase and duration assertions. Delivery state records the full child-journey pass and ten Bubble Gum cases with 22 launch receipts on supplemental Chromium 156, preserved original CI failures, and fresh hosted results pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T18:16:03.485Z",
-      "sourceDigest": "4e168f4384343575533ebb2861d75715c34bdb163ee405b2e08ea0e06266099f",
+      "reviewedAt": "2026-11-23T18:55:38.336Z",
+      "sourceDigest": "eb6c1627b8b6333b3976ff5e5ff9f14edf8694279cec66ed43c8ac3387994919",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded approved merged IAM source and successful exact-source checks, narrowed recovery requirement, and separate later UI publication source; no live activation claimed.",
+      "reviewReason": "Recorded the original PR141 fixture failures and the completed local child-journey and ten-case Bubble Gum checks with 22 launch receipts. Evidence remains supplemental Chromium 156, fresh hosted results remain pending, and no merge, deployment or production acceptance is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
