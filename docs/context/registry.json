@@ -717,7 +717,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-23T14:33:14.658Z",
-      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
+      "sourceDigest": "228a95f6404da011443bc3a9fe8be784ada6e823f8e0f4ab27f1660416f82095",
       "reviewOutcome": "updated",
       "reviewReason": "Inspected merged server/agent/openai.ts approval type, planning/source/repair and review flow, worker main dddf53db hard-coded public b472c224 checkout, and game-quality contract; documented the owner-selected future model target without asserting an API identity, entitlement, cost or current model activation.",
       "reviewHistory": [
@@ -1074,7 +1074,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-23T14:33:14.658Z",
-      "sourceDigest": "13d90c6dc309c9f72282b63d93ee1e0e827a1163ba59cb049e9fa134213166ad",
+      "sourceDigest": "0b20f7eef1cc6d4a14e9ff756aac8655a30cc4d2187b2f4c2129b5d1e2e7995c",
       "reviewOutcome": "updated",
       "reviewReason": "Rechecked protected main f60f3b8, PR59/87/107/126/137 merged states and their exact heads, Nov23 main and documentation CI, worker generation-source pin and Nov21 Pages publication receipt; corrected current delivery intent and archived draft-only operations language while retaining the blocked-production-cutover receipt and live configuration unknowns.",
       "reviewHistory": [
