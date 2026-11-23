@@ -151,9 +151,10 @@ function emptyState(): LearningState {
     totals: { presentations: 0, submissions: 0, completed: 0, independent: 0, assisted: 0, skipped: 0, interrupted: 0, shown: 0 } };
 }
 export function profileGrade(profile: LearnerProfile): Grade {
-  if ([1, 2, 3, 4].includes(Number(profile.grade))) return Number(profile.grade) as Grade;
-  const age = Number(profile.age) || 7;
-  return (age <= 7 ? 1 : age === 8 ? 2 : age === 9 ? 3 : 4) as Grade;
+  if (typeof profile.grade === 'number' && [1, 2, 3, 4].includes(profile.grade)) return profile.grade;
+  // Age, a character choice and game progress never establish school level.
+  // An unconfigured or malformed profile starts at the supported entry grade.
+  return 1;
 }
 function addLegacy(summary: EvidenceSummary, old: Record<string, any>, now: number) {
   const tries = count(old.tries), right = Math.min(tries, count(old.right)), hints = Math.min(tries, count(old.hints));

@@ -36,7 +36,7 @@ async function compareImages(page,actual,expected){
 exports.createReview=async browser=>{
  fs.mkdirSync(directory,{recursive:true});
  const manifest={build:JSON.parse(fs.readFileSync('dist/build-info.json','utf8')),browser:browser.version(),
-  artifactKind:'actual-browser-capture',backend:'deterministic mocked build statuses; no paid AI generation',
+  artifactKind:'actual-browser-capture',surface:'shared native play view',backend:'deterministic mocked build statuses; no paid AI generation',
   viewports:[],captures:[],checks:[],errors:[]};
  const comparisonPage=await browser.newPage({viewport:{width:32,height:32}});
  const update=process.env.MYJ_UPDATE_BASELINES==='1',compare=process.env.MYJ_VISUAL_COMPARE==='1';
@@ -44,6 +44,7 @@ exports.createReview=async browser=>{
  if(update)assert.ok(!process.env.CI,'CI cannot silently approve new visual baselines.');
  const baselineCandidates=new Map();
  let comparisonCount=0;
+ const visualFailures=[];
  return {
   manifest,directory,
   async capture(page,arcade,device,state){
@@ -51,8 +52,12 @@ exports.createReview=async browser=>{
    const file=device+'-'+state+'.png';
    // Native pointer captures and keyboard captures are separate evidence.
    // Keep focus visibility intact; never remove the focus outline for a test.
-   const bytes=await arcade.screenshot({path:path.join(directory,file),animations:'disabled',caret:'hide'});
-   const box=await arcade.boundingBox();
+   // Include the ordinary exit, fullscreen and ready menu in the reviewed
+   // composition. The mine no longer owns a separate dialog or build banner.
+   const frame=page.locator('#page-studio.studio-play-mode');
+   const surface=await frame.isVisible()?frame:arcade;
+   const bytes=await surface.screenshot({path:path.join(directory,file),animations:'disabled',caret:'hide'});
+   const box=await surface.boundingBox();
    manifest.captures.push({device,state,file,width:Math.round(box.width),height:Math.round(box.height)});
    if(state==='idle'&&['desktop','tablet-portrait','mobile'].includes(device)){
     fs.copyFileSync(path.join(directory,file),'test-results/mind-your-jems-'+(device==='tablet-portrait'?'tablet':device)+'.png');
@@ -61,18 +66,27 @@ exports.createReview=async browser=>{
    const baseline=path.join(baselineDirectory,file);
    if(update){baselineCandidates.set(file,bytes);return;}
    if(!compare)return;
-   assert.ok(fs.existsSync(baseline),'Missing reviewed visual baseline '+file+'. Review actual art and explicitly run MYJ_UPDATE_BASELINES=1.');
+   if(!fs.existsSync(baseline)){
+    visualFailures.push('Missing reviewed visual baseline '+file+'. Review actual art and explicitly run MYJ_UPDATE_BASELINES=1.');
+    return;
+   }
    const result=await compareImages(comparisonPage,bytes,fs.readFileSync(baseline));
    comparisonCount++;
    const {diff,...metrics}=result;manifest.checks.push({device,state,kind:'visual-regression',...metrics});
    if(!result.dimensions||result.ratio>0.008){
     if(diff)fs.writeFileSync(path.join(directory,file.replace('.png','-diff.png')),Buffer.from(diff.split(',')[1],'base64'));
     fs.copyFileSync(baseline,path.join(directory,file.replace('.png','-expected.png')));
-    throw new Error('Visual regression '+file+': '+JSON.stringify(metrics));
+    // Keep collecting actual gameplay and all nine states, then fail the same
+    // visual gate. A changed first frame must not hide later loss or input bugs.
+    visualFailures.push('Visual regression '+file+': '+JSON.stringify(metrics));
    }
   },
   check(device,kind,details){manifest.checks.push({device,kind,...details});},
   async finish(){
+   const gameplayFailed=manifest.errors.length>0;
+   if(compare&&process.env.MYJ_DEVICES===undefined&&!gameplayFailed&&comparisonCount!==9)
+    visualFailures.push('Expected all nine approved views; compared '+comparisonCount+'.');
+   manifest.errors.push(...visualFailures);
    fs.writeFileSync(path.join(directory,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
    await comparisonPage.close();
    if(update&&!manifest.errors.length){
@@ -84,7 +98,7 @@ exports.createReview=async browser=>{
      states:[...baselineStates],devices:[...baselineDevices],channelTolerance:20,maximumChangedRatio:0.008
     },null,2)+'\n');
    }
-   if(compare&&process.env.MYJ_DEVICES===undefined&&!manifest.errors.length)assert.equal(comparisonCount,9,'all nine approved views must be compared');
+   if(visualFailures.length&&!gameplayFailed)throw new AggregateError(visualFailures.map(message=>new Error(message)),'Mind Your Jems visual acceptance failed; all available captures are retained.');
   }
  };
 };

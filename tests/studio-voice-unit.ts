@@ -173,6 +173,13 @@ async function run(){
   assert.equal(speechAtMicrophoneStart,false,'late reply narration must stop before microphone capture starts');
   assert.equal(speaking,false,'microphone capture and read-aloud must not overlap');
   voice.cancel();delayedAvailability=false;
+  const fullReply='A saved reply with all its words. '.repeat(75);
+  voice.reply(fullReply);hearReply.onclick?.();assert.equal(spoken.at(-1),fullReply,'reading a saved reply must not silently truncate it');
+  voice.reply(fullReply);assert.equal(speaking,true,'unchanged rerenders must not stop the active reply');
+  voice.cancel();assert.equal(hearReply.disabled,true);
+  voice.reply(fullReply);assert.equal(hearReply.disabled,false,'reopening the same saved conversation restores its read button');
+  hearReply.onclick?.();assert.equal(spoken.at(-1),fullReply);voice.cancel();
+
   console.log('PASS local-only microphone, speech -> editable draft only, explicit Finish and Hear, profile isolation, microphone denial, local pack and off-device refusal');
 }
 run().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{

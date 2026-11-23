@@ -1,4 +1,6 @@
 # Studio compatibility integration
+> **November 22 assembly extension:** New Bubble Gum defaults now use version 3. Its `assemblyConstruction` record coexists with version 2 stickers and version 1 physics; saved revisions keep their selected engine. See [the current builder contract](../bubble-gum-builders/README.md). The historical compatibility evidence below retains its original scope.
+
 
 `studio-integration.patch` is the review record for the Studio adaptations applied to the game-quality feature branch. Studio and the design coach are already in `main` through `ca73ceba4ae2c79f9f669c3fcbaa66922230d601`; the quality branch integrates that main baseline without changing its coaching behavior or publishing the arcade.
 

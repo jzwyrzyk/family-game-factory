@@ -7,7 +7,7 @@ import {generateLanguageItem} from '../src/language/content';
 import type {LanguageItem} from '../src/language/types';
 
 let browser:Browser,bundle:string;
-const styles=readFileSync('src/language/activity.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8');
+const styles=readFileSync('src/language/activity.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8')+'\n'+readFileSync('src/speech/read-aloud.css','utf8');
 const iconSprite=readFileSync('public/jems-art/icons/jems-icons.svg','utf8');
 before(async()=>{
   mkdirSync('test-results',{recursive:true});
@@ -139,7 +139,7 @@ test('supported read-aloud includes displayed choices and never counts as indepe
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
   try{
     const speak=page.locator('[data-action="read-aloud"]');
-    if(await speak.count()===0)return; // Browser/OS without synthesis still has visible written practice.
+    assert.equal(await speak.count(),1,'read-aloud stays visible even before device voices load');
     await page.evaluate(()=>{
       const w=window as any;w.spoken='';
       w.SpeechSynthesisUtterance=class {
@@ -176,7 +176,7 @@ test('unavailable friendly voice stays readable and does not record listening su
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
   try{
     const speak=page.locator('[data-action="read-aloud"]');
-    if(await speak.count()===0)return;
+    assert.equal(await speak.count(),1,'read-aloud remains discoverable even if voice is unavailable');
     await page.evaluate(()=>{
       const w=window as any;w.spokenCount=0;
       window.speechSynthesis.getVoices=()=>[
@@ -199,7 +199,7 @@ test('leaving while voice choices load prevents delayed read-aloud or assistance
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
   try{
     const speak=page.locator('[data-action="read-aloud"]');
-    if(await speak.count()===0)return;
+    assert.equal(await speak.count(),1,'read-aloud remains discoverable even if voice is unavailable');
     await page.evaluate(()=>{
       const w=window as any;w.spokenCount=0;
       window.speechSynthesis.getVoices=()=>[];

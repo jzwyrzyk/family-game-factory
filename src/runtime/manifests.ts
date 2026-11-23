@@ -1,7 +1,10 @@
 import type { Difficulty, GameId, Manifest, Mechanics } from './types';
 export const manifests: Record<GameId, Manifest> = {
-  factory: {version:1,id:'factory',name:'Gem Factory',mechanics:[
-    {key:'orderSize',label:'Gifts per day',type:'number',default:3,min:2,max:5,step:1},
+  // Mining's difficulty grows through its actual levels. No decorative tuning
+  // controls are offered when the game does not implement a local edit.
+  mining: {version:1,id:'mining',name:'Mind Your Jems!',mechanics:[]},
+  factory: {version:1,id:'factory',name:'Jem Factory',mechanics:[
+    {key:'orderSize',label:'Gifts per day',type:'number',default:2,min:2,max:5,step:1},
     {key:'cutterSpeed',label:'Cutting speed',type:'number',default:1,min:0.5,max:1.5,step:0.25},
     {key:'sparkleBoost',label:'Extra sparkles',type:'boolean',default:false},
   ]},
@@ -17,7 +20,7 @@ export const manifests: Record<GameId, Manifest> = {
     {key:'portalEnabled',label:'Robot portals',type:'boolean',default:false},
   ]},
   gum: { version: 1, id: 'gum', name: 'Bubble Gum Builders', mechanics: [
-    { key: 'qualityVersion', label: 'Build world (stickers / physics / original)', type: 'number', default: 2, min: 0, max: 2, step: 1 },
+    { key: 'qualityVersion', label: 'Build world (assembly / stickers / physics / original)', type: 'number', default: 3, min: 0, max: 3, step: 1 },
     { key: 'gravity', label: 'Gravity', type: 'number', default: 10, min: 4, max: 16, step: 1 },
     { key: 'thrust', label: 'Fan power', type: 'number', default: 1, min: .5, max: 1.5, step: .1 },
     { key: 'originalRules', label: 'Restored original rules', type: 'boolean', default: true },
@@ -65,6 +68,7 @@ export function validateConfig(game: GameId, value: unknown): Mechanics {
 }
 export function defaults(game: GameId, difficulty: Difficulty = 'classic'): Mechanics {
   const config = Object.fromEntries(manifests[game].mechanics.map(m => [m.key, m.default]));
+  if (game === 'mining') return validateConfig(game,config);
   if (game === 'factory') {
     if (difficulty === 'gentle') Object.assign(config,{orderSize:2,cutterSpeed:0.75});
     if (difficulty === 'stretch') Object.assign(config,{orderSize:5,cutterSpeed:1.25});
@@ -85,7 +89,7 @@ export function diff(game: GameId, before: Mechanics, after: Mechanics) {
 }
 /** Show the controls that actually affect this saved engine, never compatibility flags. */
 export function playableMechanics(game: GameId, config: Mechanics) {
-  const keys = game === 'gum' ? (config.qualityVersion === 2 ? ['extraDecoys'] : config.qualityVersion === 1 ? ['gumBudget','jointStrength','gravity','thrust']
+  const keys = game === 'gum' ? (config.qualityVersion === 3 ? ['highlightMatches','extraDecoys'] : config.qualityVersion === 2 ? ['extraDecoys'] : config.qualityVersion === 1 ? ['gumBudget','jointStrength','gravity','thrust']
     : config.originalRules ? ['gumBudget','jointStrength'] : ['highlightMatches','extraDecoys'])
     : game === 'dragon' ? (config.originalRules ? ['groundResilience','fireballCadence','shieldRadius'] : ['hearts','breathSpeed']) : null;
   return manifests[game].mechanics.filter(m => keys ? keys.includes(m.key) : m.key !== 'originalRules');

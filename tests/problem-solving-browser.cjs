@@ -1,11 +1,90 @@
-/* Production-dist journeys. Children use real controls; fixtures are limited to storage faults and checkpoint pacing. */
+/* Production-dist journeys. Explicit fixtures cover storage faults, checkpoint
+ * pacing and a mocked narration transport/playback policy; no live provider. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
 const KEY='family-game-factory-problem-solving-v1';
+
+async function narrationJourney(browser,url){
+ const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,reducedMotion:'reduce'});
+ const page=await context.newPage(),requests=[],unexpected=[],errors=[];
+ const api='https://aps-narration.test',headers={'Access-Control-Allow-Origin':new URL(url).origin,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, X-Factory-Request','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
+ let statuses=0;
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{
+  window.__psAudio=[];window.__psRevoked=[];
+  const revoke=URL.revokeObjectURL.bind(URL);URL.revokeObjectURL=url=>{window.__psRevoked.push(url);revoke(url);};
+  window.Audio=class {
+   preload='';src='';onplaying=null;onended=null;onerror=null;plays=0;paused=false;
+   constructor(){window.__psAudio.push(this);}
+   async play(){this.plays++;if(this.plays===1)throw new DOMException('Fixture requires another tap','NotAllowedError');}
+   pause(){this.paused=true;}
+   removeAttribute(){this.src='';}
+  };
+ });
+ await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:api,previewOrigin:'https://aps-preview.test'})}));
+ await page.route(api+'/**',async route=>{
+  const request=route.request(),path=new URL(request.url()).pathname;
+  if(request.method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
+  let body={available:false};
+  if(path==='/v1/sessions/status')body={connected:true,trusted:true,expiresAt:Date.now()+60000};
+  else if(path==='/v1/coach/narration/status'){statuses++;body={available:true,mode:'natural'};}
+  else if(path==='/v1/coach/narration'&&request.method()==='POST'){
+   requests.push(request.postDataJSON());
+   const audio=Buffer.alloc(128);audio.write('ID3');
+   await route.fulfill({headers,contentType:'audio/mpeg',body:audio});return;
+  }else if(request.method()==='POST')unexpected.push(path);
+  await route.fulfill({headers,contentType:'application/json',body:JSON.stringify(body)});
+ });
+ const tap=selector=>page.locator(selector).tap();
+ const draft=()=>page.evaluate(()=>FG.problemSolvingEvidence.backup().factoryProblemSolving.drafts.find(item=>item.episode.owner==='player1'));
+ const waiting=()=>page.locator('#psHear').filter({hasText:'Play reading'}).waitFor({state:'visible'});
+ try{
+  await page.goto(url+'?problem-solving=1');
+  await page.waitForFunction(()=>FG.studio?.mode()==='remote'&&FG.problemSolvingEvidence);
+  await tap('[data-ps-task="robot-stop-g1-2"]');
+  assert.equal((await page.locator('#psHear').textContent()).trim(),'Read this to me');assert.equal(requests.length,0,'installing the reader never synthesizes');
+  await tap('#psHear');await waiting();assert.equal(requests.length,1);assert.equal(statuses,1);
+  assert.equal((await draft()).episode.observations.length,0,'downloaded audio is not listening evidence');
+  await tap('#psHear');
+  assert.equal((await page.locator('#psHear').textContent()).trim(),'Stop reading');assert.equal(requests.length,1,'Play reuses the current audio without synthesis');assert.equal(statuses,1);
+  assert.equal((await draft()).episode.observations.length,0,'play permission alone is not listening evidence');
+  await page.evaluate(()=>window.__psAudio[0].onplaying());
+  let support=(await draft()).episode.observations.filter(item=>item.responseId==='narration:predict');
+  assert.equal(support.length,1);assert.equal(support[0].support,'access-only');assert.equal(support[0].note,'Read-aloud started during predict.');
+  await page.evaluate(()=>window.__psAudio[0].onended());
+  assert.equal((await page.locator('#psHear').textContent()).trim(),'Read this to me');assert.equal(await page.locator('#psHear').getAttribute('aria-pressed'),'false');
+
+  await tap('#psHint');const hint=await page.locator('#psHintText').textContent();
+  await tap('#psHear');await waiting();assert.equal(requests.length,2);assert.ok(requests[1].text.includes(hint),'the next read includes the visible strategy hint');
+  await tap('#psHear');await page.evaluate(()=>window.__psAudio[1].onplaying());await tap('#psHear');
+  assert.equal(requests.length,2);assert.equal((await page.locator('#psHear').textContent()).trim(),'Read this to me');
+  assert.equal((await draft()).episode.observations.filter(item=>item.responseId==='narration:predict').length,1,'replaying a phase does not duplicate access support');
+
+  await tap('[data-ps-choice="at-gem"]');await tap('#psHear');await waiting();
+  assert.equal(requests.length,3);
+  await page.evaluate(()=>{window.__psStaleStart=window.__psAudio[2].onplaying;});
+  await tap('[data-ps-choice="smaller-steps"]');
+  await page.evaluate(()=>window.__psStaleStart());
+  assert.equal((await draft()).episode.observations.some(item=>item.responseId==='narration:test'),false,'a changed phase cannot receive late listening support');
+  assert.equal(await page.evaluate(()=>window.__psAudio[2].paused&&window.__psAudio[2].src===''),true);
+
+  await tap('#psObserve');await tap('#psHear');await waiting();assert.equal(requests.length,4);
+  await page.evaluate(()=>{window.__psStaleStart=window.__psAudio[3].onplaying;});
+  await openProfiles(page,target=>target.tap());await page.locator('.profile-choice').nth(1).tap();
+  await page.waitForFunction(()=>FG.store.current().id==='player2');await page.evaluate(()=>window.__psStaleStart());
+  assert.equal((await draft()).episode.observations.some(item=>item.responseId==='narration:interpret'),false,'waiting audio cannot credit the former profile');
+  assert.equal(await page.evaluate(()=>window.__psAudio.every(audio=>audio.paused&&audio.src==='')),true);
+  assert.equal(await page.evaluate(()=>window.__psRevoked.length),4,'completion, Stop, phase change and profile change release their audio');
+  assert.equal(requests.length,4);assert.equal(statuses,4);assert.deepEqual(unexpected,[]);assert.deepEqual(errors,[]);
+  console.log('PASS APS mocked narration: explicit Read/Play/Stop, one synthesis per read, actual-start evidence, visible hint and phase/profile cleanup');
+  return {device:'touch-narration-fixture',status:'passed',syntheticNarrationRequests:requests.length,liveProviderCalls:0};
+ }catch(error){await page.screenshot({path:'test-results/problem-solving-narration-failure.png',fullPage:true}).catch(()=>{});throw error;}
+ finally{await context.close();}
+}
 
 (async()=>{
  const server=start();if(!server.listening)await once(server,'listening');
@@ -13,6 +92,7 @@ const KEY='family-game-factory-problem-solving-v1';
   .catch(async error=>{await new Promise(resolve=>server.close(resolve));throw error;});
  fs.mkdirSync('test-results',{recursive:true});const results=[];
  try{
+  results.push(await narrationJourney(browser,`http://127.0.0.1:${server.address().port}/arcade/`));
   for(const [device,viewport] of [['desktop',{width:1440,height:1080}],['touch',{width:390,height:844}]]){
    const context=await browser.newContext({viewport,hasTouch:device==='touch',reducedMotion:'reduce',acceptDownloads:true});
    const page=await context.newPage(),errors=[],paid=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
@@ -27,8 +107,8 @@ const KEY='family-game-factory-problem-solving-v1';
    const saved=()=>page.evaluate(()=>FG.problemSolvingEvidence.list());
    const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,device+': no page overflow');
    const onlyPage=async id=>assert.deepEqual(await page.locator('main > .page:visible').evaluateAll(nodes=>nodes.map(node=>node.id)),[id],device+': one active destination');
-   const pick=async i=>{if(!await page.locator('#studioProfileMenu').evaluate(e=>e.open))await activate('#studioProfileMenu summary');await activate(page.locator('.profile-choice').nth(i));await exploreWelcome(page);};
-   const parent=()=>activate(page.getByRole('button',{name:'Grown-ups',exact:true}));
+   const pick=async i=>{await openProfiles(page);await activate(page.locator('.profile-choice').nth(i));await exploreWelcome(page);};
+   const parent=async()=>{if(await page.locator('#page-creation.has-scene').isVisible())await activate('#creationHome');await activate(page.getByRole('button',{name:'Grown-ups',exact:true}));};
    const fault=()=>page.evaluate(()=>{window.psSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k.endsWith('family-game-factory-problem-solving-v1'))throw new DOMException('Fixture quota','QuotaExceededError');return window.psSetItem.call(this,k,v);};});
    const unfault=()=>page.evaluate(()=>{Storage.prototype.setItem=window.psSetItem;delete window.psSetItem;});
    try{
@@ -73,8 +153,12 @@ const KEY='family-game-factory-problem-solving-v1';
     await page.reload();await page.waitForSelector('[data-ps-task="robot-stop-g1-2"]');
     assert.match(await page.locator('[data-ps-task="robot-stop-g1-2"]').textContent(),/Continue/);
     await activate('[data-ps-task="robot-stop-g1-2"]');assert.equal(await phase(),'test');
-    // Leaving for a different learner does not expose or overwrite this unfinished activity.
-    await pick(1);await activate('#studioNavProblemSolving');assert.equal(await page.locator('[data-ps-task="robot-stop-g3-4"]').count(),1);assert.equal((await saved()).length,0);
+    // Set the older sibling's grade deliberately; fresh profiles now all start
+    // at Grade 1. Leaving must still preserve the first learner's unfinished work.
+    await pick(1);await parent();await activate('[data-parent-tab="settings"]');
+    await page.selectOption('#parentGrade','3');await activate('#saveParent');
+    assert.equal(await page.evaluate(()=>FG.store.current().grade),3);
+    await activate('#studioNavProblemSolving');assert.equal(await page.locator('[data-ps-task="robot-stop-g3-4"]').count(),1);assert.equal((await saved()).length,0);
     await pick(0);await activate('#studioNavProblemSolving');await activate('[data-ps-task="robot-stop-g1-2"]');assert.equal(await phase(),'test');
     await activate('[data-ps-choice="smaller-steps"]');assert.equal(await phase(),'result');await overflow();
     const rover=await page.locator('.ps-rover svg').boundingBox(),gem=await page.locator('.ps-track-gem').boundingBox(),goal=await page.locator('.ps-track-spot.is-goal').boundingBox(),world=await page.locator('.ps-robot-world').boundingBox();

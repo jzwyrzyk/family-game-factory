@@ -69,7 +69,12 @@
     "docs/operations/ASSISTANT_ACCESS.md",
     "docs/decisions/2026-11-20-direct-operations.md",
     "docs/operations/PHASE_2.md",
-    "docs/operations/ACTIVATION_REVIEW.md"
+    "docs/operations/ACTIVATION_REVIEW.md",
+    "docs/speech/READ_ALOUD.md",
+    "docs/speech/NATURAL_NARRATION.md",
+    "docs/decisions/2026-11-21-profile-play-and-reading.md",
+    "docs/bubble-gum-builders/README.md",
+    "docs/decisions/2026-11-22-bubble-gum-assembly.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -101,7 +106,9 @@
     "skills/gem-pal-studio/*.md",
     "docs/drawings/*.md",
     "docs/pals/previews/*.md",
-    "docs/operations/*.md"
+    "docs/operations/*.md",
+    "docs/speech/*.md",
+    "docs/bubble-gum-builders/*.md"
   ],
   "areas": [
     {
@@ -122,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T19:01:23.610Z",
-      "sourceDigest": "2bbe73ab114feef4c596671b449b114cb9e8ea9df3333fd119a2e633ad766cc8",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the page-local portrait reuse and documented failure recovery against the existing companion doctrine. This removes repeated image work without changing approved identities/forms, ownership, growth, engagement rules, child choice or native-decoding readiness; explicit retry and honest unavailable feedback remain required.",
+      "reviewedAt": "2026-11-23T03:35:19.185Z",
+      "sourceDigest": "fd71a375d21b896e9ed02b7706bc93ea30be96794f30ebeb93e0b32ec4b3ce52",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the combined owner-approved Factory, assembly-v3, First steps, unified Mining and Notifications contracts against doctrine. Existing Keep, ownership, learning and provider boundaries remain explicit; release authorization is recorded separately from acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -189,6 +196,34 @@
           "sourceDigest": "57392b5aa735fe2782a4d43087b2f5cdb4385688b3c77c0d573469431352afbe",
           "reviewOutcome": "updated",
           "reviewReason": "Clarified faithful playable-first-version readiness, visible Build/check/reconnect actions, true chat outcomes, and explicit recoverable retries in doctrine and the accepted creation decision."
+        },
+        {
+          "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
+          "reviewedAt": "2026-11-21T19:01:23.610Z",
+          "sourceDigest": "2bbe73ab114feef4c596671b449b114cb9e8ea9df3333fd119a2e633ad766cc8",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed the page-local portrait reuse and documented failure recovery against the existing companion doctrine. This removes repeated image work without changing approved identities/forms, ownership, growth, engagement rules, child choice or native-decoding readiness; explicit retry and honest unavailable feedback remain required."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:33:08.353Z",
+          "sourceDigest": "a40c8773795d110b03b554ac55fdd7130112a08ee17a56ea26186de4af0d7ab3",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the first-learner decision and architecture against existing child-owned creation doctrine; the new presentation preserves scene language, Keep, formative evidence and artwork identity."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:32:53.699Z",
+          "sourceDigest": "bbc7163734e6cbead17471a255e625af47573a1eb9718622abb12d579236db79",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Read the added Factory phone-layout paragraph against product doctrine: reusing the current instruction area and keeping the active machine in view implement the existing clear, physical-game interface requirement. No new product policy, reward or learning behavior is introduced."
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T18:17:51.532Z",
+          "sourceDigest": "09a760f962afc24389cbcac0c2c3077a7706dadfc7cff6c0438f5ca06767c09a",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded owner-directed real-object assembly, visible gum joins, extended payoff and saved-engine preservation in doctrine and decision."
         }
       ]
     },
@@ -212,7 +247,10 @@
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
         "docs/brand/CHILD_INTERFACE.md",
-        "docs/decisions/2026-11-20-learning-readability-and-narration.md"
+        "docs/decisions/2026-11-20-learning-readability-and-narration.md",
+        "docs/speech/*.md",
+        "docs/decisions/2026-11-21-profile-play-and-reading.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "src/main.ts",
@@ -233,10 +271,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:45.352Z",
-      "sourceDigest": "fe2798829c213e3c2515a4dff46c256408d3aa8f6aa5a7de9b1ad7427ed14bc0",
+      "reviewedAt": "2026-11-23T03:35:19.713Z",
+      "sourceDigest": "620650089f438558519517cb3ee2b461b9e46308d01018294556a579afe66dd0",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected combined Studio diff: PR115 reconnect, visible Build, saved-job retry and owner guards are preserved, with only the Pal earned-form callback added; both UI contracts and scoped hosted visual evidence remain documented.",
+      "reviewReason": "Reconciled shared running Mining with current navigation and Notifications; documented live in-place Help, explicit resume, optional sound and narration cleanup. Preserved current private chat, owner guards, saved versions and all existing shell routes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -286,6 +324,13 @@
           "sourceDigest": "b4529782d657c425aee734fd7e8edf7a2a5acb55a0e9ebf1c0843f5a1d416396",
           "reviewOutcome": "updated",
           "reviewReason": "Documented bounded authored context, stable disabled Build, explicit reassessment, actual chat state, saved-job retry and actionable handoff recovery while preserving drafts, learning, and owner guards."
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:25:30.499Z",
+          "sourceDigest": "bd67eebc50accd5320fdd8d7837faea8d328591e21226d280c55abed061c3f98",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the shared game controls and assembly Help for consistent neutral targets and pink joins."
         }
       ]
     },
@@ -305,10 +350,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d6cb0d3686e70962d79396acab7912fe36f7622858fcd432dfe91c7faf487843",
-      "reviewedAt": "2026-11-21T15:39:46.199Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Combined source preserves the validated Pal scene catalog, fixed form/version references, ownership and legacy readers; PR115 matching creation-readiness tests concern conversation only. Focused combined generation-budget and saved-scene checks pass without runtime cap changes.",
+      "sourceDigest": "18e6acdaf501cbc0be82948715dc225914c95180bac085b2c225f3a0c1c46b49",
+      "reviewedAt": "2026-11-23T03:35:20.859Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed First steps exact-value editing and independent event programs, bounded Pal compositing and immutable saved scene references. Documented scoped challenge Help locators and eight passing backup/recovery journeys without removing nested Help or weakening assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -371,10 +416,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "46276557b98b0399551a4e1a57c65b7f758f45950e5d128131edce84fabd47d7",
-      "reviewedAt": "2026-11-21T05:39:47.126Z",
+      "sourceDigest": "26a06a9990228e2db61ad4069b1e4945a10427117a1a616162e858a0b235d181",
+      "reviewedAt": "2026-11-23T03:35:21.443Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed cosmetic suppression of reward and rank popups while the creation conversation is visible. Updated rewards and joy-layer contracts: committed receipts, gems, levels and normal Play/Keep/versions celebrations remain unchanged. Final Gem Journey and delight browser checks passed.",
+      "reviewReason": "Reviewed owner-scoped notification metadata validation and exact-byte backup rollback plus ordinary assembly completion fixtures. The existing updated rewards contract records play-popup suppression without changing earning policy, durable grants or replay rules.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -389,6 +434,20 @@
           "sourceDigest": "5855c79c06be66d51a86c998f97a99d07c5ec725bfb9cf4f46493080f1ef8743",
           "reviewOutcome": "updated",
           "reviewReason": "Documented the dismissible gems/maker/practice explanation and owner-scoped notebook preferences. Reviewed backup rejection of foreign guidance owners and namespace isolation; grants, source eligibility and evidence remain unchanged."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:41:04.816Z",
+          "sourceDigest": "e03d1b2fff412d3505e0e5cdcabdd9ede262891ac7ef4793e358d1542439e43a",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed the rewards fixture adjustments to reveal full coding controls and exit the fitted scene before Parent. The durable passing-check receipt, one-time grant and backup assertions remain unchanged; reward policy and contract are unchanged."
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T18:17:52.449Z",
+          "sourceDigest": "916b2c352cea3835af1f377d4f10e181914674a26c2f9699c87877ffc72e6150",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed changed rewards and maker browser fixtures: only gameplay inputs and extra-piece wording change. All existing grant amounts, exact Keep/reflection/owner assertions remain. Assembly reports one host result after explicit continuation; no earning policy change."
         }
       ]
     },
@@ -401,7 +460,9 @@
         "docs/game-quality/*.md",
         "docs/brand/GEM_FACTORY.md",
         "docs/mind-your-jems/*.md",
-        "docs/archetypes/*.md"
+        "docs/archetypes/*.md",
+        "docs/homepage/PLAY_VIEW.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "src/games/**",
@@ -416,10 +477,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T00:40:58.790Z",
-      "sourceDigest": "5b18489a65280cba1c0085101d05d33ea21e6fa131ccccd3fd9f2dec8a507bd3",
+      "reviewedAt": "2026-11-23T04:08:52.154Z",
+      "sourceDigest": "5724f5d35ec88cc328b8c315085c1bc1e96473f58ddafa7f1f766ab8c8c8b298",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the tablet evidence contract against the unchanged game and builder runtime. Updated game-quality and architecture guidance for the latest three tap receipts, bounded input/focus/scroll/viewport observations and geometry that distinguishes document scrolling from control movement. The single real tap, trusted activation counters, deadlines and construction-state assertions remain intact. The cause of the earlier redirected click and physical-device acceptance remain unverified; passive instrumentation is not a product repair. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c, including the reference assets unavailable locally.",
+      "reviewReason": "Updated the Mining visual-evidence contract to the inspected PR134 unified-player captures, with prior receipt preserved. Gameplay rules, artwork, shared Help lifecycle and compatibility contracts are unchanged by the exact hosted PNG import.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -434,6 +495,41 @@
           "sourceDigest": "f7be746d325b6fe720eb05f67cb0182c7d56e4f04057cfd81aa3ce8fa8ed14e4",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed native Rally and shared physics changes including original-aspect scaling, full wheel masks, fixed decorations, exact revision selection and missing-art behavior; architecture and drawing contracts describe supported geometry and preserve stock runtime compatibility."
+        },
+        {
+          "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
+          "reviewedAt": "2026-11-22T00:40:58.790Z",
+          "sourceDigest": "5b18489a65280cba1c0085101d05d33ea21e6fa131ccccd3fd9f2dec8a507bd3",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the tablet evidence contract against the unchanged game and builder runtime. Updated game-quality and architecture guidance for the latest three tap receipts, bounded input/focus/scroll/viewport observations and geometry that distinguishes document scrolling from control movement. The single real tap, trusted activation counters, deadlines and construction-state assertions remain intact. The cause of the earlier redirected click and physical-device acceptance remain unverified; passive instrumentation is not a product repair. Complete fingerprint observed in hosted job137040264631 on tree9f20c9c, including the reference assets unavailable locally."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:31:22.210Z",
+          "sourceDigest": "a91d1db892d110f8e28c5ab337348b419a625bbd0b3363edf3b2fb3da01258a0",
+          "reviewOutcome": "updated",
+          "reviewReason": "Inspected the Factory phone captures: the scene frame now clips without internal focus scrolling, and later-stage instructions occupy the former clue area so wrapping controls remain visible. These changes preserve the documented clear-phone and physical-control contract."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.011Z",
+          "sourceDigest": "84d4f2ce55b8910d68fdd3bc76e81277ce4e03df5ced5cf6a7422ee62b2e4983",
+          "reviewOutcome": "updated",
+          "reviewReason": "Integrated the owner-requested one-jem and ten-pocket shared engine into the native mining player; preserved all approved artwork and updated the active mining contract and decision.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:44:22.314Z",
+          "sourceDigest": "22e0a22e44deeccde0b436b75da873ad7d3e817c5d3434b2d918b7dfab9732ae",
+          "reviewOutcome": "updated",
+          "reviewReason": "Current README and physical-quality scope now point to version3 assembly. Reviewed the narrow-tray result reflow, bounded ignition label and portrait Moon framing; construction, saved engines, authored journey rules and timing remain as documented."
+        },
+        {
+          "reviewedAt": "2026-11-23T03:35:21.865Z",
+          "sourceDigest": "e8246cb4dd638ca4d188c5662b2c395acc5dd039420daec6a74893a9bafc15be",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled run/contact/bucket Mining with the shared host, added learning-safe live Help and removable sound controls, and documented stable physical-v1 picker geometry through reset/first additions. Factory progression, assembly-v3, old engines and score/reward separation remain preserved.",
+          "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         }
       ]
     },
@@ -454,10 +550,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-20T19:05:57.591Z",
-      "sourceDigest": "0d75fe89ba7b485648a6bf2cf1f8e84447401bc98358b793a95ff49bbfd8cfb7",
+      "reviewedAt": "2026-11-21T20:28:20.947Z",
+      "sourceDigest": "7a29e1ae8b763657ea3002efad103c42cfc42f3d44e1d3c554920a4aa0597fdb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed question-first Math/Language rendering, 18px controls, 20px task text, disabled instructional text, form labels and recovery colors. Documented playback-start assistance with no credit for unavailable voices; curriculum, grading, subject permissions and checkpoint policy remain unchanged."
+      "reviewReason": "Updated Math and Language integration and acceptance for explicit saved grade and learning difficulty, conservative missing values, visible profile setup and assistance-aware read-aloud."
     },
     {
       "id": "services",
@@ -479,10 +575,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T15:39:46.425Z",
-      "sourceDigest": "19fc99b544b060efd9bad332702c32d72e0a9f631e148e5ae2f03b72fb8c1ee6",
+      "reviewedAt": "2026-11-21T20:28:21.181Z",
+      "sourceDigest": "1520f240217b7658bb22926b832101aafce70e69a61cd7f7104511a007098a52",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed additive authorized retryJobId/single-successor gateway contract alongside pure Pal catalog packaging dependencies. Delivery now requires compatible PR115 gateway and private coach before Pages while preserving worker, approvals and serving configuration.",
+      "reviewReason": "Updated architecture for the independently authorized narration gateway endpoints, bounded binary transport and default-off deployment scope; existing trusted session and privacy checks remain authoritative.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -521,10 +617,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T14:34:23.976Z",
-      "sourceDigest": "7d0d10ede8fd4d68f101c414b11989b856e8f7cbecb3852b5deaa521dc2699b1",
+      "reviewedAt": "2026-11-21T20:28:21.503Z",
+      "sourceDigest": "e49e6802ee50ad0c7a75c035d934b77b70dfd2d8501ad8a349dee92bb1d61da1",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture documents transactional one-successor retry recovery, idempotency binding, ambiguous historical retries, and the initial no-acknowledgement limit. Worker generation/review executables and sandbox pins are unchanged."
+      "reviewReason": "Updated architecture for optional metadata-only narration receipts in shared PipelineState; worker selection, generated artifacts, budgets and generation execution remain unchanged."
     },
     {
       "id": "coach",
@@ -534,7 +630,8 @@
         "docs/design-coach/*.md",
         "docs/issue-28/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/speech/NATURAL_NARRATION.md"
       ],
       "sources": [
         "server/coach/**",
@@ -543,10 +640,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T21:59:42.641Z",
-      "sourceDigest": "213cbc4ce51bb9f7ad5b2cad7abac7972525a8c556d0fe30ae2890f10f52927b",
+      "reviewedAt": "2026-11-23T03:35:22.537Z",
+      "sourceDigest": "57f21bf5c6a4ae0afb0194d6c4c47f00b5cf96bf5bed4fe748ee94733e878b3a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed private-only optional metadata recovery and the final fail-closed required-field protection. The shared creation-readiness and Build gates remain unchanged; a live model reply is not yet verified.",
+      "reviewReason": "Reviewed inherited default-off narration endpoints, independent consent/budget/private-service checks and bounded metadata reads alongside merged PR133 optional-reply recovery. Current architecture records preserved source; natural narration remains separately unactivated and no provider calls were made.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -554,6 +651,13 @@
           "sourceDigest": "55a4c78234ef73b8927e2d51db9f3da9e04f847d3a6f91c512d1ffb209a43545",
           "reviewOutcome": "updated",
           "reviewReason": "Documented the provider-only readiness source references, exact public quote restoration, literal child decisions, dynamic pre-call budget and specific content-free failure reasons; reviewed design, Adult/privacy and doctrine contracts without changing audience, semantic readiness, Build or model settings."
+        },
+        {
+          "sourceCommit": "80b8da4d571619f24be350133d5254ea4293e597",
+          "reviewedAt": "2026-11-22T19:14:29.343Z",
+          "sourceDigest": "094a58d4ec0d1e6be98391a3ab191520710c1a120b620e484979ecd6606ed411",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled merged PR131 private readiness source references and exact quote restoration with the default-off narration path; retained its complete policy/provider/wire implementation, public validators, spending boundaries and private inference documentation."
         }
       ]
     },
@@ -617,7 +721,8 @@
         "docs/rewards/*.md",
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
-        "docs/pals/previews/*.md"
+        "docs/pals/previews/*.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         "tests/**",
@@ -626,10 +731,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-22T23:26:52.768Z",
-      "sourceDigest": "34cf87d62732972e53271a121d8dbca2121d5bbcb32992ffe0f6d805b7c61c39",
+      "reviewedAt": "2026-11-23T04:08:52.534Z",
+      "sourceDigest": "68391dfba47b3a938eb82ae8401515b9cffebb789df571a285e853e323b519a7",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed retained Pal lifecycle/native decoding and tablet input regressions with current private-coach provider/tests and the unchanged independent Mind Your Jems visual baseline. Previously observed screenshot phase flake remains tracked in issue #76; no blanket acceptance or weakening of assertions. Exact validation digest from hosted documentation job 137395774437. Full newest combined CI remains pending.",
+      "reviewReason": "Explicitly inspected all nine hosted Chromium 141 reference PNGs, three Help views and sampled normal-motion held-spill/fall/retry frames. Verified archive, clean build/tree, manifest, dimensions and image hashes; retained the original nine failed comparisons and all 13 functional passes. No tolerance or assertion changes; final-head CI remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -728,6 +833,48 @@
           "sourceDigest": "e98c04bb53c3fb6d2db62d83108462412205717ec3c64e89ae3156d2b5efd222",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed PR126's existing real-tap, Pal image lifecycle and receipt regressions alongside merged PR133's private-provider optional-evidence fallback tests and unchanged visual baselines. Previous 0.8%-threshold Mind Your Jems screenshot flake is tracked in issue #76; the test-only capture experiment was reverted. Exact combined-source fingerprint and hosted acceptance remain pending."
+        },
+        {
+          "sourceCommit": "80b8da4d571619f24be350133d5254ea4293e597",
+          "reviewedAt": "2026-11-22T20:14:53.855Z",
+          "sourceDigest": "4ba9ec51c463acef14cb9f2e21c1ab161789129da8ba2cfae20e437ef66920f2",
+          "reviewOutcome": "updated",
+          "reviewReason": "Verified the accepted native reference PNG hashes against the clean hosted source and artifact; retained all functional and geometry assertions, with final CI required to compare all nine committed images without regeneration."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:41:04.551Z",
+          "sourceDigest": "c3b75e616c9420f86a457329f51a62f1d2f3788b7f3c9b7e9fdc253a00f077fe",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed existing rewards, problem-solving, guidance and private-art journeys to use the visible My Games exit and optional More tools. All original data, authority and outcome assertions remain."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:32:41.666Z",
+          "sourceDigest": "7129b791b1fd6b62c03761edda1c4d37c12f0010c7dc5d262f2aeed46c24c93f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the hosted phone failure and final browser diff: a real timed input now follows camera/actionability preparation and observes activation completion once; assertions reject hidden scene scrolling and phone hints over wrapping controls. This candidate still requires hosted execution."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.275Z",
+          "sourceDigest": "ed27456c2a2261fd8b039a6b0fdc423d60e265dd0937a113d8a75b06005d8a74",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed uniform crystal-value and ten-capacity rules tests and integrated HUD assertions while preserving native-host controls, real-input fixtures,13 configurations and unchanged visual tolerances;403combinedunits pass.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:48:18.740Z",
+          "sourceDigest": "d5fb43bb9f4a8b3733342b9c5c7787e44561b10a0f404ac6738c16c851315e87",
+          "reviewOutcome": "updated",
+          "reviewReason": "The legacy design-coach journey now reopens its exact saved physical session instead of the current catalogue starter. Existing project, experiment, voice and learning assertions remain; the same journey is included in focused host integration to verify the compatibility boundary."
+        },
+        {
+          "reviewedAt": "2026-11-23T03:44:21.397Z",
+          "sourceDigest": "23620a29fb4cf258653b58fa632ef8d9fc8426555fd442f56ff2029d1117f092",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed new Mining sibling onboarding through real character/Home controls and preview handshake/paint before one click. The mock now matches production repeat-connect behavior; result, request count, stale-owner, loss and visual assertions remain. Recorded full local quality, Coding, Bubble Gum and Notifications evidence plus remaining hosted gates.",
+          "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         }
       ]
     },
@@ -739,7 +886,8 @@
         "docs/context/MAINTENANCE.md",
         "docs/assignment-006/*.md",
         "docs/operations/*.md",
-        "docs/mind-your-jems/*.md"
+        "docs/mind-your-jems/*.md",
+        "docs/bubble-gum-builders/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -756,10 +904,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-22T23:26:52.768Z",
-      "sourceDigest": "adf654212391bd7c66f0fd35e2f89dba0c829fa361988f1994af5a5b6158fc2a",
+      "reviewedAt": "2026-11-23T04:08:52.958Z",
+      "sourceDigest": "ea52d2f7c562fca2803d4740135be658ad8fb492be698b4c6ee5540be566d814",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual inert-merge authorization and bounded source scope after reconciling PR100/107/126 access and receipt tooling with current main. Confirmed release workflows remain gated by disabled GitHub flags, no new deployment/IAM binding, Cloud Shell receipt is temporary, and service-specific activation gates stay independent. Observed exact full-source delivery fingerprint in GitHub documentation job 137395774437; hosted final-head gates remain pending.",
+      "reviewReason": "Recorded the downloaded compact artifact, exact source/build/tree identity, explicit visual acceptance and preserved failed source run. PR134 remains unmerged and undeployed pending a fresh complete CI run; owner requested a pause while it completes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -879,6 +1027,48 @@
           "sourceDigest": "16c5eac1c30b4eec7e9ab92068d21e918ca831a58d9880ef56e5f02da2432c75",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed PR126's receipt hardening and guarded cloud operations alongside merged PR131's private coach readiness tests, package test wiring and the recovered read-only access receipt. This is a source-only integration, not a production rollout; the full combined-source digest was observed in hosted documentation job 137379759144. Other hosted acceptance remains separate."
+        },
+        {
+          "sourceCommit": "80b8da4d571619f24be350133d5254ea4293e597",
+          "reviewedAt": "2026-11-22T20:14:54.464Z",
+          "sourceDigest": "c58d97165e9719a6c732c4b7e639bb82b8747c277c2566534b13fb7307c9697b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the sixth candidate source-tree identity, complete Mining and visual evidence, cleared smallest-phone defect and explicit reference acceptance; final-head workflow outcome remains distinct from source/capture approval."
+        },
+        {
+          "sourceCommit": "2f3c84bea31bcfb0db210cfaf870c2c5aab0edaa",
+          "reviewedAt": "2026-11-22T18:39:37.762Z",
+          "sourceDigest": "2179d1f3bd579cc243da92252fd5eab0e84d8a12c7cb44b8e20db3f76d3b272b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the isolated PR125-based coding candidate and exact local test scope; new hosted workflow collects independent five-layout evidence and no merge or deployment is claimed."
+        },
+        {
+          "sourceCommit": "e694c8287ff0459ff757f7b4cb805002d37f4dfd",
+          "reviewedAt": "2026-11-22T15:50:53.805Z",
+          "sourceDigest": "68546fa89eb91c376a3ac872d8300924ee73b2b90e978d81fe4a70c5930dc14d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Verified all nine PR workflows on d82174e, including all four Arcade jobs, and confirmed the PR merge checkout has the same tree. Recorded the exact visual artifact, inspected states and initial failures. This final receipt changes documentation only and does not claim merge or deployment."
+        },
+        {
+          "reviewedAt": "2026-11-22T18:05:22.584Z",
+          "sourceDigest": "dc424a9ccb5f9a51748ed348890caab1c91a31df5622a68129a90e7a946541d3",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded combined build and403unit pass separately from396phase-one units; kept fresh hosted acceptance pending and the user-directed merge hold explicit.",
+          "sourceCommit": "5b8abfb55e138ea9cd9a4a10dbca897341eab956"
+        },
+        {
+          "sourceCommit": "87740d1ea07280f9c31c320c7d81dd3b9b9d8617",
+          "reviewedAt": "2026-11-22T19:59:28.314Z",
+          "sourceDigest": "6629d98039aaa17075985dabeec7fa1a6e22710662754f10dc20ee443a9d2dce",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded final exact6c source, all29 focused rules and10 browser cases, four host integration passes, artifact digests and actual tablet/phone visual acceptance. Recorded successful owner-private Site deployment and preserved the coordinated production merge hold; the follow-up commit changes delivery evidence only."
+        },
+        {
+          "reviewedAt": "2026-11-23T03:56:29.310Z",
+          "sourceDigest": "78ca8a1cd716efc8cf2ec0fa083ebffd524b39756593748ae445ddb307ebde07",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded all 13 hosted Mining functional passes at 8496696 and the nine remaining old-reference mismatches. Added a bounded review packet beside the unchanged full artifact for exact Chromium-141 image/video inspection; tests, retention, read-only workflow permissions and tolerances remain unchanged.",
+          "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         }
       ]
     },
@@ -901,10 +1091,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T17:22:45.601Z",
-      "sourceDigest": "3080c42251cd4d49620f86401b6b9b8d141612a20fe87b8a3b8e3b5245158579",
+      "reviewedAt": "2026-11-23T03:35:23.963Z",
+      "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved both source histories and current main feature-area reviews. Registered Phase2 and activation-review documents using existing operations link/source coverage, retained advisory CODEOWNERS routing, and updated task entry points for exact-account metadata diagnostics and the read-only owner handoff. AGENTS and Project instructions retain authorization scope and the explicit no-merge hold; checker enforcement is unchanged.",
+      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -968,6 +1158,20 @@
           "sourceDigest": "6af7ed23017d0ee2212376611ba04656150a3dfdd6c5efb9a0c3733099e72d14",
           "reviewOutcome": "updated",
           "reviewReason": "Preserved current main source routing and all unrelated review records; registered the PR100 access runbook and operating decision under existing delivery/operations link coverage. Reviewed AGENTS, Project retrieval instructions, docs index and ADR for direct work only within approved scope, explicit preparation/no-merge holds, exact managed identity selection, and separation of previous connection evidence from current-task access. No checker or existing protection was weakened."
+        },
+        {
+          "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
+          "reviewedAt": "2026-11-21T17:22:45.601Z",
+          "sourceDigest": "3080c42251cd4d49620f86401b6b9b8d141612a20fe87b8a3b8e3b5245158579",
+          "reviewOutcome": "updated",
+          "reviewReason": "Preserved both source histories and current main feature-area reviews. Registered Phase2 and activation-review documents using existing operations link/source coverage, retained advisory CODEOWNERS routing, and updated task entry points for exact-account metadata diagnostics and the read-only owner handoff. AGENTS and Project instructions retain authorization scope and the explicit no-merge hold; checker enforcement is unchanged."
+        },
+        {
+          "sourceCommit": "1291bc7ce4717be102db466ea044a7c7932b1a6c",
+          "reviewedAt": "2026-11-21T20:28:22.967Z",
+          "sourceDigest": "8a0bea67cbda0c2a7c2f3e1d1112b9b3e45c92c81d295735b24b71b593cb630b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added the feature decision and speech contracts to the documentation index and registry; reviewed their required-file, area ownership and local-link routes without weakening freshness enforcement."
         }
       ]
     },
@@ -984,10 +1188,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
-      "reviewedAt": "2026-11-19T17:17:56.552Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states."
+      "sourceDigest": "21cbc0fa874ca9cd7f833db2b5f756cbe41d49c349937372c3d04f5f7015c2e8",
+      "reviewedAt": "2026-11-23T03:35:24.321Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the synthetic parent-dashboard fixture date moved from 29 to 28 days before now so the oldest sample remains within the documented inclusive 30-local-calendar-day window at UTC midnight. Parent report source, filter semantics, evidence labels and limitations are unchanged."
     },
     {
       "id": "problem-solving",
@@ -1002,10 +1206,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "38e06c1fb6f9a642044a3c0a7d48edd5f148b96fb0ceccd5e25783e4dcf33943",
-      "reviewedAt": "2026-11-20T19:05:58.979Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed local female narration with current owner/episode/phase cancellation and access support recorded only on playback start. Sized its speech status/help controls for child readability without changing authored tasks, grading, competence evidence or storage.",
+      "sourceDigest": "935acd09f28ffa7ac9ba0d8c7b1c30154fd0834b6ca6266cdfd9b137d9ced184",
+      "reviewedAt": "2026-11-22T18:41:05.064Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the browser Parent helper using the visible My Games exit from a fitted coding scene. Trusted source observations, assistance attribution and parent evidence assertions remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1048,10 +1252,19 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
-      "reviewedAt": "2026-11-21T19:01:25.124Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the loading-contract update: approved character references, exact Base/Grown image bytes, expression bindings, art approvals and scene asset versions are unchanged. The page reuses current presentation nodes and retires callbacks; no visual redesign, substitute artwork or new form is introduced."
+      "sourceDigest": "ace76e79cea7593c27303b594bc7515e4e1bb748304de5aac88982689974daaf",
+      "reviewedAt": "2026-11-22T18:39:36.906Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the 48-image scene contact sheets, exact artwork and color preservation, retained authored props and documented remaining fringes; this is rendering support rather than replacement character art.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
+          "reviewedAt": "2026-11-21T19:01:25.124Z",
+          "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed the loading-contract update: approved character references, exact Base/Grown image bytes, expression bindings, art approvals and scene asset versions are unchanged. The page reuses current presentation nodes and retires callbacks; no visual redesign, substitute artwork or new form is introduced."
+        }
+      ]
     },
     {
       "id": "art-studio",
@@ -1071,10 +1284,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e40f7771e964582539cd6ed734a89e9f1cacf1d93f92acde43b164385cc6effe",
-      "reviewedAt": "2026-11-21T05:39:49.111Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the retained guarded Use my picture action moving to collapsed More choices for new ideas, with existing-game toolbar unchanged. Updated Art Studio and architecture references; final-bundle art-entry checks passed delayed/rejected config, mobile upload/drawing/focus, owner isolation and read-only recovery without paid replay.",
+      "sourceDigest": "fa4dcad372ce28cd467e0b27491f824e22e81d3914ed62641dd7d56a2ea25844",
+      "reviewedAt": "2026-11-22T18:41:05.281Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed source-return and profile-switch fixture navigation through More and My Games. Existing private image hashes, immutable scene bindings, export/import, recording and owner-isolation checks remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1108,10 +1321,19 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
-      "reviewedAt": "2026-11-21T19:01:26.034Z",
+      "sourceDigest": "196be53f4cfde1416f0ad008d1ae06dde293f1455ce336fad7b1b4b2b952f22e",
+      "reviewedAt": "2026-11-22T18:39:36.408Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented bounded owner/surface/Pal/form reuse, unchanged-URL state retention, request retirement and the inability to cancel an active native decode. Reviewed fresh-container retry listeners, focused in-progress retry, unready-owner/dispose cleanup and actual-browser regressions. Explicit same-image detail recovery remains native; gallery failures do not silently retry on ordinary refresh or hide/show, and hosted acceptance is pending."
+      "reviewReason": "Reviewed shared bounded image readiness and cancellation, conservative scene-only paper compositing and all 48 approved source identities; originals and saved form keys remain unchanged.",
+      "reviewHistory": [
+        {
+          "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
+          "reviewedAt": "2026-11-21T19:01:26.034Z",
+          "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented bounded owner/surface/Pal/form reuse, unchanged-URL state retention, request retirement and the inability to cancel an active native decode. Reviewed fresh-container retry listeners, focused in-progress retry, unready-owner/dispose cleanup and actual-browser regressions. Explicit same-image detail recovery remains native; gallery failures do not silently retry on ordinary refresh or hide/show, and hosted acceptance is pending."
+        }
+      ]
     }
   ]
 }

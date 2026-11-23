@@ -38,6 +38,8 @@ export interface LearningContext {
 }
 export interface LearnerProfile {
   id?: string; name?: string; age?: number; grade?: Grade; focus?: string; skillFocus?: string[];
+  /** Only explicit setup confirms the grade and learning challenge; never inferred from age. */
+  learningSetupComplete?: boolean;
   intensity?: string; rate?: number; hints?: boolean; punish?: boolean;
   factTargets?: string[]; mathModes?: Record<string, LearningMode>;
   skills: Record<string, any>; learning?: any; learningEvidence?: any[];

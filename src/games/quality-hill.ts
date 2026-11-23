@@ -194,7 +194,9 @@ export default class QualityHill implements GameInstance {
     // Geometry, not mutable pointer classification, determines whether pedals need screen room.
     const compactLandscape = window.innerWidth > window.innerHeight
       && window.innerHeight >= 600 && window.innerHeight <= 900 && w >= 600;
-    const h = compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
+    const fitted = this.root.closest('.studio-play-mode') && rect.height > 0;
+    const h = fitted ? Math.max(140, rect.height)
+      : compactLandscape ? Math.min(normalHeight, Math.max(340, window.innerHeight * .48)) : normalHeight;
     const dpr = Math.min(2, window.devicePixelRatio || 1); this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.canvas.style.height = h + 'px';
     this.context2d.setTransform(dpr, 0, 0, dpr, 0, 0); this.view.w = w; this.view.h = h; this.view.scale = clamp(w / 17, 27, 65);
     this.clock?.invalidate();

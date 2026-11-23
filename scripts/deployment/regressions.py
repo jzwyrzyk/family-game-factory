@@ -44,7 +44,7 @@ SHARDS = {
     "generated": npm("intent-playtest", "intent-repair-browser", "generated-art",
                      "quality-capture"),
     "creative": npm("art-browser", "creation-browser", "rewards-browser", "pals-browser"),
-    "studio": npm("studio", "gem-journey", "navigation-continuity"),
+    "studio": npm("studio", "studio-notifications", "gem-journey", "navigation-continuity"),
     "coach": npm("coach", "child-journey", "real-agent"),
 }
 

@@ -1,4 +1,6 @@
 import './brand/icons.css';
+import './speech/read-aloud.css';
+import {installVoiceSettings} from './speech/voice-settings';
 import './legacy/store.js';
 import './adult-pilot/style.css';
 import './learning/bootstrap';
@@ -18,6 +20,7 @@ import {installDrawings} from './assets/ui';
 import {installQualityCards} from './quality/cards';
 import {installStudio} from './studio/ui';
 import {installStudioHostNavigation} from './studio/host-navigation';
+import {installLearningProfileSetup} from './learning/profile-setup';
 import {installRewardWriteGuard,setRewardSourceMaintenance} from './rewards/write-guard';
 import {installParentDashboard} from './parent/ui';
 import {installRewards} from './rewards/service';
@@ -37,6 +40,8 @@ void installRewardWriteGuard().then(async writable=>{
   void initBuilder().then(installAdultProfile);
   installJemsDelight();installOffline();installDrawings();installQualityCards();installParentDashboard();installProblemSolvingProgress();
   await installStudio();installStudioHostNavigation();
+  installLearningProfileSetup();
+  installVoiceSettings(document.getElementById('parentReadingVoice'));
 }).catch(error=>{
   setRewardSourceMaintenance(true);
   for(const element of document.querySelectorAll<HTMLElement>('main,.site-header'))element.inert=true;

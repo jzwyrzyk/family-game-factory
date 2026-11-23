@@ -30,8 +30,21 @@ exports.completeWelcome=async function completeWelcome(page,character='spark'){
 exports.navigate=async function navigate(page,id){
  const selector=id.startsWith('#')?id:'#'+id;
  const target=page.locator(selector);
+ // Active play has its own visible exit. Global destinations return after the
+ // child leaves through that guarded, save-aware route.
+ if(await page.locator('#page-studio.studio-play-mode').isVisible())await page.locator('#studioHome').click();
+ if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();
  if(!await target.isVisible())await page.locator('#studioNavMenu').click();
  await target.click();
+};
+exports.openProfiles=async function openProfiles(page,activate=target=>target.click()){
+ if(await page.locator('#page-studio.studio-play-mode').isVisible()){
+  const more=page.locator('#studioMore');
+  if(!await more.evaluate(node=>node.open))await activate(more.locator(':scope > summary'));
+ }
+ const profiles=page.locator('#studioProfileMenu');
+ if(!await profiles.evaluate(node=>node.open))await activate(profiles.locator(':scope > summary'));
+ await page.locator('#profile-choices').waitFor({state:'visible'});
 };
 /** Send the fixture child's own words through the same composer they use.
  * Reading the notebook verifies durability; this helper never changes a plan,

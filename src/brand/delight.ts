@@ -40,6 +40,9 @@ export function installJemsDelight():void {
   window.addEventListener('jems:milestone',(raw)=>{
     const detail=(raw as CustomEvent<{kind?:string;anchorId?:string;character?:string;level?:number}>).detail;
     if(!detail||!names.includes(detail.kind as JemMilestone))return;
+    // A fitted game keeps its controls visible. Durable progress is recorded by
+    // the source before this cosmetic event; suppressed artwork is not replayed.
+    if(document.body.classList.contains('studio-playing'))return;
     const kind=detail.kind as JemMilestone, now=Date.now();
     if(now-(last.get(kind)||0)<1600||document.visibilityState==='hidden')return;
     last.set(kind,now);

@@ -1,10 +1,12 @@
 {
   "build": {
-    "sha": "75e888ee2910dcaf285f3c6b8c73d63e098c3919",
+    "sha": "fe5be7e0283c875dd11a9891eb535c9a0960ef81",
     "dirty": false
   },
   "browser": "141.0.7390.37",
-  "acceptedBy": "Explicit MYJ_UPDATE_BASELINES command after visual review",
+  "acceptedBy": "Codex explicit review of verified hosted stills and sampled normal-motion frames",
+  "acceptedAt": "2026-11-22T23:08:50-05:00",
+  "surface": "shared native play view",
   "states": [
     "idle",
     "warning",
@@ -16,5 +18,224 @@
     "mobile"
   ],
   "channelTolerance": 20,
-  "maximumChangedRatio": 0.008
+  "maximumChangedRatio": 0.008,
+  "source": {
+    "head": "4b00c474c733873e31849acb0778be8f4f3ceec2",
+    "tree": "07d0848fb97156c00cc3cace974a62f0361c01c3",
+    "pullRequest": "https://github.com/jzwyrzyk/family-game-factory/pull/134",
+    "runId": 45108887504,
+    "jobId": 137476434311,
+    "runUrl": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45108887504",
+    "artifactId": 14789136447,
+    "artifactName": "mind-your-jems-reference-review",
+    "archiveSizeBytes": 11554514,
+    "archiveSha256": "4c067f9490c4b1c6d9a8f5528008e303219811519da5e225a25b49b85e1245fe",
+    "manifestSha256": "ad6330b52ceb5a0a03b0da1bb7991fc76772f2fd5a25b9fc8636e5e84baeda69",
+    "fullArtifactId": 14788798205,
+    "fullArtifactSizeBytes": 90350429,
+    "fullArtifactSha256": "8daf94bcd14bb30bf4f46b17e692f01bd4615de78fdc6cc6d707ebf871284207"
+  },
+  "review": {
+    "functionalConfigurationsPassed": 13,
+    "functionalConfigurations": [
+      "desktop",
+      "tablet-portrait",
+      "tablet-landscape",
+      "mobile",
+      "mobile-small",
+      "mobile-landscape",
+      "mobile-landscape-small",
+      "desktop-motion",
+      "mobile-motion",
+      "remote-handoff",
+      "recovery-desktop",
+      "recovery-mobile",
+      "profile-reset"
+    ],
+    "captures": 148,
+    "originalRunConclusion": "failure",
+    "originalFailureScope": "Exactly nine comparisons against the previous native-player references failed. All 13 functional configurations passed. Original hosted manifest and failed conclusion remain unchanged.",
+    "inspected": "All nine full-resolution source PNGs; desktop, phone and short-landscape Help; original storyboard and previous desktop composition; representative frames throughout the 42.16-second normal-motion recording, half-second held-shake frames at 18\u201323 seconds and quarter-second fall/retry frames at 37\u201342 seconds.",
+    "visualFinding": "No blocking defect in the reviewed compositions. Original illustrated head, hair, crystals, miner, bucket and floating-island artwork remain. The unified header owns Help and More; duplicate internal header controls and helper lines are removed, counters are compact, and bottom controls fill available width. Desktop, tablet portrait and phone retain legible counters, /10 capacity, warning and ready state, with no visible control clipping. Short-landscape Help keeps reading and return actions visible while its instruction copy scrolls.",
+    "normalMotion": "The real-input recording collects individual jems and banks 4. Around 21.5 seconds the held miner stays on the head while jems scatter and Bag changes from 1/10 to 0/10, with Saved 4 retained. Around 39\u201339.75 seconds the unheld miner falls and Bag changes from 2/10 to 0/10. The retry overlay appears around 40 seconds and the miner returns to the bucket around 40.75 seconds, retaining Saved 4. Ready then appears in More without replacing the game.",
+    "functionalEvidence": "Hosted job logs report all 13 PASS results. Manifest checks retain real movement/contact, banking, held spill, release/fall/retry, level completion/advance, Help pause preserving the round, shared navigation, fullscreen, learning exit, recovery, preview handoff and owner teardown.",
+    "reviewers": "Codex; no independent human or child review claimed.",
+    "localBrowser": "Local Chromium 156 gameplay passes are supplementary. The pinned Chromium 141 download was unavailable in this environment, so these exact hosted Chromium 141 PNG bytes were imported after verification; local Chromium 156 captures were not used as references.",
+    "followup": "The next exact-head hosted run must compare these references with unchanged channel tolerance 20 and maximum changed ratio 0.008. Acceptance does not waive any release gate or convert the source failed run into a pass.",
+    "limits": "Synthetic browser/device viewports and mocked build services. Sampled video frames are not physical-device, audio, frame-pacing, child-enjoyment, educational-efficacy, paid-provider or deployment acceptance. Merge remains conditional on all final-head release gates."
+  },
+  "priorReview": {
+    "file": "history/5b8abfb.json",
+    "sha256": "11a77a8b44f6950ebe74ba7981de45c4e4ca38e7aa4750cb232f047230cbad65"
+  },
+  "previousReferenceComparisons": [
+    {
+      "device": "desktop",
+      "state": "idle",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 1280,
+      "height": 900,
+      "changed": 680354,
+      "ratio": 0.5905850694444444,
+      "meanDelta": 53.207388888888886
+    },
+    {
+      "device": "desktop",
+      "state": "warning",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 1280,
+      "height": 900,
+      "changed": 682206,
+      "ratio": 0.5921927083333334,
+      "meanDelta": 53.61471180555556
+    },
+    {
+      "device": "desktop",
+      "state": "ready",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 1280,
+      "height": 900,
+      "changed": 676190,
+      "ratio": 0.5869704861111111,
+      "meanDelta": 53.387046875
+    },
+    {
+      "device": "tablet-portrait",
+      "state": "idle",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 768,
+      "height": 1024,
+      "changed": 376624,
+      "ratio": 0.4789021809895833,
+      "meanDelta": 43.19746017456055
+    },
+    {
+      "device": "tablet-portrait",
+      "state": "warning",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 768,
+      "height": 1024,
+      "changed": 378004,
+      "ratio": 0.4806569417317708,
+      "meanDelta": 43.699462890625
+    },
+    {
+      "device": "tablet-portrait",
+      "state": "ready",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 768,
+      "height": 1024,
+      "changed": 370143,
+      "ratio": 0.4706611633300781,
+      "meanDelta": 42.67292022705078
+    },
+    {
+      "device": "mobile",
+      "state": "idle",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 390,
+      "height": 844,
+      "changed": 145013,
+      "ratio": 0.44055474541256534,
+      "meanDelta": 44.791985660469074
+    },
+    {
+      "device": "mobile",
+      "state": "warning",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 390,
+      "height": 844,
+      "changed": 146088,
+      "ratio": 0.44382063434196134,
+      "meanDelta": 45.718544173046546
+    },
+    {
+      "device": "mobile",
+      "state": "ready",
+      "kind": "visual-regression",
+      "dimensions": true,
+      "width": 390,
+      "height": 844,
+      "changed": 144404,
+      "ratio": 0.4387045813586098,
+      "meanDelta": 45.19630878600073
+    }
+  ],
+  "video": {
+    "file": "mind-your-jems-gameplay.webm",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "motion": "normal",
+    "source": "real browser movement, collection, bank, held spill, unheld fall and retry; mocked build statuses",
+    "sha256": "eadbc5b4c7a6b1fd03194f7447263bdc1430f225b70f90f97b8b22e6fd89890b",
+    "durationSeconds": 42.16,
+    "framesPerSecond": 25,
+    "sizeBytes": 4346502
+  },
+  "files": [
+    {
+      "file": "desktop-idle.png",
+      "sha256": "53148e5299dc84777663af9130ca69042850b294c5a44b24711191322c73b0fe",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "desktop-warning.png",
+      "sha256": "efb0500dd36eaeb69c606e743382f5944fcc88733aa2a67c1148fb662af09388",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "desktop-ready.png",
+      "sha256": "2ee09516b8a38b9e3e996f80cdfb0a5d6e2b420d5947c645430764a10d98765c",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "tablet-portrait-idle.png",
+      "sha256": "d2d4fa9b2a77a64c873d52aa86bee975a0c6e01e09f3f78b7d4ed3d8ad514c6e",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "tablet-portrait-warning.png",
+      "sha256": "21ea800507950b91452c1669815b6e456be62d7876d965088e57ffb23f0309fb",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "tablet-portrait-ready.png",
+      "sha256": "917d2e8930514b62e809e7e7526652d7fa00c7f34cd7e7b9ce3a627b89e8481d",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "file": "mobile-idle.png",
+      "sha256": "b9ffd4e897878105f8e1abbb6d060458c851f5715167961d6583cca4163360cd",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "mobile-warning.png",
+      "sha256": "66a8ad204623dd3bc0cbd1297eb79c7ab5657abe43687d7faa60ba77db96256e",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "mobile-ready.png",
+      "sha256": "57a05940cc50b86754e720962831833958f08fc462879ccf8908c42b57dcaf64",
+      "width": 390,
+      "height": 844
+    }
+  ]
 }

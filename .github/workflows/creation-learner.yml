@@ -1,0 +1,46 @@
+name: Coding learner review
+on:
+  pull_request:
+    paths:
+      - 'src/creation/**'
+      - 'tests/creation-learner*'
+      - 'tests/pal-scene-image.test.ts'
+      - 'src/pals/creation.ts'
+      - '.github/workflows/creation-learner.yml'
+      - 'package.json'
+  push:
+    branches: ['feature/coding-first-learner-overhaul-*']
+concurrency:
+  group: coding-learner-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  learner:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Build candidate
+        id: build
+        run: npm run build
+      - name: Beginner coding and scene layout
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:creation-learner
+      - name: Exact movement and Pal compositing contracts
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --import tsx --test tests/creation-learner-controls.test.ts tests/pal-scene-image.test.ts tests/pals-creation.test.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coding-learner-evidence
+          path: test-results/creation-learner-*
+          if-no-files-found: warn
