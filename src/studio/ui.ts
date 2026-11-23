@@ -710,7 +710,7 @@ export async function installStudio(){
  function refreshBuildAction(){
   if(!activeId)return;
   const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
-  const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value})):null;
+  const readiness=creating?(coaching?.buildReadiness()||creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value},s.design?.creationStandard===2?2:1)):null;
   const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||Boolean(s.pendingSubmission)||needsReadyRecovery(s);
   $<HTMLButtonElement>('studioSend').hidden=false;
   $<HTMLButtonElement>('studioSend').disabled=pending||!reflecting&&uncertain||creating&&(busy(s)||!readiness?.ready);
@@ -993,7 +993,7 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
- function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea',null,{message:'Tell jems what you imagine. One sentence is enough. Your idea is safe even when game building is unavailable.'});return open(s.id);}
+ function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea',null,{creationStandard:2});return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
   stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
@@ -1011,6 +1011,14 @@ export async function installStudio(){
   const sameSession=box.dataset.session===s.id,earlierWasOpen=sameSession&&box.querySelector<HTMLDetailsElement>('.studio-earlier-messages')?.open;
   conversationReaders.forEach(reader=>reader.dispose());conversationReaders=[];
   box.replaceChildren();box.dataset.session=s.id;box.dataset.signature=signature;
+  // An onboarding greeting is presentation only: never a child choice, model instruction, or Build request.
+  if(s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate&&!messages.some(m=>m.role==='child')){
+   const greeting=el('div','studio-message helper studio-coach-welcome');
+   greeting.setAttribute('aria-label','jems');
+   greeting.append(el('p','',"Hey, I'm jems! Tell me the game you're imagining."),
+    el('p','',"I'll ask a few fun questions so we can make it look and play the way you want."));
+   box.append(greeting);
+  }
   const earlier=el('details','studio-earlier-messages') as HTMLDetailsElement;
   earlier.append(el('summary','','Earlier ideas'));earlier.open=!!earlierWasOpen;
   if(messages.length>4)box.append(earlier);
@@ -1171,7 +1179,7 @@ export async function installStudio(){
   const decision=coaching?.details()||{continueTest:false,parents:[],depth:'tune' as const,origin:'child' as const};
   const firstBuild=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   if(firstBuild){
-   const readiness=coaching?.buildReadiness()||creationBuildReadiness(current());
+   const readiness=coaching?.buildReadiness()||creationBuildReadiness(current(),current().design?.creationStandard===2?2:1);
    if(!readiness.ready){status(readiness.reason);return;}
    prompt=coaching?.buildPrompt(request?.compiledPlan?typed:request?.prompt||typed)||prompt;
    // The request contains the full agreed plan; the conversation contains only

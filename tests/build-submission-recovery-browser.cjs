@@ -6,8 +6,8 @@ const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const {exploreWelcome,sendChildMessage,navigate}=require('./studio-entry.cjs');
 const {assertTextContrast}=require('./helpers/text-contrast.cjs');
-const idea='I want a silly moon cat game. I tap to jump between clouds. Catching a donut makes the cat grow. Missing a cloud sends it back to try again.';
-const evidence={action:'I tap to jump between clouds.',consequence:'Catching a donut makes the cat grow.',experience:'silly',world:'moon cat game'};
+const idea='I want a silly moon cat game. I tap to jump between clouds. Catching a donut makes the cat grow. Missing a cloud sends it back to try again. I win by reaching the moon tower. I want a bright cartoon style.';
+const evidence={action:'I tap to jump between clouds.',consequence:'Catching a donut makes the cat grow.',experience:'silly',world:'moon cat game',goal:'I win by reaching the moon tower.',visualStyle:'bright cartoon style',mood:'silly'};
 const ready={move:'listen',text:'Your moon cat jumps for donuts and grows when it catches one. You can build your game.',question:null,suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[],creationReadiness:{ready:true,evidence,unresolved:[]}};
 const current=page=>page.evaluate(()=>{const n=FG.studio.exportNotebook();return n.sessions.find(s=>s.id===n.active[FG.store.current().id]);});
 (async()=>{

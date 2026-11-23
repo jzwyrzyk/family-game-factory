@@ -5,7 +5,7 @@
 import {COACH_POLICY,COACH_SCHEMA} from './policy';
 import {prepareCreationWire} from './private-creation-wire';
 import {approved,type CoachConfig,type CoachProvider} from './service';
-import {PLAN_FIELDS,type CoachContext} from '../../src/studio/design';
+import {PLAN_FIELDS,coachReplyFields,type CoachContext} from '../../src/studio/design';
 export type PrivateCoachConfig = CoachConfig & {apiKey:string};
 
 /** Lossy recovery for non-authoritative model metadata only.
@@ -20,12 +20,13 @@ export function normalizePrivateCoachReply(value:unknown,context:CoachContext):u
  const exact=(item:Record<string,unknown>,allowed:string[])=>Object.keys(item).length===allowed.length&&
   allowed.every(key=>Object.hasOwn(item,key));
  const authored=[context.message,...context.conversation.filter(turn=>turn.role==='child').map(turn=>turn.text)];
+ const fields=coachReplyFields(context);
  const childQuote=(item:unknown):item is {field:typeof PLAN_FIELDS[number];quote:string}=>
-  object(item)&&exact(item,['field','quote'])&&PLAN_FIELDS.includes(item.field as any)&&
+  object(item)&&exact(item,['field','quote'])&&fields.includes(item.field as any)&&
   typeof item.quote==='string'&&!!item.quote.trim()&&item.quote.length<=700&&
   authored.some(text=>text.includes(item.quote as string));
  const suggestion=(item:unknown):item is {field:typeof PLAN_FIELDS[number];value:string}=>
-  object(item)&&exact(item,['field','value'])&&PLAN_FIELDS.includes(item.field as any)&&
+  object(item)&&exact(item,['field','value'])&&fields.includes(item.field as any)&&
   typeof item.value==='string'&&item.value.length<=700;
  // False observations and nonliteral child choices cannot be promoted into
  // authored decisions. Dropping them is safer than losing the entire reply.

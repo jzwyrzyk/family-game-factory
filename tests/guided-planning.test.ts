@@ -89,3 +89,13 @@ test('overlong build details fail visibly instead of truncating a child rule',()
  assert.throws(()=>compileGuidedBuild('A cat explores a moon made from donuts.',design),/shorten your game plan/);
  assert.equal(design.plan.special.value,'Keep. '.repeat(110));
 });
+
+test('current choices and unstructured creative followups reach Build in actual conversation order',()=>{
+ const design=freshDesign(),idea='A fox folds its shadow.';
+ const old='I want red paper. The folds make music.',newer='Silver paper now.',last='The paper sings louder near the den.';
+ design.plan.style={origin:'child',value:newer,accepted:true,delegated:false};
+ const messages=[idea,old,newer,last].map((text,index)=>message(String(index),'child',text));
+ const payload=compileGuidedBuild(idea,design,'',authoredFollowupIntents(messages,design),{messages,selected:{}});
+ assert.ok(payload.includes(old)&&payload.includes(newer)&&payload.includes(last));
+ assert.ok(payload.indexOf(old)<payload.indexOf(newer)&&payload.indexOf(newer)<payload.indexOf(last));
+});

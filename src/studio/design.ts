@@ -3,7 +3,8 @@
  */
 import type {Candidate} from './notebook';
 import {validateCreationReadiness,validateCreationReview,type CreationReadinessVerdict,type CreationReview} from './creation-readiness';
-export const PLAN_FIELDS = ['fun','action','goal','setback','score','style','progression','special'] as const;
+export const LEGACY_PLAN_FIELDS = ['fun','action','goal','setback','score','style','progression','special'] as const;
+export const PLAN_FIELDS = ['fun','action','goal','setback','score','style','viewpoint','movement','progression','special'] as const;
 export type PlanField = typeof PLAN_FIELDS[number];
 export type Origin = 'child'|'helper';
 export interface DesignField {value:string; origin:Origin; accepted:boolean; delegated:boolean}
@@ -14,6 +15,8 @@ export interface DesignRecord {
  ideas:Idea[]; observations:Observation[]; helpLevel:number;
  support:'brief'|'balanced'|'detailed'; paused:boolean; approvedPlan:boolean;
  creationReview?:CreationReview;
+ /** New ideas opt into richer creative readiness; older saved ideas keep their earlier contract. */
+ creationStandard?:2;
 }
 export const DESIGN_IDEA_CAPACITY=100;
 export const DESIGN_OBSERVATION_CAPACITY=300;
@@ -34,7 +37,13 @@ export interface CoachContext {
  conversation:{role:'child'|'helper'|'reflection';text:string}[];
  observations:Observation[]; tests:{label:string;title:string;prediction:string;notes:string}[];
  /** Opt-in keeps older browser clients compatible with the same coach route. */
- creation?:{version:1};
+ creation?:{version:1|2};
+}
+/** Only an explicit v2 request advertises a reader for the new plan fields.
+ * Backend-first rollout must keep v1 and existing-game replies readable by
+ * the previously published browser, even after the provider is upgraded. */
+export function coachReplyFields(context:Pick<CoachContext,'creation'>):readonly PlanField[] {
+ return context.creation?.version===2?PLAN_FIELDS:LEGACY_PLAN_FIELDS;
 }
 export interface CoachReply {
  move:'listen'|'clarify'|'inspire'|'explain'|'reflect'|'propose'|'repair'|'play';
@@ -50,8 +59,9 @@ const keys=(v:object,allowed:string[])=>Object.keys(v).every(k=>allowed.includes
 export function freshDesign():DesignRecord {return {version:1,plan:{},friction:'',ideas:[],observations:[],helpLevel:0,support:'balanced',paused:false,approvedPlan:false};}
 export function validateDesign(input:unknown):DesignRecord {
  const d=input as DesignRecord;
- if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan','creationReview'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
+ if(!d||d.version!==1||!keys(d,['version','plan','friction','ideas','observations','helpLevel','support','paused','approvedPlan','creationReview','creationStandard'])||!d.plan||typeof d.plan!=='object'||Array.isArray(d.plan)||!keys(d.plan,[...PLAN_FIELDS])||!text(d.friction,1000)||!Number.isInteger(d.helpLevel)||d.helpLevel<0||d.helpLevel>3||!['brief','balanced','detailed'].includes(d.support)||typeof d.paused!=='boolean'||typeof d.approvedPlan!=='boolean')throw Error('Invalid design record.');
  if(d.creationReview!==undefined)validateCreationReview(d.creationReview);
+ if(d.creationStandard!==undefined&&d.creationStandard!==2)throw Error('Invalid creation standard.');
  for(const field of Object.values(d.plan)){if(!field||!keys(field,['value','origin','accepted','delegated'])||!text(field.value,700)||!['child','helper'].includes(field.origin)||typeof field.accepted!=='boolean'||typeof field.delegated!=='boolean')throw Error('Invalid plan field.');}
  if(Array.isArray(d.ideas)&&d.ideas.length>DESIGN_IDEA_CAPACITY)throw new DesignCapacityError('idea');
  if(!Array.isArray(d.ideas)||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
@@ -82,14 +92,15 @@ export function missingPlan(d:DesignRecord):PlanField[] {
 export function planBrief(d:DesignRecord):string {return PLAN_FIELDS.map(k=>`${k}: ${d.plan[k]?.value|| (d.plan[k]?.delegated?'Choose a sensible option and report it.':'Not specified.')}`).join('\n');}
 export function validateCoachReply(value:unknown,context:CoachContext):CoachReply {
  const r=value as CoachReply;
- if(!r||!keys(r,['move','text','question','suggestions','proposedChange','planSuggestions','childDecisions','evidenceIds','creationReadiness'])||!['listen','clarify','inspire','explain','reflect','propose','repair','play'].includes(r.move)||!text(r.text,1800)||!(r.question===null||text(r.question,350))||!Array.isArray(r.suggestions)||r.suggestions.length>4||!r.suggestions.every(t=>text(t,500))||!Array.isArray(r.planSuggestions)||r.planSuggestions.length>8||!r.planSuggestions.every(p=>p&&keys(p,['field','value'])&&PLAN_FIELDS.includes(p.field)&&text(p.value,700))||!Array.isArray(r.evidenceIds)||r.evidenceIds.length>8||!r.evidenceIds.every(x=>context.observations.some(o=>o.id===x)))throw Error('Invalid coach response.');
+ const fields=coachReplyFields(context);
+ if(!r||!keys(r,['move','text','question','suggestions','proposedChange','planSuggestions','childDecisions','evidenceIds','creationReadiness'])||!['listen','clarify','inspire','explain','reflect','propose','repair','play'].includes(r.move)||!text(r.text,1800)||!(r.question===null||text(r.question,350))||!Array.isArray(r.suggestions)||r.suggestions.length>4||!r.suggestions.every(t=>text(t,500))||!Array.isArray(r.planSuggestions)||r.planSuggestions.length>8||!r.planSuggestions.every(p=>p&&keys(p,['field','value'])&&fields.includes(p.field)&&text(p.value,700))||!Array.isArray(r.evidenceIds)||r.evidenceIds.length>8||!r.evidenceIds.every(x=>context.observations.some(o=>o.id===x)))throw Error('Invalid coach response.');
  if(r.proposedChange!==null&&(!r.proposedChange||!keys(r.proposedChange,['title','request','depth'])||!text(r.proposedChange.title,120)||!text(r.proposedChange.request,2000)||!['tune','redesign','rethink'].includes(r.proposedChange.depth)))throw Error('Invalid proposed experiment.');
- if(r.childDecisions!==undefined&&(!Array.isArray(r.childDecisions)||r.childDecisions.length>8||!r.childDecisions.every(d=>d&&keys(d,['field','quote'])&&PLAN_FIELDS.includes(d.field)&&text(d.quote,700)&&d.quote.trim().length>0&&[context.message,...context.conversation.filter(m=>m.role==='child').map(m=>m.text)].some(t=>t.includes(d.quote)))))throw Error('Child decision needs an exact child-authored quote.');
+ if(r.childDecisions!==undefined&&(!Array.isArray(r.childDecisions)||r.childDecisions.length>8||!r.childDecisions.every(d=>d&&keys(d,['field','quote'])&&fields.includes(d.field)&&text(d.quote,700)&&d.quote.trim().length>0&&[context.message,...context.conversation.filter(m=>m.role==='child').map(m=>m.text)].some(t=>t.includes(d.quote)))))throw Error('Child decision needs an exact child-authored quote.');
  // No response can mutate a game, promote a version, or assert secret tool execution.
  if(context.mode==='reflect'&&r.move==='propose'&&r.proposedChange===null)throw Error('Missing proposal.');
  if(((r.text+' '+(r.question||'')).match(/\?/g)||[]).length>1)throw Error('Ask one useful question at a time.');
  const reply=copy(r);
- if(context.creation?.version===1){
+ if(context.creation?.version===1||context.creation?.version===2){
   if(reply.creationReadiness===undefined||reply.creationReadiness===null)throw Error('CREATION_REVIEW_MISSING');
   reply.creationReadiness=validateCreationReadiness(reply.creationReadiness,context);
   // A successful review means no material question remains. Do not send a
@@ -99,23 +110,23 @@ export function validateCoachReply(value:unknown,context:CoachContext):CoachRepl
  else delete reply.creationReadiness;
  return reply;
 }
-export const PLAN_LABELS:Record<PlanField,string>={fun:'What would make it fun?',action:'What does the player do?',goal:'What is the goal?',setback:'What happens when things go wrong?',score:'Points or rewards — or none?',style:'How should it look and feel?',progression:'What changes as you get better?',special:'Any special rules — or none?'};
+export const PLAN_LABELS:Record<PlanField,string>={fun:'How should it feel?',action:'What does the player do?',goal:'How do you win or enjoy free play?',setback:'What happens when things go wrong?',score:'Points or rewards — or none?',style:'How should it look?',viewpoint:'Where do you see the game from?',movement:'How does your character move?',progression:'What changes as you get better?',special:'Any funny surprises or special rules?'};
 /** A deliberately limited offline aid, not an LLM and never a build command. */
 export function localCoach(c:CoachContext):CoachReply {
  let message='Your idea is saved. You choose what we try.',question:string|null=null,suggestions:string[]=[],move:CoachReply['move']='listen';
  if(c.mode==='ideas'){
-  move='inspire';message='Here are starting points, not answers you have to choose.';
-  suggestions=c.helpLevel>=2?['Replace the hardest action with something your character already does well.','Let a mistake cause a funny surprise instead of ending the round.','Try a different goal while keeping the part you enjoy.']:['Keep the goal, but change the action.','Change the warning or feedback, not just the difficulty.','Imagine a different kind of fun.'];question='Does one of these spark your own idea?';
+  move='inspire';message='Here are some ideas from jems. You can change any of them.';
+  suggestions=c.helpLevel>=2?['Replace the hardest action with something your character already does well.','Let a mistake cause a funny surprise instead of ending the round.','Try a different goal while keeping the part you enjoy.']:['Keep the goal, but change the action.','Invent a new way for your game to show what happens next.','Imagine a different kind of fun.'];question='Does one of these spark your own idea?';
  }else if(c.mode==='explain'){
-  move='explain';message='Tuning changes how an action behaves. Redesigning changes the action itself. Rethinking questions the goal. A win alone does not tell us which feels more fun.';question='Which part would you like to explore?';
+  move='explain';message='You can change how a move works, invent a different move, or change what you’re trying to do.';question='Which part would you like to explore?';
  }else if(c.mode==='reflect'){
   move='reflect';message=c.plan.fun?.value?`You wanted: ${c.plan.fun.value}. Your preference matters, not just the score.`:'One play is an observation, not proof that a version is better.';question='What worked, or what would you change?';
  }else if(/\b(win|won|winning|victory|beat|finish)\b/i.test(c.message)&&/\b(every|always|too easy|each time)\b/i.test(c.message)){
-  move='clarify';message='It sounds like winning happens a lot. You get to decide whether this game should be relaxing or more challenging.';question='Should we add a tricky part, or do you like winning every time?';
+  move='clarify';message='You keep reaching the end.';question='How does it feel when you win?';
  }else if(/\b(seal|penguin|dragon|cat|robot)\b/i.test(c.message)&&/\b(game|jump|ice|moon|pizza|make|create|build|want|bounc)\b/i.test(c.message)){
   move='clarify';message='I saved the idea you described. We can figure out how the character plays before choosing Build my game.';question='What is the most fun thing your character should do?';
  }else if(/\b(don.t know|stuck|help)\b/i.test(c.message)){
-  move='clarify';question=c.helpLevel===0?'Which moment felt tricky?':c.helpLevel===1?'Was it the controls, understanding what happened, or something else?':'Would an example or a completely different direction help?';message='We can make the question smaller, or you can ask for ideas.';
+  move='clarify';question=c.helpLevel===0?'Which moment felt tricky?':c.helpLevel===1?'Picture yourself inside your game. What happens in that moment?':'Think of a toy you like. What could it do in your game?';message='We can make the question smaller, or you can ask for ideas.';
  }else if(/\b(aim(?:ing)?|control(?:s)?|buttons|shoot(?:ing)?)\b/i.test(c.message)&&/\b(hard|hate|difficult|can.t|don.t like)\b/i.test(c.message)){
   move='clarify';message='We can question the action itself, not only make it easier.';question='Does your character need to do that action, or could you reach the goal another way?';
  }else if(/\b(boring|not fun|don.t like|hate)\b/i.test(c.message)){

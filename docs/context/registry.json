@@ -129,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:19.185Z",
-      "sourceDigest": "fd71a375d21b896e9ed02b7706bc93ea30be96794f30ebeb93e0b32ec4b3ce52",
+      "reviewedAt": "2026-11-23T05:34:30.307Z",
+      "sourceDigest": "fb92aa48ed28a5b0b974b46f50c895c97f91bf7d63b892ab035bd37fbbbe38f9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined owner-approved Factory, assembly-v3, First steps, unified Mining and Notifications contracts against doctrine. Existing Keep, ownership, learning and provider boundaries remain explicit; release authorization is recorded separately from acceptance.",
+      "reviewReason": "Reviewed creative-discovery seven-dimension v2 intent alongside the merged four-experience doctrine; preserve explicit Build, child invention and selected helper attribution without changing games, rewards or learning contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -226,6 +226,20 @@
           "reviewReason": "Recorded owner-directed real-object assembly, visible gum joins, extended payoff and saved-engine preservation in doctrine and decision."
         },
         {
+          "sourceCommit": "85f461d6e55f4e3012b700936cb83907248e2eba",
+          "reviewedAt": "2026-11-23T02:35:27.598Z",
+          "sourceDigest": "73ca76f7e495126b1a9145690ce96ae593d2c1512a82000a136d6c5f02024864",
+          "reviewOutcome": "updated",
+          "reviewReason": "The doctrine and guided-creation decision record now distinguish open discovery, named helper adoption and the seven v2 first-build dimensions."
+        },
+        {
+          "sourceCommit": "3a6fcca34b2e9d15bb2d6596153069db57056a04",
+          "reviewedAt": "2026-11-23T03:35:19.185Z",
+          "sourceDigest": "fd71a375d21b896e9ed02b7706bc93ea30be96794f30ebeb93e0b32ec4b3ce52",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the combined owner-approved Factory, assembly-v3, First steps, unified Mining and Notifications contracts against doctrine. Existing Keep, ownership, learning and provider boundaries remain explicit; release authorization is recorded separately from acceptance."
+        },
+        {
           "reviewedAt": "2026-11-21T18:48:49.185Z",
           "sourceDigest": "3276525a3b4dacf6ff2e8b9ac4fafada8833408ca653671a0a7a10e71af29d20",
           "reviewOutcome": "unchanged",
@@ -278,10 +292,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:19.713Z",
-      "sourceDigest": "620650089f438558519517cb3ee2b461b9e46308d01018294556a579afe66dd0",
+      "reviewedAt": "2026-11-23T05:34:31.058Z",
+      "sourceDigest": "c85ece9b7b5c6c89ec213afee521ff9e7b4b7f97dd15db145745112d876c5d48",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled shared running Mining with current navigation and Notifications; documented live in-place Help, explicit resume, optional sound and narration cleanup. Preserved current private chat, owner guards, saved versions and all existing shell routes.",
+      "reviewReason": "Reviewed the combined Studio/navigation/notebook sources against current main; documented atomic v2 session creation and stable selected-option rechecks while retaining Notifications, profile/grade, saved game, narration and explicit Build behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -340,6 +354,20 @@
           "reviewReason": "Reviewed the shared game controls and assembly Help for consistent neutral targets and pink joins."
         },
         {
+          "sourceCommit": "85f461d6e55f4e3012b700936cb83907248e2eba",
+          "reviewedAt": "2026-11-23T02:41:13.213Z",
+          "sourceDigest": "71504d8f07f1bb02cf7c397c679c6c20c70883b5a49c13405df7c99ea8d0241c",
+          "reviewOutcome": "updated",
+          "reviewReason": "The first-creation journey preserves exact child turns for reassessment after a chat outage, including choices based on an earlier helper reply."
+        },
+        {
+          "sourceCommit": "3a6fcca34b2e9d15bb2d6596153069db57056a04",
+          "reviewedAt": "2026-11-23T03:35:19.713Z",
+          "sourceDigest": "620650089f438558519517cb3ee2b461b9e46308d01018294556a579afe66dd0",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled shared running Mining with current navigation and Notifications; documented live in-place Help, explicit resume, optional sound and narration cleanup. Preserved current private chat, owner guards, saved versions and all existing shell routes."
+        },
+        {
           "reviewedAt": "2026-11-21T18:48:49.739Z",
           "sourceDigest": "cba5d48cf312f21ce42bf1281fbba61aa4dbef39e232f5c18c9211a32828f20a",
           "reviewOutcome": "updated",
@@ -364,10 +392,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "18e6acdaf501cbc0be82948715dc225914c95180bac085b2c225f3a0c1c46b49",
-      "reviewedAt": "2026-11-23T03:35:20.859Z",
+      "sourceDigest": "fe6facdb555a348abc3ab99ef75ab2b7e6cfeab75e39f654adc92d03055727ba",
+      "reviewedAt": "2026-11-23T05:34:31.892Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed First steps exact-value editing and independent event programs, bounded Pal compositing and immutable saved scene references. Documented scoped challenge Help locators and eight passing backup/recovery journeys without removing nested Help or weakening assertions.",
+      "reviewReason": "Reviewed v2 readiness coverage against the merged First steps source; the architecture preserves seven-source first-build gates separately from Coding scene practice, saved references and recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -410,6 +438,20 @@
           "sourceDigest": "412ea1328277c17fbb86ad55f7df22feed1a055bbf3fb24cacdee441049a5692",
           "reviewOutcome": "unchanged",
           "reviewReason": "Changes matching tests/creation-* are first-game conversation-readiness regressions. Block-scene authoring, engine, generated manifest adapters, scene persistence and its existing contracts are unchanged."
+        },
+        {
+          "sourceCommit": "85f461d6e55f4e3012b700936cb83907248e2eba",
+          "reviewedAt": "2026-11-23T01:04:40.735Z",
+          "sourceDigest": "14986de0c075a11ce1f2aeaee823c810b07d51c9a9720f81d2e7b55d18b31b0b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded broader creation-readiness test coverage and the v2 seven-source field gate in ARCHITECTURE-CURRENT. Existing Creation Studio scene practice remains separate from new game invention."
+        },
+        {
+          "sourceCommit": "3a6fcca34b2e9d15bb2d6596153069db57056a04",
+          "reviewedAt": "2026-11-23T03:35:20.859Z",
+          "sourceDigest": "18e6acdaf501cbc0be82948715dc225914c95180bac085b2c225f3a0c1c46b49",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed First steps exact-value editing and independent event programs, bounded Pal compositing and immutable saved scene references. Documented scoped challenge Help locators and eight passing backup/recovery journeys without removing nested Help or weakening assertions."
         },
         {
           "reviewedAt": "2026-11-21T15:39:46.199Z",
@@ -700,10 +742,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:22.537Z",
-      "sourceDigest": "57f21bf5c6a4ae0afb0194d6c4c47f00b5cf96bf5bed4fe748ee94733e878b3a",
+      "reviewedAt": "2026-11-23T05:34:32.363Z",
+      "sourceDigest": "793919bb18899b9c39f14cfe80c51612434f677d2389c58efeb383f78d2ea402",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed inherited default-off narration endpoints, independent consent/budget/private-service checks and bounded metadata reads alongside merged PR133 optional-reply recovery. Current architecture records preserved source; natural narration remains separately unactivated and no provider calls were made.",
+      "reviewReason": "Documented legacy eight-field response capability gating for backend-first rollout, preserved v2 seven-dimension evidence, optional reply recovery and privacy/spending boundaries, and marked the original PR18 release scope historical.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -718,6 +760,20 @@
           "sourceDigest": "094a58d4ec0d1e6be98391a3ab191520710c1a120b620e484979ecd6606ed411",
           "reviewOutcome": "updated",
           "reviewReason": "Reconciled merged PR131 private readiness source references and exact quote restoration with the default-off narration path; retained its complete policy/provider/wire implementation, public validators, spending boundaries and private inference documentation."
+        },
+        {
+          "sourceCommit": "85f461d6e55f4e3012b700936cb83907248e2eba",
+          "reviewedAt": "2026-11-23T02:41:15.368Z",
+          "sourceDigest": "471bc52532c3d862a7f7f9b6bd6bec0e180183483893fae322167c168cb128e0",
+          "reviewOutcome": "updated",
+          "reviewReason": "The policy and source credit both cover earlier examples offered in prose, and reconnect can restore their authorship using the exact child selection."
+        },
+        {
+          "sourceCommit": "3a6fcca34b2e9d15bb2d6596153069db57056a04",
+          "reviewedAt": "2026-11-23T03:35:22.537Z",
+          "sourceDigest": "57f21bf5c6a4ae0afb0194d6c4c47f00b5cf96bf5bed4fe748ee94733e878b3a",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed inherited default-off narration endpoints, independent consent/budget/private-service checks and bounded metadata reads alongside merged PR133 optional-reply recovery. Current architecture records preserved source; natural narration remains separately unactivated and no provider calls were made."
         },
         {
           "reviewedAt": "2026-11-21T18:37:25.356Z",
@@ -750,10 +806,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "198530a0b2ecfa6bcd38ef013be0c33d983a850b3c00e6d7045deaaa04877e97",
-      "reviewedAt": "2026-11-21T14:34:24.173Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture and delivery record health availability versus actual adult conversation outcome scoped to session version, plus exact-audience retry recovery tests. No consent, grant, credential or privacy authority changed.",
+      "sourceDigest": "e463bbb341ce42ac878964926183ed1fb97658435c94599f17dc5af62bc10ebc",
+      "reviewedAt": "2026-11-23T02:35:29.925Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the synthetic adult reconnect fixture now returns seven empty evidence fields for its v2 request. Adult authentication, consent, isolation, budget and reporting contracts are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -805,10 +861,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T04:08:52.534Z",
-      "sourceDigest": "68391dfba47b3a938eb82ae8401515b9cffebb789df571a285e853e323b519a7",
+      "reviewedAt": "2026-11-23T05:34:32.891Z",
+      "sourceDigest": "b17d0d78ccf6f6594c4031d4c967987556266f255123a4afe613ec82e5a5439f",
       "reviewOutcome": "updated",
-      "reviewReason": "Explicitly inspected all nine hosted Chromium 141 reference PNGs, three Help views and sampled normal-motion held-spill/fall/retry frames. Verified archive, clean build/tree, manifest, dimensions and image hashes; retained the original nine failed comparisons and all 13 functional passes. No tolerance or assertion changes; final-head CI remains required.",
+      "reviewReason": "Recorded current-main integration evidence and new exact-selection recheck, atomic-creation fault and legacy reply compatibility regressions; retained all merged game/browser baselines and distinguish local fixtures from required final-head hosted checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -951,6 +1007,20 @@
           "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
         },
         {
+          "sourceCommit": "85f461d6e55f4e3012b700936cb83907248e2eba",
+          "reviewedAt": "2026-11-23T02:41:17.108Z",
+          "sourceDigest": "e43d51d42cbe4de253ebbddb124314bef39bcc3aeed235591966f47231c9276b",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the additional reconnect regression alongside the documented chronological compiler, selection proof, legacy reader and separate observed-language rubric."
+        },
+        {
+          "sourceCommit": "3a6fcca34b2e9d15bb2d6596153069db57056a04",
+          "reviewedAt": "2026-11-23T04:08:52.534Z",
+          "sourceDigest": "68391dfba47b3a938eb82ae8401515b9cffebb789df571a285e853e323b519a7",
+          "reviewOutcome": "updated",
+          "reviewReason": "Explicitly inspected all nine hosted Chromium 141 reference PNGs, three Help views and sampled normal-motion held-spill/fall/retry frames. Verified archive, clean build/tree, manifest, dimensions and image hashes; retained the original nine failed comparisons and all 13 functional passes. No tolerance or assertion changes; final-head CI remains required."
+        },
+        {
           "reviewedAt": "2026-11-21T18:49:14.890Z",
           "sourceDigest": "93106ebb6a7823674ec920c2ff806de0975a4c7f6bfce57eb91d102b842a51f8",
           "reviewOutcome": "updated",
@@ -985,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T04:34:33.110Z",
-      "sourceDigest": "ae5821af3105addbd8d551dbf71f4c39a06e016ca9d82a1ebfc931944d5f5657",
+      "reviewedAt": "2026-11-23T05:34:55.804Z",
+      "sourceDigest": "c1595529f4012b6e0009848fdca72fa490d2325f1229ac0bde51a3f26fcfaf36",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified PR134 merge afa5251, exact tested-tree identity, all final release workflows and ready-event documentation success, and observed source-PR closure. Corrected the stale architecture paragraph to the already-integrated running Mining engine. Manual Pages and absent deployment remain explicit; no runtime or service configuration changes.",
+      "reviewReason": "Recorded PR135 integration against merged PR134/136, concrete source/compatibility repairs and current fixture evidence; explicitly preserve pending exact-head hosted acceptance, backend-first release requirements and the no-production-change boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

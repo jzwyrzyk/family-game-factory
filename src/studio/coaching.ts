@@ -4,8 +4,8 @@ import {familyFetch} from '../builder/session';
 import type {BuilderConfig} from '../builder/client';
 import {conversationDisposition} from './experience';
 import {visibleConversation} from './conversation-view';
-import {creationInputFingerprint,recordCreationReview,creationBuildReadiness,creationConversation,creationPlan,lastCreationTurn,type CreationBuildReadiness} from './creation-readiness';
-import {guidedDelegation,explicitPlanChoices,compileGuidedBuild,isExplicitPlanRevision,authoredFollowupIntents,isRejectedChildTurn,isHelperAuthoredTurn} from './guided-planning';
+import {creationInputFingerprint,recordCreationReview,creationBuildReadiness,creationConversation,creationPlan,lastCreationTurn,selectedSuggestions,selectionId,isBlanketAssent,type CreationBuildReadiness} from './creation-readiness';
+import {guidedDelegation,isConversationOnly,suggestionsBehindChoice,explicitPlanChoices,compileGuidedBuild,isExplicitPlanRevision,authoredFollowupIntents,isRejectedChildTurn,isHelperAuthoredTurn} from './guided-planning';
 interface Hooks {
  notebook:StudioNotebook;current():StudioSession;owner():string;
  message(s:StudioSession,role:'child'|'helper'|'reflection',text:string):void;
@@ -74,7 +74,9 @@ export function installCoaching(h:Hooks){
   if(!explicit&&prior?.value===value){pendingFields.delete(key);return;}
   pendingFields.set(key,value);
   const unchangedHelper=helper?.value===value?helper:prior?.origin==='helper'&&prior.value===value?prior:undefined;
-  try{h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();x.design.plan[key]=unchangedHelper
+  try{h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();
+   if(value!==prior?.value)x.design.ideas=x.design.ideas.filter(idea=>!idea.id.startsWith('selection:'+key+':'));
+   x.design.plan[key]=unchangedHelper
     ?{...unchangedHelper,accepted:explicit||unchangedHelper.accepted,delegated:explicit?false:unchangedHelper.delegated}
     :{value,origin:'child',accepted:!!value.trim(),delegated:false};x.design.approvedPlan=false;});}
   catch(error){planStatus.textContent='This answer has not saved yet. Keep it here and try Save my answer again.';throw error;}
@@ -83,7 +85,7 @@ export function installCoaching(h:Hooks){
   renderPlan();
   if(explicit)h.status('Saved your choice. Nothing has been built yet.');
  }
- function firstIdea(s:StudioSession){return visibleConversation(s.messages).find((m,index,messages)=>m.role==='child'&&!isHelperAuthoredTurn(m,s.design||freshDesign())&&!isRejectedChildTurn(messages,index,s.design)&&!['Build my game','Build this plan'].includes(m.text)&&!guidedDelegation(m.text))?.text||s.draft;}
+ function firstIdea(s:StudioSession){return visibleConversation(s.messages).find((m,index,messages)=>m.role==='child'&&!isHelperAuthoredTurn(m,s.design||freshDesign())&&!isRejectedChildTurn(messages,index,s.design)&&!['Build my game','Build this plan'].includes(m.text)&&!isConversationOnly(m.text)&&!guidedDelegation(m.text))?.text||s.draft;}
  function isNewIdea(s:StudioSession){return s.game==='new'&&!s.remoteId&&!s.projectId&&!s.candidate;}
  function sourceOf(s:StudioSession,text:string):Origin{return s.design?.ideas.some(idea=>idea.origin==='helper'&&idea.text.trim()===text.trim())||Object.values(s.design?.plan||{}).some(choice=>choice?.origin==='helper'&&choice.value.trim()===text.trim())?'helper':'child';}
  function buildReadiness():CreationBuildReadiness {
@@ -91,7 +93,7 @@ export function installCoaching(h:Hooks){
   if(!isNewIdea(s))return {ready:true,reason:''};
   if(thinking)return {ready:false,reason:'jems is still thinking about your idea.',issue:'thinking'};
   if(pendingFields.size)return {ready:false,reason:'Save your new ideas before building.',issue:'unsaved'};
-  const readiness=creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value});
+  const readiness=creationBuildReadiness({...s,draft:$<HTMLTextAreaElement>('studioPrompt').value},s.design?.creationStandard===2?2:1);
   if(!readiness.ready&&readiness.issue!=='draft'&&reviewUnavailable)return {ready:false,reason:'Chat could not check your idea. Try reconnecting.',issue:'review-unavailable'};
   return readiness;
  }
@@ -110,14 +112,15 @@ export function installCoaching(h:Hooks){
   const readiness=buildReadiness();if(!readiness.ready)throw Error(readiness.reason);
   if(latestIntent.trim()&&!s.messages.some(message=>message.role==='child'&&message.text.trim()===latestIntent.trim()))throw Error('Send your new idea so we can think it through first.');
   const design={...s.design!,plan:creationPlan(s)};
-  return compileGuidedBuild(firstIdea(s),design,latestIntent,authoredFollowupIntents(visibleConversation(s.messages),design));
+  const messages=visibleConversation(s.messages);
+  return compileGuidedBuild(firstIdea(s),design,latestIntent,authoredFollowupIntents(messages,design),{messages,selected:selectedSuggestions(s,messages)});
  }
- function saveLiteralChoices(s:StudioSession,text:string,prior?:CoachContext['plan'],source:Origin='child',modelFields:readonly PlanField[]=[]){
+ function saveLiteralChoices(s:StudioSession,text:string,prior?:CoachContext['plan'],source:Origin='child'){
   const expressed=explicitPlanChoices(text);if(!Object.keys(expressed).length)return;
   const correction=isExplicitPlanRevision(text);
   h.notebook.update(s.id,s.owner,x=>{x.design ||= freshDesign();let changed=false;const accepted=creationPlan(h.notebook.withConversation(x));for(const key of PLAN_FIELDS){
    const current=x.design.plan[key],unchanged=prior===undefined||JSON.stringify(current)===JSON.stringify(prior[key]);
-   if(expressed[key]&&!modelFields.includes(key)&&unchanged&&(correction||!accepted[key]?.accepted||current?.delegated)){x.design.plan[key]={...expressed[key]!,origin:source};changed=true;}
+   if(expressed[key]&&current?.origin!=='helper'&&unchanged&&(correction||!accepted[key]?.accepted||current?.delegated)){x.design.plan[key]={...expressed[key]!,origin:source};changed=true;}
   }if(changed)x.design.approvedPlan=false;});
   h.onSavedDesignChange?.(s,h.notebook.get(s.id,s.owner));
  }
@@ -140,7 +143,7 @@ export function installCoaching(h:Hooks){
  function context(message:string,mode:CoachContext['mode']):CoachContext {
   const s=h.current(),d=s.design||freshDesign(),creating=isNewIdea(s);
   const conversation=visibleConversation(s.messages).filter(message=>!creating||message.role!=='child'||!isHelperAuthoredTurn(message,d));
-  const result:CoachContext={message,mode,game:s.game,...(creating?{creation:{version:1 as const}}:{}),plan:creating?creationPlan(s):d.plan,rules:h.rules(),friction:d.friction,helpLevel:d.helpLevel,support:d.support,conversation:creating?[]:conversation.slice(-10).map(m=>({role:m.role,text:m.text})),observations:d.observations.slice(-8),tests:(s.experiments||[]).slice(-8).map(e=>({label:e.label,title:e.title,prediction:e.prediction,notes:e.notes}))};
+  const result:CoachContext={message,mode,game:s.game,...(creating?{creation:{version:d.creationStandard===2?2 as const:1 as const}}:{}),plan:creating?creationPlan(s):d.plan,rules:h.rules(),friction:d.friction,helpLevel:d.helpLevel,support:d.support,conversation:creating?[]:conversation.slice(-10).map(m=>({role:m.role,text:m.text})),observations:d.observations.slice(-8),tests:(s.experiments||[]).slice(-8).map(e=>({label:e.label,title:e.title,prediction:e.prediction,notes:e.notes}))};
   if(creating){
    // Keep authored intent within the existing 16-entry protocol and the default
    // 16k input allowance. Old test notes cannot crowd out a first game's idea.
@@ -159,31 +162,58 @@ export function installCoaching(h:Hooks){
    await h.tryRequest(prompt,from,level,displayText,compiledPlan);
   }catch(error){if(!token||token===requestGeneration)report(error,captured);}finally{if(token&&token===requestGeneration){force=false;requestInFlight=false;origin='child';depth='tune';}}
  }
- function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession,turn?:{text:string;prior:CoachContext['plan'];origin:Origin;messageId:string;reviewCurrent:boolean;requestMode:CoachContext['mode']}){
+ function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession,turn:{text:string;prior:CoachContext['plan'];origin:Origin;messageId:string;direct:boolean;reviewCurrent:boolean;requestMode:CoachContext['mode']}){
   const before=h.notebook.get(captured.id,captured.owner);
   h.notebook.update(captured.id,captured.owner,s=>{
    s.design ||= freshDesign();let changed=false;
+   const retained=h.notebook.withConversation(s);
+   const turnIndex=retained.messages.findIndex(message=>message.id===turn.messageId);
+   const earlier=retained.messages.slice(0,Math.max(0,turnIndex));
    for(const d of reply.childDecisions||[]){
-    const previous=s.design.plan[d.field],unchanged=!turn||JSON.stringify(previous)===JSON.stringify(turn.prior[d.field]);
-    const correction=!!turn&&isExplicitPlanRevision(turn.text)&&turn.text.includes(d.quote);
-    if(unchanged&&(!creationPlan(h.notebook.withConversation(s))[d.field]?.accepted||previous?.delegated||correction)){
-     s.design.plan[d.field]={value:d.quote,origin:turn?.text.includes(d.quote)?turn.origin:sourceOf(s,d.quote),accepted:true,delegated:false};changed=true;
+    if(isBlanketAssent(d.quote)||isConversationOnly(turn.text)||guidedDelegation(turn.text))continue;
+    const previous=s.design.plan[d.field],unchanged=JSON.stringify(previous)===JSON.stringify(turn.prior[d.field]);
+    const currentQuote=turn.text.includes(d.quote);
+    if(s.design.creationStandard===2&&!currentQuote)continue;
+    const correction=currentQuote&&turn.direct&&(s.design.creationStandard===2||isExplicitPlanRevision(turn.text));
+    if(!unchanged)continue;
+    const offers=currentQuote?suggestionsBehindChoice(d.field,d.quote,previous,earlier,reply.planSuggestions,s.design.ideas):[];
+    // An offline save may have filed this same literal sentence as a child
+    // field. Reassessment can restore its credit without replacing newer work.
+    const restoresOrigin=offers.length>0&&previous?.origin==='child'&&turn.text.includes(previous.value)&&previous.value.includes(d.quote);
+    if(creationPlan(retained)[d.field]?.accepted&&!previous?.delegated&&!correction&&!restoresOrigin)continue;
+    const origin=offers.length?'helper':currentQuote?turn.origin:sourceOf(s,d.quote);
+    if(origin==='helper'&&!offers.length&&previous?.accepted)continue;
+    if(previous?.accepted&&previous.value===d.quote&&!offers.length)continue;
+    s.design.ideas=s.design.ideas.filter(idea=>!idea.id.startsWith('selection:'+d.field+':'));
+    s.design.plan[d.field]={value:d.quote,origin,accepted:origin==='child'||offers.length>0,delegated:false};
+    for(const [index,suggestion] of offers.entries()){
+     const offer=s.design.ideas.find(idea=>idea.origin==='helper'&&!idea.adopted&&idea.text===suggestion);
+     if(offer)offer.adopted=true;
+     const id=selectionId(d.field,index,turn.messageId);
+     s.design.ideas.push({id,text:suggestion,origin:'helper',adopted:true});
+     // A fresh, typed selection can itself be the name of an offered option.
+     // Rechecks and legacy helper-inserted turns cannot acquire that authority.
+     if(turn.direct&&turn.text===d.quote&&turn.text===suggestion&&reply.planSuggestions.some(p=>p.field===d.field&&p.value===suggestion)){
+      s.design.ideas=s.design.ideas.filter(idea=>idea.id!=='helper-turn:'+turn.messageId);
+     }
     }
+    changed=true;
    }
    for(const p of reply.planSuggestions){const current=s.design.plan[p.field];if(!current||current.delegated||current.origin==='helper'&&!current.accepted){s.design.plan[p.field]={value:p.value,origin:'helper',accepted:false,delegated:false};changed=true;}}
    // Remember only turns fully represented by a saved field. A later revision
    // may replace that answer without reviving it as an unrelated extra rule.
-   for(const message of h.notebook.withConversation(s).messages){
+   for(const message of retained.messages){
     if(message.role!=='child'||!Object.values(s.design.plan).some(choice=>choice?.accepted&&!choice.delegated&&choice.value.trim()===message.text.trim()))continue;
     const id='plan-answer:'+message.id;
     if(!s.design.ideas.some(idea=>idea.id===id))s.design.ideas.push({id,text:message.text.slice(0,1000),origin:sourceOf(s,message.text),adopted:true});
    }
-   for(const text of [...reply.suggestions,...(reply.proposedChange?[reply.proposedChange.request]:[])]){
+   const offeredPhrases=s.design.creationStandard===2?reply.planSuggestions.map(p=>p.value).filter(value=>value.trim()&&reply.text.includes(value)):[];
+   for(const text of [...offeredPhrases,...reply.suggestions,...(reply.proposedChange?[reply.proposedChange.request]:[])]){
     const bounded=text.slice(0,1000);if(!s.design.ideas.some(idea=>idea.origin==='helper'&&idea.text===bounded))s.design.ideas.push({id:crypto.randomUUID(),text:bounded,origin:'helper',adopted:false});
    }
    if(changed)s.design.approvedPlan=false;
-   if(mode==='model'&&turn?.reviewCurrent&&isNewIdea(s)&&reply.creationReadiness){
-    try{s.design.creationReview=recordCreationReview(h.notebook.withConversation(s),reply.creationReadiness);}catch{delete s.design.creationReview;reviewUnavailable=true;}
+   if(mode==='model'&&turn.reviewCurrent&&isNewIdea(s)&&reply.creationReadiness){
+    try{s.design.creationReview=recordCreationReview(retained,reply.creationReadiness,s.design.creationStandard===2?2:1);}catch{delete s.design.creationReview;reviewUnavailable=true;}
    }
   });
   h.onSavedDesignChange?.(before,h.notebook.get(captured.id,captured.owner));
@@ -191,7 +221,7 @@ export function installCoaching(h:Hooks){
   // The connected coach's reflection and contextual question are the actual
   // conversation. Never replace them with a fixed interview or answer buttons.
   if(text.trim())h.message(captured,'helper',text);
-  if(reply.suggestions.length&&turn?.requestMode==='ideas')h.message(captured,'helper','Some ideas from jems:\n'+reply.suggestions.join('\n'));
+  if(reply.suggestions.length&&turn.requestMode==='ideas')h.message(captured,'helper','Some ideas from jems:\n'+reply.suggestions.join('\n'));
   if(question)h.message(captured,'helper',question);
   const box=$('coachProposals');box.replaceChildren();
   if(reply.proposedChange&&!isNewIdea(captured)){const proposal=reply.proposedChange;box.append(action('Try this idea: '+proposal.title,()=>{if(isCurrent(captured))return request(proposal.request,'helper',proposal.depth);}));}
@@ -205,7 +235,10 @@ export function installCoaching(h:Hooks){
    captured=h.current();const input=$<HTMLTextAreaElement>('studioPrompt'),submittedDraft=input.value,submittedVersion=promptVersion;
    const planAtSubmission=captured.design?.plan;
    const text=(supplied??submittedDraft).trim()||(mode==='ideas'?'Please help me find ideas.':mode==='explain'?'Explain the relevant game-design choice.':'What could I think about next?');
-   const submittedOrigin=sourceOf(captured,text);
+   // Rechecking an existing child turn must retain its recorded authority. Its
+   // literal words may now equal a selected helper-origin plan value.
+   const reviewedMessage=reviewOnly?visibleConversation(captured.messages).find(message=>message.role==='child'&&message.id===reviewMessageId):undefined;
+   const submittedOrigin=reviewedMessage?(isHelperAuthoredTurn(reviewedMessage,captured.design)?'helper':'child'):sourceOf(captured,text);
    // Stop/play are immediate child requests, never interpreted as build consent.
    const disposition=conversationDisposition(text);
    // A child turn plus text, suggestions and a question may take four slots.
@@ -228,11 +261,11 @@ export function installCoaching(h:Hooks){
    h.notebook.assertIdeaCapacity(captured.id,captured.owner);
    if(!h.pauseForThinking())return;document.body.classList.add('studio-designing');
    seq=++generation;controller?.abort();turn=new AbortController();controller=turn;thinking=true;reviewUnavailable=false;
-   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(/don.t know|stuck/i.test(text))s.design.helpLevel=Math.min(3,s.design.helpLevel+1);});
+   h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.paused=false;s.playOnly=false;if(!reviewOnly)s.design.helpLevel=/don.t know|stuck/i.test(text)?Math.min(3,s.design.helpLevel+1):0;});
    if(!reviewOnly)h.message(captured,'child',text);
    const submittedMessage=reviewOnly?visibleConversation(h.current().messages).find(message=>message.role==='child'&&message.id===reviewMessageId):h.current().messages.at(-1);
    if(!submittedMessage)throw Error('Your saved idea could not be found. Reopen it and try again.');
-   if(submittedOrigin==='helper')h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.ideas.push({id:'helper-turn:'+submittedMessage.id,text:text.slice(0,1000),origin:'helper',adopted:true});});
+   if(submittedOrigin==='helper'&&!reviewOnly)h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();s.design.ideas.push({id:'helper-turn:'+submittedMessage.id,text:text.slice(0,1000),origin:'helper',adopted:true});});
    const submittedFingerprint=creationInputFingerprint(h.current());
    const c=context(text,mode);$('coachModeStatus').textContent='jems is thinking about your idea…';$('coachModeStatus').classList.add('is-thinking');
    let reply:CoachReply,used:'model'|'local'='local',reason='',safetyRefusal=false;
@@ -254,22 +287,25 @@ export function installCoaching(h:Hooks){
    if(seq!==generation||!isCurrent(captured))return;
    if(safetyRefusal)h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();const id='refused-turn:'+submittedMessage.id;if(!s.design.ideas.some(idea=>idea.id===id))s.design.ideas.push({id,text:text.slice(0,1000),origin:submittedOrigin,adopted:false});});
    const reviewCurrent=used==='model'&&creationInputFingerprint(h.current())===submittedFingerprint;
-   const correctionFields=[...new Set([...Object.keys(explicitPlanChoices(text)),...(reply.childDecisions||[]).filter(choice=>text.includes(choice.quote)).map(choice=>choice.field)])] as PlanField[];
-   const now=h.current(),supersededCorrection=!safetyRefusal&&isNewIdea(captured)&&isExplicitPlanRevision(text)&&correctionFields.some(field=>JSON.stringify(now.design?.plan[field])!==JSON.stringify(planAtSubmission?.[field]));
+   const correctionFields=used==='model'?(reply.childDecisions||[]).filter(choice=>text.includes(choice.quote)).map(choice=>choice.field)
+    :Object.keys(explicitPlanChoices(text)) as PlanField[];
+   const now=h.current(),supersededCorrection=!safetyRefusal&&isNewIdea(captured)&&(isExplicitPlanRevision(text)||used==='model'&&captured.design?.creationStandard===2)&&correctionFields.some(field=>JSON.stringify(now.design?.plan[field])!==JSON.stringify(planAtSubmission?.[field]));
    if(supersededCorrection){
     h.notebook.update(captured.id,captured.owner,s=>{s.design ||= freshDesign();const id='superseded-turn:'+submittedMessage.id;if(!s.design.ideas.some(idea=>idea.id===id))s.design.ideas.push({id,text:text.slice(0,1000),origin:submittedOrigin,adopted:false});});
     reply={move:'listen',text:'Your newer choice is saved.',question:null,suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
    }
-   if(!safetyRefusal&&!supersededCorrection&&isNewIdea(captured)&&mode==='discuss'){
-    const modelFields=(reply.childDecisions||[]).filter(choice=>text.includes(choice.quote)).map(choice=>choice.field);
-    saveLiteralChoices(h.current(),text,planAtSubmission,submittedOrigin,modelFields);
+   // After an assisted exchange the offline extractor cannot distinguish
+   // adaptation from invention. The exact turn is already saved for reconnect.
+   const assistedCreation=captured.design?.creationStandard===2&&!!captured.design.creationReview;
+   if(used==='local'&&!assistedCreation&&!safetyRefusal&&!supersededCorrection&&isNewIdea(captured)&&mode==='discuss'){
+    saveLiteralChoices(h.current(),text,planAtSubmission,submittedOrigin);
    }
    if(used==='local'&&!safetyRefusal&&guidedDelegation(text))reply={...reply,text:'I can help you think of your own idea.',question:'Imagine one moment you would want to play. What happens in it?',suggestions:[],planSuggestions:[]};
    if(used==='local'&&!safetyRefusal&&isNewIdea(captured)){
     reviewUnavailable=true;
     reply={move:'listen',text:'Chat could not answer just now. Your idea is saved.',question:null,suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
    }
-   present(reply,used,captured,{text,prior:planAtSubmission||{},origin:submittedOrigin,messageId:submittedMessage.id,reviewCurrent:reviewCurrent&&!supersededCorrection,requestMode:mode});
+   present(reply,used,captured,{text,prior:planAtSubmission||{},origin:submittedOrigin,messageId:submittedMessage.id,direct:!reviewOnly&&supplied===undefined,reviewCurrent:reviewCurrent&&!supersededCorrection,requestMode:mode});
    // A content refusal is not evidence that chat disconnected. In particular,
    // the gateway can reject private details before contacting the provider.
    if(!safetyRefusal)h.onCoachState?.(used==='model'&&!reviewUnavailable?'connected':['UNAUTHENTICATED','FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED'].includes(reason)?'sign-in':h.config().mode==='remote'?'limited':'unavailable');
