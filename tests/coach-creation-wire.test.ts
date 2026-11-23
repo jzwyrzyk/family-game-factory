@@ -223,3 +223,25 @@ test('legacy clients retain exactly their prior provider input/schema/reply path
  assert.doesNotThrow(()=>validateCoachReply(value,c));
  assert.equal(Object.hasOwn(c,'creationSources'),false);
 });
+
+
+test('creative readiness v2 has seven sourced dimensions and preserves the v1 schema',()=>{
+ const idea='A happy pixel fox dodges leaves in a forest. When a leaf hits, the fox loses. You win when the wind stops. I want it cute and colorful.';
+ const c=context(idea);c.creation={version:2};
+ const before=structuredClone(c),base=structuredClone(COACH_SCHEMA),prepared=prepareCreationWire(c,COACH_SCHEMA),id=catalog(prepared)[0].id;
+ const evidence={action:id,consequence:id,experience:id,world:id,goal:id,visualStyle:id,mood:id};
+ const v2={...ready(id),creationReadiness:{ready:true,evidence,unresolved:[]}};
+ assert.equal(matches(v2,prepared.schema),true);
+ const accepted=validateCoachReply(prepared.decode(v2),c);
+ assert.equal(accepted.creationReadiness?.evidence.goal,idea);
+ assert.equal(accepted.creationReadiness?.evidence.visualStyle,idea);
+ assert.equal(accepted.creationReadiness?.evidence.mood,idea);
+ assert.deepEqual(c,before);assert.deepEqual(COACH_SCHEMA,base);
+ assert.equal(matches({...v2,creationReadiness:{...v2.creationReadiness,evidence:{action:id,consequence:id,experience:id,world:id}}},prepared.schema),false);
+ assert.throws(()=>prepared.decode({...v2,creationReadiness:{...v2.creationReadiness,evidence:{...evidence,visualStyle:'fake-id'}}}),/Invalid creation evidence reference/);
+ const unresolved={...v2,question:'How does the game look?',creationReadiness:{ready:false,
+  evidence:{action:'',consequence:'',experience:'',world:'',goal:'',visualStyle:'',mood:''},
+  unresolved:['The child has not chosen a visual style.']}};
+ assert.equal(matches(unresolved,prepared.schema),true);
+ assert.equal(validateCoachReply(prepared.decode(unresolved),c).creationReadiness?.ready,false);
+});
