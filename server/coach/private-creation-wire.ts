@@ -1,6 +1,7 @@
 import type {CoachContext} from '../../src/studio/design';
 
 const evidenceKeys=['action','consequence','experience','world'] as const;
+const creativeEvidenceKeys=[...evidenceKeys,'goal','visualStyle','mood'] as const;
 const record=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const exactKeys=(value:Record<string,unknown>,keys:readonly string[])=>Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
 const invalid=(message='Invalid creation review.'):never=>{throw Error(message);};
@@ -39,7 +40,8 @@ export interface PreparedCreationWire {
  * The model judges readiness; IDs merely bind its evidence to existing words.
  * The unchanged public validator must still validate the decoded reply. */
 export function prepareCreationWire(context:CoachContext,baseSchema:object):PreparedCreationWire {
- if(context.creation?.version!==1)return {input:context,schema:baseSchema,decode:value=>value};
+ if(context.creation?.version!==1&&context.creation?.version!==2)return {input:context,schema:baseSchema,decode:value=>value};
+  const reviewKeys=context.creation.version===2?creativeEvidenceKeys:evidenceKeys;
  const sources:{id:string;text:string;childDecision:boolean}[]=[],byText=new Map<string,typeof sources[number]>();
  const reference=(text:string,childDecision:boolean)=>{
   const sourceIds=chunks(text).map(part=>{
@@ -47,7 +49,7 @@ export function prepareCreationWire(context:CoachContext,baseSchema:object):Prep
    if(!source){
     // Four readiness enums stay below the provider's total enum-value
     // ceiling, including the ordinary response enums.
-    if(sources.length>=160)throw Error('INVALID_REQUEST');
+    if(sources.length>=(context.creation!.version===2?110:160))throw Error('INVALID_REQUEST');
     source={id:'s'+sources.length,text:part,childDecision:childDecision&&!!part.trim()};
     sources.push(source);byText.set(part,source);
    }else if(childDecision&&part.trim())source.childDecision=true;
@@ -67,9 +69,9 @@ export function prepareCreationWire(context:CoachContext,baseSchema:object):Prep
  // JSON Schema counts code points; the unchanged host counts UTF-16 units.
  // This provider limit also fits the host's 350-unit bound for astral text.
  const gap={type:'string',minLength:1,maxLength:175,pattern:'\\S'};
- const branches=[object({ready:{type:'boolean',enum:[false]},evidence:evidence({type:'string',enum:['']}),
+ const branches=[object({ready:{type:'boolean',enum:[false]},evidence:object(Object.fromEntries(reviewKeys.map(key=>[key,{type:'string',enum:['']}]))),
   unresolved:{type:'array',maxItems:8,items:gap}})];
- if(readyIds.length)branches.push(object({ready:{type:'boolean',enum:[true]},evidence:evidence({type:'string',enum:readyIds}),
+ if(readyIds.length)branches.push(object({ready:{type:'boolean',enum:[true]},evidence:object(Object.fromEntries(reviewKeys.map(key=>[key,{type:'string',enum:readyIds}]))),
   unresolved:{type:'array',maxItems:0,items:gap}}));
  const schema=structuredClone(baseSchema) as Record<string,unknown>;
  if(!record(schema.properties))throw Error('INVALID_REQUEST');
@@ -80,14 +82,14 @@ export function prepareCreationWire(context:CoachContext,baseSchema:object):Prep
   const verdict=value.creationReadiness;
   if(verdict===undefined||verdict===null)return invalid('CREATION_REVIEW_MISSING');
   if(!record(verdict)||!exactKeys(verdict,['ready','evidence','unresolved'])||typeof verdict.ready!=='boolean'||
-   !record(verdict.evidence)||!exactKeys(verdict.evidence,evidenceKeys)||
-   !evidenceKeys.every(key=>typeof (verdict.evidence as Record<string,unknown>)[key]==='string')||
+   !record(verdict.evidence)||!exactKeys(verdict.evidence,reviewKeys)||
+   !reviewKeys.every(key=>typeof (verdict.evidence as Record<string,unknown>)[key]==='string')||
    !Array.isArray(verdict.unresolved)||verdict.unresolved.length>8||
    !verdict.unresolved.every(item=>typeof item==='string'&&!!item.trim()&&item.length<=350&&Array.from(item).length<=175))return invalid();
   const quoted=verdict.evidence;
-  if(verdict.ready&&(verdict.unresolved.length||evidenceKeys.some(key=>quoted[key]==='')))
+  if(verdict.ready&&(verdict.unresolved.length||reviewKeys.some(key=>quoted[key]==='')))
    return invalid('A ready game needs grounded intent and no unresolved design gaps.');
-  const restored=Object.fromEntries(evidenceKeys.map(key=>{
+  const restored=Object.fromEntries(reviewKeys.map(key=>{
    const id=quoted[key] as string;
    if(!verdict.ready){if(id!=='')return invalid();return [key,''];}
    const source=byId.get(id);
