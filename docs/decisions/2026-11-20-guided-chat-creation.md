@@ -69,3 +69,13 @@ Once readiness and explicit Build are satisfied, check sending → acknowledged 
 - [Explicit voice and Build](0003-explicit-voice-and-build.md)
 - [Architecture](../../ARCHITECTURE-CURRENT.md)
 - [Delivery state](../../DELIVERY-STATE.md)
+
+## November 22, 2026 owner revision: creative fidelity before Build
+
+The owner tested the actual coach policy in an independent conversation. A fox that dodges leaves and loses if hit was prematurely declared ready. The earlier minimalist readiness rule favored a merely playable first version without understanding the child's desired win/purpose, look, or emotional tone.
+
+For **new creation sessions**, version-2 readiness now requires grounded child-authored evidence for the existing action, consequence, experience and world dimensions **plus goal/free-play purpose, visual style and mood**. Ask about viewpoint and movement when the distinction materially changes the first version; special moments and celebrations are optional. One child statement can satisfy multiple dimensions; there is no fixed number/order of turns. Children who are stuck get context-specific imagination strategies (a moment, favorite thing, or ordinary object made extraordinary), not repetitive questioning or a choice-menu shortcut.
+
+A static two-sentence "Hey, I'm jems!" introduction appears before the child's first message. It is UI copy, not synthetic child evidence, a paid model turn or consent to Build. The child remains the author, and the existing explicit Build/Keep, privacy, learning, safety, spent-budget, and production rollout gates remain authoritative. Previously saved version-1 conversations retain their review contract until a deliberate migration, rather than being silently upgraded to an invented v2 creative record.
+
+The seven-key coach response and validation protocol require coordinated gateway, private-coach and web-client deployment. Legacy v1 remains separately valid for its existing clients, and Build never uses a v1 verdict for a new v2 session. Do not activate or deploy this source merely because unit tests pass.
