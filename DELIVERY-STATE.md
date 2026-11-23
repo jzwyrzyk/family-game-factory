@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — diagnostic API enablement reported successful; fresh audit pending
+
+After reviewing the confirmed `SERVICE_DISABLED` result, the owner explicitly approved enabling only `policytroubleshooter.googleapis.com` in `family-game-factory-jzw`, then rerunning the read-only IAM audit. This supersedes the diagnostic API approval hold below; it does not approve the eleven proposed IAM bindings, two deployment federation providers, release identity variables or flags, publication, model calls or production traffic changes.
+
+The owner subsequently ran the approved single-service `gcloud services enable` command in authenticated Cloud Shell and supplied its successful operation-completion output. This is owner-reported command success; an independent fresh API-state read and the full effective-access audit remain pending. The next pinned operator command is entirely read-only: verify the API state, preserve that response privately and rerun the existing collector into a new evidence directory. The assistant environment still has no attached Google identity. Do not resubmit enablement merely to collect the missing audit evidence.
+
 ## November 23, 2026 — diagnostic API disablement identified; enablement approval pending
 
 The owner supplied the sanitized result from diagnostic helper `01c090b9d93d01eb81dc7ccb701d993e017c080c`, observed at `2026-11-23T15:38:28Z`. Service Usage returned HTTP 200 with Policy Troubleshooter `DISABLED`; the troubleshooting request returned HTTP 403 with `SERVICE_DISABLED` for that exact API and the expected project consumer. This establishes the cause of the rejected diagnostic request. It does not establish the target release accounts' effective permissions. The diagnostic reports zero mutations.

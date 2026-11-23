@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T15:40:00.368Z",
-      "sourceDigest": "c0084ec2e8a51e362e70f7db24e5f2152f33395c368d5ad397cec8c6b8897579",
+      "reviewedAt": "2026-11-23T15:53:39.099Z",
+      "sourceDigest": "c2523b825e292bda65d63202f2697c2450e5f3d5779a94543d6be3a929739ba1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-supplied diagnostic evidence establishing Policy Troubleshooter API disablement and validating original private-evidence comparisons. Documented proposed diagnostic-only API enablement subject to the existing read-only boundary, without treating it as IAM/deployment approval or a completed effective-access audit.",
+      "reviewReason": "Recorded explicit approval and owner-reported successful diagnostic API enablement. Prepared only a fresh pinned read-only state check and IAM audit; no enablement helper is shipped or invoked. Preserved the remaining IAM/provider/release hold and distinction between command success and verified effective access.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
