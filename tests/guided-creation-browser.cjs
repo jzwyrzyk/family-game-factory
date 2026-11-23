@@ -9,12 +9,13 @@ const idea='A dragon lives above jelly clouds.';
 const action='I tap a cloud and the dragon bounces off it to catch a star.';
 const purpose='I want it to feel calm and floaty. Each star lights a window in the moon house; when all five shine the dragon goes home.';
 const finish='If I miss, the dragon floats back to the last cloud and I try again. I want soft blue and pink cartoon clouds. No timer, points or enemies.';
-const evidence={action,consequence:'Each star lights a window in the moon house; when all five shine the dragon goes home.',experience:'I want it to feel calm and floaty.',world:'I want soft blue and pink cartoon clouds.'};
+const evidence={action,consequence:'Each star lights a window in the moon house; when all five shine the dragon goes home.',experience:'I want it to feel calm and floaty.',world:'I want soft blue and pink cartoon clouds.',goal:'when all five shine the dragon goes home',visualStyle:'soft blue and pink cartoon clouds',mood:'calm and floaty'};
+const emptyEvidence=Object.fromEntries(Object.keys(evidence).map(key=>[key,'']));
 const baseReply={move:'clarify',suggestions:[],proposedChange:null,planSuggestions:[],childDecisions:[],evidenceIds:[]};
 const replies={
- [idea]:{...baseReply,text:'Your dragon has a world of jelly clouds.',question:'What could your dragon do with those clouds?',childDecisions:[{field:'style',quote:idea}],creationReadiness:{ready:false,evidence:{action:'',consequence:'',experience:'',world:idea},unresolved:['The player action and its effect are still unclear.']}},
- [action]:{...baseReply,text:'Your tap sends the dragon bouncing toward a star.',question:'How do you want that bouncing to feel?',childDecisions:[{field:'action',quote:action}],creationReadiness:{ready:false,evidence:{action,consequence:'',experience:'',world:idea},unresolved:['What happens when a star is caught, and the intended experience, are still unclear.']}},
- [purpose]:{...baseReply,text:'Each caught star lights up the dragon’s home. You want the bouncing to feel calm and floaty.',question:'What happens if the dragon misses a star?',childDecisions:[{field:'fun',quote:evidence.experience},{field:'goal',quote:evidence.consequence}],creationReadiness:{ready:false,evidence:{...evidence,world:idea},unresolved:['The consequence of missing a jump still needs the child’s decision.']}},
+ [idea]:{...baseReply,text:'Your dragon has a world of jelly clouds.',question:'What could your dragon do with those clouds?',childDecisions:[{field:'style',quote:idea}],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['The player action and its effect are still unclear.']}},
+ [action]:{...baseReply,text:'Your tap sends the dragon bouncing toward a star.',question:'How do you want that bouncing to feel?',childDecisions:[{field:'action',quote:action}],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['What happens when a star is caught, and the intended experience, are still unclear.']}},
+ [purpose]:{...baseReply,text:'Each caught star lights up the dragon’s home. You want the bouncing to feel calm and floaty.',question:'What happens if the dragon misses a star?',childDecisions:[{field:'fun',quote:evidence.experience},{field:'goal',quote:evidence.consequence}],creationReadiness:{ready:false,evidence:{...emptyEvidence},unresolved:['The consequence of missing a jump still needs the child’s decision.']}},
  [finish]:{...baseReply,text:'Tap a jelly cloud to bounce your dragon toward a star. Light all five windows to bring it home. Miss a star and float back to try again. Your calm blue-and-pink game is ready to build.',question:null,childDecisions:[{field:'setback',quote:'If I miss, the dragon floats back to the last cloud and I try again.'},{field:'style',quote:evidence.world},{field:'score',quote:'No timer, points or enemies.'},{field:'special',quote:'No timer, points or enemies.'}],creationReadiness:{ready:true,evidence,unresolved:[]}}
 };
 (async()=>{
@@ -36,7 +37,7 @@ const replies={
     else if(path==='/v1/builder/status'||path==='/v1/coach/status')data={available:true};
     else if(path==='/v1/coach/audio/status')data={available:false};
     else if(path==='/v1/coach'){
-     const input=req.postDataJSON().context;assert.equal(input.creation?.version,1);
+     const input=req.postDataJSON().context;assert.equal(input.creation?.version,2);
      assert.ok(replies[input.message],'the fixture responds only to the child’s authored turns');
      data={mode:'model',reply:replies[input.message]};
     }else if(path==='/v1/jobs'&&req.method()==='POST'){requests.push(req.postDataJSON());await acceptance;data={jobId:'guided-job',status:'queued',adapter:'mock'};}
@@ -46,12 +47,17 @@ const replies={
    });
    try{
     await page.goto(url);await page.waitForFunction(()=>window.FG?.studio);await exploreWelcome(page);await page.click('#studioNavCreate');
+    assert.match(await page.locator('#studioMessages').innerText(),/Hey, I'm jems!/);
+    assert.match(await page.locator('#studioMessages').innerText(),/I'll ask a few fun questions/);
+    const newSession=(await page.evaluate(()=>FG.studio.exportNotebook())).sessions.at(-1);
+    assert.equal(newSession.design.creationStandard,2);
     assert.equal(await page.locator('#studioMoreChoices').evaluate(el=>el.open),false);
     assert.equal(await page.locator('#designPlan').isVisible(),false);
     assert.equal(await page.locator('#studioUseDrawing').isVisible(),false);
     assert.equal(await page.locator('#studioSend').isDisabled(),true,'Build stays disabled before the coach understands the game');
     assert.equal(await page.locator('#coachGuidedChoices, #coachChooseRest, #coachChooseForMe, #buildGamePlan').count(),0,'no suggested-answer or delegation shortcuts exist');
     await sendChildMessage(page,idea);
+    assert.equal(await page.locator('.studio-coach-welcome').count(),0,'greeting disappears after the child speaks');
     assert.equal(await page.locator('#studioSend').isDisabled(),true);
     assert.match(await page.locator('#studioMessages').innerText(),/What could your dragon do with those clouds\?/);
     await sendChildMessage(page,action);
@@ -70,6 +76,7 @@ const replies={
     assert.equal(await page.locator('#studioSend').isDisabled(),true,'four quoted aspects still cannot override a material unresolved rule');
     const reviewed=await sendChildMessage(page,finish);
     assert.equal(reviewed.design.creationReview.ready,true);
+     assert.equal(reviewed.design.creationReview.version,2);
     assert.equal(await page.locator('#studioSend').isEnabled(),true,'the child can build after a grounded contextual review');
     assert.equal(requests.length,0,'even a ready review cannot submit a build');
     await page.fill('#studioPrompt','I have a different ending in mind.');
