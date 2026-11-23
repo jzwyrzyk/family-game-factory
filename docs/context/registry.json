@@ -129,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:34:30.307Z",
-      "sourceDigest": "fb92aa48ed28a5b0b974b46f50c895c97f91bf7d63b892ab035bd37fbbbe38f9",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed creative-discovery seven-dimension v2 intent alongside the merged four-experience doctrine; preserve explicit Build, child invention and selected helper attribution without changing games, rewards or learning contracts.",
+      "reviewedAt": "2026-11-23T05:43:12.254Z",
+      "sourceDigest": "109eb451d901427e8febf3fbe514e1d758b0a48bbcefeb9a4b385cd2e3453bec",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed retained-history, evidence-capacity, owner/head and paid-recovery safeguards against current doctrine including Coach v2 and the four experiences. No new product policy, retention deletion, earning rule or Build authority; F06 limits and source-only authorization remain explicit.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -238,6 +238,13 @@
           "sourceDigest": "fd71a375d21b896e9ed02b7706bc93ea30be96794f30ebeb93e0b32ec4b3ce52",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the combined owner-approved Factory, assembly-v3, First steps, unified Mining and Notifications contracts against doctrine. Existing Keep, ownership, learning and provider boundaries remain explicit; release authorization is recorded separately from acceptance."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:48:49.185Z",
+          "sourceDigest": "3276525a3b4dacf6ff2e8b9ac4fafada8833408ca653671a0a7a10e71af29d20",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed the integrated PR120 fixture corrections against draft ownership, retained artwork and recovery doctrine. The change adds real-editor setup, exact preservation assertions and one adapter regression; no product source, approval boundary or retention policy changes. Existing worker, recovery and transport policies remain as reviewed.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -285,10 +292,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:34:31.058Z",
-      "sourceDigest": "c85ece9b7b5c6c89ec213afee521ff9e7b4b7f97dd15db145745112d876c5d48",
+      "reviewedAt": "2026-11-23T05:43:12.647Z",
+      "sourceDigest": "d52d9e1b0c95b09478b7e24cd84d47c8873aca22f93f576dc9b84b5e8c74a28f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the combined Studio/navigation/notebook sources against current main; documented atomic v2 session creation and stable selected-option rechecks while retaining Notifications, profile/grade, saved game, narration and explicit Build behavior.",
+      "reviewReason": "Documented the combined five-component matrix, durable Notifications recovery, full transcript provenance through chapters, atomic v2 creation, compensated native creation and truthful capacity notices. Preserved all four experiences, current visible navigation, reading and ownership guards.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -359,6 +366,13 @@
           "sourceDigest": "620650089f438558519517cb3ee2b461b9e46308d01018294556a579afe66dd0",
           "reviewOutcome": "updated",
           "reviewReason": "Reconciled shared running Mining with current navigation and Notifications; documented live in-place Help, explicit resume, optional sound and narration cleanup. Preserved current private chat, owner guards, saved versions and all existing shell routes."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:48:49.739Z",
+          "sourceDigest": "cba5d48cf312f21ce42bf1281fbba61aa4dbef39e232f5c18c9211a32828f20a",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added the PR120 unload-save fixture diagnosis and corrected real-composer draft checks through reload, copy and continuation. The integrated pendingSubmission guards and linked chapters are unchanged. No runtime draft semantics change; corrected hosted journeys remain pending.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -438,6 +452,13 @@
           "sourceDigest": "18e6acdaf501cbc0be82948715dc225914c95180bac085b2c225f3a0c1c46b49",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed First steps exact-value editing and independent event programs, bounded Pal compositing and immutable saved scene references. Documented scoped challenge Help locators and eight passing backup/recovery journeys without removing nested Help or weakening assertions."
+        },
+        {
+          "reviewedAt": "2026-11-21T15:39:46.199Z",
+          "sourceDigest": "d6cb0d3686e70962d79396acab7912fe36f7622858fcd432dfe91c7faf487843",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Combined source preserves the validated Pal scene catalog, fixed form/version references, ownership and legacy readers; PR115 matching creation-readiness tests concern conversation only. Focused combined generation-budget and saved-scene checks pass without runtime cap changes.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -458,10 +479,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "26a06a9990228e2db61ad4069b1e4945a10427117a1a616162e858a0b235d181",
-      "reviewedAt": "2026-11-23T03:35:21.443Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed owner-scoped notification metadata validation and exact-byte backup rollback plus ordinary assembly completion fixtures. The existing updated rewards contract records play-popup suppression without changing earning policy, durable grants or replay rules.",
+      "sourceDigest": "4fdd985c5da76076a57ebca31acd176b4afa822b46bd5b97b17fc2a0d428dce0",
+      "reviewedAt": "2026-11-23T05:43:13.311Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Inspected combined notebook chapter expansion and family backup with Notifications, selected helper evidence and pending request identity. New tests preserve exact native game bytes and reward provenance through restore/fork; earning policy, immutable receipts and explicit Keep authority are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -490,6 +511,13 @@
           "sourceDigest": "916b2c352cea3835af1f377d4f10e181914674a26c2f9699c87877ffc72e6150",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed changed rewards and maker browser fixtures: only gameplay inputs and extra-piece wording change. All existing grant amounts, exact Keep/reflection/owner assertions remain. Assembly reports one host result after explicit continuation; no earning policy change."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:37:24.021Z",
+          "sourceDigest": "a27f13c3351bcea2dc3f3b5a31c160cf37905c2514ca006304585a94bf371e8b",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "The rewards change adds a full-family backup regression for linked notebook chapters. Existing source attribution, canonical project identity, receipt deduplication, earned totals and explicit erasure rules remain unchanged; continuation and pending build recovery create no reward entitlement.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -572,6 +600,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reconciled run/contact/bucket Mining with the shared host, added learning-safe live Help and removable sound controls, and documented stable physical-v1 picker geometry through reset/first additions. Factory progression, assembly-v3, old engines and score/reward separation remain preserved.",
           "sourceCommit": "4b00c474c733873e31849acb0778be8f4f3ceec2"
+        },
+        {
+          "reviewedAt": "2026-11-20T04:38:11.591Z",
+          "sourceDigest": "1525ea954abe5604dcd89d8f0fb6012c9bc70b20a97f56b1a180d8682c90eebf",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed runtime and quality sources against main907; this integration adds no engine or generated-asset authority. Reconciled the obsolete future-drawing paragraph with merged Art Studio physical Rally and local scene adapters, retaining the built-in workshop catalogue and separately scoped generated-game registry.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -595,7 +630,16 @@
       "reviewedAt": "2026-11-21T20:28:20.947Z",
       "sourceDigest": "7a29e1ae8b763657ea3002efad103c42cfc42f3d44e1d3c554920a4aa0597fdb",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Math and Language integration and acceptance for explicit saved grade and learning difficulty, conservative missing values, visible profile setup and assistance-aware read-aloud."
+      "reviewReason": "Updated Math and Language integration and acceptance for explicit saved grade and learning difficulty, conservative missing values, visible profile setup and assistance-aware read-aloud.",
+      "reviewHistory": [
+        {
+          "reviewedAt": "2026-11-20T19:05:57.591Z",
+          "sourceDigest": "0d75fe89ba7b485648a6bf2cf1f8e84447401bc98358b793a95ff49bbfd8cfb7",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed question-first Math/Language rendering, 18px controls, 20px task text, disabled instructional text, form labels and recovery colors. Documented playback-start assistance with no credit for unavailable voices; curriculum, grading, subject permissions and checkpoint policy remain unchanged.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        }
+      ]
     },
     {
       "id": "services",
@@ -617,10 +661,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:21.181Z",
-      "sourceDigest": "1520f240217b7658bb22926b832101aafce70e69a61cd7f7104511a007098a52",
+      "reviewedAt": "2026-11-23T05:43:13.636Z",
+      "sourceDigest": "d05a7f29c35d5896f75e73d04a67f1515cf32cca6237444b3a180a01353af9cc",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated architecture for the independently authorized narration gateway endpoints, bounded binary transport and default-off deployment scope; existing trusted session and privacy checks remain authoritative.",
+      "reviewReason": "Reviewed shared UTF-8 reader, authenticated read-only request lookup, packaging, paid receipt reconciliation and worker HTTP guards together. Architecture and service contracts preserve auth/privacy and distinguish unavailable lookup from replay permission; no production service activation.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -635,6 +679,13 @@
           "sourceDigest": "4a80ecec242f911b8871aab86a7e7ae9fdca450a965dea504c08917037ec2e29",
           "reviewOutcome": "updated",
           "reviewReason": "OpenAPI and architecture describe authorized optional retryJobId and reuse of one exact same-audience retry successor; session/privacy permissions and existing route authorization stay unchanged."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:37:24.491Z",
+          "sourceDigest": "00716376a0cd527a8ae3e74d4c2db5fae84620811f506e3419fee0d2f03601c7",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed all gateway HTTP, OpenAPI and packaging changes together. Service and architecture contracts describe actual-byte UTF-8 parsing, authenticated read-only request lookup, bounded browser renewal, expired paid-receipt reconciliation and worker rejection versus temporary unavailability. Readiness wording now accurately permits reconciliation without inference.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -659,10 +710,19 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:21.503Z",
-      "sourceDigest": "e49e6802ee50ad0c7a75c035d934b77b70dfd2d8501ad8a349dee92bb1d61da1",
+      "reviewedAt": "2026-11-23T05:43:13.962Z",
+      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated architecture for optional metadata-only narration receipts in shared PipelineState; worker selection, generated artifacts, budgets and generation execution remain unchanged."
+      "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints.",
+      "reviewHistory": [
+        {
+          "reviewedAt": "2026-11-21T18:37:24.930Z",
+          "sourceDigest": "b22f2e1752caa0d27f581384e2ad32536c8587b866705fdd731b2aa3f73a4e0d",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed combined coordinator, worker transport, dispatcher and job-service changes. Architecture and worker contracts cover fixed phase and global deadlines, immutable report receipts, bounded identity and dispatch requests, status responses independent of dispatch and exact initial-request lookup. Authorization, transactional spending and uncertain-outcome no-replay boundaries are preserved.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        }
+      ]
     },
     {
       "id": "coach",
@@ -682,10 +742,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:34:32.363Z",
-      "sourceDigest": "793919bb18899b9c39f14cfe80c51612434f677d2389c58efeb383f78d2ea402",
+      "reviewedAt": "2026-11-23T05:43:14.278Z",
+      "sourceDigest": "aa4fa458b8d743d5d1eb9fb44439ce3493a98b21ff2aabaf3ed9c6e78a8985f3",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented legacy eight-field response capability gating for backend-first rollout, preserved v2 seven-dimension evidence, optional reply recovery and privacy/spending boundaries, and marked the original PR18 release scope historical.",
+      "reviewReason": "Integrated Coach v2 seven-dimension readiness and selection-aware compiler with full retained conversation history and capacity preflight. Reviewed exact helper attribution after chapter restore, conservative receipt settlement, independent narration month rollover and shared post-body admission; live-model and child acceptance remain separate.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -714,6 +774,13 @@
           "sourceDigest": "57f21bf5c6a4ae0afb0194d6c4c47f00b5cf96bf5bed4fe748ee94733e878b3a",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed inherited default-off narration endpoints, independent consent/budget/private-service checks and bounded metadata reads alongside merged PR133 optional-reply recovery. Current architecture records preserved source; natural narration remains separately unactivated and no provider calls were made."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:37:25.356Z",
+          "sourceDigest": "5907a330d5a176847db2c3a91489869a39afe77747bfd6820711476e048dd03c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed coach and speech recovery with the shared body reader and private admission changes. Contracts document fixed reservation identities and leases, one-time conservative settlement, original-month accounting, late-result and erasure fencing, bounded UTF-8 envelopes and shared text/audio provider slots. Readiness can reconcile expired receipts without starting inference.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -739,10 +806,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "e463bbb341ce42ac878964926183ed1fb97658435c94599f17dc5af62bc10ebc",
-      "reviewedAt": "2026-11-23T02:35:29.925Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the synthetic adult reconnect fixture now returns seven empty evidence fields for its v2 request. Adult authentication, consent, isolation, budget and reporting contracts are unchanged.",
+      "sourceDigest": "b5a2a570fc92fafa428dd532e1caf7ac1428605b1e7384de292406bed856ae8c",
+      "reviewedAt": "2026-11-23T05:43:14.662Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed exact owner/API/request binding, awaited acknowledgment persistence and profile cancellation with existing trusted/adult session boundaries. Delivery records synthetic reconnect/backup evidence, preserves default-off services and requires separately authorized real-provider Adult acceptance; no consent or audience expansion.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -757,6 +824,13 @@
           "sourceDigest": "b06116996cbf77a9e1c2d30eb04758a3d73aa09a454e4b0a5e72979bd8378afe",
           "reviewOutcome": "unchanged",
           "reviewReason": "Browser fixture entry now chooses the real Explore control for fresh family or adult profiles before existing assertions. Identity, authorization, namespace, parent consent and provider source code are unchanged; rewards backup separately validates the new notebook preferences."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:37:25.788Z",
+          "sourceDigest": "a0d1e78719df6382dcd23b1ee812134d423fe56395752980ab3c46b421a6ddae",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed trusted-device parsing, audience-bound request lookup and API documentation with existing adult and guardian gates. Architecture now distinguishes authenticated configuration readiness that can reconcile expired reservations from inference. Device, family, adult-session, parent-erasure and spending authority remain intact; no consent or live rollout is inferred.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -787,10 +861,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:34:32.891Z",
-      "sourceDigest": "b17d0d78ccf6f6594c4031d4c967987556266f255123a4afe613ec82e5a5439f",
+      "reviewedAt": "2026-11-23T05:43:15.018Z",
+      "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current-main integration evidence and new exact-selection recheck, atomic-creation fault and legacy reply compatibility regressions; retained all merged game/browser baselines and distinguish local fixtures from required final-head hosted checks.",
+      "reviewReason": "Recorded source and fixture evidence without replacing final exact-head hosted gates. Retained all five component tests; reproduced and corrected PROFILE_CHANGED expectation, current navigation locators and cross-chapter provenance. Added narration rollover/admission and real backup coverage; Pal decode gate/art/baselines remain unchanged and historical failure retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -945,6 +1019,13 @@
           "sourceDigest": "68391dfba47b3a938eb82ae8401515b9cffebb789df571a285e853e323b519a7",
           "reviewOutcome": "updated",
           "reviewReason": "Explicitly inspected all nine hosted Chromium 141 reference PNGs, three Help views and sampled normal-motion held-spill/fall/retry frames. Verified archive, clean build/tree, manifest, dimensions and image hashes; retained the original nine failed comparisons and all 13 functional passes. No tolerance or assertion changes; final-head CI remains required."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:49:14.890Z",
+          "sourceDigest": "93106ebb6a7823674ec920c2ff806de0975a4c7f6bfce57eb91d102b842a51f8",
+          "reviewOutcome": "updated",
+          "reviewReason": "Integrated PR120 fixture correction 79ccb6f while preserving the Actions first-paint fix and all product source. Full combined unit passes 486/486; component notebook/workspace/backup 60/60 and art 24/24, build/typecheck/syntax checks pass. Stronger draft, compensation and legacy-art recovery assertions remain; Chromium is launch-blocked and corrected hosted browser gates are pending.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -974,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T05:34:55.804Z",
-      "sourceDigest": "c1595529f4012b6e0009848fdca72fa490d2325f1229ac0bde51a3f26fcfaf36",
+      "reviewedAt": "2026-11-23T06:00:52.225Z",
+      "sourceDigest": "357e9b88a9d140cf56ce12acbaf581273fde2e39f0d65bb9ca4a6327653edb67",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded PR135 integration against merged PR134/136, concrete source/compatibility repairs and current fixture evidence; explicitly preserve pending exact-head hosted acceptance, backend-first release requirements and the no-production-change boundary.",
+      "reviewReason": "Documented observed guarded merge rejection from cancelled source-head Arcade contexts and corrected event-scoped concurrency in three CI workflows. All jobs/assertions/protection and production workflows remain intact; 83 deployment/85 operations tests and40-command8-shard26-suite assignment checks pass. Final separate push/PR hosted evidence remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1146,6 +1227,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Recorded the downloaded compact artifact, exact source/build/tree identity, explicit visual acceptance and preserved failed source run. PR134 remains unmerged and undeployed pending a fresh complete CI run; owner requested a pause while it completes.",
           "sourceCommit": "afa5251cde97fda1865e42dbaed5fae08a2a4061"
+        },
+        {
+          "reviewedAt": "2026-11-21T18:49:15.496Z",
+          "sourceDigest": "cb9663a46fb3c1e33052de6851a4ea612349a12a0de5a7bc319992b708f58212",
+          "reviewOutcome": "updated",
+          "reviewReason": "Added exact PR120 hosted failure evidence and narrow fixture corrections on integration base 2ccd585, preserving previous combined and Actions synchronization entries. Recorded full combined unit 486/486, scoped local verification and browser launch limitation. Hosted reruns and the separate baseline Pal decode issue remain unresolved; no merge or deployment is claimed.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -1249,6 +1337,13 @@
           "sourceDigest": "8a0bea67cbda0c2a7c2f3e1d1112b9b3e45c92c81d295735b24b71b593cb630b",
           "reviewOutcome": "updated",
           "reviewReason": "Added the feature decision and speech contracts to the documentation index and registry; reviewed their required-file, area ownership and local-link routes without weakening freshness enforcement."
+        },
+        {
+          "reviewedAt": "2026-11-21T14:33:42.892Z",
+          "sourceDigest": "ebd564a2e3fe8d4256e42e76f568e11490bfcdaa08616de70e02f79d1d1a1d67",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed routing additions for the generator, supplemental approved art and integration decision; existing maintenance, evidence and PR review procedures already govern this additive feature and remain accurate.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -1268,7 +1363,16 @@
       "sourceDigest": "21cbc0fa874ca9cd7f833db2b5f756cbe41d49c349937372c3d04f5f7015c2e8",
       "reviewedAt": "2026-11-23T03:35:24.321Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Only the synthetic parent-dashboard fixture date moved from 29 to 28 days before now so the oldest sample remains within the documented inclusive 30-local-calendar-day window at UTC midnight. Parent report source, filter semantics, evidence labels and limitations are unchanged."
+      "reviewReason": "Only the synthetic parent-dashboard fixture date moved from 29 to 28 days before now so the oldest sample remains within the documented inclusive 30-local-calendar-day window at UTC midnight. Parent report source, filter semantics, evidence labels and limitations are unchanged.",
+      "reviewHistory": [
+        {
+          "reviewedAt": "2026-11-19T17:17:56.552Z",
+          "sourceDigest": "5537d1813cbd4aba351dacb9e40335325a534da23118b281fba0ffa062cfd835",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed canonical episode validation and strict owner, duplicate and retention failures; documented one native APS report, unscored source counts, first-response provenance, profile-scoped clearing and honest unavailable states.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        }
+      ]
     },
     {
       "id": "problem-solving",
@@ -1301,6 +1405,13 @@
           "sourceDigest": "dee7eabbe6d4e6b80f15414465af85c3210ddb9c9f6bf6f881a54ac6aeb5fbe2",
           "reviewOutcome": "unchanged",
           "reviewReason": "Only the browser fixture profile picker now chooses the visible Explore action for an empty sibling before using the existing navigation. Practice tasks, first-response evidence, hints, learning guards, reports, reward eligibility and backup semantics are unchanged; desktop and phone regression assertions remain intact."
+        },
+        {
+          "reviewedAt": "2026-11-20T19:05:58.979Z",
+          "sourceDigest": "38e06c1fb6f9a642044a3c0a7d48edd5f148b96fb0ceccd5e25783e4dcf33943",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed local female narration with current owner/episode/phase cancellation and access support recorded only on playback start. Sized its speech status/help controls for child readability without changing authored tasks, grading, competence evidence or storage.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -1340,6 +1451,13 @@
           "sourceDigest": "5f4cfa7392b3f5e99cc28ac4411cc8f977a1a3ea247b7e35b54425e20e2f0eca",
           "reviewOutcome": "unchanged",
           "reviewReason": "Reviewed the loading-contract update: approved character references, exact Base/Grown image bytes, expression bindings, art approvals and scene asset versions are unchanged. The page reuses current presentation nodes and retires callbacks; no visual redesign, substitute artwork or new form is introduced."
+        },
+        {
+          "reviewedAt": "2026-11-21T14:33:43.324Z",
+          "sourceDigest": "4943660550545f439dbbaefc38baafccff37efe4c8a8fa706f005eacda216700",
+          "reviewOutcome": "updated",
+          "reviewReason": "Bound all 24 approved profiles in the canonical index, retained art approvals and historical references, excluded Brio review expressions and documented exact immutable manifest plus byte-identical supplemental neutrals.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -1361,10 +1479,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fa4dcad372ce28cd467e0b27491f824e22e81d3914ed62641dd7d56a2ea25844",
-      "reviewedAt": "2026-11-22T18:41:05.281Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed source-return and profile-switch fixture navigation through More and My Games. Existing private image hashes, immutable scene bindings, export/import, recording and owner-isolation checks remain unchanged.",
+      "sourceDigest": "925ba2415c4e93d79d88f42bd14a0c7c8de30cbcabf335381630131d3e7c812c",
+      "reviewedAt": "2026-11-23T05:43:15.787Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed original-drawing, rig identity and native/notebook staging with current four-experience main. Art source contract and recovery test require exact two-store restoration after quota failure and one linked Rally on retry; optional usage indexing remains nonblocking and original assets/pins are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1372,6 +1490,13 @@
           "sourceDigest": "45c272ca36ecd6386ac752d92507253396a3c3761ea13ba3e6a358f3110bbf9a",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed final source-aspect physics and copy polish with all five art browser suites plus refreshed real UI captures; recorded per-command source identities, exact original/version semantics, recovery tests and remaining actual-device limits."
+        },
+        {
+          "reviewedAt": "2026-11-21T18:48:50.627Z",
+          "sourceDigest": "61ee87115e1225f2f03cd1fd65e8a1fdf11637bbca613006006cd3e70a3ee892",
+          "reviewOutcome": "updated",
+          "reviewReason": "Documented native/notebook compensation for Rally creation, exact project and rig preservation when recovering older unlisted games, and nonblocking supplementary usage indexing. Browser assertions now require unchanged raw stores after quota failure and exactly one linked game on retry. Original art and owner protections remain intact.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     },
@@ -1409,6 +1534,13 @@
           "sourceDigest": "8f0dec1d5c99a602f7d9588cdcae8d210ab1209149fd1669b147725d49368ff2",
           "reviewOutcome": "updated",
           "reviewReason": "Documented bounded owner/surface/Pal/form reuse, unchanged-URL state retention, request retirement and the inability to cancel an active native decode. Reviewed fresh-container retry listeners, focused in-progress retry, unready-owner/dispose cleanup and actual-browser regressions. Explicit same-image detail recovery remains native; gallery failures do not silently retry on ordinary refresh or hide/show, and hosted acceptance is pending."
+        },
+        {
+          "reviewedAt": "2026-11-21T16:01:33.583Z",
+          "sourceDigest": "3b734e7783f81ca8f947f67615961eb46db1ccac12414ca7d925d79b4f810363",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Inspected actual unavailable-picture screenshot and runtime loader guards; no speculative artwork/runtime workaround is justified. Added failure-only bounded public-asset diagnostics; approved identities, forms, ownership, recovery and acceptance assertions remain unchanged.",
+          "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
     }

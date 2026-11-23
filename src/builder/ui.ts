@@ -1,20 +1,21 @@
 import {setIconLabel,type IconName} from '../brand/icons';
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest } from '../learning/policy';
-import { BuilderClient,validateBuilderConfig,type RequestChange,type JobView,type BuilderConfig } from './client';
+import { BuilderClient,validateBuilderConfig,isKnownBuildRejection,type RequestChange,type JobView,type BuilderConfig } from './client';
 import {installParentPrivacy} from './privacy';
 import {profileStorage} from '../adult-pilot/storage';
+import {validateBuildSubmission,type PendingBuildSubmission} from './submission';
 import type { LearningMode } from '../learning/types';
 const FG=(window as any).FG;
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const messages:Record<string,string>={queued:'Your request is in the builder queue.',building:'The builder is making a private candidate.',testing:'Checking that the new game works safely.',ready:'Your playable preview is ready. Try it, then Keep it or go back.',failed:'That build did not work. Your current game is safe.',cancelled:'Build cancelled. Your current game is safe.'};
 const errorMessage=(error:Error)=>error.message==='BUILDER_UNAVAILABLE'?'Needs builder: a secure builder is not connected. No job was queued. You can keep your idea and carry on playing.':error.message==='PRIVATE_INFORMATION'?'Keep names, contact details and secrets out of game ideas. Please change your request.':error.message==='SPENDING_CUTOFF'?'The builder has reached its allowance. Your current game is safe.':'The builder is unavailable or could not finish. Your current game is safe. No success has been claimed.';
 export async function initBuilder(){
- const panel=document.createElement('section');panel.id='builderPanel';panel.className='panel';panel.hidden=true;panel.innerHTML='<h2>Try a new game</h2><p id="builderMode"></p><p id="builderStatus" role="status" aria-live="polite"></p><div class="example-choices"><button class="btn secondary" id="cancelBuild" hidden>Cancel build</button><button class="btn secondary" id="retryBuild" hidden>Try build again</button><button class="btn primary" id="openReadyBuild" hidden>Try ready preview</button></div><div id="builderPreview" hidden><p id="previewOutcome" role="status"></p><iframe id="generatedPreview" title="Private playable game preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe><div class="example-choices"><button class="btn primary" id="keepBuild">Keep this game</button><button class="btn secondary" id="undoBuild">Undo kept change</button><button class="btn secondary" id="backFromBuild">Back to my game</button></div><button class="btn secondary" id="compareBuild">Compare with previous version</button><p id="buildComparison" role="status"></p><form id="forkBuildForm"><label for="builtGameName">Name your new game</label><input id="builtGameName" maxlength="60" required value="My Star Game"><button class="btn secondary" type="submit">Save as new builder game</button></form><form id="reviseBuildForm"><label for="reviseBuildPrompt">What would you change in this new game?</label><input id="reviseBuildPrompt" maxlength="2000" minlength="5" required placeholder="Catch six stars"><button class="btn primary" type="submit">Try It</button></form></div>';
+ const panel=document.createElement('section');panel.id='builderPanel';panel.className='panel';panel.hidden=true;panel.innerHTML='<h2>Try a new game</h2><p id="builderMode"></p><p id="builderStatus" role="status" aria-live="polite"></p><div class="example-choices"><button class="btn secondary" id="cancelBuild" hidden>Cancel build</button><button class="btn secondary" id="retryBuild" hidden>Try build again</button><button class="btn secondary" id="checkBuild" hidden>Check build status</button><button class="btn primary" id="openReadyBuild" hidden>Try ready preview</button></div><div id="builderPreview" hidden><p id="previewOutcome" role="status"></p><iframe id="generatedPreview" title="Private playable game preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe><div class="example-choices"><button class="btn primary" id="keepBuild">Keep this game</button><button class="btn secondary" id="undoBuild">Undo kept change</button><button class="btn secondary" id="backFromBuild">Back to my game</button></div><button class="btn secondary" id="compareBuild">Compare with previous version</button><p id="buildComparison" role="status"></p><form id="forkBuildForm"><label for="builtGameName">Name your new game</label><input id="builtGameName" maxlength="60" required value="My Star Game"><button class="btn secondary" type="submit">Save as new builder game</button></form><form id="reviseBuildForm"><label for="reviseBuildPrompt">What would you change in this new game?</label><input id="reviseBuildPrompt" maxlength="2000" minlength="5" required placeholder="Catch six stars"><button class="btn primary" type="submit">Try It</button></form></div>';
  $('page-create').querySelector('.page-head')!.after(panel);
  setIconLabel(panel.querySelector('h2')!,'play','Try a new game');
  const buildActions: Array<[string,IconName,string,string?]> = [
-  ['cancelBuild','close','Cancel build'],['retryBuild','retry','Try build again'],
+  ['cancelBuild','close','Cancel build'],['retryBuild','retry','Try build again'],['checkBuild','clock','Check build status'],
   ['openReadyBuild','play','Try ready preview'],['keepBuild','save','Keep this game'],
   ['undoBuild','undo','Undo kept change'],['backFromBuild','arrow','Back to my game','jems-icon--back'],
   ['compareBuild','grid','Compare with previous version']
@@ -30,7 +31,7 @@ export async function initBuilder(){
  let readyPreview:{revisionId:string;owner:string;inheritedMode?:LearningMode;jobId?:string}|null=null;
  const pendingKey='family-game-factory-pending-build-v1';let currentKind='star-catcher-v1';let previewSequence=0,profileSequence=0;let currentRevision:string|null=null,currentProject:string|null=null,channel='',artifactId='',previewOwner='',previousPage='create';
  let currentPage=document.querySelector('main > .page:not(.hidden)')?.id.replace(/^page-/,'')||'home';
- function makeClient(){const owner=FG.store.current().id,at=profileSequence;return new BuilderClient(config,job=>{if(at!==profileSequence||owner!==FG.store.current().id)return;void update(job).catch(error=>{if(at===profileSequence&&owner===FG.store.current().id)showError(error);});});}
+ function makeClient(){const owner=FG.store.current().id,at=profileSequence;return new BuilderClient(config,(job,submissionId)=>{if(at!==profileSequence||owner!==FG.store.current().id)return;return update(job,submissionId);});}
  let client=makeClient();
  const mathKey=()=>currentProject?'remote:'+currentProject:null;
  const operation=()=>({owner:FG.store.current().id,page:previousPage,sequence:previewSequence,revision:currentRevision,client});
@@ -41,8 +42,30 @@ export async function initBuilder(){
  function queuePreview(revisionId:string,inheritedMode?:LearningMode,jobId?:string){readyPreview={revisionId,owner:FG.store.current().id,inheritedMode,jobId};$('openReadyBuild').hidden=false;}
  $('openReadyBuild').onclick=()=>{const ready=readyPreview;if(!ready||ready.owner!==FG.store.current().id||mathBusy())return;void showPreview(ready.revisionId,ready.inheritedMode).catch(error=>{if(ready.owner===FG.store.current().id)showError(error);});};
 
- async function update(job:JobView){
-  $('builderMode').textContent=job.adapter==='mock'?'Test builder (mock) — this is not real AI generation.':'Private workshop · acknowledged job';$('builderStatus').textContent=job.phase==='repairing'?'That version needed a fix. The builder is trying again.':job.status==='failed'&&job.errorCode==='PROVIDER_RATE_LIMIT'?'The builder is busy. Your current game is safe. Try again in a little while.':job.status==='failed'&&job.errorCode==='SPENDING_CUTOFF'?'The workshop has reached its allowance. Your current game is safe.':messages[job.status]||'Your current game is safe.';try{if(['failed','cancelled'].includes(job.status))profileStorage(localStorage).removeItem(pendingKey);else profileStorage(localStorage).setItem(pendingKey,JSON.stringify({owner:FG.store.current().id,api:config.apiBaseUrl,jobId:job.jobId}));}catch{}$('cancelBuild').hidden=!['queued','building','testing'].includes(job.status);$('retryBuild').hidden=job.status!=='failed';
+ const submissionKey=(owner=String(FG.store.current().id))=>'family-game-factory-pending-submission-v1:'+encodeURIComponent(owner);
+ function savedSubmission():PendingBuildSubmission|null {
+  const raw=profileStorage(localStorage).getItem(submissionKey());if(raw===null)return null;
+  const saved=JSON.parse(raw) as PendingBuildSubmission;
+  if(!saved||saved.owner!==String(FG.store.current().id)||saved.workspace!=='legacy-builder'||typeof saved.api!=='string')throw Error('INVALID_SAVED_SUBMISSION');
+  validateBuildSubmission(saved.request);return saved;
+ }
+ async function checkSubmission(){
+  const saved=savedSubmission();if(!saved)return;
+  $('checkBuild').hidden=false;
+  if(saved.api!==config.apiBaseUrl){$('builderStatus').textContent='Reconnect this game’s workshop to check your saved request.';return;}
+  const at=profileSequence,source=client;
+  try{
+   const job=await source.lookupSubmission(saved.request);
+   if(at!==profileSequence||saved.owner!==String(FG.store.current().id))return;
+   if(!job){$('builderStatus').textContent='Your request is still unconfirmed. Check again; your idea is saved.';return;}
+   if(!savedSubmission()&&['queued','building','testing'].includes(job.status))void source.resume(job.jobId).catch(showError);
+  }catch(error){if(at===profileSequence)showError(error as Error);}
+ }
+ $('checkBuild').onclick=()=>{void checkSubmission().catch(showError);};
+ async function update(job:JobView,submissionId?:string){
+  const pending=savedSubmission();
+  if(pending&&pending.request.clientRequestId!==submissionId)return;
+  $('builderMode').textContent=job.adapter==='mock'?'Test builder (mock) — this is not real AI generation.':'Private workshop · acknowledged job';$('builderStatus').textContent=job.phase==='repairing'?'That version needed a fix. The builder is trying again.':job.status==='failed'&&job.errorCode==='PROVIDER_RATE_LIMIT'?'The builder is busy. Your current game is safe. Try again in a little while.':job.status==='failed'&&job.errorCode==='SPENDING_CUTOFF'?'The workshop has reached its allowance. Your current game is safe.':messages[job.status]||'Your current game is safe.';try{if(job.status==='cancelled')profileStorage(localStorage).removeItem(pendingKey);else profileStorage(localStorage).setItem(pendingKey,JSON.stringify({owner:FG.store.current().id,api:config.apiBaseUrl,jobId:job.jobId}));}catch{throw Error('BUILD_STATUS_SAVE_FAILED');}if(pending)profileStorage(localStorage).removeItem(submissionKey());$('checkBuild').hidden=true;$('cancelBuild').hidden=!['queued','building','testing'].includes(job.status);$('retryBuild').hidden=job.status!=='failed';
   if(job.status==='ready'&&job.revisionId){
    queuePreview(job.revisionId,undefined,job.jobId);
    // First previews may open in the waiting view; a background revision never
@@ -73,7 +96,28 @@ export async function initBuilder(){
   if(readyPreview?.revisionId===revisionId&&readyPreview.owner===owner){if(readyPreview.jobId)try{const saved=JSON.parse(profileStorage(localStorage).getItem(pendingKey)||'null');if(saved?.owner===owner&&saved.jobId===readyPreview.jobId)profileStorage(localStorage).removeItem(pendingKey);}catch{}readyPreview=null;$('openReadyBuild').hidden=true;}
   return true;
  }
- async function request(input:RequestChange,page=previousPage){const owner=FG.store.current().id,at=profileSequence;move(page);try{const mathRequest=interpretLearningRequest(input.prompt,FG.learning.subject);if(mathRequest?.kind==='required'){$('builderStatus').textContent=mathRequest.message;return;}if(mathRequest?.kind==='mode'){if(mathKey()&&input.baseRevisionId===currentRevision){FG.learning.setMode(mathKey(),mathRequest.mode);$('builderStatus').textContent='Learning format updated for the next safe learning moment.';}else $('builderStatus').textContent='Open the game you want to change, then choose its learning format.';return;}if(config.mode==='unavailable')throw Error('BUILDER_UNAVAILABLE');$('builderStatus').textContent='Sending your request. No queued job has been acknowledged yet.';await client.submit(input);}catch(err){if(owner===FG.store.current().id&&at===profileSequence)showError(err as Error);}}
+ async function request(input:RequestChange,page=previousPage){
+  const owner=String(FG.store.current().id),at=profileSequence;let submissionId:string|undefined;move(page);
+  try{
+   const mathRequest=interpretLearningRequest(input.prompt,FG.learning.subject);
+   if(mathRequest?.kind==='required'){$('builderStatus').textContent=mathRequest.message;return;}
+   if(mathRequest?.kind==='mode'){if(mathKey()&&input.baseRevisionId===currentRevision){FG.learning.setMode(mathKey(),mathRequest.mode);$('builderStatus').textContent='Learning format updated for the next safe learning moment.';}else $('builderStatus').textContent='Open the game you want to change, then choose its learning format.';return;}
+   if(config.mode==='unavailable')throw Error('BUILDER_UNAVAILABLE');
+   if(savedSubmission()){$('checkBuild').hidden=false;$('builderStatus').textContent='Check your saved request before starting another build.';return;}
+   $('builderStatus').textContent='Sending your request. No queued job has been acknowledged yet.';
+   await client.submit(input,request=>{
+    if(owner!==String(FG.store.current().id)||at!==profileSequence)throw Error('PROFILE_CHANGED');
+    if(savedSubmission())throw Error('UNCONFIRMED_BUILD_RESPONSE');
+    profileStorage(localStorage).setItem(submissionKey(owner),JSON.stringify({owner,workspace:'legacy-builder',api:config.apiBaseUrl!,request} satisfies PendingBuildSubmission));
+    submissionId=request.clientRequestId;
+   });
+  }catch(error){
+   if(owner!==String(FG.store.current().id)||at!==profileSequence)return;
+   if(submissionId&&isKnownBuildRejection(error)&&savedSubmission()?.request.clientRequestId===submissionId)profileStorage(localStorage).removeItem(submissionKey(owner));
+   showError(error as Error);
+   if(savedSubmission()){$('checkBuild').hidden=false;$('builderStatus').textContent='Your request is unconfirmed. Check build status; your idea is saved.';}
+  }
+ }
  create.onclick=()=>{const idea=$<HTMLTextAreaElement>('inventIdea');if(!idea.reportValidity())return;void request({gameId:'new',baseRevisionId:null,prompt:idea.value},'create');};
  $('cancelBuild').onclick=()=>{void client.cancel().catch(showError);};$('retryBuild').onclick=()=>{void client.retry().catch(showError);};
  $('keepBuild').onclick=()=>{if(mathBusy())return;const at=operation();if(at.revision)void at.client.api('/v1/revisions/'+at.revision+'/keep',{}).then(()=>{if(!stillCurrent(at))return;$('builderStatus').textContent='Kept! Find your playable game in My Creations.';return refresh();}).catch(error=>{if(stillCurrent(at))showError(error);});};
@@ -85,7 +129,7 @@ export async function initBuilder(){
  window.addEventListener('message',event=>{if(event.source!==$<HTMLIFrameElement>('generatedPreview').contentWindow||previewOwner!==FG.store.current().id)return;const data=event.data;if(!data||data.type!=='factory-preview'||data.channel!==channel||data.artifactId!==artifactId)return;if(data.event==='ready'&&(currentKind==='generated-module-v1'||currentKind==='generated-module-v2')&&Number.isInteger(data.height)&&data.height>=300&&data.height<=1000)$<HTMLIFrameElement>('generatedPreview').style.height=Math.max(400,data.height+12)+'px';});
  async function refresh(){if(config.mode!=='remote')return;const owner=FG.store.current().id,at=profileSequence,source=client;try{const games=await source.api('/v1/creations');if(owner!==FG.store.current().id||at!==profileSequence)return;$('builderGames').replaceChildren();$('builderLibraryStatus').textContent='Private games from the connected family workspace.';for(const game of games){const button=document.createElement('button');button.className='btn secondary';setIconLabel(button,'play',game.name||((game.game.kind==='generated-module-v1'||game.game.kind==='generated-module-v2')?game.game.title:`Catch ${game.game.target} Stars`));button.onclick=()=>{move('create');FG.app.page('create');void showPreview(game.id).catch(showError);};$('builderGames').append(button);}}catch{if(owner===FG.store.current().id&&at===profileSequence)$('builderLibraryStatus').textContent='Private builder games are unavailable. Your local remixes are still here.';}}
  window.addEventListener('factory-page',event=>{const next=(event as CustomEvent<string>).detail;currentPage=next;if(next!==previousPage){previewSequence++;previewLearning?.dispose();previewLearning=null;$<HTMLIFrameElement>('generatedPreview').removeAttribute('src');$('builderPreview').hidden=true;panel.hidden=true;}if(next===previousPage&&readyPreview?.owner===FG.store.current().id)move(next);if(next==='creations')void refresh();});
- window.addEventListener('factory-profile',()=>{previewLearning?.dispose();previewLearning=null;previewSequence++;profileSequence++;client.disconnect();client=makeClient();readyPreview=null;$('openReadyBuild').hidden=true;currentRevision=null;currentProject=null;channel='';previewOwner='';panel.hidden=true;$('builderPreview').hidden=true;$<HTMLIFrameElement>('generatedPreview').removeAttribute('src');$('builderGames').replaceChildren();});
+ window.addEventListener('factory-profile',()=>{previewLearning?.dispose();previewLearning=null;previewSequence++;profileSequence++;client.disconnect();client=makeClient();readyPreview=null;$('openReadyBuild').hidden=true;currentRevision=null;currentProject=null;channel='';previewOwner='';panel.hidden=true;$('builderPreview').hidden=true;$<HTMLIFrameElement>('generatedPreview').removeAttribute('src');$('builderGames').replaceChildren();$('checkBuild').hidden=true;resumeSavedBuild();});
  // Family enrollment is a one-time adult action; ordinary renewals remain invisible.
  // The legacy single-use /v1/sessions route remains server-compatible for old clients.
  const connection=document.createElement('section');
@@ -257,7 +301,8 @@ export async function initBuilder(){
  });
  window.addEventListener('factory-session-restored',()=>{if(!$('page-parent').classList.contains('hidden'))void connectionStatus();});
  void connectionStatus();
- try{const saved=JSON.parse(profileStorage(localStorage).getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl&&config.mode==='remote'){move('create');void client.resume(saved.jobId).catch(showError);}}catch{}
+ function resumeSavedBuild(){try{if(config.mode!=='remote')return;if(savedSubmission()){move('create');void checkSubmission().catch(showError);return;}const saved=JSON.parse(profileStorage(localStorage).getItem(pendingKey)||'null');if(saved?.owner===FG.store.current().id&&saved.api===config.apiBaseUrl){move('create');void client.resume(saved.jobId).catch(showError);}}catch(error){showError(error as Error);}}
+ resumeSavedBuild();
  FG.builder={request:(input:RequestChange)=>request(input,'feedback'),mode:config.mode};
  return config;
 }

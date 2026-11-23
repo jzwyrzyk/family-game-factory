@@ -2,7 +2,11 @@
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { RevisionStore, WORKSPACE_KEY } from '../src/factory/workspace';
-import { StudioNotebook, STUDIO_KEY } from '../src/studio/notebook';
+import { StudioNotebook, STUDIO_KEY, type StudioSession } from '../src/studio/notebook';
+import { creationBuildReadiness, creationPlan, recordCreationReview, selectedSuggestions, selectionId } from '../src/studio/creation-readiness';
+import { authoredFollowupIntents, compileGuidedBuild } from '../src/studio/guided-planning';
+import { visibleConversation } from '../src/studio/conversation-view';
+import { identifyBuildRequest } from '../src/builder/submission';
 import { hasMeaningfulCreation } from '../src/studio/guidance';
 import { deriveStudioNotifications, freshStudioNotificationPreferences } from '../src/studio/notifications';
 import { CreationStore, CREATION_KEY } from '../src/creation/storage';
@@ -81,6 +85,64 @@ test('whole-family prevalidation uses the real base validator and strips duplica
   const legacy=validateFamilyRewardBackup(JSON.stringify(base()),validateBase,rewards,pals);
   assert.deepEqual(legacy.workspace.projects,[]);assert.deepEqual(legacy.notebook.sessions,[]);assert.deepEqual(legacy.creation.projects,[]);assert.deepEqual(legacy.rewards.data.profiles,[]);
   assert.deepEqual(legacy.problemSolving,emptyProblemSolvingWorkspace());
+});
+
+test('full-family backup preserves linked chat pages, provenance and the same native game',async()=>{
+  const value=await incoming(),source=new SourceMemory(),book=new StudioNotebook(source);
+  book.restore(value.factoryStudio);const session=book.list(OWNER)[0];
+  book.update(session.id,OWNER,s=>{s.messages=Array.from({length:200},(_,index)=>({id:'backup-turn-'+index,role:index%2?'helper':'child',text:'Original words '+index,at:new Date(TIME).toISOString()}));s.design!.plan.action={value:'Original words 0',origin:'child',accepted:true,delegated:false};});
+  book.continueConversation(session.id,OWNER);book.message(session.id,OWNER,'child','My next idea');
+  value.factoryStudio=book.read();
+  const {storage,rewards,pals}=stores(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
+  const restored=new StudioNotebook(storage);
+  assert.deepEqual(restored.read(),book.read());
+  assert.deepEqual(restored.get(session.id,OWNER),book.get(session.id,OWNER));
+  assert.equal(new RevisionStore(storage).project(session.projectId!,OWNER).id,session.projectId);
+  const foreign=structuredClone(value);foreign.factoryStudio.conversationChapters![0].owner=OTHER;
+  assert.throws(()=>validateFamilyRewardBackup(JSON.stringify(foreign),validateBase,rewards,pals),/conversation link/);
+});
+
+test('family backup keeps selected chapter evidence, existing games, notifications and exact pending identity through a continued fork',async()=>{
+  const value=await incoming(),source=new SourceMemory(),book=new StudioNotebook(source);
+  book.restore(value.factoryStudio);const native=book.list(OWNER)[0],workspaceBefore=structuredClone(value.factoryWorkspace);
+  book.update(native.id,OWNER,s=>{s.job={id:'earlier-native-job',api:'https://builder.test',status:'failed'};});
+  const notification=deriveStudioNotifications(book.list(OWNER),OWNER)[0];book.acknowledgeNotifications(OWNER,[notification]);
+  const idea=book.create(OWNER,'new','Quiet pond',null,{creationStandard:2});
+  const premise='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.',picked='I choose paper waves.';
+  book.message(idea.id,OWNER,'child',premise);book.message(idea.id,OWNER,'helper','My ideas are chalk lines, clay rings and paper waves.');
+  while(book.conversationPage(idea.id,OWNER).available)book.message(idea.id,OWNER,'helper','Retained history '+book.conversationPage(idea.id,OWNER).count);
+  book.continueConversation(idea.id,OWNER);book.message(idea.id,OWNER,'child',picked);
+  const choice=book.get(idea.id,OWNER).messages.at(-1)!;
+  const verdict={ready:true,evidence:{action:'tap',consequence:'makes a ripple',world:'pond',experience:'play with the ripples',goal:'just want to play with the ripples',mood:'quiet',visualStyle:picked},unresolved:[]};
+  book.update(idea.id,OWNER,s=>{
+    s.design!.plan.style={value:picked,origin:'helper',accepted:true,delegated:false};
+    s.design!.ideas.push({id:selectionId('style',0,choice.id),text:'paper waves',origin:'helper',adopted:true});
+    s.design!.creationReview=recordCreationReview(book.withConversation(s),verdict,2);
+  });
+  const compile=(s:StudioSession)=>{const messages=visibleConversation(s.messages),design={...s.design!,plan:creationPlan(s)};return compileGuidedBuild(premise,design,'',authoredFollowupIntents(messages,design),{messages,selected:selectedSuggestions(s,messages)});};
+  const prompt=compile(book.get(idea.id,OWNER)),request=await identifyBuildRequest({gameId:'new',baseRevisionId:null,prompt,clientRequestId:'saved-chapter-build'});
+  book.update(idea.id,OWNER,s=>{s.pendingSubmission={owner:OWNER,workspace:s.id,api:'https://builder.test',request};});
+  const original=book.get(idea.id,OWNER),preferences=book.notificationPreferences(OWNER);value.factoryStudio=book.read();
+  const {storage,rewards,pals}=stores(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals);
+  await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);
+  const restored=new StudioNotebook(storage),saved=restored.get(idea.id,OWNER);
+  assert.deepEqual(saved,original);assert.deepEqual(new RevisionStore(storage).snapshot(),workspaceBefore);
+  assert.deepEqual(restored.notificationPreferences(OWNER),preferences);
+  const restoredNative=deriveStudioNotifications(restored.list(OWNER),OWNER,{},restored.notificationPreferences(OWNER)).find(row=>row.sessionId===native.id)!;
+  assert.equal(restoredNative.token,notification.token);assert.equal(restoredNative.unread,false);
+  assert.deepEqual(saved.pendingSubmission!.request,request);assert.equal(compile(saved),prompt);assert.equal(creationBuildReadiness(saved,2).ready,true);
+  assert.throws(()=>restored.continueConversation(idea.id,OWNER),/recover this build/);
+  const copied=restored.fork(idea.id,OWNER,'Quiet pond copy',null,null);
+  assert.equal(copied.pendingSubmission,null);assert.equal(copied.rewardProjectId,original.rewardProjectId);
+  assert.equal(copied.previousConversationId,original.previousConversationId);assert.equal(creationBuildReadiness(restored.get(copied.id,OWNER),2).ready,false,'a new session needs its own review');
+  restored.continueConversation(copied.id,OWNER);
+  restored.update(copied.id,OWNER,s=>{s.design!.creationReview=recordCreationReview(restored.withConversation(s),verdict,2);});
+  const continued=new StudioNotebook(storage).get(copied.id,OWNER);
+  assert.deepEqual(continued.messages,original.messages);assert.equal(selectedSuggestions(continued).style?.[0].offer,'paper waves');
+  assert.equal(creationBuildReadiness(continued,2).ready,true);assert.equal(compile(continued),prompt);
+  assert.deepEqual(restored.get(idea.id,OWNER),original,'copy/continue never changes the pending original');
+  assert.doesNotMatch(prompt,/chalk lines|clay rings/);
 });
 
 test('invalid family ownership, linked games, namespace and recovery-only files are rejected before any write',async()=>{

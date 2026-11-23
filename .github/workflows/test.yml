@@ -1,9 +1,9 @@
 name: Arcade journeys
 on: [push, pull_request]
-# Push and PR workflows from the same source branch share one latest-head run.
-# Do not spend runners on superseded commits during rapid review iterations.
+# Keep source-head push checks and prospective-merge PR checks independent.
+# A new head still cancels superseded runs within its own event and branch.
 concurrency:
-  group: arcade-journeys-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  group: arcade-journeys-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   notifications:

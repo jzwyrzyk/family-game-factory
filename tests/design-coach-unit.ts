@@ -217,6 +217,37 @@ await test('navigation flush blocks on an unsaved plan, then saves all visible d
   const restored=new StudioNotebook(h.storage).get(h.session().id,h.session().owner);assert.equal(restored.design!.plan.fun!.value,'A funny wobbly bridge');assert.equal(restored.hypothesis,'The lighter bridge might sway');assert.equal(restored.design!.friction,'I want to try balancing');assert.equal(restored.design!.approvedPlan,false);
  }finally{h.dispose();}
 });
+for(const game of ['new','gum'] as const)await test(`a full ${game} idea ledger refuses another model request without losing work or the draft`,async()=>{
+ const h=coachingHarness(game);try{
+  const session=h.session();
+  h.book.update(session.id,session.owner,s=>{
+   s.design!.ideas=Array.from({length:100},(_,index)=>({id:'retained-idea-'+index,text:'Original idea '+index,origin:index%2?'helper':'child',adopted:index%2===0}));
+  });
+  h.book.message(session.id,session.owner,'child','Keep my earlier exact words.');
+  h.book.continueConversation(session.id,session.owner);
+  h.input('studioPrompt','My next unsent idea');
+  h.book.update(session.id,session.owner,s=>{s.draft='My next unsent idea';});
+  const before=h.storage.getItem(STUDIO_KEY);
+  await h.coach.discuss('ideas');
+  assert.equal(h.requests.length,0,'a full provenance ledger cannot start a paid reply');
+  assert.equal(h.storage.getItem(STUDIO_KEY),before,'no existing words or provenance are trimmed');
+  assert.equal(h.get('studioPrompt').value,'My next unsent idea');
+  assert.match(h.statuses.at(-1)!.text,/idea notes are full/);
+  assert.equal(new StudioNotebook(h.storage).get(session.id,session.owner).messages[0].text,'Keep my earlier exact words.');
+  // Stopping is still an immediate local action with the full saved ledger.
+  h.input('studioPrompt','no more questions');await h.coach.discuss('discuss');
+  assert.equal(h.requests.length,0);assert.equal(h.session().design!.ideas.length,100);
+  assert.match(h.session().messages.at(-1)!.text,/Okay/);
+ }finally{h.dispose();}
+});
+await test('full observation notes reject a further entry without altering earlier evidence',()=>{
+ const storage=new Memory(),book=new StudioNotebook(storage),session=book.create(owner,'new','Retained observations');
+ book.update(session.id,owner,s=>{s.design!.observations=Array.from({length:300},(_,index)=>({id:'observation-'+index,experimentId:null,text:'Exact observation '+index,source:'child',at:'2026-11-23T00:00:00Z'}));});
+ const before=storage.getItem(STUDIO_KEY);
+ assert.throws(()=>book.observe(session.id,owner,'My next observation','child'),/observation notes are full/);
+ assert.equal(storage.getItem(STUDIO_KEY),before);
+ assert.equal(new StudioNotebook(storage).get(session.id,owner).design!.observations.at(-1)!.text,'Exact observation 299');
+});
 await test('a coach persistence failure is caught and retains the child draft for recovery',async()=>{
  const h=coachingHarness();try{h.input('studioPrompt','Keep my idea if saving fails');const turn=h.coach.discuss('discuss');await h.awaitModelRequest();h.storage.fail=true;h.resolve(reply);await assert.doesNotReject(turn);
   assert.equal(h.get('studioPrompt').value,'Keep my idea if saving fails');assert.equal(h.session().messages.length,1);assert.match(h.get('coachModeStatus').textContent,/could not be saved/);assert.equal(h.statuses.some(s=>s.error),true);
@@ -600,6 +631,41 @@ await test('reconnect restores provenance for an earlier prose-only offer and ne
   assert.equal(h.buildRequests.length,0);
  }finally{h.dispose();}
 });
+await test('a selected prose-only helper offer keeps its origin across a sealed chapter, restore and Build',async()=>{
+ const h=coachingHarness();
+ try{
+  const {id,owner}=h.session();h.book.update(id,owner,s=>{s.design!.creationStandard=2;});
+  const premise='I tap the quiet pond. Each tap makes a ripple. I just want to play with the ripples.';
+  const picked='I want a storybook look.',offer='storybook';
+  const empty={action:'',consequence:'',world:'',experience:'',goal:'',visualStyle:'',mood:''};
+  const waiting={...reply,question:null,creationReadiness:{ready:false,evidence:empty,unresolved:['How should it look?']}};
+  await sendTurn(h,premise,{...waiting,text:'One idea from me is a storybook look. You can invent your own.'});
+  while(h.book.conversationPage(id,owner).available)h.book.message(id,owner,'helper','Earlier saved conversation note '+h.book.conversationPage(id,owner).count+'.');
+  const original=h.session().messages;
+  h.book.continueConversation(id,owner);
+  const backup=JSON.parse(JSON.stringify(h.book.read()));h.book.restore(backup);
+  assert.deepEqual(h.session().messages,original);
+  const ready:CoachReply={...reply,question:null,childDecisions:[{field:'style',quote:offer}],
+   creationReadiness:{ready:true,evidence:{action:'tap',consequence:'makes a ripple',world:'pond',experience:'play with the ripples',goal:'just want to play with the ripples',mood:'quiet',visualStyle:picked},unresolved:[]}};
+  await sendTurn(h,picked,ready);
+  const selected=h.session();
+  assert.deepEqual(selected.design!.plan.style,{value:offer,origin:'helper',accepted:true,delegated:false});
+  assert.equal(selectedSuggestions(selected).style?.[0].offer,offer);
+  assert.equal(h.coach.buildReadiness().ready,true);
+  const beforePrompt=h.coach.buildPrompt()!;
+  assert.match(beforePrompt,/jems suggested "storybook", child chose/);assert.ok(beforePrompt.includes(premise));
+  assert.equal(h.buildRequests.length,0,'saved readiness is never Build consent');
+  h.book.continueConversation(id,owner);h.book.restore(JSON.parse(JSON.stringify(h.book.read())));
+  h.coach.reset();h.coach.openSession();
+  const children=h.session().messages.filter(message=>message.role==='child');
+  const check=h.coach.reassess();await h.awaitModelRequest();h.resolve(ready);await check;
+  assert.deepEqual(h.session().messages.filter(message=>message.role==='child'),children);
+  assert.equal(h.coach.buildReadiness().ready,true);
+  assert.equal(h.coach.buildPrompt(),beforePrompt);
+  assert.deepEqual(new StudioNotebook(h.storage).get(id,owner).messages.slice(0,200),original);
+ }finally{h.dispose();}
+});
+
 await test('a mixed selection preserves both earlier options and no other option',async()=>{
  const h=coachingHarness();
  try{

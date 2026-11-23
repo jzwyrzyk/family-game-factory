@@ -8,13 +8,12 @@ import {allowedCoachFamily} from './consent';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotConfigured,adultPilotFlags,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
+import {randomUUID} from 'node:crypto';
+import {PAID_RECEIPT_LEASE_MS,expirePaidReceipts,reconcilePaidReceipts,settlePaidReceipt,type PaidReceipt} from './receipts';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
 export const AUDIO_MAX_BYTES=320000;
-export interface AudioReceipt {
- id:string; familyId:string; subject:string; month:string;
- at:number; reserved:number; state:'running'|'ready'|'failed';
-}
+export interface AudioReceipt extends PaidReceipt {}
 export interface SpeechConfig {
  approved:boolean;privacyApproved:boolean;providerApproved:boolean;parentConsentApproved:boolean;
  requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
@@ -73,7 +72,9 @@ export class CoachAudioService {
  }
  async familyAvailable(session:VerifiedSession):Promise<boolean>{
   if(!this.enabled()||!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))return false;
-  const state=await this.repo.snapshot(),month=new Date().toISOString().slice(0,7);
+  let state:PipelineState;
+  try{state=await reconcilePaidReceipts(this.repo,session);}catch{return false;}
+  const month=new Date().toISOString().slice(0,7);
   const ledger=state.ledgers[session.familyId];
   try{assertActiveTrustedDevice(state,session);}catch{return false;}
   const permitted=this.permitted(state,session);
@@ -91,13 +92,15 @@ export class CoachAudioService {
   const mime=validateAudio(input.audio,input.mime);
   const id='audio-'+input.id;
   const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
+  await reconcilePaidReceipts(this.repo,session);
+  const reservationId=randomUUID();
   await this.repo.transaction(state=>{
    const now=Date.now(),month=new Date(now).toISOString().slice(0,7);
    // A device revoked between the HTTP check and spending admission is denied.
    assertActiveTrustedDevice(state,session,now);
    if(!this.enabled()||!this.permitted(state,session,now))
     throw Error('AUDIO_UNAVAILABLE');
-   state.audioReceipts=(state.audioReceipts||[]).filter(x=>x.state==='running'||x.at>=now-86400000);
+   state.audioReceipts=(state.audioReceipts||[]).filter(x=>x.state==='running'||(x.recoveredAt??x.at)>=now-86400000);
    const receipts=state.audioReceipts;
    if(receipts.some(x=>x.id===id))throw Error('AUDIO_REQUEST_EXISTS');
    if(receipts.filter(x=>x.familyId===session.familyId&&x.at>now-60000).length>=4)throw Error('RATE_LIMIT');
@@ -107,7 +110,7 @@ export class CoachAudioService {
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
    ledger.reserved+=this.config.maxMicroUsd;
    receipts.push({id,familyId:session.familyId,subject,month,at:now,
-    reserved:this.config.maxMicroUsd,state:'running'});
+    reserved:this.config.maxMicroUsd,state:'running',reservationId,leaseUntil:now+PAID_RECEIPT_LEASE_MS});
    return true;
   });
   let transcript:string|undefined,failure:unknown;
@@ -121,17 +124,15 @@ export class CoachAudioService {
   // Settle the charge and recheck authorization atomically before returning
   // the transient transcript. It is never written to a receipt or audit log.
   const completion=await this.repo.transaction(state=>{
-    const receipt=state.audioReceipts?.find(x=>x.id===id&&x.familyId===session.familyId&&x.subject===subject);
-    if(!receipt)throw Error('AUDIO_UNAVAILABLE');
-    const ledger=state.ledgers[session.familyId];
-    if(ledger&&ledger.month===receipt.month){
-     ledger.reserved=Math.max(0,ledger.reserved-receipt.reserved);
-     ledger.used+=receipt.reserved;
-    }
-    const now=Date.now();let authenticated=true;
+    const now=Date.now();
+    expirePaidReceipts(state,now,session.familyId);
+    const receipt=state.audioReceipts?.find(x=>x.id===id&&x.familyId===session.familyId&&x.subject===subject&&x.reservationId===reservationId);
+    if(!receipt||receipt.state!=='running')return {permitted:false,authenticated:true};
+    let authenticated=true;
     try{assertActiveTrustedDevice(state,session,now);}catch{authenticated=false;}
     const permitted=!failure&&!!transcript&&!cancel?.aborted&&authenticated&&this.permitted(state,session,now);
-    receipt.state=permitted?'ready':'failed';return {permitted,authenticated};
+    settlePaidReceipt(state,receipt,'audio',permitted?'ready':'failed',receipt.reserved,now);
+    return {permitted,authenticated};
    });
   if(failure)throw failure;
   // Report device revocation distinctly, after the failed receipt and charge

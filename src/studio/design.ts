@@ -18,6 +18,14 @@ export interface DesignRecord {
  /** New ideas opt into richer creative readiness; older saved ideas keep their earlier contract. */
  creationStandard?:2;
 }
+export const DESIGN_IDEA_CAPACITY=100;
+export const DESIGN_OBSERVATION_CAPACITY=300;
+export class DesignCapacityError extends Error {
+ constructor(kind:'idea'|'observation'){
+  super(`This game's ${kind} notes are full. Your saved work is safe. Ask a grown-up to export a backup.`);
+  this.name='DesignCapacityError';
+ }
+}
 export interface Experiment {
  id:string; label:string; title:string; baseId:string|null; parents:string[];
  candidate:Candidate; depth:'tune'|'redesign'|'rethink'; origin:Origin;
@@ -55,8 +63,10 @@ export function validateDesign(input:unknown):DesignRecord {
  if(d.creationReview!==undefined)validateCreationReview(d.creationReview);
  if(d.creationStandard!==undefined&&d.creationStandard!==2)throw Error('Invalid creation standard.');
  for(const field of Object.values(d.plan)){if(!field||!keys(field,['value','origin','accepted','delegated'])||!text(field.value,700)||!['child','helper'].includes(field.origin)||typeof field.accepted!=='boolean'||typeof field.delegated!=='boolean')throw Error('Invalid plan field.');}
- if(!Array.isArray(d.ideas)||d.ideas.length>100||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
- if(!Array.isArray(d.observations)||d.observations.length>300||!d.observations.every(o=>o&&keys(o,['id','experimentId','text','source','at'])&&id(o.id)&&(o.experimentId===null||id(o.experimentId))&&text(o.text,1200)&&['runtime','child'].includes(o.source)&&text(o.at,40)&&Number.isFinite(Date.parse(o.at)))||new Set(d.observations.map(o=>o.id)).size!==d.observations.length)throw Error('Invalid observation.');
+ if(Array.isArray(d.ideas)&&d.ideas.length>DESIGN_IDEA_CAPACITY)throw new DesignCapacityError('idea');
+ if(!Array.isArray(d.ideas)||!d.ideas.every(i=>i&&keys(i,['id','text','origin','adopted'])&&id(i.id)&&text(i.text,1000)&&['child','helper'].includes(i.origin)&&typeof i.adopted==='boolean')||new Set(d.ideas.map(i=>i.id)).size!==d.ideas.length)throw Error('Invalid idea provenance.');
+ if(Array.isArray(d.observations)&&d.observations.length>DESIGN_OBSERVATION_CAPACITY)throw new DesignCapacityError('observation');
+ if(!Array.isArray(d.observations)||!d.observations.every(o=>o&&keys(o,['id','experimentId','text','source','at'])&&id(o.id)&&(o.experimentId===null||id(o.experimentId))&&text(o.text,1200)&&['runtime','child'].includes(o.source)&&text(o.at,40)&&Number.isFinite(Date.parse(o.at)))||new Set(d.observations.map(o=>o.id)).size!==d.observations.length)throw Error('Invalid observation.');
  return copy(d);
 }
 export function validateExperiments(input:unknown):Experiment[] {

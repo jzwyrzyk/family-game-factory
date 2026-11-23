@@ -38,8 +38,10 @@ on:
       - 'scripts/deployment/test_build.py'
 permissions:
   contents: read
+# Preserve both source-head and prospective-merge evidence for protection.
+# Superseded runs still cancel within the same event and source branch.
 concurrency:
-  group: service-images-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  group: service-images-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   service-images:

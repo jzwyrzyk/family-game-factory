@@ -16,6 +16,7 @@ import {GooglePrivateNarration} from './private-narration-provider';
 import {narrationApproved,narrationConfig,validateNarrationText,validateNarrationAudio,NARRATION_DEADLINE_MS,type NarrationProvider,type NarrationConfig} from './narration';
 import {readNarrationRequest} from './narration-transport';
 import {adultPilotFlags} from '../adult-pilot';
+import {readJsonBody} from '../http-json';
 
 export type VerifyCaller=(token:string)=>Promise<boolean>;
 export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
@@ -55,6 +56,11 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
   const aborted=new AbortController();
   let failureSignal:AbortSignal|undefined=aborted.signal;
   res.once('close',()=>{if(!res.writableEnded)aborted.abort();});
+  const acquire=()=>{
+   aborted.signal.throwIfAborted();
+   if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
+   active++;
+  };
   try{
    if(req.headers.origin||req.headers['x-factory-request']!=='1')throw Error('FORBIDDEN');
    const path=new URL(req.url||'','http://private').pathname;
@@ -66,11 +72,11 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
     if(path.endsWith('/status')||req.method!=='POST'||!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('FORBIDDEN');
     if(!ready)throw Error('NARRATION_UNAVAILABLE');
     if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
-    active++;
+    const input:any=await readNarrationRequest(req,13000);
+    if(!input||input.version!==1||Object.keys(input).some(k=>!['version','text'].includes(k)))throw Error('INVALID_NARRATION');
+    const text=validateNarrationText(input.text),signal=AbortSignal.any([aborted.signal,AbortSignal.timeout(NARRATION_DEADLINE_MS)]);
+    acquire();
     try {
-     const input:any=await readNarrationRequest(req,13000);
-     if(!input||input.version!==1||Object.keys(input).some(k=>!['version','text'].includes(k)))throw Error('INVALID_NARRATION');
-     const text=validateNarrationText(input.text),signal=AbortSignal.any([aborted.signal,AbortSignal.timeout(NARRATION_DEADLINE_MS)]);
      signal.throwIfAborted();const audio=validateNarrationAudio(await runtime.narration!.read(text,signal));signal.throwIfAborted();
      if(res.destroyed||res.writableEnded)return;
      res.writeHead(200,{'Content-Type':'audio/mpeg','Content-Length':audio.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});
@@ -103,13 +109,7 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
     throw error;
    }
    if(active>=(runtime.maxConcurrent||4))throw Error('RATE_LIMIT');
-   let data='';
-   for await(const chunk of req){
-    data+=String(chunk);
-    if(Buffer.byteLength(data,'utf8')>(isAudio?440000:40000))throw Error('INVALID_REQUEST');
-   }
-   let input:any;
-   try{input=JSON.parse(data);}catch{throw Error('INVALID_REQUEST');}
+   const input=await readJsonBody(req,isAudio?440000:40000,{invalidJsonError:'INVALID_REQUEST'});
    if(isAudio){
     if(!input||input.version!==1||
      Object.keys(input).length!==3||
@@ -120,7 +120,7 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
     const bytes=Buffer.from(input.audio,'base64');
     if(bytes.length>AUDIO_MAX_BYTES||bytes.toString('base64')!==input.audio)throw Error('INVALID_AUDIO');
     const mime=validateAudio(bytes,input.mime);
-    active++;
+    acquire();
     try{
      const text=await runtime.audio!.transcribe(bytes,mime,
       AbortSignal.any([aborted.signal,AbortSignal.timeout(15000)]));
@@ -133,7 +133,9 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    const serialized=JSON.stringify(context);
    if(serialized.length>runtime.config.maxInputChars)throw Error('INVALID_REQUEST');
    if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
-   active++;
+   // Recheck and increment without an await: other validated bodies may have
+   // occupied the shared text/audio slots while this request was being read.
+   acquire();
    try{
     stage='inference';
     const {reply,usedMicroUsd}=await runtime.provider.complete(context,

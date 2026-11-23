@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
+import { randomUUID,webcrypto } from 'node:crypto';
 import { runInNewContext } from 'node:vm';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { build } from 'esbuild';
@@ -113,7 +113,7 @@ async function uiHarness() {
     else throw Error('Unexpected test request: ' + path);
     return { ok: true, status: 200, json: async () => body };
   };
-  const context: any = { window, document, fetch, URL, Headers, Response, AbortController, AbortSignal, crypto: { randomUUID }, setTimeout, clearTimeout,
+  const context: any = { window, document, fetch, URL, Headers, Response, AbortController, AbortSignal, crypto: { randomUUID,subtle:webcrypto.subtle }, TextEncoder, setTimeout, clearTimeout,
     localStorage: { getItem: (key: string) => saved.get(key) || null, setItem: (key: string, value: string) => saved.set(key, value), removeItem: (key: string) => saved.delete(key) } };
   runInNewContext(bundledUI, context);
   await context.BuilderUI.initBuilder();
@@ -122,7 +122,12 @@ async function uiHarness() {
     delayManagement(path:string){delayedManagement.add(path);},
     async resolveManagement(path:string,value:unknown){assert.ok(managementPending.has(path),'management request is pending');managementPending.get(path)!(value);managementPending.delete(path);await flush();},
     async unlockParent(){node('builderParentUnlockPassphrase').value='fixture parent passphrase';node('builderParentUnlock').onsubmit({preventDefault(){}});await flush();},
-    async start(id = 'revision-one') { nextRevision = id; node('inventIdea').value = 'Catch three stars'; node('createTry').onclick(); await flush(); },
+    async start(id = 'revision-one') {
+      nextRevision = id;const expectedJobs=jobs+1;node('inventIdea').value = 'Catch three stars';node('createTry').onclick();
+      // WebCrypto and durable submission preparation precede network admission.
+      for(let attempt=0;attempt<100&&jobs<expectedJobs;attempt++)await new Promise(resolve=>setTimeout(resolve,1));
+      assert.equal(jobs,expectedJobs,'the explicit build reaches admission after identity is saved');await flush();
+    },
     async resolve(id: string, projectId: string) { assert.ok(pending.has(id), `preview is pending: ${JSON.stringify({requests,status:node('builderStatus').textContent})}`); pending.get(id)!.resolve({ projectId, artifactId: id, url: 'https://preview.example/preview/' + id, expiresAt: Date.now() + 60_000, kind: 'star-catcher-v1' }); pending.delete(id); await flush(); },
     async openReady(){node('openReadyBuild').onclick();await flush();},
     async reject(id:string){assert.ok(pending.has(id));pending.get(id)!.reject(Error('PREVIEW_FETCH_FAILED'));pending.delete(id);await flush();},

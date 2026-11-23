@@ -7,6 +7,8 @@
 !src/runtime/
 !src/runtime/types.ts
 !src/runtime/manifests.ts
+!src/builder/
+!src/builder/submission.ts
 !src/studio/
 !src/studio/design.ts
 !src/studio/creation-readiness.ts

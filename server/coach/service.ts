@@ -4,6 +4,7 @@ import {reconcileNarrationReceipts} from './narration';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotConfigured,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
+import {PAID_RECEIPT_LEASE_MS,expirePaidReceipts,reconcilePaidReceipts,settlePaidReceipt,type PaidReceipt} from './receipts';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
 import type {Repository,PipelineState} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
@@ -13,7 +14,7 @@ export interface CoachConfig {
  maxInputChars:number;maxOutputTokens:number;maxTurnMicroUsd:number;
  inputMicroUsdPerMillion:number;outputMicroUsdPerMillion:number;pricesReviewedAt:string;
 }
-export interface CoachReceipt {id:string;familyId:string;subject:string;hash:string;month:string;reserved:number;at:number;state:'running'|'ready'|'failed';reply?:CoachReply}
+export interface CoachReceipt extends PaidReceipt {hash:string;reply?:CoachReply}
 /** Bounded server reply cache: child conversation remains local to the browser. */
 export const COACH_RECEIPT_TTL_MS=15*60_000;
 export interface CoachProvider {complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>;readiness?(signal:AbortSignal):Promise<boolean>}
@@ -47,7 +48,7 @@ export class CoachService {
  async ready(session?:VerifiedSession):Promise<boolean>{
   if(!this.available()||!session||session.expiresAt<=Date.now())return false;
   try{
-   const state=await this.repo.snapshot(),ledger=state.ledgers[session.familyId];
+   const state=await reconcilePaidReceipts(this.repo,session),ledger=state.ledgers[session.familyId];
    const month=new Date().toISOString().slice(0,7);
    const permitted=this.permitted(state,session);
    if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
@@ -58,10 +59,11 @@ export class CoachService {
  }
  /** Parent-authenticated erasure of completed coach content. Usage and security
   * audit totals remain for accounting; no child utterances are stored there.
-  * Refuse while an inference is in flight to avoid recreating content after erasure.
+  * Recover expired requests first; refuse while a live lease is in flight.
   */
  async eraseFamilyReceipts(session:VerifiedSession):Promise<{erased:number}>{
   if(!session||session.expiresAt<=Date.now()||session.role!=='parent')throw Error('FORBIDDEN');
+  await reconcilePaidReceipts(this.repo,session);
   return this.repo.transaction(state=>{
    assertActiveTrustedDevice(state,session);
    reconcileNarrationReceipts(state);
@@ -89,6 +91,10 @@ export class CoachService {
   // Never reuse a child's cache entry in an adult session, or revive a reply
   // admitted by an adult session that was subsequently locked.
   const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
+  // Recovery commits separately so a duplicate/cutoff rejection below cannot
+  // roll back the settlement of an interrupted request.
+  await reconcilePaidReceipts(this.repo,session);
+  const reservationId=randomUUID();
   const reservation=await this.repo.transaction(state=>{
    // Firestore may wait or retry the transaction; use admission time, not request time.
    const now=Date.now(),month=new Date(now).toISOString().slice(0,7);
@@ -96,35 +102,37 @@ export class CoachService {
    assertActiveTrustedDevice(state,session,now);
    if(!this.available()||!this.permitted(state,session,now))
     throw Error('COACH_UNAVAILABLE');
-   state.coachReceipts=(state.coachReceipts||[]).filter(r=>r.state==='running'||r.at>=now-COACH_RECEIPT_TTL_MS);
+   state.coachReceipts=(state.coachReceipts||[]).filter(r=>r.state==='running'||(r.recoveredAt??r.at)>=now-COACH_RECEIPT_TTL_MS);
    const list=state.coachReceipts;
    const old=list.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===subject);
    if(old){if(old.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');if(old.state==='ready')return {cached:old.reply!};throw Error('COACH_REQUEST_EXISTS');}
    if(list.filter(x=>x.familyId===session.familyId&&x.at>now-60000).length>=10)throw Error('RATE_LIMIT');
    if(list.length>=500)throw Error('COACH_HISTORY_FULL');
    const ledger=state.ledgers[session.familyId];if(!ledger?.paidEnabled||ledger.month!==month||ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
-   ledger.reserved+=this.config.maxTurnMicroUsd;list.push({id:input.requestId,familyId:session.familyId,subject,hash,month,reserved:this.config.maxTurnMicroUsd,at:now,state:'running'});
+   ledger.reserved+=this.config.maxTurnMicroUsd;list.push({id:input.requestId,familyId:session.familyId,subject,hash,month,reserved:this.config.maxTurnMicroUsd,at:now,state:'running',reservationId,leaseUntil:now+PAID_RECEIPT_LEASE_MS});
    return {cached:null};
   });
   if(reservation.cached)return {reply:reservation.cached,mode:'model'};
   let usage=this.config.maxTurnMicroUsd,candidate:CoachReply|undefined,failure:unknown;
   try{
-   const result=await this.provider!.complete(context,AbortSignal.timeout(25000));
+   const signal=AbortSignal.timeout(25000);
+   const result=await this.provider!.complete(context,signal);
+   if(signal.aborted)throw Error('COACH_UNAVAILABLE');
    if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0||result.usedMicroUsd>this.config.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
    usage=result.usedMicroUsd;candidate=validateCoachReply(result.reply,context);
   }catch(error){failure=error;}
   // The permission check and cache publication share a transaction. A device
   // revocation or profile lock while the provider runs must leave no reply.
   const completion=await this.repo.transaction(state=>{
-   const r=state.coachReceipts?.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===subject);
-   if(!r)throw Error('COACH_UNAVAILABLE');
-   const ledger=state.ledgers[session.familyId];
-   if(ledger&&ledger.month===r.month){ledger.reserved=Math.max(0,ledger.reserved-r.reserved);ledger.used+=usage;}
-   const now=Date.now();let authenticated=true;
+   const now=Date.now();
+   expirePaidReceipts(state,now,session.familyId);
+   const r=state.coachReceipts?.find(x=>x.id===input.requestId&&x.familyId===session.familyId&&x.subject===subject&&x.reservationId===reservationId);
+   if(!r||r.state!=='running')return {reply:null,authenticated:true};
+   let authenticated=true;
    try{assertActiveTrustedDevice(state,session,now);}catch{authenticated=false;}
    const result=!failure&&candidate&&authenticated&&this.permitted(state,session,now)?candidate:null;
-   r.state=result?'ready':'failed';if(result)r.reply=result;else delete r.reply;
-   state.audit.push({jobId:'coach-'+randomUUID(),familyId:session.familyId,status:result?'ready':'failed',at:new Date().toISOString(),code:'COACH_TURN'});
+   settlePaidReceipt(state,r,'coach',result?'ready':'failed',usage,now);
+   if(result)r.reply=result;else delete r.reply;
    return {reply:result,authenticated};
   });
   if(failure)throw failure;

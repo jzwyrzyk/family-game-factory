@@ -78,19 +78,28 @@ async function playAuthoredPreview(page:Page,frame:FrameLocator,title:'Moon Hopp
 
 /** O7: validate real rendered v2 movement, not just an altered source or title. */
 async function marbleCenter(frame:FrameLocator):Promise<number>{
- const x=await frame.locator('#game').evaluate((canvas:HTMLCanvasElement)=>{
-  const pixels=canvas.getContext('2d')!.getImageData(0,0,canvas.width,canvas.height);
-  let total=0,count=0;
-  for(let y=183;y<216;y+=3)for(let x=9;x<710;x+=3){
-   const i=(y*pixels.width+x)*4,d=pixels.data;
-   if(d[i]>200&&d[i+1]>130&&d[i+1]<205&&d[i+2]<105&&d[i]>d[i+1]+28){
-    total+=x;count++;
+ // data-frames records a worker reply before the next animation callback paints
+ // it. Wait for the actual pixels, including before the movement measurement.
+ const deadline=Date.now()+4500;let observed:unknown;
+ while(Date.now()<deadline){
+  const sample=await frame.locator('#game').evaluate((canvas:HTMLCanvasElement)=>{
+   const pixels=canvas.getContext('2d')!.getImageData(0,0,canvas.width,canvas.height);
+   let total=0,count=0;
+   for(let y=183;y<216;y+=3)for(let x=9;x<710;x+=3){
+    const i=(y*pixels.width+x)*4,d=pixels.data;
+    if(d[i]>200&&d[i+1]>130&&d[i+1]<205&&d[i+2]<105&&d[i]>d[i+1]+28){
+     total+=x;count++;
+    }
    }
-  }
-  return count?total/count:null;
- });
- assert.ok(typeof x==='number'&&Number.isFinite(x),'marble must actually be visible on canvas');
- return x;
+   return {x:count?total/count:null,frames:canvas.dataset.frames,paused:canvas.dataset.paused,
+    state:document.getElementById('status')?.dataset.state,width:canvas.width,height:canvas.height};
+  },undefined,{timeout:Math.max(1,deadline-Date.now())});
+  observed=sample;
+  if(sample.state==='error'||sample.state==='lost')break;
+  if(typeof sample.x==='number'&&Number.isFinite(sample.x))return sample.x;
+  await new Promise(resolve=>setTimeout(resolve,20));
+ }
+ assert.fail('marble must actually be visible on canvas: '+JSON.stringify(observed));
 }
 async function playV2Marble(page:Page,frame:FrameLocator,device:string):Promise<number>{
  await frame.getByRole('button',{name:'Play!',exact:true}).click();

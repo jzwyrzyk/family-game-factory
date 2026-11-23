@@ -142,3 +142,31 @@ test('cancelled provider body does not wait for stalled stream cleanup',async()=
  const rejected=assert.rejects(pending,/NARRATION_UNAVAILABLE/);
  await reading;abort.abort();await rejected;
 });
+
+
+test('expired prior-month narration releases carried reservation once without charging the new month',async()=>{
+ const {repo,user}=await fixture();let calls=0;
+ await repo.transaction(state=>{
+  state.ledgers[family].reserved=1250;state.ledgers[family].used=37;
+  state.narrationReceipts=[{id:'prior-month-read',familyId:family,subject:user.subject,month:'2020-01',at:1,leaseUntil:2,reservationId:'prior-month-reservation',reserved:1000,state:'running'}];return true;
+ });
+ const reader=new NarrationService(repo,config(),{read:async()=>{calls++;return mp3();}});
+ assert.equal(await reader.familyAvailable(user),true);assert.equal(await reader.familyAvailable(user),true);
+ const state=await repo.snapshot();
+ assert.equal(calls,0);assert.equal(state.ledgers[family].reserved,250,'unrelated carried reservations remain');
+ assert.equal(state.ledgers[family].used,37,'old uncertain usage does not charge the new month');
+ assert.equal(state.narrationReceipts![0].state,'failed');
+ const receipts=state.audit.filter(event=>event.code==='NARRATION_INTERRUPTED');assert.equal(receipts.length,1);
+ assert.deepEqual(receipts[0].usage,{kind:'narration',month:'2020-01',reservedMicroUsd:1000,usedMicroUsd:1000,outcome:'interrupted'});
+});
+
+test('successful narration crossing allowance months releases reservation and retains original accounting',async()=>{
+ const {repo,user}=await fixture();const originalMonth=month();
+ const reader=new NarrationService(repo,config(),{read:async()=>{
+  await repo.transaction(state=>{state.ledgers[family].month='2099-01';state.ledgers[family].used=19;return true;});return mp3();
+ }});
+ assert.deepEqual(await reader.read(user,{id:'cross-month-success',text:'Hello'}),mp3());
+ const state=await repo.snapshot();assert.equal(state.ledgers[family].reserved,0);assert.equal(state.ledgers[family].used,19);
+ assert.equal(state.narrationReceipts![0].state,'ready');
+ assert.deepEqual(state.audit.at(-1)!.usage,{kind:'narration',month:originalMonth,reservedMicroUsd:150,usedMicroUsd:150,outcome:'settled'});
+});
