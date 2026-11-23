@@ -32,6 +32,8 @@ The four-experience integration uses the later one-jem/ten-pocket running Mining
 
 **First-learner coding candidate, November 22, 2026:** the isolated change stacked on PR125 keeps `jems.creation.v1`, the deterministic engine, ownership, draft/Keep history, and challenge evidence unchanged. A fitted stage and progressive First steps / More tools views share those existing controls. Pal-only transient canvas compositing is bounded to the active scene and preserves approved source files and saved asset IDs; it adds no asset service, stored derivative or entitlement. The [Creation contract](docs/creation-studio/README.md) and [rendering contract](docs/creation-studio/PAL_SCENE_RENDERING.md) record scope and validation limits.
 
+The [delivery ledger](DELIVERY-STATE.md) owns current source and deployment identities. Earlier PR87/117 Pal cutover and diagnostic observations remain available in the [historical receipt archive](docs/evidence/pr87-pr117-historical-receipts.md); they do not establish current service traffic, worker activation or live acceptance.
+
 ## System boundaries
 
 ### Bubble Gum assembly candidate — November 22, 2026
