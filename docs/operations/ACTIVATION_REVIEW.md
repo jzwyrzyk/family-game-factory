@@ -5,6 +5,8 @@ It does not authorize a merge, install permissions, enable a workflow or change
 production. The [policy foundation](POLICY_FOUNDATION.md) is source validation;
 its passing checks do not establish that the accounts are configured.
 
+**Current-source status (November 23, 2026):** This runbook originally accompanied draft PR107. [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) merged its reconciled source and workflow definitions at `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`; PR107 is also closed as merged. References to an *open* draft head and the placeholder handoff below remain historical examples, **not** an executable current approval or instruction to replay an older account plan. The [latest delivery record](../../DELIVERY-STATE.md) reports that current operator/cloud identity and production baselines could not be read during the authorized November 23 cutover. A fresh inspected main and private read-only baseline are required before future account actions; no new permission, approval or activation is conferred by this note.
+
 ## One read-only handoff
 
 Use the exact reviewed PR107 commit supplied with the handoff. Work in a clean
