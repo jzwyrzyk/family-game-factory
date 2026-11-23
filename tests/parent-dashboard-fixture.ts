@@ -17,7 +17,8 @@ export function parentDashboardFixture(now = Date.now()) {
   };
   const context = (at:number) => ({now:at, sessionId:'demo-'+at, gameId:'gem-factory', projectId:'demo-factory', versionId:'demo-v1'});
   for (let i=0;i<24;i++) {
-    const at=now-(29-i)*DAY-300_000;
+    // Keep the oldest synthetic record inside 30 calendar days, including at UTC midnight.
+    const at=now-(28-i)*DAY-300_000;
     const item=generateItem(i%3===0?'g2-hundreds':'g3-multiply',{
       representation:i%2?'symbolic':'visual', random:()=>0.12+(i%7)*0.11,
       ...(i%3===0?{}:{factId:'mul:8x'+(2+i%9)}),

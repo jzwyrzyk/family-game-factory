@@ -328,7 +328,7 @@ const {start}=require('./browser-server.cjs');
         assert.equal(await page.locator('#creationTargetBadge').isVisible(),false);
         await activate('#creationCheck');
         assert.equal(await page.locator('#creationFeedback').evaluate(element=>element.classList.contains('is-success')),false);
-        await activate('.creation-goal-help summary');await activate('#creationHint');
+        await activate('#creationChallengeBrief .creation-goal-help > summary');await activate('#creationHint');
         const hintText=await page.locator('.creation-hint').textContent();
         const beforeHintRead=await page.evaluate(()=>window.__creationSpeech.length);
         await activate('#creationRead');await page.waitForFunction(count=>window.__creationSpeech.length>count,beforeHintRead);

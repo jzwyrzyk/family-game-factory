@@ -188,7 +188,7 @@
 @container(max-width:520px){
  .gem-factory{border-radius:0}.gf-topbar{padding:9px 12px;min-height:67px}.gf-brand{gap:7px}.gf-brand h2{font-size:24px;letter-spacing:-.8px}.gf-brand>img{width:32px;height:38px}.gf-title-star{display:none}.gf-top-actions{gap:6px}.gf-icon-button{width:44px;height:44px;border-radius:14px;font-size:22px!important}
  .gf-world{aspect-ratio:auto;height:186.667cqw;min-height:620px;max-height:760px}
- .gf-room{top:172px;bottom:0;width:280%;height:calc(100% - 172px);transform:translateX(var(--mobile-pan));transition:transform .65s cubic-bezier(.2,.7,.2,1)}
+ .gf-room{top:188px;bottom:0;width:280%;height:calc(100% - 188px);transform:translateX(var(--mobile-pan));transition:transform .65s cubic-bezier(.2,.7,.2,1)}
  .gf-hud{inset:10px 10px auto}.gf-day{padding:6px 9px}.gf-day strong{font-size:18px}.gf-wallet{padding:4px 8px 4px 4px;gap:5px}.gf-coin{width:26px;height:26px;font-size:20px}.gf-wallet strong{font-size:20px}
  .gf-progress{top:10px;right:81px;padding:5px 7px;gap:4px}.gf-progress i{width:22px;height:24px}
  .gf-order{top:62px;left:50%;max-width:none;width:calc(100% - 20px);padding:12px 10px;border-radius:19px}.gf-order h3{font-size:24px}.gf-pattern{gap:3px;margin-top:8px}.gf-pattern-missing{border-radius:12px;font-size:32px}
@@ -200,7 +200,7 @@
  .gf-wrap-options{left:73%;right:auto;top:70%;width:25%;min-width:0;max-width:none;gap:14px;padding:13px 13px 33px}.gf-paper-roll{height:65px;min-width:46px}.gf-paper-name{font-size:18px}
  .gf-helper{left:12px;bottom:2%;width:72px;height:106px}.gf-helper-hint{max-width:calc(100cqw - 105px);min-width:0;width:max-content;padding:10px 13px;bottom:18%;font-size:20px;border-width:2px}
  /* After sorting, the next action uses the clue's space and leaves the paper rolls clear. */
- .gem-factory:not([data-stage=pick]) .gf-room{top:172px;height:calc(100% - 172px)}
+ .gem-factory:not([data-stage=pick]) .gf-room{top:188px;height:calc(100% - 188px)}
  .gem-factory:not([data-stage=pick]) .gf-helper{inset:0;width:auto;height:auto}
  .gem-factory:not([data-stage=pick]) .gf-helper img{left:12px;bottom:2%;width:72px;height:106px}
  .gem-factory:not([data-stage=pick]) .gf-helper-hint{display:block;left:10px;right:10px;top:62px;bottom:auto;width:auto;max-width:none;border-radius:19px}
