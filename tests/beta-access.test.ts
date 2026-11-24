@@ -61,7 +61,7 @@ test('recovery invalidates prior devices, requires a new pairing and preserves s
 test('callback identity is bound to the private workflow run for this job',async()=>{
  const job='11000000-0000-4000-8000-000000000001',other='22000000-0000-4000-8000-000000000002';
  const identity={runId:'123',repositoryId:'456',sha:'a'.repeat(40),stage:'generate' as const};
- const fetcher=async()=>Response.json({id:123,repository:{id:456},head_sha:identity.sha,run_attempt:1,event:'workflow_dispatch',display_title:'Private factory job '+job+' / 0'});
- await assertRunJob(identity,job,'family-game-factory-lab/family-game-factory-worker',async()=>'fixture',fetcher);
- await assert.rejects(assertRunJob(identity,other,'family-game-factory-lab/family-game-factory-worker',async()=>'fixture',fetcher));
+ const fetcher=async()=>Response.json({id:123,repository:{id:456},head_sha:identity.sha,run_attempt:1,event:'workflow_dispatch',display_title:'Private factory job '+job+' / beta-test / 0'});
+ await assertRunJob(identity,job,'family-game-factory-lab/family-game-factory-worker',async()=>'fixture','beta-test',fetcher);
+ await assert.rejects(assertRunJob(identity,other,'family-game-factory-lab/family-game-factory-worker',async()=>'fixture','beta-test',fetcher));
 });

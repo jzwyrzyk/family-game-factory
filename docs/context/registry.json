@@ -307,10 +307,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:48:28.468Z",
-      "sourceDigest": "ed01862b1637e54f94974c7efaf60fc2295348d8bbc16f9c0988ac0b47a34b3d",
+      "reviewedAt": "2026-11-24T23:59:21.800Z",
+      "sourceDigest": "0f6d4cc1ea943c4f4b4efa35a80a9b5140dae16eb76e374328326b0bae9739cb",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated architecture and entry references for approved mining artwork, family-local profiles, private application delivery and disconnected session expiry.",
+      "reviewReason": "Updated private preview form submission and reviewed-art guardian authorization in the architecture and owner operating instructions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:48:29.481Z",
-      "sourceDigest": "efc051d6406975382f3f9773b5055943f126c50c3100f74a6ad29406d4319ffc",
+      "reviewedAt": "2026-11-24T23:59:22.620Z",
+      "sourceDigest": "936bf31f2f8b83a97f4024dd192823086e275590d934f75c26d33370ebe2deb4",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the server-guarded public asset allowlist, first-party private app delivery, profile management and family-scoped artwork approvals.",
+      "reviewReason": "Documented guardian-only exports, controlled erasure executor, IAP administration, privacy evidence and grant revalidation at preview delivery.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -731,10 +731,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:29:18.758Z",
-      "sourceDigest": "ddc048863f52c2da3c9df8e10293437839cbc252ef7649b7a43daa8920b2fbf3",
+      "reviewedAt": "2026-11-24T23:59:22.966Z",
+      "sourceDigest": "b538dbd4f0afa532c670fc06850d8416b08456644424fe1d688132fb8bf80e1a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the bounded chunk format and job ownership index with transactions for monthly global and family usage.",
+      "reviewReason": "Reviewed atomic household opening balance, reservation and settlement accounting, scoped provider approval, pinned workflow origin and job-attempt binding.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -827,10 +827,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "1e582ea62779abc9eb5acfb7650f7f743a101568fe00ff99ce845346661efcb5",
-      "reviewedAt": "2026-11-24T23:37:25.000Z",
+      "sourceDigest": "3052a17ba846065820afce8aab2d958686a5cb790632da770011cf2f61f17bd4",
+      "reviewedAt": "2026-11-24T23:59:23.350Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed separate participation pairing, verified consent, device trust, acknowledgment and conservative stop and recovery handling.",
+      "reviewReason": "Documented current provider requirements and immediate withdrawal or replacement of consent, verified family export and erasure.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:48:29.888Z",
-      "sourceDigest": "8c152c72e23791670b35b7a88f66413995a34bfca0695e2e6f9cbab73a2b608c",
+      "reviewedAt": "2026-11-24T23:59:23.746Z",
+      "sourceDigest": "deb7580c45b118d42525460d93e935d1f435a7aff89214c8f829c76d0c7dc9fd",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented actual Chromium coverage, the WebKit CI journey and remaining independent real-device and deployed acceptance.",
+      "reviewReason": "Added synthetic preview replay and cross-family checks, consent withdrawal during a reservation, and reversible household opening-balance evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -1,4 +1,5 @@
 import {platformMode,validateBeta,familyOrigin,uuid,type BetaConfig} from './beta/model';
+import {mappedHouseholdRepository,type HouseholdBinding} from './beta/household';
 import {FamilyDirectory} from './beta/store';
 import {firestoreStore} from './beta/documents';
 import {betaRouter,type Surface} from './beta/router';
@@ -36,7 +37,7 @@ import {sessionHandler} from './sessions';
 import {trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
 export interface GatewayConfig {
- platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;
+ platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdBudgetBinding?:HouseholdBinding;
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
  workerRepository?:string;workerRepositoryId?:string;workerWorkflow?:string;workerApprovedSha?:string;
@@ -80,7 +81,14 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  let premiumPilot:PremiumPilot|undefined,premiumUnavailable=false;
  try{premiumPilot=approvedPremiumPilot(config,environment.FACTORY_PREMIUM_BUILDER_APPROVED==='true',adultPilotConfigured(adult),paidEnabled);}
  catch{premiumUnavailable=true;} // Refuse new builds while keeping recovery and saved revisions online.
- const repo=tenantRepo??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined));
+ let mapped:Repository|undefined;
+ if(config.householdBudgetBinding){
+  const b=config.householdBudgetBinding;
+  if(tenantRepo||config.localFile||b.familyId!==config.familyId||b.workspace!==config.workspace||!config.projectId)throw Error('HOUSEHOLD_MAPPING_REQUIRED');
+  mapped=mappedHouseholdRepository(firestoreStore(new Firestore({projectId:config.projectId})),b,
+   config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,b.workspace):undefined);
+ }
+ const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined));
  await reconcilePaidReceipts(repo);
  const agent={kind:'metered-api' as const,available:paidEnabled,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
  const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
@@ -89,7 +97,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  if(config.active&&!privateWorker)throw Error('PRIVATE_WORKER_REQUIRED_FOR_ACTIVATION');
  const target={repository:config.workerRepository||config.repository,repositoryId:config.workerRepositoryId||config.repositoryId,workflow:config.workerWorkflow||config.workflow,approvedSha:config.workerApprovedSha||config.approvedSha,privateWorker};
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(target.repositoryId)},()=>config.githubPrivateKey);
- const dispatcher=new GitHubDispatcher({enabled:paidEnabled,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:paidEnabled&&config.approval.enabled},900000,!adult.enabled,adult.enabled,premiumPilot);
+ const dispatcher=new GitHubDispatcher({enabled:paidEnabled,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,callbackRoute:tenantRepo?config.beta?.workerRoute:undefined},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:paidEnabled&&config.approval.enabled},900000,!adult.enabled,adult.enabled,premiumPilot);
  const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker});
  const worker=workerHandler(coordinator,verifier),http={sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
  const coachService=new CoachService(repo,{...coachConfig(environment),requireVerifiedParentPrivacy:!adult.enabled},
@@ -124,7 +132,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
  if(platformMode(config.platformMode)!=='PRIVATE_FAMILY_BETA'||config.appOrigin!==beta.hubOrigin||
     config.gatewayOrigin!==beta.hubOrigin||config.localFile||!config.projectId||!config.artifactBucket||
     new URL(config.previewOrigin).hostname.endsWith('.'+new URL(beta.hubOrigin).hostname)||
-    config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
+    (config.active&&!beta.workerRoute)||config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
  const db=new Firestore({projectId:config.projectId});
  const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace));
  const runtimes=new Map<string,ReturnType<typeof createGateway>>();
@@ -142,16 +150,17 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
   workflow:config.workerWorkflow??'',approvedSha:config.workerApprovedSha??'',privateWorker:true});
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(config.workerRepositoryId)},()=>config.githubPrivateKey);
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
- return betaRouter(d,config.sessionKey,{surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
+ return betaRouter(d,config.sessionKey,{preview:{environment:beta.environment,hubOrigin:beta.hubOrigin,previewOrigin:config.previewOrigin,previewKey:config.previewKey},surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
   worker:async(req,res)=>{
    const id=req.url?.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
    const bearer=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
    if(!uuid(id)||!bearer)throw Error('FORBIDDEN');
    const workerIdentity=await verifier.verify(bearer);
-   await assertRunJob(workerIdentity,id,config.workerRepository!,token);
+   if(!beta.workerRoute)throw Error('FORBIDDEN');
+   const dispatchAttempt=await assertRunJob(workerIdentity,id,config.workerRepository!,token,beta.workerRoute);
    const owner=await d.db.run(tx=>tx.get<{familyId:string}>(d.root+'/jobs/'+id));if(!owner)throw Error('NOT_FOUND');
    const target=await runtime(owner.familyId);
-   await workerHandler(target.coordinator,{verify:async()=>workerIdentity})(req,res);
+   await workerHandler(target.coordinator,{verify:async()=>({...workerIdentity,dispatchAttempt})})(req,res);
    void target.coordinator.tick().catch(()=>{});
   },
   scheduler:async(req,res)=>{
@@ -160,7 +169,15 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
    const {payload}=await jwtVerify(bearer,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});
    if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error('FORBIDDEN');
    const index=await d.db.run(tx=>tx.get<{ids:string[]}>(d.root+'/metadata/directory'));
-   for(const id of index?.ids??[]){const target=await runtime(id);await reconcilePaidReceipts(target.repo);await target.coordinator.tick();}
+   let failed=false;
+   for(const id of index?.ids??[]){
+    try{
+     const retired=await d.withFamily(id,async(_tx,f)=>f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state));
+     if(retired)continue;
+     const target=await runtime(id);await reconcilePaidReceipts(target.repo);await target.coordinator.tick();
+    }catch{failed=true;}
+   }
+   if(failed)throw Error('RECONCILIATION_INCOMPLETE');
    res.writeHead(204);res.end();
   }});
 }

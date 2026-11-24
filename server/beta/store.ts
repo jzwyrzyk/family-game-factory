@@ -26,12 +26,14 @@ export class FamilyDirectory {
   return this.db.run(async tx=>op(tx,await this.family(tx,id),await this.policy(tx)));
  }
  async inWorkspace<T>(tx:Documents,f:Family,p:Policy,update:(s:PipelineState)=>T,write:boolean){
+  if(f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state))throw Error('FAMILY_UNAVAILABLE');
   const workspace=workspaceOf(f),art=this.artifacts(workspace);
   const loaded=await readWorkspace(tx,workspace,art),s=loaded.state;
-  const owned=[...s.jobs,...s.revisions,...s.audit,...s.devices??[],...s.invitations??[],...s.parentPrivacyChoices??[],
+  const assertOwnership=()=>{const owned=[...s.jobs,...s.revisions,...s.audit,...s.devices??[],...s.invitations??[],...s.parentPrivacyChoices??[],
    ...s.coachConsent??[],...s.audioReceipts??[],...s.coachReceipts??[],...s.narrationReceipts??[]];
   if(owned.some(row=>row.familyId!==f.id)||Object.keys(s.ledgers).some(id=>id!==f.id)||
-    Object.keys(s.parentAuth??{}).some(id=>id!==f.id)||s.adultPilotPermits?.length||s.adultPilotSessions?.length)throw Error('WORKSPACE_OWNER_MISMATCH');
+    Object.keys(s.parentAuth??{}).some(id=>id!==f.id)||s.adultPilotPermits?.length||s.adultPilotSessions?.length)throw Error('WORKSPACE_OWNER_MISMATCH');};
+  assertOwnership();
   const now=Date.now(),month=new Date(now).toISOString().slice(0,7);
   const previous=s.ledgers[f.id],period=previous?.reserved?previous.month:month;
   const previousMonth=previous?.month===period;
@@ -44,6 +46,7 @@ export class FamilyDirectory {
   const devicesBefore=JSON.stringify(deviceStatus());
   const count=s.jobs.length,result=update(s);
   if(write){
+   assertOwnership();
    const ledger=s.ledgers[f.id],used=ledger.used-before.used,reserved=ledger.reserved-before.reserved;
    if(ledger.month!==period||ledger.allowance!==f.allowance||!Number.isSafeInteger(ledger.reserved)||!Number.isSafeInteger(ledger.used)||
     ledger.reserved<0||used<0)throw Error('INVALID_LEDGER');

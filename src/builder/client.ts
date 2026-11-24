@@ -6,7 +6,7 @@ export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'ca
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
 export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number;retryJobId?:string}
-export interface Preview {revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
+export interface Preview {grant?:string;revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
 export interface CreationManifestResponse {revisionId:string;projectId:string;manifest:CreationProject|null}
 const loopback=(url:URL)=>['127.0.0.1','localhost','[::1]'].includes(url.hostname);
 export function validateBuilderConfig(input:unknown):BuilderConfig {

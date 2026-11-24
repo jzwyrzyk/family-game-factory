@@ -1,3 +1,4 @@
+import {openPreviewFrame} from '../builder/open-preview';
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest, learningFormatLabel, setMode } from '../learning/policy';
 import {installCoaching} from './coaching';
@@ -1405,7 +1406,7 @@ export async function installStudio(){
   pausedForTools=false;$<HTMLDetailsElement>('studioMore').open=false;remoteViewedId=id;viewedRevisionId=null;nativeStage.classList.add('hidden');$('studioEmpty').hidden=true;const host=$('studioRemoteHost');host.hidden=false;
   iframe=document.createElement('iframe');iframe.title='Private game preview';iframe.setAttribute('sandbox','allow-scripts');iframe.referrerPolicy='no-referrer';
   previewChannel=crypto.randomUUID();previewArtifact=preview.artifactId;previewOwner=s.owner;
-  const url=new URL(preview.url);url.searchParams.set('channel',previewChannel);iframe.src=url.href;host.replaceChildren(iframe);
+  host.replaceChildren(iframe);openPreviewFrame(iframe,preview,previewChannel);
   previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onReadyChange:()=>queueMicrotask(()=>{if(sameView(s,generation))render();}),onRound:d=>announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest)});
   $('studioPlayNote').textContent=preview.adapter==='mock'?'Test builder (mock)—not a real AI generation.':'Private preview. Your working game stays unchanged until you keep it.';
   render();setTab('game');enterPlayView();

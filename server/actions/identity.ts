@@ -1,6 +1,6 @@
 import {createRemoteJWKSet,jwtVerify,type JWTVerifyGetKey} from 'jose';
 export type WorkerStage='generate'|'test'|'review';
-export interface WorkerIdentity {runId:string;repositoryId:string;sha:string;stage:WorkerStage}
+export interface WorkerIdentity {dispatchAttempt?:number;runId:string;repositoryId:string;sha:string;stage:WorkerStage}
 export interface WorkerPolicy {audience:string;repository:string;repositoryId:string;workflow:string;approvedSha:string;privateWorker?:boolean}
 export class GitHubOIDCVerifier {
  private keys:JWTVerifyGetKey;

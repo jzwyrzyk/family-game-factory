@@ -22,6 +22,8 @@ export function betaHosting(directory:string,config:BetaConfig,previewOrigin:str
   if(req.method!=='GET')return false;
   const {path}=c;
   const inPlay=!!c.capabilities;
+  // A preview form POST needs the browser's exact Origin. Never send an application path.
+  if(inPlay)res.setHeader('Referrer-Policy','strict-origin');
   res.setHeader('Content-Security-Policy',inPlay?
    `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self'; frame-src ${previewOrigin}; frame-ancestors 'none'; form-action 'self' ${previewOrigin}; object-src 'none'; base-uri 'none'`:
    "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
@@ -40,7 +42,7 @@ export function betaHosting(directory:string,config:BetaConfig,previewOrigin:str
    const controls='<aside class="family-session-controls"><a href="/grown-ups">Family controls</a> <button id="endFamilyPlay">End play</button> <button id="forgetFamilyDevice">Forget device</button> <span id="familyExitStatus" role="status"></span></aside>';
    let body=full?await readFile(resolve(root,'index.html'),'utf8'):page('Family workshop','<h1>Your family workshop</h1><section id="familyTools"></section><section id="familyActivity" hidden></section><button id="familyHome">My workshop</button>',{script:'/play/features/shell.js'});
    body=body.replace('<html lang="en">','<html lang="en" '+attributes+'>').replace('<head>','<head><script defer src="/play/session.js"></script><link rel="stylesheet" href="/play/family.css">')
-    .replace(/<link rel="manifest"[^>]*>/g,'').replace('</body>',controls+(caps.artwork?'<label>Grown-ups · reviewed artwork<input type="file" id="betaReviewedArt" accept="image/png"></label><script type="module" src="/play/features/artwork.js"></script>':'')+'</body>');
+    .replace(/<link rel="manifest"[^>]*>/g,'').replace('</body>',controls+(caps.artwork?'<label>Grown-ups · authorize this upload<input id="reviewedArtPassphrase" type="password" autocomplete="current-password" placeholder="Parent passphrase"></label><label>Reviewed artwork<input type="file" id="betaReviewedArt" accept="image/png"></label><script type="module" src="/play/features/artwork.js"></script>':'')+'</body>');
    if(!full)for(const k of localCapabilities.filter(k=>caps[k]))body=body.replace('</head>','<link rel="stylesheet" href="/play/features/'+k+'.css"></head>');
    return html(res,body);
   }

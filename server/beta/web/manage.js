@@ -23,6 +23,7 @@ function dollars(form,caption,micro){const input=field(form,caption,'number',(mi
 async function refresh(){
  const overview=await request('/manage/state');root.replaceChildren();const platform=card('Platform controls');
  platform.append(el('p','Private Family Beta · '+(overview.policy.participation?'Family access on':'Family access paused')));
+ platform.append(el('p','Global use: '+displayMoney(overview.globalUsage.used)+' · Reserved: '+displayMoney(overview.globalUsage.reserved)+' · Household budget '+(overview.householdMapped?'linked':'awaiting explicit mapping')));
  const form=el('form');platform.append(form);const invites=field(form,'Allow new invitations','checkbox',overview.policy.invitations),access=field(form,'Allow external family participation','checkbox',overview.policy.participation),stop=field(form,'Stop all beta AI spending','checkbox',overview.policy.stop),globalLimit=dollars(form,'Global monthly limit (USD)',overview.policy.monthlyLimit);
  button(form,'Save platform controls',()=>confirmAction('platform','platform',{invitations:invites.checked,participation:access.checked,stop:stop.checked,monthlyCents:globalLimit()},'Update platform controls'));
  platform.append(el('h3','Provider readiness'),el('p',overview.evidence.length?overview.evidence.map(e=>e.scope+' · '+e.provider+' · '+(e.current?'evidence current':'review expired')).join(', '):'No provider evidence is configured. Remote child processing is closed.'));
@@ -50,6 +51,8 @@ async function refresh(){
  button(privacy,'Withdraw processing consent',()=>confirmAction('withdraw',id,{},'Withdraw consent and stop affected work'));
  for(const device of f.devices){const row=el('p',device.name+' · '+(device.revoked?'revoked':'expires '+new Date(device.expiresAt).toLocaleDateString())+' ');privacy.append(row);if(!device.revoked)button(row,'Revoke device',()=>confirmAction('revoke-device',id,{deviceId:device.id},'Revoke this device'));}
  if(f.request)privacy.append(el('p','Privacy request: '+f.request.kind+' · '+f.request.state+' · '+f.request.id));
+ if(f.request?.state==='requested'){const ref=field(privacy,'Independent privacy-request verification reference','password');const deletion=f.request.kind==='deletion';
+ button(privacy,deletion?'Confirm irreversible deletion':'Release export to guardian',()=>confirmAction(deletion?'confirm-deletion':'release-export',id,{requestId:f.request.id,receipt:ref.value},deletion?'Confirm irreversible deletion for this request':'Release family export for 24 hours'));}
  button(privacy,'Request family export',()=>confirmAction('request-export',id,{},'Start a controlled export'));
  button(privacy,'Request family deletion',()=>confirmAction('request-deletion',id,{},'Suspend access and start controlled deletion'));
 }

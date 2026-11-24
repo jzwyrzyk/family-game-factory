@@ -25,17 +25,18 @@ export interface Family {
  id:string;workspace:string;status:'invited'|'pending'|'active'|'suspended'|'revoked';
  guardian:Guardian;capabilities:Capabilities;allowance:number;paused:boolean;generationPaused:boolean;
  invitation?:Invitation;plays:Play[];createdAt:number;profiles?:string[];approvedArt?:string[];
- request?:{id:string;kind:'export'|'deletion';at:number;state:'requested'|'completed'};
+ request?:{id:string;kind:'export'|'deletion';at:number;state:'requested'|'ready'|'deleting'|'completed';approvedAt?:number};
 }
 export interface Policy {version:1;invitations:boolean;participation:boolean;stop:boolean;monthlyLimit:number}
 export const closedPolicy=():Policy=>({version:1,invitations:false,participation:false,stop:true,monthlyLimit:0});
 export interface ProviderEvidence {notice:string;expiresAt:number;provider:'openai'|'google-cloud';privacyDigest:string;safetyDigest:string;scope:RemoteScope;zdrApproved?:boolean}
 export interface BetaConfig {
- environment:string;hubOrigin:string;administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
+ environment:string;hubOrigin:string;workerRoute?:'beta-dev'|'beta-test'|'beta-prod';administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
  ownerActivation:string;operatorContact:string;providerEvidence:ProviderEvidence[];
 }
 export function validateBeta(config:BetaConfig|undefined,householdWorkspace:string){
  if(!config||config.ownerActivation!=='private-family-beta-v1'||!/^[-a-z0-9]{1,30}$/.test(config.environment)||
+  (config.workerRoute!==undefined&&!['beta-dev','beta-test','beta-prod'].includes(config.workerRoute))||
   !/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/.test(config.hubOrigin)||
   !/^[^\s@<>]+@[^\s@<>]+\.[A-Za-z]{2,}$/.test(config.operatorContact)||
   householdWorkspace.startsWith('beta-')||!/^\/projects\/\d+\/global\/backendServices\/\d+$/.test(config.administrator?.audience)||

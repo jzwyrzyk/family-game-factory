@@ -61,3 +61,5 @@ No DNS, TLS, proxy or GCP resource was changed by this PR.
 6. Validate one authorized real game-build request after separate provider/child approval, including no duplicate charge or lost work. Preserve rollback revisions and prior Pages run.
 
 Keep this PR draft until these gates and device/browser tests are complete.
+
+The private family gateway uses first-party host-prefixed cookies on isolated family origins. Beta operator identity, participation verification, play acknowledgment, optional processing consent and the legacy Adult Private permit have independent grants. See the [owner operating guide](../family-beta/OWNER.md).

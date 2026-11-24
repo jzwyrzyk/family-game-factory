@@ -34,3 +34,8 @@ if($('withdraw'))$('withdraw').onclick=act(async()=>{if(confirm('Withdraw remote
 bind('privacyChoice',async(_,v)=>{const {notice}=await current();await request('/v1/devices/privacy',{noticeVersion:notice,guardianAffirmed:v.has('guardianAffirmed'),providerAcknowledged:v.has('providerAcknowledged'),scopes:Object.fromEntries(['generation','conversation','remoteSpeech'].map(k=>[k,v.has(k)]))});await showControls();});
 addEventListener('pagehide',()=>{for(const f of document.forms)f.reset();for(const out of document.querySelectorAll('output'))out.textContent='';if($('familyControls'))$('familyControls').hidden=true;});
 addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
+
+if($('familyExport'))$('familyExport').onclick=act(async()=>{
+ const data=await request('/entry/export',{}),url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='jems-private-family-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});

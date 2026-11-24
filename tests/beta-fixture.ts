@@ -17,6 +17,7 @@ export async function betaFixture(){
  const config=structuredClone(fixtureConfig);config.administrator.verifier=newParentAuth(operator);
  const d=new FamilyDirectory(new FixtureDocuments(),config),admin=new BetaAdministration(d);
  const mutate=(action:string,target:string,params:unknown={})=>admin.change('test-owner',{action,target,params,confirm:action+' '+target,passphrase:operator});
+ await d.db.run(async tx=>tx.create(d.root+'/metadata/household',{familyId:'synthetic-owner',workspace:'original-household',environment:config.environment}));
  await mutate('platform','platform',{invitations:true,participation:true,stop:false,monthlyCents:100});
  async function invite(label:string){
   const {familyId}=await mutate('create','new',{contactRef:label});const id=String(familyId);

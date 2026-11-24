@@ -5,6 +5,7 @@ import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
 import {acknowledge,exact,internalCookies,liveSession,logout,redeem,requirePlay} from './access';
 import {activeFamily,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
+import {previewAdmission,type PreviewRouting} from './preview';
 import {BetaAdministration,verifyAdministrator} from './admin';
 import type {FamilyDirectory} from './store';
 
@@ -15,7 +16,7 @@ export function json(res:ServerResponse,status:number,data:unknown,cookies?:stri
 }
 const read=(req:IncomingMessage)=>readJsonBody(req,4096,{invalidJsonError:'INVALID_REQUEST',emptyObject:true});
 export function betaRouter(d:FamilyDirectory,key:string,options:{
- runtime:(id:string)=>Promise<Handler>;worker?:Handler;scheduler?:Handler;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
+ runtime:(id:string)=>Promise<Handler>;preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
 }):Handler {
  const hub=new URL(d.config.hubOrigin),admin=new BetaAdministration(d);
  return async(req,res)=>{
@@ -77,7 +78,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(req.method==='POST'&&(path==='/entry/logout'||path==='/entry/end')){
     exact(await read(req),[]);json(res,200,{ended:true},await logout(d,id,raw,key,path==='/entry/logout'));return;
    }
-   if(path==='/entry/profiles'||path==='/entry/review-art'){
+   if(path==='/entry/profiles'||path==='/entry/review-art'||path==='/entry/export'){
     const body=req.method==='POST'?await read(req):{};
     exact(body,path==='/entry/review-art'?['digest']:[]);
     const result=await d.withFamily(id,async(tx,f,p)=>{
@@ -86,6 +87,14 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
      const session=await d.inWorkspace(tx,f,p,s=>liveSession(f,s,cookies,key,now),false);
      const parent=verifySession(cookieValue(cookies,'factory_parent'),key,now);
      if(parent.role!=='parent'||parent.familyId!==id||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
+     if(path==='/entry/export'){
+      if(req.method!=='POST'||f.request?.kind!=='export'||!['ready','completed'].includes(f.request.state)||!f.request.approvedAt||f.request.approvedAt+86400000<=now)throw Error('EXPORT_APPROVAL_REQUIRED');
+      const data=await d.inWorkspace(tx,f,p,s=>({schema:'jems.family-export.v1',familyId:id,profileIds:f.profiles??[],
+       revisions:s.revisions.filter(r=>r.familyId===id&&!r.adultPilotProfileId),jobs:s.jobs.map(j=>({id:j.id,prompt:j.prompt,status:j.status,revisionId:j.revisionId??null,usedMicroUsd:j.usedUnits})),
+       consents:(s.parentPrivacyChoices??[]).map(c=>({notice:c.noticeVersion,scopes:c.scopes,requestedAt:c.requestedAt,verifiedAt:c.verifiedAt??null,withdrawnAt:c.revokedAt??null})),
+       usage:s.ledgers[id],exportedAt:now}),false);
+      f.request.state='completed';tx.set(d.path(id),f);return data;
+     }
      if(path==='/entry/review-art'){
       if(req.method!=='POST'||typeof body.digest!=='string'||!f.capabilities.artwork||!f.approvedArt?.includes(body.digest))throw Error('ART_REVIEW_REQUIRED');
       return {approved:true};
@@ -109,7 +118,11 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(entryRoutes.includes(path)){
     await d.withFamily(id,async(_tx,f,p)=>{if(path==='/v1/sessions/renew'&&f.status==='pending'&&p.participation)return;
      activeFamily(f,p);if(['/v1/sessions/enroll','/v1/devices/invite'].includes(path)&&!p.invitations)throw Error('INVITATIONS_PAUSED');});
-   }else await requirePlay(d,id,raw,key,'check');
+   }else{
+    const access=await requirePlay(d,id,raw,key,'check'),preview=path.match(/^\/v1\/revisions\/([\w-]+)\/preview$/);
+    if(preview){if(req.method!=='GET'||!options.preview)throw Error('FORBIDDEN');
+     json(res,200,await previewAdmission(d,options.preview,access.session,raw,preview[1]));return;}
+   }
    req.headers.cookie=internalCookies(raw);
    await (await options.runtime(id))(req,res);
   }catch(e){

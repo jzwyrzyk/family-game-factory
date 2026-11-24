@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {FixtureDocuments} from '../server/beta/documents';
+import {bindHousehold,mappedHouseholdRepository} from '../server/beta/household';
+import {readWorkspace,writeWorkspace} from '../server/pipeline/workspace-state';
+import {closedPolicy} from '../server/beta/model';
+
+test('explicit household bridge preserves original records, charges opening use once and enforces one common stop',async()=>{
+ const db=new FixtureDocuments(),b={environment:'synthetic',familyId:'owner',workspace:'original'},month=new Date().toISOString().slice(0,7);
+ await db.run(async tx=>{const w=await readWorkspace(tx,b.workspace);w.state.ledgers.owner={month,paidEnabled:true,allowance:1000000,used:1200,reserved:0};
+  w.state.revisions=['Splash or Pass','Dragon Island Rescue'].map((name,i)=>({name,id:'retained-'+i,projectId:'old-project',familyId:'owner',parentId:null,game:null}));
+  await writeWorkspace(tx,w);
+ });
+ const before=await db.run(tx=>readWorkspace(tx,b.workspace));
+ const repo=mappedHouseholdRepository(db,b);
+ await assert.rejects(repo.snapshot(),/MAPPING_REQUIRED/);
+ assert.equal((await bindHousehold(db,b,false)).mapped,false);
+ await assert.rejects(bindHousehold(db,{...b,familyId:'new-family'},true),/OWNER_MISMATCH/);
+ await bindHousehold(db,b,true);await bindHousehold(db,b,true);
+ const root='factoryBeta/synthetic',read=()=>db.run(tx=>tx.get(root+'/usage/'+month));
+ assert.deepEqual(await read(),{used:1200,reserved:0});
+ assert.deepEqual((await db.run(tx=>readWorkspace(tx,b.workspace))).state,before.state);
+ await db.run(async tx=>tx.set(root,{...closedPolicy(),stop:false,monthlyLimit:2200}));
+ await repo.transaction(s=>{s.ledgers.owner.reserved+=1000;});
+ await assert.rejects(repo.transaction(s=>{s.ledgers.owner.reserved++;}));
+ await db.run(async tx=>tx.set(root,closedPolicy()));
+ assert.equal((await repo.snapshot()).ledgers.owner.paidEnabled,false);
+ await repo.transaction(s=>{s.ledgers.owner.reserved=0;s.ledgers.owner.used+=450;});
+ assert.deepEqual(await read(),{used:1650,reserved:0});
+ const after=await db.run(tx=>readWorkspace(tx,b.workspace));assert.equal(after.state.ledgers.owner.paidEnabled,true);
+ assert.deepEqual(after.state.revisions,before.state.revisions);
+});

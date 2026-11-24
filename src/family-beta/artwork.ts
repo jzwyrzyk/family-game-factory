@@ -5,6 +5,9 @@ if(file)file.onchange=async()=>{
  const out=document.getElementById('familyExitStatus')!;
  try{
   const image=file.files?.[0];if(!image||image.type!=='image/png'||image.size>5*1024*1024)throw Error('Choose a reviewed PNG up to 5 MB.');
+  const pass=document.querySelector<HTMLInputElement>('#reviewedArtPassphrase')!;
+  const unlocked=await fetch('/v1/devices/unlock',{method:'POST',headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({parentPassphrase:pass.value})});
+  pass.value='';if(!unlocked.ok)throw Error('A grown-up must authorize this upload.');
   const owner=(window as any).FG.store.current().id,bytes=await image.arrayBuffer();
   const {width,height}=inspectDrawingBytes(bytes,'image/png');
   const response=await fetch('/entry/review-art',{method:'POST',headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({digest:await drawingHash(bytes)})});

@@ -71,3 +71,5 @@ The expression package joins code and asset evidence. Review `public/jems-pals/*
 The [original charter](factory-v2-implementation-charter.md), [Assignment 001 traceability](requirements-traceability.md), [early gap analysis](gap-analysis.md), [Assignment 002](assignment-002/README.md), [owner pilot handoff](assignment-005/OWNER-PILOT.md) and [repair completion report](repair-program/COMPLETION.md) are valuable history. Their old branch statuses, pins and "current live" statements must not be used as today's inventory. Use [delivery state](../DELIVERY-STATE.md) and verify its observation date.
 
 Prefer a link to the detailed contract over a copied version. Add new feature families to this index and to the [review registry](context/registry.json). Keep ephemeral execution logs in scoped evidence directories; preserve decisions and outcomes instead of dumping entire chats into the repository.
+
+For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).

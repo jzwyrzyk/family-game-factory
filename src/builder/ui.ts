@@ -1,3 +1,4 @@
+import {openPreviewFrame} from '../builder/open-preview';
 import {setIconLabel,type IconName} from '../brand/icons';
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest } from '../learning/policy';
@@ -89,7 +90,7 @@ export async function initBuilder(){
   previewLearning?.dispose();previewLearning=null;
   currentKind=preview.kind||'star-catcher-v1';currentRevision=revisionId;currentProject=project;
   const frame=$<HTMLIFrameElement>('generatedPreview');frame.style.height=(currentKind==='generated-module-v1'||currentKind==='generated-module-v2')?'720px':'520px';
-  channel=crypto.randomUUID();artifactId=preview.artifactId;previewOwner=owner;const url=new URL(preview.url);url.searchParams.set('channel',channel);frame.src=url.href;
+  channel=crypto.randomUUID();artifactId=preview.artifactId;previewOwner=owner;openPreviewFrame(frame,preview,channel);
   previewLearning=attachPreviewLearning(frame,{channel,artifactId,ownerId:previewOwner,gameId:'generated',projectId:key,versionId:revisionId,onRound:d=>{$('previewOutcome').textContent=currentKind==='star-catcher-v1'?`You caught ${d.score} stars! Keep it or try your own next change.`:`You ${d.won?'finished':'tried'} this round. Score: ${d.score}. Keep it or try your next change.`;}});
   let mathMode=$('builderMathMode');if(!mathMode){mathMode=document.createElement('div');mathMode.id='builderMathMode';frame.before(mathMode);}
   FG.learning.modeControl(mathMode,key);$('builderPreview').hidden=false;$('previewOutcome').textContent='Play the preview. It has not replaced your current game.';
