@@ -122,7 +122,8 @@
     "docs/game-intelligence/premium-benchmark/*.md",
     "docs/development/*.md",
     "infra/nonproduction/*.md",
-    "docs/development/evidence/*.md"
+    "docs/development/evidence/*.md",
+    "docs/storage/*.md"
   ],
   "areas": [
     {
@@ -143,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.638Z",
-      "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
+      "reviewedAt": "2026-11-24T22:24:26.541Z",
+      "sourceDigest": "51f306824b1e0a96f3612c193340eaf381392904bff644f8ffdbbcddb5c688ef",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-specific retained-game placement and cutover retention exception in a decision; general preserve-work doctrine is unchanged.",
+      "reviewReason": "Architecture now distinguishes integrated local journal and remote-copy guarantees from prepared indexed/cloud adapters. Child-owned Keep, immutable art, offline play and no paid replay remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -306,10 +307,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.770Z",
-      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
+      "reviewedAt": "2026-11-24T22:24:27.006Z",
+      "sourceDigest": "021bfd5719985277c2ddfa26257b1d752c7a576d52ab2ff8ec908b400b087cb2",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
+      "reviewReason": "Reviewed Studio create/copy, construction and learning-format staging, atomic reply messages/evidence, exact-byte cache reads, and backend-first pending copy recovery; documented capacity and UI recovery gaps.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -493,10 +494,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4fdd985c5da76076a57ebca31acd176b4afa822b46bd5b97b17fc2a0d428dce0",
-      "reviewedAt": "2026-11-23T05:43:13.311Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected combined notebook chapter expansion and family backup with Notifications, selected helper evidence and pending request identity. New tests preserve exact native game bytes and reward provenance through restore/fork; earning policy, immutable receipts and explicit Keep authority are unchanged.",
+      "sourceDigest": "b92c6eea73581fd2637cb3b74522737ae665edf49c59af6002a4ef192883c9b9",
+      "reviewedAt": "2026-11-24T22:24:27.925Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented shared writer and maintenance coordination: pending project journals block source saves and family replacement, startup recovery precedes reward projection, and existing earning and backup ledger policies remain.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -675,10 +676,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:57.748Z",
-      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
+      "reviewedAt": "2026-11-24T22:26:36.674Z",
+      "sourceDigest": "376019d36cd815b208f21462b165a53ce491d8f64f66f70e5991dab2e9248a24",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
+      "reviewReason": "Verified fork GET receipt authorization and idempotency, optional asset decoding audience binding, default-off Firestore CAS and private snapshot preparation; gateway grant integration remains explicitly incomplete.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -728,10 +729,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:03:59.475Z",
-      "sourceDigest": "a7748aa2cc821639c57f194a3393e9938b763f708217921d7acfd51afc79fb2f",
+      "reviewedAt": "2026-11-24T22:24:28.890Z",
+      "sourceDigest": "0704459d83433479ea71932eae3af54f6caa1dc70f691974ddf2705958e43303",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed atomic normal-motion evidence sampling after the offline paused-frame race; preserved source/frame/state identities and originals, and explicitly retained production eight-image policy and paid serial/full-job behavior.",
+      "reviewReason": "Reviewed split private payloads against premium source/art/code hashes and frozen runtime contracts; optional encoder remains off, exact decoded objects and model/accounting behavior stay unchanged.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -824,10 +825,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "ee30422a65cfbeff27ec88eb03a1bc4b9d25de6034ed1012e09cbbff664b847b",
-      "reviewedAt": "2026-11-24T20:54:52.440Z",
+      "sourceDigest": "19c3ceff0f0389b1a655d51a54b300c23d147058a2b3e6aa894f075923b3ae07",
+      "reviewedAt": "2026-11-24T22:24:29.513Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged DEV TEST rollout guidance with premium Adult Private approval and saved-reader preservation; no child scope, grants, provider retention or authorization policy changes.",
+      "reviewReason": "Reviewed recovery after fresh Adult grant before namespace entry, unchanged family isolation and session cleanup, and audience-scoped remote-copy receipts; no local intent restores authorization.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +885,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:04:00.001Z",
-      "sourceDigest": "98447857529890e9cbb50fe3661a63b4f4c487a4c3257304148cee1263d19186",
+      "reviewedAt": "2026-11-24T22:26:37.433Z",
+      "sourceDigest": "29898afe0492f7987d651c5e4a44a24f2d3ed4237c1d07d0eb8a0505d831c749",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified final offline adversarial matrix detects 15 broken sessions with three working controls, keeps 108 original PNG identities and compares full/lossy sheets; recorded clean hosted image actual-byte and legacy/premium proof without claiming gVisor/provider acceptance.",
+      "reviewReason": "Retained mandatory original suites and added storage unit/Chromium coverage through browser-storage; reviewed interrupted private backup and cross-family asset-identity negatives, with system browser versus hosted pinned-browser limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,10 +1127,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T21:04:00.637Z",
-      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
+      "reviewedAt": "2026-11-24T22:28:04.956Z",
+      "sourceDigest": "f9850e927eb11007caca76efaa3f5d47bb1dd8f054344525d92ae760cda01db0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
+      "reviewReason": "Updated local acceptance count to 617 and retained source/browser/emulator/live-provider distinctions; branch remains unmerged and undeployed with full hosted validation and application migration work pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1383,10 +1384,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T20:54:53.956Z",
-      "sourceDigest": "0bbbe4a7991101120d756bb7410ec66b372b46aa53313cf249bd7aeb584d7cb9",
+      "reviewedAt": "2026-11-24T22:27:04.816Z",
+      "sourceDigest": "d93b9d43785ae5e93b8633c819ffccc2f78188010f55e114c8ce4b96b95cd625",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both registry source maps and documentation histories; routed new premium offline Python tools and completion handoff while preserving current maintenance requirements.",
+      "reviewReason": "Registered new storage source and document routes, including checking all storage Markdown links; preserved historical prototype/release references and distinguished incomplete migration and activation evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1670,6 +1671,27 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
+    },
+    {
+      "id": "storage",
+      "documents": [
+        "docs/storage/*.md",
+        "docs/child-continuity/F06-STORAGE-RECOVERY-EXPERIMENT.md",
+        "docs/child-continuity/RELIABILITY-2026-11-23.md",
+        "ARCHITECTURE-CURRENT.md"
+      ],
+      "sources": [
+        "src/storage/**",
+        "server/storage/**",
+        "infra/storage/**",
+        "tools/storage-*",
+        "docs/storage/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "ace94951a3ea696a2836cfe28eabaa296e9851903ad8a80804f5524a4c82d79a",
+      "reviewedAt": "2026-11-24T22:28:04.435Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded final audience-isolation and backup contracts with 617 unit checks and latest Chromium record timings, preserving the earlier noisy run and distinguishing unactivated adapters from integrated recovery."
     }
   ]
 }

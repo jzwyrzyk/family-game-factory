@@ -116,3 +116,7 @@ npm run test:rewards-browser
 The existing Arcade workflow registers these gates and preserves screenshot artifacts. Passing source/fixture/browser checks does not establish actual-device reliability, child engagement, educational efficacy or live-provider behavior. No production activation is implied by this contract.
 
 The [review captures](previews/README.md) preserve the synthetic-profile [desktop page](previews/rewards-desktop.png), [mobile page](previews/rewards-mobile.png) and [learning reward popup](previews/learning-reward.png) from the built application. Their source and evidence limits remain separate from release or actual-child acceptance.
+
+### PR166 source recovery coordination
+
+The [local project journal](../storage/README.md) blocks ordinary source writes and family backup replacement while an intent remains. Startup reconciles it under the existing writer lock before reward projection; Adult recovery requires a fresh grant. Atomic Studio replies retain their reward outbox in the same source save. Earning amounts, lifetime receipt semantics, Pals progression and existing backup rollback formats are unchanged.

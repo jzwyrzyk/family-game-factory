@@ -1,3 +1,4 @@
+import {LOCAL_JOURNAL_KEY} from '../storage/local-journal';
 import { adultStorageKey, adultWorkspaceId } from '../adult-pilot/storage';
 import { migrateWorkspace, WORKSPACE_KEY, type Workspace } from '../factory/workspace';
 import { validateNotebook, STUDIO_KEY, type Notebook } from '../studio/notebook';
@@ -123,6 +124,7 @@ function invalidateProblemSolvingView():void {
 
 /** Host maintenance owns the source-write pause. Nothing is projected here. */
 export async function applyFamilyRewardBackup(plan:PreparedFamilyRewardBackup,storage:BackupStorage,store:RewardsStore,operation:'restore'|'reset'='restore',palStore=new PalsStore(PALS_DB_NAME)):Promise<void> {
+  if(storage.getItem(LOCAL_JOURNAL_KEY)!==null)throw Error('Recover the interrupted game save before replacing progress.');
   if(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!==null)throw Error('Finish recovering the previous backup before replacing saved work.');
   if(store.namespace!==REWARDS_DB_NAME||palStore.namespace!==PALS_DB_NAME)throw Error('Family backups cannot replace an adult workspace.');
   const rewards=await store.snapshotRawForRecovery();assertLosslessRewardJSON(rewards.raw);

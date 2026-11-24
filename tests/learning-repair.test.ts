@@ -42,7 +42,7 @@ function loadStore(raw: string) {
   let stored = raw, writes = 0, failWrites = false;
   const window: any = {dispatchEvent:()=>true};
   runInNewContext(storeBundle, { window, CustomEvent:class {constructor(public type:string,public options?:any){}}, console: { warn() {} }, localStorage: {
-    getItem: () => stored,
+    getItem: (key:string) => key==='family-game-factory-state-v1'?stored:null,
     setItem: (_key: string, value: string) => { if(failWrites)throw Error('Storage is full'); writes++; stored = value; },
   } });
   return { store: window.FG.store, get stored() { return stored; }, get writes() { return writes; }, failWrites() { failWrites=true; } };

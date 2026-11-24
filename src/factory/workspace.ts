@@ -29,21 +29,31 @@ export function validateWorkspace(value: unknown): Workspace {
   if (!d || d.version !== 2 || !Array.isArray(d.projects) || !Array.isArray(d.revisions) || !Array.isArray(d.plays) || d.projects.length > 50 || d.revisions.length > 500 || d.plays.length > 1000) throw Error('This workspace backup is not supported.');
   const unique = (items: {id:string}[]) => items.every(x=>x && text(x.id,100) && x.id.length>0) && new Set(items.map(x=>x.id)).size===items.length;
   if (!unique(d.projects) || !unique(d.revisions) || !unique(d.plays)) throw Error('Workspace identifiers are invalid.');
+  const projects=new Map(d.projects.map(p=>[p.id,p]));
+  const revisions=new Map(d.revisions.map(r=>[r.id,r]));
+  const historiesChecked=new Set<string>();
   for (const p of d.projects) {
-    if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || !d.revisions.some(r=>r.id===p.headId && r.projectId===p.id)) throw Error('Invalid game project.');
-    if(p.keptId&&!d.revisions.some(r=>r.id===p.keptId&&r.projectId===p.id))throw Error('Invalid kept version.');
+    if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || revisions.get(p.headId)?.projectId!==p.id) throw Error('Invalid game project.');
+    if(p.keptId&&revisions.get(p.keptId)?.projectId!==p.id)throw Error('Invalid kept version.');
   }
   for (const r of d.revisions) {
-    const project = d.projects.find(p=>p.id===r.projectId);
+    const project = projects.get(r.projectId);
     if (!project || r.state!=='private' || !text(r.label,300) || !text(r.hypothesis,300) || !text(r.createdAt,40) || !Number.isFinite(Date.parse(r.createdAt))) throw Error('Invalid revision.');
     validateConfig(project.game, r.config);
     if (r.drawingRigId !== undefined && (project.game !== 'hill' || typeof r.drawingRigId !== 'string' || !/^[\w-]{1,100}$/.test(r.drawingRigId))) throw Error('Invalid saved drawing version.');
-    if (r.sourceRevisionId && !d.revisions.some(x=>x.id===r.sourceRevisionId)) throw Error('Missing fork source.');
-    const seen = new Set([r.id]); let parent = r.parentId;
-    while (parent !== null) { const next = d.revisions.find(x=>x.id===parent && x.projectId===r.projectId); if (!next || seen.has(next.id)) throw Error('Invalid revision history.'); seen.add(next.id); parent = next.parentId; }
+    if (r.sourceRevisionId && !revisions.has(r.sourceRevisionId)) throw Error('Missing fork source.');
+    const seen = new Set<string>(); let node:Revision|undefined=r;
+    while(node&&!historiesChecked.has(node.id)){
+      if(seen.has(node.id)||node.projectId!==r.projectId)throw Error('Invalid revision history.');
+      seen.add(node.id);if(node.parentId===null)break;
+      const parent=revisions.get(node.parentId);
+      if(!parent||parent.projectId!==r.projectId)throw Error('Invalid revision history.');
+      node=parent;
+    }
+    for(const id of seen)historiesChecked.add(id);
   }
   for (const play of d.plays) {
-    const revision=d.revisions.find(r=>r.id===play.revisionId), project=d.projects.find(p=>p.id===revision?.projectId), out=play.outcome;
+    const revision=revisions.get(play.revisionId), project=revision?projects.get(revision.projectId):undefined, out=play.outcome;
     if (!revision || !project || !out || out.game!==project.game || typeof out.won!=='boolean' || !Number.isInteger(out.level) || out.level<1 || !Number.isFinite(out.durationMs) || out.durationMs<0 || !text(out.title,300) || !text(out.description,1000) || !text(out.at,40) || !text(play.reflection,300)) throw Error('Invalid play evidence.');
     const playedConfig=validateConfig(out.game, out.config);
     if (Object.entries(playedConfig).some(([key,value])=>validateConfig(project.game,revision.config)[key]!==value)) throw Error('Play evidence does not match its revision.');

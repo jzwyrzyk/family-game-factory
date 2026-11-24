@@ -266,7 +266,22 @@ export class JobService {
   finally{if(timeout)clearTimeout(timeout);this.controllers.delete(id);}
  }
  async revision(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),r=state.revisions.find(r=>r.id===id&&r.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(state,session,r);return r;}
- async fork(session:VerifiedSession,id:string,name:string){if(typeof name!=='string'||name.trim().length<1||name.length>60)throw Error('INVALID_REQUEST');return this.repo.transaction(s=>{const source=s.revisions.find(r=>r.id===id&&r.game);if(!source)throw Error('NOT_FOUND');requireResourceAudience(s,session,source);const revision={...source,id:uuid(),projectId:uuid(),parentId:null,sourceRevisionId:source.id,name:name.trim()};s.revisions.push(revision);s.active[revision.projectId]=revision.id;return {revisionId:revision.id};});}
+ async forkReceipt(session:VerifiedSession,id:string,requestId:string){
+  if(!safeId(requestId))throw Error('INVALID_REQUEST');
+  const state=await this.repo.snapshot(),source=state.revisions.find(r=>r.id===id&&r.game);
+  if(!source)throw Error('NOT_FOUND');requireResourceAudience(state,session,source);
+  const result=state.revisions.find(r=>r.copyRequestId===requestId&&r.sourceRevisionId===id&&r.familyId===source.familyId&&r.adultPilotProfileId===source.adultPilotProfileId);
+  if(!result)return null;requireResourceAudience(state,session,result);return {revisionId:result.id};
+ }
+ async fork(session:VerifiedSession,id:string,name:string,requestId?:string){
+  if(typeof name!=='string'||name.trim().length<1||name.length>60||requestId!==undefined&&!safeId(requestId))throw Error('INVALID_REQUEST');
+  return this.repo.transaction(s=>{
+   const source=s.revisions.find(r=>r.id===id&&r.game);if(!source)throw Error('NOT_FOUND');requireResourceAudience(s,session,source);
+   if(requestId){const prior=s.revisions.find(r=>r.copyRequestId===requestId&&r.familyId===source.familyId&&r.adultPilotProfileId===source.adultPilotProfileId);
+    if(prior){requireResourceAudience(s,session,prior);if(prior.sourceRevisionId!==id||prior.name!==name.trim())throw Error('IDEMPOTENCY_CONFLICT');return {revisionId:prior.id};}}
+   const revision={...source,id:uuid(),projectId:uuid(),parentId:null,sourceRevisionId:source.id,name:name.trim(),copyRequestId:requestId};s.revisions.push(revision);s.active[revision.projectId]=revision.id;return {revisionId:revision.id};
+  });
+ }
  async keep(session:VerifiedSession,id:string){await this.repo.transaction(s=>{const r=s.revisions.find(r=>r.id===id&&r.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(s,session,r);s.active[r.projectId]=id;return true;});return {revisionId:id};}
  async undo(session:VerifiedSession,id:string){const r=await this.revision(session,id);if(!r.parentId)throw Error('NO_PREVIOUS_VERSION');const parent=await this.revision(session,r.parentId);await this.keep(session,parent.id);return {revisionId:parent.id};}
  async list(session:VerifiedSession){requireFamily(session,{id:'list',familyId:session.familyId});const s=await this.repo.snapshot();assertActiveTrustedDevice(s,session);if((session.adultSessionId||session.adultProfileId)&&!adultPilotAllowed(s,session))throw Error('FORBIDDEN');return s.revisions.filter(r=>r.familyId===session.familyId&&r.adultPilotProfileId===session.adultProfileId&&s.active[r.projectId]===r.id);}

@@ -1,6 +1,8 @@
 # F06 storage recovery — first engineering slice
 
-**Draft; offline experiment only.** Starting main `13260750b7771beb024cc6a94bf823ee5a4e29ff` includes premium PR139. No production imports, storage schema change, live data, cloud operations or provider calls. This is a first slice of the broader storage assignment, not F06 completion.
+**Historical first slice; retained unchanged below.** The [PR166 continuation](../storage/README.md) adds integrated compact recovery, copy/reply changes and disabled indexed/cloud/asset preparation. Its [disposition](../storage/ROLLOUT.md) supersedes this original integration checklist; broader F06 remains incomplete.
+
+**Original draft; offline experiment only.** Starting main `13260750b7771beb024cc6a94bf823ee5a4e29ff` includes premium PR139. No production imports, storage schema change, live data, cloud operations or provider calls. This is a first slice of the broader storage assignment, not F06 completion.
 
 ## Observed source boundary
 

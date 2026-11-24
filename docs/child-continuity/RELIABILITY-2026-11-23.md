@@ -14,6 +14,10 @@ This is the source acceptance matrix for [PR123](https://github.com/jzwyrzyk/fam
 
 Component runtime modules are retained in the integrated source, with semantic changes confined to overlaps and explicitly documented safeguards. Historical branches and receipts remain preserved. A component may be closed as superseded only after the final integrated source has passed its applicable tests and merged.
 
+## November 24 PR166 continuation
+
+The [current storage report](../storage/README.md) supersedes the remaining-work status below for integrated local create/copy journaling, staged construction/profile copying, atomic reply/evidence saves and durable remote-copy identities/read-only lookup. Existing release receipts remain historical. Full application pagination/provenance migration, sync orchestration, automated private backup/graphical recovery and live cloud/device acceptance remain open. [Rollout](../storage/ROLLOUT.md) keeps these distinctions and the backend-first compatibility requirement explicit.
+
 ## F06 remains partially implemented
 
 | Area | Present protection | Remaining gated work |

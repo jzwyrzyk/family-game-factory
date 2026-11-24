@@ -1515,10 +1515,21 @@ export async function installStudio(){
   if(saving)return;const s=current(),at=epoch;if(!canChangePlay(s,at))return;saving=true;const sourceMode=FG.learning.modeFor(s.id);render();
   try{let saved:StudioSession;
     notebook.assertCanCreate();
-    if(s.remoteId||showing==='candidate'&&s.candidate?.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(remoteViewedId||(showing==='candidate'?s.candidate?.remoteId:undefined)||s.remoteId!)+'/fork',{name});if(!canChangePlay(s,at))return;saved=notebook.fork(s.id,s.owner,name,null,r.revisionId);}
-    else if(s.projectId){saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,stagedNotebook)=>{const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?stagedGames.revision(s.projectId!,s.owner,viewedRevisionId):null;const p=stagedGames.fork(s.owner,s.projectId!,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);return stagedNotebook.fork(s.id,s.owner,name,p.id,null);},notifyRewardSourceSaved);}
-    else saved=notebook.fork(s.id,s.owner,name,null,null);
-    const learner=FG.store.data.profiles.find((p:any)=>p.id===s.owner);if(learner){const before=learner.mathModes;setMode(learner,saved.id,sourceMode);if(!FG.store.save()){learner.mathModes=before;throw Error('Your separate game was saved, but its learning format could not be copied.');}}$<HTMLDialogElement>('studioCopyDialog').close();
+    const copyMode=(profile:any,copied:StudioSession)=>setMode(profile,copied.id,sourceMode);
+    if(s.pendingCopy||s.remoteId||showing==='candidate'&&s.candidate?.remoteId){
+      const pending=s.pendingCopy??{requestId:crypto.randomUUID(),sourceRevisionId:remoteViewedId||(showing==='candidate'?s.candidate?.remoteId:undefined)||s.remoteId!,name,api:remote.apiBaseUrl!};
+      if(pending.api!==remote.apiBaseUrl)throw Error('Reconnect this game’s workshop to check its saved copy.');
+      const path='/v1/revisions/'+encodeURIComponent(pending.sourceRevisionId)+'/fork';
+      if(!s.pendingCopy)notebook.update(s.id,s.owner,x=>{x.pendingCopy=pending;});
+      // A retained intent always uses read-only reconciliation, never a replayed POST.
+      const r=s.pendingCopy?await clientFor(s).api(path+'/'+encodeURIComponent(pending.requestId)):await clientFor(s).api(path,{name:pending.name,clientRequestId:pending.requestId});
+      if(!canChangePlay(s,at))return;
+      if(!r||typeof r.revisionId!=='string'||!/^[\w-]{1,100}$/.test(r.revisionId))throw Error('The workshop has not confirmed this copy. Your original is safe. Check again later.');
+      saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(_games,book)=>book.fork(s.id,s.owner,pending.name,null,r.revisionId,pending.requestId),notifyRewardSourceSaved,copyMode);
+    }
+    else if(s.projectId){saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,stagedNotebook)=>{const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?stagedGames.revision(s.projectId!,s.owner,viewedRevisionId):null;const p=stagedGames.fork(s.owner,s.projectId!,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);return stagedNotebook.fork(s.id,s.owner,name,p.id,null);},notifyRewardSourceSaved,copyMode);}
+    else saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(_games,book)=>book.fork(s.id,s.owner,name,null,null),notifyRewardSourceSaved,copyMode);
+    $<HTMLDialogElement>('studioCopyDialog').close();
     if(canChangePlay(s,at)){await open(saved.id);status('Saved as a separate game. Your original game is unchanged.');celebrateJem('copied','studioStatus');}
   }finally{saving=false;render();}
  }

@@ -1,0 +1,76 @@
+{
+  "baseline": "1743c9e6560ae9416ec08a23cb660eb06af68351",
+  "scope": "Synthetic Node benchmarks; warm median/p95 of 25 samples, one process; not real users, browser startup, network or cloud billing",
+  "workspace": [
+    {
+      "revisions": 25,
+      "bytes": 6250,
+      "before": {
+        "medianMs": 0.16681399999998803,
+        "p95Ms": 0.33401600000001963
+      },
+      "after": {
+        "medianMs": 0.12121899999999641,
+        "p95Ms": 0.1702060000000074
+      }
+    },
+    {
+      "revisions": 100,
+      "bytes": 24700,
+      "before": {
+        "medianMs": 2.903960999999981,
+        "p95Ms": 5.739483000000064
+      },
+      "after": {
+        "medianMs": 0.3274069999999938,
+        "p95Ms": 0.53459399999997
+      }
+    },
+    {
+      "revisions": 500,
+      "bytes": 124300,
+      "before": {
+        "medianMs": 136.64145199999984,
+        "p95Ms": 182.87141599999995
+      },
+      "after": {
+        "medianMs": 1.291377999999895,
+        "p95Ms": 1.9333019999994576
+      }
+    }
+  ],
+  "conversation": {
+    "sessions": 70,
+    "messages": 14000,
+    "bytes": 4309978,
+    "before": {
+      "medianMs": 32.9120039999998,
+      "p95Ms": 55.18109199999981
+    },
+    "after": {
+      "medianMs": 20.378341999999975,
+      "p95Ms": 37.93489200000022
+    }
+  },
+  "journal": {
+    "sourceBytes": 4309978,
+    "fullImagesBytes": 9078695,
+    "compactBytes": 4539411
+  },
+  "assets": {
+    "revisions": 50,
+    "unchangedAssetBytesPerRevision": 450000,
+    "before": {
+      "objects": 50,
+      "objectBytes": 23928030,
+      "metadataBytes": 9802,
+      "encodeMs": 221.99704800000018
+    },
+    "after": {
+      "objects": 52,
+      "objectBytes": 525358,
+      "metadataBytes": 11702,
+      "encodeMs": 316.9555909999999
+    }
+  }
+}

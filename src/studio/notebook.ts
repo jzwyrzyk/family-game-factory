@@ -30,6 +30,7 @@ export interface StudioSession {
   design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
   pendingSubmission?:PendingBuildSubmission|null;
+  pendingCopy?:{requestId:string;sourceRevisionId:string;name:string;api:string}|null;
   archived?:boolean; resumeDismissed?:boolean;
   keptExperiments?:KeptExperiment[]; verifiedRemoteExperiments?:string[];
   /** Canonical source project, retained through copies and local/remote transitions. */
@@ -110,6 +111,7 @@ export function validateNotebook(input: unknown): Notebook {
     if((s.archived!==undefined&&typeof s.archived!=='boolean')||(s.resumeDismissed!==undefined&&typeof s.resumeDismissed!=='boolean'))throw Error('Invalid home visibility state.');
     if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
     if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || s.job.phase!==undefined&&(typeof s.job.phase!=='string'||!/^[a-z-]{1,32}$/.test(s.job.phase)) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
+    if(s.pendingCopy!=null){const p=s.pendingCopy;if(Object.keys(p).some(k=>!['requestId','sourceRevisionId','name','api'].includes(k))||!ident(p.requestId)||!ident(p.sourceRevisionId)||!safeText(p.name,60)||!p.name.trim()||!safeText(p.api,500)||!p.api)throw Error('Invalid pending copy.');}
     if(s.pendingSubmission!==undefined&&s.pendingSubmission!==null){
       const pending=s.pendingSubmission;
       if(Object.keys(pending).some(key=>!['owner','workspace','api','request'].includes(key))||pending.owner!==s.owner||pending.workspace!==s.id||!safeText(pending.api,500)||!pending.api)throw Error('Invalid pending submission.');
@@ -128,7 +130,7 @@ export function validateNotebook(input: unknown): Notebook {
     }
   }
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','pendingCopy','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   if(n.rewardOutbox!==undefined){
     const facts=validateRewardOutbox(n.rewardOutbox);
@@ -138,8 +140,17 @@ export function validateNotebook(input: unknown): Notebook {
   return copy(n);
 }
 export class StudioNotebook {
+  private cachedRaw:string|null|undefined;
+  private cachedNotebook:Notebook|undefined;
   constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void) { this.read(); }
-  read(): Notebook { const raw=this.storage.getItem(STUDIO_KEY); return raw===null ? fresh() : validateNotebook(JSON.parse(raw)); }
+  read(): Notebook {
+    const raw=this.storage.getItem(STUDIO_KEY);
+    if(raw!==this.cachedRaw||!this.cachedNotebook){
+      const validated=raw===null?fresh():validateNotebook(JSON.parse(raw));
+      this.cachedRaw=raw;this.cachedNotebook=validated;
+    }
+    return copy(this.cachedNotebook); // No caller can mutate the validated cache.
+  }
   private write<T>(fn:(n:Notebook)=>T):T {
     assertRewardSourceWritable();
     // Re-read on every synchronous transaction: don't overwrite a newer workspace snapshot.
@@ -235,7 +246,7 @@ export class StudioNotebook {
   get(id:string,owner:string):StudioSession {const n=this.read(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return conversationContext(n,s);}
   last(owner:string):StudioSession|null {const n=this.read(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?conversationContext(n,s):null;}
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
-  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.pendingSubmission)throw Error('Check your saved request before putting this jem away.');if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
+  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.pendingCopy)throw Error('Finish checking your saved copy before putting this jem away.');if(s.pendingSubmission)throw Error('Check your saved request before putting this jem away.');if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
   create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null,initial?:{playOnly?:boolean;message?:string;creationStandard?:2}):StudioSession {
     return this.write(n=>{assertNotebookCapacity(n);const id=crypto.randomUUID(),now=new Date().toISOString(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:initial?.message?[{id:crypto.randomUUID(),role:'helper',text:initial.message.slice(0,2200),at:now}]:[],job:null,updated:now,hypothesis:'',reflection:false,design:{...freshDesign(),...(initial?.creationStandard===2?{creationStandard:2 as const}:{})},experiments:[],selectedTest:null,playOnly:initial?.playOnly??false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
@@ -245,6 +256,15 @@ export class StudioNotebook {
     const after=this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');before=copy(conversationContext(n,s));fn(s);s.updated=new Date().toISOString();return conversationContext(n,s);});
     if(before)publishSourceEvidence({kind:'studio',before,after});
     return after;
+  }
+  /** Save reply text, plan/provenance and reward outbox in one atomic key write. */
+  reply(id:string,owner:string,texts:string[],apply:(s:StudioSession)=>void):StudioSession {
+    if(texts.some(text=>typeof text!=='string'||text.length>2200))throw Error('Invalid saved reply.');
+    return this.update(id,owner,s=>{
+      if(s.messages.length+texts.length>CONVERSATION_PAGE_CAPACITY)throw new ConversationCapacityError();
+      apply(s);
+      for(const text of texts)s.messages.push({id:crypto.randomUUID(),role:'helper',text,at:new Date().toISOString()});
+    });
   }
   select(id:string,owner:string) {this.get(id,owner);this.write(n=>{n.active[owner]=id;return true;});}
   message(id:string,owner:string,role:Message['role'],text:string) {
@@ -285,15 +305,17 @@ export class StudioNotebook {
     publishSourceEvidence({kind:'clear-studio',owner,sessionId:id});
     return result;
   }
-  fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
+  fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null,copyRequestId?:string):StudioSession {
     return this.write(n=>{
+    if(copyRequestId){const existing=n.sessions.find(s=>s.id==='copy:'+copyRequestId&&s.owner===owner&&s.remoteId===remoteId);if(existing)return existing;}
     assertNotebookCapacity(n);
     const source=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!source)throw Error('Choose a game in your own profile.');
+    if(copyRequestId&&source.pendingCopy?.requestId!==copyRequestId)throw Error('Copy identity changed.');
     const design=source.design?copy(source.design):undefined;
     // Prior observations remain truthful history. Their old tests are not on the new shelf,
     // so keep the text, author/source, identifiers and dates while detaching those links.
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
-    const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,pendingSubmission:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    const s:StudioSession={...source,id:copyRequestId?'copy:'+copyRequestId:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,pendingSubmission:null,pendingCopy:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};if(copyRequestId)source.pendingCopy=null;n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true,verifiedRemote=false):Experiment {
     let result:Experiment;

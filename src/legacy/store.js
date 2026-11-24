@@ -1,3 +1,4 @@
+import {validateFamilyState as validate} from '../storage/family-state';
 /* Family Game Factory — local-only, versioned state. No network calls. */
 import { profileGrade, validateLearning } from '../learning/engine';
 import {validateLanguage} from '../language/engine';
@@ -17,11 +18,6 @@ const profiles = [
 ];
 const learningIntensities = ['gentle','balanced','stretch'];
 const empty = () => ({version:1,activeProfile:'player1',profiles:JSON.parse(JSON.stringify(profiles)),feedback:[],createdAt:Date.now()});
-function validate(value,checkLearning=true){
- if (!value || value.version!==1 || !Array.isArray(value.profiles) || !Array.isArray(value.feedback)) return false;
- if(value.profiles.length<1 || value.profiles.length>6 || value.feedback.length>1000) return false;
- return value.profiles.every(p=> p&&typeof p.id==='string' && typeof p.name==='string' && typeof p.skills==='object' && p.skills!==null && !Array.isArray(p.skills) && typeof p.stats==='object' && p.stats!==null && (p.grade===undefined||[1,2,3,4].includes(p.grade)) && (p.learningSetupComplete===undefined||typeof p.learningSetupComplete==='boolean') && (p.learningSubject===undefined||['math','language'].includes(p.learningSubject)) && (p.allowSubjectSwitch===undefined||typeof p.allowSubjectSwitch==='boolean') && validateLearningRewardOutbox(p) && (!checkLearning||(validateLearning(p.learning)&&validateLanguage(p.language))));
-}
 function normalize(value){for(const p of value.profiles){p.grade=profileGrade(p);p.intensity=learningIntensities.includes(p.intensity)?p.intensity:'gentle';p.learningSetupComplete=p.learningSetupComplete===true;p.learningSubject=p.learningSubject==='language'?'language':'math';p.allowSubjectSwitch=p.allowSubjectSwitch===true;p.languageFocus=Array.isArray(p.languageFocus)?p.languageFocus.filter(id=>typeof id==='string'&&LANGUAGE_SKILLS.some(s=>s.id===id)).slice(0,12):[];p.rate=Math.max(1,Math.min(8,Number(p.rate)||3));p.mathModes=Object.fromEntries(Object.entries(p.mathModes||{}).filter(([k,v])=>/^[\w:-]{1,160}$/.test(k)&&!['__proto__','constructor','prototype'].includes(k)&&['checkpoint','interaction','both'].includes(v)));p.skillFocus=Array.isArray(p.skillFocus)?p.skillFocus.filter(v=>typeof v==='string'&&/^g[1-4]-[a-z0-9-]+$/.test(v)).slice(0,12):[];}return value;}
 let loadError=null,recoveryRaw=null;
 function load(){
