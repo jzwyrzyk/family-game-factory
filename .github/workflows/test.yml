@@ -16,6 +16,10 @@ on:
 permissions:
   contents: read
   actions: read
+# Activation is a reviewed source change paired with the independent release
+# verifier migration. It is not a mutable repository variable or PR input.
+env:
+  CI_MAIN_REUSE_POLICY: protected-main-equivalence-v1
 # Cancel only superseded validation of the same PR/main branch, never releases.
 concurrency:
   group: arcade-journeys-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -47,10 +51,12 @@ jobs:
       - name: Classify exact source using trusted base policy
         id: plan
         env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
           CI_FORCE_FULL: ${{ inputs.force_full || false }}
           GH_TOKEN: ${{ github.token }}
         run: node scripts/ci/prepare-plan.mjs
+      - name: Record advisory dependency consumers without narrowing coverage
+        run: node scripts/ci/dependency-shadow.mjs
       - name: Documentation integrity
         run: npm run docs:check
       - name: Operations, provenance and release-transition contracts
@@ -64,6 +70,7 @@ jobs:
           path: |
             ci-plan.json
             ci-reuse.json
+            ci-dependency-shadow.json
           retention-days: 30
           if-no-files-found: error
       - run: npm ci

@@ -39,6 +39,7 @@ jobs:
           node scripts/ci/report-performance.mjs \
             --repository "$REPORT_REPOSITORY" \
             --runs "$REPORT_RUN_ID" \
+            --baseline-config ops/ci-performance.json \
             --out "$RUNNER_TEMP/ci-performance/report.json" \
             --summary "$GITHUB_STEP_SUMMARY"
       - name: Retain metadata report

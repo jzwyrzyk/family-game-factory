@@ -1,5 +1,7 @@
 # Jems operational access and release controls
 
+**Prepared CI evidence integration, November 23, 2026:** the separate CI follow-up replaces generic successful-main Arcade acceptance in the read-only release plan with complete source-bound receipt verification. The current cutover has one exact, finite migration receipt; future sources require authenticated full first-attempt evidence and immutable build identity. The operation output is emitted only after verification. Rollback retains its application-CI independence and avoids the added Node setup step; auth, permissions, provenance, concurrency and the actual transition remain unchanged. See the [CI evidence guide](../evidence/README.md#exact-validation-reuse-and-release-integration). This privileged workflow edit requires explicit owner approval after cutover; it has not been merged, dispatched or activated.
+
 This change adds a release controller and scoped diagnostic clients. Each production
 operation requires a maintainer-reviewed intent on protected main. The repository opt-ins and
 Google grants are initially absent. Existing Pages, sandbox publication, smoke,

@@ -872,10 +872,10 @@
         "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:28:44.106Z",
-      "sourceDigest": "37ec858adb0679161c9ad349cbfe1fa8109e56b5155ad294d039f245d5555cec",
+      "reviewedAt": "2026-11-24T15:40:40.410Z",
+      "sourceDigest": "fdd961fda0a2b26d44c4a27d4fc44aaaa2ffbe91998cb647eb566551e22abb29",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged PR154 CI source with DEV/TEST receipt verification and retained exact main policy comparison, all96 commands,112 environment/6 browser-contract tests and99 CI tests; no deployed acceptance is inferred.",
+      "reviewReason": "Reconciled DEV/TEST full-receipt verifier with PR157 protected-main reuse and shadow reports: reused green runs remain ineligible for TEST, exact current policy remains required, and all96 regression commands remain assigned.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1039,11 +1039,46 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
+          "reviewedAt": "2026-11-24T03:54:08.439Z",
+          "sourceDigest": "b16a98a6e1b693141afd8365583f411171ea6ad7baff3ec93b00f2427a6c16ad",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed protected-main event/predecessor tests, immutable plan ID/hash verification, complete authenticated reuse summary, manual-main full evidence refresh, finite legacy expiry and source gate refusal paths. The CI guide records staged activation, exact-source and workflow-review limitations; executable changes and all uncertainty still run full.",
+          "sourceCommit": "9ed8f19"
+        },
+        {
           "reviewedAt": "2026-11-24T03:54:39.791Z",
           "sourceDigest": "577031884d07b5447321967f767506857e88cdb3f0d6817369986ee6e880c1cd",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed observed thirteen-shard coverage, bounded scheduling adjustment and corrected performance reporter cancellation accounting: a deliberately cancelled run remains cancelled while all failed aggregates remain visible. Guide records actual first hosted pass, queue delays, runner increase, artifact growth and byte-day reduction, preserving all failed/cancelled history.",
           "sourceCommit": "3af84756050c0bb4dbb63ee47a2e8835183cfc68"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:55:08.650Z",
+          "sourceDigest": "88fc0bdbacfcf6a568cf9d5a35fe5f266ca3fa280fb669e8525bacac200950ed",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled first-PR measured performance/cancellation reporter fixes with second-stage authenticated main/manual evidence and immutable plan transport. All original gameplay commands and assertions remain; guide distinguishes actual first benchmark from activation and future timing.",
+          "sourceCommit": "f3c9074bfbaf8a8e16acf97beec0de10e68efd21"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:06:41.814Z",
+          "sourceDigest": "55c028caadabfb148ed21e7387331988550797fc18b72ce9c225d3db00d3330c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed exact preparation artifact ID and SHA-256 binding before aggregate parsing, with adversarial replacement tests. Preserved all original leaf coverage and first-attempt semantics; guide distinguishes completed hosted equivalence from the unexecuted optional legacy shadow and pending integrated benchmarks.",
+          "sourceCommit": "13e63dce475fb436934e11d2541e9cb4272f2ac9"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:28:45.850Z",
+          "sourceDigest": "a128508685d9eceb2c5859f229879b3c6fa247633e838ec4a3886d045f01d319",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the combined first-stage plan-byte tamper test and second-stage authenticated reuse-summary checks after merging PR154 13e63dc. All original 96 leaf commands and assertions remain; 112 CI tests pass. Reconciled the guide to distinguish PR154 full-main behavior from unactivated PR157 protected-main equivalence and reviewed-main full-dispatch evidence, retaining measured benchmark failures and the exact PR155 compatibility patch.",
+          "sourceCommit": "f47947cd3a849a05d2d82c09fa9fbf45cf6c55b0"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:40:29.260Z",
+          "sourceDigest": "55c028caadabfb148ed21e7387331988550797fc18b72ce9c225d3db00d3330c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed the measured 550-second Mining dependency installation and preserved every visual assertion, viewport, capture and timeout while applying the hosted-verified Chromium-only setup pattern. The 99 CI contracts and workflow lint pass; new-source visual acceptance remains pending.",
+          "sourceCommit": "daec8cf53ed0d0cd267943ed03722675e8bafd87"
         }
       ]
     },
@@ -1078,10 +1113,10 @@
         "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:28:44.514Z",
-      "sourceDigest": "4e0ef0d0db1c7ad336fd6c9e40e219559605bec175468142615cb03ae2ce5690",
+      "reviewedAt": "2026-11-24T15:40:40.855Z",
+      "sourceDigest": "fb1d6d1d217d06ebe6682f45e19dc4f5baec5a634a666df2b89f5eefd60c14bf",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged approved PR154 protected main into the compatibility branch, preserving PR161 completed cutover and all acceptance limitations alongside the disabled DEV/TEST source and actual112 environment/6 JavaScript/234 operations local results.",
+      "reviewReason": "Preserved main154 full pass and PR157 failed first attempt; integrated DEV/TEST adapter with candidate157 source while keeping cloud setup and all deployed acceptance outstanding.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1259,6 +1294,13 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
+          "reviewedAt": "2026-11-24T03:54:08.798Z",
+          "sourceDigest": "17beeab69a1bd5ecc470ab61ad9bb7a4a8cb9bd3d166e9c112ffbb69bdb91144",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed second-stage read-only release-plan adapter and explicit protected-main reuse opt-in; tests prove all transition/auth/provenance/concurrency bytes unchanged, rollback avoids Node setup, and failed verification emits no operation. Updated architecture, guide, operations runbook and delivery state; no merge, dispatch, permission or traffic change.",
+          "sourceCommit": "9ed8f19"
+        },
+        {
           "reviewedAt": "2026-11-24T03:54:40.183Z",
           "sourceDigest": "ac5ef10ca3de7dba141f3970d9585fee552398894c365e6996b74b214dcbe2cf",
           "reviewOutcome": "updated",
@@ -1271,6 +1313,41 @@
           "reviewOutcome": "updated",
           "reviewReason": "Restricted reflected dispatch revisions to supported public selector formats and five recorded historical names, retained service-wide platform revision attribution, and recorded the verified hosted fixture download in the delivery ledger.",
           "sourceCommit": "2c4751611cbd40ef04a85432845cd260528f5a56"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:55:09.088Z",
+          "sourceDigest": "a4a9c87824bf754b3138968e1f4bf5e19fa5dfb130277cee452626c488a0be1f",
+          "reviewOutcome": "updated",
+          "reviewReason": "Integrated measured first-PR scheduling with the separately reviewed release-plan adapter and protected-main reuse. Preserved both review histories, all production transition/auth/provenance bytes, finite migration receipt and rollback independence. Both PRs remain unmerged pending cutover and explicit approval.",
+          "sourceCommit": "f3c9074bfbaf8a8e16acf97beec0de10e68efd21"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:26:49.594Z",
+          "sourceDigest": "481cbd7c08bb666185c421c59eaaeb2f3e5881be14cb318710d738a7d493c529",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled diagnostic main source and both CI benchmark outcomes, retained the Bubble Gum cancellation, and documented the exact-base PR155 compatibility patch and its tested but unactivated environment boundary.",
+          "sourceCommit": "13e63dce475fb436934e11d2541e9cb4272f2ac9"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:28:46.338Z",
+          "sourceDigest": "98c0fc79da55c4a4b96cb2c893859cf867d53ce87d788a74d87a01817ee3fc95",
+          "reviewOutcome": "updated",
+          "reviewReason": "Merged PR154 13e63dc and diagnostics main 2c47516 documentation while preserving both parent review histories, existing release gates and the disabled PR155 strategy/compatibility deliverable. Reconciled full-main versus prepared protected-main reuse and finite legacy evidence scope; 228 operations tests and workflow lint pass. The privileged plan integration remains unmerged and unactivated pending cutover completion and explicit owner approval.",
+          "sourceCommit": "f47947cd3a849a05d2d82c09fa9fbf45cf6c55b0"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:41:03.940Z",
+          "sourceDigest": "c89f639f6794f24f00a21e8fe96419f114695be6e2068df6d8c9efbe14025d6c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the exact 559-second Arcade source and full Bubble Gum pass, separated setup savings from gameplay runtime, and retained the GitHub-confirmed Mining timeout before documenting the setup-only correction and pending new-source validation.",
+          "sourceCommit": "daec8cf53ed0d0cd267943ed03722675e8bafd87"
+        },
+        {
+          "reviewedAt": "2026-11-24T04:41:55.786Z",
+          "sourceDigest": "08ae5ba91302dbdf5e1839e7185654ceecd5789ba9dd4ee7fbd979be0c9a20e1",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reconciled daec8cf Mining setup adjustment and both parent review histories with the unchanged second-stage release-evidence policy. Guide and ledger retain the exact 559-second Arcade pass, successful Bubble Gum setup improvement and GitHub-confirmed Mining timeout, separating all prior-source results from pending follow-up validation. Existing 228-operation results cover unchanged operations code; no release transition, authority, approval or activation changed.",
+          "sourceCommit": "2b170306c4ce5596742c72c69819399dcf4022a1"
         }
       ]
     },

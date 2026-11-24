@@ -1,6 +1,7 @@
 name: Release regression contracts
 on:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/pages.yml'
       - '.github/workflows/release-regression-contracts.yml'
@@ -18,7 +19,7 @@ on:
       - 'package.json'
 permissions:
   contents: read
-# Preserve both source-head and prospective-merge evidence for protection.
+# Validate each prospective PR merge once, then integrated main independently.
 # Superseded runs still cancel within the same event and source branch.
 concurrency:
   group: release-regressions-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
