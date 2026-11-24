@@ -1,0 +1,154 @@
+{
+  "source": "1a597ab3444a03123c25651f9b09e8064fb25fac",
+  "imageId": "sha256:b2498b05703303b95e1f707d553b6c2dd09d6d92b2459df3a355646a1bbc818e",
+  "hashes": [
+    {
+      "file": "server/agent/game-assets.cjs",
+      "sha256": "7e4bbe78123991642df60a9e36d793a2e363821821af1570e9a1cbb55a259286"
+    },
+    {
+      "file": "server/quality/game-quality-evidence.cjs",
+      "sha256": "4c53cd6e978203ec54fad993b19462a88fac7d47864acdfc384dba47cb9a78f3"
+    },
+    {
+      "file": "server/sandbox/bundle-v2.cjs",
+      "sha256": "9651e4b51a341075687825e8148808b51924f8ba29c72af890cc6f29f38ba6ec"
+    },
+    {
+      "file": "server/sandbox/intent-playtest-v2.cjs",
+      "sha256": "ce2affd6f0d001a6dec8ec117e3b9720aed3de5e117a56a77c7d93262b114c14"
+    },
+    {
+      "file": "server/sandbox/language-v2.cjs",
+      "sha256": "a9f30fe33202e378f7f864eb37d2c4690a3f814f7deab29746bc8487433968c8"
+    },
+    {
+      "file": "server/sandbox/package-lock.json",
+      "sha256": "0b91bf7edbade27c761ad8d1086f6d5dee176101e1d118dc4207de5512aa2b6d"
+    },
+    {
+      "file": "server/sandbox/package.json",
+      "sha256": "78996634ad110ffe5a13625d374c8c8387e944e5a411479a12ab872f206f3cda"
+    },
+    {
+      "file": "server/sandbox/playtest-v2.cjs",
+      "sha256": "0dbb5f95244df4111bada31fa883c9789575284ad16d82dd5c13534ab0c10fa0"
+    },
+    {
+      "file": "server/sandbox/preview-v2.cjs",
+      "sha256": "a24e10aba7a6e405ed6cda59dc8253ddf757d99d1a8bb636d6f9b41db1b83f61"
+    },
+    {
+      "file": "server/sandbox/preview.cjs",
+      "sha256": "7631ba550ba04e72b744b4a4a66268d8f9987de907d148e95af331514e161e5b"
+    },
+    {
+      "file": "server/sandbox/quality-capture.cjs",
+      "sha256": "b8e1974c184ecd2ea27e159fe7e830703541c375ccce047036ff940bb1bb0b5f"
+    },
+    {
+      "file": "server/sandbox/source-validator.cjs",
+      "sha256": "4c797a05fdad754d4c9ed8a4345b18eeea36c2a1c1b77af5517448fb0a031e22"
+    },
+    {
+      "file": "server/sandbox/trusted/README.md",
+      "sha256": "f30fe958afb53eff05d5dc9717fb6af1e31a5d2affac6c7cd019fdd84bc58917"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.0/client.js",
+      "sha256": "f76ea1791aabd5940d6e0527dfa072f38e4e995408a5f8f8945696b4dc617ce1"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.0/manifest.json",
+      "sha256": "f4bc6d76ae56c8343c3d607efd32c33b22c7dba0a1718a2c5710280d78cb72ef"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.0/worker.js",
+      "sha256": "83531d04d3bb56db00fffe7b1875bb02347dcccfa090eb01ac782e959aabe66c"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.1/client.js",
+      "sha256": "f76ea1791aabd5940d6e0527dfa072f38e4e995408a5f8f8945696b4dc617ce1"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.1/manifest.json",
+      "sha256": "3067ac50e81267ca48e80bd5bd7b062a290e90b473b82fb4bd726f3320628e8a"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.1/worker.js",
+      "sha256": "a5f408800db9c22aeb30890ade26b56bad4f0f378c9e7029c53000e48cf80d41"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.2/client.js",
+      "sha256": "108df798fe7b0ec19b2298dc5fdcb091abad620a5dedac80c126bc6a75b6b304"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.2/manifest.json",
+      "sha256": "229881dff6f81d964c25184eaef7cc81d32061fe3349d587541fbffb61b4eead"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.2/worker.js",
+      "sha256": "4055d7fa47258097ae18e583fa66482644a5c951533c9a34ae76790aad1c4398"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.3/client.js",
+      "sha256": "caaa78c852a61fb773a670d06006d901c22e9aaeb4f41f8c5b8472643836b62f"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.3/manifest.json",
+      "sha256": "d701b8b43fc82aae773f5262313261a1e5b9a2969273000821f7bb9800c2177c"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.0.3/worker.js",
+      "sha256": "85707524dc0d8fb01c64b023c0db7a29a420f40b82cfae42ec9728db092a1e95"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.1.0/client.js",
+      "sha256": "847e3ad941061bab51dabc8f6ff4e4d4a7b8a2b074bd450c2dbcdceb345e3775"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.1.0/manifest.json",
+      "sha256": "f6efda3d75da2721092abfacdf0972f6c0834de6fa48e8f7f5edfdc13b141e1c"
+    },
+    {
+      "file": "server/sandbox/trusted/quality-runtime-v2.1.0/worker.js",
+      "sha256": "172ad1a651d14b4f7bde5c0e5ea5c33395980bd5cdb482209314eb0fe5d6293b"
+    },
+    {
+      "file": "server/sandbox/worker.cjs",
+      "sha256": "95a58fa3876f7e41e705fd46448a977806f0585db63bc5cff7a77ee6b7f681bf"
+    }
+  ],
+  "results": [
+    {
+      "name": "legacy",
+      "inputHash": "b0757ddc32f067d53a5be106416d911ee1a20a44e9e2c783d9667dd4ed95f3a7",
+      "tests": {
+        "desktop": true,
+        "mobile": true,
+        "replay": true,
+        "isolation": true
+      },
+      "elapsedMs": 2643
+    },
+    {
+      "name": "premium",
+      "inputHash": "d5da0ada314b27757e7e9f9dcd53de1dd27599b7f2b491749c04f1ec2be20250",
+      "tests": {
+        "desktop": true,
+        "mobile": true,
+        "replay": true,
+        "isolation": true,
+        "input": true,
+        "resources": true,
+        "pause": true
+      },
+      "evidenceHash": "0cbe9a29f31ba5ed694d20dbd84b463eb74c4378a9aa90caef77590b7f74caff",
+      "elapsedMs": 22799
+    }
+  ],
+  "paidCalls": 0,
+  "published": false,
+  "build": "clean Dockerfile; locked npm dependencies; upstream browser download",
+  "isolation": "Docker packaging smoke; production gVisor acceptance remains separate"
+}

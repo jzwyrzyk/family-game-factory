@@ -728,10 +728,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T20:56:02.378Z",
-      "sourceDigest": "07ac045ad1ddcbac26ae164046c04fe73a39a629cbacc8e7e2894231eb03c8eb",
+      "reviewedAt": "2026-11-24T21:03:59.475Z",
+      "sourceDigest": "a7748aa2cc821639c57f194a3393e9938b763f708217921d7acfd51afc79fb2f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final sandbox byte-check file list, preserved immutable runtime archives and source-label verification; all admission, serial execution and capture-policy changes remain offline except lossless screenshot-label deduplication.",
+      "reviewReason": "Reviewed atomic normal-motion evidence sampling after the offline paused-frame race; preserved source/frame/state identities and originals, and explicitly retained production eight-image policy and paid serial/full-job behavior.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T20:55:36.466Z",
-      "sourceDigest": "e3cd6d4e8c545d745a564a26ab91275d8eb802a3a3e98bff4170c3ce85dcd73b",
+      "reviewedAt": "2026-11-24T21:04:00.001Z",
+      "sourceDigest": "98447857529890e9cbb50fe3661a63b4f4c487a4c3257304148cee1263d19186",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved all 99 prior Arcade commands and added the independent adversarial/contact-sheet prototype as command 100; validated exact original-group coverage plus clean unpublished sandbox source-byte/protocol proof.",
+      "reviewReason": "Verified final offline adversarial matrix detects 15 broken sessions with three working controls, keeps 108 original PNG identities and compares full/lossy sheets; recorded clean hosted image actual-byte and legacy/premium proof without claiming gVisor/provider acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T20:55:36.904Z",
-      "sourceDigest": "4d2137e29b52a6f631896e3d867339658c845ca2fcc32d9be0c07c20c10cc4d7",
+      "reviewedAt": "2026-11-24T21:04:00.637Z",
+      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed added clean sandbox workflow and command 100 against unchanged stable aggregates, disabled DEV TEST and production release policy; completion handoff distinguishes local failures, offline evidence and pending hosted source.",
+      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

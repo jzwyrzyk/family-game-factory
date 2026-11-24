@@ -53,22 +53,26 @@ async function main(){
     await page.setContent(html);await page.getByRole('button',{name:'Play!',exact:true}).click();
     await page.waitForFunction(()=>Number(document.querySelector<HTMLElement>('#game')?.dataset.ticks)>2);
     if(name==='brokenTouch'&&device==='tablet')await page.locator('#controls').evaluate(el=>(el as HTMLElement).style.pointerEvents='none');
-    const receipts:any[]=[],failures:string[]=[];
+    const receipts:any[]=[],failures:string[]=[],captures:any[]=[];
     let before=await state(page);
     const shot=async(label:string,s:Snapshot)=>{
-     // Bind pixels and renderer commands at one stable frame. This offline
-     // pause capture is distinct from production's normal-motion evidence.
-     const freeze=s.status==='playing';
-     if(freeze){await page.getByRole('button',{name:'Pause',exact:true}).click();s=await state(page);}
-     const bytes=await page.locator('#game').screenshot();
+     // Read actual canvas pixels and the latest simulation snapshot in the
+     // same browser task. The normal renderer interpolates positions, so the
+     // snapshot is associated state, not a claim of pixel/command equivalence.
+     const sample=await page.locator('#game').evaluate(canvas=>({
+      png:(canvas as HTMLCanvasElement).toDataURL('image/png').split(',')[1],
+      state:{status:document.querySelector('#status')!.getAttribute('data-state')!,
+       commands:JSON.parse((canvas as HTMLElement).dataset.snapshot||'[]'),
+       ticks:Number((canvas as HTMLElement).dataset.ticks),inputs:Number((canvas as HTMLElement).dataset.inputs)}
+     }));
+     s=sample.state;const bytes=Buffer.from(sample.png,'base64');
      const id=name+'-'+device+'-'+label;writeFileSync(directory+'/'+id+'.png',bytes);
      const record={id,device,sourceHash:hash(source),htmlHash:hash(html),assetsHash:assetPackHash(assets),tick:s.ticks,
-      stateHash:hash(JSON.stringify(s.commands)),frameState:s,pausedForCapture:freeze,
+      stateHash:hash(JSON.stringify(s.commands)),frameState:s,frameMode:'normal-motion-interpolated',
       hostFault:name==='brokenTouch'&&device==='tablet'?'controls-pointer-events-none':null,
       sha256:hash(bytes),path:id+'.png'};
-     assert.deepEqual((await state(page)).commands,s.commands,'capture changed after frame binding');
-     if(freeze)await page.getByRole('button',{name:'Resume',exact:true}).click();
      if(name==='good')originals.push(record);
+     captures.push(record);
      return record;
     };
     let prior=await shot('initial',before);
@@ -97,7 +101,7 @@ async function main(){
     }
     const detected=failures.length>0;
     assert.equal(detected,name!=='good'&&!(name==='brokenTouch'&&device==='desktop'),name+'/'+device);
-    results.push({name,device,sourceHash:hash(source),htmlHash:hash(html),detected,failures,receipts,
+    results.push({name,device,sourceHash:hash(source),htmlHash:hash(html),detected,failures,receipts,captures,
      evidenceBoundary:'independent authored expectations; no model judgment; touch defect injected in host controls'});
     await context.close();
    }
