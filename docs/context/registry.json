@@ -860,13 +860,14 @@
         "tools/**",
         "scripts/verify-brand-assets.mjs",
         "scripts/tests/verify-pal-assets.test.mjs",
-        "scripts/ci/**"
+        "scripts/ci/**",
+        "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:35:33.859Z",
-      "sourceDigest": "8fdbe2887987cce7df71db5ec9f8a5be58bd064502218c066a50ae412a09a6fb",
+      "reviewedAt": "2026-11-24T15:55:17.817Z",
+      "sourceDigest": "e9067f7b6698426cc015532ef440e35f6075592a72d72e9177888db244f9a777",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded actual protected-main full validation and preserved PR157 first-attempt documentation failure; executable selection remains advisory and approval pending.",
+      "reviewReason": "Installed the shared DEV/TEST full-evidence verifier and mandatory negative tests, documented approved CI activation and unchanged96-command coverage, and retained all failed-attempt and narrow-coverage limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1097,13 +1098,14 @@
         "vite.config.ts",
         ".dockerignore",
         ".gitignore",
-        "DELIVERY-STATE.md"
+        "DELIVERY-STATE.md",
+        "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:35:34.240Z",
-      "sourceDigest": "2b99064682418d30b12c2ac6a27fa0d8f0c4f85e95b2e700203df404a5b56b94",
+      "reviewedAt": "2026-11-24T15:55:18.228Z",
+      "sourceDigest": "c4de44b3065c2d848464a5a11b44e6f7f0c7235b2c055783ca8f3e9ab8479c3f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed added installed performance-baseline contract and current operation coverage; delivery records main success, unactivated PR157, unchanged cutover gaps, and failed stale-review attempt.",
+      "reviewReason": "Recorded explicit PR157 approval and matching merge tree, hosted full receipt and pending main demonstration; shared repository adapter is distinct from disabled PR155 cloud/controller deployment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1357,10 +1359,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:12:05.993Z",
-      "sourceDigest": "0fdb289200a048e83ee3e9691c0927be0886e266c7221687baec14577a373792",
+      "reviewedAt": "2026-11-24T15:55:36.254Z",
+      "sourceDigest": "976d574b7aef922f048c73bc011624233588ce7f8ae4233c7dd3adf6f97350f2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the PR template addition requiring exact CI identities, selection scope,96-command coverage, first-attempt outcomes and measured performance against the existing evidence guide; routing and maintenance authority remain unchanged.",
+      "reviewReason": "Routed the shared environment evidence verifier into validation and delivery source review; maintenance now identifies its mandatory negative checks and prohibits divergent success-only controller checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
