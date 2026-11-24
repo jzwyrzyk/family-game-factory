@@ -71,7 +71,7 @@ class EvidenceTests(unittest.TestCase):
     def test_private_coach_post_and_preview_error(self):
         for service, route, count in (("factory-coach-private", "/v1/private-coach/complete", 1),
                                      ("factory-preview", "[other]", 0)):
-            scope = {**SCOPE, "service": service, "revision": service + "-abc"}
+            scope = {**SCOPE, "service": service, "revision": service + "-00001-abc"}
             row = entry(503, service=service, revision=scope["revision"], route=route)
             result = evidence.verified_result(complete([row], scope), scope, NOW)
             self.assertEqual(result["counts"]["coach_5xx"], count)
@@ -164,6 +164,7 @@ class EvidenceTests(unittest.TestCase):
 
     def test_invalid_dispatch_input_never_printed_or_queried(self):
         for k, value in [("revision", "factory-preview-abc"), ("revision", SECRET + "?"),
+                         ("revision", "factory-gateway-" + SECRET),
                          ("revision", REVISION + "\n" + SECRET), ("revision", "factory-gateway-abc-"),
                          ("revision", "factory-gateway-" + "a" * 64), ("service", SECRET), ("route", SECRET),
                          ("start_utc", "2026-12-41T02:19:00Z"), ("end_utc", SCOPE["start_utc"]),
@@ -178,6 +179,20 @@ class EvidenceTests(unittest.TestCase):
             self.assertNotEqual(code, 0)
             self.assertEqual(report["query_status"], "NOT_CHECKED")
             self.assertIsNone(report["scope"])
+
+    def test_public_selectors_and_cloud_returned_revision_names(self):
+        for revision in evidence.LEGACY_SELECTORS | {REVISION, "factory-preview-00001-z9k"}:
+            service = next(k for k in evidence.ROUTES if revision.startswith(k + "-"))
+            query = evidence.query_scope({**self.env, "INPUT_SERVICE": service, "INPUT_REVISION": revision}, NOW)
+            self.assertEqual(query["revision"], revision)
+            other = next(k for k in evidence.ROUTES if k != service)
+            with self.assertRaises(evidence.InvalidEvidence):
+                evidence.query_scope({**self.env, "INPUT_SERVICE": other, "INPUT_REVISION": revision}, NOW)
+        broad = "factory-gateway-approved-custom-build"
+        self.assertFalse(evidence.allowed_selector(SERVICE, broad))
+        scope = {**SCOPE, "revision": None}
+        data = evidence.verified_result(complete([entry(revision=broad)], scope), scope, NOW)
+        self.assertEqual(data["requests"][0]["revision"], broad)
 
     def test_validate_seeds_not_checked(self):
         fetch = Mock()
@@ -230,6 +245,7 @@ class EvidenceTests(unittest.TestCase):
     def test_schema_route_method_and_reason_enums_match_consumer(self):
         schema = json.loads((Path(__file__).resolve().parents[2] / "ops/request-evidence.schema.json").read_text())
         defs = schema["$defs"]
+        self.assertEqual(set(defs["selector"]["oneOf"][1]["enum"]), evidence.LEGACY_SELECTORS)
         self.assertEqual(set(defs["service"]["enum"]), set(evidence.ROUTES))
         self.assertEqual(set(defs["method"]["enum"]), evidence.METHODS)
         self.assertEqual(set(defs["gatewayRoute"]["enum"]) | {"[other]"}, evidence.ROUTES["factory-gateway"])

@@ -18,7 +18,7 @@ SPEC = importlib.util.spec_from_file_location("request_evidence_broker", ROOT / 
 broker = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(broker)
 SERVICE = "factory-gateway"
-REVISION = "factory-gateway-offline-fixture"
+REVISION = "factory-gateway-r-00000000000000000000"
 SCOPE = {"service": SERVICE, "revision": REVISION,
          "start_utc": "2000-01-01T00:00:00Z", "end_utc": "2000-01-01T00:30:00Z"}
 OBSERVED = datetime(2000, 1, 1, 1, tzinfo=timezone.utc)

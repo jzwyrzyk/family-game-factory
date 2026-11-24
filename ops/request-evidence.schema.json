@@ -19,10 +19,15 @@
         "required": ["service","revision","start_utc","end_utc"],
         "properties": {
           "service": {"$ref":"#/$defs/service"},
-          "revision": {"oneOf":[{"$ref":"#/$defs/revision"},{"type":"null"}]},
+          "revision": {"oneOf":[{"$ref":"#/$defs/selector"},{"type":"null"}]},
           "start_utc": {"$ref":"#/$defs/second"},
           "end_utc": {"$ref":"#/$defs/second"}
-        }
+        },
+        "oneOf": [
+          {"properties":{"service":{"const":"factory-gateway"},"revision":{"pattern":"^factory-gateway-"}}},
+          {"properties":{"service":{"const":"factory-preview"},"revision":{"pattern":"^factory-preview-"}}},
+          {"properties":{"service":{"const":"factory-coach-private"},"revision":{"pattern":"^factory-coach-private-"}}}
+        ]
       }]
     },
     "observed_at_utc": {"$ref":"#/$defs/second"},
@@ -121,7 +126,16 @@
     "count":{"type":"integer","minimum":0,"maximum":1000},
     "status":{"type":"integer","minimum":100,"maximum":599},
     "service":{"enum":["factory-gateway","factory-preview","factory-coach-private"]},
-    "revision":{"type":"string","maxLength":63,"pattern":"^factory-(gateway|preview|coach-private)-[a-z0-9]([a-z0-9-]*[a-z0-9])?$"},
+    "revision":{"type":"string","maxLength":63,"not":{"pattern":"[^a-z0-9-]"},"pattern":"^factory-(gateway|preview|coach-private)-[a-z0-9]([a-z0-9-]*[a-z0-9])?$"},
+    "selector":{
+      "type":"string","maxLength":63,"not":{"pattern":"[^a-z0-9-]"},
+      "oneOf":[
+        {"pattern":"^factory-(gateway|preview|coach-private)-(r-[0-9a-f]{20}|[0-9]{5}-[a-z0-9]{3})$"},
+        {"enum":["factory-gateway-pr115-19f5e46ae114-fb5fa6","factory-gateway-workerpin-dddf53db-mwq1mbz7-e99f",
+                 "factory-coach-private-chatready-1996c1b382a7-9c98a0","factory-coach-private-chatdiag-b4734b1323de-a14b8b",
+                 "factory-coach-private-pr115-19f5e46ae114-fb5fa6"]}
+      ]
+    },
     "method":{"enum":["GET","HEAD","POST","PUT","DELETE","OPTIONS","PATCH","CONNECT","TRACE"]},
     "route":{"oneOf":[{"$ref":"#/$defs/gatewayRoute"},{"$ref":"#/$defs/privateRoute"},{"enum":["/preview/{id}","[other]"]}]},
     "gatewayRoute":{"enum":["/health","/v1/coach","/v1/coach/status","/v1/coach/erase","/v1/coach/audio","/v1/coach/audio/status","/v1/coach/narration","/v1/coach/narration/status"]},

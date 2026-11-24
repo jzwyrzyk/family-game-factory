@@ -38,6 +38,16 @@ ROUTES = {
     }),
 }
 METHODS = frozenset({"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "CONNECT", "TRACE"})
+# Exact custom revision names from the Nov 20–23 serving and rollback receipts
+# in DELIVERY-STATE.md. Other custom names can still appear as service-wide
+# observations from the verified platform, never as caller-supplied selectors.
+LEGACY_REVISIONS = frozenset({
+    "factory-gateway-pr115-19f5e46ae114-fb5fa6",
+    "factory-gateway-workerpin-dddf53db-mwq1mbz7-e99f",
+    "factory-coach-private-chatready-1996c1b382a7-9c98a0",
+    "factory-coach-private-chatdiag-b4734b1323de-a14b8b",
+    "factory-coach-private-pr115-19f5e46ae114-fb5fa6",
+})
 UTC_SECONDS = r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
 PAGE_SIZE = 100
 MAX_PAGES = 20
@@ -75,11 +85,18 @@ def valid_revision(service, name):
             and re.fullmatch(re.escape(service) + r"-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", name) is not None)
 
 
+def allowed_selector(service, name):
+    if not valid_revision(service, name):
+        return False
+    suffix = name[len(service) + 1:]
+    return name in LEGACY_REVISIONS or re.fullmatch(r"(?:r-[0-9a-f]{20}|[0-9]{5}-[a-z0-9]{3})", suffix) is not None
+
+
 def validate_scope(value, now):
     require(isinstance(value, dict) and set(value) == {"service", "revision", "start_utc", "end_utc"}, "INVALID_SCOPE")
     service, revision = value["service"], value["revision"]
     require(isinstance(service, str) and service in ROUTES, "INVALID_SCOPE")
-    require(revision is None or valid_revision(service, revision), "INVALID_SCOPE")
+    require(revision is None or allowed_selector(service, revision), "INVALID_SCOPE")
     start = instant(value["start_utc"], "INVALID_SCOPE")
     end = instant(value["end_utc"], "INVALID_SCOPE")
     require(start < end <= now and end - start <= timedelta(hours=1), "INVALID_SCOPE")

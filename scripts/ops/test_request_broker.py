@@ -139,6 +139,21 @@ class BrokerTests(unittest.TestCase):
         self.assertEqual(self.run_pages([], {**SCOPE, "end_utc": "2026-11-24T02:46:00Z"})["reason"], "INGESTION_DELAY")
         self.factory.assert_not_called()
 
+    def test_selectors_require_public_formats_or_recorded_legacy_receipts(self):
+        for revision in [CANDIDATE, BASELINE, "factory-gateway-00008-tbk", "factory-gateway-r-" + "0" * 20]:
+            result = self.run_pages([{}], {**SCOPE, "revision": revision})
+            self.assertEqual(result["query_status"], "COMPLETE")
+        for revision in ["factory-gateway-" + SECRET, "factory-coach-private-pr115-19f5e46ae114-fb5fa6",
+                         "factory-gateway-000009-tbk", "factory-gateway-r-" + "f" * 19]:
+            result = self.run_pages([], {**SCOPE, "revision": revision})
+            self.assertEqual((result["query_status"], result["scope"]), ("NOT_CHECKED", None))
+            self.assertNotIn(revision, json.dumps(result))
+        # Actual revision metadata on a service-wide read comes from the
+        # separately verified platform resource, independent of selectors.
+        revision = "factory-gateway-custom-legacy"
+        result = self.run_pages([{"entries": [entry(revision=revision)]}], {**SCOPE, "revision": None})
+        self.assertEqual(result["rows"][0]["revision"], revision)
+
     def test_predating_reviewed_coverage_and_expiry_preserve_only_observed_rows(self):
         for override in [{"JEMS_VERIFIED_UNTIL_UTC": "2026-11-24T03:00:00Z"},
                          {"JEMS_COVERAGE_START_UTC": "2026-11-24T02:25:00Z"},

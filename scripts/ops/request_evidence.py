@@ -26,6 +26,12 @@ ROUTES = {
                                        "[other]")),
 }
 METHODS = {"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "CONNECT", "TRACE"}
+# Exact pre-controller revision names documented by the production release receipts.
+LEGACY_SELECTORS = {
+    "factory-gateway-pr115-19f5e46ae114-fb5fa6", "factory-gateway-workerpin-dddf53db-mwq1mbz7-e99f",
+    "factory-coach-private-chatready-1996c1b382a7-9c98a0", "factory-coach-private-chatdiag-b4734b1323de-a14b8b",
+    "factory-coach-private-pr115-19f5e46ae114-fb5fa6",
+}
 COMPLETIONS = {"factory-gateway": "/v1/coach", "factory-coach-private": "/v1/private-coach/complete"}
 ROW_KEYS = {"timestamp_utc", "service", "revision", "method", "route", "status"}
 FLAGS = {"pagination_exhausted", "truncated", "permissions_verified", "coverage_verified", "ingestion_delay_assessed"}
@@ -61,6 +67,13 @@ def valid_revision(service, revision):
             and re.fullmatch(re.escape(service) + r"-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", revision))
 
 
+def allowed_selector(service, revision):
+    # A caller-controlled label is public even on a denied request. Accept only
+    # release hashes, native revision numbers, or a previously published exact name.
+    return valid_revision(service, revision) and (revision in LEGACY_SELECTORS or re.fullmatch(
+        re.escape(service) + r"-(?:r-[0-9a-f]{20}|[0-9]{5}-[a-z0-9]{3})", revision))
+
+
 def query_scope(env, now):
     if env.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
         # GitHub logs inline step env assignments. Read dispatch inputs from the
@@ -74,7 +87,7 @@ def query_scope(env, now):
         inputs = {key: env.get("INPUT_" + key.upper(), "") for key in INPUT_KEYS}
     service = inputs["service"]
     revision = inputs.get("revision", "")
-    require(service in ROUTES and (revision == "" or valid_revision(service, revision)))
+    require(service in ROUTES and (revision == "" or allowed_selector(service, revision)))
     start = utc(inputs["start_utc"])
     end = utc(inputs["end_utc"])
     require(timedelta(0) < end - start <= timedelta(hours=1) and end <= now)

@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:29:41.280Z",
-      "sourceDigest": "dec4e2eec97ff4fbca5dfc3132241e04dda12c91383822aa11c99786a70755a5",
+      "reviewedAt": "2026-11-24T03:35:44.656Z",
+      "sourceDigest": "181785b1cc9ec3bd8de726a6a289600718f744e7ec9df2c007bbbae47ba98268",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed dedicated protected-main diagnostics, view-only broker access, strict reporting, privacy fixtures and unchanged release controls. Updated request-evidence setup, retrieval, architecture and ledger to distinguish source, IAM, retained coverage and live acceptance.",
+      "reviewReason": "Restricted reflected dispatch revisions to supported public selector formats and five recorded historical names, retained service-wide platform revision attribution, and recorded the verified hosted fixture download in the delivery ledger.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
