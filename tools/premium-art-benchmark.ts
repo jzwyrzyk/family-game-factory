@@ -13,6 +13,9 @@ import {validateCompiled,type GeneratedGame} from '../server/agent/generated';
 import {qualityEvidenceHash,validateQualityEvidence} from '../server/quality/game-quality';
 import {renderGeneratedV2} from '../server/sandbox/preview-v2.cjs';
 import {INITIAL_PREMIUM_MODELS,premiumModelRates,premiumJobReserve,type ModelStage,type PremiumApproval} from '../server/agent/model-policy';
+import {draftChildIntentContract} from '../server/quality/child-intent';
+import {chooseGameForm} from '../server/quality/game-form';
+import {createFunctionalGameContract,type FunctionalProbe} from '../server/quality/functional-game-contract';
 import {fixedInputBound} from '../server/agent/generation-contract';
 const sha=(b:Buffer|string)=>createHash('sha256').update(b).digest('hex');
 export function fixtureApproval():PremiumApproval{
@@ -25,6 +28,26 @@ export function fixtureApproval():PremiumApproval{
  })) as PremiumApproval['stages'];
  return {version:'adult-astra-high-v1',enabled:true,approvalId:'offline-only',stages,maxRepairAttempts:1,
   images:{approvalId:'synthetic-images',enabled:true,model:'offline-image-fixture',maxImages:2,maxMicroUsdPerImage:50000,priceReviewedOn:today,sheetFormat:'rgba8-png-grid-v1'}};
+}
+// Use the other entrance from the capture route and check the visible junctions.
+// A legitimate return to the start can look unchanged to a generic input probe.
+function horseRouteContract(request:string){
+ const intent=draftChildIntentContract(request);
+ const probe:FunctionalProbe={
+  id:'return-and-find-ribbon',covers:['rider','paths','reward'],deterministicReplay:true,
+  actions:(['right','right','left','right','right'] as const).map(button=>({kind:'hold',button,frames:48})),
+  checkpoints:[
+   {after:0,outcome:'playing',observations:[{kind:'visible',key:'rider'},{kind:'hidden',key:'plank0'}]},
+   {after:1,outcome:'playing',observations:[{kind:'visible',key:'plank0'}]},
+   {after:2,outcome:'playing',observations:[{kind:'hidden',key:'plank0'},{kind:'visible',key:'board0'}]},
+   {after:4,outcome:'playing',observations:[{kind:'visible',key:'bloom0'},{kind:'hidden',key:'prize'}]},
+   {after:5,outcome:'won',observations:[{kind:'visible',key:'prize'},{kind:'visible',key:'rider'}]}
+  ]
+ };
+ return createFunctionalGameContract(intent,chooseGameForm(intent),[
+  {id:'rider',quote:'Show its ears and head'},{id:'paths',quote:'take different paths'},
+  {id:'reward',quote:'find the valley ribbon'}
+ ],[probe]);
 }
 async function trial(id:ArtCase,directory:string) {
  const sourceCommit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -60,11 +83,13 @@ async function trial(id:ArtCase,directory:string) {
  assert.equal(imageRequests,2);assert.ok('imageUsageUnits' in result);assert.equal(result.imageUsageUnits,100000);
  assert.equal(game.assets?.assets.length,1+sample.proposal.artDirection.subjects.length);
  mark('assembled candidate');
- const raw=JSON.parse(execFileSync(process.execPath,['server/sandbox/worker.cjs'],{input:JSON.stringify({game,captureQuality:true}),
+ const independentIntentPlan=id==='horse'?horseRouteContract(sample.request):undefined;
+ const raw=JSON.parse(execFileSync(process.execPath,['server/sandbox/worker.cjs'],{input:JSON.stringify({game,captureQuality:true,independentIntentPlan}),
   env:{HOME:'/tmp',PATH:process.env.PATH,WORKER_BROWSER_PATH:process.env.CHROMIUM_PATH||chromium.executablePath()},
   timeout:300000,maxBuffer:10*1024*1024}).toString());
  assert.equal(raw.ok,true,raw.diagnostics);
  const tested=validateCompiled(game,raw.game),e=validateQualityEvidence(tested,raw.qualityEvidence);
+ if(independentIntentPlan)assert.equal(tested.compiled!.tests.intent,true);
  mark('isolated browser test and capture');
  const dir=join(directory,id);mkdirSync(dir,{recursive:true});
  for(const c of e.captures)writeFileSync(join(dir,c.id+'.png'),Buffer.from(c.data,'base64'));
@@ -90,7 +115,7 @@ async function trial(id:ArtCase,directory:string) {
   return total+b.inputBound*policy.inputUsdPerMillion+policy.maxOutputTokens*policy.outputUsdPerMillion;
  },100000);
  verifySource();
- const receipt={schedules,firstPassMicroUsd,workerTimingsMs:raw.timings,version:'premium-art-trial-v1',sourceCommit,id,
+ const receipt={independentRoute:independentIntentPlan&&{source:independentIntentPlan.sourceSha256,probes:independentIntentPlan.probes},schedules,firstPassMicroUsd,workerTimingsMs:raw.timings,version:'premium-art-trial-v1',sourceCommit,id,
   pairedCase:sample.pairedCase,requestHash:sha(sample.request),fixtureHash:sha(JSON.stringify(sample.proposal)),sourceHash:e.sourceHash,
   codeHash:e.codeHash,runtimeHash:e.runtimeHash,artifactHash:e.artifactHash,assetsHash:tested.compiled!.assetsHash,htmlHash:sha(html),
   dependencies:sha(readFileSync('package-lock.json')),sandboxDependencies:sha(readFileSync('server/sandbox/package-lock.json')),
