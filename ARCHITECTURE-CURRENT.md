@@ -82,6 +82,8 @@ Actions repair feedback preserves all allowlisted quality findings and the valid
 
 ### Adult Private premium game builder
 
+Premium admission reads a separate private whole-job ceiling of up to 5,000,000 micro-USD. The gateway compares the actual stage reservation with that ceiling and the current family allowance in the existing admission path. Queued jobs carry their original reservations. Legacy admission retains its configured ceiling up to 1,000,000 micro-USD. [Testing decision and activation package](docs/game-intelligence/premium-benchmark/NOVEMBER-26.md)
+
 PR139 now integrates the disabled DEV/TEST foundation and shared exact-source CI verifier. Premium image labels avoid repeated metadata while preserving original evidence and all captures. Staged admission, durable scheduling and contact sheets remain offline feasibility tools, never production import paths. The clean hosted sandbox package check uses no publication permission. [Completion and activation boundaries](docs/game-intelligence/premium-benchmark/COMPLETION.md)
 
 New premium plans carry source-bound art-direction-v1. The private producer can extract a separately approved transparent sheet into independently decodable game-assets-v1 sprites. The renderer consumes the same IDs and raster format as older saved games. One scene and one sheet occupy two provider slots, even when a sheet has several poses. The staged benchmark joins exact code and art identities offline. Paid stages remain serial. [Artwork pilot and release gates](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
