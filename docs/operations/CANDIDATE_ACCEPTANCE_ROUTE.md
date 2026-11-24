@@ -1,0 +1,43 @@
+# Gateway candidate acceptance route — proposed, not activated
+
+The existing 5% Gateway canary has observed status/unlock successes but no attributed conversation POST in the owner-supplied evidence. The successful November 24 07:06 EST conversation reached the baseline. This proposal makes one authenticated candidate conversation deterministic. It does not accept the candidate, install diagnostics, promote traffic or publish Pages.
+
+## Exact additional scope requiring owner approval
+
+| Item | Proposed value |
+| --- | --- |
+| Service | `factory-gateway`, project `family-game-factory-jzw`, `us-east5` |
+| Candidate | `factory-gateway-r-eaf5effa06d031818f52` |
+| Publication/application source | `aa56b60abe152e750f9f0b5e8949bdb44be53196` |
+| Temporary fixed revision tag | `jems-acceptance-eaf5effa06d031818f52` |
+| Normal service traffic | Retain baseline95/candidate5 during acceptance |
+| Authentication addition | One temporary trusted family device named `Jems candidate acceptance`, enrolled by the owner using the existing one-use invitation and parent passphrase flow |
+| Paid action | One explicit Adult conversation turn using a new synthetic game idea, under the current allowance; no Build, automatic replay or budget increase |
+| Cleanup | Disable local override, revoke only the new test device, and remove only the fixed tag through protected-main release intent |
+
+The tag exposes another HTTPS address for the already-public Gateway candidate, with the existing application authentication and Origin checks. It accepts direct requests independently of the service's percentage split. Existing IAM, federation, secret access, runtime images/configuration, other tags, original device grants and production Pages origins stay unchanged. Do not activate until the owner approves this specific routing and temporary-device scope. The original instruction to escalate new trust/routing changes is the reason for this approval; paid-testing approval alone did not install this path.
+
+## Reviewed controller behavior
+
+The inactive implementation adds `acceptance-route-add` and `acceptance-route-remove` intent operations to the existing protected-main Cloud Run workflow. No workflow trust changes are needed. The operations retain the exact source/image/configuration/compatibility fields and signed-image validation. The new tag name is derived from the pinned candidate identity, not supplied freely.
+
+Adding requires Gateway, baseline95/candidate5, matching declared/effective allocation, current latest candidate, both pinned ready revisions, configuration fingerprint, reconciled tags and an etag. A conflicting existing tag fails closed. The PATCH changes only the traffic array to append a zero-percent tagged target while retaining normal percentages and every other tag. Postchecks require the same normal allocation/configuration and exact expected tag set. Repeating the same operation is idempotent.
+
+Removal is restricted to the same computed tag on the same candidate and recognized canary, promoted or recovered allocations. It preserves the current recognized allocation and other tags. Candidate readiness is not required to remove a test route after failure. Image/source validation in the workflow and baseline/configuration checks still apply. An unexpected state stops for investigation; there is no unguarded cleanup override.
+
+The read-only observer recognizes both intents and verifies tag presence/absence. Historical activation executor hashes are unchanged. Its original release-controller bytes are retained as a hashed fixture; later source must still fail that historical IAM activation gate.
+
+## Execution after approval and successful hosted checks
+
+1. Merge the inactive controller PR through protected main. This does not alter `ops/release.json`, which is the release workflow's push trigger. Read fresh service metadata and ensure the pinned predecessor still holds.
+2. Prepare a separate protected-main intent PR changing only `operation` to `acceptance-route-add`, retaining every other current pin. Review its concrete diff, pass required checks and merge. Verify the actual workflow receipt, unchanged95/5 and the exact tag mapping. Obtain the actual tagged HTTPS URL from Cloud Run; do not rely on a guessed hostname.
+3. In the owner's original production browser, use Parent Controls to issue one existing ten-minute device invitation. Keep the invitation and parent passphrase out of chat, GitHub, logs and screenshots.
+4. Use a separate temporary browser profile with no saved Jems work. Open the existing production Pages URL. In its developer tools, use a local response override for **only** `factory-config.json`, preserving its existing JSON fields and changing only `apiBaseUrl` to the observed candidate tag URL. This is an owner-side local browser setting; do not deploy the override or alter production Pages. Reload with the override active and verify the config response and outgoing Gateway hostname before entering credentials. Do not override scripts, cookies, headers, Origin, CORS, CSP or authentication failures. If the browser cannot apply this supported override, stop and reassess.
+5. Use the existing Trust this device form with device name `Jems candidate acceptance`. The owner enters the invitation and existing parent passphrase directly. Unlock Adult using the normal UI. Do not copy cookies or the in-memory Adult proof between hosts. Host-only cookies are why the original trusted-device session cannot automatically authenticate the new hostname.
+6. Send one short synthetic game idea in Adult chat and verify the actual reply. On timeout, ambiguous response or rejection, stop without replay. Collect only static route, method, status, latency, exact revision and UTC timestamp. Review all candidate request statuses over a fixed settled interval around the test, including errors. An OPTIONS or status GET does not satisfy conversation acceptance. UI success and candidate POST200 must agree; missing coverage remains an explicit limit.
+7. Disable the override and close the temporary profile. From the original trusted browser, revoke only `Jems candidate acceptance`. Prepare and merge the separate `acceptance-route-remove` intent through the same protected workflow and verify tag removal, recovery baseline and95/5. This cleanup does not delete the owner's saved games or other devices. Record any synthetic test record retained by normal service policy.
+8. Only after conversation/error acceptance and cleanup, refresh PR152 on protected main, preserve pins and required checks, merge and verify Gateway100 plus retained baseline and Coach100. Continue the existing Preview/pending-work/retained-games gates, then dispatch Pages from exactly the approved source/origins with build and all eight shards successful. Complete live acceptance and final delivery receipts.
+
+## Verification limits
+
+Source tests cover traffic/tag preservation, idempotence, conflicting tags, changed configuration/allocation/candidate, unhealthy-candidate cleanup and post-update verification. They do not prove Google will admit the mutation, browser local override usability, enrollment availability, real-provider success or saved-work preservation. This proposal's owner-side browser procedure has not run. An inability to complete enrollment or local configuration is a blocker, not authority to weaken authentication. Production has not acquired this route merely because the code or plan exists.

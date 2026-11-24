@@ -1,5 +1,9 @@
 # jems delivery state
 
+## November 24, 2026 — deterministic Gateway acceptance route prepared, inactive
+
+A [bounded candidate route proposal](docs/operations/CANDIDATE_ACCEPTANCE_ROUTE.md) prepares add/remove operations through the existing protected-main release workflow, preserving normal95/5 and every other tag. The current release intent is unchanged. Source tests pass230 operations checks, including7 new route/observation cases. The original activation executor hashes remain unchanged with its approved controller bytes preserved as a fixture. These are offline results; hosted checks, specific routing/temporary-device approval and live acceptance remain pending. No route, new device, paid request, promotion or Pages publication is performed by this preparation. PR159 holds the separate owner-supplied request and routing evidence; the successful07:06 EST conversation is attributed to the baseline, not the candidate.
+
 ## November 24, 2026 — Gateway request evidence pending
 
 The [Gateway canary release](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45311336437) completed its traffic transition at `2026-11-24T02:19:11.8337405Z`. The [later metadata observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45316092264) reported 95% baseline and 5% candidate at `02:57:52.821478Z`. The exact candidate is `factory-gateway-r-eaf5effa06d031818f52`. [PR149](https://github.com/jzwyrzyk/family-game-factory/pull/149) records the transition. [PR152](https://github.com/jzwyrzyk/family-game-factory/pull/152) holds promotion for request acceptance. Candidate `POST /v1/coach` timestamps, statuses and the candidate 5xx count are **NOT_CHECKED** here.

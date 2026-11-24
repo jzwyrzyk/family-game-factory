@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:35:44.656Z",
-      "sourceDigest": "181785b1cc9ec3bd8de726a6a289600718f744e7ec9df2c007bbbae47ba98268",
+      "reviewedAt": "2026-11-24T12:35:29.331Z",
+      "sourceDigest": "c578b562c0bcd3c2342aabd67313fa16daac11fc61b821fd93fb83f73dbd82c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Restricted reflected dispatch revisions to supported public selector formats and five recorded historical names, retained service-wide platform revision attribution, and recorded the verified hosted fixture download in the delivery ledger.",
+      "reviewReason": "Review inactive Gateway-only acceptance tag lifecycle and read-only observer, unchanged historical activation pins, exact scope, authentication and cleanup limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -135,15 +135,24 @@ def snapshot(api, service, intent):
               "matchesServingConfiguration": all(revisions[name]["configuration"] == configuration for name in effective)}
     if service == intent["service"]:
         baseline, candidate = intent["baseline"], release.revision_name(intent)
-        expected = {"stage": {baseline: 100}, "canary": {baseline: 95, candidate: 5},
-                    "promote": {candidate: 100}, "rollback": {baseline: 100}}[intent["operation"]]
-        require(effective == expected and latest["latestCreatedRevision"] == candidate
+        operation = intent["operation"]
+        expected = {"stage": ({baseline: 100},), "canary": ({baseline: 95, candidate: 5},),
+                    "promote": ({candidate: 100},), "rollback": ({baseline: 100},),
+                    "acceptance-route-add": ({baseline: 95, candidate: 5},),
+                    "acceptance-route-remove": ({baseline: 95, candidate: 5}, {candidate: 100}, {baseline: 100})}[operation]
+        if operation.startswith("acceptance-route-"):
+            require(service == "factory-gateway", "ACCEPTANCE_ROUTE_SERVICE_INVALID")
+            tag_name = "jems-acceptance-" + candidate.rsplit("-r-", 1)[1]
+            matching = [entry for entry in tags if entry["tag"] == tag_name]
+            require(matching == ([dict(release.traffic_target(candidate, 0), tag=tag_name)]
+                    if operation == "acceptance-route-add" else []), "ACCEPTANCE_ROUTE_TAG_MISMATCH")
+        require(effective in expected and latest["latestCreatedRevision"] == candidate
                 and latest["latestReadyRevision"] in (baseline, candidate), "INTENT_STATE_MISMATCH")
         require(configuration == intent["configuration"], "INTENT_CONFIGURATION_MISMATCH")
         for name, image in ((baseline, intent["baselineImage"]), (candidate, intent["image"])):
             row = revisions[name]
             require(row["image"] == image and row["configuration"] == configuration, "INTENT_REVISION_MISMATCH")
-            if name == baseline or intent["operation"] != "rollback":
+            if name == baseline or operation not in ("rollback", "acceptance-route-remove"):
                 require(row["ready"], "INTENT_REVISION_NOT_READY")
         result["intent_state_verified"] = intent["operation"]
     return result, current

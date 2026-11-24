@@ -47,7 +47,7 @@ def read_intent(path):
     prefix = re.escape(f"{REGISTRY}/{SERVICES[service]}@")
     legacy = re.escape(f"{LEGACY_REGISTRY}/{SERVICES[service]}@")
     for key, pattern in {
-        "operation": r"stage|canary|promote|rollback",
+        "operation": r"stage|canary|promote|rollback|acceptance-route-add|acceptance-route-remove",
         "source": SHA,
         "image": prefix + DIGEST,
         "baselineImage": f"(?:{prefix}|{legacy})" + DIGEST,
@@ -57,6 +57,8 @@ def read_intent(path):
     }.items():
         require(re.fullmatch(pattern, intent[key]), f"Invalid {key}")
     require(intent["image"] != intent["baselineImage"], "Candidate and baseline images must differ")
+    if intent["operation"].startswith("acceptance-route-"):
+        require(service == "factory-gateway", "Acceptance route is Gateway-only")
     if intent["operation"] != "rollback":
         proof = Path(path).with_name("compatibility.json").read_bytes()
         require(hashlib.sha256(proof).hexdigest() == intent["compatibility"], "Missing exact compatibility record")
@@ -162,6 +164,40 @@ def rollout(intent, api, *, location=LOCATION):
     staged_canary = {baseline: 95, candidate: 5}
     promoted = {candidate: 100}
     latest_is_candidate = current.get("latestCreatedRevision", "").endswith("/" + candidate)
+    if operation in {"acceptance-route-add", "acceptance-route-remove"}:
+        require(service == "factory-gateway", "Acceptance route is Gateway-only")
+        adding = operation == "acceptance-route-add"
+        require(serving in ((staged_canary,) if adding else (staged_canary, promoted, original)),
+                "Acceptance route requires an expected serving allocation")
+        active = [entry for entry in current.get("traffic", []) if entry.get("percent", 0) > 0]
+        declared = {entry.get("revision"): entry["percent"] for entry in active}
+        require(len(active) == len(declared) and declared == serving and all(
+            entry.get("type") == "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION" for entry in active),
+            "Declared and effective traffic differ")
+        if adding:
+            require(latest_is_candidate, "Candidate is no longer latest")
+            verify_revision(candidate, intent["image"])
+        tag_name = "jems-acceptance-" + candidate.rsplit("-r-", 1)[1]
+        matching = [entry for entry in tags if entry["tag"] == tag_name]
+        require(not matching or matching[0]["revision"] == candidate,
+                "Acceptance tag points to another revision")
+        expected_tags = [entry for entry in tags if entry["tag"] != tag_name]
+        if adding:
+            expected_tags.append(dict(traffic_target(candidate, 0), tag=tag_name))
+        expected_tags.sort(key=lambda entry: entry["tag"])
+        if expected_tags != tags:
+            patch = {"traffic": [traffic_target(name, percent) for name, percent in serving.items()]
+                     + expected_tags, "etag": current["etag"]}
+            api("PATCH", f"{resource}?updateMask=traffic", patch)
+            after = api("GET", resource)
+            require(not after.get("reconciling", False) and traffic(after) == serving,
+                    "Acceptance route changed serving allocation")
+            require(pinned_tags(after) == expected_tags, "Acceptance route tag verification failed")
+            require(fingerprint(after["template"]) == intent["configuration"],
+                    "Post-update configuration changed")
+            if adding:
+                verify_revision(candidate, intent["image"])
+        return "ACCEPTANCE_ROUTE_ADDED" if adding else "ACCEPTANCE_ROUTE_REMOVED"
     statuses = {"stage": "STAGED", "canary": "CANARY", "promote": "PROMOTED",
                 "rollback": "ROLLED_BACK"}
     if operation == "stage":
