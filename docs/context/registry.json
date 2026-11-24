@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:49:48.426Z",
-      "sourceDigest": "aca7065950e27a08c3faf04e454472071ec7028565687af4ae56bf3d4688c6bd",
+      "reviewedAt": "2026-11-24T04:03:35.404Z",
+      "sourceDigest": "26886ee7701b77fdb0b2971a9b0074f8521d4bbc90fc95c61e10a53952d50e2d",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved PR153 diagnostics records and added independent serving receipt45320634686, exact prior Pages publication/expiry, approved-source build comparison, pending live acceptance and approved network access blocked by published environment settings.",
+      "reviewReason": "Recorded protected PR153 merge and21 passing checks, the actual diagnostic invalid_target failure before broker access, its uninspected failure artifact, independent serving metadata and previous Pages/source/build receipts, plus unresolved live acceptance and published network-policy blocker.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
