@@ -4,17 +4,17 @@
 
 ## Proposed first trial
 
-The following one-repair envelope is a proposal for independent project review. The November 24 public short-context Standard input/output rates per million tokens match the source catalog at $2/$10 for Sol and $8/$40 for Astra. The estimates assume zero cache usage and an independently approved all-in bound of $0.05 per image. Verify the actual project and exact art request before signing dated approvals. [Sol](https://developers.openai.com/api/docs/models/gpt-6.2-sol) · [Astra](https://developers.openai.com/api/docs/models/gpt-6.2-astra)
+The following one-repair envelope is a proposal for independent project review. The November 24 public short-context Standard input/output rates per million tokens match the source catalog at $2/$10 for Sol and $8/$40 for Astra. The estimates assume zero cache usage and a proposed all-in bound of $0.10 per image. For scale, the published GPT Image 1.5 medium output prices are $0.050 landscape and $0.034 square, plus prompt charges. That model page carries a deprecation notice. Confirm an eligible image model and bound the complete request price in the actual project. Verify the actual project and exact art request before signing dated approvals. [Sol](https://developers.openai.com/api/docs/models/gpt-6.2-sol) · [Astra](https://developers.openai.com/api/docs/models/gpt-6.2-astra) · [Image pricing reference](https://developers.openai.com/api/docs/models/gpt-image-1.5)
 
 | Stage | Input / reasoning-inclusive output | Most calls | USD per call |
 |---|---:|---:|---:|
 | Sol High plan / replan | 40,000 / 6,000 | 2 | 0.140 |
-| Separate scene and transparent sprite sheet | Up to two 1024-square requests per round | 4 | 0.050 |
+| Separate scene and transparent sprite sheet | 1536 × 1024 opaque WebP and 1024 × 1024 transparent PNG, medium | 4 | 0.100 |
 | Astra High construct | 48,000 / 24,000 | 1 | 1.344 |
 | Sol High review | 64,000 / 8,000 | 2 | 0.208 |
 | Astra High repair | 64,000 / 24,000 | 1 | 1.472 |
 
-First round $1.792 plus worst-case visual repair $1.920 gives **$3.712 reserved**. The earlier $1.876 proposal allowed only 6,000 Astra output tokens per call. This proposal provides four times that headroom. The same inputs with 32,000 Astra output tokens total $4.352. All four stages at their maxima total $4.736 before art, $4.936 at $0.05 per image, or $5.136 at $0.10. Recalculate after provider review. If an envelope exceeds the ceiling, refuse admission. The provider can exhaust reasoning tokens before producing a usable game.
+First round $1.892 plus worst-case visual repair $2.020 gives **$3.912 reserved**. The earlier $1.876 proposal allowed only 6,000 Astra output tokens per call. This proposal provides four times that headroom. The same inputs with 32,000 Astra output tokens total $4.552. All four stages at their maxima total $4.736 before art, $4.936 at $0.05 per image, or $5.136 at $0.10. Recalculate after provider review. If an envelope exceeds the ceiling, refuse admission. The provider can exhaust reasoning tokens before producing a usable game.
 
 Keep serial paid stages, original artwork IDs, a scene plus separately approved RGBA sheet, and source-bound v2 play/review before explicit Keep. Keep all eight original low-detail captures across desktop and touch and the three-interaction limit per device. Validate the proposed 4,096 tokens per capture against the actual models and accepted dimensions (up to 1,024 × 1,200). Eight captures can consume 32,768 input tokens before instructions, schemas, source and receipts. The worker checks the actual packet. A receipt can include measured text and flat approved image charges. Compare both to provider billing. [Artwork and capture contract](ARTWORK-PILOT.md)
 

@@ -27,7 +27,7 @@ function settings(stage:ModelStage){
   inputUsdPerMillion:astra?8:2,outputUsdPerMillion:astra?40:10};
 }
 const approval:PremiumApproval={version:PREMIUM_POLICY_VERSION,enabled:true,approvalId:'synthetic-premium-approval',
- images:{enabled:true,approvalId:'synthetic-art',model:'fixture-art',maxImages:2,maxMicroUsdPerImage:50000,priceReviewedOn:day,sheetFormat:'rgba8-png-grid-v1'},
+ images:{enabled:true,approvalId:'synthetic-art',model:'fixture-art',maxImages:2,maxMicroUsdPerImage:100000,priceReviewedOn:day,sheetFormat:'rgba8-png-grid-v1'},
  maxRepairAttempts:1,stages:{planning:settings('planning'),construction:settings('construction'),review:settings('review'),repair:settings('repair')}};
 const pilot={approval,workerSha};
 const agent={available:true,kind:'metered-api' as const,generate:async()=>{throw Error('NO_PAID_TRANSPORT_IN_TEST');}};
@@ -91,7 +91,7 @@ test('only an unlocked adult can see the selected policy or reserve a job; ceili
 });
 test('only new premium admissions need a valid explicit ceiling and fresh approval',async()=>{
  const {repo,service,adult}=await setup();
- assert.equal(premiumJobReserve(approval),3_712_000);
+ assert.equal(premiumJobReserve(approval),3_912_000);
  const {jobId}=await service.submit(adult,request);
  for(const cap of [undefined,null,false,'5000000',NaN,Infinity,0,-1,1.5,5_000_001]){
   const closed=new JobService(repo,agent,gate,{...options,premiumMaxJobMicroUsd:cap as number,premiumPilot:pilot});
@@ -103,7 +103,7 @@ test('only new premium admissions need a valid explicit ceiling and fresh approv
  stale.approval.stages.repair.priceReviewedOn='2000-01-01';
  const expired=new JobService(repo,agent,gate,{...options,premiumPilot:stale});
  await assert.rejects(expired.submit(adult,{...request,clientRequestId:'expired'}),/MODEL_POLICY_UNAVAILABLE/);
- assert.equal((await repo.snapshot()).ledgers[familyId].reserved,3_712_000);
+ assert.equal((await repo.snapshot()).ledgers[familyId].reserved,3_912_000);
  await expired.cancel(adult,jobId);
  assert.equal((await repo.snapshot()).ledgers[familyId].reserved,0);
 });
@@ -124,6 +124,7 @@ test('a five-dollar envelope competes atomically for the remaining family allowa
  assert.equal(state.jobs.length,1);
  assert.equal(state.ledgers[familyId].reserved,5_000_000);
  await service.cancel(adult,state.jobs[0].id);
+ await service.setAllowance({...adult,role:'parent'},6_000_000,true);
  maximal.approval.images!.maxMicroUsdPerImage++;
  assert.equal((await service.readiness(adult)).available,false);
  await assert.rejects(service.submit(adult,{...request,clientRequestId:'oversize'}),/SPENDING_CUTOFF/);
@@ -149,10 +150,12 @@ for(const usageComplete of [true,false])test('an interrupted paid report preserv
  const h=await admitted(),id=identity('generate');
  const claim=await h.coordinator.claim(h.id,0,'generate',id,PREMIUM_POLICY_VERSION);
  assert.deepEqual(claim.approval,approval);
- const report={errorCode:'MODEL_ACCESS_UNAVAILABLE',...usage('planning'),usageComplete};
+ const planning=usage('planning'),art=approval.images!.maxMicroUsdPerImage;
+ const report={errorCode:'MODEL_ACCESS_UNAVAILABLE',...planning,imageUsageUnits:art,usageUnits:planning.usageUnits+art,usageComplete};
  await h.coordinator.report(h.id,0,'generate',id,report);await h.coordinator.report(h.id,0,'generate',id,report);
  const state=await h.repo.snapshot(),view=await h.service.get(h.adult,h.id);
- assert.equal(view.errorCode,'MODEL_ACCESS_UNAVAILABLE');assert.equal(view.modelPolicy?.measuredTextCostMicroUsd,report.usageUnits);
+ assert.equal(view.errorCode,'MODEL_ACCESS_UNAVAILABLE');assert.equal(view.modelPolicy?.measuredTextCostMicroUsd,planning.usageUnits);
+ assert.equal(view.modelPolicy?.imageAllowanceMicroUsd,art);
  assert.equal(view.modelPolicy?.usageUncertain,!usageComplete);
  assert.equal(view.modelPolicy?.accountedMicroUsd,usageComplete?report.usageUnits:premiumJobReserve(approval));
  assert.equal(state.ledgers[familyId].reserved,0);assert.equal(state.ledgers[familyId].used,view.modelPolicy?.accountedMicroUsd);

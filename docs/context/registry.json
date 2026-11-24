@@ -728,10 +728,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:12:38.208Z",
-      "sourceDigest": "0d1e752dadf14bf40d46e054955ed53de9fc233d03bb379b7da5a59b9c365f63",
+      "reviewedAt": "2026-11-24T23:14:20.397Z",
+      "sourceDigest": "5166eba9969f0617fd7fe3f9b00e512e8677a39f77f651d0b6a5ae4b1d94fb66",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner decision, exact one-repair stage arithmetic and fail-closed premium admission under the independent cap.",
+      "reviewReason": "Compared actual scene and sheet request dimensions with published output pricing, modeled prompt headroom, and reconciled the $3.912 synthetic reservation and image receipts.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:12:38.889Z",
-      "sourceDigest": "08441b6d424499189dc627a8aa299c73bce248010dc78396873510ab6daadcb7",
+      "reviewedAt": "2026-11-24T23:14:03.529Z",
+      "sourceDigest": "fef2f9d5825eddeeef93c92d37eaaca29ea3037ed791855b4aa8411850e375c6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact-cap, malformed-cap, family contention, settlement and retained legacy compatibility tests and the activation evidence scope.",
+      "reviewReason": "Reviewed exact-cap, contention with sufficient ledger for an oversized request, measured text and image receipts, and old-job tests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
