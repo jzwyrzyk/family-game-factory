@@ -63,6 +63,8 @@ On a saved-game edit, existing art is retained through ordinary rule or mechanic
 
 ## Asset and runtime contract
 
+Premium sheet cells have planned IDs, display sizes, pivot and contact footprint, a transparent perimeter and a single connected alpha silhouette. The private producer validates each crop and emits a normal independent PNG. Review rendered poses in motion on both devices for any ambiguous silhouette, fused subjects, poor contact or wrong identity. [Art direction and fixtures](premium-benchmark/ARTWORK-PILOT.md)
+
 [game-assets.cjs](../../server/agent/game-assets.cjs) and its [typed facade](../../server/agent/game-assets.ts) validate a server-attached `game-assets-v1` pack. It contains `style` and an `assets` array; the array may be empty for code-native artwork. Each asset has:
 
 | Fields | Contract |

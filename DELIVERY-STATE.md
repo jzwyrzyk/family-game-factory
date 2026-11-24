@@ -1,5 +1,9 @@
 # jems delivery state
 
+## November 24 — premium artwork builder, draft PR #139
+
+Reconciled PR #139 with protected main after #154. Three original illustrated fixtures run in the existing renderer through a mock private adapter and the real Chromium worker. The pilot report records the rendered evidence, scope of the scheduling experiment and the economic blocker. The proposed one-repair envelope reserves $1.876 against a $1 maximum. Premium activation, provider access and release approval remain pending. The production cutover receipts below retain their original scope. [Pilot report and November 26 checklist](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
+
 ## November 24, 2026 — cutover hold released for CI preparation; owner merge approval pending
 
 [PR161](https://github.com/jzwyrzyk/family-game-factory/pull/161) merged as `2942901fa97b81a782756cd25da738bc4c94020f` after all 20 exact-head checks passed. Its completed-cutover receipt and all unverified authenticated/data acceptance, F06, diagnostics, phone first-attempt failure and update-button limitations below remain authoritative. GitHub independently confirms release45409746339 and observation45409955694 succeeded on attempt1, and Pages45410210444 succeeded on attempt2; that retry is not first-attempt full validation evidence.

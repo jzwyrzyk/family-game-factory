@@ -1,0 +1,424 @@
+{
+  "schedules": [
+    {
+      "mode": "serial",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "compileMs": 3.382402999995975,
+      "extractMs": 63.51067499999772,
+      "wallMs": 69.38470799999777
+    },
+    {
+      "mode": "overlap",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "extractMs": 66.47550200000114,
+      "compileMs": 68.98133199999575,
+      "wallMs": 69.09801800000423
+    },
+    {
+      "mode": "overlap",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "extractMs": 58.51593399999547,
+      "compileMs": 61.52321000001393,
+      "wallMs": 61.87902799999574
+    },
+    {
+      "mode": "serial",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "compileMs": 1.8558200000115903,
+      "extractMs": 65.59029599999485,
+      "wallMs": 69.54619500000263
+    }
+  ],
+  "firstPassMicroUsd": 753122,
+  "workerTimingsMs": {
+    "compileAndValidate": 54,
+    "browserSetup": 155,
+    "playtest": 12243,
+    "captureAndClose": 11529
+  },
+  "version": "premium-art-trial-v1",
+  "sourceCommit": "0c80098ea44f1ccd8fb4bec46c89478e0a6559b1",
+  "id": "horse",
+  "pairedCase": null,
+  "requestHash": "9bff1a36bb9603b3be83524b668adc6ee35b9acb3f8aa4d403d144c79c69ae61",
+  "fixtureHash": "189adeda30d443f2c35a52e0a25357908ac8222347d779b3bd98f6d767ed2e2f",
+  "sourceHash": "ea6f143e0051efb10b15763a5e424e8cb57975c48a10edc3858cdf1cd8af3788",
+  "codeHash": "41b9f22e04fc63bd2dbd464a9534e653a711df8ccc69c05683821a688fddd46c",
+  "runtimeHash": "6a214bbed95e8ec138f78bad2f86a26dee9fc271587a223c97b738b36c289fc0",
+  "artifactHash": "88191b4c5883bb17df9006979cfff051481079a2d8c4125340699f47dd36a1a8",
+  "assetsHash": "e34e4d6263fb6d42ec347723199d9563f169460c1a3d99765338a2f0306755ea",
+  "htmlHash": "abcb7f5c1aa7f45f184463f912b78ca239198951610d1f4b6a3f43a0f47d7d39",
+  "dependencies": "f32a85a87902007ea21891f835db6652e311d10efaa79ddbd90ebfadde00250d",
+  "sandboxDependencies": "0b91bf7edbade27c761ad8d1086f6d5dee176101e1d118dc4207de5512aa2b6d",
+  "sceneHash": "df0730323524dd2ad5f68019f46bc2a37dff5018d59ef84cc16a833183f1e2e7",
+  "sheetHash": "7a1d3b673c684c54efc7cfc7137e738370b74ce3ac5a51df1fd7523280f8496e",
+  "assetIds": [
+    {
+      "id": "valley",
+      "sha256": "df0730323524dd2ad5f68019f46bc2a37dff5018d59ef84cc16a833183f1e2e7",
+      "width": 720,
+      "height": 400
+    },
+    {
+      "id": "horse",
+      "sha256": "4dccce168c0e4eec78ba84db59ffe34c6eeb7be840231a27ea393089a99b6374",
+      "width": 512,
+      "height": 1024
+    },
+    {
+      "id": "ribbon",
+      "sha256": "33386785482874a6a73ff676ae597c957f06f31f8095dcbe2f091561e8d3366f",
+      "width": 512,
+      "height": 1024
+    }
+  ],
+  "evidenceHash": "c2734cba7c8f23cf7f3e75e5934b04289d9a62bf4c18dc190f8b3e26b5accca1",
+  "tests": {
+    "desktop": true,
+    "mobile": true,
+    "replay": true,
+    "isolation": true,
+    "input": true,
+    "resources": true,
+    "pause": true
+  },
+  "captures": [
+    {
+      "id": "desktop-initial-0",
+      "device": "desktop",
+      "phase": "initial",
+      "tick": 4,
+      "width": 720,
+      "height": 750,
+      "sha256": "291056b1602ddd40676e292a3cd632294d1b4b70f7b58a633dea7a472898ff11"
+    },
+    {
+      "id": "desktop-interaction-1",
+      "device": "desktop",
+      "phase": "interaction",
+      "tick": 64,
+      "width": 720,
+      "height": 750,
+      "sha256": "55c9582c01cad767c88e32ea329ef205e3475f5a4f7b1a09473dc5caa926853f"
+    },
+    {
+      "id": "desktop-interaction-2",
+      "device": "desktop",
+      "phase": "interaction",
+      "tick": 169,
+      "width": 720,
+      "height": 750,
+      "sha256": "0cc7738a5975943ae2440319b6ff6f8142613ed459e9455135f56a2191b7a2a9"
+    },
+    {
+      "id": "desktop-outcome-3",
+      "device": "desktop",
+      "phase": "outcome",
+      "tick": 263,
+      "width": 720,
+      "height": 750,
+      "sha256": "d3d589984e816040aca9f1431569970af917247681c6cf40f87195e8ccc2cea4"
+    },
+    {
+      "id": "tablet-initial-0",
+      "device": "tablet",
+      "phase": "initial",
+      "tick": 4,
+      "width": 600,
+      "height": 683,
+      "sha256": "005184a47b9d7490fb8e1352116ab0625f6b5179521401c03c179dd4ef873346"
+    },
+    {
+      "id": "tablet-interaction-1",
+      "device": "tablet",
+      "phase": "interaction",
+      "tick": 62,
+      "width": 600,
+      "height": 683,
+      "sha256": "3b9704bc2a6f12a55c4a15f38bfd511681ca6a022d56daadd451145dec2996d4"
+    },
+    {
+      "id": "tablet-interaction-2",
+      "device": "tablet",
+      "phase": "interaction",
+      "tick": 168,
+      "width": 600,
+      "height": 683,
+      "sha256": "7bb9fd5243719550bc07642de60ee16697f42baf44e42d2f913e29e173e8c844"
+    },
+    {
+      "id": "tablet-outcome-3",
+      "device": "tablet",
+      "phase": "outcome",
+      "tick": 265,
+      "width": 600,
+      "height": 683,
+      "sha256": "d551e6941f07e7bb73c0e6f55bdee4e0a0e2134874a17f70c18f1e1ed98b1a96"
+    }
+  ],
+  "sessions": [
+    {
+      "device": "desktop",
+      "inputs": 5,
+      "visibleChanges": 5,
+      "simulatedTicks": 263,
+      "outcome": "won",
+      "replay": true,
+      "pause": true,
+      "touch": false,
+      "consoleErrors": 0,
+      "actionTrace": [
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 0,
+          "startTick": 15,
+          "endTick": 64,
+          "beforeHash": "a7489fb1076e15d07767a5ca1dc27acfaf106851e1375174c4653ff4f7168de2",
+          "afterHash": "4839debb4b90b93e36e3368024ee61b4cabebeda3f381b7cfc6989d0dd7a1d70"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 1,
+          "startTick": 73,
+          "endTick": 122,
+          "beforeHash": "1ac19679bdbdff55bdd6d63f1d7953feddfd06a6b04bcce2515baebee6e88eff",
+          "afterHash": "3c317bc92373518f01a23b00d0ec3968d99e5cda20653319ac6330c0fb386390"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 2,
+          "startTick": 122,
+          "endTick": 169,
+          "beforeHash": "3c317bc92373518f01a23b00d0ec3968d99e5cda20653319ac6330c0fb386390",
+          "afterHash": "b071688ab9b8a5b9948c623293ba23c990d0bb84e2c800763fcce750f92fd50b"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 3,
+          "startTick": 179,
+          "endTick": 225,
+          "beforeHash": "8c15d907056ad89e89d73dc4d9c318c8dc7118bc32459e8519e4030c83cd8be9",
+          "afterHash": "be2a03c012e821d7de1a7367b478f8daa758928eec525c6c39f7c1d94d64b2be"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 4,
+          "startTick": 225,
+          "endTick": 263,
+          "beforeHash": "be2a03c012e821d7de1a7367b478f8daa758928eec525c6c39f7c1d94d64b2be",
+          "afterHash": "b0b88ea3e4ff8ac89e23c5921fd49f78653d13b25cdb92c69f45407fa68d11ff"
+        }
+      ]
+    },
+    {
+      "device": "tablet",
+      "inputs": 5,
+      "visibleChanges": 5,
+      "simulatedTicks": 265,
+      "outcome": "won",
+      "replay": true,
+      "pause": true,
+      "touch": true,
+      "consoleErrors": 0,
+      "actionTrace": [
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 0,
+          "startTick": 13,
+          "endTick": 62,
+          "beforeHash": "3a57bcbb87fd69b39f46e9b094895dc512f59f18e4ab4c242c8d60e78125e5f8",
+          "afterHash": "e135131df91197f15d8f90df047a8d53b8d4b93eb1528f8a8de2c767debf1db8"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 1,
+          "startTick": 71,
+          "endTick": 119,
+          "beforeHash": "ed765e2d7d7911988ff7c44dec94b75a5a3c0e619546e4a8ff900c01fe223924",
+          "afterHash": "049ff26113d8bd1f523409c726ffc93c88851bc8e3f523afa31e020b633c8869"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 2,
+          "startTick": 119,
+          "endTick": 167,
+          "beforeHash": "049ff26113d8bd1f523409c726ffc93c88851bc8e3f523afa31e020b633c8869",
+          "afterHash": "1227e9fbef7a69d92901ed7673fd9c2e607cf05c0ff57e8f1b942cc34f7a2169"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 3,
+          "startTick": 178,
+          "endTick": 227,
+          "beforeHash": "c140df9005163303d984b334a798a3ce95ddb1b1bad2429f6099cb17ffae4f09",
+          "afterHash": "759f3ae5b05cd4112d150728791033669fe2cc76d93cd4b1c381297e525e5fce"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 4,
+          "startTick": 227,
+          "endTick": 265,
+          "beforeHash": "759f3ae5b05cd4112d150728791033669fe2cc76d93cd4b1c381297e525e5fce",
+          "afterHash": "3017df530d5ba2b4dc60b9594932f772c53ca679940586da330d33d15d0d2042"
+        }
+      ]
+    }
+  ],
+  "origin": "authored-fixture-mock-provider",
+  "paidCalls": 0,
+  "actualProviderCharges": null,
+  "measuredAcceptance": null,
+  "queueMs": null,
+  "marks": [
+    {
+      "stage": "fixture setup",
+      "elapsedMs": 1
+    },
+    {
+      "stage": "mock planning",
+      "elapsedMs": 14
+    },
+    {
+      "stage": "mock image 1",
+      "elapsedMs": 17
+    },
+    {
+      "stage": "mock image 2",
+      "elapsedMs": 18
+    },
+    {
+      "stage": "mock construction",
+      "elapsedMs": 198
+    },
+    {
+      "stage": "assembled candidate",
+      "elapsedMs": 211
+    },
+    {
+      "stage": "isolated browser test and capture",
+      "elapsedMs": 24732
+    },
+    {
+      "stage": "mock review",
+      "elapsedMs": 24795
+    },
+    {
+      "stage": "mock repair",
+      "elapsedMs": 24899
+    },
+    {
+      "stage": "mock planning",
+      "elapsedMs": 24941
+    },
+    {
+      "stage": "fixture repair and replan complete",
+      "elapsedMs": 24941
+    }
+  ],
+  "bounds": [
+    {
+      "stage": "planning",
+      "images": 0,
+      "textBytesAndFraming": 12542,
+      "screenshotTokens": 0,
+      "inputBound": 12542
+    },
+    {
+      "stage": "construction",
+      "images": 0,
+      "textBytesAndFraming": 28607,
+      "screenshotTokens": 0,
+      "inputBound": 28607
+    },
+    {
+      "stage": "review",
+      "images": 8,
+      "textBytesAndFraming": 16823,
+      "screenshotTokens": 32768,
+      "inputBound": 49591
+    },
+    {
+      "stage": "repair",
+      "images": 8,
+      "textBytesAndFraming": 27462,
+      "screenshotTokens": 32768,
+      "inputBound": 60230
+    },
+    {
+      "stage": "planning",
+      "images": 2,
+      "textBytesAndFraming": 14088,
+      "screenshotTokens": 8192,
+      "inputBound": 22280
+    }
+  ],
+  "stageCeilings": {
+    "planning": {
+      "input": 22280,
+      "output": 3000
+    },
+    "construction": {
+      "input": 28607,
+      "output": 6000
+    },
+    "review": {
+      "input": 49591,
+      "output": 3000
+    },
+    "repair": {
+      "input": 60230,
+      "output": 6000
+    }
+  },
+  "assumedImageMicroUsd": 50000,
+  "wholeJobReservationMicroUsd": 1798180,
+  "capMicroUsd": 1000000
+}

@@ -77,7 +77,8 @@
     "docs/decisions/2026-11-22-bubble-gum-assembly.md",
     "docs/game-intelligence/PREMIUM-BUILDER.md",
     "docs/game-intelligence/premium-benchmark/README.md",
-    "docs/decisions/2026-11-23-premium-builder.md"
+    "docs/decisions/2026-11-23-premium-builder.md",
+    "docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -716,13 +717,14 @@
         "server/testing/**",
         "docs/game-intelligence/*.md",
         "tools/premium-*.ts",
-        "docs/game-intelligence/premium-benchmark/*.md"
+        "docs/game-intelligence/premium-benchmark/*.md",
+        "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:58.128Z",
-      "sourceDigest": "947ce73addc804c39838a799c97b13fde281d73dad9a20308d01042d7643bb67",
+      "reviewedAt": "2026-11-24T15:46:36.267Z",
+      "sourceDigest": "72818192810dbedc86c63aa0e316002c4f193b7dc4698a4311de21b4e62a825c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fixed Astra High construction/repair, independent stage approvals and official rates, static and actual token admission, complete job reservation, measured and uncertain settlement, pinned claims, no fallback, bound production plan and compact canonical evidence. Contracts document long ordinary-input capture, near-action observations, three-interaction evidence capacity, bounded unverified repair and compatible-reader rollback; no paid activation.",
+      "reviewReason": "Reviewed the source-bound art plan, original raster reader, scoped revision reuse, serial sheet accounting, decoder rejection paths, released CI integration and fixture costs against the documented premium timing and activation gates.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -872,10 +874,10 @@
         "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T04:40:29.260Z",
-      "sourceDigest": "55c028caadabfb148ed21e7387331988550797fc18b72ce9c225d3db00d3330c",
+      "reviewedAt": "2026-11-24T15:46:36.760Z",
+      "sourceDigest": "2c35fedfb4dafae4b20d4c593f067a0eff4d615020c2988913f4b902d49ea1c1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the measured 550-second Mining dependency installation and preserved every visual assertion, viewport, capture and timeout while applying the hosted-verified Chromium-only setup pattern. The 99 CI contracts and workflow lint pass; new-source visual acceptance remains pending.",
+      "reviewReason": "Compared all original CI leaf commands, negative policy tests, dependency closures and desktop and touch screenshots for the three authored prototypes; documented the 99-command roster and explicit provider evidence gap.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1074,10 +1076,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:11:33.088Z",
-      "sourceDigest": "620d1066da553574fd4d440cc4894952ae8aad4f748a98ff0f0fd89c978e5e85",
+      "reviewedAt": "2026-11-24T15:46:37.229Z",
+      "sourceDigest": "e8f271c508aad3cfe7ed43bf55bfa4e044c935441961574680dd55eb3c636282",
       "reviewOutcome": "updated",
-      "reviewReason": "Rebased the complete CI tree onto PR161 protected merge; preserved completed cutover and all acceptance gaps, distinguished released timing hold from pending PR154/157 owner approvals, and verified all original96 leaf argv/multiplicities with no production workflow or intent changes.",
+      "reviewReason": "Recorded the exact integrated main, draft status, isolated worker rollout pins, separate DEV initiative, first-pass economics and November 26 authenticated verification and rollback steps.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1289,10 +1291,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:12:05.993Z",
-      "sourceDigest": "0fdb289200a048e83ee3e9691c0927be0886e266c7221687baec14577a373792",
+      "reviewedAt": "2026-11-24T15:46:37.803Z",
+      "sourceDigest": "00eeb1b8cf149d66a24507ad24a675eded9831e49b7062c95546ba72b320dce8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the PR template addition requiring exact CI identities, selection scope,96-command coverage, first-attempt outcomes and measured performance against the existing evidence guide; routing and maintenance authority remain unchanged.",
+      "reviewReason": "Routed authored fixture sources and the November artwork runbook to generation and verified the existing canonical evidence and release indexes retain prior CI and production records.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

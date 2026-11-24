@@ -1,5 +1,7 @@
 # Adult Private premium game builder
 
+The November 24 extension is implemented on draft #139. The [artwork pilot](premium-benchmark/ARTWORK-PILOT.md) covers the new schema, sheet approval and extraction, three playable fixtures, exact request economics and November 26 activation checklist. Its whole-job reservation at the proposed stage bounds exceeds the gateway ceiling.
+
 The owner selected `adult-astra-high-v1` to improve execution of each child's agreed idea. The pilot is a separately approved policy inside the existing builder. A chat turn, readiness verdict, model suggestion or source merge cannot submit a paid job. Build still needs the creator's explicit action, authenticated family/profile, trusted device, current permission and available allowance. The [decision record](../decisions/2026-11-23-premium-builder.md) describes the choice. The [delivery record](../../DELIVERY-STATE.md) tracks release evidence.
 
 ## Stage contracts

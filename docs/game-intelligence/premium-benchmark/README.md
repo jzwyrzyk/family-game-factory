@@ -1,5 +1,7 @@
 # Legacy and Astra High game comparison
 
+The [November 24 artwork pilot](ARTWORK-PILOT.md) adds three offline playable fixtures with exact request, asset and capture identities. Its fox uses the paired fox request. The factory and horse are additional probes outside the seven-case cohort.
+
 **Actual-model comparison pending.** Seven authored prompts are available in matched legacy and premium lanes. The offline runs below exercised the real adapter with a synthetic transport and the sandbox worker with one authored game. Human scores, changes in game quality, real generation latency, paid token usage and actual spend remain unmeasured.
 
 ## Run locally

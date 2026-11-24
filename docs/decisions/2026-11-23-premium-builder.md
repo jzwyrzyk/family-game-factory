@@ -14,6 +14,8 @@ Reject a premium job or leave it recoverable when the specified model, privacy a
 
 ## Consequences
 
+On November 24 the owner selected artwork-first 2D/2.5D within the existing renderer. A sealed layout and independently decodable sprites preserve pose, character identity and live actions within the two-image pilot. Keep the existing pack reader instead of introducing an atlas decoder into generated code. Paid overlap awaits durable per-stage accounting and recovery. Expanded capture coverage awaits independent legibility and action-binding evidence. [Decision and activation gates](../game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
+
 More reasoning, a longer interactive trace or a repair can increase time and cost. Admission reserves the full bounded path and settlement records the evidence available. Sandbox and review failures protect the last kept game. Benchmarks will measure quality gains and cost per accepted game before an audience decision. Review the limits or capture method when ordinary play repeatedly misses a requested payoff, when evaluated false passes or rejections are frequent, or when measured usage exceeds the approved envelope. A change to the coding model requires a separate owner decision.
 
 See the [pilot contract and rollout](../game-intelligence/PREMIUM-BUILDER.md), [execution boundaries](0004-separated-private-execution.md) and [style-diverse quality standard](0006-style-diverse-playable-quality.md).
