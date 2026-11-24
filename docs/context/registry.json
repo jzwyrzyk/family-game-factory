@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T00:17:46.500Z",
-      "sourceDigest": "e020c0dd7df099860a86599af1dda37f45db3663da30400a791d350129849ec2",
+      "reviewedAt": "2026-11-24T00:49:37.043Z",
+      "sourceDigest": "f2c749c1f68070b8528fe77d3306fc71f2bba97ee297bb96498795cd66c87680",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated the Coach promotion evidence and preserved fresh Gateway stage pins; documented PR147 sequencing after successful PR148 promotion while allowing exact-head source checks to run concurrently.",
+      "reviewReason": "Recorded actual Coach100 promotion, owner successful post-promotion reply and Gateway0 stage with exact tests/trees/runs; documented the read-only pinned backend, Preview-input and projected failure-metadata observation before Gateway canary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
