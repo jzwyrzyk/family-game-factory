@@ -1102,10 +1102,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:55:18.228Z",
-      "sourceDigest": "c4de44b3065c2d848464a5a11b44e6f7f0c7235b2c055783ca8f3e9ab8479c3f",
+      "reviewedAt": "2026-11-24T16:13:38.999Z",
+      "sourceDigest": "30e39e844b89c02ed2d64770c4db8012b7b717feb57203bbfd328138a3eb183c",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded explicit PR157 approval and matching merge tree, hosted full receipt and pending main demonstration; shared repository adapter is distinct from disabled PR155 cloud/controller deployment.",
+      "reviewReason": "Recorded approved CI and shared-verifier merges, independently verified full main receipt, actual setup/retention measurements and unchanged acceptance gaps; protected-main fast-path execution remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
