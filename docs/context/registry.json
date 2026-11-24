@@ -1115,10 +1115,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:32:25.359Z",
-      "sourceDigest": "ed005d7dbb9b6a1a76816e696a4bf36e00ba090579a5f25bdac74ef43ea69f45",
+      "reviewedAt": "2026-11-24T16:34:24.036Z",
+      "sourceDigest": "19eac7de58712ebb02a1619762da727bb8d86529d8901e4fba8069095733d81a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled existing PR155 consumers with merged shared verifier, actual main full and reuse receipts and operational baseline; preserved disabled setup/deployed acceptance and clarified historical pre-approval wording without changing production controls.",
+      "reviewReason": "Removed the observed duplicate environment-contract branch push while retaining PR/main checks, all paths/assertions and deployment triggers; recorded superseded b45798a runs without treating them as final-source evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -4,6 +4,8 @@
 
 This existing DEV/TEST foundation branch now consumes the shared `scripts/environments/ci_evidence.py` verifier installed on main by PR162. It retains all original foundation/controller work and incorporates approved PR154/PR157, the verified full source, and actual protected-main documentation/operational demonstrations below. Candidate rechecks include the immutable full CI proof; DEV requires exact current merge parents/tree, while TEST rejects reused-main-only green results. The helper, its16 negative tests and mandatory Arcade step are byte-identical to shared main policy. Original96-command regression coverage, separate parent reporting and the production eight-group contract remain unchanged.
 
+Hosted head `b45798a` revealed duplicate environment-contract executions on branch push and PR. The follow-up restricts only the push trigger to main, retaining every path, contract and PR check; superseded source runs remain visible. No deployment workflow trigger or authority changes.
+
 The repository-side compatibility integration is implemented; hosted validation of this final branch remains pending at this writing. The environment configuration remains `enabled:false` with no project/identity/provider setup supplied. Cloud provisioning, deployed DEV/TEST, real-provider/device acceptance and complete TEST-to-PROD approval remain outstanding. No production release intent, traffic, IAM, infrastructure, paid call or Cloud Shell action accompanied this reconciliation.
 
 ## November 24, 2026 — protected-main documentation and operational fast paths verified

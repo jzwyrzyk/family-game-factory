@@ -1,6 +1,7 @@
 name: Jems environment contracts
 on:
   push:
+    branches: [main]
     paths: ['scripts/environments/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
   pull_request:
     paths: ['scripts/environments/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']

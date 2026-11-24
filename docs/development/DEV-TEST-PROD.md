@@ -59,6 +59,8 @@ Evaluate preview applicability against the complete PR diff, and TEST against it
 
 ### CI receipt compatibility with parallel Arcade validation
 
+Environment contracts run once on the prospective PR merge and independently on applicable main pushes; feature-branch push duplication is removed without changing any contract, path rule or deployment trigger.
+
 The preview controller accepts full Arcade fixture evidence through `scripts/environments/ci_evidence.py`. It does not require duplicate branch-push regressions. For DEV, the latest first-attempt successful PR run must publish `arcade-validation-<tested-merge-SHA>-1`; the receipt's actual checkout source is independently checked against GitHub's current prospective merge, exact base/head parents and Git tree. The merge tree must equal the preview candidate head tree. Otherwise rebase onto current main and rerun; an API run's `head_sha` is not proof that its job checked out that SHA.
 
 The controller reads only fixed-repository GitHub metadata and a bounded JSON receipt ZIP, verifies its SHA-256, and requires every trusted manifest shard, command and stable aggregate to succeed on the expected GitHub-hosted runner. It compares the candidate's workflow, complete `scripts/ci/` subtree and package/lock files with protected main before trusting the receipt writer. Changes to that policy must be reviewed and integrated before a preview can rely on it. Missing installed policy, missing/expired/partial/cancelled evidence, an unrecognized event or source drift fails closed. The controller never executes the candidate's scripts or downloaded receipt. Existing current-head, archive, role-free-server, IAP and cloud identity checks remain independent.
