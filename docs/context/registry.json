@@ -725,7 +725,7 @@
       ],
       "reviewAfterDays": 30,
       "reviewedAt": "2026-11-24T14:25:06.000Z",
-      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
+      "sourceDigest": "34fa2a04f86f1d7ecee2a8259d1a9e30170c535491feb913247b43d6ce676341",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed current Responses approval type, private workflow checkout pin and draft PR139 stage/policy code; presentation contract distinguishes branch implementation from merged and effective provider state.",
       "reviewHistory": [
@@ -1098,7 +1098,7 @@
       ],
       "reviewAfterDays": 7,
       "reviewedAt": "2026-11-24T14:25:06.000Z",
-      "sourceDigest": "bccedbc8ffd7bcfd2ff15ef1a553c77c619ded1a3707c100ec732bfb7ea3f8a4",
+      "sourceDigest": "2005a928f4785e2a374c0c1f471db62a8edcfc629b01cba5c8199b266490ae51",
       "reviewOutcome": "updated",
       "reviewReason": "Inspected merged PR152 intent, actual transition and read-only observation logs, Pages build and per-shard status, current private worker runs and prior acceptance exception. Recorded dated promotion and publication limits without changing authorization.",
       "reviewHistory": [
