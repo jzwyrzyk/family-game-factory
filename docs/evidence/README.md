@@ -2,6 +2,8 @@
 
 ## CI architecture and performance
 
+**November 24 closure continuation:** PR161 merged as `2942901fa97b81a782756cd25da738bc4c94020f`, recording the completed production cutover and its retained acceptance gaps. The cutover timing hold is satisfied; PR154 merge approval and PR157 privileged activation approval remain explicit owner decisions. PR154 is rebased against that main with its original 96 command argument vectors/multiplicities independently compared to the pre-migration workflow and package scripts. Main remains full until the separately approved PR157 integration. Historical candidate measurements below remain historical; they are not activated-main performance.
+
 **November 23, 2026 (America/New_York), implementation candidate based on main `28fe3311036f8ef9f3bfc623c522432499c08113`.** This guide separates implemented source, hosted results and activation. No merge, production deployment, traffic change, IAM expansion, provider call or Cloud Shell action is authorized by a CI receipt. The active Gateway cutover remains a separate workstream; [PR152](https://github.com/jzwyrzyk/family-game-factory/pull/152) was awaiting candidate request acceptance at this observation.
 
 ### Execution and coverage contract

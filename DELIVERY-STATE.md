@@ -1,5 +1,13 @@
 # jems delivery state
 
+## November 24, 2026 — cutover hold released for CI preparation; owner merge approval pending
+
+[PR161](https://github.com/jzwyrzyk/family-game-factory/pull/161) merged as `2942901fa97b81a782756cd25da738bc4c94020f` after all 20 exact-head checks passed. Its completed-cutover receipt and all unverified authenticated/data acceptance, F06, diagnostics, phone first-attempt failure and update-button limitations below remain authoritative. GitHub independently confirms release45409746339 and observation45409955694 succeeded on attempt1, and Pages45410210444 succeeded on attempt2; that retry is not first-attempt full validation evidence.
+
+The previous CI timing hold is satisfied by the completed cutover. The November24 CI closure assignment authorizes rebase, corrections and hosted testing, but expressly retains final owner approval for PR154 and separate explicit approval for PR157's privileged release-plan integration and protected-main equivalence policy. Neither approval nor activation is inferred here. No deployment or traffic change is part of this assignment.
+
+PR154 is rebased onto the reconciled protected main, retaining its complete integrated tree rather than dropping fixes originally recorded in a merge commit. Direct comparison against the original workflow and package scripts at `2c4751611cbd40ef04a85432845cd260528f5a56` proves all **96 exact leaf argument vectors and multiplicities** remain: browser19, learning12, creative63, notifications2. All 13 shards and the separate image-isolation gate remain. Local CI contracts pass99 tests; fresh hosted checks and owner approval remain pending. PR157 stays stacked and unactivated until PR154 integrates. PR155's disabled DEV/TEST compatibility integration remains a subsequent repository task; no cloud provisioning is required to prepare it.
+
 ## November 24, 2026 — production cutover deployed; public live checks complete
 
 [PR152](https://github.com/jzwyrzyk/family-game-factory/pull/152) merged through protected main as `cc3da7ef0cdd371f628f9bc51d32d6296f575f8e` after all **21** exact-head checks passed on `a938c728feedc484988a6e895d310f8316611eb5`, including [PR Arcade45405821417](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45405821417) and [push Arcade45405804762](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45405804762). The actual merge tree `ab044dba914af8f0ae2371795706c13886e1b86d` equals the reviewed tree. The owner-approved evidence exception is recorded below and in the activation runbook; no branch rule, automated check or image/configuration gate was bypassed.

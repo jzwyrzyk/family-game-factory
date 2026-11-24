@@ -1065,10 +1065,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T14:41:04.120Z",
-      "sourceDigest": "9e5fca2b4b44e1c0f56910c5a750803c0cbe628385b0c23ffcf8aa6ace8358bc",
+      "reviewedAt": "2026-11-24T15:11:33.088Z",
+      "sourceDigest": "620d1066da553574fd4d440cc4894952ae8aad4f748a98ff0f0fd89c978e5e85",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded actual protected PR152 promotion, independent serving and recovery observation, exact-source Pages deployment with all eight shards, first-attempt phone failure and unchanged passing retry, live asset hashes and browser continuity, update recovery and approved unverified authenticated/pending-work limits.",
+      "reviewReason": "Rebased the complete CI tree onto PR161 protected merge; preserved completed cutover and all acceptance gaps, distinguished released timing hold from pending PR154/157 owner approvals, and verified all original96 leaf argv/multiplicities with no production workflow or intent changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1280,10 +1280,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T03:38:30.414Z",
-      "sourceDigest": "0fe08eabc960a29e8de4c42dc4aad912143f936a18fc686aca0d4c19fba623ea",
+      "reviewedAt": "2026-11-24T15:12:05.993Z",
+      "sourceDigest": "0fdb289200a048e83ee3e9691c0927be0886e266c7221687baec14577a373792",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered scripts/ci in validation and the existing evidence guide in link checking and delivery review; added README/index/maintenance references. Preserved all original documentation routing and review history; new tests require explicit shard ownership and measured runner and first-attempt evidence.",
+      "reviewReason": "Reviewed the PR template addition requiring exact CI identities, selection scope,96-command coverage, first-attempt outcomes and measured performance against the existing evidence guide; routing and maintenance authority remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
