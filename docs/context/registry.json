@@ -144,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T22:24:26.541Z",
+      "reviewedAt": "2026-11-24T22:31:41.318Z",
       "sourceDigest": "51f306824b1e0a96f3612c193340eaf381392904bff644f8ffdbbcddb5c688ef",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture now distinguishes integrated local journal and remote-copy guarantees from prepared indexed/cloud adapters. Child-owned Keep, immutable art, offline play and no paid replay remain unchanged.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed recovery and reward persistence contract updates against the doctrine. Child-owned Keep, original artwork, immutable versions, private profile boundaries and no paid replay remain unchanged; no product policy or routed decision document changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -1127,10 +1127,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T22:28:04.956Z",
-      "sourceDigest": "f9850e927eb11007caca76efaa3f5d47bb1dd8f054344525d92ae760cda01db0",
+      "reviewedAt": "2026-11-24T22:33:17.818Z",
+      "sourceDigest": "82f37d8f45b76fea7f097ecb8dac66596d51d9c0fc10d4ab9ea7f331b4320ca8",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated local acceptance count to 617 and retained source/browser/emulator/live-provider distinctions; branch remains unmerged and undeployed with full hosted validation and application migration work pending.",
+      "reviewReason": "Registered the mandatory storage browser test in both Arcade and the release regression partition; documented 41 commands and retained all eight release shards, original suites and exact-source evidence gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1688,10 +1688,10 @@
         "docs/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ace94951a3ea696a2836cfe28eabaa296e9851903ad8a80804f5524a4c82d79a",
-      "reviewedAt": "2026-11-24T22:28:04.435Z",
+      "sourceDigest": "e68a1d1899fbf3b7d9e6a69ec1b4e7b3273b33228f3648bf0d41b2f4c83c7f3b",
+      "reviewedAt": "2026-11-24T22:33:41.962Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded final audience-isolation and backup contracts with 617 unit checks and latest Chromium record timings, preserving the earlier noisy run and distinguishing unactivated adapters from integrated recovery."
+      "reviewReason": "Recorded the first hosted registration failures, the additive release-shard correction and supplemental restored-game browser passes. Runtime recovery and default-disabled adapters remain scoped separately from unfinished application migration and synchronization."
     }
   ]
 }
