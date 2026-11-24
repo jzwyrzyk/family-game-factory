@@ -58,6 +58,9 @@ test('performance baseline rejects arbitrary endpoints, duplicate fields and unb
     assert.throws(() => parsePerformanceBaseline(raw));
   }
 });
+test('the installed reporting baseline satisfies its exact data-only contract', () => {
+  parsePerformanceBaseline(readFileSync(new URL('../ops/ci-performance.json', import.meta.url), 'utf8'));
+});
 
 test('documentation-only change is exact allowlist and keeps integrity + operations checks', t => {
   const f = fixture(t); f.put('README.md', '# Updated documentation\n');

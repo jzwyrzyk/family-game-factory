@@ -863,10 +863,10 @@
         "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T04:41:55.258Z",
-      "sourceDigest": "a128508685d9eceb2c5859f229879b3c6fa247633e838ec4a3886d045f01d319",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed incoming daec8cf Mining setup-only correction: Chromium still uses the same pinned Ubuntu24 runner and browser version; all visual baselines, assertions, captures, viewports and timeout remain. No CI implementation or test source changed from the previously validated 112-test second-stage candidate. Its authenticated reuse policy and tamper defenses remain intact; new-source hosted Mining acceptance is pending and the observed timeout remains recorded.",
+      "reviewedAt": "2026-11-24T15:30:12.422Z",
+      "sourceDigest": "8fdbe2887987cce7df71db5ec9f8a5be58bd064502218c066a50ae412a09a6fb",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed118 integrated CI contracts including actual installed numeric-only reporting configuration; exact authenticated source/artifact/command/expiry gates, dependency shadow and synchronous cancellation assertions remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1100,10 +1100,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:24:33.337Z",
-      "sourceDigest": "fe7dd7add49835fae6ed77976922cbdd8bf0e8cc6e380249d2427d1d54b28793",
+      "reviewedAt": "2026-11-24T15:27:29.450Z",
+      "sourceDigest": "baa82686b0e559adf583ce7ab5ac34f1581df488a2448bd485c814f21f6ea4c5",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the read-only reporting baseline as a genuine operational update without production intent mutation, pending full hosted evidence and separately approved PR157 main reuse. Retained first-attempt failures, full fallback and local-only browser limits.",
+      "reviewReason": "Recorded explicit owner-approved PR154 merge and identical tested/main tree,14 passing first-attempt workflows with595second/52.02runner-minute Arcade sample, and pending integrated main validation. Reviewed PR157 plan-only privilege delta,239 operations tests including acceptance-route evidence failures, expiry and independent activation approval.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -38,7 +38,7 @@ class ReleaseValidationWorkflow(unittest.TestCase):
             return result, output.read_text(), summary.read_text(), calls.read_text() if calls.exists() else None
 
     def test_failed_evidence_never_exposes_transition_output_even_when_tee_succeeds(self):
-        for operation in ('stage', 'canary', 'promote'):
+        for operation in ('stage', 'canary', 'promote', 'acceptance-route-add', 'acceptance-route-remove'):
             with self.subTest(operation=operation):
                 result, output, _summary, calls = self.run_gate(operation, verifier_exit=7)
                 self.assertNotEqual(result.returncode, 0)
@@ -46,7 +46,7 @@ class ReleaseValidationWorkflow(unittest.TestCase):
                 self.assertEqual(calls.splitlines(), ['scripts/ci/verify-release-validation.mjs', 'a' * 40, '123'])
 
     def test_successful_evidence_is_required_before_forwarding_exact_operation(self):
-        for operation in ('stage', 'canary', 'promote'):
+        for operation in ('stage', 'canary', 'promote', 'acceptance-route-add', 'acceptance-route-remove'):
             with self.subTest(operation=operation):
                 result, output, summary, calls = self.run_gate(operation)
                 self.assertEqual(result.returncode, 0, result.stderr)
