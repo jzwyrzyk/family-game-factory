@@ -870,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T04:09:39.430Z",
-      "sourceDigest": "8359e76b40cea19109df23613df1be84cbb239f4637fb2a9824ceb506b32c4fe",
+      "reviewedAt": "2026-11-24T15:16:23.334Z",
+      "sourceDigest": "8f14843fdeba8eae8a2148870a621613d7eac86cbb58f86053816ee833178135",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed complete-revert preview regressions in addition to docs-during-build cases; local 96 environment tests pass, with prior viewport evidence and all live acceptance limitations retained.",
+      "reviewReason": "Applied and reviewed the full Arcade receipt adapter: exact PR merge parents/tree, main-owned CI policy, complete suite commands and hosted jobs, archive digest and expiration;112 environment tests and6 smoke tests pass. Derived preview bytes and deployed acceptance remain separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1068,10 +1068,10 @@
         "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T04:25:50.315Z",
-      "sourceDigest": "3c14f2d785e7457d718048fc06ae6158e97cc2d8de30a920c79dcf40b09a2184",
+      "reviewedAt": "2026-11-24T15:16:23.842Z",
+      "sourceDigest": "10c5b26ae438243ac6b9558acf12e87ced51f3813ba36c80e981813df929ecbd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the integration with main 2c47516 and retained PR153 diagnostics source and live-access limits. Reconciled both delivery receipts, recorded enforced restricted network access and pending Google sign-in, and kept nonproduction provisioning, AI activation, and the production cutover separate.",
+      "reviewReason": "Integrated the prior compatibility patch as actual disabled DEV/TEST controller source, with candidate rechecks bound to CI evidence. Recorded112 Python and6 JS checks and retained unmerged main, unprovisioned cloud and missing live acceptance limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

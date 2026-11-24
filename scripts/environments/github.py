@@ -19,6 +19,8 @@ import subprocess
 import zipfile
 from typing import Any
 
+import ci_evidence
+
 REPOSITORY = "jzwyrzyk/family-game-factory"
 REPOSITORY_ID = 1458033181
 PREFIX = f"repos/{REPOSITORY}"
@@ -168,11 +170,11 @@ def check_provenance(api: GitHub, check: dict, source: str) -> bool:
             or job.get("check_run_url") != f"https://api.github.com/{PREFIX}/check-runs/{check.get('id')}"):
         return False
     parent = api.request(f"{PREFIX}/actions/runs/{run_id}")
-    return (parent.get("event") in ("push", "pull_request")
+    return (parent.get("event") in ("push", "pull_request", "workflow_dispatch")
             and _valid_run(parent, source, CHECK_WORKFLOWS.get(check.get("name"))))
 
 
-def check_source(api: GitHub, source: str, policy: list[dict]) -> bool:
+def check_source(api: GitHub, source: str, policy: list[dict], kind: str, pr: int | None) -> dict | bool:
     checks = api.pages(f"{PREFIX}/commits/{source}/check-runs?filter=all", "check_runs")
     for requirement in policy:
         matching = [c for c in checks if c.get("name") == requirement["context"]
@@ -186,9 +188,11 @@ def check_source(api: GitHub, source: str, policy: list[dict]) -> bool:
             return False
         if not check_provenance(api, current, source):
             return False
-    runs = api.pages(f"{PREFIX}/actions/workflows/test.yml/runs?head_sha={source}&event=push", "workflow_runs")
-    current = _latest(runs)
-    return current is not None and current.get("event") == "push" and _valid_run(current, source, ".github/workflows/test.yml")
+    try:
+        return ci_evidence.verify_full_ci(api, source, kind, pr)
+    except (ci_evidence.EvidenceError, OSError, KeyError, TypeError, ValueError):
+        # No old branch-push or narrowed-main success can substitute a full receipt.
+        return False
 
 
 def _current_target(api: GitHub, source: str) -> tuple[str, int | None]:
@@ -280,7 +284,8 @@ def choose_candidate(api: GitHub, run_id: int, policy: list[dict], download_dir:
         environment, pr = _current_target(api, source)
     except GitHubError:
         return {"eligible": False, "reason": "SOURCE_NO_LONGER_CURRENT"}
-    if not check_source(api, source, policy):
+    ci_proof = check_source(api, source, policy, environment, pr)
+    if not ci_proof:
         return {"eligible": False, "reason": "REQUIRED_CHECKS_PENDING_OR_FAILED"}
     event = "push" if environment == "test" else "pull_request"
     runs = api.pages(f"{PREFIX}/actions/workflows/jems-preview-build.yml/runs?head_sha={source}&event={event}", "workflow_runs")
@@ -299,7 +304,7 @@ def choose_candidate(api: GitHub, run_id: int, policy: list[dict], download_dir:
         raise
     candidate = {"eligible": True, "environment": environment, "prNumber": pr,
                  "sourceSha": source, "runId": current["id"], "artifactId": artifact["id"],
-                 "artifactDigest": artifact["digest"]}
+                 "artifactDigest": artifact["digest"], "ciEvidence": ci_proof}
     if download_dir is not None:
         download_dir.mkdir(parents=True, exist_ok=True)
         archive = download_dir / f"artifact-{artifact['id']}.zip"

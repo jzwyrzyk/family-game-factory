@@ -104,7 +104,7 @@ def recheck(root, api=None):
     candidate = json.loads((root / "jems-candidate.json").read_text())
     policy = gh.required_checks(json.loads(Path("ops/github-main-ruleset.json").read_text()))
     fresh = gh.choose_candidate(api, candidate["runId"], policy)
-    fields = ("environment", "prNumber", "sourceSha", "runId", "artifactId", "artifactDigest")
+    fields = ("environment", "prNumber", "sourceSha", "runId", "artifactId", "artifactDigest", "ciEvidence")
     if not fresh.get("eligible") or any(fresh.get(k) != candidate.get(k) for k in fields):
         raise AutomationError("CANDIDATE_NO_LONGER_ELIGIBLE")
     current_controller(api)

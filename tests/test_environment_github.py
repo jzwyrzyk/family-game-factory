@@ -6,10 +6,13 @@ import io
 import json
 from pathlib import Path
 import tempfile
+import sys
+from unittest.mock import patch
 import unittest
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts/environments'))
 spec = importlib.util.spec_from_file_location("environment_github", ROOT / "scripts/environments/github.py")
 github = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(github)
@@ -103,6 +106,13 @@ class FakeGitHub:
 
 
 class CandidateTests(unittest.TestCase):
+    def setUp(self):
+        # Full receipt authentication has its own adversarial API/archive tests.
+        # These existing cases isolate the surrounding current-source/bundle gates.
+        self.ci_gate = patch.object(github.ci_evidence, 'verify_full_ci', return_value={'scope': 'verified-fixture'})
+        self.ci_gate.start()
+        self.addCleanup(self.ci_gate.stop)
+
     def test_candidate_binds_run_repo_sha_and_current_pr(self):
         api = FakeGitHub()
         candidate = github.choose_candidate(api, 99, POLICY)
@@ -156,8 +166,8 @@ class CandidateTests(unittest.TestCase):
             mutation(api)
             self.assertFalse(github.choose_candidate(api, 99, POLICY)["eligible"])
 
-    def test_successful_exact_source_push_ci_required(self):
-        for key, value in (("head_sha", OLD), ("event", "pull_request"), ("conclusion", "cancelled"), ("path", "other.yml")):
+    def test_wrong_source_failed_and_unrecognized_ci_events_fail(self):
+        for key, value in (("head_sha", OLD), ("event", "schedule"), ("conclusion", "cancelled"), ("path", "other.yml")):
             api = FakeGitHub()
             api.ci[key] = value
             self.assertFalse(github.choose_candidate(api, 99, POLICY)["eligible"])
