@@ -1,5 +1,9 @@
 # Direct Jems diagnostic access
 
+## Production HTTP request evidence through GitHub
+
+Use the [production diagnostics guide](PRODUCTION_DIAGNOSTICS.md) for the separate protected-main workflow, scoped source, report interpretation and ChatGPT retrieval procedure. It uses GitHub Actions federation to a private request-metadata broker. Its browser-based setup is independent of the managed Codex identity and Cloud Shell. See the [delivery ledger](../../DELIVERY-STATE.md) for the last verified state.
+
 ## November 23: existing GitHub release route for metadata
 
 **Verified live:** [PR151](https://github.com/jzwyrzyk/family-game-factory/pull/151) merged as `5e257a771c69e48ac919d947a4339535af4a934f` after all 21 exact-head checks passed. [Observation run45311130260](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45311130260) succeeded at `2026-11-24T02:16:49.898767Z`, with the effective release identity verified, all mutation jobs skipped, Coach100/Gateway0 verified and current Preview inputs read. [Run45311550910](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45311550910) independently verified the subsequent Gateway95/5 canary and successful lifecycle conditions. This supersedes the preparation-only status below. Cloud Shell is no longer required for these service metadata reads; the identity's existing log-access restriction remains.

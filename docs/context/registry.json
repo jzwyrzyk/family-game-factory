@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T02:23:30.547Z",
-      "sourceDigest": "e16b27a3aabe646f9d6d7227d9b66d271f7b4a2e26fbc250d3e257d4ef8aa68b",
+      "reviewedAt": "2026-11-24T13:38:56.079Z",
+      "sourceDigest": "bccedbc8ffd7bcfd2ff15ef1a553c77c619ded1a3707c100ec732bfb7ea3f8a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified metadata access and Gateway95/5 canary receipts, and prepared a distinct promotion intent held for candidate-specific functional/error evidence; metadata success is explicitly insufficient and all provider/IAM/data boundaries remain unchanged.",
+      "reviewReason": "Record actual PR160 tag activation and independent 95/5 observation, preserve unresolved request/data evidence, and document owner-approved risk-accepted cutover with all automated/protected release gates retained; refresh only the pinned Gateway promotion intent.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
