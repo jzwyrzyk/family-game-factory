@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T13:38:56.079Z",
-      "sourceDigest": "bccedbc8ffd7bcfd2ff15ef1a553c77c619ded1a3707c100ec732bfb7ea3f8a4",
+      "reviewedAt": "2026-11-24T14:41:04.120Z",
+      "sourceDigest": "9e5fca2b4b44e1c0f56910c5a750803c0cbe628385b0c23ffcf8aa6ace8358bc",
       "reviewOutcome": "updated",
-      "reviewReason": "Record actual PR160 tag activation and independent 95/5 observation, preserve unresolved request/data evidence, and document owner-approved risk-accepted cutover with all automated/protected release gates retained; refresh only the pinned Gateway promotion intent.",
+      "reviewReason": "Recorded actual protected PR152 promotion, independent serving and recovery observation, exact-source Pages deployment with all eight shards, first-attempt phone failure and unchanged passing retry, live asset hashes and browser continuity, update recovery and approved unverified authenticated/pending-work limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
