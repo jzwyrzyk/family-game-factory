@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 24, 2026 — CI follow-up prepared: dependency shadow and browser event evidence
+
+A follow-up to PR154 adds advisory dependency-consumer reports across game/UI/learning/coding/conversation categories while keeping all executable regression mandatory. It removes three remaining duplicate branch-push contract workflows while preserving their PR-merge/main execution and assertions. Factory touch cancellation now observes the real trusted DOM event and asserts release in the event handler, retaining the original immediate and150ms state checks. The historical Pages failure is retained; this is a test synchronization correction, not a proven production defect fix.
+
+Local CI contracts pass102 tests. Production build and all Factory desktop/tablet/phone/narrow-phone, reduced-motion and saved native lifecycle cases pass on this Codex browser. The dependency audit takes approximately1.6seconds for both current trees in this workspace. These are supplemental local results, not hosted/main activation, dependency-coverage proof or a reliability-rate claim. Protected-main validation and performance evidence remain pending. No production workflow, release intent, IAM, paid-provider call or Cloud Shell action is involved.
+
 ## November 24, 2026 — cutover hold released for CI preparation; owner merge approval pending
 
 [PR161](https://github.com/jzwyrzyk/family-game-factory/pull/161) merged as `2942901fa97b81a782756cd25da738bc4c94020f` after all 20 exact-head checks passed. Its completed-cutover receipt and all unverified authenticated/data acceptance, F06, diagnostics, phone first-attempt failure and update-button limitations below remain authoritative. GitHub independently confirms release45409746339 and observation45409955694 succeeded on attempt1, and Pages45410210444 succeeded on attempt2; that retry is not first-attempt full validation evidence.

@@ -1100,10 +1100,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:11:33.088Z",
-      "sourceDigest": "620d1066da553574fd4d440cc4894952ae8aad4f748a98ff0f0fd89c978e5e85",
+      "reviewedAt": "2026-11-24T15:20:22.806Z",
+      "sourceDigest": "1a7a38a874540003d3575d9c2e02aea523c48a8ca42199ef33f934de1e28addc",
       "reviewOutcome": "updated",
-      "reviewReason": "Rebased the complete CI tree onto PR161 protected merge; preserved completed cutover and all acceptance gaps, distinguished released timing hold from pending PR154/157 owner approvals, and verified all original96 leaf argv/multiplicities with no production workflow or intent changes.",
+      "reviewReason": "Recorded prepared duplicate contract-run removal, dependency-shadow limits and actual local Factory validation; PR-merge/main checks and all production controls remain unchanged, and hosted activation/reliability are not claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

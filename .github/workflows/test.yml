@@ -55,6 +55,8 @@ jobs:
           CI_FORCE_FULL: ${{ inputs.force_full || false }}
           GH_TOKEN: ${{ github.token }}
         run: node scripts/ci/prepare-plan.mjs
+      - name: Record advisory dependency consumers without narrowing coverage
+        run: node scripts/ci/dependency-shadow.mjs
       - name: Documentation integrity
         run: npm run docs:check
       - name: Operations, provenance and release-transition contracts
@@ -68,6 +70,7 @@ jobs:
           path: |
             ci-plan.json
             ci-reuse.json
+            ci-dependency-shadow.json
           retention-days: 30
           if-no-files-found: error
       - run: npm ci

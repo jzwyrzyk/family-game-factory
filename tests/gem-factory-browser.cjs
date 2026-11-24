@@ -465,7 +465,21 @@ async function checkCustomCadence(browser,url){
      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
      await page.waitForTimeout(220);
      assert.equal((await snapshot(page)).holding,true,'a real touch can hold Polish');
+     // CDP command completion does not acknowledge DOM event delivery. Observe
+     // the trusted event after it bubbles through the game's synchronous input
+     // handler; do not grant the game extra time to eventually release a hold.
+     await page.evaluate(()=>{
+      window.factoryTouchCancellation=null;
+      window.addEventListener('pointercancel',event=>{
+       window.factoryTouchCancellation={trusted:event.isTrusted,pointerType:event.pointerType,state:FG.runtime.snapshot().state};
+      },{once:true});
+     });
      await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+     await page.waitForFunction(()=>window.factoryTouchCancellation!==null,{},{timeout:3000});
+     const delivered=await page.evaluate(()=>window.factoryTouchCancellation);
+     assert.equal(delivered.trusted,true,'the browser delivers a real cancellation');
+     assert.equal(delivered.pointerType,'touch','the observed cancellation belongs to touch input');
+     assert.equal(delivered.state.holding,false,'cancelled touch releases polishing in its event handler');
      const cancelled=await snapshot(page);assert.equal(cancelled.holding,false,'cancelled touch releases polishing');
      await page.waitForTimeout(150);assert.equal((await snapshot(page)).polish,cancelled.polish,'touch cancel cannot keep polishing invisibly');
     }else{
