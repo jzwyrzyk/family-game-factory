@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T00:21:22.734Z",
-      "sourceDigest": "3812e221c158a42ee934e0de50d7be4e1b55d115ba63a7e7a22ef9672fc50d5b",
+      "reviewedAt": "2026-11-24T01:51:12.836Z",
+      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
       "reviewOutcome": "updated",
-      "reviewReason": "Prepared the exact-pinned Gateway canary behind successful Coach promotion and Gateway staging; documented live predecessor, lifecycle review and candidate acceptance requirements while running source checks in advance.",
+      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
