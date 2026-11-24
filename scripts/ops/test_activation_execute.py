@@ -18,6 +18,8 @@ from test_production_activation import fixture
 FROZEN_ACTIVATION_INPUTS = {
     'ops/compatibility.json': b'{}\n',
     'ops/release.json': b'{}\n',
+    '.github/workflows/jems-cloud-run-release.yml': (
+        Path(__file__).with_name('fixtures') / 'activation-release-workflow.yml').read_bytes(),
 }
 
 
@@ -210,8 +212,9 @@ class Preparation(unittest.TestCase):
         self.assertEqual(len(result['scope']['roles']), 2); self.assertEqual(len(result['scope']['variables']), 4)
         self.assertTrue(FROZEN_ACTIVATION_INPUTS.keys() <= e.SOURCE_HASHES.keys())
         for path, expected in e.SOURCE_HASHES.items():
-            # These two files were empty at activation; later release intents
-            # evolve independently. Executable and workflow pins stay exact.
+            # Preserve the originally approved activation bytes. Later release
+            # intents and the read-only observation mode cannot authorize a
+            # replay of the historical IAM activation executor.
             data = FROZEN_ACTIVATION_INPUTS[path] if path in FROZEN_ACTIVATION_INPUTS else (e.review.ROOT / path).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), expected, path)
 

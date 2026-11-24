@@ -1,5 +1,15 @@
 # Direct Jems diagnostic access
 
+## November 23: existing GitHub release route for metadata
+
+The owner confirmed exhaustion of Cloud Shell's 50-hour weekly terminal quota after successful Coach promotion. This does not stop deployed Cloud Run services. The enabled production release identity already has service/revision GET access on the three reviewed services. A new mutually exclusive `observe` input on [the existing release workflow](../../.github/workflows/jems-cloud-run-release.yml) provides those reads through the same protected-main workflow, environment, federation provider and service account. It adds no IAM, trust, spending or runtime scope. See [delivery state](../../DELIVERY-STATE.md) for actual execution evidence; source preparation alone does not establish a working connection.
+
+Dispatch the workflow on main with `observe=true`, `verify_identity=false`, and `verify_access=false`. The identity/access-proof jobs and transition plan explicitly exclude observation, and transition still depends on plan. The observer verifies hosted-runner claims, current main and checked-out workflow identity, plus the effective Google account using the same short-lived access token. It checks service reconciliation, explicit desired/effective traffic, bounded latest/serving revisions, image digests, runtime accounts and in-memory configuration fingerprints; the current release intent must match the observed transition. A second service read and main check reject concurrent change.
+
+Only sanitized metadata is emitted. The GET-only client is limited to Google userinfo and the three exact Cloud Run service/revision namespaces; redirects, permission POSTs and other endpoints are rejected. No logs, application requests, secret payloads, data inventory or paid provider tests are available through this mode. The release account still has its existing deployment privileges: read-only describes this reader's behavior, not a reduced IAM ceiling. No new credential or service-account key is installed in Codex. Gateway lifecycle/metadata inspection can continue through this route; request attribution, saved-game preservation and live acceptance remain separate evidence.
+
+The older managed-environment setup below remains a separate diagnostic option. Its historical no-merge and inactive-release statements do not override the owner's subsequent production-cutover authorization. The original activation executor's approved workflow checksum remains unchanged; offline tests retain the exact old workflow fixture and verify that the later observation workflow cannot replay that historical activation scope.
+
 **Status:** PR100 source reconciled with main `6cc9c3801ccb7ae53d8eb9f708ae851699ac3f2d` for review. Earlier operational discussion reported successful metadata reads in a configured environment; that is prior evidence, not a live check from this task. This task has neither `gcloud` nor a managed outbound identity manifest. A passing local test, merged PR or connection in another task does not activate access here. See [delivery state](../../DELIVERY-STATE.md) for the scoped observations.
 
 ## Outcome and operating scope
