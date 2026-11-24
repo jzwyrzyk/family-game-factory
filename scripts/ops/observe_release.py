@@ -142,7 +142,7 @@ def snapshot(api, service, intent):
                     "acceptance-route-remove": ({baseline: 95, candidate: 5}, {candidate: 100}, {baseline: 100})}[operation]
         if operation.startswith("acceptance-route-") or (operation == "promote" and service == "factory-gateway"):
             require(service == "factory-gateway", "ACCEPTANCE_ROUTE_SERVICE_INVALID")
-            tag_name = "jems-acceptance-" + candidate.rsplit("-r-", 1)[1]
+            tag_name = "jems-test-" + candidate.rsplit("-r-", 1)[1]
             matching = [entry for entry in tags if entry["tag"] == tag_name]
             require(matching == ([dict(release.traffic_target(candidate, 0), tag=tag_name)]
                     if operation == "acceptance-route-add" else []), "ACCEPTANCE_ROUTE_TAG_MISMATCH")

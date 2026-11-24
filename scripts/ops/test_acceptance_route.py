@@ -52,7 +52,7 @@ class AcceptanceRouteTests(unittest.TestCase):
     def test_conflicting_tag_is_not_reassigned_or_removed(self):
         for operation in ('acceptance-route-add', 'acceptance-route-remove'):
             f = self.fixture()
-            tag = dict(release.traffic_target(f.baseline,0),tag='jems-acceptance-'+f.candidate.rsplit('-r-',1)[1])
+            tag = dict(release.traffic_target(f.baseline,0),tag='jems-test-'+f.candidate.rsplit('-r-',1)[1])
             for field in ('traffic','trafficStatuses'): f.state[field] = [*f.state[field], copy.deepcopy(tag)]
             count=len(f.patches)
             with self.assertRaisesRegex(release.ReleaseError,'another revision'): f.transition(operation)
@@ -81,7 +81,7 @@ class AcceptanceRouteTests(unittest.TestCase):
 
     def test_promotion_refuses_conflicting_acceptance_tag_before_write(self):
         f=self.fixture()
-        tag=dict(release.traffic_target(f.baseline,0),tag='jems-acceptance-'+f.candidate.rsplit('-r-',1)[1])
+        tag=dict(release.traffic_target(f.baseline,0),tag='jems-test-'+f.candidate.rsplit('-r-',1)[1])
         for field in ('traffic','trafficStatuses'): f.state[field]=[*f.state[field],copy.deepcopy(tag)]
         count=len(f.patches)
         with self.assertRaisesRegex(release.ReleaseError,'another revision'): f.transition('promote')
@@ -95,6 +95,13 @@ class AcceptanceRouteTests(unittest.TestCase):
         f.transition('promote')
         self.assertEqual(release.traffic(f.state),{f.candidate:100})
         self.assertEqual(release.pinned_tags(f.state),[])
+
+    def test_fixed_tag_fits_observed_gateway_dns_labels(self):
+        f=self.fixture(); f.transition('acceptance-route-add')
+        tag=release.pinned_tags(f.state)[0]['tag']
+        self.assertEqual(tag,'jems-test-'+f.candidate.rsplit('-r-',1)[1])
+        for service_label in ('factory-gateway-ola734esta-ul','factory-gateway-1054529152893'):
+            self.assertLessEqual(len(tag+'---'+service_label),63)
 
     def test_other_service_is_rejected(self):
         f=CloudRunFixture(); f.transition('stage'); f.transition('canary')

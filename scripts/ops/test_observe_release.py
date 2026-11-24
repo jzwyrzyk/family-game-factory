@@ -81,7 +81,7 @@ class ObservationTests(unittest.TestCase):
     def test_acceptance_route_requires_exact_tag_and_preserved_allocation(self):
         f = Fixture(); candidate = release.revision_name(f.intent)
         active = [release.traffic_target(f.intent['baseline'], 95), release.traffic_target(candidate, 5)]
-        tag = dict(release.traffic_target(candidate, 0), tag='jems-acceptance-'+candidate.rsplit('-r-',1)[1])
+        tag = dict(release.traffic_target(candidate, 0), tag='jems-test-'+candidate.rsplit('-r-',1)[1])
         f.intent['operation'] = 'acceptance-route-add'
         f.gateway['traffic'] = f.gateway['trafficStatuses'] = active + [tag]
         reader.observe(f, f.intent)

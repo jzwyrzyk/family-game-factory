@@ -177,7 +177,7 @@ def rollout(intent, api, *, location=LOCATION):
         if adding:
             require(latest_is_candidate, "Candidate is no longer latest")
             verify_revision(candidate, intent["image"])
-        tag_name = "jems-acceptance-" + candidate.rsplit("-r-", 1)[1]
+        tag_name = "jems-test-" + candidate.rsplit("-r-", 1)[1]
         matching = [entry for entry in tags if entry["tag"] == tag_name]
         require(not matching or matching[0]["revision"] == candidate,
                 "Acceptance tag points to another revision")
@@ -222,7 +222,7 @@ def rollout(intent, api, *, location=LOCATION):
         }[operation]
         removed_acceptance_tag = False
         if operation == "promote" and service == "factory-gateway":
-            tag_name = "jems-acceptance-" + candidate.rsplit("-r-", 1)[1]
+            tag_name = "jems-test-" + candidate.rsplit("-r-", 1)[1]
             matching = [entry for entry in tags if entry["tag"] == tag_name]
             require(not matching or matching[0]["revision"] == candidate,
                     "Acceptance tag points to another revision")

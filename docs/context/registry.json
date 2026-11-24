@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T12:48:50.180Z",
-      "sourceDigest": "db2b653ba10f62b988c60c20b87fd1ccba05d68e9016c2876eb200549719f89f",
+      "reviewedAt": "2026-11-24T12:57:42.968Z",
+      "sourceDigest": "1f165fc1694bf6994b33725d4bff0197748b165894b0b741b77ef50dbd0a20b0",
       "reviewOutcome": "updated",
-      "reviewReason": "Review fixed candidate route plus atomic cleanup during promotion, observer tag absence checks and preserved baseline/other tags; all original acceptance gates remain.",
+      "reviewReason": "Shorten fixed acceptance tag to fit current Gateway DNS labels; verify the same candidate/scope, atomic cleanup and existing release gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

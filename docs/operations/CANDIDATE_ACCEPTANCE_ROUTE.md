@@ -9,7 +9,7 @@ The existing 5% Gateway canary has observed status/unlock successes but no attri
 | Service | `factory-gateway`, project `family-game-factory-jzw`, `us-east5` |
 | Candidate | `factory-gateway-r-eaf5effa06d031818f52` |
 | Publication/application source | `aa56b60abe152e750f9f0b5e8949bdb44be53196` |
-| Temporary fixed revision tag | `jems-acceptance-eaf5effa06d031818f52` |
+| Temporary fixed revision tag | `jems-test-eaf5effa06d031818f52` |
 | Normal service traffic | Retain baseline95/candidate5 during acceptance |
 | Authentication addition | One temporary trusted family device named `Jems candidate acceptance`, enrolled by the owner using the existing one-use invitation and parent passphrase flow |
 | Paid action | One explicit Adult conversation turn using a new synthetic game idea, under the current allowance; no Build, automatic replay or budget increase |
@@ -19,7 +19,7 @@ The tag exposes another HTTPS address for the already-public Gateway candidate, 
 
 ## Reviewed controller behavior
 
-The implementation adds `acceptance-route-add` and `acceptance-route-remove` intent operations to the existing protected-main Cloud Run workflow. No workflow trust changes are needed. The operations retain the exact source/image/configuration/compatibility fields and signed-image validation. The new tag name is derived from the pinned candidate identity, not supplied freely.
+The implementation adds `acceptance-route-add` and `acceptance-route-remove` intent operations to the existing protected-main Cloud Run workflow. No workflow trust changes are needed. The operations retain the exact source/image/configuration/compatibility fields and signed-image validation. The new tag name is derived from the pinned candidate identity, not supplied freely. Its shortened `jems-test-` prefix keeps both observed Gateway hostname forms within the 63-character DNS-label limit; the actual returned URL must still be verified before use.
 
 Adding requires Gateway, baseline95/candidate5, matching declared/effective allocation, current latest candidate, both pinned ready revisions, configuration fingerprint, reconciled tags and an etag. A conflicting existing tag fails closed. The PATCH changes only the traffic array to append a zero-percent tagged target while retaining normal percentages and every other tag. Postchecks require the same normal allocation/configuration and exact expected tag set. Repeating the same operation is idempotent.
 
