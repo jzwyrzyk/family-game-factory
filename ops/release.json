@@ -1,10 +1,10 @@
 {
-  "operation": "canary",
+  "operation": "stage",
   "source": "aa56b60abe152e750f9f0b5e8949bdb44be53196",
-  "service": "factory-coach-private",
-  "image": "us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images/coach@sha256:67cf3b3b92f83ecf5f107b68c00606cf5bbc946561d13104d37ad929c80575e3",
-  "baseline": "factory-coach-private-chatready-1996c1b382a7-9c98a0",
-  "baselineImage": "us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/coach@sha256:5719a739f5a470adf40bb544aab82afee3fab4dea8b2544b7f2b5dcc16e21488",
-  "configuration": "92c35f30b7dd8ff67d8fc41eb1b1319b1180c4686af53d6a10195f9fd68c13a7",
-  "compatibility": "8674dffa96298dc2de7434f05067559c1d56db3feb1a12aa6f71616d1c0413da"
+  "service": "factory-gateway",
+  "image": "us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images/gateway@sha256:18c62e421f5a8c4f6fbf4223b2121f979e64cdf7a9d3821ddf03379dad082436",
+  "baseline": "factory-gateway-pr115-19f5e46ae114-fb5fa6",
+  "baselineImage": "us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/gateway@sha256:7a36d722f09e8a78aefbbb5470c5b8fc164d8be10b8222feea2947dd266cd7d0",
+  "configuration": "e75c30de0f926d94228c2fc6fca2a1e204b87c0e1577d1163edc6be974505510",
+  "compatibility": "67441815c650879bf74a95f9c8e8f458e4a56ecb1d07208205c31989c18de19d"
 }

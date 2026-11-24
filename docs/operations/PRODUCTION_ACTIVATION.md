@@ -36,6 +36,12 @@ Use the supplied checksum-pinned [canary observation handoff](../../scripts/ops/
 
 Use the existing authenticated Adult profile and approved allowance for the bounded conversation check, keeping Build separate. Match a successful actual reply to the candidate's completion-request metadata; a reply served by the baseline cannot clear candidate acceptance. Do not automatically repeat an uncertain paid request. Review any errors before a separate promotion intent. The retained baseline and owner recovery permissions support the existing controller's traffic-only rollback if needed; this read-only handoff never invokes apply, promotion or rollback.
 
+## Preparing the November 23 Gateway stage
+
+The owner completed the canary handoff at `2026-11-24T00:01:05.156354Z`; its receipt and fresh Gateway inputs are recorded in [delivery state](../../DELIVERY-STATE.md). Coach remained at 95/5, while the bounded request query contained no matching chat POSTs or status GETs. Candidate conversation acceptance remains open.
+
+The Gateway stage intent binds that observation's single 100% baseline and matching configuration to the already published Gateway image from source `aa56b60abe152e750f9f0b5e8949bdb44be53196`. Staging may proceed independently at candidate0/baseline100 while Coach's conversation check remains open. It uses the existing reviewed provenance and etag-guarded release workflow; it neither changes Coach traffic nor advances Gateway to canary. Recheck the exact source, required CI and current main before merge, then observe the actual workflow result. A successful stage proves pinned revision metadata, not functional request handling. After main advances, preserve the older canary handoff as historical evidence and use a separately reviewed observation for the new release state.
+
 ## What is known, and what still needs a fresh read
 
 | Evidence | Scope and limit |
