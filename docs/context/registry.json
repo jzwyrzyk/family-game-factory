@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T01:51:12.836Z",
-      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
+      "reviewedAt": "2026-11-24T03:29:41.280Z",
+      "sourceDigest": "dec4e2eec97ff4fbca5dfc3132241e04dda12c91383822aa11c99786a70755a5",
       "reviewOutcome": "updated",
-      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
+      "reviewReason": "Reviewed dedicated protected-main diagnostics, view-only broker access, strict reporting, privacy fixtures and unchanged release controls. Updated request-evidence setup, retrieval, architecture and ledger to distinguish source, IAM, retained coverage and live acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

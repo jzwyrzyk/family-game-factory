@@ -18,6 +18,15 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -m unittest discover -s scripts/ops -p 'test_*.py' -v
+        env:
+          JEMS_OFFLINE_FIXTURE_DIR: ${{ runner.temp }}/jems-offline-fixture
+      - name: Upload synthetic diagnostics fixture
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: jems-diagnostics-OFFLINE-fixture-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/jems-offline-fixture/report.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Boot both nonproduction drill images offline as non-root
         run: bash ops/drill/smoke.sh
       - name: Validate proposed release intent

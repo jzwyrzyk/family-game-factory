@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 24, 2026 — Gateway request evidence pending
+
+The [Gateway canary release](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45311336437) completed its traffic transition at `2026-11-24T02:19:11.8337405Z`. The [later metadata observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45316092264) reported 95% baseline and 5% candidate at `02:57:52.821478Z`. The exact candidate is `factory-gateway-r-eaf5effa06d031818f52`. [PR149](https://github.com/jzwyrzyk/family-game-factory/pull/149) records the transition. [PR152](https://github.com/jzwyrzyk/family-game-factory/pull/152) holds promotion for request acceptance. Candidate `POST /v1/coach` timestamps, statuses and the candidate 5xx count are **NOT_CHECKED** here.
+
+A separate [GitHub request reader](docs/operations/PRODUCTION_DIAGNOSTICS.md) is prepared for review against main `28fe3311036f8ef9f3bfc623c522432499c08113`. Source implementation, merge, approved deployment/IAM, effective privacy tests and a successful production artifact are separate milestones. This entry records source preparation only. The managed GCP self-check in this task returned `IDENTITY_NOT_CONFIGURED`. Existence of the proposed reader, coverage of the original interval and effective Google access remain unverified. No historical requests were replayed. Record later approvals, run links, exact scope, counts and limitations in a new dated receipt.
+
 ## November 23, 2026 — Gateway canary prepared behind the ordered backend transitions
 
 A separate Gateway canary intent is prepared on top of staged-release head `c2176c0d557f8751ec71f1263d2adc726dd5d0c0`. It changes only the Gateway operation from stage to canary, retaining the same source, signed image, baseline image/revision, configuration fingerprint and exact compatibility receipt. It targets baseline95/candidate5 through the unchanged controller. This is preparation only: Coach promotion PR148 and Gateway stage PR147 must each merge and complete their live transition successfully before this canary intent may merge. Exact-head source checks can run in advance; neither their success nor this entry establishes staging, canary readiness, a traffic change or functional acceptance.
