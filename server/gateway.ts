@@ -1,3 +1,4 @@
+import {platformMode,type BetaConfig} from './beta/model';
 import {CoachService} from './coach/service';
 import {reconcilePaidReceipts} from './coach/receipts';
 import {PrivateCoachBridge,PrivateSpeechBridge,privateCoachOrigin} from './coach/private-bridge';
@@ -29,6 +30,7 @@ import {sessionHandler} from './sessions';
 import {trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
 export interface GatewayConfig {
+ platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
  workerRepository?:string;workerRepositoryId?:string;workerWorkflow?:string;workerApprovedSha?:string;
@@ -49,6 +51,7 @@ export function approvedPremiumPilot(config:GatewayConfig,requested:boolean,adul
  return {approval:config.premiumApproval,workerSha:config.premiumWorkerApprovedSha};
 }
 export async function createGateway(config:GatewayConfig){
+ if(platformMode(config.platformMode)!=='HOUSEHOLD')throw Error('BETA_GATEWAY_REQUIRED');
  for(const origin of [config.appOrigin,config.gatewayOrigin,config.previewOrigin]){const url=new URL(origin);if(url.origin!==origin||url.protocol!=='https:')throw Error('HTTPS_ORIGINS_REQUIRED');}
  if(new URL(config.previewOrigin).hostname===new URL(config.appOrigin).hostname||new URL(config.previewOrigin).hostname===new URL(config.gatewayOrigin).hostname)throw Error('SEPARATE_PREVIEW_HOST_REQUIRED');
  if(!/^[A-Za-z0-9_-]{1,100}$/.test(config.familyId)||['__proto__','constructor','prototype'].includes(config.familyId))throw Error('FAMILY_ID_REQUIRED');

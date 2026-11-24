@@ -1,5 +1,7 @@
 # Jems parent privacy and temporary adult development profile
 
+Private beta processing also requires the current family capability, platform spending policy and independently reviewed provider evidence for that scope. The gateway computes those permissions on every workspace read. See the [tenancy contract](../family-beta/ARCHITECTURE.md).
+
 This change adds a temporary authenticated adult development profile to the existing Jems website alongside ordinary child profiles. Once deployed and configured, switching to Adult (development) activates approved AI tools after the existing passphrase unlock. It needs neither another site nor a separate activation button. See [the adult release guide](../adult-pilot/VOICE_RELEASE_AND_UAT.md) for the session contract and deployment steps.
 
 ## Parent choices in Grown-ups

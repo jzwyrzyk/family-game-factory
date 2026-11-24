@@ -662,7 +662,8 @@
         "docs/auth/*.md",
         "server/README.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/family-beta/*.md"
       ],
       "sources": [
         "server/*.ts",
@@ -672,13 +673,14 @@
         "server/contracts/**",
         "server/storage/**",
         "docs/auth/*.md",
-        "server/privacy/**"
+        "server/privacy/**",
+        "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:57.748Z",
-      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
+      "reviewedAt": "2026-11-24T23:29:18.377Z",
+      "sourceDigest": "9226cbcb4f8f3e0f7f90729ab4a1f5180aff867dd37fb185a28bf4b5fb3d1a77",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
+      "reviewReason": "Documented beta family and policy documents, isolated browser origins, artifact namespaces and reserved operating modes.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -728,10 +730,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:03:59.475Z",
-      "sourceDigest": "a7748aa2cc821639c57f194a3393e9938b763f708217921d7acfd51afc79fb2f",
+      "reviewedAt": "2026-11-24T23:29:18.758Z",
+      "sourceDigest": "ddc048863f52c2da3c9df8e10293437839cbc252ef7649b7a43daa8920b2fbf3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed atomic normal-motion evidence sampling after the offline paused-frame race; preserved source/frame/state identities and originals, and explicitly retained production eight-image policy and paid serial/full-job behavior.",
+      "reviewReason": "Reviewed the bounded chunk format and job ownership index with transactions for monthly global and family usage.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -824,10 +826,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "ee30422a65cfbeff27ec88eb03a1bc4b9d25de6034ed1012e09cbbff664b847b",
-      "reviewedAt": "2026-11-24T20:54:52.440Z",
+      "sourceDigest": "955a220d2c32d6174c28cafdce406cc3c63ca8c03fbd65148532fbc5cea1ef2d",
+      "reviewedAt": "2026-11-24T23:29:19.152Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged DEV TEST rollout guidance with premium Adult Private approval and saved-reader preservation; no child scope, grants, provider retention or authorization policy changes.",
+      "reviewReason": "Verified current guardian scope checks now also consult runtime beta scope and independently reviewed provider evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:04:00.001Z",
-      "sourceDigest": "98447857529890e9cbb50fe3661a63b4f4c487a4c3257304148cee1263d19186",
+      "reviewedAt": "2026-11-24T23:29:19.526Z",
+      "sourceDigest": "5096e7920bcd802f29a507cb99e5a64790a7585ffc3bf9347341240e885a16ad",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified final offline adversarial matrix detects 15 broken sessions with three working controls, keeps 108 original PNG identities and compares full/lossy sheets; recorded clean hosted image actual-byte and legacy/premium proof without claiming gVisor/provider acceptance.",
+      "reviewReason": "Synthetic accounts and an unmapped owner workspace exercise separation and malformed mode and evidence rejection.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1383,10 +1385,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T20:54:53.956Z",
-      "sourceDigest": "0bbbe4a7991101120d756bb7410ec66b372b46aa53313cf249bd7aeb584d7cb9",
+      "reviewedAt": "2026-11-24T23:29:19.876Z",
+      "sourceDigest": "61fb036b7331f0ea4dfbf0de47090b99bb3a6b96543cbaa2879e6f582b53e15f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both registry source maps and documentation histories; routed new premium offline Python tools and completion handoff while preserving current maintenance requirements.",
+      "reviewReason": "Routed family beta source and architecture references to the service documentation registry.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
