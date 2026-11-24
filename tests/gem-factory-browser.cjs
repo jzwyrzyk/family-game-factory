@@ -26,14 +26,14 @@ async function openFactory(page){
  await page.waitForFunction(()=>FG.runtime.snapshot()?.config.orderSize===2);
 }
 
-async function capture(page,device,stage){
+async function capture(page,device,stage,evidenceName=device){
  // Capture the settled station, not an intermediate frame in its intentional
  // camera pan. This waits for that finite transition, never for valid bounds.
  await page.locator('.gf-room').evaluate(async room=>{room.getBoundingClientRect();await Promise.allSettled(room.getAnimations().map(animation=>animation.finished));});
  await checkRoomBounds(page,device,stage);
  if(stage==='pack'&&device.startsWith('phone'))await checkPackingSpace(page,device);
  fs.mkdirSync('test-results/gem-factory',{recursive:true});
- await page.locator('.gem-factory').screenshot({path:`test-results/gem-factory/${device}-${stage}.png`});
+ await page.locator('.gem-factory').screenshot({path:`test-results/gem-factory/${evidenceName}-${stage}.png`});
 }
 
 async function checkPackingSpace(page,device){
@@ -180,11 +180,11 @@ async function chooseGem(page,device='desktop',keyboard=false){
  assert.ok(sorted.sorting.contacts>=2,'sorting has real body and tray contacts');
 }
 
-async function cutGem(page,device='desktop'){
+async function cutGem(page,device='desktop',evidenceName=device){
  for(let checkpoint=0;checkpoint<4;checkpoint++){
   if(await page.evaluate(()=>FG.learning.active)){await finishLearning(page);continue;}
   const button=page.locator('.gem-factory .gf-cut-action[data-action="cut"]');
-  await waitForCamera(page);await capture(page,device,'cut');
+  await waitForCamera(page);await capture(page,device,'cut',evidenceName);
   // Finish actionability/scroll work before timing starts. A locator tap after
   // observing the needle would wait for a moving camera and miss the window.
   await button.scrollIntoViewIfNeeded();await waitForCamera(page);
@@ -328,7 +328,7 @@ async function checkCustomCadence(browser,url){
    const before=await snapshot(page);
    assert.equal(before.patternsCompleted,count);
    assert.equal(before.patternLevel,1+Math.floor(count/2),'long orders increase difficulty every two patterns, not only at day end');
-   await chooseGem(page);await cutGem(page);await polishByTapping(page,'desktop',true);
+   await chooseGem(page);await cutGem(page,'desktop','cadence');await polishByTapping(page,'desktop',true);
    await choosePaper(page,['hearts','stripes','stars'][count%3],'desktop');
    await activate(page,page.locator('.gf-gift-action'),'desktop');
    await page.waitForFunction(()=>FG.runtime.snapshot().state.stage!=='ship');
@@ -339,7 +339,7 @@ async function checkCustomCadence(browser,url){
   await page.evaluate(()=>window.factoryContract.next());
   assert.equal((await snapshot(page)).patternLevel,3,'an odd-sized order carries its half-finished tier into the next day');
   assert.equal((await snapshot(page)).patternIndex,5);
-  await chooseGem(page);await cutGem(page);await polishByTapping(page,'desktop',true);
+  await chooseGem(page);await cutGem(page,'desktop','cadence');await polishByTapping(page,'desktop',true);
   await activate(page,page.locator('.gf-gift-action'),'desktop');
   await page.waitForFunction(()=>FG.runtime.snapshot().state.stage==='pick');
   assert.equal((await snapshot(page)).patternLevel,4,'the sixth completed pattern opens tier four');
@@ -537,7 +537,7 @@ async function checkCustomCadence(browser,url){
   try{
    const page=await reduced.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
    await page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime);await exploreWelcome(page);await openFactory(page);
-   await checkPattern(page);await checkSortingLayout(page);await chooseGem(page,'phone');await missCut(page,'phone-reduced');await chooseGem(page,'phone');await cutGem(page,'phone');await polishByTapping(page,'phone');await choosePaper(page,'stars','phone');
+   await checkPattern(page);await checkSortingLayout(page);await chooseGem(page,'phone');await missCut(page,'phone-reduced');await chooseGem(page,'phone');await cutGem(page,'phone','phone-reduced');await polishByTapping(page,'phone');await choosePaper(page,'stars','phone');
    await capture(page,'phone-reduced','pack');
    assert.equal((await snapshot(page)).stage,'pack','reduced motion preserves physical play and the complete interaction');
    console.log('PASS Gem Factory reduced motion: pattern sorting, on-line stations and wrapping choices remain playable');

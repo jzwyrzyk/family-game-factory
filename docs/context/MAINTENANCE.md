@@ -53,6 +53,8 @@ An **updated** review for an impacted area must have an applicable document chan
 
 ## 3. Automatic repository checks
 
+CI policy and test assignment are maintained with application contracts. Changes to the test manifest, classifier, aggregate checks or evidence verifier require validation and delivery reviews. New suites must have an explicit shard assignment; the coverage check rejects missing, duplicated and unassigned commands. Compare elapsed time, cumulative runner minutes, queue time and first-attempt outcomes before claiming a speed improvement. Preserve failure receipts and distinguish fixture regression from visual, device, provider and owner acceptance. See the [CI evidence guide](../evidence/README.md#ci-architecture-and-performance).
+
 [Documentation workflow](../../.github/workflows/documentation.yml) runs on pull requests, pushes to main, a weekly schedule and manual dispatch. It checks canonical file/link integrity, source coverage, content fingerprints and review records. It warns when an area has not been reviewed within its declared interval; routine age warnings do not block unrelated development. Content mismatches or invalid required records fail the check.
 
 The workflow uses a read-only token, does not execute a deployment, call a model, auto-refresh review records or write new claims to main. It prints deterministic source digests as diagnostics; printing a digest does not record or approve a semantic review. Its report explains what needs attention. It does not prove that prose is correct, that an external service is healthy, or that an accepted idea was implemented faithfully.

@@ -97,6 +97,8 @@ Run `npm run docs:check` after changes and record each affected area review as d
 
 ## Tests
 
+The [CI architecture and evidence guide](docs/evidence/README.md#ci-architecture-and-performance) describes the source-bound browser shards, conservative change classification, exact evidence reuse, performance reporting and three validation tiers. New functionality needs meaningful validation without automatically lengthening every routine PR's critical path. Assign new suites explicitly and run `npm run test:ci` to check the orchestration contracts; `npm test` remains the complete local regression entry point.
+
 ```sh
 npm ci
 npx playwright install --with-deps chromium

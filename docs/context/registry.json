@@ -108,7 +108,8 @@
     "docs/pals/previews/*.md",
     "docs/operations/*.md",
     "docs/speech/*.md",
-    "docs/bubble-gum-builders/*.md"
+    "docs/bubble-gum-builders/*.md",
+    "docs/evidence/README.md"
   ],
   "areas": [
     {
@@ -858,13 +859,14 @@
         "tests/**",
         "tools/**",
         "scripts/verify-brand-assets.mjs",
-        "scripts/tests/verify-pal-assets.test.mjs"
+        "scripts/tests/verify-pal-assets.test.mjs",
+        "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:54:44.529Z",
-      "sourceDigest": "9fb64a023aabdbdd877544ea349c9701605d964aa9fec17f18dd618c4c4f38fb",
+      "reviewedAt": "2026-11-24T04:40:29.260Z",
+      "sourceDigest": "55c028caadabfb148ed21e7387331988550797fc18b72ce9c225d3db00d3330c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the exact collection GET fixture and bounded observed-time countdown helper; retained strict unknown-request, paid-build, phase and duration assertions. Delivery state records the full child-journey pass and ten Bubble Gum cases with 22 launch receipts on supplemental Chromium 156, preserved original CI failures, and fresh hosted results pending.",
+      "reviewReason": "Reviewed the measured 550-second Mining dependency installation and preserved every visual assertion, viewport, capture and timeout while applying the hosted-verified Chromium-only setup pattern. The 99 CI contracts and workflow lint pass; new-source visual acceptance remains pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1026,6 +1028,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Integrated PR120 fixture correction 79ccb6f while preserving the Actions first-paint fix and all product source. Full combined unit passes 486/486; component notebook/workspace/backup 60/60 and art 24/24, build/typecheck/syntax checks pass. Stronger draft, compensation and legacy-art recovery assertions remain; Chromium is launch-blocked and corrected hosted browser gates are pending.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:54:39.791Z",
+          "sourceDigest": "577031884d07b5447321967f767506857e88cdb3f0d6817369986ee6e880c1cd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed observed thirteen-shard coverage, bounded scheduling adjustment and corrected performance reporter cancellation accounting: a deliberately cancelled run remains cancelled while all failed aggregates remain visible. Guide records actual first hosted pass, queue delays, runner increase, artifact growth and byte-day reduction, preserving all failed/cancelled history.",
+          "sourceCommit": "3af84756050c0bb4dbb63ee47a2e8835183cfc68"
         }
       ]
     },
@@ -1038,7 +1047,8 @@
         "docs/assignment-006/*.md",
         "docs/operations/*.md",
         "docs/mind-your-jems/*.md",
-        "docs/bubble-gum-builders/*.md"
+        "docs/bubble-gum-builders/*.md",
+        "docs/evidence/README.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1055,10 +1065,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T14:41:04.120Z",
-      "sourceDigest": "9e5fca2b4b44e1c0f56910c5a750803c0cbe628385b0c23ffcf8aa6ace8358bc",
+      "reviewedAt": "2026-11-24T15:11:33.088Z",
+      "sourceDigest": "620d1066da553574fd4d440cc4894952ae8aad4f748a98ff0f0fd89c978e5e85",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded actual protected PR152 promotion, independent serving and recovery observation, exact-source Pages deployment with all eight shards, first-attempt phone failure and unchanged passing retry, live asset hashes and browser continuity, update recovery and approved unverified authenticated/pending-work limits.",
+      "reviewReason": "Rebased the complete CI tree onto PR161 protected merge; preserved completed cutover and all acceptance gaps, distinguished released timing hold from pending PR154/157 owner approvals, and verified all original96 leaf argv/multiplicities with no production workflow or intent changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1234,6 +1244,20 @@
           "reviewOutcome": "updated",
           "reviewReason": "Added exact PR120 hosted failure evidence and narrow fixture corrections on integration base 2ccd585, preserving previous combined and Actions synchronization entries. Recorded full combined unit 486/486, scoped local verification and browser launch limitation. Hosted reruns and the separate baseline Pal decode issue remain unresolved; no merge or deployment is claimed.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:54:40.183Z",
+          "sourceDigest": "ac5ef10ca3de7dba141f3970d9585fee552398894c365e6996b74b214dcbe2cf",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded passing initial hosted Arcade45321205281 and measured55.27percent elapsed reduction with49.13 runner-minutes and explicit storage tradeoffs. Updated bounded concurrency10 based on observed second-wave queueing; initial Bubble Gum review still running. No production workflow or permission change and merge/activation remain held.",
+          "sourceCommit": "3af84756050c0bb4dbb63ee47a2e8835183cfc68"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:35:44.656Z",
+          "sourceDigest": "181785b1cc9ec3bd8de726a6a289600718f744e7ec9df2c007bbbae47ba98268",
+          "reviewOutcome": "updated",
+          "reviewReason": "Restricted reflected dispatch revisions to supported public selector formats and five recorded historical names, retained service-wide platform revision attribution, and recorded the verified hosted fixture download in the delivery ledger.",
+          "sourceCommit": "2c4751611cbd40ef04a85432845cd260528f5a56"
         }
       ]
     },
@@ -1256,10 +1280,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:23.963Z",
-      "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
+      "reviewedAt": "2026-11-24T15:12:05.993Z",
+      "sourceDigest": "0fdb289200a048e83ee3e9691c0927be0886e266c7221687baec14577a373792",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
+      "reviewReason": "Reviewed the PR template addition requiring exact CI identities, selection scope,96-command coverage, first-attempt outcomes and measured performance against the existing evidence guide; routing and maintenance authority remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

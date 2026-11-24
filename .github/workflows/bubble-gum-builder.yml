@@ -37,7 +37,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: npm run build
         id: build
       - name: Preserve legacy workshop and Studio histories
@@ -70,7 +70,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Isolate touch transport on plain controls
         run: node tests/bubble-gum-touch-probe.cjs
       - name: Upload touch transport event evidence
@@ -91,7 +91,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: npm run build
         id: build
       - name: Verify construction, saves and progression rules

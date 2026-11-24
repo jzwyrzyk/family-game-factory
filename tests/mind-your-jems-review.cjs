@@ -38,10 +38,12 @@ exports.createReview=async browser=>{
  const manifest={build:JSON.parse(fs.readFileSync('dist/build-info.json','utf8')),browser:browser.version(),
   artifactKind:'actual-browser-capture',surface:'shared native play view',backend:'deterministic mocked build statuses; no paid AI generation',
   viewports:[],captures:[],checks:[],errors:[]};
- const comparisonPage=await browser.newPage({viewport:{width:32,height:32}});
  const update=process.env.MYJ_UPDATE_BASELINES==='1',compare=process.env.MYJ_VISUAL_COMPARE==='1';
  assert.ok(!(update&&compare),'Use baseline update or comparison, never both together.');
  if(update)assert.ok(!process.env.CI,'CI cannot silently approve new visual baselines.');
+ // Functional journeys and baseline capture do not compare pixels. Avoid an
+ // unused browser context in those runs; visual acceptance still uses it.
+ const comparisonPage=compare?await browser.newPage({viewport:{width:32,height:32}}):null;
  const baselineCandidates=new Map();
  let comparisonCount=0;
  const visualFailures=[];
@@ -88,7 +90,7 @@ exports.createReview=async browser=>{
     visualFailures.push('Expected all nine approved views; compared '+comparisonCount+'.');
    manifest.errors.push(...visualFailures);
    fs.writeFileSync(path.join(directory,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
-   await comparisonPage.close();
+   await comparisonPage?.close();
    if(update&&!manifest.errors.length){
     assert.equal(baselineCandidates.size,9,'Review all three devices and all three states before accepting the baseline set.');
     fs.mkdirSync(baselineDirectory,{recursive:true});
