@@ -1,5 +1,15 @@
 # jems delivery state
 
+## November 24, 2026 — PR157 approved and merged; shared DEV/TEST verifier integration
+
+The owner explicitly approved PR157 at `3d03328f09a535b22c785716dfe131d5dbe70487`. It merged as **`81a05ae8aca0576be3a56911ed8beec431e36de5`**, identical tree `83918457c16cda230d9056bb0549b60408230de4` to tested prospective merge `8c087b0465cc5a9fb3cc54d5619cb7f271d90e1a`. All10 workflow executions passed on attempt1 at that corrected head. Full [Arcade45427363404](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45427363404) took **509seconds (8m29s), 51.85 runner-minutes**, maximum individual queue240seconds. Downloaded validation artifact14937892158, ZIP SHA-256 `f9a11145c2c289fd3e8feee068ca990beaf10c93ece76fed80e3f5c79cd535e3`, independently verifies13 successful suites and96 zero-exit commands. The earlier failed source/run remains recorded below.
+
+The initial post-integration full [main run45430611547](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45430611547) is running. Protected-main reuse is installed, but no successful main fast-path claim is made until the actual runs are verified. No production workflow or release intent was dispatched or changed.
+
+This continuation installs the shared DEV/TEST full-evidence verifier and its negative tests on the CI integration branch, with a mandatory preparation check. PR155's source consumers are reconciled with approved main; its controller, environment configuration and cloud setup stay disabled and separate. The shared adapter accepts no reused-main substitute for TEST and grants no deployment authority. Local reconciliation previously passed112 environment tests,6 smoke-runner tests,118 CI contracts and239 operations tests; this focused integration requires its own hosted validation.
+
+Dependency coverage remains advisory. Inspection of actual representative game/UI/learning/coding/conversation modules found3/2/105/3/96 static consumers respectively; learning and conversation each reached40 ambiguous modules. Static graphs do not prove omitted-test safety. All five executable categories, shared/security-sensitive/unknown changes remain full; no3–6minute narrower-coverage claim is made.
+
 ## November 24, 2026 — PR154 merged and protected-main validation passed; PR157 activation under review
 
 The owner explicitly approved PR154 at `c6a238725ce84a08a84dba4c6a65c8cfd4f91709`. It merged as **`c73472554d56148541d5ed3fed2641b7c0f15ee0`**. GitHub's tested prospective merge `b86ff71c26f570a54a3869f0e5c510a79629a244` and actual main have identical tree `56f7c98f2ae69e649cabcf64c6d3b4dc95294118`. All14 workflows passed on attempt1; [Arcade45422762348](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45422762348) executed all96 commands and full receipt production in **595seconds (9m55s), 52.02 runner-minutes**. The original baseline was1301seconds /37.63 runner-minutes. All14 workflows consumed87.45 runner-minutes, including1.75 minutes from three duplicate branch contract runs. This PR sample meets the full elapsed objective but increases per-run runner use; it is not yet main activation evidence.
