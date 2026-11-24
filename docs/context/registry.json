@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T01:49:49.120Z",
-      "sourceDigest": "23b6dca8f6561b24776c8106220a92f460502fc024c000f5922bae4d89b1dcf3",
+      "reviewedAt": "2026-11-24T01:51:12.836Z",
+      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the mutually exclusive metadata observation mode using the existing release identity after Cloud Shell quota exhaustion; recorded actual Coach promotion and owner reply, Gateway stage, pending observation limits, and unchanged historical activation pins.",
+      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

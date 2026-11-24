@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — Gateway canary prepared behind the ordered backend transitions
+
+A separate Gateway canary intent is prepared on top of staged-release head `c2176c0d557f8751ec71f1263d2adc726dd5d0c0`. It changes only the Gateway operation from stage to canary, retaining the same source, signed image, baseline image/revision, configuration fingerprint and exact compatibility receipt. It targets baseline95/candidate5 through the unchanged controller. This is preparation only: Coach promotion PR148 and Gateway stage PR147 must each merge and complete their live transition successfully before this canary intent may merge. Exact-head source checks can run in advance; neither their success nor this entry establishes staging, canary readiness, a traffic change or functional acceptance.
+
+Before merge, review the actual predecessor receipts, any stage/lifecycle errors and current main/head/tree. The controller must still verify the exact single-serving Gateway baseline, ready candidate, immutable images/configuration, tags and etag at execution. Stop on drift or an unresolved stage error. After a successful canary transition, obtain candidate-specific Gateway request/response evidence and review errors before preparing promotion. No automatic paid replay, Pages publication, provider/budget/IAM/worker change or data cleanup is included. Existing Coach promotion evidence remains bounded to the actual replies and request metadata recorded below.
+
 ## November 23, 2026 — Cloud Shell quota exhausted; existing release metadata route prepared
 
 The owner confirmed Cloud Shell's **50-hour weekly quota** after reporting a successful post-promotion Adult chat reply. The terminal quota does not stop deployed Cloud Run services. The owner-side backend handoff in [draft PR150](https://github.com/jzwyrzyk/family-game-factory/pull/150), source `c32d8ee17ea7acf5eb4623835d448d434e9cb3cb`, was prepared and tested but has not run. Its fixed-main source is retained as a historical handoff, not live evidence.
